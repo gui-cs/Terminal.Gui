@@ -1,0 +1,123 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ISeries
+  commentId: T:Terminal.Gui.ISeries
+  id: ISeries
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  langs:
+  - csharp
+  - vb
+  name: ISeries
+  nameWithType: ISeries
+  fullName: Terminal.Gui.ISeries
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Series.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ISeries
+    path: ../Terminal.Gui/Views/GraphView/Series.cs
+    startLine: 11
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Describes a series of data that can be rendered into a <xref href="Terminal.Gui.GraphView" data-throw-if-not-resolved="false"></xref>&gt;
+  example: []
+  syntax:
+    content: public interface ISeries
+    content.vb: Public Interface ISeries
+- uid: Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  id: DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.ISeries
+  langs:
+  - csharp
+  - vb
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  nameWithType: ISeries.DrawSeries(GraphView, Rect, RectangleF)
+  fullName: Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Series.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DrawSeries
+    path: ../Terminal.Gui/Views/GraphView/Series.cs
+    startLine: 20
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Draws the <code class="paramref">graphBounds</code> section of a series into the
+
+    <code class="paramref">graph</code> view <code class="paramref">drawBounds</code>
+  example: []
+  syntax:
+    content: void DrawSeries(GraphView graph, Rect drawBounds, RectangleF graphBounds)
+    parameters:
+    - id: graph
+      type: Terminal.Gui.GraphView
+      description: Graph series is to be drawn onto
+    - id: drawBounds
+      type: Terminal.Gui.Rect
+      description: Visible area of the graph in Console Screen units (excluding margins)
+    - id: graphBounds
+      type: Terminal.Gui.RectangleF
+      description: Visible area of the graph in Graph space units
+    content.vb: Sub DrawSeries(graph As GraphView, drawBounds As Rect, graphBounds As RectangleF)
+  overload: Terminal.Gui.ISeries.DrawSeries*
+references:
+- uid: Terminal.Gui.GraphView
+  commentId: T:Terminal.Gui.GraphView
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphView.html
+  name: GraphView
+  nameWithType: GraphView
+  fullName: Terminal.Gui.GraphView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ISeries.DrawSeries*
+  commentId: Overload:Terminal.Gui.ISeries.DrawSeries
+  href: Terminal.Gui.ISeries.html#Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries
+  nameWithType: ISeries.DrawSeries
+  fullName: Terminal.Gui.ISeries.DrawSeries
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  href: Terminal.Gui.Rect.html
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.RectangleF
+  commentId: T:Terminal.Gui.RectangleF
+  parent: Terminal.Gui
+  href: Terminal.Gui.RectangleF.html
+  name: RectangleF
+  nameWithType: RectangleF
+  fullName: Terminal.Gui.RectangleF
+shouldSkipMarkup: true

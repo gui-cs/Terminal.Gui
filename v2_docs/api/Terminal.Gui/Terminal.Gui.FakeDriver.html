@@ -1,0 +1,780 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class FakeDriver
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class FakeDriver
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../../">
+  
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.FakeDriver">
+
+
+
+  <h1 id="Terminal_Gui_FakeDriver" data-uid="Terminal.Gui.FakeDriver" class="text-break">Class FakeDriver
+</h1>
+  <div class="markdown level0 summary">Implements a mock ConsoleDriver for unit testing</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a></div>
+    <div class="level2"><span class="xref">FakeDriver</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SizeChanged">ConsoleDriver.SizeChanged</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnSizeChanged_Terminal_Gui_SizeChangedEventArgs_">ConsoleDriver.OnSizeChanged(SizeChangedEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Cols">ConsoleDriver.Cols</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Rows">ConsoleDriver.Rows</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Left">ConsoleDriver.Left</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Top">ConsoleDriver.Top</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clipboard">ConsoleDriver.Clipboard</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Contents">ConsoleDriver.Contents</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Col">ConsoleDriver.Col</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Row">ConsoleDriver.Row</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Move_System_Int32_System_Int32_">ConsoleDriver.Move(int, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_IsRuneSupported_System_Text_Rune_">ConsoleDriver.IsRuneSupported(Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_System_Text_Rune_">ConsoleDriver.AddRune(Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddRune_System_Char_">ConsoleDriver.AddRune(char)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_AddStr_System_String_">ConsoleDriver.AddStr(string)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_IsValidLocation_System_Int32_System_Int32_">ConsoleDriver.IsValidLocation(int, int)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Clip">ConsoleDriver.Clip</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_ClearContents">ConsoleDriver.ClearContents()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_CurrentAttribute">ConsoleDriver.CurrentAttribute</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetAttribute_Terminal_Gui_Attribute_">ConsoleDriver.SetAttribute(Attribute)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetAttribute">ConsoleDriver.GetAttribute()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MakeColor_Terminal_Gui_Color_Terminal_Gui_Color_">ConsoleDriver.MakeColor(Color, Color)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_KeyPressed">ConsoleDriver.KeyPressed</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnKeyPressed_Terminal_Gui_KeyEventArgs_">ConsoleDriver.OnKeyPressed(KeyEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_KeyUp">ConsoleDriver.KeyUp</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnKeyUp_Terminal_Gui_KeyEventArgs_">ConsoleDriver.OnKeyUp(KeyEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_KeyDown">ConsoleDriver.KeyDown</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnKeyDown_Terminal_Gui_KeyEventArgs_">ConsoleDriver.OnKeyDown(KeyEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_MouseEvent">ConsoleDriver.MouseEvent</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_OnMouseEvent_Terminal_Gui_MouseEventEventArgs_">ConsoleDriver.OnMouseEvent(MouseEventEventArgs)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Diagnostics">ConsoleDriver.Diagnostics</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_FillRect_Terminal_Gui_Rect_System_Text_Rune_">ConsoleDriver.FillRect(Rect, Rune)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_FillRect_Terminal_Gui_Rect_System_Char_">ConsoleDriver.FillRect(Rect, char)</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetVersionInfo">ConsoleDriver.GetVersionInfo()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.html">Terminal</a>.<a class="xref" href="Terminal.Gui.html">Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_FakeDriver_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class FakeDriver : ConsoleDriver</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L41">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver__ctor_" data-uid="Terminal.Gui.FakeDriver.#ctor*"></a>
+  <h4 id="Terminal_Gui_FakeDriver__ctor" data-uid="Terminal.Gui.FakeDriver.#ctor">FakeDriver()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FakeDriver()</code></pre>
+  </div>
+  <h3 id="fields">Fields
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_FakeBehaviors.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.FakeBehaviors%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L37">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_FakeDriver_FakeBehaviors" data-uid="Terminal.Gui.FakeDriver.FakeBehaviors">FakeBehaviors</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FakeDriver.Behaviors FakeBehaviors</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.FakeDriver.html">FakeDriver</a>.<a class="xref" href="Terminal.Gui.FakeDriver.Behaviors.html">Behaviors</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_SupportsTrueColor.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SupportsTrueColor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L39">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_SupportsTrueColor_" data-uid="Terminal.Gui.FakeDriver.SupportsTrueColor*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SupportsTrueColor" data-uid="Terminal.Gui.FakeDriver.SupportsTrueColor">SupportsTrueColor</h4>
+  <div class="markdown level1 summary">Gets whether the <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a> supports TrueColor output.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool SupportsTrueColor { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SupportsTrueColor">ConsoleDriver.SupportsTrueColor</a></div>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_EnsureCursorVisibility.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.EnsureCursorVisibility%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L398">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_EnsureCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.EnsureCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_EnsureCursorVisibility" data-uid="Terminal.Gui.FakeDriver.EnsureCursorVisibility">EnsureCursorVisibility()</h4>
+  <div class="markdown level1 summary">Determines if the terminal cursor should be visible or not and sets it accordingly.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool EnsureCursorVisibility()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_EnsureCursorVisibility">ConsoleDriver.EnsureCursorVisibility()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_FromVKPacketToKConsoleKeyInfo_System_ConsoleKeyInfo_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L202">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_FromVKPacketToKConsoleKeyInfo_" data-uid="Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_FromVKPacketToKConsoleKeyInfo_System_ConsoleKeyInfo_" data-uid="Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)">FromVKPacketToKConsoleKeyInfo(ConsoleKeyInfo)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo(ConsoleKeyInfo consoleKeyInfo)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.consolekeyinfo">ConsoleKeyInfo</a></td>
+        <td><span class="parametername">consoleKeyInfo</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.consolekeyinfo">ConsoleKeyInfo</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility%40)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L381">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_GetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__" data-uid="Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)">GetCursorVisibility(out CursorVisibility)</h4>
+  <div class="markdown level1 summary">Gets the terminal cursor visibility.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool GetCursorVisibility(out CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The current <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_GetCursorVisibility_Terminal_Gui_CursorVisibility__">ConsoleDriver.GetCursorVisibility(out CursorVisibility)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_Refresh.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Refresh%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L177">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_Refresh_" data-uid="Terminal.Gui.FakeDriver.Refresh*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_Refresh" data-uid="Terminal.Gui.FakeDriver.Refresh">Refresh()</h4>
+  <div class="markdown level1 summary">Updates the screen to reflect all the changes that have been done to the display buffer</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Refresh()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Refresh">ConsoleDriver.Refresh()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_ResizeScreen.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.ResizeScreen%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L452">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_ResizeScreen_" data-uid="Terminal.Gui.FakeDriver.ResizeScreen*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_ResizeScreen" data-uid="Terminal.Gui.FakeDriver.ResizeScreen">ResizeScreen()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void ResizeScreen()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SendKeys(System.Char%2CSystem.ConsoleKey%2CSystem.Boolean%2CSystem.Boolean%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L411">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_SendKeys_" data-uid="Terminal.Gui.FakeDriver.SendKeys*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_" data-uid="Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)">SendKeys(char, ConsoleKey, bool, bool, bool)</h4>
+  <div class="markdown level1 summary">Simulates a key press.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void SendKeys(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.char">char</a></td>
+        <td><span class="parametername">keyChar</span></td>
+        <td>The key character.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.consolekey">ConsoleKey</a></td>
+        <td><span class="parametername">key</span></td>
+        <td>The key.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">shift</span></td>
+        <td>If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> simulates the Shift key being pressed.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">alt</span></td>
+        <td>If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> simulates the Alt key being pressed.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">control</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SendKeys_System_Char_System_ConsoleKey_System_Boolean_System_Boolean_System_Boolean_">ConsoleDriver.SendKeys(char, ConsoleKey, bool, bool, bool)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_SetBufferSize_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetBufferSize(System.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L416">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_SetBufferSize_" data-uid="Terminal.Gui.FakeDriver.SetBufferSize*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetBufferSize_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)">SetBufferSize(int, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetBufferSize(int width, int height)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">width</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">height</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L391">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_SetCursorVisibility_" data-uid="Terminal.Gui.FakeDriver.SetCursorVisibility*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_" data-uid="Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)">SetCursorVisibility(CursorVisibility)</h4>
+  <div class="markdown level1 summary">Sets the terminal cursor visibility.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool SetCursorVisibility(CursorVisibility visibility)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+        <td><span class="parametername">visibility</span></td>
+        <td>The wished <a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> upon success</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_SetCursorVisibility_Terminal_Gui_CursorVisibility_">ConsoleDriver.SetCursorVisibility(CursorVisibility)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_SetWindowPosition_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L436">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_SetWindowPosition_" data-uid="Terminal.Gui.FakeDriver.SetWindowPosition*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetWindowPosition_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)">SetWindowPosition(int, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetWindowPosition(int left, int top)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">top</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_SetWindowSize_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.SetWindowSize(System.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L425">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_SetWindowSize_" data-uid="Terminal.Gui.FakeDriver.SetWindowSize*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_SetWindowSize_System_Int32_System_Int32_" data-uid="Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)">SetWindowSize(int, int)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void SetWindowSize(int width, int height)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">width</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">height</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_Suspend.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.Suspend%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L489">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_Suspend_" data-uid="Terminal.Gui.FakeDriver.Suspend*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_Suspend" data-uid="Terminal.Gui.FakeDriver.Suspend">Suspend()</h4>
+  <div class="markdown level1 summary">Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Suspend()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Suspend">ConsoleDriver.Suspend()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_UpdateCursor.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.UpdateCursor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L471">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_UpdateCursor_" data-uid="Terminal.Gui.FakeDriver.UpdateCursor*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_UpdateCursor" data-uid="Terminal.Gui.FakeDriver.UpdateCursor">UpdateCursor()</h4>
+  <div class="markdown level1 summary">Sets the position of the terminal cursor to <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Col">Col</a> and <a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_Row">Row</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void UpdateCursor()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateCursor">ConsoleDriver.UpdateCursor()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver_UpdateScreen.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver.UpdateScreen%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L85">View Source</a>
+  </span>
+  <a id="Terminal_Gui_FakeDriver_UpdateScreen_" data-uid="Terminal.Gui.FakeDriver.UpdateScreen*"></a>
+  <h4 id="Terminal_Gui_FakeDriver_UpdateScreen" data-uid="Terminal.Gui.FakeDriver.UpdateScreen">UpdateScreen()</h4>
+  <div class="markdown level1 summary">Redraws the physical screen with the contents that have been queued up via any of the printing commands.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void UpdateScreen()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.ConsoleDriver.html#Terminal_Gui_ConsoleDriver_UpdateScreen">ConsoleDriver.UpdateScreen()</a></div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_FakeDriver.md&amp;value=---%0Auid%3A%20Terminal.Gui.FakeDriver%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs/#L16" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,711 @@
+### YamlMime:TableOfContent
+items:
+- uid: Terminal.Gui
+  name: Terminal.Gui
+  items:
+  - uid: Terminal.Gui.AllowedType
+    name: AllowedType
+  - uid: Terminal.Gui.AllowedTypeAny
+    name: AllowedTypeAny
+  - uid: Terminal.Gui.AppendAutocomplete
+    name: AppendAutocomplete
+  - uid: Terminal.Gui.Application
+    name: Application
+  - uid: Terminal.Gui.AppScope
+    name: AppScope
+  - uid: Terminal.Gui.AspectGetterDelegate`1
+    name: AspectGetterDelegate<T>
+    name.vb: AspectGetterDelegate(Of T)
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+  - uid: Terminal.Gui.AutocompleteBase
+    name: AutocompleteBase
+  - uid: Terminal.Gui.AutocompleteContext
+    name: AutocompleteContext
+  - uid: Terminal.Gui.Axis
+    name: Axis
+  - uid: Terminal.Gui.AxisIncrementToRender
+    name: AxisIncrementToRender
+  - uid: Terminal.Gui.BarSeries
+    name: BarSeries
+  - uid: Terminal.Gui.BarSeriesBar
+    name: BarSeriesBar
+  - uid: Terminal.Gui.Button
+    name: Button
+  - uid: Terminal.Gui.Cell
+    name: Cell
+  - uid: Terminal.Gui.CellActivatedEventArgs
+    name: CellActivatedEventArgs
+  - uid: Terminal.Gui.CellColorGetterArgs
+    name: CellColorGetterArgs
+  - uid: Terminal.Gui.CellColorGetterDelegate
+    name: CellColorGetterDelegate
+  - uid: Terminal.Gui.CellToggledEventArgs
+    name: CellToggledEventArgs
+  - uid: Terminal.Gui.CheckBox
+    name: CheckBox
+  - uid: Terminal.Gui.CheckBoxTableSourceWrapperBase
+    name: CheckBoxTableSourceWrapperBase
+  - uid: Terminal.Gui.CheckBoxTableSourceWrapperByIndex
+    name: CheckBoxTableSourceWrapperByIndex
+  - uid: Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+    name: CheckBoxTableSourceWrapperByObject<T>
+    name.vb: CheckBoxTableSourceWrapperByObject(Of T)
+  - uid: Terminal.Gui.Clipboard
+    name: Clipboard
+  - uid: Terminal.Gui.ClipboardBase
+    name: ClipboardBase
+  - uid: Terminal.Gui.CollectionNavigator
+    name: CollectionNavigator
+  - uid: Terminal.Gui.CollectionNavigatorBase
+    name: CollectionNavigatorBase
+  - uid: Terminal.Gui.Color
+    name: Color
+  - uid: Terminal.Gui.ColorEventArgs
+    name: ColorEventArgs
+  - uid: Terminal.Gui.ColorName
+    name: ColorName
+  - uid: Terminal.Gui.ColorPicker
+    name: ColorPicker
+  - uid: Terminal.Gui.Colors
+    name: Colors
+  - uid: Terminal.Gui.ColorScheme
+    name: ColorScheme
+  - uid: Terminal.Gui.ColumnStyle
+    name: ColumnStyle
+  - uid: Terminal.Gui.ComboBox
+    name: ComboBox
+  - uid: Terminal.Gui.Command
+    name: Command
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+  - uid: Terminal.Gui.ConfigurationManager
+    name: ConfigurationManager
+  - uid: Terminal.Gui.ConfigurationManager.ConfigLocations
+    name: ConfigurationManager.ConfigLocations
+  - uid: Terminal.Gui.ConfigurationManagerEventArgs
+    name: ConfigurationManagerEventArgs
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+  - uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+    name: ConsoleDriver.DiagnosticFlags
+  - uid: Terminal.Gui.ConsoleKeyMapping
+    name: ConsoleKeyMapping
+  - uid: Terminal.Gui.ContentsChangedEventArgs
+    name: ContentsChangedEventArgs
+  - uid: Terminal.Gui.ContextMenu
+    name: ContextMenu
+  - uid: Terminal.Gui.CursorVisibility
+    name: CursorVisibility
+  - uid: Terminal.Gui.DataTableSource
+    name: DataTableSource
+  - uid: Terminal.Gui.DateField
+    name: DateField
+  - uid: Terminal.Gui.DateTimeEventArgs`1
+    name: DateTimeEventArgs<T>
+    name.vb: DateTimeEventArgs(Of T)
+  - uid: Terminal.Gui.DefaultFileOperations
+    name: DefaultFileOperations
+  - uid: Terminal.Gui.DelegateTreeBuilder`1
+    name: DelegateTreeBuilder<T>
+    name.vb: DelegateTreeBuilder(Of T)
+  - uid: Terminal.Gui.Dialog
+    name: Dialog
+  - uid: Terminal.Gui.Dialog.ButtonAlignments
+    name: Dialog.ButtonAlignments
+  - uid: Terminal.Gui.Dim
+    name: Dim
+  - uid: Terminal.Gui.DisplayModeLayout
+    name: DisplayModeLayout
+  - uid: Terminal.Gui.DrawEventArgs
+    name: DrawEventArgs
+  - uid: Terminal.Gui.DrawTreeViewLineEventArgs`1
+    name: DrawTreeViewLineEventArgs<T>
+    name.vb: DrawTreeViewLineEventArgs(Of T)
+  - uid: Terminal.Gui.EnumerableTableSource`1
+    name: EnumerableTableSource<T>
+    name.vb: EnumerableTableSource(Of T)
+  - uid: Terminal.Gui.EscSeqReqStatus
+    name: EscSeqReqStatus
+  - uid: Terminal.Gui.EscSeqRequests
+    name: EscSeqRequests
+  - uid: Terminal.Gui.EscSeqUtils
+    name: EscSeqUtils
+  - uid: Terminal.Gui.EscSeqUtils.ClearScreenOptions
+    name: EscSeqUtils.ClearScreenOptions
+  - uid: Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+    name: EscSeqUtils.DECSCUSR_Style
+  - uid: Terminal.Gui.FakeConsole
+    name: FakeConsole
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+  - uid: Terminal.Gui.FakeDriver.Behaviors
+    name: FakeDriver.Behaviors
+  - uid: Terminal.Gui.FakeDriver.FakeClipboard
+    name: FakeDriver.FakeClipboard
+  - uid: Terminal.Gui.FileDialog
+    name: FileDialog
+  - uid: Terminal.Gui.FileDialogStyle
+    name: FileDialogStyle
+  - uid: Terminal.Gui.FilesSelectedEventArgs
+    name: FilesSelectedEventArgs
+  - uid: Terminal.Gui.FileSystemColorProvider
+    name: FileSystemColorProvider
+  - uid: Terminal.Gui.FileSystemIconProvider
+    name: FileSystemIconProvider
+  - uid: Terminal.Gui.FileSystemTreeBuilder
+    name: FileSystemTreeBuilder
+  - uid: Terminal.Gui.FocusEventArgs
+    name: FocusEventArgs
+  - uid: Terminal.Gui.Frame
+    name: Frame
+  - uid: Terminal.Gui.FrameView
+    name: FrameView
+  - uid: Terminal.Gui.GlyphDefinitions
+    name: GlyphDefinitions
+  - uid: Terminal.Gui.GrabMouseEventArgs
+    name: GrabMouseEventArgs
+  - uid: Terminal.Gui.GraphCellToRender
+    name: GraphCellToRender
+  - uid: Terminal.Gui.GraphView
+    name: GraphView
+  - uid: Terminal.Gui.HexView
+    name: HexView
+  - uid: Terminal.Gui.HexViewEditEventArgs
+    name: HexViewEditEventArgs
+  - uid: Terminal.Gui.HexViewEventArgs
+    name: HexViewEventArgs
+  - uid: Terminal.Gui.HorizontalAxis
+    name: HorizontalAxis
+  - uid: Terminal.Gui.IAllowedType
+    name: IAllowedType
+  - uid: Terminal.Gui.IAnnotation
+    name: IAnnotation
+  - uid: Terminal.Gui.IAutocomplete
+    name: IAutocomplete
+  - uid: Terminal.Gui.IClipboard
+    name: IClipboard
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource<T>
+    name.vb: IEnumerableTableSource(Of T)
+  - uid: Terminal.Gui.IFileOperations
+    name: IFileOperations
+  - uid: Terminal.Gui.IListDataSource
+    name: IListDataSource
+  - uid: Terminal.Gui.ISearchMatcher
+    name: ISearchMatcher
+  - uid: Terminal.Gui.ISeries
+    name: ISeries
+  - uid: Terminal.Gui.ISuggestionGenerator
+    name: ISuggestionGenerator
+  - uid: Terminal.Gui.ITableSource
+    name: ITableSource
+  - uid: Terminal.Gui.IterationEventArgs
+    name: IterationEventArgs
+  - uid: Terminal.Gui.ITreeBuilder`1
+    name: ITreeBuilder<T>
+    name.vb: ITreeBuilder(Of T)
+  - uid: Terminal.Gui.ITreeNode
+    name: ITreeNode
+  - uid: Terminal.Gui.ITreeView
+    name: ITreeView
+  - uid: Terminal.Gui.ITreeViewFilter`1
+    name: ITreeViewFilter<T>
+    name.vb: ITreeViewFilter(Of T)
+  - uid: Terminal.Gui.Key
+    name: Key
+  - uid: Terminal.Gui.KeyChangedEventArgs
+    name: KeyChangedEventArgs
+  - uid: Terminal.Gui.KeyEvent
+    name: KeyEvent
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+  - uid: Terminal.Gui.KeyModifiers
+    name: KeyModifiers
+  - uid: Terminal.Gui.KeystrokeNavigatorEventArgs
+    name: KeystrokeNavigatorEventArgs
+  - uid: Terminal.Gui.Label
+    name: Label
+  - uid: Terminal.Gui.LabelGetterDelegate
+    name: LabelGetterDelegate
+  - uid: Terminal.Gui.LayoutEventArgs
+    name: LayoutEventArgs
+  - uid: Terminal.Gui.LayoutStyle
+    name: LayoutStyle
+  - uid: Terminal.Gui.LegendAnnotation
+    name: LegendAnnotation
+  - uid: Terminal.Gui.Line
+    name: Line
+  - uid: Terminal.Gui.LineCanvas
+    name: LineCanvas
+  - uid: Terminal.Gui.LineF
+    name: LineF
+  - uid: Terminal.Gui.LineStyle
+    name: LineStyle
+  - uid: Terminal.Gui.LineView
+    name: LineView
+  - uid: Terminal.Gui.ListColumnStyle
+    name: ListColumnStyle
+  - uid: Terminal.Gui.ListTableSource
+    name: ListTableSource
+  - uid: Terminal.Gui.ListView
+    name: ListView
+  - uid: Terminal.Gui.ListViewItemEventArgs
+    name: ListViewItemEventArgs
+  - uid: Terminal.Gui.ListViewRowEventArgs
+    name: ListViewRowEventArgs
+  - uid: Terminal.Gui.ListWrapper
+    name: ListWrapper
+  - uid: Terminal.Gui.MenuBar
+    name: MenuBar
+  - uid: Terminal.Gui.MenuBarItem
+    name: MenuBarItem
+  - uid: Terminal.Gui.MenuClosingEventArgs
+    name: MenuClosingEventArgs
+  - uid: Terminal.Gui.MenuItem
+    name: MenuItem
+  - uid: Terminal.Gui.MenuItemCheckStyle
+    name: MenuItemCheckStyle
+  - uid: Terminal.Gui.MenuOpenedEventArgs
+    name: MenuOpenedEventArgs
+  - uid: Terminal.Gui.MenuOpeningEventArgs
+    name: MenuOpeningEventArgs
+  - uid: Terminal.Gui.MessageBox
+    name: MessageBox
+  - uid: Terminal.Gui.MouseEvent
+    name: MouseEvent
+  - uid: Terminal.Gui.MouseEventEventArgs
+    name: MouseEventEventArgs
+  - uid: Terminal.Gui.MouseFlags
+    name: MouseFlags
+  - uid: Terminal.Gui.MouseFlagsChangedEventArgs
+    name: MouseFlagsChangedEventArgs
+  - uid: Terminal.Gui.MultiBarSeries
+    name: MultiBarSeries
+  - uid: Terminal.Gui.ObjectActivatedEventArgs`1
+    name: ObjectActivatedEventArgs<T>
+    name.vb: ObjectActivatedEventArgs(Of T)
+  - uid: Terminal.Gui.OpenDialog
+    name: OpenDialog
+  - uid: Terminal.Gui.OpenMode
+    name: OpenMode
+  - uid: Terminal.Gui.Orientation
+    name: Orientation
+  - uid: Terminal.Gui.OrientationEventArgs
+    name: OrientationEventArgs
+  - uid: Terminal.Gui.PathAnnotation
+    name: PathAnnotation
+  - uid: Terminal.Gui.Point
+    name: Point
+  - uid: Terminal.Gui.PointEventArgs
+    name: PointEventArgs
+  - uid: Terminal.Gui.PointF
+    name: PointF
+  - uid: Terminal.Gui.PopupAutocomplete
+    name: PopupAutocomplete
+  - uid: Terminal.Gui.Pos
+    name: Pos
+  - uid: Terminal.Gui.ProgressBar
+    name: ProgressBar
+  - uid: Terminal.Gui.ProgressBarFormat
+    name: ProgressBarFormat
+  - uid: Terminal.Gui.ProgressBarStyle
+    name: ProgressBarStyle
+  - uid: Terminal.Gui.RadioGroup
+    name: RadioGroup
+  - uid: Terminal.Gui.Rect
+    name: Rect
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+  - uid: Terminal.Gui.Responder
+    name: Responder
+  - uid: Terminal.Gui.RowColorGetterArgs
+    name: RowColorGetterArgs
+  - uid: Terminal.Gui.RowColorGetterDelegate
+    name: RowColorGetterDelegate
+  - uid: Terminal.Gui.Ruler
+    name: Ruler
+  - uid: Terminal.Gui.RuneCell
+    name: RuneCell
+  - uid: Terminal.Gui.RuneCellEventArgs
+    name: RuneCellEventArgs
+  - uid: Terminal.Gui.RuneExtensions
+    name: RuneExtensions
+  - uid: Terminal.Gui.RunState
+    name: RunState
+  - uid: Terminal.Gui.RunStateEventArgs
+    name: RunStateEventArgs
+  - uid: Terminal.Gui.SaveDialog
+    name: SaveDialog
+  - uid: Terminal.Gui.ScatterSeries
+    name: ScatterSeries
+  - uid: Terminal.Gui.Scope`1
+    name: Scope<T>
+    name.vb: Scope(Of T)
+  - uid: Terminal.Gui.ScrollBarView
+    name: ScrollBarView
+  - uid: Terminal.Gui.ScrollView
+    name: ScrollView
+  - uid: Terminal.Gui.SelectedCellChangedEventArgs
+    name: SelectedCellChangedEventArgs
+  - uid: Terminal.Gui.SelectedItemChangedArgs
+    name: SelectedItemChangedArgs
+  - uid: Terminal.Gui.SelectionChangedEventArgs`1
+    name: SelectionChangedEventArgs<T>
+    name.vb: SelectionChangedEventArgs(Of T)
+  - uid: Terminal.Gui.SerializableConfigurationProperty
+    name: SerializableConfigurationProperty
+  - uid: Terminal.Gui.SettingsScope
+    name: SettingsScope
+  - uid: Terminal.Gui.ShortcutHelper
+    name: ShortcutHelper
+  - uid: Terminal.Gui.SingleWordSuggestionGenerator
+    name: SingleWordSuggestionGenerator
+  - uid: Terminal.Gui.Size
+    name: Size
+  - uid: Terminal.Gui.SizeChangedEventArgs
+    name: SizeChangedEventArgs
+  - uid: Terminal.Gui.SizeF
+    name: SizeF
+  - uid: Terminal.Gui.Slider
+    name: Slider
+  - uid: Terminal.Gui.Slider`1
+    name: Slider<T>
+    name.vb: Slider(Of T)
+  - uid: Terminal.Gui.SliderAttributes
+    name: SliderAttributes
+  - uid: Terminal.Gui.SliderEventArgs`1
+    name: SliderEventArgs<T>
+    name.vb: SliderEventArgs(Of T)
+  - uid: Terminal.Gui.SliderOption`1
+    name: SliderOption<T>
+    name.vb: SliderOption(Of T)
+  - uid: Terminal.Gui.SliderOptionEventArgs
+    name: SliderOptionEventArgs
+  - uid: Terminal.Gui.SliderStyle
+    name: SliderStyle
+  - uid: Terminal.Gui.SliderType
+    name: SliderType
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+  - uid: Terminal.Gui.SpinnerStyle.Aesthetic
+    name: SpinnerStyle.Aesthetic
+  - uid: Terminal.Gui.SpinnerStyle.Aesthetic2
+    name: SpinnerStyle.Aesthetic2
+  - uid: Terminal.Gui.SpinnerStyle.Arc
+    name: SpinnerStyle.Arc
+  - uid: Terminal.Gui.SpinnerStyle.Arrow
+    name: SpinnerStyle.Arrow
+  - uid: Terminal.Gui.SpinnerStyle.Arrow2
+    name: SpinnerStyle.Arrow2
+  - uid: Terminal.Gui.SpinnerStyle.Arrow3
+    name: SpinnerStyle.Arrow3
+  - uid: Terminal.Gui.SpinnerStyle.Balloon
+    name: SpinnerStyle.Balloon
+  - uid: Terminal.Gui.SpinnerStyle.Balloon2
+    name: SpinnerStyle.Balloon2
+  - uid: Terminal.Gui.SpinnerStyle.BetaWave
+    name: SpinnerStyle.BetaWave
+  - uid: Terminal.Gui.SpinnerStyle.BluePulse
+    name: SpinnerStyle.BluePulse
+  - uid: Terminal.Gui.SpinnerStyle.Bounce
+    name: SpinnerStyle.Bounce
+  - uid: Terminal.Gui.SpinnerStyle.BouncingBall
+    name: SpinnerStyle.BouncingBall
+  - uid: Terminal.Gui.SpinnerStyle.BouncingBar
+    name: SpinnerStyle.BouncingBar
+  - uid: Terminal.Gui.SpinnerStyle.BoxBounce
+    name: SpinnerStyle.BoxBounce
+  - uid: Terminal.Gui.SpinnerStyle.BoxBounce2
+    name: SpinnerStyle.BoxBounce2
+  - uid: Terminal.Gui.SpinnerStyle.Christmas
+    name: SpinnerStyle.Christmas
+  - uid: Terminal.Gui.SpinnerStyle.Circle
+    name: SpinnerStyle.Circle
+  - uid: Terminal.Gui.SpinnerStyle.CircleHalves
+    name: SpinnerStyle.CircleHalves
+  - uid: Terminal.Gui.SpinnerStyle.CircleQuarters
+    name: SpinnerStyle.CircleQuarters
+  - uid: Terminal.Gui.SpinnerStyle.Clock
+    name: SpinnerStyle.Clock
+  - uid: Terminal.Gui.SpinnerStyle.Custom
+    name: SpinnerStyle.Custom
+  - uid: Terminal.Gui.SpinnerStyle.Dots
+    name: SpinnerStyle.Dots
+  - uid: Terminal.Gui.SpinnerStyle.Dots10
+    name: SpinnerStyle.Dots10
+  - uid: Terminal.Gui.SpinnerStyle.Dots11
+    name: SpinnerStyle.Dots11
+  - uid: Terminal.Gui.SpinnerStyle.Dots12
+    name: SpinnerStyle.Dots12
+  - uid: Terminal.Gui.SpinnerStyle.Dots2
+    name: SpinnerStyle.Dots2
+  - uid: Terminal.Gui.SpinnerStyle.Dots3
+    name: SpinnerStyle.Dots3
+  - uid: Terminal.Gui.SpinnerStyle.Dots4
+    name: SpinnerStyle.Dots4
+  - uid: Terminal.Gui.SpinnerStyle.Dots5
+    name: SpinnerStyle.Dots5
+  - uid: Terminal.Gui.SpinnerStyle.Dots6
+    name: SpinnerStyle.Dots6
+  - uid: Terminal.Gui.SpinnerStyle.Dots7
+    name: SpinnerStyle.Dots7
+  - uid: Terminal.Gui.SpinnerStyle.Dots8
+    name: SpinnerStyle.Dots8
+  - uid: Terminal.Gui.SpinnerStyle.Dots8Bit
+    name: SpinnerStyle.Dots8Bit
+  - uid: Terminal.Gui.SpinnerStyle.Dots9
+    name: SpinnerStyle.Dots9
+  - uid: Terminal.Gui.SpinnerStyle.Dqpb
+    name: SpinnerStyle.Dqpb
+  - uid: Terminal.Gui.SpinnerStyle.Earth
+    name: SpinnerStyle.Earth
+  - uid: Terminal.Gui.SpinnerStyle.FingerDance
+    name: SpinnerStyle.FingerDance
+  - uid: Terminal.Gui.SpinnerStyle.FistBump
+    name: SpinnerStyle.FistBump
+  - uid: Terminal.Gui.SpinnerStyle.Flip
+    name: SpinnerStyle.Flip
+  - uid: Terminal.Gui.SpinnerStyle.Grenade
+    name: SpinnerStyle.Grenade
+  - uid: Terminal.Gui.SpinnerStyle.GrowHorizontal
+    name: SpinnerStyle.GrowHorizontal
+  - uid: Terminal.Gui.SpinnerStyle.GrowVertical
+    name: SpinnerStyle.GrowVertical
+  - uid: Terminal.Gui.SpinnerStyle.Hamburger
+    name: SpinnerStyle.Hamburger
+  - uid: Terminal.Gui.SpinnerStyle.Hearts
+    name: SpinnerStyle.Hearts
+  - uid: Terminal.Gui.SpinnerStyle.Layer
+    name: SpinnerStyle.Layer
+  - uid: Terminal.Gui.SpinnerStyle.Line
+    name: SpinnerStyle.Line
+  - uid: Terminal.Gui.SpinnerStyle.Line2
+    name: SpinnerStyle.Line2
+  - uid: Terminal.Gui.SpinnerStyle.Material
+    name: SpinnerStyle.Material
+  - uid: Terminal.Gui.SpinnerStyle.MindBlown
+    name: SpinnerStyle.MindBlown
+  - uid: Terminal.Gui.SpinnerStyle.Monkey
+    name: SpinnerStyle.Monkey
+  - uid: Terminal.Gui.SpinnerStyle.Moon
+    name: SpinnerStyle.Moon
+  - uid: Terminal.Gui.SpinnerStyle.Noise
+    name: SpinnerStyle.Noise
+  - uid: Terminal.Gui.SpinnerStyle.OrangeBluePulse
+    name: SpinnerStyle.OrangeBluePulse
+  - uid: Terminal.Gui.SpinnerStyle.OrangePulse
+    name: SpinnerStyle.OrangePulse
+  - uid: Terminal.Gui.SpinnerStyle.Pipe
+    name: SpinnerStyle.Pipe
+  - uid: Terminal.Gui.SpinnerStyle.Points
+    name: SpinnerStyle.Points
+  - uid: Terminal.Gui.SpinnerStyle.Pong
+    name: SpinnerStyle.Pong
+  - uid: Terminal.Gui.SpinnerStyle.Runner
+    name: SpinnerStyle.Runner
+  - uid: Terminal.Gui.SpinnerStyle.Shark
+    name: SpinnerStyle.Shark
+  - uid: Terminal.Gui.SpinnerStyle.SimpleDots
+    name: SpinnerStyle.SimpleDots
+  - uid: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+    name: SpinnerStyle.SimpleDotsScrolling
+  - uid: Terminal.Gui.SpinnerStyle.Smiley
+    name: SpinnerStyle.Smiley
+  - uid: Terminal.Gui.SpinnerStyle.SoccerHeader
+    name: SpinnerStyle.SoccerHeader
+  - uid: Terminal.Gui.SpinnerStyle.Speaker
+    name: SpinnerStyle.Speaker
+  - uid: Terminal.Gui.SpinnerStyle.SquareCorners
+    name: SpinnerStyle.SquareCorners
+  - uid: Terminal.Gui.SpinnerStyle.Squish
+    name: SpinnerStyle.Squish
+  - uid: Terminal.Gui.SpinnerStyle.Star
+    name: SpinnerStyle.Star
+  - uid: Terminal.Gui.SpinnerStyle.Star2
+    name: SpinnerStyle.Star2
+  - uid: Terminal.Gui.SpinnerStyle.TimeTravelClock
+    name: SpinnerStyle.TimeTravelClock
+  - uid: Terminal.Gui.SpinnerStyle.Toggle
+    name: SpinnerStyle.Toggle
+  - uid: Terminal.Gui.SpinnerStyle.Toggle10
+    name: SpinnerStyle.Toggle10
+  - uid: Terminal.Gui.SpinnerStyle.Toggle11
+    name: SpinnerStyle.Toggle11
+  - uid: Terminal.Gui.SpinnerStyle.Toggle12
+    name: SpinnerStyle.Toggle12
+  - uid: Terminal.Gui.SpinnerStyle.Toggle13
+    name: SpinnerStyle.Toggle13
+  - uid: Terminal.Gui.SpinnerStyle.Toggle2
+    name: SpinnerStyle.Toggle2
+  - uid: Terminal.Gui.SpinnerStyle.Toggle3
+    name: SpinnerStyle.Toggle3
+  - uid: Terminal.Gui.SpinnerStyle.Toggle4
+    name: SpinnerStyle.Toggle4
+  - uid: Terminal.Gui.SpinnerStyle.Toggle5
+    name: SpinnerStyle.Toggle5
+  - uid: Terminal.Gui.SpinnerStyle.Toggle6
+    name: SpinnerStyle.Toggle6
+  - uid: Terminal.Gui.SpinnerStyle.Toggle7
+    name: SpinnerStyle.Toggle7
+  - uid: Terminal.Gui.SpinnerStyle.Toggle8
+    name: SpinnerStyle.Toggle8
+  - uid: Terminal.Gui.SpinnerStyle.Toggle9
+    name: SpinnerStyle.Toggle9
+  - uid: Terminal.Gui.SpinnerStyle.Triangle
+    name: SpinnerStyle.Triangle
+  - uid: Terminal.Gui.SpinnerStyle.Weather
+    name: SpinnerStyle.Weather
+  - uid: Terminal.Gui.SpinnerView
+    name: SpinnerView
+  - uid: Terminal.Gui.SplitterEventArgs
+    name: SplitterEventArgs
+  - uid: Terminal.Gui.SplitterEventHandler
+    name: SplitterEventHandler
+  - uid: Terminal.Gui.StackExtensions
+    name: StackExtensions
+  - uid: Terminal.Gui.StatusBar
+    name: StatusBar
+  - uid: Terminal.Gui.StatusItem
+    name: StatusItem
+  - uid: Terminal.Gui.StepChangeEventArgs
+    name: StepChangeEventArgs
+  - uid: Terminal.Gui.StraightLine
+    name: StraightLine
+  - uid: Terminal.Gui.StraightLineExtensions
+    name: StraightLineExtensions
+  - uid: Terminal.Gui.StringExtensions
+    name: StringExtensions
+  - uid: Terminal.Gui.Suggestion
+    name: Suggestion
+  - uid: Terminal.Gui.SuperViewChangedEventArgs
+    name: SuperViewChangedEventArgs
+  - uid: Terminal.Gui.Tab
+    name: Tab
+  - uid: Terminal.Gui.TabChangedEventArgs
+    name: TabChangedEventArgs
+  - uid: Terminal.Gui.TableCollectionNavigator
+    name: TableCollectionNavigator
+  - uid: Terminal.Gui.TableSelection
+    name: TableSelection
+  - uid: Terminal.Gui.TableStyle
+    name: TableStyle
+  - uid: Terminal.Gui.TableView
+    name: TableView
+  - uid: Terminal.Gui.TabMouseEventArgs
+    name: TabMouseEventArgs
+  - uid: Terminal.Gui.TabStyle
+    name: TabStyle
+  - uid: Terminal.Gui.TabView
+    name: TabView
+  - uid: Terminal.Gui.TextAlignment
+    name: TextAlignment
+  - uid: Terminal.Gui.TextAnnotation
+    name: TextAnnotation
+  - uid: Terminal.Gui.TextChangedEventArgs
+    name: TextChangedEventArgs
+  - uid: Terminal.Gui.TextChangingEventArgs
+    name: TextChangingEventArgs
+  - uid: Terminal.Gui.TextDirection
+    name: TextDirection
+  - uid: Terminal.Gui.TextField
+    name: TextField
+  - uid: Terminal.Gui.TextFieldAutocomplete
+    name: TextFieldAutocomplete
+  - uid: Terminal.Gui.TextFormatter
+    name: TextFormatter
+  - uid: Terminal.Gui.TextValidateField
+    name: TextValidateField
+  - uid: Terminal.Gui.TextView
+    name: TextView
+  - uid: Terminal.Gui.TextViewAutocomplete
+    name: TextViewAutocomplete
+  - uid: Terminal.Gui.ThemeManager
+    name: ThemeManager
+  - uid: Terminal.Gui.ThemeManagerEventArgs
+    name: ThemeManagerEventArgs
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+  - uid: Terminal.Gui.Thickness
+    name: Thickness
+  - uid: Terminal.Gui.ThicknessEventArgs
+    name: ThicknessEventArgs
+  - uid: Terminal.Gui.Tile
+    name: Tile
+  - uid: Terminal.Gui.TileView
+    name: TileView
+  - uid: Terminal.Gui.TimeField
+    name: TimeField
+  - uid: Terminal.Gui.Timeout
+    name: Timeout
+  - uid: Terminal.Gui.TitleEventArgs
+    name: TitleEventArgs
+  - uid: Terminal.Gui.ToggleEventArgs
+    name: ToggleEventArgs
+  - uid: Terminal.Gui.Toplevel
+    name: Toplevel
+  - uid: Terminal.Gui.ToplevelClosingEventArgs
+    name: ToplevelClosingEventArgs
+  - uid: Terminal.Gui.ToplevelComparer
+    name: ToplevelComparer
+  - uid: Terminal.Gui.ToplevelEqualityComparer
+    name: ToplevelEqualityComparer
+  - uid: Terminal.Gui.ToplevelEventArgs
+    name: ToplevelEventArgs
+  - uid: Terminal.Gui.TreeBuilder`1
+    name: TreeBuilder<T>
+    name.vb: TreeBuilder(Of T)
+  - uid: Terminal.Gui.TreeNode
+    name: TreeNode
+  - uid: Terminal.Gui.TreeNodeBuilder
+    name: TreeNodeBuilder
+  - uid: Terminal.Gui.TreeStyle
+    name: TreeStyle
+  - uid: Terminal.Gui.TreeTableSource`1
+    name: TreeTableSource<T>
+    name.vb: TreeTableSource(Of T)
+  - uid: Terminal.Gui.TreeView
+    name: TreeView
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView<T>
+    name.vb: TreeView(Of T)
+  - uid: Terminal.Gui.TreeViewTextFilter`1
+    name: TreeViewTextFilter<T>
+    name.vb: TreeViewTextFilter(Of T)
+  - uid: Terminal.Gui.VerticalAxis
+    name: VerticalAxis
+  - uid: Terminal.Gui.VerticalTextAlignment
+    name: VerticalTextAlignment
+  - uid: Terminal.Gui.View
+    name: View
+  - uid: Terminal.Gui.ViewEventArgs
+    name: ViewEventArgs
+  - uid: Terminal.Gui.Window
+    name: Window
+  - uid: Terminal.Gui.Wizard
+    name: Wizard
+  - uid: Terminal.Gui.WizardButtonEventArgs
+    name: WizardButtonEventArgs
+  - uid: Terminal.Gui.WizardStep
+    name: WizardStep
+- uid: Terminal.Gui.TextValidateProviders
+  name: Terminal.Gui.TextValidateProviders
+  items:
+  - uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider
+    name: ITextValidateProvider
+  - uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+    name: NetMaskedTextProvider
+  - uid: Terminal.Gui.TextValidateProviders.TextRegexProvider
+    name: TextRegexProvider
+- uid: Unix.Terminal
+  name: Unix.Terminal
+  items:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+  - uid: Unix.Terminal.Curses.Event
+    name: Curses.Event
+  - uid: Unix.Terminal.Curses.MouseEvent
+    name: Curses.MouseEvent
+  - uid: Unix.Terminal.Curses.Window
+    name: Curses.Window
+memberLayout: SamePage

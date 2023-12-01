@@ -1,0 +1,602 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.SelectedCellChangedEventArgs
+  commentId: T:Terminal.Gui.SelectedCellChangedEventArgs
+  id: SelectedCellChangedEventArgs
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.SelectedCellChangedEventArgs.#ctor(Terminal.Gui.ITableSource,System.Int32,System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+  - Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+  - Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+  - Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+  - Terminal.Gui.SelectedCellChangedEventArgs.Table
+  langs:
+  - csharp
+  - vb
+  name: SelectedCellChangedEventArgs
+  nameWithType: SelectedCellChangedEventArgs
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SelectedCellChangedEventArgs
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 8
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Defines the event arguments for <xref href="Terminal.Gui.TableView.SelectedCellChanged" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: 'public class SelectedCellChangedEventArgs : EventArgs'
+    content.vb: Public Class SelectedCellChangedEventArgs Inherits EventArgs
+  inheritance:
+  - System.Object
+  - System.EventArgs
+  inheritedMembers:
+  - System.EventArgs.Empty
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.Table
+  commentId: P:Terminal.Gui.SelectedCellChangedEventArgs.Table
+  id: Table
+  parent: Terminal.Gui.SelectedCellChangedEventArgs
+  langs:
+  - csharp
+  - vb
+  name: Table
+  nameWithType: SelectedCellChangedEventArgs.Table
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.Table
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Table
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
+  example: []
+  syntax:
+    content: public ITableSource Table { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ITableSource
+      description: ''
+    content.vb: Public ReadOnly Property Table As ITableSource
+  overload: Terminal.Gui.SelectedCellChangedEventArgs.Table*
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+  commentId: P:Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+  id: OldCol
+  parent: Terminal.Gui.SelectedCellChangedEventArgs
+  langs:
+  - csharp
+  - vb
+  name: OldCol
+  nameWithType: SelectedCellChangedEventArgs.OldCol
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OldCol
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 19
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The previous selected column index.  May be invalid e.g. when the selection has been changed as a result of replacing the existing Table with a smaller one
+  example: []
+  syntax:
+    content: public int OldCol { get; }
+    parameters: []
+    return:
+      type: System.Int32
+      description: ''
+    content.vb: Public ReadOnly Property OldCol As Integer
+  overload: Terminal.Gui.SelectedCellChangedEventArgs.OldCol*
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+  commentId: P:Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+  id: NewCol
+  parent: Terminal.Gui.SelectedCellChangedEventArgs
+  langs:
+  - csharp
+  - vb
+  name: NewCol
+  nameWithType: SelectedCellChangedEventArgs.NewCol
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NewCol
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 25
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The newly selected column index.
+  example: []
+  syntax:
+    content: public int NewCol { get; }
+    parameters: []
+    return:
+      type: System.Int32
+      description: ''
+    content.vb: Public ReadOnly Property NewCol As Integer
+  overload: Terminal.Gui.SelectedCellChangedEventArgs.NewCol*
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+  commentId: P:Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+  id: OldRow
+  parent: Terminal.Gui.SelectedCellChangedEventArgs
+  langs:
+  - csharp
+  - vb
+  name: OldRow
+  nameWithType: SelectedCellChangedEventArgs.OldRow
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OldRow
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 31
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The previous selected row index.  May be invalid e.g. when the selection has been changed as a result of deleting rows from the table
+  example: []
+  syntax:
+    content: public int OldRow { get; }
+    parameters: []
+    return:
+      type: System.Int32
+      description: ''
+    content.vb: Public ReadOnly Property OldRow As Integer
+  overload: Terminal.Gui.SelectedCellChangedEventArgs.OldRow*
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+  commentId: P:Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+  id: NewRow
+  parent: Terminal.Gui.SelectedCellChangedEventArgs
+  langs:
+  - csharp
+  - vb
+  name: NewRow
+  nameWithType: SelectedCellChangedEventArgs.NewRow
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NewRow
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 37
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The newly selected row index.
+  example: []
+  syntax:
+    content: public int NewRow { get; }
+    parameters: []
+    return:
+      type: System.Int32
+      description: ''
+    content.vb: Public ReadOnly Property NewRow As Integer
+  overload: Terminal.Gui.SelectedCellChangedEventArgs.NewRow*
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.#ctor(Terminal.Gui.ITableSource,System.Int32,System.Int32,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.SelectedCellChangedEventArgs.#ctor(Terminal.Gui.ITableSource,System.Int32,System.Int32,System.Int32,System.Int32)
+  id: '#ctor(Terminal.Gui.ITableSource,System.Int32,System.Int32,System.Int32,System.Int32)'
+  parent: Terminal.Gui.SelectedCellChangedEventArgs
+  langs:
+  - csharp
+  - vb
+  name: SelectedCellChangedEventArgs(ITableSource, int, int, int, int)
+  nameWithType: SelectedCellChangedEventArgs.SelectedCellChangedEventArgs(ITableSource, int, int, int, int)
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.SelectedCellChangedEventArgs(Terminal.Gui.ITableSource, int, int, int, int)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/TableView/SelectedCellChangedEventArgs.cs
+    startLine: 47
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new instance of arguments describing a change in selected cell in a <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public SelectedCellChangedEventArgs(ITableSource t, int oldCol, int newCol, int oldRow, int newRow)
+    parameters:
+    - id: t
+      type: Terminal.Gui.ITableSource
+      description: ''
+    - id: oldCol
+      type: System.Int32
+      description: ''
+    - id: newCol
+      type: System.Int32
+      description: ''
+    - id: oldRow
+      type: System.Int32
+      description: ''
+    - id: newRow
+      type: System.Int32
+      description: ''
+    content.vb: Public Sub New(t As ITableSource, oldCol As Integer, newCol As Integer, oldRow As Integer, newRow As Integer)
+  overload: Terminal.Gui.SelectedCellChangedEventArgs.#ctor*
+  nameWithType.vb: SelectedCellChangedEventArgs.New(ITableSource, Integer, Integer, Integer, Integer)
+  fullName.vb: Terminal.Gui.SelectedCellChangedEventArgs.New(Terminal.Gui.ITableSource, Integer, Integer, Integer, Integer)
+  name.vb: New(ITableSource, Integer, Integer, Integer, Integer)
+references:
+- uid: Terminal.Gui.TableView.SelectedCellChanged
+  commentId: E:Terminal.Gui.TableView.SelectedCellChanged
+  href: Terminal.Gui.TableView.html#Terminal.Gui.TableView.SelectedCellChanged
+  name: SelectedCellChanged
+  nameWithType: TableView.SelectedCellChanged
+  fullName: Terminal.Gui.TableView.SelectedCellChanged
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.EventArgs
+  commentId: T:System.EventArgs
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventargs
+  name: EventArgs
+  nameWithType: EventArgs
+  fullName: System.EventArgs
+- uid: System.EventArgs.Empty
+  commentId: F:System.EventArgs.Empty
+  parent: System.EventArgs
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventargs.empty
+  name: Empty
+  nameWithType: EventArgs.Empty
+  fullName: System.EventArgs.Empty
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.Table*
+  commentId: Overload:Terminal.Gui.SelectedCellChangedEventArgs.Table
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html#Terminal.Gui.SelectedCellChangedEventArgs.Table
+  name: Table
+  nameWithType: SelectedCellChangedEventArgs.Table
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.Table
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITableSource.html
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.OldCol*
+  commentId: Overload:Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html#Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+  name: OldCol
+  nameWithType: SelectedCellChangedEventArgs.OldCol
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.OldCol
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.NewCol*
+  commentId: Overload:Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html#Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+  name: NewCol
+  nameWithType: SelectedCellChangedEventArgs.NewCol
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.NewCol
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.OldRow*
+  commentId: Overload:Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html#Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+  name: OldRow
+  nameWithType: SelectedCellChangedEventArgs.OldRow
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.OldRow
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.NewRow*
+  commentId: Overload:Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html#Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+  name: NewRow
+  nameWithType: SelectedCellChangedEventArgs.NewRow
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.NewRow
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui.SelectedCellChangedEventArgs.#ctor*
+  commentId: Overload:Terminal.Gui.SelectedCellChangedEventArgs.#ctor
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html#Terminal.Gui.SelectedCellChangedEventArgs.#ctor(Terminal.Gui.ITableSource,System.Int32,System.Int32,System.Int32,System.Int32)
+  name: SelectedCellChangedEventArgs
+  nameWithType: SelectedCellChangedEventArgs.SelectedCellChangedEventArgs
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs.SelectedCellChangedEventArgs
+  nameWithType.vb: SelectedCellChangedEventArgs.New
+  fullName.vb: Terminal.Gui.SelectedCellChangedEventArgs.New
+  name.vb: New
+shouldSkipMarkup: true

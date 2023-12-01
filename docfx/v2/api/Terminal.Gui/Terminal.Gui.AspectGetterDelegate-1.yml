@@ -1,0 +1,94 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.AspectGetterDelegate`1
+  commentId: T:Terminal.Gui.AspectGetterDelegate`1
+  id: AspectGetterDelegate`1
+  parent: Terminal.Gui
+  children: []
+  langs:
+  - csharp
+  - vb
+  name: AspectGetterDelegate<T>
+  nameWithType: AspectGetterDelegate<T>
+  fullName: Terminal.Gui.AspectGetterDelegate<T>
+  type: Delegate
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/AspectGetterDelegate.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AspectGetterDelegate
+    path: ../Terminal.Gui/Views/TreeView/AspectGetterDelegate.cs
+    startLine: 8
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Delegates of this type are used to fetch string representations of user's model objects
+  example: []
+  syntax:
+    content: 'public delegate string AspectGetterDelegate<T>(T toRender) where T : class'
+    parameters:
+    - id: toRender
+      type: '{T}'
+      description: The object that is being rendered
+    typeParameters:
+    - id: T
+    return:
+      type: System.String
+      description: ''
+    content.vb: Public Delegate Function AspectGetterDelegate(Of T As Class)(toRender As T) As String
+  nameWithType.vb: AspectGetterDelegate(Of T)
+  fullName.vb: Terminal.Gui.AspectGetterDelegate(Of T)
+  name.vb: AspectGetterDelegate(Of T)
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+shouldSkipMarkup: true

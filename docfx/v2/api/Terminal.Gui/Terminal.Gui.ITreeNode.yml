@@ -1,0 +1,332 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ITreeNode
+  commentId: T:Terminal.Gui.ITreeNode
+  id: ITreeNode
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ITreeNode.Children
+  - Terminal.Gui.ITreeNode.Tag
+  - Terminal.Gui.ITreeNode.Text
+  langs:
+  - csharp
+  - vb
+  name: ITreeNode
+  nameWithType: ITreeNode
+  fullName: Terminal.Gui.ITreeNode
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeNode.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ITreeNode
+    path: ../Terminal.Gui/Views/TreeView/TreeNode.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Interface to implement when you want the regular (non generic) <xref href="Terminal.Gui.TreeView" data-throw-if-not-resolved="false"></xref>
+
+    to automatically determine children for your class (without having to specify 
+
+    an <xref href="Terminal.Gui.ITreeBuilder%601" data-throw-if-not-resolved="false"></xref>)
+  example: []
+  syntax:
+    content: public interface ITreeNode
+    content.vb: Public Interface ITreeNode
+- uid: Terminal.Gui.ITreeNode.Text
+  commentId: P:Terminal.Gui.ITreeNode.Text
+  id: Text
+  parent: Terminal.Gui.ITreeNode
+  langs:
+  - csharp
+  - vb
+  name: Text
+  nameWithType: ITreeNode.Text
+  fullName: Terminal.Gui.ITreeNode.Text
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeNode.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Text
+    path: ../Terminal.Gui/Views/TreeView/TreeNode.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Text to display when rendering the node
+  example: []
+  syntax:
+    content: string Text { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Property Text As String
+  overload: Terminal.Gui.ITreeNode.Text*
+- uid: Terminal.Gui.ITreeNode.Children
+  commentId: P:Terminal.Gui.ITreeNode.Children
+  id: Children
+  parent: Terminal.Gui.ITreeNode
+  langs:
+  - csharp
+  - vb
+  name: Children
+  nameWithType: ITreeNode.Children
+  fullName: Terminal.Gui.ITreeNode.Children
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeNode.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Children
+    path: ../Terminal.Gui/Views/TreeView/TreeNode.cs
+    startLine: 19
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The children of your class which should be rendered underneath it when expanded
+  example: []
+  syntax:
+    content: IList<ITreeNode> Children { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IList{Terminal.Gui.ITreeNode}
+      description: ''
+    content.vb: ReadOnly Property Children As IList(Of ITreeNode)
+  overload: Terminal.Gui.ITreeNode.Children*
+- uid: Terminal.Gui.ITreeNode.Tag
+  commentId: P:Terminal.Gui.ITreeNode.Tag
+  id: Tag
+  parent: Terminal.Gui.ITreeNode
+  langs:
+  - csharp
+  - vb
+  name: Tag
+  nameWithType: ITreeNode.Tag
+  fullName: Terminal.Gui.ITreeNode.Tag
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeNode.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Tag
+    path: ../Terminal.Gui/Views/TreeView/TreeNode.cs
+    startLine: 24
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Optionally allows you to store some custom data/class here.
+  example: []
+  syntax:
+    content: object Tag { get; set; }
+    parameters: []
+    return:
+      type: System.Object
+    content.vb: Property Tag As Object
+  overload: Terminal.Gui.ITreeNode.Tag*
+references:
+- uid: Terminal.Gui.TreeView
+  commentId: T:Terminal.Gui.TreeView
+  href: Terminal.Gui.TreeView.html
+  name: TreeView
+  nameWithType: TreeView
+  fullName: Terminal.Gui.TreeView
+- uid: Terminal.Gui.ITreeBuilder`1
+  commentId: T:Terminal.Gui.ITreeBuilder`1
+  href: Terminal.Gui.ITreeBuilder-1.html
+  name: ITreeBuilder<T>
+  nameWithType: ITreeBuilder<T>
+  fullName: Terminal.Gui.ITreeBuilder<T>
+  nameWithType.vb: ITreeBuilder(Of T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T)
+  name.vb: ITreeBuilder(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.ITreeBuilder`1
+    name: ITreeBuilder
+    href: Terminal.Gui.ITreeBuilder-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.ITreeBuilder`1
+    name: ITreeBuilder
+    href: Terminal.Gui.ITreeBuilder-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ITreeNode.Text*
+  commentId: Overload:Terminal.Gui.ITreeNode.Text
+  href: Terminal.Gui.ITreeNode.html#Terminal.Gui.ITreeNode.Text
+  name: Text
+  nameWithType: ITreeNode.Text
+  fullName: Terminal.Gui.ITreeNode.Text
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ITreeNode.Children*
+  commentId: Overload:Terminal.Gui.ITreeNode.Children
+  href: Terminal.Gui.ITreeNode.html#Terminal.Gui.ITreeNode.Children
+  name: Children
+  nameWithType: ITreeNode.Children
+  fullName: Terminal.Gui.ITreeNode.Children
+- uid: System.Collections.Generic.IList{Terminal.Gui.ITreeNode}
+  commentId: T:System.Collections.Generic.IList{Terminal.Gui.ITreeNode}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IList`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1
+  name: IList<ITreeNode>
+  nameWithType: IList<ITreeNode>
+  fullName: System.Collections.Generic.IList<Terminal.Gui.ITreeNode>
+  nameWithType.vb: IList(Of ITreeNode)
+  fullName.vb: System.Collections.Generic.IList(Of Terminal.Gui.ITreeNode)
+  name.vb: IList(Of ITreeNode)
+  spec.csharp:
+  - uid: System.Collections.Generic.IList`1
+    name: IList
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1
+  - name: <
+  - uid: Terminal.Gui.ITreeNode
+    name: ITreeNode
+    href: Terminal.Gui.ITreeNode.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IList`1
+    name: IList
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.ITreeNode
+    name: ITreeNode
+    href: Terminal.Gui.ITreeNode.html
+  - name: )
+- uid: System.Collections.Generic.IList`1
+  commentId: T:System.Collections.Generic.IList`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1
+  name: IList<T>
+  nameWithType: IList<T>
+  fullName: System.Collections.Generic.IList<T>
+  nameWithType.vb: IList(Of T)
+  fullName.vb: System.Collections.Generic.IList(Of T)
+  name.vb: IList(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IList`1
+    name: IList
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IList`1
+    name: IList
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.ITreeNode.Tag*
+  commentId: Overload:Terminal.Gui.ITreeNode.Tag
+  href: Terminal.Gui.ITreeNode.html#Terminal.Gui.ITreeNode.Tag
+  name: Tag
+  nameWithType: ITreeNode.Tag
+  fullName: Terminal.Gui.ITreeNode.Tag
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+shouldSkipMarkup: true

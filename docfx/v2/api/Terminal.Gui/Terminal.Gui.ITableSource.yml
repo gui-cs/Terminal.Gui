@@ -1,0 +1,278 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  id: ITableSource
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ITableSource.ColumnNames
+  - Terminal.Gui.ITableSource.Columns
+  - Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  - Terminal.Gui.ITableSource.Rows
+  langs:
+  - csharp
+  - vb
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ITableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ITableSource
+    path: ../Terminal.Gui/Views/TableView/ITableSource.cs
+    startLine: 4
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tabular matrix of data to be displayed in a <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public interface ITableSource
+    content.vb: Public Interface ITableSource
+- uid: Terminal.Gui.ITableSource.Rows
+  commentId: P:Terminal.Gui.ITableSource.Rows
+  id: Rows
+  parent: Terminal.Gui.ITableSource
+  langs:
+  - csharp
+  - vb
+  name: Rows
+  nameWithType: ITableSource.Rows
+  fullName: Terminal.Gui.ITableSource.Rows
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ITableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Rows
+    path: ../Terminal.Gui/Views/TableView/ITableSource.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of rows in the table.
+  example: []
+  syntax:
+    content: int Rows { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property Rows As Integer
+  overload: Terminal.Gui.ITableSource.Rows*
+- uid: Terminal.Gui.ITableSource.Columns
+  commentId: P:Terminal.Gui.ITableSource.Columns
+  id: Columns
+  parent: Terminal.Gui.ITableSource
+  langs:
+  - csharp
+  - vb
+  name: Columns
+  nameWithType: ITableSource.Columns
+  fullName: Terminal.Gui.ITableSource.Columns
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ITableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Columns
+    path: ../Terminal.Gui/Views/TableView/ITableSource.cs
+    startLine: 14
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of columns in the table.
+  example: []
+  syntax:
+    content: int Columns { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: ReadOnly Property Columns As Integer
+  overload: Terminal.Gui.ITableSource.Columns*
+- uid: Terminal.Gui.ITableSource.ColumnNames
+  commentId: P:Terminal.Gui.ITableSource.ColumnNames
+  id: ColumnNames
+  parent: Terminal.Gui.ITableSource
+  langs:
+  - csharp
+  - vb
+  name: ColumnNames
+  nameWithType: ITableSource.ColumnNames
+  fullName: Terminal.Gui.ITableSource.ColumnNames
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ITableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColumnNames
+    path: ../Terminal.Gui/Views/TableView/ITableSource.cs
+    startLine: 19
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the label for each column.
+  example: []
+  syntax:
+    content: string[] ColumnNames { get; }
+    parameters: []
+    return:
+      type: System.String[]
+    content.vb: ReadOnly Property ColumnNames As String()
+  overload: Terminal.Gui.ITableSource.ColumnNames*
+- uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  id: Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.ITableSource
+  langs:
+  - csharp
+  - vb
+  name: this[int, int]
+  nameWithType: ITableSource.this[int, int]
+  fullName: Terminal.Gui.ITableSource.this[int, int]
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ITableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: this[]
+    path: ../Terminal.Gui/Views/TableView/ITableSource.cs
+    startLine: 27
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns the data at the given indexes of the table (row, column).
+  example: []
+  syntax:
+    content: object this[int row, int col] { get; }
+    parameters:
+    - id: row
+      type: System.Int32
+      description: ''
+    - id: col
+      type: System.Int32
+      description: ''
+    return:
+      type: System.Object
+      description: ''
+    content.vb: ReadOnly Default Property this[](row As Integer, col As Integer) As Object
+  overload: Terminal.Gui.ITableSource.Item*
+  nameWithType.vb: ITableSource.this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.ITableSource.this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+references:
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ITableSource.Rows*
+  commentId: Overload:Terminal.Gui.ITableSource.Rows
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Rows
+  name: Rows
+  nameWithType: ITableSource.Rows
+  fullName: Terminal.Gui.ITableSource.Rows
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ITableSource.Columns*
+  commentId: Overload:Terminal.Gui.ITableSource.Columns
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Columns
+  name: Columns
+  nameWithType: ITableSource.Columns
+  fullName: Terminal.Gui.ITableSource.Columns
+- uid: Terminal.Gui.ITableSource.ColumnNames*
+  commentId: Overload:Terminal.Gui.ITableSource.ColumnNames
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.ColumnNames
+  name: ColumnNames
+  nameWithType: ITableSource.ColumnNames
+  fullName: Terminal.Gui.ITableSource.ColumnNames
+- uid: System.String[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string[]
+  nameWithType: string[]
+  fullName: string[]
+  nameWithType.vb: String()
+  fullName.vb: String()
+  name.vb: String()
+  spec.csharp:
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+- uid: Terminal.Gui.ITableSource.Item*
+  commentId: Overload:Terminal.Gui.ITableSource.Item
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  name: this
+  nameWithType: ITableSource.this
+  fullName: Terminal.Gui.ITableSource.this
+  nameWithType.vb: ITableSource.this[]
+  fullName.vb: Terminal.Gui.ITableSource.this[]
+  name.vb: this[]
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+shouldSkipMarkup: true

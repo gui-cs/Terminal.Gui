@@ -1,0 +1,1180 @@
+### YamlMime:ManagedReference
+items:
+- uid: Unix.Terminal.Curses.Window
+  commentId: T:Unix.Terminal.Curses.Window
+  id: Curses.Window
+  parent: Unix.Terminal
+  children:
+  - Unix.Terminal.Curses.Window.addch(System.Char)
+  - Unix.Terminal.Curses.Window.clearok(System.Boolean)
+  - Unix.Terminal.Curses.Window.Current
+  - Unix.Terminal.Curses.Window.Handle
+  - Unix.Terminal.Curses.Window.idcok(System.Boolean)
+  - Unix.Terminal.Curses.Window.idlok(System.Boolean)
+  - Unix.Terminal.Curses.Window.immedok(System.Boolean)
+  - Unix.Terminal.Curses.Window.intrflush(System.Boolean)
+  - Unix.Terminal.Curses.Window.keypad(System.Boolean)
+  - Unix.Terminal.Curses.Window.leaveok(System.Boolean)
+  - Unix.Terminal.Curses.Window.meta(System.Boolean)
+  - Unix.Terminal.Curses.Window.move(System.Int32,System.Int32)
+  - Unix.Terminal.Curses.Window.notimeout(System.Boolean)
+  - Unix.Terminal.Curses.Window.redrawwin
+  - Unix.Terminal.Curses.Window.refresh
+  - Unix.Terminal.Curses.Window.scrollok(System.Boolean)
+  - Unix.Terminal.Curses.Window.setscrreg(System.Int32,System.Int32)
+  - Unix.Terminal.Curses.Window.Standard
+  - Unix.Terminal.Curses.Window.wnoutrefresh
+  - Unix.Terminal.Curses.Window.wrefresh
+  - Unix.Terminal.Curses.Window.wtimeout(System.Int32)
+  langs:
+  - csharp
+  - vb
+  name: Curses.Window
+  nameWithType: Curses.Window
+  fullName: Unix.Terminal.Curses.Window
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Window
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 32
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public class Curses.Window
+    content.vb: Public Class Curses.Window
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Unix.Terminal.Curses.Window.Handle
+  commentId: F:Unix.Terminal.Curses.Window.Handle
+  id: Handle
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: Handle
+  nameWithType: Curses.Window.Handle
+  fullName: Unix.Terminal.Curses.Window.Handle
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Handle
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 33
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public readonly nint Handle
+    return:
+      type: System.IntPtr
+    content.vb: Public ReadOnly Handle As IntPtr
+- uid: Unix.Terminal.Curses.Window.Standard
+  commentId: P:Unix.Terminal.Curses.Window.Standard
+  id: Standard
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: Standard
+  nameWithType: Curses.Window.Standard
+  fullName: Unix.Terminal.Curses.Window.Standard
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Standard
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 49
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public static Curses.Window Standard { get; }
+    parameters: []
+    return:
+      type: Unix.Terminal.Curses.Window
+    content.vb: Public Shared ReadOnly Property Standard As Curses.Window
+  overload: Unix.Terminal.Curses.Window.Standard*
+- uid: Unix.Terminal.Curses.Window.Current
+  commentId: P:Unix.Terminal.Curses.Window.Current
+  id: Current
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: Current
+  nameWithType: Curses.Window.Current
+  fullName: Unix.Terminal.Curses.Window.Current
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Current
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 55
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public static Curses.Window Current { get; }
+    parameters: []
+    return:
+      type: Unix.Terminal.Curses.Window
+    content.vb: Public Shared ReadOnly Property Current As Curses.Window
+  overload: Unix.Terminal.Curses.Window.Current*
+- uid: Unix.Terminal.Curses.Window.wtimeout(System.Int32)
+  commentId: M:Unix.Terminal.Curses.Window.wtimeout(System.Int32)
+  id: wtimeout(System.Int32)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: wtimeout(int)
+  nameWithType: Curses.Window.wtimeout(int)
+  fullName: Unix.Terminal.Curses.Window.wtimeout(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: wtimeout
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 61
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int wtimeout(int delay)
+    parameters:
+    - id: delay
+      type: System.Int32
+    return:
+      type: System.Int32
+    content.vb: Public Function wtimeout(delay As Integer) As Integer
+  overload: Unix.Terminal.Curses.Window.wtimeout*
+  nameWithType.vb: Curses.Window.wtimeout(Integer)
+  fullName.vb: Unix.Terminal.Curses.Window.wtimeout(Integer)
+  name.vb: wtimeout(Integer)
+- uid: Unix.Terminal.Curses.Window.notimeout(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.notimeout(System.Boolean)
+  id: notimeout(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: notimeout(bool)
+  nameWithType: Curses.Window.notimeout(bool)
+  fullName: Unix.Terminal.Curses.Window.notimeout(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: notimeout
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 66
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int notimeout(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function notimeout(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.notimeout*
+  nameWithType.vb: Curses.Window.notimeout(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.notimeout(Boolean)
+  name.vb: notimeout(Boolean)
+- uid: Unix.Terminal.Curses.Window.keypad(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.keypad(System.Boolean)
+  id: keypad(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: keypad(bool)
+  nameWithType: Curses.Window.keypad(bool)
+  fullName: Unix.Terminal.Curses.Window.keypad(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: keypad
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int keypad(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function keypad(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.keypad*
+  nameWithType.vb: Curses.Window.keypad(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.keypad(Boolean)
+  name.vb: keypad(Boolean)
+- uid: Unix.Terminal.Curses.Window.meta(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.meta(System.Boolean)
+  id: meta(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: meta(bool)
+  nameWithType: Curses.Window.meta(bool)
+  fullName: Unix.Terminal.Curses.Window.meta(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: meta
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 76
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int meta(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function meta(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.meta*
+  nameWithType.vb: Curses.Window.meta(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.meta(Boolean)
+  name.vb: meta(Boolean)
+- uid: Unix.Terminal.Curses.Window.intrflush(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.intrflush(System.Boolean)
+  id: intrflush(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: intrflush(bool)
+  nameWithType: Curses.Window.intrflush(bool)
+  fullName: Unix.Terminal.Curses.Window.intrflush(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: intrflush
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 81
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int intrflush(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function intrflush(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.intrflush*
+  nameWithType.vb: Curses.Window.intrflush(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.intrflush(Boolean)
+  name.vb: intrflush(Boolean)
+- uid: Unix.Terminal.Curses.Window.clearok(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.clearok(System.Boolean)
+  id: clearok(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: clearok(bool)
+  nameWithType: Curses.Window.clearok(bool)
+  fullName: Unix.Terminal.Curses.Window.clearok(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: clearok
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 86
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int clearok(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function clearok(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.clearok*
+  nameWithType.vb: Curses.Window.clearok(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.clearok(Boolean)
+  name.vb: clearok(Boolean)
+- uid: Unix.Terminal.Curses.Window.idlok(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.idlok(System.Boolean)
+  id: idlok(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: idlok(bool)
+  nameWithType: Curses.Window.idlok(bool)
+  fullName: Unix.Terminal.Curses.Window.idlok(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: idlok
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 91
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int idlok(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function idlok(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.idlok*
+  nameWithType.vb: Curses.Window.idlok(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.idlok(Boolean)
+  name.vb: idlok(Boolean)
+- uid: Unix.Terminal.Curses.Window.idcok(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.idcok(System.Boolean)
+  id: idcok(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: idcok(bool)
+  nameWithType: Curses.Window.idcok(bool)
+  fullName: Unix.Terminal.Curses.Window.idcok(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: idcok
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 96
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public void idcok(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    content.vb: Public Sub idcok(bf As Boolean)
+  overload: Unix.Terminal.Curses.Window.idcok*
+  nameWithType.vb: Curses.Window.idcok(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.idcok(Boolean)
+  name.vb: idcok(Boolean)
+- uid: Unix.Terminal.Curses.Window.immedok(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.immedok(System.Boolean)
+  id: immedok(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: immedok(bool)
+  nameWithType: Curses.Window.immedok(bool)
+  fullName: Unix.Terminal.Curses.Window.immedok(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: immedok
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 101
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public void immedok(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    content.vb: Public Sub immedok(bf As Boolean)
+  overload: Unix.Terminal.Curses.Window.immedok*
+  nameWithType.vb: Curses.Window.immedok(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.immedok(Boolean)
+  name.vb: immedok(Boolean)
+- uid: Unix.Terminal.Curses.Window.leaveok(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.leaveok(System.Boolean)
+  id: leaveok(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: leaveok(bool)
+  nameWithType: Curses.Window.leaveok(bool)
+  fullName: Unix.Terminal.Curses.Window.leaveok(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: leaveok
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 106
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int leaveok(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function leaveok(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.leaveok*
+  nameWithType.vb: Curses.Window.leaveok(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.leaveok(Boolean)
+  name.vb: leaveok(Boolean)
+- uid: Unix.Terminal.Curses.Window.setscrreg(System.Int32,System.Int32)
+  commentId: M:Unix.Terminal.Curses.Window.setscrreg(System.Int32,System.Int32)
+  id: setscrreg(System.Int32,System.Int32)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: setscrreg(int, int)
+  nameWithType: Curses.Window.setscrreg(int, int)
+  fullName: Unix.Terminal.Curses.Window.setscrreg(int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: setscrreg
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 111
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int setscrreg(int top, int bot)
+    parameters:
+    - id: top
+      type: System.Int32
+    - id: bot
+      type: System.Int32
+    return:
+      type: System.Int32
+    content.vb: Public Function setscrreg(top As Integer, bot As Integer) As Integer
+  overload: Unix.Terminal.Curses.Window.setscrreg*
+  nameWithType.vb: Curses.Window.setscrreg(Integer, Integer)
+  fullName.vb: Unix.Terminal.Curses.Window.setscrreg(Integer, Integer)
+  name.vb: setscrreg(Integer, Integer)
+- uid: Unix.Terminal.Curses.Window.scrollok(System.Boolean)
+  commentId: M:Unix.Terminal.Curses.Window.scrollok(System.Boolean)
+  id: scrollok(System.Boolean)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: scrollok(bool)
+  nameWithType: Curses.Window.scrollok(bool)
+  fullName: Unix.Terminal.Curses.Window.scrollok(bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: scrollok
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 116
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int scrollok(bool bf)
+    parameters:
+    - id: bf
+      type: System.Boolean
+    return:
+      type: System.Int32
+    content.vb: Public Function scrollok(bf As Boolean) As Integer
+  overload: Unix.Terminal.Curses.Window.scrollok*
+  nameWithType.vb: Curses.Window.scrollok(Boolean)
+  fullName.vb: Unix.Terminal.Curses.Window.scrollok(Boolean)
+  name.vb: scrollok(Boolean)
+- uid: Unix.Terminal.Curses.Window.wrefresh
+  commentId: M:Unix.Terminal.Curses.Window.wrefresh
+  id: wrefresh
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: wrefresh()
+  nameWithType: Curses.Window.wrefresh()
+  fullName: Unix.Terminal.Curses.Window.wrefresh()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: wrefresh
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 121
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int wrefresh()
+    return:
+      type: System.Int32
+    content.vb: Public Function wrefresh() As Integer
+  overload: Unix.Terminal.Curses.Window.wrefresh*
+- uid: Unix.Terminal.Curses.Window.redrawwin
+  commentId: M:Unix.Terminal.Curses.Window.redrawwin
+  id: redrawwin
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: redrawwin()
+  nameWithType: Curses.Window.redrawwin()
+  fullName: Unix.Terminal.Curses.Window.redrawwin()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: redrawwin
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 126
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int redrawwin()
+    return:
+      type: System.Int32
+    content.vb: Public Function redrawwin() As Integer
+  overload: Unix.Terminal.Curses.Window.redrawwin*
+- uid: Unix.Terminal.Curses.Window.wnoutrefresh
+  commentId: M:Unix.Terminal.Curses.Window.wnoutrefresh
+  id: wnoutrefresh
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: wnoutrefresh()
+  nameWithType: Curses.Window.wnoutrefresh()
+  fullName: Unix.Terminal.Curses.Window.wnoutrefresh()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: wnoutrefresh
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 137
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int wnoutrefresh()
+    return:
+      type: System.Int32
+    content.vb: Public Function wnoutrefresh() As Integer
+  overload: Unix.Terminal.Curses.Window.wnoutrefresh*
+- uid: Unix.Terminal.Curses.Window.move(System.Int32,System.Int32)
+  commentId: M:Unix.Terminal.Curses.Window.move(System.Int32,System.Int32)
+  id: move(System.Int32,System.Int32)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: move(int, int)
+  nameWithType: Curses.Window.move(int, int)
+  fullName: Unix.Terminal.Curses.Window.move(int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: move
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 142
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int move(int line, int col)
+    parameters:
+    - id: line
+      type: System.Int32
+    - id: col
+      type: System.Int32
+    return:
+      type: System.Int32
+    content.vb: Public Function move(line As Integer, col As Integer) As Integer
+  overload: Unix.Terminal.Curses.Window.move*
+  nameWithType.vb: Curses.Window.move(Integer, Integer)
+  fullName.vb: Unix.Terminal.Curses.Window.move(Integer, Integer)
+  name.vb: move(Integer, Integer)
+- uid: Unix.Terminal.Curses.Window.addch(System.Char)
+  commentId: M:Unix.Terminal.Curses.Window.addch(System.Char)
+  id: addch(System.Char)
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: addch(char)
+  nameWithType: Curses.Window.addch(char)
+  fullName: Unix.Terminal.Curses.Window.addch(char)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: addch
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 147
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int addch(char ch)
+    parameters:
+    - id: ch
+      type: System.Char
+    return:
+      type: System.Int32
+    content.vb: Public Function addch(ch As Char) As Integer
+  overload: Unix.Terminal.Curses.Window.addch*
+  nameWithType.vb: Curses.Window.addch(Char)
+  fullName.vb: Unix.Terminal.Curses.Window.addch(Char)
+  name.vb: addch(Char)
+- uid: Unix.Terminal.Curses.Window.refresh
+  commentId: M:Unix.Terminal.Curses.Window.refresh
+  id: refresh
+  parent: Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: refresh()
+  nameWithType: Curses.Window.refresh()
+  fullName: Unix.Terminal.Curses.Window.refresh()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: refresh
+    path: ../Terminal.Gui/ConsoleDrivers/CursesDriver/handles.cs
+    startLine: 157
+  assemblies:
+  - Terminal.Gui
+  namespace: Unix.Terminal
+  syntax:
+    content: public int refresh()
+    return:
+      type: System.Int32
+    content.vb: Public Function refresh() As Integer
+  overload: Unix.Terminal.Curses.Window.refresh*
+references:
+- uid: Unix.Terminal
+  commentId: N:Unix.Terminal
+  href: Unix.html
+  name: Unix.Terminal
+  nameWithType: Unix.Terminal
+  fullName: Unix.Terminal
+  spec.csharp:
+  - uid: Unix
+    name: Unix
+    href: Unix.html
+  - name: .
+  - uid: Unix.Terminal
+    name: Terminal
+    href: Unix.Terminal.html
+  spec.vb:
+  - uid: Unix
+    name: Unix
+    href: Unix.html
+  - name: .
+  - uid: Unix.Terminal
+    name: Terminal
+    href: Unix.Terminal.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.IntPtr
+  commentId: T:System.IntPtr
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.intptr
+  name: nint
+  nameWithType: nint
+  fullName: nint
+  nameWithType.vb: IntPtr
+  fullName.vb: System.IntPtr
+  name.vb: IntPtr
+- uid: Unix.Terminal.Curses.Window.Standard*
+  commentId: Overload:Unix.Terminal.Curses.Window.Standard
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.Standard
+  name: Standard
+  nameWithType: Curses.Window.Standard
+  fullName: Unix.Terminal.Curses.Window.Standard
+- uid: Unix.Terminal.Curses.Window
+  commentId: T:Unix.Terminal.Curses.Window
+  parent: Unix.Terminal
+  href: Unix.Terminal.Curses.html
+  name: Curses.Window
+  nameWithType: Curses.Window
+  fullName: Unix.Terminal.Curses.Window
+  spec.csharp:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.Window
+    name: Window
+    href: Unix.Terminal.Curses.Window.html
+  spec.vb:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.Window
+    name: Window
+    href: Unix.Terminal.Curses.Window.html
+- uid: Unix.Terminal.Curses.Window.Current*
+  commentId: Overload:Unix.Terminal.Curses.Window.Current
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.Current
+  name: Current
+  nameWithType: Curses.Window.Current
+  fullName: Unix.Terminal.Curses.Window.Current
+- uid: Unix.Terminal.Curses.Window.wtimeout*
+  commentId: Overload:Unix.Terminal.Curses.Window.wtimeout
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.wtimeout(System.Int32)
+  name: wtimeout
+  nameWithType: Curses.Window.wtimeout
+  fullName: Unix.Terminal.Curses.Window.wtimeout
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Unix.Terminal.Curses.Window.notimeout*
+  commentId: Overload:Unix.Terminal.Curses.Window.notimeout
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.notimeout(System.Boolean)
+  name: notimeout
+  nameWithType: Curses.Window.notimeout
+  fullName: Unix.Terminal.Curses.Window.notimeout
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Unix.Terminal.Curses.Window.keypad*
+  commentId: Overload:Unix.Terminal.Curses.Window.keypad
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.keypad(System.Boolean)
+  name: keypad
+  nameWithType: Curses.Window.keypad
+  fullName: Unix.Terminal.Curses.Window.keypad
+- uid: Unix.Terminal.Curses.Window.meta*
+  commentId: Overload:Unix.Terminal.Curses.Window.meta
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.meta(System.Boolean)
+  name: meta
+  nameWithType: Curses.Window.meta
+  fullName: Unix.Terminal.Curses.Window.meta
+- uid: Unix.Terminal.Curses.Window.intrflush*
+  commentId: Overload:Unix.Terminal.Curses.Window.intrflush
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.intrflush(System.Boolean)
+  name: intrflush
+  nameWithType: Curses.Window.intrflush
+  fullName: Unix.Terminal.Curses.Window.intrflush
+- uid: Unix.Terminal.Curses.Window.clearok*
+  commentId: Overload:Unix.Terminal.Curses.Window.clearok
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.clearok(System.Boolean)
+  name: clearok
+  nameWithType: Curses.Window.clearok
+  fullName: Unix.Terminal.Curses.Window.clearok
+- uid: Unix.Terminal.Curses.Window.idlok*
+  commentId: Overload:Unix.Terminal.Curses.Window.idlok
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.idlok(System.Boolean)
+  name: idlok
+  nameWithType: Curses.Window.idlok
+  fullName: Unix.Terminal.Curses.Window.idlok
+- uid: Unix.Terminal.Curses.Window.idcok*
+  commentId: Overload:Unix.Terminal.Curses.Window.idcok
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.idcok(System.Boolean)
+  name: idcok
+  nameWithType: Curses.Window.idcok
+  fullName: Unix.Terminal.Curses.Window.idcok
+- uid: Unix.Terminal.Curses.Window.immedok*
+  commentId: Overload:Unix.Terminal.Curses.Window.immedok
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.immedok(System.Boolean)
+  name: immedok
+  nameWithType: Curses.Window.immedok
+  fullName: Unix.Terminal.Curses.Window.immedok
+- uid: Unix.Terminal.Curses.Window.leaveok*
+  commentId: Overload:Unix.Terminal.Curses.Window.leaveok
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.leaveok(System.Boolean)
+  name: leaveok
+  nameWithType: Curses.Window.leaveok
+  fullName: Unix.Terminal.Curses.Window.leaveok
+- uid: Unix.Terminal.Curses.Window.setscrreg*
+  commentId: Overload:Unix.Terminal.Curses.Window.setscrreg
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.setscrreg(System.Int32,System.Int32)
+  name: setscrreg
+  nameWithType: Curses.Window.setscrreg
+  fullName: Unix.Terminal.Curses.Window.setscrreg
+- uid: Unix.Terminal.Curses.Window.scrollok*
+  commentId: Overload:Unix.Terminal.Curses.Window.scrollok
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.scrollok(System.Boolean)
+  name: scrollok
+  nameWithType: Curses.Window.scrollok
+  fullName: Unix.Terminal.Curses.Window.scrollok
+- uid: Unix.Terminal.Curses.Window.wrefresh*
+  commentId: Overload:Unix.Terminal.Curses.Window.wrefresh
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.wrefresh
+  name: wrefresh
+  nameWithType: Curses.Window.wrefresh
+  fullName: Unix.Terminal.Curses.Window.wrefresh
+- uid: Unix.Terminal.Curses.Window.redrawwin*
+  commentId: Overload:Unix.Terminal.Curses.Window.redrawwin
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.redrawwin
+  name: redrawwin
+  nameWithType: Curses.Window.redrawwin
+  fullName: Unix.Terminal.Curses.Window.redrawwin
+- uid: Unix.Terminal.Curses.Window.wnoutrefresh*
+  commentId: Overload:Unix.Terminal.Curses.Window.wnoutrefresh
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.wnoutrefresh
+  name: wnoutrefresh
+  nameWithType: Curses.Window.wnoutrefresh
+  fullName: Unix.Terminal.Curses.Window.wnoutrefresh
+- uid: Unix.Terminal.Curses.Window.move*
+  commentId: Overload:Unix.Terminal.Curses.Window.move
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.move(System.Int32,System.Int32)
+  name: move
+  nameWithType: Curses.Window.move
+  fullName: Unix.Terminal.Curses.Window.move
+- uid: Unix.Terminal.Curses.Window.addch*
+  commentId: Overload:Unix.Terminal.Curses.Window.addch
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.addch(System.Char)
+  name: addch
+  nameWithType: Curses.Window.addch
+  fullName: Unix.Terminal.Curses.Window.addch
+- uid: System.Char
+  commentId: T:System.Char
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.char
+  name: char
+  nameWithType: char
+  fullName: char
+  nameWithType.vb: Char
+  fullName.vb: Char
+  name.vb: Char
+- uid: Unix.Terminal.Curses.Window.refresh*
+  commentId: Overload:Unix.Terminal.Curses.Window.refresh
+  href: Unix.Terminal.Curses.Window.html#Unix.Terminal.Curses.Window.refresh
+  name: refresh
+  nameWithType: Curses.Window.refresh
+  fullName: Unix.Terminal.Curses.Window.refresh
+shouldSkipMarkup: true

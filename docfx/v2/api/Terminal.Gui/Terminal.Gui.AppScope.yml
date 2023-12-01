@@ -1,0 +1,2218 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.AppScope
+  commentId: T:Terminal.Gui.AppScope
+  id: AppScope
+  parent: Terminal.Gui
+  children: []
+  langs:
+  - csharp
+  - vb
+  name: AppScope
+  nameWithType: AppScope
+  fullName: Terminal.Gui.AppScope
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/AppScope.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AppScope
+    path: ../Terminal.Gui/Configuration/AppScope.cs
+    startLine: 39
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The <xref href="Terminal.Gui.Scope%601" data-throw-if-not-resolved="false"></xref> class for application-defined configuration settings.
+  remarks: ''
+  example:
+  - >-
+    <p>
+
+    Use the <xref href="Terminal.Gui.SerializableConfigurationProperty" data-throw-if-not-resolved="false"></xref> attribute to mark properties that should be serialized as part
+
+    of application-defined configuration settings.
+
+    </p>
+
+    <pre><code class="lang-csharp">public class MyAppSettings {
+
+    [SerializableConfigurationProperty (Scope = typeof (AppScope))]
+
+    public static bool? MyProperty { get; set; } = true;
+
+    }</code></pre>
+
+    <p>
+
+    THe resultant Json will look like this:
+
+    </p>
+
+    <pre><code class="lang-csharp">"AppSettings": {
+      "MyAppSettings.MyProperty": true,
+      "UICatalog.ShowStatusBar": true
+    },</code></pre>
+  syntax:
+    content: >-
+      [JsonConverter(typeof(ScopeJsonConverter<AppScope>))]
+
+      public class AppScope : Scope<AppScope>, IDictionary<string, ConfigProperty>, ICollection<KeyValuePair<string, ConfigProperty>>, IReadOnlyDictionary<string, ConfigProperty>, IReadOnlyCollection<KeyValuePair<string, ConfigProperty>>, IEnumerable<KeyValuePair<string, ConfigProperty>>, IDictionary, ICollection, IEnumerable, IDeserializationCallback, ISerializable
+    content.vb: >-
+      <JsonConverter(GetType(ScopeJsonConverter(Of AppScope)))>
+
+      Public Class AppScope Inherits Scope(Of AppScope) Implements IDictionary(Of String, ConfigProperty), ICollection(Of KeyValuePair(Of String, ConfigProperty)), IReadOnlyDictionary(Of String, ConfigProperty), IReadOnlyCollection(Of KeyValuePair(Of String, ConfigProperty)), IEnumerable(Of KeyValuePair(Of String, ConfigProperty)), IDictionary, ICollection, IEnumerable, IDeserializationCallback, ISerializable
+  inheritance:
+  - System.Object
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  - Terminal.Gui.Scope{Terminal.Gui.AppScope}
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ConfigProperty}
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  - System.Collections.Generic.IReadOnlyDictionary{System.String,Terminal.Gui.ConfigProperty}
+  - System.Collections.Generic.IReadOnlyCollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  - System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  - System.Collections.IDictionary
+  - System.Collections.ICollection
+  - System.Collections.IEnumerable
+  - System.Runtime.Serialization.IDeserializationCallback
+  - System.Runtime.Serialization.ISerializable
+  inheritedMembers:
+  - Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+  - Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Add(System.String,Terminal.Gui.ConfigProperty)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Clear
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsKey(System.String)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsValue(Terminal.Gui.ConfigProperty)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.EnsureCapacity(System.Int32)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetEnumerator
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.OnDeserialization(System.Object)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String,Terminal.Gui.ConfigProperty@)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess(System.Int32)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryAdd(System.String,Terminal.Gui.ConfigProperty)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryGetValue(System.String,Terminal.Gui.ConfigProperty@)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Comparer
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Count
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Item(System.String)
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Keys
+  - System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Values
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+references:
+- uid: Terminal.Gui.Scope`1
+  commentId: T:Terminal.Gui.Scope`1
+  parent: Terminal.Gui
+  href: Terminal.Gui.Scope-1.html
+  name: Scope<T>
+  nameWithType: Scope<T>
+  fullName: Terminal.Gui.Scope<T>
+  nameWithType.vb: Scope(Of T)
+  fullName.vb: Terminal.Gui.Scope(Of T)
+  name.vb: Scope(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.SerializableConfigurationProperty
+  commentId: T:Terminal.Gui.SerializableConfigurationProperty
+  href: Terminal.Gui.SerializableConfigurationProperty.html
+  name: SerializableConfigurationProperty
+  nameWithType: SerializableConfigurationProperty
+  fullName: Terminal.Gui.SerializableConfigurationProperty
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  commentId: T:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Dictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<string, ConfigProperty>
+  nameWithType: Dictionary<string, ConfigProperty>
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>
+  nameWithType.vb: Dictionary(Of String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty)
+  name.vb: Dictionary(Of String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}
+  commentId: T:Terminal.Gui.Scope{Terminal.Gui.AppScope}
+  parent: Terminal.Gui
+  definition: Terminal.Gui.Scope`1
+  href: Terminal.Gui.Scope-1.html
+  name: Scope<AppScope>
+  nameWithType: Scope<AppScope>
+  fullName: Terminal.Gui.Scope<Terminal.Gui.AppScope>
+  nameWithType.vb: Scope(Of AppScope)
+  fullName.vb: Terminal.Gui.Scope(Of Terminal.Gui.AppScope)
+  name.vb: Scope(Of AppScope)
+  spec.csharp:
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: <
+  - uid: Terminal.Gui.AppScope
+    name: AppScope
+    href: Terminal.Gui.AppScope.html
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.AppScope
+    name: AppScope
+    href: Terminal.Gui.AppScope.html
+  - name: )
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ConfigProperty}
+  commentId: T:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ConfigProperty}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IDictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  name: IDictionary<string, ConfigProperty>
+  nameWithType: IDictionary<string, ConfigProperty>
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ConfigProperty>
+  nameWithType.vb: IDictionary(Of String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ConfigProperty)
+  name.vb: IDictionary(Of String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  commentId: T:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.ICollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  name: ICollection<KeyValuePair<string, ConfigProperty>>
+  nameWithType: ICollection<KeyValuePair<string, ConfigProperty>>
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ConfigProperty>>
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ConfigProperty))
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ConfigProperty))
+  name.vb: ICollection(Of KeyValuePair(Of String, ConfigProperty))
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: <
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.IReadOnlyDictionary{System.String,Terminal.Gui.ConfigProperty}
+  commentId: T:System.Collections.Generic.IReadOnlyDictionary{System.String,Terminal.Gui.ConfigProperty}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IReadOnlyDictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2
+  name: IReadOnlyDictionary<string, ConfigProperty>
+  nameWithType: IReadOnlyDictionary<string, ConfigProperty>
+  fullName: System.Collections.Generic.IReadOnlyDictionary<string, Terminal.Gui.ConfigProperty>
+  nameWithType.vb: IReadOnlyDictionary(Of String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.IReadOnlyDictionary(Of String, Terminal.Gui.ConfigProperty)
+  name.vb: IReadOnlyDictionary(Of String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyDictionary`2
+    name: IReadOnlyDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IReadOnlyDictionary`2
+    name: IReadOnlyDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.IReadOnlyCollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  commentId: T:System.Collections.Generic.IReadOnlyCollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IReadOnlyCollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  name: IReadOnlyCollection<KeyValuePair<string, ConfigProperty>>
+  nameWithType: IReadOnlyCollection<KeyValuePair<string, ConfigProperty>>
+  fullName: System.Collections.Generic.IReadOnlyCollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ConfigProperty>>
+  nameWithType.vb: IReadOnlyCollection(Of KeyValuePair(Of String, ConfigProperty))
+  fullName.vb: System.Collections.Generic.IReadOnlyCollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ConfigProperty))
+  name.vb: IReadOnlyCollection(Of KeyValuePair(Of String, ConfigProperty))
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: <
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  commentId: T:System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ConfigProperty}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<KeyValuePair<string, ConfigProperty>>
+  nameWithType: IEnumerable<KeyValuePair<string, ConfigProperty>>
+  fullName: System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ConfigProperty>>
+  nameWithType.vb: IEnumerable(Of KeyValuePair(Of String, ConfigProperty))
+  fullName.vb: System.Collections.Generic.IEnumerable(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ConfigProperty))
+  name.vb: IEnumerable(Of KeyValuePair(Of String, ConfigProperty))
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  - name: )
+- uid: System.Collections.IDictionary
+  commentId: T:System.Collections.IDictionary
+  parent: System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.idictionary
+  name: IDictionary
+  nameWithType: IDictionary
+  fullName: System.Collections.IDictionary
+- uid: System.Collections.ICollection
+  commentId: T:System.Collections.ICollection
+  parent: System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.icollection
+  name: ICollection
+  nameWithType: ICollection
+  fullName: System.Collections.ICollection
+- uid: System.Collections.IEnumerable
+  commentId: T:System.Collections.IEnumerable
+  parent: System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.ienumerable
+  name: IEnumerable
+  nameWithType: IEnumerable
+  fullName: System.Collections.IEnumerable
+- uid: System.Runtime.Serialization.IDeserializationCallback
+  commentId: T:System.Runtime.Serialization.IDeserializationCallback
+  parent: System.Runtime.Serialization
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.ideserializationcallback
+  name: IDeserializationCallback
+  nameWithType: IDeserializationCallback
+  fullName: System.Runtime.Serialization.IDeserializationCallback
+- uid: System.Runtime.Serialization.ISerializable
+  commentId: T:System.Runtime.Serialization.ISerializable
+  parent: System.Runtime.Serialization
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.iserializable
+  name: ISerializable
+  nameWithType: ISerializable
+  fullName: System.Runtime.Serialization.ISerializable
+- uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+  commentId: M:Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+  parent: Terminal.Gui.Scope{Terminal.Gui.AppScope}
+  definition: Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+  href: Terminal.Gui.Scope{Terminal.Gui.AppScope}.html#Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+  name: Update(Scope<AppScope>)
+  nameWithType: Scope<AppScope>.Update(Scope<AppScope>)
+  fullName: Terminal.Gui.Scope<Terminal.Gui.AppScope>.Update(Terminal.Gui.Scope<Terminal.Gui.AppScope>)
+  nameWithType.vb: Scope(Of AppScope).Update(Scope(Of AppScope))
+  fullName.vb: Terminal.Gui.Scope(Of Terminal.Gui.AppScope).Update(Terminal.Gui.Scope(Of Terminal.Gui.AppScope))
+  name.vb: Update(Scope(Of AppScope))
+  spec.csharp:
+  - uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+    name: Update
+    href: Terminal.Gui.Scope{Terminal.Gui.AppScope}.html#Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+  - name: (
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: <
+  - uid: Terminal.Gui.AppScope
+    name: AppScope
+    href: Terminal.Gui.AppScope.html
+  - name: '>'
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+    name: Update
+    href: Terminal.Gui.Scope{Terminal.Gui.AppScope}.html#Terminal.Gui.Scope{Terminal.Gui.AppScope}.Update(Terminal.Gui.Scope{Terminal.Gui.AppScope})
+  - name: (
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.AppScope
+    name: AppScope
+    href: Terminal.Gui.AppScope.html
+  - name: )
+  - name: )
+- uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+  commentId: M:Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+  parent: Terminal.Gui.Scope{Terminal.Gui.AppScope}
+  definition: Terminal.Gui.Scope`1.RetrieveValues
+  href: Terminal.Gui.Scope{Terminal.Gui.AppScope}.html#Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+  name: RetrieveValues()
+  nameWithType: Scope<AppScope>.RetrieveValues()
+  fullName: Terminal.Gui.Scope<Terminal.Gui.AppScope>.RetrieveValues()
+  nameWithType.vb: Scope(Of AppScope).RetrieveValues()
+  fullName.vb: Terminal.Gui.Scope(Of Terminal.Gui.AppScope).RetrieveValues()
+  spec.csharp:
+  - uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+    name: RetrieveValues
+    href: Terminal.Gui.Scope{Terminal.Gui.AppScope}.html#Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+    name: RetrieveValues
+    href: Terminal.Gui.Scope{Terminal.Gui.AppScope}.html#Terminal.Gui.Scope{Terminal.Gui.AppScope}.RetrieveValues
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Add(System.String,Terminal.Gui.ConfigProperty)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Add(System.String,Terminal.Gui.ConfigProperty)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Add(`0,`1)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.add#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-add(system-string-terminal-gui-configproperty)
+  name: Add(string, ConfigProperty)
+  nameWithType: Dictionary<string, ConfigProperty>.Add(string, ConfigProperty)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Add(string, Terminal.Gui.ConfigProperty)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Add(String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Add(String, Terminal.Gui.ConfigProperty)
+  name.vb: Add(String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Add(System.String,Terminal.Gui.ConfigProperty)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.add#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-add(system-string-terminal-gui-configproperty)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Add(System.String,Terminal.Gui.ConfigProperty)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.add#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-add(system-string-terminal-gui-configproperty)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Clear
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Clear
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Clear
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.clear#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-clear
+  name: Clear()
+  nameWithType: Dictionary<string, ConfigProperty>.Clear()
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Clear()
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Clear()
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Clear()
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.clear#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-clear
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.clear#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-clear
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsKey(System.String)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsKey(System.String)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.ContainsKey(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.containskey#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-containskey(system-string)
+  name: ContainsKey(string)
+  nameWithType: Dictionary<string, ConfigProperty>.ContainsKey(string)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.ContainsKey(string)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).ContainsKey(String)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).ContainsKey(String)
+  name.vb: ContainsKey(String)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsKey(System.String)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.containskey#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-containskey(system-string)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsKey(System.String)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.containskey#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-containskey(system-string)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsValue(Terminal.Gui.ConfigProperty)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsValue(Terminal.Gui.ConfigProperty)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.ContainsValue(`1)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.containsvalue#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-containsvalue(terminal-gui-configproperty)
+  name: ContainsValue(ConfigProperty)
+  nameWithType: Dictionary<string, ConfigProperty>.ContainsValue(ConfigProperty)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.ContainsValue(Terminal.Gui.ConfigProperty)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).ContainsValue(ConfigProperty)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).ContainsValue(Terminal.Gui.ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsValue(Terminal.Gui.ConfigProperty)
+    name: ContainsValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.containsvalue#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-containsvalue(terminal-gui-configproperty)
+  - name: (
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.ContainsValue(Terminal.Gui.ConfigProperty)
+    name: ContainsValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.containsvalue#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-containsvalue(terminal-gui-configproperty)
+  - name: (
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.EnsureCapacity(System.Int32)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.EnsureCapacity(System.Int32)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.EnsureCapacity(System.Int32)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.ensurecapacity#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-ensurecapacity(system-int32)
+  name: EnsureCapacity(int)
+  nameWithType: Dictionary<string, ConfigProperty>.EnsureCapacity(int)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.EnsureCapacity(int)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).EnsureCapacity(Integer)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).EnsureCapacity(Integer)
+  name.vb: EnsureCapacity(Integer)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.EnsureCapacity(System.Int32)
+    name: EnsureCapacity
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.ensurecapacity#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-ensurecapacity(system-int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.EnsureCapacity(System.Int32)
+    name: EnsureCapacity
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.ensurecapacity#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-ensurecapacity(system-int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetEnumerator
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetEnumerator
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.GetEnumerator
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.getenumerator#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-getenumerator
+  name: GetEnumerator()
+  nameWithType: Dictionary<string, ConfigProperty>.GetEnumerator()
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.GetEnumerator()
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).GetEnumerator()
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).GetEnumerator()
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.getenumerator#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-getenumerator
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.getenumerator#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-getenumerator
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.getobjectdata#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-getobjectdata(system-runtime-serialization-serializationinfo-system-runtime-serialization-streamingcontext)
+  name: GetObjectData(SerializationInfo, StreamingContext)
+  nameWithType: Dictionary<string, ConfigProperty>.GetObjectData(SerializationInfo, StreamingContext)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.GetObjectData(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).GetObjectData(SerializationInfo, StreamingContext)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).GetObjectData(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+    name: GetObjectData
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.getobjectdata#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-getobjectdata(system-runtime-serialization-serializationinfo-system-runtime-serialization-streamingcontext)
+  - name: (
+  - uid: System.Runtime.Serialization.SerializationInfo
+    name: SerializationInfo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.serializationinfo
+  - name: ','
+  - name: " "
+  - uid: System.Runtime.Serialization.StreamingContext
+    name: StreamingContext
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.streamingcontext
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+    name: GetObjectData
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.getobjectdata#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-getobjectdata(system-runtime-serialization-serializationinfo-system-runtime-serialization-streamingcontext)
+  - name: (
+  - uid: System.Runtime.Serialization.SerializationInfo
+    name: SerializationInfo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.serializationinfo
+  - name: ','
+  - name: " "
+  - uid: System.Runtime.Serialization.StreamingContext
+    name: StreamingContext
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.streamingcontext
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.OnDeserialization(System.Object)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.OnDeserialization(System.Object)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.OnDeserialization(System.Object)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.ondeserialization#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-ondeserialization(system-object)
+  name: OnDeserialization(object)
+  nameWithType: Dictionary<string, ConfigProperty>.OnDeserialization(object)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.OnDeserialization(object)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).OnDeserialization(Object)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).OnDeserialization(Object)
+  name.vb: OnDeserialization(Object)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.OnDeserialization(System.Object)
+    name: OnDeserialization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.ondeserialization#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-ondeserialization(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.OnDeserialization(System.Object)
+    name: OnDeserialization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.ondeserialization#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-ondeserialization(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Remove(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.remove#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-remove(system-string)
+  name: Remove(string)
+  nameWithType: Dictionary<string, ConfigProperty>.Remove(string)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Remove(string)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Remove(String)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Remove(String)
+  name.vb: Remove(String)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.remove#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-remove(system-string)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.remove#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-remove(system-string)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String,Terminal.Gui.ConfigProperty@)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String,Terminal.Gui.ConfigProperty@)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Remove(`0,`1@)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.remove#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-remove(system-string-terminal-gui-configproperty@)
+  name: Remove(string, out ConfigProperty)
+  nameWithType: Dictionary<string, ConfigProperty>.Remove(string, out ConfigProperty)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Remove(string, out Terminal.Gui.ConfigProperty)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Remove(String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Remove(String, Terminal.Gui.ConfigProperty)
+  name.vb: Remove(String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String,Terminal.Gui.ConfigProperty@)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.remove#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-remove(system-string-terminal-gui-configproperty@)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Remove(System.String,Terminal.Gui.ConfigProperty@)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.remove#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-remove(system-string-terminal-gui-configproperty@)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.TrimExcess
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trimexcess#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trimexcess
+  name: TrimExcess()
+  nameWithType: Dictionary<string, ConfigProperty>.TrimExcess()
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.TrimExcess()
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).TrimExcess()
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).TrimExcess()
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trimexcess#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trimexcess
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trimexcess#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trimexcess
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess(System.Int32)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess(System.Int32)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.TrimExcess(System.Int32)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trimexcess#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trimexcess(system-int32)
+  name: TrimExcess(int)
+  nameWithType: Dictionary<string, ConfigProperty>.TrimExcess(int)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.TrimExcess(int)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).TrimExcess(Integer)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).TrimExcess(Integer)
+  name.vb: TrimExcess(Integer)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess(System.Int32)
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trimexcess#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trimexcess(system-int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TrimExcess(System.Int32)
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trimexcess#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trimexcess(system-int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryAdd(System.String,Terminal.Gui.ConfigProperty)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryAdd(System.String,Terminal.Gui.ConfigProperty)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.TryAdd(`0,`1)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.tryadd#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-tryadd(system-string-terminal-gui-configproperty)
+  name: TryAdd(string, ConfigProperty)
+  nameWithType: Dictionary<string, ConfigProperty>.TryAdd(string, ConfigProperty)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.TryAdd(string, Terminal.Gui.ConfigProperty)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).TryAdd(String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).TryAdd(String, Terminal.Gui.ConfigProperty)
+  name.vb: TryAdd(String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryAdd(System.String,Terminal.Gui.ConfigProperty)
+    name: TryAdd
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.tryadd#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-tryadd(system-string-terminal-gui-configproperty)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryAdd(System.String,Terminal.Gui.ConfigProperty)
+    name: TryAdd
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.tryadd#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-tryadd(system-string-terminal-gui-configproperty)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryGetValue(System.String,Terminal.Gui.ConfigProperty@)
+  commentId: M:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryGetValue(System.String,Terminal.Gui.ConfigProperty@)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.TryGetValue(`0,`1@)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trygetvalue#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trygetvalue(system-string-terminal-gui-configproperty@)
+  name: TryGetValue(string, out ConfigProperty)
+  nameWithType: Dictionary<string, ConfigProperty>.TryGetValue(string, out ConfigProperty)
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.TryGetValue(string, out Terminal.Gui.ConfigProperty)
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).TryGetValue(String, ConfigProperty)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).TryGetValue(String, Terminal.Gui.ConfigProperty)
+  name.vb: TryGetValue(String, ConfigProperty)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryGetValue(System.String,Terminal.Gui.ConfigProperty@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trygetvalue#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trygetvalue(system-string-terminal-gui-configproperty@)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.TryGetValue(System.String,Terminal.Gui.ConfigProperty@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.trygetvalue#system-collections-generic-dictionary((system-string-terminal-gui-configproperty))-trygetvalue(system-string-terminal-gui-configproperty@)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConfigProperty
+    name: ConfigProperty
+    href: Terminal.Gui.ConfigProperty.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Comparer
+  commentId: P:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Comparer
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Comparer
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.comparer
+  name: Comparer
+  nameWithType: Dictionary<string, ConfigProperty>.Comparer
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Comparer
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Comparer
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Comparer
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Count
+  commentId: P:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Count
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Count
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.count
+  name: Count
+  nameWithType: Dictionary<string, ConfigProperty>.Count
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Count
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Count
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Count
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Item(System.String)
+  commentId: P:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Item(System.String)
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Item(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: this[string]
+  nameWithType: Dictionary<string, ConfigProperty>.this[string]
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.this[string]
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).this[](String)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).this[](String)
+  name.vb: this[](String)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ']'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Item(System.String)
+    name: this[]
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.item
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Keys
+  commentId: P:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Keys
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Keys
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.keys
+  name: Keys
+  nameWithType: Dictionary<string, ConfigProperty>.Keys
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Keys
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Keys
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Keys
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Values
+  commentId: P:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}.Values
+  parent: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ConfigProperty}
+  definition: System.Collections.Generic.Dictionary`2.Values
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-system.string,terminal.gui.configproperty-.values
+  name: Values
+  nameWithType: Dictionary<string, ConfigProperty>.Values
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ConfigProperty>.Values
+  nameWithType.vb: Dictionary(Of String, ConfigProperty).Values
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ConfigProperty).Values
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Collections.Generic.Dictionary`2
+  commentId: T:System.Collections.Generic.Dictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<TKey, TValue>
+  nameWithType: Dictionary<TKey, TValue>
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>
+  nameWithType.vb: Dictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue)
+  name.vb: Dictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: System.Collections.Generic.IDictionary`2
+  commentId: T:System.Collections.Generic.IDictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  name: IDictionary<TKey, TValue>
+  nameWithType: IDictionary<TKey, TValue>
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>
+  nameWithType.vb: IDictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue)
+  name.vb: IDictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.ICollection`1
+  commentId: T:System.Collections.Generic.ICollection`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  name: ICollection<T>
+  nameWithType: ICollection<T>
+  fullName: System.Collections.Generic.ICollection<T>
+  nameWithType.vb: ICollection(Of T)
+  fullName.vb: System.Collections.Generic.ICollection(Of T)
+  name.vb: ICollection(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.IReadOnlyDictionary`2
+  commentId: T:System.Collections.Generic.IReadOnlyDictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2
+  name: IReadOnlyDictionary<TKey, TValue>
+  nameWithType: IReadOnlyDictionary<TKey, TValue>
+  fullName: System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>
+  nameWithType.vb: IReadOnlyDictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.IReadOnlyDictionary(Of TKey, TValue)
+  name.vb: IReadOnlyDictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyDictionary`2
+    name: IReadOnlyDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IReadOnlyDictionary`2
+    name: IReadOnlyDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.IReadOnlyCollection`1
+  commentId: T:System.Collections.Generic.IReadOnlyCollection`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  name: IReadOnlyCollection<T>
+  nameWithType: IReadOnlyCollection<T>
+  fullName: System.Collections.Generic.IReadOnlyCollection<T>
+  nameWithType.vb: IReadOnlyCollection(Of T)
+  fullName.vb: System.Collections.Generic.IReadOnlyCollection(Of T)
+  name.vb: IReadOnlyCollection(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+- uid: System.Runtime.Serialization
+  commentId: N:System.Runtime.Serialization
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Runtime.Serialization
+  nameWithType: System.Runtime.Serialization
+  fullName: System.Runtime.Serialization
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime
+  - name: .
+  - uid: System.Runtime.Serialization
+    name: Serialization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Runtime
+    name: Runtime
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime
+  - name: .
+  - uid: System.Runtime.Serialization
+    name: Serialization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization
+- uid: Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+  commentId: M:Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+  href: Terminal.Gui.Scope-1.html#Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+  name: Update(Scope<T>)
+  nameWithType: Scope<T>.Update(Scope<T>)
+  fullName: Terminal.Gui.Scope<T>.Update(Terminal.Gui.Scope<T>)
+  nameWithType.vb: Scope(Of T).Update(Scope(Of T))
+  fullName.vb: Terminal.Gui.Scope(Of T).Update(Terminal.Gui.Scope(Of T))
+  name.vb: Update(Scope(Of T))
+  spec.csharp:
+  - uid: Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+    name: Update
+    href: Terminal.Gui.Scope-1.html#Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+  - name: (
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+    name: Update
+    href: Terminal.Gui.Scope-1.html#Terminal.Gui.Scope`1.Update(Terminal.Gui.Scope{`0})
+  - name: (
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+  - name: )
+- uid: Terminal.Gui.Scope`1.RetrieveValues
+  commentId: M:Terminal.Gui.Scope`1.RetrieveValues
+  href: Terminal.Gui.Scope-1.html#Terminal.Gui.Scope`1.RetrieveValues
+  name: RetrieveValues()
+  nameWithType: Scope<T>.RetrieveValues()
+  fullName: Terminal.Gui.Scope<T>.RetrieveValues()
+  nameWithType.vb: Scope(Of T).RetrieveValues()
+  fullName.vb: Terminal.Gui.Scope(Of T).RetrieveValues()
+  spec.csharp:
+  - uid: Terminal.Gui.Scope`1.RetrieveValues
+    name: RetrieveValues
+    href: Terminal.Gui.Scope-1.html#Terminal.Gui.Scope`1.RetrieveValues
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.Scope`1.RetrieveValues
+    name: RetrieveValues
+    href: Terminal.Gui.Scope-1.html#Terminal.Gui.Scope`1.RetrieveValues
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.Add(`0,`1)
+  commentId: M:System.Collections.Generic.Dictionary`2.Add(`0,`1)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.add
+  name: Add(TKey, TValue)
+  nameWithType: Dictionary<TKey, TValue>.Add(TKey, TValue)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Add(TKey, TValue)
+  nameWithType.vb: Dictionary(Of TKey, TValue).Add(TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Add(TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.Add(`0,`1)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.add
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.Add(`0,`1)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.add
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.Clear
+  commentId: M:System.Collections.Generic.Dictionary`2.Clear
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.clear
+  name: Clear()
+  nameWithType: Dictionary<TKey, TValue>.Clear()
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Clear()
+  nameWithType.vb: Dictionary(Of TKey, TValue).Clear()
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Clear()
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.clear
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.clear
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.ContainsKey(`0)
+  commentId: M:System.Collections.Generic.Dictionary`2.ContainsKey(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.containskey
+  name: ContainsKey(TKey)
+  nameWithType: Dictionary<TKey, TValue>.ContainsKey(TKey)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.ContainsKey(TKey)
+  nameWithType.vb: Dictionary(Of TKey, TValue).ContainsKey(TKey)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).ContainsKey(TKey)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.ContainsKey(`0)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.containskey
+  - name: (
+  - name: TKey
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.ContainsKey(`0)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.containskey
+  - name: (
+  - name: TKey
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.ContainsValue(`1)
+  commentId: M:System.Collections.Generic.Dictionary`2.ContainsValue(`1)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.containsvalue
+  name: ContainsValue(TValue)
+  nameWithType: Dictionary<TKey, TValue>.ContainsValue(TValue)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.ContainsValue(TValue)
+  nameWithType.vb: Dictionary(Of TKey, TValue).ContainsValue(TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).ContainsValue(TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.ContainsValue(`1)
+    name: ContainsValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.containsvalue
+  - name: (
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.ContainsValue(`1)
+    name: ContainsValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.containsvalue
+  - name: (
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.EnsureCapacity(System.Int32)
+  commentId: M:System.Collections.Generic.Dictionary`2.EnsureCapacity(System.Int32)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.ensurecapacity
+  name: EnsureCapacity(int)
+  nameWithType: Dictionary<TKey, TValue>.EnsureCapacity(int)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.EnsureCapacity(int)
+  nameWithType.vb: Dictionary(Of TKey, TValue).EnsureCapacity(Integer)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).EnsureCapacity(Integer)
+  name.vb: EnsureCapacity(Integer)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.EnsureCapacity(System.Int32)
+    name: EnsureCapacity
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.ensurecapacity
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.EnsureCapacity(System.Int32)
+    name: EnsureCapacity
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.ensurecapacity
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.GetEnumerator
+  commentId: M:System.Collections.Generic.Dictionary`2.GetEnumerator
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.getenumerator
+  name: GetEnumerator()
+  nameWithType: Dictionary<TKey, TValue>.GetEnumerator()
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.GetEnumerator()
+  nameWithType.vb: Dictionary(Of TKey, TValue).GetEnumerator()
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).GetEnumerator()
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.getenumerator
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.getenumerator
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  commentId: M:System.Collections.Generic.Dictionary`2.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.getobjectdata
+  name: GetObjectData(SerializationInfo, StreamingContext)
+  nameWithType: Dictionary<TKey, TValue>.GetObjectData(SerializationInfo, StreamingContext)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.GetObjectData(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)
+  nameWithType.vb: Dictionary(Of TKey, TValue).GetObjectData(SerializationInfo, StreamingContext)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).GetObjectData(System.Runtime.Serialization.SerializationInfo, System.Runtime.Serialization.StreamingContext)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+    name: GetObjectData
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.getobjectdata
+  - name: (
+  - uid: System.Runtime.Serialization.SerializationInfo
+    name: SerializationInfo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.serializationinfo
+  - name: ','
+  - name: " "
+  - uid: System.Runtime.Serialization.StreamingContext
+    name: StreamingContext
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.streamingcontext
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.GetObjectData(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)
+    name: GetObjectData
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.getobjectdata
+  - name: (
+  - uid: System.Runtime.Serialization.SerializationInfo
+    name: SerializationInfo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.serializationinfo
+  - name: ','
+  - name: " "
+  - uid: System.Runtime.Serialization.StreamingContext
+    name: StreamingContext
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.runtime.serialization.streamingcontext
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.OnDeserialization(System.Object)
+  commentId: M:System.Collections.Generic.Dictionary`2.OnDeserialization(System.Object)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.ondeserialization
+  name: OnDeserialization(object)
+  nameWithType: Dictionary<TKey, TValue>.OnDeserialization(object)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.OnDeserialization(object)
+  nameWithType.vb: Dictionary(Of TKey, TValue).OnDeserialization(Object)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).OnDeserialization(Object)
+  name.vb: OnDeserialization(Object)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.OnDeserialization(System.Object)
+    name: OnDeserialization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.ondeserialization
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.OnDeserialization(System.Object)
+    name: OnDeserialization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.ondeserialization
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.Remove(`0)
+  commentId: M:System.Collections.Generic.Dictionary`2.Remove(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.remove#system-collections-generic-dictionary-2-remove(-0)
+  name: Remove(TKey)
+  nameWithType: Dictionary<TKey, TValue>.Remove(TKey)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Remove(TKey)
+  nameWithType.vb: Dictionary(Of TKey, TValue).Remove(TKey)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Remove(TKey)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.Remove(`0)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.remove#system-collections-generic-dictionary-2-remove(-0)
+  - name: (
+  - name: TKey
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.Remove(`0)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.remove#system-collections-generic-dictionary-2-remove(-0)
+  - name: (
+  - name: TKey
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.Remove(`0,`1@)
+  commentId: M:System.Collections.Generic.Dictionary`2.Remove(`0,`1@)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.remove#system-collections-generic-dictionary-2-remove(-0-1@)
+  name: Remove(TKey, out TValue)
+  nameWithType: Dictionary<TKey, TValue>.Remove(TKey, out TValue)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Remove(TKey, out TValue)
+  nameWithType.vb: Dictionary(Of TKey, TValue).Remove(TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Remove(TKey, TValue)
+  name.vb: Remove(TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.Remove(`0,`1@)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.remove#system-collections-generic-dictionary-2-remove(-0-1@)
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.Remove(`0,`1@)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.remove#system-collections-generic-dictionary-2-remove(-0-1@)
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.TrimExcess
+  commentId: M:System.Collections.Generic.Dictionary`2.TrimExcess
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trimexcess#system-collections-generic-dictionary-2-trimexcess
+  name: TrimExcess()
+  nameWithType: Dictionary<TKey, TValue>.TrimExcess()
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.TrimExcess()
+  nameWithType.vb: Dictionary(Of TKey, TValue).TrimExcess()
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).TrimExcess()
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.TrimExcess
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trimexcess#system-collections-generic-dictionary-2-trimexcess
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.TrimExcess
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trimexcess#system-collections-generic-dictionary-2-trimexcess
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.TrimExcess(System.Int32)
+  commentId: M:System.Collections.Generic.Dictionary`2.TrimExcess(System.Int32)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trimexcess#system-collections-generic-dictionary-2-trimexcess(system-int32)
+  name: TrimExcess(int)
+  nameWithType: Dictionary<TKey, TValue>.TrimExcess(int)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.TrimExcess(int)
+  nameWithType.vb: Dictionary(Of TKey, TValue).TrimExcess(Integer)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).TrimExcess(Integer)
+  name.vb: TrimExcess(Integer)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.TrimExcess(System.Int32)
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trimexcess#system-collections-generic-dictionary-2-trimexcess(system-int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.TrimExcess(System.Int32)
+    name: TrimExcess
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trimexcess#system-collections-generic-dictionary-2-trimexcess(system-int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.TryAdd(`0,`1)
+  commentId: M:System.Collections.Generic.Dictionary`2.TryAdd(`0,`1)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.tryadd
+  name: TryAdd(TKey, TValue)
+  nameWithType: Dictionary<TKey, TValue>.TryAdd(TKey, TValue)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.TryAdd(TKey, TValue)
+  nameWithType.vb: Dictionary(Of TKey, TValue).TryAdd(TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).TryAdd(TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.TryAdd(`0,`1)
+    name: TryAdd
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.tryadd
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.TryAdd(`0,`1)
+    name: TryAdd
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.tryadd
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.TryGetValue(`0,`1@)
+  commentId: M:System.Collections.Generic.Dictionary`2.TryGetValue(`0,`1@)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trygetvalue
+  name: TryGetValue(TKey, out TValue)
+  nameWithType: Dictionary<TKey, TValue>.TryGetValue(TKey, out TValue)
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.TryGetValue(TKey, out TValue)
+  nameWithType.vb: Dictionary(Of TKey, TValue).TryGetValue(TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).TryGetValue(TKey, TValue)
+  name.vb: TryGetValue(TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2.TryGetValue(`0,`1@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trygetvalue
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.TryGetValue(`0,`1@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.trygetvalue
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.Comparer
+  commentId: P:System.Collections.Generic.Dictionary`2.Comparer
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.comparer
+  name: Comparer
+  nameWithType: Dictionary<TKey, TValue>.Comparer
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Comparer
+  nameWithType.vb: Dictionary(Of TKey, TValue).Comparer
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Comparer
+- uid: System.Collections.Generic.Dictionary`2.Count
+  commentId: P:System.Collections.Generic.Dictionary`2.Count
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.count
+  name: Count
+  nameWithType: Dictionary<TKey, TValue>.Count
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Count
+  nameWithType.vb: Dictionary(Of TKey, TValue).Count
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Count
+- uid: System.Collections.Generic.Dictionary`2.Item(`0)
+  commentId: P:System.Collections.Generic.Dictionary`2.Item(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.item
+  name: this[TKey]
+  nameWithType: Dictionary<TKey, TValue>.this[TKey]
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.this[TKey]
+  nameWithType.vb: Dictionary(Of TKey, TValue).this[](TKey)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).this[](TKey)
+  name.vb: this[](TKey)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - name: TKey
+  - name: ']'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2.Item(`0)
+    name: this[]
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.item
+  - name: (
+  - name: TKey
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2.Keys
+  commentId: P:System.Collections.Generic.Dictionary`2.Keys
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.keys
+  name: Keys
+  nameWithType: Dictionary<TKey, TValue>.Keys
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Keys
+  nameWithType.vb: Dictionary(Of TKey, TValue).Keys
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Keys
+- uid: System.Collections.Generic.Dictionary`2.Values
+  commentId: P:System.Collections.Generic.Dictionary`2.Values
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2.values
+  name: Values
+  nameWithType: Dictionary<TKey, TValue>.Values
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>.Values
+  nameWithType.vb: Dictionary(Of TKey, TValue).Values
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue).Values
+shouldSkipMarkup: true

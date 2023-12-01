@@ -1,0 +1,82 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.RowColorGetterDelegate
+  commentId: T:Terminal.Gui.RowColorGetterDelegate
+  id: RowColorGetterDelegate
+  parent: Terminal.Gui
+  children: []
+  langs:
+  - csharp
+  - vb
+  name: RowColorGetterDelegate
+  nameWithType: RowColorGetterDelegate
+  fullName: Terminal.Gui.RowColorGetterDelegate
+  type: Delegate
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableView.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RowColorGetterDelegate
+    path: ../Terminal.Gui/Views/TableView/TableView.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Delegate for providing color for a whole row of a <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public delegate ColorScheme RowColorGetterDelegate(RowColorGetterArgs args)
+    parameters:
+    - id: args
+      type: Terminal.Gui.RowColorGetterArgs
+      description: ''
+    return:
+      type: Terminal.Gui.ColorScheme
+      description: ''
+    content.vb: Public Delegate Function RowColorGetterDelegate(args As RowColorGetterArgs) As ColorScheme
+references:
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.RowColorGetterArgs
+  commentId: T:Terminal.Gui.RowColorGetterArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.RowColorGetterArgs.html
+  name: RowColorGetterArgs
+  nameWithType: RowColorGetterArgs
+  fullName: Terminal.Gui.RowColorGetterArgs
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorScheme.html
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
+shouldSkipMarkup: true

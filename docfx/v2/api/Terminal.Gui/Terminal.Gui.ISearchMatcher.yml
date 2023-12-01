@@ -1,0 +1,210 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ISearchMatcher
+  commentId: T:Terminal.Gui.ISearchMatcher
+  id: ISearchMatcher
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ISearchMatcher.Initialize(System.String)
+  - Terminal.Gui.ISearchMatcher.IsMatch(System.IO.Abstractions.IFileSystemInfo)
+  langs:
+  - csharp
+  - vb
+  name: ISearchMatcher
+  nameWithType: ISearchMatcher
+  fullName: Terminal.Gui.ISearchMatcher
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/ISearchMatcher.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ISearchMatcher
+    path: ../Terminal.Gui/FileServices/ISearchMatcher.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Defines whether a given file/directory matches a set of
+
+    search terms.
+  example: []
+  syntax:
+    content: public interface ISearchMatcher
+    content.vb: Public Interface ISearchMatcher
+- uid: Terminal.Gui.ISearchMatcher.Initialize(System.String)
+  commentId: M:Terminal.Gui.ISearchMatcher.Initialize(System.String)
+  id: Initialize(System.String)
+  parent: Terminal.Gui.ISearchMatcher
+  langs:
+  - csharp
+  - vb
+  name: Initialize(string)
+  nameWithType: ISearchMatcher.Initialize(string)
+  fullName: Terminal.Gui.ISearchMatcher.Initialize(string)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/ISearchMatcher.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Initialize
+    path: ../Terminal.Gui/FileServices/ISearchMatcher.cs
+    startLine: 14
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Called once for each new search. Defines the string
+
+    the user has provided as search terms.
+  example: []
+  syntax:
+    content: void Initialize(string terms)
+    parameters:
+    - id: terms
+      type: System.String
+    content.vb: Sub Initialize(terms As String)
+  overload: Terminal.Gui.ISearchMatcher.Initialize*
+  nameWithType.vb: ISearchMatcher.Initialize(String)
+  fullName.vb: Terminal.Gui.ISearchMatcher.Initialize(String)
+  name.vb: Initialize(String)
+- uid: Terminal.Gui.ISearchMatcher.IsMatch(System.IO.Abstractions.IFileSystemInfo)
+  commentId: M:Terminal.Gui.ISearchMatcher.IsMatch(System.IO.Abstractions.IFileSystemInfo)
+  id: IsMatch(System.IO.Abstractions.IFileSystemInfo)
+  parent: Terminal.Gui.ISearchMatcher
+  langs:
+  - csharp
+  - vb
+  name: IsMatch(IFileSystemInfo)
+  nameWithType: ISearchMatcher.IsMatch(IFileSystemInfo)
+  fullName: Terminal.Gui.ISearchMatcher.IsMatch(System.IO.Abstractions.IFileSystemInfo)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/ISearchMatcher.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsMatch
+    path: ../Terminal.Gui/FileServices/ISearchMatcher.cs
+    startLine: 20
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Return true if <code class="paramref">f</code> is a match to the
+
+    last provided search terms
+  example: []
+  syntax:
+    content: bool IsMatch(IFileSystemInfo f)
+    parameters:
+    - id: f
+      type: System.IO.Abstractions.IFileSystemInfo
+    return:
+      type: System.Boolean
+    content.vb: Function IsMatch(f As IFileSystemInfo) As Boolean
+  overload: Terminal.Gui.ISearchMatcher.IsMatch*
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ISearchMatcher.Initialize*
+  commentId: Overload:Terminal.Gui.ISearchMatcher.Initialize
+  href: Terminal.Gui.ISearchMatcher.html#Terminal.Gui.ISearchMatcher.Initialize(System.String)
+  name: Initialize
+  nameWithType: ISearchMatcher.Initialize
+  fullName: Terminal.Gui.ISearchMatcher.Initialize
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ISearchMatcher.IsMatch*
+  commentId: Overload:Terminal.Gui.ISearchMatcher.IsMatch
+  href: Terminal.Gui.ISearchMatcher.html#Terminal.Gui.ISearchMatcher.IsMatch(System.IO.Abstractions.IFileSystemInfo)
+  name: IsMatch
+  nameWithType: ISearchMatcher.IsMatch
+  fullName: Terminal.Gui.ISearchMatcher.IsMatch
+- uid: System.IO.Abstractions.IFileSystemInfo
+  commentId: T:System.IO.Abstractions.IFileSystemInfo
+  parent: System.IO.Abstractions
+  isExternal: true
+  name: IFileSystemInfo
+  nameWithType: IFileSystemInfo
+  fullName: System.IO.Abstractions.IFileSystemInfo
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.IO.Abstractions
+  commentId: N:System.IO.Abstractions
+  isExternal: true
+  name: System.IO.Abstractions
+  nameWithType: System.IO.Abstractions
+  fullName: System.IO.Abstractions
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+  - name: .
+  - uid: System.IO.Abstractions
+    name: Abstractions
+    isExternal: true
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+  - name: .
+  - uid: System.IO.Abstractions
+    name: Abstractions
+    isExternal: true
+shouldSkipMarkup: true

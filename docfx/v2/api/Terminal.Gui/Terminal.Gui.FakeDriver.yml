@@ -1,0 +1,1928 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.FakeDriver
+  commentId: T:Terminal.Gui.FakeDriver
+  id: FakeDriver
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.FakeDriver.#ctor
+  - Terminal.Gui.FakeDriver.EnsureCursorVisibility
+  - Terminal.Gui.FakeDriver.FakeBehaviors
+  - Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)
+  - Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  - Terminal.Gui.FakeDriver.Refresh
+  - Terminal.Gui.FakeDriver.ResizeScreen
+  - Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  - Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)
+  - Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  - Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)
+  - Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)
+  - Terminal.Gui.FakeDriver.SupportsTrueColor
+  - Terminal.Gui.FakeDriver.Suspend
+  - Terminal.Gui.FakeDriver.UpdateCursor
+  - Terminal.Gui.FakeDriver.UpdateScreen
+  langs:
+  - csharp
+  - vb
+  name: FakeDriver
+  nameWithType: FakeDriver
+  fullName: Terminal.Gui.FakeDriver
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FakeDriver
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 15
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Implements a mock ConsoleDriver for unit testing
+  example: []
+  syntax:
+    content: 'public class FakeDriver : ConsoleDriver'
+    content.vb: Public Class FakeDriver Inherits ConsoleDriver
+  inheritance:
+  - System.Object
+  - Terminal.Gui.ConsoleDriver
+  inheritedMembers:
+  - Terminal.Gui.ConsoleDriver.SizeChanged
+  - Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  - Terminal.Gui.ConsoleDriver.Cols
+  - Terminal.Gui.ConsoleDriver.Rows
+  - Terminal.Gui.ConsoleDriver.Left
+  - Terminal.Gui.ConsoleDriver.Top
+  - Terminal.Gui.ConsoleDriver.Clipboard
+  - Terminal.Gui.ConsoleDriver.Contents
+  - Terminal.Gui.ConsoleDriver.Col
+  - Terminal.Gui.ConsoleDriver.Row
+  - Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  - Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  - Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  - Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+  - Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  - Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+  - Terminal.Gui.ConsoleDriver.Clip
+  - Terminal.Gui.ConsoleDriver.ClearContents
+  - Terminal.Gui.ConsoleDriver.CurrentAttribute
+  - Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  - Terminal.Gui.ConsoleDriver.GetAttribute
+  - Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  - Terminal.Gui.ConsoleDriver.KeyPressed
+  - Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  - Terminal.Gui.ConsoleDriver.KeyUp
+  - Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  - Terminal.Gui.ConsoleDriver.KeyDown
+  - Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  - Terminal.Gui.ConsoleDriver.MouseEvent
+  - Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  - Terminal.Gui.ConsoleDriver.Diagnostics
+  - Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+  - Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+  - Terminal.Gui.ConsoleDriver.GetVersionInfo
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.FakeDriver.FakeBehaviors
+  commentId: F:Terminal.Gui.FakeDriver.FakeBehaviors
+  id: FakeBehaviors
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: FakeBehaviors
+  nameWithType: FakeDriver.FakeBehaviors
+  fullName: Terminal.Gui.FakeDriver.FakeBehaviors
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FakeBehaviors
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 36
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public static FakeDriver.Behaviors FakeBehaviors
+    return:
+      type: Terminal.Gui.FakeDriver.Behaviors
+    content.vb: Public Shared FakeBehaviors As FakeDriver.Behaviors
+- uid: Terminal.Gui.FakeDriver.SupportsTrueColor
+  commentId: P:Terminal.Gui.FakeDriver.SupportsTrueColor
+  id: SupportsTrueColor
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: SupportsTrueColor
+  nameWithType: FakeDriver.SupportsTrueColor
+  fullName: Terminal.Gui.FakeDriver.SupportsTrueColor
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SupportsTrueColor
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 38
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets whether the <xref href="Terminal.Gui.ConsoleDriver" data-throw-if-not-resolved="false"></xref> supports TrueColor output.
+  example: []
+  syntax:
+    content: public override bool SupportsTrueColor { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Overrides ReadOnly Property SupportsTrueColor As Boolean
+  overridden: Terminal.Gui.ConsoleDriver.SupportsTrueColor
+  overload: Terminal.Gui.FakeDriver.SupportsTrueColor*
+- uid: Terminal.Gui.FakeDriver.#ctor
+  commentId: M:Terminal.Gui.FakeDriver.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: FakeDriver()
+  nameWithType: FakeDriver.FakeDriver()
+  fullName: Terminal.Gui.FakeDriver.FakeDriver()
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 40
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public FakeDriver()
+    content.vb: Public Sub New()
+  overload: Terminal.Gui.FakeDriver.#ctor*
+  nameWithType.vb: FakeDriver.New()
+  fullName.vb: Terminal.Gui.FakeDriver.New()
+  name.vb: New()
+- uid: Terminal.Gui.FakeDriver.UpdateScreen
+  commentId: M:Terminal.Gui.FakeDriver.UpdateScreen
+  id: UpdateScreen
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: UpdateScreen()
+  nameWithType: FakeDriver.UpdateScreen()
+  fullName: Terminal.Gui.FakeDriver.UpdateScreen()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UpdateScreen
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 84
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Redraws the physical screen with the contents that have been queued up via any of the printing commands.
+  example: []
+  syntax:
+    content: public override void UpdateScreen()
+    content.vb: Public Overrides Sub UpdateScreen()
+  overridden: Terminal.Gui.ConsoleDriver.UpdateScreen
+  overload: Terminal.Gui.FakeDriver.UpdateScreen*
+- uid: Terminal.Gui.FakeDriver.Refresh
+  commentId: M:Terminal.Gui.FakeDriver.Refresh
+  id: Refresh
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: Refresh()
+  nameWithType: FakeDriver.Refresh()
+  fullName: Terminal.Gui.FakeDriver.Refresh()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Refresh
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 176
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Updates the screen to reflect all the changes that have been done to the display buffer
+  example: []
+  syntax:
+    content: public override void Refresh()
+    content.vb: Public Overrides Sub Refresh()
+  overridden: Terminal.Gui.ConsoleDriver.Refresh
+  overload: Terminal.Gui.FakeDriver.Refresh*
+- uid: Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)
+  commentId: M:Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)
+  id: FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: FromVKPacketToKConsoleKeyInfo(ConsoleKeyInfo)
+  nameWithType: FakeDriver.FromVKPacketToKConsoleKeyInfo(ConsoleKeyInfo)
+  fullName: Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FromVKPacketToKConsoleKeyInfo
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 201
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo(ConsoleKeyInfo consoleKeyInfo)
+    parameters:
+    - id: consoleKeyInfo
+      type: System.ConsoleKeyInfo
+    return:
+      type: System.ConsoleKeyInfo
+    content.vb: Public Function FromVKPacketToKConsoleKeyInfo(consoleKeyInfo As ConsoleKeyInfo) As ConsoleKeyInfo
+  overload: Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo*
+- uid: Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  commentId: M:Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  id: GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: GetCursorVisibility(out CursorVisibility)
+  nameWithType: FakeDriver.GetCursorVisibility(out CursorVisibility)
+  fullName: Terminal.Gui.FakeDriver.GetCursorVisibility(out Terminal.Gui.CursorVisibility)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetCursorVisibility
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 380
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the terminal cursor visibility.
+  example: []
+  syntax:
+    content: public override bool GetCursorVisibility(out CursorVisibility visibility)
+    parameters:
+    - id: visibility
+      type: Terminal.Gui.CursorVisibility
+      description: The current <xref href="Terminal.Gui.CursorVisibility" data-throw-if-not-resolved="false"></xref>
+    return:
+      type: System.Boolean
+      description: <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> upon success
+    content.vb: Public Overrides Function GetCursorVisibility(visibility As CursorVisibility) As Boolean
+  overridden: Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  overload: Terminal.Gui.FakeDriver.GetCursorVisibility*
+  nameWithType.vb: FakeDriver.GetCursorVisibility(CursorVisibility)
+  fullName.vb: Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility)
+  name.vb: GetCursorVisibility(CursorVisibility)
+- uid: Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  commentId: M:Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  id: SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: SetCursorVisibility(CursorVisibility)
+  nameWithType: FakeDriver.SetCursorVisibility(CursorVisibility)
+  fullName: Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SetCursorVisibility
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 390
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets the terminal cursor visibility.
+  example: []
+  syntax:
+    content: public override bool SetCursorVisibility(CursorVisibility visibility)
+    parameters:
+    - id: visibility
+      type: Terminal.Gui.CursorVisibility
+      description: The wished <xref href="Terminal.Gui.CursorVisibility" data-throw-if-not-resolved="false"></xref>
+    return:
+      type: System.Boolean
+      description: <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> upon success
+    content.vb: Public Overrides Function SetCursorVisibility(visibility As CursorVisibility) As Boolean
+  overridden: Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  overload: Terminal.Gui.FakeDriver.SetCursorVisibility*
+- uid: Terminal.Gui.FakeDriver.EnsureCursorVisibility
+  commentId: M:Terminal.Gui.FakeDriver.EnsureCursorVisibility
+  id: EnsureCursorVisibility
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: EnsureCursorVisibility()
+  nameWithType: FakeDriver.EnsureCursorVisibility()
+  fullName: Terminal.Gui.FakeDriver.EnsureCursorVisibility()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EnsureCursorVisibility
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 397
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Determines if the terminal cursor should be visible or not and sets it accordingly.
+  example: []
+  syntax:
+    content: public override bool EnsureCursorVisibility()
+    return:
+      type: System.Boolean
+      description: <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> upon success
+    content.vb: Public Overrides Function EnsureCursorVisibility() As Boolean
+  overridden: Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+  overload: Terminal.Gui.FakeDriver.EnsureCursorVisibility*
+- uid: Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  commentId: M:Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  id: SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: SendKeys(char, ConsoleKey, bool, bool, bool)
+  nameWithType: FakeDriver.SendKeys(char, ConsoleKey, bool, bool, bool)
+  fullName: Terminal.Gui.FakeDriver.SendKeys(char, System.ConsoleKey, bool, bool, bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SendKeys
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 410
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Simulates a key press.
+  example: []
+  syntax:
+    content: public override void SendKeys(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
+    parameters:
+    - id: keyChar
+      type: System.Char
+      description: The key character.
+    - id: key
+      type: System.ConsoleKey
+      description: The key.
+    - id: shift
+      type: System.Boolean
+      description: If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> simulates the Shift key being pressed.
+    - id: alt
+      type: System.Boolean
+      description: If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> simulates the Alt key being pressed.
+    - id: control
+      type: System.Boolean
+    content.vb: Public Overrides Sub SendKeys(keyChar As Char, key As ConsoleKey, shift As Boolean, alt As Boolean, control As Boolean)
+  overridden: Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  overload: Terminal.Gui.FakeDriver.SendKeys*
+  nameWithType.vb: FakeDriver.SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+  fullName.vb: Terminal.Gui.FakeDriver.SendKeys(Char, System.ConsoleKey, Boolean, Boolean, Boolean)
+  name.vb: SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+- uid: Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)
+  id: SetBufferSize(System.Int32,System.Int32)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: SetBufferSize(int, int)
+  nameWithType: FakeDriver.SetBufferSize(int, int)
+  fullName: Terminal.Gui.FakeDriver.SetBufferSize(int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SetBufferSize
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 415
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public void SetBufferSize(int width, int height)
+    parameters:
+    - id: width
+      type: System.Int32
+    - id: height
+      type: System.Int32
+    content.vb: Public Sub SetBufferSize(width As Integer, height As Integer)
+  overload: Terminal.Gui.FakeDriver.SetBufferSize*
+  nameWithType.vb: FakeDriver.SetBufferSize(Integer, Integer)
+  fullName.vb: Terminal.Gui.FakeDriver.SetBufferSize(Integer, Integer)
+  name.vb: SetBufferSize(Integer, Integer)
+- uid: Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)
+  id: SetWindowSize(System.Int32,System.Int32)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: SetWindowSize(int, int)
+  nameWithType: FakeDriver.SetWindowSize(int, int)
+  fullName: Terminal.Gui.FakeDriver.SetWindowSize(int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SetWindowSize
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 424
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public void SetWindowSize(int width, int height)
+    parameters:
+    - id: width
+      type: System.Int32
+    - id: height
+      type: System.Int32
+    content.vb: Public Sub SetWindowSize(width As Integer, height As Integer)
+  overload: Terminal.Gui.FakeDriver.SetWindowSize*
+  nameWithType.vb: FakeDriver.SetWindowSize(Integer, Integer)
+  fullName.vb: Terminal.Gui.FakeDriver.SetWindowSize(Integer, Integer)
+  name.vb: SetWindowSize(Integer, Integer)
+- uid: Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)
+  id: SetWindowPosition(System.Int32,System.Int32)
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: SetWindowPosition(int, int)
+  nameWithType: FakeDriver.SetWindowPosition(int, int)
+  fullName: Terminal.Gui.FakeDriver.SetWindowPosition(int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SetWindowPosition
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 435
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public void SetWindowPosition(int left, int top)
+    parameters:
+    - id: left
+      type: System.Int32
+    - id: top
+      type: System.Int32
+    content.vb: Public Sub SetWindowPosition(left As Integer, top As Integer)
+  overload: Terminal.Gui.FakeDriver.SetWindowPosition*
+  nameWithType.vb: FakeDriver.SetWindowPosition(Integer, Integer)
+  fullName.vb: Terminal.Gui.FakeDriver.SetWindowPosition(Integer, Integer)
+  name.vb: SetWindowPosition(Integer, Integer)
+- uid: Terminal.Gui.FakeDriver.ResizeScreen
+  commentId: M:Terminal.Gui.FakeDriver.ResizeScreen
+  id: ResizeScreen
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: ResizeScreen()
+  nameWithType: FakeDriver.ResizeScreen()
+  fullName: Terminal.Gui.FakeDriver.ResizeScreen()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ResizeScreen
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 451
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  syntax:
+    content: public virtual void ResizeScreen()
+    content.vb: Public Overridable Sub ResizeScreen()
+  overload: Terminal.Gui.FakeDriver.ResizeScreen*
+- uid: Terminal.Gui.FakeDriver.UpdateCursor
+  commentId: M:Terminal.Gui.FakeDriver.UpdateCursor
+  id: UpdateCursor
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: UpdateCursor()
+  nameWithType: FakeDriver.UpdateCursor()
+  fullName: Terminal.Gui.FakeDriver.UpdateCursor()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UpdateCursor
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 470
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets the position of the terminal cursor to <xref href="Terminal.Gui.ConsoleDriver.Col" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.ConsoleDriver.Row" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public override void UpdateCursor()
+    content.vb: Public Overrides Sub UpdateCursor()
+  overridden: Terminal.Gui.ConsoleDriver.UpdateCursor
+  overload: Terminal.Gui.FakeDriver.UpdateCursor*
+- uid: Terminal.Gui.FakeDriver.Suspend
+  commentId: M:Terminal.Gui.FakeDriver.Suspend
+  id: Suspend
+  parent: Terminal.Gui.FakeDriver
+  langs:
+  - csharp
+  - vb
+  name: Suspend()
+  nameWithType: FakeDriver.Suspend()
+  fullName: Terminal.Gui.FakeDriver.Suspend()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Suspend
+    path: ../Terminal.Gui/ConsoleDrivers/FakeDriver/FakeDriver.cs
+    startLine: 488
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.
+  remarks: This is only implemented in <xref href="Terminal.Gui.CursesDriver" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public override void Suspend()
+    content.vb: Public Overrides Sub Suspend()
+  overridden: Terminal.Gui.ConsoleDriver.Suspend
+  overload: Terminal.Gui.FakeDriver.Suspend*
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConsoleDriver.html
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+- uid: Terminal.Gui.ConsoleDriver.SizeChanged
+  commentId: E:Terminal.Gui.ConsoleDriver.SizeChanged
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SizeChanged
+  name: SizeChanged
+  nameWithType: ConsoleDriver.SizeChanged
+  fullName: Terminal.Gui.ConsoleDriver.SizeChanged
+- uid: Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  commentId: M:Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  name: OnSizeChanged(SizeChangedEventArgs)
+  nameWithType: ConsoleDriver.OnSizeChanged(SizeChangedEventArgs)
+  fullName: Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+    name: OnSizeChanged
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  - name: (
+  - uid: Terminal.Gui.SizeChangedEventArgs
+    name: SizeChangedEventArgs
+    href: Terminal.Gui.SizeChangedEventArgs.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+    name: OnSizeChanged
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnSizeChanged(Terminal.Gui.SizeChangedEventArgs)
+  - name: (
+  - uid: Terminal.Gui.SizeChangedEventArgs
+    name: SizeChangedEventArgs
+    href: Terminal.Gui.SizeChangedEventArgs.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.Cols
+  commentId: P:Terminal.Gui.ConsoleDriver.Cols
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Cols
+  name: Cols
+  nameWithType: ConsoleDriver.Cols
+  fullName: Terminal.Gui.ConsoleDriver.Cols
+- uid: Terminal.Gui.ConsoleDriver.Rows
+  commentId: P:Terminal.Gui.ConsoleDriver.Rows
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Rows
+  name: Rows
+  nameWithType: ConsoleDriver.Rows
+  fullName: Terminal.Gui.ConsoleDriver.Rows
+- uid: Terminal.Gui.ConsoleDriver.Left
+  commentId: P:Terminal.Gui.ConsoleDriver.Left
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Left
+  name: Left
+  nameWithType: ConsoleDriver.Left
+  fullName: Terminal.Gui.ConsoleDriver.Left
+- uid: Terminal.Gui.ConsoleDriver.Top
+  commentId: P:Terminal.Gui.ConsoleDriver.Top
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Top
+  name: Top
+  nameWithType: ConsoleDriver.Top
+  fullName: Terminal.Gui.ConsoleDriver.Top
+- uid: Terminal.Gui.ConsoleDriver.Clipboard
+  commentId: P:Terminal.Gui.ConsoleDriver.Clipboard
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Clipboard
+  name: Clipboard
+  nameWithType: ConsoleDriver.Clipboard
+  fullName: Terminal.Gui.ConsoleDriver.Clipboard
+- uid: Terminal.Gui.ConsoleDriver.Contents
+  commentId: P:Terminal.Gui.ConsoleDriver.Contents
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Contents
+  name: Contents
+  nameWithType: ConsoleDriver.Contents
+  fullName: Terminal.Gui.ConsoleDriver.Contents
+- uid: Terminal.Gui.ConsoleDriver.Col
+  commentId: P:Terminal.Gui.ConsoleDriver.Col
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Col
+  name: Col
+  nameWithType: ConsoleDriver.Col
+  fullName: Terminal.Gui.ConsoleDriver.Col
+- uid: Terminal.Gui.ConsoleDriver.Row
+  commentId: P:Terminal.Gui.ConsoleDriver.Row
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Row
+  name: Row
+  nameWithType: ConsoleDriver.Row
+  fullName: Terminal.Gui.ConsoleDriver.Row
+- uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  name: Move(int, int)
+  nameWithType: ConsoleDriver.Move(int, int)
+  fullName: Terminal.Gui.ConsoleDriver.Move(int, int)
+  nameWithType.vb: ConsoleDriver.Move(Integer, Integer)
+  fullName.vb: Terminal.Gui.ConsoleDriver.Move(Integer, Integer)
+  name.vb: Move(Integer, Integer)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+    name: Move
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+    name: Move
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Move(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  commentId: M:Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  name: IsRuneSupported(Rune)
+  nameWithType: ConsoleDriver.IsRuneSupported(Rune)
+  fullName: Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+    name: IsRuneSupported
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  - name: (
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+    name: IsRuneSupported
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.IsRuneSupported(System.Text.Rune)
+  - name: (
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  commentId: M:Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  name: AddRune(Rune)
+  nameWithType: ConsoleDriver.AddRune(Rune)
+  fullName: Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+    name: AddRune
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  - name: (
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+    name: AddRune
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddRune(System.Text.Rune)
+  - name: (
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+  commentId: M:Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+  name: AddRune(char)
+  nameWithType: ConsoleDriver.AddRune(char)
+  fullName: Terminal.Gui.ConsoleDriver.AddRune(char)
+  nameWithType.vb: ConsoleDriver.AddRune(Char)
+  fullName.vb: Terminal.Gui.ConsoleDriver.AddRune(Char)
+  name.vb: AddRune(Char)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+    name: AddRune
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+  - name: (
+  - uid: System.Char
+    name: char
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.char
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+    name: AddRune
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddRune(System.Char)
+  - name: (
+  - uid: System.Char
+    name: Char
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.char
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  commentId: M:Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  name: AddStr(string)
+  nameWithType: ConsoleDriver.AddStr(string)
+  fullName: Terminal.Gui.ConsoleDriver.AddStr(string)
+  nameWithType.vb: ConsoleDriver.AddStr(String)
+  fullName.vb: Terminal.Gui.ConsoleDriver.AddStr(String)
+  name.vb: AddStr(String)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
+    name: AddStr
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.AddStr(System.String)
+    name: AddStr
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.AddStr(System.String)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+  name: IsValidLocation(int, int)
+  nameWithType: ConsoleDriver.IsValidLocation(int, int)
+  fullName: Terminal.Gui.ConsoleDriver.IsValidLocation(int, int)
+  nameWithType.vb: ConsoleDriver.IsValidLocation(Integer, Integer)
+  fullName.vb: Terminal.Gui.ConsoleDriver.IsValidLocation(Integer, Integer)
+  name.vb: IsValidLocation(Integer, Integer)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+    name: IsValidLocation
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+    name: IsValidLocation
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.IsValidLocation(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.Clip
+  commentId: P:Terminal.Gui.ConsoleDriver.Clip
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Clip
+  name: Clip
+  nameWithType: ConsoleDriver.Clip
+  fullName: Terminal.Gui.ConsoleDriver.Clip
+- uid: Terminal.Gui.ConsoleDriver.ClearContents
+  commentId: M:Terminal.Gui.ConsoleDriver.ClearContents
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.ClearContents
+  name: ClearContents()
+  nameWithType: ConsoleDriver.ClearContents()
+  fullName: Terminal.Gui.ConsoleDriver.ClearContents()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.ClearContents
+    name: ClearContents
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.ClearContents
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.ClearContents
+    name: ClearContents
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.ClearContents
+  - name: (
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.CurrentAttribute
+  commentId: P:Terminal.Gui.ConsoleDriver.CurrentAttribute
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.CurrentAttribute
+  name: CurrentAttribute
+  nameWithType: ConsoleDriver.CurrentAttribute
+  fullName: Terminal.Gui.ConsoleDriver.CurrentAttribute
+- uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  name: SetAttribute(Attribute)
+  nameWithType: ConsoleDriver.SetAttribute(Attribute)
+  fullName: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+    name: SetAttribute
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  - name: (
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+    name: SetAttribute
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SetAttribute(Terminal.Gui.Attribute)
+  - name: (
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.GetAttribute
+  commentId: M:Terminal.Gui.ConsoleDriver.GetAttribute
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetAttribute
+  name: GetAttribute()
+  nameWithType: ConsoleDriver.GetAttribute()
+  fullName: Terminal.Gui.ConsoleDriver.GetAttribute()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.GetAttribute
+    name: GetAttribute
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetAttribute
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.GetAttribute
+    name: GetAttribute
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetAttribute
+  - name: (
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  name: MakeColor(Color, Color)
+  nameWithType: ConsoleDriver.MakeColor(Color, Color)
+  fullName: Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color, Terminal.Gui.Color)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+    name: MakeColor
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  - name: (
+  - uid: Terminal.Gui.Color
+    name: Color
+    href: Terminal.Gui.Color.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Color
+    name: Color
+    href: Terminal.Gui.Color.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+    name: MakeColor
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.MakeColor(Terminal.Gui.Color,Terminal.Gui.Color)
+  - name: (
+  - uid: Terminal.Gui.Color
+    name: Color
+    href: Terminal.Gui.Color.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Color
+    name: Color
+    href: Terminal.Gui.Color.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.KeyPressed
+  commentId: E:Terminal.Gui.ConsoleDriver.KeyPressed
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.KeyPressed
+  name: KeyPressed
+  nameWithType: ConsoleDriver.KeyPressed
+  fullName: Terminal.Gui.ConsoleDriver.KeyPressed
+- uid: Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  commentId: M:Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  name: OnKeyPressed(KeyEventEventArgs)
+  nameWithType: ConsoleDriver.OnKeyPressed(KeyEventEventArgs)
+  fullName: Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+    name: OnKeyPressed
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+    href: Terminal.Gui.KeyEventEventArgs.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+    name: OnKeyPressed
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyPressed(Terminal.Gui.KeyEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+    href: Terminal.Gui.KeyEventEventArgs.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.KeyUp
+  commentId: E:Terminal.Gui.ConsoleDriver.KeyUp
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.KeyUp
+  name: KeyUp
+  nameWithType: ConsoleDriver.KeyUp
+  fullName: Terminal.Gui.ConsoleDriver.KeyUp
+- uid: Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  commentId: M:Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  name: OnKeyUp(KeyEventEventArgs)
+  nameWithType: ConsoleDriver.OnKeyUp(KeyEventEventArgs)
+  fullName: Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+    name: OnKeyUp
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+    href: Terminal.Gui.KeyEventEventArgs.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+    name: OnKeyUp
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyUp(Terminal.Gui.KeyEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+    href: Terminal.Gui.KeyEventEventArgs.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.KeyDown
+  commentId: E:Terminal.Gui.ConsoleDriver.KeyDown
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.KeyDown
+  name: KeyDown
+  nameWithType: ConsoleDriver.KeyDown
+  fullName: Terminal.Gui.ConsoleDriver.KeyDown
+- uid: Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  commentId: M:Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  name: OnKeyDown(KeyEventEventArgs)
+  nameWithType: ConsoleDriver.OnKeyDown(KeyEventEventArgs)
+  fullName: Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+    name: OnKeyDown
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+    href: Terminal.Gui.KeyEventEventArgs.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+    name: OnKeyDown
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnKeyDown(Terminal.Gui.KeyEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.KeyEventEventArgs
+    name: KeyEventEventArgs
+    href: Terminal.Gui.KeyEventEventArgs.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.MouseEvent
+  commentId: E:Terminal.Gui.ConsoleDriver.MouseEvent
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.MouseEvent
+  name: MouseEvent
+  nameWithType: ConsoleDriver.MouseEvent
+  fullName: Terminal.Gui.ConsoleDriver.MouseEvent
+- uid: Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  commentId: M:Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  name: OnMouseEvent(MouseEventEventArgs)
+  nameWithType: ConsoleDriver.OnMouseEvent(MouseEventEventArgs)
+  fullName: Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+    name: OnMouseEvent
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.MouseEventEventArgs
+    name: MouseEventEventArgs
+    href: Terminal.Gui.MouseEventEventArgs.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+    name: OnMouseEvent
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.OnMouseEvent(Terminal.Gui.MouseEventEventArgs)
+  - name: (
+  - uid: Terminal.Gui.MouseEventEventArgs
+    name: MouseEventEventArgs
+    href: Terminal.Gui.MouseEventEventArgs.html
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.Diagnostics
+  commentId: P:Terminal.Gui.ConsoleDriver.Diagnostics
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Diagnostics
+  name: Diagnostics
+  nameWithType: ConsoleDriver.Diagnostics
+  fullName: Terminal.Gui.ConsoleDriver.Diagnostics
+- uid: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+  commentId: M:Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+  name: FillRect(Rect, Rune)
+  nameWithType: ConsoleDriver.FillRect(Rect, Rune)
+  fullName: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect, System.Text.Rune)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+    name: FillRect
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+  - name: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+    name: FillRect
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Text.Rune)
+  - name: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+  commentId: M:Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+  name: FillRect(Rect, char)
+  nameWithType: ConsoleDriver.FillRect(Rect, char)
+  fullName: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect, char)
+  nameWithType.vb: ConsoleDriver.FillRect(Rect, Char)
+  fullName.vb: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect, Char)
+  name.vb: FillRect(Rect, Char)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+    name: FillRect
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+  - name: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: System.Char
+    name: char
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.char
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+    name: FillRect
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.FillRect(Terminal.Gui.Rect,System.Char)
+  - name: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: System.Char
+    name: Char
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.char
+  - name: )
+- uid: Terminal.Gui.ConsoleDriver.GetVersionInfo
+  commentId: M:Terminal.Gui.ConsoleDriver.GetVersionInfo
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetVersionInfo
+  name: GetVersionInfo()
+  nameWithType: ConsoleDriver.GetVersionInfo()
+  fullName: Terminal.Gui.ConsoleDriver.GetVersionInfo()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.GetVersionInfo
+    name: GetVersionInfo
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetVersionInfo
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.GetVersionInfo
+    name: GetVersionInfo
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetVersionInfo
+  - name: (
+  - name: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.FakeDriver.Behaviors
+  commentId: T:Terminal.Gui.FakeDriver.Behaviors
+  parent: Terminal.Gui
+  href: Terminal.Gui.FakeDriver.html
+  name: FakeDriver.Behaviors
+  nameWithType: FakeDriver.Behaviors
+  fullName: Terminal.Gui.FakeDriver.Behaviors
+  spec.csharp:
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+    href: Terminal.Gui.FakeDriver.html
+  - name: .
+  - uid: Terminal.Gui.FakeDriver.Behaviors
+    name: Behaviors
+    href: Terminal.Gui.FakeDriver.Behaviors.html
+  spec.vb:
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+    href: Terminal.Gui.FakeDriver.html
+  - name: .
+  - uid: Terminal.Gui.FakeDriver.Behaviors
+    name: Behaviors
+    href: Terminal.Gui.FakeDriver.Behaviors.html
+- uid: Terminal.Gui.ConsoleDriver.SupportsTrueColor
+  commentId: P:Terminal.Gui.ConsoleDriver.SupportsTrueColor
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SupportsTrueColor
+  name: SupportsTrueColor
+  nameWithType: ConsoleDriver.SupportsTrueColor
+  fullName: Terminal.Gui.ConsoleDriver.SupportsTrueColor
+- uid: Terminal.Gui.FakeDriver.SupportsTrueColor*
+  commentId: Overload:Terminal.Gui.FakeDriver.SupportsTrueColor
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.SupportsTrueColor
+  name: SupportsTrueColor
+  nameWithType: FakeDriver.SupportsTrueColor
+  fullName: Terminal.Gui.FakeDriver.SupportsTrueColor
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.FakeDriver.#ctor*
+  commentId: Overload:Terminal.Gui.FakeDriver.#ctor
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.#ctor
+  name: FakeDriver
+  nameWithType: FakeDriver.FakeDriver
+  fullName: Terminal.Gui.FakeDriver.FakeDriver
+  nameWithType.vb: FakeDriver.New
+  fullName.vb: Terminal.Gui.FakeDriver.New
+  name.vb: New
+- uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+  commentId: M:Terminal.Gui.ConsoleDriver.UpdateScreen
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.UpdateScreen
+  name: UpdateScreen()
+  nameWithType: ConsoleDriver.UpdateScreen()
+  fullName: Terminal.Gui.ConsoleDriver.UpdateScreen()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+    name: UpdateScreen
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.UpdateScreen
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateScreen
+    name: UpdateScreen
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.UpdateScreen
+  - name: (
+  - name: )
+- uid: Terminal.Gui.FakeDriver.UpdateScreen*
+  commentId: Overload:Terminal.Gui.FakeDriver.UpdateScreen
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.UpdateScreen
+  name: UpdateScreen
+  nameWithType: FakeDriver.UpdateScreen
+  fullName: Terminal.Gui.FakeDriver.UpdateScreen
+- uid: Terminal.Gui.ConsoleDriver.Refresh
+  commentId: M:Terminal.Gui.ConsoleDriver.Refresh
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Refresh
+  name: Refresh()
+  nameWithType: ConsoleDriver.Refresh()
+  fullName: Terminal.Gui.ConsoleDriver.Refresh()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Refresh
+    name: Refresh
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Refresh
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Refresh
+    name: Refresh
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Refresh
+  - name: (
+  - name: )
+- uid: Terminal.Gui.FakeDriver.Refresh*
+  commentId: Overload:Terminal.Gui.FakeDriver.Refresh
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.Refresh
+  name: Refresh
+  nameWithType: FakeDriver.Refresh
+  fullName: Terminal.Gui.FakeDriver.Refresh
+- uid: Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo*
+  commentId: Overload:Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo(System.ConsoleKeyInfo)
+  name: FromVKPacketToKConsoleKeyInfo
+  nameWithType: FakeDriver.FromVKPacketToKConsoleKeyInfo
+  fullName: Terminal.Gui.FakeDriver.FromVKPacketToKConsoleKeyInfo
+- uid: System.ConsoleKeyInfo
+  commentId: T:System.ConsoleKeyInfo
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.consolekeyinfo
+  name: ConsoleKeyInfo
+  nameWithType: ConsoleKeyInfo
+  fullName: System.ConsoleKeyInfo
+- uid: Terminal.Gui.CursorVisibility
+  commentId: T:Terminal.Gui.CursorVisibility
+  parent: Terminal.Gui
+  href: Terminal.Gui.CursorVisibility.html
+  name: CursorVisibility
+  nameWithType: CursorVisibility
+  fullName: Terminal.Gui.CursorVisibility
+- uid: Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  commentId: M:Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  name: GetCursorVisibility(out CursorVisibility)
+  nameWithType: ConsoleDriver.GetCursorVisibility(out CursorVisibility)
+  fullName: Terminal.Gui.ConsoleDriver.GetCursorVisibility(out Terminal.Gui.CursorVisibility)
+  nameWithType.vb: ConsoleDriver.GetCursorVisibility(CursorVisibility)
+  fullName.vb: Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility)
+  name.vb: GetCursorVisibility(CursorVisibility)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+    name: GetCursorVisibility
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  - name: (
+  - name: out
+  - name: " "
+  - uid: Terminal.Gui.CursorVisibility
+    name: CursorVisibility
+    href: Terminal.Gui.CursorVisibility.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+    name: GetCursorVisibility
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  - name: (
+  - uid: Terminal.Gui.CursorVisibility
+    name: CursorVisibility
+    href: Terminal.Gui.CursorVisibility.html
+  - name: )
+- uid: Terminal.Gui.FakeDriver.GetCursorVisibility*
+  commentId: Overload:Terminal.Gui.FakeDriver.GetCursorVisibility
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.GetCursorVisibility(Terminal.Gui.CursorVisibility@)
+  name: GetCursorVisibility
+  nameWithType: FakeDriver.GetCursorVisibility
+  fullName: Terminal.Gui.FakeDriver.GetCursorVisibility
+- uid: Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  commentId: M:Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  name: SetCursorVisibility(CursorVisibility)
+  nameWithType: ConsoleDriver.SetCursorVisibility(CursorVisibility)
+  fullName: Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+    name: SetCursorVisibility
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  - name: (
+  - uid: Terminal.Gui.CursorVisibility
+    name: CursorVisibility
+    href: Terminal.Gui.CursorVisibility.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+    name: SetCursorVisibility
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  - name: (
+  - uid: Terminal.Gui.CursorVisibility
+    name: CursorVisibility
+    href: Terminal.Gui.CursorVisibility.html
+  - name: )
+- uid: Terminal.Gui.FakeDriver.SetCursorVisibility*
+  commentId: Overload:Terminal.Gui.FakeDriver.SetCursorVisibility
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.SetCursorVisibility(Terminal.Gui.CursorVisibility)
+  name: SetCursorVisibility
+  nameWithType: FakeDriver.SetCursorVisibility
+  fullName: Terminal.Gui.FakeDriver.SetCursorVisibility
+- uid: Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+  commentId: M:Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+  name: EnsureCursorVisibility()
+  nameWithType: ConsoleDriver.EnsureCursorVisibility()
+  fullName: Terminal.Gui.ConsoleDriver.EnsureCursorVisibility()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+    name: EnsureCursorVisibility
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+    name: EnsureCursorVisibility
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.EnsureCursorVisibility
+  - name: (
+  - name: )
+- uid: Terminal.Gui.FakeDriver.EnsureCursorVisibility*
+  commentId: Overload:Terminal.Gui.FakeDriver.EnsureCursorVisibility
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.EnsureCursorVisibility
+  name: EnsureCursorVisibility
+  nameWithType: FakeDriver.EnsureCursorVisibility
+  fullName: Terminal.Gui.FakeDriver.EnsureCursorVisibility
+- uid: Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  commentId: M:Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  parent: Terminal.Gui.ConsoleDriver
+  isExternal: true
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  name: SendKeys(char, ConsoleKey, bool, bool, bool)
+  nameWithType: ConsoleDriver.SendKeys(char, ConsoleKey, bool, bool, bool)
+  fullName: Terminal.Gui.ConsoleDriver.SendKeys(char, System.ConsoleKey, bool, bool, bool)
+  nameWithType.vb: ConsoleDriver.SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+  fullName.vb: Terminal.Gui.ConsoleDriver.SendKeys(Char, System.ConsoleKey, Boolean, Boolean, Boolean)
+  name.vb: SendKeys(Char, ConsoleKey, Boolean, Boolean, Boolean)
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+    name: SendKeys
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  - name: (
+  - uid: System.Char
+    name: char
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.char
+  - name: ','
+  - name: " "
+  - uid: System.ConsoleKey
+    name: ConsoleKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.consolekey
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+    name: SendKeys
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  - name: (
+  - uid: System.Char
+    name: Char
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.char
+  - name: ','
+  - name: " "
+  - uid: System.ConsoleKey
+    name: ConsoleKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.consolekey
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+- uid: Terminal.Gui.FakeDriver.SendKeys*
+  commentId: Overload:Terminal.Gui.FakeDriver.SendKeys
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.SendKeys(System.Char,System.ConsoleKey,System.Boolean,System.Boolean,System.Boolean)
+  name: SendKeys
+  nameWithType: FakeDriver.SendKeys
+  fullName: Terminal.Gui.FakeDriver.SendKeys
+- uid: System.Char
+  commentId: T:System.Char
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.char
+  name: char
+  nameWithType: char
+  fullName: char
+  nameWithType.vb: Char
+  fullName.vb: Char
+  name.vb: Char
+- uid: System.ConsoleKey
+  commentId: T:System.ConsoleKey
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.consolekey
+  name: ConsoleKey
+  nameWithType: ConsoleKey
+  fullName: System.ConsoleKey
+- uid: Terminal.Gui.FakeDriver.SetBufferSize*
+  commentId: Overload:Terminal.Gui.FakeDriver.SetBufferSize
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.SetBufferSize(System.Int32,System.Int32)
+  name: SetBufferSize
+  nameWithType: FakeDriver.SetBufferSize
+  fullName: Terminal.Gui.FakeDriver.SetBufferSize
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.FakeDriver.SetWindowSize*
+  commentId: Overload:Terminal.Gui.FakeDriver.SetWindowSize
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.SetWindowSize(System.Int32,System.Int32)
+  name: SetWindowSize
+  nameWithType: FakeDriver.SetWindowSize
+  fullName: Terminal.Gui.FakeDriver.SetWindowSize
+- uid: Terminal.Gui.FakeDriver.SetWindowPosition*
+  commentId: Overload:Terminal.Gui.FakeDriver.SetWindowPosition
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.SetWindowPosition(System.Int32,System.Int32)
+  name: SetWindowPosition
+  nameWithType: FakeDriver.SetWindowPosition
+  fullName: Terminal.Gui.FakeDriver.SetWindowPosition
+- uid: Terminal.Gui.FakeDriver.ResizeScreen*
+  commentId: Overload:Terminal.Gui.FakeDriver.ResizeScreen
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.ResizeScreen
+  name: ResizeScreen
+  nameWithType: FakeDriver.ResizeScreen
+  fullName: Terminal.Gui.FakeDriver.ResizeScreen
+- uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+  commentId: M:Terminal.Gui.ConsoleDriver.UpdateCursor
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.UpdateCursor
+  name: UpdateCursor()
+  nameWithType: ConsoleDriver.UpdateCursor()
+  fullName: Terminal.Gui.ConsoleDriver.UpdateCursor()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+    name: UpdateCursor
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.UpdateCursor
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.UpdateCursor
+    name: UpdateCursor
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.UpdateCursor
+  - name: (
+  - name: )
+- uid: Terminal.Gui.FakeDriver.UpdateCursor*
+  commentId: Overload:Terminal.Gui.FakeDriver.UpdateCursor
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.UpdateCursor
+  name: UpdateCursor
+  nameWithType: FakeDriver.UpdateCursor
+  fullName: Terminal.Gui.FakeDriver.UpdateCursor
+- uid: Terminal.Gui.CursesDriver
+  commentId: T:Terminal.Gui.CursesDriver
+  href: Terminal.Gui.CursesDriver.html
+  name: CursesDriver
+  nameWithType: CursesDriver
+  fullName: Terminal.Gui.CursesDriver
+- uid: Terminal.Gui.ConsoleDriver.Suspend
+  commentId: M:Terminal.Gui.ConsoleDriver.Suspend
+  parent: Terminal.Gui.ConsoleDriver
+  href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Suspend
+  name: Suspend()
+  nameWithType: ConsoleDriver.Suspend()
+  fullName: Terminal.Gui.ConsoleDriver.Suspend()
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver.Suspend
+    name: Suspend
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Suspend
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver.Suspend
+    name: Suspend
+    href: Terminal.Gui.ConsoleDriver.html#Terminal.Gui.ConsoleDriver.Suspend
+  - name: (
+  - name: )
+- uid: Terminal.Gui.FakeDriver.Suspend*
+  commentId: Overload:Terminal.Gui.FakeDriver.Suspend
+  href: Terminal.Gui.FakeDriver.html#Terminal.Gui.FakeDriver.Suspend
+  name: Suspend
+  nameWithType: FakeDriver.Suspend
+  fullName: Terminal.Gui.FakeDriver.Suspend
+shouldSkipMarkup: true

@@ -1,0 +1,467 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ListViewItemEventArgs
+  commentId: T:Terminal.Gui.ListViewItemEventArgs
+  id: ListViewItemEventArgs
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ListViewItemEventArgs.#ctor(System.Int32,System.Object)
+  - Terminal.Gui.ListViewItemEventArgs.Item
+  - Terminal.Gui.ListViewItemEventArgs.Value
+  langs:
+  - csharp
+  - vb
+  name: ListViewItemEventArgs
+  nameWithType: ListViewItemEventArgs
+  fullName: Terminal.Gui.ListViewItemEventArgs
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListViewEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ListViewItemEventArgs
+    path: ../Terminal.Gui/Views/ListViewEventArgs.cs
+    startLine: 6
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: <xref href="System.EventArgs" data-throw-if-not-resolved="false"></xref> for <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> events.
+  example: []
+  syntax:
+    content: 'public class ListViewItemEventArgs : EventArgs'
+    content.vb: Public Class ListViewItemEventArgs Inherits EventArgs
+  inheritance:
+  - System.Object
+  - System.EventArgs
+  inheritedMembers:
+  - System.EventArgs.Empty
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.ListViewItemEventArgs.Item
+  commentId: P:Terminal.Gui.ListViewItemEventArgs.Item
+  id: Item
+  parent: Terminal.Gui.ListViewItemEventArgs
+  langs:
+  - csharp
+  - vb
+  name: Item
+  nameWithType: ListViewItemEventArgs.Item
+  fullName: Terminal.Gui.ListViewItemEventArgs.Item
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListViewEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Item
+    path: ../Terminal.Gui/Views/ListViewEventArgs.cs
+    startLine: 10
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The index of the <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> item.
+  example: []
+  syntax:
+    content: public int Item { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Item As Integer
+  overload: Terminal.Gui.ListViewItemEventArgs.Item*
+- uid: Terminal.Gui.ListViewItemEventArgs.Value
+  commentId: P:Terminal.Gui.ListViewItemEventArgs.Value
+  id: Value
+  parent: Terminal.Gui.ListViewItemEventArgs
+  langs:
+  - csharp
+  - vb
+  name: Value
+  nameWithType: ListViewItemEventArgs.Value
+  fullName: Terminal.Gui.ListViewItemEventArgs.Value
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListViewEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Value
+    path: ../Terminal.Gui/Views/ListViewEventArgs.cs
+    startLine: 14
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> item.
+  example: []
+  syntax:
+    content: public object Value { get; }
+    parameters: []
+    return:
+      type: System.Object
+    content.vb: Public ReadOnly Property Value As Object
+  overload: Terminal.Gui.ListViewItemEventArgs.Value*
+- uid: Terminal.Gui.ListViewItemEventArgs.#ctor(System.Int32,System.Object)
+  commentId: M:Terminal.Gui.ListViewItemEventArgs.#ctor(System.Int32,System.Object)
+  id: '#ctor(System.Int32,System.Object)'
+  parent: Terminal.Gui.ListViewItemEventArgs
+  langs:
+  - csharp
+  - vb
+  name: ListViewItemEventArgs(int, object)
+  nameWithType: ListViewItemEventArgs.ListViewItemEventArgs(int, object)
+  fullName: Terminal.Gui.ListViewItemEventArgs.ListViewItemEventArgs(int, object)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/ListViewEventArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/ListViewEventArgs.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of <xref href="Terminal.Gui.ListViewItemEventArgs" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public ListViewItemEventArgs(int item, object value)
+    parameters:
+    - id: item
+      type: System.Int32
+      description: The index of the <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> item.
+    - id: value
+      type: System.Object
+      description: The <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> item
+    content.vb: Public Sub New(item As Integer, value As Object)
+  overload: Terminal.Gui.ListViewItemEventArgs.#ctor*
+  nameWithType.vb: ListViewItemEventArgs.New(Integer, Object)
+  fullName.vb: Terminal.Gui.ListViewItemEventArgs.New(Integer, Object)
+  name.vb: New(Integer, Object)
+references:
+- uid: System.EventArgs
+  commentId: T:System.EventArgs
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventargs
+  name: EventArgs
+  nameWithType: EventArgs
+  fullName: System.EventArgs
+- uid: Terminal.Gui.ListView
+  commentId: T:Terminal.Gui.ListView
+  parent: Terminal.Gui
+  href: Terminal.Gui.ListView.html
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.EventArgs.Empty
+  commentId: F:System.EventArgs.Empty
+  parent: System.EventArgs
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventargs.empty
+  name: Empty
+  nameWithType: EventArgs.Empty
+  fullName: System.EventArgs.Empty
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ListViewItemEventArgs.Item*
+  commentId: Overload:Terminal.Gui.ListViewItemEventArgs.Item
+  href: Terminal.Gui.ListViewItemEventArgs.html#Terminal.Gui.ListViewItemEventArgs.Item
+  name: Item
+  nameWithType: ListViewItemEventArgs.Item
+  fullName: Terminal.Gui.ListViewItemEventArgs.Item
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.ListViewItemEventArgs.Value*
+  commentId: Overload:Terminal.Gui.ListViewItemEventArgs.Value
+  href: Terminal.Gui.ListViewItemEventArgs.html#Terminal.Gui.ListViewItemEventArgs.Value
+  name: Value
+  nameWithType: ListViewItemEventArgs.Value
+  fullName: Terminal.Gui.ListViewItemEventArgs.Value
+- uid: Terminal.Gui.ListViewItemEventArgs
+  commentId: T:Terminal.Gui.ListViewItemEventArgs
+  href: Terminal.Gui.ListViewItemEventArgs.html
+  name: ListViewItemEventArgs
+  nameWithType: ListViewItemEventArgs
+  fullName: Terminal.Gui.ListViewItemEventArgs
+- uid: Terminal.Gui.ListViewItemEventArgs.#ctor*
+  commentId: Overload:Terminal.Gui.ListViewItemEventArgs.#ctor
+  href: Terminal.Gui.ListViewItemEventArgs.html#Terminal.Gui.ListViewItemEventArgs.#ctor(System.Int32,System.Object)
+  name: ListViewItemEventArgs
+  nameWithType: ListViewItemEventArgs.ListViewItemEventArgs
+  fullName: Terminal.Gui.ListViewItemEventArgs.ListViewItemEventArgs
+  nameWithType.vb: ListViewItemEventArgs.New
+  fullName.vb: Terminal.Gui.ListViewItemEventArgs.New
+  name.vb: New
+shouldSkipMarkup: true

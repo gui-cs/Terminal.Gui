@@ -1,0 +1,848 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.StackExtensions
+  commentId: T:Terminal.Gui.StackExtensions
+  id: StackExtensions
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.StackExtensions.Contains``1(System.Collections.Generic.Stack{``0},``0,System.Collections.Generic.IEqualityComparer{``0})
+  - Terminal.Gui.StackExtensions.FindDuplicates``1(System.Collections.Generic.Stack{``0},System.Collections.Generic.IEqualityComparer{``0})
+  - Terminal.Gui.StackExtensions.MoveNext``1(System.Collections.Generic.Stack{``0})
+  - Terminal.Gui.StackExtensions.MovePrevious``1(System.Collections.Generic.Stack{``0})
+  - Terminal.Gui.StackExtensions.MoveTo``1(System.Collections.Generic.Stack{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})
+  - Terminal.Gui.StackExtensions.Replace``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  - Terminal.Gui.StackExtensions.Swap``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  langs:
+  - csharp
+  - vb
+  name: StackExtensions
+  nameWithType: StackExtensions
+  fullName: Terminal.Gui.StackExtensions
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: StackExtensions
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 7
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extension of <xref href="System.Collections.Generic.Stack%601" data-throw-if-not-resolved="false"></xref> helper to work with specific <xref href="System.Collections.Generic.IEqualityComparer%601" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public static class StackExtensions
+    content.vb: Public Module StackExtensions
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.StackExtensions.Replace``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  commentId: M:Terminal.Gui.StackExtensions.Replace``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  id: Replace``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: Replace<T>(Stack<T>, T, T, IEqualityComparer<T>)
+  nameWithType: StackExtensions.Replace<T>(Stack<T>, T, T, IEqualityComparer<T>)
+  fullName: Terminal.Gui.StackExtensions.Replace<T>(System.Collections.Generic.Stack<T>, T, T, System.Collections.Generic.IEqualityComparer<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Replace
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 16
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Replaces an stack object values that match with the value to replace.
+  example: []
+  syntax:
+    content: public static void Replace<T>(this Stack<T> stack, T valueToReplace, T valueToReplaceWith, IEqualityComparer<T> comparer = null)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    - id: valueToReplace
+      type: '{T}'
+      description: Value to replace.
+    - id: valueToReplaceWith
+      type: '{T}'
+      description: Value to replace with to what matches the value to replace.
+    - id: comparer
+      type: System.Collections.Generic.IEqualityComparer{{T}}
+      description: The comparison object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    content.vb: Public Shared Sub Replace(Of T)(stack As Stack(Of T), valueToReplace As T, valueToReplaceWith As T, comparer As IEqualityComparer(Of T) = Nothing)
+  overload: Terminal.Gui.StackExtensions.Replace*
+  nameWithType.vb: StackExtensions.Replace(Of T)(Stack(Of T), T, T, IEqualityComparer(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.Replace(Of T)(System.Collections.Generic.Stack(Of T), T, T, System.Collections.Generic.IEqualityComparer(Of T))
+  name.vb: Replace(Of T)(Stack(Of T), T, T, IEqualityComparer(Of T))
+- uid: Terminal.Gui.StackExtensions.Swap``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  commentId: M:Terminal.Gui.StackExtensions.Swap``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  id: Swap``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: Swap<T>(Stack<T>, T, T, IEqualityComparer<T>)
+  nameWithType: StackExtensions.Swap<T>(Stack<T>, T, T, IEqualityComparer<T>)
+  fullName: Terminal.Gui.StackExtensions.Swap<T>(System.Collections.Generic.Stack<T>, T, T, System.Collections.Generic.IEqualityComparer<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Swap
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 43
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Swap two stack objects values that matches with the both values.
+  example: []
+  syntax:
+    content: public static void Swap<T>(this Stack<T> stack, T valueToSwapFrom, T valueToSwapTo, IEqualityComparer<T> comparer = null)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    - id: valueToSwapFrom
+      type: '{T}'
+      description: Value to swap from.
+    - id: valueToSwapTo
+      type: '{T}'
+      description: Value to swap to.
+    - id: comparer
+      type: System.Collections.Generic.IEqualityComparer{{T}}
+      description: The comparison object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    content.vb: Public Shared Sub Swap(Of T)(stack As Stack(Of T), valueToSwapFrom As T, valueToSwapTo As T, comparer As IEqualityComparer(Of T) = Nothing)
+  overload: Terminal.Gui.StackExtensions.Swap*
+  nameWithType.vb: StackExtensions.Swap(Of T)(Stack(Of T), T, T, IEqualityComparer(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.Swap(Of T)(System.Collections.Generic.Stack(Of T), T, T, System.Collections.Generic.IEqualityComparer(Of T))
+  name.vb: Swap(Of T)(Stack(Of T), T, T, IEqualityComparer(Of T))
+- uid: Terminal.Gui.StackExtensions.MoveNext``1(System.Collections.Generic.Stack{``0})
+  commentId: M:Terminal.Gui.StackExtensions.MoveNext``1(System.Collections.Generic.Stack{``0})
+  id: MoveNext``1(System.Collections.Generic.Stack{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: MoveNext<T>(Stack<T>)
+  nameWithType: StackExtensions.MoveNext<T>(Stack<T>)
+  fullName: Terminal.Gui.StackExtensions.MoveNext<T>(System.Collections.Generic.Stack<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MoveNext
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move the first stack object value to the end.
+  example: []
+  syntax:
+    content: public static void MoveNext<T>(this Stack<T> stack)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    content.vb: Public Shared Sub MoveNext(Of T)(stack As Stack(Of T))
+  overload: Terminal.Gui.StackExtensions.MoveNext*
+  nameWithType.vb: StackExtensions.MoveNext(Of T)(Stack(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.MoveNext(Of T)(System.Collections.Generic.Stack(Of T))
+  name.vb: MoveNext(Of T)(Stack(Of T))
+- uid: Terminal.Gui.StackExtensions.MovePrevious``1(System.Collections.Generic.Stack{``0})
+  commentId: M:Terminal.Gui.StackExtensions.MovePrevious``1(System.Collections.Generic.Stack{``0})
+  id: MovePrevious``1(System.Collections.Generic.Stack{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: MovePrevious<T>(Stack<T>)
+  nameWithType: StackExtensions.MovePrevious<T>(Stack<T>)
+  fullName: Terminal.Gui.StackExtensions.MovePrevious<T>(System.Collections.Generic.Stack<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MovePrevious
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 90
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move the last stack object value to the top.
+  example: []
+  syntax:
+    content: public static void MovePrevious<T>(this Stack<T> stack)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    content.vb: Public Shared Sub MovePrevious(Of T)(stack As Stack(Of T))
+  overload: Terminal.Gui.StackExtensions.MovePrevious*
+  nameWithType.vb: StackExtensions.MovePrevious(Of T)(Stack(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.MovePrevious(Of T)(System.Collections.Generic.Stack(Of T))
+  name.vb: MovePrevious(Of T)(Stack(Of T))
+- uid: Terminal.Gui.StackExtensions.FindDuplicates``1(System.Collections.Generic.Stack{``0},System.Collections.Generic.IEqualityComparer{``0})
+  commentId: M:Terminal.Gui.StackExtensions.FindDuplicates``1(System.Collections.Generic.Stack{``0},System.Collections.Generic.IEqualityComparer{``0})
+  id: FindDuplicates``1(System.Collections.Generic.Stack{``0},System.Collections.Generic.IEqualityComparer{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: FindDuplicates<T>(Stack<T>, IEqualityComparer<T>)
+  nameWithType: StackExtensions.FindDuplicates<T>(Stack<T>, IEqualityComparer<T>)
+  fullName: Terminal.Gui.StackExtensions.FindDuplicates<T>(System.Collections.Generic.Stack<T>, System.Collections.Generic.IEqualityComparer<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FindDuplicates
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 114
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Find all duplicates stack objects values.
+  example: []
+  syntax:
+    content: public static Stack<T> FindDuplicates<T>(this Stack<T> stack, IEqualityComparer<T> comparer = null)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    - id: comparer
+      type: System.Collections.Generic.IEqualityComparer{{T}}
+      description: The comparison object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    return:
+      type: System.Collections.Generic.Stack{{T}}
+      description: The duplicates stack object.
+    content.vb: Public Shared Function FindDuplicates(Of T)(stack As Stack(Of T), comparer As IEqualityComparer(Of T) = Nothing) As Stack(Of T)
+  overload: Terminal.Gui.StackExtensions.FindDuplicates*
+  nameWithType.vb: StackExtensions.FindDuplicates(Of T)(Stack(Of T), IEqualityComparer(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.FindDuplicates(Of T)(System.Collections.Generic.Stack(Of T), System.Collections.Generic.IEqualityComparer(Of T))
+  name.vb: FindDuplicates(Of T)(Stack(Of T), IEqualityComparer(Of T))
+- uid: Terminal.Gui.StackExtensions.Contains``1(System.Collections.Generic.Stack{``0},``0,System.Collections.Generic.IEqualityComparer{``0})
+  commentId: M:Terminal.Gui.StackExtensions.Contains``1(System.Collections.Generic.Stack{``0},``0,System.Collections.Generic.IEqualityComparer{``0})
+  id: Contains``1(System.Collections.Generic.Stack{``0},``0,System.Collections.Generic.IEqualityComparer{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: Contains<T>(Stack<T>, T, IEqualityComparer<T>)
+  nameWithType: StackExtensions.Contains<T>(Stack<T>, T, IEqualityComparer<T>)
+  fullName: Terminal.Gui.StackExtensions.Contains<T>(System.Collections.Generic.Stack<T>, T, System.Collections.Generic.IEqualityComparer<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Contains
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 141
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Check if the stack object contains the value to find.
+  example: []
+  syntax:
+    content: public static bool Contains<T>(this Stack<T> stack, T valueToFind, IEqualityComparer<T> comparer = null)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    - id: valueToFind
+      type: '{T}'
+      description: Value to find.
+    - id: comparer
+      type: System.Collections.Generic.IEqualityComparer{{T}}
+      description: The comparison object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    return:
+      type: System.Boolean
+      description: <code>true</code> If the value was found.<code>false</code> otherwise.
+    content.vb: Public Shared Function Contains(Of T)(stack As Stack(Of T), valueToFind As T, comparer As IEqualityComparer(Of T) = Nothing) As Boolean
+  overload: Terminal.Gui.StackExtensions.Contains*
+  nameWithType.vb: StackExtensions.Contains(Of T)(Stack(Of T), T, IEqualityComparer(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.Contains(Of T)(System.Collections.Generic.Stack(Of T), T, System.Collections.Generic.IEqualityComparer(Of T))
+  name.vb: Contains(Of T)(Stack(Of T), T, IEqualityComparer(Of T))
+- uid: Terminal.Gui.StackExtensions.MoveTo``1(System.Collections.Generic.Stack{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})
+  commentId: M:Terminal.Gui.StackExtensions.MoveTo``1(System.Collections.Generic.Stack{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})
+  id: MoveTo``1(System.Collections.Generic.Stack{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})
+  isExtensionMethod: true
+  parent: Terminal.Gui.StackExtensions
+  langs:
+  - csharp
+  - vb
+  name: MoveTo<T>(Stack<T>, T, int, IEqualityComparer<T>)
+  nameWithType: StackExtensions.MoveTo<T>(Stack<T>, T, int, IEqualityComparer<T>)
+  fullName: Terminal.Gui.StackExtensions.MoveTo<T>(System.Collections.Generic.Stack<T>, T, int, System.Collections.Generic.IEqualityComparer<T>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/StackExtensions.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MoveTo
+    path: ../Terminal.Gui/StackExtensions.cs
+    startLine: 161
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move the stack object value to the index.
+  example: []
+  syntax:
+    content: public static void MoveTo<T>(this Stack<T> stack, T valueToMove, int index = 0, IEqualityComparer<T> comparer = null)
+    parameters:
+    - id: stack
+      type: System.Collections.Generic.Stack{{T}}
+      description: The stack object.
+    - id: valueToMove
+      type: '{T}'
+      description: Value to move.
+    - id: index
+      type: System.Int32
+      description: The index where to move.
+    - id: comparer
+      type: System.Collections.Generic.IEqualityComparer{{T}}
+      description: The comparison object.
+    typeParameters:
+    - id: T
+      description: The stack object type.
+    content.vb: Public Shared Sub MoveTo(Of T)(stack As Stack(Of T), valueToMove As T, index As Integer = 0, comparer As IEqualityComparer(Of T) = Nothing)
+  overload: Terminal.Gui.StackExtensions.MoveTo*
+  nameWithType.vb: StackExtensions.MoveTo(Of T)(Stack(Of T), T, Integer, IEqualityComparer(Of T))
+  fullName.vb: Terminal.Gui.StackExtensions.MoveTo(Of T)(System.Collections.Generic.Stack(Of T), T, Integer, System.Collections.Generic.IEqualityComparer(Of T))
+  name.vb: MoveTo(Of T)(Stack(Of T), T, Integer, IEqualityComparer(Of T))
+references:
+- uid: System.Collections.Generic.Stack`1
+  commentId: T:System.Collections.Generic.Stack`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1
+  name: Stack<T>
+  nameWithType: Stack<T>
+  fullName: System.Collections.Generic.Stack<T>
+  nameWithType.vb: Stack(Of T)
+  fullName.vb: System.Collections.Generic.Stack(Of T)
+  name.vb: Stack(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.Stack`1
+    name: Stack
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Stack`1
+    name: Stack
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.IEqualityComparer`1
+  commentId: T:System.Collections.Generic.IEqualityComparer`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1
+  name: IEqualityComparer<T>
+  nameWithType: IEqualityComparer<T>
+  fullName: System.Collections.Generic.IEqualityComparer<T>
+  nameWithType.vb: IEqualityComparer(Of T)
+  fullName.vb: System.Collections.Generic.IEqualityComparer(Of T)
+  name.vb: IEqualityComparer(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEqualityComparer`1
+    name: IEqualityComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEqualityComparer`1
+    name: IEqualityComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.StackExtensions.Replace*
+  commentId: Overload:Terminal.Gui.StackExtensions.Replace
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.Replace``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  name: Replace
+  nameWithType: StackExtensions.Replace
+  fullName: Terminal.Gui.StackExtensions.Replace
+- uid: System.Collections.Generic.Stack{{T}}
+  commentId: T:System.Collections.Generic.Stack{``0}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Stack`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1
+  name: Stack<T>
+  nameWithType: Stack<T>
+  fullName: System.Collections.Generic.Stack<T>
+  nameWithType.vb: Stack(Of T)
+  fullName.vb: System.Collections.Generic.Stack(Of T)
+  name.vb: Stack(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.Stack`1
+    name: Stack
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Stack`1
+    name: Stack
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Collections.Generic.IEqualityComparer{{T}}
+  commentId: T:System.Collections.Generic.IEqualityComparer{``0}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEqualityComparer`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1
+  name: IEqualityComparer<T>
+  nameWithType: IEqualityComparer<T>
+  fullName: System.Collections.Generic.IEqualityComparer<T>
+  nameWithType.vb: IEqualityComparer(Of T)
+  fullName.vb: System.Collections.Generic.IEqualityComparer(Of T)
+  name.vb: IEqualityComparer(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEqualityComparer`1
+    name: IEqualityComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEqualityComparer`1
+    name: IEqualityComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: Terminal.Gui.StackExtensions.Swap*
+  commentId: Overload:Terminal.Gui.StackExtensions.Swap
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.Swap``1(System.Collections.Generic.Stack{``0},``0,``0,System.Collections.Generic.IEqualityComparer{``0})
+  name: Swap
+  nameWithType: StackExtensions.Swap
+  fullName: Terminal.Gui.StackExtensions.Swap
+- uid: Terminal.Gui.StackExtensions.MoveNext*
+  commentId: Overload:Terminal.Gui.StackExtensions.MoveNext
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.MoveNext``1(System.Collections.Generic.Stack{``0})
+  name: MoveNext
+  nameWithType: StackExtensions.MoveNext
+  fullName: Terminal.Gui.StackExtensions.MoveNext
+- uid: Terminal.Gui.StackExtensions.MovePrevious*
+  commentId: Overload:Terminal.Gui.StackExtensions.MovePrevious
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.MovePrevious``1(System.Collections.Generic.Stack{``0})
+  name: MovePrevious
+  nameWithType: StackExtensions.MovePrevious
+  fullName: Terminal.Gui.StackExtensions.MovePrevious
+- uid: Terminal.Gui.StackExtensions.FindDuplicates*
+  commentId: Overload:Terminal.Gui.StackExtensions.FindDuplicates
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.FindDuplicates``1(System.Collections.Generic.Stack{``0},System.Collections.Generic.IEqualityComparer{``0})
+  name: FindDuplicates
+  nameWithType: StackExtensions.FindDuplicates
+  fullName: Terminal.Gui.StackExtensions.FindDuplicates
+- uid: Terminal.Gui.StackExtensions.Contains*
+  commentId: Overload:Terminal.Gui.StackExtensions.Contains
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.Contains``1(System.Collections.Generic.Stack{``0},``0,System.Collections.Generic.IEqualityComparer{``0})
+  name: Contains
+  nameWithType: StackExtensions.Contains
+  fullName: Terminal.Gui.StackExtensions.Contains
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.StackExtensions.MoveTo*
+  commentId: Overload:Terminal.Gui.StackExtensions.MoveTo
+  href: Terminal.Gui.StackExtensions.html#Terminal.Gui.StackExtensions.MoveTo``1(System.Collections.Generic.Stack{``0},``0,System.Int32,System.Collections.Generic.IEqualityComparer{``0})
+  name: MoveTo
+  nameWithType: StackExtensions.MoveTo
+  fullName: Terminal.Gui.StackExtensions.MoveTo
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+shouldSkipMarkup: true

@@ -1,0 +1,69 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TextValidateProviders
+  commentId: N:Terminal.Gui.TextValidateProviders
+  id: Terminal.Gui.TextValidateProviders
+  children:
+  - Terminal.Gui.TextValidateProviders.ITextValidateProvider
+  - Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+  - Terminal.Gui.TextValidateProviders.TextRegexProvider
+  langs:
+  - csharp
+  - vb
+  name: Terminal.Gui.TextValidateProviders
+  nameWithType: Terminal.Gui.TextValidateProviders
+  fullName: Terminal.Gui.TextValidateProviders
+  type: Namespace
+  assemblies:
+  - Terminal.Gui
+references:
+- uid: Terminal.Gui.TextValidateProviders.ITextValidateProvider
+  commentId: T:Terminal.Gui.TextValidateProviders.ITextValidateProvider
+  parent: Terminal.Gui.TextValidateProviders
+  href: Terminal.Gui.TextValidateProviders.ITextValidateProvider.html
+  name: ITextValidateProvider
+  nameWithType: ITextValidateProvider
+  fullName: Terminal.Gui.TextValidateProviders.ITextValidateProvider
+- uid: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+  commentId: T:Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+  href: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider.html
+  name: NetMaskedTextProvider
+  nameWithType: NetMaskedTextProvider
+  fullName: Terminal.Gui.TextValidateProviders.NetMaskedTextProvider
+- uid: Terminal.Gui.TextValidateProviders.TextRegexProvider
+  commentId: T:Terminal.Gui.TextValidateProviders.TextRegexProvider
+  href: Terminal.Gui.TextValidateProviders.TextRegexProvider.html
+  name: TextRegexProvider
+  nameWithType: TextRegexProvider
+  fullName: Terminal.Gui.TextValidateProviders.TextRegexProvider
+- uid: Terminal.Gui.TextValidateProviders
+  commentId: N:Terminal.Gui.TextValidateProviders
+  href: Terminal.html
+  name: Terminal.Gui.TextValidateProviders
+  nameWithType: Terminal.Gui.TextValidateProviders
+  fullName: Terminal.Gui.TextValidateProviders
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  - name: .
+  - uid: Terminal.Gui.TextValidateProviders
+    name: TextValidateProviders
+    href: Terminal.Gui.TextValidateProviders.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  - name: .
+  - uid: Terminal.Gui.TextValidateProviders
+    name: TextValidateProviders
+    href: Terminal.Gui.TextValidateProviders.html
+shouldSkipMarkup: true

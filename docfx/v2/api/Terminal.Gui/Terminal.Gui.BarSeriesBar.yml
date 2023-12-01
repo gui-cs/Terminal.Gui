@@ -1,0 +1,530 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.BarSeriesBar
+  commentId: T:Terminal.Gui.BarSeriesBar
+  id: BarSeriesBar
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.BarSeriesBar.#ctor(System.String,Terminal.Gui.GraphCellToRender,System.Single)
+  - Terminal.Gui.BarSeriesBar.Fill
+  - Terminal.Gui.BarSeriesBar.Text
+  - Terminal.Gui.BarSeriesBar.Value
+  langs:
+  - csharp
+  - vb
+  name: BarSeriesBar
+  nameWithType: BarSeriesBar
+  fullName: Terminal.Gui.BarSeriesBar
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BarSeriesBar
+    path: ../Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+    startLine: 5
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: A single bar in a <xref href="Terminal.Gui.BarSeries" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public class BarSeriesBar
+    content.vb: Public Class BarSeriesBar
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.BarSeriesBar.Text
+  commentId: P:Terminal.Gui.BarSeriesBar.Text
+  id: Text
+  parent: Terminal.Gui.BarSeriesBar
+  langs:
+  - csharp
+  - vb
+  name: Text
+  nameWithType: BarSeriesBar.Text
+  fullName: Terminal.Gui.BarSeriesBar.Text
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Text
+    path: ../Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+    startLine: 11
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Optional text that describes the bar.  This will be rendered on the corresponding
+
+    <xref href="Terminal.Gui.Axis" data-throw-if-not-resolved="false"></xref> unless <xref href="Terminal.Gui.BarSeries.DrawLabels" data-throw-if-not-resolved="false"></xref> is false
+  example: []
+  syntax:
+    content: public string Text { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property Text As String
+  overload: Terminal.Gui.BarSeriesBar.Text*
+- uid: Terminal.Gui.BarSeriesBar.Fill
+  commentId: P:Terminal.Gui.BarSeriesBar.Fill
+  id: Fill
+  parent: Terminal.Gui.BarSeriesBar
+  langs:
+  - csharp
+  - vb
+  name: Fill
+  nameWithType: BarSeriesBar.Fill
+  fullName: Terminal.Gui.BarSeriesBar.Fill
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Fill
+    path: ../Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+    startLine: 17
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The color and character that will be rendered in the console
+
+    when the bar extends over it
+  example: []
+  syntax:
+    content: public GraphCellToRender Fill { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.GraphCellToRender
+    content.vb: Public Property Fill As GraphCellToRender
+  overload: Terminal.Gui.BarSeriesBar.Fill*
+- uid: Terminal.Gui.BarSeriesBar.Value
+  commentId: P:Terminal.Gui.BarSeriesBar.Value
+  id: Value
+  parent: Terminal.Gui.BarSeriesBar
+  langs:
+  - csharp
+  - vb
+  name: Value
+  nameWithType: BarSeriesBar.Value
+  fullName: Terminal.Gui.BarSeriesBar.Value
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Value
+    path: ../Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+    startLine: 22
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The value in graph space X/Y (depending on <xref href="Terminal.Gui.Orientation" data-throw-if-not-resolved="false"></xref>) to which the bar extends.
+  example: []
+  syntax:
+    content: public float Value { get; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: Public ReadOnly Property Value As Single
+  overload: Terminal.Gui.BarSeriesBar.Value*
+- uid: Terminal.Gui.BarSeriesBar.#ctor(System.String,Terminal.Gui.GraphCellToRender,System.Single)
+  commentId: M:Terminal.Gui.BarSeriesBar.#ctor(System.String,Terminal.Gui.GraphCellToRender,System.Single)
+  id: '#ctor(System.String,Terminal.Gui.GraphCellToRender,System.Single)'
+  parent: Terminal.Gui.BarSeriesBar
+  langs:
+  - csharp
+  - vb
+  name: BarSeriesBar(string, GraphCellToRender, float)
+  nameWithType: BarSeriesBar.BarSeriesBar(string, GraphCellToRender, float)
+  fullName: Terminal.Gui.BarSeriesBar.BarSeriesBar(string, Terminal.Gui.GraphCellToRender, float)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/GraphView/BarSeriesBar.cs
+    startLine: 31
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Creates a new instance of a single bar rendered in the given <code class="paramref">fill</code> that extends
+
+    out <code class="paramref">value</code> graph space units in the default <xref href="Terminal.Gui.Orientation" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public BarSeriesBar(string text, GraphCellToRender fill, float value)
+    parameters:
+    - id: text
+      type: System.String
+      description: ''
+    - id: fill
+      type: Terminal.Gui.GraphCellToRender
+      description: ''
+    - id: value
+      type: System.Single
+      description: ''
+    content.vb: Public Sub New(text As String, fill As GraphCellToRender, value As Single)
+  overload: Terminal.Gui.BarSeriesBar.#ctor*
+  nameWithType.vb: BarSeriesBar.New(String, GraphCellToRender, Single)
+  fullName.vb: Terminal.Gui.BarSeriesBar.New(String, Terminal.Gui.GraphCellToRender, Single)
+  name.vb: New(String, GraphCellToRender, Single)
+references:
+- uid: Terminal.Gui.BarSeries
+  commentId: T:Terminal.Gui.BarSeries
+  href: Terminal.Gui.BarSeries.html
+  name: BarSeries
+  nameWithType: BarSeries
+  fullName: Terminal.Gui.BarSeries
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.Axis
+  commentId: T:Terminal.Gui.Axis
+  parent: Terminal.Gui
+  href: Terminal.Gui.Axis.html
+  name: Axis
+  nameWithType: Axis
+  fullName: Terminal.Gui.Axis
+- uid: Terminal.Gui.BarSeries.DrawLabels
+  commentId: P:Terminal.Gui.BarSeries.DrawLabels
+  href: Terminal.Gui.BarSeries.html#Terminal.Gui.BarSeries.DrawLabels
+  name: DrawLabels
+  nameWithType: BarSeries.DrawLabels
+  fullName: Terminal.Gui.BarSeries.DrawLabels
+- uid: Terminal.Gui.BarSeriesBar.Text*
+  commentId: Overload:Terminal.Gui.BarSeriesBar.Text
+  href: Terminal.Gui.BarSeriesBar.html#Terminal.Gui.BarSeriesBar.Text
+  name: Text
+  nameWithType: BarSeriesBar.Text
+  fullName: Terminal.Gui.BarSeriesBar.Text
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: Terminal.Gui.BarSeriesBar.Fill*
+  commentId: Overload:Terminal.Gui.BarSeriesBar.Fill
+  href: Terminal.Gui.BarSeriesBar.html#Terminal.Gui.BarSeriesBar.Fill
+  name: Fill
+  nameWithType: BarSeriesBar.Fill
+  fullName: Terminal.Gui.BarSeriesBar.Fill
+- uid: Terminal.Gui.GraphCellToRender
+  commentId: T:Terminal.Gui.GraphCellToRender
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphCellToRender.html
+  name: GraphCellToRender
+  nameWithType: GraphCellToRender
+  fullName: Terminal.Gui.GraphCellToRender
+- uid: Terminal.Gui.Orientation
+  commentId: T:Terminal.Gui.Orientation
+  parent: Terminal.Gui
+  href: Terminal.Gui.Orientation.html
+  name: Orientation
+  nameWithType: Orientation
+  fullName: Terminal.Gui.Orientation
+- uid: Terminal.Gui.BarSeriesBar.Value*
+  commentId: Overload:Terminal.Gui.BarSeriesBar.Value
+  href: Terminal.Gui.BarSeriesBar.html#Terminal.Gui.BarSeriesBar.Value
+  name: Value
+  nameWithType: BarSeriesBar.Value
+  fullName: Terminal.Gui.BarSeriesBar.Value
+- uid: System.Single
+  commentId: T:System.Single
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.single
+  name: float
+  nameWithType: float
+  fullName: float
+  nameWithType.vb: Single
+  fullName.vb: Single
+  name.vb: Single
+- uid: Terminal.Gui.BarSeriesBar.#ctor*
+  commentId: Overload:Terminal.Gui.BarSeriesBar.#ctor
+  href: Terminal.Gui.BarSeriesBar.html#Terminal.Gui.BarSeriesBar.#ctor(System.String,Terminal.Gui.GraphCellToRender,System.Single)
+  name: BarSeriesBar
+  nameWithType: BarSeriesBar.BarSeriesBar
+  fullName: Terminal.Gui.BarSeriesBar.BarSeriesBar
+  nameWithType.vb: BarSeriesBar.New
+  fullName.vb: Terminal.Gui.BarSeriesBar.New
+  name.vb: New
+shouldSkipMarkup: true

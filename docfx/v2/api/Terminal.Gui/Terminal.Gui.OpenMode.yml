@@ -1,0 +1,175 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.OpenMode
+  commentId: T:Terminal.Gui.OpenMode
+  id: OpenMode
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.OpenMode.Directory
+  - Terminal.Gui.OpenMode.File
+  - Terminal.Gui.OpenMode.Mixed
+  langs:
+  - csharp
+  - vb
+  name: OpenMode
+  nameWithType: OpenMode
+  fullName: Terminal.Gui.OpenMode
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Views/OpenDialog.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OpenMode
+    path: ../Terminal.Gui/Views/OpenDialog.cs
+    startLine: 24
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Determine which <xref href="System.IO" data-throw-if-not-resolved="false"></xref> type to open.
+  example: []
+  syntax:
+    content: public enum OpenMode
+    content.vb: Public Enum OpenMode
+- uid: Terminal.Gui.OpenMode.File
+  commentId: F:Terminal.Gui.OpenMode.File
+  id: File
+  parent: Terminal.Gui.OpenMode
+  langs:
+  - csharp
+  - vb
+  name: File
+  nameWithType: OpenMode.File
+  fullName: Terminal.Gui.OpenMode.File
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/OpenDialog.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: File
+    path: ../Terminal.Gui/Views/OpenDialog.cs
+    startLine: 28
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Opens only file or files.
+  example: []
+  syntax:
+    content: File = 0
+    return:
+      type: Terminal.Gui.OpenMode
+- uid: Terminal.Gui.OpenMode.Directory
+  commentId: F:Terminal.Gui.OpenMode.Directory
+  id: Directory
+  parent: Terminal.Gui.OpenMode
+  langs:
+  - csharp
+  - vb
+  name: Directory
+  nameWithType: OpenMode.Directory
+  fullName: Terminal.Gui.OpenMode.Directory
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/OpenDialog.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Directory
+    path: ../Terminal.Gui/Views/OpenDialog.cs
+    startLine: 32
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Opens only directory or directories.
+  example: []
+  syntax:
+    content: Directory = 1
+    return:
+      type: Terminal.Gui.OpenMode
+- uid: Terminal.Gui.OpenMode.Mixed
+  commentId: F:Terminal.Gui.OpenMode.Mixed
+  id: Mixed
+  parent: Terminal.Gui.OpenMode
+  langs:
+  - csharp
+  - vb
+  name: Mixed
+  nameWithType: OpenMode.Mixed
+  fullName: Terminal.Gui.OpenMode.Mixed
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/OpenDialog.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Mixed
+    path: ../Terminal.Gui/Views/OpenDialog.cs
+    startLine: 36
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Opens files and directories.
+  example: []
+  syntax:
+    content: Mixed = 2
+    return:
+      type: Terminal.Gui.OpenMode
+references:
+- uid: System.IO
+  commentId: N:System.IO
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.IO
+  nameWithType: System.IO
+  fullName: System.IO
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.io
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.io
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.OpenMode
+  commentId: T:Terminal.Gui.OpenMode
+  parent: Terminal.Gui
+  href: Terminal.Gui.OpenMode.html
+  name: OpenMode
+  nameWithType: OpenMode
+  fullName: Terminal.Gui.OpenMode
+shouldSkipMarkup: true

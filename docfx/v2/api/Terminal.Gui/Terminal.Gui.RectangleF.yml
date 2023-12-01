@@ -1,0 +1,1980 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.RectangleF
+  commentId: T:Terminal.Gui.RectangleF
+  id: RectangleF
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)
+  - Terminal.Gui.RectangleF.#ctor(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  - Terminal.Gui.RectangleF.Bottom
+  - Terminal.Gui.RectangleF.Contains(System.Single,System.Single)
+  - Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  - Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.Empty
+  - Terminal.Gui.RectangleF.Equals(System.Object)
+  - Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  - Terminal.Gui.RectangleF.GetHashCode
+  - Terminal.Gui.RectangleF.Height
+  - Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)
+  - Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF,System.Single,System.Single)
+  - Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  - Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.IsEmpty
+  - Terminal.Gui.RectangleF.Left
+  - Terminal.Gui.RectangleF.Location
+  - Terminal.Gui.RectangleF.Offset(System.Single,System.Single)
+  - Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  - Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.op_Implicit(Terminal.Gui.Rect)~Terminal.Gui.RectangleF
+  - Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.Right
+  - Terminal.Gui.RectangleF.Size
+  - Terminal.Gui.RectangleF.Top
+  - Terminal.Gui.RectangleF.ToString
+  - Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  - Terminal.Gui.RectangleF.Width
+  - Terminal.Gui.RectangleF.X
+  - Terminal.Gui.RectangleF.Y
+  langs:
+  - csharp
+  - vb
+  name: RectangleF
+  nameWithType: RectangleF
+  fullName: Terminal.Gui.RectangleF
+  type: Struct
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RectangleF
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Stores the location and size of a rectangular region.
+  example: []
+  syntax:
+    content: 'public struct RectangleF : IEquatable<RectangleF>'
+    content.vb: Public Structure RectangleF Implements IEquatable(Of RectangleF)
+  implements:
+  - System.IEquatable{Terminal.Gui.RectangleF}
+  inheritedMembers:
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+- uid: Terminal.Gui.RectangleF.Empty
+  commentId: F:Terminal.Gui.RectangleF.Empty
+  id: Empty
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Empty
+  nameWithType: RectangleF.Empty
+  fullName: Terminal.Gui.RectangleF.Empty
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Empty
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 17
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> class.
+  example: []
+  syntax:
+    content: public static readonly RectangleF Empty
+    return:
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Shared ReadOnly Empty As RectangleF
+- uid: Terminal.Gui.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)
+  commentId: M:Terminal.Gui.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)
+  id: '#ctor(System.Single,System.Single,System.Single,System.Single)'
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: RectangleF(float, float, float, float)
+  nameWithType: RectangleF.RectangleF(float, float, float, float)
+  fullName: Terminal.Gui.RectangleF.RectangleF(float, float, float, float)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 28
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> class with the specified location
+
+    and size.
+  example: []
+  syntax:
+    content: public RectangleF(float x, float y, float width, float height)
+    parameters:
+    - id: x
+      type: System.Single
+    - id: y
+      type: System.Single
+    - id: width
+      type: System.Single
+    - id: height
+      type: System.Single
+    content.vb: Public Sub New(x As Single, y As Single, width As Single, height As Single)
+  overload: Terminal.Gui.RectangleF.#ctor*
+  nameWithType.vb: RectangleF.New(Single, Single, Single, Single)
+  fullName.vb: Terminal.Gui.RectangleF.New(Single, Single, Single, Single)
+  name.vb: New(Single, Single, Single, Single)
+- uid: Terminal.Gui.RectangleF.#ctor(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  commentId: M:Terminal.Gui.RectangleF.#ctor(Terminal.Gui.PointF,Terminal.Gui.SizeF)
+  id: '#ctor(Terminal.Gui.PointF,Terminal.Gui.SizeF)'
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: RectangleF(PointF, SizeF)
+  nameWithType: RectangleF.RectangleF(PointF, SizeF)
+  fullName: Terminal.Gui.RectangleF.RectangleF(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 40
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> class with the specified location
+
+    and size.
+  example: []
+  syntax:
+    content: public RectangleF(PointF location, SizeF size)
+    parameters:
+    - id: location
+      type: Terminal.Gui.PointF
+    - id: size
+      type: Terminal.Gui.SizeF
+    content.vb: Public Sub New(location As PointF, size As SizeF)
+  overload: Terminal.Gui.RectangleF.#ctor*
+  nameWithType.vb: RectangleF.New(PointF, SizeF)
+  fullName.vb: Terminal.Gui.RectangleF.New(Terminal.Gui.PointF, Terminal.Gui.SizeF)
+  name.vb: New(PointF, SizeF)
+- uid: Terminal.Gui.RectangleF.FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  commentId: M:Terminal.Gui.RectangleF.FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  id: FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: FromLTRB(float, float, float, float)
+  nameWithType: RectangleF.FromLTRB(float, float, float, float)
+  fullName: Terminal.Gui.RectangleF.FromLTRB(float, float, float, float)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FromLTRB
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 51
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> with the specified location and size.
+  example: []
+  syntax:
+    content: public static RectangleF FromLTRB(float left, float top, float right, float bottom)
+    parameters:
+    - id: left
+      type: System.Single
+    - id: top
+      type: System.Single
+    - id: right
+      type: System.Single
+    - id: bottom
+      type: System.Single
+    return:
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Shared Function FromLTRB(left As Single, top As Single, right As Single, bottom As Single) As RectangleF
+  overload: Terminal.Gui.RectangleF.FromLTRB*
+  nameWithType.vb: RectangleF.FromLTRB(Single, Single, Single, Single)
+  fullName.vb: Terminal.Gui.RectangleF.FromLTRB(Single, Single, Single, Single)
+  name.vb: FromLTRB(Single, Single, Single, Single)
+- uid: Terminal.Gui.RectangleF.Location
+  commentId: P:Terminal.Gui.RectangleF.Location
+  id: Location
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Location
+  nameWithType: RectangleF.Location
+  fullName: Terminal.Gui.RectangleF.Location
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Location
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 58
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the coordinates of the upper-left corner of the rectangular region represented by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public PointF Location { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.PointF
+    content.vb: >-
+      <Browsable(False)>
+
+      Public Property Location As PointF
+  overload: Terminal.Gui.RectangleF.Location*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.Size
+  commentId: P:Terminal.Gui.RectangleF.Size
+  id: Size
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Size
+  nameWithType: RectangleF.Size
+  fullName: Terminal.Gui.RectangleF.Size
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Size
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 70
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the size of this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public SizeF Size { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.SizeF
+    content.vb: >-
+      <Browsable(False)>
+
+      Public Property Size As SizeF
+  overload: Terminal.Gui.RectangleF.Size*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.X
+  commentId: P:Terminal.Gui.RectangleF.X
+  id: X
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: X
+  nameWithType: RectangleF.X
+  fullName: Terminal.Gui.RectangleF.X
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: X
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 83
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the x-coordinate of the upper-left corner of the rectangular region defined by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public float X { get; set; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: Public Property X As Single
+  overload: Terminal.Gui.RectangleF.X*
+- uid: Terminal.Gui.RectangleF.Y
+  commentId: P:Terminal.Gui.RectangleF.Y
+  id: Y
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Y
+  nameWithType: RectangleF.Y
+  fullName: Terminal.Gui.RectangleF.Y
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Y
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 92
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the y-coordinate of the upper-left corner of the rectangular region defined by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public float Y { get; set; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: Public Property Y As Single
+  overload: Terminal.Gui.RectangleF.Y*
+- uid: Terminal.Gui.RectangleF.Width
+  commentId: P:Terminal.Gui.RectangleF.Width
+  id: Width
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Width
+  nameWithType: RectangleF.Width
+  fullName: Terminal.Gui.RectangleF.Width
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Width
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 100
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the width of the rectangular region defined by this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public float Width { get; set; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: Public Property Width As Single
+  overload: Terminal.Gui.RectangleF.Width*
+- uid: Terminal.Gui.RectangleF.Height
+  commentId: P:Terminal.Gui.RectangleF.Height
+  id: Height
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Height
+  nameWithType: RectangleF.Height
+  fullName: Terminal.Gui.RectangleF.Height
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Height
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 108
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the height of the rectangular region defined by this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public float Height { get; set; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: Public Property Height As Single
+  overload: Terminal.Gui.RectangleF.Height*
+- uid: Terminal.Gui.RectangleF.Left
+  commentId: P:Terminal.Gui.RectangleF.Left
+  id: Left
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Left
+  nameWithType: RectangleF.Left
+  fullName: Terminal.Gui.RectangleF.Left
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Left
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 117
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the x-coordinate of the upper-left corner of the rectangular region defined by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> .
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public float Left { get; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: >-
+      <Browsable(False)>
+
+      Public ReadOnly Property Left As Single
+  overload: Terminal.Gui.RectangleF.Left*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.Top
+  commentId: P:Terminal.Gui.RectangleF.Top
+  id: Top
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Top
+  nameWithType: RectangleF.Top
+  fullName: Terminal.Gui.RectangleF.Top
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Top
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 124
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the y-coordinate of the upper-left corner of the rectangular region defined by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public float Top { get; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: >-
+      <Browsable(False)>
+
+      Public ReadOnly Property Top As Single
+  overload: Terminal.Gui.RectangleF.Top*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.Right
+  commentId: P:Terminal.Gui.RectangleF.Right
+  id: Right
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Right
+  nameWithType: RectangleF.Right
+  fullName: Terminal.Gui.RectangleF.Right
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Right
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 131
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the x-coordinate of the lower-right corner of the rectangular region defined by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public float Right { get; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: >-
+      <Browsable(False)>
+
+      Public ReadOnly Property Right As Single
+  overload: Terminal.Gui.RectangleF.Right*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.Bottom
+  commentId: P:Terminal.Gui.RectangleF.Bottom
+  id: Bottom
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Bottom
+  nameWithType: RectangleF.Bottom
+  fullName: Terminal.Gui.RectangleF.Bottom
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Bottom
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 138
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the y-coordinate of the lower-right corner of the rectangular region defined by this
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public float Bottom { get; }
+    parameters: []
+    return:
+      type: System.Single
+    content.vb: >-
+      <Browsable(False)>
+
+      Public ReadOnly Property Bottom As Single
+  overload: Terminal.Gui.RectangleF.Bottom*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.IsEmpty
+  commentId: P:Terminal.Gui.RectangleF.IsEmpty
+  id: IsEmpty
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: IsEmpty
+  nameWithType: RectangleF.IsEmpty
+  fullName: Terminal.Gui.RectangleF.IsEmpty
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsEmpty
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 144
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tests whether this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> has a <xref href="Terminal.Gui.RectangleF.Width" data-throw-if-not-resolved="false"></xref> or a <xref href="Terminal.Gui.RectangleF.Height" data-throw-if-not-resolved="false"></xref> of 0.
+  example: []
+  syntax:
+    content: >-
+      [Browsable(false)]
+
+      public bool IsEmpty { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: >-
+      <Browsable(False)>
+
+      Public ReadOnly Property IsEmpty As Boolean
+  overload: Terminal.Gui.RectangleF.IsEmpty*
+  attributes:
+  - type: System.ComponentModel.BrowsableAttribute
+    ctor: System.ComponentModel.BrowsableAttribute.#ctor(System.Boolean)
+    arguments:
+    - type: System.Boolean
+      value: false
+- uid: Terminal.Gui.RectangleF.Equals(System.Object)
+  commentId: M:Terminal.Gui.RectangleF.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Equals(object)
+  nameWithType: RectangleF.Equals(object)
+  fullName: Terminal.Gui.RectangleF.Equals(object)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Equals
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 151
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Tests whether <code class="paramref">obj</code> is a <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> with the same location and
+
+    size of this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public override bool Equals(object obj)
+    parameters:
+    - id: obj
+      type: System.Object
+    return:
+      type: System.Boolean
+    content.vb: Public Overrides Function Equals(obj As Object) As Boolean
+  overridden: System.ValueType.Equals(System.Object)
+  overload: Terminal.Gui.RectangleF.Equals*
+  nameWithType.vb: RectangleF.Equals(Object)
+  fullName.vb: Terminal.Gui.RectangleF.Equals(Object)
+  name.vb: Equals(Object)
+- uid: Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  id: Equals(Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Equals(RectangleF)
+  nameWithType: RectangleF.Equals(RectangleF)
+  fullName: Terminal.Gui.RectangleF.Equals(Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Equals
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 158
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns true if two <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> objects have equal location and size.
+  example: []
+  syntax:
+    content: public bool Equals(RectangleF other)
+    parameters:
+    - id: other
+      type: Terminal.Gui.RectangleF
+      description: ''
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: Public Function Equals(other As RectangleF) As Boolean
+  overload: Terminal.Gui.RectangleF.Equals*
+  implements:
+  - System.IEquatable{Terminal.Gui.RectangleF}.Equals(Terminal.Gui.RectangleF)
+- uid: Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  id: op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: operator ==(RectangleF, RectangleF)
+  nameWithType: RectangleF.operator ==(RectangleF, RectangleF)
+  fullName: Terminal.Gui.RectangleF.operator ==(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Equality
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 163
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tests whether two <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> objects have equal location and size.
+  example: []
+  syntax:
+    content: public static bool operator ==(RectangleF left, RectangleF right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.RectangleF
+    - id: right
+      type: Terminal.Gui.RectangleF
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Operator =(left As RectangleF, right As RectangleF) As Boolean
+  overload: Terminal.Gui.RectangleF.op_Equality*
+  nameWithType.vb: RectangleF.=(RectangleF, RectangleF)
+  fullName.vb: Terminal.Gui.RectangleF.=(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  name.vb: =(RectangleF, RectangleF)
+- uid: Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  id: op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: operator !=(RectangleF, RectangleF)
+  nameWithType: RectangleF.operator !=(RectangleF, RectangleF)
+  fullName: Terminal.Gui.RectangleF.operator !=(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Inequality
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 169
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tests whether two <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> objects differ in location or size.
+  example: []
+  syntax:
+    content: public static bool operator !=(RectangleF left, RectangleF right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.RectangleF
+    - id: right
+      type: Terminal.Gui.RectangleF
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Operator <>(left As RectangleF, right As RectangleF) As Boolean
+  overload: Terminal.Gui.RectangleF.op_Inequality*
+  nameWithType.vb: RectangleF.<>(RectangleF, RectangleF)
+  fullName.vb: Terminal.Gui.RectangleF.<>(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  name.vb: <>(RectangleF, RectangleF)
+- uid: Terminal.Gui.RectangleF.Contains(System.Single,System.Single)
+  commentId: M:Terminal.Gui.RectangleF.Contains(System.Single,System.Single)
+  id: Contains(System.Single,System.Single)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Contains(float, float)
+  nameWithType: RectangleF.Contains(float, float)
+  fullName: Terminal.Gui.RectangleF.Contains(float, float)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Contains
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 175
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Determines if the specified point is contained within the rectangular region defined by this
+
+    <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> .
+  example: []
+  syntax:
+    content: public bool Contains(float x, float y)
+    parameters:
+    - id: x
+      type: System.Single
+    - id: y
+      type: System.Single
+    return:
+      type: System.Boolean
+    content.vb: Public Function Contains(x As Single, y As Single) As Boolean
+  overload: Terminal.Gui.RectangleF.Contains*
+  nameWithType.vb: RectangleF.Contains(Single, Single)
+  fullName.vb: Terminal.Gui.RectangleF.Contains(Single, Single)
+  name.vb: Contains(Single, Single)
+- uid: Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  commentId: M:Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  id: Contains(Terminal.Gui.PointF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Contains(PointF)
+  nameWithType: RectangleF.Contains(PointF)
+  fullName: Terminal.Gui.RectangleF.Contains(Terminal.Gui.PointF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Contains
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 181
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Determines if the specified point is contained within the rectangular region defined by this
+
+    <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> .
+  example: []
+  syntax:
+    content: public bool Contains(PointF pt)
+    parameters:
+    - id: pt
+      type: Terminal.Gui.PointF
+    return:
+      type: System.Boolean
+    content.vb: Public Function Contains(pt As PointF) As Boolean
+  overload: Terminal.Gui.RectangleF.Contains*
+- uid: Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  id: Contains(Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Contains(RectangleF)
+  nameWithType: RectangleF.Contains(RectangleF)
+  fullName: Terminal.Gui.RectangleF.Contains(Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Contains
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 187
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Determines if the rectangular region represented by <code class="paramref">rect</code> is entirely contained within
+
+    the rectangular region represented by this <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> .
+  example: []
+  syntax:
+    content: public bool Contains(RectangleF rect)
+    parameters:
+    - id: rect
+      type: Terminal.Gui.RectangleF
+    return:
+      type: System.Boolean
+    content.vb: Public Function Contains(rect As RectangleF) As Boolean
+  overload: Terminal.Gui.RectangleF.Contains*
+- uid: Terminal.Gui.RectangleF.GetHashCode
+  commentId: M:Terminal.Gui.RectangleF.GetHashCode
+  id: GetHashCode
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: RectangleF.GetHashCode()
+  fullName: Terminal.Gui.RectangleF.GetHashCode()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetHashCode
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 193
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the hash code for this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public override int GetHashCode()
+    return:
+      type: System.Int32
+    content.vb: Public Overrides Function GetHashCode() As Integer
+  overridden: System.ValueType.GetHashCode
+  overload: Terminal.Gui.RectangleF.GetHashCode*
+- uid: Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)
+  commentId: M:Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)
+  id: Inflate(System.Single,System.Single)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Inflate(float, float)
+  nameWithType: RectangleF.Inflate(float, float)
+  fullName: Terminal.Gui.RectangleF.Inflate(float, float)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Inflate
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 201
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Inflates this <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> by the specified amount.
+  example: []
+  syntax:
+    content: public void Inflate(float x, float y)
+    parameters:
+    - id: x
+      type: System.Single
+    - id: y
+      type: System.Single
+    content.vb: Public Sub Inflate(x As Single, y As Single)
+  overload: Terminal.Gui.RectangleF.Inflate*
+  nameWithType.vb: RectangleF.Inflate(Single, Single)
+  fullName.vb: Terminal.Gui.RectangleF.Inflate(Single, Single)
+  name.vb: Inflate(Single, Single)
+- uid: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  commentId: M:Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  id: Inflate(Terminal.Gui.SizeF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Inflate(SizeF)
+  nameWithType: RectangleF.Inflate(SizeF)
+  fullName: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.SizeF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Inflate
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 212
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Inflates this <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> by the specified amount.
+  example: []
+  syntax:
+    content: public void Inflate(SizeF size)
+    parameters:
+    - id: size
+      type: Terminal.Gui.SizeF
+    content.vb: Public Sub Inflate(size As SizeF)
+  overload: Terminal.Gui.RectangleF.Inflate*
+- uid: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF,System.Single,System.Single)
+  commentId: M:Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF,System.Single,System.Single)
+  id: Inflate(Terminal.Gui.RectangleF,System.Single,System.Single)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Inflate(RectangleF, float, float)
+  nameWithType: RectangleF.Inflate(RectangleF, float, float)
+  fullName: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF, float, float)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Inflate
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 217
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> that is inflated by the specified amount.
+  example: []
+  syntax:
+    content: public static RectangleF Inflate(RectangleF rect, float x, float y)
+    parameters:
+    - id: rect
+      type: Terminal.Gui.RectangleF
+    - id: x
+      type: System.Single
+    - id: y
+      type: System.Single
+    return:
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Shared Function Inflate(rect As RectangleF, x As Single, y As Single) As RectangleF
+  overload: Terminal.Gui.RectangleF.Inflate*
+  nameWithType.vb: RectangleF.Inflate(RectangleF, Single, Single)
+  fullName.vb: Terminal.Gui.RectangleF.Inflate(Terminal.Gui.RectangleF, Single, Single)
+  name.vb: Inflate(RectangleF, Single, Single)
+- uid: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  id: Intersect(Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Intersect(RectangleF)
+  nameWithType: RectangleF.Intersect(RectangleF)
+  fullName: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Intersect
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 227
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a Rectangle that represents the intersection between this Rectangle and rect.
+  example: []
+  syntax:
+    content: public void Intersect(RectangleF rect)
+    parameters:
+    - id: rect
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Sub Intersect(rect As RectangleF)
+  overload: Terminal.Gui.RectangleF.Intersect*
+- uid: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  id: Intersect(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Intersect(RectangleF, RectangleF)
+  nameWithType: RectangleF.Intersect(RectangleF, RectangleF)
+  fullName: Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Intersect
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 241
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Creates a rectangle that represents the intersection between a and b. If there is no intersection, an
+
+    empty rectangle is returned.
+  example: []
+  syntax:
+    content: public static RectangleF Intersect(RectangleF a, RectangleF b)
+    parameters:
+    - id: a
+      type: Terminal.Gui.RectangleF
+    - id: b
+      type: Terminal.Gui.RectangleF
+    return:
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Shared Function Intersect(a As RectangleF, b As RectangleF) As RectangleF
+  overload: Terminal.Gui.RectangleF.Intersect*
+- uid: Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  id: IntersectsWith(Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: IntersectsWith(RectangleF)
+  nameWithType: RectangleF.IntersectsWith(RectangleF)
+  fullName: Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IntersectsWith
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 258
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Determines if this rectangle intersects with rect.
+  example: []
+  syntax:
+    content: public bool IntersectsWith(RectangleF rect)
+    parameters:
+    - id: rect
+      type: Terminal.Gui.RectangleF
+    return:
+      type: System.Boolean
+    content.vb: Public Function IntersectsWith(rect As RectangleF) As Boolean
+  overload: Terminal.Gui.RectangleF.IntersectsWith*
+- uid: Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  id: Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Union(RectangleF, RectangleF)
+  nameWithType: RectangleF.Union(RectangleF, RectangleF)
+  fullName: Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF, Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Union
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 264
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a rectangle that represents the union between a and b.
+  example: []
+  syntax:
+    content: public static RectangleF Union(RectangleF a, RectangleF b)
+    parameters:
+    - id: a
+      type: Terminal.Gui.RectangleF
+    - id: b
+      type: Terminal.Gui.RectangleF
+    return:
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Shared Function Union(a As RectangleF, b As RectangleF) As RectangleF
+  overload: Terminal.Gui.RectangleF.Union*
+- uid: Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  commentId: M:Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  id: Offset(Terminal.Gui.PointF)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Offset(PointF)
+  nameWithType: RectangleF.Offset(PointF)
+  fullName: Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Offset
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 277
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adjusts the location of this rectangle by the specified amount.
+  example: []
+  syntax:
+    content: public void Offset(PointF pos)
+    parameters:
+    - id: pos
+      type: Terminal.Gui.PointF
+    content.vb: Public Sub Offset(pos As PointF)
+  overload: Terminal.Gui.RectangleF.Offset*
+- uid: Terminal.Gui.RectangleF.Offset(System.Single,System.Single)
+  commentId: M:Terminal.Gui.RectangleF.Offset(System.Single,System.Single)
+  id: Offset(System.Single,System.Single)
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: Offset(float, float)
+  nameWithType: RectangleF.Offset(float, float)
+  fullName: Terminal.Gui.RectangleF.Offset(float, float)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Offset
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 282
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adjusts the location of this rectangle by the specified amount.
+  example: []
+  syntax:
+    content: public void Offset(float x, float y)
+    parameters:
+    - id: x
+      type: System.Single
+    - id: y
+      type: System.Single
+    content.vb: Public Sub Offset(x As Single, y As Single)
+  overload: Terminal.Gui.RectangleF.Offset*
+  nameWithType.vb: RectangleF.Offset(Single, Single)
+  fullName.vb: Terminal.Gui.RectangleF.Offset(Single, Single)
+  name.vb: Offset(Single, Single)
+- uid: Terminal.Gui.RectangleF.op_Implicit(Terminal.Gui.Rect)~Terminal.Gui.RectangleF
+  commentId: M:Terminal.Gui.RectangleF.op_Implicit(Terminal.Gui.Rect)~Terminal.Gui.RectangleF
+  id: op_Implicit(Terminal.Gui.Rect)~Terminal.Gui.RectangleF
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: implicit operator RectangleF(Rect)
+  nameWithType: RectangleF.implicit operator RectangleF(Rect)
+  fullName: Terminal.Gui.RectangleF.implicit operator Terminal.Gui.RectangleF(Terminal.Gui.Rect)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Implicit
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 292
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Converts the specified <xref href="Terminal.Gui.Rect" data-throw-if-not-resolved="false"></xref> to a
+
+    <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public static implicit operator RectangleF(Rect r)
+    parameters:
+    - id: r
+      type: Terminal.Gui.Rect
+    return:
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Shared Widening Operator CType(r As Rect) As RectangleF
+  overload: Terminal.Gui.RectangleF.op_Implicit*
+  nameWithType.vb: RectangleF.CType(Rect)
+  fullName.vb: Terminal.Gui.RectangleF.CType(Terminal.Gui.Rect)
+  name.vb: CType(Rect)
+- uid: Terminal.Gui.RectangleF.ToString
+  commentId: M:Terminal.Gui.RectangleF.ToString
+  id: ToString
+  parent: Terminal.Gui.RectangleF
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: RectangleF.ToString()
+  fullName: Terminal.Gui.RectangleF.ToString()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Types/RectangleF.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToString
+    path: ../Terminal.Gui/Types/RectangleF.cs
+    startLine: 298
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Converts the <xref href="Terminal.Gui.RectangleF.Location" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.RectangleF.Size" data-throw-if-not-resolved="false"></xref>
+
+    of this <xref href="Terminal.Gui.RectangleF" data-throw-if-not-resolved="false"></xref> to a human-readable string.
+  example: []
+  syntax:
+    content: public override string ToString()
+    return:
+      type: System.String
+    content.vb: Public Overrides Function ToString() As String
+  overridden: System.ValueType.ToString
+  overload: Terminal.Gui.RectangleF.ToString*
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.IEquatable{Terminal.Gui.RectangleF}
+  commentId: T:System.IEquatable{Terminal.Gui.RectangleF}
+  parent: System
+  definition: System.IEquatable`1
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<RectangleF>
+  nameWithType: IEquatable<RectangleF>
+  fullName: System.IEquatable<Terminal.Gui.RectangleF>
+  nameWithType.vb: IEquatable(Of RectangleF)
+  fullName.vb: System.IEquatable(Of Terminal.Gui.RectangleF)
+  name.vb: IEquatable(Of RectangleF)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+    href: Terminal.Gui.RectangleF.html
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+    href: Terminal.Gui.RectangleF.html
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.IEquatable`1
+  commentId: T:System.IEquatable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<T>
+  nameWithType: IEquatable<T>
+  fullName: System.IEquatable<T>
+  nameWithType.vb: IEquatable(Of T)
+  fullName.vb: System.IEquatable(Of T)
+  name.vb: IEquatable(Of T)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: Terminal.Gui.RectangleF
+  commentId: T:Terminal.Gui.RectangleF
+  parent: Terminal.Gui
+  href: Terminal.Gui.RectangleF.html
+  name: RectangleF
+  nameWithType: RectangleF
+  fullName: Terminal.Gui.RectangleF
+- uid: Terminal.Gui.RectangleF.#ctor*
+  commentId: Overload:Terminal.Gui.RectangleF.#ctor
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.#ctor(System.Single,System.Single,System.Single,System.Single)
+  name: RectangleF
+  nameWithType: RectangleF.RectangleF
+  fullName: Terminal.Gui.RectangleF.RectangleF
+  nameWithType.vb: RectangleF.New
+  fullName.vb: Terminal.Gui.RectangleF.New
+  name.vb: New
+- uid: System.Single
+  commentId: T:System.Single
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.single
+  name: float
+  nameWithType: float
+  fullName: float
+  nameWithType.vb: Single
+  fullName.vb: Single
+  name.vb: Single
+- uid: Terminal.Gui.PointF
+  commentId: T:Terminal.Gui.PointF
+  parent: Terminal.Gui
+  href: Terminal.Gui.PointF.html
+  name: PointF
+  nameWithType: PointF
+  fullName: Terminal.Gui.PointF
+- uid: Terminal.Gui.SizeF
+  commentId: T:Terminal.Gui.SizeF
+  parent: Terminal.Gui
+  href: Terminal.Gui.SizeF.html
+  name: SizeF
+  nameWithType: SizeF
+  fullName: Terminal.Gui.SizeF
+- uid: Terminal.Gui.RectangleF.FromLTRB*
+  commentId: Overload:Terminal.Gui.RectangleF.FromLTRB
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.FromLTRB(System.Single,System.Single,System.Single,System.Single)
+  name: FromLTRB
+  nameWithType: RectangleF.FromLTRB
+  fullName: Terminal.Gui.RectangleF.FromLTRB
+- uid: Terminal.Gui.RectangleF.Location*
+  commentId: Overload:Terminal.Gui.RectangleF.Location
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Location
+  name: Location
+  nameWithType: RectangleF.Location
+  fullName: Terminal.Gui.RectangleF.Location
+- uid: Terminal.Gui.RectangleF.Size*
+  commentId: Overload:Terminal.Gui.RectangleF.Size
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Size
+  name: Size
+  nameWithType: RectangleF.Size
+  fullName: Terminal.Gui.RectangleF.Size
+- uid: Terminal.Gui.RectangleF.X*
+  commentId: Overload:Terminal.Gui.RectangleF.X
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.X
+  name: X
+  nameWithType: RectangleF.X
+  fullName: Terminal.Gui.RectangleF.X
+- uid: Terminal.Gui.RectangleF.Y*
+  commentId: Overload:Terminal.Gui.RectangleF.Y
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Y
+  name: Y
+  nameWithType: RectangleF.Y
+  fullName: Terminal.Gui.RectangleF.Y
+- uid: Terminal.Gui.RectangleF.Width*
+  commentId: Overload:Terminal.Gui.RectangleF.Width
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Width
+  name: Width
+  nameWithType: RectangleF.Width
+  fullName: Terminal.Gui.RectangleF.Width
+- uid: Terminal.Gui.RectangleF.Height*
+  commentId: Overload:Terminal.Gui.RectangleF.Height
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Height
+  name: Height
+  nameWithType: RectangleF.Height
+  fullName: Terminal.Gui.RectangleF.Height
+- uid: Terminal.Gui.RectangleF.Left*
+  commentId: Overload:Terminal.Gui.RectangleF.Left
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Left
+  name: Left
+  nameWithType: RectangleF.Left
+  fullName: Terminal.Gui.RectangleF.Left
+- uid: Terminal.Gui.RectangleF.Top*
+  commentId: Overload:Terminal.Gui.RectangleF.Top
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Top
+  name: Top
+  nameWithType: RectangleF.Top
+  fullName: Terminal.Gui.RectangleF.Top
+- uid: Terminal.Gui.RectangleF.Right*
+  commentId: Overload:Terminal.Gui.RectangleF.Right
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Right
+  name: Right
+  nameWithType: RectangleF.Right
+  fullName: Terminal.Gui.RectangleF.Right
+- uid: Terminal.Gui.RectangleF.Bottom*
+  commentId: Overload:Terminal.Gui.RectangleF.Bottom
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Bottom
+  name: Bottom
+  nameWithType: RectangleF.Bottom
+  fullName: Terminal.Gui.RectangleF.Bottom
+- uid: Terminal.Gui.RectangleF.Width
+  commentId: P:Terminal.Gui.RectangleF.Width
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Width
+  name: Width
+  nameWithType: RectangleF.Width
+  fullName: Terminal.Gui.RectangleF.Width
+- uid: Terminal.Gui.RectangleF.Height
+  commentId: P:Terminal.Gui.RectangleF.Height
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Height
+  name: Height
+  nameWithType: RectangleF.Height
+  fullName: Terminal.Gui.RectangleF.Height
+- uid: Terminal.Gui.RectangleF.IsEmpty*
+  commentId: Overload:Terminal.Gui.RectangleF.IsEmpty
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.IsEmpty
+  name: IsEmpty
+  nameWithType: RectangleF.IsEmpty
+  fullName: Terminal.Gui.RectangleF.IsEmpty
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype.equals
+  name: Equals(object)
+  nameWithType: ValueType.Equals(object)
+  fullName: System.ValueType.Equals(object)
+  nameWithType.vb: ValueType.Equals(Object)
+  fullName.vb: System.ValueType.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.equals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.equals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: Terminal.Gui.RectangleF.Equals*
+  commentId: Overload:Terminal.Gui.RectangleF.Equals
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Equals(System.Object)
+  name: Equals
+  nameWithType: RectangleF.Equals
+  fullName: Terminal.Gui.RectangleF.Equals
+- uid: System.ValueType
+  commentId: T:System.ValueType
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: System.IEquatable{Terminal.Gui.RectangleF}.Equals(Terminal.Gui.RectangleF)
+  commentId: M:System.IEquatable{Terminal.Gui.RectangleF}.Equals(Terminal.Gui.RectangleF)
+  parent: System.IEquatable{Terminal.Gui.RectangleF}
+  definition: System.IEquatable`1.Equals(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-terminal.gui.rectanglef-.equals#system-iequatable((terminal-gui-rectanglef))-equals(terminal-gui-rectanglef)
+  name: Equals(RectangleF)
+  nameWithType: IEquatable<RectangleF>.Equals(RectangleF)
+  fullName: System.IEquatable<Terminal.Gui.RectangleF>.Equals(Terminal.Gui.RectangleF)
+  nameWithType.vb: IEquatable(Of RectangleF).Equals(RectangleF)
+  fullName.vb: System.IEquatable(Of Terminal.Gui.RectangleF).Equals(Terminal.Gui.RectangleF)
+  spec.csharp:
+  - uid: System.IEquatable{Terminal.Gui.RectangleF}.Equals(Terminal.Gui.RectangleF)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-terminal.gui.rectanglef-.equals#system-iequatable((terminal-gui-rectanglef))-equals(terminal-gui-rectanglef)
+  - name: (
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+    href: Terminal.Gui.RectangleF.html
+  - name: )
+  spec.vb:
+  - uid: System.IEquatable{Terminal.Gui.RectangleF}.Equals(Terminal.Gui.RectangleF)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-terminal.gui.rectanglef-.equals#system-iequatable((terminal-gui-rectanglef))-equals(terminal-gui-rectanglef)
+  - name: (
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+    href: Terminal.Gui.RectangleF.html
+  - name: )
+- uid: System.IEquatable`1.Equals(`0)
+  commentId: M:System.IEquatable`1.Equals(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals
+  name: Equals(T)
+  nameWithType: IEquatable<T>.Equals(T)
+  fullName: System.IEquatable<T>.Equals(T)
+  nameWithType.vb: IEquatable(Of T).Equals(T)
+  fullName.vb: System.IEquatable(Of T).Equals(T)
+  spec.csharp:
+  - uid: System.IEquatable`1.Equals(`0)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: System.IEquatable`1.Equals(`0)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals
+  - name: (
+  - name: T
+  - name: )
+- uid: Terminal.Gui.RectangleF.op_Equality*
+  commentId: Overload:Terminal.Gui.RectangleF.op_Equality
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: operator ==
+  nameWithType: RectangleF.operator ==
+  fullName: Terminal.Gui.RectangleF.operator ==
+  nameWithType.vb: RectangleF.=
+  fullName.vb: Terminal.Gui.RectangleF.=
+  name.vb: =
+  spec.csharp:
+  - name: operator
+  - name: " "
+  - uid: Terminal.Gui.RectangleF.op_Equality*
+    name: ==
+    href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.op_Equality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+- uid: Terminal.Gui.RectangleF.op_Inequality*
+  commentId: Overload:Terminal.Gui.RectangleF.op_Inequality
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: operator !=
+  nameWithType: RectangleF.operator !=
+  fullName: Terminal.Gui.RectangleF.operator !=
+  nameWithType.vb: RectangleF.<>
+  fullName.vb: Terminal.Gui.RectangleF.<>
+  name.vb: <>
+  spec.csharp:
+  - name: operator
+  - name: " "
+  - uid: Terminal.Gui.RectangleF.op_Inequality*
+    name: '!='
+    href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.op_Inequality(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  href: Terminal.Gui.Rect.html
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.RectangleF.Contains*
+  commentId: Overload:Terminal.Gui.RectangleF.Contains
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Contains(System.Single,System.Single)
+  name: Contains
+  nameWithType: RectangleF.Contains
+  fullName: Terminal.Gui.RectangleF.Contains
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode
+  - name: (
+  - name: )
+- uid: Terminal.Gui.RectangleF.GetHashCode*
+  commentId: Overload:Terminal.Gui.RectangleF.GetHashCode
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.GetHashCode
+  name: GetHashCode
+  nameWithType: RectangleF.GetHashCode
+  fullName: Terminal.Gui.RectangleF.GetHashCode
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.RectangleF.Inflate*
+  commentId: Overload:Terminal.Gui.RectangleF.Inflate
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Inflate(System.Single,System.Single)
+  name: Inflate
+  nameWithType: RectangleF.Inflate
+  fullName: Terminal.Gui.RectangleF.Inflate
+- uid: Terminal.Gui.RectangleF.Intersect*
+  commentId: Overload:Terminal.Gui.RectangleF.Intersect
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Intersect(Terminal.Gui.RectangleF)
+  name: Intersect
+  nameWithType: RectangleF.Intersect
+  fullName: Terminal.Gui.RectangleF.Intersect
+- uid: Terminal.Gui.RectangleF.IntersectsWith*
+  commentId: Overload:Terminal.Gui.RectangleF.IntersectsWith
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.IntersectsWith(Terminal.Gui.RectangleF)
+  name: IntersectsWith
+  nameWithType: RectangleF.IntersectsWith
+  fullName: Terminal.Gui.RectangleF.IntersectsWith
+- uid: Terminal.Gui.RectangleF.Union*
+  commentId: Overload:Terminal.Gui.RectangleF.Union
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Union(Terminal.Gui.RectangleF,Terminal.Gui.RectangleF)
+  name: Union
+  nameWithType: RectangleF.Union
+  fullName: Terminal.Gui.RectangleF.Union
+- uid: Terminal.Gui.RectangleF.Offset*
+  commentId: Overload:Terminal.Gui.RectangleF.Offset
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Offset(Terminal.Gui.PointF)
+  name: Offset
+  nameWithType: RectangleF.Offset
+  fullName: Terminal.Gui.RectangleF.Offset
+- uid: Terminal.Gui.RectangleF.op_Implicit*
+  commentId: Overload:Terminal.Gui.RectangleF.op_Implicit
+  name: implicit operator
+  nameWithType: RectangleF.implicit operator
+  fullName: Terminal.Gui.RectangleF.implicit operator
+  nameWithType.vb: RectangleF.CType
+  fullName.vb: Terminal.Gui.RectangleF.CType
+  name.vb: CType
+  spec.csharp:
+  - name: implicit
+  - name: " "
+  - name: operator
+- uid: Terminal.Gui.RectangleF.Location
+  commentId: P:Terminal.Gui.RectangleF.Location
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Location
+  name: Location
+  nameWithType: RectangleF.Location
+  fullName: Terminal.Gui.RectangleF.Location
+- uid: Terminal.Gui.RectangleF.Size
+  commentId: P:Terminal.Gui.RectangleF.Size
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.Size
+  name: Size
+  nameWithType: RectangleF.Size
+  fullName: Terminal.Gui.RectangleF.Size
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype.tostring
+  name: ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.tostring
+  - name: (
+  - name: )
+- uid: Terminal.Gui.RectangleF.ToString*
+  commentId: Overload:Terminal.Gui.RectangleF.ToString
+  href: Terminal.Gui.RectangleF.html#Terminal.Gui.RectangleF.ToString
+  name: ToString
+  nameWithType: RectangleF.ToString
+  fullName: Terminal.Gui.RectangleF.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+shouldSkipMarkup: true

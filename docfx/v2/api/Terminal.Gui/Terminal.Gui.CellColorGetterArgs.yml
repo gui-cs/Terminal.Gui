@@ -1,0 +1,594 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.CellColorGetterArgs
+  commentId: T:Terminal.Gui.CellColorGetterArgs
+  id: CellColorGetterArgs
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.CellColorGetterArgs.CellValue
+  - Terminal.Gui.CellColorGetterArgs.ColIdex
+  - Terminal.Gui.CellColorGetterArgs.Representation
+  - Terminal.Gui.CellColorGetterArgs.RowIndex
+  - Terminal.Gui.CellColorGetterArgs.RowScheme
+  - Terminal.Gui.CellColorGetterArgs.Table
+  langs:
+  - csharp
+  - vb
+  name: CellColorGetterArgs
+  nameWithType: CellColorGetterArgs
+  fullName: Terminal.Gui.CellColorGetterArgs
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CellColorGetterArgs
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 6
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Arguments for a <xref href="Terminal.Gui.CellColorGetterDelegate" data-throw-if-not-resolved="false"></xref>.  Describes a cell for which a rendering
+
+    <xref href="Terminal.Gui.ColorScheme" data-throw-if-not-resolved="false"></xref> is being sought
+  example: []
+  syntax:
+    content: public class CellColorGetterArgs
+    content.vb: Public Class CellColorGetterArgs
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.CellColorGetterArgs.Table
+  commentId: P:Terminal.Gui.CellColorGetterArgs.Table
+  id: Table
+  parent: Terminal.Gui.CellColorGetterArgs
+  langs:
+  - csharp
+  - vb
+  name: Table
+  nameWithType: CellColorGetterArgs.Table
+  fullName: Terminal.Gui.CellColorGetterArgs.Table
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Table
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 11
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The data table hosted by the <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref> control.
+  example: []
+  syntax:
+    content: public ITableSource Table { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ITableSource
+    content.vb: Public ReadOnly Property Table As ITableSource
+  overload: Terminal.Gui.CellColorGetterArgs.Table*
+- uid: Terminal.Gui.CellColorGetterArgs.RowIndex
+  commentId: P:Terminal.Gui.CellColorGetterArgs.RowIndex
+  id: RowIndex
+  parent: Terminal.Gui.CellColorGetterArgs
+  langs:
+  - csharp
+  - vb
+  name: RowIndex
+  nameWithType: CellColorGetterArgs.RowIndex
+  fullName: Terminal.Gui.CellColorGetterArgs.RowIndex
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RowIndex
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 16
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The index of the row in <xref href="Terminal.Gui.CellColorGetterArgs.Table" data-throw-if-not-resolved="false"></xref> for which color is needed
+  example: []
+  syntax:
+    content: public int RowIndex { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property RowIndex As Integer
+  overload: Terminal.Gui.CellColorGetterArgs.RowIndex*
+- uid: Terminal.Gui.CellColorGetterArgs.ColIdex
+  commentId: P:Terminal.Gui.CellColorGetterArgs.ColIdex
+  id: ColIdex
+  parent: Terminal.Gui.CellColorGetterArgs
+  langs:
+  - csharp
+  - vb
+  name: ColIdex
+  nameWithType: CellColorGetterArgs.ColIdex
+  fullName: Terminal.Gui.CellColorGetterArgs.ColIdex
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColIdex
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The index of column in <xref href="Terminal.Gui.CellColorGetterArgs.Table" data-throw-if-not-resolved="false"></xref> for which color is needed
+  example: []
+  syntax:
+    content: public int ColIdex { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property ColIdex As Integer
+  overload: Terminal.Gui.CellColorGetterArgs.ColIdex*
+- uid: Terminal.Gui.CellColorGetterArgs.CellValue
+  commentId: P:Terminal.Gui.CellColorGetterArgs.CellValue
+  id: CellValue
+  parent: Terminal.Gui.CellColorGetterArgs
+  langs:
+  - csharp
+  - vb
+  name: CellValue
+  nameWithType: CellColorGetterArgs.CellValue
+  fullName: Terminal.Gui.CellColorGetterArgs.CellValue
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CellValue
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 26
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The hard typed value being rendered in the cell for which color is needed
+  example: []
+  syntax:
+    content: public object CellValue { get; }
+    parameters: []
+    return:
+      type: System.Object
+    content.vb: Public ReadOnly Property CellValue As Object
+  overload: Terminal.Gui.CellColorGetterArgs.CellValue*
+- uid: Terminal.Gui.CellColorGetterArgs.Representation
+  commentId: P:Terminal.Gui.CellColorGetterArgs.Representation
+  id: Representation
+  parent: Terminal.Gui.CellColorGetterArgs
+  langs:
+  - csharp
+  - vb
+  name: Representation
+  nameWithType: CellColorGetterArgs.Representation
+  fullName: Terminal.Gui.CellColorGetterArgs.Representation
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Representation
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 31
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The textual representation of <xref href="Terminal.Gui.CellColorGetterArgs.CellValue" data-throw-if-not-resolved="false"></xref> (what will actually be drawn to the screen)
+  example: []
+  syntax:
+    content: public string Representation { get; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public ReadOnly Property Representation As String
+  overload: Terminal.Gui.CellColorGetterArgs.Representation*
+- uid: Terminal.Gui.CellColorGetterArgs.RowScheme
+  commentId: P:Terminal.Gui.CellColorGetterArgs.RowScheme
+  id: RowScheme
+  parent: Terminal.Gui.CellColorGetterArgs
+  langs:
+  - csharp
+  - vb
+  name: RowScheme
+  nameWithType: CellColorGetterArgs.RowScheme
+  fullName: Terminal.Gui.CellColorGetterArgs.RowScheme
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RowScheme
+    path: ../Terminal.Gui/Views/TableView/CellColorGetterArgs.cs
+    startLine: 36
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: the color scheme that is going to be used to render the cell if no cell specific color scheme is returned
+  example: []
+  syntax:
+    content: public ColorScheme RowScheme { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ColorScheme
+    content.vb: Public ReadOnly Property RowScheme As ColorScheme
+  overload: Terminal.Gui.CellColorGetterArgs.RowScheme*
+references:
+- uid: Terminal.Gui.CellColorGetterDelegate
+  commentId: T:Terminal.Gui.CellColorGetterDelegate
+  parent: Terminal.Gui
+  href: Terminal.Gui.CellColorGetterDelegate.html
+  name: CellColorGetterDelegate
+  nameWithType: CellColorGetterDelegate
+  fullName: Terminal.Gui.CellColorGetterDelegate
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorScheme.html
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui.CellColorGetterArgs.Table*
+  commentId: Overload:Terminal.Gui.CellColorGetterArgs.Table
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.Table
+  name: Table
+  nameWithType: CellColorGetterArgs.Table
+  fullName: Terminal.Gui.CellColorGetterArgs.Table
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITableSource.html
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+- uid: Terminal.Gui.CellColorGetterArgs.Table
+  commentId: P:Terminal.Gui.CellColorGetterArgs.Table
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.Table
+  name: Table
+  nameWithType: CellColorGetterArgs.Table
+  fullName: Terminal.Gui.CellColorGetterArgs.Table
+- uid: Terminal.Gui.CellColorGetterArgs.RowIndex*
+  commentId: Overload:Terminal.Gui.CellColorGetterArgs.RowIndex
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.RowIndex
+  name: RowIndex
+  nameWithType: CellColorGetterArgs.RowIndex
+  fullName: Terminal.Gui.CellColorGetterArgs.RowIndex
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.CellColorGetterArgs.ColIdex*
+  commentId: Overload:Terminal.Gui.CellColorGetterArgs.ColIdex
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.ColIdex
+  name: ColIdex
+  nameWithType: CellColorGetterArgs.ColIdex
+  fullName: Terminal.Gui.CellColorGetterArgs.ColIdex
+- uid: Terminal.Gui.CellColorGetterArgs.CellValue*
+  commentId: Overload:Terminal.Gui.CellColorGetterArgs.CellValue
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.CellValue
+  name: CellValue
+  nameWithType: CellColorGetterArgs.CellValue
+  fullName: Terminal.Gui.CellColorGetterArgs.CellValue
+- uid: Terminal.Gui.CellColorGetterArgs.CellValue
+  commentId: P:Terminal.Gui.CellColorGetterArgs.CellValue
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.CellValue
+  name: CellValue
+  nameWithType: CellColorGetterArgs.CellValue
+  fullName: Terminal.Gui.CellColorGetterArgs.CellValue
+- uid: Terminal.Gui.CellColorGetterArgs.Representation*
+  commentId: Overload:Terminal.Gui.CellColorGetterArgs.Representation
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.Representation
+  name: Representation
+  nameWithType: CellColorGetterArgs.Representation
+  fullName: Terminal.Gui.CellColorGetterArgs.Representation
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: Terminal.Gui.CellColorGetterArgs.RowScheme*
+  commentId: Overload:Terminal.Gui.CellColorGetterArgs.RowScheme
+  href: Terminal.Gui.CellColorGetterArgs.html#Terminal.Gui.CellColorGetterArgs.RowScheme
+  name: RowScheme
+  nameWithType: CellColorGetterArgs.RowScheme
+  fullName: Terminal.Gui.CellColorGetterArgs.RowScheme
+shouldSkipMarkup: true

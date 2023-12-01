@@ -1,0 +1,86 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.LabelGetterDelegate
+  commentId: T:Terminal.Gui.LabelGetterDelegate
+  id: LabelGetterDelegate
+  parent: Terminal.Gui
+  children: []
+  langs:
+  - csharp
+  - vb
+  name: LabelGetterDelegate
+  nameWithType: LabelGetterDelegate
+  fullName: Terminal.Gui.LabelGetterDelegate
+  type: Delegate
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Axis.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LabelGetterDelegate
+    path: ../Terminal.Gui/Views/GraphView/Axis.cs
+    startLine: 553
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Delegate for custom formatting of axis labels.  Determines what should be displayed at a given label
+  example: []
+  syntax:
+    content: public delegate string LabelGetterDelegate(AxisIncrementToRender toRender)
+    parameters:
+    - id: toRender
+      type: Terminal.Gui.AxisIncrementToRender
+      description: The axis increment to which the label is attached
+    return:
+      type: System.String
+      description: ''
+    content.vb: Public Delegate Function LabelGetterDelegate(toRender As AxisIncrementToRender) As String
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.AxisIncrementToRender
+  commentId: T:Terminal.Gui.AxisIncrementToRender
+  parent: Terminal.Gui
+  href: Terminal.Gui.AxisIncrementToRender.html
+  name: AxisIncrementToRender
+  nameWithType: AxisIncrementToRender
+  fullName: Terminal.Gui.AxisIncrementToRender
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+shouldSkipMarkup: true

@@ -1,0 +1,706 @@
+### YamlMime:ManagedReference
+items:
+- uid: UICatalog.Scenarios.UcdApiClient
+  commentId: T:UICatalog.Scenarios.UcdApiClient
+  id: UcdApiClient
+  parent: UICatalog.Scenarios
+  children:
+  - UICatalog.Scenarios.UcdApiClient.BaseUrl
+  - UICatalog.Scenarios.UcdApiClient.GetChars(System.String)
+  - UICatalog.Scenarios.UcdApiClient.GetCharsName(System.String)
+  - UICatalog.Scenarios.UcdApiClient.GetCodepointDec(System.Int32)
+  - UICatalog.Scenarios.UcdApiClient.GetCodepointHex(System.String)
+  langs:
+  - csharp
+  - vb
+  name: UcdApiClient
+  nameWithType: UcdApiClient
+  fullName: UICatalog.Scenarios.UcdApiClient
+  type: Class
+  source:
+    remote:
+      path: UICatalog/Scenarios/CharacterMap.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UcdApiClient
+    path: ../UICatalog/Scenarios/CharacterMap.cs
+    startLine: 820
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: public class UcdApiClient
+    content.vb: Public Class UcdApiClient
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  extensionMethods:
+  - System.Object.UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.String)
+- uid: UICatalog.Scenarios.UcdApiClient.BaseUrl
+  commentId: F:UICatalog.Scenarios.UcdApiClient.BaseUrl
+  id: BaseUrl
+  parent: UICatalog.Scenarios.UcdApiClient
+  langs:
+  - csharp
+  - vb
+  name: BaseUrl
+  nameWithType: UcdApiClient.BaseUrl
+  fullName: UICatalog.Scenarios.UcdApiClient.BaseUrl
+  type: Field
+  source:
+    remote:
+      path: UICatalog/Scenarios/CharacterMap.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BaseUrl
+    path: ../UICatalog/Scenarios/CharacterMap.cs
+    startLine: 822
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: public const string BaseUrl = "https://ucdapi.org/unicode/latest/"
+    return:
+      type: System.String
+    content.vb: Public Const BaseUrl As String = "https://ucdapi.org/unicode/latest/"
+- uid: UICatalog.Scenarios.UcdApiClient.GetCodepointHex(System.String)
+  commentId: M:UICatalog.Scenarios.UcdApiClient.GetCodepointHex(System.String)
+  id: GetCodepointHex(System.String)
+  parent: UICatalog.Scenarios.UcdApiClient
+  langs:
+  - csharp
+  - vb
+  name: GetCodepointHex(string)
+  nameWithType: UcdApiClient.GetCodepointHex(string)
+  fullName: UICatalog.Scenarios.UcdApiClient.GetCodepointHex(string)
+  type: Method
+  source:
+    remote:
+      path: UICatalog/Scenarios/CharacterMap.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetCodepointHex
+    path: ../UICatalog/Scenarios/CharacterMap.cs
+    startLine: 824
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: public Task<string> GetCodepointHex(string hex)
+    parameters:
+    - id: hex
+      type: System.String
+    return:
+      type: System.Threading.Tasks.Task{System.String}
+    content.vb: Public Function GetCodepointHex(hex As String) As Task(Of String)
+  overload: UICatalog.Scenarios.UcdApiClient.GetCodepointHex*
+  nameWithType.vb: UcdApiClient.GetCodepointHex(String)
+  fullName.vb: UICatalog.Scenarios.UcdApiClient.GetCodepointHex(String)
+  name.vb: GetCodepointHex(String)
+- uid: UICatalog.Scenarios.UcdApiClient.GetCodepointDec(System.Int32)
+  commentId: M:UICatalog.Scenarios.UcdApiClient.GetCodepointDec(System.Int32)
+  id: GetCodepointDec(System.Int32)
+  parent: UICatalog.Scenarios.UcdApiClient
+  langs:
+  - csharp
+  - vb
+  name: GetCodepointDec(int)
+  nameWithType: UcdApiClient.GetCodepointDec(int)
+  fullName: UICatalog.Scenarios.UcdApiClient.GetCodepointDec(int)
+  type: Method
+  source:
+    remote:
+      path: UICatalog/Scenarios/CharacterMap.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetCodepointDec
+    path: ../UICatalog/Scenarios/CharacterMap.cs
+    startLine: 831
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: public Task<string> GetCodepointDec(int dec)
+    parameters:
+    - id: dec
+      type: System.Int32
+    return:
+      type: System.Threading.Tasks.Task{System.String}
+    content.vb: Public Function GetCodepointDec(dec As Integer) As Task(Of String)
+  overload: UICatalog.Scenarios.UcdApiClient.GetCodepointDec*
+  nameWithType.vb: UcdApiClient.GetCodepointDec(Integer)
+  fullName.vb: UICatalog.Scenarios.UcdApiClient.GetCodepointDec(Integer)
+  name.vb: GetCodepointDec(Integer)
+- uid: UICatalog.Scenarios.UcdApiClient.GetChars(System.String)
+  commentId: M:UICatalog.Scenarios.UcdApiClient.GetChars(System.String)
+  id: GetChars(System.String)
+  parent: UICatalog.Scenarios.UcdApiClient
+  langs:
+  - csharp
+  - vb
+  name: GetChars(string)
+  nameWithType: UcdApiClient.GetChars(string)
+  fullName: UICatalog.Scenarios.UcdApiClient.GetChars(string)
+  type: Method
+  source:
+    remote:
+      path: UICatalog/Scenarios/CharacterMap.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetChars
+    path: ../UICatalog/Scenarios/CharacterMap.cs
+    startLine: 838
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: public Task<string> GetChars(string chars)
+    parameters:
+    - id: chars
+      type: System.String
+    return:
+      type: System.Threading.Tasks.Task{System.String}
+    content.vb: Public Function GetChars(chars As String) As Task(Of String)
+  overload: UICatalog.Scenarios.UcdApiClient.GetChars*
+  nameWithType.vb: UcdApiClient.GetChars(String)
+  fullName.vb: UICatalog.Scenarios.UcdApiClient.GetChars(String)
+  name.vb: GetChars(String)
+- uid: UICatalog.Scenarios.UcdApiClient.GetCharsName(System.String)
+  commentId: M:UICatalog.Scenarios.UcdApiClient.GetCharsName(System.String)
+  id: GetCharsName(System.String)
+  parent: UICatalog.Scenarios.UcdApiClient
+  langs:
+  - csharp
+  - vb
+  name: GetCharsName(string)
+  nameWithType: UcdApiClient.GetCharsName(string)
+  fullName: UICatalog.Scenarios.UcdApiClient.GetCharsName(string)
+  type: Method
+  source:
+    remote:
+      path: UICatalog/Scenarios/CharacterMap.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetCharsName
+    path: ../UICatalog/Scenarios/CharacterMap.cs
+    startLine: 845
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: public Task<string> GetCharsName(string chars)
+    parameters:
+    - id: chars
+      type: System.String
+    return:
+      type: System.Threading.Tasks.Task{System.String}
+    content.vb: Public Function GetCharsName(chars As String) As Task(Of String)
+  overload: UICatalog.Scenarios.UcdApiClient.GetCharsName*
+  nameWithType.vb: UcdApiClient.GetCharsName(String)
+  fullName.vb: UICatalog.Scenarios.UcdApiClient.GetCharsName(String)
+  name.vb: GetCharsName(String)
+references:
+- uid: UICatalog.Scenarios
+  commentId: N:UICatalog.Scenarios
+  href: UICatalog.html
+  name: UICatalog.Scenarios
+  nameWithType: UICatalog.Scenarios
+  fullName: UICatalog.Scenarios
+  spec.csharp:
+  - uid: UICatalog
+    name: UICatalog
+    href: UICatalog.html
+  - name: .
+  - uid: UICatalog.Scenarios
+    name: Scenarios
+    href: UICatalog.Scenarios.html
+  spec.vb:
+  - uid: UICatalog
+    name: UICatalog
+    href: UICatalog.html
+  - name: .
+  - uid: UICatalog.Scenarios
+    name: Scenarios
+    href: UICatalog.Scenarios.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System.Object.UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.String)
+  commentId: M:UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  parent: UICatalog.Scenarios.EventExtensions
+  definition: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  name: ClearEventHandlers(object, string)
+  nameWithType: EventExtensions.ClearEventHandlers(object, string)
+  fullName: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(object, string)
+  nameWithType.vb: EventExtensions.ClearEventHandlers(Object, String)
+  fullName.vb: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(Object, String)
+  name.vb: ClearEventHandlers(Object, String)
+  spec.csharp:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  commentId: M:UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  isExternal: true
+  href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  name: ClearEventHandlers(object, string)
+  nameWithType: EventExtensions.ClearEventHandlers(object, string)
+  fullName: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(object, string)
+  nameWithType.vb: EventExtensions.ClearEventHandlers(Object, String)
+  fullName.vb: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(Object, String)
+  name.vb: ClearEventHandlers(Object, String)
+  spec.csharp:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: UICatalog.Scenarios.EventExtensions
+  commentId: T:UICatalog.Scenarios.EventExtensions
+  parent: UICatalog.Scenarios
+  href: UICatalog.Scenarios.EventExtensions.html
+  name: EventExtensions
+  nameWithType: EventExtensions
+  fullName: UICatalog.Scenarios.EventExtensions
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: UICatalog.Scenarios.UcdApiClient.GetCodepointHex*
+  commentId: Overload:UICatalog.Scenarios.UcdApiClient.GetCodepointHex
+  href: UICatalog.Scenarios.UcdApiClient.html#UICatalog.Scenarios.UcdApiClient.GetCodepointHex(System.String)
+  name: GetCodepointHex
+  nameWithType: UcdApiClient.GetCodepointHex
+  fullName: UICatalog.Scenarios.UcdApiClient.GetCodepointHex
+- uid: System.Threading.Tasks.Task{System.String}
+  commentId: T:System.Threading.Tasks.Task{System.String}
+  parent: System.Threading.Tasks
+  definition: System.Threading.Tasks.Task`1
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<string>
+  nameWithType: Task<string>
+  fullName: System.Threading.Tasks.Task<string>
+  nameWithType.vb: Task(Of String)
+  fullName.vb: System.Threading.Tasks.Task(Of String)
+  name.vb: Task(Of String)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Threading.Tasks.Task`1
+  commentId: T:System.Threading.Tasks.Task`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  name: Task<TResult>
+  nameWithType: Task<TResult>
+  fullName: System.Threading.Tasks.Task<TResult>
+  nameWithType.vb: Task(Of TResult)
+  fullName.vb: System.Threading.Tasks.Task(Of TResult)
+  name.vb: Task(Of TResult)
+  spec.csharp:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Threading.Tasks.Task`1
+    name: Task
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: System.Threading.Tasks
+  commentId: N:System.Threading.Tasks
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Threading.Tasks
+  nameWithType: System.Threading.Tasks
+  fullName: System.Threading.Tasks
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Threading
+    name: Threading
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading
+  - name: .
+  - uid: System.Threading.Tasks
+    name: Tasks
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.threading.tasks
+- uid: UICatalog.Scenarios.UcdApiClient.GetCodepointDec*
+  commentId: Overload:UICatalog.Scenarios.UcdApiClient.GetCodepointDec
+  href: UICatalog.Scenarios.UcdApiClient.html#UICatalog.Scenarios.UcdApiClient.GetCodepointDec(System.Int32)
+  name: GetCodepointDec
+  nameWithType: UcdApiClient.GetCodepointDec
+  fullName: UICatalog.Scenarios.UcdApiClient.GetCodepointDec
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: UICatalog.Scenarios.UcdApiClient.GetChars*
+  commentId: Overload:UICatalog.Scenarios.UcdApiClient.GetChars
+  href: UICatalog.Scenarios.UcdApiClient.html#UICatalog.Scenarios.UcdApiClient.GetChars(System.String)
+  name: GetChars
+  nameWithType: UcdApiClient.GetChars
+  fullName: UICatalog.Scenarios.UcdApiClient.GetChars
+- uid: UICatalog.Scenarios.UcdApiClient.GetCharsName*
+  commentId: Overload:UICatalog.Scenarios.UcdApiClient.GetCharsName
+  href: UICatalog.Scenarios.UcdApiClient.html#UICatalog.Scenarios.UcdApiClient.GetCharsName(System.String)
+  name: GetCharsName
+  nameWithType: UcdApiClient.GetCharsName
+  fullName: UICatalog.Scenarios.UcdApiClient.GetCharsName

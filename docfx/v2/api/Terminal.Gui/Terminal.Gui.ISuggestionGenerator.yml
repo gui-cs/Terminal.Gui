@@ -1,0 +1,304 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ISuggestionGenerator
+  commentId: T:Terminal.Gui.ISuggestionGenerator
+  id: ISuggestionGenerator
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ISuggestionGenerator.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  - Terminal.Gui.ISuggestionGenerator.IsWordChar(System.Text.Rune)
+  langs:
+  - csharp
+  - vb
+  name: ISuggestionGenerator
+  nameWithType: ISuggestionGenerator
+  fullName: Terminal.Gui.ISuggestionGenerator
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/ISuggestionGenerator.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ISuggestionGenerator
+    path: ../Terminal.Gui/Text/Autocomplete/ISuggestionGenerator.cs
+    startLine: 7
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Generates autocomplete <xref href="Terminal.Gui.Suggestion" data-throw-if-not-resolved="false"></xref> based on a given cursor location within a string
+  example: []
+  syntax:
+    content: public interface ISuggestionGenerator
+    content.vb: Public Interface ISuggestionGenerator
+- uid: Terminal.Gui.ISuggestionGenerator.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  commentId: M:Terminal.Gui.ISuggestionGenerator.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  id: GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  parent: Terminal.Gui.ISuggestionGenerator
+  langs:
+  - csharp
+  - vb
+  name: GenerateSuggestions(AutocompleteContext)
+  nameWithType: ISuggestionGenerator.GenerateSuggestions(AutocompleteContext)
+  fullName: Terminal.Gui.ISuggestionGenerator.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/ISuggestionGenerator.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GenerateSuggestions
+    path: ../Terminal.Gui/Text/Autocomplete/ISuggestionGenerator.cs
+    startLine: 12
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Generates autocomplete <xref href="Terminal.Gui.Suggestion" data-throw-if-not-resolved="false"></xref> based on a given <code class="paramref">context</code>
+  example: []
+  syntax:
+    content: IEnumerable<Suggestion> GenerateSuggestions(AutocompleteContext context)
+    parameters:
+    - id: context
+      type: Terminal.Gui.AutocompleteContext
+    return:
+      type: System.Collections.Generic.IEnumerable{Terminal.Gui.Suggestion}
+    content.vb: Function GenerateSuggestions(context As AutocompleteContext) As IEnumerable(Of Suggestion)
+  overload: Terminal.Gui.ISuggestionGenerator.GenerateSuggestions*
+- uid: Terminal.Gui.ISuggestionGenerator.IsWordChar(System.Text.Rune)
+  commentId: M:Terminal.Gui.ISuggestionGenerator.IsWordChar(System.Text.Rune)
+  id: IsWordChar(System.Text.Rune)
+  parent: Terminal.Gui.ISuggestionGenerator
+  langs:
+  - csharp
+  - vb
+  name: IsWordChar(Rune)
+  nameWithType: ISuggestionGenerator.IsWordChar(Rune)
+  fullName: Terminal.Gui.ISuggestionGenerator.IsWordChar(System.Text.Rune)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/ISuggestionGenerator.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsWordChar
+    path: ../Terminal.Gui/Text/Autocomplete/ISuggestionGenerator.cs
+    startLine: 19
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Returns <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if <code class="paramref">rune</code> is a character that
+
+    would continue autocomplete suggesting. Returns <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a> if it
+
+    is a 'breaking' character (i.e. terminating current word boundary)
+  example: []
+  syntax:
+    content: bool IsWordChar(Rune rune)
+    parameters:
+    - id: rune
+      type: System.Text.Rune
+    return:
+      type: System.Boolean
+    content.vb: Function IsWordChar(rune As Rune) As Boolean
+  overload: Terminal.Gui.ISuggestionGenerator.IsWordChar*
+references:
+- uid: Terminal.Gui.Suggestion
+  commentId: T:Terminal.Gui.Suggestion
+  parent: Terminal.Gui
+  href: Terminal.Gui.Suggestion.html
+  name: Suggestion
+  nameWithType: Suggestion
+  fullName: Terminal.Gui.Suggestion
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ISuggestionGenerator.GenerateSuggestions*
+  commentId: Overload:Terminal.Gui.ISuggestionGenerator.GenerateSuggestions
+  href: Terminal.Gui.ISuggestionGenerator.html#Terminal.Gui.ISuggestionGenerator.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  name: GenerateSuggestions
+  nameWithType: ISuggestionGenerator.GenerateSuggestions
+  fullName: Terminal.Gui.ISuggestionGenerator.GenerateSuggestions
+- uid: Terminal.Gui.AutocompleteContext
+  commentId: T:Terminal.Gui.AutocompleteContext
+  parent: Terminal.Gui
+  href: Terminal.Gui.AutocompleteContext.html
+  name: AutocompleteContext
+  nameWithType: AutocompleteContext
+  fullName: Terminal.Gui.AutocompleteContext
+- uid: System.Collections.Generic.IEnumerable{Terminal.Gui.Suggestion}
+  commentId: T:System.Collections.Generic.IEnumerable{Terminal.Gui.Suggestion}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<Suggestion>
+  nameWithType: IEnumerable<Suggestion>
+  fullName: System.Collections.Generic.IEnumerable<Terminal.Gui.Suggestion>
+  nameWithType.vb: IEnumerable(Of Suggestion)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of Terminal.Gui.Suggestion)
+  name.vb: IEnumerable(Of Suggestion)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: Terminal.Gui.Suggestion
+    name: Suggestion
+    href: Terminal.Gui.Suggestion.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.Suggestion
+    name: Suggestion
+    href: Terminal.Gui.Suggestion.html
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.ISuggestionGenerator.IsWordChar*
+  commentId: Overload:Terminal.Gui.ISuggestionGenerator.IsWordChar
+  href: Terminal.Gui.ISuggestionGenerator.html#Terminal.Gui.ISuggestionGenerator.IsWordChar(System.Text.Rune)
+  name: IsWordChar
+  nameWithType: ISuggestionGenerator.IsWordChar
+  fullName: Terminal.Gui.ISuggestionGenerator.IsWordChar
+- uid: System.Text.Rune
+  commentId: T:System.Text.Rune
+  parent: System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Text.Rune
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Text
+  commentId: N:System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Text
+  nameWithType: System.Text
+  fullName: System.Text
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+shouldSkipMarkup: true

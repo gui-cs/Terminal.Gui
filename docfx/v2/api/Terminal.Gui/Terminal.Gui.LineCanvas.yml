@@ -1,0 +1,1371 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.LineCanvas
+  commentId: T:Terminal.Gui.LineCanvas
+  id: LineCanvas
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.LineCanvas.#ctor
+  - Terminal.Gui.LineCanvas.#ctor(System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine})
+  - Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute})
+  - Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.StraightLine)
+  - Terminal.Gui.LineCanvas.Bounds
+  - Terminal.Gui.LineCanvas.Clear
+  - Terminal.Gui.LineCanvas.ClearCache
+  - Terminal.Gui.LineCanvas.Dispose
+  - Terminal.Gui.LineCanvas.GetCellMap
+  - Terminal.Gui.LineCanvas.GetMap
+  - Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)
+  - Terminal.Gui.LineCanvas.Lines
+  - Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)
+  - Terminal.Gui.LineCanvas.RemoveLastLine
+  - Terminal.Gui.LineCanvas.ToString
+  langs:
+  - csharp
+  - vb
+  name: LineCanvas
+  nameWithType: LineCanvas
+  fullName: Terminal.Gui.LineCanvas
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineCanvas
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 67
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Facilitates box drawing and line intersection detection
+
+    and rendering.  Does not support diagonal lines.
+  example: []
+  syntax:
+    content: 'public class LineCanvas : IDisposable'
+    content.vb: Public Class LineCanvas Implements IDisposable
+  inheritance:
+  - System.Object
+  implements:
+  - System.IDisposable
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+- uid: Terminal.Gui.LineCanvas.#ctor
+  commentId: M:Terminal.Gui.LineCanvas.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: LineCanvas()
+  nameWithType: LineCanvas.LineCanvas()
+  fullName: Terminal.Gui.LineCanvas.LineCanvas()
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new instance.
+  example: []
+  syntax:
+    content: public LineCanvas()
+    content.vb: Public Sub New()
+  overload: Terminal.Gui.LineCanvas.#ctor*
+  nameWithType.vb: LineCanvas.New()
+  fullName.vb: Terminal.Gui.LineCanvas.New()
+  name.vb: New()
+- uid: Terminal.Gui.LineCanvas.#ctor(System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine})
+  commentId: M:Terminal.Gui.LineCanvas.#ctor(System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine})
+  id: '#ctor(System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine})'
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: LineCanvas(IEnumerable<StraightLine>)
+  nameWithType: LineCanvas.LineCanvas(IEnumerable<StraightLine>)
+  fullName: Terminal.Gui.LineCanvas.LineCanvas(System.Collections.Generic.IEnumerable<Terminal.Gui.StraightLine>)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 83
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new instance with the given <code class="paramref">lines</code>.
+  example: []
+  syntax:
+    content: public LineCanvas(IEnumerable<StraightLine> lines)
+    parameters:
+    - id: lines
+      type: System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine}
+      description: Initial lines for the canvas.
+    content.vb: Public Sub New(lines As IEnumerable(Of StraightLine))
+  overload: Terminal.Gui.LineCanvas.#ctor*
+  nameWithType.vb: LineCanvas.New(IEnumerable(Of StraightLine))
+  fullName.vb: Terminal.Gui.LineCanvas.New(System.Collections.Generic.IEnumerable(Of Terminal.Gui.StraightLine))
+  name.vb: New(IEnumerable(Of StraightLine))
+- uid: Terminal.Gui.LineCanvas.Lines
+  commentId: P:Terminal.Gui.LineCanvas.Lines
+  id: Lines
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: Lines
+  nameWithType: LineCanvas.Lines
+  fullName: Terminal.Gui.LineCanvas.Lines
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Lines
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 100
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the lines in the canvas.
+  example: []
+  syntax:
+    content: public IReadOnlyCollection<StraightLine> Lines { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.IReadOnlyCollection{Terminal.Gui.StraightLine}
+    content.vb: Public ReadOnly Property Lines As IReadOnlyCollection(Of StraightLine)
+  overload: Terminal.Gui.LineCanvas.Lines*
+- uid: Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute})
+  commentId: M:Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute})
+  id: AddLine(Terminal.Gui.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute})
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: AddLine(Point, int, Orientation, LineStyle, Attribute?)
+  nameWithType: LineCanvas.AddLine(Point, int, Orientation, LineStyle, Attribute?)
+  fullName: Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point, int, Terminal.Gui.Orientation, Terminal.Gui.LineStyle, Terminal.Gui.Attribute?)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AddLine
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 135
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    <p>
+
+    Adds a new <code class="paramref">length</code> long line to the canvas starting at <code class="paramref">start</code>.
+
+    </p>
+
+    <p>
+
+    Use positive <code class="paramref">length</code> for the line to extend Right and negative for Left
+
+    when <xref href="Terminal.Gui.Orientation" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.Orientation.Horizontal" data-throw-if-not-resolved="false"></xref>.
+
+    </p>
+
+    <p>
+
+    Use positive <code class="paramref">length</code> for the line to extend Down and negative for Up
+
+    when <xref href="Terminal.Gui.Orientation" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.Orientation.Vertical" data-throw-if-not-resolved="false"></xref>.
+
+    </p>
+  example: []
+  syntax:
+    content: public void AddLine(Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = null)
+    parameters:
+    - id: start
+      type: Terminal.Gui.Point
+      description: Starting point.
+    - id: length
+      type: System.Int32
+      description: The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for Up/Left.
+    - id: orientation
+      type: Terminal.Gui.Orientation
+      description: The direction of the line.
+    - id: style
+      type: Terminal.Gui.LineStyle
+      description: The style of line to use
+    - id: attribute
+      type: System.Nullable{Terminal.Gui.Attribute}
+      description: ''
+    content.vb: Public Sub AddLine(start As Point, length As Integer, orientation As Orientation, style As LineStyle, attribute As Attribute? = Nothing)
+  overload: Terminal.Gui.LineCanvas.AddLine*
+  nameWithType.vb: LineCanvas.AddLine(Point, Integer, Orientation, LineStyle, Attribute?)
+  fullName.vb: Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point, Integer, Terminal.Gui.Orientation, Terminal.Gui.LineStyle, Terminal.Gui.Attribute?)
+  name.vb: AddLine(Point, Integer, Orientation, LineStyle, Attribute?)
+- uid: Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.StraightLine)
+  commentId: M:Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.StraightLine)
+  id: AddLine(Terminal.Gui.StraightLine)
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: AddLine(StraightLine)
+  nameWithType: LineCanvas.AddLine(StraightLine)
+  fullName: Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.StraightLine)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AddLine
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 145
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adds a new line to the canvas
+  example: []
+  syntax:
+    content: public void AddLine(StraightLine line)
+    parameters:
+    - id: line
+      type: Terminal.Gui.StraightLine
+      description: ''
+    content.vb: Public Sub AddLine(line As StraightLine)
+  overload: Terminal.Gui.LineCanvas.AddLine*
+- uid: Terminal.Gui.LineCanvas.RemoveLastLine
+  commentId: M:Terminal.Gui.LineCanvas.RemoveLastLine
+  id: RemoveLastLine
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: RemoveLastLine()
+  nameWithType: LineCanvas.RemoveLastLine()
+  fullName: Terminal.Gui.LineCanvas.RemoveLastLine()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RemoveLastLine
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 155
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes the last line added to the canvas
+  example: []
+  syntax:
+    content: public StraightLine RemoveLastLine()
+    return:
+      type: Terminal.Gui.StraightLine
+      description: ''
+    content.vb: Public Function RemoveLastLine() As StraightLine
+  overload: Terminal.Gui.LineCanvas.RemoveLastLine*
+- uid: Terminal.Gui.LineCanvas.Clear
+  commentId: M:Terminal.Gui.LineCanvas.Clear
+  id: Clear
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: Clear()
+  nameWithType: LineCanvas.Clear()
+  fullName: Terminal.Gui.LineCanvas.Clear()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Clear
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 168
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Clears all lines from the LineCanvas.
+  example: []
+  syntax:
+    content: public void Clear()
+    content.vb: Public Sub Clear()
+  overload: Terminal.Gui.LineCanvas.Clear*
+- uid: Terminal.Gui.LineCanvas.ClearCache
+  commentId: M:Terminal.Gui.LineCanvas.ClearCache
+  id: ClearCache
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: ClearCache()
+  nameWithType: LineCanvas.ClearCache()
+  fullName: Terminal.Gui.LineCanvas.ClearCache()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClearCache
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 179
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Clears any cached states from the canvas
+
+    Call this method if you make changes to lines
+
+    that have already been added.
+  example: []
+  syntax:
+    content: public void ClearCache()
+    content.vb: Public Sub ClearCache()
+  overload: Terminal.Gui.LineCanvas.ClearCache*
+- uid: Terminal.Gui.LineCanvas.Bounds
+  commentId: P:Terminal.Gui.LineCanvas.Bounds
+  id: Bounds
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: Bounds
+  nameWithType: LineCanvas.Bounds
+  fullName: Terminal.Gui.LineCanvas.Bounds
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Bounds
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 190
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the 
+
+    line that is furthest left/top and Size is defined by the line that extends the furthest
+
+    right/bottom.
+  example: []
+  syntax:
+    content: public Rect Bounds { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Rect
+    content.vb: Public ReadOnly Property Bounds As Rect
+  overload: Terminal.Gui.LineCanvas.Bounds*
+- uid: Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)
+  commentId: M:Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)
+  id: GetMap(Terminal.Gui.Rect)
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: GetMap(Rect)
+  nameWithType: LineCanvas.GetMap(Rect)
+  fullName: Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetMap
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 228
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Evaluates the lines that have been added to the canvas and returns a map containing
+
+    the glyphs and their locations. The glyphs are the characters that should be rendered
+
+    so that all lines connect up with the appropriate intersection symbols.
+  example: []
+  syntax:
+    content: public Dictionary<Point, Rune> GetMap(Rect inArea)
+    parameters:
+    - id: inArea
+      type: Terminal.Gui.Rect
+      description: A rectangle to constrain the search by.
+    return:
+      type: System.Collections.Generic.Dictionary{Terminal.Gui.Point,System.Text.Rune}
+      description: A map of the points within the canvas that intersect with <code class="paramref">inArea</code>.
+    content.vb: Public Function GetMap(inArea As Rect) As Dictionary(Of Point, Rune)
+  overload: Terminal.Gui.LineCanvas.GetMap*
+- uid: Terminal.Gui.LineCanvas.GetCellMap
+  commentId: M:Terminal.Gui.LineCanvas.GetCellMap
+  id: GetCellMap
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: GetCellMap()
+  nameWithType: LineCanvas.GetCellMap()
+  fullName: Terminal.Gui.LineCanvas.GetCellMap()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetCellMap
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 258
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Evaluates the lines that have been added to the canvas and returns a map containing
+
+    the glyphs and their locations. The glyphs are the characters that should be rendered
+
+    so that all lines connect up with the appropriate intersection symbols.
+  example: []
+  syntax:
+    content: public Dictionary<Point, Cell> GetCellMap()
+    return:
+      type: System.Collections.Generic.Dictionary{Terminal.Gui.Point,Terminal.Gui.Cell}
+      description: A map of all the points within the canvas.
+    content.vb: Public Function GetCellMap() As Dictionary(Of Point, Cell)
+  overload: Terminal.Gui.LineCanvas.GetCellMap*
+- uid: Terminal.Gui.LineCanvas.GetMap
+  commentId: M:Terminal.Gui.LineCanvas.GetMap
+  id: GetMap
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: GetMap()
+  nameWithType: LineCanvas.GetMap()
+  fullName: Terminal.Gui.LineCanvas.GetMap()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetMap
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 288
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Evaluates the lines that have been added to the canvas and returns a map containing
+
+    the glyphs and their locations. The glyphs are the characters that should be rendered
+
+    so that all lines connect up with the appropriate intersection symbols.
+  example: []
+  syntax:
+    content: public Dictionary<Point, Rune> GetMap()
+    return:
+      type: System.Collections.Generic.Dictionary{Terminal.Gui.Point,System.Text.Rune}
+      description: A map of all the points within the canvas.
+    content.vb: Public Function GetMap() As Dictionary(Of Point, Rune)
+  overload: Terminal.Gui.LineCanvas.GetMap*
+- uid: Terminal.Gui.LineCanvas.ToString
+  commentId: M:Terminal.Gui.LineCanvas.ToString
+  id: ToString
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: LineCanvas.ToString()
+  fullName: Terminal.Gui.LineCanvas.ToString()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToString
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 297
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Returns the contents of the line canvas rendered to a string. The string
+
+    will include all columns and rows, even if <xref href="Terminal.Gui.LineCanvas.Bounds" data-throw-if-not-resolved="false"></xref> has negative coordinates. 
+
+    For example, if the canvas contains a single line that starts at (-1,-1) with a length of 2, the
+
+    rendered string will have a length of 2.
+  example: []
+  syntax:
+    content: public override string ToString()
+    return:
+      type: System.String
+      description: The canvas rendered to a string.
+    content.vb: Public Overrides Function ToString() As String
+  overridden: System.Object.ToString
+  overload: Terminal.Gui.LineCanvas.ToString*
+- uid: Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)
+  commentId: M:Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)
+  id: Merge(Terminal.Gui.LineCanvas)
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: Merge(LineCanvas)
+  nameWithType: LineCanvas.Merge(LineCanvas)
+  fullName: Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Merge
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 735
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Merges one line canvas into this one.
+  example: []
+  syntax:
+    content: public void Merge(LineCanvas lineCanvas)
+    parameters:
+    - id: lineCanvas
+      type: Terminal.Gui.LineCanvas
+      description: ''
+    content.vb: Public Sub Merge(lineCanvas As LineCanvas)
+  overload: Terminal.Gui.LineCanvas.Merge*
+- uid: Terminal.Gui.LineCanvas.Dispose
+  commentId: M:Terminal.Gui.LineCanvas.Dispose
+  id: Dispose
+  parent: Terminal.Gui.LineCanvas
+  langs:
+  - csharp
+  - vb
+  name: Dispose()
+  nameWithType: LineCanvas.Dispose()
+  fullName: Terminal.Gui.LineCanvas.Dispose()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/LineCanvas.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Dispose
+    path: ../Terminal.Gui/Drawing/LineCanvas.cs
+    startLine: 743
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public void Dispose()
+    content.vb: Public Sub Dispose()
+  overload: Terminal.Gui.LineCanvas.Dispose*
+  implements:
+  - System.IDisposable.Dispose
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.LineCanvas.#ctor*
+  commentId: Overload:Terminal.Gui.LineCanvas.#ctor
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.#ctor
+  name: LineCanvas
+  nameWithType: LineCanvas.LineCanvas
+  fullName: Terminal.Gui.LineCanvas.LineCanvas
+  nameWithType.vb: LineCanvas.New
+  fullName.vb: Terminal.Gui.LineCanvas.New
+  name.vb: New
+- uid: System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine}
+  commentId: T:System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<StraightLine>
+  nameWithType: IEnumerable<StraightLine>
+  fullName: System.Collections.Generic.IEnumerable<Terminal.Gui.StraightLine>
+  nameWithType.vb: IEnumerable(Of StraightLine)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of Terminal.Gui.StraightLine)
+  name.vb: IEnumerable(Of StraightLine)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: Terminal.Gui.StraightLine
+    name: StraightLine
+    href: Terminal.Gui.StraightLine.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.StraightLine
+    name: StraightLine
+    href: Terminal.Gui.StraightLine.html
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.LineCanvas.Lines*
+  commentId: Overload:Terminal.Gui.LineCanvas.Lines
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.Lines
+  name: Lines
+  nameWithType: LineCanvas.Lines
+  fullName: Terminal.Gui.LineCanvas.Lines
+- uid: System.Collections.Generic.IReadOnlyCollection{Terminal.Gui.StraightLine}
+  commentId: T:System.Collections.Generic.IReadOnlyCollection{Terminal.Gui.StraightLine}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IReadOnlyCollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  name: IReadOnlyCollection<StraightLine>
+  nameWithType: IReadOnlyCollection<StraightLine>
+  fullName: System.Collections.Generic.IReadOnlyCollection<Terminal.Gui.StraightLine>
+  nameWithType.vb: IReadOnlyCollection(Of StraightLine)
+  fullName.vb: System.Collections.Generic.IReadOnlyCollection(Of Terminal.Gui.StraightLine)
+  name.vb: IReadOnlyCollection(Of StraightLine)
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: <
+  - uid: Terminal.Gui.StraightLine
+    name: StraightLine
+    href: Terminal.Gui.StraightLine.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.StraightLine
+    name: StraightLine
+    href: Terminal.Gui.StraightLine.html
+  - name: )
+- uid: System.Collections.Generic.IReadOnlyCollection`1
+  commentId: T:System.Collections.Generic.IReadOnlyCollection`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  name: IReadOnlyCollection<T>
+  nameWithType: IReadOnlyCollection<T>
+  fullName: System.Collections.Generic.IReadOnlyCollection<T>
+  nameWithType.vb: IReadOnlyCollection(Of T)
+  fullName.vb: System.Collections.Generic.IReadOnlyCollection(Of T)
+  name.vb: IReadOnlyCollection(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IReadOnlyCollection`1
+    name: IReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.Orientation
+  commentId: T:Terminal.Gui.Orientation
+  parent: Terminal.Gui
+  href: Terminal.Gui.Orientation.html
+  name: Orientation
+  nameWithType: Orientation
+  fullName: Terminal.Gui.Orientation
+- uid: Terminal.Gui.Orientation.Horizontal
+  commentId: F:Terminal.Gui.Orientation.Horizontal
+  href: Terminal.Gui.Orientation.html#Terminal.Gui.Orientation.Horizontal
+  name: Horizontal
+  nameWithType: Orientation.Horizontal
+  fullName: Terminal.Gui.Orientation.Horizontal
+- uid: Terminal.Gui.Orientation.Vertical
+  commentId: F:Terminal.Gui.Orientation.Vertical
+  href: Terminal.Gui.Orientation.html#Terminal.Gui.Orientation.Vertical
+  name: Vertical
+  nameWithType: Orientation.Vertical
+  fullName: Terminal.Gui.Orientation.Vertical
+- uid: Terminal.Gui.LineCanvas.AddLine*
+  commentId: Overload:Terminal.Gui.LineCanvas.AddLine
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute})
+  name: AddLine
+  nameWithType: LineCanvas.AddLine
+  fullName: Terminal.Gui.LineCanvas.AddLine
+- uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
+  parent: Terminal.Gui
+  href: Terminal.Gui.Point.html
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.LineStyle
+  commentId: T:Terminal.Gui.LineStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.LineStyle.html
+  name: LineStyle
+  nameWithType: LineStyle
+  fullName: Terminal.Gui.LineStyle
+- uid: System.Nullable{Terminal.Gui.Attribute}
+  commentId: T:System.Nullable{Terminal.Gui.Attribute}
+  parent: System
+  definition: System.Nullable`1
+  href: Terminal.Gui.Attribute.html
+  name: Attribute?
+  nameWithType: Attribute?
+  fullName: Terminal.Gui.Attribute?
+  spec.csharp:
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: '?'
+  spec.vb:
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: '?'
+- uid: System.Nullable`1
+  commentId: T:System.Nullable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  name: Nullable<T>
+  nameWithType: Nullable<T>
+  fullName: System.Nullable<T>
+  nameWithType.vb: Nullable(Of T)
+  fullName.vb: System.Nullable(Of T)
+  name.vb: Nullable(Of T)
+  spec.csharp:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.StraightLine
+  commentId: T:Terminal.Gui.StraightLine
+  parent: Terminal.Gui
+  href: Terminal.Gui.StraightLine.html
+  name: StraightLine
+  nameWithType: StraightLine
+  fullName: Terminal.Gui.StraightLine
+- uid: Terminal.Gui.LineCanvas.RemoveLastLine*
+  commentId: Overload:Terminal.Gui.LineCanvas.RemoveLastLine
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.RemoveLastLine
+  name: RemoveLastLine
+  nameWithType: LineCanvas.RemoveLastLine
+  fullName: Terminal.Gui.LineCanvas.RemoveLastLine
+- uid: Terminal.Gui.LineCanvas.Clear*
+  commentId: Overload:Terminal.Gui.LineCanvas.Clear
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.Clear
+  name: Clear
+  nameWithType: LineCanvas.Clear
+  fullName: Terminal.Gui.LineCanvas.Clear
+- uid: Terminal.Gui.LineCanvas.ClearCache*
+  commentId: Overload:Terminal.Gui.LineCanvas.ClearCache
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.ClearCache
+  name: ClearCache
+  nameWithType: LineCanvas.ClearCache
+  fullName: Terminal.Gui.LineCanvas.ClearCache
+- uid: Terminal.Gui.LineCanvas.Bounds*
+  commentId: Overload:Terminal.Gui.LineCanvas.Bounds
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.Bounds
+  name: Bounds
+  nameWithType: LineCanvas.Bounds
+  fullName: Terminal.Gui.LineCanvas.Bounds
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  href: Terminal.Gui.Rect.html
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.LineCanvas.GetMap*
+  commentId: Overload:Terminal.Gui.LineCanvas.GetMap
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)
+  name: GetMap
+  nameWithType: LineCanvas.GetMap
+  fullName: Terminal.Gui.LineCanvas.GetMap
+- uid: System.Collections.Generic.Dictionary{Terminal.Gui.Point,System.Text.Rune}
+  commentId: T:System.Collections.Generic.Dictionary{Terminal.Gui.Point,System.Text.Rune}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Dictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<Point, Rune>
+  nameWithType: Dictionary<Point, Rune>
+  fullName: System.Collections.Generic.Dictionary<Terminal.Gui.Point, System.Text.Rune>
+  nameWithType.vb: Dictionary(Of Point, Rune)
+  fullName.vb: System.Collections.Generic.Dictionary(Of Terminal.Gui.Point, System.Text.Rune)
+  name.vb: Dictionary(Of Point, Rune)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: Terminal.Gui.Point
+    name: Point
+    href: Terminal.Gui.Point.html
+  - name: ','
+  - name: " "
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.Point
+    name: Point
+    href: Terminal.Gui.Point.html
+  - name: ','
+  - name: " "
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2
+  commentId: T:System.Collections.Generic.Dictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<TKey, TValue>
+  nameWithType: Dictionary<TKey, TValue>
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>
+  nameWithType.vb: Dictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue)
+  name.vb: Dictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: Terminal.Gui.LineCanvas.GetCellMap*
+  commentId: Overload:Terminal.Gui.LineCanvas.GetCellMap
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.GetCellMap
+  name: GetCellMap
+  nameWithType: LineCanvas.GetCellMap
+  fullName: Terminal.Gui.LineCanvas.GetCellMap
+- uid: System.Collections.Generic.Dictionary{Terminal.Gui.Point,Terminal.Gui.Cell}
+  commentId: T:System.Collections.Generic.Dictionary{Terminal.Gui.Point,Terminal.Gui.Cell}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Dictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<Point, Cell>
+  nameWithType: Dictionary<Point, Cell>
+  fullName: System.Collections.Generic.Dictionary<Terminal.Gui.Point, Terminal.Gui.Cell>
+  nameWithType.vb: Dictionary(Of Point, Cell)
+  fullName.vb: System.Collections.Generic.Dictionary(Of Terminal.Gui.Point, Terminal.Gui.Cell)
+  name.vb: Dictionary(Of Point, Cell)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: Terminal.Gui.Point
+    name: Point
+    href: Terminal.Gui.Point.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Cell
+    name: Cell
+    href: Terminal.Gui.Cell.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.Point
+    name: Point
+    href: Terminal.Gui.Point.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Cell
+    name: Cell
+    href: Terminal.Gui.Cell.html
+  - name: )
+- uid: Terminal.Gui.LineCanvas.Bounds
+  commentId: P:Terminal.Gui.LineCanvas.Bounds
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.Bounds
+  name: Bounds
+  nameWithType: LineCanvas.Bounds
+  fullName: Terminal.Gui.LineCanvas.Bounds
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: Terminal.Gui.LineCanvas.ToString*
+  commentId: Overload:Terminal.Gui.LineCanvas.ToString
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.ToString
+  name: ToString
+  nameWithType: LineCanvas.ToString
+  fullName: Terminal.Gui.LineCanvas.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: Terminal.Gui.LineCanvas.Merge*
+  commentId: Overload:Terminal.Gui.LineCanvas.Merge
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)
+  name: Merge
+  nameWithType: LineCanvas.Merge
+  fullName: Terminal.Gui.LineCanvas.Merge
+- uid: Terminal.Gui.LineCanvas
+  commentId: T:Terminal.Gui.LineCanvas
+  parent: Terminal.Gui
+  href: Terminal.Gui.LineCanvas.html
+  name: LineCanvas
+  nameWithType: LineCanvas
+  fullName: Terminal.Gui.LineCanvas
+- uid: Terminal.Gui.LineCanvas.Dispose*
+  commentId: Overload:Terminal.Gui.LineCanvas.Dispose
+  href: Terminal.Gui.LineCanvas.html#Terminal.Gui.LineCanvas.Dispose
+  name: Dispose
+  nameWithType: LineCanvas.Dispose
+  fullName: Terminal.Gui.LineCanvas.Dispose
+- uid: System.IDisposable.Dispose
+  commentId: M:System.IDisposable.Dispose
+  parent: System.IDisposable
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  name: Dispose()
+  nameWithType: IDisposable.Dispose()
+  fullName: System.IDisposable.Dispose()
+  spec.csharp:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  - name: (
+  - name: )
+shouldSkipMarkup: true

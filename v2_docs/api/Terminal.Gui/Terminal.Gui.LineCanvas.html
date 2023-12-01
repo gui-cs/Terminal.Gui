@@ -1,0 +1,640 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class LineCanvas
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class LineCanvas
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../../">
+  
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.LineCanvas">
+
+
+
+  <h1 id="Terminal_Gui_LineCanvas" data-uid="Terminal.Gui.LineCanvas" class="text-break">Class LineCanvas
+</h1>
+  <div class="markdown level0 summary">Facilitates box drawing and line intersection detection
+and rendering.  Does not support diagonal lines.</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">LineCanvas</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.html">Terminal</a>.<a class="xref" href="Terminal.Gui.html">Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_LineCanvas_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class LineCanvas : IDisposable</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L72">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas__ctor_" data-uid="Terminal.Gui.LineCanvas.#ctor*"></a>
+  <h4 id="Terminal_Gui_LineCanvas__ctor" data-uid="Terminal.Gui.LineCanvas.#ctor">LineCanvas()</h4>
+  <div class="markdown level1 summary">Creates a new instance.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public LineCanvas()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas__ctor_System_Collections_Generic_IEnumerable_Terminal_Gui_StraightLine__.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.%23ctor(System.Collections.Generic.IEnumerable%7BTerminal.Gui.StraightLine%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L84">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas__ctor_" data-uid="Terminal.Gui.LineCanvas.#ctor*"></a>
+  <h4 id="Terminal_Gui_LineCanvas__ctor_System_Collections_Generic_IEnumerable_Terminal_Gui_StraightLine__" data-uid="Terminal.Gui.LineCanvas.#ctor(System.Collections.Generic.IEnumerable{Terminal.Gui.StraightLine})">LineCanvas(IEnumerable&lt;StraightLine&gt;)</h4>
+  <div class="markdown level1 summary">Creates a new instance with the given <code class="paramref">lines</code>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public LineCanvas(IEnumerable&lt;StraightLine&gt; lines)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Terminal.Gui.StraightLine.html">StraightLine</a>&gt;</td>
+        <td><span class="parametername">lines</span></td>
+        <td>Initial lines for the canvas.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_Bounds.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.Bounds%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L191">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_Bounds_" data-uid="Terminal.Gui.LineCanvas.Bounds*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_Bounds" data-uid="Terminal.Gui.LineCanvas.Bounds">Bounds</h4>
+  <div class="markdown level1 summary">Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the 
+line that is furthest left/top and Size is defined by the line that extends the furthest
+right/bottom.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Rect Bounds { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_Lines.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.Lines%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L101">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_Lines_" data-uid="Terminal.Gui.LineCanvas.Lines*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_Lines" data-uid="Terminal.Gui.LineCanvas.Lines">Lines</h4>
+  <div class="markdown level1 summary">Gets the lines in the canvas.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IReadOnlyCollection&lt;StraightLine&gt; Lines { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="Terminal.Gui.StraightLine.html">StraightLine</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_AddLine_Terminal_Gui_Point_System_Int32_Terminal_Gui_Orientation_Terminal_Gui_LineStyle_System_Nullable_Terminal_Gui_Attribute__.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point%2CSystem.Int32%2CTerminal.Gui.Orientation%2CTerminal.Gui.LineStyle%2CSystem.Nullable%7BTerminal.Gui.Attribute%7D)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L136">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_AddLine_" data-uid="Terminal.Gui.LineCanvas.AddLine*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_AddLine_Terminal_Gui_Point_System_Int32_Terminal_Gui_Orientation_Terminal_Gui_LineStyle_System_Nullable_Terminal_Gui_Attribute__" data-uid="Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.Point,System.Int32,Terminal.Gui.Orientation,Terminal.Gui.LineStyle,System.Nullable{Terminal.Gui.Attribute})">AddLine(Point, int, Orientation, LineStyle, Attribute?)</h4>
+  <div class="markdown level1 summary"><p>
+Adds a new <code class="paramref">length</code> long line to the canvas starting at <code class="paramref">start</code>.
+</p>
+<p>
+Use positive <code class="paramref">length</code> for the line to extend Right and negative for Left
+when <a class="xref" href="Terminal.Gui.Orientation.html">Orientation</a> is <a class="xref" href="Terminal.Gui.Orientation.html#Terminal_Gui_Orientation_Horizontal">Horizontal</a>.
+</p>
+<p>
+Use positive <code class="paramref">length</code> for the line to extend Down and negative for Up
+when <a class="xref" href="Terminal.Gui.Orientation.html">Orientation</a> is <a class="xref" href="Terminal.Gui.Orientation.html#Terminal_Gui_Orientation_Vertical">Vertical</a>.
+</p></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddLine(Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">start</span></td>
+        <td>Starting point.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">length</span></td>
+        <td>The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for Up/Left.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Orientation.html">Orientation</a></td>
+        <td><span class="parametername">orientation</span></td>
+        <td>The direction of the line.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.LineStyle.html">LineStyle</a></td>
+        <td><span class="parametername">style</span></td>
+        <td>The style of line to use</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>?</td>
+        <td><span class="parametername">attribute</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_AddLine_Terminal_Gui_StraightLine_.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.StraightLine)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L146">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_AddLine_" data-uid="Terminal.Gui.LineCanvas.AddLine*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_AddLine_Terminal_Gui_StraightLine_" data-uid="Terminal.Gui.LineCanvas.AddLine(Terminal.Gui.StraightLine)">AddLine(StraightLine)</h4>
+  <div class="markdown level1 summary">Adds a new line to the canvas</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void AddLine(StraightLine line)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.StraightLine.html">StraightLine</a></td>
+        <td><span class="parametername">line</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_Clear.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.Clear%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L169">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_Clear_" data-uid="Terminal.Gui.LineCanvas.Clear*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_Clear" data-uid="Terminal.Gui.LineCanvas.Clear">Clear()</h4>
+  <div class="markdown level1 summary">Clears all lines from the LineCanvas.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Clear()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_ClearCache.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.ClearCache%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L180">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_ClearCache_" data-uid="Terminal.Gui.LineCanvas.ClearCache*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_ClearCache" data-uid="Terminal.Gui.LineCanvas.ClearCache">ClearCache()</h4>
+  <div class="markdown level1 summary">Clears any cached states from the canvas
+Call this method if you make changes to lines
+that have already been added.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearCache()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_Dispose.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.Dispose%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L744">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_Dispose_" data-uid="Terminal.Gui.LineCanvas.Dispose*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_Dispose" data-uid="Terminal.Gui.LineCanvas.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_GetCellMap.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.GetCellMap%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L259">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_GetCellMap_" data-uid="Terminal.Gui.LineCanvas.GetCellMap*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_GetCellMap" data-uid="Terminal.Gui.LineCanvas.GetCellMap">GetCellMap()</h4>
+  <div class="markdown level1 summary">Evaluates the lines that have been added to the canvas and returns a map containing
+the glyphs and their locations. The glyphs are the characters that should be rendered
+so that all lines connect up with the appropriate intersection symbols.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;Point, Cell&gt; GetCellMap()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="Terminal.Gui.Point.html">Point</a>, <a class="xref" href="Terminal.Gui.Cell.html">Cell</a>&gt;</td>
+        <td>A map of all the points within the canvas.</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_GetMap.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.GetMap%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L289">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_GetMap_" data-uid="Terminal.Gui.LineCanvas.GetMap*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_GetMap" data-uid="Terminal.Gui.LineCanvas.GetMap">GetMap()</h4>
+  <div class="markdown level1 summary">Evaluates the lines that have been added to the canvas and returns a map containing
+the glyphs and their locations. The glyphs are the characters that should be rendered
+so that all lines connect up with the appropriate intersection symbols.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;Point, Rune&gt; GetMap()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="Terminal.Gui.Point.html">Point</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.rune">Rune</a>&gt;</td>
+        <td>A map of all the points within the canvas.</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_GetMap_Terminal_Gui_Rect_.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L229">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_GetMap_" data-uid="Terminal.Gui.LineCanvas.GetMap*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_GetMap_Terminal_Gui_Rect_" data-uid="Terminal.Gui.LineCanvas.GetMap(Terminal.Gui.Rect)">GetMap(Rect)</h4>
+  <div class="markdown level1 summary">Evaluates the lines that have been added to the canvas and returns a map containing
+the glyphs and their locations. The glyphs are the characters that should be rendered
+so that all lines connect up with the appropriate intersection symbols.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Dictionary&lt;Point, Rune&gt; GetMap(Rect inArea)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></td>
+        <td><span class="parametername">inArea</span></td>
+        <td>A rectangle to constrain the search by.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="Terminal.Gui.Point.html">Point</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.rune">Rune</a>&gt;</td>
+        <td>A map of the points within the canvas that intersect with <code class="paramref">inArea</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_Merge_Terminal_Gui_LineCanvas_.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L736">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_Merge_" data-uid="Terminal.Gui.LineCanvas.Merge*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_Merge_Terminal_Gui_LineCanvas_" data-uid="Terminal.Gui.LineCanvas.Merge(Terminal.Gui.LineCanvas)">Merge(LineCanvas)</h4>
+  <div class="markdown level1 summary">Merges one line canvas into this one.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Merge(LineCanvas lineCanvas)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.LineCanvas.html">LineCanvas</a></td>
+        <td><span class="parametername">lineCanvas</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_RemoveLastLine.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.RemoveLastLine%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L156">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_RemoveLastLine_" data-uid="Terminal.Gui.LineCanvas.RemoveLastLine*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_RemoveLastLine" data-uid="Terminal.Gui.LineCanvas.RemoveLastLine">RemoveLastLine()</h4>
+  <div class="markdown level1 summary">Removes the last line added to the canvas</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public StraightLine RemoveLastLine()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.StraightLine.html">StraightLine</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas_ToString.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas.ToString%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L298">View Source</a>
+  </span>
+  <a id="Terminal_Gui_LineCanvas_ToString_" data-uid="Terminal.Gui.LineCanvas.ToString*"></a>
+  <h4 id="Terminal_Gui_LineCanvas_ToString" data-uid="Terminal.Gui.LineCanvas.ToString">ToString()</h4>
+  <div class="markdown level1 summary">Returns the contents of the line canvas rendered to a string. The string
+will include all columns and rows, even if <a class="xref" href="Terminal.Gui.LineCanvas.html#Terminal_Gui_LineCanvas_Bounds">Bounds</a> has negative coordinates. 
+For example, if the canvas contains a single line that starts at (-1,-1) with a length of 2, the
+rendered string will have a length of 2.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td>The canvas rendered to a string.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a></div>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_LineCanvas.md&amp;value=---%0Auid%3A%20Terminal.Gui.LineCanvas%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/LineCanvas.cs/#L68" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

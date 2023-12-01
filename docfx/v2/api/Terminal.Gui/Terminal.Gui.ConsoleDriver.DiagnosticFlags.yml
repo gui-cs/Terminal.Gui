@@ -1,0 +1,205 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  commentId: T:Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  id: ConsoleDriver.DiagnosticFlags
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  - Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  - Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  langs:
+  - csharp
+  - vb
+  name: ConsoleDriver.DiagnosticFlags
+  nameWithType: ConsoleDriver.DiagnosticFlags
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DiagnosticFlags
+    path: ../Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+    startLine: 535
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Enables diagnostic functions
+  example: []
+  syntax:
+    content: >-
+      [Flags]
+
+      public enum ConsoleDriver.DiagnosticFlags : uint
+    content.vb: >-
+      <Flags>
+
+      Public Enum ConsoleDriver.DiagnosticFlags As UInteger
+  attributes:
+  - type: System.FlagsAttribute
+    ctor: System.FlagsAttribute.#ctor
+    arguments: []
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  commentId: F:Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  id: Off
+  parent: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  langs:
+  - csharp
+  - vb
+  name: Off
+  nameWithType: ConsoleDriver.DiagnosticFlags.Off
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags.Off
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Off
+    path: ../Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+    startLine: 540
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: All diagnostics off
+  example: []
+  syntax:
+    content: Off = 0
+    return:
+      type: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  commentId: F:Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  id: FrameRuler
+  parent: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  langs:
+  - csharp
+  - vb
+  name: FrameRuler
+  nameWithType: ConsoleDriver.DiagnosticFlags.FrameRuler
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FrameRuler
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FrameRuler
+    path: ../Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+    startLine: 545
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    When enabled, <xref href="Terminal.Gui.Frame.OnDrawFrames" data-throw-if-not-resolved="false"></xref> will draw a 
+
+    ruler in the frame for any side with a padding value greater than 0.
+  example: []
+  syntax:
+    content: FrameRuler = 1
+    return:
+      type: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  commentId: F:Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  id: FramePadding
+  parent: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  langs:
+  - csharp
+  - vb
+  name: FramePadding
+  nameWithType: ConsoleDriver.DiagnosticFlags.FramePadding
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags.FramePadding
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FramePadding
+    path: ../Terminal.Gui/ConsoleDrivers/ConsoleDriver.cs
+    startLine: 550
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    When enabled, <xref href="Terminal.Gui.Frame.OnDrawFrames" data-throw-if-not-resolved="false"></xref> will draw a 
+
+    'L', 'R', 'T', and 'B' when clearing <xref href="Terminal.Gui.Thickness" data-throw-if-not-resolved="false"></xref>'s instead of ' '.
+  example: []
+  syntax:
+    content: FramePadding = 2
+    return:
+      type: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  commentId: T:Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConsoleDriver.html
+  name: ConsoleDriver.DiagnosticFlags
+  nameWithType: ConsoleDriver.DiagnosticFlags
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    href: Terminal.Gui.ConsoleDriver.html
+  - name: .
+  - uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+    name: DiagnosticFlags
+    href: Terminal.Gui.ConsoleDriver.DiagnosticFlags.html
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    href: Terminal.Gui.ConsoleDriver.html
+  - name: .
+  - uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+    name: DiagnosticFlags
+    href: Terminal.Gui.ConsoleDriver.DiagnosticFlags.html
+- uid: Terminal.Gui.Frame.OnDrawFrames
+  commentId: M:Terminal.Gui.Frame.OnDrawFrames
+  href: Terminal.Gui.Frame.html#Terminal.Gui.Frame.OnDrawFrames
+  name: OnDrawFrames()
+  nameWithType: Frame.OnDrawFrames()
+  fullName: Terminal.Gui.Frame.OnDrawFrames()
+  spec.csharp:
+  - uid: Terminal.Gui.Frame.OnDrawFrames
+    name: OnDrawFrames
+    href: Terminal.Gui.Frame.html#Terminal.Gui.Frame.OnDrawFrames
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.Frame.OnDrawFrames
+    name: OnDrawFrames
+    href: Terminal.Gui.Frame.html#Terminal.Gui.Frame.OnDrawFrames
+  - name: (
+  - name: )
+- uid: Terminal.Gui.Thickness
+  commentId: T:Terminal.Gui.Thickness
+  parent: Terminal.Gui
+  href: Terminal.Gui.Thickness.html
+  name: Thickness
+  nameWithType: Thickness
+  fullName: Terminal.Gui.Thickness
+shouldSkipMarkup: true

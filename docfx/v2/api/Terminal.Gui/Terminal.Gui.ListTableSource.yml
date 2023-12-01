@@ -1,0 +1,894 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ListTableSource
+  commentId: T:Terminal.Gui.ListTableSource
+  id: ListTableSource
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView,Terminal.Gui.ListColumnStyle)
+  - Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView)
+  - Terminal.Gui.ListTableSource.ColumnNames
+  - Terminal.Gui.ListTableSource.Columns
+  - Terminal.Gui.ListTableSource.Count
+  - Terminal.Gui.ListTableSource.DataTable
+  - Terminal.Gui.ListTableSource.Item(System.Int32,System.Int32)
+  - Terminal.Gui.ListTableSource.List
+  - Terminal.Gui.ListTableSource.Rows
+  - Terminal.Gui.ListTableSource.Style
+  langs:
+  - csharp
+  - vb
+  name: ListTableSource
+  nameWithType: ListTableSource
+  fullName: Terminal.Gui.ListTableSource
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ListTableSource
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 11
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    <xref href="Terminal.Gui.ITableSource" data-throw-if-not-resolved="false"></xref> implementation that wraps 
+
+    a <xref href="System.Collections.IList" data-throw-if-not-resolved="false"></xref>.  This class is
+
+    mutable: changes are permitted to the wrapped <xref href="System.Collections.IList" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: 'public class ListTableSource : ITableSource'
+    content.vb: Public Class ListTableSource Implements ITableSource
+  inheritance:
+  - System.Object
+  implements:
+  - Terminal.Gui.ITableSource
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.ListTableSource.List
+  commentId: F:Terminal.Gui.ListTableSource.List
+  id: List
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: List
+  nameWithType: ListTableSource.List
+  fullName: Terminal.Gui.ListTableSource.List
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: List
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 15
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The list this source wraps.
+  example: []
+  syntax:
+    content: public IList List
+    return:
+      type: System.Collections.IList
+    content.vb: Public List As IList
+- uid: Terminal.Gui.ListTableSource.Style
+  commentId: F:Terminal.Gui.ListTableSource.Style
+  id: Style
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: Style
+  nameWithType: ListTableSource.Style
+  fullName: Terminal.Gui.ListTableSource.Style
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Style
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 20
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The style this source uses.
+  example: []
+  syntax:
+    content: public ListColumnStyle Style
+    return:
+      type: Terminal.Gui.ListColumnStyle
+    content.vb: Public Style As ListColumnStyle
+- uid: Terminal.Gui.ListTableSource.DataTable
+  commentId: P:Terminal.Gui.ListTableSource.DataTable
+  id: DataTable
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: DataTable
+  nameWithType: ListTableSource.DataTable
+  fullName: Terminal.Gui.ListTableSource.DataTable
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DataTable
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 25
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The data table this source wraps.
+  example: []
+  syntax:
+    content: public DataTable DataTable { get; }
+    parameters: []
+    return:
+      type: System.Data.DataTable
+    content.vb: Public Property DataTable As DataTable
+  overload: Terminal.Gui.ListTableSource.DataTable*
+- uid: Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView,Terminal.Gui.ListColumnStyle)
+  commentId: M:Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView,Terminal.Gui.ListColumnStyle)
+  id: '#ctor(System.Collections.IList,Terminal.Gui.TableView,Terminal.Gui.ListColumnStyle)'
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: ListTableSource(IList, TableView, ListColumnStyle)
+  nameWithType: ListTableSource.ListTableSource(IList, TableView, ListColumnStyle)
+  fullName: Terminal.Gui.ListTableSource.ListTableSource(System.Collections.IList, Terminal.Gui.TableView, Terminal.Gui.ListColumnStyle)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 42
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Creates a new columned list table instance based on the data in <code class="paramref">list</code>
+
+    and dimensions from <code class="paramref">tableView</code>.
+  example: []
+  syntax:
+    content: public ListTableSource(IList list, TableView tableView, ListColumnStyle style)
+    parameters:
+    - id: list
+      type: System.Collections.IList
+      description: ''
+    - id: tableView
+      type: Terminal.Gui.TableView
+      description: ''
+    - id: style
+      type: Terminal.Gui.ListColumnStyle
+      description: ''
+    content.vb: Public Sub New(list As IList, tableView As TableView, style As ListColumnStyle)
+  overload: Terminal.Gui.ListTableSource.#ctor*
+  nameWithType.vb: ListTableSource.New(IList, TableView, ListColumnStyle)
+  fullName.vb: Terminal.Gui.ListTableSource.New(System.Collections.IList, Terminal.Gui.TableView, Terminal.Gui.ListColumnStyle)
+  name.vb: New(IList, TableView, ListColumnStyle)
+- uid: Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView)
+  commentId: M:Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView)
+  id: '#ctor(System.Collections.IList,Terminal.Gui.TableView)'
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: ListTableSource(IList, TableView)
+  nameWithType: ListTableSource.ListTableSource(IList, TableView)
+  fullName: Terminal.Gui.ListTableSource.ListTableSource(System.Collections.IList, Terminal.Gui.TableView)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 55
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public ListTableSource(IList list, TableView tableView)
+    parameters:
+    - id: list
+      type: System.Collections.IList
+    - id: tableView
+      type: Terminal.Gui.TableView
+    content.vb: Public Sub New(list As IList, tableView As TableView)
+  overload: Terminal.Gui.ListTableSource.#ctor*
+  nameWithType.vb: ListTableSource.New(IList, TableView)
+  fullName.vb: Terminal.Gui.ListTableSource.New(System.Collections.IList, Terminal.Gui.TableView)
+  name.vb: New(IList, TableView)
+- uid: Terminal.Gui.ListTableSource.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.ListTableSource.Item(System.Int32,System.Int32)
+  id: Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: this[int, int]
+  nameWithType: ListTableSource.this[int, int]
+  fullName: Terminal.Gui.ListTableSource.this[int, int]
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: this[]
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 75
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns the data at the given indexes of the table (row, column).
+  example: []
+  syntax:
+    content: public object this[int row, int col] { get; }
+    parameters:
+    - id: row
+      type: System.Int32
+      description: ''
+    - id: col
+      type: System.Int32
+      description: ''
+    return:
+      type: System.Object
+      description: ''
+    content.vb: Public ReadOnly Default Property this[](row As Integer, col As Integer) As Object
+  overload: Terminal.Gui.ListTableSource.Item*
+  implements:
+  - Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  nameWithType.vb: ListTableSource.this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.ListTableSource.this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+- uid: Terminal.Gui.ListTableSource.Count
+  commentId: P:Terminal.Gui.ListTableSource.Count
+  id: Count
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: Count
+  nameWithType: ListTableSource.Count
+  fullName: Terminal.Gui.ListTableSource.Count
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Count
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 93
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The number of items in the IList source
+  example: []
+  syntax:
+    content: public int Count { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Count As Integer
+  overload: Terminal.Gui.ListTableSource.Count*
+- uid: Terminal.Gui.ListTableSource.Rows
+  commentId: P:Terminal.Gui.ListTableSource.Rows
+  id: Rows
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: Rows
+  nameWithType: ListTableSource.Rows
+  fullName: Terminal.Gui.ListTableSource.Rows
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Rows
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 96
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of rows in the table.
+  example: []
+  syntax:
+    content: public int Rows { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Rows As Integer
+  overload: Terminal.Gui.ListTableSource.Rows*
+  implements:
+  - Terminal.Gui.ITableSource.Rows
+- uid: Terminal.Gui.ListTableSource.Columns
+  commentId: P:Terminal.Gui.ListTableSource.Columns
+  id: Columns
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: Columns
+  nameWithType: ListTableSource.Columns
+  fullName: Terminal.Gui.ListTableSource.Columns
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Columns
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 99
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of columns in the table.
+  example: []
+  syntax:
+    content: public int Columns { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Columns As Integer
+  overload: Terminal.Gui.ListTableSource.Columns*
+  implements:
+  - Terminal.Gui.ITableSource.Columns
+- uid: Terminal.Gui.ListTableSource.ColumnNames
+  commentId: P:Terminal.Gui.ListTableSource.ColumnNames
+  id: ColumnNames
+  parent: Terminal.Gui.ListTableSource
+  langs:
+  - csharp
+  - vb
+  name: ColumnNames
+  nameWithType: ListTableSource.ColumnNames
+  fullName: Terminal.Gui.ListTableSource.ColumnNames
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/ListTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColumnNames
+    path: ../Terminal.Gui/Views/TableView/ListTableSource.cs
+    startLine: 102
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the label for each column.
+  example: []
+  syntax:
+    content: public string[] ColumnNames { get; }
+    parameters: []
+    return:
+      type: System.String[]
+    content.vb: Public ReadOnly Property ColumnNames As String()
+  overload: Terminal.Gui.ListTableSource.ColumnNames*
+  implements:
+  - Terminal.Gui.ITableSource.ColumnNames
+references:
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITableSource.html
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+- uid: System.Collections.IList
+  commentId: T:System.Collections.IList
+  parent: System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.ilist
+  name: IList
+  nameWithType: IList
+  fullName: System.Collections.IList
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ListColumnStyle
+  commentId: T:Terminal.Gui.ListColumnStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.ListColumnStyle.html
+  name: ListColumnStyle
+  nameWithType: ListColumnStyle
+  fullName: Terminal.Gui.ListColumnStyle
+- uid: Terminal.Gui.ListTableSource.DataTable*
+  commentId: Overload:Terminal.Gui.ListTableSource.DataTable
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.DataTable
+  name: DataTable
+  nameWithType: ListTableSource.DataTable
+  fullName: Terminal.Gui.ListTableSource.DataTable
+- uid: System.Data.DataTable
+  commentId: T:System.Data.DataTable
+  parent: System.Data
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.data.datatable
+  name: DataTable
+  nameWithType: DataTable
+  fullName: System.Data.DataTable
+- uid: System.Data
+  commentId: N:System.Data
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Data
+  nameWithType: System.Data
+  fullName: System.Data
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Data
+    name: Data
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.data
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Data
+    name: Data
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.data
+- uid: Terminal.Gui.ListTableSource.#ctor*
+  commentId: Overload:Terminal.Gui.ListTableSource.#ctor
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.#ctor(System.Collections.IList,Terminal.Gui.TableView,Terminal.Gui.ListColumnStyle)
+  name: ListTableSource
+  nameWithType: ListTableSource.ListTableSource
+  fullName: Terminal.Gui.ListTableSource.ListTableSource
+  nameWithType.vb: ListTableSource.New
+  fullName.vb: Terminal.Gui.ListTableSource.New
+  name.vb: New
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui.ListTableSource.Item*
+  commentId: Overload:Terminal.Gui.ListTableSource.Item
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.Item(System.Int32,System.Int32)
+  name: this
+  nameWithType: ListTableSource.this
+  fullName: Terminal.Gui.ListTableSource.this
+  nameWithType.vb: ListTableSource.this[]
+  fullName.vb: Terminal.Gui.ListTableSource.this[]
+  name.vb: this[]
+- uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.ITableSource
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: this[int, int]
+  nameWithType: ITableSource.this[int, int]
+  fullName: Terminal.Gui.ITableSource.this[int, int]
+  nameWithType.vb: ITableSource.this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.ITableSource.this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ']'
+  spec.vb:
+  - uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+    name: this[]
+    href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.ListTableSource.Count*
+  commentId: Overload:Terminal.Gui.ListTableSource.Count
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.Count
+  name: Count
+  nameWithType: ListTableSource.Count
+  fullName: Terminal.Gui.ListTableSource.Count
+- uid: Terminal.Gui.ListTableSource.Rows*
+  commentId: Overload:Terminal.Gui.ListTableSource.Rows
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.Rows
+  name: Rows
+  nameWithType: ListTableSource.Rows
+  fullName: Terminal.Gui.ListTableSource.Rows
+- uid: Terminal.Gui.ITableSource.Rows
+  commentId: P:Terminal.Gui.ITableSource.Rows
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Rows
+  name: Rows
+  nameWithType: ITableSource.Rows
+  fullName: Terminal.Gui.ITableSource.Rows
+- uid: Terminal.Gui.ListTableSource.Columns*
+  commentId: Overload:Terminal.Gui.ListTableSource.Columns
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.Columns
+  name: Columns
+  nameWithType: ListTableSource.Columns
+  fullName: Terminal.Gui.ListTableSource.Columns
+- uid: Terminal.Gui.ITableSource.Columns
+  commentId: P:Terminal.Gui.ITableSource.Columns
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Columns
+  name: Columns
+  nameWithType: ITableSource.Columns
+  fullName: Terminal.Gui.ITableSource.Columns
+- uid: Terminal.Gui.ListTableSource.ColumnNames*
+  commentId: Overload:Terminal.Gui.ListTableSource.ColumnNames
+  href: Terminal.Gui.ListTableSource.html#Terminal.Gui.ListTableSource.ColumnNames
+  name: ColumnNames
+  nameWithType: ListTableSource.ColumnNames
+  fullName: Terminal.Gui.ListTableSource.ColumnNames
+- uid: Terminal.Gui.ITableSource.ColumnNames
+  commentId: P:Terminal.Gui.ITableSource.ColumnNames
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.ColumnNames
+  name: ColumnNames
+  nameWithType: ITableSource.ColumnNames
+  fullName: Terminal.Gui.ITableSource.ColumnNames
+- uid: System.String[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string[]
+  nameWithType: string[]
+  fullName: string[]
+  nameWithType.vb: String()
+  fullName.vb: String()
+  name.vb: String()
+  spec.csharp:
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+shouldSkipMarkup: true

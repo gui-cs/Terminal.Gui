@@ -1,0 +1,180 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
+  id: TextAlignment
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.TextAlignment.Centered
+  - Terminal.Gui.TextAlignment.Justified
+  - Terminal.Gui.TextAlignment.Left
+  - Terminal.Gui.TextAlignment.Right
+  langs:
+  - csharp
+  - vb
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TextAlignment
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Text alignment enumeration, controls how text is displayed.
+  example: []
+  syntax:
+    content: public enum TextAlignment
+    content.vb: Public Enum TextAlignment
+- uid: Terminal.Gui.TextAlignment.Left
+  commentId: F:Terminal.Gui.TextAlignment.Left
+  id: Left
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  - vb
+  name: Left
+  nameWithType: TextAlignment.Left
+  fullName: Terminal.Gui.TextAlignment.Left
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Left
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The text will be left-aligned.
+  example: []
+  syntax:
+    content: Left = 0
+    return:
+      type: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.TextAlignment.Right
+  commentId: F:Terminal.Gui.TextAlignment.Right
+  id: Right
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  - vb
+  name: Right
+  nameWithType: TextAlignment.Right
+  fullName: Terminal.Gui.TextAlignment.Right
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Right
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 17
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The text will be right-aligned.
+  example: []
+  syntax:
+    content: Right = 1
+    return:
+      type: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.TextAlignment.Centered
+  commentId: F:Terminal.Gui.TextAlignment.Centered
+  id: Centered
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  - vb
+  name: Centered
+  nameWithType: TextAlignment.Centered
+  fullName: Terminal.Gui.TextAlignment.Centered
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Centered
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The text will be centered horizontally.
+  example: []
+  syntax:
+    content: Centered = 2
+    return:
+      type: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.TextAlignment.Justified
+  commentId: F:Terminal.Gui.TextAlignment.Justified
+  id: Justified
+  parent: Terminal.Gui.TextAlignment
+  langs:
+  - csharp
+  - vb
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: Terminal.Gui.TextAlignment.Justified
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Justified
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 26
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The text will be justified (spaces will be added to existing spaces such that
+
+    the text fills the container horizontally).
+  example: []
+  syntax:
+    content: Justified = 3
+    return:
+      type: Terminal.Gui.TextAlignment
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextAlignment.html
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+shouldSkipMarkup: true

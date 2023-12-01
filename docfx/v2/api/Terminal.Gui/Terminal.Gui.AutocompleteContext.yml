@@ -1,0 +1,606 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.AutocompleteContext
+  commentId: T:Terminal.Gui.AutocompleteContext
+  id: AutocompleteContext
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.AutocompleteContext.#ctor(System.Collections.Generic.List{Terminal.Gui.RuneCell},System.Int32,System.Boolean)
+  - Terminal.Gui.AutocompleteContext.Canceled
+  - Terminal.Gui.AutocompleteContext.CurrentLine
+  - Terminal.Gui.AutocompleteContext.CursorPosition
+  langs:
+  - csharp
+  - vb
+  name: AutocompleteContext
+  nameWithType: AutocompleteContext
+  fullName: Terminal.Gui.AutocompleteContext
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AutocompleteContext
+    path: ../Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+    startLine: 8
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Describes the current state of a <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> which
+
+    is proposing autocomplete. Suggestions are based on this state.
+  example: []
+  syntax:
+    content: public class AutocompleteContext
+    content.vb: Public Class AutocompleteContext
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.AutocompleteContext.CurrentLine
+  commentId: P:Terminal.Gui.AutocompleteContext.CurrentLine
+  id: CurrentLine
+  parent: Terminal.Gui.AutocompleteContext
+  langs:
+  - csharp
+  - vb
+  name: CurrentLine
+  nameWithType: AutocompleteContext.CurrentLine
+  fullName: Terminal.Gui.AutocompleteContext.CurrentLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CurrentLine
+    path: ../Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The text on the current line.
+  example: []
+  syntax:
+    content: public List<RuneCell> CurrentLine { get; set; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.List{Terminal.Gui.RuneCell}
+    content.vb: Public Property CurrentLine As List(Of RuneCell)
+  overload: Terminal.Gui.AutocompleteContext.CurrentLine*
+- uid: Terminal.Gui.AutocompleteContext.CursorPosition
+  commentId: P:Terminal.Gui.AutocompleteContext.CursorPosition
+  id: CursorPosition
+  parent: Terminal.Gui.AutocompleteContext
+  langs:
+  - csharp
+  - vb
+  name: CursorPosition
+  nameWithType: AutocompleteContext.CursorPosition
+  fullName: Terminal.Gui.AutocompleteContext.CursorPosition
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CursorPosition
+    path: ../Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+    startLine: 18
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The position of the input cursor within the <xref href="Terminal.Gui.AutocompleteContext.CurrentLine" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public int CursorPosition { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property CursorPosition As Integer
+  overload: Terminal.Gui.AutocompleteContext.CursorPosition*
+- uid: Terminal.Gui.AutocompleteContext.Canceled
+  commentId: P:Terminal.Gui.AutocompleteContext.Canceled
+  id: Canceled
+  parent: Terminal.Gui.AutocompleteContext
+  langs:
+  - csharp
+  - vb
+  name: Canceled
+  nameWithType: AutocompleteContext.Canceled
+  fullName: Terminal.Gui.AutocompleteContext.Canceled
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Canceled
+    path: ../Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+    startLine: 23
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets if the autocomplete was canceled from popup.
+  example: []
+  syntax:
+    content: public bool Canceled { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property Canceled As Boolean
+  overload: Terminal.Gui.AutocompleteContext.Canceled*
+- uid: Terminal.Gui.AutocompleteContext.#ctor(System.Collections.Generic.List{Terminal.Gui.RuneCell},System.Int32,System.Boolean)
+  commentId: M:Terminal.Gui.AutocompleteContext.#ctor(System.Collections.Generic.List{Terminal.Gui.RuneCell},System.Int32,System.Boolean)
+  id: '#ctor(System.Collections.Generic.List{Terminal.Gui.RuneCell},System.Int32,System.Boolean)'
+  parent: Terminal.Gui.AutocompleteContext
+  langs:
+  - csharp
+  - vb
+  name: AutocompleteContext(List<RuneCell>, int, bool)
+  nameWithType: AutocompleteContext.AutocompleteContext(List<RuneCell>, int, bool)
+  fullName: Terminal.Gui.AutocompleteContext.AutocompleteContext(System.Collections.Generic.List<Terminal.Gui.RuneCell>, int, bool)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Text/Autocomplete/AutocompleteContext.cs
+    startLine: 28
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new instance of the <xref href="Terminal.Gui.AutocompleteContext" data-throw-if-not-resolved="false"></xref> class
+  example: []
+  syntax:
+    content: public AutocompleteContext(List<RuneCell> currentLine, int cursorPosition, bool canceled = false)
+    parameters:
+    - id: currentLine
+      type: System.Collections.Generic.List{Terminal.Gui.RuneCell}
+    - id: cursorPosition
+      type: System.Int32
+    - id: canceled
+      type: System.Boolean
+    content.vb: Public Sub New(currentLine As List(Of RuneCell), cursorPosition As Integer, canceled As Boolean = False)
+  overload: Terminal.Gui.AutocompleteContext.#ctor*
+  nameWithType.vb: AutocompleteContext.New(List(Of RuneCell), Integer, Boolean)
+  fullName.vb: Terminal.Gui.AutocompleteContext.New(System.Collections.Generic.List(Of Terminal.Gui.RuneCell), Integer, Boolean)
+  name.vb: New(List(Of RuneCell), Integer, Boolean)
+references:
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.AutocompleteContext.CurrentLine*
+  commentId: Overload:Terminal.Gui.AutocompleteContext.CurrentLine
+  href: Terminal.Gui.AutocompleteContext.html#Terminal.Gui.AutocompleteContext.CurrentLine
+  name: CurrentLine
+  nameWithType: AutocompleteContext.CurrentLine
+  fullName: Terminal.Gui.AutocompleteContext.CurrentLine
+- uid: System.Collections.Generic.List{Terminal.Gui.RuneCell}
+  commentId: T:System.Collections.Generic.List{Terminal.Gui.RuneCell}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<RuneCell>
+  nameWithType: List<RuneCell>
+  fullName: System.Collections.Generic.List<Terminal.Gui.RuneCell>
+  nameWithType.vb: List(Of RuneCell)
+  fullName.vb: System.Collections.Generic.List(Of Terminal.Gui.RuneCell)
+  name.vb: List(Of RuneCell)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - uid: Terminal.Gui.RuneCell
+    name: RuneCell
+    href: Terminal.Gui.RuneCell.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.RuneCell
+    name: RuneCell
+    href: Terminal.Gui.RuneCell.html
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.AutocompleteContext.CurrentLine
+  commentId: P:Terminal.Gui.AutocompleteContext.CurrentLine
+  href: Terminal.Gui.AutocompleteContext.html#Terminal.Gui.AutocompleteContext.CurrentLine
+  name: CurrentLine
+  nameWithType: AutocompleteContext.CurrentLine
+  fullName: Terminal.Gui.AutocompleteContext.CurrentLine
+- uid: Terminal.Gui.AutocompleteContext.CursorPosition*
+  commentId: Overload:Terminal.Gui.AutocompleteContext.CursorPosition
+  href: Terminal.Gui.AutocompleteContext.html#Terminal.Gui.AutocompleteContext.CursorPosition
+  name: CursorPosition
+  nameWithType: AutocompleteContext.CursorPosition
+  fullName: Terminal.Gui.AutocompleteContext.CursorPosition
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.AutocompleteContext.Canceled*
+  commentId: Overload:Terminal.Gui.AutocompleteContext.Canceled
+  href: Terminal.Gui.AutocompleteContext.html#Terminal.Gui.AutocompleteContext.Canceled
+  name: Canceled
+  nameWithType: AutocompleteContext.Canceled
+  fullName: Terminal.Gui.AutocompleteContext.Canceled
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.AutocompleteContext
+  commentId: T:Terminal.Gui.AutocompleteContext
+  parent: Terminal.Gui
+  href: Terminal.Gui.AutocompleteContext.html
+  name: AutocompleteContext
+  nameWithType: AutocompleteContext
+  fullName: Terminal.Gui.AutocompleteContext
+- uid: Terminal.Gui.AutocompleteContext.#ctor*
+  commentId: Overload:Terminal.Gui.AutocompleteContext.#ctor
+  href: Terminal.Gui.AutocompleteContext.html#Terminal.Gui.AutocompleteContext.#ctor(System.Collections.Generic.List{Terminal.Gui.RuneCell},System.Int32,System.Boolean)
+  name: AutocompleteContext
+  nameWithType: AutocompleteContext.AutocompleteContext
+  fullName: Terminal.Gui.AutocompleteContext.AutocompleteContext
+  nameWithType.vb: AutocompleteContext.New
+  fullName.vb: Terminal.Gui.AutocompleteContext.New
+  name.vb: New
+shouldSkipMarkup: true

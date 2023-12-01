@@ -1,0 +1,125 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.DisplayModeLayout
+  commentId: T:Terminal.Gui.DisplayModeLayout
+  id: DisplayModeLayout
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.DisplayModeLayout.Horizontal
+  - Terminal.Gui.DisplayModeLayout.Vertical
+  langs:
+  - csharp
+  - vb
+  name: DisplayModeLayout
+  nameWithType: DisplayModeLayout
+  fullName: Terminal.Gui.DisplayModeLayout
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Views/RadioGroup.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DisplayModeLayout
+    path: ../Terminal.Gui/Views/RadioGroup.cs
+    startLine: 405
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Used for choose the display mode of this <xref href="Terminal.Gui.RadioGroup" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public enum DisplayModeLayout
+    content.vb: Public Enum DisplayModeLayout
+- uid: Terminal.Gui.DisplayModeLayout.Vertical
+  commentId: F:Terminal.Gui.DisplayModeLayout.Vertical
+  id: Vertical
+  parent: Terminal.Gui.DisplayModeLayout
+  langs:
+  - csharp
+  - vb
+  name: Vertical
+  nameWithType: DisplayModeLayout.Vertical
+  fullName: Terminal.Gui.DisplayModeLayout.Vertical
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/RadioGroup.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Vertical
+    path: ../Terminal.Gui/Views/RadioGroup.cs
+    startLine: 409
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Vertical mode display. It's the default.
+  example: []
+  syntax:
+    content: Vertical = 0
+    return:
+      type: Terminal.Gui.DisplayModeLayout
+- uid: Terminal.Gui.DisplayModeLayout.Horizontal
+  commentId: F:Terminal.Gui.DisplayModeLayout.Horizontal
+  id: Horizontal
+  parent: Terminal.Gui.DisplayModeLayout
+  langs:
+  - csharp
+  - vb
+  name: Horizontal
+  nameWithType: DisplayModeLayout.Horizontal
+  fullName: Terminal.Gui.DisplayModeLayout.Horizontal
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/RadioGroup.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Horizontal
+    path: ../Terminal.Gui/Views/RadioGroup.cs
+    startLine: 413
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Horizontal mode display.
+  example: []
+  syntax:
+    content: Horizontal = 1
+    return:
+      type: Terminal.Gui.DisplayModeLayout
+references:
+- uid: Terminal.Gui.RadioGroup
+  commentId: T:Terminal.Gui.RadioGroup
+  href: Terminal.Gui.RadioGroup.html
+  name: RadioGroup
+  nameWithType: RadioGroup
+  fullName: Terminal.Gui.RadioGroup
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.DisplayModeLayout
+  commentId: T:Terminal.Gui.DisplayModeLayout
+  parent: Terminal.Gui
+  href: Terminal.Gui.DisplayModeLayout.html
+  name: DisplayModeLayout
+  nameWithType: DisplayModeLayout
+  fullName: Terminal.Gui.DisplayModeLayout
+shouldSkipMarkup: true

@@ -1,0 +1,1211 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TableStyle
+  commentId: T:Terminal.Gui.TableStyle
+  id: TableStyle
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.TableStyle.AlwaysShowHeaders
+  - Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  - Terminal.Gui.TableStyle.ColumnStyles
+  - Terminal.Gui.TableStyle.ExpandLastColumn
+  - Terminal.Gui.TableStyle.GetColumnStyleIfAny(System.Int32)
+  - Terminal.Gui.TableStyle.GetOrCreateColumnStyle(System.Int32)
+  - Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+  - Terminal.Gui.TableStyle.RowColorGetter
+  - Terminal.Gui.TableStyle.ShowHeaders
+  - Terminal.Gui.TableStyle.ShowHorizontalBottomline
+  - Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  - Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  - Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+  - Terminal.Gui.TableStyle.ShowVerticalCellLines
+  - Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+  - Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+  langs:
+  - csharp
+  - vb
+  name: TableStyle
+  nameWithType: TableStyle
+  fullName: Terminal.Gui.TableStyle
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TableStyle
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Defines rendering options that affect how the table is displayed.
+
+
+    <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
+  example: []
+  syntax:
+    content: public class TableStyle
+    content.vb: Public Class TableStyle
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.TableStyle.ShowHeaders
+  commentId: P:Terminal.Gui.TableStyle.ShowHeaders
+  id: ShowHeaders
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowHeaders
+  nameWithType: TableStyle.ShowHeaders
+  fullName: Terminal.Gui.TableStyle.ShowHeaders
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowHeaders
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 17
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets a flag indicating whether to render headers of a <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref>.
+
+    Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.
+  remarks: >-
+    <xref href="Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline" data-throw-if-not-resolved="false"></xref>, <xref href="Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline" data-throw-if-not-resolved="false"></xref> etc
+        may still be used even if <xref href="Terminal.Gui.TableStyle.ShowHeaders" data-throw-if-not-resolved="false"></xref> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.
+  example: []
+  syntax:
+    content: public bool ShowHeaders { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowHeaders As Boolean
+  overload: Terminal.Gui.TableStyle.ShowHeaders*
+- uid: Terminal.Gui.TableStyle.AlwaysShowHeaders
+  commentId: P:Terminal.Gui.TableStyle.AlwaysShowHeaders
+  id: AlwaysShowHeaders
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: AlwaysShowHeaders
+  nameWithType: TableStyle.AlwaysShowHeaders
+  fullName: Terminal.Gui.TableStyle.AlwaysShowHeaders
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AlwaysShowHeaders
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 22
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: When scrolling down always lock the column headers in place as the first row of the table
+  example: []
+  syntax:
+    content: public bool AlwaysShowHeaders { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property AlwaysShowHeaders As Boolean
+  overload: Terminal.Gui.TableStyle.AlwaysShowHeaders*
+- uid: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  commentId: P:Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  id: ShowHorizontalHeaderOverline
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowHorizontalHeaderOverline
+  nameWithType: TableStyle.ShowHorizontalHeaderOverline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowHorizontalHeaderOverline
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 27
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: True to render a solid line above the headers
+  example: []
+  syntax:
+    content: public bool ShowHorizontalHeaderOverline { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowHorizontalHeaderOverline As Boolean
+  overload: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline*
+- uid: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  commentId: P:Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  id: ShowHorizontalHeaderUnderline
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowHorizontalHeaderUnderline
+  nameWithType: TableStyle.ShowHorizontalHeaderUnderline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowHorizontalHeaderUnderline
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 32
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: True to render a solid line under the headers
+  example: []
+  syntax:
+    content: public bool ShowHorizontalHeaderUnderline { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowHorizontalHeaderUnderline As Boolean
+  overload: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline*
+- uid: Terminal.Gui.TableStyle.ShowVerticalCellLines
+  commentId: P:Terminal.Gui.TableStyle.ShowVerticalCellLines
+  id: ShowVerticalCellLines
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowVerticalCellLines
+  nameWithType: TableStyle.ShowVerticalCellLines
+  fullName: Terminal.Gui.TableStyle.ShowVerticalCellLines
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowVerticalCellLines
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 37
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: True to render a solid line vertical line between cells
+  example: []
+  syntax:
+    content: public bool ShowVerticalCellLines { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowVerticalCellLines As Boolean
+  overload: Terminal.Gui.TableStyle.ShowVerticalCellLines*
+- uid: Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+  commentId: P:Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+  id: ShowVerticalHeaderLines
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowVerticalHeaderLines
+  nameWithType: TableStyle.ShowVerticalHeaderLines
+  fullName: Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowVerticalHeaderLines
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 42
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: True to render a solid line vertical line between headers
+  example: []
+  syntax:
+    content: public bool ShowVerticalHeaderLines { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowVerticalHeaderLines As Boolean
+  overload: Terminal.Gui.TableStyle.ShowVerticalHeaderLines*
+- uid: Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+  commentId: P:Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+  id: ShowHorizontalScrollIndicators
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowHorizontalScrollIndicators
+  nameWithType: TableStyle.ShowHorizontalScrollIndicators
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowHorizontalScrollIndicators
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 50
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    True to render a arrows on the right/left of the table when 
+
+    there are more column(s) that can be scrolled to.  Requires
+
+    <xref href="Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline" data-throw-if-not-resolved="false"></xref> to be true.
+
+    Defaults to true
+  example: []
+  syntax:
+    content: public bool ShowHorizontalScrollIndicators { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowHorizontalScrollIndicators As Boolean
+  overload: Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators*
+- uid: Terminal.Gui.TableStyle.ShowHorizontalBottomline
+  commentId: P:Terminal.Gui.TableStyle.ShowHorizontalBottomline
+  id: ShowHorizontalBottomline
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ShowHorizontalBottomline
+  nameWithType: TableStyle.ShowHorizontalBottomline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalBottomline
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ShowHorizontalBottomline
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 57
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets a flag indicating whether there should be a horizontal line after all the data
+
+    in the table. Defaults to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.
+  example: []
+  syntax:
+    content: public bool ShowHorizontalBottomline { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ShowHorizontalBottomline As Boolean
+  overload: Terminal.Gui.TableStyle.ShowHorizontalBottomline*
+- uid: Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+  commentId: P:Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+  id: InvertSelectedCellFirstCharacter
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: InvertSelectedCellFirstCharacter
+  nameWithType: TableStyle.InvertSelectedCellFirstCharacter
+  fullName: Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: InvertSelectedCellFirstCharacter
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 64
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    True to invert the colors of the first symbol of the selected cell in the <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref>.
+
+    This gives the appearance of a cursor for when the <xref href="Terminal.Gui.ConsoleDriver" data-throw-if-not-resolved="false"></xref> doesn't otherwise show
+
+    this
+  example: []
+  syntax:
+    content: public bool InvertSelectedCellFirstCharacter { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property InvertSelectedCellFirstCharacter As Boolean
+  overload: Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter*
+- uid: Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  commentId: P:Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  id: AlwaysUseNormalColorForVerticalCellLines
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: AlwaysUseNormalColorForVerticalCellLines
+  nameWithType: TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  fullName: Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AlwaysUseNormalColorForVerticalCellLines
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 70
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets a flag indicating whether to force <xref href="Terminal.Gui.ColorScheme.Normal" data-throw-if-not-resolved="false"></xref> use when rendering
+
+    vertical cell lines (even when <xref href="Terminal.Gui.TableView.FullRowSelect" data-throw-if-not-resolved="false"></xref> is on).
+  example: []
+  syntax:
+    content: public bool AlwaysUseNormalColorForVerticalCellLines { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property AlwaysUseNormalColorForVerticalCellLines As Boolean
+  overload: Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines*
+- uid: Terminal.Gui.TableStyle.ColumnStyles
+  commentId: P:Terminal.Gui.TableStyle.ColumnStyles
+  id: ColumnStyles
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ColumnStyles
+  nameWithType: TableStyle.ColumnStyles
+  fullName: Terminal.Gui.TableStyle.ColumnStyles
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColumnStyles
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 75
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
+  example: []
+  syntax:
+    content: public Dictionary<int, ColumnStyle> ColumnStyles { get; set; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.Dictionary{System.Int32,Terminal.Gui.ColumnStyle}
+    content.vb: Public Property ColumnStyles As Dictionary(Of Integer, ColumnStyle)
+  overload: Terminal.Gui.TableStyle.ColumnStyles*
+- uid: Terminal.Gui.TableStyle.RowColorGetter
+  commentId: P:Terminal.Gui.TableStyle.RowColorGetter
+  id: RowColorGetter
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: RowColorGetter
+  nameWithType: TableStyle.RowColorGetter
+  fullName: Terminal.Gui.TableStyle.RowColorGetter
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RowColorGetter
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 81
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Delegate for coloring specific rows in a different color.  For cell color <xref href="Terminal.Gui.ColumnStyle.ColorGetter" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public RowColorGetterDelegate RowColorGetter { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.RowColorGetterDelegate
+      description: ''
+    content.vb: Public Property RowColorGetter As RowColorGetterDelegate
+  overload: Terminal.Gui.TableStyle.RowColorGetter*
+- uid: Terminal.Gui.TableStyle.ExpandLastColumn
+  commentId: P:Terminal.Gui.TableStyle.ExpandLastColumn
+  id: ExpandLastColumn
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: ExpandLastColumn
+  nameWithType: TableStyle.ExpandLastColumn
+  fullName: Terminal.Gui.TableStyle.ExpandLastColumn
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ExpandLastColumn
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 91
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Determines rendering when the last column in the table is visible but it's
+
+    content or <xref href="Terminal.Gui.ColumnStyle.MaxWidth" data-throw-if-not-resolved="false"></xref> is less than the remaining 
+
+    space in the control.  True (the default) will expand the column to fill
+
+    the remaining bounds of the control.  False will draw a column ending line
+
+    and leave a blank column that cannot be selected in the remaining space.
+  example: []
+  syntax:
+    content: public bool ExpandLastColumn { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: Public Property ExpandLastColumn As Boolean
+  overload: Terminal.Gui.TableStyle.ExpandLastColumn*
+- uid: Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+  commentId: P:Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+  id: SmoothHorizontalScrolling
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: SmoothHorizontalScrolling
+  nameWithType: TableStyle.SmoothHorizontalScrolling
+  fullName: Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SmoothHorizontalScrolling
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 107
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    <p>
+
+    Determines how <xref href="Terminal.Gui.TableView.ColumnOffset" data-throw-if-not-resolved="false"></xref> is updated when scrolling
+
+    right off the end of the currently visible area.
+
+    </p>
+
+    <p>
+
+    If true then when scrolling right the scroll offset is increased the minimum required to show
+
+    the new column.  This may be slow if you have an incredibly large number of columns in
+
+    your table and/or slow <xref href="Terminal.Gui.ColumnStyle.RepresentationGetter" data-throw-if-not-resolved="false"></xref> implementations
+
+    </p>
+
+    <p>
+
+    If false then scroll offset is set to the currently selected column (i.e. PageRight).
+
+    </p>
+  example: []
+  syntax:
+    content: public bool SmoothHorizontalScrolling { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property SmoothHorizontalScrolling As Boolean
+  overload: Terminal.Gui.TableStyle.SmoothHorizontalScrolling*
+- uid: Terminal.Gui.TableStyle.GetColumnStyleIfAny(System.Int32)
+  commentId: M:Terminal.Gui.TableStyle.GetColumnStyleIfAny(System.Int32)
+  id: GetColumnStyleIfAny(System.Int32)
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: GetColumnStyleIfAny(int)
+  nameWithType: TableStyle.GetColumnStyleIfAny(int)
+  fullName: Terminal.Gui.TableStyle.GetColumnStyleIfAny(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetColumnStyleIfAny
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 114
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns the entry from <xref href="Terminal.Gui.TableStyle.ColumnStyles" data-throw-if-not-resolved="false"></xref> for the given <code class="paramref">col</code> or null if no custom styling is defined for it
+  example: []
+  syntax:
+    content: public ColumnStyle GetColumnStyleIfAny(int col)
+    parameters:
+    - id: col
+      type: System.Int32
+      description: ''
+    return:
+      type: Terminal.Gui.ColumnStyle
+      description: ''
+    content.vb: Public Function GetColumnStyleIfAny(col As Integer) As ColumnStyle
+  overload: Terminal.Gui.TableStyle.GetColumnStyleIfAny*
+  nameWithType.vb: TableStyle.GetColumnStyleIfAny(Integer)
+  fullName.vb: Terminal.Gui.TableStyle.GetColumnStyleIfAny(Integer)
+  name.vb: GetColumnStyleIfAny(Integer)
+- uid: Terminal.Gui.TableStyle.GetOrCreateColumnStyle(System.Int32)
+  commentId: M:Terminal.Gui.TableStyle.GetOrCreateColumnStyle(System.Int32)
+  id: GetOrCreateColumnStyle(System.Int32)
+  parent: Terminal.Gui.TableStyle
+  langs:
+  - csharp
+  - vb
+  name: GetOrCreateColumnStyle(int)
+  nameWithType: TableStyle.GetOrCreateColumnStyle(int)
+  fullName: Terminal.Gui.TableStyle.GetOrCreateColumnStyle(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TableStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetOrCreateColumnStyle
+    path: ../Terminal.Gui/Views/TableView/TableStyle.cs
+    startLine: 124
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns an existing <xref href="Terminal.Gui.ColumnStyle" data-throw-if-not-resolved="false"></xref> for the given <code class="paramref">col</code> or creates a new one with default options
+  example: []
+  syntax:
+    content: public ColumnStyle GetOrCreateColumnStyle(int col)
+    parameters:
+    - id: col
+      type: System.Int32
+      description: ''
+    return:
+      type: Terminal.Gui.ColumnStyle
+      description: ''
+    content.vb: Public Function GetOrCreateColumnStyle(col As Integer) As ColumnStyle
+  overload: Terminal.Gui.TableStyle.GetOrCreateColumnStyle*
+  nameWithType.vb: TableStyle.GetOrCreateColumnStyle(Integer)
+  fullName.vb: Terminal.Gui.TableStyle.GetOrCreateColumnStyle(Integer)
+  name.vb: GetOrCreateColumnStyle(Integer)
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  commentId: P:Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  name: ShowHorizontalHeaderOverline
+  nameWithType: TableStyle.ShowHorizontalHeaderOverline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+- uid: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  commentId: P:Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  name: ShowHorizontalHeaderUnderline
+  nameWithType: TableStyle.ShowHorizontalHeaderUnderline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+- uid: Terminal.Gui.TableStyle.ShowHeaders
+  commentId: P:Terminal.Gui.TableStyle.ShowHeaders
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHeaders
+  name: ShowHeaders
+  nameWithType: TableStyle.ShowHeaders
+  fullName: Terminal.Gui.TableStyle.ShowHeaders
+- uid: Terminal.Gui.TableStyle.ShowHeaders*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowHeaders
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHeaders
+  name: ShowHeaders
+  nameWithType: TableStyle.ShowHeaders
+  fullName: Terminal.Gui.TableStyle.ShowHeaders
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.TableStyle.AlwaysShowHeaders*
+  commentId: Overload:Terminal.Gui.TableStyle.AlwaysShowHeaders
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.AlwaysShowHeaders
+  name: AlwaysShowHeaders
+  nameWithType: TableStyle.AlwaysShowHeaders
+  fullName: Terminal.Gui.TableStyle.AlwaysShowHeaders
+- uid: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+  name: ShowHorizontalHeaderOverline
+  nameWithType: TableStyle.ShowHorizontalHeaderOverline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalHeaderOverline
+- uid: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+  name: ShowHorizontalHeaderUnderline
+  nameWithType: TableStyle.ShowHorizontalHeaderUnderline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalHeaderUnderline
+- uid: Terminal.Gui.TableStyle.ShowVerticalCellLines*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowVerticalCellLines
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowVerticalCellLines
+  name: ShowVerticalCellLines
+  nameWithType: TableStyle.ShowVerticalCellLines
+  fullName: Terminal.Gui.TableStyle.ShowVerticalCellLines
+- uid: Terminal.Gui.TableStyle.ShowVerticalHeaderLines*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+  name: ShowVerticalHeaderLines
+  nameWithType: TableStyle.ShowVerticalHeaderLines
+  fullName: Terminal.Gui.TableStyle.ShowVerticalHeaderLines
+- uid: Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+  name: ShowHorizontalScrollIndicators
+  nameWithType: TableStyle.ShowHorizontalScrollIndicators
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalScrollIndicators
+- uid: Terminal.Gui.TableStyle.ShowHorizontalBottomline*
+  commentId: Overload:Terminal.Gui.TableStyle.ShowHorizontalBottomline
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ShowHorizontalBottomline
+  name: ShowHorizontalBottomline
+  nameWithType: TableStyle.ShowHorizontalBottomline
+  fullName: Terminal.Gui.TableStyle.ShowHorizontalBottomline
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConsoleDriver.html
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+- uid: Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter*
+  commentId: Overload:Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+  name: InvertSelectedCellFirstCharacter
+  nameWithType: TableStyle.InvertSelectedCellFirstCharacter
+  fullName: Terminal.Gui.TableStyle.InvertSelectedCellFirstCharacter
+- uid: Terminal.Gui.ColorScheme.Normal
+  commentId: P:Terminal.Gui.ColorScheme.Normal
+  href: Terminal.Gui.ColorScheme.html#Terminal.Gui.ColorScheme.Normal
+  name: Normal
+  nameWithType: ColorScheme.Normal
+  fullName: Terminal.Gui.ColorScheme.Normal
+- uid: Terminal.Gui.TableView.FullRowSelect
+  commentId: P:Terminal.Gui.TableView.FullRowSelect
+  href: Terminal.Gui.TableView.html#Terminal.Gui.TableView.FullRowSelect
+  name: FullRowSelect
+  nameWithType: TableView.FullRowSelect
+  fullName: Terminal.Gui.TableView.FullRowSelect
+- uid: Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines*
+  commentId: Overload:Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  name: AlwaysUseNormalColorForVerticalCellLines
+  nameWithType: TableStyle.AlwaysUseNormalColorForVerticalCellLines
+  fullName: Terminal.Gui.TableStyle.AlwaysUseNormalColorForVerticalCellLines
+- uid: Terminal.Gui.TableStyle.ColumnStyles*
+  commentId: Overload:Terminal.Gui.TableStyle.ColumnStyles
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ColumnStyles
+  name: ColumnStyles
+  nameWithType: TableStyle.ColumnStyles
+  fullName: Terminal.Gui.TableStyle.ColumnStyles
+- uid: System.Collections.Generic.Dictionary{System.Int32,Terminal.Gui.ColumnStyle}
+  commentId: T:System.Collections.Generic.Dictionary{System.Int32,Terminal.Gui.ColumnStyle}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Dictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<int, ColumnStyle>
+  nameWithType: Dictionary<int, ColumnStyle>
+  fullName: System.Collections.Generic.Dictionary<int, Terminal.Gui.ColumnStyle>
+  nameWithType.vb: Dictionary(Of Integer, ColumnStyle)
+  fullName.vb: System.Collections.Generic.Dictionary(Of Integer, Terminal.Gui.ColumnStyle)
+  name.vb: Dictionary(Of Integer, ColumnStyle)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ColumnStyle
+    name: ColumnStyle
+    href: Terminal.Gui.ColumnStyle.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ColumnStyle
+    name: ColumnStyle
+    href: Terminal.Gui.ColumnStyle.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2
+  commentId: T:System.Collections.Generic.Dictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<TKey, TValue>
+  nameWithType: Dictionary<TKey, TValue>
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>
+  nameWithType.vb: Dictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue)
+  name.vb: Dictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.ColumnStyle.ColorGetter
+  commentId: F:Terminal.Gui.ColumnStyle.ColorGetter
+  href: Terminal.Gui.ColumnStyle.html#Terminal.Gui.ColumnStyle.ColorGetter
+  name: ColorGetter
+  nameWithType: ColumnStyle.ColorGetter
+  fullName: Terminal.Gui.ColumnStyle.ColorGetter
+- uid: Terminal.Gui.TableStyle.RowColorGetter*
+  commentId: Overload:Terminal.Gui.TableStyle.RowColorGetter
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.RowColorGetter
+  name: RowColorGetter
+  nameWithType: TableStyle.RowColorGetter
+  fullName: Terminal.Gui.TableStyle.RowColorGetter
+- uid: Terminal.Gui.RowColorGetterDelegate
+  commentId: T:Terminal.Gui.RowColorGetterDelegate
+  parent: Terminal.Gui
+  href: Terminal.Gui.RowColorGetterDelegate.html
+  name: RowColorGetterDelegate
+  nameWithType: RowColorGetterDelegate
+  fullName: Terminal.Gui.RowColorGetterDelegate
+- uid: Terminal.Gui.ColumnStyle.MaxWidth
+  commentId: P:Terminal.Gui.ColumnStyle.MaxWidth
+  href: Terminal.Gui.ColumnStyle.html#Terminal.Gui.ColumnStyle.MaxWidth
+  name: MaxWidth
+  nameWithType: ColumnStyle.MaxWidth
+  fullName: Terminal.Gui.ColumnStyle.MaxWidth
+- uid: Terminal.Gui.TableStyle.ExpandLastColumn*
+  commentId: Overload:Terminal.Gui.TableStyle.ExpandLastColumn
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ExpandLastColumn
+  name: ExpandLastColumn
+  nameWithType: TableStyle.ExpandLastColumn
+  fullName: Terminal.Gui.TableStyle.ExpandLastColumn
+- uid: Terminal.Gui.TableView.ColumnOffset
+  commentId: P:Terminal.Gui.TableView.ColumnOffset
+  href: Terminal.Gui.TableView.html#Terminal.Gui.TableView.ColumnOffset
+  name: ColumnOffset
+  nameWithType: TableView.ColumnOffset
+  fullName: Terminal.Gui.TableView.ColumnOffset
+- uid: Terminal.Gui.ColumnStyle.RepresentationGetter
+  commentId: F:Terminal.Gui.ColumnStyle.RepresentationGetter
+  href: Terminal.Gui.ColumnStyle.html#Terminal.Gui.ColumnStyle.RepresentationGetter
+  name: RepresentationGetter
+  nameWithType: ColumnStyle.RepresentationGetter
+  fullName: Terminal.Gui.ColumnStyle.RepresentationGetter
+- uid: Terminal.Gui.TableStyle.SmoothHorizontalScrolling*
+  commentId: Overload:Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+  name: SmoothHorizontalScrolling
+  nameWithType: TableStyle.SmoothHorizontalScrolling
+  fullName: Terminal.Gui.TableStyle.SmoothHorizontalScrolling
+- uid: Terminal.Gui.TableStyle.ColumnStyles
+  commentId: P:Terminal.Gui.TableStyle.ColumnStyles
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.ColumnStyles
+  name: ColumnStyles
+  nameWithType: TableStyle.ColumnStyles
+  fullName: Terminal.Gui.TableStyle.ColumnStyles
+- uid: Terminal.Gui.TableStyle.GetColumnStyleIfAny*
+  commentId: Overload:Terminal.Gui.TableStyle.GetColumnStyleIfAny
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.GetColumnStyleIfAny(System.Int32)
+  name: GetColumnStyleIfAny
+  nameWithType: TableStyle.GetColumnStyleIfAny
+  fullName: Terminal.Gui.TableStyle.GetColumnStyleIfAny
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.ColumnStyle
+  commentId: T:Terminal.Gui.ColumnStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColumnStyle.html
+  name: ColumnStyle
+  nameWithType: ColumnStyle
+  fullName: Terminal.Gui.ColumnStyle
+- uid: Terminal.Gui.TableStyle.GetOrCreateColumnStyle*
+  commentId: Overload:Terminal.Gui.TableStyle.GetOrCreateColumnStyle
+  href: Terminal.Gui.TableStyle.html#Terminal.Gui.TableStyle.GetOrCreateColumnStyle(System.Int32)
+  name: GetOrCreateColumnStyle
+  nameWithType: TableStyle.GetOrCreateColumnStyle
+  fullName: Terminal.Gui.TableStyle.GetOrCreateColumnStyle
+shouldSkipMarkup: true

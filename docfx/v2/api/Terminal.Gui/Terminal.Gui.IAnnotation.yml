@@ -1,0 +1,224 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.IAnnotation
+  commentId: T:Terminal.Gui.IAnnotation
+  id: IAnnotation
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.IAnnotation.BeforeSeries
+  - Terminal.Gui.IAnnotation.Render(Terminal.Gui.GraphView)
+  langs:
+  - csharp
+  - vb
+  name: IAnnotation
+  nameWithType: IAnnotation
+  fullName: Terminal.Gui.IAnnotation
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Annotations.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IAnnotation
+    path: ../Terminal.Gui/Views/GraphView/Annotations.cs
+    startLine: 16
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    <p>Describes an overlay element that is rendered either before or
+
+    after a series.</p>
+
+
+    <p>Annotations can be positioned either in screen space (e.g.
+
+    a legend) or in graph space (e.g. a line showing high point)
+
+    </p>
+
+    <p>Unlike <xref href="Terminal.Gui.ISeries" data-throw-if-not-resolved="false"></xref>, annotations are allowed to
+
+    draw into graph margins
+
+    </p>
+  example: []
+  syntax:
+    content: public interface IAnnotation
+    content.vb: Public Interface IAnnotation
+- uid: Terminal.Gui.IAnnotation.BeforeSeries
+  commentId: P:Terminal.Gui.IAnnotation.BeforeSeries
+  id: BeforeSeries
+  parent: Terminal.Gui.IAnnotation
+  langs:
+  - csharp
+  - vb
+  name: BeforeSeries
+  nameWithType: IAnnotation.BeforeSeries
+  fullName: Terminal.Gui.IAnnotation.BeforeSeries
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Annotations.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BeforeSeries
+    path: ../Terminal.Gui/Views/GraphView/Annotations.cs
+    startLine: 22
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    True if annotation should be drawn before <xref href="Terminal.Gui.ISeries" data-throw-if-not-resolved="false"></xref>.  This
+
+    allowes Series and later annotations to potentially draw over the top
+
+    of this annotation.
+  example: []
+  syntax:
+    content: bool BeforeSeries { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: ReadOnly Property BeforeSeries As Boolean
+  overload: Terminal.Gui.IAnnotation.BeforeSeries*
+- uid: Terminal.Gui.IAnnotation.Render(Terminal.Gui.GraphView)
+  commentId: M:Terminal.Gui.IAnnotation.Render(Terminal.Gui.GraphView)
+  id: Render(Terminal.Gui.GraphView)
+  parent: Terminal.Gui.IAnnotation
+  langs:
+  - csharp
+  - vb
+  name: Render(GraphView)
+  nameWithType: IAnnotation.Render(GraphView)
+  fullName: Terminal.Gui.IAnnotation.Render(Terminal.Gui.GraphView)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Annotations.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Render
+    path: ../Terminal.Gui/Views/GraphView/Annotations.cs
+    startLine: 30
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Called once after series have been rendered (or before if <xref href="Terminal.Gui.IAnnotation.BeforeSeries" data-throw-if-not-resolved="false"></xref> is true).
+
+    Use <xref href="Terminal.Gui.View.Driver" data-throw-if-not-resolved="false"></xref> to draw and <xref href="Terminal.Gui.View.Bounds" data-throw-if-not-resolved="false"></xref> to avoid drawing outside of
+
+    graph
+  example: []
+  syntax:
+    content: void Render(GraphView graph)
+    parameters:
+    - id: graph
+      type: Terminal.Gui.GraphView
+      description: ''
+    content.vb: Sub Render(graph As GraphView)
+  overload: Terminal.Gui.IAnnotation.Render*
+references:
+- uid: Terminal.Gui.ISeries
+  commentId: T:Terminal.Gui.ISeries
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISeries.html
+  name: ISeries
+  nameWithType: ISeries
+  fullName: Terminal.Gui.ISeries
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.IAnnotation.BeforeSeries*
+  commentId: Overload:Terminal.Gui.IAnnotation.BeforeSeries
+  href: Terminal.Gui.IAnnotation.html#Terminal.Gui.IAnnotation.BeforeSeries
+  name: BeforeSeries
+  nameWithType: IAnnotation.BeforeSeries
+  fullName: Terminal.Gui.IAnnotation.BeforeSeries
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.IAnnotation.BeforeSeries
+  commentId: P:Terminal.Gui.IAnnotation.BeforeSeries
+  parent: Terminal.Gui.IAnnotation
+  href: Terminal.Gui.IAnnotation.html#Terminal.Gui.IAnnotation.BeforeSeries
+  name: BeforeSeries
+  nameWithType: IAnnotation.BeforeSeries
+  fullName: Terminal.Gui.IAnnotation.BeforeSeries
+- uid: Terminal.Gui.View.Driver
+  commentId: P:Terminal.Gui.View.Driver
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.Driver
+  name: Driver
+  nameWithType: View.Driver
+  fullName: Terminal.Gui.View.Driver
+- uid: Terminal.Gui.View.Bounds
+  commentId: P:Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.Bounds
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: Terminal.Gui.View.Bounds
+- uid: Terminal.Gui.IAnnotation.Render*
+  commentId: Overload:Terminal.Gui.IAnnotation.Render
+  href: Terminal.Gui.IAnnotation.html#Terminal.Gui.IAnnotation.Render(Terminal.Gui.GraphView)
+  name: Render
+  nameWithType: IAnnotation.Render
+  fullName: Terminal.Gui.IAnnotation.Render
+- uid: Terminal.Gui.GraphView
+  commentId: T:Terminal.Gui.GraphView
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphView.html
+  name: GraphView
+  nameWithType: GraphView
+  fullName: Terminal.Gui.GraphView
+- uid: Terminal.Gui.IAnnotation
+  commentId: T:Terminal.Gui.IAnnotation
+  parent: Terminal.Gui
+  href: Terminal.Gui.IAnnotation.html
+  name: IAnnotation
+  nameWithType: IAnnotation
+  fullName: Terminal.Gui.IAnnotation
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+shouldSkipMarkup: true

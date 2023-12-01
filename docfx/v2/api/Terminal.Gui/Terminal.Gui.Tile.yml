@@ -1,0 +1,856 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Tile
+  commentId: T:Terminal.Gui.Tile
+  id: Tile
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.Tile.#ctor
+  - Terminal.Gui.Tile.ContentView
+  - Terminal.Gui.Tile.MinSize
+  - Terminal.Gui.Tile.OnTitleChanged(System.String,System.String)
+  - Terminal.Gui.Tile.OnTitleChanging(System.String,System.String)
+  - Terminal.Gui.Tile.Title
+  - Terminal.Gui.Tile.TitleChanged
+  - Terminal.Gui.Tile.TitleChanging
+  langs:
+  - csharp
+  - vb
+  name: Tile
+  nameWithType: Tile
+  fullName: Terminal.Gui.Tile
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Tile
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    A single <xref href="Terminal.Gui.Tile.ContentView" data-throw-if-not-resolved="false"></xref> presented in a <xref href="Terminal.Gui.TileView" data-throw-if-not-resolved="false"></xref>. To create
+
+    new instances use <xref href="Terminal.Gui.TileView.RebuildForTileCount(System.Int32)" data-throw-if-not-resolved="false"></xref> 
+
+    or <xref href="Terminal.Gui.TileView.InsertTile(System.Int32)" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public class Tile
+    content.vb: Public Class Tile
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.Tile.ContentView
+  commentId: P:Terminal.Gui.Tile.ContentView
+  id: ContentView
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: ContentView
+  nameWithType: Tile.ContentView
+  fullName: Terminal.Gui.Tile.ContentView
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ContentView
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 15
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The <xref href="Terminal.Gui.Tile.ContentView" data-throw-if-not-resolved="false"></xref> that is contained in this <xref href="Terminal.Gui.TileView" data-throw-if-not-resolved="false"></xref>.
+
+    Add new child views to this member for multiple 
+
+    <xref href="Terminal.Gui.Tile.ContentView" data-throw-if-not-resolved="false"></xref>s within the <xref href="Terminal.Gui.Tile" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public View ContentView { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.View
+    content.vb: Public Property ContentView As View
+  overload: Terminal.Gui.Tile.ContentView*
+- uid: Terminal.Gui.Tile.MinSize
+  commentId: P:Terminal.Gui.Tile.MinSize
+  id: MinSize
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: MinSize
+  nameWithType: Tile.MinSize
+  fullName: Terminal.Gui.Tile.MinSize
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MinSize
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or Sets the minimum size you to allow when splitter resizing along
+
+    parent <xref href="Terminal.Gui.TileView.Orientation" data-throw-if-not-resolved="false"></xref> direction.
+  example: []
+  syntax:
+    content: public int MinSize { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property MinSize As Integer
+  overload: Terminal.Gui.Tile.MinSize*
+- uid: Terminal.Gui.Tile.Title
+  commentId: P:Terminal.Gui.Tile.Title
+  id: Title
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: Title
+  nameWithType: Tile.Title
+  fullName: Terminal.Gui.Tile.Title
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Title
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 31
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The text that should be displayed above the <xref href="Terminal.Gui.Tile.ContentView" data-throw-if-not-resolved="false"></xref>. This 
+
+    will appear over the splitter line or border (above the view client area).
+  remarks: >-
+    Title are not rendered for root level tiles 
+
+    <xref href="Terminal.Gui.LineStyle" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.LineStyle.None" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public string Title { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property Title As String
+  overload: Terminal.Gui.Tile.Title*
+- uid: Terminal.Gui.Tile.OnTitleChanging(System.String,System.String)
+  commentId: M:Terminal.Gui.Tile.OnTitleChanging(System.String,System.String)
+  id: OnTitleChanging(System.String,System.String)
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: OnTitleChanging(string, string)
+  nameWithType: Tile.OnTitleChanging(string, string)
+  fullName: Terminal.Gui.Tile.OnTitleChanging(string, string)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OnTitleChanging
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 52
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Called before the <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> changes. Invokes the <xref href="Terminal.Gui.Tile.TitleChanging" data-throw-if-not-resolved="false"></xref> event, which can be cancelled.
+  example: []
+  syntax:
+    content: public virtual bool OnTitleChanging(string oldTitle, string newTitle)
+    parameters:
+    - id: oldTitle
+      type: System.String
+      description: The <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> that is/has been replaced.
+    - id: newTitle
+      type: System.String
+      description: The new <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> to be replaced.
+    return:
+      type: System.Boolean
+      description: <code>true</code> if an event handler cancelled the Title change.
+    content.vb: Public Overridable Function OnTitleChanging(oldTitle As String, newTitle As String) As Boolean
+  overload: Terminal.Gui.Tile.OnTitleChanging*
+  nameWithType.vb: Tile.OnTitleChanging(String, String)
+  fullName.vb: Terminal.Gui.Tile.OnTitleChanging(String, String)
+  name.vb: OnTitleChanging(String, String)
+- uid: Terminal.Gui.Tile.TitleChanging
+  commentId: E:Terminal.Gui.Tile.TitleChanging
+  id: TitleChanging
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: TitleChanging
+  nameWithType: Tile.TitleChanging
+  fullName: Terminal.Gui.Tile.TitleChanging
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TitleChanging
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 63
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Event fired when the <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> is changing. Set <xref href="Terminal.Gui.TitleEventArgs.Cancel" data-throw-if-not-resolved="false"></xref> to 
+
+    <code>true</code> to cancel the Title change.
+  example: []
+  syntax:
+    content: public event EventHandler<TitleEventArgs> TitleChanging
+    return:
+      type: System.EventHandler{Terminal.Gui.TitleEventArgs}
+    content.vb: Public Event TitleChanging As EventHandler(Of TitleEventArgs)
+- uid: Terminal.Gui.Tile.OnTitleChanged(System.String,System.String)
+  commentId: M:Terminal.Gui.Tile.OnTitleChanged(System.String,System.String)
+  id: OnTitleChanged(System.String,System.String)
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: OnTitleChanged(string, string)
+  nameWithType: Tile.OnTitleChanged(string, string)
+  fullName: Terminal.Gui.Tile.OnTitleChanged(string, string)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OnTitleChanged
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 70
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Called when the <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> has been changed. Invokes the <xref href="Terminal.Gui.Tile.TitleChanged" data-throw-if-not-resolved="false"></xref> event.
+  example: []
+  syntax:
+    content: public virtual void OnTitleChanged(string oldTitle, string newTitle)
+    parameters:
+    - id: oldTitle
+      type: System.String
+      description: The <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> that is/has been replaced.
+    - id: newTitle
+      type: System.String
+      description: The new <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> to be replaced.
+    content.vb: Public Overridable Sub OnTitleChanged(oldTitle As String, newTitle As String)
+  overload: Terminal.Gui.Tile.OnTitleChanged*
+  nameWithType.vb: Tile.OnTitleChanged(String, String)
+  fullName.vb: Terminal.Gui.Tile.OnTitleChanged(String, String)
+  name.vb: OnTitleChanged(String, String)
+- uid: Terminal.Gui.Tile.TitleChanged
+  commentId: E:Terminal.Gui.Tile.TitleChanged
+  id: TitleChanged
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: TitleChanged
+  nameWithType: Tile.TitleChanged
+  fullName: Terminal.Gui.Tile.TitleChanged
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TitleChanged
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 79
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Event fired after the <xref href="Terminal.Gui.Tile.Title" data-throw-if-not-resolved="false"></xref> has been changed.
+  example: []
+  syntax:
+    content: public event EventHandler<TitleEventArgs> TitleChanged
+    return:
+      type: System.EventHandler{Terminal.Gui.TitleEventArgs}
+    content.vb: Public Event TitleChanged As EventHandler(Of TitleEventArgs)
+- uid: Terminal.Gui.Tile.#ctor
+  commentId: M:Terminal.Gui.Tile.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.Tile
+  langs:
+  - csharp
+  - vb
+  name: Tile()
+  nameWithType: Tile.Tile()
+  fullName: Terminal.Gui.Tile.Tile()
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/Tile.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/Tile.cs
+    startLine: 84
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new instance of the <xref href="Terminal.Gui.Tile" data-throw-if-not-resolved="false"></xref> class.
+  example: []
+  syntax:
+    content: public Tile()
+    content.vb: Public Sub New()
+  overload: Terminal.Gui.Tile.#ctor*
+  nameWithType.vb: Tile.New()
+  fullName.vb: Terminal.Gui.Tile.New()
+  name.vb: New()
+references:
+- uid: Terminal.Gui.Tile.ContentView
+  commentId: P:Terminal.Gui.Tile.ContentView
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.ContentView
+  name: ContentView
+  nameWithType: Tile.ContentView
+  fullName: Terminal.Gui.Tile.ContentView
+- uid: Terminal.Gui.TileView
+  commentId: T:Terminal.Gui.TileView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TileView.html
+  name: TileView
+  nameWithType: TileView
+  fullName: Terminal.Gui.TileView
+- uid: Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+  commentId: M:Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+  isExternal: true
+  href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+  name: RebuildForTileCount(int)
+  nameWithType: TileView.RebuildForTileCount(int)
+  fullName: Terminal.Gui.TileView.RebuildForTileCount(int)
+  nameWithType.vb: TileView.RebuildForTileCount(Integer)
+  fullName.vb: Terminal.Gui.TileView.RebuildForTileCount(Integer)
+  name.vb: RebuildForTileCount(Integer)
+  spec.csharp:
+  - uid: Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+    name: RebuildForTileCount
+    href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+    name: RebuildForTileCount
+    href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.RebuildForTileCount(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: Terminal.Gui.TileView.InsertTile(System.Int32)
+  commentId: M:Terminal.Gui.TileView.InsertTile(System.Int32)
+  isExternal: true
+  href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.InsertTile(System.Int32)
+  name: InsertTile(int)
+  nameWithType: TileView.InsertTile(int)
+  fullName: Terminal.Gui.TileView.InsertTile(int)
+  nameWithType.vb: TileView.InsertTile(Integer)
+  fullName.vb: Terminal.Gui.TileView.InsertTile(Integer)
+  name.vb: InsertTile(Integer)
+  spec.csharp:
+  - uid: Terminal.Gui.TileView.InsertTile(System.Int32)
+    name: InsertTile
+    href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.InsertTile(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.TileView.InsertTile(System.Int32)
+    name: InsertTile
+    href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.InsertTile(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.Tile
+  commentId: T:Terminal.Gui.Tile
+  parent: Terminal.Gui
+  href: Terminal.Gui.Tile.html
+  name: Tile
+  nameWithType: Tile
+  fullName: Terminal.Gui.Tile
+- uid: Terminal.Gui.Tile.ContentView*
+  commentId: Overload:Terminal.Gui.Tile.ContentView
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.ContentView
+  name: ContentView
+  nameWithType: Tile.ContentView
+  fullName: Terminal.Gui.Tile.ContentView
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.TileView.Orientation
+  commentId: P:Terminal.Gui.TileView.Orientation
+  href: Terminal.Gui.TileView.html#Terminal.Gui.TileView.Orientation
+  name: Orientation
+  nameWithType: TileView.Orientation
+  fullName: Terminal.Gui.TileView.Orientation
+- uid: Terminal.Gui.Tile.MinSize*
+  commentId: Overload:Terminal.Gui.Tile.MinSize
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.MinSize
+  name: MinSize
+  nameWithType: Tile.MinSize
+  fullName: Terminal.Gui.Tile.MinSize
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.LineStyle
+  commentId: T:Terminal.Gui.LineStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.LineStyle.html
+  name: LineStyle
+  nameWithType: LineStyle
+  fullName: Terminal.Gui.LineStyle
+- uid: Terminal.Gui.LineStyle.None
+  commentId: F:Terminal.Gui.LineStyle.None
+  href: Terminal.Gui.LineStyle.html#Terminal.Gui.LineStyle.None
+  name: None
+  nameWithType: LineStyle.None
+  fullName: Terminal.Gui.LineStyle.None
+- uid: Terminal.Gui.Tile.Title*
+  commentId: Overload:Terminal.Gui.Tile.Title
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.Title
+  name: Title
+  nameWithType: Tile.Title
+  fullName: Terminal.Gui.Tile.Title
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: Terminal.Gui.Tile.Title
+  commentId: P:Terminal.Gui.Tile.Title
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.Title
+  name: Title
+  nameWithType: Tile.Title
+  fullName: Terminal.Gui.Tile.Title
+- uid: Terminal.Gui.Tile.TitleChanging
+  commentId: E:Terminal.Gui.Tile.TitleChanging
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.TitleChanging
+  name: TitleChanging
+  nameWithType: Tile.TitleChanging
+  fullName: Terminal.Gui.Tile.TitleChanging
+- uid: Terminal.Gui.Tile.OnTitleChanging*
+  commentId: Overload:Terminal.Gui.Tile.OnTitleChanging
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.OnTitleChanging(System.String,System.String)
+  name: OnTitleChanging
+  nameWithType: Tile.OnTitleChanging
+  fullName: Terminal.Gui.Tile.OnTitleChanging
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.TitleEventArgs.Cancel
+  commentId: P:Terminal.Gui.TitleEventArgs.Cancel
+  href: Terminal.Gui.TitleEventArgs.html#Terminal.Gui.TitleEventArgs.Cancel
+  name: Cancel
+  nameWithType: TitleEventArgs.Cancel
+  fullName: Terminal.Gui.TitleEventArgs.Cancel
+- uid: System.EventHandler{Terminal.Gui.TitleEventArgs}
+  commentId: T:System.EventHandler{Terminal.Gui.TitleEventArgs}
+  parent: System
+  definition: System.EventHandler`1
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<TitleEventArgs>
+  nameWithType: EventHandler<TitleEventArgs>
+  fullName: System.EventHandler<Terminal.Gui.TitleEventArgs>
+  nameWithType.vb: EventHandler(Of TitleEventArgs)
+  fullName.vb: System.EventHandler(Of Terminal.Gui.TitleEventArgs)
+  name.vb: EventHandler(Of TitleEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - uid: Terminal.Gui.TitleEventArgs
+    name: TitleEventArgs
+    href: Terminal.Gui.TitleEventArgs.html
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.TitleEventArgs
+    name: TitleEventArgs
+    href: Terminal.Gui.TitleEventArgs.html
+  - name: )
+- uid: System.EventHandler`1
+  commentId: T:System.EventHandler`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<TEventArgs>
+  nameWithType: EventHandler<TEventArgs>
+  fullName: System.EventHandler<TEventArgs>
+  nameWithType.vb: EventHandler(Of TEventArgs)
+  fullName.vb: System.EventHandler(Of TEventArgs)
+  name.vb: EventHandler(Of TEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - name: TEventArgs
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TEventArgs
+  - name: )
+- uid: Terminal.Gui.Tile.TitleChanged
+  commentId: E:Terminal.Gui.Tile.TitleChanged
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.TitleChanged
+  name: TitleChanged
+  nameWithType: Tile.TitleChanged
+  fullName: Terminal.Gui.Tile.TitleChanged
+- uid: Terminal.Gui.Tile.OnTitleChanged*
+  commentId: Overload:Terminal.Gui.Tile.OnTitleChanged
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.OnTitleChanged(System.String,System.String)
+  name: OnTitleChanged
+  nameWithType: Tile.OnTitleChanged
+  fullName: Terminal.Gui.Tile.OnTitleChanged
+- uid: Terminal.Gui.Tile.#ctor*
+  commentId: Overload:Terminal.Gui.Tile.#ctor
+  href: Terminal.Gui.Tile.html#Terminal.Gui.Tile.#ctor
+  name: Tile
+  nameWithType: Tile.Tile
+  fullName: Terminal.Gui.Tile.Tile
+  nameWithType.vb: Tile.New
+  fullName.vb: Terminal.Gui.Tile.New
+  name.vb: New
+shouldSkipMarkup: true

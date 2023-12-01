@@ -1,0 +1,998 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.IAutocomplete
+  commentId: T:Terminal.Gui.IAutocomplete
+  id: IAutocomplete
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.IAutocomplete.ClearSuggestions
+  - Terminal.Gui.IAutocomplete.CloseKey
+  - Terminal.Gui.IAutocomplete.ColorScheme
+  - Terminal.Gui.IAutocomplete.Context
+  - Terminal.Gui.IAutocomplete.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  - Terminal.Gui.IAutocomplete.HostControl
+  - Terminal.Gui.IAutocomplete.MaxHeight
+  - Terminal.Gui.IAutocomplete.MaxWidth
+  - Terminal.Gui.IAutocomplete.MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)
+  - Terminal.Gui.IAutocomplete.PopupInsideContainer
+  - Terminal.Gui.IAutocomplete.ProcessKey(Terminal.Gui.KeyEvent)
+  - Terminal.Gui.IAutocomplete.RenderOverlay(Terminal.Gui.Point)
+  - Terminal.Gui.IAutocomplete.Reopen
+  - Terminal.Gui.IAutocomplete.SelectedIdx
+  - Terminal.Gui.IAutocomplete.SelectionKey
+  - Terminal.Gui.IAutocomplete.SuggestionGenerator
+  - Terminal.Gui.IAutocomplete.Suggestions
+  - Terminal.Gui.IAutocomplete.Visible
+  langs:
+  - csharp
+  - vb
+  name: IAutocomplete
+  nameWithType: IAutocomplete
+  fullName: Terminal.Gui.IAutocomplete
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IAutocomplete
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 11
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Renders an overlay on another view at a given point that allows selecting
+
+    from a range of 'autocomplete' options.
+  example: []
+  syntax:
+    content: public interface IAutocomplete
+    content.vb: Public Interface IAutocomplete
+- uid: Terminal.Gui.IAutocomplete.HostControl
+  commentId: P:Terminal.Gui.IAutocomplete.HostControl
+  id: HostControl
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: HostControl
+  nameWithType: IAutocomplete.HostControl
+  fullName: Terminal.Gui.IAutocomplete.HostControl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HostControl
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 16
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The host control that will use autocomplete.
+  example: []
+  syntax:
+    content: View HostControl { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.View
+    content.vb: Property HostControl As View
+  overload: Terminal.Gui.IAutocomplete.HostControl*
+- uid: Terminal.Gui.IAutocomplete.PopupInsideContainer
+  commentId: P:Terminal.Gui.IAutocomplete.PopupInsideContainer
+  id: PopupInsideContainer
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: PopupInsideContainer
+  nameWithType: IAutocomplete.PopupInsideContainer
+  fullName: Terminal.Gui.IAutocomplete.PopupInsideContainer
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PopupInsideContainer
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 21
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets where the popup will be displayed.
+  example: []
+  syntax:
+    content: bool PopupInsideContainer { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Property PopupInsideContainer As Boolean
+  overload: Terminal.Gui.IAutocomplete.PopupInsideContainer*
+- uid: Terminal.Gui.IAutocomplete.MaxWidth
+  commentId: P:Terminal.Gui.IAutocomplete.MaxWidth
+  id: MaxWidth
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: MaxWidth
+  nameWithType: IAutocomplete.MaxWidth
+  fullName: Terminal.Gui.IAutocomplete.MaxWidth
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MaxWidth
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 26
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The maximum width of the autocomplete dropdown
+  example: []
+  syntax:
+    content: int MaxWidth { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Property MaxWidth As Integer
+  overload: Terminal.Gui.IAutocomplete.MaxWidth*
+- uid: Terminal.Gui.IAutocomplete.MaxHeight
+  commentId: P:Terminal.Gui.IAutocomplete.MaxHeight
+  id: MaxHeight
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: MaxHeight
+  nameWithType: IAutocomplete.MaxHeight
+  fullName: Terminal.Gui.IAutocomplete.MaxHeight
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MaxHeight
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 31
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The maximum number of visible rows in the autocomplete dropdown to render
+  example: []
+  syntax:
+    content: int MaxHeight { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Property MaxHeight As Integer
+  overload: Terminal.Gui.IAutocomplete.MaxHeight*
+- uid: Terminal.Gui.IAutocomplete.Visible
+  commentId: P:Terminal.Gui.IAutocomplete.Visible
+  id: Visible
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: Visible
+  nameWithType: IAutocomplete.Visible
+  fullName: Terminal.Gui.IAutocomplete.Visible
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Visible
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 36
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: True if the autocomplete should be considered open and visible
+  example: []
+  syntax:
+    content: bool Visible { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Property Visible As Boolean
+  overload: Terminal.Gui.IAutocomplete.Visible*
+- uid: Terminal.Gui.IAutocomplete.Suggestions
+  commentId: P:Terminal.Gui.IAutocomplete.Suggestions
+  id: Suggestions
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: Suggestions
+  nameWithType: IAutocomplete.Suggestions
+  fullName: Terminal.Gui.IAutocomplete.Suggestions
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Suggestions
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 42
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The strings that form the current list of suggestions to render
+
+    based on what the user has typed so far.
+  example: []
+  syntax:
+    content: ReadOnlyCollection<Suggestion> Suggestions { get; set; }
+    parameters: []
+    return:
+      type: System.Collections.ObjectModel.ReadOnlyCollection{Terminal.Gui.Suggestion}
+    content.vb: Property Suggestions As ReadOnlyCollection(Of Suggestion)
+  overload: Terminal.Gui.IAutocomplete.Suggestions*
+- uid: Terminal.Gui.IAutocomplete.SelectedIdx
+  commentId: P:Terminal.Gui.IAutocomplete.SelectedIdx
+  id: SelectedIdx
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: SelectedIdx
+  nameWithType: IAutocomplete.SelectedIdx
+  fullName: Terminal.Gui.IAutocomplete.SelectedIdx
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SelectedIdx
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 47
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The currently selected index into <xref href="Terminal.Gui.IAutocomplete.Suggestions" data-throw-if-not-resolved="false"></xref> that the user has highlighted
+  example: []
+  syntax:
+    content: int SelectedIdx { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Property SelectedIdx As Integer
+  overload: Terminal.Gui.IAutocomplete.SelectedIdx*
+- uid: Terminal.Gui.IAutocomplete.ColorScheme
+  commentId: P:Terminal.Gui.IAutocomplete.ColorScheme
+  id: ColorScheme
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: ColorScheme
+  nameWithType: IAutocomplete.ColorScheme
+  fullName: Terminal.Gui.IAutocomplete.ColorScheme
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColorScheme
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 53
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The colors to use to render the overlay. Accessing this property before
+
+    the Application has been initialized will cause an error
+  example: []
+  syntax:
+    content: ColorScheme ColorScheme { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ColorScheme
+    content.vb: Property ColorScheme As ColorScheme
+  overload: Terminal.Gui.IAutocomplete.ColorScheme*
+- uid: Terminal.Gui.IAutocomplete.SelectionKey
+  commentId: P:Terminal.Gui.IAutocomplete.SelectionKey
+  id: SelectionKey
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: SelectionKey
+  nameWithType: IAutocomplete.SelectionKey
+  fullName: Terminal.Gui.IAutocomplete.SelectionKey
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SelectionKey
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 58
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The key that the user must press to accept the currently selected autocomplete suggestion
+  example: []
+  syntax:
+    content: Key SelectionKey { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Key
+    content.vb: Property SelectionKey As Key
+  overload: Terminal.Gui.IAutocomplete.SelectionKey*
+- uid: Terminal.Gui.IAutocomplete.CloseKey
+  commentId: P:Terminal.Gui.IAutocomplete.CloseKey
+  id: CloseKey
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: CloseKey
+  nameWithType: IAutocomplete.CloseKey
+  fullName: Terminal.Gui.IAutocomplete.CloseKey
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CloseKey
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 63
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The key that the user can press to close the currently popped autocomplete menu
+  example: []
+  syntax:
+    content: Key CloseKey { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Key
+    content.vb: Property CloseKey As Key
+  overload: Terminal.Gui.IAutocomplete.CloseKey*
+- uid: Terminal.Gui.IAutocomplete.Reopen
+  commentId: P:Terminal.Gui.IAutocomplete.Reopen
+  id: Reopen
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: Reopen
+  nameWithType: IAutocomplete.Reopen
+  fullName: Terminal.Gui.IAutocomplete.Reopen
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Reopen
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 68
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The key that the user can press to reopen the currently popped autocomplete menu
+  example: []
+  syntax:
+    content: Key Reopen { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Key
+    content.vb: Property Reopen As Key
+  overload: Terminal.Gui.IAutocomplete.Reopen*
+- uid: Terminal.Gui.IAutocomplete.Context
+  commentId: P:Terminal.Gui.IAutocomplete.Context
+  id: Context
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: Context
+  nameWithType: IAutocomplete.Context
+  fullName: Terminal.Gui.IAutocomplete.Context
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Context
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 73
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The context used by the autocomplete menu.
+  example: []
+  syntax:
+    content: AutocompleteContext Context { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.AutocompleteContext
+    content.vb: Property Context As AutocompleteContext
+  overload: Terminal.Gui.IAutocomplete.Context*
+- uid: Terminal.Gui.IAutocomplete.RenderOverlay(Terminal.Gui.Point)
+  commentId: M:Terminal.Gui.IAutocomplete.RenderOverlay(Terminal.Gui.Point)
+  id: RenderOverlay(Terminal.Gui.Point)
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: RenderOverlay(Point)
+  nameWithType: IAutocomplete.RenderOverlay(Point)
+  fullName: Terminal.Gui.IAutocomplete.RenderOverlay(Terminal.Gui.Point)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RenderOverlay
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 80
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Renders the autocomplete dialog inside the given <xref href="Terminal.Gui.IAutocomplete.HostControl" data-throw-if-not-resolved="false"></xref> at the
+
+    given point.
+  example: []
+  syntax:
+    content: void RenderOverlay(Point renderAt)
+    parameters:
+    - id: renderAt
+      type: Terminal.Gui.Point
+      description: ''
+    content.vb: Sub RenderOverlay(renderAt As Point)
+  overload: Terminal.Gui.IAutocomplete.RenderOverlay*
+- uid: Terminal.Gui.IAutocomplete.ProcessKey(Terminal.Gui.KeyEvent)
+  commentId: M:Terminal.Gui.IAutocomplete.ProcessKey(Terminal.Gui.KeyEvent)
+  id: ProcessKey(Terminal.Gui.KeyEvent)
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: ProcessKey(KeyEvent)
+  nameWithType: IAutocomplete.ProcessKey(KeyEvent)
+  fullName: Terminal.Gui.IAutocomplete.ProcessKey(Terminal.Gui.KeyEvent)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ProcessKey
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 89
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Handle key events before <xref href="Terminal.Gui.IAutocomplete.HostControl" data-throw-if-not-resolved="false"></xref> e.g. to make key events like
+
+    up/down apply to the autocomplete control instead of changing the cursor position in
+
+    the underlying text view.
+  example: []
+  syntax:
+    content: bool ProcessKey(KeyEvent kb)
+    parameters:
+    - id: kb
+      type: Terminal.Gui.KeyEvent
+      description: The key event.
+    return:
+      type: System.Boolean
+      description: <code>true</code>if the key can be handled <code>false</code>otherwise.
+    content.vb: Function ProcessKey(kb As KeyEvent) As Boolean
+  overload: Terminal.Gui.IAutocomplete.ProcessKey*
+- uid: Terminal.Gui.IAutocomplete.MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)
+  commentId: M:Terminal.Gui.IAutocomplete.MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)
+  id: MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: MouseEvent(MouseEvent, bool)
+  nameWithType: IAutocomplete.MouseEvent(MouseEvent, bool)
+  fullName: Terminal.Gui.IAutocomplete.MouseEvent(Terminal.Gui.MouseEvent, bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MouseEvent
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 99
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Handle mouse events before <xref href="Terminal.Gui.IAutocomplete.HostControl" data-throw-if-not-resolved="false"></xref> e.g. to make mouse events like
+
+    report/click apply to the autocomplete control instead of changing the cursor position in
+
+    the underlying text view.
+  example: []
+  syntax:
+    content: bool MouseEvent(MouseEvent me, bool fromHost = false)
+    parameters:
+    - id: me
+      type: Terminal.Gui.MouseEvent
+      description: The mouse event.
+    - id: fromHost
+      type: System.Boolean
+      description: If was called from the popup or from the host.
+    return:
+      type: System.Boolean
+      description: <code>true</code>if the mouse can be handled <code>false</code>otherwise.
+    content.vb: Function MouseEvent([me] As MouseEvent, fromHost As Boolean = False) As Boolean
+  overload: Terminal.Gui.IAutocomplete.MouseEvent*
+  nameWithType.vb: IAutocomplete.MouseEvent(MouseEvent, Boolean)
+  fullName.vb: Terminal.Gui.IAutocomplete.MouseEvent(Terminal.Gui.MouseEvent, Boolean)
+  name.vb: MouseEvent(MouseEvent, Boolean)
+- uid: Terminal.Gui.IAutocomplete.ClearSuggestions
+  commentId: M:Terminal.Gui.IAutocomplete.ClearSuggestions
+  id: ClearSuggestions
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: ClearSuggestions()
+  nameWithType: IAutocomplete.ClearSuggestions()
+  fullName: Terminal.Gui.IAutocomplete.ClearSuggestions()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClearSuggestions
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 104
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Clears <xref href="Terminal.Gui.IAutocomplete.Suggestions" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: void ClearSuggestions()
+    content.vb: Sub ClearSuggestions()
+  overload: Terminal.Gui.IAutocomplete.ClearSuggestions*
+- uid: Terminal.Gui.IAutocomplete.SuggestionGenerator
+  commentId: P:Terminal.Gui.IAutocomplete.SuggestionGenerator
+  id: SuggestionGenerator
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: SuggestionGenerator
+  nameWithType: IAutocomplete.SuggestionGenerator
+  fullName: Terminal.Gui.IAutocomplete.SuggestionGenerator
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SuggestionGenerator
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 110
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or Sets the class responsible for generating <xref href="Terminal.Gui.IAutocomplete.Suggestions" data-throw-if-not-resolved="false"></xref>
+
+    based on a given <xref href="Terminal.Gui.AutocompleteContext" data-throw-if-not-resolved="false"></xref> of the <xref href="Terminal.Gui.IAutocomplete.HostControl" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: ISuggestionGenerator SuggestionGenerator { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ISuggestionGenerator
+    content.vb: Property SuggestionGenerator As ISuggestionGenerator
+  overload: Terminal.Gui.IAutocomplete.SuggestionGenerator*
+- uid: Terminal.Gui.IAutocomplete.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  commentId: M:Terminal.Gui.IAutocomplete.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  id: GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  parent: Terminal.Gui.IAutocomplete
+  langs:
+  - csharp
+  - vb
+  name: GenerateSuggestions(AutocompleteContext)
+  nameWithType: IAutocomplete.GenerateSuggestions(AutocompleteContext)
+  fullName: Terminal.Gui.IAutocomplete.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GenerateSuggestions
+    path: ../Terminal.Gui/Text/Autocomplete/IAutocomplete.cs
+    startLine: 117
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Populates <xref href="Terminal.Gui.IAutocomplete.Suggestions" data-throw-if-not-resolved="false"></xref> with all <xref href="Terminal.Gui.Suggestion" data-throw-if-not-resolved="false"></xref> 
+
+    proposed by <xref href="Terminal.Gui.IAutocomplete.SuggestionGenerator" data-throw-if-not-resolved="false"></xref> at the given <code class="paramref">context</code>
+
+    (cursor position)
+  example: []
+  syntax:
+    content: void GenerateSuggestions(AutocompleteContext context)
+    parameters:
+    - id: context
+      type: Terminal.Gui.AutocompleteContext
+    content.vb: Sub GenerateSuggestions(context As AutocompleteContext)
+  overload: Terminal.Gui.IAutocomplete.GenerateSuggestions*
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.IAutocomplete.HostControl*
+  commentId: Overload:Terminal.Gui.IAutocomplete.HostControl
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.HostControl
+  name: HostControl
+  nameWithType: IAutocomplete.HostControl
+  fullName: Terminal.Gui.IAutocomplete.HostControl
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.IAutocomplete.PopupInsideContainer*
+  commentId: Overload:Terminal.Gui.IAutocomplete.PopupInsideContainer
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.PopupInsideContainer
+  name: PopupInsideContainer
+  nameWithType: IAutocomplete.PopupInsideContainer
+  fullName: Terminal.Gui.IAutocomplete.PopupInsideContainer
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.IAutocomplete.MaxWidth*
+  commentId: Overload:Terminal.Gui.IAutocomplete.MaxWidth
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.MaxWidth
+  name: MaxWidth
+  nameWithType: IAutocomplete.MaxWidth
+  fullName: Terminal.Gui.IAutocomplete.MaxWidth
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.IAutocomplete.MaxHeight*
+  commentId: Overload:Terminal.Gui.IAutocomplete.MaxHeight
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.MaxHeight
+  name: MaxHeight
+  nameWithType: IAutocomplete.MaxHeight
+  fullName: Terminal.Gui.IAutocomplete.MaxHeight
+- uid: Terminal.Gui.IAutocomplete.Visible*
+  commentId: Overload:Terminal.Gui.IAutocomplete.Visible
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.Visible
+  name: Visible
+  nameWithType: IAutocomplete.Visible
+  fullName: Terminal.Gui.IAutocomplete.Visible
+- uid: Terminal.Gui.IAutocomplete.Suggestions*
+  commentId: Overload:Terminal.Gui.IAutocomplete.Suggestions
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.Suggestions
+  name: Suggestions
+  nameWithType: IAutocomplete.Suggestions
+  fullName: Terminal.Gui.IAutocomplete.Suggestions
+- uid: System.Collections.ObjectModel.ReadOnlyCollection{Terminal.Gui.Suggestion}
+  commentId: T:System.Collections.ObjectModel.ReadOnlyCollection{Terminal.Gui.Suggestion}
+  parent: System.Collections.ObjectModel
+  definition: System.Collections.ObjectModel.ReadOnlyCollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+  name: ReadOnlyCollection<Suggestion>
+  nameWithType: ReadOnlyCollection<Suggestion>
+  fullName: System.Collections.ObjectModel.ReadOnlyCollection<Terminal.Gui.Suggestion>
+  nameWithType.vb: ReadOnlyCollection(Of Suggestion)
+  fullName.vb: System.Collections.ObjectModel.ReadOnlyCollection(Of Terminal.Gui.Suggestion)
+  name.vb: ReadOnlyCollection(Of Suggestion)
+  spec.csharp:
+  - uid: System.Collections.ObjectModel.ReadOnlyCollection`1
+    name: ReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+  - name: <
+  - uid: Terminal.Gui.Suggestion
+    name: Suggestion
+    href: Terminal.Gui.Suggestion.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.ObjectModel.ReadOnlyCollection`1
+    name: ReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.Suggestion
+    name: Suggestion
+    href: Terminal.Gui.Suggestion.html
+  - name: )
+- uid: System.Collections.ObjectModel.ReadOnlyCollection`1
+  commentId: T:System.Collections.ObjectModel.ReadOnlyCollection`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+  name: ReadOnlyCollection<T>
+  nameWithType: ReadOnlyCollection<T>
+  fullName: System.Collections.ObjectModel.ReadOnlyCollection<T>
+  nameWithType.vb: ReadOnlyCollection(Of T)
+  fullName.vb: System.Collections.ObjectModel.ReadOnlyCollection(Of T)
+  name.vb: ReadOnlyCollection(Of T)
+  spec.csharp:
+  - uid: System.Collections.ObjectModel.ReadOnlyCollection`1
+    name: ReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.ObjectModel.ReadOnlyCollection`1
+    name: ReadOnlyCollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel.readonlycollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.ObjectModel
+  commentId: N:System.Collections.ObjectModel
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.ObjectModel
+  nameWithType: System.Collections.ObjectModel
+  fullName: System.Collections.ObjectModel
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.ObjectModel
+    name: ObjectModel
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.ObjectModel
+    name: ObjectModel
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.objectmodel
+- uid: Terminal.Gui.IAutocomplete.Suggestions
+  commentId: P:Terminal.Gui.IAutocomplete.Suggestions
+  parent: Terminal.Gui.IAutocomplete
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.Suggestions
+  name: Suggestions
+  nameWithType: IAutocomplete.Suggestions
+  fullName: Terminal.Gui.IAutocomplete.Suggestions
+- uid: Terminal.Gui.IAutocomplete.SelectedIdx*
+  commentId: Overload:Terminal.Gui.IAutocomplete.SelectedIdx
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.SelectedIdx
+  name: SelectedIdx
+  nameWithType: IAutocomplete.SelectedIdx
+  fullName: Terminal.Gui.IAutocomplete.SelectedIdx
+- uid: Terminal.Gui.IAutocomplete
+  commentId: T:Terminal.Gui.IAutocomplete
+  parent: Terminal.Gui
+  href: Terminal.Gui.IAutocomplete.html
+  name: IAutocomplete
+  nameWithType: IAutocomplete
+  fullName: Terminal.Gui.IAutocomplete
+- uid: Terminal.Gui.IAutocomplete.ColorScheme*
+  commentId: Overload:Terminal.Gui.IAutocomplete.ColorScheme
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.ColorScheme
+  name: ColorScheme
+  nameWithType: IAutocomplete.ColorScheme
+  fullName: Terminal.Gui.IAutocomplete.ColorScheme
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorScheme.html
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
+- uid: Terminal.Gui.IAutocomplete.SelectionKey*
+  commentId: Overload:Terminal.Gui.IAutocomplete.SelectionKey
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.SelectionKey
+  name: SelectionKey
+  nameWithType: IAutocomplete.SelectionKey
+  fullName: Terminal.Gui.IAutocomplete.SelectionKey
+- uid: Terminal.Gui.Key
+  commentId: T:Terminal.Gui.Key
+  parent: Terminal.Gui
+  href: Terminal.Gui.Key.html
+  name: Key
+  nameWithType: Key
+  fullName: Terminal.Gui.Key
+- uid: Terminal.Gui.IAutocomplete.CloseKey*
+  commentId: Overload:Terminal.Gui.IAutocomplete.CloseKey
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.CloseKey
+  name: CloseKey
+  nameWithType: IAutocomplete.CloseKey
+  fullName: Terminal.Gui.IAutocomplete.CloseKey
+- uid: Terminal.Gui.IAutocomplete.Reopen*
+  commentId: Overload:Terminal.Gui.IAutocomplete.Reopen
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.Reopen
+  name: Reopen
+  nameWithType: IAutocomplete.Reopen
+  fullName: Terminal.Gui.IAutocomplete.Reopen
+- uid: Terminal.Gui.IAutocomplete.Context*
+  commentId: Overload:Terminal.Gui.IAutocomplete.Context
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.Context
+  name: Context
+  nameWithType: IAutocomplete.Context
+  fullName: Terminal.Gui.IAutocomplete.Context
+- uid: Terminal.Gui.AutocompleteContext
+  commentId: T:Terminal.Gui.AutocompleteContext
+  parent: Terminal.Gui
+  href: Terminal.Gui.AutocompleteContext.html
+  name: AutocompleteContext
+  nameWithType: AutocompleteContext
+  fullName: Terminal.Gui.AutocompleteContext
+- uid: Terminal.Gui.IAutocomplete.HostControl
+  commentId: P:Terminal.Gui.IAutocomplete.HostControl
+  parent: Terminal.Gui.IAutocomplete
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.HostControl
+  name: HostControl
+  nameWithType: IAutocomplete.HostControl
+  fullName: Terminal.Gui.IAutocomplete.HostControl
+- uid: Terminal.Gui.IAutocomplete.RenderOverlay*
+  commentId: Overload:Terminal.Gui.IAutocomplete.RenderOverlay
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.RenderOverlay(Terminal.Gui.Point)
+  name: RenderOverlay
+  nameWithType: IAutocomplete.RenderOverlay
+  fullName: Terminal.Gui.IAutocomplete.RenderOverlay
+- uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
+  parent: Terminal.Gui
+  href: Terminal.Gui.Point.html
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.IAutocomplete.ProcessKey*
+  commentId: Overload:Terminal.Gui.IAutocomplete.ProcessKey
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.ProcessKey(Terminal.Gui.KeyEvent)
+  name: ProcessKey
+  nameWithType: IAutocomplete.ProcessKey
+  fullName: Terminal.Gui.IAutocomplete.ProcessKey
+- uid: Terminal.Gui.KeyEvent
+  commentId: T:Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  href: Terminal.Gui.KeyEvent.html
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.IAutocomplete.MouseEvent*
+  commentId: Overload:Terminal.Gui.IAutocomplete.MouseEvent
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)
+  name: MouseEvent
+  nameWithType: IAutocomplete.MouseEvent
+  fullName: Terminal.Gui.IAutocomplete.MouseEvent
+- uid: Terminal.Gui.MouseEvent
+  commentId: T:Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  href: Terminal.Gui.MouseEvent.html
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.IAutocomplete.ClearSuggestions*
+  commentId: Overload:Terminal.Gui.IAutocomplete.ClearSuggestions
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.ClearSuggestions
+  name: ClearSuggestions
+  nameWithType: IAutocomplete.ClearSuggestions
+  fullName: Terminal.Gui.IAutocomplete.ClearSuggestions
+- uid: Terminal.Gui.IAutocomplete.SuggestionGenerator*
+  commentId: Overload:Terminal.Gui.IAutocomplete.SuggestionGenerator
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.SuggestionGenerator
+  name: SuggestionGenerator
+  nameWithType: IAutocomplete.SuggestionGenerator
+  fullName: Terminal.Gui.IAutocomplete.SuggestionGenerator
+- uid: Terminal.Gui.ISuggestionGenerator
+  commentId: T:Terminal.Gui.ISuggestionGenerator
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISuggestionGenerator.html
+  name: ISuggestionGenerator
+  nameWithType: ISuggestionGenerator
+  fullName: Terminal.Gui.ISuggestionGenerator
+- uid: Terminal.Gui.Suggestion
+  commentId: T:Terminal.Gui.Suggestion
+  parent: Terminal.Gui
+  href: Terminal.Gui.Suggestion.html
+  name: Suggestion
+  nameWithType: Suggestion
+  fullName: Terminal.Gui.Suggestion
+- uid: Terminal.Gui.IAutocomplete.SuggestionGenerator
+  commentId: P:Terminal.Gui.IAutocomplete.SuggestionGenerator
+  parent: Terminal.Gui.IAutocomplete
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.SuggestionGenerator
+  name: SuggestionGenerator
+  nameWithType: IAutocomplete.SuggestionGenerator
+  fullName: Terminal.Gui.IAutocomplete.SuggestionGenerator
+- uid: Terminal.Gui.IAutocomplete.GenerateSuggestions*
+  commentId: Overload:Terminal.Gui.IAutocomplete.GenerateSuggestions
+  href: Terminal.Gui.IAutocomplete.html#Terminal.Gui.IAutocomplete.GenerateSuggestions(Terminal.Gui.AutocompleteContext)
+  name: GenerateSuggestions
+  nameWithType: IAutocomplete.GenerateSuggestions
+  fullName: Terminal.Gui.IAutocomplete.GenerateSuggestions
+shouldSkipMarkup: true

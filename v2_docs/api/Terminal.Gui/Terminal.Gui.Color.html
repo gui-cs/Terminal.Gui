@@ -1,0 +1,1742 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Color
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Color
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../../">
+  
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.Color">
+
+
+
+  <h1 id="Terminal_Gui_Color" data-uid="Terminal.Gui.Color" class="text-break">Class Color
+</h1>
+  <div class="markdown level0 summary">Represents a 24-bit color. Provides automatic mapping between the legacy 4-bit (16 color) system and 24-bit colors (see <a class="xref" href="Terminal.Gui.Color.html#Terminal_Gui_Color_ColorName">ColorName</a>).
+Used with <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>.</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">Color</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Terminal.Gui.Color.html">Color</a>&gt;</div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.html">Terminal</a>.<a class="xref" href="Terminal.Gui.html">Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_Color_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">[JsonConverter(typeof(ColorJsonConverter))]
+public class Color : IEquatable&lt;Color&gt;</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L155">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color__ctor_" data-uid="Terminal.Gui.Color.#ctor*"></a>
+  <h4 id="Terminal_Gui_Color__ctor" data-uid="Terminal.Gui.Color.#ctor">Color()</h4>
+  <div class="markdown level1 summary">Initializes a new instance of the <a class="xref" href="Terminal.Gui.Color.html">Color</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Color()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color__ctor_System_Int32_System_Int32_System_Int32_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.%23ctor(System.Int32%2CSystem.Int32%2CSystem.Int32%2CSystem.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L106">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color__ctor_" data-uid="Terminal.Gui.Color.#ctor*"></a>
+  <h4 id="Terminal_Gui_Color__ctor_System_Int32_System_Int32_System_Int32_System_Int32_" data-uid="Terminal.Gui.Color.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">Color(int, int, int, int)</h4>
+  <div class="markdown level1 summary">Initializes a new instance of the <a class="xref" href="Terminal.Gui.Color.html">Color</a> class.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Color(int red, int green, int blue, int alpha = 255)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">red</span></td>
+        <td>The red 8-bits.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">green</span></td>
+        <td>The green 8-bits.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">blue</span></td>
+        <td>The blue 8-bits.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">alpha</span></td>
+        <td>Optional; defaults to 0xFF. The Alpha channel is not supported by Terminal.Gui.</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color__ctor_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.%23ctor(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L118">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color__ctor_" data-uid="Terminal.Gui.Color.#ctor*"></a>
+  <h4 id="Terminal_Gui_Color__ctor_System_Int32_" data-uid="Terminal.Gui.Color.#ctor(System.Int32)">Color(int)</h4>
+  <div class="markdown level1 summary">Initializes a new instance of the <a class="xref" href="Terminal.Gui.Color.html">Color</a> class with an encoded 24-bit color value.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Color(int rgba)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">rgba</span></td>
+        <td>The encoded 24-bit color value (see <a class="xref" href="Terminal.Gui.Color.html#Terminal_Gui_Color_Rgba">Rgba</a>).</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color__ctor_System_String_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.%23ctor(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L141">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color__ctor_" data-uid="Terminal.Gui.Color.#ctor*"></a>
+  <h4 id="Terminal_Gui_Color__ctor_System_String_" data-uid="Terminal.Gui.Color.#ctor(System.String)">Color(string)</h4>
+  <div class="markdown level1 summary">Initializes a new instance of the <a class="xref" href="Terminal.Gui.Color.html">Color</a> color from string. See <a class="xref" href="Terminal.Gui.Color.html#Terminal_Gui_Color_TryParse_System_String_Terminal_Gui_Color__">TryParse(string, out Color)</a> for details.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Color(string colorString)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">colorString</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.exception">Exception</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color__ctor_Terminal_Gui_ColorName_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.%23ctor(Terminal.Gui.ColorName)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L127">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color__ctor_" data-uid="Terminal.Gui.Color.#ctor*"></a>
+  <h4 id="Terminal_Gui_Color__ctor_Terminal_Gui_ColorName_" data-uid="Terminal.Gui.Color.#ctor(Terminal.Gui.ColorName)">Color(ColorName)</h4>
+  <div class="markdown level1 summary">Initializes a new instance of the <a class="xref" href="Terminal.Gui.Color.html">Color</a> color from a legacy 16-color value.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Color(ColorName colorName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td><span class="parametername">colorName</span></td>
+        <td>The 16-color value.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="fields">Fields
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Black.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Black%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L307">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Black" data-uid="Terminal.Gui.Color.Black">Black</h4>
+  <div class="markdown level1 summary">The black color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Black = Black</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Blue.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Blue%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L312">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Blue" data-uid="Terminal.Gui.Color.Blue">Blue</h4>
+  <div class="markdown level1 summary">The blue color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Blue = Blue</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_BrightBlue.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.BrightBlue%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L344">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_BrightBlue" data-uid="Terminal.Gui.Color.BrightBlue">BrightBlue</h4>
+  <div class="markdown level1 summary">The bright bBlue color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName BrightBlue = BrightBlue</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_BrightCyan.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.BrightCyan%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L352">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_BrightCyan" data-uid="Terminal.Gui.Color.BrightCyan">BrightCyan</h4>
+  <div class="markdown level1 summary">The bright cyan color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName BrightCyan = BrightCyan</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_BrightGreen.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.BrightGreen%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L348">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_BrightGreen" data-uid="Terminal.Gui.Color.BrightGreen">BrightGreen</h4>
+  <div class="markdown level1 summary">The bright green color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName BrightGreen = BrightGreen</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_BrightMagenta.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.BrightMagenta%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L360">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_BrightMagenta" data-uid="Terminal.Gui.Color.BrightMagenta">BrightMagenta</h4>
+  <div class="markdown level1 summary">The bright magenta color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName BrightMagenta = BrightMagenta</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_BrightRed.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.BrightRed%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L356">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_BrightRed" data-uid="Terminal.Gui.Color.BrightRed">BrightRed</h4>
+  <div class="markdown level1 summary">The bright red color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName BrightRed = BrightRed</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_BrightYellow.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.BrightYellow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L364">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_BrightYellow" data-uid="Terminal.Gui.Color.BrightYellow">BrightYellow</h4>
+  <div class="markdown level1 summary">The bright yellow color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName BrightYellow = BrightYellow</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Cyan.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Cyan%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L320">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Cyan" data-uid="Terminal.Gui.Color.Cyan">Cyan</h4>
+  <div class="markdown level1 summary">The cyan color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Cyan = Cyan</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_DarkGray.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.DarkGray%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L340">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_DarkGray" data-uid="Terminal.Gui.Color.DarkGray">DarkGray</h4>
+  <div class="markdown level1 summary">The dark gray color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName DarkGray = DarkGray</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Gray.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Gray%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L336">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Gray" data-uid="Terminal.Gui.Color.Gray">Gray</h4>
+  <div class="markdown level1 summary">The gray color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Gray = Gray</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Green.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Green%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L316">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Green" data-uid="Terminal.Gui.Color.Green">Green</h4>
+  <div class="markdown level1 summary">The green color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Green = Green</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Magenta.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Magenta%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L328">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Magenta" data-uid="Terminal.Gui.Color.Magenta">Magenta</h4>
+  <div class="markdown level1 summary">The magenta color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Magenta = Magenta</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Red.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Red%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L324">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Red" data-uid="Terminal.Gui.Color.Red">Red</h4>
+  <div class="markdown level1 summary">The red color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Red = Red</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_White.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.White%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L368">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_White" data-uid="Terminal.Gui.Color.White">White</h4>
+  <div class="markdown level1 summary">The White color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName White = White</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Yellow.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Yellow%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L332">View Source</a>
+  </span>
+  <h4 id="Terminal_Gui_Color_Yellow" data-uid="Terminal.Gui.Color.Yellow">Yellow</h4>
+  <div class="markdown level1 summary">The yellow color.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public const ColorName Yellow = Yellow</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_A.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.A%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L182">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_A_" data-uid="Terminal.Gui.Color.A*"></a>
+  <h4 id="Terminal_Gui_Color_A" data-uid="Terminal.Gui.Color.A">A</h4>
+  <div class="markdown level1 summary">Alpha color component.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int A { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_B.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.B%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L174">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_B_" data-uid="Terminal.Gui.Color.B*"></a>
+  <h4 id="Terminal_Gui_Color_B" data-uid="Terminal.Gui.Color.B">B</h4>
+  <div class="markdown level1 summary">Blue color component.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int B { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_ColorName.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.ColorName%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L291">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_ColorName_" data-uid="Terminal.Gui.Color.ColorName*"></a>
+  <h4 id="Terminal_Gui_Color_ColorName" data-uid="Terminal.Gui.Color.ColorName">ColorName</h4>
+  <div class="markdown level1 summary">Gets or sets the <a class="xref" href="Terminal.Gui.Color.html">Color</a> using a legacy 16-color <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a> value.
+<a href="https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/get">get</a> will return the closest 16 color match to the true color when no exact value is found.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ColorName ColorName { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Colors.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Colors%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L229">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_Colors_" data-uid="Terminal.Gui.Color.Colors*"></a>
+  <h4 id="Terminal_Gui_Color_Colors" data-uid="Terminal.Gui.Color.Colors">Colors</h4>
+  <div class="markdown level1 summary">Gets or sets the 24-bit color value for each of the legacy 16-color values.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Dictionary&lt;ColorName, string&gt; Colors { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2">Dictionary</a>&lt;<a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_G.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.G%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L170">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_G_" data-uid="Terminal.Gui.Color.G*"></a>
+  <h4 id="Terminal_Gui_Color_G" data-uid="Terminal.Gui.Color.G">G</h4>
+  <div class="markdown level1 summary">Green color component.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int G { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_R.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.R%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L166">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_R_" data-uid="Terminal.Gui.Color.R*"></a>
+  <h4 id="Terminal_Gui_Color_R" data-uid="Terminal.Gui.Color.R">R</h4>
+  <div class="markdown level1 summary">Red color component.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int R { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Rgba.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Rgba%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L190">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_Rgba_" data-uid="Terminal.Gui.Color.Rgba*"></a>
+  <h4 id="Terminal_Gui_Color_Rgba" data-uid="Terminal.Gui.Color.Rgba">Rgba</h4>
+  <div class="markdown level1 summary">Gets or sets the color value encoded as ARGB32.
+<pre><code class="lang-csharp">(&lt;see cref="A"/&gt; &lt;&lt; 24) | (&lt;see cref="R"/&gt; &lt;&lt; 16) | (&lt;see cref="G"/&gt; &lt;&lt; 8) | &lt;see cref="B"/&gt;</code></pre></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public int Rgba { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Equals_System_Object_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Equals(System.Object)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L582">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_Equals_" data-uid="Terminal.Gui.Color.Equals*"></a>
+  <h4 id="Terminal_Gui_Color_Equals_System_Object_" data-uid="Terminal.Gui.Color.Equals(System.Object)">Equals(object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_Equals_Terminal_Gui_Color_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.Equals(Terminal.Gui.Color)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L588">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_Equals_" data-uid="Terminal.Gui.Color.Equals*"></a>
+  <h4 id="Terminal_Gui_Color_Equals_Terminal_Gui_Color_" data-uid="Terminal.Gui.Color.Equals(Terminal.Gui.Color)">Equals(Color)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Equals(Color other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_GetHashCode.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.GetHashCode%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L598">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_GetHashCode_" data-uid="Terminal.Gui.Color.GetHashCode*"></a>
+  <h4 id="Terminal_Gui_Color_GetHashCode" data-uid="Terminal.Gui.Color.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_ToString.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.ToString%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L616">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_ToString_" data-uid="Terminal.Gui.Color.ToString*"></a>
+  <h4 id="Terminal_Gui_Color_ToString" data-uid="Terminal.Gui.Color.ToString">ToString()</h4>
+  <div class="markdown level1 summary">Converts the color to a string representation.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_TryParse_System_String_Terminal_Gui_Color__.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.TryParse(System.String%2CTerminal.Gui.Color%40)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L382">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_TryParse_" data-uid="Terminal.Gui.Color.TryParse*"></a>
+  <h4 id="Terminal_Gui_Color_TryParse_System_String_Terminal_Gui_Color__" data-uid="Terminal.Gui.Color.TryParse(System.String,Terminal.Gui.Color@)">TryParse(string, out Color)</h4>
+  <div class="markdown level1 summary">Converts the provided string to a new <a class="xref" href="Terminal.Gui.Color.html">Color</a> instance.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool TryParse(string text, out Color color)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">text</span></td>
+        <td>The text to analyze. Formats supported are
+    "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", and any of the
+    <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a>.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">color</span></td>
+        <td>The parsed value.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td>A boolean value indicating whether parsing was successful.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="operators">Operators
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Equality_Terminal_Gui_Color_Terminal_Gui_Color_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Equality(Terminal.Gui.Color%2CTerminal.Gui.Color)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L507">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Equality_" data-uid="Terminal.Gui.Color.op_Equality*"></a>
+  <h4 id="Terminal_Gui_Color_op_Equality_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.Color.op_Equality(Terminal.Gui.Color,Terminal.Gui.Color)">operator ==(Color, Color)</h4>
+  <div class="markdown level1 summary">Equality operator for two <a class="xref" href="Terminal.Gui.Color.html">Color</a> objects..</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(Color left, Color right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Equality_Terminal_Gui_Color_Terminal_Gui_ColorName_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Equality(Terminal.Gui.Color%2CTerminal.Gui.ColorName)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L564">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Equality_" data-uid="Terminal.Gui.Color.op_Equality*"></a>
+  <h4 id="Terminal_Gui_Color_op_Equality_Terminal_Gui_Color_Terminal_Gui_ColorName_" data-uid="Terminal.Gui.Color.op_Equality(Terminal.Gui.Color,Terminal.Gui.ColorName)">operator ==(Color, ColorName)</h4>
+  <div class="markdown level1 summary">Equality operator for <a class="xref" href="Terminal.Gui.Color.html">Color</a> and <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a> objects.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(Color left, ColorName right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Equality_Terminal_Gui_ColorName_Terminal_Gui_Color_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Equality(Terminal.Gui.ColorName%2CTerminal.Gui.Color)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L542">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Equality_" data-uid="Terminal.Gui.Color.op_Equality*"></a>
+  <h4 id="Terminal_Gui_Color_op_Equality_Terminal_Gui_ColorName_Terminal_Gui_Color_" data-uid="Terminal.Gui.Color.op_Equality(Terminal.Gui.ColorName,Terminal.Gui.Color)">operator ==(ColorName, Color)</h4>
+  <div class="markdown level1 summary">Equality operator for <a class="xref" href="Terminal.Gui.Color.html">Color</a> and <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a> objects.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(ColorName left, Color right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Explicit_Terminal_Gui_Color__System_Int32.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Explicit(Terminal.Gui.Color)~System.Int32%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L477">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Explicit_" data-uid="Terminal.Gui.Color.op_Explicit*"></a>
+  <h4 id="Terminal_Gui_Color_op_Explicit_Terminal_Gui_Color__System_Int32" data-uid="Terminal.Gui.Color.op_Explicit(Terminal.Gui.Color)~System.Int32">explicit operator int(Color)</h4>
+  <div class="markdown level1 summary">Cast to int.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static explicit operator int(Color color)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">color</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Explicit_Terminal_Gui_Color__Terminal_Gui_ColorName.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Explicit(Terminal.Gui.Color)~Terminal.Gui.ColorName%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L495">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Explicit_" data-uid="Terminal.Gui.Color.op_Explicit*"></a>
+  <h4 id="Terminal_Gui_Color_op_Explicit_Terminal_Gui_Color__Terminal_Gui_ColorName" data-uid="Terminal.Gui.Color.op_Explicit(Terminal.Gui.Color)~Terminal.Gui.ColorName">explicit operator ColorName(Color)</h4>
+  <div class="markdown level1 summary">Cast to <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static explicit operator ColorName(Color color)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">color</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Explicit_Terminal_Gui_ColorName__Terminal_Gui_Color.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Explicit(Terminal.Gui.ColorName)~Terminal.Gui.Color%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L486">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Explicit_" data-uid="Terminal.Gui.Color.op_Explicit*"></a>
+  <h4 id="Terminal_Gui_Color_op_Explicit_Terminal_Gui_ColorName__Terminal_Gui_Color" data-uid="Terminal.Gui.Color.op_Explicit(Terminal.Gui.ColorName)~Terminal.Gui.Color">explicit operator Color(ColorName)</h4>
+  <div class="markdown level1 summary">Cast from <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static explicit operator Color(ColorName colorName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td><span class="parametername">colorName</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Implicit_System_Int32__Terminal_Gui_Color.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Implicit(System.Int32)~Terminal.Gui.Color%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L468">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Implicit_" data-uid="Terminal.Gui.Color.op_Implicit*"></a>
+  <h4 id="Terminal_Gui_Color_op_Implicit_System_Int32__Terminal_Gui_Color" data-uid="Terminal.Gui.Color.op_Implicit(System.Int32)~Terminal.Gui.Color">implicit operator Color(int)</h4>
+  <div class="markdown level1 summary">Cast from int.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static implicit operator Color(int rgba)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">rgba</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Inequality_Terminal_Gui_Color_Terminal_Gui_Color_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Inequality(Terminal.Gui.Color%2CTerminal.Gui.Color)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L525">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Inequality_" data-uid="Terminal.Gui.Color.op_Inequality*"></a>
+  <h4 id="Terminal_Gui_Color_op_Inequality_Terminal_Gui_Color_Terminal_Gui_Color_" data-uid="Terminal.Gui.Color.op_Inequality(Terminal.Gui.Color,Terminal.Gui.Color)">operator !=(Color, Color)</h4>
+  <div class="markdown level1 summary">Inequality operator for two <a class="xref" href="Terminal.Gui.Color.html">Color</a> objects.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(Color left, Color right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Inequality_Terminal_Gui_Color_Terminal_Gui_ColorName_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Inequality(Terminal.Gui.Color%2CTerminal.Gui.ColorName)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L575">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Inequality_" data-uid="Terminal.Gui.Color.op_Inequality*"></a>
+  <h4 id="Terminal_Gui_Color_op_Inequality_Terminal_Gui_Color_Terminal_Gui_ColorName_" data-uid="Terminal.Gui.Color.op_Inequality(Terminal.Gui.Color,Terminal.Gui.ColorName)">operator !=(Color, ColorName)</h4>
+  <div class="markdown level1 summary">Inequality operator for <a class="xref" href="Terminal.Gui.Color.html">Color</a> and <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a> objects.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(Color left, ColorName right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color_op_Inequality_Terminal_Gui_ColorName_Terminal_Gui_Color_.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color.op_Inequality(Terminal.Gui.ColorName%2CTerminal.Gui.Color)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L553">View Source</a>
+  </span>
+  <a id="Terminal_Gui_Color_op_Inequality_" data-uid="Terminal.Gui.Color.op_Inequality*"></a>
+  <h4 id="Terminal_Gui_Color_op_Inequality_Terminal_Gui_ColorName_Terminal_Gui_Color_" data-uid="Terminal.Gui.Color.op_Inequality(Terminal.Gui.ColorName,Terminal.Gui.Color)">operator !=(ColorName, Color)</h4>
+  <div class="markdown level1 summary">Inequality operator for <a class="xref" href="Terminal.Gui.Color.html">Color</a> and <a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a> objects.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(ColorName left, Color right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Color.html">Color</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.iequatable-1">IEquatable&lt;T&gt;</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_Color.md&amp;value=---%0Auid%3A%20Terminal.Gui.Color%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Drawing/Color.cs/#L96" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

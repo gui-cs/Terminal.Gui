@@ -1,0 +1,118 @@
+### YamlMime:ManagedReference
+items:
+- uid: Unix.Terminal
+  commentId: N:Unix.Terminal
+  id: Unix.Terminal
+  children:
+  - Unix.Terminal.Curses
+  - Unix.Terminal.Curses.Event
+  - Unix.Terminal.Curses.MouseEvent
+  - Unix.Terminal.Curses.Window
+  langs:
+  - csharp
+  - vb
+  name: Unix.Terminal
+  nameWithType: Unix.Terminal
+  fullName: Unix.Terminal
+  type: Namespace
+  assemblies:
+  - Terminal.Gui
+references:
+- uid: Unix.Terminal.Curses
+  commentId: T:Unix.Terminal.Curses
+  href: Unix.Terminal.Curses.html
+  name: Curses
+  nameWithType: Curses
+  fullName: Unix.Terminal.Curses
+- uid: Unix.Terminal.Curses.MouseEvent
+  commentId: T:Unix.Terminal.Curses.MouseEvent
+  parent: Unix.Terminal
+  href: Unix.Terminal.Curses.html
+  name: Curses.MouseEvent
+  nameWithType: Curses.MouseEvent
+  fullName: Unix.Terminal.Curses.MouseEvent
+  spec.csharp:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.MouseEvent
+    name: MouseEvent
+    href: Unix.Terminal.Curses.MouseEvent.html
+  spec.vb:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.MouseEvent
+    name: MouseEvent
+    href: Unix.Terminal.Curses.MouseEvent.html
+- uid: Unix.Terminal.Curses.Event
+  commentId: T:Unix.Terminal.Curses.Event
+  parent: Unix.Terminal
+  href: Unix.Terminal.Curses.html
+  name: Curses.Event
+  nameWithType: Curses.Event
+  fullName: Unix.Terminal.Curses.Event
+  spec.csharp:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.Event
+    name: Event
+    href: Unix.Terminal.Curses.Event.html
+  spec.vb:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.Event
+    name: Event
+    href: Unix.Terminal.Curses.Event.html
+- uid: Unix.Terminal.Curses.Window
+  commentId: T:Unix.Terminal.Curses.Window
+  parent: Unix.Terminal
+  href: Unix.Terminal.Curses.html
+  name: Curses.Window
+  nameWithType: Curses.Window
+  fullName: Unix.Terminal.Curses.Window
+  spec.csharp:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.Window
+    name: Window
+    href: Unix.Terminal.Curses.Window.html
+  spec.vb:
+  - uid: Unix.Terminal.Curses
+    name: Curses
+    href: Unix.Terminal.Curses.html
+  - name: .
+  - uid: Unix.Terminal.Curses.Window
+    name: Window
+    href: Unix.Terminal.Curses.Window.html
+- uid: Unix.Terminal
+  commentId: N:Unix.Terminal
+  href: Unix.html
+  name: Unix.Terminal
+  nameWithType: Unix.Terminal
+  fullName: Unix.Terminal
+  spec.csharp:
+  - uid: Unix
+    name: Unix
+    href: Unix.html
+  - name: .
+  - uid: Unix.Terminal
+    name: Terminal
+    href: Unix.Terminal.html
+  spec.vb:
+  - uid: Unix
+    name: Unix
+    href: Unix.html
+  - name: .
+  - uid: Unix.Terminal
+    name: Terminal
+    href: Unix.Terminal.html
+shouldSkipMarkup: true

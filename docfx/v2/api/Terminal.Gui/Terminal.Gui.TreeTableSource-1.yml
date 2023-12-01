@@ -1,0 +1,1363 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TreeTableSource`1
+  commentId: T:Terminal.Gui.TreeTableSource`1
+  id: TreeTableSource`1
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.TreeTableSource`1.#ctor(Terminal.Gui.TableView,System.String,Terminal.Gui.TreeView{`0},System.Collections.Generic.Dictionary{System.String,System.Func{`0,System.Object}})
+  - Terminal.Gui.TreeTableSource`1.ColumnNames
+  - Terminal.Gui.TreeTableSource`1.Columns
+  - Terminal.Gui.TreeTableSource`1.Dispose
+  - Terminal.Gui.TreeTableSource`1.GetAllObjects
+  - Terminal.Gui.TreeTableSource`1.GetObjectOnRow(System.Int32)
+  - Terminal.Gui.TreeTableSource`1.Item(System.Int32,System.Int32)
+  - Terminal.Gui.TreeTableSource`1.Rows
+  - Terminal.Gui.TreeTableSource`1.RowToObject(System.Int32)
+  langs:
+  - csharp
+  - vb
+  name: TreeTableSource<T>
+  nameWithType: TreeTableSource<T>
+  fullName: Terminal.Gui.TreeTableSource<T>
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TreeTableSource
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 12
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: An <xref href="Terminal.Gui.ITableSource" data-throw-if-not-resolved="false"></xref> with expandable rows.
+  example: []
+  syntax:
+    content: 'public class TreeTableSource<T> : IEnumerableTableSource<T>, ITableSource, IDisposable where T : class'
+    typeParameters:
+    - id: T
+      description: ''
+    content.vb: Public Class TreeTableSource(Of T As Class) Implements IEnumerableTableSource(Of T), ITableSource, IDisposable
+  inheritance:
+  - System.Object
+  implements:
+  - Terminal.Gui.IEnumerableTableSource{{T}}
+  - Terminal.Gui.ITableSource
+  - System.IDisposable
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  nameWithType.vb: TreeTableSource(Of T)
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T)
+  name.vb: TreeTableSource(Of T)
+- uid: Terminal.Gui.TreeTableSource`1.#ctor(Terminal.Gui.TableView,System.String,Terminal.Gui.TreeView{`0},System.Collections.Generic.Dictionary{System.String,System.Func{`0,System.Object}})
+  commentId: M:Terminal.Gui.TreeTableSource`1.#ctor(Terminal.Gui.TableView,System.String,Terminal.Gui.TreeView{`0},System.Collections.Generic.Dictionary{System.String,System.Func{`0,System.Object}})
+  id: '#ctor(Terminal.Gui.TableView,System.String,Terminal.Gui.TreeView{`0},System.Collections.Generic.Dictionary{System.String,System.Func{`0,System.Object}})'
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: TreeTableSource(TableView, string, TreeView<T>, Dictionary<string, Func<T, object>>)
+  nameWithType: TreeTableSource<T>.TreeTableSource(TableView, string, TreeView<T>, Dictionary<string, Func<T, object>>)
+  fullName: Terminal.Gui.TreeTableSource<T>.TreeTableSource(Terminal.Gui.TableView, string, Terminal.Gui.TreeView<T>, System.Collections.Generic.Dictionary<string, System.Func<T, object>>)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 36
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Creates a new instance of <xref href="Terminal.Gui.TreeTableSource%601" data-throw-if-not-resolved="false"></xref> presenting the given
+
+    <code class="paramref">tree</code>. This source should only be used with <code class="paramref">table</code>.
+  example: []
+  syntax:
+    content: public TreeTableSource(TableView table, string firstColumnName, TreeView<T> tree, Dictionary<string, Func<T, object>> subsequentColumns)
+    parameters:
+    - id: table
+      type: Terminal.Gui.TableView
+      description: The table this source will provide data for.
+    - id: firstColumnName
+      type: System.String
+      description: >-
+        Column name to use for the first column of the table (where
+             the tree branches/leaves will be rendered.
+    - id: tree
+      type: Terminal.Gui.TreeView{{T}}
+      description: >-
+        The tree data to render. This should be a new view and not used
+             elsewhere (e.g. via <xref href="Terminal.Gui.View.Add(Terminal.Gui.View)" data-throw-if-not-resolved="false"></xref>).
+    - id: subsequentColumns
+      type: System.Collections.Generic.Dictionary{System.String,System.Func{{T},System.Object}}
+      description: >-
+        Getter methods for each additional property you want to present in the table. For example:
+
+        <pre><code class="lang-csharp"> new () {
+            { "Colname1", (t)=&gt;t.SomeField},
+            { "Colname2", (t)=&gt;t.SomeOtherField}
+        }</code></pre>
+    content.vb: Public Sub New(table As TableView, firstColumnName As String, tree As TreeView(Of T), subsequentColumns As Dictionary(Of String, Func(Of T, Object)))
+  overload: Terminal.Gui.TreeTableSource`1.#ctor*
+  nameWithType.vb: TreeTableSource(Of T).New(TableView, String, TreeView(Of T), Dictionary(Of String, Func(Of T, Object)))
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).New(Terminal.Gui.TableView, String, Terminal.Gui.TreeView(Of T), System.Collections.Generic.Dictionary(Of String, System.Func(Of T, Object)))
+  name.vb: New(TableView, String, TreeView(Of T), Dictionary(Of String, Func(Of T, Object)))
+- uid: Terminal.Gui.TreeTableSource`1.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.TreeTableSource`1.Item(System.Int32,System.Int32)
+  id: Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: this[int, int]
+  nameWithType: TreeTableSource<T>.this[int, int]
+  fullName: Terminal.Gui.TreeTableSource<T>.this[int, int]
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: this[]
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 54
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns the data at the given indexes of the table (row, column).
+  example: []
+  syntax:
+    content: public object this[int row, int col] { get; }
+    parameters:
+    - id: row
+      type: System.Int32
+      description: ''
+    - id: col
+      type: System.Int32
+      description: ''
+    return:
+      type: System.Object
+      description: ''
+    content.vb: Public ReadOnly Default Property this[](row As Integer, col As Integer) As Object
+  overload: Terminal.Gui.TreeTableSource`1.Item*
+  implements:
+  - Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  nameWithType.vb: TreeTableSource(Of T).this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+- uid: Terminal.Gui.TreeTableSource`1.Rows
+  commentId: P:Terminal.Gui.TreeTableSource`1.Rows
+  id: Rows
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: Rows
+  nameWithType: TreeTableSource<T>.Rows
+  fullName: Terminal.Gui.TreeTableSource<T>.Rows
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Rows
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 59
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of rows in the table.
+  example: []
+  syntax:
+    content: public int Rows { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Rows As Integer
+  overload: Terminal.Gui.TreeTableSource`1.Rows*
+  implements:
+  - Terminal.Gui.ITableSource.Rows
+  nameWithType.vb: TreeTableSource(Of T).Rows
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).Rows
+- uid: Terminal.Gui.TreeTableSource`1.Columns
+  commentId: P:Terminal.Gui.TreeTableSource`1.Columns
+  id: Columns
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: Columns
+  nameWithType: TreeTableSource<T>.Columns
+  fullName: Terminal.Gui.TreeTableSource<T>.Columns
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Columns
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 62
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of columns in the table.
+  example: []
+  syntax:
+    content: public int Columns { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Columns As Integer
+  overload: Terminal.Gui.TreeTableSource`1.Columns*
+  implements:
+  - Terminal.Gui.ITableSource.Columns
+  nameWithType.vb: TreeTableSource(Of T).Columns
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).Columns
+- uid: Terminal.Gui.TreeTableSource`1.ColumnNames
+  commentId: P:Terminal.Gui.TreeTableSource`1.ColumnNames
+  id: ColumnNames
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: ColumnNames
+  nameWithType: TreeTableSource<T>.ColumnNames
+  fullName: Terminal.Gui.TreeTableSource<T>.ColumnNames
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColumnNames
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 65
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the label for each column.
+  example: []
+  syntax:
+    content: public string[] ColumnNames { get; }
+    parameters: []
+    return:
+      type: System.String[]
+    content.vb: Public ReadOnly Property ColumnNames As String()
+  overload: Terminal.Gui.TreeTableSource`1.ColumnNames*
+  implements:
+  - Terminal.Gui.ITableSource.ColumnNames
+  nameWithType.vb: TreeTableSource(Of T).ColumnNames
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).ColumnNames
+- uid: Terminal.Gui.TreeTableSource`1.Dispose
+  commentId: M:Terminal.Gui.TreeTableSource`1.Dispose
+  id: Dispose
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: Dispose()
+  nameWithType: TreeTableSource<T>.Dispose()
+  fullName: Terminal.Gui.TreeTableSource<T>.Dispose()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Dispose
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 68
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public void Dispose()
+    content.vb: Public Sub Dispose()
+  overload: Terminal.Gui.TreeTableSource`1.Dispose*
+  implements:
+  - System.IDisposable.Dispose
+  nameWithType.vb: TreeTableSource(Of T).Dispose()
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).Dispose()
+- uid: Terminal.Gui.TreeTableSource`1.RowToObject(System.Int32)
+  commentId: M:Terminal.Gui.TreeTableSource`1.RowToObject(System.Int32)
+  id: RowToObject(System.Int32)
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: RowToObject(int)
+  nameWithType: TreeTableSource<T>.RowToObject(int)
+  fullName: Terminal.Gui.TreeTableSource<T>.RowToObject(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RowToObject
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 81
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Returns the tree model object rendering on the given <code class="paramref">row</code>
+
+    of the table.
+  example: []
+  syntax:
+    content: public T RowToObject(int row)
+    parameters:
+    - id: row
+      type: System.Int32
+      description: Row in table.
+    return:
+      type: '{T}'
+      description: ''
+    content.vb: Public Function RowToObject(row As Integer) As T
+  overload: Terminal.Gui.TreeTableSource`1.RowToObject*
+  nameWithType.vb: TreeTableSource(Of T).RowToObject(Integer)
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).RowToObject(Integer)
+  name.vb: RowToObject(Integer)
+- uid: Terminal.Gui.TreeTableSource`1.GetObjectOnRow(System.Int32)
+  commentId: M:Terminal.Gui.TreeTableSource`1.GetObjectOnRow(System.Int32)
+  id: GetObjectOnRow(System.Int32)
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: GetObjectOnRow(int)
+  nameWithType: TreeTableSource<T>.GetObjectOnRow(int)
+  fullName: Terminal.Gui.TreeTableSource<T>.GetObjectOnRow(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetObjectOnRow
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 194
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Return the object on the given row.
+  example: []
+  syntax:
+    content: public T GetObjectOnRow(int row)
+    parameters:
+    - id: row
+      type: System.Int32
+    return:
+      type: '{T}'
+    content.vb: Public Function GetObjectOnRow(row As Integer) As T
+  overload: Terminal.Gui.TreeTableSource`1.GetObjectOnRow*
+  implements:
+  - Terminal.Gui.IEnumerableTableSource{{T}}.GetObjectOnRow(System.Int32)
+  nameWithType.vb: TreeTableSource(Of T).GetObjectOnRow(Integer)
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).GetObjectOnRow(Integer)
+  name.vb: GetObjectOnRow(Integer)
+- uid: Terminal.Gui.TreeTableSource`1.GetAllObjects
+  commentId: M:Terminal.Gui.TreeTableSource`1.GetAllObjects
+  id: GetAllObjects
+  parent: Terminal.Gui.TreeTableSource`1
+  langs:
+  - csharp
+  - vb
+  name: GetAllObjects()
+  nameWithType: TreeTableSource<T>.GetAllObjects()
+  fullName: Terminal.Gui.TreeTableSource<T>.GetAllObjects()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/TreeTableSource.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetAllObjects
+    path: ../Terminal.Gui/Views/TableView/TreeTableSource.cs
+    startLine: 200
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Return all objects in the table.
+  example: []
+  syntax:
+    content: public IEnumerable<T> GetAllObjects()
+    return:
+      type: System.Collections.Generic.IEnumerable{{T}}
+    content.vb: Public Function GetAllObjects() As IEnumerable(Of T)
+  overload: Terminal.Gui.TreeTableSource`1.GetAllObjects*
+  implements:
+  - Terminal.Gui.IEnumerableTableSource{{T}}.GetAllObjects
+  nameWithType.vb: TreeTableSource(Of T).GetAllObjects()
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).GetAllObjects()
+references:
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITableSource.html
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: Terminal.Gui.IEnumerableTableSource{{T}}
+  commentId: T:Terminal.Gui.IEnumerableTableSource{`0}
+  parent: Terminal.Gui
+  definition: Terminal.Gui.IEnumerableTableSource`1
+  href: Terminal.Gui.IEnumerableTableSource-1.html
+  name: IEnumerableTableSource<T>
+  nameWithType: IEnumerableTableSource<T>
+  fullName: Terminal.Gui.IEnumerableTableSource<T>
+  nameWithType.vb: IEnumerableTableSource(Of T)
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T)
+  name.vb: IEnumerableTableSource(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource
+    href: Terminal.Gui.IEnumerableTableSource-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource
+    href: Terminal.Gui.IEnumerableTableSource-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.IEnumerableTableSource`1
+  commentId: T:Terminal.Gui.IEnumerableTableSource`1
+  href: Terminal.Gui.IEnumerableTableSource-1.html
+  name: IEnumerableTableSource<T>
+  nameWithType: IEnumerableTableSource<T>
+  fullName: Terminal.Gui.IEnumerableTableSource<T>
+  nameWithType.vb: IEnumerableTableSource(Of T)
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T)
+  name.vb: IEnumerableTableSource(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource
+    href: Terminal.Gui.IEnumerableTableSource-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource
+    href: Terminal.Gui.IEnumerableTableSource-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.TreeTableSource`1
+  commentId: T:Terminal.Gui.TreeTableSource`1
+  href: Terminal.Gui.TreeTableSource-1.html
+  name: TreeTableSource<T>
+  nameWithType: TreeTableSource<T>
+  fullName: Terminal.Gui.TreeTableSource<T>
+  nameWithType.vb: TreeTableSource(Of T)
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T)
+  name.vb: TreeTableSource(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeTableSource`1
+    name: TreeTableSource
+    href: Terminal.Gui.TreeTableSource-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeTableSource`1
+    name: TreeTableSource
+    href: Terminal.Gui.TreeTableSource-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.View.Add(Terminal.Gui.View)
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.Add(Terminal.Gui.View)
+  name: Add(View)
+  nameWithType: View.Add(View)
+  fullName: Terminal.Gui.View.Add(Terminal.Gui.View)
+  spec.csharp:
+  - uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+    name: Add
+    href: Terminal.Gui.View.html#Terminal.Gui.View.Add(Terminal.Gui.View)
+  - name: (
+  - uid: Terminal.Gui.View
+    name: View
+    href: Terminal.Gui.View.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.View.Add(Terminal.Gui.View)
+    name: Add
+    href: Terminal.Gui.View.html#Terminal.Gui.View.Add(Terminal.Gui.View)
+  - name: (
+  - uid: Terminal.Gui.View
+    name: View
+    href: Terminal.Gui.View.html
+  - name: )
+- uid: Terminal.Gui.TreeTableSource`1.#ctor*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.#ctor
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.#ctor(Terminal.Gui.TableView,System.String,Terminal.Gui.TreeView{`0},System.Collections.Generic.Dictionary{System.String,System.Func{`0,System.Object}})
+  name: TreeTableSource
+  nameWithType: TreeTableSource<T>.TreeTableSource
+  fullName: Terminal.Gui.TreeTableSource<T>.TreeTableSource
+  nameWithType.vb: TreeTableSource(Of T).New
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).New
+  name.vb: New
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: Terminal.Gui.TreeView{{T}}
+  commentId: T:Terminal.Gui.TreeView{`0}
+  parent: Terminal.Gui
+  definition: Terminal.Gui.TreeView`1
+  href: Terminal.Gui.TreeView-1.html
+  name: TreeView<T>
+  nameWithType: TreeView<T>
+  fullName: Terminal.Gui.TreeView<T>
+  nameWithType.vb: TreeView(Of T)
+  fullName.vb: Terminal.Gui.TreeView(Of T)
+  name.vb: TreeView(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.Dictionary{System.String,System.Func{{T},System.Object}}
+  commentId: T:System.Collections.Generic.Dictionary{System.String,System.Func{`0,System.Object}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Dictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<string, Func<T, object>>
+  nameWithType: Dictionary<string, Func<T, object>>
+  fullName: System.Collections.Generic.Dictionary<string, System.Func<T, object>>
+  nameWithType.vb: Dictionary(Of String, Func(Of T, Object))
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, System.Func(Of T, Object))
+  name.vb: Dictionary(Of String, Func(Of T, Object))
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-2
+  - name: <
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Func`2
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  - name: )
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.TreeView`1
+  commentId: T:Terminal.Gui.TreeView`1
+  href: Terminal.Gui.TreeView-1.html
+  name: TreeView<T>
+  nameWithType: TreeView<T>
+  fullName: Terminal.Gui.TreeView<T>
+  nameWithType.vb: TreeView(Of T)
+  fullName.vb: Terminal.Gui.TreeView(Of T)
+  name.vb: TreeView(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2
+  commentId: T:System.Collections.Generic.Dictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<TKey, TValue>
+  nameWithType: Dictionary<TKey, TValue>
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>
+  nameWithType.vb: Dictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue)
+  name.vb: Dictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.TreeTableSource`1.Item*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.Item
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.Item(System.Int32,System.Int32)
+  name: this
+  nameWithType: TreeTableSource<T>.this
+  fullName: Terminal.Gui.TreeTableSource<T>.this
+  nameWithType.vb: TreeTableSource(Of T).this[]
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).this[]
+  name.vb: this[]
+- uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.ITableSource
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: this[int, int]
+  nameWithType: ITableSource.this[int, int]
+  fullName: Terminal.Gui.ITableSource.this[int, int]
+  nameWithType.vb: ITableSource.this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.ITableSource.this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ']'
+  spec.vb:
+  - uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+    name: this[]
+    href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.TreeTableSource`1.Rows*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.Rows
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.Rows
+  name: Rows
+  nameWithType: TreeTableSource<T>.Rows
+  fullName: Terminal.Gui.TreeTableSource<T>.Rows
+  nameWithType.vb: TreeTableSource(Of T).Rows
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).Rows
+- uid: Terminal.Gui.ITableSource.Rows
+  commentId: P:Terminal.Gui.ITableSource.Rows
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Rows
+  name: Rows
+  nameWithType: ITableSource.Rows
+  fullName: Terminal.Gui.ITableSource.Rows
+- uid: Terminal.Gui.TreeTableSource`1.Columns*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.Columns
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.Columns
+  name: Columns
+  nameWithType: TreeTableSource<T>.Columns
+  fullName: Terminal.Gui.TreeTableSource<T>.Columns
+  nameWithType.vb: TreeTableSource(Of T).Columns
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).Columns
+- uid: Terminal.Gui.ITableSource.Columns
+  commentId: P:Terminal.Gui.ITableSource.Columns
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Columns
+  name: Columns
+  nameWithType: ITableSource.Columns
+  fullName: Terminal.Gui.ITableSource.Columns
+- uid: Terminal.Gui.TreeTableSource`1.ColumnNames*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.ColumnNames
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.ColumnNames
+  name: ColumnNames
+  nameWithType: TreeTableSource<T>.ColumnNames
+  fullName: Terminal.Gui.TreeTableSource<T>.ColumnNames
+  nameWithType.vb: TreeTableSource(Of T).ColumnNames
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).ColumnNames
+- uid: Terminal.Gui.ITableSource.ColumnNames
+  commentId: P:Terminal.Gui.ITableSource.ColumnNames
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.ColumnNames
+  name: ColumnNames
+  nameWithType: ITableSource.ColumnNames
+  fullName: Terminal.Gui.ITableSource.ColumnNames
+- uid: System.String[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string[]
+  nameWithType: string[]
+  fullName: string[]
+  nameWithType.vb: String()
+  fullName.vb: String()
+  name.vb: String()
+  spec.csharp:
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+- uid: Terminal.Gui.TreeTableSource`1.Dispose*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.Dispose
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.Dispose
+  name: Dispose
+  nameWithType: TreeTableSource<T>.Dispose
+  fullName: Terminal.Gui.TreeTableSource<T>.Dispose
+  nameWithType.vb: TreeTableSource(Of T).Dispose
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).Dispose
+- uid: System.IDisposable.Dispose
+  commentId: M:System.IDisposable.Dispose
+  parent: System.IDisposable
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  name: Dispose()
+  nameWithType: IDisposable.Dispose()
+  fullName: System.IDisposable.Dispose()
+  spec.csharp:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  - name: (
+  - name: )
+- uid: Terminal.Gui.TreeTableSource`1.RowToObject*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.RowToObject
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.RowToObject(System.Int32)
+  name: RowToObject
+  nameWithType: TreeTableSource<T>.RowToObject
+  fullName: Terminal.Gui.TreeTableSource<T>.RowToObject
+  nameWithType.vb: TreeTableSource(Of T).RowToObject
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).RowToObject
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: Terminal.Gui.TreeTableSource`1.GetObjectOnRow*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.GetObjectOnRow
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.GetObjectOnRow(System.Int32)
+  name: GetObjectOnRow
+  nameWithType: TreeTableSource<T>.GetObjectOnRow
+  fullName: Terminal.Gui.TreeTableSource<T>.GetObjectOnRow
+  nameWithType.vb: TreeTableSource(Of T).GetObjectOnRow
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).GetObjectOnRow
+- uid: Terminal.Gui.IEnumerableTableSource{{T}}.GetObjectOnRow(System.Int32)
+  commentId: M:Terminal.Gui.IEnumerableTableSource{`0}.GetObjectOnRow(System.Int32)
+  parent: Terminal.Gui.IEnumerableTableSource{{T}}
+  definition: Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+  href: Terminal.Gui.IEnumerableTableSource{-0}.html#Terminal.Gui.IEnumerableTableSource{`0}.GetObjectOnRow(System.Int32)
+  name: GetObjectOnRow(int)
+  nameWithType: IEnumerableTableSource<T>.GetObjectOnRow(int)
+  fullName: Terminal.Gui.IEnumerableTableSource<T>.GetObjectOnRow(int)
+  nameWithType.vb: IEnumerableTableSource(Of T).GetObjectOnRow(Integer)
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T).GetObjectOnRow(Integer)
+  name.vb: GetObjectOnRow(Integer)
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource{`0}.GetObjectOnRow(System.Int32)
+    name: GetObjectOnRow
+    href: Terminal.Gui.IEnumerableTableSource{-0}.html#Terminal.Gui.IEnumerableTableSource{`0}.GetObjectOnRow(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource{`0}.GetObjectOnRow(System.Int32)
+    name: GetObjectOnRow
+    href: Terminal.Gui.IEnumerableTableSource{-0}.html#Terminal.Gui.IEnumerableTableSource{`0}.GetObjectOnRow(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+  commentId: M:Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+  isExternal: true
+  href: Terminal.Gui.IEnumerableTableSource-1.html#Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+  name: GetObjectOnRow(int)
+  nameWithType: IEnumerableTableSource<T>.GetObjectOnRow(int)
+  fullName: Terminal.Gui.IEnumerableTableSource<T>.GetObjectOnRow(int)
+  nameWithType.vb: IEnumerableTableSource(Of T).GetObjectOnRow(Integer)
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T).GetObjectOnRow(Integer)
+  name.vb: GetObjectOnRow(Integer)
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+    name: GetObjectOnRow
+    href: Terminal.Gui.IEnumerableTableSource-1.html#Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+    name: GetObjectOnRow
+    href: Terminal.Gui.IEnumerableTableSource-1.html#Terminal.Gui.IEnumerableTableSource`1.GetObjectOnRow(System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: Terminal.Gui.TreeTableSource`1.GetAllObjects*
+  commentId: Overload:Terminal.Gui.TreeTableSource`1.GetAllObjects
+  href: Terminal.Gui.TreeTableSource-1.html#Terminal.Gui.TreeTableSource`1.GetAllObjects
+  name: GetAllObjects
+  nameWithType: TreeTableSource<T>.GetAllObjects
+  fullName: Terminal.Gui.TreeTableSource<T>.GetAllObjects
+  nameWithType.vb: TreeTableSource(Of T).GetAllObjects
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T).GetAllObjects
+- uid: Terminal.Gui.IEnumerableTableSource{{T}}.GetAllObjects
+  commentId: M:Terminal.Gui.IEnumerableTableSource{`0}.GetAllObjects
+  parent: Terminal.Gui.IEnumerableTableSource{{T}}
+  definition: Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+  href: Terminal.Gui.IEnumerableTableSource{-0}.html#Terminal.Gui.IEnumerableTableSource{`0}.GetAllObjects
+  name: GetAllObjects()
+  nameWithType: IEnumerableTableSource<T>.GetAllObjects()
+  fullName: Terminal.Gui.IEnumerableTableSource<T>.GetAllObjects()
+  nameWithType.vb: IEnumerableTableSource(Of T).GetAllObjects()
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T).GetAllObjects()
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource{`0}.GetAllObjects
+    name: GetAllObjects
+    href: Terminal.Gui.IEnumerableTableSource{-0}.html#Terminal.Gui.IEnumerableTableSource{`0}.GetAllObjects
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource{`0}.GetAllObjects
+    name: GetAllObjects
+    href: Terminal.Gui.IEnumerableTableSource{-0}.html#Terminal.Gui.IEnumerableTableSource{`0}.GetAllObjects
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.IEnumerable{{T}}
+  commentId: T:System.Collections.Generic.IEnumerable{`0}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+  commentId: M:Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+  href: Terminal.Gui.IEnumerableTableSource-1.html#Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+  name: GetAllObjects()
+  nameWithType: IEnumerableTableSource<T>.GetAllObjects()
+  fullName: Terminal.Gui.IEnumerableTableSource<T>.GetAllObjects()
+  nameWithType.vb: IEnumerableTableSource(Of T).GetAllObjects()
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T).GetAllObjects()
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+    name: GetAllObjects
+    href: Terminal.Gui.IEnumerableTableSource-1.html#Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+    name: GetAllObjects
+    href: Terminal.Gui.IEnumerableTableSource-1.html#Terminal.Gui.IEnumerableTableSource`1.GetAllObjects
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+shouldSkipMarkup: true

@@ -1,0 +1,723 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.SliderStyle
+  commentId: T:Terminal.Gui.SliderStyle
+  id: SliderStyle
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.SliderStyle.#ctor
+  - Terminal.Gui.SliderStyle.DragChar
+  - Terminal.Gui.SliderStyle.EmptyChar
+  - Terminal.Gui.SliderStyle.EndRangeChar
+  - Terminal.Gui.SliderStyle.LegendAttributes
+  - Terminal.Gui.SliderStyle.OptionChar
+  - Terminal.Gui.SliderStyle.RangeChar
+  - Terminal.Gui.SliderStyle.SetChar
+  - Terminal.Gui.SliderStyle.SpaceChar
+  - Terminal.Gui.SliderStyle.StartRangeChar
+  langs:
+  - csharp
+  - vb
+  name: SliderStyle
+  nameWithType: SliderStyle
+  fullName: Terminal.Gui.SliderStyle
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SliderStyle
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 147
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: <xref href="Terminal.Gui.Slider%601" data-throw-if-not-resolved="false"></xref> Style
+  example: []
+  syntax:
+    content: public class SliderStyle
+    content.vb: Public Class SliderStyle
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.SliderStyle.LegendAttributes
+  commentId: P:Terminal.Gui.SliderStyle.LegendAttributes
+  id: LegendAttributes
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: LegendAttributes
+  nameWithType: SliderStyle.LegendAttributes
+  fullName: Terminal.Gui.SliderStyle.LegendAttributes
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LegendAttributes
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 151
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Legend attributes
+  example: []
+  syntax:
+    content: public SliderAttributes LegendAttributes { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.SliderAttributes
+    content.vb: Public Property LegendAttributes As SliderAttributes
+  overload: Terminal.Gui.SliderStyle.LegendAttributes*
+- uid: Terminal.Gui.SliderStyle.EmptyChar
+  commentId: P:Terminal.Gui.SliderStyle.EmptyChar
+  id: EmptyChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: EmptyChar
+  nameWithType: SliderStyle.EmptyChar
+  fullName: Terminal.Gui.SliderStyle.EmptyChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EmptyChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 155
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for empty spaces on the slider.
+  example: []
+  syntax:
+    content: public Cell EmptyChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property EmptyChar As Cell
+  overload: Terminal.Gui.SliderStyle.EmptyChar*
+- uid: Terminal.Gui.SliderStyle.OptionChar
+  commentId: P:Terminal.Gui.SliderStyle.OptionChar
+  id: OptionChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: OptionChar
+  nameWithType: SliderStyle.OptionChar
+  fullName: Terminal.Gui.SliderStyle.OptionChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OptionChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 159
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for each option (tick) on the slider.
+  example: []
+  syntax:
+    content: public Cell OptionChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property OptionChar As Cell
+  overload: Terminal.Gui.SliderStyle.OptionChar*
+- uid: Terminal.Gui.SliderStyle.SetChar
+  commentId: P:Terminal.Gui.SliderStyle.SetChar
+  id: SetChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: SetChar
+  nameWithType: SliderStyle.SetChar
+  fullName: Terminal.Gui.SliderStyle.SetChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SetChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 163
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for options (ticks) that are set on the slider.
+  example: []
+  syntax:
+    content: public Cell SetChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property SetChar As Cell
+  overload: Terminal.Gui.SliderStyle.SetChar*
+- uid: Terminal.Gui.SliderStyle.DragChar
+  commentId: P:Terminal.Gui.SliderStyle.DragChar
+  id: DragChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: DragChar
+  nameWithType: SliderStyle.DragChar
+  fullName: Terminal.Gui.SliderStyle.DragChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DragChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 167
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute to indicate mouse dragging.
+  example: []
+  syntax:
+    content: public Cell DragChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property DragChar As Cell
+  overload: Terminal.Gui.SliderStyle.DragChar*
+- uid: Terminal.Gui.SliderStyle.SpaceChar
+  commentId: P:Terminal.Gui.SliderStyle.SpaceChar
+  id: SpaceChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: SpaceChar
+  nameWithType: SliderStyle.SpaceChar
+  fullName: Terminal.Gui.SliderStyle.SpaceChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SpaceChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 171
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for spaces between options (ticks) on the slider.
+  example: []
+  syntax:
+    content: public Cell SpaceChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property SpaceChar As Cell
+  overload: Terminal.Gui.SliderStyle.SpaceChar*
+- uid: Terminal.Gui.SliderStyle.RangeChar
+  commentId: P:Terminal.Gui.SliderStyle.RangeChar
+  id: RangeChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: RangeChar
+  nameWithType: SliderStyle.RangeChar
+  fullName: Terminal.Gui.SliderStyle.RangeChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RangeChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 175
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for filling in ranges on the slider.
+  example: []
+  syntax:
+    content: public Cell RangeChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property RangeChar As Cell
+  overload: Terminal.Gui.SliderStyle.RangeChar*
+- uid: Terminal.Gui.SliderStyle.StartRangeChar
+  commentId: P:Terminal.Gui.SliderStyle.StartRangeChar
+  id: StartRangeChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: StartRangeChar
+  nameWithType: SliderStyle.StartRangeChar
+  fullName: Terminal.Gui.SliderStyle.StartRangeChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: StartRangeChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 179
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for the start of ranges on the slider.
+  example: []
+  syntax:
+    content: public Cell StartRangeChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property StartRangeChar As Cell
+  overload: Terminal.Gui.SliderStyle.StartRangeChar*
+- uid: Terminal.Gui.SliderStyle.EndRangeChar
+  commentId: P:Terminal.Gui.SliderStyle.EndRangeChar
+  id: EndRangeChar
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: EndRangeChar
+  nameWithType: SliderStyle.EndRangeChar
+  fullName: Terminal.Gui.SliderStyle.EndRangeChar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EndRangeChar
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 183
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The glyph and the attribute used for the end of ranges on the slider.
+  example: []
+  syntax:
+    content: public Cell EndRangeChar { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Cell
+    content.vb: Public Property EndRangeChar As Cell
+  overload: Terminal.Gui.SliderStyle.EndRangeChar*
+- uid: Terminal.Gui.SliderStyle.#ctor
+  commentId: M:Terminal.Gui.SliderStyle.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.SliderStyle
+  langs:
+  - csharp
+  - vb
+  name: SliderStyle()
+  nameWithType: SliderStyle.SliderStyle()
+  fullName: Terminal.Gui.SliderStyle.SliderStyle()
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/Slider.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/Slider.cs
+    startLine: 188
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Constructs a new instance.
+  example: []
+  syntax:
+    content: public SliderStyle()
+    content.vb: Public Sub New()
+  overload: Terminal.Gui.SliderStyle.#ctor*
+  nameWithType.vb: SliderStyle.New()
+  fullName.vb: Terminal.Gui.SliderStyle.New()
+  name.vb: New()
+references:
+- uid: Terminal.Gui.Slider`1
+  commentId: T:Terminal.Gui.Slider`1
+  href: Terminal.Gui.Slider-1.html
+  name: Slider<T>
+  nameWithType: Slider<T>
+  fullName: Terminal.Gui.Slider<T>
+  nameWithType.vb: Slider(Of T)
+  fullName.vb: Terminal.Gui.Slider(Of T)
+  name.vb: Slider(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.Slider`1
+    name: Slider
+    href: Terminal.Gui.Slider-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.Slider`1
+    name: Slider
+    href: Terminal.Gui.Slider-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.SliderStyle.LegendAttributes*
+  commentId: Overload:Terminal.Gui.SliderStyle.LegendAttributes
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.LegendAttributes
+  name: LegendAttributes
+  nameWithType: SliderStyle.LegendAttributes
+  fullName: Terminal.Gui.SliderStyle.LegendAttributes
+- uid: Terminal.Gui.SliderAttributes
+  commentId: T:Terminal.Gui.SliderAttributes
+  parent: Terminal.Gui
+  href: Terminal.Gui.SliderAttributes.html
+  name: SliderAttributes
+  nameWithType: SliderAttributes
+  fullName: Terminal.Gui.SliderAttributes
+- uid: Terminal.Gui.SliderStyle.EmptyChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.EmptyChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.EmptyChar
+  name: EmptyChar
+  nameWithType: SliderStyle.EmptyChar
+  fullName: Terminal.Gui.SliderStyle.EmptyChar
+- uid: Terminal.Gui.Cell
+  commentId: T:Terminal.Gui.Cell
+  parent: Terminal.Gui
+  href: Terminal.Gui.Cell.html
+  name: Cell
+  nameWithType: Cell
+  fullName: Terminal.Gui.Cell
+- uid: Terminal.Gui.SliderStyle.OptionChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.OptionChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.OptionChar
+  name: OptionChar
+  nameWithType: SliderStyle.OptionChar
+  fullName: Terminal.Gui.SliderStyle.OptionChar
+- uid: Terminal.Gui.SliderStyle.SetChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.SetChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.SetChar
+  name: SetChar
+  nameWithType: SliderStyle.SetChar
+  fullName: Terminal.Gui.SliderStyle.SetChar
+- uid: Terminal.Gui.SliderStyle.DragChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.DragChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.DragChar
+  name: DragChar
+  nameWithType: SliderStyle.DragChar
+  fullName: Terminal.Gui.SliderStyle.DragChar
+- uid: Terminal.Gui.SliderStyle.SpaceChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.SpaceChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.SpaceChar
+  name: SpaceChar
+  nameWithType: SliderStyle.SpaceChar
+  fullName: Terminal.Gui.SliderStyle.SpaceChar
+- uid: Terminal.Gui.SliderStyle.RangeChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.RangeChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.RangeChar
+  name: RangeChar
+  nameWithType: SliderStyle.RangeChar
+  fullName: Terminal.Gui.SliderStyle.RangeChar
+- uid: Terminal.Gui.SliderStyle.StartRangeChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.StartRangeChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.StartRangeChar
+  name: StartRangeChar
+  nameWithType: SliderStyle.StartRangeChar
+  fullName: Terminal.Gui.SliderStyle.StartRangeChar
+- uid: Terminal.Gui.SliderStyle.EndRangeChar*
+  commentId: Overload:Terminal.Gui.SliderStyle.EndRangeChar
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.EndRangeChar
+  name: EndRangeChar
+  nameWithType: SliderStyle.EndRangeChar
+  fullName: Terminal.Gui.SliderStyle.EndRangeChar
+- uid: Terminal.Gui.SliderStyle.#ctor*
+  commentId: Overload:Terminal.Gui.SliderStyle.#ctor
+  href: Terminal.Gui.SliderStyle.html#Terminal.Gui.SliderStyle.#ctor
+  name: SliderStyle
+  nameWithType: SliderStyle.SliderStyle
+  fullName: Terminal.Gui.SliderStyle.SliderStyle
+  nameWithType.vb: SliderStyle.New
+  fullName.vb: Terminal.Gui.SliderStyle.New
+  name.vb: New
+shouldSkipMarkup: true

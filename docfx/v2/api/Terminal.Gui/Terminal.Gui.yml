@@ -1,0 +1,4322 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  id: Terminal.Gui
+  children:
+  - Terminal.Gui.AllowedType
+  - Terminal.Gui.AllowedTypeAny
+  - Terminal.Gui.AppendAutocomplete
+  - Terminal.Gui.Application
+  - Terminal.Gui.AppScope
+  - Terminal.Gui.AspectGetterDelegate`1
+  - Terminal.Gui.Attribute
+  - Terminal.Gui.AutocompleteBase
+  - Terminal.Gui.AutocompleteContext
+  - Terminal.Gui.Axis
+  - Terminal.Gui.AxisIncrementToRender
+  - Terminal.Gui.BarSeries
+  - Terminal.Gui.BarSeriesBar
+  - Terminal.Gui.Button
+  - Terminal.Gui.Cell
+  - Terminal.Gui.CellActivatedEventArgs
+  - Terminal.Gui.CellColorGetterArgs
+  - Terminal.Gui.CellColorGetterDelegate
+  - Terminal.Gui.CellToggledEventArgs
+  - Terminal.Gui.CheckBox
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase
+  - Terminal.Gui.CheckBoxTableSourceWrapperByIndex
+  - Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+  - Terminal.Gui.Clipboard
+  - Terminal.Gui.ClipboardBase
+  - Terminal.Gui.CollectionNavigator
+  - Terminal.Gui.CollectionNavigatorBase
+  - Terminal.Gui.Color
+  - Terminal.Gui.ColorEventArgs
+  - Terminal.Gui.ColorName
+  - Terminal.Gui.ColorPicker
+  - Terminal.Gui.Colors
+  - Terminal.Gui.ColorScheme
+  - Terminal.Gui.ColumnStyle
+  - Terminal.Gui.ComboBox
+  - Terminal.Gui.Command
+  - Terminal.Gui.ConfigProperty
+  - Terminal.Gui.ConfigurationManager
+  - Terminal.Gui.ConfigurationManager.ConfigLocations
+  - Terminal.Gui.ConfigurationManagerEventArgs
+  - Terminal.Gui.ConsoleDriver
+  - Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  - Terminal.Gui.ConsoleKeyMapping
+  - Terminal.Gui.ContentsChangedEventArgs
+  - Terminal.Gui.ContextMenu
+  - Terminal.Gui.CursorVisibility
+  - Terminal.Gui.DataTableSource
+  - Terminal.Gui.DateField
+  - Terminal.Gui.DateTimeEventArgs`1
+  - Terminal.Gui.DefaultFileOperations
+  - Terminal.Gui.DelegateTreeBuilder`1
+  - Terminal.Gui.Dialog
+  - Terminal.Gui.Dialog.ButtonAlignments
+  - Terminal.Gui.Dim
+  - Terminal.Gui.DisplayModeLayout
+  - Terminal.Gui.DrawEventArgs
+  - Terminal.Gui.DrawTreeViewLineEventArgs`1
+  - Terminal.Gui.EnumerableTableSource`1
+  - Terminal.Gui.EscSeqReqStatus
+  - Terminal.Gui.EscSeqRequests
+  - Terminal.Gui.EscSeqUtils
+  - Terminal.Gui.EscSeqUtils.ClearScreenOptions
+  - Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+  - Terminal.Gui.FakeConsole
+  - Terminal.Gui.FakeDriver
+  - Terminal.Gui.FakeDriver.Behaviors
+  - Terminal.Gui.FakeDriver.FakeClipboard
+  - Terminal.Gui.FileDialog
+  - Terminal.Gui.FileDialogStyle
+  - Terminal.Gui.FilesSelectedEventArgs
+  - Terminal.Gui.FileSystemColorProvider
+  - Terminal.Gui.FileSystemIconProvider
+  - Terminal.Gui.FileSystemTreeBuilder
+  - Terminal.Gui.FocusEventArgs
+  - Terminal.Gui.Frame
+  - Terminal.Gui.FrameView
+  - Terminal.Gui.GlyphDefinitions
+  - Terminal.Gui.GrabMouseEventArgs
+  - Terminal.Gui.GraphCellToRender
+  - Terminal.Gui.GraphView
+  - Terminal.Gui.HexView
+  - Terminal.Gui.HexViewEditEventArgs
+  - Terminal.Gui.HexViewEventArgs
+  - Terminal.Gui.HorizontalAxis
+  - Terminal.Gui.IAllowedType
+  - Terminal.Gui.IAnnotation
+  - Terminal.Gui.IAutocomplete
+  - Terminal.Gui.IClipboard
+  - Terminal.Gui.IEnumerableTableSource`1
+  - Terminal.Gui.IFileOperations
+  - Terminal.Gui.IListDataSource
+  - Terminal.Gui.ISearchMatcher
+  - Terminal.Gui.ISeries
+  - Terminal.Gui.ISuggestionGenerator
+  - Terminal.Gui.ITableSource
+  - Terminal.Gui.IterationEventArgs
+  - Terminal.Gui.ITreeBuilder`1
+  - Terminal.Gui.ITreeNode
+  - Terminal.Gui.ITreeView
+  - Terminal.Gui.ITreeViewFilter`1
+  - Terminal.Gui.Key
+  - Terminal.Gui.KeyChangedEventArgs
+  - Terminal.Gui.KeyEvent
+  - Terminal.Gui.KeyEventEventArgs
+  - Terminal.Gui.KeyModifiers
+  - Terminal.Gui.KeystrokeNavigatorEventArgs
+  - Terminal.Gui.Label
+  - Terminal.Gui.LabelGetterDelegate
+  - Terminal.Gui.LayoutEventArgs
+  - Terminal.Gui.LayoutStyle
+  - Terminal.Gui.LegendAnnotation
+  - Terminal.Gui.Line
+  - Terminal.Gui.LineCanvas
+  - Terminal.Gui.LineF
+  - Terminal.Gui.LineStyle
+  - Terminal.Gui.LineView
+  - Terminal.Gui.ListColumnStyle
+  - Terminal.Gui.ListTableSource
+  - Terminal.Gui.ListView
+  - Terminal.Gui.ListViewItemEventArgs
+  - Terminal.Gui.ListViewRowEventArgs
+  - Terminal.Gui.ListWrapper
+  - Terminal.Gui.MenuBar
+  - Terminal.Gui.MenuBarItem
+  - Terminal.Gui.MenuClosingEventArgs
+  - Terminal.Gui.MenuItem
+  - Terminal.Gui.MenuItemCheckStyle
+  - Terminal.Gui.MenuOpenedEventArgs
+  - Terminal.Gui.MenuOpeningEventArgs
+  - Terminal.Gui.MessageBox
+  - Terminal.Gui.MouseEvent
+  - Terminal.Gui.MouseEventEventArgs
+  - Terminal.Gui.MouseFlags
+  - Terminal.Gui.MouseFlagsChangedEventArgs
+  - Terminal.Gui.MultiBarSeries
+  - Terminal.Gui.ObjectActivatedEventArgs`1
+  - Terminal.Gui.OpenDialog
+  - Terminal.Gui.OpenMode
+  - Terminal.Gui.Orientation
+  - Terminal.Gui.OrientationEventArgs
+  - Terminal.Gui.PathAnnotation
+  - Terminal.Gui.Point
+  - Terminal.Gui.PointEventArgs
+  - Terminal.Gui.PointF
+  - Terminal.Gui.PopupAutocomplete
+  - Terminal.Gui.Pos
+  - Terminal.Gui.ProgressBar
+  - Terminal.Gui.ProgressBarFormat
+  - Terminal.Gui.ProgressBarStyle
+  - Terminal.Gui.RadioGroup
+  - Terminal.Gui.Rect
+  - Terminal.Gui.RectangleF
+  - Terminal.Gui.Responder
+  - Terminal.Gui.RowColorGetterArgs
+  - Terminal.Gui.RowColorGetterDelegate
+  - Terminal.Gui.Ruler
+  - Terminal.Gui.RuneCell
+  - Terminal.Gui.RuneCellEventArgs
+  - Terminal.Gui.RuneExtensions
+  - Terminal.Gui.RunState
+  - Terminal.Gui.RunStateEventArgs
+  - Terminal.Gui.SaveDialog
+  - Terminal.Gui.ScatterSeries
+  - Terminal.Gui.Scope`1
+  - Terminal.Gui.ScrollBarView
+  - Terminal.Gui.ScrollView
+  - Terminal.Gui.SelectedCellChangedEventArgs
+  - Terminal.Gui.SelectedItemChangedArgs
+  - Terminal.Gui.SelectionChangedEventArgs`1
+  - Terminal.Gui.SerializableConfigurationProperty
+  - Terminal.Gui.SettingsScope
+  - Terminal.Gui.ShortcutHelper
+  - Terminal.Gui.SingleWordSuggestionGenerator
+  - Terminal.Gui.Size
+  - Terminal.Gui.SizeChangedEventArgs
+  - Terminal.Gui.SizeF
+  - Terminal.Gui.Slider
+  - Terminal.Gui.Slider`1
+  - Terminal.Gui.SliderAttributes
+  - Terminal.Gui.SliderEventArgs`1
+  - Terminal.Gui.SliderOption`1
+  - Terminal.Gui.SliderOptionEventArgs
+  - Terminal.Gui.SliderStyle
+  - Terminal.Gui.SliderType
+  - Terminal.Gui.SpinnerStyle
+  - Terminal.Gui.SpinnerStyle.Aesthetic
+  - Terminal.Gui.SpinnerStyle.Aesthetic2
+  - Terminal.Gui.SpinnerStyle.Arc
+  - Terminal.Gui.SpinnerStyle.Arrow
+  - Terminal.Gui.SpinnerStyle.Arrow2
+  - Terminal.Gui.SpinnerStyle.Arrow3
+  - Terminal.Gui.SpinnerStyle.Balloon
+  - Terminal.Gui.SpinnerStyle.Balloon2
+  - Terminal.Gui.SpinnerStyle.BetaWave
+  - Terminal.Gui.SpinnerStyle.BluePulse
+  - Terminal.Gui.SpinnerStyle.Bounce
+  - Terminal.Gui.SpinnerStyle.BouncingBall
+  - Terminal.Gui.SpinnerStyle.BouncingBar
+  - Terminal.Gui.SpinnerStyle.BoxBounce
+  - Terminal.Gui.SpinnerStyle.BoxBounce2
+  - Terminal.Gui.SpinnerStyle.Christmas
+  - Terminal.Gui.SpinnerStyle.Circle
+  - Terminal.Gui.SpinnerStyle.CircleHalves
+  - Terminal.Gui.SpinnerStyle.CircleQuarters
+  - Terminal.Gui.SpinnerStyle.Clock
+  - Terminal.Gui.SpinnerStyle.Custom
+  - Terminal.Gui.SpinnerStyle.Dots
+  - Terminal.Gui.SpinnerStyle.Dots10
+  - Terminal.Gui.SpinnerStyle.Dots11
+  - Terminal.Gui.SpinnerStyle.Dots12
+  - Terminal.Gui.SpinnerStyle.Dots2
+  - Terminal.Gui.SpinnerStyle.Dots3
+  - Terminal.Gui.SpinnerStyle.Dots4
+  - Terminal.Gui.SpinnerStyle.Dots5
+  - Terminal.Gui.SpinnerStyle.Dots6
+  - Terminal.Gui.SpinnerStyle.Dots7
+  - Terminal.Gui.SpinnerStyle.Dots8
+  - Terminal.Gui.SpinnerStyle.Dots8Bit
+  - Terminal.Gui.SpinnerStyle.Dots9
+  - Terminal.Gui.SpinnerStyle.Dqpb
+  - Terminal.Gui.SpinnerStyle.Earth
+  - Terminal.Gui.SpinnerStyle.FingerDance
+  - Terminal.Gui.SpinnerStyle.FistBump
+  - Terminal.Gui.SpinnerStyle.Flip
+  - Terminal.Gui.SpinnerStyle.Grenade
+  - Terminal.Gui.SpinnerStyle.GrowHorizontal
+  - Terminal.Gui.SpinnerStyle.GrowVertical
+  - Terminal.Gui.SpinnerStyle.Hamburger
+  - Terminal.Gui.SpinnerStyle.Hearts
+  - Terminal.Gui.SpinnerStyle.Layer
+  - Terminal.Gui.SpinnerStyle.Line
+  - Terminal.Gui.SpinnerStyle.Line2
+  - Terminal.Gui.SpinnerStyle.Material
+  - Terminal.Gui.SpinnerStyle.MindBlown
+  - Terminal.Gui.SpinnerStyle.Monkey
+  - Terminal.Gui.SpinnerStyle.Moon
+  - Terminal.Gui.SpinnerStyle.Noise
+  - Terminal.Gui.SpinnerStyle.OrangeBluePulse
+  - Terminal.Gui.SpinnerStyle.OrangePulse
+  - Terminal.Gui.SpinnerStyle.Pipe
+  - Terminal.Gui.SpinnerStyle.Points
+  - Terminal.Gui.SpinnerStyle.Pong
+  - Terminal.Gui.SpinnerStyle.Runner
+  - Terminal.Gui.SpinnerStyle.Shark
+  - Terminal.Gui.SpinnerStyle.SimpleDots
+  - Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+  - Terminal.Gui.SpinnerStyle.Smiley
+  - Terminal.Gui.SpinnerStyle.SoccerHeader
+  - Terminal.Gui.SpinnerStyle.Speaker
+  - Terminal.Gui.SpinnerStyle.SquareCorners
+  - Terminal.Gui.SpinnerStyle.Squish
+  - Terminal.Gui.SpinnerStyle.Star
+  - Terminal.Gui.SpinnerStyle.Star2
+  - Terminal.Gui.SpinnerStyle.TimeTravelClock
+  - Terminal.Gui.SpinnerStyle.Toggle
+  - Terminal.Gui.SpinnerStyle.Toggle10
+  - Terminal.Gui.SpinnerStyle.Toggle11
+  - Terminal.Gui.SpinnerStyle.Toggle12
+  - Terminal.Gui.SpinnerStyle.Toggle13
+  - Terminal.Gui.SpinnerStyle.Toggle2
+  - Terminal.Gui.SpinnerStyle.Toggle3
+  - Terminal.Gui.SpinnerStyle.Toggle4
+  - Terminal.Gui.SpinnerStyle.Toggle5
+  - Terminal.Gui.SpinnerStyle.Toggle6
+  - Terminal.Gui.SpinnerStyle.Toggle7
+  - Terminal.Gui.SpinnerStyle.Toggle8
+  - Terminal.Gui.SpinnerStyle.Toggle9
+  - Terminal.Gui.SpinnerStyle.Triangle
+  - Terminal.Gui.SpinnerStyle.Weather
+  - Terminal.Gui.SpinnerView
+  - Terminal.Gui.SplitterEventArgs
+  - Terminal.Gui.SplitterEventHandler
+  - Terminal.Gui.StackExtensions
+  - Terminal.Gui.StatusBar
+  - Terminal.Gui.StatusItem
+  - Terminal.Gui.StepChangeEventArgs
+  - Terminal.Gui.StraightLine
+  - Terminal.Gui.StraightLineExtensions
+  - Terminal.Gui.StringExtensions
+  - Terminal.Gui.Suggestion
+  - Terminal.Gui.SuperViewChangedEventArgs
+  - Terminal.Gui.Tab
+  - Terminal.Gui.TabChangedEventArgs
+  - Terminal.Gui.TableCollectionNavigator
+  - Terminal.Gui.TableSelection
+  - Terminal.Gui.TableStyle
+  - Terminal.Gui.TableView
+  - Terminal.Gui.TabMouseEventArgs
+  - Terminal.Gui.TabStyle
+  - Terminal.Gui.TabView
+  - Terminal.Gui.TextAlignment
+  - Terminal.Gui.TextAnnotation
+  - Terminal.Gui.TextChangedEventArgs
+  - Terminal.Gui.TextChangingEventArgs
+  - Terminal.Gui.TextDirection
+  - Terminal.Gui.TextField
+  - Terminal.Gui.TextFieldAutocomplete
+  - Terminal.Gui.TextFormatter
+  - Terminal.Gui.TextValidateField
+  - Terminal.Gui.TextView
+  - Terminal.Gui.TextViewAutocomplete
+  - Terminal.Gui.ThemeManager
+  - Terminal.Gui.ThemeManagerEventArgs
+  - Terminal.Gui.ThemeScope
+  - Terminal.Gui.Thickness
+  - Terminal.Gui.ThicknessEventArgs
+  - Terminal.Gui.Tile
+  - Terminal.Gui.TileView
+  - Terminal.Gui.TimeField
+  - Terminal.Gui.Timeout
+  - Terminal.Gui.TitleEventArgs
+  - Terminal.Gui.ToggleEventArgs
+  - Terminal.Gui.Toplevel
+  - Terminal.Gui.ToplevelClosingEventArgs
+  - Terminal.Gui.ToplevelComparer
+  - Terminal.Gui.ToplevelEqualityComparer
+  - Terminal.Gui.ToplevelEventArgs
+  - Terminal.Gui.TreeBuilder`1
+  - Terminal.Gui.TreeNode
+  - Terminal.Gui.TreeNodeBuilder
+  - Terminal.Gui.TreeStyle
+  - Terminal.Gui.TreeTableSource`1
+  - Terminal.Gui.TreeView
+  - Terminal.Gui.TreeView`1
+  - Terminal.Gui.TreeViewTextFilter`1
+  - Terminal.Gui.VerticalAxis
+  - Terminal.Gui.VerticalTextAlignment
+  - Terminal.Gui.View
+  - Terminal.Gui.ViewEventArgs
+  - Terminal.Gui.Window
+  - Terminal.Gui.Wizard
+  - Terminal.Gui.WizardButtonEventArgs
+  - Terminal.Gui.WizardStep
+  langs:
+  - csharp
+  - vb
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  type: Namespace
+  assemblies:
+  - Terminal.Gui
+references:
+- uid: Terminal.Gui.Application
+  commentId: T:Terminal.Gui.Application
+  href: Terminal.Gui.Application.html
+  name: Application
+  nameWithType: Application
+  fullName: Terminal.Gui.Application
+- uid: Terminal.Gui.IterationEventArgs
+  commentId: T:Terminal.Gui.IterationEventArgs
+  href: Terminal.Gui.IterationEventArgs.html
+  name: IterationEventArgs
+  nameWithType: IterationEventArgs
+  fullName: Terminal.Gui.IterationEventArgs
+- uid: Terminal.Gui.Clipboard
+  commentId: T:Terminal.Gui.Clipboard
+  href: Terminal.Gui.Clipboard.html
+  name: Clipboard
+  nameWithType: Clipboard
+  fullName: Terminal.Gui.Clipboard
+- uid: Terminal.Gui.ClipboardBase
+  commentId: T:Terminal.Gui.ClipboardBase
+  parent: Terminal.Gui
+  href: Terminal.Gui.ClipboardBase.html
+  name: ClipboardBase
+  nameWithType: ClipboardBase
+  fullName: Terminal.Gui.ClipboardBase
+- uid: Terminal.Gui.IClipboard
+  commentId: T:Terminal.Gui.IClipboard
+  parent: Terminal.Gui
+  href: Terminal.Gui.IClipboard.html
+  name: IClipboard
+  nameWithType: IClipboard
+  fullName: Terminal.Gui.IClipboard
+- uid: Terminal.Gui.AppScope
+  commentId: T:Terminal.Gui.AppScope
+  parent: Terminal.Gui
+  href: Terminal.Gui.AppScope.html
+  name: AppScope
+  nameWithType: AppScope
+  fullName: Terminal.Gui.AppScope
+- uid: Terminal.Gui.ConfigProperty
+  commentId: T:Terminal.Gui.ConfigProperty
+  href: Terminal.Gui.ConfigProperty.html
+  name: ConfigProperty
+  nameWithType: ConfigProperty
+  fullName: Terminal.Gui.ConfigProperty
+- uid: Terminal.Gui.ConfigurationManager
+  commentId: T:Terminal.Gui.ConfigurationManager
+  href: Terminal.Gui.ConfigurationManager.html
+  name: ConfigurationManager
+  nameWithType: ConfigurationManager
+  fullName: Terminal.Gui.ConfigurationManager
+- uid: Terminal.Gui.ConfigurationManager.ConfigLocations
+  commentId: T:Terminal.Gui.ConfigurationManager.ConfigLocations
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConfigurationManager.html
+  name: ConfigurationManager.ConfigLocations
+  nameWithType: ConfigurationManager.ConfigLocations
+  fullName: Terminal.Gui.ConfigurationManager.ConfigLocations
+  spec.csharp:
+  - uid: Terminal.Gui.ConfigurationManager
+    name: ConfigurationManager
+    href: Terminal.Gui.ConfigurationManager.html
+  - name: .
+  - uid: Terminal.Gui.ConfigurationManager.ConfigLocations
+    name: ConfigLocations
+    href: Terminal.Gui.ConfigurationManager.ConfigLocations.html
+  spec.vb:
+  - uid: Terminal.Gui.ConfigurationManager
+    name: ConfigurationManager
+    href: Terminal.Gui.ConfigurationManager.html
+  - name: .
+  - uid: Terminal.Gui.ConfigurationManager.ConfigLocations
+    name: ConfigLocations
+    href: Terminal.Gui.ConfigurationManager.ConfigLocations.html
+- uid: Terminal.Gui.ConfigurationManagerEventArgs
+  commentId: T:Terminal.Gui.ConfigurationManagerEventArgs
+  href: Terminal.Gui.ConfigurationManagerEventArgs.html
+  name: ConfigurationManagerEventArgs
+  nameWithType: ConfigurationManagerEventArgs
+  fullName: Terminal.Gui.ConfigurationManagerEventArgs
+- uid: Terminal.Gui.ThemeManagerEventArgs
+  commentId: T:Terminal.Gui.ThemeManagerEventArgs
+  href: Terminal.Gui.ThemeManagerEventArgs.html
+  name: ThemeManagerEventArgs
+  nameWithType: ThemeManagerEventArgs
+  fullName: Terminal.Gui.ThemeManagerEventArgs
+- uid: Terminal.Gui.Scope`1
+  commentId: T:Terminal.Gui.Scope`1
+  parent: Terminal.Gui
+  href: Terminal.Gui.Scope-1.html
+  name: Scope<T>
+  nameWithType: Scope<T>
+  fullName: Terminal.Gui.Scope<T>
+  nameWithType.vb: Scope(Of T)
+  fullName.vb: Terminal.Gui.Scope(Of T)
+  name.vb: Scope(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.Scope`1
+    name: Scope
+    href: Terminal.Gui.Scope-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.SerializableConfigurationProperty
+  commentId: T:Terminal.Gui.SerializableConfigurationProperty
+  href: Terminal.Gui.SerializableConfigurationProperty.html
+  name: SerializableConfigurationProperty
+  nameWithType: SerializableConfigurationProperty
+  fullName: Terminal.Gui.SerializableConfigurationProperty
+- uid: Terminal.Gui.SettingsScope
+  commentId: T:Terminal.Gui.SettingsScope
+  parent: Terminal.Gui
+  href: Terminal.Gui.SettingsScope.html
+  name: SettingsScope
+  nameWithType: SettingsScope
+  fullName: Terminal.Gui.SettingsScope
+- uid: Terminal.Gui.ThemeManager
+  commentId: T:Terminal.Gui.ThemeManager
+  parent: Terminal.Gui
+  href: Terminal.Gui.ThemeManager.html
+  name: ThemeManager
+  nameWithType: ThemeManager
+  fullName: Terminal.Gui.ThemeManager
+- uid: Terminal.Gui.ThemeScope
+  commentId: T:Terminal.Gui.ThemeScope
+  parent: Terminal.Gui
+  href: Terminal.Gui.ThemeScope.html
+  name: ThemeScope
+  nameWithType: ThemeScope
+  fullName: Terminal.Gui.ThemeScope
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConsoleDriver.html
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+- uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  commentId: T:Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConsoleDriver.html
+  name: ConsoleDriver.DiagnosticFlags
+  nameWithType: ConsoleDriver.DiagnosticFlags
+  fullName: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+  spec.csharp:
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    href: Terminal.Gui.ConsoleDriver.html
+  - name: .
+  - uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+    name: DiagnosticFlags
+    href: Terminal.Gui.ConsoleDriver.DiagnosticFlags.html
+  spec.vb:
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    href: Terminal.Gui.ConsoleDriver.html
+  - name: .
+  - uid: Terminal.Gui.ConsoleDriver.DiagnosticFlags
+    name: DiagnosticFlags
+    href: Terminal.Gui.ConsoleDriver.DiagnosticFlags.html
+- uid: Terminal.Gui.CursorVisibility
+  commentId: T:Terminal.Gui.CursorVisibility
+  parent: Terminal.Gui
+  href: Terminal.Gui.CursorVisibility.html
+  name: CursorVisibility
+  nameWithType: CursorVisibility
+  fullName: Terminal.Gui.CursorVisibility
+- uid: Terminal.Gui.EscSeqReqStatus
+  commentId: T:Terminal.Gui.EscSeqReqStatus
+  href: Terminal.Gui.EscSeqReqStatus.html
+  name: EscSeqReqStatus
+  nameWithType: EscSeqReqStatus
+  fullName: Terminal.Gui.EscSeqReqStatus
+- uid: Terminal.Gui.EscSeqRequests
+  commentId: T:Terminal.Gui.EscSeqRequests
+  parent: Terminal.Gui
+  href: Terminal.Gui.EscSeqRequests.html
+  name: EscSeqRequests
+  nameWithType: EscSeqRequests
+  fullName: Terminal.Gui.EscSeqRequests
+- uid: Terminal.Gui.EscSeqUtils
+  commentId: T:Terminal.Gui.EscSeqUtils
+  href: Terminal.Gui.EscSeqUtils.html
+  name: EscSeqUtils
+  nameWithType: EscSeqUtils
+  fullName: Terminal.Gui.EscSeqUtils
+- uid: Terminal.Gui.EscSeqUtils.ClearScreenOptions
+  commentId: T:Terminal.Gui.EscSeqUtils.ClearScreenOptions
+  parent: Terminal.Gui
+  href: Terminal.Gui.EscSeqUtils.html
+  name: EscSeqUtils.ClearScreenOptions
+  nameWithType: EscSeqUtils.ClearScreenOptions
+  fullName: Terminal.Gui.EscSeqUtils.ClearScreenOptions
+  spec.csharp:
+  - uid: Terminal.Gui.EscSeqUtils
+    name: EscSeqUtils
+    href: Terminal.Gui.EscSeqUtils.html
+  - name: .
+  - uid: Terminal.Gui.EscSeqUtils.ClearScreenOptions
+    name: ClearScreenOptions
+    href: Terminal.Gui.EscSeqUtils.ClearScreenOptions.html
+  spec.vb:
+  - uid: Terminal.Gui.EscSeqUtils
+    name: EscSeqUtils
+    href: Terminal.Gui.EscSeqUtils.html
+  - name: .
+  - uid: Terminal.Gui.EscSeqUtils.ClearScreenOptions
+    name: ClearScreenOptions
+    href: Terminal.Gui.EscSeqUtils.ClearScreenOptions.html
+- uid: Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+  commentId: T:Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+  parent: Terminal.Gui
+  href: Terminal.Gui.EscSeqUtils.html
+  name: EscSeqUtils.DECSCUSR_Style
+  nameWithType: EscSeqUtils.DECSCUSR_Style
+  fullName: Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+  spec.csharp:
+  - uid: Terminal.Gui.EscSeqUtils
+    name: EscSeqUtils
+    href: Terminal.Gui.EscSeqUtils.html
+  - name: .
+  - uid: Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+    name: DECSCUSR_Style
+    href: Terminal.Gui.EscSeqUtils.DECSCUSR_Style.html
+  spec.vb:
+  - uid: Terminal.Gui.EscSeqUtils
+    name: EscSeqUtils
+    href: Terminal.Gui.EscSeqUtils.html
+  - name: .
+  - uid: Terminal.Gui.EscSeqUtils.DECSCUSR_Style
+    name: DECSCUSR_Style
+    href: Terminal.Gui.EscSeqUtils.DECSCUSR_Style.html
+- uid: Terminal.Gui.FakeConsole
+  commentId: T:Terminal.Gui.FakeConsole
+  href: Terminal.Gui.FakeConsole.html
+  name: FakeConsole
+  nameWithType: FakeConsole
+  fullName: Terminal.Gui.FakeConsole
+- uid: Terminal.Gui.FakeDriver
+  commentId: T:Terminal.Gui.FakeDriver
+  href: Terminal.Gui.FakeDriver.html
+  name: FakeDriver
+  nameWithType: FakeDriver
+  fullName: Terminal.Gui.FakeDriver
+- uid: Terminal.Gui.FakeDriver.Behaviors
+  commentId: T:Terminal.Gui.FakeDriver.Behaviors
+  parent: Terminal.Gui
+  href: Terminal.Gui.FakeDriver.html
+  name: FakeDriver.Behaviors
+  nameWithType: FakeDriver.Behaviors
+  fullName: Terminal.Gui.FakeDriver.Behaviors
+  spec.csharp:
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+    href: Terminal.Gui.FakeDriver.html
+  - name: .
+  - uid: Terminal.Gui.FakeDriver.Behaviors
+    name: Behaviors
+    href: Terminal.Gui.FakeDriver.Behaviors.html
+  spec.vb:
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+    href: Terminal.Gui.FakeDriver.html
+  - name: .
+  - uid: Terminal.Gui.FakeDriver.Behaviors
+    name: Behaviors
+    href: Terminal.Gui.FakeDriver.Behaviors.html
+- uid: Terminal.Gui.FakeDriver.FakeClipboard
+  commentId: T:Terminal.Gui.FakeDriver.FakeClipboard
+  href: Terminal.Gui.FakeDriver.html
+  name: FakeDriver.FakeClipboard
+  nameWithType: FakeDriver.FakeClipboard
+  fullName: Terminal.Gui.FakeDriver.FakeClipboard
+  spec.csharp:
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+    href: Terminal.Gui.FakeDriver.html
+  - name: .
+  - uid: Terminal.Gui.FakeDriver.FakeClipboard
+    name: FakeClipboard
+    href: Terminal.Gui.FakeDriver.FakeClipboard.html
+  spec.vb:
+  - uid: Terminal.Gui.FakeDriver
+    name: FakeDriver
+    href: Terminal.Gui.FakeDriver.html
+  - name: .
+  - uid: Terminal.Gui.FakeDriver.FakeClipboard
+    name: FakeClipboard
+    href: Terminal.Gui.FakeDriver.FakeClipboard.html
+- uid: Terminal.Gui.Cell
+  commentId: T:Terminal.Gui.Cell
+  parent: Terminal.Gui
+  href: Terminal.Gui.Cell.html
+  name: Cell
+  nameWithType: Cell
+  fullName: Terminal.Gui.Cell
+- uid: Terminal.Gui.ColorName
+  commentId: T:Terminal.Gui.ColorName
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorName.html
+  name: ColorName
+  nameWithType: ColorName
+  fullName: Terminal.Gui.ColorName
+- uid: Terminal.Gui.Color
+  commentId: T:Terminal.Gui.Color
+  parent: Terminal.Gui
+  href: Terminal.Gui.Color.html
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  href: Terminal.Gui.Attribute.html
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorScheme.html
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
+- uid: Terminal.Gui.Colors
+  commentId: T:Terminal.Gui.Colors
+  href: Terminal.Gui.Colors.html
+  name: Colors
+  nameWithType: Colors
+  fullName: Terminal.Gui.Colors
+- uid: Terminal.Gui.GlyphDefinitions
+  commentId: T:Terminal.Gui.GlyphDefinitions
+  parent: Terminal.Gui
+  href: Terminal.Gui.GlyphDefinitions.html
+  name: GlyphDefinitions
+  nameWithType: GlyphDefinitions
+  fullName: Terminal.Gui.GlyphDefinitions
+- uid: Terminal.Gui.LineStyle
+  commentId: T:Terminal.Gui.LineStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.LineStyle.html
+  name: LineStyle
+  nameWithType: LineStyle
+  fullName: Terminal.Gui.LineStyle
+- uid: Terminal.Gui.LineCanvas
+  commentId: T:Terminal.Gui.LineCanvas
+  parent: Terminal.Gui
+  href: Terminal.Gui.LineCanvas.html
+  name: LineCanvas
+  nameWithType: LineCanvas
+  fullName: Terminal.Gui.LineCanvas
+- uid: Terminal.Gui.Ruler
+  commentId: T:Terminal.Gui.Ruler
+  href: Terminal.Gui.Ruler.html
+  name: Ruler
+  nameWithType: Ruler
+  fullName: Terminal.Gui.Ruler
+- uid: Terminal.Gui.StraightLine
+  commentId: T:Terminal.Gui.StraightLine
+  parent: Terminal.Gui
+  href: Terminal.Gui.StraightLine.html
+  name: StraightLine
+  nameWithType: StraightLine
+  fullName: Terminal.Gui.StraightLine
+- uid: Terminal.Gui.StraightLineExtensions
+  commentId: T:Terminal.Gui.StraightLineExtensions
+  href: Terminal.Gui.StraightLineExtensions.html
+  name: StraightLineExtensions
+  nameWithType: StraightLineExtensions
+  fullName: Terminal.Gui.StraightLineExtensions
+- uid: Terminal.Gui.Thickness
+  commentId: T:Terminal.Gui.Thickness
+  parent: Terminal.Gui
+  href: Terminal.Gui.Thickness.html
+  name: Thickness
+  nameWithType: Thickness
+  fullName: Terminal.Gui.Thickness
+- uid: Terminal.Gui.ThicknessEventArgs
+  commentId: T:Terminal.Gui.ThicknessEventArgs
+  href: Terminal.Gui.ThicknessEventArgs.html
+  name: ThicknessEventArgs
+  nameWithType: ThicknessEventArgs
+  fullName: Terminal.Gui.ThicknessEventArgs
+- uid: Terminal.Gui.IAllowedType
+  commentId: T:Terminal.Gui.IAllowedType
+  parent: Terminal.Gui
+  href: Terminal.Gui.IAllowedType.html
+  name: IAllowedType
+  nameWithType: IAllowedType
+  fullName: Terminal.Gui.IAllowedType
+- uid: Terminal.Gui.AllowedTypeAny
+  commentId: T:Terminal.Gui.AllowedTypeAny
+  href: Terminal.Gui.AllowedTypeAny.html
+  name: AllowedTypeAny
+  nameWithType: AllowedTypeAny
+  fullName: Terminal.Gui.AllowedTypeAny
+- uid: Terminal.Gui.AllowedType
+  commentId: T:Terminal.Gui.AllowedType
+  href: Terminal.Gui.AllowedType.html
+  name: AllowedType
+  nameWithType: AllowedType
+  fullName: Terminal.Gui.AllowedType
+- uid: Terminal.Gui.DefaultFileOperations
+  commentId: T:Terminal.Gui.DefaultFileOperations
+  href: Terminal.Gui.DefaultFileOperations.html
+  name: DefaultFileOperations
+  nameWithType: DefaultFileOperations
+  fullName: Terminal.Gui.DefaultFileOperations
+- uid: Terminal.Gui.FileDialogStyle
+  commentId: T:Terminal.Gui.FileDialogStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileDialogStyle.html
+  name: FileDialogStyle
+  nameWithType: FileDialogStyle
+  fullName: Terminal.Gui.FileDialogStyle
+- uid: Terminal.Gui.FilesSelectedEventArgs
+  commentId: T:Terminal.Gui.FilesSelectedEventArgs
+  href: Terminal.Gui.FilesSelectedEventArgs.html
+  name: FilesSelectedEventArgs
+  nameWithType: FilesSelectedEventArgs
+  fullName: Terminal.Gui.FilesSelectedEventArgs
+- uid: Terminal.Gui.FileSystemTreeBuilder
+  commentId: T:Terminal.Gui.FileSystemTreeBuilder
+  href: Terminal.Gui.FileSystemTreeBuilder.html
+  name: FileSystemTreeBuilder
+  nameWithType: FileSystemTreeBuilder
+  fullName: Terminal.Gui.FileSystemTreeBuilder
+- uid: Terminal.Gui.IFileOperations
+  commentId: T:Terminal.Gui.IFileOperations
+  parent: Terminal.Gui
+  href: Terminal.Gui.IFileOperations.html
+  name: IFileOperations
+  nameWithType: IFileOperations
+  fullName: Terminal.Gui.IFileOperations
+- uid: Terminal.Gui.ISearchMatcher
+  commentId: T:Terminal.Gui.ISearchMatcher
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISearchMatcher.html
+  name: ISearchMatcher
+  nameWithType: ISearchMatcher
+  fullName: Terminal.Gui.ISearchMatcher
+- uid: Terminal.Gui.Command
+  commentId: T:Terminal.Gui.Command
+  parent: Terminal.Gui
+  href: Terminal.Gui.Command.html
+  name: Command
+  nameWithType: Command
+  fullName: Terminal.Gui.Command
+- uid: Terminal.Gui.ConsoleKeyMapping
+  commentId: T:Terminal.Gui.ConsoleKeyMapping
+  href: Terminal.Gui.ConsoleKeyMapping.html
+  name: ConsoleKeyMapping
+  nameWithType: ConsoleKeyMapping
+  fullName: Terminal.Gui.ConsoleKeyMapping
+- uid: Terminal.Gui.KeyModifiers
+  commentId: T:Terminal.Gui.KeyModifiers
+  parent: Terminal.Gui
+  href: Terminal.Gui.KeyModifiers.html
+  name: KeyModifiers
+  nameWithType: KeyModifiers
+  fullName: Terminal.Gui.KeyModifiers
+- uid: Terminal.Gui.Key
+  commentId: T:Terminal.Gui.Key
+  parent: Terminal.Gui
+  href: Terminal.Gui.Key.html
+  name: Key
+  nameWithType: Key
+  fullName: Terminal.Gui.Key
+- uid: Terminal.Gui.KeyEvent
+  commentId: T:Terminal.Gui.KeyEvent
+  parent: Terminal.Gui
+  href: Terminal.Gui.KeyEvent.html
+  name: KeyEvent
+  nameWithType: KeyEvent
+  fullName: Terminal.Gui.KeyEvent
+- uid: Terminal.Gui.MouseFlags
+  commentId: T:Terminal.Gui.MouseFlags
+  parent: Terminal.Gui
+  href: Terminal.Gui.MouseFlags.html
+  name: MouseFlags
+  nameWithType: MouseFlags
+  fullName: Terminal.Gui.MouseFlags
+- uid: Terminal.Gui.MouseEvent
+  commentId: T:Terminal.Gui.MouseEvent
+  parent: Terminal.Gui
+  href: Terminal.Gui.MouseEvent.html
+  name: MouseEvent
+  nameWithType: MouseEvent
+  fullName: Terminal.Gui.MouseEvent
+- uid: Terminal.Gui.GrabMouseEventArgs
+  commentId: T:Terminal.Gui.GrabMouseEventArgs
+  href: Terminal.Gui.GrabMouseEventArgs.html
+  name: GrabMouseEventArgs
+  nameWithType: GrabMouseEventArgs
+  fullName: Terminal.Gui.GrabMouseEventArgs
+- uid: Terminal.Gui.KeyChangedEventArgs
+  commentId: T:Terminal.Gui.KeyChangedEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.KeyChangedEventArgs.html
+  name: KeyChangedEventArgs
+  nameWithType: KeyChangedEventArgs
+  fullName: Terminal.Gui.KeyChangedEventArgs
+- uid: Terminal.Gui.KeyEventEventArgs
+  commentId: T:Terminal.Gui.KeyEventEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.KeyEventEventArgs.html
+  name: KeyEventEventArgs
+  nameWithType: KeyEventEventArgs
+  fullName: Terminal.Gui.KeyEventEventArgs
+- uid: Terminal.Gui.KeystrokeNavigatorEventArgs
+  commentId: T:Terminal.Gui.KeystrokeNavigatorEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.KeystrokeNavigatorEventArgs.html
+  name: KeystrokeNavigatorEventArgs
+  nameWithType: KeystrokeNavigatorEventArgs
+  fullName: Terminal.Gui.KeystrokeNavigatorEventArgs
+- uid: Terminal.Gui.MouseEventEventArgs
+  commentId: T:Terminal.Gui.MouseEventEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.MouseEventEventArgs.html
+  name: MouseEventEventArgs
+  nameWithType: MouseEventEventArgs
+  fullName: Terminal.Gui.MouseEventEventArgs
+- uid: Terminal.Gui.MouseFlagsChangedEventArgs
+  commentId: T:Terminal.Gui.MouseFlagsChangedEventArgs
+  href: Terminal.Gui.MouseFlagsChangedEventArgs.html
+  name: MouseFlagsChangedEventArgs
+  nameWithType: MouseFlagsChangedEventArgs
+  fullName: Terminal.Gui.MouseFlagsChangedEventArgs
+- uid: Terminal.Gui.PointEventArgs
+  commentId: T:Terminal.Gui.PointEventArgs
+  href: Terminal.Gui.PointEventArgs.html
+  name: PointEventArgs
+  nameWithType: PointEventArgs
+  fullName: Terminal.Gui.PointEventArgs
+- uid: Terminal.Gui.Responder
+  commentId: T:Terminal.Gui.Responder
+  parent: Terminal.Gui
+  href: Terminal.Gui.Responder.html
+  name: Responder
+  nameWithType: Responder
+  fullName: Terminal.Gui.Responder
+- uid: Terminal.Gui.ShortcutHelper
+  commentId: T:Terminal.Gui.ShortcutHelper
+  href: Terminal.Gui.ShortcutHelper.html
+  name: ShortcutHelper
+  nameWithType: ShortcutHelper
+  fullName: Terminal.Gui.ShortcutHelper
+- uid: Terminal.Gui.RunState
+  commentId: T:Terminal.Gui.RunState
+  parent: Terminal.Gui
+  href: Terminal.Gui.RunState.html
+  name: RunState
+  nameWithType: RunState
+  fullName: Terminal.Gui.RunState
+- uid: Terminal.Gui.RunStateEventArgs
+  commentId: T:Terminal.Gui.RunStateEventArgs
+  href: Terminal.Gui.RunStateEventArgs.html
+  name: RunStateEventArgs
+  nameWithType: RunStateEventArgs
+  fullName: Terminal.Gui.RunStateEventArgs
+- uid: Terminal.Gui.StackExtensions
+  commentId: T:Terminal.Gui.StackExtensions
+  href: Terminal.Gui.StackExtensions.html
+  name: StackExtensions
+  nameWithType: StackExtensions
+  fullName: Terminal.Gui.StackExtensions
+- uid: Terminal.Gui.AppendAutocomplete
+  commentId: T:Terminal.Gui.AppendAutocomplete
+  href: Terminal.Gui.AppendAutocomplete.html
+  name: AppendAutocomplete
+  nameWithType: AppendAutocomplete
+  fullName: Terminal.Gui.AppendAutocomplete
+- uid: Terminal.Gui.AutocompleteBase
+  commentId: T:Terminal.Gui.AutocompleteBase
+  parent: Terminal.Gui
+  href: Terminal.Gui.AutocompleteBase.html
+  name: AutocompleteBase
+  nameWithType: AutocompleteBase
+  fullName: Terminal.Gui.AutocompleteBase
+- uid: Terminal.Gui.AutocompleteContext
+  commentId: T:Terminal.Gui.AutocompleteContext
+  parent: Terminal.Gui
+  href: Terminal.Gui.AutocompleteContext.html
+  name: AutocompleteContext
+  nameWithType: AutocompleteContext
+  fullName: Terminal.Gui.AutocompleteContext
+- uid: Terminal.Gui.IAutocomplete
+  commentId: T:Terminal.Gui.IAutocomplete
+  parent: Terminal.Gui
+  href: Terminal.Gui.IAutocomplete.html
+  name: IAutocomplete
+  nameWithType: IAutocomplete
+  fullName: Terminal.Gui.IAutocomplete
+- uid: Terminal.Gui.ISuggestionGenerator
+  commentId: T:Terminal.Gui.ISuggestionGenerator
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISuggestionGenerator.html
+  name: ISuggestionGenerator
+  nameWithType: ISuggestionGenerator
+  fullName: Terminal.Gui.ISuggestionGenerator
+- uid: Terminal.Gui.PopupAutocomplete
+  commentId: T:Terminal.Gui.PopupAutocomplete
+  parent: Terminal.Gui
+  href: Terminal.Gui.PopupAutocomplete.html
+  name: PopupAutocomplete
+  nameWithType: PopupAutocomplete
+  fullName: Terminal.Gui.PopupAutocomplete
+- uid: Terminal.Gui.SingleWordSuggestionGenerator
+  commentId: T:Terminal.Gui.SingleWordSuggestionGenerator
+  href: Terminal.Gui.SingleWordSuggestionGenerator.html
+  name: SingleWordSuggestionGenerator
+  nameWithType: SingleWordSuggestionGenerator
+  fullName: Terminal.Gui.SingleWordSuggestionGenerator
+- uid: Terminal.Gui.Suggestion
+  commentId: T:Terminal.Gui.Suggestion
+  parent: Terminal.Gui
+  href: Terminal.Gui.Suggestion.html
+  name: Suggestion
+  nameWithType: Suggestion
+  fullName: Terminal.Gui.Suggestion
+- uid: Terminal.Gui.CollectionNavigator
+  commentId: T:Terminal.Gui.CollectionNavigator
+  parent: Terminal.Gui
+  href: Terminal.Gui.CollectionNavigator.html
+  name: CollectionNavigator
+  nameWithType: CollectionNavigator
+  fullName: Terminal.Gui.CollectionNavigator
+- uid: Terminal.Gui.CollectionNavigatorBase
+  commentId: T:Terminal.Gui.CollectionNavigatorBase
+  parent: Terminal.Gui
+  href: Terminal.Gui.CollectionNavigatorBase.html
+  name: CollectionNavigatorBase
+  nameWithType: CollectionNavigatorBase
+  fullName: Terminal.Gui.CollectionNavigatorBase
+- uid: Terminal.Gui.RuneExtensions
+  commentId: T:Terminal.Gui.RuneExtensions
+  href: Terminal.Gui.RuneExtensions.html
+  name: RuneExtensions
+  nameWithType: RuneExtensions
+  fullName: Terminal.Gui.RuneExtensions
+- uid: Terminal.Gui.StringExtensions
+  commentId: T:Terminal.Gui.StringExtensions
+  href: Terminal.Gui.StringExtensions.html
+  name: StringExtensions
+  nameWithType: StringExtensions
+  fullName: Terminal.Gui.StringExtensions
+- uid: Terminal.Gui.TableCollectionNavigator
+  commentId: T:Terminal.Gui.TableCollectionNavigator
+  href: Terminal.Gui.TableCollectionNavigator.html
+  name: TableCollectionNavigator
+  nameWithType: TableCollectionNavigator
+  fullName: Terminal.Gui.TableCollectionNavigator
+- uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextAlignment.html
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.VerticalTextAlignment
+  commentId: T:Terminal.Gui.VerticalTextAlignment
+  parent: Terminal.Gui
+  href: Terminal.Gui.VerticalTextAlignment.html
+  name: VerticalTextAlignment
+  nameWithType: VerticalTextAlignment
+  fullName: Terminal.Gui.VerticalTextAlignment
+- uid: Terminal.Gui.TextDirection
+  commentId: T:Terminal.Gui.TextDirection
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextDirection.html
+  name: TextDirection
+  nameWithType: TextDirection
+  fullName: Terminal.Gui.TextDirection
+- uid: Terminal.Gui.TextFormatter
+  commentId: T:Terminal.Gui.TextFormatter
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextFormatter.html
+  name: TextFormatter
+  nameWithType: TextFormatter
+  fullName: Terminal.Gui.TextFormatter
+- uid: Terminal.Gui.LayoutStyle
+  commentId: T:Terminal.Gui.LayoutStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.LayoutStyle.html
+  name: LayoutStyle
+  nameWithType: LayoutStyle
+  fullName: Terminal.Gui.LayoutStyle
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.Timeout
+  commentId: T:Terminal.Gui.Timeout
+  href: Terminal.Gui.Timeout.html
+  name: Timeout
+  nameWithType: Timeout
+  fullName: Terminal.Gui.Timeout
+- uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
+  parent: Terminal.Gui
+  href: Terminal.Gui.Point.html
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.PointF
+  commentId: T:Terminal.Gui.PointF
+  parent: Terminal.Gui
+  href: Terminal.Gui.PointF.html
+  name: PointF
+  nameWithType: PointF
+  fullName: Terminal.Gui.PointF
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  href: Terminal.Gui.Rect.html
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.RectangleF
+  commentId: T:Terminal.Gui.RectangleF
+  parent: Terminal.Gui
+  href: Terminal.Gui.RectangleF.html
+  name: RectangleF
+  nameWithType: RectangleF
+  fullName: Terminal.Gui.RectangleF
+- uid: Terminal.Gui.Size
+  commentId: T:Terminal.Gui.Size
+  parent: Terminal.Gui
+  href: Terminal.Gui.Size.html
+  name: Size
+  nameWithType: Size
+  fullName: Terminal.Gui.Size
+- uid: Terminal.Gui.SizeF
+  commentId: T:Terminal.Gui.SizeF
+  parent: Terminal.Gui
+  href: Terminal.Gui.SizeF.html
+  name: SizeF
+  nameWithType: SizeF
+  fullName: Terminal.Gui.SizeF
+- uid: Terminal.Gui.Button
+  commentId: T:Terminal.Gui.Button
+  parent: Terminal.Gui
+  href: Terminal.Gui.Button.html
+  name: Button
+  nameWithType: Button
+  fullName: Terminal.Gui.Button
+- uid: Terminal.Gui.CheckBox
+  commentId: T:Terminal.Gui.CheckBox
+  href: Terminal.Gui.CheckBox.html
+  name: CheckBox
+  nameWithType: CheckBox
+  fullName: Terminal.Gui.CheckBox
+- uid: Terminal.Gui.ColorEventArgs
+  commentId: T:Terminal.Gui.ColorEventArgs
+  href: Terminal.Gui.ColorEventArgs.html
+  name: ColorEventArgs
+  nameWithType: ColorEventArgs
+  fullName: Terminal.Gui.ColorEventArgs
+- uid: Terminal.Gui.ColorPicker
+  commentId: T:Terminal.Gui.ColorPicker
+  href: Terminal.Gui.ColorPicker.html
+  name: ColorPicker
+  nameWithType: ColorPicker
+  fullName: Terminal.Gui.ColorPicker
+- uid: Terminal.Gui.ComboBox
+  commentId: T:Terminal.Gui.ComboBox
+  href: Terminal.Gui.ComboBox.html
+  name: ComboBox
+  nameWithType: ComboBox
+  fullName: Terminal.Gui.ComboBox
+- uid: Terminal.Gui.ContentsChangedEventArgs
+  commentId: T:Terminal.Gui.ContentsChangedEventArgs
+  href: Terminal.Gui.ContentsChangedEventArgs.html
+  name: ContentsChangedEventArgs
+  nameWithType: ContentsChangedEventArgs
+  fullName: Terminal.Gui.ContentsChangedEventArgs
+- uid: Terminal.Gui.ContextMenu
+  commentId: T:Terminal.Gui.ContextMenu
+  parent: Terminal.Gui
+  href: Terminal.Gui.ContextMenu.html
+  name: ContextMenu
+  nameWithType: ContextMenu
+  fullName: Terminal.Gui.ContextMenu
+- uid: Terminal.Gui.DateField
+  commentId: T:Terminal.Gui.DateField
+  href: Terminal.Gui.DateField.html
+  name: DateField
+  nameWithType: DateField
+  fullName: Terminal.Gui.DateField
+- uid: Terminal.Gui.DateTimeEventArgs`1
+  commentId: T:Terminal.Gui.DateTimeEventArgs`1
+  href: Terminal.Gui.DateTimeEventArgs-1.html
+  name: DateTimeEventArgs<T>
+  nameWithType: DateTimeEventArgs<T>
+  fullName: Terminal.Gui.DateTimeEventArgs<T>
+  nameWithType.vb: DateTimeEventArgs(Of T)
+  fullName.vb: Terminal.Gui.DateTimeEventArgs(Of T)
+  name.vb: DateTimeEventArgs(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.DateTimeEventArgs`1
+    name: DateTimeEventArgs
+    href: Terminal.Gui.DateTimeEventArgs-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.DateTimeEventArgs`1
+    name: DateTimeEventArgs
+    href: Terminal.Gui.DateTimeEventArgs-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.Dialog
+  commentId: T:Terminal.Gui.Dialog
+  parent: Terminal.Gui
+  href: Terminal.Gui.Dialog.html
+  name: Dialog
+  nameWithType: Dialog
+  fullName: Terminal.Gui.Dialog
+- uid: Terminal.Gui.Dialog.ButtonAlignments
+  commentId: T:Terminal.Gui.Dialog.ButtonAlignments
+  parent: Terminal.Gui
+  href: Terminal.Gui.Dialog.html
+  name: Dialog.ButtonAlignments
+  nameWithType: Dialog.ButtonAlignments
+  fullName: Terminal.Gui.Dialog.ButtonAlignments
+  spec.csharp:
+  - uid: Terminal.Gui.Dialog
+    name: Dialog
+    href: Terminal.Gui.Dialog.html
+  - name: .
+  - uid: Terminal.Gui.Dialog.ButtonAlignments
+    name: ButtonAlignments
+    href: Terminal.Gui.Dialog.ButtonAlignments.html
+  spec.vb:
+  - uid: Terminal.Gui.Dialog
+    name: Dialog
+    href: Terminal.Gui.Dialog.html
+  - name: .
+  - uid: Terminal.Gui.Dialog.ButtonAlignments
+    name: ButtonAlignments
+    href: Terminal.Gui.Dialog.ButtonAlignments.html
+- uid: Terminal.Gui.FileDialog
+  commentId: T:Terminal.Gui.FileDialog
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileDialog.html
+  name: FileDialog
+  nameWithType: FileDialog
+  fullName: Terminal.Gui.FileDialog
+- uid: Terminal.Gui.FileSystemColorProvider
+  commentId: T:Terminal.Gui.FileSystemColorProvider
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileSystemColorProvider.html
+  name: FileSystemColorProvider
+  nameWithType: FileSystemColorProvider
+  fullName: Terminal.Gui.FileSystemColorProvider
+- uid: Terminal.Gui.FileSystemIconProvider
+  commentId: T:Terminal.Gui.FileSystemIconProvider
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileSystemIconProvider.html
+  name: FileSystemIconProvider
+  nameWithType: FileSystemIconProvider
+  fullName: Terminal.Gui.FileSystemIconProvider
+- uid: Terminal.Gui.FrameView
+  commentId: T:Terminal.Gui.FrameView
+  parent: Terminal.Gui
+  href: Terminal.Gui.FrameView.html
+  name: FrameView
+  nameWithType: FrameView
+  fullName: Terminal.Gui.FrameView
+- uid: Terminal.Gui.IAnnotation
+  commentId: T:Terminal.Gui.IAnnotation
+  parent: Terminal.Gui
+  href: Terminal.Gui.IAnnotation.html
+  name: IAnnotation
+  nameWithType: IAnnotation
+  fullName: Terminal.Gui.IAnnotation
+- uid: Terminal.Gui.TextAnnotation
+  commentId: T:Terminal.Gui.TextAnnotation
+  href: Terminal.Gui.TextAnnotation.html
+  name: TextAnnotation
+  nameWithType: TextAnnotation
+  fullName: Terminal.Gui.TextAnnotation
+- uid: Terminal.Gui.LegendAnnotation
+  commentId: T:Terminal.Gui.LegendAnnotation
+  href: Terminal.Gui.LegendAnnotation.html
+  name: LegendAnnotation
+  nameWithType: LegendAnnotation
+  fullName: Terminal.Gui.LegendAnnotation
+- uid: Terminal.Gui.PathAnnotation
+  commentId: T:Terminal.Gui.PathAnnotation
+  href: Terminal.Gui.PathAnnotation.html
+  name: PathAnnotation
+  nameWithType: PathAnnotation
+  fullName: Terminal.Gui.PathAnnotation
+- uid: Terminal.Gui.Axis
+  commentId: T:Terminal.Gui.Axis
+  parent: Terminal.Gui
+  href: Terminal.Gui.Axis.html
+  name: Axis
+  nameWithType: Axis
+  fullName: Terminal.Gui.Axis
+- uid: Terminal.Gui.HorizontalAxis
+  commentId: T:Terminal.Gui.HorizontalAxis
+  parent: Terminal.Gui
+  href: Terminal.Gui.HorizontalAxis.html
+  name: HorizontalAxis
+  nameWithType: HorizontalAxis
+  fullName: Terminal.Gui.HorizontalAxis
+- uid: Terminal.Gui.VerticalAxis
+  commentId: T:Terminal.Gui.VerticalAxis
+  parent: Terminal.Gui
+  href: Terminal.Gui.VerticalAxis.html
+  name: VerticalAxis
+  nameWithType: VerticalAxis
+  fullName: Terminal.Gui.VerticalAxis
+- uid: Terminal.Gui.AxisIncrementToRender
+  commentId: T:Terminal.Gui.AxisIncrementToRender
+  parent: Terminal.Gui
+  href: Terminal.Gui.AxisIncrementToRender.html
+  name: AxisIncrementToRender
+  nameWithType: AxisIncrementToRender
+  fullName: Terminal.Gui.AxisIncrementToRender
+- uid: Terminal.Gui.LabelGetterDelegate
+  commentId: T:Terminal.Gui.LabelGetterDelegate
+  parent: Terminal.Gui
+  href: Terminal.Gui.LabelGetterDelegate.html
+  name: LabelGetterDelegate
+  nameWithType: LabelGetterDelegate
+  fullName: Terminal.Gui.LabelGetterDelegate
+- uid: Terminal.Gui.BarSeriesBar
+  commentId: T:Terminal.Gui.BarSeriesBar
+  parent: Terminal.Gui
+  href: Terminal.Gui.BarSeriesBar.html
+  name: BarSeriesBar
+  nameWithType: BarSeriesBar
+  fullName: Terminal.Gui.BarSeriesBar
+- uid: Terminal.Gui.GraphCellToRender
+  commentId: T:Terminal.Gui.GraphCellToRender
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphCellToRender.html
+  name: GraphCellToRender
+  nameWithType: GraphCellToRender
+  fullName: Terminal.Gui.GraphCellToRender
+- uid: Terminal.Gui.GraphView
+  commentId: T:Terminal.Gui.GraphView
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphView.html
+  name: GraphView
+  nameWithType: GraphView
+  fullName: Terminal.Gui.GraphView
+- uid: Terminal.Gui.LineF
+  commentId: T:Terminal.Gui.LineF
+  href: Terminal.Gui.LineF.html
+  name: LineF
+  nameWithType: LineF
+  fullName: Terminal.Gui.LineF
+- uid: Terminal.Gui.Orientation
+  commentId: T:Terminal.Gui.Orientation
+  parent: Terminal.Gui
+  href: Terminal.Gui.Orientation.html
+  name: Orientation
+  nameWithType: Orientation
+  fullName: Terminal.Gui.Orientation
+- uid: Terminal.Gui.ISeries
+  commentId: T:Terminal.Gui.ISeries
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISeries.html
+  name: ISeries
+  nameWithType: ISeries
+  fullName: Terminal.Gui.ISeries
+- uid: Terminal.Gui.ScatterSeries
+  commentId: T:Terminal.Gui.ScatterSeries
+  href: Terminal.Gui.ScatterSeries.html
+  name: ScatterSeries
+  nameWithType: ScatterSeries
+  fullName: Terminal.Gui.ScatterSeries
+- uid: Terminal.Gui.MultiBarSeries
+  commentId: T:Terminal.Gui.MultiBarSeries
+  href: Terminal.Gui.MultiBarSeries.html
+  name: MultiBarSeries
+  nameWithType: MultiBarSeries
+  fullName: Terminal.Gui.MultiBarSeries
+- uid: Terminal.Gui.BarSeries
+  commentId: T:Terminal.Gui.BarSeries
+  href: Terminal.Gui.BarSeries.html
+  name: BarSeries
+  nameWithType: BarSeries
+  fullName: Terminal.Gui.BarSeries
+- uid: Terminal.Gui.HexView
+  commentId: T:Terminal.Gui.HexView
+  href: Terminal.Gui.HexView.html
+  name: HexView
+  nameWithType: HexView
+  fullName: Terminal.Gui.HexView
+- uid: Terminal.Gui.HexViewEventArgs
+  commentId: T:Terminal.Gui.HexViewEventArgs
+  href: Terminal.Gui.HexViewEventArgs.html
+  name: HexViewEventArgs
+  nameWithType: HexViewEventArgs
+  fullName: Terminal.Gui.HexViewEventArgs
+- uid: Terminal.Gui.HexViewEditEventArgs
+  commentId: T:Terminal.Gui.HexViewEditEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.HexViewEditEventArgs.html
+  name: HexViewEditEventArgs
+  nameWithType: HexViewEditEventArgs
+  fullName: Terminal.Gui.HexViewEditEventArgs
+- uid: Terminal.Gui.ITreeViewFilter`1
+  commentId: T:Terminal.Gui.ITreeViewFilter`1
+  href: Terminal.Gui.ITreeViewFilter-1.html
+  name: ITreeViewFilter<T>
+  nameWithType: ITreeViewFilter<T>
+  fullName: Terminal.Gui.ITreeViewFilter<T>
+  nameWithType.vb: ITreeViewFilter(Of T)
+  fullName.vb: Terminal.Gui.ITreeViewFilter(Of T)
+  name.vb: ITreeViewFilter(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.ITreeViewFilter`1
+    name: ITreeViewFilter
+    href: Terminal.Gui.ITreeViewFilter-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.ITreeViewFilter`1
+    name: ITreeViewFilter
+    href: Terminal.Gui.ITreeViewFilter-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.Label
+  commentId: T:Terminal.Gui.Label
+  href: Terminal.Gui.Label.html
+  name: Label
+  nameWithType: Label
+  fullName: Terminal.Gui.Label
+- uid: Terminal.Gui.Line
+  commentId: T:Terminal.Gui.Line
+  href: Terminal.Gui.Line.html
+  name: Line
+  nameWithType: Line
+  fullName: Terminal.Gui.Line
+- uid: Terminal.Gui.LineView
+  commentId: T:Terminal.Gui.LineView
+  href: Terminal.Gui.LineView.html
+  name: LineView
+  nameWithType: LineView
+  fullName: Terminal.Gui.LineView
+- uid: Terminal.Gui.IListDataSource
+  commentId: T:Terminal.Gui.IListDataSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.IListDataSource.html
+  name: IListDataSource
+  nameWithType: IListDataSource
+  fullName: Terminal.Gui.IListDataSource
+- uid: Terminal.Gui.ListView
+  commentId: T:Terminal.Gui.ListView
+  parent: Terminal.Gui
+  href: Terminal.Gui.ListView.html
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
+- uid: Terminal.Gui.ListWrapper
+  commentId: T:Terminal.Gui.ListWrapper
+  href: Terminal.Gui.ListWrapper.html
+  name: ListWrapper
+  nameWithType: ListWrapper
+  fullName: Terminal.Gui.ListWrapper
+- uid: Terminal.Gui.ListViewItemEventArgs
+  commentId: T:Terminal.Gui.ListViewItemEventArgs
+  href: Terminal.Gui.ListViewItemEventArgs.html
+  name: ListViewItemEventArgs
+  nameWithType: ListViewItemEventArgs
+  fullName: Terminal.Gui.ListViewItemEventArgs
+- uid: Terminal.Gui.ListViewRowEventArgs
+  commentId: T:Terminal.Gui.ListViewRowEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.ListViewRowEventArgs.html
+  name: ListViewRowEventArgs
+  nameWithType: ListViewRowEventArgs
+  fullName: Terminal.Gui.ListViewRowEventArgs
+- uid: Terminal.Gui.MenuItemCheckStyle
+  commentId: T:Terminal.Gui.MenuItemCheckStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuItemCheckStyle.html
+  name: MenuItemCheckStyle
+  nameWithType: MenuItemCheckStyle
+  fullName: Terminal.Gui.MenuItemCheckStyle
+- uid: Terminal.Gui.MenuItem
+  commentId: T:Terminal.Gui.MenuItem
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuItem.html
+  name: MenuItem
+  nameWithType: MenuItem
+  fullName: Terminal.Gui.MenuItem
+- uid: Terminal.Gui.MenuBarItem
+  commentId: T:Terminal.Gui.MenuBarItem
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuBarItem.html
+  name: MenuBarItem
+  nameWithType: MenuBarItem
+  fullName: Terminal.Gui.MenuBarItem
+- uid: Terminal.Gui.MenuBar
+  commentId: T:Terminal.Gui.MenuBar
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuBar.html
+  name: MenuBar
+  nameWithType: MenuBar
+  fullName: Terminal.Gui.MenuBar
+- uid: Terminal.Gui.MenuOpeningEventArgs
+  commentId: T:Terminal.Gui.MenuOpeningEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuOpeningEventArgs.html
+  name: MenuOpeningEventArgs
+  nameWithType: MenuOpeningEventArgs
+  fullName: Terminal.Gui.MenuOpeningEventArgs
+- uid: Terminal.Gui.MenuOpenedEventArgs
+  commentId: T:Terminal.Gui.MenuOpenedEventArgs
+  href: Terminal.Gui.MenuOpenedEventArgs.html
+  name: MenuOpenedEventArgs
+  nameWithType: MenuOpenedEventArgs
+  fullName: Terminal.Gui.MenuOpenedEventArgs
+- uid: Terminal.Gui.MenuClosingEventArgs
+  commentId: T:Terminal.Gui.MenuClosingEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuClosingEventArgs.html
+  name: MenuClosingEventArgs
+  nameWithType: MenuClosingEventArgs
+  fullName: Terminal.Gui.MenuClosingEventArgs
+- uid: Terminal.Gui.MessageBox
+  commentId: T:Terminal.Gui.MessageBox
+  href: Terminal.Gui.MessageBox.html
+  name: MessageBox
+  nameWithType: MessageBox
+  fullName: Terminal.Gui.MessageBox
+- uid: Terminal.Gui.OpenMode
+  commentId: T:Terminal.Gui.OpenMode
+  parent: Terminal.Gui
+  href: Terminal.Gui.OpenMode.html
+  name: OpenMode
+  nameWithType: OpenMode
+  fullName: Terminal.Gui.OpenMode
+- uid: Terminal.Gui.OpenDialog
+  commentId: T:Terminal.Gui.OpenDialog
+  href: Terminal.Gui.OpenDialog.html
+  name: OpenDialog
+  nameWithType: OpenDialog
+  fullName: Terminal.Gui.OpenDialog
+- uid: Terminal.Gui.ProgressBarStyle
+  commentId: T:Terminal.Gui.ProgressBarStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.ProgressBarStyle.html
+  name: ProgressBarStyle
+  nameWithType: ProgressBarStyle
+  fullName: Terminal.Gui.ProgressBarStyle
+- uid: Terminal.Gui.ProgressBarFormat
+  commentId: T:Terminal.Gui.ProgressBarFormat
+  parent: Terminal.Gui
+  href: Terminal.Gui.ProgressBarFormat.html
+  name: ProgressBarFormat
+  nameWithType: ProgressBarFormat
+  fullName: Terminal.Gui.ProgressBarFormat
+- uid: Terminal.Gui.ProgressBar
+  commentId: T:Terminal.Gui.ProgressBar
+  href: Terminal.Gui.ProgressBar.html
+  name: ProgressBar
+  nameWithType: ProgressBar
+  fullName: Terminal.Gui.ProgressBar
+- uid: Terminal.Gui.RadioGroup
+  commentId: T:Terminal.Gui.RadioGroup
+  href: Terminal.Gui.RadioGroup.html
+  name: RadioGroup
+  nameWithType: RadioGroup
+  fullName: Terminal.Gui.RadioGroup
+- uid: Terminal.Gui.DisplayModeLayout
+  commentId: T:Terminal.Gui.DisplayModeLayout
+  parent: Terminal.Gui
+  href: Terminal.Gui.DisplayModeLayout.html
+  name: DisplayModeLayout
+  nameWithType: DisplayModeLayout
+  fullName: Terminal.Gui.DisplayModeLayout
+- uid: Terminal.Gui.RuneCellEventArgs
+  commentId: T:Terminal.Gui.RuneCellEventArgs
+  href: Terminal.Gui.RuneCellEventArgs.html
+  name: RuneCellEventArgs
+  nameWithType: RuneCellEventArgs
+  fullName: Terminal.Gui.RuneCellEventArgs
+- uid: Terminal.Gui.SaveDialog
+  commentId: T:Terminal.Gui.SaveDialog
+  href: Terminal.Gui.SaveDialog.html
+  name: SaveDialog
+  nameWithType: SaveDialog
+  fullName: Terminal.Gui.SaveDialog
+- uid: Terminal.Gui.ScrollBarView
+  commentId: T:Terminal.Gui.ScrollBarView
+  parent: Terminal.Gui
+  href: Terminal.Gui.ScrollBarView.html
+  name: ScrollBarView
+  nameWithType: ScrollBarView
+  fullName: Terminal.Gui.ScrollBarView
+- uid: Terminal.Gui.ScrollView
+  commentId: T:Terminal.Gui.ScrollView
+  href: Terminal.Gui.ScrollView.html
+  name: ScrollView
+  nameWithType: ScrollView
+  fullName: Terminal.Gui.ScrollView
+- uid: Terminal.Gui.SelectedItemChangedArgs
+  commentId: T:Terminal.Gui.SelectedItemChangedArgs
+  href: Terminal.Gui.SelectedItemChangedArgs.html
+  name: SelectedItemChangedArgs
+  nameWithType: SelectedItemChangedArgs
+  fullName: Terminal.Gui.SelectedItemChangedArgs
+- uid: Terminal.Gui.SliderOptionEventArgs
+  commentId: T:Terminal.Gui.SliderOptionEventArgs
+  href: Terminal.Gui.SliderOptionEventArgs.html
+  name: SliderOptionEventArgs
+  nameWithType: SliderOptionEventArgs
+  fullName: Terminal.Gui.SliderOptionEventArgs
+- uid: Terminal.Gui.SliderOption`1
+  commentId: T:Terminal.Gui.SliderOption`1
+  href: Terminal.Gui.SliderOption-1.html
+  name: SliderOption<T>
+  nameWithType: SliderOption<T>
+  fullName: Terminal.Gui.SliderOption<T>
+  nameWithType.vb: SliderOption(Of T)
+  fullName.vb: Terminal.Gui.SliderOption(Of T)
+  name.vb: SliderOption(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.SliderOption`1
+    name: SliderOption
+    href: Terminal.Gui.SliderOption-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.SliderOption`1
+    name: SliderOption
+    href: Terminal.Gui.SliderOption-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.SliderType
+  commentId: T:Terminal.Gui.SliderType
+  parent: Terminal.Gui
+  href: Terminal.Gui.SliderType.html
+  name: SliderType
+  nameWithType: SliderType
+  fullName: Terminal.Gui.SliderType
+- uid: Terminal.Gui.SliderAttributes
+  commentId: T:Terminal.Gui.SliderAttributes
+  parent: Terminal.Gui
+  href: Terminal.Gui.SliderAttributes.html
+  name: SliderAttributes
+  nameWithType: SliderAttributes
+  fullName: Terminal.Gui.SliderAttributes
+- uid: Terminal.Gui.SliderStyle
+  commentId: T:Terminal.Gui.SliderStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.SliderStyle.html
+  name: SliderStyle
+  nameWithType: SliderStyle
+  fullName: Terminal.Gui.SliderStyle
+- uid: Terminal.Gui.SliderEventArgs`1
+  commentId: T:Terminal.Gui.SliderEventArgs`1
+  href: Terminal.Gui.SliderEventArgs-1.html
+  name: SliderEventArgs<T>
+  nameWithType: SliderEventArgs<T>
+  fullName: Terminal.Gui.SliderEventArgs<T>
+  nameWithType.vb: SliderEventArgs(Of T)
+  fullName.vb: Terminal.Gui.SliderEventArgs(Of T)
+  name.vb: SliderEventArgs(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.SliderEventArgs`1
+    name: SliderEventArgs
+    href: Terminal.Gui.SliderEventArgs-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.SliderEventArgs`1
+    name: SliderEventArgs
+    href: Terminal.Gui.SliderEventArgs-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.OrientationEventArgs
+  commentId: T:Terminal.Gui.OrientationEventArgs
+  href: Terminal.Gui.OrientationEventArgs.html
+  name: OrientationEventArgs
+  nameWithType: OrientationEventArgs
+  fullName: Terminal.Gui.OrientationEventArgs
+- uid: Terminal.Gui.Slider
+  commentId: T:Terminal.Gui.Slider
+  href: Terminal.Gui.Slider.html
+  name: Slider
+  nameWithType: Slider
+  fullName: Terminal.Gui.Slider
+- uid: Terminal.Gui.Slider`1
+  commentId: T:Terminal.Gui.Slider`1
+  href: Terminal.Gui.Slider-1.html
+  name: Slider<T>
+  nameWithType: Slider<T>
+  fullName: Terminal.Gui.Slider<T>
+  nameWithType.vb: Slider(Of T)
+  fullName.vb: Terminal.Gui.Slider(Of T)
+  name.vb: Slider(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.Slider`1
+    name: Slider
+    href: Terminal.Gui.Slider-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.Slider`1
+    name: Slider
+    href: Terminal.Gui.Slider-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.SpinnerStyle
+  commentId: T:Terminal.Gui.SpinnerStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle
+  nameWithType: SpinnerStyle
+  fullName: Terminal.Gui.SpinnerStyle
+- uid: Terminal.Gui.SpinnerStyle.Custom
+  commentId: T:Terminal.Gui.SpinnerStyle.Custom
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Custom
+  nameWithType: SpinnerStyle.Custom
+  fullName: Terminal.Gui.SpinnerStyle.Custom
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Custom
+    name: Custom
+    href: Terminal.Gui.SpinnerStyle.Custom.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Custom
+    name: Custom
+    href: Terminal.Gui.SpinnerStyle.Custom.html
+- uid: Terminal.Gui.SpinnerStyle.Dots
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots
+  nameWithType: SpinnerStyle.Dots
+  fullName: Terminal.Gui.SpinnerStyle.Dots
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots
+    name: Dots
+    href: Terminal.Gui.SpinnerStyle.Dots.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots
+    name: Dots
+    href: Terminal.Gui.SpinnerStyle.Dots.html
+- uid: Terminal.Gui.SpinnerStyle.Dots2
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots2
+  nameWithType: SpinnerStyle.Dots2
+  fullName: Terminal.Gui.SpinnerStyle.Dots2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots2
+    name: Dots2
+    href: Terminal.Gui.SpinnerStyle.Dots2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots2
+    name: Dots2
+    href: Terminal.Gui.SpinnerStyle.Dots2.html
+- uid: Terminal.Gui.SpinnerStyle.Dots3
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots3
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots3
+  nameWithType: SpinnerStyle.Dots3
+  fullName: Terminal.Gui.SpinnerStyle.Dots3
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots3
+    name: Dots3
+    href: Terminal.Gui.SpinnerStyle.Dots3.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots3
+    name: Dots3
+    href: Terminal.Gui.SpinnerStyle.Dots3.html
+- uid: Terminal.Gui.SpinnerStyle.Dots4
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots4
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots4
+  nameWithType: SpinnerStyle.Dots4
+  fullName: Terminal.Gui.SpinnerStyle.Dots4
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots4
+    name: Dots4
+    href: Terminal.Gui.SpinnerStyle.Dots4.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots4
+    name: Dots4
+    href: Terminal.Gui.SpinnerStyle.Dots4.html
+- uid: Terminal.Gui.SpinnerStyle.Dots5
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots5
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots5
+  nameWithType: SpinnerStyle.Dots5
+  fullName: Terminal.Gui.SpinnerStyle.Dots5
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots5
+    name: Dots5
+    href: Terminal.Gui.SpinnerStyle.Dots5.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots5
+    name: Dots5
+    href: Terminal.Gui.SpinnerStyle.Dots5.html
+- uid: Terminal.Gui.SpinnerStyle.Dots6
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots6
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots6
+  nameWithType: SpinnerStyle.Dots6
+  fullName: Terminal.Gui.SpinnerStyle.Dots6
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots6
+    name: Dots6
+    href: Terminal.Gui.SpinnerStyle.Dots6.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots6
+    name: Dots6
+    href: Terminal.Gui.SpinnerStyle.Dots6.html
+- uid: Terminal.Gui.SpinnerStyle.Dots7
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots7
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots7
+  nameWithType: SpinnerStyle.Dots7
+  fullName: Terminal.Gui.SpinnerStyle.Dots7
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots7
+    name: Dots7
+    href: Terminal.Gui.SpinnerStyle.Dots7.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots7
+    name: Dots7
+    href: Terminal.Gui.SpinnerStyle.Dots7.html
+- uid: Terminal.Gui.SpinnerStyle.Dots8
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots8
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots8
+  nameWithType: SpinnerStyle.Dots8
+  fullName: Terminal.Gui.SpinnerStyle.Dots8
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots8
+    name: Dots8
+    href: Terminal.Gui.SpinnerStyle.Dots8.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots8
+    name: Dots8
+    href: Terminal.Gui.SpinnerStyle.Dots8.html
+- uid: Terminal.Gui.SpinnerStyle.Dots9
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots9
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots9
+  nameWithType: SpinnerStyle.Dots9
+  fullName: Terminal.Gui.SpinnerStyle.Dots9
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots9
+    name: Dots9
+    href: Terminal.Gui.SpinnerStyle.Dots9.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots9
+    name: Dots9
+    href: Terminal.Gui.SpinnerStyle.Dots9.html
+- uid: Terminal.Gui.SpinnerStyle.Dots10
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots10
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots10
+  nameWithType: SpinnerStyle.Dots10
+  fullName: Terminal.Gui.SpinnerStyle.Dots10
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots10
+    name: Dots10
+    href: Terminal.Gui.SpinnerStyle.Dots10.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots10
+    name: Dots10
+    href: Terminal.Gui.SpinnerStyle.Dots10.html
+- uid: Terminal.Gui.SpinnerStyle.Dots11
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots11
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots11
+  nameWithType: SpinnerStyle.Dots11
+  fullName: Terminal.Gui.SpinnerStyle.Dots11
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots11
+    name: Dots11
+    href: Terminal.Gui.SpinnerStyle.Dots11.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots11
+    name: Dots11
+    href: Terminal.Gui.SpinnerStyle.Dots11.html
+- uid: Terminal.Gui.SpinnerStyle.Dots12
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots12
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots12
+  nameWithType: SpinnerStyle.Dots12
+  fullName: Terminal.Gui.SpinnerStyle.Dots12
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots12
+    name: Dots12
+    href: Terminal.Gui.SpinnerStyle.Dots12.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots12
+    name: Dots12
+    href: Terminal.Gui.SpinnerStyle.Dots12.html
+- uid: Terminal.Gui.SpinnerStyle.Dots8Bit
+  commentId: T:Terminal.Gui.SpinnerStyle.Dots8Bit
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dots8Bit
+  nameWithType: SpinnerStyle.Dots8Bit
+  fullName: Terminal.Gui.SpinnerStyle.Dots8Bit
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots8Bit
+    name: Dots8Bit
+    href: Terminal.Gui.SpinnerStyle.Dots8Bit.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dots8Bit
+    name: Dots8Bit
+    href: Terminal.Gui.SpinnerStyle.Dots8Bit.html
+- uid: Terminal.Gui.SpinnerStyle.Line
+  commentId: T:Terminal.Gui.SpinnerStyle.Line
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Line
+  nameWithType: SpinnerStyle.Line
+  fullName: Terminal.Gui.SpinnerStyle.Line
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Line
+    name: Line
+    href: Terminal.Gui.SpinnerStyle.Line.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Line
+    name: Line
+    href: Terminal.Gui.SpinnerStyle.Line.html
+- uid: Terminal.Gui.SpinnerStyle.Line2
+  commentId: T:Terminal.Gui.SpinnerStyle.Line2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Line2
+  nameWithType: SpinnerStyle.Line2
+  fullName: Terminal.Gui.SpinnerStyle.Line2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Line2
+    name: Line2
+    href: Terminal.Gui.SpinnerStyle.Line2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Line2
+    name: Line2
+    href: Terminal.Gui.SpinnerStyle.Line2.html
+- uid: Terminal.Gui.SpinnerStyle.Pipe
+  commentId: T:Terminal.Gui.SpinnerStyle.Pipe
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Pipe
+  nameWithType: SpinnerStyle.Pipe
+  fullName: Terminal.Gui.SpinnerStyle.Pipe
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Pipe
+    name: Pipe
+    href: Terminal.Gui.SpinnerStyle.Pipe.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Pipe
+    name: Pipe
+    href: Terminal.Gui.SpinnerStyle.Pipe.html
+- uid: Terminal.Gui.SpinnerStyle.SimpleDots
+  commentId: T:Terminal.Gui.SpinnerStyle.SimpleDots
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.SimpleDots
+  nameWithType: SpinnerStyle.SimpleDots
+  fullName: Terminal.Gui.SpinnerStyle.SimpleDots
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SimpleDots
+    name: SimpleDots
+    href: Terminal.Gui.SpinnerStyle.SimpleDots.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SimpleDots
+    name: SimpleDots
+    href: Terminal.Gui.SpinnerStyle.SimpleDots.html
+- uid: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+  commentId: T:Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.SimpleDotsScrolling
+  nameWithType: SpinnerStyle.SimpleDotsScrolling
+  fullName: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+    name: SimpleDotsScrolling
+    href: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling
+    name: SimpleDotsScrolling
+    href: Terminal.Gui.SpinnerStyle.SimpleDotsScrolling.html
+- uid: Terminal.Gui.SpinnerStyle.Star
+  commentId: T:Terminal.Gui.SpinnerStyle.Star
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Star
+  nameWithType: SpinnerStyle.Star
+  fullName: Terminal.Gui.SpinnerStyle.Star
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Star
+    name: Star
+    href: Terminal.Gui.SpinnerStyle.Star.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Star
+    name: Star
+    href: Terminal.Gui.SpinnerStyle.Star.html
+- uid: Terminal.Gui.SpinnerStyle.Star2
+  commentId: T:Terminal.Gui.SpinnerStyle.Star2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Star2
+  nameWithType: SpinnerStyle.Star2
+  fullName: Terminal.Gui.SpinnerStyle.Star2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Star2
+    name: Star2
+    href: Terminal.Gui.SpinnerStyle.Star2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Star2
+    name: Star2
+    href: Terminal.Gui.SpinnerStyle.Star2.html
+- uid: Terminal.Gui.SpinnerStyle.Flip
+  commentId: T:Terminal.Gui.SpinnerStyle.Flip
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Flip
+  nameWithType: SpinnerStyle.Flip
+  fullName: Terminal.Gui.SpinnerStyle.Flip
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Flip
+    name: Flip
+    href: Terminal.Gui.SpinnerStyle.Flip.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Flip
+    name: Flip
+    href: Terminal.Gui.SpinnerStyle.Flip.html
+- uid: Terminal.Gui.SpinnerStyle.Hamburger
+  commentId: T:Terminal.Gui.SpinnerStyle.Hamburger
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Hamburger
+  nameWithType: SpinnerStyle.Hamburger
+  fullName: Terminal.Gui.SpinnerStyle.Hamburger
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Hamburger
+    name: Hamburger
+    href: Terminal.Gui.SpinnerStyle.Hamburger.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Hamburger
+    name: Hamburger
+    href: Terminal.Gui.SpinnerStyle.Hamburger.html
+- uid: Terminal.Gui.SpinnerStyle.GrowVertical
+  commentId: T:Terminal.Gui.SpinnerStyle.GrowVertical
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.GrowVertical
+  nameWithType: SpinnerStyle.GrowVertical
+  fullName: Terminal.Gui.SpinnerStyle.GrowVertical
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.GrowVertical
+    name: GrowVertical
+    href: Terminal.Gui.SpinnerStyle.GrowVertical.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.GrowVertical
+    name: GrowVertical
+    href: Terminal.Gui.SpinnerStyle.GrowVertical.html
+- uid: Terminal.Gui.SpinnerStyle.GrowHorizontal
+  commentId: T:Terminal.Gui.SpinnerStyle.GrowHorizontal
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.GrowHorizontal
+  nameWithType: SpinnerStyle.GrowHorizontal
+  fullName: Terminal.Gui.SpinnerStyle.GrowHorizontal
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.GrowHorizontal
+    name: GrowHorizontal
+    href: Terminal.Gui.SpinnerStyle.GrowHorizontal.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.GrowHorizontal
+    name: GrowHorizontal
+    href: Terminal.Gui.SpinnerStyle.GrowHorizontal.html
+- uid: Terminal.Gui.SpinnerStyle.Balloon
+  commentId: T:Terminal.Gui.SpinnerStyle.Balloon
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Balloon
+  nameWithType: SpinnerStyle.Balloon
+  fullName: Terminal.Gui.SpinnerStyle.Balloon
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Balloon
+    name: Balloon
+    href: Terminal.Gui.SpinnerStyle.Balloon.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Balloon
+    name: Balloon
+    href: Terminal.Gui.SpinnerStyle.Balloon.html
+- uid: Terminal.Gui.SpinnerStyle.Balloon2
+  commentId: T:Terminal.Gui.SpinnerStyle.Balloon2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Balloon2
+  nameWithType: SpinnerStyle.Balloon2
+  fullName: Terminal.Gui.SpinnerStyle.Balloon2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Balloon2
+    name: Balloon2
+    href: Terminal.Gui.SpinnerStyle.Balloon2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Balloon2
+    name: Balloon2
+    href: Terminal.Gui.SpinnerStyle.Balloon2.html
+- uid: Terminal.Gui.SpinnerStyle.Noise
+  commentId: T:Terminal.Gui.SpinnerStyle.Noise
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Noise
+  nameWithType: SpinnerStyle.Noise
+  fullName: Terminal.Gui.SpinnerStyle.Noise
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Noise
+    name: Noise
+    href: Terminal.Gui.SpinnerStyle.Noise.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Noise
+    name: Noise
+    href: Terminal.Gui.SpinnerStyle.Noise.html
+- uid: Terminal.Gui.SpinnerStyle.Bounce
+  commentId: T:Terminal.Gui.SpinnerStyle.Bounce
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Bounce
+  nameWithType: SpinnerStyle.Bounce
+  fullName: Terminal.Gui.SpinnerStyle.Bounce
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Bounce
+    name: Bounce
+    href: Terminal.Gui.SpinnerStyle.Bounce.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Bounce
+    name: Bounce
+    href: Terminal.Gui.SpinnerStyle.Bounce.html
+- uid: Terminal.Gui.SpinnerStyle.BoxBounce
+  commentId: T:Terminal.Gui.SpinnerStyle.BoxBounce
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.BoxBounce
+  nameWithType: SpinnerStyle.BoxBounce
+  fullName: Terminal.Gui.SpinnerStyle.BoxBounce
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BoxBounce
+    name: BoxBounce
+    href: Terminal.Gui.SpinnerStyle.BoxBounce.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BoxBounce
+    name: BoxBounce
+    href: Terminal.Gui.SpinnerStyle.BoxBounce.html
+- uid: Terminal.Gui.SpinnerStyle.BoxBounce2
+  commentId: T:Terminal.Gui.SpinnerStyle.BoxBounce2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.BoxBounce2
+  nameWithType: SpinnerStyle.BoxBounce2
+  fullName: Terminal.Gui.SpinnerStyle.BoxBounce2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BoxBounce2
+    name: BoxBounce2
+    href: Terminal.Gui.SpinnerStyle.BoxBounce2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BoxBounce2
+    name: BoxBounce2
+    href: Terminal.Gui.SpinnerStyle.BoxBounce2.html
+- uid: Terminal.Gui.SpinnerStyle.Triangle
+  commentId: T:Terminal.Gui.SpinnerStyle.Triangle
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Triangle
+  nameWithType: SpinnerStyle.Triangle
+  fullName: Terminal.Gui.SpinnerStyle.Triangle
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Triangle
+    name: Triangle
+    href: Terminal.Gui.SpinnerStyle.Triangle.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Triangle
+    name: Triangle
+    href: Terminal.Gui.SpinnerStyle.Triangle.html
+- uid: Terminal.Gui.SpinnerStyle.Arc
+  commentId: T:Terminal.Gui.SpinnerStyle.Arc
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Arc
+  nameWithType: SpinnerStyle.Arc
+  fullName: Terminal.Gui.SpinnerStyle.Arc
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arc
+    name: Arc
+    href: Terminal.Gui.SpinnerStyle.Arc.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arc
+    name: Arc
+    href: Terminal.Gui.SpinnerStyle.Arc.html
+- uid: Terminal.Gui.SpinnerStyle.Circle
+  commentId: T:Terminal.Gui.SpinnerStyle.Circle
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Circle
+  nameWithType: SpinnerStyle.Circle
+  fullName: Terminal.Gui.SpinnerStyle.Circle
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Circle
+    name: Circle
+    href: Terminal.Gui.SpinnerStyle.Circle.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Circle
+    name: Circle
+    href: Terminal.Gui.SpinnerStyle.Circle.html
+- uid: Terminal.Gui.SpinnerStyle.SquareCorners
+  commentId: T:Terminal.Gui.SpinnerStyle.SquareCorners
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.SquareCorners
+  nameWithType: SpinnerStyle.SquareCorners
+  fullName: Terminal.Gui.SpinnerStyle.SquareCorners
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SquareCorners
+    name: SquareCorners
+    href: Terminal.Gui.SpinnerStyle.SquareCorners.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SquareCorners
+    name: SquareCorners
+    href: Terminal.Gui.SpinnerStyle.SquareCorners.html
+- uid: Terminal.Gui.SpinnerStyle.CircleQuarters
+  commentId: T:Terminal.Gui.SpinnerStyle.CircleQuarters
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.CircleQuarters
+  nameWithType: SpinnerStyle.CircleQuarters
+  fullName: Terminal.Gui.SpinnerStyle.CircleQuarters
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.CircleQuarters
+    name: CircleQuarters
+    href: Terminal.Gui.SpinnerStyle.CircleQuarters.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.CircleQuarters
+    name: CircleQuarters
+    href: Terminal.Gui.SpinnerStyle.CircleQuarters.html
+- uid: Terminal.Gui.SpinnerStyle.CircleHalves
+  commentId: T:Terminal.Gui.SpinnerStyle.CircleHalves
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.CircleHalves
+  nameWithType: SpinnerStyle.CircleHalves
+  fullName: Terminal.Gui.SpinnerStyle.CircleHalves
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.CircleHalves
+    name: CircleHalves
+    href: Terminal.Gui.SpinnerStyle.CircleHalves.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.CircleHalves
+    name: CircleHalves
+    href: Terminal.Gui.SpinnerStyle.CircleHalves.html
+- uid: Terminal.Gui.SpinnerStyle.Squish
+  commentId: T:Terminal.Gui.SpinnerStyle.Squish
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Squish
+  nameWithType: SpinnerStyle.Squish
+  fullName: Terminal.Gui.SpinnerStyle.Squish
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Squish
+    name: Squish
+    href: Terminal.Gui.SpinnerStyle.Squish.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Squish
+    name: Squish
+    href: Terminal.Gui.SpinnerStyle.Squish.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle
+  nameWithType: SpinnerStyle.Toggle
+  fullName: Terminal.Gui.SpinnerStyle.Toggle
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle
+    name: Toggle
+    href: Terminal.Gui.SpinnerStyle.Toggle.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle
+    name: Toggle
+    href: Terminal.Gui.SpinnerStyle.Toggle.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle2
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle2
+  nameWithType: SpinnerStyle.Toggle2
+  fullName: Terminal.Gui.SpinnerStyle.Toggle2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle2
+    name: Toggle2
+    href: Terminal.Gui.SpinnerStyle.Toggle2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle2
+    name: Toggle2
+    href: Terminal.Gui.SpinnerStyle.Toggle2.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle3
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle3
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle3
+  nameWithType: SpinnerStyle.Toggle3
+  fullName: Terminal.Gui.SpinnerStyle.Toggle3
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle3
+    name: Toggle3
+    href: Terminal.Gui.SpinnerStyle.Toggle3.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle3
+    name: Toggle3
+    href: Terminal.Gui.SpinnerStyle.Toggle3.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle4
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle4
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle4
+  nameWithType: SpinnerStyle.Toggle4
+  fullName: Terminal.Gui.SpinnerStyle.Toggle4
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle4
+    name: Toggle4
+    href: Terminal.Gui.SpinnerStyle.Toggle4.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle4
+    name: Toggle4
+    href: Terminal.Gui.SpinnerStyle.Toggle4.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle5
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle5
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle5
+  nameWithType: SpinnerStyle.Toggle5
+  fullName: Terminal.Gui.SpinnerStyle.Toggle5
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle5
+    name: Toggle5
+    href: Terminal.Gui.SpinnerStyle.Toggle5.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle5
+    name: Toggle5
+    href: Terminal.Gui.SpinnerStyle.Toggle5.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle6
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle6
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle6
+  nameWithType: SpinnerStyle.Toggle6
+  fullName: Terminal.Gui.SpinnerStyle.Toggle6
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle6
+    name: Toggle6
+    href: Terminal.Gui.SpinnerStyle.Toggle6.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle6
+    name: Toggle6
+    href: Terminal.Gui.SpinnerStyle.Toggle6.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle7
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle7
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle7
+  nameWithType: SpinnerStyle.Toggle7
+  fullName: Terminal.Gui.SpinnerStyle.Toggle7
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle7
+    name: Toggle7
+    href: Terminal.Gui.SpinnerStyle.Toggle7.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle7
+    name: Toggle7
+    href: Terminal.Gui.SpinnerStyle.Toggle7.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle8
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle8
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle8
+  nameWithType: SpinnerStyle.Toggle8
+  fullName: Terminal.Gui.SpinnerStyle.Toggle8
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle8
+    name: Toggle8
+    href: Terminal.Gui.SpinnerStyle.Toggle8.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle8
+    name: Toggle8
+    href: Terminal.Gui.SpinnerStyle.Toggle8.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle9
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle9
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle9
+  nameWithType: SpinnerStyle.Toggle9
+  fullName: Terminal.Gui.SpinnerStyle.Toggle9
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle9
+    name: Toggle9
+    href: Terminal.Gui.SpinnerStyle.Toggle9.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle9
+    name: Toggle9
+    href: Terminal.Gui.SpinnerStyle.Toggle9.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle10
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle10
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle10
+  nameWithType: SpinnerStyle.Toggle10
+  fullName: Terminal.Gui.SpinnerStyle.Toggle10
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle10
+    name: Toggle10
+    href: Terminal.Gui.SpinnerStyle.Toggle10.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle10
+    name: Toggle10
+    href: Terminal.Gui.SpinnerStyle.Toggle10.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle11
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle11
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle11
+  nameWithType: SpinnerStyle.Toggle11
+  fullName: Terminal.Gui.SpinnerStyle.Toggle11
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle11
+    name: Toggle11
+    href: Terminal.Gui.SpinnerStyle.Toggle11.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle11
+    name: Toggle11
+    href: Terminal.Gui.SpinnerStyle.Toggle11.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle12
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle12
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle12
+  nameWithType: SpinnerStyle.Toggle12
+  fullName: Terminal.Gui.SpinnerStyle.Toggle12
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle12
+    name: Toggle12
+    href: Terminal.Gui.SpinnerStyle.Toggle12.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle12
+    name: Toggle12
+    href: Terminal.Gui.SpinnerStyle.Toggle12.html
+- uid: Terminal.Gui.SpinnerStyle.Toggle13
+  commentId: T:Terminal.Gui.SpinnerStyle.Toggle13
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Toggle13
+  nameWithType: SpinnerStyle.Toggle13
+  fullName: Terminal.Gui.SpinnerStyle.Toggle13
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle13
+    name: Toggle13
+    href: Terminal.Gui.SpinnerStyle.Toggle13.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Toggle13
+    name: Toggle13
+    href: Terminal.Gui.SpinnerStyle.Toggle13.html
+- uid: Terminal.Gui.SpinnerStyle.Arrow
+  commentId: T:Terminal.Gui.SpinnerStyle.Arrow
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Arrow
+  nameWithType: SpinnerStyle.Arrow
+  fullName: Terminal.Gui.SpinnerStyle.Arrow
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arrow
+    name: Arrow
+    href: Terminal.Gui.SpinnerStyle.Arrow.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arrow
+    name: Arrow
+    href: Terminal.Gui.SpinnerStyle.Arrow.html
+- uid: Terminal.Gui.SpinnerStyle.Arrow2
+  commentId: T:Terminal.Gui.SpinnerStyle.Arrow2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Arrow2
+  nameWithType: SpinnerStyle.Arrow2
+  fullName: Terminal.Gui.SpinnerStyle.Arrow2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arrow2
+    name: Arrow2
+    href: Terminal.Gui.SpinnerStyle.Arrow2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arrow2
+    name: Arrow2
+    href: Terminal.Gui.SpinnerStyle.Arrow2.html
+- uid: Terminal.Gui.SpinnerStyle.Arrow3
+  commentId: T:Terminal.Gui.SpinnerStyle.Arrow3
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Arrow3
+  nameWithType: SpinnerStyle.Arrow3
+  fullName: Terminal.Gui.SpinnerStyle.Arrow3
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arrow3
+    name: Arrow3
+    href: Terminal.Gui.SpinnerStyle.Arrow3.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Arrow3
+    name: Arrow3
+    href: Terminal.Gui.SpinnerStyle.Arrow3.html
+- uid: Terminal.Gui.SpinnerStyle.BouncingBar
+  commentId: T:Terminal.Gui.SpinnerStyle.BouncingBar
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.BouncingBar
+  nameWithType: SpinnerStyle.BouncingBar
+  fullName: Terminal.Gui.SpinnerStyle.BouncingBar
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BouncingBar
+    name: BouncingBar
+    href: Terminal.Gui.SpinnerStyle.BouncingBar.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BouncingBar
+    name: BouncingBar
+    href: Terminal.Gui.SpinnerStyle.BouncingBar.html
+- uid: Terminal.Gui.SpinnerStyle.BouncingBall
+  commentId: T:Terminal.Gui.SpinnerStyle.BouncingBall
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.BouncingBall
+  nameWithType: SpinnerStyle.BouncingBall
+  fullName: Terminal.Gui.SpinnerStyle.BouncingBall
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BouncingBall
+    name: BouncingBall
+    href: Terminal.Gui.SpinnerStyle.BouncingBall.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BouncingBall
+    name: BouncingBall
+    href: Terminal.Gui.SpinnerStyle.BouncingBall.html
+- uid: Terminal.Gui.SpinnerStyle.Smiley
+  commentId: T:Terminal.Gui.SpinnerStyle.Smiley
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Smiley
+  nameWithType: SpinnerStyle.Smiley
+  fullName: Terminal.Gui.SpinnerStyle.Smiley
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Smiley
+    name: Smiley
+    href: Terminal.Gui.SpinnerStyle.Smiley.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Smiley
+    name: Smiley
+    href: Terminal.Gui.SpinnerStyle.Smiley.html
+- uid: Terminal.Gui.SpinnerStyle.Monkey
+  commentId: T:Terminal.Gui.SpinnerStyle.Monkey
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Monkey
+  nameWithType: SpinnerStyle.Monkey
+  fullName: Terminal.Gui.SpinnerStyle.Monkey
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Monkey
+    name: Monkey
+    href: Terminal.Gui.SpinnerStyle.Monkey.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Monkey
+    name: Monkey
+    href: Terminal.Gui.SpinnerStyle.Monkey.html
+- uid: Terminal.Gui.SpinnerStyle.Hearts
+  commentId: T:Terminal.Gui.SpinnerStyle.Hearts
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Hearts
+  nameWithType: SpinnerStyle.Hearts
+  fullName: Terminal.Gui.SpinnerStyle.Hearts
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Hearts
+    name: Hearts
+    href: Terminal.Gui.SpinnerStyle.Hearts.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Hearts
+    name: Hearts
+    href: Terminal.Gui.SpinnerStyle.Hearts.html
+- uid: Terminal.Gui.SpinnerStyle.Clock
+  commentId: T:Terminal.Gui.SpinnerStyle.Clock
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Clock
+  nameWithType: SpinnerStyle.Clock
+  fullName: Terminal.Gui.SpinnerStyle.Clock
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Clock
+    name: Clock
+    href: Terminal.Gui.SpinnerStyle.Clock.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Clock
+    name: Clock
+    href: Terminal.Gui.SpinnerStyle.Clock.html
+- uid: Terminal.Gui.SpinnerStyle.Earth
+  commentId: T:Terminal.Gui.SpinnerStyle.Earth
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Earth
+  nameWithType: SpinnerStyle.Earth
+  fullName: Terminal.Gui.SpinnerStyle.Earth
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Earth
+    name: Earth
+    href: Terminal.Gui.SpinnerStyle.Earth.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Earth
+    name: Earth
+    href: Terminal.Gui.SpinnerStyle.Earth.html
+- uid: Terminal.Gui.SpinnerStyle.Material
+  commentId: T:Terminal.Gui.SpinnerStyle.Material
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Material
+  nameWithType: SpinnerStyle.Material
+  fullName: Terminal.Gui.SpinnerStyle.Material
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Material
+    name: Material
+    href: Terminal.Gui.SpinnerStyle.Material.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Material
+    name: Material
+    href: Terminal.Gui.SpinnerStyle.Material.html
+- uid: Terminal.Gui.SpinnerStyle.Moon
+  commentId: T:Terminal.Gui.SpinnerStyle.Moon
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Moon
+  nameWithType: SpinnerStyle.Moon
+  fullName: Terminal.Gui.SpinnerStyle.Moon
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Moon
+    name: Moon
+    href: Terminal.Gui.SpinnerStyle.Moon.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Moon
+    name: Moon
+    href: Terminal.Gui.SpinnerStyle.Moon.html
+- uid: Terminal.Gui.SpinnerStyle.Runner
+  commentId: T:Terminal.Gui.SpinnerStyle.Runner
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Runner
+  nameWithType: SpinnerStyle.Runner
+  fullName: Terminal.Gui.SpinnerStyle.Runner
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Runner
+    name: Runner
+    href: Terminal.Gui.SpinnerStyle.Runner.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Runner
+    name: Runner
+    href: Terminal.Gui.SpinnerStyle.Runner.html
+- uid: Terminal.Gui.SpinnerStyle.Pong
+  commentId: T:Terminal.Gui.SpinnerStyle.Pong
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Pong
+  nameWithType: SpinnerStyle.Pong
+  fullName: Terminal.Gui.SpinnerStyle.Pong
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Pong
+    name: Pong
+    href: Terminal.Gui.SpinnerStyle.Pong.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Pong
+    name: Pong
+    href: Terminal.Gui.SpinnerStyle.Pong.html
+- uid: Terminal.Gui.SpinnerStyle.Shark
+  commentId: T:Terminal.Gui.SpinnerStyle.Shark
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Shark
+  nameWithType: SpinnerStyle.Shark
+  fullName: Terminal.Gui.SpinnerStyle.Shark
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Shark
+    name: Shark
+    href: Terminal.Gui.SpinnerStyle.Shark.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Shark
+    name: Shark
+    href: Terminal.Gui.SpinnerStyle.Shark.html
+- uid: Terminal.Gui.SpinnerStyle.Dqpb
+  commentId: T:Terminal.Gui.SpinnerStyle.Dqpb
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Dqpb
+  nameWithType: SpinnerStyle.Dqpb
+  fullName: Terminal.Gui.SpinnerStyle.Dqpb
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dqpb
+    name: Dqpb
+    href: Terminal.Gui.SpinnerStyle.Dqpb.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Dqpb
+    name: Dqpb
+    href: Terminal.Gui.SpinnerStyle.Dqpb.html
+- uid: Terminal.Gui.SpinnerStyle.Weather
+  commentId: T:Terminal.Gui.SpinnerStyle.Weather
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Weather
+  nameWithType: SpinnerStyle.Weather
+  fullName: Terminal.Gui.SpinnerStyle.Weather
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Weather
+    name: Weather
+    href: Terminal.Gui.SpinnerStyle.Weather.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Weather
+    name: Weather
+    href: Terminal.Gui.SpinnerStyle.Weather.html
+- uid: Terminal.Gui.SpinnerStyle.Christmas
+  commentId: T:Terminal.Gui.SpinnerStyle.Christmas
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Christmas
+  nameWithType: SpinnerStyle.Christmas
+  fullName: Terminal.Gui.SpinnerStyle.Christmas
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Christmas
+    name: Christmas
+    href: Terminal.Gui.SpinnerStyle.Christmas.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Christmas
+    name: Christmas
+    href: Terminal.Gui.SpinnerStyle.Christmas.html
+- uid: Terminal.Gui.SpinnerStyle.Grenade
+  commentId: T:Terminal.Gui.SpinnerStyle.Grenade
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Grenade
+  nameWithType: SpinnerStyle.Grenade
+  fullName: Terminal.Gui.SpinnerStyle.Grenade
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Grenade
+    name: Grenade
+    href: Terminal.Gui.SpinnerStyle.Grenade.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Grenade
+    name: Grenade
+    href: Terminal.Gui.SpinnerStyle.Grenade.html
+- uid: Terminal.Gui.SpinnerStyle.Points
+  commentId: T:Terminal.Gui.SpinnerStyle.Points
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Points
+  nameWithType: SpinnerStyle.Points
+  fullName: Terminal.Gui.SpinnerStyle.Points
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Points
+    name: Points
+    href: Terminal.Gui.SpinnerStyle.Points.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Points
+    name: Points
+    href: Terminal.Gui.SpinnerStyle.Points.html
+- uid: Terminal.Gui.SpinnerStyle.Layer
+  commentId: T:Terminal.Gui.SpinnerStyle.Layer
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Layer
+  nameWithType: SpinnerStyle.Layer
+  fullName: Terminal.Gui.SpinnerStyle.Layer
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Layer
+    name: Layer
+    href: Terminal.Gui.SpinnerStyle.Layer.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Layer
+    name: Layer
+    href: Terminal.Gui.SpinnerStyle.Layer.html
+- uid: Terminal.Gui.SpinnerStyle.BetaWave
+  commentId: T:Terminal.Gui.SpinnerStyle.BetaWave
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.BetaWave
+  nameWithType: SpinnerStyle.BetaWave
+  fullName: Terminal.Gui.SpinnerStyle.BetaWave
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BetaWave
+    name: BetaWave
+    href: Terminal.Gui.SpinnerStyle.BetaWave.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BetaWave
+    name: BetaWave
+    href: Terminal.Gui.SpinnerStyle.BetaWave.html
+- uid: Terminal.Gui.SpinnerStyle.FingerDance
+  commentId: T:Terminal.Gui.SpinnerStyle.FingerDance
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.FingerDance
+  nameWithType: SpinnerStyle.FingerDance
+  fullName: Terminal.Gui.SpinnerStyle.FingerDance
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.FingerDance
+    name: FingerDance
+    href: Terminal.Gui.SpinnerStyle.FingerDance.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.FingerDance
+    name: FingerDance
+    href: Terminal.Gui.SpinnerStyle.FingerDance.html
+- uid: Terminal.Gui.SpinnerStyle.FistBump
+  commentId: T:Terminal.Gui.SpinnerStyle.FistBump
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.FistBump
+  nameWithType: SpinnerStyle.FistBump
+  fullName: Terminal.Gui.SpinnerStyle.FistBump
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.FistBump
+    name: FistBump
+    href: Terminal.Gui.SpinnerStyle.FistBump.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.FistBump
+    name: FistBump
+    href: Terminal.Gui.SpinnerStyle.FistBump.html
+- uid: Terminal.Gui.SpinnerStyle.SoccerHeader
+  commentId: T:Terminal.Gui.SpinnerStyle.SoccerHeader
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.SoccerHeader
+  nameWithType: SpinnerStyle.SoccerHeader
+  fullName: Terminal.Gui.SpinnerStyle.SoccerHeader
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SoccerHeader
+    name: SoccerHeader
+    href: Terminal.Gui.SpinnerStyle.SoccerHeader.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.SoccerHeader
+    name: SoccerHeader
+    href: Terminal.Gui.SpinnerStyle.SoccerHeader.html
+- uid: Terminal.Gui.SpinnerStyle.MindBlown
+  commentId: T:Terminal.Gui.SpinnerStyle.MindBlown
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.MindBlown
+  nameWithType: SpinnerStyle.MindBlown
+  fullName: Terminal.Gui.SpinnerStyle.MindBlown
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.MindBlown
+    name: MindBlown
+    href: Terminal.Gui.SpinnerStyle.MindBlown.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.MindBlown
+    name: MindBlown
+    href: Terminal.Gui.SpinnerStyle.MindBlown.html
+- uid: Terminal.Gui.SpinnerStyle.Speaker
+  commentId: T:Terminal.Gui.SpinnerStyle.Speaker
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Speaker
+  nameWithType: SpinnerStyle.Speaker
+  fullName: Terminal.Gui.SpinnerStyle.Speaker
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Speaker
+    name: Speaker
+    href: Terminal.Gui.SpinnerStyle.Speaker.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Speaker
+    name: Speaker
+    href: Terminal.Gui.SpinnerStyle.Speaker.html
+- uid: Terminal.Gui.SpinnerStyle.OrangePulse
+  commentId: T:Terminal.Gui.SpinnerStyle.OrangePulse
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.OrangePulse
+  nameWithType: SpinnerStyle.OrangePulse
+  fullName: Terminal.Gui.SpinnerStyle.OrangePulse
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.OrangePulse
+    name: OrangePulse
+    href: Terminal.Gui.SpinnerStyle.OrangePulse.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.OrangePulse
+    name: OrangePulse
+    href: Terminal.Gui.SpinnerStyle.OrangePulse.html
+- uid: Terminal.Gui.SpinnerStyle.BluePulse
+  commentId: T:Terminal.Gui.SpinnerStyle.BluePulse
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.BluePulse
+  nameWithType: SpinnerStyle.BluePulse
+  fullName: Terminal.Gui.SpinnerStyle.BluePulse
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BluePulse
+    name: BluePulse
+    href: Terminal.Gui.SpinnerStyle.BluePulse.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.BluePulse
+    name: BluePulse
+    href: Terminal.Gui.SpinnerStyle.BluePulse.html
+- uid: Terminal.Gui.SpinnerStyle.OrangeBluePulse
+  commentId: T:Terminal.Gui.SpinnerStyle.OrangeBluePulse
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.OrangeBluePulse
+  nameWithType: SpinnerStyle.OrangeBluePulse
+  fullName: Terminal.Gui.SpinnerStyle.OrangeBluePulse
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.OrangeBluePulse
+    name: OrangeBluePulse
+    href: Terminal.Gui.SpinnerStyle.OrangeBluePulse.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.OrangeBluePulse
+    name: OrangeBluePulse
+    href: Terminal.Gui.SpinnerStyle.OrangeBluePulse.html
+- uid: Terminal.Gui.SpinnerStyle.TimeTravelClock
+  commentId: T:Terminal.Gui.SpinnerStyle.TimeTravelClock
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.TimeTravelClock
+  nameWithType: SpinnerStyle.TimeTravelClock
+  fullName: Terminal.Gui.SpinnerStyle.TimeTravelClock
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.TimeTravelClock
+    name: TimeTravelClock
+    href: Terminal.Gui.SpinnerStyle.TimeTravelClock.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.TimeTravelClock
+    name: TimeTravelClock
+    href: Terminal.Gui.SpinnerStyle.TimeTravelClock.html
+- uid: Terminal.Gui.SpinnerStyle.Aesthetic
+  commentId: T:Terminal.Gui.SpinnerStyle.Aesthetic
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Aesthetic
+  nameWithType: SpinnerStyle.Aesthetic
+  fullName: Terminal.Gui.SpinnerStyle.Aesthetic
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Aesthetic
+    name: Aesthetic
+    href: Terminal.Gui.SpinnerStyle.Aesthetic.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Aesthetic
+    name: Aesthetic
+    href: Terminal.Gui.SpinnerStyle.Aesthetic.html
+- uid: Terminal.Gui.SpinnerStyle.Aesthetic2
+  commentId: T:Terminal.Gui.SpinnerStyle.Aesthetic2
+  href: Terminal.Gui.SpinnerStyle.html
+  name: SpinnerStyle.Aesthetic2
+  nameWithType: SpinnerStyle.Aesthetic2
+  fullName: Terminal.Gui.SpinnerStyle.Aesthetic2
+  spec.csharp:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Aesthetic2
+    name: Aesthetic2
+    href: Terminal.Gui.SpinnerStyle.Aesthetic2.html
+  spec.vb:
+  - uid: Terminal.Gui.SpinnerStyle
+    name: SpinnerStyle
+    href: Terminal.Gui.SpinnerStyle.html
+  - name: .
+  - uid: Terminal.Gui.SpinnerStyle.Aesthetic2
+    name: Aesthetic2
+    href: Terminal.Gui.SpinnerStyle.Aesthetic2.html
+- uid: Terminal.Gui.SpinnerView
+  commentId: T:Terminal.Gui.SpinnerView
+  href: Terminal.Gui.SpinnerView.html
+  name: SpinnerView
+  nameWithType: SpinnerView
+  fullName: Terminal.Gui.SpinnerView
+- uid: Terminal.Gui.SplitterEventArgs
+  commentId: T:Terminal.Gui.SplitterEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.SplitterEventArgs.html
+  name: SplitterEventArgs
+  nameWithType: SplitterEventArgs
+  fullName: Terminal.Gui.SplitterEventArgs
+- uid: Terminal.Gui.StatusItem
+  commentId: T:Terminal.Gui.StatusItem
+  parent: Terminal.Gui
+  href: Terminal.Gui.StatusItem.html
+  name: StatusItem
+  nameWithType: StatusItem
+  fullName: Terminal.Gui.StatusItem
+- uid: Terminal.Gui.StatusBar
+  commentId: T:Terminal.Gui.StatusBar
+  parent: Terminal.Gui
+  href: Terminal.Gui.StatusBar.html
+  name: StatusBar
+  nameWithType: StatusBar
+  fullName: Terminal.Gui.StatusBar
+- uid: Terminal.Gui.Tab
+  commentId: T:Terminal.Gui.Tab
+  parent: Terminal.Gui
+  href: Terminal.Gui.Tab.html
+  name: Tab
+  nameWithType: Tab
+  fullName: Terminal.Gui.Tab
+- uid: Terminal.Gui.TabChangedEventArgs
+  commentId: T:Terminal.Gui.TabChangedEventArgs
+  href: Terminal.Gui.TabChangedEventArgs.html
+  name: TabChangedEventArgs
+  nameWithType: TabChangedEventArgs
+  fullName: Terminal.Gui.TabChangedEventArgs
+- uid: Terminal.Gui.CellActivatedEventArgs
+  commentId: T:Terminal.Gui.CellActivatedEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.CellActivatedEventArgs.html
+  name: CellActivatedEventArgs
+  nameWithType: CellActivatedEventArgs
+  fullName: Terminal.Gui.CellActivatedEventArgs
+- uid: Terminal.Gui.CellColorGetterArgs
+  commentId: T:Terminal.Gui.CellColorGetterArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.CellColorGetterArgs.html
+  name: CellColorGetterArgs
+  nameWithType: CellColorGetterArgs
+  fullName: Terminal.Gui.CellColorGetterArgs
+- uid: Terminal.Gui.CellToggledEventArgs
+  commentId: T:Terminal.Gui.CellToggledEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.CellToggledEventArgs.html
+  name: CellToggledEventArgs
+  nameWithType: CellToggledEventArgs
+  fullName: Terminal.Gui.CellToggledEventArgs
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  commentId: T:Terminal.Gui.CheckBoxTableSourceWrapperBase
+  parent: Terminal.Gui
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html
+  name: CheckBoxTableSourceWrapperBase
+  nameWithType: CheckBoxTableSourceWrapperBase
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperByIndex
+  commentId: T:Terminal.Gui.CheckBoxTableSourceWrapperByIndex
+  href: Terminal.Gui.CheckBoxTableSourceWrapperByIndex.html
+  name: CheckBoxTableSourceWrapperByIndex
+  nameWithType: CheckBoxTableSourceWrapperByIndex
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperByIndex
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+  commentId: T:Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+  href: Terminal.Gui.CheckBoxTableSourceWrapperByObject-1.html
+  name: CheckBoxTableSourceWrapperByObject<T>
+  nameWithType: CheckBoxTableSourceWrapperByObject<T>
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperByObject<T>
+  nameWithType.vb: CheckBoxTableSourceWrapperByObject(Of T)
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperByObject(Of T)
+  name.vb: CheckBoxTableSourceWrapperByObject(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+    name: CheckBoxTableSourceWrapperByObject
+    href: Terminal.Gui.CheckBoxTableSourceWrapperByObject-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+    name: CheckBoxTableSourceWrapperByObject
+    href: Terminal.Gui.CheckBoxTableSourceWrapperByObject-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ColumnStyle
+  commentId: T:Terminal.Gui.ColumnStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColumnStyle.html
+  name: ColumnStyle
+  nameWithType: ColumnStyle
+  fullName: Terminal.Gui.ColumnStyle
+- uid: Terminal.Gui.DataTableSource
+  commentId: T:Terminal.Gui.DataTableSource
+  href: Terminal.Gui.DataTableSource.html
+  name: DataTableSource
+  nameWithType: DataTableSource
+  fullName: Terminal.Gui.DataTableSource
+- uid: Terminal.Gui.EnumerableTableSource`1
+  commentId: T:Terminal.Gui.EnumerableTableSource`1
+  href: Terminal.Gui.EnumerableTableSource-1.html
+  name: EnumerableTableSource<T>
+  nameWithType: EnumerableTableSource<T>
+  fullName: Terminal.Gui.EnumerableTableSource<T>
+  nameWithType.vb: EnumerableTableSource(Of T)
+  fullName.vb: Terminal.Gui.EnumerableTableSource(Of T)
+  name.vb: EnumerableTableSource(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.EnumerableTableSource`1
+    name: EnumerableTableSource
+    href: Terminal.Gui.EnumerableTableSource-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.EnumerableTableSource`1
+    name: EnumerableTableSource
+    href: Terminal.Gui.EnumerableTableSource-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.IEnumerableTableSource`1
+  commentId: T:Terminal.Gui.IEnumerableTableSource`1
+  href: Terminal.Gui.IEnumerableTableSource-1.html
+  name: IEnumerableTableSource<T>
+  nameWithType: IEnumerableTableSource<T>
+  fullName: Terminal.Gui.IEnumerableTableSource<T>
+  nameWithType.vb: IEnumerableTableSource(Of T)
+  fullName.vb: Terminal.Gui.IEnumerableTableSource(Of T)
+  name.vb: IEnumerableTableSource(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource
+    href: Terminal.Gui.IEnumerableTableSource-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.IEnumerableTableSource`1
+    name: IEnumerableTableSource
+    href: Terminal.Gui.IEnumerableTableSource-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITableSource.html
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+- uid: Terminal.Gui.ListColumnStyle
+  commentId: T:Terminal.Gui.ListColumnStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.ListColumnStyle.html
+  name: ListColumnStyle
+  nameWithType: ListColumnStyle
+  fullName: Terminal.Gui.ListColumnStyle
+- uid: Terminal.Gui.ListTableSource
+  commentId: T:Terminal.Gui.ListTableSource
+  href: Terminal.Gui.ListTableSource.html
+  name: ListTableSource
+  nameWithType: ListTableSource
+  fullName: Terminal.Gui.ListTableSource
+- uid: Terminal.Gui.RowColorGetterArgs
+  commentId: T:Terminal.Gui.RowColorGetterArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.RowColorGetterArgs.html
+  name: RowColorGetterArgs
+  nameWithType: RowColorGetterArgs
+  fullName: Terminal.Gui.RowColorGetterArgs
+- uid: Terminal.Gui.SelectedCellChangedEventArgs
+  commentId: T:Terminal.Gui.SelectedCellChangedEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.SelectedCellChangedEventArgs.html
+  name: SelectedCellChangedEventArgs
+  nameWithType: SelectedCellChangedEventArgs
+  fullName: Terminal.Gui.SelectedCellChangedEventArgs
+- uid: Terminal.Gui.TableSelection
+  commentId: T:Terminal.Gui.TableSelection
+  href: Terminal.Gui.TableSelection.html
+  name: TableSelection
+  nameWithType: TableSelection
+  fullName: Terminal.Gui.TableSelection
+- uid: Terminal.Gui.TableStyle
+  commentId: T:Terminal.Gui.TableStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableStyle.html
+  name: TableStyle
+  nameWithType: TableStyle
+  fullName: Terminal.Gui.TableStyle
+- uid: Terminal.Gui.CellColorGetterDelegate
+  commentId: T:Terminal.Gui.CellColorGetterDelegate
+  parent: Terminal.Gui
+  href: Terminal.Gui.CellColorGetterDelegate.html
+  name: CellColorGetterDelegate
+  nameWithType: CellColorGetterDelegate
+  fullName: Terminal.Gui.CellColorGetterDelegate
+- uid: Terminal.Gui.RowColorGetterDelegate
+  commentId: T:Terminal.Gui.RowColorGetterDelegate
+  parent: Terminal.Gui
+  href: Terminal.Gui.RowColorGetterDelegate.html
+  name: RowColorGetterDelegate
+  nameWithType: RowColorGetterDelegate
+  fullName: Terminal.Gui.RowColorGetterDelegate
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui.TreeTableSource`1
+  commentId: T:Terminal.Gui.TreeTableSource`1
+  href: Terminal.Gui.TreeTableSource-1.html
+  name: TreeTableSource<T>
+  nameWithType: TreeTableSource<T>
+  fullName: Terminal.Gui.TreeTableSource<T>
+  nameWithType.vb: TreeTableSource(Of T)
+  fullName.vb: Terminal.Gui.TreeTableSource(Of T)
+  name.vb: TreeTableSource(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeTableSource`1
+    name: TreeTableSource
+    href: Terminal.Gui.TreeTableSource-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeTableSource`1
+    name: TreeTableSource
+    href: Terminal.Gui.TreeTableSource-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.TabMouseEventArgs
+  commentId: T:Terminal.Gui.TabMouseEventArgs
+  href: Terminal.Gui.TabMouseEventArgs.html
+  name: TabMouseEventArgs
+  nameWithType: TabMouseEventArgs
+  fullName: Terminal.Gui.TabMouseEventArgs
+- uid: Terminal.Gui.TabStyle
+  commentId: T:Terminal.Gui.TabStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.TabStyle.html
+  name: TabStyle
+  nameWithType: TabStyle
+  fullName: Terminal.Gui.TabStyle
+- uid: Terminal.Gui.TabView
+  commentId: T:Terminal.Gui.TabView
+  href: Terminal.Gui.TabView.html
+  name: TabView
+  nameWithType: TabView
+  fullName: Terminal.Gui.TabView
+- uid: Terminal.Gui.TextChangedEventArgs
+  commentId: T:Terminal.Gui.TextChangedEventArgs
+  href: Terminal.Gui.TextChangedEventArgs.html
+  name: TextChangedEventArgs
+  nameWithType: TextChangedEventArgs
+  fullName: Terminal.Gui.TextChangedEventArgs
+- uid: Terminal.Gui.TextChangingEventArgs
+  commentId: T:Terminal.Gui.TextChangingEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextChangingEventArgs.html
+  name: TextChangingEventArgs
+  nameWithType: TextChangingEventArgs
+  fullName: Terminal.Gui.TextChangingEventArgs
+- uid: Terminal.Gui.TextField
+  commentId: T:Terminal.Gui.TextField
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextField.html
+  name: TextField
+  nameWithType: TextField
+  fullName: Terminal.Gui.TextField
+- uid: Terminal.Gui.TextFieldAutocomplete
+  commentId: T:Terminal.Gui.TextFieldAutocomplete
+  href: Terminal.Gui.TextFieldAutocomplete.html
+  name: TextFieldAutocomplete
+  nameWithType: TextFieldAutocomplete
+  fullName: Terminal.Gui.TextFieldAutocomplete
+- uid: Terminal.Gui.TextValidateField
+  commentId: T:Terminal.Gui.TextValidateField
+  href: Terminal.Gui.TextValidateField.html
+  name: TextValidateField
+  nameWithType: TextValidateField
+  fullName: Terminal.Gui.TextValidateField
+- uid: Terminal.Gui.RuneCell
+  commentId: T:Terminal.Gui.RuneCell
+  parent: Terminal.Gui
+  href: Terminal.Gui.RuneCell.html
+  name: RuneCell
+  nameWithType: RuneCell
+  fullName: Terminal.Gui.RuneCell
+- uid: Terminal.Gui.TextView
+  commentId: T:Terminal.Gui.TextView
+  href: Terminal.Gui.TextView.html
+  name: TextView
+  nameWithType: TextView
+  fullName: Terminal.Gui.TextView
+- uid: Terminal.Gui.TextViewAutocomplete
+  commentId: T:Terminal.Gui.TextViewAutocomplete
+  href: Terminal.Gui.TextViewAutocomplete.html
+  name: TextViewAutocomplete
+  nameWithType: TextViewAutocomplete
+  fullName: Terminal.Gui.TextViewAutocomplete
+- uid: Terminal.Gui.Tile
+  commentId: T:Terminal.Gui.Tile
+  parent: Terminal.Gui
+  href: Terminal.Gui.Tile.html
+  name: Tile
+  nameWithType: Tile
+  fullName: Terminal.Gui.Tile
+- uid: Terminal.Gui.TileView
+  commentId: T:Terminal.Gui.TileView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TileView.html
+  name: TileView
+  nameWithType: TileView
+  fullName: Terminal.Gui.TileView
+- uid: Terminal.Gui.SplitterEventHandler
+  commentId: T:Terminal.Gui.SplitterEventHandler
+  parent: Terminal.Gui
+  href: Terminal.Gui.SplitterEventHandler.html
+  name: SplitterEventHandler
+  nameWithType: SplitterEventHandler
+  fullName: Terminal.Gui.SplitterEventHandler
+- uid: Terminal.Gui.TimeField
+  commentId: T:Terminal.Gui.TimeField
+  href: Terminal.Gui.TimeField.html
+  name: TimeField
+  nameWithType: TimeField
+  fullName: Terminal.Gui.TimeField
+- uid: Terminal.Gui.Toplevel
+  commentId: T:Terminal.Gui.Toplevel
+  parent: Terminal.Gui
+  href: Terminal.Gui.Toplevel.html
+  name: Toplevel
+  nameWithType: Toplevel
+  fullName: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.ToplevelEqualityComparer
+  commentId: T:Terminal.Gui.ToplevelEqualityComparer
+  href: Terminal.Gui.ToplevelEqualityComparer.html
+  name: ToplevelEqualityComparer
+  nameWithType: ToplevelEqualityComparer
+  fullName: Terminal.Gui.ToplevelEqualityComparer
+- uid: Terminal.Gui.ToplevelComparer
+  commentId: T:Terminal.Gui.ToplevelComparer
+  href: Terminal.Gui.ToplevelComparer.html
+  name: ToplevelComparer
+  nameWithType: ToplevelComparer
+  fullName: Terminal.Gui.ToplevelComparer
+- uid: Terminal.Gui.ToplevelEventArgs
+  commentId: T:Terminal.Gui.ToplevelEventArgs
+  href: Terminal.Gui.ToplevelEventArgs.html
+  name: ToplevelEventArgs
+  nameWithType: ToplevelEventArgs
+  fullName: Terminal.Gui.ToplevelEventArgs
+- uid: Terminal.Gui.ToplevelClosingEventArgs
+  commentId: T:Terminal.Gui.ToplevelClosingEventArgs
+  href: Terminal.Gui.ToplevelClosingEventArgs.html
+  name: ToplevelClosingEventArgs
+  nameWithType: ToplevelClosingEventArgs
+  fullName: Terminal.Gui.ToplevelClosingEventArgs
+- uid: Terminal.Gui.TreeViewTextFilter`1
+  commentId: T:Terminal.Gui.TreeViewTextFilter`1
+  href: Terminal.Gui.TreeViewTextFilter-1.html
+  name: TreeViewTextFilter<T>
+  nameWithType: TreeViewTextFilter<T>
+  fullName: Terminal.Gui.TreeViewTextFilter<T>
+  nameWithType.vb: TreeViewTextFilter(Of T)
+  fullName.vb: Terminal.Gui.TreeViewTextFilter(Of T)
+  name.vb: TreeViewTextFilter(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeViewTextFilter`1
+    name: TreeViewTextFilter
+    href: Terminal.Gui.TreeViewTextFilter-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeViewTextFilter`1
+    name: TreeViewTextFilter
+    href: Terminal.Gui.TreeViewTextFilter-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.AspectGetterDelegate`1
+  commentId: T:Terminal.Gui.AspectGetterDelegate`1
+  href: Terminal.Gui.AspectGetterDelegate-1.html
+  name: AspectGetterDelegate<T>
+  nameWithType: AspectGetterDelegate<T>
+  fullName: Terminal.Gui.AspectGetterDelegate<T>
+  nameWithType.vb: AspectGetterDelegate(Of T)
+  fullName.vb: Terminal.Gui.AspectGetterDelegate(Of T)
+  name.vb: AspectGetterDelegate(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.AspectGetterDelegate`1
+    name: AspectGetterDelegate
+    href: Terminal.Gui.AspectGetterDelegate-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.AspectGetterDelegate`1
+    name: AspectGetterDelegate
+    href: Terminal.Gui.AspectGetterDelegate-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.DelegateTreeBuilder`1
+  commentId: T:Terminal.Gui.DelegateTreeBuilder`1
+  href: Terminal.Gui.DelegateTreeBuilder-1.html
+  name: DelegateTreeBuilder<T>
+  nameWithType: DelegateTreeBuilder<T>
+  fullName: Terminal.Gui.DelegateTreeBuilder<T>
+  nameWithType.vb: DelegateTreeBuilder(Of T)
+  fullName.vb: Terminal.Gui.DelegateTreeBuilder(Of T)
+  name.vb: DelegateTreeBuilder(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.DelegateTreeBuilder`1
+    name: DelegateTreeBuilder
+    href: Terminal.Gui.DelegateTreeBuilder-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.DelegateTreeBuilder`1
+    name: DelegateTreeBuilder
+    href: Terminal.Gui.DelegateTreeBuilder-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.DrawTreeViewLineEventArgs`1
+  commentId: T:Terminal.Gui.DrawTreeViewLineEventArgs`1
+  href: Terminal.Gui.DrawTreeViewLineEventArgs-1.html
+  name: DrawTreeViewLineEventArgs<T>
+  nameWithType: DrawTreeViewLineEventArgs<T>
+  fullName: Terminal.Gui.DrawTreeViewLineEventArgs<T>
+  nameWithType.vb: DrawTreeViewLineEventArgs(Of T)
+  fullName.vb: Terminal.Gui.DrawTreeViewLineEventArgs(Of T)
+  name.vb: DrawTreeViewLineEventArgs(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.DrawTreeViewLineEventArgs`1
+    name: DrawTreeViewLineEventArgs
+    href: Terminal.Gui.DrawTreeViewLineEventArgs-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.DrawTreeViewLineEventArgs`1
+    name: DrawTreeViewLineEventArgs
+    href: Terminal.Gui.DrawTreeViewLineEventArgs-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ITreeBuilder`1
+  commentId: T:Terminal.Gui.ITreeBuilder`1
+  href: Terminal.Gui.ITreeBuilder-1.html
+  name: ITreeBuilder<T>
+  nameWithType: ITreeBuilder<T>
+  fullName: Terminal.Gui.ITreeBuilder<T>
+  nameWithType.vb: ITreeBuilder(Of T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T)
+  name.vb: ITreeBuilder(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.ITreeBuilder`1
+    name: ITreeBuilder
+    href: Terminal.Gui.ITreeBuilder-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.ITreeBuilder`1
+    name: ITreeBuilder
+    href: Terminal.Gui.ITreeBuilder-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ObjectActivatedEventArgs`1
+  commentId: T:Terminal.Gui.ObjectActivatedEventArgs`1
+  href: Terminal.Gui.ObjectActivatedEventArgs-1.html
+  name: ObjectActivatedEventArgs<T>
+  nameWithType: ObjectActivatedEventArgs<T>
+  fullName: Terminal.Gui.ObjectActivatedEventArgs<T>
+  nameWithType.vb: ObjectActivatedEventArgs(Of T)
+  fullName.vb: Terminal.Gui.ObjectActivatedEventArgs(Of T)
+  name.vb: ObjectActivatedEventArgs(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.ObjectActivatedEventArgs`1
+    name: ObjectActivatedEventArgs
+    href: Terminal.Gui.ObjectActivatedEventArgs-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.ObjectActivatedEventArgs`1
+    name: ObjectActivatedEventArgs
+    href: Terminal.Gui.ObjectActivatedEventArgs-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.SelectionChangedEventArgs`1
+  commentId: T:Terminal.Gui.SelectionChangedEventArgs`1
+  href: Terminal.Gui.SelectionChangedEventArgs-1.html
+  name: SelectionChangedEventArgs<T>
+  nameWithType: SelectionChangedEventArgs<T>
+  fullName: Terminal.Gui.SelectionChangedEventArgs<T>
+  nameWithType.vb: SelectionChangedEventArgs(Of T)
+  fullName.vb: Terminal.Gui.SelectionChangedEventArgs(Of T)
+  name.vb: SelectionChangedEventArgs(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.SelectionChangedEventArgs`1
+    name: SelectionChangedEventArgs
+    href: Terminal.Gui.SelectionChangedEventArgs-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.SelectionChangedEventArgs`1
+    name: SelectionChangedEventArgs
+    href: Terminal.Gui.SelectionChangedEventArgs-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.TreeBuilder`1
+  commentId: T:Terminal.Gui.TreeBuilder`1
+  href: Terminal.Gui.TreeBuilder-1.html
+  name: TreeBuilder<T>
+  nameWithType: TreeBuilder<T>
+  fullName: Terminal.Gui.TreeBuilder<T>
+  nameWithType.vb: TreeBuilder(Of T)
+  fullName.vb: Terminal.Gui.TreeBuilder(Of T)
+  name.vb: TreeBuilder(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeBuilder`1
+    name: TreeBuilder
+    href: Terminal.Gui.TreeBuilder-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeBuilder`1
+    name: TreeBuilder
+    href: Terminal.Gui.TreeBuilder-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ITreeNode
+  commentId: T:Terminal.Gui.ITreeNode
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITreeNode.html
+  name: ITreeNode
+  nameWithType: ITreeNode
+  fullName: Terminal.Gui.ITreeNode
+- uid: Terminal.Gui.TreeNode
+  commentId: T:Terminal.Gui.TreeNode
+  href: Terminal.Gui.TreeNode.html
+  name: TreeNode
+  nameWithType: TreeNode
+  fullName: Terminal.Gui.TreeNode
+- uid: Terminal.Gui.TreeNodeBuilder
+  commentId: T:Terminal.Gui.TreeNodeBuilder
+  href: Terminal.Gui.TreeNodeBuilder.html
+  name: TreeNodeBuilder
+  nameWithType: TreeNodeBuilder
+  fullName: Terminal.Gui.TreeNodeBuilder
+- uid: Terminal.Gui.TreeStyle
+  commentId: T:Terminal.Gui.TreeStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.TreeStyle.html
+  name: TreeStyle
+  nameWithType: TreeStyle
+  fullName: Terminal.Gui.TreeStyle
+- uid: Terminal.Gui.ITreeView
+  commentId: T:Terminal.Gui.ITreeView
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITreeView.html
+  name: ITreeView
+  nameWithType: ITreeView
+  fullName: Terminal.Gui.ITreeView
+- uid: Terminal.Gui.TreeView
+  commentId: T:Terminal.Gui.TreeView
+  href: Terminal.Gui.TreeView.html
+  name: TreeView
+  nameWithType: TreeView
+  fullName: Terminal.Gui.TreeView
+- uid: Terminal.Gui.TreeView`1
+  commentId: T:Terminal.Gui.TreeView`1
+  href: Terminal.Gui.TreeView-1.html
+  name: TreeView<T>
+  nameWithType: TreeView<T>
+  fullName: Terminal.Gui.TreeView<T>
+  nameWithType.vb: TreeView(Of T)
+  fullName.vb: Terminal.Gui.TreeView(Of T)
+  name.vb: TreeView(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.Window
+  commentId: T:Terminal.Gui.Window
+  parent: Terminal.Gui
+  href: Terminal.Gui.Window.html
+  name: Window
+  nameWithType: Window
+  fullName: Terminal.Gui.Window
+- uid: Terminal.Gui.Wizard
+  commentId: T:Terminal.Gui.Wizard
+  href: Terminal.Gui.Wizard.html
+  name: Wizard
+  nameWithType: Wizard
+  fullName: Terminal.Gui.Wizard
+- uid: Terminal.Gui.WizardButtonEventArgs
+  commentId: T:Terminal.Gui.WizardButtonEventArgs
+  href: Terminal.Gui.WizardButtonEventArgs.html
+  name: WizardButtonEventArgs
+  nameWithType: WizardButtonEventArgs
+  fullName: Terminal.Gui.WizardButtonEventArgs
+- uid: Terminal.Gui.StepChangeEventArgs
+  commentId: T:Terminal.Gui.StepChangeEventArgs
+  href: Terminal.Gui.StepChangeEventArgs.html
+  name: StepChangeEventArgs
+  nameWithType: StepChangeEventArgs
+  fullName: Terminal.Gui.StepChangeEventArgs
+- uid: Terminal.Gui.WizardStep
+  commentId: T:Terminal.Gui.WizardStep
+  parent: Terminal.Gui
+  href: Terminal.Gui.WizardStep.html
+  name: WizardStep
+  nameWithType: WizardStep
+  fullName: Terminal.Gui.WizardStep
+- uid: Terminal.Gui.Frame
+  commentId: T:Terminal.Gui.Frame
+  parent: Terminal.Gui
+  href: Terminal.Gui.Frame.html
+  name: Frame
+  nameWithType: Frame
+  fullName: Terminal.Gui.Frame
+- uid: Terminal.Gui.Pos
+  commentId: T:Terminal.Gui.Pos
+  parent: Terminal.Gui
+  href: Terminal.Gui.Pos.html
+  name: Pos
+  nameWithType: Pos
+  fullName: Terminal.Gui.Pos
+- uid: Terminal.Gui.Dim
+  commentId: T:Terminal.Gui.Dim
+  parent: Terminal.Gui
+  href: Terminal.Gui.Dim.html
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
+- uid: Terminal.Gui.SizeChangedEventArgs
+  commentId: T:Terminal.Gui.SizeChangedEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.SizeChangedEventArgs.html
+  name: SizeChangedEventArgs
+  nameWithType: SizeChangedEventArgs
+  fullName: Terminal.Gui.SizeChangedEventArgs
+- uid: Terminal.Gui.SuperViewChangedEventArgs
+  commentId: T:Terminal.Gui.SuperViewChangedEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.SuperViewChangedEventArgs.html
+  name: SuperViewChangedEventArgs
+  nameWithType: SuperViewChangedEventArgs
+  fullName: Terminal.Gui.SuperViewChangedEventArgs
+- uid: Terminal.Gui.TitleEventArgs
+  commentId: T:Terminal.Gui.TitleEventArgs
+  href: Terminal.Gui.TitleEventArgs.html
+  name: TitleEventArgs
+  nameWithType: TitleEventArgs
+  fullName: Terminal.Gui.TitleEventArgs
+- uid: Terminal.Gui.ToggleEventArgs
+  commentId: T:Terminal.Gui.ToggleEventArgs
+  parent: Terminal.Gui
+  href: Terminal.Gui.ToggleEventArgs.html
+  name: ToggleEventArgs
+  nameWithType: ToggleEventArgs
+  fullName: Terminal.Gui.ToggleEventArgs
+- uid: Terminal.Gui.ViewEventArgs
+  commentId: T:Terminal.Gui.ViewEventArgs
+  href: Terminal.Gui.ViewEventArgs.html
+  name: ViewEventArgs
+  nameWithType: ViewEventArgs
+  fullName: Terminal.Gui.ViewEventArgs
+- uid: Terminal.Gui.LayoutEventArgs
+  commentId: T:Terminal.Gui.LayoutEventArgs
+  href: Terminal.Gui.LayoutEventArgs.html
+  name: LayoutEventArgs
+  nameWithType: LayoutEventArgs
+  fullName: Terminal.Gui.LayoutEventArgs
+- uid: Terminal.Gui.DrawEventArgs
+  commentId: T:Terminal.Gui.DrawEventArgs
+  href: Terminal.Gui.DrawEventArgs.html
+  name: DrawEventArgs
+  nameWithType: DrawEventArgs
+  fullName: Terminal.Gui.DrawEventArgs
+- uid: Terminal.Gui.FocusEventArgs
+  commentId: T:Terminal.Gui.FocusEventArgs
+  href: Terminal.Gui.FocusEventArgs.html
+  name: FocusEventArgs
+  nameWithType: FocusEventArgs
+  fullName: Terminal.Gui.FocusEventArgs
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+shouldSkipMarkup: true

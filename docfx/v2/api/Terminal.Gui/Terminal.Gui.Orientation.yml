@@ -1,0 +1,119 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Orientation
+  commentId: T:Terminal.Gui.Orientation
+  id: Orientation
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.Orientation.Horizontal
+  - Terminal.Gui.Orientation.Vertical
+  langs:
+  - csharp
+  - vb
+  name: Orientation
+  nameWithType: Orientation
+  fullName: Terminal.Gui.Orientation
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Orientation.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Orientation
+    path: ../Terminal.Gui/Views/GraphView/Orientation.cs
+    startLine: 4
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Direction of an element (horizontal or vertical)
+  example: []
+  syntax:
+    content: public enum Orientation
+    content.vb: Public Enum Orientation
+- uid: Terminal.Gui.Orientation.Horizontal
+  commentId: F:Terminal.Gui.Orientation.Horizontal
+  id: Horizontal
+  parent: Terminal.Gui.Orientation
+  langs:
+  - csharp
+  - vb
+  name: Horizontal
+  nameWithType: Orientation.Horizontal
+  fullName: Terminal.Gui.Orientation.Horizontal
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Orientation.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Horizontal
+    path: ../Terminal.Gui/Views/GraphView/Orientation.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Left to right
+  example: []
+  syntax:
+    content: Horizontal = 0
+    return:
+      type: Terminal.Gui.Orientation
+- uid: Terminal.Gui.Orientation.Vertical
+  commentId: F:Terminal.Gui.Orientation.Vertical
+  id: Vertical
+  parent: Terminal.Gui.Orientation
+  langs:
+  - csharp
+  - vb
+  name: Vertical
+  nameWithType: Orientation.Vertical
+  fullName: Terminal.Gui.Orientation.Vertical
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Orientation.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Vertical
+    path: ../Terminal.Gui/Views/GraphView/Orientation.cs
+    startLine: 14
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Bottom to top
+  example: []
+  syntax:
+    content: Vertical = 1
+    return:
+      type: Terminal.Gui.Orientation
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.Orientation
+  commentId: T:Terminal.Gui.Orientation
+  parent: Terminal.Gui
+  href: Terminal.Gui.Orientation.html
+  name: Orientation
+  nameWithType: Orientation
+  fullName: Terminal.Gui.Orientation
+shouldSkipMarkup: true

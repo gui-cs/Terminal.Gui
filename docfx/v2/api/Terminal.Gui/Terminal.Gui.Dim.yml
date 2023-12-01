@@ -1,0 +1,958 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Dim
+  commentId: T:Terminal.Gui.Dim
+  id: Dim
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.Dim.Equals(System.Object)
+  - Terminal.Gui.Dim.Fill(System.Int32)
+  - Terminal.Gui.Dim.Function(System.Func{System.Int32})
+  - Terminal.Gui.Dim.GetHashCode
+  - Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  - Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  - Terminal.Gui.Dim.op_Implicit(System.Int32)~Terminal.Gui.Dim
+  - Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  - Terminal.Gui.Dim.Percent(System.Single,System.Boolean)
+  - Terminal.Gui.Dim.Sized(System.Int32)
+  - Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  langs:
+  - csharp
+  - vb
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Dim
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 410
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Dim properties of a <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> to control the position.
+  remarks: >-
+    <p>
+      Use the Dim objects on the Width or Height properties of a <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> to control the position.
+    </p>
+
+    <p>
+      These can be used to set the absolute position, when merely assigning an
+      integer value (via the implicit integer to Pos conversion), and they can be combined
+      to produce more useful layouts, like: Pos.Center - 3, which would shift the position
+      of the <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> 3 characters to the left after centering for example.
+    </p>
+  example: []
+  syntax:
+    content: public class Dim
+    content.vb: Public Class [Dim]
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.Dim.Function(System.Func{System.Int32})
+  commentId: M:Terminal.Gui.Dim.Function(System.Func{System.Int32})
+  id: Function(System.Func{System.Int32})
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Function(Func<int>)
+  nameWithType: Dim.Function(Func<int>)
+  fullName: Terminal.Gui.Dim.Function(System.Func<int>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Function
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 445
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a "DimFunc" from the specified function.
+  example: []
+  syntax:
+    content: public static Dim Function(Func<int> function)
+    parameters:
+    - id: function
+      type: System.Func{System.Int32}
+      description: The function to be executed.
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> returned from the function.
+    content.vb: Public Shared Function [Function]([function] As Func(Of Integer)) As [Dim]
+  overload: Terminal.Gui.Dim.Function*
+  nameWithType.vb: Dim.Function(Func(Of Integer))
+  fullName.vb: Terminal.Gui.Dim.Function(System.Func(Of Integer))
+  name.vb: Function(Func(Of Integer))
+- uid: Terminal.Gui.Dim.Percent(System.Single,System.Boolean)
+  commentId: M:Terminal.Gui.Dim.Percent(System.Single,System.Boolean)
+  id: Percent(System.Single,System.Boolean)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Percent(float, bool)
+  nameWithType: Dim.Percent(float, bool)
+  fullName: Terminal.Gui.Dim.Percent(float, bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Percent
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 498
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a percentage <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> object
+  example:
+  - >-
+    This initializes a <xref href="Terminal.Gui.TextField" data-throw-if-not-resolved="false"></xref>that is centered horizontally, is 50% of the way down, 
+
+    is 30% the height, and is 80% the width of the <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> it added to.
+
+    <pre><code class="lang-csharp">var textView = new TextView () {
+
+    X = Pos.Center (),
+
+    Y = Pos.Percent (50),
+
+    Width = Dim.Percent (80),
+    	Height = Dim.Percent (30),
+    };</code></pre>
+  syntax:
+    content: public static Dim Percent(float n, bool r = false)
+    parameters:
+    - id: n
+      type: System.Single
+      description: A value between 0 and 100 representing the percentage.
+    - id: r
+      type: System.Boolean
+      description: If <code>true</code> the Percent is computed based on the remaining space after the X/Y anchor positions. If <code>false</code> is computed based on the whole original space.
+    return:
+      type: Terminal.Gui.Dim
+      description: The percent <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> object.
+    content.vb: Public Shared Function Percent(n As Single, r As Boolean = False) As [Dim]
+  overload: Terminal.Gui.Dim.Percent*
+  nameWithType.vb: Dim.Percent(Single, Boolean)
+  fullName.vb: Terminal.Gui.Dim.Percent(Single, Boolean)
+  name.vb: Percent(Single, Boolean)
+- uid: Terminal.Gui.Dim.Fill(System.Int32)
+  commentId: M:Terminal.Gui.Dim.Fill(System.Int32)
+  id: Fill(System.Int32)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Fill(int)
+  nameWithType: Dim.Fill(int)
+  fullName: Terminal.Gui.Dim.Fill(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Fill
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 549
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> class that fills the dimension, but leaves the specified number of colums for a margin.
+  example: []
+  syntax:
+    content: public static Dim Fill(int margin = 0)
+    parameters:
+    - id: margin
+      type: System.Int32
+      description: Margin to use.
+    return:
+      type: Terminal.Gui.Dim
+      description: The Fill dimension.
+    content.vb: Public Shared Function Fill(margin As Integer = 0) As [Dim]
+  overload: Terminal.Gui.Dim.Fill*
+  nameWithType.vb: Dim.Fill(Integer)
+  fullName.vb: Terminal.Gui.Dim.Fill(Integer)
+  name.vb: Fill(Integer)
+- uid: Terminal.Gui.Dim.op_Implicit(System.Int32)~Terminal.Gui.Dim
+  commentId: M:Terminal.Gui.Dim.op_Implicit(System.Int32)~Terminal.Gui.Dim
+  id: op_Implicit(System.Int32)~Terminal.Gui.Dim
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: implicit operator Dim(int)
+  nameWithType: Dim.implicit operator Dim(int)
+  fullName: Terminal.Gui.Dim.implicit operator Terminal.Gui.Dim(int)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Implicit
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 559
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an Absolute <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> from the specified integer value.
+  example: []
+  syntax:
+    content: public static implicit operator Dim(int n)
+    parameters:
+    - id: n
+      type: System.Int32
+      description: The value to convert to the pos.
+    return:
+      type: Terminal.Gui.Dim
+      description: The Absolute <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>.
+    content.vb: Public Shared Widening Operator CType(n As Integer) As [Dim]
+  overload: Terminal.Gui.Dim.op_Implicit*
+  nameWithType.vb: Dim.CType(Integer)
+  fullName.vb: Terminal.Gui.Dim.CType(Integer)
+  name.vb: CType(Integer)
+- uid: Terminal.Gui.Dim.Sized(System.Int32)
+  commentId: M:Terminal.Gui.Dim.Sized(System.Int32)
+  id: Sized(System.Int32)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Sized(int)
+  nameWithType: Dim.Sized(int)
+  fullName: Terminal.Gui.Dim.Sized(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Sized
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 569
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates an Absolute <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> from the specified integer value.
+  example: []
+  syntax:
+    content: public static Dim Sized(int n)
+    parameters:
+    - id: n
+      type: System.Int32
+      description: The value to convert to the <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>.
+    return:
+      type: Terminal.Gui.Dim
+      description: The Absolute <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>.
+    content.vb: Public Shared Function Sized(n As Integer) As [Dim]
+  overload: Terminal.Gui.Dim.Sized*
+  nameWithType.vb: Dim.Sized(Integer)
+  fullName.vb: Terminal.Gui.Dim.Sized(Integer)
+  name.vb: Sized(Integer)
+- uid: Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  commentId: M:Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  id: op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: operator +(Dim, Dim)
+  nameWithType: Dim.operator +(Dim, Dim)
+  fullName: Terminal.Gui.Dim.operator +(Terminal.Gui.Dim, Terminal.Gui.Dim)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Addition
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 607
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Adds a <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> to a <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>, yielding a new <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public static Dim operator +(Dim left, Dim right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.Dim
+      description: The first <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> to add.
+    - id: right
+      type: Terminal.Gui.Dim
+      description: The second <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> to add.
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> that is the sum of the values of <code>left</code> and <code>right</code>.
+    content.vb: Public Shared Operator +(left As [Dim], right As [Dim]) As [Dim]
+  overload: Terminal.Gui.Dim.op_Addition*
+  nameWithType.vb: Dim.+(Dim, Dim)
+  fullName.vb: Terminal.Gui.Dim.+(Terminal.Gui.Dim, Terminal.Gui.Dim)
+  name.vb: +(Dim, Dim)
+- uid: Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  commentId: M:Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  id: op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: operator -(Dim, Dim)
+  nameWithType: Dim.operator -(Dim, Dim)
+  fullName: Terminal.Gui.Dim.operator -(Terminal.Gui.Dim, Terminal.Gui.Dim)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Subtraction
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 623
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Subtracts a <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> from a <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>, yielding a new <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public static Dim operator -(Dim left, Dim right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> to subtract from (the minuend).
+    - id: right
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> to subtract (the subtrahend).
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> that is the <code>left</code> minus <code>right</code>.
+    content.vb: Public Shared Operator -(left As [Dim], right As [Dim]) As [Dim]
+  overload: Terminal.Gui.Dim.op_Subtraction*
+  nameWithType.vb: Dim.-(Dim, Dim)
+  fullName.vb: Terminal.Gui.Dim.-(Terminal.Gui.Dim, Terminal.Gui.Dim)
+  name.vb: -(Dim, Dim)
+- uid: Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  id: Width(Terminal.Gui.View)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Width(View)
+  nameWithType: Dim.Width(View)
+  fullName: Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Width
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 680
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> object tracks the Width of the specified <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public static Dim Width(View view)
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> of the other <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref>.
+    content.vb: Public Shared Function Width(view As View) As [Dim]
+  overload: Terminal.Gui.Dim.Width*
+- uid: Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  commentId: M:Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  id: Height(Terminal.Gui.View)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Height(View)
+  nameWithType: Dim.Height(View)
+  fullName: Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Height
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 687
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns a <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> object tracks the Height of the specified <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public static Dim Height(View view)
+    parameters:
+    - id: view
+      type: Terminal.Gui.View
+      description: The view that will be tracked.
+    return:
+      type: Terminal.Gui.Dim
+      description: The <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> of the other <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref>.
+    content.vb: Public Shared Function Height(view As View) As [Dim]
+  overload: Terminal.Gui.Dim.Height*
+- uid: Terminal.Gui.Dim.GetHashCode
+  commentId: M:Terminal.Gui.Dim.GetHashCode
+  id: GetHashCode
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: Dim.GetHashCode()
+  fullName: Terminal.Gui.Dim.GetHashCode()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetHashCode
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 691
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Serves as the default hash function.
+  example: []
+  syntax:
+    content: public override int GetHashCode()
+    return:
+      type: System.Int32
+      description: A hash code for the current object.
+    content.vb: Public Overrides Function GetHashCode() As Integer
+  overridden: System.Object.GetHashCode
+  overload: Terminal.Gui.Dim.GetHashCode*
+- uid: Terminal.Gui.Dim.Equals(System.Object)
+  commentId: M:Terminal.Gui.Dim.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: Terminal.Gui.Dim
+  langs:
+  - csharp
+  - vb
+  name: Equals(object)
+  nameWithType: Dim.Equals(object)
+  fullName: Terminal.Gui.Dim.Equals(object)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/View/Layout/PosDim.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Equals
+    path: ../Terminal.Gui/View/Layout/PosDim.cs
+    startLine: 697
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Determines whether the specified object is equal to the current object.
+  example: []
+  syntax:
+    content: public override bool Equals(object other)
+    parameters:
+    - id: other
+      type: System.Object
+      description: The object to compare with the current object.
+    return:
+      type: System.Boolean
+      description: <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if the specified object  is equal to the current object; otherwise, <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.
+    content.vb: Public Overrides Function Equals(other As Object) As Boolean
+  overridden: System.Object.Equals(System.Object)
+  overload: Terminal.Gui.Dim.Equals*
+  nameWithType.vb: Dim.Equals(Object)
+  fullName.vb: Terminal.Gui.Dim.Equals(Object)
+  name.vb: Equals(Object)
+references:
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.Dim
+  commentId: T:Terminal.Gui.Dim
+  parent: Terminal.Gui
+  href: Terminal.Gui.Dim.html
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
+- uid: Terminal.Gui.Dim.Function*
+  commentId: Overload:Terminal.Gui.Dim.Function
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Function(System.Func{System.Int32})
+  name: Function
+  nameWithType: Dim.Function
+  fullName: Terminal.Gui.Dim.Function
+- uid: System.Func{System.Int32}
+  commentId: T:System.Func{System.Int32}
+  parent: System
+  definition: System.Func`1
+  href: https://learn.microsoft.com/dotnet/api/system.func-1
+  name: Func<int>
+  nameWithType: Func<int>
+  fullName: System.Func<int>
+  nameWithType.vb: Func(Of Integer)
+  fullName.vb: System.Func(Of Integer)
+  name.vb: Func(Of Integer)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: <
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Func`1
+  commentId: T:System.Func`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.func-1
+  name: Func<TResult>
+  nameWithType: Func<TResult>
+  fullName: System.Func<TResult>
+  nameWithType.vb: Func(Of TResult)
+  fullName.vb: System.Func(Of TResult)
+  name.vb: Func(Of TResult)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: Terminal.Gui.TextField
+  commentId: T:Terminal.Gui.TextField
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextField.html
+  name: TextField
+  nameWithType: TextField
+  fullName: Terminal.Gui.TextField
+- uid: Terminal.Gui.Dim.Percent*
+  commentId: Overload:Terminal.Gui.Dim.Percent
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Percent(System.Single,System.Boolean)
+  name: Percent
+  nameWithType: Dim.Percent
+  fullName: Terminal.Gui.Dim.Percent
+- uid: System.Single
+  commentId: T:System.Single
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.single
+  name: float
+  nameWithType: float
+  fullName: float
+  nameWithType.vb: Single
+  fullName.vb: Single
+  name.vb: Single
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.Dim.Fill*
+  commentId: Overload:Terminal.Gui.Dim.Fill
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Fill(System.Int32)
+  name: Fill
+  nameWithType: Dim.Fill
+  fullName: Terminal.Gui.Dim.Fill
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.Dim.op_Implicit*
+  commentId: Overload:Terminal.Gui.Dim.op_Implicit
+  name: implicit operator
+  nameWithType: Dim.implicit operator
+  fullName: Terminal.Gui.Dim.implicit operator
+  nameWithType.vb: Dim.CType
+  fullName.vb: Terminal.Gui.Dim.CType
+  name.vb: CType
+  spec.csharp:
+  - name: implicit
+  - name: " "
+  - name: operator
+- uid: Terminal.Gui.Dim.Sized*
+  commentId: Overload:Terminal.Gui.Dim.Sized
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Sized(System.Int32)
+  name: Sized
+  nameWithType: Dim.Sized
+  fullName: Terminal.Gui.Dim.Sized
+- uid: Terminal.Gui.Dim.op_Addition*
+  commentId: Overload:Terminal.Gui.Dim.op_Addition
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  name: operator +
+  nameWithType: Dim.operator +
+  fullName: Terminal.Gui.Dim.operator +
+  nameWithType.vb: Dim.+
+  fullName.vb: Terminal.Gui.Dim.+
+  name.vb: +
+  spec.csharp:
+  - name: operator
+  - name: " "
+  - uid: Terminal.Gui.Dim.op_Addition*
+    name: +
+    href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.op_Addition(Terminal.Gui.Dim,Terminal.Gui.Dim)
+- uid: Terminal.Gui.Dim.op_Subtraction*
+  commentId: Overload:Terminal.Gui.Dim.op_Subtraction
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+  name: operator -
+  nameWithType: Dim.operator -
+  fullName: Terminal.Gui.Dim.operator -
+  nameWithType.vb: Dim.-
+  fullName.vb: Terminal.Gui.Dim.-
+  name.vb: '-'
+  spec.csharp:
+  - name: operator
+  - name: " "
+  - uid: Terminal.Gui.Dim.op_Subtraction*
+    name: '-'
+    href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.op_Subtraction(Terminal.Gui.Dim,Terminal.Gui.Dim)
+- uid: Terminal.Gui.Dim.Width*
+  commentId: Overload:Terminal.Gui.Dim.Width
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Width(Terminal.Gui.View)
+  name: Width
+  nameWithType: Dim.Width
+  fullName: Terminal.Gui.Dim.Width
+- uid: Terminal.Gui.Dim.Height*
+  commentId: Overload:Terminal.Gui.Dim.Height
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Height(Terminal.Gui.View)
+  name: Height
+  nameWithType: Dim.Height
+  fullName: Terminal.Gui.Dim.Height
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: Terminal.Gui.Dim.GetHashCode*
+  commentId: Overload:Terminal.Gui.Dim.GetHashCode
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.GetHashCode
+  name: GetHashCode
+  nameWithType: Dim.GetHashCode
+  fullName: Terminal.Gui.Dim.GetHashCode
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: Terminal.Gui.Dim.Equals*
+  commentId: Overload:Terminal.Gui.Dim.Equals
+  href: Terminal.Gui.Dim.html#Terminal.Gui.Dim.Equals(System.Object)
+  name: Equals
+  nameWithType: Dim.Equals
+  fullName: Terminal.Gui.Dim.Equals
+shouldSkipMarkup: true

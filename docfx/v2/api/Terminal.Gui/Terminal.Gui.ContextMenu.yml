@@ -1,0 +1,1194 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ContextMenu
+  commentId: T:Terminal.Gui.ContextMenu
+  id: ContextMenu
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ContextMenu.#ctor
+  - Terminal.Gui.ContextMenu.#ctor(System.Int32,System.Int32,Terminal.Gui.MenuBarItem)
+  - Terminal.Gui.ContextMenu.#ctor(Terminal.Gui.View,Terminal.Gui.MenuBarItem)
+  - Terminal.Gui.ContextMenu.Dispose
+  - Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+  - Terminal.Gui.ContextMenu.Hide
+  - Terminal.Gui.ContextMenu.Host
+  - Terminal.Gui.ContextMenu.IsShow
+  - Terminal.Gui.ContextMenu.Key
+  - Terminal.Gui.ContextMenu.KeyChanged
+  - Terminal.Gui.ContextMenu.MenuBar
+  - Terminal.Gui.ContextMenu.MenuItems
+  - Terminal.Gui.ContextMenu.MouseFlags
+  - Terminal.Gui.ContextMenu.MouseFlagsChanged
+  - Terminal.Gui.ContextMenu.Position
+  - Terminal.Gui.ContextMenu.Show
+  - Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  langs:
+  - csharp
+  - vb
+  name: ContextMenu
+  nameWithType: ContextMenu
+  fullName: Terminal.Gui.ContextMenu
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ContextMenu
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 23
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    ContextMenu provides a pop-up menu that can be positioned anywhere within a <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref>. 
+
+    ContextMenu is analogous to <xref href="Terminal.Gui.ContextMenu.MenuBar" data-throw-if-not-resolved="false"></xref> and, once activated, works like a sub-menu 
+
+    of a <xref href="Terminal.Gui.MenuBarItem" data-throw-if-not-resolved="false"></xref> (but can be positioned anywhere).
+
+    <p>
+
+    By default, a ContextMenu with sub-menus is displayed in a cascading manner, where each sub-menu pops out of the ContextMenu frame
+
+    (either to the right or left, depending on where the ContextMenu is relative to the edge of the screen). By setting
+
+    <xref href="Terminal.Gui.ContextMenu.UseSubMenusSingleFrame" data-throw-if-not-resolved="false"></xref> to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, this behavior can be changed such that all sub-menus are
+
+    drawn within the ContextMenu frame.
+
+    </p>
+
+    <p>
+
+    ContextMenus can be activated using the Shift-F10 key (by default; use the <xref href="Terminal.Gui.ContextMenu.Key" data-throw-if-not-resolved="false"></xref> to change to another key).
+
+    </p>
+
+    <p>
+
+    Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling <xref href="Terminal.Gui.ContextMenu.Show" data-throw-if-not-resolved="false"></xref>.
+
+    </p>
+
+    <p>
+
+    ContextMenus are located using screen using screen coordinates and appear above all other Views.
+
+    </p>
+  example: []
+  syntax:
+    content: 'public sealed class ContextMenu : IDisposable'
+    content.vb: Public NotInheritable Class ContextMenu Implements IDisposable
+  inheritance:
+  - System.Object
+  implements:
+  - System.IDisposable
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.ContextMenu.#ctor
+  commentId: M:Terminal.Gui.ContextMenu.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: ContextMenu()
+  nameWithType: ContextMenu.ContextMenu()
+  fullName: Terminal.Gui.ContextMenu.ContextMenu()
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 32
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a context menu with no menu items.
+  example: []
+  syntax:
+    content: public ContextMenu()
+    content.vb: Public Sub New()
+  overload: Terminal.Gui.ContextMenu.#ctor*
+  nameWithType.vb: ContextMenu.New()
+  fullName.vb: Terminal.Gui.ContextMenu.New()
+  name.vb: New()
+- uid: Terminal.Gui.ContextMenu.#ctor(Terminal.Gui.View,Terminal.Gui.MenuBarItem)
+  commentId: M:Terminal.Gui.ContextMenu.#ctor(Terminal.Gui.View,Terminal.Gui.MenuBarItem)
+  id: '#ctor(Terminal.Gui.View,Terminal.Gui.MenuBarItem)'
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: ContextMenu(View, MenuBarItem)
+  nameWithType: ContextMenu.ContextMenu(View, MenuBarItem)
+  fullName: Terminal.Gui.ContextMenu.ContextMenu(Terminal.Gui.View, Terminal.Gui.MenuBarItem)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 39
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a context menu, with a <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> specifying the parent/host of the menu.
+  example: []
+  syntax:
+    content: public ContextMenu(View host, MenuBarItem menuItems)
+    parameters:
+    - id: host
+      type: Terminal.Gui.View
+      description: The host view.
+    - id: menuItems
+      type: Terminal.Gui.MenuBarItem
+      description: The menu items for the context menu.
+    content.vb: Public Sub New(host As View, menuItems As MenuBarItem)
+  overload: Terminal.Gui.ContextMenu.#ctor*
+  nameWithType.vb: ContextMenu.New(View, MenuBarItem)
+  fullName.vb: Terminal.Gui.ContextMenu.New(Terminal.Gui.View, Terminal.Gui.MenuBarItem)
+  name.vb: New(View, MenuBarItem)
+- uid: Terminal.Gui.ContextMenu.#ctor(System.Int32,System.Int32,Terminal.Gui.MenuBarItem)
+  commentId: M:Terminal.Gui.ContextMenu.#ctor(System.Int32,System.Int32,Terminal.Gui.MenuBarItem)
+  id: '#ctor(System.Int32,System.Int32,Terminal.Gui.MenuBarItem)'
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: ContextMenu(int, int, MenuBarItem)
+  nameWithType: ContextMenu.ContextMenu(int, int, MenuBarItem)
+  fullName: Terminal.Gui.ContextMenu.ContextMenu(int, int, Terminal.Gui.MenuBarItem)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 51
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a context menu with menu items at a specific screen location.
+  example: []
+  syntax:
+    content: public ContextMenu(int x, int y, MenuBarItem menuItems)
+    parameters:
+    - id: x
+      type: System.Int32
+      description: The left position (screen relative).
+    - id: y
+      type: System.Int32
+      description: The top position (screen relative).
+    - id: menuItems
+      type: Terminal.Gui.MenuBarItem
+      description: The menu items.
+    content.vb: Public Sub New(x As Integer, y As Integer, menuItems As MenuBarItem)
+  overload: Terminal.Gui.ContextMenu.#ctor*
+  nameWithType.vb: ContextMenu.New(Integer, Integer, MenuBarItem)
+  fullName.vb: Terminal.Gui.ContextMenu.New(Integer, Integer, Terminal.Gui.MenuBarItem)
+  name.vb: New(Integer, Integer, MenuBarItem)
+- uid: Terminal.Gui.ContextMenu.Dispose
+  commentId: M:Terminal.Gui.ContextMenu.Dispose
+  id: Dispose
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: Dispose()
+  nameWithType: ContextMenu.Dispose()
+  fullName: Terminal.Gui.ContextMenu.Dispose()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Dispose
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Disposes the context menu object.
+  example: []
+  syntax:
+    content: public void Dispose()
+    content.vb: Public Sub Dispose()
+  overload: Terminal.Gui.ContextMenu.Dispose*
+  implements:
+  - System.IDisposable.Dispose
+- uid: Terminal.Gui.ContextMenu.Show
+  commentId: M:Terminal.Gui.ContextMenu.Show
+  id: Show
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: Show()
+  nameWithType: ContextMenu.Show()
+  fullName: Terminal.Gui.ContextMenu.Show()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Show
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 87
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Shows (opens) the ContextMenu, displaying the <xref href="Terminal.Gui.MenuItem" data-throw-if-not-resolved="false"></xref>s it contains.
+  example: []
+  syntax:
+    content: public void Show()
+    content.vb: Public Sub Show()
+  overload: Terminal.Gui.ContextMenu.Show*
+- uid: Terminal.Gui.ContextMenu.Hide
+  commentId: M:Terminal.Gui.ContextMenu.Hide
+  id: Hide
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: Hide()
+  nameWithType: ContextMenu.Hide()
+  fullName: Terminal.Gui.ContextMenu.Hide()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Hide
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 153
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Hides (closes) the ContextMenu.
+  example: []
+  syntax:
+    content: public void Hide()
+    content.vb: Public Sub Hide()
+  overload: Terminal.Gui.ContextMenu.Hide*
+- uid: Terminal.Gui.ContextMenu.KeyChanged
+  commentId: E:Terminal.Gui.ContextMenu.KeyChanged
+  id: KeyChanged
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: KeyChanged
+  nameWithType: ContextMenu.KeyChanged
+  fullName: Terminal.Gui.ContextMenu.KeyChanged
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: KeyChanged
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 162
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Event invoked when the <xref href="Terminal.Gui.ContextMenu.Key" data-throw-if-not-resolved="false"></xref> is changed.
+  example: []
+  syntax:
+    content: public event EventHandler<KeyChangedEventArgs> KeyChanged
+    return:
+      type: System.EventHandler{Terminal.Gui.KeyChangedEventArgs}
+    content.vb: Public Event KeyChanged As EventHandler(Of KeyChangedEventArgs)
+- uid: Terminal.Gui.ContextMenu.MouseFlagsChanged
+  commentId: E:Terminal.Gui.ContextMenu.MouseFlagsChanged
+  id: MouseFlagsChanged
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: MouseFlagsChanged
+  nameWithType: ContextMenu.MouseFlagsChanged
+  fullName: Terminal.Gui.ContextMenu.MouseFlagsChanged
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MouseFlagsChanged
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 167
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Event invoked when the <xref href="Terminal.Gui.ContextMenu.MouseFlags" data-throw-if-not-resolved="false"></xref> is changed.
+  example: []
+  syntax:
+    content: public event EventHandler<MouseFlagsChangedEventArgs> MouseFlagsChanged
+    return:
+      type: System.EventHandler{Terminal.Gui.MouseFlagsChangedEventArgs}
+    content.vb: Public Event MouseFlagsChanged As EventHandler(Of MouseFlagsChangedEventArgs)
+- uid: Terminal.Gui.ContextMenu.Position
+  commentId: P:Terminal.Gui.ContextMenu.Position
+  id: Position
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: Position
+  nameWithType: ContextMenu.Position
+  fullName: Terminal.Gui.ContextMenu.Position
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Position
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 172
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the menu position.
+  example: []
+  syntax:
+    content: public Point Position { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Point
+    content.vb: Public Property Position As Point
+  overload: Terminal.Gui.ContextMenu.Position*
+- uid: Terminal.Gui.ContextMenu.MenuItems
+  commentId: P:Terminal.Gui.ContextMenu.MenuItems
+  id: MenuItems
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: MenuItems
+  nameWithType: ContextMenu.MenuItems
+  fullName: Terminal.Gui.ContextMenu.MenuItems
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MenuItems
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 177
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the menu items for this context menu.
+  example: []
+  syntax:
+    content: public MenuBarItem MenuItems { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.MenuBarItem
+    content.vb: Public Property MenuItems As MenuBarItem
+  overload: Terminal.Gui.ContextMenu.MenuItems*
+- uid: Terminal.Gui.ContextMenu.Key
+  commentId: P:Terminal.Gui.ContextMenu.Key
+  id: Key
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: Key
+  nameWithType: ContextMenu.Key
+  fullName: Terminal.Gui.ContextMenu.Key
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Key
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 182
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: <xref href="Terminal.Gui.Key" data-throw-if-not-resolved="false"></xref> specifies they keyboard key that will activate the context menu with the keyboard.
+  example: []
+  syntax:
+    content: public Key Key { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Key
+    content.vb: Public Property Key As Key
+  overload: Terminal.Gui.ContextMenu.Key*
+- uid: Terminal.Gui.ContextMenu.MouseFlags
+  commentId: P:Terminal.Gui.ContextMenu.MouseFlags
+  id: MouseFlags
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: MouseFlags
+  nameWithType: ContextMenu.MouseFlags
+  fullName: Terminal.Gui.ContextMenu.MouseFlags
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MouseFlags
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 194
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: <xref href="Terminal.Gui.MouseFlags" data-throw-if-not-resolved="false"></xref> specifies the mouse action used to activate the context menu by mouse.
+  example: []
+  syntax:
+    content: public MouseFlags MouseFlags { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.MouseFlags
+    content.vb: Public Property MouseFlags As MouseFlags
+  overload: Terminal.Gui.ContextMenu.MouseFlags*
+- uid: Terminal.Gui.ContextMenu.IsShow
+  commentId: P:Terminal.Gui.ContextMenu.IsShow
+  id: IsShow
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: IsShow
+  nameWithType: ContextMenu.IsShow
+  fullName: Terminal.Gui.ContextMenu.IsShow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsShow
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 206
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets whether the ContextMenu is showing or not.
+  example: []
+  syntax:
+    content: public static bool IsShow { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Property IsShow As Boolean
+  overload: Terminal.Gui.ContextMenu.IsShow*
+- uid: Terminal.Gui.ContextMenu.Host
+  commentId: P:Terminal.Gui.ContextMenu.Host
+  id: Host
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: Host
+  nameWithType: ContextMenu.Host
+  fullName: Terminal.Gui.ContextMenu.Host
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Host
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 212
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The host <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> which position will be used,
+
+    otherwise if it's null the container will be used.
+  example: []
+  syntax:
+    content: public View Host { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.View
+    content.vb: Public Property Host As View
+  overload: Terminal.Gui.ContextMenu.Host*
+- uid: Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+  commentId: P:Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+  id: ForceMinimumPosToZero
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: ForceMinimumPosToZero
+  nameWithType: ContextMenu.ForceMinimumPosToZero
+  fullName: Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ForceMinimumPosToZero
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 219
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Sets or gets whether the context menu be forced to the right, ensuring it is not clipped, if the x position 
+
+    is less than zero. The default is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> which means the context menu will be forced to the right.
+
+    If set to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>, the context menu will be clipped on the left if x is less than zero.
+  example: []
+  syntax:
+    content: public bool ForceMinimumPosToZero { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property ForceMinimumPosToZero As Boolean
+  overload: Terminal.Gui.ContextMenu.ForceMinimumPosToZero*
+- uid: Terminal.Gui.ContextMenu.MenuBar
+  commentId: P:Terminal.Gui.ContextMenu.MenuBar
+  id: MenuBar
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: MenuBar
+  nameWithType: ContextMenu.MenuBar
+  fullName: Terminal.Gui.ContextMenu.MenuBar
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MenuBar
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 224
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the <xref href="Terminal.Gui.MenuBar" data-throw-if-not-resolved="false"></xref> that is hosting this context menu.
+  example: []
+  syntax:
+    content: public MenuBar MenuBar { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.MenuBar
+    content.vb: Public ReadOnly Property MenuBar As MenuBar
+  overload: Terminal.Gui.ContextMenu.MenuBar*
+- uid: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  commentId: P:Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  id: UseSubMenusSingleFrame
+  parent: Terminal.Gui.ContextMenu
+  langs:
+  - csharp
+  - vb
+  name: UseSubMenusSingleFrame
+  nameWithType: ContextMenu.UseSubMenusSingleFrame
+  fullName: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/ContextMenu.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UseSubMenusSingleFrame
+    path: ../Terminal.Gui/Views/ContextMenu.cs
+    startLine: 231
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets if sub-menus will be displayed using a "single frame" menu style. If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the ContextMenu
+
+    and any sub-menus that would normally cascade will be displayed within a single frame. If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a> (the default),
+
+    sub-menus will cascade using separate frames for each level of the menu hierarchy.
+  example: []
+  syntax:
+    content: public bool UseSubMenusSingleFrame { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseSubMenusSingleFrame As Boolean
+  overload: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame*
+references:
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui.ContextMenu.MenuBar
+  commentId: P:Terminal.Gui.ContextMenu.MenuBar
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.MenuBar
+  name: MenuBar
+  nameWithType: ContextMenu.MenuBar
+  fullName: Terminal.Gui.ContextMenu.MenuBar
+- uid: Terminal.Gui.MenuBarItem
+  commentId: T:Terminal.Gui.MenuBarItem
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuBarItem.html
+  name: MenuBarItem
+  nameWithType: MenuBarItem
+  fullName: Terminal.Gui.MenuBarItem
+- uid: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  commentId: P:Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  name: UseSubMenusSingleFrame
+  nameWithType: ContextMenu.UseSubMenusSingleFrame
+  fullName: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+- uid: Terminal.Gui.ContextMenu.Key
+  commentId: P:Terminal.Gui.ContextMenu.Key
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Key
+  name: Key
+  nameWithType: ContextMenu.Key
+  fullName: Terminal.Gui.ContextMenu.Key
+- uid: Terminal.Gui.ContextMenu.Show
+  commentId: M:Terminal.Gui.ContextMenu.Show
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Show
+  name: Show()
+  nameWithType: ContextMenu.Show()
+  fullName: Terminal.Gui.ContextMenu.Show()
+  spec.csharp:
+  - uid: Terminal.Gui.ContextMenu.Show
+    name: Show
+    href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Show
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ContextMenu.Show
+    name: Show
+    href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Show
+  - name: (
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ContextMenu.#ctor*
+  commentId: Overload:Terminal.Gui.ContextMenu.#ctor
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.#ctor
+  name: ContextMenu
+  nameWithType: ContextMenu.ContextMenu
+  fullName: Terminal.Gui.ContextMenu.ContextMenu
+  nameWithType.vb: ContextMenu.New
+  fullName.vb: Terminal.Gui.ContextMenu.New
+  name.vb: New
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.ContextMenu.Dispose*
+  commentId: Overload:Terminal.Gui.ContextMenu.Dispose
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Dispose
+  name: Dispose
+  nameWithType: ContextMenu.Dispose
+  fullName: Terminal.Gui.ContextMenu.Dispose
+- uid: System.IDisposable.Dispose
+  commentId: M:System.IDisposable.Dispose
+  parent: System.IDisposable
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  name: Dispose()
+  nameWithType: IDisposable.Dispose()
+  fullName: System.IDisposable.Dispose()
+  spec.csharp:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.IDisposable.Dispose
+    name: Dispose
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.idisposable.dispose
+  - name: (
+  - name: )
+- uid: Terminal.Gui.MenuItem
+  commentId: T:Terminal.Gui.MenuItem
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuItem.html
+  name: MenuItem
+  nameWithType: MenuItem
+  fullName: Terminal.Gui.MenuItem
+- uid: Terminal.Gui.ContextMenu.Show*
+  commentId: Overload:Terminal.Gui.ContextMenu.Show
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Show
+  name: Show
+  nameWithType: ContextMenu.Show
+  fullName: Terminal.Gui.ContextMenu.Show
+- uid: Terminal.Gui.ContextMenu.Hide*
+  commentId: Overload:Terminal.Gui.ContextMenu.Hide
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Hide
+  name: Hide
+  nameWithType: ContextMenu.Hide
+  fullName: Terminal.Gui.ContextMenu.Hide
+- uid: System.EventHandler{Terminal.Gui.KeyChangedEventArgs}
+  commentId: T:System.EventHandler{Terminal.Gui.KeyChangedEventArgs}
+  parent: System
+  definition: System.EventHandler`1
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<KeyChangedEventArgs>
+  nameWithType: EventHandler<KeyChangedEventArgs>
+  fullName: System.EventHandler<Terminal.Gui.KeyChangedEventArgs>
+  nameWithType.vb: EventHandler(Of KeyChangedEventArgs)
+  fullName.vb: System.EventHandler(Of Terminal.Gui.KeyChangedEventArgs)
+  name.vb: EventHandler(Of KeyChangedEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - uid: Terminal.Gui.KeyChangedEventArgs
+    name: KeyChangedEventArgs
+    href: Terminal.Gui.KeyChangedEventArgs.html
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.KeyChangedEventArgs
+    name: KeyChangedEventArgs
+    href: Terminal.Gui.KeyChangedEventArgs.html
+  - name: )
+- uid: System.EventHandler`1
+  commentId: T:System.EventHandler`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<TEventArgs>
+  nameWithType: EventHandler<TEventArgs>
+  fullName: System.EventHandler<TEventArgs>
+  nameWithType.vb: EventHandler(Of TEventArgs)
+  fullName.vb: System.EventHandler(Of TEventArgs)
+  name.vb: EventHandler(Of TEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - name: TEventArgs
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TEventArgs
+  - name: )
+- uid: Terminal.Gui.ContextMenu.MouseFlags
+  commentId: P:Terminal.Gui.ContextMenu.MouseFlags
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.MouseFlags
+  name: MouseFlags
+  nameWithType: ContextMenu.MouseFlags
+  fullName: Terminal.Gui.ContextMenu.MouseFlags
+- uid: System.EventHandler{Terminal.Gui.MouseFlagsChangedEventArgs}
+  commentId: T:System.EventHandler{Terminal.Gui.MouseFlagsChangedEventArgs}
+  parent: System
+  definition: System.EventHandler`1
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<MouseFlagsChangedEventArgs>
+  nameWithType: EventHandler<MouseFlagsChangedEventArgs>
+  fullName: System.EventHandler<Terminal.Gui.MouseFlagsChangedEventArgs>
+  nameWithType.vb: EventHandler(Of MouseFlagsChangedEventArgs)
+  fullName.vb: System.EventHandler(Of Terminal.Gui.MouseFlagsChangedEventArgs)
+  name.vb: EventHandler(Of MouseFlagsChangedEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - uid: Terminal.Gui.MouseFlagsChangedEventArgs
+    name: MouseFlagsChangedEventArgs
+    href: Terminal.Gui.MouseFlagsChangedEventArgs.html
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.MouseFlagsChangedEventArgs
+    name: MouseFlagsChangedEventArgs
+    href: Terminal.Gui.MouseFlagsChangedEventArgs.html
+  - name: )
+- uid: Terminal.Gui.ContextMenu.Position*
+  commentId: Overload:Terminal.Gui.ContextMenu.Position
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Position
+  name: Position
+  nameWithType: ContextMenu.Position
+  fullName: Terminal.Gui.ContextMenu.Position
+- uid: Terminal.Gui.Point
+  commentId: T:Terminal.Gui.Point
+  parent: Terminal.Gui
+  href: Terminal.Gui.Point.html
+  name: Point
+  nameWithType: Point
+  fullName: Terminal.Gui.Point
+- uid: Terminal.Gui.ContextMenu.MenuItems*
+  commentId: Overload:Terminal.Gui.ContextMenu.MenuItems
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.MenuItems
+  name: MenuItems
+  nameWithType: ContextMenu.MenuItems
+  fullName: Terminal.Gui.ContextMenu.MenuItems
+- uid: Terminal.Gui.Key
+  commentId: T:Terminal.Gui.Key
+  parent: Terminal.Gui
+  href: Terminal.Gui.Key.html
+  name: Key
+  nameWithType: Key
+  fullName: Terminal.Gui.Key
+- uid: Terminal.Gui.ContextMenu.Key*
+  commentId: Overload:Terminal.Gui.ContextMenu.Key
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Key
+  name: Key
+  nameWithType: ContextMenu.Key
+  fullName: Terminal.Gui.ContextMenu.Key
+- uid: Terminal.Gui.MouseFlags
+  commentId: T:Terminal.Gui.MouseFlags
+  parent: Terminal.Gui
+  href: Terminal.Gui.MouseFlags.html
+  name: MouseFlags
+  nameWithType: MouseFlags
+  fullName: Terminal.Gui.MouseFlags
+- uid: Terminal.Gui.ContextMenu.MouseFlags*
+  commentId: Overload:Terminal.Gui.ContextMenu.MouseFlags
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.MouseFlags
+  name: MouseFlags
+  nameWithType: ContextMenu.MouseFlags
+  fullName: Terminal.Gui.ContextMenu.MouseFlags
+- uid: Terminal.Gui.ContextMenu.IsShow*
+  commentId: Overload:Terminal.Gui.ContextMenu.IsShow
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.IsShow
+  name: IsShow
+  nameWithType: ContextMenu.IsShow
+  fullName: Terminal.Gui.ContextMenu.IsShow
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.ContextMenu.Host*
+  commentId: Overload:Terminal.Gui.ContextMenu.Host
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.Host
+  name: Host
+  nameWithType: ContextMenu.Host
+  fullName: Terminal.Gui.ContextMenu.Host
+- uid: Terminal.Gui.ContextMenu.ForceMinimumPosToZero*
+  commentId: Overload:Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+  name: ForceMinimumPosToZero
+  nameWithType: ContextMenu.ForceMinimumPosToZero
+  fullName: Terminal.Gui.ContextMenu.ForceMinimumPosToZero
+- uid: Terminal.Gui.MenuBar
+  commentId: T:Terminal.Gui.MenuBar
+  parent: Terminal.Gui
+  href: Terminal.Gui.MenuBar.html
+  name: MenuBar
+  nameWithType: MenuBar
+  fullName: Terminal.Gui.MenuBar
+- uid: Terminal.Gui.ContextMenu.MenuBar*
+  commentId: Overload:Terminal.Gui.ContextMenu.MenuBar
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.MenuBar
+  name: MenuBar
+  nameWithType: ContextMenu.MenuBar
+  fullName: Terminal.Gui.ContextMenu.MenuBar
+- uid: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame*
+  commentId: Overload:Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  href: Terminal.Gui.ContextMenu.html#Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+  name: UseSubMenusSingleFrame
+  nameWithType: ContextMenu.UseSubMenusSingleFrame
+  fullName: Terminal.Gui.ContextMenu.UseSubMenusSingleFrame
+shouldSkipMarkup: true

@@ -1,0 +1,763 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class PopupAutocomplete
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class PopupAutocomplete
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../../">
+  
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui.PopupAutocomplete">
+
+
+
+  <h1 id="Terminal_Gui_PopupAutocomplete" data-uid="Terminal.Gui.PopupAutocomplete" class="text-break">Class PopupAutocomplete
+</h1>
+  <div class="markdown level0 summary">Renders an overlay on another view at a given point that allows selecting
+from a range of 'autocomplete' options.</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="Terminal.Gui.AutocompleteBase.html">AutocompleteBase</a></div>
+    <div class="level2"><span class="xref">PopupAutocomplete</span></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.TextFieldAutocomplete.html">TextFieldAutocomplete</a></div>
+      <div class="level3"><a class="xref" href="Terminal.Gui.TextViewAutocomplete.html">TextViewAutocomplete</a></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_PopupInsideContainer">AutocompleteBase.PopupInsideContainer</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_SuggestionGenerator">AutocompleteBase.SuggestionGenerator</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_MaxWidth">AutocompleteBase.MaxWidth</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_MaxHeight">AutocompleteBase.MaxHeight</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_Visible">AutocompleteBase.Visible</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_Suggestions">AutocompleteBase.Suggestions</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_SelectedIdx">AutocompleteBase.SelectedIdx</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_SelectionKey">AutocompleteBase.SelectionKey</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_CloseKey">AutocompleteBase.CloseKey</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_Reopen">AutocompleteBase.Reopen</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_Context">AutocompleteBase.Context</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_ClearSuggestions">AutocompleteBase.ClearSuggestions()</a>
+    </div>
+    <div>
+      <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_GenerateSuggestions_Terminal_Gui_AutocompleteContext_">AutocompleteBase.GenerateSuggestions(AutocompleteContext)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Terminal.html">Terminal</a>.<a class="xref" href="Terminal.Gui.html">Gui</a></h6>
+  <h6><strong>Assembly</strong>: Terminal.Gui.dll</h6>
+  <h5 id="Terminal_Gui_PopupAutocomplete_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class PopupAutocomplete : AutocompleteBase, IAutocomplete</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete__ctor.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.%23ctor%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L81">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete__ctor_" data-uid="Terminal.Gui.PopupAutocomplete.#ctor*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete__ctor" data-uid="Terminal.Gui.PopupAutocomplete.#ctor">PopupAutocomplete()</h4>
+  <div class="markdown level1 summary">Creates a new instance of the <a class="xref" href="Terminal.Gui.PopupAutocomplete.html">PopupAutocomplete</a> class.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public PopupAutocomplete()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_ColorScheme.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.ColorScheme%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L135">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_ColorScheme_" data-uid="Terminal.Gui.PopupAutocomplete.ColorScheme*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_ColorScheme" data-uid="Terminal.Gui.PopupAutocomplete.ColorScheme">ColorScheme</h4>
+  <div class="markdown level1 summary">The colors to use to render the overlay. Accessing this property before
+the Application has been initialized will cause an error</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override ColorScheme ColorScheme { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_ColorScheme">AutocompleteBase.ColorScheme</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_HostControl.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.HostControl%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L65">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_HostControl_" data-uid="Terminal.Gui.PopupAutocomplete.HostControl*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_HostControl" data-uid="Terminal.Gui.PopupAutocomplete.HostControl">HostControl</h4>
+  <div class="markdown level1 summary">The host control to handle.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override View HostControl { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.View.html">View</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_HostControl">AutocompleteBase.HostControl</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_ScrollOffset.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.ScrollOffset%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L129">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_ScrollOffset_" data-uid="Terminal.Gui.PopupAutocomplete.ScrollOffset*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_ScrollOffset" data-uid="Terminal.Gui.PopupAutocomplete.ScrollOffset">ScrollOffset</h4>
+  <div class="markdown level1 summary">When more suggestions are available than can be rendered the user
+can scroll down the dropdown list. This indicates how far down they
+have gone</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual int ScrollOffset { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_Close.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.Close%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L476">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_Close_" data-uid="Terminal.Gui.PopupAutocomplete.Close*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_Close" data-uid="Terminal.Gui.PopupAutocomplete.Close">Close()</h4>
+  <div class="markdown level1 summary">Closes the Autocomplete context menu if it is showing and <a class="xref" href="Terminal.Gui.IAutocomplete.html#Terminal_Gui_IAutocomplete_ClearSuggestions">ClearSuggestions()</a></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void Close()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_DeleteTextBackwards.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.DeleteTextBackwards%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L459">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_DeleteTextBackwards_" data-uid="Terminal.Gui.PopupAutocomplete.DeleteTextBackwards*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_DeleteTextBackwards" data-uid="Terminal.Gui.PopupAutocomplete.DeleteTextBackwards">DeleteTextBackwards()</h4>
+  <div class="markdown level1 summary">Deletes the text backwards before insert the selected text in the <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void DeleteTextBackwards()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_EnsureSelectedIdxIsValid.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.EnsureSelectedIdxIsValid%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L260">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_EnsureSelectedIdxIsValid_" data-uid="Terminal.Gui.PopupAutocomplete.EnsureSelectedIdxIsValid*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_EnsureSelectedIdxIsValid" data-uid="Terminal.Gui.PopupAutocomplete.EnsureSelectedIdxIsValid">EnsureSelectedIdxIsValid()</h4>
+  <div class="markdown level1 summary">Updates <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_SelectedIdx">SelectedIdx</a> to be a valid index within <a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_Suggestions">Suggestions</a></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void EnsureSelectedIdxIsValid()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_EnsureSelectedIdxIsValid">AutocompleteBase.EnsureSelectedIdxIsValid()</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_InsertSelection_Terminal_Gui_Suggestion_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.InsertSelection(Terminal.Gui.Suggestion)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L444">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_InsertSelection_" data-uid="Terminal.Gui.PopupAutocomplete.InsertSelection*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_InsertSelection_Terminal_Gui_Suggestion_" data-uid="Terminal.Gui.PopupAutocomplete.InsertSelection(Terminal.Gui.Suggestion)">InsertSelection(Suggestion)</h4>
+  <div class="markdown level1 summary">Called when the user confirms a selection at the current cursor location in
+the <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a>. The <code class="paramref">accepted</code> string
+is the full autocomplete word to be inserted. Typically a host will have to
+remove some characters such that the <code class="paramref">accepted</code> string 
+completes the word instead of simply being appended.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected virtual bool InsertSelection(Suggestion accepted)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Suggestion.html">Suggestion</a></td>
+        <td><span class="parametername">accepted</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td>True if the insertion was possible otherwise false</td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_InsertText_System_String_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.InsertText(System.String)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L465">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_InsertText_" data-uid="Terminal.Gui.PopupAutocomplete.InsertText*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_InsertText_System_String_" data-uid="Terminal.Gui.PopupAutocomplete.InsertText(System.String)">InsertText(string)</h4>
+  <div class="markdown level1 summary">Insert the selected text in the <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void InsertText(string accepted)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">accepted</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_MouseEvent_Terminal_Gui_MouseEvent_System_Boolean_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.MouseEvent(Terminal.Gui.MouseEvent%2CSystem.Boolean)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L346">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_MouseEvent_" data-uid="Terminal.Gui.PopupAutocomplete.MouseEvent*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_MouseEvent_Terminal_Gui_MouseEvent_System_Boolean_" data-uid="Terminal.Gui.PopupAutocomplete.MouseEvent(Terminal.Gui.MouseEvent,System.Boolean)">MouseEvent(MouseEvent, bool)</h4>
+  <div class="markdown level1 summary">Handle mouse events before <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a> e.g. to make mouse events like
+report/click apply to the autocomplete control instead of changing the cursor position in
+the underlying text view.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool MouseEvent(MouseEvent me, bool fromHost = false)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">me</span></td>
+        <td>The mouse event.</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">fromHost</span></td>
+        <td>If was called from the popup or from the host.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><code>true</code>if the mouse can be handled <code>false</code>otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_MouseEvent_Terminal_Gui_MouseEvent_System_Boolean_">AutocompleteBase.MouseEvent(MouseEvent, bool)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_MoveDown.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.MoveDown%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L501">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_MoveDown_" data-uid="Terminal.Gui.PopupAutocomplete.MoveDown*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_MoveDown" data-uid="Terminal.Gui.PopupAutocomplete.MoveDown">MoveDown()</h4>
+  <div class="markdown level1 summary">Moves the selection in the Autocomplete context menu down one</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void MoveDown()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_MoveUp.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.MoveUp%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L488">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_MoveUp_" data-uid="Terminal.Gui.PopupAutocomplete.MoveUp*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_MoveUp" data-uid="Terminal.Gui.PopupAutocomplete.MoveUp">MoveUp()</h4>
+  <div class="markdown level1 summary">Moves the selection in the Autocomplete context menu up one</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void MoveUp()</code></pre>
+  </div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_ProcessKey_Terminal_Gui_KeyEventArgs_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.ProcessKey(Terminal.Gui.KeyEventArgs)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L281">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_ProcessKey_" data-uid="Terminal.Gui.PopupAutocomplete.ProcessKey*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_ProcessKey_Terminal_Gui_KeyEventArgs_" data-uid="Terminal.Gui.PopupAutocomplete.ProcessKey(Terminal.Gui.KeyEventArgs)">ProcessKey(KeyEventArgs)</h4>
+  <div class="markdown level1 summary">Handle key events before <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a> e.g. to make key events like
+up/down apply to the autocomplete control instead of changing the cursor position in
+the underlying text view.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool ProcessKey(KeyEventArgs a)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.KeyEventArgs.html">KeyEventArgs</a></td>
+        <td><span class="parametername">a</span></td>
+        <td>The key event.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><code>true</code>if the key can be handled <code>false</code>otherwise.</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_ProcessKey_Terminal_Gui_KeyEventArgs_">AutocompleteBase.ProcessKey(KeyEventArgs)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_RenderOverlay_Terminal_Gui_Point_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.RenderOverlay(Terminal.Gui.Point)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L152">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_RenderOverlay_" data-uid="Terminal.Gui.PopupAutocomplete.RenderOverlay*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_RenderOverlay_Terminal_Gui_Point_" data-uid="Terminal.Gui.PopupAutocomplete.RenderOverlay(Terminal.Gui.Point)">RenderOverlay(Point)</h4>
+  <div class="markdown level1 summary">Renders the autocomplete dialog inside or outside the given <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a> at the
+given point.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void RenderOverlay(Point renderAt)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.Point.html">Point</a></td>
+        <td><span class="parametername">renderAt</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Terminal.Gui.AutocompleteBase.html#Terminal_Gui_AutocompleteBase_RenderOverlay_Terminal_Gui_Point_">AutocompleteBase.RenderOverlay(Point)</a></div>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_RenderSelectedIdxByMouse_Terminal_Gui_MouseEvent_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.RenderSelectedIdxByMouse(Terminal.Gui.MouseEvent)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L408">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_RenderSelectedIdxByMouse_" data-uid="Terminal.Gui.PopupAutocomplete.RenderSelectedIdxByMouse*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_RenderSelectedIdxByMouse_Terminal_Gui_MouseEvent_" data-uid="Terminal.Gui.PopupAutocomplete.RenderSelectedIdxByMouse(Terminal.Gui.MouseEvent)">RenderSelectedIdxByMouse(MouseEvent)</h4>
+  <div class="markdown level1 summary">Render the current selection in the Autocomplete context menu by the mouse reporting.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected void RenderSelectedIdxByMouse(MouseEvent me)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></td>
+        <td><span class="parametername">me</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_ReopenSuggestions.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.ReopenSuggestions%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L515">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_ReopenSuggestions_" data-uid="Terminal.Gui.PopupAutocomplete.ReopenSuggestions*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_ReopenSuggestions" data-uid="Terminal.Gui.PopupAutocomplete.ReopenSuggestions">ReopenSuggestions()</h4>
+  <div class="markdown level1 summary">Reopen the popup after it has been closed.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool ReopenSuggestions()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_Select.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.Select%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L423">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_Select_" data-uid="Terminal.Gui.PopupAutocomplete.Select*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_Select" data-uid="Terminal.Gui.PopupAutocomplete.Select">Select()</h4>
+  <div class="markdown level1 summary">Completes the autocomplete selection process. Called when user hits the <a class="xref" href="Terminal.Gui.IAutocomplete.html#Terminal_Gui_IAutocomplete_SelectionKey">SelectionKey</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected bool Select()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <span class="small pull-right mobile-hide">
+    <span class="divider">|</span>
+    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete_SetCursorPosition_System_Int32_.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete.SetCursorPosition(System.Int32)%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A">Improve this Doc</a>
+  </span>
+  <span class="small pull-right mobile-hide">
+    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L471">View Source</a>
+  </span>
+  <a id="Terminal_Gui_PopupAutocomplete_SetCursorPosition_" data-uid="Terminal.Gui.PopupAutocomplete.SetCursorPosition*"></a>
+  <h4 id="Terminal_Gui_PopupAutocomplete_SetCursorPosition_System_Int32_" data-uid="Terminal.Gui.PopupAutocomplete.SetCursorPosition(System.Int32)">SetCursorPosition(int)</h4>
+  <div class="markdown level1 summary">Set the cursor position in the <a class="xref" href="Terminal.Gui.PopupAutocomplete.html#Terminal_Gui_PopupAutocomplete_HostControl">HostControl</a>.</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract void SetCursorPosition(int column)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">column</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/new/v2_develop/docfx/overrides/new?filename=Terminal_Gui_PopupAutocomplete.md&amp;value=---%0Auid%3A%20Terminal.Gui.PopupAutocomplete%0Asummary%3A%20&#39;*You%20can%20override%20summary%20for%20the%20API%20here%20using%20*MARKDOWN*%20syntax&#39;%0A---%0A%0A*Please%20type%20below%20more%20information%20about%20this%20API%3A*%0A%0A" class="contribution-link">Improve this Doc</a>
+                  </li>
+                  <li>
+                    <a href="tig:tig/Terminal.Gui/blob/v2_develop/Terminal.Gui/Text/Autocomplete/PopupAutocomplete.cs/#L14" class="contribution-link">View Source</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

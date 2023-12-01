@@ -1,0 +1,998 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Namespace Terminal.Gui
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Namespace Terminal.Gui
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../../favicon.ico">
+    <link rel="stylesheet" href="../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../styles/docfx.css">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../../">
+  
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../../index.html">
+                <img id="logo" class="svg" src="../../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Terminal.Gui">
+
+  <h1 id="Terminal_Gui" data-uid="Terminal.Gui" class="text-break">Namespace Terminal.Gui
+</h1>
+  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="markdown level0 remarks"></div>
+    <h3 id="classes">Classes
+</h3>
+      <h4><a class="xref" href="Terminal.Gui.AllowedType.html">AllowedType</a></h4>
+      <section>Describes a requirement on what <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.fileinfo">FileInfo</a> can be selected.
+This can be combined with other <a class="xref" href="Terminal.Gui.IAllowedType.html">IAllowedType</a> in a <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>
+to for example show only .csv files but let user change to open any if they want.</section>
+      <h4><a class="xref" href="Terminal.Gui.AllowedTypeAny.html">AllowedTypeAny</a></h4>
+      <section><a class="xref" href="Terminal.Gui.IAllowedType.html">IAllowedType</a> that allows selection of any types (*.*).</section>
+      <h4><a class="xref" href="Terminal.Gui.AppendAutocomplete.html">AppendAutocomplete</a></h4>
+      <section>Autocomplete for a <a class="xref" href="Terminal.Gui.TextField.html">TextField</a> which shows suggestions within the box.
+Displayed suggestions can be completed using the tab key.</section>
+      <h4><a class="xref" href="Terminal.Gui.Application.html">Application</a></h4>
+      <section>A static, singleton class representing the application. This class is the entry point for the application.</section>
+      <h4><a class="xref" href="Terminal.Gui.AppScope.html">AppScope</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.Scope-1.html">Scope&lt;T&gt;</a> class for application-defined configuration settings.</section>
+      <h4><a class="xref" href="Terminal.Gui.AutocompleteBase.html">AutocompleteBase</a></h4>
+      <section>Abstract implementation of <a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a> allows
+for tailoring how autocomplete is rendered/interacted with.</section>
+      <h4><a class="xref" href="Terminal.Gui.AutocompleteContext.html">AutocompleteContext</a></h4>
+      <section>Describes the current state of a <a class="xref" href="Terminal.Gui.View.html">View</a> which
+is proposing autocomplete. Suggestions are based on this state.</section>
+      <h4><a class="xref" href="Terminal.Gui.Axis.html">Axis</a></h4>
+      <section>Renders a continuous line with grid line ticks and labels</section>
+      <h4><a class="xref" href="Terminal.Gui.AxisIncrementToRender.html">AxisIncrementToRender</a></h4>
+      <section>A location on an axis of a <a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a> that may
+or may not have a label associated with it</section>
+      <h4><a class="xref" href="Terminal.Gui.BarSeries.html">BarSeries</a></h4>
+      <section>Series of bars positioned at regular intervals</section>
+      <h4><a class="xref" href="Terminal.Gui.BarSeriesBar.html">BarSeriesBar</a></h4>
+      <section>A single bar in a <a class="xref" href="Terminal.Gui.BarSeries.html">BarSeries</a></section>
+      <h4><a class="xref" href="Terminal.Gui.Button.html">Button</a></h4>
+      <section>Button is a <a class="xref" href="Terminal.Gui.View.html">View</a> that provides an item that invokes raises the <a class="xref" href="Terminal.Gui.Button.html#Terminal_Gui_Button_Clicked">Clicked</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.Cell.html">Cell</a></h4>
+      <section>Represents a single row/column in a Terminal.Gui rendering surface
+(e.g. <a class="xref" href="Terminal.Gui.LineCanvas.html">LineCanvas</a> and <a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a>).</section>
+      <h4><a class="xref" href="Terminal.Gui.CellActivatedEventArgs.html">CellActivatedEventArgs</a></h4>
+      <section>Defines the event arguments for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_CellActivated">CellActivated</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.CellColorGetterArgs.html">CellColorGetterArgs</a></h4>
+      <section>Arguments for a <a class="xref" href="Terminal.Gui.CellColorGetterDelegate.html">CellColorGetterDelegate</a>.  Describes a cell for which a rendering
+<a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> is being sought</section>
+      <h4><a class="xref" href="Terminal.Gui.CellToggledEventArgs.html">CellToggledEventArgs</a></h4>
+      <section>Event args for the <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_CellToggled">CellToggled</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.CheckBox.html">CheckBox</a> <a class="xref" href="Terminal.Gui.View.html">View</a> shows an on/off toggle that the user can set</section>
+      <h4><a class="xref" href="Terminal.Gui.CheckBoxTableSourceWrapperBase.html">CheckBoxTableSourceWrapperBase</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a> for a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> which adds a
+checkbox column as an additional column in the table.</section>
+      <h4><a class="xref" href="Terminal.Gui.CheckBoxTableSourceWrapperByIndex.html">CheckBoxTableSourceWrapperByIndex</a></h4>
+      <section>Implementation of <a class="xref" href="Terminal.Gui.CheckBoxTableSourceWrapperBase.html">CheckBoxTableSourceWrapperBase</a> which records toggled rows
+by their row number.</section>
+      <h4><a class="xref" href="Terminal.Gui.CheckBoxTableSourceWrapperByObject-1.html">CheckBoxTableSourceWrapperByObject&lt;T&gt;</a></h4>
+      <section>Implementation of <a class="xref" href="Terminal.Gui.CheckBoxTableSourceWrapperBase.html">CheckBoxTableSourceWrapperBase</a> which records toggled rows
+by a property on row objects.</section>
+      <h4><a class="xref" href="Terminal.Gui.Clipboard.html">Clipboard</a></h4>
+      <section>Provides cut, copy, and paste support for the OS clipboard.</section>
+      <h4><a class="xref" href="Terminal.Gui.ClipboardBase.html">ClipboardBase</a></h4>
+      <section>Shared abstract class to enforce rules from the implementation of the <a class="xref" href="Terminal.Gui.IClipboard.html">IClipboard</a> interface.</section>
+      <h4><a class="xref" href="Terminal.Gui.CollectionNavigator.html">CollectionNavigator</a></h4>
+      <section>Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. 
+The <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_SearchString">SearchString</a> is used to find the next item in the collection that matches the search string
+when <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_GetNextMatchingItem_System_Int32_System_Char_">GetNextMatchingItem(int, char)</a> is called.
+<p>
+If the user types keystrokes that can't be found in the collection, 
+the search string is cleared and the next item is found that starts with the last keystroke.
+</p><p>
+If the user pauses keystrokes for a short time (see <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_TypingDelay">TypingDelay</a>), the search string is cleared.
+</p></section>
+      <h4><a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html">CollectionNavigatorBase</a></h4>
+      <section>Navigates a collection of items using keystrokes. The keystrokes are used to build a search string. 
+The <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_SearchString">SearchString</a> is used to find the next item in the collection that matches the search string
+when <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_GetNextMatchingItem_System_Int32_System_Char_">GetNextMatchingItem(int, char)</a> is called.
+<p>
+If the user types keystrokes that can't be found in the collection, 
+the search string is cleared and the next item is found that starts with the last keystroke.
+</p>
+<p>
+If the user pauses keystrokes for a short time (see <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_TypingDelay">TypingDelay</a>), the search string is cleared.
+</p></section>
+      <h4><a class="xref" href="Terminal.Gui.Color.html">Color</a></h4>
+      <section>Represents a 24-bit color. Provides automatic mapping between the legacy 4-bit (16 color) system and 24-bit colors (see <a class="xref" href="Terminal.Gui.Color.html#Terminal_Gui_Color_ColorName">ColorName</a>).
+Used with <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ColorEventArgs.html">ColorEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.ColorEventArgs.html#Terminal_Gui_ColorEventArgs_Color">Color</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.ColorPicker.html">ColorPicker</a> <a class="xref" href="Terminal.Gui.View.html">View</a> Color picker.</section>
+      <h4><a class="xref" href="Terminal.Gui.Colors.html">Colors</a></h4>
+      <section>The default <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a>s for the application.</section>
+      <h4><a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a></h4>
+      <section>Defines the <a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a>s for common visible elements in a <a class="xref" href="Terminal.Gui.View.html">View</a>. 
+Containers such as <a class="xref" href="Terminal.Gui.Window.html">Window</a> and <a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a> use <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> to determine
+the colors used by sub-views.</section>
+      <h4><a class="xref" href="Terminal.Gui.ColumnStyle.html">ColumnStyle</a></h4>
+      <section>Describes how to render a given column in  a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> including <a class="xref" href="Terminal.Gui.ColumnStyle.html#Terminal_Gui_ColumnStyle_Alignment">Alignment</a> 
+and textual representation of cells (e.g. date formats)
+
+<a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ComboBox.html">ComboBox</a></h4>
+      <section>Provides a drop-down list of items the user can select from.</section>
+      <h4><a class="xref" href="Terminal.Gui.ConfigProperty.html">ConfigProperty</a></h4>
+      <section>Holds a property's value and the <a class="xref" href="Terminal.Gui.ConfigProperty.html#Terminal_Gui_ConfigProperty_PropertyInfo">PropertyInfo</a> that allows <a class="xref" href="Terminal.Gui.ConfigurationManager.html">ConfigurationManager</a> 
+to get and set the property's value.</section>
+      <h4><a class="xref" href="Terminal.Gui.ConfigurationManager.html">ConfigurationManager</a></h4>
+      <section>Provides settings and configuration management for Terminal.Gui applications. 
+<p>
+Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted configuration files.
+The configuration files can be placed in at <code>.tui</code> folder in the user's home directory (e.g. <code>C:/Users/username/.tui</code>, 
+or <code>/usr/username/.tui</code>),
+the folder where the Terminal.Gui application was launched from (e.g. <code>./.tui</code>), or as a resource
+within the Terminal.Gui application's main assembly. 
+</p>
+<p>
+Settings are defined in JSON format, according to this schema: 
+https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+</p>
+<p>
+Settings that will apply to all applications (global settings) reside in files named <code>config.json</code>. Settings 
+that will apply to a specific Terminal.Gui application reside in files named <code>appname.config.json</code>,
+where <code>appname</code> is the assembly name of the application (e.g. <code>UICatalog.config.json</code>).
+</p>
+Settings are applied using the following precedence (higher precedence settings
+overwrite lower precedence settings):
+<p>
+1. Application configuration found in the users's home directory (<code>~/.tui/appname.config.json</code>) -- Highest precedence 
+</p>
+<p>
+2. Application configuration found in the directory the app was launched from (<code>./.tui/appname.config.json</code>).
+</p>
+<p>
+3. Application configuration found in the applications's resources (<code>Resources/config.json</code>). 
+</p>
+<p>
+4. Global configuration found in the user's home directory (<code>~/.tui/config.json</code>).
+</p>
+<p>
+5. Global configuration found in the directory the app was launched from (<code>./.tui/config.json</code>).
+</p>
+<p>
+    6. Global configuration in <code>Terminal.Gui.dll</code>'s resources (<code>Terminal.Gui.Resources.config.json</code>) -- Lowest Precidence.
+</p></section>
+      <h4><a class="xref" href="Terminal.Gui.ConfigurationManagerEventArgs.html">ConfigurationManagerEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.ConfigurationManager.html">ConfigurationManager</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.ConsoleDriver.html">ConsoleDriver</a></h4>
+      <section>Base class for Terminal.Gui ConsoleDriver implementations.</section>
+      <h4><a class="xref" href="Terminal.Gui.ConsoleKeyMapping.html">ConsoleKeyMapping</a></h4>
+      <section>Helper class to handle the scan code and virtual key from a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.consolekey">ConsoleKey</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ContentsChangedEventArgs.html">ContentsChangedEventArgs</a></h4>
+      <section>Event arguments for events for when the contents of the TextView change. E.g. the <a class="xref" href="Terminal.Gui.TextView.html#Terminal_Gui_TextView_ContentsChanged">ContentsChanged</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.ContextMenu.html">ContextMenu</a></h4>
+      <section>ContextMenu provides a pop-up menu that can be positioned anywhere within a <a class="xref" href="Terminal.Gui.View.html">View</a>. 
+ContextMenu is analogous to <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_MenuBar">MenuBar</a> and, once activated, works like a sub-menu 
+of a <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> (but can be positioned anywhere).
+<p>
+By default, a ContextMenu with sub-menus is displayed in a cascading manner, where each sub-menu pops out of the ContextMenu frame
+(either to the right or left, depending on where the ContextMenu is relative to the edge of the screen). By setting
+<a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_UseSubMenusSingleFrame">UseSubMenusSingleFrame</a> to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, this behavior can be changed such that all sub-menus are
+drawn within the ContextMenu frame.
+</p>
+<p>
+ContextMenus can be activated using the Shift-F10 key (by default; use the <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_Key">Key</a> to change to another key).
+</p>
+<p>
+Callers can cause the ContextMenu to be activated on a right-mouse click (or other interaction) by calling <a class="xref" href="Terminal.Gui.ContextMenu.html#Terminal_Gui_ContextMenu_Show">Show()</a>.
+</p>
+<p>
+ContextMenus are located using screen using screen coordinates and appear above all other Views.
+</p></section>
+      <h4><a class="xref" href="Terminal.Gui.DataTableSource.html">DataTableSource</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a> implementation that wraps 
+a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.data.datatable">DataTable</a>.  This class is
+mutable: changes are permitted to the wrapped <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.data.datatable">DataTable</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.DateField.html">DateField</a></h4>
+      <section>Simple Date editing <a class="xref" href="Terminal.Gui.View.html">View</a></section>
+      <h4><a class="xref" href="Terminal.Gui.DateTimeEventArgs-1.html">DateTimeEventArgs&lt;T&gt;</a></h4>
+      <section>Defines the event arguments for <a class="xref" href="Terminal.Gui.DateField.html#Terminal_Gui_DateField_DateChanged">DateChanged</a> and <a class="xref" href="Terminal.Gui.TimeField.html#Terminal_Gui_TimeField_TimeChanged">TimeChanged</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.DefaultFileOperations.html">DefaultFileOperations</a></h4>
+      <section>Default file operation handlers using modal dialogs.</section>
+      <h4><a class="xref" href="Terminal.Gui.DelegateTreeBuilder-1.html">DelegateTreeBuilder&lt;T&gt;</a></h4>
+      <section>Implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> that uses user defined functions</section>
+      <h4><a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a> <a class="xref" href="Terminal.Gui.View.html">View</a> is a <a class="xref" href="Terminal.Gui.Window.html">Window</a> that by default is centered and contains one 
+or more <a class="xref" href="Terminal.Gui.Button.html">Button</a>s. It defaults to the <a class="xref" href="Terminal.Gui.Colors.html#Terminal_Gui_Colors_Dialog">Dialog</a> color scheme and has a 1 cell padding around the edges.</section>
+      <h4><a class="xref" href="Terminal.Gui.Dim.html">Dim</a></h4>
+      <section>Dim properties of a <a class="xref" href="Terminal.Gui.View.html">View</a> to control the position.</section>
+      <h4><a class="xref" href="Terminal.Gui.DrawEventArgs.html">DrawEventArgs</a></h4>
+      <section>Event args for draw events</section>
+      <h4><a class="xref" href="Terminal.Gui.DrawTreeViewLineEventArgs-1.html">DrawTreeViewLineEventArgs&lt;T&gt;</a></h4>
+      <section>Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_DrawLine">DrawLine</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.EnumerableTableSource-1.html">EnumerableTableSource&lt;T&gt;</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a> implementation that wraps arbitrary data.</section>
+      <h4><a class="xref" href="Terminal.Gui.EscSeqReqStatus.html">EscSeqReqStatus</a></h4>
+      <section>Represents the status of an ANSI escape sequence request made to the terminal using <a class="xref" href="Terminal.Gui.EscSeqRequests.html">EscSeqRequests</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.EscSeqRequests.html">EscSeqRequests</a></h4>
+      <section>Manages ANSI Escape Sequence requests and responses. The list of <a class="xref" href="Terminal.Gui.EscSeqReqStatus.html">EscSeqReqStatus</a> contains the status of the request.
+Each request is identified by the terminator (e.g. ESC[8t ... t is the terminator).</section>
+      <h4><a class="xref" href="Terminal.Gui.EscSeqUtils.html">EscSeqUtils</a></h4>
+      <section>Provides a platform-independent API for managing ANSI escape sequences.</section>
+      <h4><a class="xref" href="Terminal.Gui.FakeConsole.html">FakeConsole</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.FakeDriver.html">FakeDriver</a></h4>
+      <section>Implements a mock ConsoleDriver for unit testing</section>
+      <h4><a class="xref" href="Terminal.Gui.FakeDriver.Behaviors.html">FakeDriver.Behaviors</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.FakeDriver.FakeClipboard.html">FakeDriver.FakeClipboard</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a></h4>
+      <section>Modal dialog for selecting files/directories. Has auto-complete and expandable
+navigation pane (Recent, Root drives etc).</section>
+      <h4><a class="xref" href="Terminal.Gui.FileDialogStyle.html">FileDialogStyle</a></h4>
+      <section>Stores style settings for <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.FilesSelectedEventArgs.html">FilesSelectedEventArgs</a></h4>
+      <section>Event args for the <a class="xref" href="Terminal.Gui.FileDialog.html#Terminal_Gui_FileDialog_FilesSelected">FilesSelected</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.FileSystemColorProvider.html">FileSystemColorProvider</a></h4>
+      <section>Provides a way to get the color of a file or directory.</section>
+      <h4><a class="xref" href="Terminal.Gui.FileSystemIconProvider.html">FileSystemIconProvider</a></h4>
+      <section>Determines which symbol to use to represent files and directories.</section>
+      <h4><a class="xref" href="Terminal.Gui.FileSystemTreeBuilder.html">FileSystemTreeBuilder</a></h4>
+      <section>TreeView builder for creating file system based trees.</section>
+      <h4><a class="xref" href="Terminal.Gui.FocusEventArgs.html">FocusEventArgs</a></h4>
+      <section>Defines the event arguments for <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SetFocus">SetFocus()</a></section>
+      <h4><a class="xref" href="Terminal.Gui.Frame.html">Frame</a></h4>
+      <section>Frames are a special form of <a class="xref" href="Terminal.Gui.View.html">View</a> that act as adornments; they appear outside of the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Bounds">Bounds</a>
+enabling borders, menus, etc...</section>
+      <h4><a class="xref" href="Terminal.Gui.FrameView.html">FrameView</a></h4>
+      <section>The FrameView is a container frame that draws a frame around the contents. It is similar to
+a GroupBox in Windows.</section>
+      <h4><a class="xref" href="Terminal.Gui.GlyphDefinitions.html">GlyphDefinitions</a></h4>
+      <section>Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...</section>
+      <h4><a class="xref" href="Terminal.Gui.GrabMouseEventArgs.html">GrabMouseEventArgs</a></h4>
+      <section>Args <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_GrabMouse_Terminal_Gui_View_">GrabMouse(View)</a> related events.</section>
+      <h4><a class="xref" href="Terminal.Gui.GraphCellToRender.html">GraphCellToRender</a></h4>
+      <section>Describes how to render a single row/column of a <a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a> based
+on the value(s) in <a class="xref" href="Terminal.Gui.ISeries.html">ISeries</a> at that location</section>
+      <h4><a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a></h4>
+      <section>Control for rendering graphs (bar, scatter etc)</section>
+      <h4><a class="xref" href="Terminal.Gui.HexView.html">HexView</a></h4>
+      <section>An hex viewer and editor <a class="xref" href="Terminal.Gui.View.html">View</a> over a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.io.stream">Stream</a></section>
+      <h4><a class="xref" href="Terminal.Gui.HexViewEditEventArgs.html">HexViewEditEventArgs</a></h4>
+      <section>Defines the event arguments for <a class="xref" href="Terminal.Gui.HexView.html#Terminal_Gui_HexView_Edited">Edited</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.HexViewEventArgs.html">HexViewEventArgs</a></h4>
+      <section>Defines the event arguments for <a class="xref" href="Terminal.Gui.HexView.html#Terminal_Gui_HexView_PositionChanged">PositionChanged</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.HorizontalAxis.html">HorizontalAxis</a></h4>
+      <section>The horizontal (x axis) of a <a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a></section>
+      <h4><a class="xref" href="Terminal.Gui.IterationEventArgs.html">IterationEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_Iteration">Iteration</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.KeyChangedEventArgs.html">KeyChangedEventArgs</a></h4>
+      <section>Event args for when a <a class="xref" href="Terminal.Gui.Key.html">Key</a> is changed from
+one value to a new value (e.g. in <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKeyChanged">HotKeyChanged</a>)</section>
+      <h4><a class="xref" href="Terminal.Gui.KeyEventArgs.html">KeyEventArgs</a></h4>
+      <section>Defines the event arguments for keyboard events.</section>
+      <h4><a class="xref" href="Terminal.Gui.KeyModifiers.html">KeyModifiers</a></h4>
+      <section>Identifies the state of the "shift"-keys within a event.</section>
+      <h4><a class="xref" href="Terminal.Gui.KeystrokeNavigatorEventArgs.html">KeystrokeNavigatorEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.CollectionNavigatorBase.html#Terminal_Gui_CollectionNavigatorBase_SearchStringChanged">SearchStringChanged</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.Label.html">Label</a></h4>
+      <section>The Label <a class="xref" href="Terminal.Gui.View.html">View</a> displays a string at a given position and supports multiple lines separated by newline characters.
+Multi-line Labels support word wrap.</section>
+      <h4><a class="xref" href="Terminal.Gui.LayoutEventArgs.html">LayoutEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutComplete">LayoutComplete</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.LegendAnnotation.html">LegendAnnotation</a></h4>
+      <section>A box containing symbol definitions e.g. meanings for colors in a graph.
+The 'Key' to the graph</section>
+      <h4><a class="xref" href="Terminal.Gui.Line.html">Line</a></h4>
+      <section>Draws a single line using the <a class="xref" href="Terminal.Gui.LineStyle.html">LineStyle</a> specified by <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BorderStyle">BorderStyle</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.LineCanvas.html">LineCanvas</a></h4>
+      <section>Facilitates box drawing and line intersection detection
+and rendering.  Does not support diagonal lines.</section>
+      <h4><a class="xref" href="Terminal.Gui.LineF.html">LineF</a></h4>
+      <section>Describes two points in graph space and a line between them</section>
+      <h4><a class="xref" href="Terminal.Gui.LineView.html">LineView</a></h4>
+      <section>A straight line control either horizontal or vertical</section>
+      <h4><a class="xref" href="Terminal.Gui.ListColumnStyle.html">ListColumnStyle</a></h4>
+      <section>Defines rendering options that affect how the view is displayed.</section>
+      <h4><a class="xref" href="Terminal.Gui.ListTableSource.html">ListTableSource</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a> implementation that wraps 
+a <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ilist">IList</a>.  This class is
+mutable: changes are permitted to the wrapped <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.ilist">IList</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ListView.html">ListView</a></h4>
+      <section>ListView <a class="xref" href="Terminal.Gui.View.html">View</a> renders a scrollable list of data where each item can be activated to perform an action.</section>
+      <h4><a class="xref" href="Terminal.Gui.ListViewItemEventArgs.html">ListViewItemEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for <a class="xref" href="Terminal.Gui.ListView.html">ListView</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.ListViewRowEventArgs.html">ListViewRowEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> used by the <a class="xref" href="Terminal.Gui.ListView.html#Terminal_Gui_ListView_RowRender">RowRender</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.ListWrapper.html">ListWrapper</a></h4>
+      <section>Provides a default implementation of <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> that renders
+<a class="xref" href="Terminal.Gui.ListView.html">ListView</a> items using <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">ToString()</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a></h4>
+      <section><p>
+Provides a menu bar that spans the top of a <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> View with drop-down and cascading menus. 
+</p>
+<p>
+By default, any sub-sub-menus (sub-menus of the <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a>s added to <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>s) 
+are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame
+(either to the right or left, depending on where the sub-menu is relative to the edge of the screen). By setting
+<a class="xref" href="Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_UseSubMenusSingleFrame">UseSubMenusSingleFrame</a> to <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, this behavior can be changed such that all sub-sub-menus are
+drawn within a single frame below the MenuBar.
+</p></section>
+      <h4><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a></h4>
+      <section><a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a> is a menu item on an app's <a class="xref" href="Terminal.Gui.MenuBar.html">MenuBar</a>. 
+MenuBarItems do not support <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Shortcut">Shortcut</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.MenuClosingEventArgs.html">MenuClosingEventArgs</a></h4>
+      <section>An <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> which allows passing a cancelable menu closing event.</section>
+      <h4><a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a></h4>
+      <section>A <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> has title, an associated help text, and an action to execute on activation. 
+MenuItems can also have a checked indicator (see <a class="xref" href="Terminal.Gui.MenuItem.html#Terminal_Gui_MenuItem_Checked">Checked</a>).</section>
+      <h4><a class="xref" href="Terminal.Gui.MenuOpenedEventArgs.html">MenuOpenedEventArgs</a></h4>
+      <section>Defines arguments for the <a class="xref" href="Terminal.Gui.MenuBar.html#Terminal_Gui_MenuBar_MenuOpened">MenuOpened</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.MenuOpeningEventArgs.html">MenuOpeningEventArgs</a></h4>
+      <section>An <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> which allows passing a cancelable menu opening event or replacing with a new <a class="xref" href="Terminal.Gui.MenuBarItem.html">MenuBarItem</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a></h4>
+      <section>MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can choose from.</section>
+      <h4><a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a></h4>
+      <section>Low-level construct that conveys the details of mouse events, such
+as coordinates and button state, from ConsoleDrivers up to <a class="xref" href="Terminal.Gui.Application.html">Application</a> and
+Views.</section>
+      <h4><a class="xref" href="Terminal.Gui.MouseEventEventArgs.html">MouseEventEventArgs</a></h4>
+      <section>Specifies the event arguments for <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>. This is a higher-level construct
+than the wrapped <a class="xref" href="Terminal.Gui.MouseEventEventArgs.html#Terminal_Gui_MouseEventEventArgs_MouseEvent">MouseEvent</a> class and is used for the events defined on <a class="xref" href="Terminal.Gui.View.html">View</a>
+and subclasses of View (e.g. <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseEnter">MouseEnter</a> and <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_MouseClick">MouseClick</a>).</section>
+      <h4><a class="xref" href="Terminal.Gui.MouseFlagsChangedEventArgs.html">MouseFlagsChangedEventArgs</a></h4>
+      <section>Args for events that describe a change in <a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a></section>
+      <h4><a class="xref" href="Terminal.Gui.MultiBarSeries.html">MultiBarSeries</a></h4>
+      <section>Collection of <a class="xref" href="Terminal.Gui.BarSeries.html">BarSeries</a> in which bars are clustered by category</section>
+      <h4><a class="xref" href="Terminal.Gui.ObjectActivatedEventArgs-1.html">ObjectActivatedEventArgs&lt;T&gt;</a></h4>
+      <section>Event args for the <a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_ObjectActivated">ObjectActivated</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.OpenDialog.html">OpenDialog</a>provides an interactive dialog box for users to select files or directories.</section>
+      <h4><a class="xref" href="Terminal.Gui.OrientationEventArgs.html">OrientationEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for <a class="xref" href="Terminal.Gui.OrientationEventArgs.html#Terminal_Gui_OrientationEventArgs_Orientation">Orientation</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.PathAnnotation.html">PathAnnotation</a></h4>
+      <section>Sequence of lines to connect points e.g. of a <a class="xref" href="Terminal.Gui.ScatterSeries.html">ScatterSeries</a></section>
+      <h4><a class="xref" href="Terminal.Gui.PointEventArgs.html">PointEventArgs</a></h4>
+      <section>Event args for events which relate to a single <a class="xref" href="Terminal.Gui.PointEventArgs.html#Terminal_Gui_PointEventArgs_Point">Point</a></section>
+      <h4><a class="xref" href="Terminal.Gui.PopupAutocomplete.html">PopupAutocomplete</a></h4>
+      <section>Renders an overlay on another view at a given point that allows selecting
+from a range of 'autocomplete' options.</section>
+      <h4><a class="xref" href="Terminal.Gui.Pos.html">Pos</a></h4>
+      <section>Describes the position of a <a class="xref" href="Terminal.Gui.View.html">View</a> which can be an absolute value, a percentage, centered, or 
+relative to the ending dimension. Integer values are implicitly convertible to
+an absolute <a class="xref" href="Terminal.Gui.Pos.html">Pos</a>. These objects are created using the static methods Percent,
+AnchorEnd, and Center. The <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> objects can be combined with the addition and 
+subtraction operators.</section>
+      <h4><a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a></h4>
+      <section>A Progress Bar view that can indicate progress of an activity visually.</section>
+      <h4><a class="xref" href="Terminal.Gui.RadioGroup.html">RadioGroup</a></h4>
+      <section>Displays a group of labels each with a selected indicator. Only one of those can be selected at a given time.</section>
+      <h4><a class="xref" href="Terminal.Gui.Responder.html">Responder</a></h4>
+      <section>Responder base class implemented by objects that want to participate on keyboard and mouse input.</section>
+      <h4><a class="xref" href="Terminal.Gui.RowColorGetterArgs.html">RowColorGetterArgs</a></h4>
+      <section>Arguments for <a class="xref" href="Terminal.Gui.RowColorGetterDelegate.html">RowColorGetterDelegate</a>. Describes a row of data in a <a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a>
+for which <a class="xref" href="Terminal.Gui.ColorScheme.html">ColorScheme</a> is sought.</section>
+      <h4><a class="xref" href="Terminal.Gui.Ruler.html">Ruler</a></h4>
+      <section>Draws a ruler on the screen.</section>
+      <h4><a class="xref" href="Terminal.Gui.RuneCell.html">RuneCell</a></h4>
+      <section>Represents a single row/column within the <a class="xref" href="Terminal.Gui.TextView.html">TextView</a>. Includes the glyph and the foreground/background colors.</section>
+      <h4><a class="xref" href="Terminal.Gui.RuneCellEventArgs.html">RuneCellEventArgs</a></h4>
+      <section>Args for events that relate to a specific <a class="xref" href="Terminal.Gui.RuneCell.html">RuneCell</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.RuneExtensions.html">RuneExtensions</a></h4>
+      <section>Extends <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.text.rune">Rune</a> to support TUI text manipulation.</section>
+      <h4><a class="xref" href="Terminal.Gui.RunState.html">RunState</a></h4>
+      <section>The execution state for a <a class="xref" href="Terminal.Gui.RunState.html#Terminal_Gui_RunState_Toplevel">Toplevel</a> view.</section>
+      <h4><a class="xref" href="Terminal.Gui.RunStateEventArgs.html">RunStateEventArgs</a></h4>
+      <section>Event arguments for events about <a class="xref" href="Terminal.Gui.RunState.html">RunState</a></section>
+      <h4><a class="xref" href="Terminal.Gui.SaveDialog.html">SaveDialog</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.SaveDialog.html">SaveDialog</a> provides an interactive dialog box for users to pick a file to 
+save.</section>
+      <h4><a class="xref" href="Terminal.Gui.ScatterSeries.html">ScatterSeries</a></h4>
+      <section>Series composed of any number of discrete data points</section>
+      <h4><a class="xref" href="Terminal.Gui.Scope-1.html">Scope&lt;T&gt;</a></h4>
+      <section>Defines a configuration settings scope. Classes that inherit from this abstract class can be used to define
+scopes for configuration settings. Each scope is a JSON object that contains a set of configuration settings.</section>
+      <h4><a class="xref" href="Terminal.Gui.ScrollBarView.html">ScrollBarView</a></h4>
+      <section>ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical</section>
+      <h4><a class="xref" href="Terminal.Gui.ScrollView.html">ScrollView</a></h4>
+      <section>Scrollviews are views that present a window into a virtual space where subviews are added.  Similar to the iOS UIScrollView.</section>
+      <h4><a class="xref" href="Terminal.Gui.SelectedCellChangedEventArgs.html">SelectedCellChangedEventArgs</a></h4>
+      <section>Defines the event arguments for <a class="xref" href="Terminal.Gui.TableView.html#Terminal_Gui_TableView_SelectedCellChanged">SelectedCellChanged</a></section>
+      <h4><a class="xref" href="Terminal.Gui.SelectedItemChangedArgs.html">SelectedItemChangedArgs</a></h4>
+      <section>Event arguments for the SelectedItemChagned event.</section>
+      <h4><a class="xref" href="Terminal.Gui.SelectionChangedEventArgs-1.html">SelectionChangedEventArgs&lt;T&gt;</a></h4>
+      <section>Event arguments describing a change in selected object in a tree view</section>
+      <h4><a class="xref" href="Terminal.Gui.SerializableConfigurationProperty.html">SerializableConfigurationProperty</a></h4>
+      <section>An attribute that can be applied to a property to indicate that it should included in the configuration file.</section>
+      <h4><a class="xref" href="Terminal.Gui.SettingsScope.html">SettingsScope</a></h4>
+      <section>The root object of Terminal.Gui configuration settings / JSON schema. Contains only properties 
+attributed with  <a class="xref" href="Terminal.Gui.SettingsScope.html">SettingsScope</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ShortcutHelper.html">ShortcutHelper</a></h4>
+      <section>Represents a helper to manipulate shortcut keys used on views.</section>
+      <h4><a class="xref" href="Terminal.Gui.SingleWordSuggestionGenerator.html">SingleWordSuggestionGenerator</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ISuggestionGenerator.html">ISuggestionGenerator</a> which suggests from a collection
+of words those that match the <a class="xref" href="Terminal.Gui.AutocompleteContext.html">AutocompleteContext</a>. You
+can update <a class="xref" href="Terminal.Gui.SingleWordSuggestionGenerator.html#Terminal_Gui_SingleWordSuggestionGenerator_AllSuggestions">AllSuggestions</a> at any time to change candidates
+considered for autocomplete.</section>
+      <h4><a class="xref" href="Terminal.Gui.SizeChangedEventArgs.html">SizeChangedEventArgs</a></h4>
+      <section>Args for events about Size (e.g. Resized)</section>
+      <h4><a class="xref" href="Terminal.Gui.Slider.html">Slider</a></h4>
+      <section>Slider control.</section>
+      <h4><a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a></h4>
+      <section>Provides a slider control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.</section>
+      <h4><a class="xref" href="Terminal.Gui.SliderAttributes.html">SliderAttributes</a></h4>
+      <section><a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a> Legend Style</section>
+      <h4><a class="xref" href="Terminal.Gui.SliderEventArgs-1.html">SliderEventArgs&lt;T&gt;</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for <a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.SliderOption-1.html">SliderOption&lt;T&gt;</a></h4>
+      <section>Represents an option in a <a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a> .</section>
+      <h4><a class="xref" href="Terminal.Gui.SliderOptionEventArgs.html">SliderOptionEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for <a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a> <a class="xref" href="Terminal.Gui.SliderOption-1.html">SliderOption&lt;T&gt;</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.SliderStyle.html">SliderStyle</a></h4>
+      <section><a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a> Style</section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.html">SpinnerStyle</a></h4>
+      <section>SpinnerStyles used in a <a class="xref" href="Terminal.Gui.SpinnerView.html">SpinnerView</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Aesthetic.html">SpinnerStyle.Aesthetic</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Aesthetic2.html">SpinnerStyle.Aesthetic2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Arc.html">SpinnerStyle.Arc</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Arrow.html">SpinnerStyle.Arrow</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Arrow2.html">SpinnerStyle.Arrow2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Arrow3.html">SpinnerStyle.Arrow3</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Balloon.html">SpinnerStyle.Balloon</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Balloon2.html">SpinnerStyle.Balloon2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.BetaWave.html">SpinnerStyle.BetaWave</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.BluePulse.html">SpinnerStyle.BluePulse</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Bounce.html">SpinnerStyle.Bounce</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.BouncingBall.html">SpinnerStyle.BouncingBall</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.BouncingBar.html">SpinnerStyle.BouncingBar</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.BoxBounce.html">SpinnerStyle.BoxBounce</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.BoxBounce2.html">SpinnerStyle.BoxBounce2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Christmas.html">SpinnerStyle.Christmas</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Circle.html">SpinnerStyle.Circle</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.CircleHalves.html">SpinnerStyle.CircleHalves</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.CircleQuarters.html">SpinnerStyle.CircleQuarters</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Clock.html">SpinnerStyle.Clock</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Custom.html">SpinnerStyle.Custom</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots.html">SpinnerStyle.Dots</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots10.html">SpinnerStyle.Dots10</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots11.html">SpinnerStyle.Dots11</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots12.html">SpinnerStyle.Dots12</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots2.html">SpinnerStyle.Dots2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots3.html">SpinnerStyle.Dots3</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots4.html">SpinnerStyle.Dots4</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots5.html">SpinnerStyle.Dots5</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots6.html">SpinnerStyle.Dots6</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots7.html">SpinnerStyle.Dots7</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots8.html">SpinnerStyle.Dots8</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots8Bit.html">SpinnerStyle.Dots8Bit</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dots9.html">SpinnerStyle.Dots9</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Dqpb.html">SpinnerStyle.Dqpb</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Earth.html">SpinnerStyle.Earth</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.FingerDance.html">SpinnerStyle.FingerDance</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.FistBump.html">SpinnerStyle.FistBump</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Flip.html">SpinnerStyle.Flip</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Grenade.html">SpinnerStyle.Grenade</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.GrowHorizontal.html">SpinnerStyle.GrowHorizontal</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.GrowVertical.html">SpinnerStyle.GrowVertical</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Hamburger.html">SpinnerStyle.Hamburger</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Hearts.html">SpinnerStyle.Hearts</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Layer.html">SpinnerStyle.Layer</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Line.html">SpinnerStyle.Line</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Line2.html">SpinnerStyle.Line2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Material.html">SpinnerStyle.Material</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.MindBlown.html">SpinnerStyle.MindBlown</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Monkey.html">SpinnerStyle.Monkey</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Moon.html">SpinnerStyle.Moon</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Noise.html">SpinnerStyle.Noise</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.OrangeBluePulse.html">SpinnerStyle.OrangeBluePulse</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.OrangePulse.html">SpinnerStyle.OrangePulse</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Pipe.html">SpinnerStyle.Pipe</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Points.html">SpinnerStyle.Points</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Pong.html">SpinnerStyle.Pong</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Runner.html">SpinnerStyle.Runner</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Shark.html">SpinnerStyle.Shark</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.SimpleDots.html">SpinnerStyle.SimpleDots</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.SimpleDotsScrolling.html">SpinnerStyle.SimpleDotsScrolling</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Smiley.html">SpinnerStyle.Smiley</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.SoccerHeader.html">SpinnerStyle.SoccerHeader</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Speaker.html">SpinnerStyle.Speaker</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.SquareCorners.html">SpinnerStyle.SquareCorners</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Squish.html">SpinnerStyle.Squish</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Star.html">SpinnerStyle.Star</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Star2.html">SpinnerStyle.Star2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.TimeTravelClock.html">SpinnerStyle.TimeTravelClock</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle.html">SpinnerStyle.Toggle</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle10.html">SpinnerStyle.Toggle10</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle11.html">SpinnerStyle.Toggle11</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle12.html">SpinnerStyle.Toggle12</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle13.html">SpinnerStyle.Toggle13</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle2.html">SpinnerStyle.Toggle2</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle3.html">SpinnerStyle.Toggle3</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle4.html">SpinnerStyle.Toggle4</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle5.html">SpinnerStyle.Toggle5</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle6.html">SpinnerStyle.Toggle6</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle7.html">SpinnerStyle.Toggle7</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle8.html">SpinnerStyle.Toggle8</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Toggle9.html">SpinnerStyle.Toggle9</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Triangle.html">SpinnerStyle.Triangle</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerStyle.Weather.html">SpinnerStyle.Weather</a></h4>
+      <section></section>
+      <h4><a class="xref" href="Terminal.Gui.SpinnerView.html">SpinnerView</a></h4>
+      <section>A <a class="xref" href="Terminal.Gui.View.html">View</a> which displays (by default) a spinning line character.</section>
+      <h4><a class="xref" href="Terminal.Gui.SplitterEventArgs.html">SplitterEventArgs</a></h4>
+      <section>Provides data for <a class="xref" href="Terminal.Gui.SplitterEventArgs.html#Terminal_Gui_SplitterEventArgs_TileView">TileView</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.StackExtensions.html">StackExtensions</a></h4>
+      <section>Extension of <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1">Stack&lt;T&gt;</a> helper to work with specific <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1">IEqualityComparer&lt;T&gt;</a></section>
+      <h4><a class="xref" href="Terminal.Gui.StatusBar.html">StatusBar</a></h4>
+      <section>A status bar is a <a class="xref" href="Terminal.Gui.View.html">View</a> that snaps to the bottom of a <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> displaying set of <a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a>s.
+The <a class="xref" href="Terminal.Gui.StatusBar.html">StatusBar</a> should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
+be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help.
+So for each context must be a new instance of a status bar.</section>
+      <h4><a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a></h4>
+      <section><a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a> objects are contained by <a class="xref" href="Terminal.Gui.StatusBar.html">StatusBar</a> <a class="xref" href="Terminal.Gui.View.html">View</a>s. 
+Each <a class="xref" href="Terminal.Gui.StatusItem.html">StatusItem</a> has a title, a shortcut (hotkey), and an <a class="xref" href="Terminal.Gui.Command.html">Command</a> that will be invoked when the 
+<a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Shortcut">Shortcut</a> is pressed.
+The <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Shortcut">Shortcut</a> will be a global hotkey for the application in the current context of the screen.
+The color of the <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Title">Title</a> will be changed after each ~. 
+A <a class="xref" href="Terminal.Gui.StatusItem.html#Terminal_Gui_StatusItem_Title">Title</a> set to `~F1~ Help` will render as *F1* using <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_HotNormal">HotNormal</a> and
+*Help* as <a class="xref" href="Terminal.Gui.ColorScheme.html#Terminal_Gui_ColorScheme_HotNormal">HotNormal</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.StepChangeEventArgs.html">StepChangeEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for <a class="xref" href="Terminal.Gui.WizardStep.html">WizardStep</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.StraightLine.html">StraightLine</a></h4>
+      <section>A line between two points on a horizontal or vertical <a class="xref" href="Terminal.Gui.StraightLine.html#Terminal_Gui_StraightLine_Orientation">Orientation</a>
+and a given style/color.</section>
+      <h4><a class="xref" href="Terminal.Gui.StraightLineExtensions.html">StraightLineExtensions</a></h4>
+      <section>Extension methods for <a class="xref" href="Terminal.Gui.StraightLine.html">StraightLine</a> (including collections).</section>
+      <h4><a class="xref" href="Terminal.Gui.StringExtensions.html">StringExtensions</a></h4>
+      <section>Extensions to <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a> to support TUI text manipulation.</section>
+      <h4><a class="xref" href="Terminal.Gui.Suggestion.html">Suggestion</a></h4>
+      <section>A replacement suggestion made by <a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a></section>
+      <h4><a class="xref" href="Terminal.Gui.SuperViewChangedEventArgs.html">SuperViewChangedEventArgs</a></h4>
+      <section>Args for events where the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_SuperView">SuperView</a> of a <a class="xref" href="Terminal.Gui.View.html">View</a> is changed
+(e.g. <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Removed">Removed</a> / <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Added">Added</a> events).</section>
+      <h4><a class="xref" href="Terminal.Gui.Tab.html">Tab</a></h4>
+      <section>A single tab in a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a></section>
+      <h4><a class="xref" href="Terminal.Gui.TabChangedEventArgs.html">TabChangedEventArgs</a></h4>
+      <section>Describes a change in <a class="xref" href="Terminal.Gui.TabView.html#Terminal_Gui_TabView_SelectedTab">SelectedTab</a></section>
+      <h4><a class="xref" href="Terminal.Gui.TableCollectionNavigator.html">TableCollectionNavigator</a></h4>
+      <section>Collection navigator for cycling selections in a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TableSelection.html">TableSelection</a></h4>
+      <section>Describes a selected region of the table</section>
+      <h4><a class="xref" href="Terminal.Gui.TableStyle.html">TableStyle</a></h4>
+      <section>Defines rendering options that affect how the table is displayed.
+
+<a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TableView.html">TableView</a></h4>
+      <section>View for tabular data based on a <a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a>.
+
+<a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TabMouseEventArgs.html">TabMouseEventArgs</a></h4>
+      <section>Describes a mouse event over a specific <a class="xref" href="Terminal.Gui.TabMouseEventArgs.html#Terminal_Gui_TabMouseEventArgs_Tab">Tab</a> in a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TabStyle.html">TabStyle</a></h4>
+      <section>Describes render stylistic selections of a <a class="xref" href="Terminal.Gui.TabView.html">TabView</a></section>
+      <h4><a class="xref" href="Terminal.Gui.TabView.html">TabView</a></h4>
+      <section>Control that hosts multiple sub views, presenting a single one at once</section>
+      <h4><a class="xref" href="Terminal.Gui.TextAnnotation.html">TextAnnotation</a></h4>
+      <section>Displays text at a given position (in screen space or graph space)</section>
+      <h4><a class="xref" href="Terminal.Gui.TextChangedEventArgs.html">TextChangedEventArgs</a></h4>
+      <section>Event args for the <a class="xref" href="Terminal.Gui.TextField.html#Terminal_Gui_TextField_TextChanged">TextChanged</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.TextChangingEventArgs.html">TextChangingEventArgs</a></h4>
+      <section>An <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> which allows passing a cancelable new text value event.</section>
+      <h4><a class="xref" href="Terminal.Gui.TextField.html">TextField</a></h4>
+      <section>Single-line text entry <a class="xref" href="Terminal.Gui.View.html">View</a></section>
+      <h4><a class="xref" href="Terminal.Gui.TextFieldAutocomplete.html">TextFieldAutocomplete</a></h4>
+      <section>Renders an overlay on another view at a given point that allows selecting
+from a range of 'autocomplete' options.
+An implementation on a TextField.</section>
+      <h4><a class="xref" href="Terminal.Gui.TextFormatter.html">TextFormatter</a></h4>
+      <section>Provides text formatting. Supports <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_HotKey">HotKey</a>s, horizontal alignment, vertical alignment, multiple lines, and word-based line wrap.</section>
+      <h4><a class="xref" href="Terminal.Gui.TextValidateField.html">TextValidateField</a></h4>
+      <section>Text field that validates input through a  <a class="xref" href="Terminal.Gui.TextValidateProviders.ITextValidateProvider.html">ITextValidateProvider</a></section>
+      <h4><a class="xref" href="Terminal.Gui.TextView.html">TextView</a></h4>
+      <section>Multi-line text editing <a class="xref" href="Terminal.Gui.View.html">View</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TextViewAutocomplete.html">TextViewAutocomplete</a></h4>
+      <section>Renders an overlay on another view at a given point that allows selecting
+from a range of 'autocomplete' options.
+An implementation on a TextView.</section>
+      <h4><a class="xref" href="Terminal.Gui.ThemeManager.html">ThemeManager</a></h4>
+      <section>Contains a dictionary of the <a class="xref" href="Terminal.Gui.ThemeManager.html#Terminal_Gui_ThemeManager_Theme">Theme</a>s for a Terminal.Gui application.</section>
+      <h4><a class="xref" href="Terminal.Gui.ThemeManagerEventArgs.html">ThemeManagerEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.ThemeManager.html">ThemeManager</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.ThemeScope.html">ThemeScope</a></h4>
+      <section>The root object for a Theme. A Theme is a set of settings that are applied to the running <a class="xref" href="Terminal.Gui.Application.html">Application</a>
+as a group.</section>
+      <h4><a class="xref" href="Terminal.Gui.Thickness.html">Thickness</a></h4>
+      <section>Describes the thickness of a frame around a rectangle. Four <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a> values describe
+ the <a class="xref" href="Terminal.Gui.Thickness.html#Terminal_Gui_Thickness_Left">Left</a>, <a class="xref" href="Terminal.Gui.Thickness.html#Terminal_Gui_Thickness_Top">Top</a>, <a class="xref" href="Terminal.Gui.Thickness.html#Terminal_Gui_Thickness_Right">Right</a>, and <a class="xref" href="Terminal.Gui.Thickness.html#Terminal_Gui_Thickness_Bottom">Bottom</a> sides
+ of the rectangle, respectively.</section>
+      <h4><a class="xref" href="Terminal.Gui.ThicknessEventArgs.html">ThicknessEventArgs</a></h4>
+      <section>Event arguments for the <a class="xref" href="Terminal.Gui.ThicknessEventArgs.html#Terminal_Gui_ThicknessEventArgs_Thickness">Thickness</a> events.</section>
+      <h4><a class="xref" href="Terminal.Gui.Tile.html">Tile</a></h4>
+      <section>A single <a class="xref" href="Terminal.Gui.Tile.html#Terminal_Gui_Tile_ContentView">ContentView</a> presented in a <a class="xref" href="Terminal.Gui.TileView.html">TileView</a>. To create
+new instances use <a class="xref" href="Terminal.Gui.TileView.html#Terminal_Gui_TileView_RebuildForTileCount_System_Int32_">RebuildForTileCount(int)</a> 
+or <a class="xref" href="Terminal.Gui.TileView.html#Terminal_Gui_TileView_InsertTile_System_Int32_">InsertTile(int)</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TileView.html">TileView</a></h4>
+      <section>A <a class="xref" href="Terminal.Gui.View.html">View</a> consisting of a moveable bar that divides
+the display area into resizeable <a class="xref" href="Terminal.Gui.TileView.html#Terminal_Gui_TileView_Tiles">Tiles</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TimeField.html">TimeField</a></h4>
+      <section>Time editing <a class="xref" href="Terminal.Gui.View.html">View</a></section>
+      <h4><a class="xref" href="Terminal.Gui.Timeout.html">Timeout</a></h4>
+      <section>Provides data for timers running manipulation.</section>
+      <h4><a class="xref" href="Terminal.Gui.TitleEventArgs.html">TitleEventArgs</a></h4>
+      <section>Event arguments for Title change events.</section>
+      <h4><a class="xref" href="Terminal.Gui.ToggleEventArgs.html">ToggleEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for the <a class="xref" href="Terminal.Gui.CheckBox.html#Terminal_Gui_CheckBox_Toggled">Toggled</a> event</section>
+      <h4><a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a></h4>
+      <section>Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
+for pop-up views such as <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>, <a class="xref" href="Terminal.Gui.MessageBox.html">MessageBox</a>, and <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ToplevelClosingEventArgs.html">ToplevelClosingEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> implementation for the <a class="xref" href="Terminal.Gui.Toplevel.html#Terminal_Gui_Toplevel_Closing">Closing</a> event.</section>
+      <h4><a class="xref" href="Terminal.Gui.ToplevelComparer.html">ToplevelComparer</a></h4>
+      <section>Implements the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1">IComparer&lt;T&gt;</a> to sort the <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> 
+from the <a class="xref" href="Terminal.Gui.Application.html#Terminal_Gui_Application_OverlappedChildren">OverlappedChildren</a> if needed.</section>
+      <h4><a class="xref" href="Terminal.Gui.ToplevelEqualityComparer.html">ToplevelEqualityComparer</a></h4>
+      <section>Implements the <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.iequalitycomparer-1">IEqualityComparer&lt;T&gt;</a> for comparing two <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a>s
+used by <a class="xref" href="Terminal.Gui.StackExtensions.html">StackExtensions</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ToplevelEventArgs.html">ToplevelEventArgs</a></h4>
+      <section>Args for events that relate to a specific <a class="xref" href="Terminal.Gui.ToplevelEventArgs.html#Terminal_Gui_ToplevelEventArgs_Toplevel">Toplevel</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeBuilder-1.html">TreeBuilder&lt;T&gt;</a></h4>
+      <section>Abstract implementation of <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeNode.html">TreeNode</a></h4>
+      <section>Simple class for representing nodes, use with regular (non generic) <a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeNodeBuilder.html">TreeNodeBuilder</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a> implementation for <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a> objects</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeStyle.html">TreeStyle</a></h4>
+      <section>Defines rendering options that affect how the tree is displayed.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeTableSource-1.html">TreeTableSource&lt;T&gt;</a></h4>
+      <section>An <a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a> with expandable rows.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a></h4>
+      <section>Convenience implementation of generic <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a> for any tree were all nodes
+implement <a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a>.
+
+<a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a></h4>
+      <section>Hierarchical tree view with expandable branches. Branch objects are dynamically determined
+when expanded using a user defined <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>.
+
+<a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.TreeViewTextFilter-1.html">TreeViewTextFilter&lt;T&gt;</a></h4>
+      <section><a class="xref" href="Terminal.Gui.ITreeViewFilter-1.html">ITreeViewFilter&lt;T&gt;</a> implementation which searches the
+<a class="xref" href="Terminal.Gui.TreeView-1.html#Terminal_Gui_TreeView_1_AspectGetter">AspectGetter</a> of the model for the given
+<a class="xref" href="Terminal.Gui.TreeViewTextFilter-1.html#Terminal_Gui_TreeViewTextFilter_1_Text">Text</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.VerticalAxis.html">VerticalAxis</a></h4>
+      <section>The vertical (i.e. Y axis) of a <a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a></section>
+      <h4><a class="xref" href="Terminal.Gui.View.html">View</a></h4>
+      <section>View is the base class for all views on the screen and represents a visible element that can render itself and 
+contains zero or more nested views, called SubViews.</section>
+      <h4><a class="xref" href="Terminal.Gui.ViewEventArgs.html">ViewEventArgs</a></h4>
+      <section>Args for events that relate to specific <a class="xref" href="Terminal.Gui.ViewEventArgs.html#Terminal_Gui_ViewEventArgs_View">View</a></section>
+      <h4><a class="xref" href="Terminal.Gui.Window.html">Window</a></h4>
+      <section>A <a class="xref" href="Terminal.Gui.Toplevel.html">Toplevel</a> <a class="xref" href="Terminal.Gui.View.html">View</a> with <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_BorderStyle">BorderStyle</a> set to <a class="xref" href="Terminal.Gui.LineStyle.html#Terminal_Gui_LineStyle_Single">Single</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a></h4>
+      <section>Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (<a class="xref" href="Terminal.Gui.WizardStep.html">WizardStep</a>) can host 
+arbitrary <a class="xref" href="Terminal.Gui.View.html">View</a>s, much like a <a class="xref" href="Terminal.Gui.Dialog.html">Dialog</a>. Each step also has a pane for help text. Along the
+bottom of the Wizard view are customizable buttons enabling the user to navigate forward and backward through the Wizard.</section>
+      <h4><a class="xref" href="Terminal.Gui.WizardButtonEventArgs.html">WizardButtonEventArgs</a></h4>
+      <section><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">EventArgs</a> for <a class="xref" href="Terminal.Gui.WizardStep.html">WizardStep</a> transition events.</section>
+      <h4><a class="xref" href="Terminal.Gui.WizardStep.html">WizardStep</a></h4>
+      <section>Represents a basic step that is displayed in a <a class="xref" href="Terminal.Gui.Wizard.html">Wizard</a>. The <a class="xref" href="Terminal.Gui.WizardStep.html">WizardStep</a> view is divided horizontally in two. On the left is the
+content view where <a class="xref" href="Terminal.Gui.View.html">View</a>s can be added,  On the right is the help for the step.
+Set <a class="xref" href="Terminal.Gui.WizardStep.html#Terminal_Gui_WizardStep_HelpText">HelpText</a> to set the help text. If the help text is empty the help pane will not
+be shown. 
+
+If there are no Views added to the WizardStep the <a class="xref" href="Terminal.Gui.WizardStep.html#Terminal_Gui_WizardStep_HelpText">HelpText</a> (if not empty) will fill the wizard step.</section>
+    <h3 id="structs">Structs
+</h3>
+      <h4><a class="xref" href="Terminal.Gui.Attribute.html">Attribute</a></h4>
+      <section>Attributes represent how text is styled when displayed in the terminal.</section>
+      <h4><a class="xref" href="Terminal.Gui.Point.html">Point</a></h4>
+      <section>Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.</section>
+      <h4><a class="xref" href="Terminal.Gui.PointF.html">PointF</a></h4>
+      <section>Represents an ordered pair of x and y coordinates that define a point in a two-dimensional plane.</section>
+      <h4><a class="xref" href="Terminal.Gui.Rect.html">Rect</a></h4>
+      <section>Stores a set of four integers that represent the location and size of a rectangle</section>
+      <h4><a class="xref" href="Terminal.Gui.RectangleF.html">RectangleF</a></h4>
+      <section>Stores the location and size of a rectangular region.</section>
+      <h4><a class="xref" href="Terminal.Gui.Size.html">Size</a></h4>
+      <section>Stores an ordered pair of integers, which specify a Height and Width.</section>
+      <h4><a class="xref" href="Terminal.Gui.SizeF.html">SizeF</a></h4>
+      <section>Represents the size of a rectangular region with an ordered pair of width and height.</section>
+    <h3 id="interfaces">Interfaces
+</h3>
+      <h4><a class="xref" href="Terminal.Gui.IAllowedType.html">IAllowedType</a></h4>
+      <section>Interface for <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a> restrictions on which file type(s) the
+user is allowed to select/enter.</section>
+      <h4><a class="xref" href="Terminal.Gui.IAnnotation.html">IAnnotation</a></h4>
+      <section><p>Describes an overlay element that is rendered either before or
+after a series.</p>
+
+<p>Annotations can be positioned either in screen space (e.g.
+a legend) or in graph space (e.g. a line showing high point)
+</p>
+<p>Unlike <a class="xref" href="Terminal.Gui.ISeries.html">ISeries</a>, annotations are allowed to
+draw into graph margins
+</p></section>
+      <h4><a class="xref" href="Terminal.Gui.IAutocomplete.html">IAutocomplete</a></h4>
+      <section>Renders an overlay on another view at a given point that allows selecting
+from a range of 'autocomplete' options.</section>
+      <h4><a class="xref" href="Terminal.Gui.IClipboard.html">IClipboard</a></h4>
+      <section>Definition to interact with the OS clipboard.</section>
+      <h4><a class="xref" href="Terminal.Gui.IEnumerableTableSource-1.html">IEnumerableTableSource&lt;T&gt;</a></h4>
+      <section>Interface for all <a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a> which present
+an object per row (of type <code class="typeparamref">T</code>).</section>
+      <h4><a class="xref" href="Terminal.Gui.IFileOperations.html">IFileOperations</a></h4>
+      <section>Interface for defining how to handle file/directory 
+deletion, rename and newing attempts in <a class="xref" href="Terminal.Gui.FileDialog.html">FileDialog</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a></h4>
+      <section>Implement <a class="xref" href="Terminal.Gui.IListDataSource.html">IListDataSource</a> to provide custom rendering for a <a class="xref" href="Terminal.Gui.ListView.html">ListView</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ISearchMatcher.html">ISearchMatcher</a></h4>
+      <section>Defines whether a given file/directory matches a set of
+search terms.</section>
+      <h4><a class="xref" href="Terminal.Gui.ISeries.html">ISeries</a></h4>
+      <section>Describes a series of data that can be rendered into a <a class="xref" href="Terminal.Gui.GraphView.html">GraphView</a>&gt;</section>
+      <h4><a class="xref" href="Terminal.Gui.ISuggestionGenerator.html">ISuggestionGenerator</a></h4>
+      <section>Generates autocomplete <a class="xref" href="Terminal.Gui.Suggestion.html">Suggestion</a> based on a given cursor location within a string</section>
+      <h4><a class="xref" href="Terminal.Gui.ITableSource.html">ITableSource</a></h4>
+      <section>Tabular matrix of data to be displayed in a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a></h4>
+      <section>Interface for supplying data to a <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a> on demand as root level nodes
+are expanded by the user</section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeNode.html">ITreeNode</a></h4>
+      <section>Interface to implement when you want the regular (non generic) <a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a>
+to automatically determine children for your class (without having to specify 
+an <a class="xref" href="Terminal.Gui.ITreeBuilder-1.html">ITreeBuilder&lt;T&gt;</a>)</section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeView.html">ITreeView</a></h4>
+      <section>Interface for all non generic members of <a class="xref" href="Terminal.Gui.TreeView-1.html">TreeView&lt;T&gt;</a>.
+
+<a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.ITreeViewFilter-1.html">ITreeViewFilter&lt;T&gt;</a></h4>
+      <section>Provides filtering for a <a class="xref" href="Terminal.Gui.TreeView.html">TreeView</a>.</section>
+    <h3 id="enums">Enums
+</h3>
+      <h4><a class="xref" href="Terminal.Gui.ColorName.html">ColorName</a></h4>
+      <section>Defines the 16 legacy color names and values that can be used to set the
+foreground and background colors in Terminal.Gui apps. Used with <a class="xref" href="Terminal.Gui.Color.html">Color</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.Command.html">Command</a></h4>
+      <section>Actions which can be performed by the application or bound to keys in a <a class="xref" href="Terminal.Gui.View.html">View</a> control.</section>
+      <h4><a class="xref" href="Terminal.Gui.ConfigurationManager.ConfigLocations.html">ConfigurationManager.ConfigLocations</a></h4>
+      <section>Describes the location of the configuration files. The constants can be
+combined (bitwise) to specify multiple locations.</section>
+      <h4><a class="xref" href="Terminal.Gui.ConsoleDriver.DiagnosticFlags.html">ConsoleDriver.DiagnosticFlags</a></h4>
+      <section>Enables diagnostic functions</section>
+      <h4><a class="xref" href="Terminal.Gui.CursorVisibility.html">CursorVisibility</a></h4>
+      <section>Terminal Cursor Visibility settings.</section>
+      <h4><a class="xref" href="Terminal.Gui.Dialog.ButtonAlignments.html">Dialog.ButtonAlignments</a></h4>
+      <section>Determines the horizontal alignment of the Dialog buttons.</section>
+      <h4><a class="xref" href="Terminal.Gui.DisplayModeLayout.html">DisplayModeLayout</a></h4>
+      <section>Used for choose the display mode of this <a class="xref" href="Terminal.Gui.RadioGroup.html">RadioGroup</a></section>
+      <h4><a class="xref" href="Terminal.Gui.EscSeqUtils.ClearScreenOptions.html">EscSeqUtils.ClearScreenOptions</a></h4>
+      <section>Options for ANSI ESC "[xJ" - Clears part of the screen.</section>
+      <h4><a class="xref" href="Terminal.Gui.EscSeqUtils.DECSCUSR_Style.html">EscSeqUtils.DECSCUSR_Style</a></h4>
+      <section>Styles for ANSI ESC "[x q" - Set Cursor Style</section>
+      <h4><a class="xref" href="Terminal.Gui.Key.html">Key</a></h4>
+      <section>The <a class="xref" href="Terminal.Gui.Key.html">Key</a> enumeration contains special encoding for some keys, but can also
+encode all the unicode values that can be passed.</section>
+      <h4><a class="xref" href="Terminal.Gui.LayoutStyle.html">LayoutStyle</a></h4>
+      <section>Determines the LayoutStyle for a <a class="xref" href="Terminal.Gui.View.html">View</a>, if Absolute, during <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_LayoutSubviews">LayoutSubviews()</a>, the
+value from the <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a> will be used, if the value is Computed, then <a class="xref" href="Terminal.Gui.View.html#Terminal_Gui_View_Frame">Frame</a>
+will be updated from the X, Y <a class="xref" href="Terminal.Gui.Pos.html">Pos</a> objects and the Width and Height <a class="xref" href="Terminal.Gui.Dim.html">Dim</a> objects.</section>
+      <h4><a class="xref" href="Terminal.Gui.LineStyle.html">LineStyle</a></h4>
+      <section>Defines the style of lines for a <a class="xref" href="Terminal.Gui.LineCanvas.html">LineCanvas</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.MenuItemCheckStyle.html">MenuItemCheckStyle</a></h4>
+      <section>Specifies how a <a class="xref" href="Terminal.Gui.MenuItem.html">MenuItem</a> shows selection state.</section>
+      <h4><a class="xref" href="Terminal.Gui.MouseFlags.html">MouseFlags</a></h4>
+      <section>Mouse flags reported in <a class="xref" href="Terminal.Gui.MouseEvent.html">MouseEvent</a>.</section>
+      <h4><a class="xref" href="Terminal.Gui.OpenMode.html">OpenMode</a></h4>
+      <section>Determine which <a class="xref" href="https://learn.microsoft.com/dotnet/api/system">System.IO</a> type to open.</section>
+      <h4><a class="xref" href="Terminal.Gui.Orientation.html">Orientation</a></h4>
+      <section>Direction of an element (horizontal or vertical)</section>
+      <h4><a class="xref" href="Terminal.Gui.ProgressBarFormat.html">ProgressBarFormat</a></h4>
+      <section>Specifies the format that a <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a> uses to indicate the visual presentation.</section>
+      <h4><a class="xref" href="Terminal.Gui.ProgressBarStyle.html">ProgressBarStyle</a></h4>
+      <section>Specifies the style that a <a class="xref" href="Terminal.Gui.ProgressBar.html">ProgressBar</a> uses to indicate the progress of an operation.</section>
+      <h4><a class="xref" href="Terminal.Gui.SliderType.html">SliderType</a></h4>
+      <section><a class="xref" href="Terminal.Gui.Slider-1.html">Slider&lt;T&gt;</a>  Types</section>
+      <h4><a class="xref" href="Terminal.Gui.TextAlignment.html">TextAlignment</a></h4>
+      <section>Text alignment enumeration, controls how text is displayed.</section>
+      <h4><a class="xref" href="Terminal.Gui.TextDirection.html">TextDirection</a></h4>
+      <section>Text direction enumeration, controls how text is displayed.</section>
+      <h4><a class="xref" href="Terminal.Gui.VerticalTextAlignment.html">VerticalTextAlignment</a></h4>
+      <section>Vertical text alignment enumeration, controls how text is displayed.</section>
+    <h3 id="delegates">Delegates
+</h3>
+      <h4><a class="xref" href="Terminal.Gui.AspectGetterDelegate-1.html">AspectGetterDelegate&lt;T&gt;</a></h4>
+      <section>Delegates of this type are used to fetch string representations of user's model objects</section>
+      <h4><a class="xref" href="Terminal.Gui.CellColorGetterDelegate.html">CellColorGetterDelegate</a></h4>
+      <section>Delegate for providing color to <a class="xref" href="Terminal.Gui.TableView.html">TableView</a> cells based on the value being rendered</section>
+      <h4><a class="xref" href="Terminal.Gui.LabelGetterDelegate.html">LabelGetterDelegate</a></h4>
+      <section>Delegate for custom formatting of axis labels.  Determines what should be displayed at a given label</section>
+      <h4><a class="xref" href="Terminal.Gui.RowColorGetterDelegate.html">RowColorGetterDelegate</a></h4>
+      <section>Delegate for providing color for a whole row of a <a class="xref" href="Terminal.Gui.TableView.html">TableView</a></section>
+      <h4><a class="xref" href="Terminal.Gui.SplitterEventHandler.html">SplitterEventHandler</a></h4>
+      <section>Represents a method that will handle splitter events.</section>
+
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../styles/main.js"></script>
+  </body>
+</html>

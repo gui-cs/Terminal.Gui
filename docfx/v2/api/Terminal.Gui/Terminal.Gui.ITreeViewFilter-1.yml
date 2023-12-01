@@ -1,0 +1,140 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ITreeViewFilter`1
+  commentId: T:Terminal.Gui.ITreeViewFilter`1
+  id: ITreeViewFilter`1
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ITreeViewFilter`1.IsMatch(`0)
+  langs:
+  - csharp
+  - vb
+  name: ITreeViewFilter<T>
+  nameWithType: ITreeViewFilter<T>
+  fullName: Terminal.Gui.ITreeViewFilter<T>
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/ITreeViewFilter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ITreeViewFilter
+    path: ../Terminal.Gui/Views/ITreeViewFilter.cs
+    startLine: 5
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Provides filtering for a <xref href="Terminal.Gui.TreeView" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: 'public interface ITreeViewFilter<T> where T : class'
+    typeParameters:
+    - id: T
+    content.vb: Public Interface ITreeViewFilter(Of T As Class)
+  nameWithType.vb: ITreeViewFilter(Of T)
+  fullName.vb: Terminal.Gui.ITreeViewFilter(Of T)
+  name.vb: ITreeViewFilter(Of T)
+- uid: Terminal.Gui.ITreeViewFilter`1.IsMatch(`0)
+  commentId: M:Terminal.Gui.ITreeViewFilter`1.IsMatch(`0)
+  id: IsMatch(`0)
+  parent: Terminal.Gui.ITreeViewFilter`1
+  langs:
+  - csharp
+  - vb
+  name: IsMatch(T)
+  nameWithType: ITreeViewFilter<T>.IsMatch(T)
+  fullName: Terminal.Gui.ITreeViewFilter<T>.IsMatch(T)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/ITreeViewFilter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsMatch
+    path: ../Terminal.Gui/Views/ITreeViewFilter.cs
+    startLine: 11
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Return <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> if the <code class="paramref">model</code> should
+
+    be included in the tree.
+  example: []
+  syntax:
+    content: bool IsMatch(T model)
+    parameters:
+    - id: model
+      type: '{T}'
+    return:
+      type: System.Boolean
+    content.vb: Function IsMatch(model As T) As Boolean
+  overload: Terminal.Gui.ITreeViewFilter`1.IsMatch*
+  nameWithType.vb: ITreeViewFilter(Of T).IsMatch(T)
+  fullName.vb: Terminal.Gui.ITreeViewFilter(Of T).IsMatch(T)
+references:
+- uid: Terminal.Gui.TreeView
+  commentId: T:Terminal.Gui.TreeView
+  href: Terminal.Gui.TreeView.html
+  name: TreeView
+  nameWithType: TreeView
+  fullName: Terminal.Gui.TreeView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ITreeViewFilter`1.IsMatch*
+  commentId: Overload:Terminal.Gui.ITreeViewFilter`1.IsMatch
+  href: Terminal.Gui.ITreeViewFilter-1.html#Terminal.Gui.ITreeViewFilter`1.IsMatch(`0)
+  name: IsMatch
+  nameWithType: ITreeViewFilter<T>.IsMatch
+  fullName: Terminal.Gui.ITreeViewFilter<T>.IsMatch
+  nameWithType.vb: ITreeViewFilter(Of T).IsMatch
+  fullName.vb: Terminal.Gui.ITreeViewFilter(Of T).IsMatch
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+shouldSkipMarkup: true

@@ -1,0 +1,1203 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  commentId: T:Terminal.Gui.CheckBoxTableSourceWrapperBase
+  id: CheckBoxTableSourceWrapperBase
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor(Terminal.Gui.TableView,Terminal.Gui.ITableSource)
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked(System.Int32)
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.Item(System.Int32,System.Int32)
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow(System.Int32)
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows(System.Int32[])
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  - Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+  langs:
+  - csharp
+  - vb
+  name: CheckBoxTableSourceWrapperBase
+  nameWithType: CheckBoxTableSourceWrapperBase
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CheckBoxTableSourceWrapperBase
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 14
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    <xref href="Terminal.Gui.ITableSource" data-throw-if-not-resolved="false"></xref> for a <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref> which adds a
+
+    checkbox column as an additional column in the table.
+  remarks: >-
+    This class wraps another <xref href="Terminal.Gui.ITableSource" data-throw-if-not-resolved="false"></xref> and dynamically
+        serves its rows/cols plus an extra column. Data in the wrapped source can be
+        dynamic (change over time).
+  example: []
+  syntax:
+    content: 'public abstract class CheckBoxTableSourceWrapperBase : ITableSource'
+    content.vb: Public MustInherit Class CheckBoxTableSourceWrapperBase Implements ITableSource
+  inheritance:
+  - System.Object
+  derivedClasses:
+  - Terminal.Gui.CheckBoxTableSourceWrapperByIndex
+  - Terminal.Gui.CheckBoxTableSourceWrapperByObject`1
+  implements:
+  - Terminal.Gui.ITableSource
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor(Terminal.Gui.TableView,Terminal.Gui.ITableSource)
+  commentId: M:Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor(Terminal.Gui.TableView,Terminal.Gui.ITableSource)
+  id: '#ctor(Terminal.Gui.TableView,Terminal.Gui.ITableSource)'
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: CheckBoxTableSourceWrapperBase(TableView, ITableSource)
+  nameWithType: CheckBoxTableSourceWrapperBase.CheckBoxTableSourceWrapperBase(TableView, ITableSource)
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckBoxTableSourceWrapperBase(Terminal.Gui.TableView, Terminal.Gui.ITableSource)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 26
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Creates a new instance of the class presenting the data in <code class="paramref">toWrap</code>
+
+    plus an additional checkbox column.
+  example: []
+  syntax:
+    content: public CheckBoxTableSourceWrapperBase(TableView tableView, ITableSource toWrap)
+    parameters:
+    - id: tableView
+      type: Terminal.Gui.TableView
+      description: >-
+        The <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref> this source will be used with.
+            This is required for event registration.
+    - id: toWrap
+      type: Terminal.Gui.ITableSource
+      description: >-
+        The original data source of the <xref href="Terminal.Gui.TableView" data-throw-if-not-resolved="false"></xref> that you
+            want to add checkboxes to.
+    content.vb: Public Sub New(tableView As TableView, toWrap As ITableSource)
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor*
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.New(TableView, ITableSource)
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.New(Terminal.Gui.TableView, Terminal.Gui.ITableSource)
+  name.vb: New(TableView, ITableSource)
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+  id: CheckedRune
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: CheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.CheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CheckedRune
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 41
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the character to use for checked entries. Defaults to <xref href="Terminal.Gui.GlyphDefinitions.Checked" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public Rune CheckedRune { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CheckedRune As Rune
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+  id: UnCheckedRune
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: UnCheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.UnCheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UnCheckedRune
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 46
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the character to use for UnChecked entries. Defaults to <xref href="Terminal.Gui.GlyphDefinitions.UnChecked" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public Rune UnCheckedRune { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property UnCheckedRune As Rune
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  id: UseRadioButtons
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: UseRadioButtons
+  nameWithType: CheckBoxTableSourceWrapperBase.UseRadioButtons
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UseRadioButtons
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 51
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets whether to only allow a single row to be toggled at once (Radio button).
+  example: []
+  syntax:
+    content: public bool UseRadioButtons { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseRadioButtons As Boolean
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  id: RadioCheckedRune
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: RadioCheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RadioCheckedRune
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 57
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the character to use for checked entry when <xref href="Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons" data-throw-if-not-resolved="false"></xref> is true.
+
+    Defaults to <xref href="Terminal.Gui.GlyphDefinitions.Selected" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public Rune RadioCheckedRune { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RadioCheckedRune As Rune
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  id: RadioUnCheckedRune
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: RadioUnCheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RadioUnCheckedRune
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 63
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the character to use for unchecked entries when <xref href="Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons" data-throw-if-not-resolved="false"></xref> is true.
+
+    Defaults to <xref href="Terminal.Gui.GlyphDefinitions.UnSelected" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public Rune RadioUnCheckedRune { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RadioUnCheckedRune As Rune
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+  id: Wrapping
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: Wrapping
+  nameWithType: CheckBoxTableSourceWrapperBase.Wrapping
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Wrapping
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 68
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the <xref href="Terminal.Gui.ITableSource" data-throw-if-not-resolved="false"></xref> that this instance is wrapping.
+  example: []
+  syntax:
+    content: public ITableSource Wrapping { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ITableSource
+    content.vb: Public ReadOnly Property Wrapping As ITableSource
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.Item(System.Int32,System.Int32)
+  id: Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: this[int, int]
+  nameWithType: CheckBoxTableSourceWrapperBase.this[int, int]
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.this[int, int]
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: this[]
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 72
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns the data at the given indexes of the table (row, column).
+  example: []
+  syntax:
+    content: public object this[int row, int col] { get; }
+    parameters:
+    - id: row
+      type: System.Int32
+      description: ''
+    - id: col
+      type: System.Int32
+      description: ''
+    return:
+      type: System.Object
+      description: ''
+    content.vb: Public ReadOnly Default Property this[](row As Integer, col As Integer) As Object
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.Item*
+  implements:
+  - Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+  id: Rows
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: Rows
+  nameWithType: CheckBoxTableSourceWrapperBase.Rows
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Rows
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 88
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of rows in the table.
+  example: []
+  syntax:
+    content: public int Rows { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Rows As Integer
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows*
+  implements:
+  - Terminal.Gui.ITableSource.Rows
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+  id: Columns
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: Columns
+  nameWithType: CheckBoxTableSourceWrapperBase.Columns
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Columns
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 91
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of columns in the table.
+  example: []
+  syntax:
+    content: public int Columns { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Columns As Integer
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns*
+  implements:
+  - Terminal.Gui.ITableSource.Columns
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+  id: ColumnNames
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: ColumnNames
+  nameWithType: CheckBoxTableSourceWrapperBase.ColumnNames
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColumnNames
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 94
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the label for each column.
+  example: []
+  syntax:
+    content: public string[] ColumnNames { get; }
+    parameters: []
+    return:
+      type: System.String[]
+    content.vb: Public ReadOnly Property ColumnNames As String()
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames*
+  implements:
+  - Terminal.Gui.ITableSource.ColumnNames
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked(System.Int32)
+  commentId: M:Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked(System.Int32)
+  id: IsChecked(System.Int32)
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: IsChecked(int)
+  nameWithType: CheckBoxTableSourceWrapperBase.IsChecked(int)
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsChecked
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 169
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns true if <code class="paramref">row</code> is checked.
+  example: []
+  syntax:
+    content: protected abstract bool IsChecked(int row)
+    parameters:
+    - id: row
+      type: System.Int32
+      description: ''
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: Protected MustOverride Function IsChecked(row As Integer) As Boolean
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked*
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.IsChecked(Integer)
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked(Integer)
+  name.vb: IsChecked(Integer)
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows(System.Int32[])
+  commentId: M:Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows(System.Int32[])
+  id: ToggleRows(System.Int32[])
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: ToggleRows(int[])
+  nameWithType: CheckBoxTableSourceWrapperBase.ToggleRows(int[])
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows(int[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleRows
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 177
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Flips the checked state for a collection of rows. If
+
+    some (but not all) are selected they should flip to all
+
+    selected.
+  example: []
+  syntax:
+    content: protected abstract void ToggleRows(int[] range)
+    parameters:
+    - id: range
+      type: System.Int32[]
+      description: ''
+    content.vb: Protected MustOverride Sub ToggleRows(range As Integer())
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows*
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.ToggleRows(Integer())
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows(Integer())
+  name.vb: ToggleRows(Integer())
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow(System.Int32)
+  commentId: M:Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow(System.Int32)
+  id: ToggleRow(System.Int32)
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: ToggleRow(int)
+  nameWithType: CheckBoxTableSourceWrapperBase.ToggleRow(int)
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow(int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleRow
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 183
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Flips the checked state of the given <code class="paramref">row</code>/
+  example: []
+  syntax:
+    content: protected abstract void ToggleRow(int row)
+    parameters:
+    - id: row
+      type: System.Int32
+      description: ''
+    content.vb: Protected MustOverride Sub ToggleRow(row As Integer)
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow*
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.ToggleRow(Integer)
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow(Integer)
+  name.vb: ToggleRow(Integer)
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows
+  commentId: M:Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows
+  id: ToggleAllRows
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: ToggleAllRows()
+  nameWithType: CheckBoxTableSourceWrapperBase.ToggleAllRows()
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleAllRows
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 191
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Called when the 'toggled all' action is performed.
+
+    This should change state from 'some selected' to
+
+    'all selected' or clear selection if all area already
+
+    selected.
+  example: []
+  syntax:
+    content: protected abstract void ToggleAllRows()
+    content.vb: Protected MustOverride Sub ToggleAllRows()
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows*
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles
+  commentId: M:Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles
+  id: ClearAllToggles
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  langs:
+  - csharp
+  - vb
+  name: ClearAllToggles()
+  nameWithType: CheckBoxTableSourceWrapperBase.ClearAllToggles()
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClearAllToggles
+    path: ../Terminal.Gui/Views/TableView/CheckBoxTableSourceWrapper.cs
+    startLine: 196
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Clears the toggled state of all rows.
+  example: []
+  syntax:
+    content: protected abstract void ClearAllToggles()
+    content.vb: Protected MustOverride Sub ClearAllToggles()
+  overload: Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles*
+references:
+- uid: Terminal.Gui.ITableSource
+  commentId: T:Terminal.Gui.ITableSource
+  parent: Terminal.Gui
+  href: Terminal.Gui.ITableSource.html
+  name: ITableSource
+  nameWithType: ITableSource
+  fullName: Terminal.Gui.ITableSource
+- uid: Terminal.Gui.TableView
+  commentId: T:Terminal.Gui.TableView
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableView.html
+  name: TableView
+  nameWithType: TableView
+  fullName: Terminal.Gui.TableView
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.#ctor(Terminal.Gui.TableView,Terminal.Gui.ITableSource)
+  name: CheckBoxTableSourceWrapperBase
+  nameWithType: CheckBoxTableSourceWrapperBase.CheckBoxTableSourceWrapperBase
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckBoxTableSourceWrapperBase
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.New
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.New
+  name.vb: New
+- uid: Terminal.Gui.GlyphDefinitions.Checked
+  commentId: P:Terminal.Gui.GlyphDefinitions.Checked
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Checked
+  name: Checked
+  nameWithType: GlyphDefinitions.Checked
+  fullName: Terminal.Gui.GlyphDefinitions.Checked
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+  name: CheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.CheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.CheckedRune
+- uid: System.Text.Rune
+  commentId: T:System.Text.Rune
+  parent: System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Text.Rune
+- uid: System.Text
+  commentId: N:System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Text
+  nameWithType: System.Text
+  fullName: System.Text
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+- uid: Terminal.Gui.GlyphDefinitions.UnChecked
+  commentId: P:Terminal.Gui.GlyphDefinitions.UnChecked
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.UnChecked
+  name: UnChecked
+  nameWithType: GlyphDefinitions.UnChecked
+  fullName: Terminal.Gui.GlyphDefinitions.UnChecked
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+  name: UnCheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.UnCheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.UnCheckedRune
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  name: UseRadioButtons
+  nameWithType: CheckBoxTableSourceWrapperBase.UseRadioButtons
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  commentId: P:Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  parent: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+  name: UseRadioButtons
+  nameWithType: CheckBoxTableSourceWrapperBase.UseRadioButtons
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.UseRadioButtons
+- uid: Terminal.Gui.GlyphDefinitions.Selected
+  commentId: P:Terminal.Gui.GlyphDefinitions.Selected
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Selected
+  name: Selected
+  nameWithType: GlyphDefinitions.Selected
+  fullName: Terminal.Gui.GlyphDefinitions.Selected
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  name: RadioCheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.RadioCheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioCheckedRune
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase
+  commentId: T:Terminal.Gui.CheckBoxTableSourceWrapperBase
+  parent: Terminal.Gui
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html
+  name: CheckBoxTableSourceWrapperBase
+  nameWithType: CheckBoxTableSourceWrapperBase
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase
+- uid: Terminal.Gui.GlyphDefinitions.UnSelected
+  commentId: P:Terminal.Gui.GlyphDefinitions.UnSelected
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.UnSelected
+  name: UnSelected
+  nameWithType: GlyphDefinitions.UnSelected
+  fullName: Terminal.Gui.GlyphDefinitions.UnSelected
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  name: RadioUnCheckedRune
+  nameWithType: CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.RadioUnCheckedRune
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+  name: Wrapping
+  nameWithType: CheckBoxTableSourceWrapperBase.Wrapping
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.Wrapping
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Item*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.Item
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.Item(System.Int32,System.Int32)
+  name: this
+  nameWithType: CheckBoxTableSourceWrapperBase.this
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.this
+  nameWithType.vb: CheckBoxTableSourceWrapperBase.this[]
+  fullName.vb: Terminal.Gui.CheckBoxTableSourceWrapperBase.this[]
+  name.vb: this[]
+- uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  commentId: P:Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  parent: Terminal.Gui.ITableSource
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: this[int, int]
+  nameWithType: ITableSource.this[int, int]
+  fullName: Terminal.Gui.ITableSource.this[int, int]
+  nameWithType.vb: ITableSource.this[](Integer, Integer)
+  fullName.vb: Terminal.Gui.ITableSource.this[](Integer, Integer)
+  name.vb: this[](Integer, Integer)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ']'
+  spec.vb:
+  - uid: Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+    name: this[]
+    href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Item(System.Int32,System.Int32)
+  - name: (
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+  name: Rows
+  nameWithType: CheckBoxTableSourceWrapperBase.Rows
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.Rows
+- uid: Terminal.Gui.ITableSource.Rows
+  commentId: P:Terminal.Gui.ITableSource.Rows
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Rows
+  name: Rows
+  nameWithType: ITableSource.Rows
+  fullName: Terminal.Gui.ITableSource.Rows
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+  name: Columns
+  nameWithType: CheckBoxTableSourceWrapperBase.Columns
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.Columns
+- uid: Terminal.Gui.ITableSource.Columns
+  commentId: P:Terminal.Gui.ITableSource.Columns
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.Columns
+  name: Columns
+  nameWithType: ITableSource.Columns
+  fullName: Terminal.Gui.ITableSource.Columns
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+  name: ColumnNames
+  nameWithType: CheckBoxTableSourceWrapperBase.ColumnNames
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ColumnNames
+- uid: Terminal.Gui.ITableSource.ColumnNames
+  commentId: P:Terminal.Gui.ITableSource.ColumnNames
+  parent: Terminal.Gui.ITableSource
+  href: Terminal.Gui.ITableSource.html#Terminal.Gui.ITableSource.ColumnNames
+  name: ColumnNames
+  nameWithType: ITableSource.ColumnNames
+  fullName: Terminal.Gui.ITableSource.ColumnNames
+- uid: System.String[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string[]
+  nameWithType: string[]
+  fullName: string[]
+  nameWithType.vb: String()
+  fullName.vb: String()
+  name.vb: String()
+  spec.csharp:
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked(System.Int32)
+  name: IsChecked
+  nameWithType: CheckBoxTableSourceWrapperBase.IsChecked
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.IsChecked
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows(System.Int32[])
+  name: ToggleRows
+  nameWithType: CheckBoxTableSourceWrapperBase.ToggleRows
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRows
+- uid: System.Int32[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int[]
+  nameWithType: int[]
+  fullName: int[]
+  nameWithType.vb: Integer()
+  fullName.vb: Integer()
+  name.vb: Integer()
+  spec.csharp:
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: (
+  - name: )
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow(System.Int32)
+  name: ToggleRow
+  nameWithType: CheckBoxTableSourceWrapperBase.ToggleRow
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleRow
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows
+  name: ToggleAllRows
+  nameWithType: CheckBoxTableSourceWrapperBase.ToggleAllRows
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ToggleAllRows
+- uid: Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles*
+  commentId: Overload:Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles
+  href: Terminal.Gui.CheckBoxTableSourceWrapperBase.html#Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles
+  name: ClearAllToggles
+  nameWithType: CheckBoxTableSourceWrapperBase.ClearAllToggles
+  fullName: Terminal.Gui.CheckBoxTableSourceWrapperBase.ClearAllToggles
+shouldSkipMarkup: true

@@ -1,0 +1,615 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.GraphCellToRender
+  commentId: T:Terminal.Gui.GraphCellToRender
+  id: GraphCellToRender
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune,System.Nullable{Terminal.Gui.Attribute})
+  - Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune,Terminal.Gui.Attribute)
+  - Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune)
+  - Terminal.Gui.GraphCellToRender.Color
+  - Terminal.Gui.GraphCellToRender.Rune
+  langs:
+  - csharp
+  - vb
+  name: GraphCellToRender
+  nameWithType: GraphCellToRender
+  fullName: Terminal.Gui.GraphCellToRender
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GraphCellToRender
+    path: ../Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+    startLine: 8
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Describes how to render a single row/column of a <xref href="Terminal.Gui.GraphView" data-throw-if-not-resolved="false"></xref> based
+
+    on the value(s) in <xref href="Terminal.Gui.ISeries" data-throw-if-not-resolved="false"></xref> at that location
+  example: []
+  syntax:
+    content: public class GraphCellToRender
+    content.vb: Public Class GraphCellToRender
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.GraphCellToRender.Rune
+  commentId: P:Terminal.Gui.GraphCellToRender.Rune
+  id: Rune
+  parent: Terminal.Gui.GraphCellToRender
+  langs:
+  - csharp
+  - vb
+  name: Rune
+  nameWithType: GraphCellToRender.Rune
+  fullName: Terminal.Gui.GraphCellToRender.Rune
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Rune
+    path: ../Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+    startLine: 13
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The character to render in the console
+  example: []
+  syntax:
+    content: public Rune Rune { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Rune As Rune
+  overload: Terminal.Gui.GraphCellToRender.Rune*
+- uid: Terminal.Gui.GraphCellToRender.Color
+  commentId: P:Terminal.Gui.GraphCellToRender.Color
+  id: Color
+  parent: Terminal.Gui.GraphCellToRender
+  langs:
+  - csharp
+  - vb
+  name: Color
+  nameWithType: GraphCellToRender.Color
+  fullName: Terminal.Gui.GraphCellToRender.Color
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Color
+    path: ../Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+    startLine: 18
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Optional color to render the <xref href="Terminal.Gui.GraphCellToRender.Rune" data-throw-if-not-resolved="false"></xref> with
+  example: []
+  syntax:
+    content: public Attribute? Color { get; set; }
+    parameters: []
+    return:
+      type: System.Nullable{Terminal.Gui.Attribute}
+    content.vb: Public Property Color As Attribute?
+  overload: Terminal.Gui.GraphCellToRender.Color*
+- uid: Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune)
+  commentId: M:Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune)
+  id: '#ctor(System.Text.Rune)'
+  parent: Terminal.Gui.GraphCellToRender
+  langs:
+  - csharp
+  - vb
+  name: GraphCellToRender(Rune)
+  nameWithType: GraphCellToRender.GraphCellToRender(Rune)
+  fullName: Terminal.Gui.GraphCellToRender.GraphCellToRender(System.Text.Rune)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+    startLine: 24
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates instance and sets <xref href="Terminal.Gui.GraphCellToRender.Rune" data-throw-if-not-resolved="false"></xref> with default graph coloring
+  example: []
+  syntax:
+    content: public GraphCellToRender(Rune rune)
+    parameters:
+    - id: rune
+      type: System.Text.Rune
+      description: ''
+    content.vb: Public Sub New(rune As Rune)
+  overload: Terminal.Gui.GraphCellToRender.#ctor*
+  nameWithType.vb: GraphCellToRender.New(Rune)
+  fullName.vb: Terminal.Gui.GraphCellToRender.New(System.Text.Rune)
+  name.vb: New(Rune)
+- uid: Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune,Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune,Terminal.Gui.Attribute)
+  id: '#ctor(System.Text.Rune,Terminal.Gui.Attribute)'
+  parent: Terminal.Gui.GraphCellToRender
+  langs:
+  - csharp
+  - vb
+  name: GraphCellToRender(Rune, Attribute)
+  nameWithType: GraphCellToRender.GraphCellToRender(Rune, Attribute)
+  fullName: Terminal.Gui.GraphCellToRender.GraphCellToRender(System.Text.Rune, Terminal.Gui.Attribute)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+    startLine: 33
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates instance and sets <xref href="Terminal.Gui.GraphCellToRender.Rune" data-throw-if-not-resolved="false"></xref> with custom graph coloring
+  example: []
+  syntax:
+    content: public GraphCellToRender(Rune rune, Attribute color)
+    parameters:
+    - id: rune
+      type: System.Text.Rune
+      description: ''
+    - id: color
+      type: Terminal.Gui.Attribute
+      description: ''
+    content.vb: Public Sub New(rune As Rune, color As Attribute)
+  overload: Terminal.Gui.GraphCellToRender.#ctor*
+  nameWithType.vb: GraphCellToRender.New(Rune, Attribute)
+  fullName.vb: Terminal.Gui.GraphCellToRender.New(System.Text.Rune, Terminal.Gui.Attribute)
+  name.vb: New(Rune, Attribute)
+- uid: Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune,System.Nullable{Terminal.Gui.Attribute})
+  commentId: M:Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune,System.Nullable{Terminal.Gui.Attribute})
+  id: '#ctor(System.Text.Rune,System.Nullable{Terminal.Gui.Attribute})'
+  parent: Terminal.Gui.GraphCellToRender
+  langs:
+  - csharp
+  - vb
+  name: GraphCellToRender(Rune, Attribute?)
+  nameWithType: GraphCellToRender.GraphCellToRender(Rune, Attribute?)
+  fullName: Terminal.Gui.GraphCellToRender.GraphCellToRender(System.Text.Rune, Terminal.Gui.Attribute?)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Views/GraphView/GraphCellToRender.cs
+    startLine: 40
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates instance and sets <xref href="Terminal.Gui.GraphCellToRender.Rune" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.GraphCellToRender.Color" data-throw-if-not-resolved="false"></xref> (or default if null)
+  example: []
+  syntax:
+    content: public GraphCellToRender(Rune rune, Attribute? color)
+    parameters:
+    - id: rune
+      type: System.Text.Rune
+    - id: color
+      type: System.Nullable{Terminal.Gui.Attribute}
+    content.vb: Public Sub New(rune As Rune, color As Attribute?)
+  overload: Terminal.Gui.GraphCellToRender.#ctor*
+  nameWithType.vb: GraphCellToRender.New(Rune, Attribute?)
+  fullName.vb: Terminal.Gui.GraphCellToRender.New(System.Text.Rune, Terminal.Gui.Attribute?)
+  name.vb: New(Rune, Attribute?)
+references:
+- uid: Terminal.Gui.GraphView
+  commentId: T:Terminal.Gui.GraphView
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphView.html
+  name: GraphView
+  nameWithType: GraphView
+  fullName: Terminal.Gui.GraphView
+- uid: Terminal.Gui.ISeries
+  commentId: T:Terminal.Gui.ISeries
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISeries.html
+  name: ISeries
+  nameWithType: ISeries
+  fullName: Terminal.Gui.ISeries
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.GraphCellToRender.Rune*
+  commentId: Overload:Terminal.Gui.GraphCellToRender.Rune
+  href: Terminal.Gui.GraphCellToRender.html#Terminal.Gui.GraphCellToRender.Rune
+  name: Rune
+  nameWithType: GraphCellToRender.Rune
+  fullName: Terminal.Gui.GraphCellToRender.Rune
+- uid: System.Text.Rune
+  commentId: T:System.Text.Rune
+  parent: System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Text.Rune
+- uid: System.Text
+  commentId: N:System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Text
+  nameWithType: System.Text
+  fullName: System.Text
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+- uid: Terminal.Gui.GraphCellToRender.Rune
+  commentId: P:Terminal.Gui.GraphCellToRender.Rune
+  href: Terminal.Gui.GraphCellToRender.html#Terminal.Gui.GraphCellToRender.Rune
+  name: Rune
+  nameWithType: GraphCellToRender.Rune
+  fullName: Terminal.Gui.GraphCellToRender.Rune
+- uid: Terminal.Gui.GraphCellToRender.Color*
+  commentId: Overload:Terminal.Gui.GraphCellToRender.Color
+  href: Terminal.Gui.GraphCellToRender.html#Terminal.Gui.GraphCellToRender.Color
+  name: Color
+  nameWithType: GraphCellToRender.Color
+  fullName: Terminal.Gui.GraphCellToRender.Color
+- uid: System.Nullable{Terminal.Gui.Attribute}
+  commentId: T:System.Nullable{Terminal.Gui.Attribute}
+  parent: System
+  definition: System.Nullable`1
+  href: Terminal.Gui.Attribute.html
+  name: Attribute?
+  nameWithType: Attribute?
+  fullName: Terminal.Gui.Attribute?
+  spec.csharp:
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: '?'
+  spec.vb:
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: '?'
+- uid: System.Nullable`1
+  commentId: T:System.Nullable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  name: Nullable<T>
+  nameWithType: Nullable<T>
+  fullName: System.Nullable<T>
+  nameWithType.vb: Nullable(Of T)
+  fullName.vb: System.Nullable(Of T)
+  name.vb: Nullable(Of T)
+  spec.csharp:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Nullable`1
+    name: Nullable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.nullable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui.GraphCellToRender.#ctor*
+  commentId: Overload:Terminal.Gui.GraphCellToRender.#ctor
+  href: Terminal.Gui.GraphCellToRender.html#Terminal.Gui.GraphCellToRender.#ctor(System.Text.Rune)
+  name: GraphCellToRender
+  nameWithType: GraphCellToRender.GraphCellToRender
+  fullName: Terminal.Gui.GraphCellToRender.GraphCellToRender
+  nameWithType.vb: GraphCellToRender.New
+  fullName.vb: Terminal.Gui.GraphCellToRender.New
+  name.vb: New
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  href: Terminal.Gui.Attribute.html
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.GraphCellToRender.Color
+  commentId: P:Terminal.Gui.GraphCellToRender.Color
+  href: Terminal.Gui.GraphCellToRender.html#Terminal.Gui.GraphCellToRender.Color
+  name: Color
+  nameWithType: GraphCellToRender.Color
+  fullName: Terminal.Gui.GraphCellToRender.Color
+shouldSkipMarkup: true

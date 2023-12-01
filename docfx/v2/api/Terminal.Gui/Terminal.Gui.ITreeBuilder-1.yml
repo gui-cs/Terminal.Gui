@@ -1,0 +1,409 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ITreeBuilder`1
+  commentId: T:Terminal.Gui.ITreeBuilder`1
+  id: ITreeBuilder`1
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  - Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  - Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  langs:
+  - csharp
+  - vb
+  name: ITreeBuilder<T>
+  nameWithType: ITreeBuilder<T>
+  fullName: Terminal.Gui.ITreeBuilder<T>
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ITreeBuilder
+    path: ../Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+    startLine: 7
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Interface for supplying data to a <xref href="Terminal.Gui.TreeView%601" data-throw-if-not-resolved="false"></xref> on demand as root level nodes
+
+    are expanded by the user
+  example: []
+  syntax:
+    content: public interface ITreeBuilder<T>
+    typeParameters:
+    - id: T
+    content.vb: Public Interface ITreeBuilder(Of T)
+  nameWithType.vb: ITreeBuilder(Of T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T)
+  name.vb: ITreeBuilder(Of T)
+- uid: Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  commentId: P:Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  id: SupportsCanExpand
+  parent: Terminal.Gui.ITreeBuilder`1
+  langs:
+  - csharp
+  - vb
+  name: SupportsCanExpand
+  nameWithType: ITreeBuilder<T>.SupportsCanExpand
+  fullName: Terminal.Gui.ITreeBuilder<T>.SupportsCanExpand
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SupportsCanExpand
+    path: ../Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+    startLine: 12
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Returns true if <xref href="Terminal.Gui.ITreeBuilder%601.CanExpand(%600)" data-throw-if-not-resolved="false"></xref> is implemented by this class
+  example: []
+  syntax:
+    content: bool SupportsCanExpand { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: ReadOnly Property SupportsCanExpand As Boolean
+  overload: Terminal.Gui.ITreeBuilder`1.SupportsCanExpand*
+  nameWithType.vb: ITreeBuilder(Of T).SupportsCanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).SupportsCanExpand
+- uid: Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  commentId: M:Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  id: CanExpand(`0)
+  parent: Terminal.Gui.ITreeBuilder`1
+  langs:
+  - csharp
+  - vb
+  name: CanExpand(T)
+  nameWithType: ITreeBuilder<T>.CanExpand(T)
+  fullName: Terminal.Gui.ITreeBuilder<T>.CanExpand(T)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CanExpand
+    path: ../Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+    startLine: 25
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Returns true/false for whether a model has children.  This method should be implemented
+
+    when <xref href="Terminal.Gui.ITreeBuilder%601.GetChildren(%600)" data-throw-if-not-resolved="false"></xref> is an expensive operation otherwise 
+
+    <xref href="Terminal.Gui.ITreeBuilder%601.SupportsCanExpand" data-throw-if-not-resolved="false"></xref> should return false (in which case this method will not
+
+    be called)
+  remarks: >-
+    Only implement this method if you have a very fast way of determining whether 
+        an object can have children e.g. checking a Type (directories can always be expanded)
+  example: []
+  syntax:
+    content: bool CanExpand(T toExpand)
+    parameters:
+    - id: toExpand
+      type: '{T}'
+      description: ''
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: Function CanExpand(toExpand As T) As Boolean
+  overload: Terminal.Gui.ITreeBuilder`1.CanExpand*
+  nameWithType.vb: ITreeBuilder(Of T).CanExpand(T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).CanExpand(T)
+- uid: Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  commentId: M:Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  id: GetChildren(`0)
+  parent: Terminal.Gui.ITreeBuilder`1
+  langs:
+  - csharp
+  - vb
+  name: GetChildren(T)
+  nameWithType: ITreeBuilder<T>.GetChildren(T)
+  fullName: Terminal.Gui.ITreeBuilder<T>.GetChildren(T)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetChildren
+    path: ../Terminal.Gui/Views/TreeView/ITreeBuilder.cs
+    startLine: 33
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Returns all children of a given <code class="paramref">forObject</code> which should be added to the 
+
+    tree as new branches underneath it
+  example: []
+  syntax:
+    content: IEnumerable<T> GetChildren(T forObject)
+    parameters:
+    - id: forObject
+      type: '{T}'
+      description: ''
+    return:
+      type: System.Collections.Generic.IEnumerable{{T}}
+      description: ''
+    content.vb: Function GetChildren(forObject As T) As IEnumerable(Of T)
+  overload: Terminal.Gui.ITreeBuilder`1.GetChildren*
+  nameWithType.vb: ITreeBuilder(Of T).GetChildren(T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).GetChildren(T)
+references:
+- uid: Terminal.Gui.TreeView`1
+  commentId: T:Terminal.Gui.TreeView`1
+  href: Terminal.Gui.TreeView-1.html
+  name: TreeView<T>
+  nameWithType: TreeView<T>
+  fullName: Terminal.Gui.TreeView<T>
+  nameWithType.vb: TreeView(Of T)
+  fullName.vb: Terminal.Gui.TreeView(Of T)
+  name.vb: TreeView(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  commentId: M:Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  name: CanExpand(T)
+  nameWithType: ITreeBuilder<T>.CanExpand(T)
+  fullName: Terminal.Gui.ITreeBuilder<T>.CanExpand(T)
+  nameWithType.vb: ITreeBuilder(Of T).CanExpand(T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).CanExpand(T)
+  spec.csharp:
+  - uid: Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+    name: CanExpand
+    href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+    name: CanExpand
+    href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  - name: (
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ITreeBuilder`1.SupportsCanExpand*
+  commentId: Overload:Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  name: SupportsCanExpand
+  nameWithType: ITreeBuilder<T>.SupportsCanExpand
+  fullName: Terminal.Gui.ITreeBuilder<T>.SupportsCanExpand
+  nameWithType.vb: ITreeBuilder(Of T).SupportsCanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).SupportsCanExpand
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  commentId: M:Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  name: GetChildren(T)
+  nameWithType: ITreeBuilder<T>.GetChildren(T)
+  fullName: Terminal.Gui.ITreeBuilder<T>.GetChildren(T)
+  nameWithType.vb: ITreeBuilder(Of T).GetChildren(T)
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).GetChildren(T)
+  spec.csharp:
+  - uid: Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+    name: GetChildren
+    href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+    name: GetChildren
+    href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  - name: (
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  commentId: P:Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.SupportsCanExpand
+  name: SupportsCanExpand
+  nameWithType: ITreeBuilder<T>.SupportsCanExpand
+  fullName: Terminal.Gui.ITreeBuilder<T>.SupportsCanExpand
+  nameWithType.vb: ITreeBuilder(Of T).SupportsCanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).SupportsCanExpand
+- uid: Terminal.Gui.ITreeBuilder`1.CanExpand*
+  commentId: Overload:Terminal.Gui.ITreeBuilder`1.CanExpand
+  href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.CanExpand(`0)
+  name: CanExpand
+  nameWithType: ITreeBuilder<T>.CanExpand
+  fullName: Terminal.Gui.ITreeBuilder<T>.CanExpand
+  nameWithType.vb: ITreeBuilder(Of T).CanExpand
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).CanExpand
+- uid: '{T}'
+  commentId: '!:T'
+  definition: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: T
+  name: T
+  nameWithType: T
+  fullName: T
+- uid: Terminal.Gui.ITreeBuilder`1.GetChildren*
+  commentId: Overload:Terminal.Gui.ITreeBuilder`1.GetChildren
+  href: Terminal.Gui.ITreeBuilder-1.html#Terminal.Gui.ITreeBuilder`1.GetChildren(`0)
+  name: GetChildren
+  nameWithType: ITreeBuilder<T>.GetChildren
+  fullName: Terminal.Gui.ITreeBuilder<T>.GetChildren
+  nameWithType.vb: ITreeBuilder(Of T).GetChildren
+  fullName.vb: Terminal.Gui.ITreeBuilder(Of T).GetChildren
+- uid: System.Collections.Generic.IEnumerable{{T}}
+  commentId: T:System.Collections.Generic.IEnumerable{`0}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+shouldSkipMarkup: true

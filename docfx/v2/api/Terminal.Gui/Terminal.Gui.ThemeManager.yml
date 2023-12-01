@@ -1,0 +1,2807 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ThemeManager
+  commentId: T:Terminal.Gui.ThemeManager
+  id: ThemeManager
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ThemeManager.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  - Terminal.Gui.ThemeManager.Add(System.String,Terminal.Gui.ThemeScope)
+  - Terminal.Gui.ThemeManager.Clear
+  - Terminal.Gui.ThemeManager.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  - Terminal.Gui.ThemeManager.ContainsKey(System.String)
+  - Terminal.Gui.ThemeManager.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  - Terminal.Gui.ThemeManager.Count
+  - Terminal.Gui.ThemeManager.GetEnumerator
+  - Terminal.Gui.ThemeManager.Instance
+  - Terminal.Gui.ThemeManager.IsReadOnly
+  - Terminal.Gui.ThemeManager.Item(System.String)
+  - Terminal.Gui.ThemeManager.Keys
+  - Terminal.Gui.ThemeManager.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  - Terminal.Gui.ThemeManager.Remove(System.String)
+  - Terminal.Gui.ThemeManager.Theme
+  - Terminal.Gui.ThemeManager.ThemeChanged
+  - Terminal.Gui.ThemeManager.Themes
+  - Terminal.Gui.ThemeManager.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  - Terminal.Gui.ThemeManager.Values
+  langs:
+  - csharp
+  - vb
+  name: ThemeManager
+  nameWithType: ThemeManager
+  fullName: Terminal.Gui.ThemeManager
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ThemeManager
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 58
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Contains a dictionary of the <xref href="Terminal.Gui.ThemeManager.Theme" data-throw-if-not-resolved="false"></xref>s for a Terminal.Gui application.
+  remarks: >-
+    <p>
+
+    A Theme is a collection of settings that are named. The default theme is named "Default".
+
+    </p>
+
+    <p>
+
+    The <xref href="Terminal.Gui.ThemeManager.Theme" data-throw-if-not-resolved="false"></xref> property is used to detemrine the currently active theme. 
+
+    </p>
+  example:
+  - >-
+    <pre>
+      <code class="lang-csharp">"Themes": [
+                 {
+                 	"Default": {
+                 		"ColorSchemes": [
+                 		{
+                 		"TopLevel": {
+                 		"Normal": {
+                 			"Foreground": "BrightGreen",
+                 			"Background": "Black"
+                 		},
+                 		"Focus": {
+                 		"Foreground": "White",
+                 			"Background": "Cyan"
+
+                 		},
+                 		"HotNormal": {
+                 			"Foreground": "Yellow",
+                 			"Background": "Black"
+
+                 		},
+                 		"HotFocus": {
+                 			"Foreground": "Blue",
+                 			"Background": "Cyan"
+                 		},
+                 		"Disabled": {
+                 			"Foreground": "DarkGray",
+                 			"Background": "Black"
+
+                 		}
+                 	}
+                 }</code>
+    </pre>
+  syntax:
+    content: 'public class ThemeManager : IDictionary<string, ThemeScope>, ICollection<KeyValuePair<string, ThemeScope>>, IEnumerable<KeyValuePair<string, ThemeScope>>, IEnumerable'
+    content.vb: Public Class ThemeManager Implements IDictionary(Of String, ThemeScope), ICollection(Of KeyValuePair(Of String, ThemeScope)), IEnumerable(Of KeyValuePair(Of String, ThemeScope)), IEnumerable
+  inheritance:
+  - System.Object
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  - System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  - System.Collections.IEnumerable
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.ThemeManager.Instance
+  commentId: P:Terminal.Gui.ThemeManager.Instance
+  id: Instance
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Instance
+  nameWithType: ThemeManager.Instance
+  fullName: Terminal.Gui.ThemeManager.Instance
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Instance
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 66
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Class is a singleton...
+  example: []
+  syntax:
+    content: public static ThemeManager Instance { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.ThemeManager
+    content.vb: Public Shared ReadOnly Property Instance As ThemeManager
+  overload: Terminal.Gui.ThemeManager.Instance*
+- uid: Terminal.Gui.ThemeManager.Theme
+  commentId: P:Terminal.Gui.ThemeManager.Theme
+  id: Theme
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Theme
+  nameWithType: ThemeManager.Theme
+  fullName: Terminal.Gui.ThemeManager.Theme
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Theme
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 92
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the currently selected theme. The value is persisted to the "Theme"
+
+    property.
+  example: []
+  syntax:
+    content: >-
+      [JsonIgnore]
+
+      public string Theme { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: >-
+      <JsonIgnore>
+
+      Public Property Theme As String
+  overload: Terminal.Gui.ThemeManager.Theme*
+  attributes:
+  - type: System.Text.Json.Serialization.JsonIgnoreAttribute
+    ctor: System.Text.Json.Serialization.JsonIgnoreAttribute.#ctor
+    arguments: []
+- uid: Terminal.Gui.ThemeManager.ThemeChanged
+  commentId: E:Terminal.Gui.ThemeManager.ThemeChanged
+  id: ThemeChanged
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: ThemeChanged
+  nameWithType: ThemeManager.ThemeChanged
+  fullName: Terminal.Gui.ThemeManager.ThemeChanged
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ThemeChanged
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 113
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Event fired he selected theme has changed.
+
+    application.
+  example: []
+  syntax:
+    content: public event EventHandler<ThemeManagerEventArgs>? ThemeChanged
+    return:
+      type: System.EventHandler{Terminal.Gui.ThemeManagerEventArgs}
+    content.vb: Public Event ThemeChanged As EventHandler(Of ThemeManagerEventArgs)
+- uid: Terminal.Gui.ThemeManager.Themes
+  commentId: P:Terminal.Gui.ThemeManager.Themes
+  id: Themes
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Themes
+  nameWithType: ThemeManager.Themes
+  fullName: Terminal.Gui.ThemeManager.Themes
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Themes
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 118
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Holds the <xref href="Terminal.Gui.ThemeScope" data-throw-if-not-resolved="false"></xref> definitions.
+  example: []
+  syntax:
+    content: >-
+      [JsonInclude]
+
+      [JsonConverter(typeof(DictionaryJsonConverter<ThemeScope>))]
+
+      public static Dictionary<string, ThemeScope>? Themes { get; set; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ThemeScope}
+    content.vb: >-
+      <JsonInclude>
+
+      <JsonConverter(GetType(DictionaryJsonConverter(Of ThemeScope)))>
+
+      Public Shared Property Themes As Dictionary(Of String, ThemeScope)
+  overload: Terminal.Gui.ThemeManager.Themes*
+  attributes:
+  - type: System.Text.Json.Serialization.JsonIncludeAttribute
+    ctor: System.Text.Json.Serialization.JsonIncludeAttribute.#ctor
+    arguments: []
+- uid: Terminal.Gui.ThemeManager.Keys
+  commentId: P:Terminal.Gui.ThemeManager.Keys
+  id: Keys
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Keys
+  nameWithType: ThemeManager.Keys
+  fullName: Terminal.Gui.ThemeManager.Keys
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Keys
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 153
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public ICollection<string> Keys { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.ICollection{System.String}
+    content.vb: Public ReadOnly Property Keys As ICollection(Of String)
+  overload: Terminal.Gui.ThemeManager.Keys*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Keys
+- uid: Terminal.Gui.ThemeManager.Values
+  commentId: P:Terminal.Gui.ThemeManager.Values
+  id: Values
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Values
+  nameWithType: ThemeManager.Values
+  fullName: Terminal.Gui.ThemeManager.Values
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Values
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 154
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public ICollection<ThemeScope> Values { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.ICollection{Terminal.Gui.ThemeScope}
+    content.vb: Public ReadOnly Property Values As ICollection(Of ThemeScope)
+  overload: Terminal.Gui.ThemeManager.Values*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Values
+- uid: Terminal.Gui.ThemeManager.Count
+  commentId: P:Terminal.Gui.ThemeManager.Count
+  id: Count
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Count
+  nameWithType: ThemeManager.Count
+  fullName: Terminal.Gui.ThemeManager.Count
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Count
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 155
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public int Count { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Count As Integer
+  overload: Terminal.Gui.ThemeManager.Count*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Count
+- uid: Terminal.Gui.ThemeManager.IsReadOnly
+  commentId: P:Terminal.Gui.ThemeManager.IsReadOnly
+  id: IsReadOnly
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: IsReadOnly
+  nameWithType: ThemeManager.IsReadOnly
+  fullName: Terminal.Gui.ThemeManager.IsReadOnly
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsReadOnly
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 156
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool IsReadOnly { get; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public ReadOnly Property IsReadOnly As Boolean
+  overload: Terminal.Gui.ThemeManager.IsReadOnly*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.IsReadOnly
+- uid: Terminal.Gui.ThemeManager.Item(System.String)
+  commentId: P:Terminal.Gui.ThemeManager.Item(System.String)
+  id: Item(System.String)
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: this[string]
+  nameWithType: ThemeManager.this[string]
+  fullName: Terminal.Gui.ThemeManager.this[string]
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: this[]
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 157
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public ThemeScope this[string key] { get; set; }
+    parameters:
+    - id: key
+      type: System.String
+    return:
+      type: Terminal.Gui.ThemeScope
+    content.vb: Public Default Property this[](key As String) As ThemeScope
+  overload: Terminal.Gui.ThemeManager.Item*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Item(System.String)
+  nameWithType.vb: ThemeManager.this[](String)
+  fullName.vb: Terminal.Gui.ThemeManager.this[](String)
+  name.vb: this[](String)
+- uid: Terminal.Gui.ThemeManager.Add(System.String,Terminal.Gui.ThemeScope)
+  commentId: M:Terminal.Gui.ThemeManager.Add(System.String,Terminal.Gui.ThemeScope)
+  id: Add(System.String,Terminal.Gui.ThemeScope)
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Add(string, ThemeScope)
+  nameWithType: ThemeManager.Add(string, ThemeScope)
+  fullName: Terminal.Gui.ThemeManager.Add(string, Terminal.Gui.ThemeScope)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Add
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 158
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public void Add(string key, ThemeScope value)
+    parameters:
+    - id: key
+      type: System.String
+    - id: value
+      type: Terminal.Gui.ThemeScope
+    content.vb: Public Sub Add(key As String, value As ThemeScope)
+  overload: Terminal.Gui.ThemeManager.Add*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Add(System.String,Terminal.Gui.ThemeScope)
+  nameWithType.vb: ThemeManager.Add(String, ThemeScope)
+  fullName.vb: Terminal.Gui.ThemeManager.Add(String, Terminal.Gui.ThemeScope)
+  name.vb: Add(String, ThemeScope)
+- uid: Terminal.Gui.ThemeManager.ContainsKey(System.String)
+  commentId: M:Terminal.Gui.ThemeManager.ContainsKey(System.String)
+  id: ContainsKey(System.String)
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: ContainsKey(string)
+  nameWithType: ThemeManager.ContainsKey(string)
+  fullName: Terminal.Gui.ThemeManager.ContainsKey(string)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ContainsKey
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 162
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool ContainsKey(string key)
+    parameters:
+    - id: key
+      type: System.String
+    return:
+      type: System.Boolean
+    content.vb: Public Function ContainsKey(key As String) As Boolean
+  overload: Terminal.Gui.ThemeManager.ContainsKey*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.ContainsKey(System.String)
+  nameWithType.vb: ThemeManager.ContainsKey(String)
+  fullName.vb: Terminal.Gui.ThemeManager.ContainsKey(String)
+  name.vb: ContainsKey(String)
+- uid: Terminal.Gui.ThemeManager.Remove(System.String)
+  commentId: M:Terminal.Gui.ThemeManager.Remove(System.String)
+  id: Remove(System.String)
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Remove(string)
+  nameWithType: ThemeManager.Remove(string)
+  fullName: Terminal.Gui.ThemeManager.Remove(string)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Remove
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 166
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool Remove(string key)
+    parameters:
+    - id: key
+      type: System.String
+    return:
+      type: System.Boolean
+    content.vb: Public Function Remove(key As String) As Boolean
+  overload: Terminal.Gui.ThemeManager.Remove*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Remove(System.String)
+  nameWithType.vb: ThemeManager.Remove(String)
+  fullName.vb: Terminal.Gui.ThemeManager.Remove(String)
+  name.vb: Remove(String)
+- uid: Terminal.Gui.ThemeManager.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  commentId: M:Terminal.Gui.ThemeManager.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  id: TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: TryGetValue(string, out ThemeScope)
+  nameWithType: ThemeManager.TryGetValue(string, out ThemeScope)
+  fullName: Terminal.Gui.ThemeManager.TryGetValue(string, out Terminal.Gui.ThemeScope)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TryGetValue
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 170
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool TryGetValue(string key, out ThemeScope value)
+    parameters:
+    - id: key
+      type: System.String
+    - id: value
+      type: Terminal.Gui.ThemeScope
+    return:
+      type: System.Boolean
+    content.vb: Public Function TryGetValue(key As String, value As ThemeScope) As Boolean
+  overload: Terminal.Gui.ThemeManager.TryGetValue*
+  implements:
+  - System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  nameWithType.vb: ThemeManager.TryGetValue(String, ThemeScope)
+  fullName.vb: Terminal.Gui.ThemeManager.TryGetValue(String, Terminal.Gui.ThemeScope)
+  name.vb: TryGetValue(String, ThemeScope)
+- uid: Terminal.Gui.ThemeManager.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  commentId: M:Terminal.Gui.ThemeManager.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  id: Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Add(KeyValuePair<string, ThemeScope>)
+  nameWithType: ThemeManager.Add(KeyValuePair<string, ThemeScope>)
+  fullName: Terminal.Gui.ThemeManager.Add(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Add
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 174
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public void Add(KeyValuePair<string, ThemeScope> item)
+    parameters:
+    - id: item
+      type: System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}
+    content.vb: Public Sub Add(item As KeyValuePair(Of String, ThemeScope))
+  overload: Terminal.Gui.ThemeManager.Add*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  nameWithType.vb: ThemeManager.Add(KeyValuePair(Of String, ThemeScope))
+  fullName.vb: Terminal.Gui.ThemeManager.Add(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: Add(KeyValuePair(Of String, ThemeScope))
+- uid: Terminal.Gui.ThemeManager.Clear
+  commentId: M:Terminal.Gui.ThemeManager.Clear
+  id: Clear
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Clear()
+  nameWithType: ThemeManager.Clear()
+  fullName: Terminal.Gui.ThemeManager.Clear()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Clear
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 178
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public void Clear()
+    content.vb: Public Sub Clear()
+  overload: Terminal.Gui.ThemeManager.Clear*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Clear
+- uid: Terminal.Gui.ThemeManager.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  commentId: M:Terminal.Gui.ThemeManager.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  id: Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Contains(KeyValuePair<string, ThemeScope>)
+  nameWithType: ThemeManager.Contains(KeyValuePair<string, ThemeScope>)
+  fullName: Terminal.Gui.ThemeManager.Contains(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Contains
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 182
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool Contains(KeyValuePair<string, ThemeScope> item)
+    parameters:
+    - id: item
+      type: System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}
+    return:
+      type: System.Boolean
+    content.vb: Public Function Contains(item As KeyValuePair(Of String, ThemeScope)) As Boolean
+  overload: Terminal.Gui.ThemeManager.Contains*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  nameWithType.vb: ThemeManager.Contains(KeyValuePair(Of String, ThemeScope))
+  fullName.vb: Terminal.Gui.ThemeManager.Contains(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: Contains(KeyValuePair(Of String, ThemeScope))
+- uid: Terminal.Gui.ThemeManager.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  commentId: M:Terminal.Gui.ThemeManager.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  id: CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: CopyTo(KeyValuePair<string, ThemeScope>[], int)
+  nameWithType: ThemeManager.CopyTo(KeyValuePair<string, ThemeScope>[], int)
+  fullName: Terminal.Gui.ThemeManager.CopyTo(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>[], int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CopyTo
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 186
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public void CopyTo(KeyValuePair<string, ThemeScope>[] array, int arrayIndex)
+    parameters:
+    - id: array
+      type: System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[]
+    - id: arrayIndex
+      type: System.Int32
+    content.vb: Public Sub CopyTo(array As KeyValuePair(Of String, ThemeScope)(), arrayIndex As Integer)
+  overload: Terminal.Gui.ThemeManager.CopyTo*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  nameWithType.vb: ThemeManager.CopyTo(KeyValuePair(Of String, ThemeScope)(), Integer)
+  fullName.vb: Terminal.Gui.ThemeManager.CopyTo(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)(), Integer)
+  name.vb: CopyTo(KeyValuePair(Of String, ThemeScope)(), Integer)
+- uid: Terminal.Gui.ThemeManager.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  commentId: M:Terminal.Gui.ThemeManager.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  id: Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: Remove(KeyValuePair<string, ThemeScope>)
+  nameWithType: ThemeManager.Remove(KeyValuePair<string, ThemeScope>)
+  fullName: Terminal.Gui.ThemeManager.Remove(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Remove
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 190
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool Remove(KeyValuePair<string, ThemeScope> item)
+    parameters:
+    - id: item
+      type: System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}
+    return:
+      type: System.Boolean
+    content.vb: Public Function Remove(item As KeyValuePair(Of String, ThemeScope)) As Boolean
+  overload: Terminal.Gui.ThemeManager.Remove*
+  implements:
+  - System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  nameWithType.vb: ThemeManager.Remove(KeyValuePair(Of String, ThemeScope))
+  fullName.vb: Terminal.Gui.ThemeManager.Remove(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: Remove(KeyValuePair(Of String, ThemeScope))
+- uid: Terminal.Gui.ThemeManager.GetEnumerator
+  commentId: M:Terminal.Gui.ThemeManager.GetEnumerator
+  id: GetEnumerator
+  parent: Terminal.Gui.ThemeManager
+  langs:
+  - csharp
+  - vb
+  name: GetEnumerator()
+  nameWithType: ThemeManager.GetEnumerator()
+  fullName: Terminal.Gui.ThemeManager.GetEnumerator()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Configuration/ThemeManager.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetEnumerator
+    path: ../Terminal.Gui/Configuration/ThemeManager.cs
+    startLine: 194
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public IEnumerator<KeyValuePair<string, ThemeScope>> GetEnumerator()
+    return:
+      type: System.Collections.Generic.IEnumerator{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+    content.vb: Public Function GetEnumerator() As IEnumerator(Of KeyValuePair(Of String, ThemeScope))
+  overload: Terminal.Gui.ThemeManager.GetEnumerator*
+  implements:
+  - System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.GetEnumerator
+references:
+- uid: Terminal.Gui.ThemeManager.Theme
+  commentId: P:Terminal.Gui.ThemeManager.Theme
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Theme
+  name: Theme
+  nameWithType: ThemeManager.Theme
+  fullName: Terminal.Gui.ThemeManager.Theme
+- uid: Terminal.Gui.ThemeManager
+  commentId: T:Terminal.Gui.ThemeManager
+  parent: Terminal.Gui
+  href: Terminal.Gui.ThemeManager.html
+  name: ThemeManager
+  nameWithType: ThemeManager
+  fullName: Terminal.Gui.ThemeManager
+- uid: Terminal.Gui.ThemeManager.Instance
+  commentId: P:Terminal.Gui.ThemeManager.Instance
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Instance
+  name: Instance
+  nameWithType: ThemeManager.Instance
+  fullName: Terminal.Gui.ThemeManager.Instance
+- uid: Terminal.Gui.ConfigurationManager.Themes
+  commentId: P:Terminal.Gui.ConfigurationManager.Themes
+  href: Terminal.Gui.ConfigurationManager.html#Terminal.Gui.ConfigurationManager.Themes
+  name: Themes
+  nameWithType: ConfigurationManager.Themes
+  fullName: Terminal.Gui.ConfigurationManager.Themes
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  commentId: T:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IDictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  name: IDictionary<string, ThemeScope>
+  nameWithType: IDictionary<string, ThemeScope>
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>
+  nameWithType.vb: IDictionary(Of String, ThemeScope)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope)
+  name.vb: IDictionary(Of String, ThemeScope)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  commentId: T:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.ICollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  name: ICollection<KeyValuePair<string, ThemeScope>>
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope))
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: ICollection(Of KeyValuePair(Of String, ThemeScope))
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: <
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  commentId: T:System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerable`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<KeyValuePair<string, ThemeScope>>
+  nameWithType: IEnumerable<KeyValuePair<string, ThemeScope>>
+  fullName: System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>
+  nameWithType.vb: IEnumerable(Of KeyValuePair(Of String, ThemeScope))
+  fullName.vb: System.Collections.Generic.IEnumerable(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: IEnumerable(Of KeyValuePair(Of String, ThemeScope))
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: )
+- uid: System.Collections.IEnumerable
+  commentId: T:System.Collections.IEnumerable
+  parent: System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.ienumerable
+  name: IEnumerable
+  nameWithType: IEnumerable
+  fullName: System.Collections.IEnumerable
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Collections.Generic.IDictionary`2
+  commentId: T:System.Collections.Generic.IDictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  name: IDictionary<TKey, TValue>
+  nameWithType: IDictionary<TKey, TValue>
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>
+  nameWithType.vb: IDictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue)
+  name.vb: IDictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2
+    name: IDictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: System.Collections.Generic.ICollection`1
+  commentId: T:System.Collections.Generic.ICollection`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  name: ICollection<T>
+  nameWithType: ICollection<T>
+  fullName: System.Collections.Generic.ICollection<T>
+  nameWithType.vb: ICollection(Of T)
+  fullName.vb: System.Collections.Generic.ICollection(Of T)
+  name.vb: ICollection(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1
+  commentId: T:System.Collections.Generic.IEnumerable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  name: IEnumerable<T>
+  nameWithType: IEnumerable<T>
+  fullName: System.Collections.Generic.IEnumerable<T>
+  nameWithType.vb: IEnumerable(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T)
+  name.vb: IEnumerable(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1
+    name: IEnumerable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections
+  commentId: N:System.Collections
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections
+  nameWithType: System.Collections
+  fullName: System.Collections
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+- uid: Terminal.Gui.ThemeManager.Instance*
+  commentId: Overload:Terminal.Gui.ThemeManager.Instance
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Instance
+  name: Instance
+  nameWithType: ThemeManager.Instance
+  fullName: Terminal.Gui.ThemeManager.Instance
+- uid: Terminal.Gui.ThemeManager.Theme*
+  commentId: Overload:Terminal.Gui.ThemeManager.Theme
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Theme
+  name: Theme
+  nameWithType: ThemeManager.Theme
+  fullName: Terminal.Gui.ThemeManager.Theme
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.EventHandler{Terminal.Gui.ThemeManagerEventArgs}
+  commentId: T:System.EventHandler{Terminal.Gui.ThemeManagerEventArgs}
+  parent: System
+  definition: System.EventHandler`1
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<ThemeManagerEventArgs>
+  nameWithType: EventHandler<ThemeManagerEventArgs>
+  fullName: System.EventHandler<Terminal.Gui.ThemeManagerEventArgs>
+  nameWithType.vb: EventHandler(Of ThemeManagerEventArgs)
+  fullName.vb: System.EventHandler(Of Terminal.Gui.ThemeManagerEventArgs)
+  name.vb: EventHandler(Of ThemeManagerEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - uid: Terminal.Gui.ThemeManagerEventArgs
+    name: ThemeManagerEventArgs
+    href: Terminal.Gui.ThemeManagerEventArgs.html
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.ThemeManagerEventArgs
+    name: ThemeManagerEventArgs
+    href: Terminal.Gui.ThemeManagerEventArgs.html
+  - name: )
+- uid: System.EventHandler`1
+  commentId: T:System.EventHandler`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<TEventArgs>
+  nameWithType: EventHandler<TEventArgs>
+  fullName: System.EventHandler<TEventArgs>
+  nameWithType.vb: EventHandler(Of TEventArgs)
+  fullName.vb: System.EventHandler(Of TEventArgs)
+  name.vb: EventHandler(Of TEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - name: TEventArgs
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TEventArgs
+  - name: )
+- uid: Terminal.Gui.ThemeScope
+  commentId: T:Terminal.Gui.ThemeScope
+  parent: Terminal.Gui
+  href: Terminal.Gui.ThemeScope.html
+  name: ThemeScope
+  nameWithType: ThemeScope
+  fullName: Terminal.Gui.ThemeScope
+- uid: Terminal.Gui.ThemeManager.Themes*
+  commentId: Overload:Terminal.Gui.ThemeManager.Themes
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Themes
+  name: Themes
+  nameWithType: ThemeManager.Themes
+  fullName: Terminal.Gui.ThemeManager.Themes
+- uid: System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ThemeScope}
+  commentId: T:System.Collections.Generic.Dictionary{System.String,Terminal.Gui.ThemeScope}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.Dictionary`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<string, ThemeScope>
+  nameWithType: Dictionary<string, ThemeScope>
+  fullName: System.Collections.Generic.Dictionary<string, Terminal.Gui.ThemeScope>
+  nameWithType.vb: Dictionary(Of String, ThemeScope)
+  fullName.vb: System.Collections.Generic.Dictionary(Of String, Terminal.Gui.ThemeScope)
+  name.vb: Dictionary(Of String, ThemeScope)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+- uid: System.Collections.Generic.Dictionary`2
+  commentId: T:System.Collections.Generic.Dictionary`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  name: Dictionary<TKey, TValue>
+  nameWithType: Dictionary<TKey, TValue>
+  fullName: System.Collections.Generic.Dictionary<TKey, TValue>
+  nameWithType.vb: Dictionary(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.Dictionary(Of TKey, TValue)
+  name.vb: Dictionary(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: Terminal.Gui.ThemeManager.Keys*
+  commentId: Overload:Terminal.Gui.ThemeManager.Keys
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Keys
+  name: Keys
+  nameWithType: ThemeManager.Keys
+  fullName: Terminal.Gui.ThemeManager.Keys
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Keys
+  commentId: P:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Keys
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.Keys
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.keys
+  name: Keys
+  nameWithType: IDictionary<string, ThemeScope>.Keys
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.Keys
+  nameWithType.vb: IDictionary(Of String, ThemeScope).Keys
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).Keys
+- uid: System.Collections.Generic.ICollection{System.String}
+  commentId: T:System.Collections.Generic.ICollection{System.String}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.ICollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  name: ICollection<string>
+  nameWithType: ICollection<string>
+  fullName: System.Collections.Generic.ICollection<string>
+  nameWithType.vb: ICollection(Of String)
+  fullName.vb: System.Collections.Generic.ICollection(Of String)
+  name.vb: ICollection(Of String)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.Keys
+  commentId: P:System.Collections.Generic.IDictionary`2.Keys
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.keys
+  name: Keys
+  nameWithType: IDictionary<TKey, TValue>.Keys
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.Keys
+  nameWithType.vb: IDictionary(Of TKey, TValue).Keys
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).Keys
+- uid: Terminal.Gui.ThemeManager.Values*
+  commentId: Overload:Terminal.Gui.ThemeManager.Values
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Values
+  name: Values
+  nameWithType: ThemeManager.Values
+  fullName: Terminal.Gui.ThemeManager.Values
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Values
+  commentId: P:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Values
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.Values
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.values
+  name: Values
+  nameWithType: IDictionary<string, ThemeScope>.Values
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.Values
+  nameWithType.vb: IDictionary(Of String, ThemeScope).Values
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).Values
+- uid: System.Collections.Generic.ICollection{Terminal.Gui.ThemeScope}
+  commentId: T:System.Collections.Generic.ICollection{Terminal.Gui.ThemeScope}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.ICollection`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  name: ICollection<ThemeScope>
+  nameWithType: ICollection<ThemeScope>
+  fullName: System.Collections.Generic.ICollection<Terminal.Gui.ThemeScope>
+  nameWithType.vb: ICollection(Of ThemeScope)
+  fullName.vb: System.Collections.Generic.ICollection(Of Terminal.Gui.ThemeScope)
+  name.vb: ICollection(Of ThemeScope)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: <
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1
+    name: ICollection
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.Values
+  commentId: P:System.Collections.Generic.IDictionary`2.Values
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.values
+  name: Values
+  nameWithType: IDictionary<TKey, TValue>.Values
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.Values
+  nameWithType.vb: IDictionary(Of TKey, TValue).Values
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).Values
+- uid: Terminal.Gui.ThemeManager.Count*
+  commentId: Overload:Terminal.Gui.ThemeManager.Count
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Count
+  name: Count
+  nameWithType: ThemeManager.Count
+  fullName: Terminal.Gui.ThemeManager.Count
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Count
+  commentId: P:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Count
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.Count
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.count
+  name: Count
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.Count
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.Count
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).Count
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).Count
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.Collections.Generic.ICollection`1.Count
+  commentId: P:System.Collections.Generic.ICollection`1.Count
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.count
+  name: Count
+  nameWithType: ICollection<T>.Count
+  fullName: System.Collections.Generic.ICollection<T>.Count
+  nameWithType.vb: ICollection(Of T).Count
+  fullName.vb: System.Collections.Generic.ICollection(Of T).Count
+- uid: Terminal.Gui.ThemeManager.IsReadOnly*
+  commentId: Overload:Terminal.Gui.ThemeManager.IsReadOnly
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.IsReadOnly
+  name: IsReadOnly
+  nameWithType: ThemeManager.IsReadOnly
+  fullName: Terminal.Gui.ThemeManager.IsReadOnly
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.IsReadOnly
+  commentId: P:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.IsReadOnly
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.IsReadOnly
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.isreadonly
+  name: IsReadOnly
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.IsReadOnly
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.IsReadOnly
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).IsReadOnly
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).IsReadOnly
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: System.Collections.Generic.ICollection`1.IsReadOnly
+  commentId: P:System.Collections.Generic.ICollection`1.IsReadOnly
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.isreadonly
+  name: IsReadOnly
+  nameWithType: ICollection<T>.IsReadOnly
+  fullName: System.Collections.Generic.ICollection<T>.IsReadOnly
+  nameWithType.vb: ICollection(Of T).IsReadOnly
+  fullName.vb: System.Collections.Generic.ICollection(Of T).IsReadOnly
+- uid: Terminal.Gui.ThemeManager.Item*
+  commentId: Overload:Terminal.Gui.ThemeManager.Item
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Item(System.String)
+  name: this
+  nameWithType: ThemeManager.this
+  fullName: Terminal.Gui.ThemeManager.this
+  nameWithType.vb: ThemeManager.this[]
+  fullName.vb: Terminal.Gui.ThemeManager.this[]
+  name.vb: this[]
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Item(System.String)
+  commentId: P:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Item(System.String)
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.Item(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: this[string]
+  nameWithType: IDictionary<string, ThemeScope>.this[string]
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.this[string]
+  nameWithType.vb: IDictionary(Of String, ThemeScope).this[](String)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).this[](String)
+  name.vb: this[](String)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ']'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Item(System.String)
+    name: this[]
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.item
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.Item(`0)
+  commentId: P:System.Collections.Generic.IDictionary`2.Item(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.item
+  name: this[TKey]
+  nameWithType: IDictionary<TKey, TValue>.this[TKey]
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.this[TKey]
+  nameWithType.vb: IDictionary(Of TKey, TValue).this[](TKey)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).this[](TKey)
+  name.vb: this[](TKey)
+  spec.csharp:
+  - name: this
+  - name: '['
+  - name: TKey
+  - name: ']'
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2.Item(`0)
+    name: this[]
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.item
+  - name: (
+  - name: TKey
+  - name: )
+- uid: Terminal.Gui.ThemeManager.Add*
+  commentId: Overload:Terminal.Gui.ThemeManager.Add
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Add(System.String,Terminal.Gui.ThemeScope)
+  name: Add
+  nameWithType: ThemeManager.Add
+  fullName: Terminal.Gui.ThemeManager.Add
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Add(System.String,Terminal.Gui.ThemeScope)
+  commentId: M:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Add(System.String,Terminal.Gui.ThemeScope)
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.Add(`0,`1)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.add#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-add(system-string-terminal-gui-themescope)
+  name: Add(string, ThemeScope)
+  nameWithType: IDictionary<string, ThemeScope>.Add(string, ThemeScope)
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.Add(string, Terminal.Gui.ThemeScope)
+  nameWithType.vb: IDictionary(Of String, ThemeScope).Add(String, ThemeScope)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).Add(String, Terminal.Gui.ThemeScope)
+  name.vb: Add(String, ThemeScope)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Add(System.String,Terminal.Gui.ThemeScope)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.add#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-add(system-string-terminal-gui-themescope)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Add(System.String,Terminal.Gui.ThemeScope)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.add#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-add(system-string-terminal-gui-themescope)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.Add(`0,`1)
+  commentId: M:System.Collections.Generic.IDictionary`2.Add(`0,`1)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.add
+  name: Add(TKey, TValue)
+  nameWithType: IDictionary<TKey, TValue>.Add(TKey, TValue)
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.Add(TKey, TValue)
+  nameWithType.vb: IDictionary(Of TKey, TValue).Add(TKey, TValue)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).Add(TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2.Add(`0,`1)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.add
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2.Add(`0,`1)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.add
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: Terminal.Gui.ThemeManager.ContainsKey*
+  commentId: Overload:Terminal.Gui.ThemeManager.ContainsKey
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.ContainsKey(System.String)
+  name: ContainsKey
+  nameWithType: ThemeManager.ContainsKey
+  fullName: Terminal.Gui.ThemeManager.ContainsKey
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.ContainsKey(System.String)
+  commentId: M:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.ContainsKey(System.String)
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.ContainsKey(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.containskey#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-containskey(system-string)
+  name: ContainsKey(string)
+  nameWithType: IDictionary<string, ThemeScope>.ContainsKey(string)
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.ContainsKey(string)
+  nameWithType.vb: IDictionary(Of String, ThemeScope).ContainsKey(String)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).ContainsKey(String)
+  name.vb: ContainsKey(String)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.ContainsKey(System.String)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.containskey#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-containskey(system-string)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.ContainsKey(System.String)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.containskey#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-containskey(system-string)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.ContainsKey(`0)
+  commentId: M:System.Collections.Generic.IDictionary`2.ContainsKey(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.containskey
+  name: ContainsKey(TKey)
+  nameWithType: IDictionary<TKey, TValue>.ContainsKey(TKey)
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.ContainsKey(TKey)
+  nameWithType.vb: IDictionary(Of TKey, TValue).ContainsKey(TKey)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).ContainsKey(TKey)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2.ContainsKey(`0)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.containskey
+  - name: (
+  - name: TKey
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2.ContainsKey(`0)
+    name: ContainsKey
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.containskey
+  - name: (
+  - name: TKey
+  - name: )
+- uid: Terminal.Gui.ThemeManager.Remove*
+  commentId: Overload:Terminal.Gui.ThemeManager.Remove
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Remove(System.String)
+  name: Remove
+  nameWithType: ThemeManager.Remove
+  fullName: Terminal.Gui.ThemeManager.Remove
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Remove(System.String)
+  commentId: M:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Remove(System.String)
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.Remove(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.remove#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-remove(system-string)
+  name: Remove(string)
+  nameWithType: IDictionary<string, ThemeScope>.Remove(string)
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.Remove(string)
+  nameWithType.vb: IDictionary(Of String, ThemeScope).Remove(String)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).Remove(String)
+  name.vb: Remove(String)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Remove(System.String)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.remove#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-remove(system-string)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.Remove(System.String)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.remove#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-remove(system-string)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.Remove(`0)
+  commentId: M:System.Collections.Generic.IDictionary`2.Remove(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.remove
+  name: Remove(TKey)
+  nameWithType: IDictionary<TKey, TValue>.Remove(TKey)
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.Remove(TKey)
+  nameWithType.vb: IDictionary(Of TKey, TValue).Remove(TKey)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).Remove(TKey)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2.Remove(`0)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.remove
+  - name: (
+  - name: TKey
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2.Remove(`0)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.remove
+  - name: (
+  - name: TKey
+  - name: )
+- uid: Terminal.Gui.ThemeManager.TryGetValue*
+  commentId: Overload:Terminal.Gui.ThemeManager.TryGetValue
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  name: TryGetValue
+  nameWithType: ThemeManager.TryGetValue
+  fullName: Terminal.Gui.ThemeManager.TryGetValue
+- uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  commentId: M:System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+  parent: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}
+  definition: System.Collections.Generic.IDictionary`2.TryGetValue(`0,`1@)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.trygetvalue#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-trygetvalue(system-string-terminal-gui-themescope@)
+  name: TryGetValue(string, out ThemeScope)
+  nameWithType: IDictionary<string, ThemeScope>.TryGetValue(string, out ThemeScope)
+  fullName: System.Collections.Generic.IDictionary<string, Terminal.Gui.ThemeScope>.TryGetValue(string, out Terminal.Gui.ThemeScope)
+  nameWithType.vb: IDictionary(Of String, ThemeScope).TryGetValue(String, ThemeScope)
+  fullName.vb: System.Collections.Generic.IDictionary(Of String, Terminal.Gui.ThemeScope).TryGetValue(String, Terminal.Gui.ThemeScope)
+  name.vb: TryGetValue(String, ThemeScope)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.trygetvalue#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-trygetvalue(system-string-terminal-gui-themescope@)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary{System.String,Terminal.Gui.ThemeScope}.TryGetValue(System.String,Terminal.Gui.ThemeScope@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-system.string,terminal.gui.themescope-.trygetvalue#system-collections-generic-idictionary((system-string-terminal-gui-themescope))-trygetvalue(system-string-terminal-gui-themescope@)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+- uid: System.Collections.Generic.IDictionary`2.TryGetValue(`0,`1@)
+  commentId: M:System.Collections.Generic.IDictionary`2.TryGetValue(`0,`1@)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.trygetvalue
+  name: TryGetValue(TKey, out TValue)
+  nameWithType: IDictionary<TKey, TValue>.TryGetValue(TKey, out TValue)
+  fullName: System.Collections.Generic.IDictionary<TKey, TValue>.TryGetValue(TKey, out TValue)
+  nameWithType.vb: IDictionary(Of TKey, TValue).TryGetValue(TKey, TValue)
+  fullName.vb: System.Collections.Generic.IDictionary(Of TKey, TValue).TryGetValue(TKey, TValue)
+  name.vb: TryGetValue(TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.IDictionary`2.TryGetValue(`0,`1@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.trygetvalue
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: out
+  - name: " "
+  - name: TValue
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IDictionary`2.TryGetValue(`0,`1@)
+    name: TryGetValue
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2.trygetvalue
+  - name: (
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  commentId: M:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.Add(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.add#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-add(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  name: Add(KeyValuePair<string, ThemeScope>)
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.Add(KeyValuePair<string, ThemeScope>)
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.Add(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>)
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).Add(KeyValuePair(Of String, ThemeScope))
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).Add(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: Add(KeyValuePair(Of String, ThemeScope))
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.add#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-add(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Add(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.add#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-add(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}
+  commentId: T:System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.KeyValuePair`2
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  name: KeyValuePair<string, ThemeScope>
+  nameWithType: KeyValuePair<string, ThemeScope>
+  fullName: System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>
+  nameWithType.vb: KeyValuePair(Of String, ThemeScope)
+  fullName.vb: System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)
+  name.vb: KeyValuePair(Of String, ThemeScope)
+  spec.csharp:
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+- uid: System.Collections.Generic.ICollection`1.Add(`0)
+  commentId: M:System.Collections.Generic.ICollection`1.Add(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.add
+  name: Add(T)
+  nameWithType: ICollection<T>.Add(T)
+  fullName: System.Collections.Generic.ICollection<T>.Add(T)
+  nameWithType.vb: ICollection(Of T).Add(T)
+  fullName.vb: System.Collections.Generic.ICollection(Of T).Add(T)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1.Add(`0)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.add
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1.Add(`0)
+    name: Add
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.add
+  - name: (
+  - name: T
+  - name: )
+- uid: System.Collections.Generic.KeyValuePair`2
+  commentId: T:System.Collections.Generic.KeyValuePair`2
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  name: KeyValuePair<TKey, TValue>
+  nameWithType: KeyValuePair<TKey, TValue>
+  fullName: System.Collections.Generic.KeyValuePair<TKey, TValue>
+  nameWithType.vb: KeyValuePair(Of TKey, TValue)
+  fullName.vb: System.Collections.Generic.KeyValuePair(Of TKey, TValue)
+  name.vb: KeyValuePair(Of TKey, TValue)
+  spec.csharp:
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TKey
+  - name: ','
+  - name: " "
+  - name: TValue
+  - name: )
+- uid: Terminal.Gui.ThemeManager.Clear*
+  commentId: Overload:Terminal.Gui.ThemeManager.Clear
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Clear
+  name: Clear
+  nameWithType: ThemeManager.Clear
+  fullName: Terminal.Gui.ThemeManager.Clear
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Clear
+  commentId: M:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Clear
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.Clear
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.clear#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-clear
+  name: Clear()
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.Clear()
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.Clear()
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).Clear()
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).Clear()
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.clear#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-clear
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.clear#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-clear
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.ICollection`1.Clear
+  commentId: M:System.Collections.Generic.ICollection`1.Clear
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.clear
+  name: Clear()
+  nameWithType: ICollection<T>.Clear()
+  fullName: System.Collections.Generic.ICollection<T>.Clear()
+  nameWithType.vb: ICollection(Of T).Clear()
+  fullName.vb: System.Collections.Generic.ICollection(Of T).Clear()
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.clear
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1.Clear
+    name: Clear
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.clear
+  - name: (
+  - name: )
+- uid: Terminal.Gui.ThemeManager.Contains*
+  commentId: Overload:Terminal.Gui.ThemeManager.Contains
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  name: Contains
+  nameWithType: ThemeManager.Contains
+  fullName: Terminal.Gui.ThemeManager.Contains
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  commentId: M:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.Contains(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.contains#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-contains(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  name: Contains(KeyValuePair<string, ThemeScope>)
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.Contains(KeyValuePair<string, ThemeScope>)
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.Contains(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>)
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).Contains(KeyValuePair(Of String, ThemeScope))
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).Contains(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: Contains(KeyValuePair(Of String, ThemeScope))
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+    name: Contains
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.contains#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-contains(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Contains(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+    name: Contains
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.contains#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-contains(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.ICollection`1.Contains(`0)
+  commentId: M:System.Collections.Generic.ICollection`1.Contains(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.contains
+  name: Contains(T)
+  nameWithType: ICollection<T>.Contains(T)
+  fullName: System.Collections.Generic.ICollection<T>.Contains(T)
+  nameWithType.vb: ICollection(Of T).Contains(T)
+  fullName.vb: System.Collections.Generic.ICollection(Of T).Contains(T)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1.Contains(`0)
+    name: Contains
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.contains
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1.Contains(`0)
+    name: Contains
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.contains
+  - name: (
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ThemeManager.CopyTo*
+  commentId: Overload:Terminal.Gui.ThemeManager.CopyTo
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  name: CopyTo
+  nameWithType: ThemeManager.CopyTo
+  fullName: Terminal.Gui.ThemeManager.CopyTo
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  commentId: M:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.CopyTo(`0[],System.Int32)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.copyto#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-copyto(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))()-system-int32)
+  name: CopyTo(KeyValuePair<string, ThemeScope>[], int)
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.CopyTo(KeyValuePair<string, ThemeScope>[], int)
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.CopyTo(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>[], int)
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).CopyTo(KeyValuePair(Of String, ThemeScope)(), Integer)
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).CopyTo(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)(), Integer)
+  name.vb: CopyTo(KeyValuePair(Of String, ThemeScope)(), Integer)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+    name: CopyTo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.copyto#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-copyto(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))()-system-int32)
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: '['
+  - name: ']'
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[],System.Int32)
+    name: CopyTo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.copyto#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-copyto(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))()-system-int32)
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: (
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  name: KeyValuePair<string, ThemeScope>[]
+  nameWithType: KeyValuePair<string, ThemeScope>[]
+  fullName: System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>[]
+  nameWithType.vb: KeyValuePair(Of String, ThemeScope)()
+  fullName.vb: System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)()
+  name.vb: KeyValuePair(Of String, ThemeScope)()
+  spec.csharp:
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.ICollection`1.CopyTo(`0[],System.Int32)
+  commentId: M:System.Collections.Generic.ICollection`1.CopyTo(`0[],System.Int32)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.copyto
+  name: CopyTo(T[], int)
+  nameWithType: ICollection<T>.CopyTo(T[], int)
+  fullName: System.Collections.Generic.ICollection<T>.CopyTo(T[], int)
+  nameWithType.vb: ICollection(Of T).CopyTo(T(), Integer)
+  fullName.vb: System.Collections.Generic.ICollection(Of T).CopyTo(T(), Integer)
+  name.vb: CopyTo(T(), Integer)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1.CopyTo(`0[],System.Int32)
+    name: CopyTo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.copyto
+  - name: (
+  - name: T
+  - name: '['
+  - name: ']'
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1.CopyTo(`0[],System.Int32)
+    name: CopyTo
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.copyto
+  - name: (
+  - name: T
+  - name: (
+  - name: )
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: )
+- uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  commentId: M:System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+  parent: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.ICollection`1.Remove(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.remove#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-remove(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  name: Remove(KeyValuePair<string, ThemeScope>)
+  nameWithType: ICollection<KeyValuePair<string, ThemeScope>>.Remove(KeyValuePair<string, ThemeScope>)
+  fullName: System.Collections.Generic.ICollection<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.Remove(System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>)
+  nameWithType.vb: ICollection(Of KeyValuePair(Of String, ThemeScope)).Remove(KeyValuePair(Of String, ThemeScope))
+  fullName.vb: System.Collections.Generic.ICollection(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).Remove(System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: Remove(KeyValuePair(Of String, ThemeScope))
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.remove#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-remove(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.Remove(System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope})
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.remove#system-collections-generic-icollection((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-remove(system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope)))
+  - name: (
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.ICollection`1.Remove(`0)
+  commentId: M:System.Collections.Generic.ICollection`1.Remove(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.remove
+  name: Remove(T)
+  nameWithType: ICollection<T>.Remove(T)
+  fullName: System.Collections.Generic.ICollection<T>.Remove(T)
+  nameWithType.vb: ICollection(Of T).Remove(T)
+  fullName.vb: System.Collections.Generic.ICollection(Of T).Remove(T)
+  spec.csharp:
+  - uid: System.Collections.Generic.ICollection`1.Remove(`0)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.remove
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.ICollection`1.Remove(`0)
+    name: Remove
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.remove
+  - name: (
+  - name: T
+  - name: )
+- uid: Terminal.Gui.ThemeManager.GetEnumerator*
+  commentId: Overload:Terminal.Gui.ThemeManager.GetEnumerator
+  href: Terminal.Gui.ThemeManager.html#Terminal.Gui.ThemeManager.GetEnumerator
+  name: GetEnumerator
+  nameWithType: ThemeManager.GetEnumerator
+  fullName: Terminal.Gui.ThemeManager.GetEnumerator
+- uid: System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.GetEnumerator
+  commentId: M:System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.GetEnumerator
+  parent: System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  definition: System.Collections.Generic.IEnumerable`1.GetEnumerator
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.getenumerator#system-collections-generic-ienumerable((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-getenumerator
+  name: GetEnumerator()
+  nameWithType: IEnumerable<KeyValuePair<string, ThemeScope>>.GetEnumerator()
+  fullName: System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>.GetEnumerator()
+  nameWithType.vb: IEnumerable(Of KeyValuePair(Of String, ThemeScope)).GetEnumerator()
+  fullName.vb: System.Collections.Generic.IEnumerable(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope)).GetEnumerator()
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.getenumerator#system-collections-generic-ienumerable((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-getenumerator
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-system.collections.generic.keyvaluepair-system.string,terminal.gui.themescope--.getenumerator#system-collections-generic-ienumerable((system-collections-generic-keyvaluepair((system-string-terminal-gui-themescope))))-getenumerator
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.IEnumerator{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  commentId: T:System.Collections.Generic.IEnumerator{System.Collections.Generic.KeyValuePair{System.String,Terminal.Gui.ThemeScope}}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IEnumerator`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1
+  name: IEnumerator<KeyValuePair<string, ThemeScope>>
+  nameWithType: IEnumerator<KeyValuePair<string, ThemeScope>>
+  fullName: System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<string, Terminal.Gui.ThemeScope>>
+  nameWithType.vb: IEnumerator(Of KeyValuePair(Of String, ThemeScope))
+  fullName.vb: System.Collections.Generic.IEnumerator(Of System.Collections.Generic.KeyValuePair(Of String, Terminal.Gui.ThemeScope))
+  name.vb: IEnumerator(Of KeyValuePair(Of String, ThemeScope))
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerator`1
+    name: IEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1
+  - name: <
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerator`1
+    name: IEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.KeyValuePair`2
+    name: KeyValuePair
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ThemeScope
+    name: ThemeScope
+    href: Terminal.Gui.ThemeScope.html
+  - name: )
+  - name: )
+- uid: System.Collections.Generic.IEnumerable`1.GetEnumerator
+  commentId: M:System.Collections.Generic.IEnumerable`1.GetEnumerator
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator
+  name: GetEnumerator()
+  nameWithType: IEnumerable<T>.GetEnumerator()
+  fullName: System.Collections.Generic.IEnumerable<T>.GetEnumerator()
+  nameWithType.vb: IEnumerable(Of T).GetEnumerator()
+  fullName.vb: System.Collections.Generic.IEnumerable(Of T).GetEnumerator()
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerable`1.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerable`1.GetEnumerator
+    name: GetEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator
+  - name: (
+  - name: )
+- uid: System.Collections.Generic.IEnumerator`1
+  commentId: T:System.Collections.Generic.IEnumerator`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1
+  name: IEnumerator<T>
+  nameWithType: IEnumerator<T>
+  fullName: System.Collections.Generic.IEnumerator<T>
+  nameWithType.vb: IEnumerator(Of T)
+  fullName.vb: System.Collections.Generic.IEnumerator(Of T)
+  name.vb: IEnumerator(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IEnumerator`1
+    name: IEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IEnumerator`1
+    name: IEnumerator
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+shouldSkipMarkup: true

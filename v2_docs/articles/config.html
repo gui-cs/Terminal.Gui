@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Configuration Management </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Configuration Management ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="configuration-management">Configuration Management</h1>
+
+<p>Terminal.Gui provides configuration and theme management for Terminal.Gui applications via the [<code>ConfigurationManager</code>](~/api/Terminal.Gui/Terminal.Gui.</p>
+<ol>
+<li><strong>Settings</strong>. Settings are applied to the <a href="../api/Terminal.Gui/Terminal.Gui.Application.html"><code>Application</code></a> class. Settings are accessed via the <code>Settings</code> property of the <a href="../api/Terminal.Gui/Terminal.Gui.ConfigurationManager.html"><code>ConfigurationManager</code></a> class.</li>
+<li><strong>Themes</strong>. Themes are a named collection of settings impacting how applications look. The default theme is named &quot;Default&quot;. The built-in configuration stored within the Terminal.Gui library defines two additional themes: &quot;Dark&quot;, and &quot;Light&quot;. Additional themes can be defined in the configuration files.</li>
+<li><strong>AppSettings</strong>. AppSettings allow applicaitons to use the  <a href="../api/Terminal.Gui/Terminal.Gui.ConfigurationManager.html"><code>ConfigurationManager</code></a> to store and retrieve application-specific settings.</li>
+</ol>
+<p>The The <a href="../api/Terminal.Gui/Terminal.Gui.ConfigurationManager.html"><code>ConfigurationManager</code></a> will look for configuration files in the <code>.tui</code> folder in the user's home directory (e.g. <code>C:/Users/username/.tui</code> or <code>/usr/username/.tui</code>), the folder where the Terminal.Gui application was launched from (e.g. <code>./.tui</code>), or as a resource within the Terminal.Gui application's main assembly.</p>
+<p>Settings that will apply to all applications (global settings) reside in files named config.json. Settings that will apply to a specific Terminal.Gui application reside in files named appname.config.json, where appname is the assembly name of the application (e.g. <code>UICatalog.config.json</code>).</p>
+<p>Settings are applied using the following precedence (higher precedence settings overwrite lower precedence settings):</p>
+<ol>
+<li><p>App specific settings found in the users's home directory (<code>~/.tui/appname.config.json</code>). -- Highest precedence.</p>
+</li>
+<li><p>App specific settings found in the directory the app was launched from (<code>./.tui/appname.config.json</code>).</p>
+</li>
+<li><p>App settings in app resources (<code>Resources/config.json</code>).</p>
+</li>
+<li><p>Global settings found in the the user's home directory (<code>~/.tui/config.json</code>).</p>
+</li>
+<li><p>Global settings found in the directory the app was launched from (<code>./.tui/config.json</code>).</p>
+</li>
+<li><p>Default settings defined in the Terminal.Gui assembly -- Lowest precedence.</p>
+</li>
+</ol>
+<p>The <code>UI Catalog</code> application provides an example of how to use the <a href="../api/Terminal.Gui/Terminal.Gui.ConfigurationManager.html"><code>ConfigurationManager</code></a> class to load and save configuration files. The <code>Configuration Editor</code> scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell <a href="../api/Terminal.Gui/Terminal.Gui.ConfigurationManager.html"><code>ConfigurationManager</code></a> to reaload them; allowing users to change settings without having to restart the application.</p>
+<h1 id="what-can-be-configured">What Can Be Configured</h1>
+<h2 id="settings">Settings</h2>
+<p>(Note, this list may not be complete; search the source code for <code>SerializableConfigurationProperty</code> to find all settings that can be configured.)</p>
+<pre><code>* [Application.QuitKey](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_QuitKey)
+* [Application.AlternateForwardKey](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateForwardKey)
+* [Application.AlternateBackwardKey](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateBackwardKey)
+* [Application.UseSystemConsole](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_UseSystemConsole)
+* [Application.IsMouseDisabled](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_IsMouseDisabled)
+* [Application.EnableConsoleScrolling](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_EnableConsoleScrolling)
+</code></pre>
+<h2 id="glyphs">Glyphs</h2>
+<p>Defines the standard set of glyphs used for standard views (e.g. the default indicator for <a href="../api/Terminal.Gui/Terminal.Gui.Button.html">Button</a>) and line drawing (e.g. <a href="../api/Terminal.Gui/Terminal.Gui.LineCanvas.html">LineCanvas</a>).</p>
+<p>The value can be either a decimal number or a string. The string may be:</p>
+<ul>
+<li>A unicode char (e.g. &quot;☑&quot;)</li>
+<li>A hex value in U+ format (e.g. &quot;U+2611&quot;)</li>
+<li>A hex value in UTF-16 format (e.g. &quot;\u2611&quot;)</li>
+</ul>
+<pre><code class="lang-json">  &quot;Glyphs&quot;: {
+    &quot;RightArrow&quot;: &quot;►&quot;,
+    &quot;LeftArrow&quot;: &quot;U+25C4&quot;,
+    &quot;DownArrow&quot;: &quot;\\u25BC&quot;,
+    &quot;UpArrow&quot;: 965010
+  }
+</code></pre>
+<h2 id="themes">Themes</h2>
+<p>A Theme is a named collection of settings that impact the visual style of Terminal.Gui applications. The default theme is named &quot;Default&quot;. The built-in configuration stored within the Terminal.Gui library defines two more themes: &quot;Dark&quot;, and &quot;Light&quot;. Additional themes can be defined in the configuration files.</p>
+<p>The Json property <code>Theme</code> defines the name of the theme that will be used. If the theme is not found, the default theme will be used.</p>
+<p>Themes support defining ColorSchemes as well as various default settings for Views. Both the default color schemes and user defined color schemes can be configured. See <a href="../api/Terminal.Gui/Terminal.Gui.Colors.html">ColorSchemes</a> for more information.</p>
+<h1 id="example-configuration-file">Example Configuration File</h1>
+<pre><code class="lang-json">{
+  &quot;$schema&quot;: &quot;https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json&quot;,
+  &quot;Application.QuitKey&quot;: {
+    &quot;Key&quot;: &quot;Esc&quot;
+  },
+  &quot;AppSettings&quot;: {
+    &quot;UICatalog.StatusBar&quot;: false
+  },
+  &quot;Theme&quot;: &quot;UI Catalog Theme&quot;,
+  &quot;Themes&quot;: [
+    {
+      &quot;UI Catalog Theme&quot;: {
+        &quot;ColorSchemes&quot;: [
+          {
+            &quot;UI Catalog Scheme&quot;: {
+              &quot;Normal&quot;: {
+                &quot;Foreground&quot;: &quot;White&quot;,
+                &quot;Background&quot;: &quot;Green&quot;
+              },
+              &quot;Focus&quot;: {
+                &quot;Foreground&quot;: &quot;Green&quot;,
+                &quot;Background&quot;: &quot;White&quot;
+              },
+              &quot;HotNormal&quot;: {
+                &quot;Foreground&quot;: &quot;Blue&quot;,
+                &quot;Background&quot;: &quot;Green&quot;
+              },
+              &quot;HotFocus&quot;: {
+                &quot;Foreground&quot;: &quot;BrightRed&quot;,
+                &quot;Background&quot;: &quot;White&quot;
+              },
+              &quot;Disabled&quot;: {
+                &quot;Foreground&quot;: &quot;BrightGreen&quot;,
+                &quot;Background&quot;: &quot;Gray&quot;
+              }
+            }
+          },
+          {
+            &quot;TopLevel&quot;: {
+              &quot;Normal&quot;: {
+                &quot;Foreground&quot;: &quot;DarkGray&quot;,
+                &quot;Background&quot;: &quot;White&quot;
+              ...
+              }
+            }
+          }
+        ],
+        &quot;Dialog.DefaultEffect3D&quot;: false
+      }
+    }
+  ]
+}
+</code></pre>
+<h1 id="configuration-file-schema">Configuration File Schema</h1>
+<p>Settings are defined in JSON format, according to the schema found here:</p>
+<p><a href="https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json">https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json</a></p>
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/blob/v2_develop/docfx/articles/config.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

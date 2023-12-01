@@ -11,7 +11,7 @@ permissions:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    name: Build and Deploy API docs to ${{ steps.deployment.outputs.page_url }}
+    name: Build and Deploy API docs to github-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

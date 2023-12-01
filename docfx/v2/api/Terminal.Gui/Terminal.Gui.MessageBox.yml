@@ -1,0 +1,1254 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.MessageBox
+  commentId: T:Terminal.Gui.MessageBox
+  id: MessageBox
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.MessageBox.Clicked
+  - Terminal.Gui.MessageBox.DefaultBorderStyle
+  - Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  - Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  - Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
+  - Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  - Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.Int32,System.String[])
+  - Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  - Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  - Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  - Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])
+  - Terminal.Gui.MessageBox.Query(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  - Terminal.Gui.MessageBox.Query(System.String,System.String,System.Int32,System.String[])
+  - Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  langs:
+  - csharp
+  - vb
+  name: MessageBox
+  nameWithType: MessageBox
+  fullName: Terminal.Gui.MessageBox
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MessageBox
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 25
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: MessageBox displays a modal message to the user, with a title, a message and a series of options that the user can choose from.
+  example:
+  - >-
+    <pre><code class="lang-csharp">var n = MessageBox.Query ("Quit Demo", "Are you sure you want to quit this demo?", "Yes", "No");
+
+    if (n == 0)
+       quit = true;
+    else
+       quit = false;</code></pre>
+  syntax:
+    content: public static class MessageBox
+    content.vb: Public Module MessageBox
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])
+  id: Query(System.Int32,System.Int32,System.String,System.String,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Query(int, int, string, string, params string[])
+  nameWithType: MessageBox.Query(int, int, string, string, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(int, int, string, string, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Query
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 38
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents a normal <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: Use <xref href="Terminal.Gui.MessageBox.Query(System.String%2cSystem.String%2cSystem.String%5b%5d)" data-throw-if-not-resolved="false"></xref> instead; it automatically sizes the MessageBox based on the contents.
+  example: []
+  syntax:
+    content: public static int Query(int width, int height, string title, string message, params string[] buttons)
+    parameters:
+    - id: width
+      type: System.Int32
+      description: Width for the window.
+    - id: height
+      type: System.Int32
+      description: Height for the window.
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function Query(width As Integer, height As Integer, title As String, message As String, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.Query*
+  nameWithType.vb: MessageBox.Query(Integer, Integer, String, String, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(Integer, Integer, String, String, ParamArray String())
+  name.vb: Query(Integer, Integer, String, String, ParamArray String())
+- uid: Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  id: Query(System.String,System.String,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Query(string, string, params string[])
+  nameWithType: MessageBox.Query(string, string, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(string, string, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Query
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 54
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: >-
+    The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+
+    from the size of the message and buttons.
+  example: []
+  syntax:
+    content: public static int Query(string title, string message, params string[] buttons)
+    parameters:
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function Query(title As String, message As String, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.Query*
+  nameWithType.vb: MessageBox.Query(String, String, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(String, String, ParamArray String())
+  name.vb: Query(String, String, ParamArray String())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
+  id: ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: ErrorQuery(int, int, string, string, params string[])
+  nameWithType: MessageBox.ErrorQuery(int, int, string, string, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(int, int, string, string, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ErrorQuery
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: Use <xref href="Terminal.Gui.MessageBox.ErrorQuery(System.String%2cSystem.String%2cSystem.String%5b%5d)" data-throw-if-not-resolved="false"></xref> instead; it automatically sizes the MessageBox based on the contents.
+  example: []
+  syntax:
+    content: public static int ErrorQuery(int width, int height, string title, string message, params string[] buttons)
+    parameters:
+    - id: width
+      type: System.Int32
+      description: Width for the window.
+    - id: height
+      type: System.Int32
+      description: Height for the window.
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function ErrorQuery(width As Integer, height As Integer, title As String, message As String, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.ErrorQuery*
+  nameWithType.vb: MessageBox.ErrorQuery(Integer, Integer, String, String, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(Integer, Integer, String, String, ParamArray String())
+  name.vb: ErrorQuery(Integer, Integer, String, String, ParamArray String())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  id: ErrorQuery(System.String,System.String,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: ErrorQuery(string, string, params string[])
+  nameWithType: MessageBox.ErrorQuery(string, string, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(string, string, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ErrorQuery
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 87
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: >-
+    The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+
+    from the size of the title, message. and buttons.
+  example: []
+  syntax:
+    content: public static int ErrorQuery(string title, string message, params string[] buttons)
+    parameters:
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function ErrorQuery(title As String, message As String, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.ErrorQuery*
+  nameWithType.vb: MessageBox.ErrorQuery(String, String, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(String, String, ParamArray String())
+  name.vb: ErrorQuery(String, String, ParamArray String())
+- uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  id: Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Query(int, int, string, string, int, params string[])
+  nameWithType: MessageBox.Query(int, int, string, string, int, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(int, int, string, string, int, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Query
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 105
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents a normal <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: Use <xref href="Terminal.Gui.MessageBox.Query(System.String%2cSystem.String%2cSystem.String%5b%5d)" data-throw-if-not-resolved="false"></xref> instead; it automatically sizes the MessageBox based on the contents.
+  example: []
+  syntax:
+    content: public static int Query(int width, int height, string title, string message, int defaultButton = 0, params string[] buttons)
+    parameters:
+    - id: width
+      type: System.Int32
+      description: Width for the window.
+    - id: height
+      type: System.Int32
+      description: Height for the window.
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function Query(width As Integer, height As Integer, title As String, message As String, defaultButton As Integer = 0, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.Query*
+  nameWithType.vb: MessageBox.Query(Integer, Integer, String, String, Integer, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(Integer, Integer, String, String, Integer, ParamArray String())
+  name.vb: Query(Integer, Integer, String, String, Integer, ParamArray String())
+- uid: Terminal.Gui.MessageBox.Query(System.String,System.String,System.Int32,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.String,System.String,System.Int32,System.String[])
+  id: Query(System.String,System.String,System.Int32,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Query(string, string, int, params string[])
+  nameWithType: MessageBox.Query(string, string, int, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(string, string, int, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Query
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 122
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: >-
+    The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+
+    from the size of the message and buttons.
+  example: []
+  syntax:
+    content: public static int Query(string title, string message, int defaultButton = 0, params string[] buttons)
+    parameters:
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function Query(title As String, message As String, defaultButton As Integer = 0, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.Query*
+  nameWithType.vb: MessageBox.Query(String, String, Integer, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(String, String, Integer, ParamArray String())
+  name.vb: Query(String, String, Integer, ParamArray String())
+- uid: Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  id: Query(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Query(int, int, string, string, int, bool, params string[])
+  nameWithType: MessageBox.Query(int, int, string, string, int, bool, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(int, int, string, string, int, bool, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Query
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 141
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents a normal <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: Use <xref href="Terminal.Gui.MessageBox.Query(System.String%2cSystem.String%2cSystem.String%5b%5d)" data-throw-if-not-resolved="false"></xref> instead; it automatically sizes the MessageBox based on the contents.
+  example: []
+  syntax:
+    content: public static int Query(int width, int height, string title, string message, int defaultButton = 0, bool wrapMessagge = true, params string[] buttons)
+    parameters:
+    - id: width
+      type: System.Int32
+      description: Width for the window.
+    - id: height
+      type: System.Int32
+      description: Height for the window.
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: wrapMessagge
+      type: System.Boolean
+      description: If wrap the message or not.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function Query(width As Integer, height As Integer, title As String, message As String, defaultButton As Integer = 0, wrapMessagge As Boolean = True, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.Query*
+  nameWithType.vb: MessageBox.Query(Integer, Integer, String, String, Integer, Boolean, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(Integer, Integer, String, String, Integer, Boolean, ParamArray String())
+  name.vb: Query(Integer, Integer, String, String, Integer, Boolean, ParamArray String())
+- uid: Terminal.Gui.MessageBox.Query(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  id: Query(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Query(string, string, int, bool, params string[])
+  nameWithType: MessageBox.Query(string, string, int, bool, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(string, string, int, bool, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Query
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 159
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: >-
+    The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+
+    from the size of the message and buttons.
+  example: []
+  syntax:
+    content: public static int Query(string title, string message, int defaultButton = 0, bool wrapMessage = true, params string[] buttons)
+    parameters:
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: wrapMessage
+      type: System.Boolean
+      description: If wrap the message or not.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function Query(title As String, message As String, defaultButton As Integer = 0, wrapMessage As Boolean = True, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.Query*
+  nameWithType.vb: MessageBox.Query(String, String, Integer, Boolean, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(String, String, Integer, Boolean, ParamArray String())
+  name.vb: Query(String, String, Integer, Boolean, ParamArray String())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  id: ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: ErrorQuery(int, int, string, string, int, params string[])
+  nameWithType: MessageBox.ErrorQuery(int, int, string, string, int, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(int, int, string, string, int, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ErrorQuery
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 177
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: Use <xref href="Terminal.Gui.MessageBox.ErrorQuery(System.String%2cSystem.String%2cSystem.String%5b%5d)" data-throw-if-not-resolved="false"></xref> instead; it automatically sizes the MessageBox based on the contents.
+  example: []
+  syntax:
+    content: public static int ErrorQuery(int width, int height, string title, string message, int defaultButton = 0, params string[] buttons)
+    parameters:
+    - id: width
+      type: System.Int32
+      description: Width for the window.
+    - id: height
+      type: System.Int32
+      description: Height for the window.
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function ErrorQuery(width As Integer, height As Integer, title As String, message As String, defaultButton As Integer = 0, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.ErrorQuery*
+  nameWithType.vb: MessageBox.ErrorQuery(Integer, Integer, String, String, Integer, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(Integer, Integer, String, String, Integer, ParamArray String())
+  name.vb: ErrorQuery(Integer, Integer, String, String, Integer, ParamArray String())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.Int32,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.Int32,System.String[])
+  id: ErrorQuery(System.String,System.String,System.Int32,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: ErrorQuery(string, string, int, params string[])
+  nameWithType: MessageBox.ErrorQuery(string, string, int, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(string, string, int, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ErrorQuery
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 194
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: >-
+    The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+
+    from the size of the title, message. and buttons.
+  example: []
+  syntax:
+    content: public static int ErrorQuery(string title, string message, int defaultButton = 0, params string[] buttons)
+    parameters:
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function ErrorQuery(title As String, message As String, defaultButton As Integer = 0, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.ErrorQuery*
+  nameWithType.vb: MessageBox.ErrorQuery(String, String, Integer, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(String, String, Integer, ParamArray String())
+  name.vb: ErrorQuery(String, String, Integer, ParamArray String())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  id: ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.Int32,System.Boolean,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: ErrorQuery(int, int, string, string, int, bool, params string[])
+  nameWithType: MessageBox.ErrorQuery(int, int, string, string, int, bool, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(int, int, string, string, int, bool, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ErrorQuery
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 213
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: Use <xref href="Terminal.Gui.MessageBox.ErrorQuery(System.String%2cSystem.String%2cSystem.String%5b%5d)" data-throw-if-not-resolved="false"></xref> instead; it automatically sizes the MessageBox based on the contents.
+  example: []
+  syntax:
+    content: public static int ErrorQuery(int width, int height, string title, string message, int defaultButton = 0, bool wrapMessagge = true, params string[] buttons)
+    parameters:
+    - id: width
+      type: System.Int32
+      description: Width for the window.
+    - id: height
+      type: System.Int32
+      description: Height for the window.
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: wrapMessagge
+      type: System.Boolean
+      description: If wrap the message or not.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function ErrorQuery(width As Integer, height As Integer, title As String, message As String, defaultButton As Integer = 0, wrapMessagge As Boolean = True, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.ErrorQuery*
+  nameWithType.vb: MessageBox.ErrorQuery(Integer, Integer, String, String, Integer, Boolean, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(Integer, Integer, String, String, Integer, Boolean, ParamArray String())
+  name.vb: ErrorQuery(Integer, Integer, String, String, Integer, Boolean, ParamArray String())
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  id: ErrorQuery(System.String,System.String,System.Int32,System.Boolean,System.String[])
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: ErrorQuery(string, string, int, bool, params string[])
+  nameWithType: MessageBox.ErrorQuery(string, string, int, bool, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(string, string, int, bool, params string[])
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ErrorQuery
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 231
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Presents an error <xref href="Terminal.Gui.MessageBox" data-throw-if-not-resolved="false"></xref> with the specified title and message and a list of buttons to show to the user.
+  remarks: >-
+    The message box will be vertically and horizontally centered in the container and the size will be automatically determined
+
+    from the size of the title, message. and buttons.
+  example: []
+  syntax:
+    content: public static int ErrorQuery(string title, string message, int defaultButton = 0, bool wrapMessagge = true, params string[] buttons)
+    parameters:
+    - id: title
+      type: System.String
+      description: Title for the query.
+    - id: message
+      type: System.String
+      description: Message to display, might contain multiple lines.
+    - id: defaultButton
+      type: System.Int32
+      description: Index of the default button.
+    - id: wrapMessagge
+      type: System.Boolean
+      description: If wrap the message or not.
+    - id: buttons
+      type: System.String[]
+      description: Array of buttons to add.
+    return:
+      type: System.Int32
+      description: The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+    content.vb: Public Shared Function ErrorQuery(title As String, message As String, defaultButton As Integer = 0, wrapMessagge As Boolean = True, ParamArray buttons As String()) As Integer
+  overload: Terminal.Gui.MessageBox.ErrorQuery*
+  nameWithType.vb: MessageBox.ErrorQuery(String, String, Integer, Boolean, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(String, String, Integer, Boolean, ParamArray String())
+  name.vb: ErrorQuery(String, String, Integer, Boolean, ParamArray String())
+- uid: Terminal.Gui.MessageBox.DefaultBorderStyle
+  commentId: P:Terminal.Gui.MessageBox.DefaultBorderStyle
+  id: DefaultBorderStyle
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: DefaultBorderStyle
+  nameWithType: MessageBox.DefaultBorderStyle
+  fullName: Terminal.Gui.MessageBox.DefaultBorderStyle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DefaultBorderStyle
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 239
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Defines the default border styling for <xref href="Terminal.Gui.Dialog" data-throw-if-not-resolved="false"></xref>. Can be configured via <xref href="Terminal.Gui.ConfigurationManager" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public static LineStyle DefaultBorderStyle { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.LineStyle
+    content.vb: Public Shared Property DefaultBorderStyle As LineStyle
+  overload: Terminal.Gui.MessageBox.DefaultBorderStyle*
+- uid: Terminal.Gui.MessageBox.Clicked
+  commentId: P:Terminal.Gui.MessageBox.Clicked
+  id: Clicked
+  parent: Terminal.Gui.MessageBox
+  langs:
+  - csharp
+  - vb
+  name: Clicked
+  nameWithType: MessageBox.Clicked
+  fullName: Terminal.Gui.MessageBox.Clicked
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/MessageBox.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Clicked
+    path: ../Terminal.Gui/Views/MessageBox.cs
+    startLine: 345
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The index of the selected button, or -1 if the user pressed ESC to close the dialog.
+
+    This is useful for web based console where by default there is no SynchronizationContext or TaskScheduler.
+  example: []
+  syntax:
+    content: public static int Clicked { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Shared Property Clicked As Integer
+  overload: Terminal.Gui.MessageBox.Clicked*
+references:
+- uid: Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  isExternal: true
+  href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  name: Query(string, string, params string[])
+  nameWithType: MessageBox.Query(string, string, params string[])
+  fullName: Terminal.Gui.MessageBox.Query(string, string, params string[])
+  nameWithType.vb: MessageBox.Query(String, String, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.Query(String, String, ParamArray String())
+  name.vb: Query(String, String, ParamArray String())
+  spec.csharp:
+  - uid: Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+    name: Query
+    href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: params
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+    name: Query
+    href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.Query(System.String,System.String,System.String[])
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: ParamArray
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+  - name: )
+- uid: Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  commentId: M:Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  isExternal: true
+  href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  name: ErrorQuery(string, string, params string[])
+  nameWithType: MessageBox.ErrorQuery(string, string, params string[])
+  fullName: Terminal.Gui.MessageBox.ErrorQuery(string, string, params string[])
+  nameWithType.vb: MessageBox.ErrorQuery(String, String, ParamArray String())
+  fullName.vb: Terminal.Gui.MessageBox.ErrorQuery(String, String, ParamArray String())
+  name.vb: ErrorQuery(String, String, ParamArray String())
+  spec.csharp:
+  - uid: Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+    name: ErrorQuery
+    href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: params
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+    name: ErrorQuery
+    href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.ErrorQuery(System.String,System.String,System.String[])
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - name: ParamArray
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+  - name: )
+- uid: Terminal.Gui.MessageBox
+  commentId: T:Terminal.Gui.MessageBox
+  href: Terminal.Gui.MessageBox.html
+  name: MessageBox
+  nameWithType: MessageBox
+  fullName: Terminal.Gui.MessageBox
+- uid: Terminal.Gui.Button
+  commentId: T:Terminal.Gui.Button
+  parent: Terminal.Gui
+  href: Terminal.Gui.Button.html
+  name: Button
+  nameWithType: Button
+  fullName: Terminal.Gui.Button
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.MessageBox.Query*
+  commentId: Overload:Terminal.Gui.MessageBox.Query
+  href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.Query(System.Int32,System.Int32,System.String,System.String,System.String[])
+  name: Query
+  nameWithType: MessageBox.Query
+  fullName: Terminal.Gui.MessageBox.Query
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.String[]
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string[]
+  nameWithType: string[]
+  fullName: string[]
+  nameWithType.vb: String()
+  fullName.vb: String()
+  name.vb: String()
+  spec.csharp:
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '['
+  - name: ']'
+  spec.vb:
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: (
+  - name: )
+- uid: Terminal.Gui.MessageBox.ErrorQuery*
+  commentId: Overload:Terminal.Gui.MessageBox.ErrorQuery
+  href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.ErrorQuery(System.Int32,System.Int32,System.String,System.String,System.String[])
+  name: ErrorQuery
+  nameWithType: MessageBox.ErrorQuery
+  fullName: Terminal.Gui.MessageBox.ErrorQuery
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.Dialog
+  commentId: T:Terminal.Gui.Dialog
+  parent: Terminal.Gui
+  href: Terminal.Gui.Dialog.html
+  name: Dialog
+  nameWithType: Dialog
+  fullName: Terminal.Gui.Dialog
+- uid: Terminal.Gui.ConfigurationManager
+  commentId: T:Terminal.Gui.ConfigurationManager
+  href: Terminal.Gui.ConfigurationManager.html
+  name: ConfigurationManager
+  nameWithType: ConfigurationManager
+  fullName: Terminal.Gui.ConfigurationManager
+- uid: Terminal.Gui.MessageBox.DefaultBorderStyle*
+  commentId: Overload:Terminal.Gui.MessageBox.DefaultBorderStyle
+  href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.DefaultBorderStyle
+  name: DefaultBorderStyle
+  nameWithType: MessageBox.DefaultBorderStyle
+  fullName: Terminal.Gui.MessageBox.DefaultBorderStyle
+- uid: Terminal.Gui.LineStyle
+  commentId: T:Terminal.Gui.LineStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.LineStyle.html
+  name: LineStyle
+  nameWithType: LineStyle
+  fullName: Terminal.Gui.LineStyle
+- uid: Terminal.Gui.MessageBox.Clicked*
+  commentId: Overload:Terminal.Gui.MessageBox.Clicked
+  href: Terminal.Gui.MessageBox.html#Terminal.Gui.MessageBox.Clicked
+  name: Clicked
+  nameWithType: MessageBox.Clicked
+  fullName: Terminal.Gui.MessageBox.Clicked
+shouldSkipMarkup: true

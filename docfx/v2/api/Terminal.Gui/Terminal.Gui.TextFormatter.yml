@@ -1,0 +1,3074 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.TextFormatter
+  commentId: T:Terminal.Gui.TextFormatter
+  id: TextFormatter
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.TextFormatter.Alignment
+  - Terminal.Gui.TextFormatter.AutoSize
+  - Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,System.String,Terminal.Gui.TextDirection,System.Int32)
+  - Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,System.Boolean,Terminal.Gui.TextDirection,System.Int32)
+  - Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,Terminal.Gui.TextAlignment,Terminal.Gui.TextDirection,System.Int32)
+  - Terminal.Gui.TextFormatter.ClipOrPad(System.String,System.Int32)
+  - Terminal.Gui.TextFormatter.CursorPosition
+  - Terminal.Gui.TextFormatter.Direction
+  - Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  - Terminal.Gui.TextFormatter.FindHotKey(System.String,System.Text.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  - Terminal.Gui.TextFormatter.Format
+  - Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  - Terminal.Gui.TextFormatter.Format(System.String,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  - Terminal.Gui.TextFormatter.GetFormattedSize
+  - Terminal.Gui.TextFormatter.GetLengthThatFits(System.Collections.Generic.List{System.Text.Rune},System.Int32,System.Int32)
+  - Terminal.Gui.TextFormatter.GetLengthThatFits(System.String,System.Int32,System.Int32)
+  - Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32)
+  - Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.String,System.Int32,System.Int32,System.Int32)
+  - Terminal.Gui.TextFormatter.HotKey
+  - Terminal.Gui.TextFormatter.HotKeyChanged
+  - Terminal.Gui.TextFormatter.HotKeyPos
+  - Terminal.Gui.TextFormatter.HotKeySpecifier
+  - Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  - Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  - Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  - Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  - Terminal.Gui.TextFormatter.Justify(System.String,System.Int32,System.Char,Terminal.Gui.TextDirection,System.Int32)
+  - Terminal.Gui.TextFormatter.Lines
+  - Terminal.Gui.TextFormatter.MaxLines(System.String,System.Int32)
+  - Terminal.Gui.TextFormatter.MaxWidth(System.String,System.Int32,System.Int32)
+  - Terminal.Gui.TextFormatter.MaxWidthLine(System.String,System.Int32)
+  - Terminal.Gui.TextFormatter.MultiLine
+  - Terminal.Gui.TextFormatter.NeedsFormat
+  - Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  - Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(System.String,System.Int32,System.Text.Rune)
+  - Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(System.String,System.Int32)
+  - Terminal.Gui.TextFormatter.Size
+  - Terminal.Gui.TextFormatter.SplitNewLine(System.String)
+  - Terminal.Gui.TextFormatter.TabWidth
+  - Terminal.Gui.TextFormatter.Text
+  - Terminal.Gui.TextFormatter.VerticalAlignment
+  - Terminal.Gui.TextFormatter.WordWrap
+  - Terminal.Gui.TextFormatter.WordWrapText(System.String,System.Int32,System.Boolean,System.Int32,Terminal.Gui.TextDirection)
+  langs:
+  - csharp
+  - vb
+  name: TextFormatter
+  nameWithType: TextFormatter
+  fullName: Terminal.Gui.TextFormatter
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TextFormatter
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 115
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Provides text formatting. Supports <xref href="Terminal.Gui.View.HotKey" data-throw-if-not-resolved="false"></xref>s, horizontal alignment, vertical alignment, multiple lines, and word-based line wrap.
+  example: []
+  syntax:
+    content: public class TextFormatter
+    content.vb: Public Class TextFormatter
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.TextFormatter.SplitNewLine(System.String)
+  commentId: M:Terminal.Gui.TextFormatter.SplitNewLine(System.String)
+  id: SplitNewLine(System.String)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: SplitNewLine(string)
+  nameWithType: TextFormatter.SplitNewLine(string)
+  fullName: Terminal.Gui.TextFormatter.SplitNewLine(string)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SplitNewLine
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 185
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Splits all newlines in the <code class="paramref">text</code> into a list
+
+    and supports both CRLF and LF, preserving the ending newline.
+  example: []
+  syntax:
+    content: public static List<string> SplitNewLine(string text)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text.
+    return:
+      type: System.Collections.Generic.List{System.String}
+      description: A list of text without the newline characters.
+    content.vb: Public Shared Function SplitNewLine(text As String) As List(Of String)
+  overload: Terminal.Gui.TextFormatter.SplitNewLine*
+  nameWithType.vb: TextFormatter.SplitNewLine(String)
+  fullName.vb: Terminal.Gui.TextFormatter.SplitNewLine(String)
+  name.vb: SplitNewLine(String)
+- uid: Terminal.Gui.TextFormatter.ClipOrPad(System.String,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.ClipOrPad(System.String,System.Int32)
+  id: ClipOrPad(System.String,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: ClipOrPad(string, int)
+  nameWithType: TextFormatter.ClipOrPad(string, int)
+  fullName: Terminal.Gui.TextFormatter.ClipOrPad(string, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClipOrPad
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 232
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Adds trailing whitespace or truncates <code class="paramref">text</code>
+
+    so that it fits exactly <code class="paramref">width</code> console units.
+
+    Note that some unicode characters take 2+ columns
+  example: []
+  syntax:
+    content: public static string ClipOrPad(string text, int width)
+    parameters:
+    - id: text
+      type: System.String
+      description: ''
+    - id: width
+      type: System.Int32
+      description: ''
+    return:
+      type: System.String
+      description: ''
+    content.vb: Public Shared Function ClipOrPad(text As String, width As Integer) As String
+  overload: Terminal.Gui.TextFormatter.ClipOrPad*
+  nameWithType.vb: TextFormatter.ClipOrPad(String, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.ClipOrPad(String, Integer)
+  name.vb: ClipOrPad(String, Integer)
+- uid: Terminal.Gui.TextFormatter.WordWrapText(System.String,System.Int32,System.Boolean,System.Int32,Terminal.Gui.TextDirection)
+  commentId: M:Terminal.Gui.TextFormatter.WordWrapText(System.String,System.Int32,System.Boolean,System.Int32,Terminal.Gui.TextDirection)
+  id: WordWrapText(System.String,System.Int32,System.Boolean,System.Int32,Terminal.Gui.TextDirection)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: WordWrapText(string, int, bool, int, TextDirection)
+  nameWithType: TextFormatter.WordWrapText(string, int, bool, int, TextDirection)
+  fullName: Terminal.Gui.TextFormatter.WordWrapText(string, int, bool, int, Terminal.Gui.TextDirection)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WordWrapText
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 271
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Formats the provided text to fit within the width provided using word wrapping.
+  remarks: >-
+    <p>
+
+    This method does not do any justification.
+
+    </p>
+
+    <p>
+
+    This method strips Newline ('\n' and '\r\n') sequences before processing.
+
+    </p>
+
+    <p>
+
+    If <code class="paramref">preserveTrailingSpaces</code> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a> at most one space will be preserved at the end of the last line.
+
+    </p>
+  example: []
+  syntax:
+    content: public static List<string> WordWrapText(string text, int width, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text to word wrap
+    - id: width
+      type: System.Int32
+      description: The number of columns to constrain the text to
+    - id: preserveTrailingSpaces
+      type: System.Boolean
+      description: >-
+        If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> trailing spaces at the end of wrapped lines will be preserved.
+             If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>, trailing spaces at the end of wrapped lines will be trimmed.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    return:
+      type: System.Collections.Generic.List{System.String}
+      description: A list of word wrapped lines.
+    content.vb: Public Shared Function WordWrapText(text As String, width As Integer, preserveTrailingSpaces As Boolean = False, tabWidth As Integer = 0, textDirection As TextDirection = TextDirection.LeftRight_TopBottom) As List(Of String)
+  overload: Terminal.Gui.TextFormatter.WordWrapText*
+  nameWithType.vb: TextFormatter.WordWrapText(String, Integer, Boolean, Integer, TextDirection)
+  fullName.vb: Terminal.Gui.TextFormatter.WordWrapText(String, Integer, Boolean, Integer, Terminal.Gui.TextDirection)
+  name.vb: WordWrapText(String, Integer, Boolean, Integer, TextDirection)
+- uid: Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,Terminal.Gui.TextAlignment,Terminal.Gui.TextDirection,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,Terminal.Gui.TextAlignment,Terminal.Gui.TextDirection,System.Int32)
+  id: ClipAndJustify(System.String,System.Int32,Terminal.Gui.TextAlignment,Terminal.Gui.TextDirection,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: ClipAndJustify(string, int, TextAlignment, TextDirection, int)
+  nameWithType: TextFormatter.ClipAndJustify(string, int, TextAlignment, TextDirection, int)
+  fullName: Terminal.Gui.TextFormatter.ClipAndJustify(string, int, Terminal.Gui.TextAlignment, Terminal.Gui.TextDirection, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClipAndJustify
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 465
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Justifies text within a specified width.
+  example: []
+  syntax:
+    content: public static string ClipAndJustify(string text, int width, TextAlignment talign, TextDirection textDirection = TextDirection.LeftRight_TopBottom, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text to justify.
+    - id: width
+      type: System.Int32
+      description: The number of columns to clip the text to. Text longer than <code class="paramref">width</code> will be clipped.
+    - id: talign
+      type: Terminal.Gui.TextAlignment
+      description: Alignment.
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.String
+      description: Justified and clipped text.
+    content.vb: Public Shared Function ClipAndJustify(text As String, width As Integer, talign As TextAlignment, textDirection As TextDirection = TextDirection.LeftRight_TopBottom, tabWidth As Integer = 0) As String
+  overload: Terminal.Gui.TextFormatter.ClipAndJustify*
+  nameWithType.vb: TextFormatter.ClipAndJustify(String, Integer, TextAlignment, TextDirection, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.ClipAndJustify(String, Integer, Terminal.Gui.TextAlignment, Terminal.Gui.TextDirection, Integer)
+  name.vb: ClipAndJustify(String, Integer, TextAlignment, TextDirection, Integer)
+- uid: Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,System.Boolean,Terminal.Gui.TextDirection,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,System.Boolean,Terminal.Gui.TextDirection,System.Int32)
+  id: ClipAndJustify(System.String,System.Int32,System.Boolean,Terminal.Gui.TextDirection,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: ClipAndJustify(string, int, bool, TextDirection, int)
+  nameWithType: TextFormatter.ClipAndJustify(string, int, bool, TextDirection, int)
+  fullName: Terminal.Gui.TextFormatter.ClipAndJustify(string, int, bool, Terminal.Gui.TextDirection, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClipAndJustify
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 479
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Justifies text within a specified width.
+  example: []
+  syntax:
+    content: public static string ClipAndJustify(string text, int width, bool justify, TextDirection textDirection = TextDirection.LeftRight_TopBottom, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text to justify.
+    - id: width
+      type: System.Int32
+      description: The number of columns to clip the text to. Text longer than <code class="paramref">width</code> will be clipped.
+    - id: justify
+      type: System.Boolean
+      description: Justify.
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.String
+      description: Justified and clipped text.
+    content.vb: Public Shared Function ClipAndJustify(text As String, width As Integer, justify As Boolean, textDirection As TextDirection = TextDirection.LeftRight_TopBottom, tabWidth As Integer = 0) As String
+  overload: Terminal.Gui.TextFormatter.ClipAndJustify*
+  nameWithType.vb: TextFormatter.ClipAndJustify(String, Integer, Boolean, TextDirection, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.ClipAndJustify(String, Integer, Boolean, Terminal.Gui.TextDirection, Integer)
+  name.vb: ClipAndJustify(String, Integer, Boolean, TextDirection, Integer)
+- uid: Terminal.Gui.TextFormatter.Justify(System.String,System.Int32,System.Char,Terminal.Gui.TextDirection,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.Justify(System.String,System.Int32,System.Char,Terminal.Gui.TextDirection,System.Int32)
+  id: Justify(System.String,System.Int32,System.Char,Terminal.Gui.TextDirection,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Justify(string, int, char, TextDirection, int)
+  nameWithType: TextFormatter.Justify(string, int, char, TextDirection, int)
+  fullName: Terminal.Gui.TextFormatter.Justify(string, int, char, Terminal.Gui.TextDirection, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Justify
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 518
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Justifies the text to fill the width provided. Space will be added between words (demarked by spaces and tabs) to
+
+    make the text just fit <code>width</code>. Spaces will not be added to the ends.
+  example: []
+  syntax:
+    content: public static string Justify(string text, int width, char spaceChar = ' ', TextDirection textDirection = TextDirection.LeftRight_TopBottom, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: ''
+    - id: width
+      type: System.Int32
+      description: ''
+    - id: spaceChar
+      type: System.Char
+      description: Character to replace whitespace and pad with. For debugging purposes.
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.String
+      description: The justified text.
+    content.vb: Public Shared Function Justify(text As String, width As Integer, spaceChar As Char = " "c, textDirection As TextDirection = TextDirection.LeftRight_TopBottom, tabWidth As Integer = 0) As String
+  overload: Terminal.Gui.TextFormatter.Justify*
+  nameWithType.vb: TextFormatter.Justify(String, Integer, Char, TextDirection, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.Justify(String, Integer, Char, Terminal.Gui.TextDirection, Integer)
+  name.vb: Justify(String, Integer, Char, TextDirection, Integer)
+- uid: Terminal.Gui.TextFormatter.Format(System.String,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  commentId: M:Terminal.Gui.TextFormatter.Format(System.String,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  id: Format(System.String,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Format(string, int, TextAlignment, bool, bool, int, TextDirection, bool)
+  nameWithType: TextFormatter.Format(string, int, TextAlignment, bool, bool, int, TextDirection, bool)
+  fullName: Terminal.Gui.TextFormatter.Format(string, int, Terminal.Gui.TextAlignment, bool, bool, int, Terminal.Gui.TextDirection, bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Format
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 585
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
+  remarks: >-
+    <p>
+
+    An empty <code class="paramref">text</code> string will result in one empty line.
+
+    </p>
+
+    <p>
+
+    If <code class="paramref">width</code> is 0, a single, empty line will be returned.
+
+    </p>
+
+    <p>
+
+    If <code class="paramref">width</code> is int.MaxValue, the text will be formatted to the maximum width possible. 
+
+    </p>
+  example: []
+  syntax:
+    content: public static List<string> Format(string text, int width, TextAlignment talign, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom, bool multiLine = false)
+    parameters:
+    - id: text
+      type: System.String
+      description: ''
+    - id: width
+      type: System.Int32
+      description: The number of columns to constrain the text to for word wrapping and clipping.
+    - id: talign
+      type: Terminal.Gui.TextAlignment
+      description: Specifies how the text will be aligned horizontally.
+    - id: wordWrap
+      type: System.Boolean
+      description: >-
+        If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the text will be wrapped to new lines no longer than <code class="paramref">width</code>.	
+            If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <code class="paramref">width</code>.
+    - id: preserveTrailingSpaces
+      type: System.Boolean
+      description: >-
+        If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> trailing spaces at the end of wrapped lines will be preserved.
+             If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>, trailing spaces at the end of wrapped lines will be trimmed.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    - id: multiLine
+      type: System.Boolean
+      description: If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> new lines are allowed.
+    return:
+      type: System.Collections.Generic.List{System.String}
+      description: A list of word wrapped lines.
+    content.vb: Public Shared Function Format(text As String, width As Integer, talign As TextAlignment, wordWrap As Boolean, preserveTrailingSpaces As Boolean = False, tabWidth As Integer = 0, textDirection As TextDirection = TextDirection.LeftRight_TopBottom, multiLine As Boolean = False) As List(Of String)
+  overload: Terminal.Gui.TextFormatter.Format*
+  nameWithType.vb: TextFormatter.Format(String, Integer, TextAlignment, Boolean, Boolean, Integer, TextDirection, Boolean)
+  fullName.vb: Terminal.Gui.TextFormatter.Format(String, Integer, Terminal.Gui.TextAlignment, Boolean, Boolean, Integer, Terminal.Gui.TextDirection, Boolean)
+  name.vb: Format(String, Integer, TextAlignment, Boolean, Boolean, Integer, TextDirection, Boolean)
+- uid: Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  commentId: M:Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  id: Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Format(string, int, bool, bool, bool, int, TextDirection, bool)
+  nameWithType: TextFormatter.Format(string, int, bool, bool, bool, int, TextDirection, bool)
+  fullName: Terminal.Gui.TextFormatter.Format(string, int, bool, bool, bool, int, Terminal.Gui.TextDirection, bool)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Format
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 615
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Reformats text into lines, applying text alignment and optionally wrapping text to new lines on word boundaries.
+  remarks: >-
+    <p>
+
+    An empty <code class="paramref">text</code> string will result in one empty line.
+
+    </p>
+
+    <p>
+
+    If <code class="paramref">width</code> is 0, a single, empty line will be returned.
+
+    </p>
+
+    <p>
+
+    If <code class="paramref">width</code> is int.MaxValue, the text will be formatted to the maximum width possible. 
+
+    </p>
+  example: []
+  syntax:
+    content: public static List<string> Format(string text, int width, bool justify, bool wordWrap, bool preserveTrailingSpaces = false, int tabWidth = 0, TextDirection textDirection = TextDirection.LeftRight_TopBottom, bool multiLine = false)
+    parameters:
+    - id: text
+      type: System.String
+      description: ''
+    - id: width
+      type: System.Int32
+      description: The number of columns to constrain the text to for word wrapping and clipping.
+    - id: justify
+      type: System.Boolean
+      description: Specifies whether the text should be justified.
+    - id: wordWrap
+      type: System.Boolean
+      description: >-
+        If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>, the text will be wrapped to new lines no longer than <code class="paramref">width</code>.	
+            If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>, forces text to fit a single line. Line breaks are converted to spaces. The text will be clipped to <code class="paramref">width</code>.
+    - id: preserveTrailingSpaces
+      type: System.Boolean
+      description: >-
+        If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> trailing spaces at the end of wrapped lines will be preserved.
+             If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>, trailing spaces at the end of wrapped lines will be trimmed.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    - id: multiLine
+      type: System.Boolean
+      description: If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> new lines are allowed.
+    return:
+      type: System.Collections.Generic.List{System.String}
+      description: A list of word wrapped lines.
+    content.vb: Public Shared Function Format(text As String, width As Integer, justify As Boolean, wordWrap As Boolean, preserveTrailingSpaces As Boolean = False, tabWidth As Integer = 0, textDirection As TextDirection = TextDirection.LeftRight_TopBottom, multiLine As Boolean = False) As List(Of String)
+  overload: Terminal.Gui.TextFormatter.Format*
+  nameWithType.vb: TextFormatter.Format(String, Integer, Boolean, Boolean, Boolean, Integer, TextDirection, Boolean)
+  fullName.vb: Terminal.Gui.TextFormatter.Format(String, Integer, Boolean, Boolean, Boolean, Integer, Terminal.Gui.TextDirection, Boolean)
+  name.vb: Format(String, Integer, Boolean, Boolean, Boolean, Integer, TextDirection, Boolean)
+- uid: Terminal.Gui.TextFormatter.MaxLines(System.String,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.MaxLines(System.String,System.Int32)
+  id: MaxLines(System.String,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: MaxLines(string, int)
+  nameWithType: TextFormatter.MaxLines(string, int)
+  fullName: Terminal.Gui.TextFormatter.MaxLines(string, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MaxLines
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 680
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Computes the number of lines needed to render the specified text given the width.
+  example: []
+  syntax:
+    content: public static int MaxLines(string text, int width)
+    parameters:
+    - id: text
+      type: System.String
+      description: Text, may contain newlines.
+    - id: width
+      type: System.Int32
+      description: The minimum width for the text.
+    return:
+      type: System.Int32
+      description: Number of lines.
+    content.vb: Public Shared Function MaxLines(text As String, width As Integer) As Integer
+  overload: Terminal.Gui.TextFormatter.MaxLines*
+  nameWithType.vb: TextFormatter.MaxLines(String, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.MaxLines(String, Integer)
+  name.vb: MaxLines(String, Integer)
+- uid: Terminal.Gui.TextFormatter.MaxWidth(System.String,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.MaxWidth(System.String,System.Int32,System.Int32)
+  id: MaxWidth(System.String,System.Int32,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: MaxWidth(string, int, int)
+  nameWithType: TextFormatter.MaxWidth(string, int, int)
+  fullName: Terminal.Gui.TextFormatter.MaxWidth(string, int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MaxWidth
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 694
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Computes the maximum width needed to render the text (single line or multiple lines, word wrapped) given 
+
+    a number of columns to constrain the text to.
+  example: []
+  syntax:
+    content: public static int MaxWidth(string text, int maxColumns, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: Text, may contain newlines.
+    - id: maxColumns
+      type: System.Int32
+      description: The number of columns to constrain the text to for formatting.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: Width of the longest line after formatting the text constrained by <code class="paramref">maxColumns</code>.
+    content.vb: Public Shared Function MaxWidth(text As String, maxColumns As Integer, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.MaxWidth*
+  nameWithType.vb: TextFormatter.MaxWidth(String, Integer, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.MaxWidth(String, Integer, Integer)
+  name.vb: MaxWidth(String, Integer, Integer)
+- uid: Terminal.Gui.TextFormatter.MaxWidthLine(System.String,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.MaxWidthLine(System.String,System.Int32)
+  id: MaxWidthLine(System.String,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: MaxWidthLine(string, int)
+  nameWithType: TextFormatter.MaxWidthLine(string, int)
+  fullName: Terminal.Gui.TextFormatter.MaxWidthLine(string, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MaxWidthLine
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 715
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Returns the width of the widest line in the text, accounting for wide-glyphs (uses <xref href="Terminal.Gui.StringExtensions.GetColumns(System.String)" data-throw-if-not-resolved="false"></xref>).
+
+    <code class="paramref">text</code> if it contains newlines.
+  example: []
+  syntax:
+    content: public static int MaxWidthLine(string text, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: Text, may contain newlines.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: The length of the longest line.
+    content.vb: Public Shared Function MaxWidthLine(text As String, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.MaxWidthLine*
+  nameWithType.vb: TextFormatter.MaxWidthLine(String, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.MaxWidthLine(String, Integer)
+  name.vb: MaxWidthLine(String, Integer)
+- uid: Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32,System.Int32)
+  id: GetSumMaxCharWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: GetSumMaxCharWidth(List<string>, int, int, int)
+  nameWithType: TextFormatter.GetSumMaxCharWidth(List<string>, int, int, int)
+  fullName: Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.Collections.Generic.List<string>, int, int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetSumMaxCharWidth
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 730
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the maximum characters width from the list based on the <code class="paramref">startIndex</code>
+
+    and the <code class="paramref">length</code>.
+  example: []
+  syntax:
+    content: public static int GetSumMaxCharWidth(List<string> lines, int startIndex = -1, int length = -1, int tabWidth = 0)
+    parameters:
+    - id: lines
+      type: System.Collections.Generic.List{System.String}
+      description: The lines.
+    - id: startIndex
+      type: System.Int32
+      description: The start index.
+    - id: length
+      type: System.Int32
+      description: The length.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: The maximum characters width.
+    content.vb: Public Shared Function GetSumMaxCharWidth(lines As List(Of String), startIndex As Integer = -1, length As Integer = -1, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.GetSumMaxCharWidth*
+  nameWithType.vb: TextFormatter.GetSumMaxCharWidth(List(Of String), Integer, Integer, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.Collections.Generic.List(Of String), Integer, Integer, Integer)
+  name.vb: GetSumMaxCharWidth(List(Of String), Integer, Integer, Integer)
+- uid: Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.String,System.Int32,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.String,System.Int32,System.Int32,System.Int32)
+  id: GetSumMaxCharWidth(System.String,System.Int32,System.Int32,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: GetSumMaxCharWidth(string, int, int, int)
+  nameWithType: TextFormatter.GetSumMaxCharWidth(string, int, int, int)
+  fullName: Terminal.Gui.TextFormatter.GetSumMaxCharWidth(string, int, int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetSumMaxCharWidth
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 750
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets the maximum characters width from the text based on the <code class="paramref">startIndex</code>
+
+    and the <code class="paramref">length</code>.
+  example: []
+  syntax:
+    content: public static int GetSumMaxCharWidth(string text, int startIndex = -1, int length = -1, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text.
+    - id: startIndex
+      type: System.Int32
+      description: The start index.
+    - id: length
+      type: System.Int32
+      description: The length.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: The maximum characters width.
+    content.vb: Public Shared Function GetSumMaxCharWidth(text As String, startIndex As Integer = -1, length As Integer = -1, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.GetSumMaxCharWidth*
+  nameWithType.vb: TextFormatter.GetSumMaxCharWidth(String, Integer, Integer, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.GetSumMaxCharWidth(String, Integer, Integer, Integer)
+  name.vb: GetSumMaxCharWidth(String, Integer, Integer, Integer)
+- uid: Terminal.Gui.TextFormatter.GetLengthThatFits(System.String,System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.GetLengthThatFits(System.String,System.Int32,System.Int32)
+  id: GetLengthThatFits(System.String,System.Int32,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: GetLengthThatFits(string, int, int)
+  nameWithType: TextFormatter.GetLengthThatFits(string, int, int)
+  fullName: Terminal.Gui.TextFormatter.GetLengthThatFits(string, int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetLengthThatFits
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 767
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of the Runes in a <xref href="System.String" data-throw-if-not-resolved="false"></xref> that will fit in <code class="paramref">columns</code>.
+  example: []
+  syntax:
+    content: public static int GetLengthThatFits(string text, int columns, int tabWidth = 0)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text.
+    - id: columns
+      type: System.Int32
+      description: The width.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: The index of the text that fit the width.
+    content.vb: Public Shared Function GetLengthThatFits(text As String, columns As Integer, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.GetLengthThatFits*
+  nameWithType.vb: TextFormatter.GetLengthThatFits(String, Integer, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.GetLengthThatFits(String, Integer, Integer)
+  name.vb: GetLengthThatFits(String, Integer, Integer)
+- uid: Terminal.Gui.TextFormatter.GetLengthThatFits(System.Collections.Generic.List{System.Text.Rune},System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.GetLengthThatFits(System.Collections.Generic.List{System.Text.Rune},System.Int32,System.Int32)
+  id: GetLengthThatFits(System.Collections.Generic.List{System.Text.Rune},System.Int32,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: GetLengthThatFits(List<Rune>, int, int)
+  nameWithType: TextFormatter.GetLengthThatFits(List<Rune>, int, int)
+  fullName: Terminal.Gui.TextFormatter.GetLengthThatFits(System.Collections.Generic.List<System.Text.Rune>, int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetLengthThatFits
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 776
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the number of the Runes in a list of Runes that will fit in <code class="paramref">columns</code>.
+  example: []
+  syntax:
+    content: public static int GetLengthThatFits(List<Rune> runes, int columns, int tabWidth = 0)
+    parameters:
+    - id: runes
+      type: System.Collections.Generic.List{System.Text.Rune}
+      description: The list of runes.
+    - id: columns
+      type: System.Int32
+      description: The width.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: The index of the last Rune in <code class="paramref">runes</code> that fit in <code class="paramref">columns</code>.
+    content.vb: Public Shared Function GetLengthThatFits(runes As List(Of Rune), columns As Integer, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.GetLengthThatFits*
+  nameWithType.vb: TextFormatter.GetLengthThatFits(List(Of Rune), Integer, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.GetLengthThatFits(System.Collections.Generic.List(Of System.Text.Rune), Integer, Integer)
+  name.vb: GetLengthThatFits(List(Of Rune), Integer, Integer)
+- uid: Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32)
+  id: GetMaxColsForWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: GetMaxColsForWidth(List<string>, int, int)
+  nameWithType: TextFormatter.GetMaxColsForWidth(List<string>, int, int)
+  fullName: Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List<string>, int, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetMaxColsForWidth
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 824
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the index position from the list based on the <code class="paramref">width</code>.
+  example: []
+  syntax:
+    content: public static int GetMaxColsForWidth(List<string> lines, int width, int tabWidth = 0)
+    parameters:
+    - id: lines
+      type: System.Collections.Generic.List{System.String}
+      description: The lines.
+    - id: width
+      type: System.Int32
+      description: The width.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: System.Int32
+      description: The index of the list that fit the width.
+    content.vb: Public Shared Function GetMaxColsForWidth(lines As List(Of String), width As Integer, tabWidth As Integer = 0) As Integer
+  overload: Terminal.Gui.TextFormatter.GetMaxColsForWidth*
+  nameWithType.vb: TextFormatter.GetMaxColsForWidth(List(Of String), Integer, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List(Of String), Integer, Integer)
+  name.vb: GetMaxColsForWidth(List(Of String), Integer, Integer)
+- uid: Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,System.String,Terminal.Gui.TextDirection,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,System.String,Terminal.Gui.TextDirection,System.Int32)
+  id: CalcRect(System.Int32,System.Int32,System.String,Terminal.Gui.TextDirection,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: CalcRect(int, int, string, TextDirection, int)
+  nameWithType: TextFormatter.CalcRect(int, int, string, TextDirection, int)
+  fullName: Terminal.Gui.TextFormatter.CalcRect(int, int, string, Terminal.Gui.TextDirection, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CalcRect
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 849
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Calculates the rectangle required to hold text, assuming no word wrapping or justification.
+  example: []
+  syntax:
+    content: public static Rect CalcRect(int x, int y, string text, TextDirection direction = TextDirection.LeftRight_TopBottom, int tabWidth = 0)
+    parameters:
+    - id: x
+      type: System.Int32
+      description: The x location of the rectangle
+    - id: y
+      type: System.Int32
+      description: The y location of the rectangle
+    - id: text
+      type: System.String
+      description: The text to measure
+    - id: direction
+      type: Terminal.Gui.TextDirection
+      description: The text direction.
+    - id: tabWidth
+      type: System.Int32
+      description: The number of columns used for a tab.
+    return:
+      type: Terminal.Gui.Rect
+      description: ''
+    content.vb: Public Shared Function CalcRect(x As Integer, y As Integer, text As String, direction As TextDirection = TextDirection.LeftRight_TopBottom, tabWidth As Integer = 0) As Rect
+  overload: Terminal.Gui.TextFormatter.CalcRect*
+  nameWithType.vb: TextFormatter.CalcRect(Integer, Integer, String, TextDirection, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.CalcRect(Integer, Integer, String, Terminal.Gui.TextDirection, Integer)
+  name.vb: CalcRect(Integer, Integer, String, TextDirection, Integer)
+- uid: Terminal.Gui.TextFormatter.FindHotKey(System.String,System.Text.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  commentId: M:Terminal.Gui.TextFormatter.FindHotKey(System.String,System.Text.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  id: FindHotKey(System.String,System.Text.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: FindHotKey(string, Rune, bool, out int, out Key)
+  nameWithType: TextFormatter.FindHotKey(string, Rune, bool, out int, out Key)
+  fullName: Terminal.Gui.TextFormatter.FindHotKey(string, System.Text.Rune, bool, out int, out Terminal.Gui.Key)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FindHotKey
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 940
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Finds the hotkey and its location in text.
+  example: []
+  syntax:
+    content: public static bool FindHotKey(string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text to look in.
+    - id: hotKeySpecifier
+      type: System.Text.Rune
+      description: The hotkey specifier (e.g. '_') to look for.
+    - id: firstUpperCase
+      type: System.Boolean
+      description: >-
+        If <code>true</code> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
+            Regardless of the value of this parameter, <code>hotKeySpecifier</code> takes precedence.
+    - id: hotPos
+      type: System.Int32
+      description: Outputs the Rune index into <code>text</code>.
+    - id: hotKey
+      type: Terminal.Gui.Key
+      description: Outputs the hotKey.
+    return:
+      type: System.Boolean
+      description: <code>true</code> if a hotkey was found; <code>false</code> otherwise.
+    content.vb: Public Shared Function FindHotKey(text As String, hotKeySpecifier As Rune, firstUpperCase As Boolean, hotPos As Integer, hotKey As Key) As Boolean
+  overload: Terminal.Gui.TextFormatter.FindHotKey*
+  nameWithType.vb: TextFormatter.FindHotKey(String, Rune, Boolean, Integer, Key)
+  fullName.vb: Terminal.Gui.TextFormatter.FindHotKey(String, System.Text.Rune, Boolean, Integer, Terminal.Gui.Key)
+  name.vb: FindHotKey(String, Rune, Boolean, Integer, Key)
+- uid: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(System.String,System.Int32)
+  commentId: M:Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(System.String,System.Int32)
+  id: ReplaceHotKeyWithTag(System.String,System.Int32)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: ReplaceHotKeyWithTag(string, int)
+  nameWithType: TextFormatter.ReplaceHotKeyWithTag(string, int)
+  fullName: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(string, int)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ReplaceHotKeyWithTag
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1006
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Replaces the Rune at the index specified by the <code>hotPos</code> parameter with a tag identifying 
+
+    it as the hotkey.
+  remarks: The returned string will not render correctly without first un-doing the tag. To undo the tag, search for
+  example: []
+  syntax:
+    content: public string ReplaceHotKeyWithTag(string text, int hotPos)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text to tag the hotkey in.
+    - id: hotPos
+      type: System.Int32
+      description: The Rune index of the hotkey in <code>text</code>.
+    return:
+      type: System.String
+      description: The text with the hotkey tagged.
+    content.vb: Public Function ReplaceHotKeyWithTag(text As String, hotPos As Integer) As String
+  overload: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag*
+  nameWithType.vb: TextFormatter.ReplaceHotKeyWithTag(String, Integer)
+  fullName.vb: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(String, Integer)
+  name.vb: ReplaceHotKeyWithTag(String, Integer)
+- uid: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(System.String,System.Int32,System.Text.Rune)
+  commentId: M:Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(System.String,System.Int32,System.Text.Rune)
+  id: RemoveHotKeySpecifier(System.String,System.Int32,System.Text.Rune)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: RemoveHotKeySpecifier(string, int, Rune)
+  nameWithType: TextFormatter.RemoveHotKeySpecifier(string, int, Rune)
+  fullName: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(string, int, System.Text.Rune)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RemoveHotKeySpecifier
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1023
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes the hotkey specifier from text.
+  example: []
+  syntax:
+    content: public static string RemoveHotKeySpecifier(string text, int hotPos, Rune hotKeySpecifier)
+    parameters:
+    - id: text
+      type: System.String
+      description: The text to manipulate.
+    - id: hotPos
+      type: System.Int32
+      description: Returns the position of the hot-key in the text. -1 if not found.
+    - id: hotKeySpecifier
+      type: System.Text.Rune
+      description: The hot-key specifier (e.g. '_') to look for.
+    return:
+      type: System.String
+      description: The input text with the hotkey specifier ('_') removed.
+    content.vb: Public Shared Function RemoveHotKeySpecifier(text As String, hotPos As Integer, hotKeySpecifier As Rune) As String
+  overload: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier*
+  nameWithType.vb: TextFormatter.RemoveHotKeySpecifier(String, Integer, Rune)
+  fullName.vb: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(String, Integer, System.Text.Rune)
+  name.vb: RemoveHotKeySpecifier(String, Integer, Rune)
+- uid: Terminal.Gui.TextFormatter.HotKeyChanged
+  commentId: E:Terminal.Gui.TextFormatter.HotKeyChanged
+  id: HotKeyChanged
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: HotKeyChanged
+  nameWithType: TextFormatter.HotKeyChanged
+  fullName: Terminal.Gui.TextFormatter.HotKeyChanged
+  type: Event
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HotKeyChanged
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1061
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Event invoked when the <xref href="Terminal.Gui.TextFormatter.HotKey" data-throw-if-not-resolved="false"></xref> is changed.
+  example: []
+  syntax:
+    content: public event EventHandler<KeyChangedEventArgs> HotKeyChanged
+    return:
+      type: System.EventHandler{Terminal.Gui.KeyChangedEventArgs}
+    content.vb: Public Event HotKeyChanged As EventHandler(Of KeyChangedEventArgs)
+- uid: Terminal.Gui.TextFormatter.Text
+  commentId: P:Terminal.Gui.TextFormatter.Text
+  id: Text
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Text
+  nameWithType: TextFormatter.Text
+  fullName: Terminal.Gui.TextFormatter.Text
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Text
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1066
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The text to be displayed. This string is never modified.
+  example: []
+  syntax:
+    content: public virtual string Text { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Overridable Property Text As String
+  overload: Terminal.Gui.TextFormatter.Text*
+- uid: Terminal.Gui.TextFormatter.AutoSize
+  commentId: P:Terminal.Gui.TextFormatter.AutoSize
+  id: AutoSize
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: AutoSize
+  nameWithType: TextFormatter.AutoSize
+  fullName: Terminal.Gui.TextFormatter.AutoSize
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AutoSize
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1093
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Used by <xref href="Terminal.Gui.TextFormatter.Text" data-throw-if-not-resolved="false"></xref> to resize the view's <xref href="Terminal.Gui.View.Bounds" data-throw-if-not-resolved="false"></xref> with the <xref href="Terminal.Gui.TextFormatter.Size" data-throw-if-not-resolved="false"></xref>.
+
+    Setting <xref href="Terminal.Gui.TextFormatter.AutoSize" data-throw-if-not-resolved="false"></xref> to true only work if the <xref href="Terminal.Gui.View.Width" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.View.Height" data-throw-if-not-resolved="false"></xref> are null or
+      <xref href="Terminal.Gui.LayoutStyle.Absolute" data-throw-if-not-resolved="false"></xref> values and doesn't work with <xref href="Terminal.Gui.LayoutStyle.Computed" data-throw-if-not-resolved="false"></xref> layout,
+      to avoid breaking the <xref href="Terminal.Gui.Pos" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.Dim" data-throw-if-not-resolved="false"></xref> settings.
+  remarks: Auto size is ignored if the <xref href="Terminal.Gui.TextAlignment.Justified" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.VerticalTextAlignment.Justified" data-throw-if-not-resolved="false"></xref> are used.
+  example: []
+  syntax:
+    content: public bool AutoSize { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property AutoSize As Boolean
+  overload: Terminal.Gui.TextFormatter.AutoSize*
+- uid: Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  commentId: P:Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  id: PreserveTrailingSpaces
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: PreserveTrailingSpaces
+  nameWithType: TextFormatter.PreserveTrailingSpaces
+  fullName: Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PreserveTrailingSpaces
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1109
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
+
+    or not when <xref href="Terminal.Gui.TextFormatter.WordWrap" data-throw-if-not-resolved="false"></xref> is enabled. 
+
+    If <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a> trailing spaces at the end of wrapped lines will be removed when 
+
+    <xref href="Terminal.Gui.TextFormatter.Text" data-throw-if-not-resolved="false"></xref> is formatted for display. The default is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">false</a>.
+  example: []
+  syntax:
+    content: public bool PreserveTrailingSpaces { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property PreserveTrailingSpaces As Boolean
+  overload: Terminal.Gui.TextFormatter.PreserveTrailingSpaces*
+- uid: Terminal.Gui.TextFormatter.Alignment
+  commentId: P:Terminal.Gui.TextFormatter.Alignment
+  id: Alignment
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Alignment
+  nameWithType: TextFormatter.Alignment
+  fullName: Terminal.Gui.TextFormatter.Alignment
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Alignment
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1118
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Controls the horizontal text-alignment property.
+  example: []
+  syntax:
+    content: public TextAlignment Alignment { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.TextAlignment
+      description: The text alignment.
+    content.vb: Public Property Alignment As TextAlignment
+  overload: Terminal.Gui.TextFormatter.Alignment*
+- uid: Terminal.Gui.TextFormatter.VerticalAlignment
+  commentId: P:Terminal.Gui.TextFormatter.VerticalAlignment
+  id: VerticalAlignment
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: VerticalAlignment
+  nameWithType: TextFormatter.VerticalAlignment
+  fullName: Terminal.Gui.TextFormatter.VerticalAlignment
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VerticalAlignment
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1127
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Controls the vertical text-alignment property.
+  example: []
+  syntax:
+    content: public VerticalTextAlignment VerticalAlignment { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.VerticalTextAlignment
+      description: The text vertical alignment.
+    content.vb: Public Property VerticalAlignment As VerticalTextAlignment
+  overload: Terminal.Gui.TextFormatter.VerticalAlignment*
+- uid: Terminal.Gui.TextFormatter.Direction
+  commentId: P:Terminal.Gui.TextFormatter.Direction
+  id: Direction
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Direction
+  nameWithType: TextFormatter.Direction
+  fullName: Terminal.Gui.TextFormatter.Direction
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Direction
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1136
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Controls the text-direction property.
+  example: []
+  syntax:
+    content: public TextDirection Direction { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.TextDirection
+      description: The text vertical alignment.
+    content.vb: Public Property Direction As TextDirection
+  overload: Terminal.Gui.TextFormatter.Direction*
+- uid: Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  commentId: M:Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  id: IsHorizontalDirection(Terminal.Gui.TextDirection)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: IsHorizontalDirection(TextDirection)
+  nameWithType: TextFormatter.IsHorizontalDirection(TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsHorizontalDirection
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1144
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Check if it is a horizontal direction
+  example: []
+  syntax:
+    content: public static bool IsHorizontalDirection(TextDirection textDirection)
+    parameters:
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function IsHorizontalDirection(textDirection As TextDirection) As Boolean
+  overload: Terminal.Gui.TextFormatter.IsHorizontalDirection*
+- uid: Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  commentId: M:Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  id: IsVerticalDirection(Terminal.Gui.TextDirection)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: IsVerticalDirection(TextDirection)
+  nameWithType: TextFormatter.IsVerticalDirection(TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsVerticalDirection
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1160
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Check if it is a vertical direction
+  example: []
+  syntax:
+    content: public static bool IsVerticalDirection(TextDirection textDirection)
+    parameters:
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function IsVerticalDirection(textDirection As TextDirection) As Boolean
+  overload: Terminal.Gui.TextFormatter.IsVerticalDirection*
+- uid: Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  commentId: M:Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  id: IsLeftToRight(Terminal.Gui.TextDirection)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: IsLeftToRight(TextDirection)
+  nameWithType: TextFormatter.IsLeftToRight(TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsLeftToRight
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1176
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Check if it is Left to Right direction
+  example: []
+  syntax:
+    content: public static bool IsLeftToRight(TextDirection textDirection)
+    parameters:
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function IsLeftToRight(textDirection As TextDirection) As Boolean
+  overload: Terminal.Gui.TextFormatter.IsLeftToRight*
+- uid: Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  commentId: M:Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  id: IsTopToBottom(Terminal.Gui.TextDirection)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: IsTopToBottom(TextDirection)
+  nameWithType: TextFormatter.IsTopToBottom(TextDirection)
+  fullName: Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IsTopToBottom
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1190
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Check if it is Top to Bottom direction
+  example: []
+  syntax:
+    content: public static bool IsTopToBottom(TextDirection textDirection)
+    parameters:
+    - id: textDirection
+      type: Terminal.Gui.TextDirection
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Function IsTopToBottom(textDirection As TextDirection) As Boolean
+  overload: Terminal.Gui.TextFormatter.IsTopToBottom*
+- uid: Terminal.Gui.TextFormatter.WordWrap
+  commentId: P:Terminal.Gui.TextFormatter.WordWrap
+  id: WordWrap
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: WordWrap
+  nameWithType: TextFormatter.WordWrap
+  fullName: Terminal.Gui.TextFormatter.WordWrap
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WordWrap
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1204
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Allows word wrap the to fit the available container width.
+  example: []
+  syntax:
+    content: public bool WordWrap { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property WordWrap As Boolean
+  overload: Terminal.Gui.TextFormatter.WordWrap*
+- uid: Terminal.Gui.TextFormatter.Size
+  commentId: P:Terminal.Gui.TextFormatter.Size
+  id: Size
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Size
+  nameWithType: TextFormatter.Size
+  fullName: Terminal.Gui.TextFormatter.Size
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Size
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1215
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the size of the area the text will be constrained to when formatted.
+  remarks: Does not return the size the formatted text; just the value that was set.
+  example: []
+  syntax:
+    content: public Size Size { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Size
+    content.vb: Public Property Size As Size
+  overload: Terminal.Gui.TextFormatter.Size*
+- uid: Terminal.Gui.TextFormatter.HotKeySpecifier
+  commentId: P:Terminal.Gui.TextFormatter.HotKeySpecifier
+  id: HotKeySpecifier
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: HotKeySpecifier
+  nameWithType: TextFormatter.HotKeySpecifier
+  fullName: Terminal.Gui.TextFormatter.HotKeySpecifier
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HotKeySpecifier
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1229
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'.
+  example: []
+  syntax:
+    content: public Rune HotKeySpecifier { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HotKeySpecifier As Rune
+  overload: Terminal.Gui.TextFormatter.HotKeySpecifier*
+- uid: Terminal.Gui.TextFormatter.HotKeyPos
+  commentId: P:Terminal.Gui.TextFormatter.HotKeyPos
+  id: HotKeyPos
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: HotKeyPos
+  nameWithType: TextFormatter.HotKeyPos
+  fullName: Terminal.Gui.TextFormatter.HotKeyPos
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HotKeyPos
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1234
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The position in the text of the hotkey. The hotkey will be rendered using the hot color.
+  example: []
+  syntax:
+    content: public int HotKeyPos { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property HotKeyPos As Integer
+  overload: Terminal.Gui.TextFormatter.HotKeyPos*
+- uid: Terminal.Gui.TextFormatter.HotKey
+  commentId: P:Terminal.Gui.TextFormatter.HotKey
+  id: HotKey
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: HotKey
+  nameWithType: TextFormatter.HotKey
+  fullName: Terminal.Gui.TextFormatter.HotKey
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HotKey
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1239
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the hotkey. Will be an upper case letter or digit.
+  example: []
+  syntax:
+    content: public Key HotKey { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Key
+    content.vb: Public Property HotKey As Key
+  overload: Terminal.Gui.TextFormatter.HotKey*
+- uid: Terminal.Gui.TextFormatter.CursorPosition
+  commentId: P:Terminal.Gui.TextFormatter.CursorPosition
+  id: CursorPosition
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: CursorPosition
+  nameWithType: TextFormatter.CursorPosition
+  fullName: Terminal.Gui.TextFormatter.CursorPosition
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CursorPosition
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1253
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the cursor position from <xref href="Terminal.Gui.TextFormatter.HotKey" data-throw-if-not-resolved="false"></xref>. If the <xref href="Terminal.Gui.TextFormatter.HotKey" data-throw-if-not-resolved="false"></xref> is defined, the cursor will be positioned over it.
+  example: []
+  syntax:
+    content: public int CursorPosition { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property CursorPosition As Integer
+  overload: Terminal.Gui.TextFormatter.CursorPosition*
+- uid: Terminal.Gui.TextFormatter.GetFormattedSize
+  commentId: M:Terminal.Gui.TextFormatter.GetFormattedSize
+  id: GetFormattedSize
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: GetFormattedSize()
+  nameWithType: TextFormatter.GetFormattedSize()
+  fullName: Terminal.Gui.TextFormatter.GetFormattedSize()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetFormattedSize
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1262
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the size required to hold the formatted text, given the constraints placed by <xref href="Terminal.Gui.TextFormatter.Size" data-throw-if-not-resolved="false"></xref>.
+  remarks: Causes a format, resetting <xref href="Terminal.Gui.TextFormatter.NeedsFormat" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public Size GetFormattedSize()
+    return:
+      type: Terminal.Gui.Size
+      description: ''
+    content.vb: Public Function GetFormattedSize() As Size
+  overload: Terminal.Gui.TextFormatter.GetFormattedSize*
+- uid: Terminal.Gui.TextFormatter.Lines
+  commentId: P:Terminal.Gui.TextFormatter.Lines
+  id: Lines
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Lines
+  nameWithType: TextFormatter.Lines
+  fullName: Terminal.Gui.TextFormatter.Lines
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Lines
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1279
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the formatted lines.
+  remarks: >-
+    <p>
+
+    Upon a 'get' of this property, if the text needs to be formatted (if <xref href="Terminal.Gui.TextFormatter.NeedsFormat" data-throw-if-not-resolved="false"></xref> is <code>true</code>)
+
+    <xref href="Terminal.Gui.TextFormatter.Format(System.String%2cSystem.Int32%2cSystem.Boolean%2cSystem.Boolean%2cSystem.Boolean%2cSystem.Int32%2cTerminal.Gui.TextDirection%2cSystem.Boolean)" data-throw-if-not-resolved="false"></xref> will be called internally. 
+
+    </p>
+  example: []
+  syntax:
+    content: public List<string> Lines { get; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.List{System.String}
+    content.vb: Public ReadOnly Property Lines As List(Of String)
+  overload: Terminal.Gui.TextFormatter.Lines*
+- uid: Terminal.Gui.TextFormatter.NeedsFormat
+  commentId: P:Terminal.Gui.TextFormatter.NeedsFormat
+  id: NeedsFormat
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: NeedsFormat
+  nameWithType: TextFormatter.NeedsFormat
+  fullName: Terminal.Gui.TextFormatter.NeedsFormat
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NeedsFormat
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1331
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets whether the <xref href="Terminal.Gui.TextFormatter" data-throw-if-not-resolved="false"></xref> needs to format the text when <xref href="Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect%2cTerminal.Gui.Attribute%2cTerminal.Gui.Attribute%2cTerminal.Gui.Rect%2cSystem.Boolean%2cTerminal.Gui.ConsoleDriver)" data-throw-if-not-resolved="false"></xref> is called.
+
+    If it is <code>false</code> when Draw is called, the Draw call will be faster.
+  remarks: >-
+    <p>
+
+    This is set to true when the properties of <xref href="Terminal.Gui.TextFormatter" data-throw-if-not-resolved="false"></xref> are set.
+
+    </p>
+  example: []
+  syntax:
+    content: public bool NeedsFormat { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property NeedsFormat As Boolean
+  overload: Terminal.Gui.TextFormatter.NeedsFormat*
+- uid: Terminal.Gui.TextFormatter.TabWidth
+  commentId: P:Terminal.Gui.TextFormatter.TabWidth
+  id: TabWidth
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: TabWidth
+  nameWithType: TextFormatter.TabWidth
+  fullName: Terminal.Gui.TextFormatter.TabWidth
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TabWidth
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1336
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the number of columns used for a tab.
+  example: []
+  syntax:
+    content: public int TabWidth { get; set; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public Property TabWidth As Integer
+  overload: Terminal.Gui.TextFormatter.TabWidth*
+- uid: Terminal.Gui.TextFormatter.MultiLine
+  commentId: P:Terminal.Gui.TextFormatter.MultiLine
+  id: MultiLine
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: MultiLine
+  nameWithType: TextFormatter.MultiLine
+  fullName: Terminal.Gui.TextFormatter.MultiLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: MultiLine
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1347
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets a value indicating whether multi line is allowed.
+  remarks: Multi line is ignored if <xref href="Terminal.Gui.TextFormatter.WordWrap" data-throw-if-not-resolved="false"></xref> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.
+  example: []
+  syntax:
+    content: public bool MultiLine { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property MultiLine As Boolean
+  overload: Terminal.Gui.TextFormatter.MultiLine*
+- uid: Terminal.Gui.TextFormatter.Format
+  commentId: M:Terminal.Gui.TextFormatter.Format
+  id: Format
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Format()
+  nameWithType: TextFormatter.Format()
+  fullName: Terminal.Gui.TextFormatter.Format()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Format
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1364
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Causes the <xref href="Terminal.Gui.TextFormatter" data-throw-if-not-resolved="false"></xref> to reformat the text.
+  example: []
+  syntax:
+    content: public string Format()
+    return:
+      type: System.String
+      description: The formatted text.
+    content.vb: Public Function Format() As String
+  overload: Terminal.Gui.TextFormatter.Format*
+- uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  commentId: M:Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  id: Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  parent: Terminal.Gui.TextFormatter
+  langs:
+  - csharp
+  - vb
+  name: Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)
+  nameWithType: TextFormatter.Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)
+  fullName: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute, Terminal.Gui.Rect, bool, Terminal.Gui.ConsoleDriver)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Text/TextFormatter.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Draw
+    path: ../Terminal.Gui/Text/TextFormatter.cs
+    startLine: 1383
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Draws the text held by <xref href="Terminal.Gui.TextFormatter" data-throw-if-not-resolved="false"></xref> to <xref href="Terminal.Gui.ConsoleDriver" data-throw-if-not-resolved="false"></xref> using the colors specified.
+  example: []
+  syntax:
+    content: public void Draw(Rect bounds, Attribute normalColor, Attribute hotColor, Rect containerBounds = default, bool fillRemaining = true, ConsoleDriver driver = null)
+    parameters:
+    - id: bounds
+      type: Terminal.Gui.Rect
+      description: Specifies the screen-relative location and maximum size for drawing the text.
+    - id: normalColor
+      type: Terminal.Gui.Attribute
+      description: The color to use for all text except the hotkey
+    - id: hotColor
+      type: Terminal.Gui.Attribute
+      description: The color to use to draw the hotkey
+    - id: containerBounds
+      type: Terminal.Gui.Rect
+      description: Specifies the screen-relative location and maximum container size.
+    - id: fillRemaining
+      type: System.Boolean
+      description: Determines if the bounds width will be used (default) or only the text width will be used.
+    - id: driver
+      type: Terminal.Gui.ConsoleDriver
+      description: The console driver currently used by the application.
+    content.vb: Public Sub Draw(bounds As Rect, normalColor As Attribute, hotColor As Attribute, containerBounds As Rect = Nothing, fillRemaining As Boolean = True, driver As ConsoleDriver = Nothing)
+  overload: Terminal.Gui.TextFormatter.Draw*
+  nameWithType.vb: TextFormatter.Draw(Rect, Attribute, Attribute, Rect, Boolean, ConsoleDriver)
+  fullName.vb: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute, Terminal.Gui.Rect, Boolean, Terminal.Gui.ConsoleDriver)
+  name.vb: Draw(Rect, Attribute, Attribute, Rect, Boolean, ConsoleDriver)
+references:
+- uid: Terminal.Gui.View.HotKey
+  commentId: P:Terminal.Gui.View.HotKey
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.HotKey
+  name: HotKey
+  nameWithType: View.HotKey
+  fullName: Terminal.Gui.View.HotKey
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.TextFormatter.SplitNewLine*
+  commentId: Overload:Terminal.Gui.TextFormatter.SplitNewLine
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.SplitNewLine(System.String)
+  name: SplitNewLine
+  nameWithType: TextFormatter.SplitNewLine
+  fullName: Terminal.Gui.TextFormatter.SplitNewLine
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: System.Collections.Generic.List{System.String}
+  commentId: T:System.Collections.Generic.List{System.String}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<string>
+  nameWithType: List<string>
+  fullName: System.Collections.Generic.List<string>
+  nameWithType.vb: List(Of String)
+  fullName.vb: System.Collections.Generic.List(Of String)
+  name.vb: List(Of String)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.TextFormatter.ClipOrPad*
+  commentId: Overload:Terminal.Gui.TextFormatter.ClipOrPad
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.ClipOrPad(System.String,System.Int32)
+  name: ClipOrPad
+  nameWithType: TextFormatter.ClipOrPad
+  fullName: Terminal.Gui.TextFormatter.ClipOrPad
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: Terminal.Gui.TextFormatter.WordWrapText*
+  commentId: Overload:Terminal.Gui.TextFormatter.WordWrapText
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.WordWrapText(System.String,System.Int32,System.Boolean,System.Int32,Terminal.Gui.TextDirection)
+  name: WordWrapText
+  nameWithType: TextFormatter.WordWrapText
+  fullName: Terminal.Gui.TextFormatter.WordWrapText
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.TextDirection
+  commentId: T:Terminal.Gui.TextDirection
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextDirection.html
+  name: TextDirection
+  nameWithType: TextDirection
+  fullName: Terminal.Gui.TextDirection
+- uid: Terminal.Gui.TextFormatter.ClipAndJustify*
+  commentId: Overload:Terminal.Gui.TextFormatter.ClipAndJustify
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.ClipAndJustify(System.String,System.Int32,Terminal.Gui.TextAlignment,Terminal.Gui.TextDirection,System.Int32)
+  name: ClipAndJustify
+  nameWithType: TextFormatter.ClipAndJustify
+  fullName: Terminal.Gui.TextFormatter.ClipAndJustify
+- uid: Terminal.Gui.TextAlignment
+  commentId: T:Terminal.Gui.TextAlignment
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextAlignment.html
+  name: TextAlignment
+  nameWithType: TextAlignment
+  fullName: Terminal.Gui.TextAlignment
+- uid: Terminal.Gui.TextFormatter.Justify*
+  commentId: Overload:Terminal.Gui.TextFormatter.Justify
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Justify(System.String,System.Int32,System.Char,Terminal.Gui.TextDirection,System.Int32)
+  name: Justify
+  nameWithType: TextFormatter.Justify
+  fullName: Terminal.Gui.TextFormatter.Justify
+- uid: System.Char
+  commentId: T:System.Char
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.char
+  name: char
+  nameWithType: char
+  fullName: char
+  nameWithType.vb: Char
+  fullName.vb: Char
+  name.vb: Char
+- uid: Terminal.Gui.TextFormatter.Format*
+  commentId: Overload:Terminal.Gui.TextFormatter.Format
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Format(System.String,System.Int32,Terminal.Gui.TextAlignment,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  name: Format
+  nameWithType: TextFormatter.Format
+  fullName: Terminal.Gui.TextFormatter.Format
+- uid: Terminal.Gui.TextFormatter.MaxLines*
+  commentId: Overload:Terminal.Gui.TextFormatter.MaxLines
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.MaxLines(System.String,System.Int32)
+  name: MaxLines
+  nameWithType: TextFormatter.MaxLines
+  fullName: Terminal.Gui.TextFormatter.MaxLines
+- uid: Terminal.Gui.TextFormatter.MaxWidth*
+  commentId: Overload:Terminal.Gui.TextFormatter.MaxWidth
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.MaxWidth(System.String,System.Int32,System.Int32)
+  name: MaxWidth
+  nameWithType: TextFormatter.MaxWidth
+  fullName: Terminal.Gui.TextFormatter.MaxWidth
+- uid: Terminal.Gui.StringExtensions.GetColumns(System.String)
+  commentId: M:Terminal.Gui.StringExtensions.GetColumns(System.String)
+  isExternal: true
+  href: Terminal.Gui.StringExtensions.html#Terminal.Gui.StringExtensions.GetColumns(System.String)
+  name: GetColumns(string)
+  nameWithType: StringExtensions.GetColumns(string)
+  fullName: Terminal.Gui.StringExtensions.GetColumns(string)
+  nameWithType.vb: StringExtensions.GetColumns(String)
+  fullName.vb: Terminal.Gui.StringExtensions.GetColumns(String)
+  name.vb: GetColumns(String)
+  spec.csharp:
+  - uid: Terminal.Gui.StringExtensions.GetColumns(System.String)
+    name: GetColumns
+    href: Terminal.Gui.StringExtensions.html#Terminal.Gui.StringExtensions.GetColumns(System.String)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.StringExtensions.GetColumns(System.String)
+    name: GetColumns
+    href: Terminal.Gui.StringExtensions.html#Terminal.Gui.StringExtensions.GetColumns(System.String)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: Terminal.Gui.TextFormatter.MaxWidthLine*
+  commentId: Overload:Terminal.Gui.TextFormatter.MaxWidthLine
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.MaxWidthLine(System.String,System.Int32)
+  name: MaxWidthLine
+  nameWithType: TextFormatter.MaxWidthLine
+  fullName: Terminal.Gui.TextFormatter.MaxWidthLine
+- uid: Terminal.Gui.TextFormatter.GetSumMaxCharWidth*
+  commentId: Overload:Terminal.Gui.TextFormatter.GetSumMaxCharWidth
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.GetSumMaxCharWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32,System.Int32)
+  name: GetSumMaxCharWidth
+  nameWithType: TextFormatter.GetSumMaxCharWidth
+  fullName: Terminal.Gui.TextFormatter.GetSumMaxCharWidth
+- uid: Terminal.Gui.TextFormatter.GetLengthThatFits*
+  commentId: Overload:Terminal.Gui.TextFormatter.GetLengthThatFits
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.GetLengthThatFits(System.String,System.Int32,System.Int32)
+  name: GetLengthThatFits
+  nameWithType: TextFormatter.GetLengthThatFits
+  fullName: Terminal.Gui.TextFormatter.GetLengthThatFits
+- uid: System.Collections.Generic.List{System.Text.Rune}
+  commentId: T:System.Collections.Generic.List{System.Text.Rune}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<Rune>
+  nameWithType: List<Rune>
+  fullName: System.Collections.Generic.List<System.Text.Rune>
+  nameWithType.vb: List(Of Rune)
+  fullName.vb: System.Collections.Generic.List(Of System.Text.Rune)
+  name.vb: List(Of Rune)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Text.Rune
+    name: Rune
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  - name: )
+- uid: Terminal.Gui.TextFormatter.GetMaxColsForWidth*
+  commentId: Overload:Terminal.Gui.TextFormatter.GetMaxColsForWidth
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.GetMaxColsForWidth(System.Collections.Generic.List{System.String},System.Int32,System.Int32)
+  name: GetMaxColsForWidth
+  nameWithType: TextFormatter.GetMaxColsForWidth
+  fullName: Terminal.Gui.TextFormatter.GetMaxColsForWidth
+- uid: Terminal.Gui.TextFormatter.CalcRect*
+  commentId: Overload:Terminal.Gui.TextFormatter.CalcRect
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.CalcRect(System.Int32,System.Int32,System.String,Terminal.Gui.TextDirection,System.Int32)
+  name: CalcRect
+  nameWithType: TextFormatter.CalcRect
+  fullName: Terminal.Gui.TextFormatter.CalcRect
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  href: Terminal.Gui.Rect.html
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.TextFormatter.FindHotKey*
+  commentId: Overload:Terminal.Gui.TextFormatter.FindHotKey
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.FindHotKey(System.String,System.Text.Rune,System.Boolean,System.Int32@,Terminal.Gui.Key@)
+  name: FindHotKey
+  nameWithType: TextFormatter.FindHotKey
+  fullName: Terminal.Gui.TextFormatter.FindHotKey
+- uid: System.Text.Rune
+  commentId: T:System.Text.Rune
+  parent: System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Text.Rune
+- uid: Terminal.Gui.Key
+  commentId: T:Terminal.Gui.Key
+  parent: Terminal.Gui
+  href: Terminal.Gui.Key.html
+  name: Key
+  nameWithType: Key
+  fullName: Terminal.Gui.Key
+- uid: System.Text
+  commentId: N:System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Text
+  nameWithType: System.Text
+  fullName: System.Text
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+- uid: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag*
+  commentId: Overload:Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag(System.String,System.Int32)
+  name: ReplaceHotKeyWithTag
+  nameWithType: TextFormatter.ReplaceHotKeyWithTag
+  fullName: Terminal.Gui.TextFormatter.ReplaceHotKeyWithTag
+- uid: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier*
+  commentId: Overload:Terminal.Gui.TextFormatter.RemoveHotKeySpecifier
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.RemoveHotKeySpecifier(System.String,System.Int32,System.Text.Rune)
+  name: RemoveHotKeySpecifier
+  nameWithType: TextFormatter.RemoveHotKeySpecifier
+  fullName: Terminal.Gui.TextFormatter.RemoveHotKeySpecifier
+- uid: Terminal.Gui.TextFormatter.HotKey
+  commentId: P:Terminal.Gui.TextFormatter.HotKey
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.HotKey
+  name: HotKey
+  nameWithType: TextFormatter.HotKey
+  fullName: Terminal.Gui.TextFormatter.HotKey
+- uid: System.EventHandler{Terminal.Gui.KeyChangedEventArgs}
+  commentId: T:System.EventHandler{Terminal.Gui.KeyChangedEventArgs}
+  parent: System
+  definition: System.EventHandler`1
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<KeyChangedEventArgs>
+  nameWithType: EventHandler<KeyChangedEventArgs>
+  fullName: System.EventHandler<Terminal.Gui.KeyChangedEventArgs>
+  nameWithType.vb: EventHandler(Of KeyChangedEventArgs)
+  fullName.vb: System.EventHandler(Of Terminal.Gui.KeyChangedEventArgs)
+  name.vb: EventHandler(Of KeyChangedEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - uid: Terminal.Gui.KeyChangedEventArgs
+    name: KeyChangedEventArgs
+    href: Terminal.Gui.KeyChangedEventArgs.html
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.KeyChangedEventArgs
+    name: KeyChangedEventArgs
+    href: Terminal.Gui.KeyChangedEventArgs.html
+  - name: )
+- uid: System.EventHandler`1
+  commentId: T:System.EventHandler`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  name: EventHandler<TEventArgs>
+  nameWithType: EventHandler<TEventArgs>
+  fullName: System.EventHandler<TEventArgs>
+  nameWithType.vb: EventHandler(Of TEventArgs)
+  fullName.vb: System.EventHandler(Of TEventArgs)
+  name.vb: EventHandler(Of TEventArgs)
+  spec.csharp:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: <
+  - name: TEventArgs
+  - name: '>'
+  spec.vb:
+  - uid: System.EventHandler`1
+    name: EventHandler
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.eventhandler-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TEventArgs
+  - name: )
+- uid: Terminal.Gui.TextFormatter.Text*
+  commentId: Overload:Terminal.Gui.TextFormatter.Text
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Text
+  name: Text
+  nameWithType: TextFormatter.Text
+  fullName: Terminal.Gui.TextFormatter.Text
+- uid: Terminal.Gui.TextFormatter.Text
+  commentId: P:Terminal.Gui.TextFormatter.Text
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Text
+  name: Text
+  nameWithType: TextFormatter.Text
+  fullName: Terminal.Gui.TextFormatter.Text
+- uid: Terminal.Gui.View.Bounds
+  commentId: P:Terminal.Gui.View.Bounds
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.Bounds
+  name: Bounds
+  nameWithType: View.Bounds
+  fullName: Terminal.Gui.View.Bounds
+- uid: Terminal.Gui.TextFormatter.Size
+  commentId: P:Terminal.Gui.TextFormatter.Size
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Size
+  name: Size
+  nameWithType: TextFormatter.Size
+  fullName: Terminal.Gui.TextFormatter.Size
+- uid: Terminal.Gui.TextFormatter.AutoSize
+  commentId: P:Terminal.Gui.TextFormatter.AutoSize
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.AutoSize
+  name: AutoSize
+  nameWithType: TextFormatter.AutoSize
+  fullName: Terminal.Gui.TextFormatter.AutoSize
+- uid: Terminal.Gui.View.Width
+  commentId: P:Terminal.Gui.View.Width
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.Width
+  name: Width
+  nameWithType: View.Width
+  fullName: Terminal.Gui.View.Width
+- uid: Terminal.Gui.View.Height
+  commentId: P:Terminal.Gui.View.Height
+  parent: Terminal.Gui.View
+  href: Terminal.Gui.View.html#Terminal.Gui.View.Height
+  name: Height
+  nameWithType: View.Height
+  fullName: Terminal.Gui.View.Height
+- uid: Terminal.Gui.LayoutStyle.Absolute
+  commentId: F:Terminal.Gui.LayoutStyle.Absolute
+  href: Terminal.Gui.LayoutStyle.html#Terminal.Gui.LayoutStyle.Absolute
+  name: Absolute
+  nameWithType: LayoutStyle.Absolute
+  fullName: Terminal.Gui.LayoutStyle.Absolute
+- uid: Terminal.Gui.LayoutStyle.Computed
+  commentId: F:Terminal.Gui.LayoutStyle.Computed
+  href: Terminal.Gui.LayoutStyle.html#Terminal.Gui.LayoutStyle.Computed
+  name: Computed
+  nameWithType: LayoutStyle.Computed
+  fullName: Terminal.Gui.LayoutStyle.Computed
+- uid: Terminal.Gui.Pos
+  commentId: T:Terminal.Gui.Pos
+  parent: Terminal.Gui
+  href: Terminal.Gui.Pos.html
+  name: Pos
+  nameWithType: Pos
+  fullName: Terminal.Gui.Pos
+- uid: Terminal.Gui.Dim
+  commentId: T:Terminal.Gui.Dim
+  parent: Terminal.Gui
+  href: Terminal.Gui.Dim.html
+  name: Dim
+  nameWithType: Dim
+  fullName: Terminal.Gui.Dim
+- uid: Terminal.Gui.TextAlignment.Justified
+  commentId: F:Terminal.Gui.TextAlignment.Justified
+  href: Terminal.Gui.TextAlignment.html#Terminal.Gui.TextAlignment.Justified
+  name: Justified
+  nameWithType: TextAlignment.Justified
+  fullName: Terminal.Gui.TextAlignment.Justified
+- uid: Terminal.Gui.VerticalTextAlignment.Justified
+  commentId: F:Terminal.Gui.VerticalTextAlignment.Justified
+  href: Terminal.Gui.VerticalTextAlignment.html#Terminal.Gui.VerticalTextAlignment.Justified
+  name: Justified
+  nameWithType: VerticalTextAlignment.Justified
+  fullName: Terminal.Gui.VerticalTextAlignment.Justified
+- uid: Terminal.Gui.TextFormatter.AutoSize*
+  commentId: Overload:Terminal.Gui.TextFormatter.AutoSize
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.AutoSize
+  name: AutoSize
+  nameWithType: TextFormatter.AutoSize
+  fullName: Terminal.Gui.TextFormatter.AutoSize
+- uid: Terminal.Gui.TextFormatter.WordWrap
+  commentId: P:Terminal.Gui.TextFormatter.WordWrap
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.WordWrap
+  name: WordWrap
+  nameWithType: TextFormatter.WordWrap
+  fullName: Terminal.Gui.TextFormatter.WordWrap
+- uid: Terminal.Gui.TextFormatter.PreserveTrailingSpaces*
+  commentId: Overload:Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+  name: PreserveTrailingSpaces
+  nameWithType: TextFormatter.PreserveTrailingSpaces
+  fullName: Terminal.Gui.TextFormatter.PreserveTrailingSpaces
+- uid: Terminal.Gui.TextFormatter.Alignment*
+  commentId: Overload:Terminal.Gui.TextFormatter.Alignment
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Alignment
+  name: Alignment
+  nameWithType: TextFormatter.Alignment
+  fullName: Terminal.Gui.TextFormatter.Alignment
+- uid: Terminal.Gui.TextFormatter.VerticalAlignment*
+  commentId: Overload:Terminal.Gui.TextFormatter.VerticalAlignment
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.VerticalAlignment
+  name: VerticalAlignment
+  nameWithType: TextFormatter.VerticalAlignment
+  fullName: Terminal.Gui.TextFormatter.VerticalAlignment
+- uid: Terminal.Gui.VerticalTextAlignment
+  commentId: T:Terminal.Gui.VerticalTextAlignment
+  parent: Terminal.Gui
+  href: Terminal.Gui.VerticalTextAlignment.html
+  name: VerticalTextAlignment
+  nameWithType: VerticalTextAlignment
+  fullName: Terminal.Gui.VerticalTextAlignment
+- uid: Terminal.Gui.TextFormatter.Direction*
+  commentId: Overload:Terminal.Gui.TextFormatter.Direction
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Direction
+  name: Direction
+  nameWithType: TextFormatter.Direction
+  fullName: Terminal.Gui.TextFormatter.Direction
+- uid: Terminal.Gui.TextFormatter.IsHorizontalDirection*
+  commentId: Overload:Terminal.Gui.TextFormatter.IsHorizontalDirection
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.IsHorizontalDirection(Terminal.Gui.TextDirection)
+  name: IsHorizontalDirection
+  nameWithType: TextFormatter.IsHorizontalDirection
+  fullName: Terminal.Gui.TextFormatter.IsHorizontalDirection
+- uid: Terminal.Gui.TextFormatter.IsVerticalDirection*
+  commentId: Overload:Terminal.Gui.TextFormatter.IsVerticalDirection
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.IsVerticalDirection(Terminal.Gui.TextDirection)
+  name: IsVerticalDirection
+  nameWithType: TextFormatter.IsVerticalDirection
+  fullName: Terminal.Gui.TextFormatter.IsVerticalDirection
+- uid: Terminal.Gui.TextFormatter.IsLeftToRight*
+  commentId: Overload:Terminal.Gui.TextFormatter.IsLeftToRight
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.IsLeftToRight(Terminal.Gui.TextDirection)
+  name: IsLeftToRight
+  nameWithType: TextFormatter.IsLeftToRight
+  fullName: Terminal.Gui.TextFormatter.IsLeftToRight
+- uid: Terminal.Gui.TextFormatter.IsTopToBottom*
+  commentId: Overload:Terminal.Gui.TextFormatter.IsTopToBottom
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.IsTopToBottom(Terminal.Gui.TextDirection)
+  name: IsTopToBottom
+  nameWithType: TextFormatter.IsTopToBottom
+  fullName: Terminal.Gui.TextFormatter.IsTopToBottom
+- uid: Terminal.Gui.TextFormatter.WordWrap*
+  commentId: Overload:Terminal.Gui.TextFormatter.WordWrap
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.WordWrap
+  name: WordWrap
+  nameWithType: TextFormatter.WordWrap
+  fullName: Terminal.Gui.TextFormatter.WordWrap
+- uid: Terminal.Gui.TextFormatter.Size*
+  commentId: Overload:Terminal.Gui.TextFormatter.Size
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Size
+  name: Size
+  nameWithType: TextFormatter.Size
+  fullName: Terminal.Gui.TextFormatter.Size
+- uid: Terminal.Gui.Size
+  commentId: T:Terminal.Gui.Size
+  parent: Terminal.Gui
+  href: Terminal.Gui.Size.html
+  name: Size
+  nameWithType: Size
+  fullName: Terminal.Gui.Size
+- uid: Terminal.Gui.TextFormatter.HotKeySpecifier*
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKeySpecifier
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.HotKeySpecifier
+  name: HotKeySpecifier
+  nameWithType: TextFormatter.HotKeySpecifier
+  fullName: Terminal.Gui.TextFormatter.HotKeySpecifier
+- uid: Terminal.Gui.TextFormatter.HotKeyPos*
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKeyPos
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.HotKeyPos
+  name: HotKeyPos
+  nameWithType: TextFormatter.HotKeyPos
+  fullName: Terminal.Gui.TextFormatter.HotKeyPos
+- uid: Terminal.Gui.TextFormatter.HotKey*
+  commentId: Overload:Terminal.Gui.TextFormatter.HotKey
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.HotKey
+  name: HotKey
+  nameWithType: TextFormatter.HotKey
+  fullName: Terminal.Gui.TextFormatter.HotKey
+- uid: Terminal.Gui.TextFormatter.CursorPosition*
+  commentId: Overload:Terminal.Gui.TextFormatter.CursorPosition
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.CursorPosition
+  name: CursorPosition
+  nameWithType: TextFormatter.CursorPosition
+  fullName: Terminal.Gui.TextFormatter.CursorPosition
+- uid: Terminal.Gui.TextFormatter.NeedsFormat
+  commentId: P:Terminal.Gui.TextFormatter.NeedsFormat
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.NeedsFormat
+  name: NeedsFormat
+  nameWithType: TextFormatter.NeedsFormat
+  fullName: Terminal.Gui.TextFormatter.NeedsFormat
+- uid: Terminal.Gui.TextFormatter.GetFormattedSize*
+  commentId: Overload:Terminal.Gui.TextFormatter.GetFormattedSize
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.GetFormattedSize
+  name: GetFormattedSize
+  nameWithType: TextFormatter.GetFormattedSize
+  fullName: Terminal.Gui.TextFormatter.GetFormattedSize
+- uid: Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  commentId: M:Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  isExternal: true
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  name: Format(string, int, bool, bool, bool, int, TextDirection, bool)
+  nameWithType: TextFormatter.Format(string, int, bool, bool, bool, int, TextDirection, bool)
+  fullName: Terminal.Gui.TextFormatter.Format(string, int, bool, bool, bool, int, Terminal.Gui.TextDirection, bool)
+  nameWithType.vb: TextFormatter.Format(String, Integer, Boolean, Boolean, Boolean, Integer, TextDirection, Boolean)
+  fullName.vb: Terminal.Gui.TextFormatter.Format(String, Integer, Boolean, Boolean, Boolean, Integer, Terminal.Gui.TextDirection, Boolean)
+  name.vb: Format(String, Integer, Boolean, Boolean, Boolean, Integer, TextDirection, Boolean)
+  spec.csharp:
+  - uid: Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+    name: Format
+    href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  - name: (
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: int
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.TextDirection
+    name: TextDirection
+    href: Terminal.Gui.TextDirection.html
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+    name: Format
+    href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Format(System.String,System.Int32,System.Boolean,System.Boolean,System.Boolean,System.Int32,Terminal.Gui.TextDirection,System.Boolean)
+  - name: (
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: System.Int32
+    name: Integer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.int32
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.TextDirection
+    name: TextDirection
+    href: Terminal.Gui.TextDirection.html
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+- uid: Terminal.Gui.TextFormatter.Lines*
+  commentId: Overload:Terminal.Gui.TextFormatter.Lines
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Lines
+  name: Lines
+  nameWithType: TextFormatter.Lines
+  fullName: Terminal.Gui.TextFormatter.Lines
+- uid: Terminal.Gui.TextFormatter
+  commentId: T:Terminal.Gui.TextFormatter
+  parent: Terminal.Gui
+  href: Terminal.Gui.TextFormatter.html
+  name: TextFormatter
+  nameWithType: TextFormatter
+  fullName: Terminal.Gui.TextFormatter
+- uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  commentId: M:Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  isExternal: true
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  name: Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)
+  nameWithType: TextFormatter.Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)
+  fullName: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute, Terminal.Gui.Rect, bool, Terminal.Gui.ConsoleDriver)
+  nameWithType.vb: TextFormatter.Draw(Rect, Attribute, Attribute, Rect, Boolean, ConsoleDriver)
+  fullName.vb: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect, Terminal.Gui.Attribute, Terminal.Gui.Attribute, Terminal.Gui.Rect, Boolean, Terminal.Gui.ConsoleDriver)
+  name.vb: Draw(Rect, Attribute, Attribute, Rect, Boolean, ConsoleDriver)
+  spec.csharp:
+  - uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+    name: Draw
+    href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  - name: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    href: Terminal.Gui.ConsoleDriver.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+    name: Draw
+    href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  - name: (
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.ConsoleDriver
+    name: ConsoleDriver
+    href: Terminal.Gui.ConsoleDriver.html
+  - name: )
+- uid: Terminal.Gui.TextFormatter.NeedsFormat*
+  commentId: Overload:Terminal.Gui.TextFormatter.NeedsFormat
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.NeedsFormat
+  name: NeedsFormat
+  nameWithType: TextFormatter.NeedsFormat
+  fullName: Terminal.Gui.TextFormatter.NeedsFormat
+- uid: Terminal.Gui.TextFormatter.TabWidth*
+  commentId: Overload:Terminal.Gui.TextFormatter.TabWidth
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.TabWidth
+  name: TabWidth
+  nameWithType: TextFormatter.TabWidth
+  fullName: Terminal.Gui.TextFormatter.TabWidth
+- uid: Terminal.Gui.TextFormatter.MultiLine*
+  commentId: Overload:Terminal.Gui.TextFormatter.MultiLine
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.MultiLine
+  name: MultiLine
+  nameWithType: TextFormatter.MultiLine
+  fullName: Terminal.Gui.TextFormatter.MultiLine
+- uid: Terminal.Gui.ConsoleDriver
+  commentId: T:Terminal.Gui.ConsoleDriver
+  parent: Terminal.Gui
+  href: Terminal.Gui.ConsoleDriver.html
+  name: ConsoleDriver
+  nameWithType: ConsoleDriver
+  fullName: Terminal.Gui.ConsoleDriver
+- uid: Terminal.Gui.TextFormatter.Draw*
+  commentId: Overload:Terminal.Gui.TextFormatter.Draw
+  href: Terminal.Gui.TextFormatter.html#Terminal.Gui.TextFormatter.Draw(Terminal.Gui.Rect,Terminal.Gui.Attribute,Terminal.Gui.Attribute,Terminal.Gui.Rect,System.Boolean,Terminal.Gui.ConsoleDriver)
+  name: Draw
+  nameWithType: TextFormatter.Draw
+  fullName: Terminal.Gui.TextFormatter.Draw
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  href: Terminal.Gui.Attribute.html
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+shouldSkipMarkup: true

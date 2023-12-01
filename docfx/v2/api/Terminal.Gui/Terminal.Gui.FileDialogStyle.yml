@@ -1,0 +1,1743 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.FileDialogStyle
+  commentId: T:Terminal.Gui.FileDialogStyle
+  id: FileDialogStyle
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.FileDialogStyle.#ctor(System.IO.Abstractions.IFileSystem)
+  - Terminal.Gui.FileDialogStyle.CancelButtonText
+  - Terminal.Gui.FileDialogStyle.ColorProvider
+  - Terminal.Gui.FileDialogStyle.Culture
+  - Terminal.Gui.FileDialogStyle.DateFormat
+  - Terminal.Gui.FileDialogStyle.DefaultUseColors
+  - Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+  - Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+  - Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+  - Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+  - Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+  - Terminal.Gui.FileDialogStyle.FilenameColumnName
+  - Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+  - Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  - Terminal.Gui.FileDialogStyle.IconProvider
+  - Terminal.Gui.FileDialogStyle.ModifiedColumnName
+  - Terminal.Gui.FileDialogStyle.OkButtonText
+  - Terminal.Gui.FileDialogStyle.PathCaption
+  - Terminal.Gui.FileDialogStyle.SearchCaption
+  - Terminal.Gui.FileDialogStyle.SizeColumnName
+  - Terminal.Gui.FileDialogStyle.TableStyle
+  - Terminal.Gui.FileDialogStyle.TreeRootGetter
+  - Terminal.Gui.FileDialogStyle.TreeStyle
+  - Terminal.Gui.FileDialogStyle.TypeColumnName
+  - Terminal.Gui.FileDialogStyle.UseColors
+  - Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  - Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+  langs:
+  - csharp
+  - vb
+  name: FileDialogStyle
+  nameWithType: FileDialogStyle
+  fullName: Terminal.Gui.FileDialogStyle
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FileDialogStyle
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 16
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Stores style settings for <xref href="Terminal.Gui.FileDialog" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public class FileDialogStyle
+    content.vb: Public Class FileDialogStyle
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.FileDialogStyle.DefaultUseColors
+  commentId: P:Terminal.Gui.FileDialogStyle.DefaultUseColors
+  id: DefaultUseColors
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: DefaultUseColors
+  nameWithType: FileDialogStyle.DefaultUseColors
+  fullName: Terminal.Gui.FileDialogStyle.DefaultUseColors
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DefaultUseColors
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 23
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the default value to use for <xref href="Terminal.Gui.FileDialogStyle.UseColors" data-throw-if-not-resolved="false"></xref>.
+
+    This can be populated from .tui config files via <xref href="Terminal.Gui.ConfigurationManager" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public static bool DefaultUseColors { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Property DefaultUseColors As Boolean
+  overload: Terminal.Gui.FileDialogStyle.DefaultUseColors*
+- uid: Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+  commentId: P:Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+  id: DefaultUseUnicodeCharacters
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: DefaultUseUnicodeCharacters
+  nameWithType: FileDialogStyle.DefaultUseUnicodeCharacters
+  fullName: Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DefaultUseUnicodeCharacters
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 30
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the default value to use for <xref href="Terminal.Gui.FileDialogStyle.UseUnicodeCharacters" data-throw-if-not-resolved="false"></xref>.
+
+    This can be populated from .tui config files via <xref href="Terminal.Gui.ConfigurationManager" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public static bool DefaultUseUnicodeCharacters { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Shared Property DefaultUseUnicodeCharacters As Boolean
+  overload: Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters*
+- uid: Terminal.Gui.FileDialogStyle.UseColors
+  commentId: P:Terminal.Gui.FileDialogStyle.UseColors
+  id: UseColors
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: UseColors
+  nameWithType: FileDialogStyle.UseColors
+  fullName: Terminal.Gui.FileDialogStyle.UseColors
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UseColors
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 38
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or Sets a value indicating whether different colors
+
+    should be used for different file types/directories.  Defaults
+
+    to false.
+  example: []
+  syntax:
+    content: public bool UseColors { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseColors As Boolean
+  overload: Terminal.Gui.FileDialogStyle.UseColors*
+- uid: Terminal.Gui.FileDialogStyle.IconProvider
+  commentId: P:Terminal.Gui.FileDialogStyle.IconProvider
+  id: IconProvider
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: IconProvider
+  nameWithType: FileDialogStyle.IconProvider
+  fullName: Terminal.Gui.FileDialogStyle.IconProvider
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IconProvider
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 44
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the class responsible for determining which symbol
+
+    to use to represent files and directories.
+  example: []
+  syntax:
+    content: public FileSystemIconProvider IconProvider { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.FileSystemIconProvider
+    content.vb: Public Property IconProvider As FileSystemIconProvider
+  overload: Terminal.Gui.FileDialogStyle.IconProvider*
+- uid: Terminal.Gui.FileDialogStyle.ColorProvider
+  commentId: P:Terminal.Gui.FileDialogStyle.ColorProvider
+  id: ColorProvider
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: ColorProvider
+  nameWithType: FileDialogStyle.ColorProvider
+  fullName: Terminal.Gui.FileDialogStyle.ColorProvider
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ColorProvider
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 51
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the class thatis responsible for determining which color
+
+    to use to represent files and directories when <xref href="Terminal.Gui.FileDialogStyle.UseColors" data-throw-if-not-resolved="false"></xref> is
+
+    <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.
+  example: []
+  syntax:
+    content: public FileSystemColorProvider ColorProvider { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.FileSystemColorProvider
+    content.vb: Public Property ColorProvider As FileSystemColorProvider
+  overload: Terminal.Gui.FileDialogStyle.ColorProvider*
+- uid: Terminal.Gui.FileDialogStyle.Culture
+  commentId: P:Terminal.Gui.FileDialogStyle.Culture
+  id: Culture
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: Culture
+  nameWithType: FileDialogStyle.Culture
+  fullName: Terminal.Gui.FileDialogStyle.Culture
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Culture
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 57
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the culture to use (e.g. for number formatting).
+
+    Defaults to <xref href="System.Globalization.CultureInfo.CurrentUICulture" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public CultureInfo Culture { get; set; }
+    parameters: []
+    return:
+      type: System.Globalization.CultureInfo
+    content.vb: Public Property Culture As CultureInfo
+  overload: Terminal.Gui.FileDialogStyle.Culture*
+- uid: Terminal.Gui.FileDialogStyle.FilenameColumnName
+  commentId: P:Terminal.Gui.FileDialogStyle.FilenameColumnName
+  id: FilenameColumnName
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: FilenameColumnName
+  nameWithType: FileDialogStyle.FilenameColumnName
+  fullName: Terminal.Gui.FileDialogStyle.FilenameColumnName
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FilenameColumnName
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 62
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the header text displayed in the Filename column of the files table.
+  example: []
+  syntax:
+    content: public string FilenameColumnName { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property FilenameColumnName As String
+  overload: Terminal.Gui.FileDialogStyle.FilenameColumnName*
+- uid: Terminal.Gui.FileDialogStyle.SizeColumnName
+  commentId: P:Terminal.Gui.FileDialogStyle.SizeColumnName
+  id: SizeColumnName
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: SizeColumnName
+  nameWithType: FileDialogStyle.SizeColumnName
+  fullName: Terminal.Gui.FileDialogStyle.SizeColumnName
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SizeColumnName
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 67
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the header text displayed in the Size column of the files table.
+  example: []
+  syntax:
+    content: public string SizeColumnName { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property SizeColumnName As String
+  overload: Terminal.Gui.FileDialogStyle.SizeColumnName*
+- uid: Terminal.Gui.FileDialogStyle.ModifiedColumnName
+  commentId: P:Terminal.Gui.FileDialogStyle.ModifiedColumnName
+  id: ModifiedColumnName
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: ModifiedColumnName
+  nameWithType: FileDialogStyle.ModifiedColumnName
+  fullName: Terminal.Gui.FileDialogStyle.ModifiedColumnName
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ModifiedColumnName
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 72
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the header text displayed in the Modified column of the files table.
+  example: []
+  syntax:
+    content: public string ModifiedColumnName { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property ModifiedColumnName As String
+  overload: Terminal.Gui.FileDialogStyle.ModifiedColumnName*
+- uid: Terminal.Gui.FileDialogStyle.TypeColumnName
+  commentId: P:Terminal.Gui.FileDialogStyle.TypeColumnName
+  id: TypeColumnName
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: TypeColumnName
+  nameWithType: FileDialogStyle.TypeColumnName
+  fullName: Terminal.Gui.FileDialogStyle.TypeColumnName
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TypeColumnName
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 77
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the header text displayed in the Type column of the files table.
+  example: []
+  syntax:
+    content: public string TypeColumnName { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property TypeColumnName As String
+  overload: Terminal.Gui.FileDialogStyle.TypeColumnName*
+- uid: Terminal.Gui.FileDialogStyle.SearchCaption
+  commentId: P:Terminal.Gui.FileDialogStyle.SearchCaption
+  id: SearchCaption
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: SearchCaption
+  nameWithType: FileDialogStyle.SearchCaption
+  fullName: Terminal.Gui.FileDialogStyle.SearchCaption
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SearchCaption
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 82
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the text displayed in the 'Search' text box when user has not supplied any input yet.
+  example: []
+  syntax:
+    content: public string SearchCaption { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property SearchCaption As String
+  overload: Terminal.Gui.FileDialogStyle.SearchCaption*
+- uid: Terminal.Gui.FileDialogStyle.PathCaption
+  commentId: P:Terminal.Gui.FileDialogStyle.PathCaption
+  id: PathCaption
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: PathCaption
+  nameWithType: FileDialogStyle.PathCaption
+  fullName: Terminal.Gui.FileDialogStyle.PathCaption
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PathCaption
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 87
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the text displayed in the 'Path' text box when user has not supplied any input yet.
+  example: []
+  syntax:
+    content: public string PathCaption { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property PathCaption As String
+  overload: Terminal.Gui.FileDialogStyle.PathCaption*
+- uid: Terminal.Gui.FileDialogStyle.OkButtonText
+  commentId: P:Terminal.Gui.FileDialogStyle.OkButtonText
+  id: OkButtonText
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: OkButtonText
+  nameWithType: FileDialogStyle.OkButtonText
+  fullName: Terminal.Gui.FileDialogStyle.OkButtonText
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OkButtonText
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 93
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the text on the 'Ok' button.  Typically you may want to change this to
+
+    "Open" or "Save" etc.
+  example: []
+  syntax:
+    content: public string OkButtonText { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property OkButtonText As String
+  overload: Terminal.Gui.FileDialogStyle.OkButtonText*
+- uid: Terminal.Gui.FileDialogStyle.CancelButtonText
+  commentId: P:Terminal.Gui.FileDialogStyle.CancelButtonText
+  id: CancelButtonText
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: CancelButtonText
+  nameWithType: FileDialogStyle.CancelButtonText
+  fullName: Terminal.Gui.FileDialogStyle.CancelButtonText
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CancelButtonText
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 98
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets the text on the 'Cancel' button.
+  example: []
+  syntax:
+    content: public string CancelButtonText { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property CancelButtonText As String
+  overload: Terminal.Gui.FileDialogStyle.CancelButtonText*
+- uid: Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  commentId: P:Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  id: FlipOkCancelButtonLayoutOrder
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: FlipOkCancelButtonLayoutOrder
+  nameWithType: FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  fullName: Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FlipOkCancelButtonLayoutOrder
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 105
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets whether to flip the order of the Ok and Cancel buttons. Defaults
+
+    to false (Ok button then Cancel button). Set to true to show Cancel button on
+
+    left then Ok button instead.
+  example: []
+  syntax:
+    content: public bool FlipOkCancelButtonLayoutOrder { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property FlipOkCancelButtonLayoutOrder As Boolean
+  overload: Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder*
+- uid: Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+  commentId: P:Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+  id: WrongFileTypeFeedback
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: WrongFileTypeFeedback
+  nameWithType: FileDialogStyle.WrongFileTypeFeedback
+  fullName: Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WrongFileTypeFeedback
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 110
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets or sets error message when user attempts to select a file type that is not one of <xref href="Terminal.Gui.FileDialog.AllowedTypes" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public string WrongFileTypeFeedback { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property WrongFileTypeFeedback As String
+  overload: Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback*
+- uid: Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+  commentId: P:Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+  id: DirectoryMustExistFeedback
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: DirectoryMustExistFeedback
+  nameWithType: FileDialogStyle.DirectoryMustExistFeedback
+  fullName: Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DirectoryMustExistFeedback
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 116
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets error message when user selects a directory that does not exist and
+
+    <xref href="Terminal.Gui.OpenMode" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.OpenMode.Directory" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.FileDialog.MustExist" data-throw-if-not-resolved="false"></xref> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.
+  example: []
+  syntax:
+    content: public string DirectoryMustExistFeedback { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property DirectoryMustExistFeedback As String
+  overload: Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback*
+- uid: Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+  commentId: P:Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+  id: FileAlreadyExistsFeedback
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: FileAlreadyExistsFeedback
+  nameWithType: FileDialogStyle.FileAlreadyExistsFeedback
+  fullName: Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FileAlreadyExistsFeedback
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 122
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets error message when user <xref href="Terminal.Gui.OpenMode" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.OpenMode.Directory" data-throw-if-not-resolved="false"></xref>
+
+    and user enters the name of an existing file (File system cannot have a folder with the same name as a file).
+  example: []
+  syntax:
+    content: public string FileAlreadyExistsFeedback { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property FileAlreadyExistsFeedback As String
+  overload: Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback*
+- uid: Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+  commentId: P:Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+  id: FileMustExistFeedback
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: FileMustExistFeedback
+  nameWithType: FileDialogStyle.FileMustExistFeedback
+  fullName: Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FileMustExistFeedback
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 128
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets error message when user selects a file that does not exist and
+
+    <xref href="Terminal.Gui.OpenMode" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.OpenMode.File" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.FileDialog.MustExist" data-throw-if-not-resolved="false"></xref> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.
+  example: []
+  syntax:
+    content: public string FileMustExistFeedback { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property FileMustExistFeedback As String
+  overload: Terminal.Gui.FileDialogStyle.FileMustExistFeedback*
+- uid: Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+  commentId: P:Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+  id: DirectoryAlreadyExistsFeedback
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: DirectoryAlreadyExistsFeedback
+  nameWithType: FileDialogStyle.DirectoryAlreadyExistsFeedback
+  fullName: Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DirectoryAlreadyExistsFeedback
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 134
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets error message when user <xref href="Terminal.Gui.OpenMode" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.OpenMode.File" data-throw-if-not-resolved="false"></xref>
+
+    and user enters the name of an existing directory (File system cannot have a folder with the same name as a file).
+  example: []
+  syntax:
+    content: public string DirectoryAlreadyExistsFeedback { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property DirectoryAlreadyExistsFeedback As String
+  overload: Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback*
+- uid: Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+  commentId: P:Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+  id: FileOrDirectoryMustExistFeedback
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: FileOrDirectoryMustExistFeedback
+  nameWithType: FileDialogStyle.FileOrDirectoryMustExistFeedback
+  fullName: Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: FileOrDirectoryMustExistFeedback
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 140
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets error message when user selects a file/dir that does not exist and
+
+    <xref href="Terminal.Gui.OpenMode" data-throw-if-not-resolved="false"></xref> is <xref href="Terminal.Gui.OpenMode.Mixed" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.FileDialog.MustExist" data-throw-if-not-resolved="false"></xref> is <a href="https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/bool">true</a>.
+  example: []
+  syntax:
+    content: public string FileOrDirectoryMustExistFeedback { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property FileOrDirectoryMustExistFeedback As String
+  overload: Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback*
+- uid: Terminal.Gui.FileDialogStyle.TableStyle
+  commentId: P:Terminal.Gui.FileDialogStyle.TableStyle
+  id: TableStyle
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: TableStyle
+  nameWithType: FileDialogStyle.TableStyle
+  fullName: Terminal.Gui.FileDialogStyle.TableStyle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TableStyle
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 145
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the style settings for the table of files (in currently selected directory).
+  example: []
+  syntax:
+    content: public TableStyle TableStyle { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.TableStyle
+    content.vb: Public Property TableStyle As TableStyle
+  overload: Terminal.Gui.FileDialogStyle.TableStyle*
+- uid: Terminal.Gui.FileDialogStyle.TreeStyle
+  commentId: P:Terminal.Gui.FileDialogStyle.TreeStyle
+  id: TreeStyle
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: TreeStyle
+  nameWithType: FileDialogStyle.TreeStyle
+  fullName: Terminal.Gui.FileDialogStyle.TreeStyle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TreeStyle
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 150
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Gets the style settings for the collapse-able directory/places tree
+  example: []
+  syntax:
+    content: public TreeStyle TreeStyle { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.TreeStyle
+    content.vb: Public Property TreeStyle As TreeStyle
+  overload: Terminal.Gui.FileDialogStyle.TreeStyle*
+- uid: Terminal.Gui.FileDialogStyle.TreeRootGetter
+  commentId: P:Terminal.Gui.FileDialogStyle.TreeRootGetter
+  id: TreeRootGetter
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: TreeRootGetter
+  nameWithType: FileDialogStyle.TreeRootGetter
+  fullName: Terminal.Gui.FileDialogStyle.TreeRootGetter
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TreeRootGetter
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 159
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or Sets the method for getting the root tree objects that are displayed in
+
+    the collapse-able tree in the <xref href="Terminal.Gui.FileDialog" data-throw-if-not-resolved="false"></xref>.  Defaults to all accessible
+
+    <xref href="System.Environment.GetLogicalDrives" data-throw-if-not-resolved="false"></xref> and unique
+
+    <xref href="System.Environment.SpecialFolder" data-throw-if-not-resolved="false"></xref>.
+  remarks: Must be configured before showing the dialog.
+  example: []
+  syntax:
+    content: public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
+    parameters: []
+    return:
+      type: System.Func{System.Collections.Generic.Dictionary{System.IO.Abstractions.IDirectoryInfo,System.String}}
+    content.vb: Public Property TreeRootGetter As Func(Of Dictionary(Of IDirectoryInfo, String))
+  overload: Terminal.Gui.FileDialogStyle.TreeRootGetter*
+- uid: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  commentId: P:Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  id: UseUnicodeCharacters
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: UseUnicodeCharacters
+  nameWithType: FileDialogStyle.UseUnicodeCharacters
+  fullName: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UseUnicodeCharacters
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 165
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets whether to use advanced unicode characters which might not be installed
+
+    on all users computers.
+  example: []
+  syntax:
+    content: public bool UseUnicodeCharacters { get; set; }
+    parameters: []
+    return:
+      type: System.Boolean
+    content.vb: Public Property UseUnicodeCharacters As Boolean
+  overload: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters*
+- uid: Terminal.Gui.FileDialogStyle.DateFormat
+  commentId: P:Terminal.Gui.FileDialogStyle.DateFormat
+  id: DateFormat
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: DateFormat
+  nameWithType: FileDialogStyle.DateFormat
+  fullName: Terminal.Gui.FileDialogStyle.DateFormat
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DateFormat
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 172
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Gets or sets the format to use for date/times in the Modified column.
+
+    Defaults to <xref href="System.Globalization.DateTimeFormatInfo.SortableDateTimePattern" data-throw-if-not-resolved="false"></xref> 
+
+    of the <xref href="System.Globalization.CultureInfo.CurrentCulture" data-throw-if-not-resolved="false"></xref>
+  example: []
+  syntax:
+    content: public string DateFormat { get; set; }
+    parameters: []
+    return:
+      type: System.String
+    content.vb: Public Property DateFormat As String
+  overload: Terminal.Gui.FileDialogStyle.DateFormat*
+- uid: Terminal.Gui.FileDialogStyle.#ctor(System.IO.Abstractions.IFileSystem)
+  commentId: M:Terminal.Gui.FileDialogStyle.#ctor(System.IO.Abstractions.IFileSystem)
+  id: '#ctor(System.IO.Abstractions.IFileSystem)'
+  parent: Terminal.Gui.FileDialogStyle
+  langs:
+  - csharp
+  - vb
+  name: FileDialogStyle(IFileSystem)
+  nameWithType: FileDialogStyle.FileDialogStyle(IFileSystem)
+  fullName: Terminal.Gui.FileDialogStyle.FileDialogStyle(System.IO.Abstractions.IFileSystem)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/FileServices/FileDialogStyle.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/FileServices/FileDialogStyle.cs
+    startLine: 177
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Creates a new instance of the <xref href="Terminal.Gui.FileDialogStyle" data-throw-if-not-resolved="false"></xref> class.
+  example: []
+  syntax:
+    content: public FileDialogStyle(IFileSystem fileSystem)
+    parameters:
+    - id: fileSystem
+      type: System.IO.Abstractions.IFileSystem
+    content.vb: Public Sub New(fileSystem As IFileSystem)
+  overload: Terminal.Gui.FileDialogStyle.#ctor*
+  nameWithType.vb: FileDialogStyle.New(IFileSystem)
+  fullName.vb: Terminal.Gui.FileDialogStyle.New(System.IO.Abstractions.IFileSystem)
+  name.vb: New(IFileSystem)
+references:
+- uid: Terminal.Gui.FileDialog
+  commentId: T:Terminal.Gui.FileDialog
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileDialog.html
+  name: FileDialog
+  nameWithType: FileDialog
+  fullName: Terminal.Gui.FileDialog
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.FileDialogStyle.UseColors
+  commentId: P:Terminal.Gui.FileDialogStyle.UseColors
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.UseColors
+  name: UseColors
+  nameWithType: FileDialogStyle.UseColors
+  fullName: Terminal.Gui.FileDialogStyle.UseColors
+- uid: Terminal.Gui.ConfigurationManager
+  commentId: T:Terminal.Gui.ConfigurationManager
+  href: Terminal.Gui.ConfigurationManager.html
+  name: ConfigurationManager
+  nameWithType: ConfigurationManager
+  fullName: Terminal.Gui.ConfigurationManager
+- uid: Terminal.Gui.FileDialogStyle.DefaultUseColors*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.DefaultUseColors
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.DefaultUseColors
+  name: DefaultUseColors
+  nameWithType: FileDialogStyle.DefaultUseColors
+  fullName: Terminal.Gui.FileDialogStyle.DefaultUseColors
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  commentId: P:Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  name: UseUnicodeCharacters
+  nameWithType: FileDialogStyle.UseUnicodeCharacters
+  fullName: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+- uid: Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+  name: DefaultUseUnicodeCharacters
+  nameWithType: FileDialogStyle.DefaultUseUnicodeCharacters
+  fullName: Terminal.Gui.FileDialogStyle.DefaultUseUnicodeCharacters
+- uid: Terminal.Gui.FileDialogStyle.UseColors*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.UseColors
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.UseColors
+  name: UseColors
+  nameWithType: FileDialogStyle.UseColors
+  fullName: Terminal.Gui.FileDialogStyle.UseColors
+- uid: Terminal.Gui.FileDialogStyle.IconProvider*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.IconProvider
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.IconProvider
+  name: IconProvider
+  nameWithType: FileDialogStyle.IconProvider
+  fullName: Terminal.Gui.FileDialogStyle.IconProvider
+- uid: Terminal.Gui.FileSystemIconProvider
+  commentId: T:Terminal.Gui.FileSystemIconProvider
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileSystemIconProvider.html
+  name: FileSystemIconProvider
+  nameWithType: FileSystemIconProvider
+  fullName: Terminal.Gui.FileSystemIconProvider
+- uid: Terminal.Gui.FileDialogStyle.ColorProvider*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.ColorProvider
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.ColorProvider
+  name: ColorProvider
+  nameWithType: FileDialogStyle.ColorProvider
+  fullName: Terminal.Gui.FileDialogStyle.ColorProvider
+- uid: Terminal.Gui.FileSystemColorProvider
+  commentId: T:Terminal.Gui.FileSystemColorProvider
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileSystemColorProvider.html
+  name: FileSystemColorProvider
+  nameWithType: FileSystemColorProvider
+  fullName: Terminal.Gui.FileSystemColorProvider
+- uid: System.Globalization.CultureInfo.CurrentUICulture
+  commentId: P:System.Globalization.CultureInfo.CurrentUICulture
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentuiculture
+  name: CurrentUICulture
+  nameWithType: CultureInfo.CurrentUICulture
+  fullName: System.Globalization.CultureInfo.CurrentUICulture
+- uid: Terminal.Gui.FileDialogStyle.Culture*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.Culture
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.Culture
+  name: Culture
+  nameWithType: FileDialogStyle.Culture
+  fullName: Terminal.Gui.FileDialogStyle.Culture
+- uid: System.Globalization.CultureInfo
+  commentId: T:System.Globalization.CultureInfo
+  parent: System.Globalization
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo
+  name: CultureInfo
+  nameWithType: CultureInfo
+  fullName: System.Globalization.CultureInfo
+- uid: System.Globalization
+  commentId: N:System.Globalization
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Globalization
+  nameWithType: System.Globalization
+  fullName: System.Globalization
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Globalization
+    name: Globalization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.globalization
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Globalization
+    name: Globalization
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.globalization
+- uid: Terminal.Gui.FileDialogStyle.FilenameColumnName*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.FilenameColumnName
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.FilenameColumnName
+  name: FilenameColumnName
+  nameWithType: FileDialogStyle.FilenameColumnName
+  fullName: Terminal.Gui.FileDialogStyle.FilenameColumnName
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+- uid: Terminal.Gui.FileDialogStyle.SizeColumnName*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.SizeColumnName
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.SizeColumnName
+  name: SizeColumnName
+  nameWithType: FileDialogStyle.SizeColumnName
+  fullName: Terminal.Gui.FileDialogStyle.SizeColumnName
+- uid: Terminal.Gui.FileDialogStyle.ModifiedColumnName*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.ModifiedColumnName
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.ModifiedColumnName
+  name: ModifiedColumnName
+  nameWithType: FileDialogStyle.ModifiedColumnName
+  fullName: Terminal.Gui.FileDialogStyle.ModifiedColumnName
+- uid: Terminal.Gui.FileDialogStyle.TypeColumnName*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.TypeColumnName
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.TypeColumnName
+  name: TypeColumnName
+  nameWithType: FileDialogStyle.TypeColumnName
+  fullName: Terminal.Gui.FileDialogStyle.TypeColumnName
+- uid: Terminal.Gui.FileDialogStyle.SearchCaption*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.SearchCaption
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.SearchCaption
+  name: SearchCaption
+  nameWithType: FileDialogStyle.SearchCaption
+  fullName: Terminal.Gui.FileDialogStyle.SearchCaption
+- uid: Terminal.Gui.FileDialogStyle.PathCaption*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.PathCaption
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.PathCaption
+  name: PathCaption
+  nameWithType: FileDialogStyle.PathCaption
+  fullName: Terminal.Gui.FileDialogStyle.PathCaption
+- uid: Terminal.Gui.FileDialogStyle.OkButtonText*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.OkButtonText
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.OkButtonText
+  name: OkButtonText
+  nameWithType: FileDialogStyle.OkButtonText
+  fullName: Terminal.Gui.FileDialogStyle.OkButtonText
+- uid: Terminal.Gui.FileDialogStyle.CancelButtonText*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.CancelButtonText
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.CancelButtonText
+  name: CancelButtonText
+  nameWithType: FileDialogStyle.CancelButtonText
+  fullName: Terminal.Gui.FileDialogStyle.CancelButtonText
+- uid: Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  name: FlipOkCancelButtonLayoutOrder
+  nameWithType: FileDialogStyle.FlipOkCancelButtonLayoutOrder
+  fullName: Terminal.Gui.FileDialogStyle.FlipOkCancelButtonLayoutOrder
+- uid: Terminal.Gui.FileDialog.AllowedTypes
+  commentId: P:Terminal.Gui.FileDialog.AllowedTypes
+  parent: Terminal.Gui.FileDialog
+  href: Terminal.Gui.FileDialog.html#Terminal.Gui.FileDialog.AllowedTypes
+  name: AllowedTypes
+  nameWithType: FileDialog.AllowedTypes
+  fullName: Terminal.Gui.FileDialog.AllowedTypes
+- uid: Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+  name: WrongFileTypeFeedback
+  nameWithType: FileDialogStyle.WrongFileTypeFeedback
+  fullName: Terminal.Gui.FileDialogStyle.WrongFileTypeFeedback
+- uid: Terminal.Gui.OpenMode
+  commentId: T:Terminal.Gui.OpenMode
+  parent: Terminal.Gui
+  href: Terminal.Gui.OpenMode.html
+  name: OpenMode
+  nameWithType: OpenMode
+  fullName: Terminal.Gui.OpenMode
+- uid: Terminal.Gui.OpenMode.Directory
+  commentId: F:Terminal.Gui.OpenMode.Directory
+  href: Terminal.Gui.OpenMode.html#Terminal.Gui.OpenMode.Directory
+  name: Directory
+  nameWithType: OpenMode.Directory
+  fullName: Terminal.Gui.OpenMode.Directory
+- uid: Terminal.Gui.FileDialog.MustExist
+  commentId: P:Terminal.Gui.FileDialog.MustExist
+  parent: Terminal.Gui.FileDialog
+  href: Terminal.Gui.FileDialog.html#Terminal.Gui.FileDialog.MustExist
+  name: MustExist
+  nameWithType: FileDialog.MustExist
+  fullName: Terminal.Gui.FileDialog.MustExist
+- uid: Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+  name: DirectoryMustExistFeedback
+  nameWithType: FileDialogStyle.DirectoryMustExistFeedback
+  fullName: Terminal.Gui.FileDialogStyle.DirectoryMustExistFeedback
+- uid: Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+  name: FileAlreadyExistsFeedback
+  nameWithType: FileDialogStyle.FileAlreadyExistsFeedback
+  fullName: Terminal.Gui.FileDialogStyle.FileAlreadyExistsFeedback
+- uid: Terminal.Gui.OpenMode.File
+  commentId: F:Terminal.Gui.OpenMode.File
+  href: Terminal.Gui.OpenMode.html#Terminal.Gui.OpenMode.File
+  name: File
+  nameWithType: OpenMode.File
+  fullName: Terminal.Gui.OpenMode.File
+- uid: Terminal.Gui.FileDialogStyle.FileMustExistFeedback*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+  name: FileMustExistFeedback
+  nameWithType: FileDialogStyle.FileMustExistFeedback
+  fullName: Terminal.Gui.FileDialogStyle.FileMustExistFeedback
+- uid: Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+  name: DirectoryAlreadyExistsFeedback
+  nameWithType: FileDialogStyle.DirectoryAlreadyExistsFeedback
+  fullName: Terminal.Gui.FileDialogStyle.DirectoryAlreadyExistsFeedback
+- uid: Terminal.Gui.OpenMode.Mixed
+  commentId: F:Terminal.Gui.OpenMode.Mixed
+  href: Terminal.Gui.OpenMode.html#Terminal.Gui.OpenMode.Mixed
+  name: Mixed
+  nameWithType: OpenMode.Mixed
+  fullName: Terminal.Gui.OpenMode.Mixed
+- uid: Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+  name: FileOrDirectoryMustExistFeedback
+  nameWithType: FileDialogStyle.FileOrDirectoryMustExistFeedback
+  fullName: Terminal.Gui.FileDialogStyle.FileOrDirectoryMustExistFeedback
+- uid: Terminal.Gui.FileDialogStyle.TableStyle*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.TableStyle
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.TableStyle
+  name: TableStyle
+  nameWithType: FileDialogStyle.TableStyle
+  fullName: Terminal.Gui.FileDialogStyle.TableStyle
+- uid: Terminal.Gui.TableStyle
+  commentId: T:Terminal.Gui.TableStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.TableStyle.html
+  name: TableStyle
+  nameWithType: TableStyle
+  fullName: Terminal.Gui.TableStyle
+- uid: Terminal.Gui.FileDialogStyle.TreeStyle*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.TreeStyle
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.TreeStyle
+  name: TreeStyle
+  nameWithType: FileDialogStyle.TreeStyle
+  fullName: Terminal.Gui.FileDialogStyle.TreeStyle
+- uid: Terminal.Gui.TreeStyle
+  commentId: T:Terminal.Gui.TreeStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.TreeStyle.html
+  name: TreeStyle
+  nameWithType: TreeStyle
+  fullName: Terminal.Gui.TreeStyle
+- uid: System.Environment.GetLogicalDrives
+  commentId: M:System.Environment.GetLogicalDrives
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.environment.getlogicaldrives
+  name: GetLogicalDrives()
+  nameWithType: Environment.GetLogicalDrives()
+  fullName: System.Environment.GetLogicalDrives()
+  spec.csharp:
+  - uid: System.Environment.GetLogicalDrives
+    name: GetLogicalDrives
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.environment.getlogicaldrives
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Environment.GetLogicalDrives
+    name: GetLogicalDrives
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.environment.getlogicaldrives
+  - name: (
+  - name: )
+- uid: System.Environment.SpecialFolder
+  commentId: T:System.Environment.SpecialFolder
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.environment
+  name: Environment.SpecialFolder
+  nameWithType: Environment.SpecialFolder
+  fullName: System.Environment.SpecialFolder
+  spec.csharp:
+  - uid: System.Environment
+    name: Environment
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.environment
+  - name: .
+  - uid: System.Environment.SpecialFolder
+    name: SpecialFolder
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.environment.specialfolder
+  spec.vb:
+  - uid: System.Environment
+    name: Environment
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.environment
+  - name: .
+  - uid: System.Environment.SpecialFolder
+    name: SpecialFolder
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.environment.specialfolder
+- uid: Terminal.Gui.FileDialogStyle.TreeRootGetter*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.TreeRootGetter
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.TreeRootGetter
+  name: TreeRootGetter
+  nameWithType: FileDialogStyle.TreeRootGetter
+  fullName: Terminal.Gui.FileDialogStyle.TreeRootGetter
+- uid: System.Func{System.Collections.Generic.Dictionary{System.IO.Abstractions.IDirectoryInfo,System.String}}
+  commentId: T:System.Func{System.Collections.Generic.Dictionary{System.IO.Abstractions.IDirectoryInfo,System.String}}
+  parent: System
+  definition: System.Func`1
+  href: https://learn.microsoft.com/dotnet/api/system.func-1
+  name: Func<Dictionary<IDirectoryInfo, string>>
+  nameWithType: Func<Dictionary<IDirectoryInfo, string>>
+  fullName: System.Func<System.Collections.Generic.Dictionary<System.IO.Abstractions.IDirectoryInfo, string>>
+  nameWithType.vb: Func(Of Dictionary(Of IDirectoryInfo, String))
+  fullName.vb: System.Func(Of System.Collections.Generic.Dictionary(Of System.IO.Abstractions.IDirectoryInfo, String))
+  name.vb: Func(Of Dictionary(Of IDirectoryInfo, String))
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: <
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: <
+  - uid: System.IO.Abstractions.IDirectoryInfo
+    name: IDirectoryInfo
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: '>'
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.Collections.Generic.Dictionary`2
+    name: Dictionary
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: System.IO.Abstractions.IDirectoryInfo
+    name: IDirectoryInfo
+    isExternal: true
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  - name: )
+- uid: System.Func`1
+  commentId: T:System.Func`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.func-1
+  name: Func<TResult>
+  nameWithType: Func<TResult>
+  fullName: System.Func<TResult>
+  nameWithType.vb: Func(Of TResult)
+  fullName.vb: System.Func(Of TResult)
+  name.vb: Func(Of TResult)
+  spec.csharp:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: <
+  - name: TResult
+  - name: '>'
+  spec.vb:
+  - uid: System.Func`1
+    name: Func
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.func-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TResult
+  - name: )
+- uid: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+  name: UseUnicodeCharacters
+  nameWithType: FileDialogStyle.UseUnicodeCharacters
+  fullName: Terminal.Gui.FileDialogStyle.UseUnicodeCharacters
+- uid: System.Globalization.DateTimeFormatInfo.SortableDateTimePattern
+  commentId: P:System.Globalization.DateTimeFormatInfo.SortableDateTimePattern
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.globalization.datetimeformatinfo.sortabledatetimepattern
+  name: SortableDateTimePattern
+  nameWithType: DateTimeFormatInfo.SortableDateTimePattern
+  fullName: System.Globalization.DateTimeFormatInfo.SortableDateTimePattern
+- uid: System.Globalization.CultureInfo.CurrentCulture
+  commentId: P:System.Globalization.CultureInfo.CurrentCulture
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo.currentculture
+  name: CurrentCulture
+  nameWithType: CultureInfo.CurrentCulture
+  fullName: System.Globalization.CultureInfo.CurrentCulture
+- uid: Terminal.Gui.FileDialogStyle.DateFormat*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.DateFormat
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.DateFormat
+  name: DateFormat
+  nameWithType: FileDialogStyle.DateFormat
+  fullName: Terminal.Gui.FileDialogStyle.DateFormat
+- uid: Terminal.Gui.FileDialogStyle
+  commentId: T:Terminal.Gui.FileDialogStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.FileDialogStyle.html
+  name: FileDialogStyle
+  nameWithType: FileDialogStyle
+  fullName: Terminal.Gui.FileDialogStyle
+- uid: Terminal.Gui.FileDialogStyle.#ctor*
+  commentId: Overload:Terminal.Gui.FileDialogStyle.#ctor
+  href: Terminal.Gui.FileDialogStyle.html#Terminal.Gui.FileDialogStyle.#ctor(System.IO.Abstractions.IFileSystem)
+  name: FileDialogStyle
+  nameWithType: FileDialogStyle.FileDialogStyle
+  fullName: Terminal.Gui.FileDialogStyle.FileDialogStyle
+  nameWithType.vb: FileDialogStyle.New
+  fullName.vb: Terminal.Gui.FileDialogStyle.New
+  name.vb: New
+- uid: System.IO.Abstractions.IFileSystem
+  commentId: T:System.IO.Abstractions.IFileSystem
+  parent: System.IO.Abstractions
+  isExternal: true
+  name: IFileSystem
+  nameWithType: IFileSystem
+  fullName: System.IO.Abstractions.IFileSystem
+- uid: System.IO.Abstractions
+  commentId: N:System.IO.Abstractions
+  isExternal: true
+  name: System.IO.Abstractions
+  nameWithType: System.IO.Abstractions
+  fullName: System.IO.Abstractions
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+  - name: .
+  - uid: System.IO.Abstractions
+    name: Abstractions
+    isExternal: true
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+  - name: .
+  - uid: System.IO
+    name: IO
+    isExternal: true
+  - name: .
+  - uid: System.IO.Abstractions
+    name: Abstractions
+    isExternal: true
+shouldSkipMarkup: true

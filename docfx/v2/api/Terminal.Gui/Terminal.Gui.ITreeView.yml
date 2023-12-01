@@ -1,0 +1,198 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ITreeView
+  commentId: T:Terminal.Gui.ITreeView
+  id: ITreeView
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ITreeView.ClearObjects
+  - Terminal.Gui.ITreeView.SetNeedsDisplay
+  - Terminal.Gui.ITreeView.Style
+  langs:
+  - csharp
+  - vb
+  name: ITreeView
+  nameWithType: ITreeView
+  fullName: Terminal.Gui.ITreeView
+  type: Interface
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeView.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ITreeView
+    path: ../Terminal.Gui/Views/TreeView/TreeView.cs
+    startLine: 18
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Interface for all non generic members of <xref href="Terminal.Gui.TreeView%601" data-throw-if-not-resolved="false"></xref>.
+
+
+    <a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.
+  example: []
+  syntax:
+    content: public interface ITreeView
+    content.vb: Public Interface ITreeView
+- uid: Terminal.Gui.ITreeView.Style
+  commentId: P:Terminal.Gui.ITreeView.Style
+  id: Style
+  parent: Terminal.Gui.ITreeView
+  langs:
+  - csharp
+  - vb
+  name: Style
+  nameWithType: ITreeView.Style
+  fullName: Terminal.Gui.ITreeView.Style
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeView.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Style
+    path: ../Terminal.Gui/Views/TreeView/TreeView.cs
+    startLine: 22
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Contains options for changing how the tree is rendered.
+  example: []
+  syntax:
+    content: TreeStyle Style { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.TreeStyle
+    content.vb: Property Style As TreeStyle
+  overload: Terminal.Gui.ITreeView.Style*
+- uid: Terminal.Gui.ITreeView.ClearObjects
+  commentId: M:Terminal.Gui.ITreeView.ClearObjects
+  id: ClearObjects
+  parent: Terminal.Gui.ITreeView
+  langs:
+  - csharp
+  - vb
+  name: ClearObjects()
+  nameWithType: ITreeView.ClearObjects()
+  fullName: Terminal.Gui.ITreeView.ClearObjects()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeView.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ClearObjects
+    path: ../Terminal.Gui/Views/TreeView/TreeView.cs
+    startLine: 27
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Removes all objects from the tree and clears selection.
+  example: []
+  syntax:
+    content: void ClearObjects()
+    content.vb: Sub ClearObjects()
+  overload: Terminal.Gui.ITreeView.ClearObjects*
+- uid: Terminal.Gui.ITreeView.SetNeedsDisplay
+  commentId: M:Terminal.Gui.ITreeView.SetNeedsDisplay
+  id: SetNeedsDisplay
+  parent: Terminal.Gui.ITreeView
+  langs:
+  - csharp
+  - vb
+  name: SetNeedsDisplay()
+  nameWithType: ITreeView.SetNeedsDisplay()
+  fullName: Terminal.Gui.ITreeView.SetNeedsDisplay()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/TreeView/TreeView.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SetNeedsDisplay
+    path: ../Terminal.Gui/Views/TreeView/TreeView.cs
+    startLine: 32
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Sets a flag indicating this view needs to be redisplayed because its state has changed.
+  example: []
+  syntax:
+    content: void SetNeedsDisplay()
+    content.vb: Sub SetNeedsDisplay()
+  overload: Terminal.Gui.ITreeView.SetNeedsDisplay*
+references:
+- uid: Terminal.Gui.TreeView`1
+  commentId: T:Terminal.Gui.TreeView`1
+  href: Terminal.Gui.TreeView-1.html
+  name: TreeView<T>
+  nameWithType: TreeView<T>
+  fullName: Terminal.Gui.TreeView<T>
+  nameWithType.vb: TreeView(Of T)
+  fullName.vb: Terminal.Gui.TreeView(Of T)
+  name.vb: TreeView(Of T)
+  spec.csharp:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: Terminal.Gui.TreeView`1
+    name: TreeView
+    href: Terminal.Gui.TreeView-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.ITreeView.Style*
+  commentId: Overload:Terminal.Gui.ITreeView.Style
+  href: Terminal.Gui.ITreeView.html#Terminal.Gui.ITreeView.Style
+  name: Style
+  nameWithType: ITreeView.Style
+  fullName: Terminal.Gui.ITreeView.Style
+- uid: Terminal.Gui.TreeStyle
+  commentId: T:Terminal.Gui.TreeStyle
+  parent: Terminal.Gui
+  href: Terminal.Gui.TreeStyle.html
+  name: TreeStyle
+  nameWithType: TreeStyle
+  fullName: Terminal.Gui.TreeStyle
+- uid: Terminal.Gui.ITreeView.ClearObjects*
+  commentId: Overload:Terminal.Gui.ITreeView.ClearObjects
+  href: Terminal.Gui.ITreeView.html#Terminal.Gui.ITreeView.ClearObjects
+  name: ClearObjects
+  nameWithType: ITreeView.ClearObjects
+  fullName: Terminal.Gui.ITreeView.ClearObjects
+- uid: Terminal.Gui.ITreeView.SetNeedsDisplay*
+  commentId: Overload:Terminal.Gui.ITreeView.SetNeedsDisplay
+  href: Terminal.Gui.ITreeView.html#Terminal.Gui.ITreeView.SetNeedsDisplay
+  name: SetNeedsDisplay
+  nameWithType: ITreeView.SetNeedsDisplay
+  fullName: Terminal.Gui.ITreeView.SetNeedsDisplay
+shouldSkipMarkup: true

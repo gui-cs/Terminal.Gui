@@ -1,0 +1,85 @@
+### YamlMime:ManagedReference
+items:
+- uid: UICatalog
+  commentId: N:UICatalog
+  id: UICatalog
+  children:
+  - UICatalog.NumberToWords
+  - UICatalog.Scenario
+  - UICatalog.Scenario.ScenarioCategory
+  - UICatalog.Scenario.ScenarioMetadata
+  langs:
+  - csharp
+  - vb
+  name: UICatalog
+  nameWithType: UICatalog
+  fullName: UICatalog
+  type: Namespace
+  assemblies:
+  - UICatalog
+references:
+- uid: UICatalog.NumberToWords
+  commentId: T:UICatalog.NumberToWords
+  href: UICatalog.NumberToWords.html
+  name: NumberToWords
+  nameWithType: NumberToWords
+  fullName: UICatalog.NumberToWords
+- uid: UICatalog.Scenario
+  commentId: T:UICatalog.Scenario
+  parent: UICatalog
+  href: UICatalog.Scenario.html
+  name: Scenario
+  nameWithType: Scenario
+  fullName: UICatalog.Scenario
+- uid: UICatalog.Scenario.ScenarioMetadata
+  commentId: T:UICatalog.Scenario.ScenarioMetadata
+  parent: UICatalog
+  href: UICatalog.Scenario.html
+  name: Scenario.ScenarioMetadata
+  nameWithType: Scenario.ScenarioMetadata
+  fullName: UICatalog.Scenario.ScenarioMetadata
+  spec.csharp:
+  - uid: UICatalog.Scenario
+    name: Scenario
+    href: UICatalog.Scenario.html
+  - name: .
+  - uid: UICatalog.Scenario.ScenarioMetadata
+    name: ScenarioMetadata
+    href: UICatalog.Scenario.ScenarioMetadata.html
+  spec.vb:
+  - uid: UICatalog.Scenario
+    name: Scenario
+    href: UICatalog.Scenario.html
+  - name: .
+  - uid: UICatalog.Scenario.ScenarioMetadata
+    name: ScenarioMetadata
+    href: UICatalog.Scenario.ScenarioMetadata.html
+- uid: UICatalog.Scenario.ScenarioCategory
+  commentId: T:UICatalog.Scenario.ScenarioCategory
+  parent: UICatalog
+  href: UICatalog.Scenario.html
+  name: Scenario.ScenarioCategory
+  nameWithType: Scenario.ScenarioCategory
+  fullName: UICatalog.Scenario.ScenarioCategory
+  spec.csharp:
+  - uid: UICatalog.Scenario
+    name: Scenario
+    href: UICatalog.Scenario.html
+  - name: .
+  - uid: UICatalog.Scenario.ScenarioCategory
+    name: ScenarioCategory
+    href: UICatalog.Scenario.ScenarioCategory.html
+  spec.vb:
+  - uid: UICatalog.Scenario
+    name: Scenario
+    href: UICatalog.Scenario.html
+  - name: .
+  - uid: UICatalog.Scenario.ScenarioCategory
+    name: ScenarioCategory
+    href: UICatalog.Scenario.ScenarioCategory.html
+- uid: UICatalog
+  commentId: N:UICatalog
+  href: UICatalog.html
+  name: UICatalog
+  nameWithType: UICatalog
+  fullName: UICatalog

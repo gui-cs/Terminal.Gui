@@ -1,0 +1,1085 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  id: Attribute
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.Attribute.#ctor
+  - Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)
+  - Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.ColorName)
+  - Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color)
+  - Terminal.Gui.Attribute.#ctor(Terminal.Gui.ColorName,Terminal.Gui.Color)
+  - Terminal.Gui.Attribute.#ctor(Terminal.Gui.ColorName,Terminal.Gui.ColorName)
+  - Terminal.Gui.Attribute.Background
+  - Terminal.Gui.Attribute.Default
+  - Terminal.Gui.Attribute.Equals(System.Object)
+  - Terminal.Gui.Attribute.Equals(Terminal.Gui.Attribute)
+  - Terminal.Gui.Attribute.Foreground
+  - Terminal.Gui.Attribute.GetHashCode
+  - Terminal.Gui.Attribute.op_Equality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.Attribute.op_Inequality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  - Terminal.Gui.Attribute.ToString
+  langs:
+  - csharp
+  - vb
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+  type: Struct
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Attribute
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 634
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Attributes represent how text is styled when displayed in the terminal.
+  remarks: >-
+    <xref href="Terminal.Gui.Attribute" data-throw-if-not-resolved="false"></xref> provides a platform independent representation of colors (and someday other forms of text styling).
+
+    They encode both the foreground and the background color and are used in the <xref href="Terminal.Gui.ColorScheme" data-throw-if-not-resolved="false"></xref>
+
+    class to define color schemes that can be used in an application.
+  example: []
+  syntax:
+    content: >-
+      [JsonConverter(typeof(AttributeJsonConverter))]
+
+      public readonly struct Attribute : IEquatable<Attribute>
+    content.vb: >-
+      <JsonConverter(GetType(AttributeJsonConverter))>
+
+      Public Structure Attribute Implements IEquatable(Of Attribute)
+  implements:
+  - System.IEquatable{Terminal.Gui.Attribute}
+  inheritedMembers:
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+- uid: Terminal.Gui.Attribute.Default
+  commentId: F:Terminal.Gui.Attribute.Default
+  id: Default
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Default
+  nameWithType: Attribute.Default
+  fullName: Terminal.Gui.Attribute.Default
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Default
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 640
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Default empty attribute.
+  example: []
+  syntax:
+    content: public static readonly Attribute Default
+    return:
+      type: Terminal.Gui.Attribute
+    content.vb: Public Shared ReadOnly [Default] As Attribute
+- uid: Terminal.Gui.Attribute.Foreground
+  commentId: P:Terminal.Gui.Attribute.Foreground
+  id: Foreground
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Foreground
+  nameWithType: Attribute.Foreground
+  fullName: Terminal.Gui.Attribute.Foreground
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Foreground
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 651
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The foreground color.
+  example: []
+  syntax:
+    content: >-
+      [JsonConverter(typeof(ColorJsonConverter))]
+
+      public Color Foreground { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Color
+    content.vb: >-
+      <JsonConverter(GetType(ColorJsonConverter))>
+
+      Public Property Foreground As Color
+  overload: Terminal.Gui.Attribute.Foreground*
+- uid: Terminal.Gui.Attribute.Background
+  commentId: P:Terminal.Gui.Attribute.Background
+  id: Background
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Background
+  nameWithType: Attribute.Background
+  fullName: Terminal.Gui.Attribute.Background
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Background
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 657
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: The background color.
+  example: []
+  syntax:
+    content: >-
+      [JsonConverter(typeof(ColorJsonConverter))]
+
+      public Color Background { get; }
+    parameters: []
+    return:
+      type: Terminal.Gui.Color
+    content.vb: >-
+      <JsonConverter(GetType(ColorJsonConverter))>
+
+      Public Property Background As Color
+  overload: Terminal.Gui.Attribute.Background*
+- uid: Terminal.Gui.Attribute.#ctor
+  commentId: M:Terminal.Gui.Attribute.#ctor
+  id: '#ctor'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute()
+  nameWithType: Attribute.Attribute()
+  fullName: Terminal.Gui.Attribute.Attribute()
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 663
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance with default values.
+  example: []
+  syntax:
+    content: public Attribute()
+    content.vb: Public Sub New()
+  overload: Terminal.Gui.Attribute.#ctor*
+  nameWithType.vb: Attribute.New()
+  fullName.vb: Terminal.Gui.Attribute.New()
+  name.vb: New()
+- uid: Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.Color)
+  id: '#ctor(Terminal.Gui.Color,Terminal.Gui.Color)'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute(Color, Color)
+  nameWithType: Attribute.Attribute(Color, Color)
+  fullName: Terminal.Gui.Attribute.Attribute(Terminal.Gui.Color, Terminal.Gui.Color)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 703
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Attribute" data-throw-if-not-resolved="false"></xref> struct.
+  example: []
+  syntax:
+    content: public Attribute(Color foreground, Color background)
+    parameters:
+    - id: foreground
+      type: Terminal.Gui.Color
+      description: Foreground
+    - id: background
+      type: Terminal.Gui.Color
+      description: Background
+    content.vb: Public Sub New(foreground As Color, background As Color)
+  overload: Terminal.Gui.Attribute.#ctor*
+  nameWithType.vb: Attribute.New(Color, Color)
+  fullName.vb: Terminal.Gui.Attribute.New(Terminal.Gui.Color, Terminal.Gui.Color)
+  name.vb: New(Color, Color)
+- uid: Terminal.Gui.Attribute.#ctor(Terminal.Gui.ColorName,Terminal.Gui.ColorName)
+  commentId: M:Terminal.Gui.Attribute.#ctor(Terminal.Gui.ColorName,Terminal.Gui.ColorName)
+  id: '#ctor(Terminal.Gui.ColorName,Terminal.Gui.ColorName)'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute(ColorName, ColorName)
+  nameWithType: Attribute.Attribute(ColorName, ColorName)
+  fullName: Terminal.Gui.Attribute.Attribute(Terminal.Gui.ColorName, Terminal.Gui.ColorName)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 730
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Attribute" data-throw-if-not-resolved="false"></xref> struct.
+  example: []
+  syntax:
+    content: public Attribute(ColorName foregroundName, ColorName backgroundName)
+    parameters:
+    - id: foregroundName
+      type: Terminal.Gui.ColorName
+      description: Foreground
+    - id: backgroundName
+      type: Terminal.Gui.ColorName
+      description: Background
+    content.vb: Public Sub New(foregroundName As ColorName, backgroundName As ColorName)
+  overload: Terminal.Gui.Attribute.#ctor*
+  nameWithType.vb: Attribute.New(ColorName, ColorName)
+  fullName.vb: Terminal.Gui.Attribute.New(Terminal.Gui.ColorName, Terminal.Gui.ColorName)
+  name.vb: New(ColorName, ColorName)
+- uid: Terminal.Gui.Attribute.#ctor(Terminal.Gui.ColorName,Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.Attribute.#ctor(Terminal.Gui.ColorName,Terminal.Gui.Color)
+  id: '#ctor(Terminal.Gui.ColorName,Terminal.Gui.Color)'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute(ColorName, Color)
+  nameWithType: Attribute.Attribute(ColorName, Color)
+  fullName: Terminal.Gui.Attribute.Attribute(Terminal.Gui.ColorName, Terminal.Gui.Color)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 738
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Attribute" data-throw-if-not-resolved="false"></xref> struct.
+  example: []
+  syntax:
+    content: public Attribute(ColorName foregroundName, Color background)
+    parameters:
+    - id: foregroundName
+      type: Terminal.Gui.ColorName
+      description: Foreground
+    - id: background
+      type: Terminal.Gui.Color
+      description: Background
+    content.vb: Public Sub New(foregroundName As ColorName, background As Color)
+  overload: Terminal.Gui.Attribute.#ctor*
+  nameWithType.vb: Attribute.New(ColorName, Color)
+  fullName.vb: Terminal.Gui.Attribute.New(Terminal.Gui.ColorName, Terminal.Gui.Color)
+  name.vb: New(ColorName, Color)
+- uid: Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.ColorName)
+  commentId: M:Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color,Terminal.Gui.ColorName)
+  id: '#ctor(Terminal.Gui.Color,Terminal.Gui.ColorName)'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute(Color, ColorName)
+  nameWithType: Attribute.Attribute(Color, ColorName)
+  fullName: Terminal.Gui.Attribute.Attribute(Terminal.Gui.Color, Terminal.Gui.ColorName)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 745
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Initializes a new instance of the <xref href="Terminal.Gui.Attribute" data-throw-if-not-resolved="false"></xref> struct.
+  example: []
+  syntax:
+    content: public Attribute(Color foreground, ColorName backgroundName)
+    parameters:
+    - id: foreground
+      type: Terminal.Gui.Color
+      description: Foreground
+    - id: backgroundName
+      type: Terminal.Gui.ColorName
+      description: Background
+    content.vb: Public Sub New(foreground As Color, backgroundName As ColorName)
+  overload: Terminal.Gui.Attribute.#ctor*
+  nameWithType.vb: Attribute.New(Color, ColorName)
+  fullName.vb: Terminal.Gui.Attribute.New(Terminal.Gui.Color, Terminal.Gui.ColorName)
+  name.vb: New(Color, ColorName)
+- uid: Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color)
+  commentId: M:Terminal.Gui.Attribute.#ctor(Terminal.Gui.Color)
+  id: '#ctor(Terminal.Gui.Color)'
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Attribute(Color)
+  nameWithType: Attribute.Attribute(Color)
+  fullName: Terminal.Gui.Attribute.Attribute(Terminal.Gui.Color)
+  type: Constructor
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: .ctor
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 752
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Initializes a new instance of the <xref href="Terminal.Gui.Attribute" data-throw-if-not-resolved="false"></xref> struct
+     with the same colors for the foreground and background.
+  example: []
+  syntax:
+    content: public Attribute(Color color)
+    parameters:
+    - id: color
+      type: Terminal.Gui.Color
+      description: The color.
+    content.vb: Public Sub New(color As Color)
+  overload: Terminal.Gui.Attribute.#ctor*
+  nameWithType.vb: Attribute.New(Color)
+  fullName.vb: Terminal.Gui.Attribute.New(Terminal.Gui.Color)
+  name.vb: New(Color)
+- uid: Terminal.Gui.Attribute.op_Equality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.Attribute.op_Equality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  id: op_Equality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: operator ==(Attribute, Attribute)
+  nameWithType: Attribute.operator ==(Attribute, Attribute)
+  fullName: Terminal.Gui.Attribute.operator ==(Terminal.Gui.Attribute, Terminal.Gui.Attribute)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Equality
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 761
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Compares two attributes for equality.
+  example: []
+  syntax:
+    content: public static bool operator ==(Attribute left, Attribute right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.Attribute
+      description: ''
+    - id: right
+      type: Terminal.Gui.Attribute
+      description: ''
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: Public Shared Operator =(left As Attribute, right As Attribute) As Boolean
+  overload: Terminal.Gui.Attribute.op_Equality*
+  nameWithType.vb: Attribute.=(Attribute, Attribute)
+  fullName.vb: Terminal.Gui.Attribute.=(Terminal.Gui.Attribute, Terminal.Gui.Attribute)
+  name.vb: =(Attribute, Attribute)
+- uid: Terminal.Gui.Attribute.op_Inequality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.Attribute.op_Inequality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  id: op_Inequality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: operator !=(Attribute, Attribute)
+  nameWithType: Attribute.operator !=(Attribute, Attribute)
+  fullName: Terminal.Gui.Attribute.operator !=(Terminal.Gui.Attribute, Terminal.Gui.Attribute)
+  type: Operator
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: op_Inequality
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 769
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Compares two attributes for inequality.
+  example: []
+  syntax:
+    content: public static bool operator !=(Attribute left, Attribute right)
+    parameters:
+    - id: left
+      type: Terminal.Gui.Attribute
+      description: ''
+    - id: right
+      type: Terminal.Gui.Attribute
+      description: ''
+    return:
+      type: System.Boolean
+      description: ''
+    content.vb: Public Shared Operator <>(left As Attribute, right As Attribute) As Boolean
+  overload: Terminal.Gui.Attribute.op_Inequality*
+  nameWithType.vb: Attribute.<>(Attribute, Attribute)
+  fullName.vb: Terminal.Gui.Attribute.<>(Terminal.Gui.Attribute, Terminal.Gui.Attribute)
+  name.vb: <>(Attribute, Attribute)
+- uid: Terminal.Gui.Attribute.Equals(System.Object)
+  commentId: M:Terminal.Gui.Attribute.Equals(System.Object)
+  id: Equals(System.Object)
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Equals(object)
+  nameWithType: Attribute.Equals(object)
+  fullName: Terminal.Gui.Attribute.Equals(object)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Equals
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 772
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public override bool Equals(object obj)
+    parameters:
+    - id: obj
+      type: System.Object
+    return:
+      type: System.Boolean
+    content.vb: Public Overrides Function Equals(obj As Object) As Boolean
+  overridden: System.ValueType.Equals(System.Object)
+  overload: Terminal.Gui.Attribute.Equals*
+  nameWithType.vb: Attribute.Equals(Object)
+  fullName.vb: Terminal.Gui.Attribute.Equals(Object)
+  name.vb: Equals(Object)
+- uid: Terminal.Gui.Attribute.Equals(Terminal.Gui.Attribute)
+  commentId: M:Terminal.Gui.Attribute.Equals(Terminal.Gui.Attribute)
+  id: Equals(Terminal.Gui.Attribute)
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: Equals(Attribute)
+  nameWithType: Attribute.Equals(Attribute)
+  fullName: Terminal.Gui.Attribute.Equals(Terminal.Gui.Attribute)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Equals
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 778
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public bool Equals(Attribute other)
+    parameters:
+    - id: other
+      type: Terminal.Gui.Attribute
+    return:
+      type: System.Boolean
+    content.vb: Public Function Equals(other As Attribute) As Boolean
+  overload: Terminal.Gui.Attribute.Equals*
+  implements:
+  - System.IEquatable{Terminal.Gui.Attribute}.Equals(Terminal.Gui.Attribute)
+- uid: Terminal.Gui.Attribute.GetHashCode
+  commentId: M:Terminal.Gui.Attribute.GetHashCode
+  id: GetHashCode
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: GetHashCode()
+  nameWithType: Attribute.GetHashCode()
+  fullName: Terminal.Gui.Attribute.GetHashCode()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GetHashCode
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 786
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public override int GetHashCode()
+    return:
+      type: System.Int32
+    content.vb: Public Overrides Function GetHashCode() As Integer
+  overridden: System.ValueType.GetHashCode
+  overload: Terminal.Gui.Attribute.GetHashCode*
+- uid: Terminal.Gui.Attribute.ToString
+  commentId: M:Terminal.Gui.Attribute.ToString
+  id: ToString
+  parent: Terminal.Gui.Attribute
+  langs:
+  - csharp
+  - vb
+  name: ToString()
+  nameWithType: Attribute.ToString()
+  fullName: Terminal.Gui.Attribute.ToString()
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Color.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToString
+    path: ../Terminal.Gui/Drawing/Color.cs
+    startLine: 789
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  example: []
+  syntax:
+    content: public override string ToString()
+    return:
+      type: System.String
+    content.vb: Public Overrides Function ToString() As String
+  overridden: System.ValueType.ToString
+  overload: Terminal.Gui.Attribute.ToString*
+references:
+- uid: Terminal.Gui.Attribute
+  commentId: T:Terminal.Gui.Attribute
+  parent: Terminal.Gui
+  href: Terminal.Gui.Attribute.html
+  name: Attribute
+  nameWithType: Attribute
+  fullName: Terminal.Gui.Attribute
+- uid: Terminal.Gui.ColorScheme
+  commentId: T:Terminal.Gui.ColorScheme
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorScheme.html
+  name: ColorScheme
+  nameWithType: ColorScheme
+  fullName: Terminal.Gui.ColorScheme
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.IEquatable{Terminal.Gui.Attribute}
+  commentId: T:System.IEquatable{Terminal.Gui.Attribute}
+  parent: System
+  definition: System.IEquatable`1
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<Attribute>
+  nameWithType: IEquatable<Attribute>
+  fullName: System.IEquatable<Terminal.Gui.Attribute>
+  nameWithType.vb: IEquatable(Of Attribute)
+  fullName.vb: System.IEquatable(Of Terminal.Gui.Attribute)
+  name.vb: IEquatable(Of Attribute)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.IEquatable`1
+  commentId: T:System.IEquatable`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  name: IEquatable<T>
+  nameWithType: IEquatable<T>
+  fullName: System.IEquatable<T>
+  nameWithType.vb: IEquatable(Of T)
+  fullName.vb: System.IEquatable(Of T)
+  name.vb: IEquatable(Of T)
+  spec.csharp:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.IEquatable`1
+    name: IEquatable
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: Terminal.Gui.Attribute.Foreground*
+  commentId: Overload:Terminal.Gui.Attribute.Foreground
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.Foreground
+  name: Foreground
+  nameWithType: Attribute.Foreground
+  fullName: Terminal.Gui.Attribute.Foreground
+- uid: Terminal.Gui.Color
+  commentId: T:Terminal.Gui.Color
+  parent: Terminal.Gui
+  href: Terminal.Gui.Color.html
+  name: Color
+  nameWithType: Color
+  fullName: Terminal.Gui.Color
+- uid: Terminal.Gui.Attribute.Background*
+  commentId: Overload:Terminal.Gui.Attribute.Background
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.Background
+  name: Background
+  nameWithType: Attribute.Background
+  fullName: Terminal.Gui.Attribute.Background
+- uid: Terminal.Gui.Attribute.#ctor*
+  commentId: Overload:Terminal.Gui.Attribute.#ctor
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.#ctor
+  name: Attribute
+  nameWithType: Attribute.Attribute
+  fullName: Terminal.Gui.Attribute.Attribute
+  nameWithType.vb: Attribute.New
+  fullName.vb: Terminal.Gui.Attribute.New
+  name.vb: New
+- uid: Terminal.Gui.ColorName
+  commentId: T:Terminal.Gui.ColorName
+  parent: Terminal.Gui
+  href: Terminal.Gui.ColorName.html
+  name: ColorName
+  nameWithType: ColorName
+  fullName: Terminal.Gui.ColorName
+- uid: Terminal.Gui.Attribute.op_Equality*
+  commentId: Overload:Terminal.Gui.Attribute.op_Equality
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.op_Equality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  name: operator ==
+  nameWithType: Attribute.operator ==
+  fullName: Terminal.Gui.Attribute.operator ==
+  nameWithType.vb: Attribute.=
+  fullName.vb: Terminal.Gui.Attribute.=
+  name.vb: =
+  spec.csharp:
+  - name: operator
+  - name: " "
+  - uid: Terminal.Gui.Attribute.op_Equality*
+    name: ==
+    href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.op_Equality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: Terminal.Gui.Attribute.op_Inequality*
+  commentId: Overload:Terminal.Gui.Attribute.op_Inequality
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.op_Inequality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+  name: operator !=
+  nameWithType: Attribute.operator !=
+  fullName: Terminal.Gui.Attribute.operator !=
+  nameWithType.vb: Attribute.<>
+  fullName.vb: Terminal.Gui.Attribute.<>
+  name.vb: <>
+  spec.csharp:
+  - name: operator
+  - name: " "
+  - uid: Terminal.Gui.Attribute.op_Inequality*
+    name: '!='
+    href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.op_Inequality(Terminal.Gui.Attribute,Terminal.Gui.Attribute)
+- uid: System.ValueType.Equals(System.Object)
+  commentId: M:System.ValueType.Equals(System.Object)
+  parent: System.ValueType
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype.equals
+  name: Equals(object)
+  nameWithType: ValueType.Equals(object)
+  fullName: System.ValueType.Equals(object)
+  nameWithType.vb: ValueType.Equals(Object)
+  fullName.vb: System.ValueType.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.equals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.equals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: Terminal.Gui.Attribute.Equals*
+  commentId: Overload:Terminal.Gui.Attribute.Equals
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.Equals(System.Object)
+  name: Equals
+  nameWithType: Attribute.Equals
+  fullName: Terminal.Gui.Attribute.Equals
+- uid: System.ValueType
+  commentId: T:System.ValueType
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype
+  name: ValueType
+  nameWithType: ValueType
+  fullName: System.ValueType
+- uid: System.IEquatable{Terminal.Gui.Attribute}.Equals(Terminal.Gui.Attribute)
+  commentId: M:System.IEquatable{Terminal.Gui.Attribute}.Equals(Terminal.Gui.Attribute)
+  parent: System.IEquatable{Terminal.Gui.Attribute}
+  definition: System.IEquatable`1.Equals(`0)
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-terminal.gui.attribute-.equals#system-iequatable((terminal-gui-attribute))-equals(terminal-gui-attribute)
+  name: Equals(Attribute)
+  nameWithType: IEquatable<Attribute>.Equals(Attribute)
+  fullName: System.IEquatable<Terminal.Gui.Attribute>.Equals(Terminal.Gui.Attribute)
+  nameWithType.vb: IEquatable(Of Attribute).Equals(Attribute)
+  fullName.vb: System.IEquatable(Of Terminal.Gui.Attribute).Equals(Terminal.Gui.Attribute)
+  spec.csharp:
+  - uid: System.IEquatable{Terminal.Gui.Attribute}.Equals(Terminal.Gui.Attribute)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-terminal.gui.attribute-.equals#system-iequatable((terminal-gui-attribute))-equals(terminal-gui-attribute)
+  - name: (
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: )
+  spec.vb:
+  - uid: System.IEquatable{Terminal.Gui.Attribute}.Equals(Terminal.Gui.Attribute)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-terminal.gui.attribute-.equals#system-iequatable((terminal-gui-attribute))-equals(terminal-gui-attribute)
+  - name: (
+  - uid: Terminal.Gui.Attribute
+    name: Attribute
+    href: Terminal.Gui.Attribute.html
+  - name: )
+- uid: System.IEquatable`1.Equals(`0)
+  commentId: M:System.IEquatable`1.Equals(`0)
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals
+  name: Equals(T)
+  nameWithType: IEquatable<T>.Equals(T)
+  fullName: System.IEquatable<T>.Equals(T)
+  nameWithType.vb: IEquatable(Of T).Equals(T)
+  fullName.vb: System.IEquatable(Of T).Equals(T)
+  spec.csharp:
+  - uid: System.IEquatable`1.Equals(`0)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals
+  - name: (
+  - name: T
+  - name: )
+  spec.vb:
+  - uid: System.IEquatable`1.Equals(`0)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals
+  - name: (
+  - name: T
+  - name: )
+- uid: System.ValueType.GetHashCode
+  commentId: M:System.ValueType.GetHashCode
+  parent: System.ValueType
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode
+  name: GetHashCode()
+  nameWithType: ValueType.GetHashCode()
+  fullName: System.ValueType.GetHashCode()
+  spec.csharp:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.gethashcode
+  - name: (
+  - name: )
+- uid: Terminal.Gui.Attribute.GetHashCode*
+  commentId: Overload:Terminal.Gui.Attribute.GetHashCode
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.GetHashCode
+  name: GetHashCode
+  nameWithType: Attribute.GetHashCode
+  fullName: Terminal.Gui.Attribute.GetHashCode
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: System.ValueType.ToString
+  commentId: M:System.ValueType.ToString
+  parent: System.ValueType
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.valuetype.tostring
+  name: ToString()
+  nameWithType: ValueType.ToString()
+  fullName: System.ValueType.ToString()
+  spec.csharp:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.ValueType.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.valuetype.tostring
+  - name: (
+  - name: )
+- uid: Terminal.Gui.Attribute.ToString*
+  commentId: Overload:Terminal.Gui.Attribute.ToString
+  href: Terminal.Gui.Attribute.html#Terminal.Gui.Attribute.ToString
+  name: ToString
+  nameWithType: Attribute.ToString
+  fullName: Terminal.Gui.Attribute.ToString
+- uid: System.String
+  commentId: T:System.String
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.string
+  name: string
+  nameWithType: string
+  fullName: string
+  nameWithType.vb: String
+  fullName.vb: String
+  name.vb: String
+shouldSkipMarkup: true

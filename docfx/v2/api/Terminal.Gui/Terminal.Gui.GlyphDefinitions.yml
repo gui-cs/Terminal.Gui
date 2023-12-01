@@ -1,0 +1,5283 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.GlyphDefinitions
+  commentId: T:Terminal.Gui.GlyphDefinitions
+  id: GlyphDefinitions
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.GlyphDefinitions.Apple
+  - Terminal.Gui.GlyphDefinitions.AppleBMP
+  - Terminal.Gui.GlyphDefinitions.BlackCircle
+  - Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+  - Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+  - Terminal.Gui.GlyphDefinitions.BottomTee
+  - Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+  - Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+  - Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+  - Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+  - Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+  - Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+  - Terminal.Gui.GlyphDefinitions.Checked
+  - Terminal.Gui.GlyphDefinitions.Close
+  - Terminal.Gui.GlyphDefinitions.Collapse
+  - Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+  - Terminal.Gui.GlyphDefinitions.Cross
+  - Terminal.Gui.GlyphDefinitions.CrossDbl
+  - Terminal.Gui.GlyphDefinitions.CrossDblH
+  - Terminal.Gui.GlyphDefinitions.CrossDblV
+  - Terminal.Gui.GlyphDefinitions.CrossHv
+  - Terminal.Gui.GlyphDefinitions.CrossHvH
+  - Terminal.Gui.GlyphDefinitions.CrossHvV
+  - Terminal.Gui.GlyphDefinitions.Diamond
+  - Terminal.Gui.GlyphDefinitions.Dot
+  - Terminal.Gui.GlyphDefinitions.DownArrow
+  - Terminal.Gui.GlyphDefinitions.Expand
+  - Terminal.Gui.GlyphDefinitions.File
+  - Terminal.Gui.GlyphDefinitions.Folder
+  - Terminal.Gui.GlyphDefinitions.HalfBottomLine
+  - Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+  - Terminal.Gui.GlyphDefinitions.HalfLeftLine
+  - Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+  - Terminal.Gui.GlyphDefinitions.HalfRightLine
+  - Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+  - Terminal.Gui.GlyphDefinitions.HalfTopLine
+  - Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+  - Terminal.Gui.GlyphDefinitions.HLine
+  - Terminal.Gui.GlyphDefinitions.HLineDa2
+  - Terminal.Gui.GlyphDefinitions.HLineDa3
+  - Terminal.Gui.GlyphDefinitions.HLineDa4
+  - Terminal.Gui.GlyphDefinitions.HLineDbl
+  - Terminal.Gui.GlyphDefinitions.HLineHv
+  - Terminal.Gui.GlyphDefinitions.HLineHvDa2
+  - Terminal.Gui.GlyphDefinitions.HLineHvDa3
+  - Terminal.Gui.GlyphDefinitions.HLineHvDa4
+  - Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+  - Terminal.Gui.GlyphDefinitions.IdenticalTo
+  - Terminal.Gui.GlyphDefinitions.LeftArrow
+  - Terminal.Gui.GlyphDefinitions.LeftBracket
+  - Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+  - Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+  - Terminal.Gui.GlyphDefinitions.LeftTee
+  - Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+  - Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+  - Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+  - Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+  - Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+  - Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+  - Terminal.Gui.GlyphDefinitions.LLCorner
+  - Terminal.Gui.GlyphDefinitions.LLCornerDbl
+  - Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+  - Terminal.Gui.GlyphDefinitions.LLCornerHv
+  - Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+  - Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+  - Terminal.Gui.GlyphDefinitions.LLCornerR
+  - Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+  - Terminal.Gui.GlyphDefinitions.LRCorner
+  - Terminal.Gui.GlyphDefinitions.LRCornerDbl
+  - Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+  - Terminal.Gui.GlyphDefinitions.LRCornerHv
+  - Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+  - Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+  - Terminal.Gui.GlyphDefinitions.LRCornerR
+  - Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+  - Terminal.Gui.GlyphDefinitions.Maximize
+  - Terminal.Gui.GlyphDefinitions.Minimize
+  - Terminal.Gui.GlyphDefinitions.NullChecked
+  - Terminal.Gui.GlyphDefinitions.RightArrow
+  - Terminal.Gui.GlyphDefinitions.RightBracket
+  - Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+  - Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+  - Terminal.Gui.GlyphDefinitions.RightTee
+  - Terminal.Gui.GlyphDefinitions.RightTeeDbl
+  - Terminal.Gui.GlyphDefinitions.RightTeeDblH
+  - Terminal.Gui.GlyphDefinitions.RightTeeDblV
+  - Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+  - Terminal.Gui.GlyphDefinitions.RightTeeHvH
+  - Terminal.Gui.GlyphDefinitions.RightTeeHvV
+  - Terminal.Gui.GlyphDefinitions.Selected
+  - Terminal.Gui.GlyphDefinitions.Stipple
+  - Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+  - Terminal.Gui.GlyphDefinitions.TopTee
+  - Terminal.Gui.GlyphDefinitions.TopTeeDbl
+  - Terminal.Gui.GlyphDefinitions.TopTeeDblH
+  - Terminal.Gui.GlyphDefinitions.TopTeeDblV
+  - Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+  - Terminal.Gui.GlyphDefinitions.TopTeeHvH
+  - Terminal.Gui.GlyphDefinitions.TopTeeHvV
+  - Terminal.Gui.GlyphDefinitions.ULCorner
+  - Terminal.Gui.GlyphDefinitions.ULCornerDbl
+  - Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+  - Terminal.Gui.GlyphDefinitions.ULCornerHv
+  - Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+  - Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+  - Terminal.Gui.GlyphDefinitions.ULCornerR
+  - Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+  - Terminal.Gui.GlyphDefinitions.UnChecked
+  - Terminal.Gui.GlyphDefinitions.UnSelected
+  - Terminal.Gui.GlyphDefinitions.UpArrow
+  - Terminal.Gui.GlyphDefinitions.URCorner
+  - Terminal.Gui.GlyphDefinitions.URCornerDbl
+  - Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+  - Terminal.Gui.GlyphDefinitions.URCornerHv
+  - Terminal.Gui.GlyphDefinitions.URCornerHvLt
+  - Terminal.Gui.GlyphDefinitions.URCornerLtHv
+  - Terminal.Gui.GlyphDefinitions.URCornerR
+  - Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+  - Terminal.Gui.GlyphDefinitions.VerticalFourDots
+  - Terminal.Gui.GlyphDefinitions.VLine
+  - Terminal.Gui.GlyphDefinitions.VLineDa2
+  - Terminal.Gui.GlyphDefinitions.VLineDa3
+  - Terminal.Gui.GlyphDefinitions.VLineDa4
+  - Terminal.Gui.GlyphDefinitions.VLineDbl
+  - Terminal.Gui.GlyphDefinitions.VLineHv
+  - Terminal.Gui.GlyphDefinitions.VLineHvDa2
+  - Terminal.Gui.GlyphDefinitions.VLineHvDa3
+  - Terminal.Gui.GlyphDefinitions.VLineHvDa4
+  langs:
+  - csharp
+  - vb
+  name: GlyphDefinitions
+  nameWithType: GlyphDefinitions
+  fullName: Terminal.Gui.GlyphDefinitions
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: GlyphDefinitions
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 23
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...
+  remarks: >-
+    <p>
+
+    Access with <xref href="Terminal.Gui.ConfigurationManager.Glyphs" data-throw-if-not-resolved="false"></xref> (which is a global using alias for <xref href="Terminal.Gui.ConfigurationManager.Glyphs" data-throw-if-not-resolved="false"></xref>).
+
+    </p>
+
+    <p>
+
+    The default glyphs can be changed via the <xref href="Terminal.Gui.ConfigurationManager" data-throw-if-not-resolved="false"></xref>. Within a <code>config.json</code> file 
+
+    The Json property name is the property name prefixed with "Glyphs.". 
+
+    </p>
+
+    <p>
+
+    The JSon property can be either a decimal number or a string. The string may be one of:
+
+    - A unicode char (e.g. "☑")
+
+    - A hex value in U+ format (e.g. "U+2611")
+
+    - A hex value in UTF-16 format (e.g. "\\u2611")
+
+    </p>
+  example: []
+  syntax:
+    content: public class GlyphDefinitions
+    content.vb: Public Class GlyphDefinitions
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.GlyphDefinitions.Checked
+  commentId: P:Terminal.Gui.GlyphDefinitions.Checked
+  id: Checked
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Checked
+  nameWithType: GlyphDefinitions.Checked
+  fullName: Terminal.Gui.GlyphDefinitions.Checked
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Checked
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 29
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Checked indicator (e.g. for <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.CheckBox" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune Checked { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Checked As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Checked*
+- uid: Terminal.Gui.GlyphDefinitions.UnChecked
+  commentId: P:Terminal.Gui.GlyphDefinitions.UnChecked
+  id: UnChecked
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: UnChecked
+  nameWithType: GlyphDefinitions.UnChecked
+  fullName: Terminal.Gui.GlyphDefinitions.UnChecked
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UnChecked
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 34
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Not Checked indicator (e.g. for <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.CheckBox" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune UnChecked { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property UnChecked As Rune
+  overload: Terminal.Gui.GlyphDefinitions.UnChecked*
+- uid: Terminal.Gui.GlyphDefinitions.NullChecked
+  commentId: P:Terminal.Gui.GlyphDefinitions.NullChecked
+  id: NullChecked
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: NullChecked
+  nameWithType: GlyphDefinitions.NullChecked
+  fullName: Terminal.Gui.GlyphDefinitions.NullChecked
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NullChecked
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 39
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Null Checked indicator (e.g. for <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.CheckBox" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune NullChecked { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property NullChecked As Rune
+  overload: Terminal.Gui.GlyphDefinitions.NullChecked*
+- uid: Terminal.Gui.GlyphDefinitions.Selected
+  commentId: P:Terminal.Gui.GlyphDefinitions.Selected
+  id: Selected
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Selected
+  nameWithType: GlyphDefinitions.Selected
+  fullName: Terminal.Gui.GlyphDefinitions.Selected
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Selected
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 44
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Selected indicator  (e.g. for <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.RadioGroup" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune Selected { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Selected As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Selected*
+- uid: Terminal.Gui.GlyphDefinitions.UnSelected
+  commentId: P:Terminal.Gui.GlyphDefinitions.UnSelected
+  id: UnSelected
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: UnSelected
+  nameWithType: GlyphDefinitions.UnSelected
+  fullName: Terminal.Gui.GlyphDefinitions.UnSelected
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UnSelected
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 49
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Not Selected indicator (e.g. for <xref href="Terminal.Gui.ListView" data-throw-if-not-resolved="false"></xref> and <xref href="Terminal.Gui.RadioGroup" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune UnSelected { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property UnSelected As Rune
+  overload: Terminal.Gui.GlyphDefinitions.UnSelected*
+- uid: Terminal.Gui.GlyphDefinitions.RightArrow
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightArrow
+  id: RightArrow
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightArrow
+  nameWithType: GlyphDefinitions.RightArrow
+  fullName: Terminal.Gui.GlyphDefinitions.RightArrow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightArrow
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 54
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Horizontal arrow.
+  example: []
+  syntax:
+    content: public Rune RightArrow { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightArrow As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightArrow*
+- uid: Terminal.Gui.GlyphDefinitions.LeftArrow
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftArrow
+  id: LeftArrow
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftArrow
+  nameWithType: GlyphDefinitions.LeftArrow
+  fullName: Terminal.Gui.GlyphDefinitions.LeftArrow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftArrow
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 59
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Left arrow.
+  example: []
+  syntax:
+    content: public Rune LeftArrow { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftArrow As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftArrow*
+- uid: Terminal.Gui.GlyphDefinitions.DownArrow
+  commentId: P:Terminal.Gui.GlyphDefinitions.DownArrow
+  id: DownArrow
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: DownArrow
+  nameWithType: GlyphDefinitions.DownArrow
+  fullName: Terminal.Gui.GlyphDefinitions.DownArrow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DownArrow
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 64
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Down arrow.
+  example: []
+  syntax:
+    content: public Rune DownArrow { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property DownArrow As Rune
+  overload: Terminal.Gui.GlyphDefinitions.DownArrow*
+- uid: Terminal.Gui.GlyphDefinitions.UpArrow
+  commentId: P:Terminal.Gui.GlyphDefinitions.UpArrow
+  id: UpArrow
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: UpArrow
+  nameWithType: GlyphDefinitions.UpArrow
+  fullName: Terminal.Gui.GlyphDefinitions.UpArrow
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UpArrow
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 69
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Vertical arrow.
+  example: []
+  syntax:
+    content: public Rune UpArrow { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property UpArrow As Rune
+  overload: Terminal.Gui.GlyphDefinitions.UpArrow*
+- uid: Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+  id: LeftDefaultIndicator
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftDefaultIndicator
+  nameWithType: GlyphDefinitions.LeftDefaultIndicator
+  fullName: Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftDefaultIndicator
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 74
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Left default indicator (e.g. for <xref href="Terminal.Gui.Button" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public Rune LeftDefaultIndicator { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftDefaultIndicator As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator*
+- uid: Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+  id: RightDefaultIndicator
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightDefaultIndicator
+  nameWithType: GlyphDefinitions.RightDefaultIndicator
+  fullName: Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightDefaultIndicator
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 79
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Horizontal default indicator (e.g. for <xref href="Terminal.Gui.Button" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public Rune RightDefaultIndicator { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightDefaultIndicator As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightDefaultIndicator*
+- uid: Terminal.Gui.GlyphDefinitions.LeftBracket
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftBracket
+  id: LeftBracket
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftBracket
+  nameWithType: GlyphDefinitions.LeftBracket
+  fullName: Terminal.Gui.GlyphDefinitions.LeftBracket
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftBracket
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 84
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Left Bracket (e.g. for <xref href="Terminal.Gui.Button" data-throw-if-not-resolved="false"></xref>. Default is (U+005B) - [.
+  example: []
+  syntax:
+    content: public Rune LeftBracket { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftBracket As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftBracket*
+- uid: Terminal.Gui.GlyphDefinitions.RightBracket
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightBracket
+  id: RightBracket
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightBracket
+  nameWithType: GlyphDefinitions.RightBracket
+  fullName: Terminal.Gui.GlyphDefinitions.RightBracket
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightBracket
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 89
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Horizontal Bracket (e.g. for <xref href="Terminal.Gui.Button" data-throw-if-not-resolved="false"></xref>. Default is (U+005D) - ].
+  example: []
+  syntax:
+    content: public Rune RightBracket { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightBracket As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightBracket*
+- uid: Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+  commentId: P:Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+  id: BlocksMeterSegment
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BlocksMeterSegment
+  nameWithType: GlyphDefinitions.BlocksMeterSegment
+  fullName: Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BlocksMeterSegment
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 94
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Half block meter segment (e.g. for <xref href="Terminal.Gui.ProgressBar" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune BlocksMeterSegment { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BlocksMeterSegment As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BlocksMeterSegment*
+- uid: Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+  commentId: P:Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+  id: ContinuousMeterSegment
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ContinuousMeterSegment
+  nameWithType: GlyphDefinitions.ContinuousMeterSegment
+  fullName: Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ContinuousMeterSegment
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 99
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Continuous block meter segment (e.g. for <xref href="Terminal.Gui.ProgressBar" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: public Rune ContinuousMeterSegment { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ContinuousMeterSegment As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment*
+- uid: Terminal.Gui.GlyphDefinitions.Stipple
+  commentId: P:Terminal.Gui.GlyphDefinitions.Stipple
+  id: Stipple
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Stipple
+  nameWithType: GlyphDefinitions.Stipple
+  fullName: Terminal.Gui.GlyphDefinitions.Stipple
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Stipple
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 104
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Stipple pattern (e.g. for <xref href="Terminal.Gui.ScrollBarView" data-throw-if-not-resolved="false"></xref>). Default is Light Shade (U+2591) - ░.
+  example: []
+  syntax:
+    content: public Rune Stipple { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Stipple As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Stipple*
+- uid: Terminal.Gui.GlyphDefinitions.Diamond
+  commentId: P:Terminal.Gui.GlyphDefinitions.Diamond
+  id: Diamond
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Diamond
+  nameWithType: GlyphDefinitions.Diamond
+  fullName: Terminal.Gui.GlyphDefinitions.Diamond
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Diamond
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 109
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Diamond (e.g. for <xref href="Terminal.Gui.ScrollBarView" data-throw-if-not-resolved="false"></xref>. Default is Lozenge (U+25CA) - ◊.
+  example: []
+  syntax:
+    content: public Rune Diamond { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Diamond As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Diamond*
+- uid: Terminal.Gui.GlyphDefinitions.Close
+  commentId: P:Terminal.Gui.GlyphDefinitions.Close
+  id: Close
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Close
+  nameWithType: GlyphDefinitions.Close
+  fullName: Terminal.Gui.GlyphDefinitions.Close
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Close
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 114
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Close. Default is Heavy Ballot X (U+2718) - ✘.
+  example: []
+  syntax:
+    content: public Rune Close { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Close As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Close*
+- uid: Terminal.Gui.GlyphDefinitions.Minimize
+  commentId: P:Terminal.Gui.GlyphDefinitions.Minimize
+  id: Minimize
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Minimize
+  nameWithType: GlyphDefinitions.Minimize
+  fullName: Terminal.Gui.GlyphDefinitions.Minimize
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Minimize
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 119
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Minimize. Default is Lower Horizontal Shadowed White Circle (U+274F) - ❏.
+  example: []
+  syntax:
+    content: public Rune Minimize { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Minimize As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Minimize*
+- uid: Terminal.Gui.GlyphDefinitions.Maximize
+  commentId: P:Terminal.Gui.GlyphDefinitions.Maximize
+  id: Maximize
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Maximize
+  nameWithType: GlyphDefinitions.Maximize
+  fullName: Terminal.Gui.GlyphDefinitions.Maximize
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Maximize
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 124
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Maximize. Default is Upper Horizontal Shadowed White Circle (U+273D) - ✽.
+  example: []
+  syntax:
+    content: public Rune Maximize { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Maximize As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Maximize*
+- uid: Terminal.Gui.GlyphDefinitions.Dot
+  commentId: P:Terminal.Gui.GlyphDefinitions.Dot
+  id: Dot
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Dot
+  nameWithType: GlyphDefinitions.Dot
+  fullName: Terminal.Gui.GlyphDefinitions.Dot
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Dot
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 129
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Dot. Default is (U+2219) - ∙.
+  example: []
+  syntax:
+    content: public Rune Dot { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Dot As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Dot*
+- uid: Terminal.Gui.GlyphDefinitions.BlackCircle
+  commentId: P:Terminal.Gui.GlyphDefinitions.BlackCircle
+  id: BlackCircle
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BlackCircle
+  nameWithType: GlyphDefinitions.BlackCircle
+  fullName: Terminal.Gui.GlyphDefinitions.BlackCircle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BlackCircle
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 134
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Black Circle . Default is (U+025cf) - ●.
+  example: []
+  syntax:
+    content: public Rune BlackCircle { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BlackCircle As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BlackCircle*
+- uid: Terminal.Gui.GlyphDefinitions.Expand
+  commentId: P:Terminal.Gui.GlyphDefinitions.Expand
+  id: Expand
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Expand
+  nameWithType: GlyphDefinitions.Expand
+  fullName: Terminal.Gui.GlyphDefinitions.Expand
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Expand
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 139
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Expand (e.g. for <xref href="Terminal.Gui.TreeView" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public Rune Expand { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Expand As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Expand*
+- uid: Terminal.Gui.GlyphDefinitions.Collapse
+  commentId: P:Terminal.Gui.GlyphDefinitions.Collapse
+  id: Collapse
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Collapse
+  nameWithType: GlyphDefinitions.Collapse
+  fullName: Terminal.Gui.GlyphDefinitions.Collapse
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Collapse
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 144
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Expand (e.g. for <xref href="Terminal.Gui.TreeView" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: public Rune Collapse { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Collapse As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Collapse*
+- uid: Terminal.Gui.GlyphDefinitions.IdenticalTo
+  commentId: P:Terminal.Gui.GlyphDefinitions.IdenticalTo
+  id: IdenticalTo
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: IdenticalTo
+  nameWithType: GlyphDefinitions.IdenticalTo
+  fullName: Terminal.Gui.GlyphDefinitions.IdenticalTo
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: IdenticalTo
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 149
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Identical To (U+226)
+  example: []
+  syntax:
+    content: public Rune IdenticalTo { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property IdenticalTo As Rune
+  overload: Terminal.Gui.GlyphDefinitions.IdenticalTo*
+- uid: Terminal.Gui.GlyphDefinitions.Apple
+  commentId: P:Terminal.Gui.GlyphDefinitions.Apple
+  id: Apple
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Apple
+  nameWithType: GlyphDefinitions.Apple
+  fullName: Terminal.Gui.GlyphDefinitions.Apple
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Apple
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 154
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: "Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610."
+  example: []
+  syntax:
+    content: public Rune Apple { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Apple As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Apple*
+- uid: Terminal.Gui.GlyphDefinitions.AppleBMP
+  commentId: P:Terminal.Gui.GlyphDefinitions.AppleBMP
+  id: AppleBMP
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: AppleBMP
+  nameWithType: GlyphDefinitions.AppleBMP
+  fullName: Terminal.Gui.GlyphDefinitions.AppleBMP
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: AppleBMP
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 159
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: 'Apple (BMP). Because snek. See Issue #2610.'
+  example: []
+  syntax:
+    content: public Rune AppleBMP { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property AppleBMP As Rune
+  overload: Terminal.Gui.GlyphDefinitions.AppleBMP*
+- uid: Terminal.Gui.GlyphDefinitions.Folder
+  commentId: P:Terminal.Gui.GlyphDefinitions.Folder
+  id: Folder
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Folder
+  nameWithType: GlyphDefinitions.Folder
+  fullName: Terminal.Gui.GlyphDefinitions.Folder
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Folder
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 171
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Folder icon.  Defaults to ꤉ (Kayah Li Digit Nine)
+  example: []
+  syntax:
+    content: public Rune Folder { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Folder As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Folder*
+- uid: Terminal.Gui.GlyphDefinitions.File
+  commentId: P:Terminal.Gui.GlyphDefinitions.File
+  id: File
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: File
+  nameWithType: GlyphDefinitions.File
+  fullName: Terminal.Gui.GlyphDefinitions.File
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: File
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 176
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: File icon.  Defaults to ☰ (Trigram For Heaven)
+  example: []
+  syntax:
+    content: public Rune File { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property File As Rune
+  overload: Terminal.Gui.GlyphDefinitions.File*
+- uid: Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+  commentId: P:Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+  id: HorizontalEllipsis
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HorizontalEllipsis
+  nameWithType: GlyphDefinitions.HorizontalEllipsis
+  fullName: Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HorizontalEllipsis
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 181
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Horizontal Ellipsis - … U+2026
+  example: []
+  syntax:
+    content: public Rune HorizontalEllipsis { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HorizontalEllipsis As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HorizontalEllipsis*
+- uid: Terminal.Gui.GlyphDefinitions.VerticalFourDots
+  commentId: P:Terminal.Gui.GlyphDefinitions.VerticalFourDots
+  id: VerticalFourDots
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VerticalFourDots
+  nameWithType: GlyphDefinitions.VerticalFourDots
+  fullName: Terminal.Gui.GlyphDefinitions.VerticalFourDots
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VerticalFourDots
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 186
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Vertical Four Dots - ⁞ U+205e
+  example: []
+  syntax:
+    content: public Rune VerticalFourDots { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VerticalFourDots As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VerticalFourDots*
+- uid: Terminal.Gui.GlyphDefinitions.HLine
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLine
+  id: HLine
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLine
+  nameWithType: GlyphDefinitions.HLine
+  fullName: Terminal.Gui.GlyphDefinitions.HLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLine
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 192
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Horizontal Line - Light (U+2500) - ─
+  example: []
+  syntax:
+    content: public Rune HLine { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLine As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLine*
+- uid: Terminal.Gui.GlyphDefinitions.VLine
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLine
+  id: VLine
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLine
+  nameWithType: GlyphDefinitions.VLine
+  fullName: Terminal.Gui.GlyphDefinitions.VLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLine
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 197
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Vertical Line - Light (U+2502) - │
+  example: []
+  syntax:
+    content: public Rune VLine { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLine As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLine*
+- uid: Terminal.Gui.GlyphDefinitions.HLineDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineDbl
+  id: HLineDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineDbl
+  nameWithType: GlyphDefinitions.HLineDbl
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 202
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Double Horizontal (U+2550) - ═
+  example: []
+  syntax:
+    content: public Rune HLineDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineDbl*
+- uid: Terminal.Gui.GlyphDefinitions.VLineDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineDbl
+  id: VLineDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineDbl
+  nameWithType: GlyphDefinitions.VLineDbl
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 207
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Double Vertical (U+2551) - ║
+  example: []
+  syntax:
+    content: public Rune VLineDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineDbl*
+- uid: Terminal.Gui.GlyphDefinitions.HLineHvDa2
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineHvDa2
+  id: HLineHvDa2
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineHvDa2
+  nameWithType: GlyphDefinitions.HLineHvDa2
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHvDa2
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineHvDa2
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 212
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Double Dash Horizontal (U+254D) - ╍
+  example: []
+  syntax:
+    content: public Rune HLineHvDa2 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineHvDa2 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineHvDa2*
+- uid: Terminal.Gui.GlyphDefinitions.VLineHvDa3
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineHvDa3
+  id: VLineHvDa3
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineHvDa3
+  nameWithType: GlyphDefinitions.VLineHvDa3
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHvDa3
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineHvDa3
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 217
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Triple Dash Vertical (U+2507) - ┇
+  example: []
+  syntax:
+    content: public Rune VLineHvDa3 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineHvDa3 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineHvDa3*
+- uid: Terminal.Gui.GlyphDefinitions.HLineHvDa3
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineHvDa3
+  id: HLineHvDa3
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineHvDa3
+  nameWithType: GlyphDefinitions.HLineHvDa3
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHvDa3
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineHvDa3
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 222
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Triple Dash Horizontal (U+2505) - ┅
+  example: []
+  syntax:
+    content: public Rune HLineHvDa3 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineHvDa3 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineHvDa3*
+- uid: Terminal.Gui.GlyphDefinitions.HLineHvDa4
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineHvDa4
+  id: HLineHvDa4
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineHvDa4
+  nameWithType: GlyphDefinitions.HLineHvDa4
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHvDa4
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineHvDa4
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 227
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Quadruple Dash Horizontal (U+2509) - ┉
+  example: []
+  syntax:
+    content: public Rune HLineHvDa4 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineHvDa4 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineHvDa4*
+- uid: Terminal.Gui.GlyphDefinitions.VLineHvDa2
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineHvDa2
+  id: VLineHvDa2
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineHvDa2
+  nameWithType: GlyphDefinitions.VLineHvDa2
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHvDa2
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineHvDa2
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 232
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Double Dash Vertical (U+254F) - ╏
+  example: []
+  syntax:
+    content: public Rune VLineHvDa2 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineHvDa2 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineHvDa2*
+- uid: Terminal.Gui.GlyphDefinitions.VLineHvDa4
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineHvDa4
+  id: VLineHvDa4
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineHvDa4
+  nameWithType: GlyphDefinitions.VLineHvDa4
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHvDa4
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineHvDa4
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 237
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Quadruple Dash Vertical (U+250B) - ┋
+  example: []
+  syntax:
+    content: public Rune VLineHvDa4 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineHvDa4 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineHvDa4*
+- uid: Terminal.Gui.GlyphDefinitions.HLineDa2
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineDa2
+  id: HLineDa2
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineDa2
+  nameWithType: GlyphDefinitions.HLineDa2
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDa2
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineDa2
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 242
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Double Dash Horizontal (U+254C) - ╌
+  example: []
+  syntax:
+    content: public Rune HLineDa2 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineDa2 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineDa2*
+- uid: Terminal.Gui.GlyphDefinitions.VLineDa3
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineDa3
+  id: VLineDa3
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineDa3
+  nameWithType: GlyphDefinitions.VLineDa3
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDa3
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineDa3
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 247
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Triple Dash Vertical (U+2506) - ┆
+  example: []
+  syntax:
+    content: public Rune VLineDa3 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineDa3 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineDa3*
+- uid: Terminal.Gui.GlyphDefinitions.HLineDa3
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineDa3
+  id: HLineDa3
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineDa3
+  nameWithType: GlyphDefinitions.HLineDa3
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDa3
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineDa3
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 252
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Triple Dash Horizontal (U+2504) - ┄
+  example: []
+  syntax:
+    content: public Rune HLineDa3 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineDa3 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineDa3*
+- uid: Terminal.Gui.GlyphDefinitions.HLineDa4
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineDa4
+  id: HLineDa4
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineDa4
+  nameWithType: GlyphDefinitions.HLineDa4
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDa4
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineDa4
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 257
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Quadruple Dash Horizontal (U+2508) - ┈
+  example: []
+  syntax:
+    content: public Rune HLineDa4 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineDa4 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineDa4*
+- uid: Terminal.Gui.GlyphDefinitions.VLineDa2
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineDa2
+  id: VLineDa2
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineDa2
+  nameWithType: GlyphDefinitions.VLineDa2
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDa2
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineDa2
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 262
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Double Dash Vertical (U+254E) - ╎
+  example: []
+  syntax:
+    content: public Rune VLineDa2 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineDa2 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineDa2*
+- uid: Terminal.Gui.GlyphDefinitions.VLineDa4
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineDa4
+  id: VLineDa4
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineDa4
+  nameWithType: GlyphDefinitions.VLineDa4
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDa4
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineDa4
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 267
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Quadruple Dash Vertical (U+250A) - ┊
+  example: []
+  syntax:
+    content: public Rune VLineDa4 { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineDa4 As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineDa4*
+- uid: Terminal.Gui.GlyphDefinitions.HLineHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.HLineHv
+  id: HLineHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HLineHv
+  nameWithType: GlyphDefinitions.HLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HLineHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 272
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Horizontal (U+2501) - ━
+  example: []
+  syntax:
+    content: public Rune HLineHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HLineHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HLineHv*
+- uid: Terminal.Gui.GlyphDefinitions.VLineHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.VLineHv
+  id: VLineHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: VLineHv
+  nameWithType: GlyphDefinitions.VLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: VLineHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 277
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Vertical (U+2503) - ┃
+  example: []
+  syntax:
+    content: public Rune VLineHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property VLineHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.VLineHv*
+- uid: Terminal.Gui.GlyphDefinitions.HalfLeftLine
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfLeftLine
+  id: HalfLeftLine
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfLeftLine
+  nameWithType: GlyphDefinitions.HalfLeftLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfLeftLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfLeftLine
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 282
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Left (U+2574) - ╴
+  example: []
+  syntax:
+    content: public Rune HalfLeftLine { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfLeftLine As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfLeftLine*
+- uid: Terminal.Gui.GlyphDefinitions.HalfTopLine
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfTopLine
+  id: HalfTopLine
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfTopLine
+  nameWithType: GlyphDefinitions.HalfTopLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfTopLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfTopLine
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 287
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Vertical (U+2575) - ╵
+  example: []
+  syntax:
+    content: public Rune HalfTopLine { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfTopLine As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfTopLine*
+- uid: Terminal.Gui.GlyphDefinitions.HalfRightLine
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfRightLine
+  id: HalfRightLine
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfRightLine
+  nameWithType: GlyphDefinitions.HalfRightLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfRightLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfRightLine
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 292
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Horizontal (U+2576) - ╶
+  example: []
+  syntax:
+    content: public Rune HalfRightLine { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfRightLine As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfRightLine*
+- uid: Terminal.Gui.GlyphDefinitions.HalfBottomLine
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfBottomLine
+  id: HalfBottomLine
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfBottomLine
+  nameWithType: GlyphDefinitions.HalfBottomLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfBottomLine
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfBottomLine
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 297
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Down (U+2577) - ╷
+  example: []
+  syntax:
+    content: public Rune HalfBottomLine { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfBottomLine As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfBottomLine*
+- uid: Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+  id: HalfLeftLineHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfLeftLineHv
+  nameWithType: GlyphDefinitions.HalfLeftLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfLeftLineHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 302
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Left (U+2578) - ╸
+  example: []
+  syntax:
+    content: public Rune HalfLeftLineHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfLeftLineHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfLeftLineHv*
+- uid: Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+  id: HalfTopLineHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfTopLineHv
+  nameWithType: GlyphDefinitions.HalfTopLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfTopLineHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 307
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Vertical (U+2579) - ╹
+  example: []
+  syntax:
+    content: public Rune HalfTopLineHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfTopLineHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfTopLineHv*
+- uid: Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+  id: HalfRightLineHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfRightLineHv
+  nameWithType: GlyphDefinitions.HalfRightLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfRightLineHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 312
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Horizontal (U+257A) - ╺
+  example: []
+  syntax:
+    content: public Rune HalfRightLineHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfRightLineHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfRightLineHv*
+- uid: Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+  id: HalfBottomLineLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: HalfBottomLineLt
+  nameWithType: GlyphDefinitions.HalfBottomLineLt
+  fullName: Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: HalfBottomLineLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 317
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Vertical and Horizontal (U+257B) - ╻
+  example: []
+  syntax:
+    content: public Rune HalfBottomLineLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property HalfBottomLineLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.HalfBottomLineLt*
+- uid: Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+  id: RightSideLineLtHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightSideLineLtHv
+  nameWithType: GlyphDefinitions.RightSideLineLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightSideLineLtHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 322
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Horizontal and Heavy Horizontal (U+257C) - ╼
+  example: []
+  syntax:
+    content: public Rune RightSideLineLtHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightSideLineLtHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightSideLineLtHv*
+- uid: Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+  id: BottomSideLineLtHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomSideLineLtHv
+  nameWithType: GlyphDefinitions.BottomSideLineLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomSideLineLtHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 327
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Light Vertical and Heavy Horizontal (U+257D) - ╽
+  example: []
+  syntax:
+    content: public Rune BottomSideLineLtHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomSideLineLtHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv*
+- uid: Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+  id: LeftSideLineHvLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftSideLineHvLt
+  nameWithType: GlyphDefinitions.LeftSideLineHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftSideLineHvLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 332
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Left and Light Horizontal (U+257E) - ╾
+  example: []
+  syntax:
+    content: public Rune LeftSideLineHvLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftSideLineHvLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt*
+- uid: Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+  id: TopSideLineHvLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopSideLineHvLt
+  nameWithType: GlyphDefinitions.TopSideLineHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopSideLineHvLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 337
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Vertical and Light Horizontal (U+257F) - ╿
+  example: []
+  syntax:
+    content: public Rune TopSideLineHvLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopSideLineHvLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopSideLineHvLt*
+- uid: Terminal.Gui.GlyphDefinitions.ULCorner
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCorner
+  id: ULCorner
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCorner
+  nameWithType: GlyphDefinitions.ULCorner
+  fullName: Terminal.Gui.GlyphDefinitions.ULCorner
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCorner
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 344
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Left Corner - Light Vertical and Light Horizontal (U+250C) - ┌
+  example: []
+  syntax:
+    content: public Rune ULCorner { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCorner As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCorner*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerDbl
+  id: ULCornerDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerDbl
+  nameWithType: GlyphDefinitions.ULCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 349
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Left Corner -  Double (U+2554) - ╔
+  example: []
+  syntax:
+    content: public Rune ULCornerDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerDbl*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerR
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerR
+  id: ULCornerR
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerR
+  nameWithType: GlyphDefinitions.ULCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerR
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerR
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 354
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Left Corner - Light Arc Down and Horizontal (U+256D) - ╭
+  example: []
+  syntax:
+    content: public Rune ULCornerR { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerR As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerR*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerHv
+  id: ULCornerHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerHv
+  nameWithType: GlyphDefinitions.ULCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 359
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Down and Horizontal (U+250F) - ┏
+  example: []
+  syntax:
+    content: public Rune ULCornerHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerHv*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+  id: ULCornerHvLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerHvLt
+  nameWithType: GlyphDefinitions.ULCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerHvLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 364
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Down Heavy and Horizontal Light (U+251E) - ┎
+  example: []
+  syntax:
+    content: public Rune ULCornerHvLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerHvLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerHvLt*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+  id: ULCornerLtHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerLtHv
+  nameWithType: GlyphDefinitions.ULCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerLtHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 369
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Down Light and Horizontal Heavy (U+250D) - ┎
+  example: []
+  syntax:
+    content: public Rune ULCornerLtHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerLtHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerLtHv*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+  id: ULCornerDblSingle
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerDblSingle
+  nameWithType: GlyphDefinitions.ULCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerDblSingle
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 374
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Double Down and Single Horizontal (U+2553) - ╓
+  example: []
+  syntax:
+    content: public Rune ULCornerDblSingle { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerDblSingle As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerDblSingle*
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+  id: ULCornerSingleDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: ULCornerSingleDbl
+  nameWithType: GlyphDefinitions.ULCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ULCornerSingleDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 379
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Single Down and Double Horizontal (U+2552) - ╒
+  example: []
+  syntax:
+    content: public Rune ULCornerSingleDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property ULCornerSingleDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LLCorner
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCorner
+  id: LLCorner
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCorner
+  nameWithType: GlyphDefinitions.LLCorner
+  fullName: Terminal.Gui.GlyphDefinitions.LLCorner
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCorner
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 386
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Left Corner - Light Vertical and Light Horizontal (U+2514) - └
+  example: []
+  syntax:
+    content: public Rune LLCorner { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCorner As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCorner*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerHv
+  id: LLCornerHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerHv
+  nameWithType: GlyphDefinitions.LLCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 391
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Vertical and Horizontal (U+2517) - ┗
+  example: []
+  syntax:
+    content: public Rune LLCornerHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerHv*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+  id: LLCornerHvLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerHvLt
+  nameWithType: GlyphDefinitions.LLCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerHvLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 396
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Vertical and Horizontal Light (U+2516) - ┖
+  example: []
+  syntax:
+    content: public Rune LLCornerHvLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerHvLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerHvLt*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+  id: LLCornerLtHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerLtHv
+  nameWithType: GlyphDefinitions.LLCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerLtHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 401
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Vertical Light and Horizontal Heavy (U+2511) - ┕
+  example: []
+  syntax:
+    content: public Rune LLCornerLtHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerLtHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerLtHv*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerDbl
+  id: LLCornerDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerDbl
+  nameWithType: GlyphDefinitions.LLCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 406
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Double Vertical and Double Left (U+255A) - ╚
+  example: []
+  syntax:
+    content: public Rune LLCornerDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+  id: LLCornerSingleDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerSingleDbl
+  nameWithType: GlyphDefinitions.LLCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerSingleDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 411
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Single Vertical and Double Left (U+2558) - ╘
+  example: []
+  syntax:
+    content: public Rune LLCornerSingleDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerSingleDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+  id: LLCornerDblSingle
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerDblSingle
+  nameWithType: GlyphDefinitions.LLCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerDblSingle
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 416
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Double Down and Single Left (U+2559) - ╙
+  example: []
+  syntax:
+    content: public Rune LLCornerDblSingle { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerDblSingle As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerDblSingle*
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerR
+  commentId: P:Terminal.Gui.GlyphDefinitions.LLCornerR
+  id: LLCornerR
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LLCornerR
+  nameWithType: GlyphDefinitions.LLCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerR
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LLCornerR
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 421
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Left Corner - Light Arc Down and Left (U+2570) - ╰
+  example: []
+  syntax:
+    content: public Rune LLCornerR { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LLCornerR As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LLCornerR*
+- uid: Terminal.Gui.GlyphDefinitions.URCorner
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCorner
+  id: URCorner
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCorner
+  nameWithType: GlyphDefinitions.URCorner
+  fullName: Terminal.Gui.GlyphDefinitions.URCorner
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCorner
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 429
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Horizontal Corner - Light Vertical and Light Horizontal (U+2510) - ┐
+  example: []
+  syntax:
+    content: public Rune URCorner { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCorner As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCorner*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerDbl
+  id: URCornerDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerDbl
+  nameWithType: GlyphDefinitions.URCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 434
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Horizontal Corner - Double Vertical and Double Horizontal (U+2557) - ╗
+  example: []
+  syntax:
+    content: public Rune URCornerDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerDbl*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerR
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerR
+  id: URCornerR
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerR
+  nameWithType: GlyphDefinitions.URCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerR
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerR
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 439
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Upper Horizontal Corner - Light Arc Vertical and Horizontal (U+256E) - ╮
+  example: []
+  syntax:
+    content: public Rune URCornerR { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerR As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerR*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerHv
+  id: URCornerHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerHv
+  nameWithType: GlyphDefinitions.URCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 444
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Down and Left (U+2513) - ┓
+  example: []
+  syntax:
+    content: public Rune URCornerHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerHv*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerHvLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerHvLt
+  id: URCornerHvLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerHvLt
+  nameWithType: GlyphDefinitions.URCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerHvLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerHvLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 449
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Heavy Vertical and Left Down Light (U+2511) - ┑
+  example: []
+  syntax:
+    content: public Rune URCornerHvLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerHvLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerHvLt*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerLtHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerLtHv
+  id: URCornerLtHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerLtHv
+  nameWithType: GlyphDefinitions.URCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerLtHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerLtHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 454
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Down Light and Horizontal Heavy (U+2514) - ┒
+  example: []
+  syntax:
+    content: public Rune URCornerLtHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerLtHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerLtHv*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+  id: URCornerDblSingle
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerDblSingle
+  nameWithType: GlyphDefinitions.URCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerDblSingle
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 459
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Double Vertical and Single Left (U+2556) - ╖
+  example: []
+  syntax:
+    content: public Rune URCornerDblSingle { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerDblSingle As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerDblSingle*
+- uid: Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+  id: URCornerSingleDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: URCornerSingleDbl
+  nameWithType: GlyphDefinitions.URCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: URCornerSingleDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 464
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Single Vertical and Double Left (U+2555) - ╕
+  example: []
+  syntax:
+    content: public Rune URCornerSingleDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property URCornerSingleDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.URCornerSingleDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LRCorner
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCorner
+  id: LRCorner
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCorner
+  nameWithType: GlyphDefinitions.LRCorner
+  fullName: Terminal.Gui.GlyphDefinitions.LRCorner
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCorner
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 471
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Light (U+2518) - ┘
+  example: []
+  syntax:
+    content: public Rune LRCorner { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCorner As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCorner*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerDbl
+  id: LRCornerDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerDbl
+  nameWithType: GlyphDefinitions.LRCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 476
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Double (U+255D) - ╝
+  example: []
+  syntax:
+    content: public Rune LRCornerDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerR
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerR
+  id: LRCornerR
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerR
+  nameWithType: GlyphDefinitions.LRCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerR
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerR
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 481
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Rounded (U+256F) - ╯
+  example: []
+  syntax:
+    content: public Rune LRCornerR { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerR As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerR*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerHv
+  id: LRCornerHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerHv
+  nameWithType: GlyphDefinitions.LRCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 486
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Heavy (U+251B) - ┛
+  example: []
+  syntax:
+    content: public Rune LRCornerHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerHv*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+  id: LRCornerDblSingle
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerDblSingle
+  nameWithType: GlyphDefinitions.LRCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerDblSingle
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 491
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Double Vertical and Single Horizontal (U+255C) - ╜
+  example: []
+  syntax:
+    content: public Rune LRCornerDblSingle { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerDblSingle As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerDblSingle*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+  id: LRCornerSingleDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerSingleDbl
+  nameWithType: GlyphDefinitions.LRCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerSingleDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 496
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Single Vertical and Double Horizontal (U+255B) - ╛
+  example: []
+  syntax:
+    content: public Rune LRCornerSingleDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerSingleDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+  id: LRCornerLtHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerLtHv
+  nameWithType: GlyphDefinitions.LRCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerLtHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 501
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Light Vertical and Heavy Horizontal (U+2519) - ┙
+  example: []
+  syntax:
+    content: public Rune LRCornerLtHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerLtHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerLtHv*
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+  commentId: P:Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+  id: LRCornerHvLt
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LRCornerHvLt
+  nameWithType: GlyphDefinitions.LRCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LRCornerHvLt
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 506
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Lower Right Corner - Heavy Vertical and Light Horizontal (U+251A) - ┚
+  example: []
+  syntax:
+    content: public Rune LRCornerHvLt { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LRCornerHvLt As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LRCornerHvLt*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTee
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTee
+  id: LeftTee
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTee
+  nameWithType: GlyphDefinitions.LeftTee
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTee
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTee
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 513
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Single Vertical and Single Horizontal (U+251C) - ├
+  example: []
+  syntax:
+    content: public Rune LeftTee { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTee As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTee*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+  id: LeftTeeDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTeeDblH
+  nameWithType: GlyphDefinitions.LeftTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTeeDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 518
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Single Vertical and Double Horizontal (U+255E) - ╞
+  example: []
+  syntax:
+    content: public Rune LeftTeeDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTeeDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTeeDblH*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+  id: LeftTeeDblV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTeeDblV
+  nameWithType: GlyphDefinitions.LeftTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTeeDblV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 523
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Double Vertical and Single Horizontal (U+255F) - ╟
+  example: []
+  syntax:
+    content: public Rune LeftTeeDblV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTeeDblV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTeeDblV*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+  id: LeftTeeDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTeeDbl
+  nameWithType: GlyphDefinitions.LeftTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTeeDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 528
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Double Vertical and Double Horizontal (U+2560) - ╠
+  example: []
+  syntax:
+    content: public Rune LeftTeeDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTeeDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTeeDbl*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+  id: LeftTeeHvH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTeeHvH
+  nameWithType: GlyphDefinitions.LeftTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTeeHvH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 533
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Heavy Horizontal and Light Vertical (U+2523) - ┝
+  example: []
+  syntax:
+    content: public Rune LeftTeeHvH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTeeHvH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTeeHvH*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+  id: LeftTeeHvV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTeeHvV
+  nameWithType: GlyphDefinitions.LeftTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTeeHvV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 538
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Light Horizontal and Heavy Vertical (U+252B) - ┠
+  example: []
+  syntax:
+    content: public Rune LeftTeeHvV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTeeHvV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTeeHvV*
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+  id: LeftTeeHvDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: LeftTeeHvDblH
+  nameWithType: GlyphDefinitions.LeftTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftTeeHvDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 543
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Left Tee - Heavy Vertical and Heavy Horizontal (U+2527) - ┣
+  example: []
+  syntax:
+    content: public Rune LeftTeeHvDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property LeftTeeHvDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH*
+- uid: Terminal.Gui.GlyphDefinitions.RightTee
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTee
+  id: RightTee
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTee
+  nameWithType: GlyphDefinitions.RightTee
+  fullName: Terminal.Gui.GlyphDefinitions.RightTee
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTee
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 548
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Righ Tee - Single Vertical and Single Horizontal (U+2524) - ┤
+  example: []
+  syntax:
+    content: public Rune RightTee { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTee As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTee*
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTeeDblH
+  id: RightTeeDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTeeDblH
+  nameWithType: GlyphDefinitions.RightTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTeeDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 553
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Right Tee - Single Vertical and Double Horizontal (U+2561) - ╡
+  example: []
+  syntax:
+    content: public Rune RightTeeDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTeeDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTeeDblH*
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeDblV
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTeeDblV
+  id: RightTeeDblV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTeeDblV
+  nameWithType: GlyphDefinitions.RightTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeDblV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTeeDblV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 558
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Right Tee - Double Vertical and Single Horizontal (U+2562) - ╢
+  example: []
+  syntax:
+    content: public Rune RightTeeDblV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTeeDblV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTeeDblV*
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTeeDbl
+  id: RightTeeDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTeeDbl
+  nameWithType: GlyphDefinitions.RightTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTeeDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 563
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Right Tee - Double Vertical and Double Horizontal (U+2563) - ╣
+  example: []
+  syntax:
+    content: public Rune RightTeeDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTeeDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTeeDbl*
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeHvH
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTeeHvH
+  id: RightTeeHvH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTeeHvH
+  nameWithType: GlyphDefinitions.RightTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeHvH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTeeHvH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 568
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Right Tee - Heavy Horizontal and Light Vertical (U+2528) - ┥
+  example: []
+  syntax:
+    content: public Rune RightTeeHvH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTeeHvH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTeeHvH*
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeHvV
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTeeHvV
+  id: RightTeeHvV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTeeHvV
+  nameWithType: GlyphDefinitions.RightTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeHvV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTeeHvV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 573
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Right Tee - Light Horizontal and Heavy Vertical (U+2530) - ┨
+  example: []
+  syntax:
+    content: public Rune RightTeeHvV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTeeHvV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTeeHvV*
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+  id: RightTeeHvDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: RightTeeHvDblH
+  nameWithType: GlyphDefinitions.RightTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightTeeHvDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 578
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Right Tee - Heavy Vertical and Heavy Horizontal (U+252C) - ┫
+  example: []
+  syntax:
+    content: public Rune RightTeeHvDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property RightTeeHvDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.RightTeeHvDblH*
+- uid: Terminal.Gui.GlyphDefinitions.TopTee
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTee
+  id: TopTee
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTee
+  nameWithType: GlyphDefinitions.TopTee
+  fullName: Terminal.Gui.GlyphDefinitions.TopTee
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTee
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 583
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Single Vertical and Single Horizontal (U+252C) - ┬
+  example: []
+  syntax:
+    content: public Rune TopTee { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTee As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTee*
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTeeDblH
+  id: TopTeeDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTeeDblH
+  nameWithType: GlyphDefinitions.TopTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTeeDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 588
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Single Vertical and Double Horizontal (U+2564) - ╤
+  example: []
+  syntax:
+    content: public Rune TopTeeDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTeeDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTeeDblH*
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeDblV
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTeeDblV
+  id: TopTeeDblV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTeeDblV
+  nameWithType: GlyphDefinitions.TopTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeDblV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTeeDblV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 593
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Double Vertical and Single Horizontal  (U+2565) - ╥
+  example: []
+  syntax:
+    content: public Rune TopTeeDblV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTeeDblV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTeeDblV*
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTeeDbl
+  id: TopTeeDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTeeDbl
+  nameWithType: GlyphDefinitions.TopTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTeeDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 598
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Double Vertical and Double Horizontal (U+2566) - ╦
+  example: []
+  syntax:
+    content: public Rune TopTeeDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTeeDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTeeDbl*
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeHvH
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTeeHvH
+  id: TopTeeHvH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTeeHvH
+  nameWithType: GlyphDefinitions.TopTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeHvH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTeeHvH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 603
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Heavy Horizontal and Light Vertical (U+252F) - ┯
+  example: []
+  syntax:
+    content: public Rune TopTeeHvH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTeeHvH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTeeHvH*
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeHvV
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTeeHvV
+  id: TopTeeHvV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTeeHvV
+  nameWithType: GlyphDefinitions.TopTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeHvV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTeeHvV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 608
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Light Horizontal and Heavy Vertical (U+2537) - ┰
+  example: []
+  syntax:
+    content: public Rune TopTeeHvV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTeeHvV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTeeHvV*
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+  id: TopTeeHvDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: TopTeeHvDblH
+  nameWithType: GlyphDefinitions.TopTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopTeeHvDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 613
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Top Tee - Heavy Vertical and Heavy Horizontal (U+2533) - ┳
+  example: []
+  syntax:
+    content: public Rune TopTeeHvDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property TopTeeHvDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.TopTeeHvDblH*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTee
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTee
+  id: BottomTee
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTee
+  nameWithType: GlyphDefinitions.BottomTee
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTee
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTee
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 618
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Single Vertical and Single Horizontal (U+2534) - ┴
+  example: []
+  syntax:
+    content: public Rune BottomTee { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTee As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTee*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+  id: BottomTeeDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTeeDblH
+  nameWithType: GlyphDefinitions.BottomTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTeeDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 623
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Single Vertical and Double Horizontal (U+2567) - ╧
+  example: []
+  syntax:
+    content: public Rune BottomTeeDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTeeDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTeeDblH*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+  id: BottomTeeDblV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTeeDblV
+  nameWithType: GlyphDefinitions.BottomTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTeeDblV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 628
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Double Vertical and Single Horizontal (U+2568) - ╨
+  example: []
+  syntax:
+    content: public Rune BottomTeeDblV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTeeDblV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTeeDblV*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+  id: BottomTeeDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTeeDbl
+  nameWithType: GlyphDefinitions.BottomTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTeeDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 633
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Double Vertical and Double Horizontal (U+2569) - ╩
+  example: []
+  syntax:
+    content: public Rune BottomTeeDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTeeDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTeeDbl*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+  id: BottomTeeHvH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTeeHvH
+  nameWithType: GlyphDefinitions.BottomTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTeeHvH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 638
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Heavy Horizontal and Light Vertical (U+2535) - ┷
+  example: []
+  syntax:
+    content: public Rune BottomTeeHvH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTeeHvH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTeeHvH*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+  id: BottomTeeHvV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTeeHvV
+  nameWithType: GlyphDefinitions.BottomTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTeeHvV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 643
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Light Horizontal and Heavy Vertical (U+253D) - ┸
+  example: []
+  syntax:
+    content: public Rune BottomTeeHvV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTeeHvV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTeeHvV*
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+  id: BottomTeeHvDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: BottomTeeHvDblH
+  nameWithType: GlyphDefinitions.BottomTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomTeeHvDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 648
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Bottom Tee - Heavy Vertical and Heavy Horizontal (U+2539) - ┻
+  example: []
+  syntax:
+    content: public Rune BottomTeeHvDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property BottomTeeHvDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH*
+- uid: Terminal.Gui.GlyphDefinitions.Cross
+  commentId: P:Terminal.Gui.GlyphDefinitions.Cross
+  id: Cross
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: Cross
+  nameWithType: GlyphDefinitions.Cross
+  fullName: Terminal.Gui.GlyphDefinitions.Cross
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Cross
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 656
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Single Vertical and Single Horizontal (U+253C) - ┼
+  example: []
+  syntax:
+    content: public Rune Cross { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property Cross As Rune
+  overload: Terminal.Gui.GlyphDefinitions.Cross*
+- uid: Terminal.Gui.GlyphDefinitions.CrossDblH
+  commentId: P:Terminal.Gui.GlyphDefinitions.CrossDblH
+  id: CrossDblH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: CrossDblH
+  nameWithType: GlyphDefinitions.CrossDblH
+  fullName: Terminal.Gui.GlyphDefinitions.CrossDblH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CrossDblH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 661
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Single Vertical and Double Horizontal (U+256A) - ╪
+  example: []
+  syntax:
+    content: public Rune CrossDblH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CrossDblH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.CrossDblH*
+- uid: Terminal.Gui.GlyphDefinitions.CrossDblV
+  commentId: P:Terminal.Gui.GlyphDefinitions.CrossDblV
+  id: CrossDblV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: CrossDblV
+  nameWithType: GlyphDefinitions.CrossDblV
+  fullName: Terminal.Gui.GlyphDefinitions.CrossDblV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CrossDblV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 666
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Double Vertical and Single Horizontal (U+256B) - ╫
+  example: []
+  syntax:
+    content: public Rune CrossDblV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CrossDblV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.CrossDblV*
+- uid: Terminal.Gui.GlyphDefinitions.CrossDbl
+  commentId: P:Terminal.Gui.GlyphDefinitions.CrossDbl
+  id: CrossDbl
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: CrossDbl
+  nameWithType: GlyphDefinitions.CrossDbl
+  fullName: Terminal.Gui.GlyphDefinitions.CrossDbl
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CrossDbl
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 671
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Double Vertical and Double Horizontal (U+256C) - ╬
+  example: []
+  syntax:
+    content: public Rune CrossDbl { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CrossDbl As Rune
+  overload: Terminal.Gui.GlyphDefinitions.CrossDbl*
+- uid: Terminal.Gui.GlyphDefinitions.CrossHvH
+  commentId: P:Terminal.Gui.GlyphDefinitions.CrossHvH
+  id: CrossHvH
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: CrossHvH
+  nameWithType: GlyphDefinitions.CrossHvH
+  fullName: Terminal.Gui.GlyphDefinitions.CrossHvH
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CrossHvH
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 676
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Heavy Horizontal and Light Vertical (U+253F) - ┿
+  example: []
+  syntax:
+    content: public Rune CrossHvH { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CrossHvH As Rune
+  overload: Terminal.Gui.GlyphDefinitions.CrossHvH*
+- uid: Terminal.Gui.GlyphDefinitions.CrossHvV
+  commentId: P:Terminal.Gui.GlyphDefinitions.CrossHvV
+  id: CrossHvV
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: CrossHvV
+  nameWithType: GlyphDefinitions.CrossHvV
+  fullName: Terminal.Gui.GlyphDefinitions.CrossHvV
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CrossHvV
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 681
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Light Horizontal and Heavy Vertical (U+2541) - ╂
+  example: []
+  syntax:
+    content: public Rune CrossHvV { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CrossHvV As Rune
+  overload: Terminal.Gui.GlyphDefinitions.CrossHvV*
+- uid: Terminal.Gui.GlyphDefinitions.CrossHv
+  commentId: P:Terminal.Gui.GlyphDefinitions.CrossHv
+  id: CrossHv
+  parent: Terminal.Gui.GlyphDefinitions
+  langs:
+  - csharp
+  - vb
+  name: CrossHv
+  nameWithType: GlyphDefinitions.CrossHv
+  fullName: Terminal.Gui.GlyphDefinitions.CrossHv
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Drawing/Glyphs.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CrossHv
+    path: ../Terminal.Gui/Drawing/Glyphs.cs
+    startLine: 686
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Box Drawings Cross - Heavy Vertical and Heavy Horizontal (U+254B) - ╋
+  example: []
+  syntax:
+    content: public Rune CrossHv { get; set; }
+    parameters: []
+    return:
+      type: System.Text.Rune
+    content.vb: Public Property CrossHv As Rune
+  overload: Terminal.Gui.GlyphDefinitions.CrossHv*
+references:
+- uid: Terminal.Gui.ConfigurationManager.Glyphs
+  commentId: P:Terminal.Gui.ConfigurationManager.Glyphs
+  href: Terminal.Gui.ConfigurationManager.html#Terminal.Gui.ConfigurationManager.Glyphs
+  name: Glyphs
+  nameWithType: ConfigurationManager.Glyphs
+  fullName: Terminal.Gui.ConfigurationManager.Glyphs
+- uid: Terminal.Gui.ConfigurationManager
+  commentId: T:Terminal.Gui.ConfigurationManager
+  href: Terminal.Gui.ConfigurationManager.html
+  name: ConfigurationManager
+  nameWithType: ConfigurationManager
+  fullName: Terminal.Gui.ConfigurationManager
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ListView
+  commentId: T:Terminal.Gui.ListView
+  parent: Terminal.Gui
+  href: Terminal.Gui.ListView.html
+  name: ListView
+  nameWithType: ListView
+  fullName: Terminal.Gui.ListView
+- uid: Terminal.Gui.CheckBox
+  commentId: T:Terminal.Gui.CheckBox
+  href: Terminal.Gui.CheckBox.html
+  name: CheckBox
+  nameWithType: CheckBox
+  fullName: Terminal.Gui.CheckBox
+- uid: Terminal.Gui.GlyphDefinitions.Checked*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Checked
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Checked
+  name: Checked
+  nameWithType: GlyphDefinitions.Checked
+  fullName: Terminal.Gui.GlyphDefinitions.Checked
+- uid: System.Text.Rune
+  commentId: T:System.Text.Rune
+  parent: System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.text.rune
+  name: Rune
+  nameWithType: Rune
+  fullName: System.Text.Rune
+- uid: System.Text
+  commentId: N:System.Text
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Text
+  nameWithType: System.Text
+  fullName: System.Text
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Text
+    name: Text
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.text
+- uid: Terminal.Gui.GlyphDefinitions.UnChecked*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.UnChecked
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.UnChecked
+  name: UnChecked
+  nameWithType: GlyphDefinitions.UnChecked
+  fullName: Terminal.Gui.GlyphDefinitions.UnChecked
+- uid: Terminal.Gui.GlyphDefinitions.NullChecked*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.NullChecked
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.NullChecked
+  name: NullChecked
+  nameWithType: GlyphDefinitions.NullChecked
+  fullName: Terminal.Gui.GlyphDefinitions.NullChecked
+- uid: Terminal.Gui.RadioGroup
+  commentId: T:Terminal.Gui.RadioGroup
+  href: Terminal.Gui.RadioGroup.html
+  name: RadioGroup
+  nameWithType: RadioGroup
+  fullName: Terminal.Gui.RadioGroup
+- uid: Terminal.Gui.GlyphDefinitions.Selected*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Selected
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Selected
+  name: Selected
+  nameWithType: GlyphDefinitions.Selected
+  fullName: Terminal.Gui.GlyphDefinitions.Selected
+- uid: Terminal.Gui.GlyphDefinitions.UnSelected*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.UnSelected
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.UnSelected
+  name: UnSelected
+  nameWithType: GlyphDefinitions.UnSelected
+  fullName: Terminal.Gui.GlyphDefinitions.UnSelected
+- uid: Terminal.Gui.GlyphDefinitions.RightArrow*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightArrow
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightArrow
+  name: RightArrow
+  nameWithType: GlyphDefinitions.RightArrow
+  fullName: Terminal.Gui.GlyphDefinitions.RightArrow
+- uid: Terminal.Gui.GlyphDefinitions.LeftArrow*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftArrow
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftArrow
+  name: LeftArrow
+  nameWithType: GlyphDefinitions.LeftArrow
+  fullName: Terminal.Gui.GlyphDefinitions.LeftArrow
+- uid: Terminal.Gui.GlyphDefinitions.DownArrow*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.DownArrow
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.DownArrow
+  name: DownArrow
+  nameWithType: GlyphDefinitions.DownArrow
+  fullName: Terminal.Gui.GlyphDefinitions.DownArrow
+- uid: Terminal.Gui.GlyphDefinitions.UpArrow*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.UpArrow
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.UpArrow
+  name: UpArrow
+  nameWithType: GlyphDefinitions.UpArrow
+  fullName: Terminal.Gui.GlyphDefinitions.UpArrow
+- uid: Terminal.Gui.Button
+  commentId: T:Terminal.Gui.Button
+  parent: Terminal.Gui
+  href: Terminal.Gui.Button.html
+  name: Button
+  nameWithType: Button
+  fullName: Terminal.Gui.Button
+- uid: Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+  name: LeftDefaultIndicator
+  nameWithType: GlyphDefinitions.LeftDefaultIndicator
+  fullName: Terminal.Gui.GlyphDefinitions.LeftDefaultIndicator
+- uid: Terminal.Gui.GlyphDefinitions.RightDefaultIndicator*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+  name: RightDefaultIndicator
+  nameWithType: GlyphDefinitions.RightDefaultIndicator
+  fullName: Terminal.Gui.GlyphDefinitions.RightDefaultIndicator
+- uid: Terminal.Gui.GlyphDefinitions.LeftBracket*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftBracket
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftBracket
+  name: LeftBracket
+  nameWithType: GlyphDefinitions.LeftBracket
+  fullName: Terminal.Gui.GlyphDefinitions.LeftBracket
+- uid: Terminal.Gui.GlyphDefinitions.RightBracket*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightBracket
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightBracket
+  name: RightBracket
+  nameWithType: GlyphDefinitions.RightBracket
+  fullName: Terminal.Gui.GlyphDefinitions.RightBracket
+- uid: Terminal.Gui.ProgressBar
+  commentId: T:Terminal.Gui.ProgressBar
+  href: Terminal.Gui.ProgressBar.html
+  name: ProgressBar
+  nameWithType: ProgressBar
+  fullName: Terminal.Gui.ProgressBar
+- uid: Terminal.Gui.GlyphDefinitions.BlocksMeterSegment*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+  name: BlocksMeterSegment
+  nameWithType: GlyphDefinitions.BlocksMeterSegment
+  fullName: Terminal.Gui.GlyphDefinitions.BlocksMeterSegment
+- uid: Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+  name: ContinuousMeterSegment
+  nameWithType: GlyphDefinitions.ContinuousMeterSegment
+  fullName: Terminal.Gui.GlyphDefinitions.ContinuousMeterSegment
+- uid: Terminal.Gui.ScrollBarView
+  commentId: T:Terminal.Gui.ScrollBarView
+  parent: Terminal.Gui
+  href: Terminal.Gui.ScrollBarView.html
+  name: ScrollBarView
+  nameWithType: ScrollBarView
+  fullName: Terminal.Gui.ScrollBarView
+- uid: Terminal.Gui.GlyphDefinitions.Stipple*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Stipple
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Stipple
+  name: Stipple
+  nameWithType: GlyphDefinitions.Stipple
+  fullName: Terminal.Gui.GlyphDefinitions.Stipple
+- uid: Terminal.Gui.GlyphDefinitions.Diamond*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Diamond
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Diamond
+  name: Diamond
+  nameWithType: GlyphDefinitions.Diamond
+  fullName: Terminal.Gui.GlyphDefinitions.Diamond
+- uid: Terminal.Gui.GlyphDefinitions.Close*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Close
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Close
+  name: Close
+  nameWithType: GlyphDefinitions.Close
+  fullName: Terminal.Gui.GlyphDefinitions.Close
+- uid: Terminal.Gui.GlyphDefinitions.Minimize*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Minimize
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Minimize
+  name: Minimize
+  nameWithType: GlyphDefinitions.Minimize
+  fullName: Terminal.Gui.GlyphDefinitions.Minimize
+- uid: Terminal.Gui.GlyphDefinitions.Maximize*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Maximize
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Maximize
+  name: Maximize
+  nameWithType: GlyphDefinitions.Maximize
+  fullName: Terminal.Gui.GlyphDefinitions.Maximize
+- uid: Terminal.Gui.GlyphDefinitions.Dot*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Dot
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Dot
+  name: Dot
+  nameWithType: GlyphDefinitions.Dot
+  fullName: Terminal.Gui.GlyphDefinitions.Dot
+- uid: Terminal.Gui.GlyphDefinitions.BlackCircle*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BlackCircle
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BlackCircle
+  name: BlackCircle
+  nameWithType: GlyphDefinitions.BlackCircle
+  fullName: Terminal.Gui.GlyphDefinitions.BlackCircle
+- uid: Terminal.Gui.TreeView
+  commentId: T:Terminal.Gui.TreeView
+  href: Terminal.Gui.TreeView.html
+  name: TreeView
+  nameWithType: TreeView
+  fullName: Terminal.Gui.TreeView
+- uid: Terminal.Gui.GlyphDefinitions.Expand*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Expand
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Expand
+  name: Expand
+  nameWithType: GlyphDefinitions.Expand
+  fullName: Terminal.Gui.GlyphDefinitions.Expand
+- uid: Terminal.Gui.GlyphDefinitions.Collapse*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Collapse
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Collapse
+  name: Collapse
+  nameWithType: GlyphDefinitions.Collapse
+  fullName: Terminal.Gui.GlyphDefinitions.Collapse
+- uid: Terminal.Gui.GlyphDefinitions.IdenticalTo*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.IdenticalTo
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.IdenticalTo
+  name: IdenticalTo
+  nameWithType: GlyphDefinitions.IdenticalTo
+  fullName: Terminal.Gui.GlyphDefinitions.IdenticalTo
+- uid: Terminal.Gui.GlyphDefinitions.Apple*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Apple
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Apple
+  name: Apple
+  nameWithType: GlyphDefinitions.Apple
+  fullName: Terminal.Gui.GlyphDefinitions.Apple
+- uid: Terminal.Gui.GlyphDefinitions.AppleBMP*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.AppleBMP
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.AppleBMP
+  name: AppleBMP
+  nameWithType: GlyphDefinitions.AppleBMP
+  fullName: Terminal.Gui.GlyphDefinitions.AppleBMP
+- uid: Terminal.Gui.GlyphDefinitions.Folder*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Folder
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Folder
+  name: Folder
+  nameWithType: GlyphDefinitions.Folder
+  fullName: Terminal.Gui.GlyphDefinitions.Folder
+- uid: Terminal.Gui.GlyphDefinitions.File*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.File
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.File
+  name: File
+  nameWithType: GlyphDefinitions.File
+  fullName: Terminal.Gui.GlyphDefinitions.File
+- uid: Terminal.Gui.GlyphDefinitions.HorizontalEllipsis*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+  name: HorizontalEllipsis
+  nameWithType: GlyphDefinitions.HorizontalEllipsis
+  fullName: Terminal.Gui.GlyphDefinitions.HorizontalEllipsis
+- uid: Terminal.Gui.GlyphDefinitions.VerticalFourDots*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VerticalFourDots
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VerticalFourDots
+  name: VerticalFourDots
+  nameWithType: GlyphDefinitions.VerticalFourDots
+  fullName: Terminal.Gui.GlyphDefinitions.VerticalFourDots
+- uid: Terminal.Gui.GlyphDefinitions.HLine*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLine
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLine
+  name: HLine
+  nameWithType: GlyphDefinitions.HLine
+  fullName: Terminal.Gui.GlyphDefinitions.HLine
+- uid: Terminal.Gui.GlyphDefinitions.VLine*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLine
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLine
+  name: VLine
+  nameWithType: GlyphDefinitions.VLine
+  fullName: Terminal.Gui.GlyphDefinitions.VLine
+- uid: Terminal.Gui.GlyphDefinitions.HLineDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineDbl
+  name: HLineDbl
+  nameWithType: GlyphDefinitions.HLineDbl
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDbl
+- uid: Terminal.Gui.GlyphDefinitions.VLineDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineDbl
+  name: VLineDbl
+  nameWithType: GlyphDefinitions.VLineDbl
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDbl
+- uid: Terminal.Gui.GlyphDefinitions.HLineHvDa2*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineHvDa2
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineHvDa2
+  name: HLineHvDa2
+  nameWithType: GlyphDefinitions.HLineHvDa2
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHvDa2
+- uid: Terminal.Gui.GlyphDefinitions.VLineHvDa3*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineHvDa3
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineHvDa3
+  name: VLineHvDa3
+  nameWithType: GlyphDefinitions.VLineHvDa3
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHvDa3
+- uid: Terminal.Gui.GlyphDefinitions.HLineHvDa3*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineHvDa3
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineHvDa3
+  name: HLineHvDa3
+  nameWithType: GlyphDefinitions.HLineHvDa3
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHvDa3
+- uid: Terminal.Gui.GlyphDefinitions.HLineHvDa4*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineHvDa4
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineHvDa4
+  name: HLineHvDa4
+  nameWithType: GlyphDefinitions.HLineHvDa4
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHvDa4
+- uid: Terminal.Gui.GlyphDefinitions.VLineHvDa2*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineHvDa2
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineHvDa2
+  name: VLineHvDa2
+  nameWithType: GlyphDefinitions.VLineHvDa2
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHvDa2
+- uid: Terminal.Gui.GlyphDefinitions.VLineHvDa4*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineHvDa4
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineHvDa4
+  name: VLineHvDa4
+  nameWithType: GlyphDefinitions.VLineHvDa4
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHvDa4
+- uid: Terminal.Gui.GlyphDefinitions.HLineDa2*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineDa2
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineDa2
+  name: HLineDa2
+  nameWithType: GlyphDefinitions.HLineDa2
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDa2
+- uid: Terminal.Gui.GlyphDefinitions.VLineDa3*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineDa3
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineDa3
+  name: VLineDa3
+  nameWithType: GlyphDefinitions.VLineDa3
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDa3
+- uid: Terminal.Gui.GlyphDefinitions.HLineDa3*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineDa3
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineDa3
+  name: HLineDa3
+  nameWithType: GlyphDefinitions.HLineDa3
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDa3
+- uid: Terminal.Gui.GlyphDefinitions.HLineDa4*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineDa4
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineDa4
+  name: HLineDa4
+  nameWithType: GlyphDefinitions.HLineDa4
+  fullName: Terminal.Gui.GlyphDefinitions.HLineDa4
+- uid: Terminal.Gui.GlyphDefinitions.VLineDa2*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineDa2
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineDa2
+  name: VLineDa2
+  nameWithType: GlyphDefinitions.VLineDa2
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDa2
+- uid: Terminal.Gui.GlyphDefinitions.VLineDa4*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineDa4
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineDa4
+  name: VLineDa4
+  nameWithType: GlyphDefinitions.VLineDa4
+  fullName: Terminal.Gui.GlyphDefinitions.VLineDa4
+- uid: Terminal.Gui.GlyphDefinitions.HLineHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HLineHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HLineHv
+  name: HLineHv
+  nameWithType: GlyphDefinitions.HLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HLineHv
+- uid: Terminal.Gui.GlyphDefinitions.VLineHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.VLineHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.VLineHv
+  name: VLineHv
+  nameWithType: GlyphDefinitions.VLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.VLineHv
+- uid: Terminal.Gui.GlyphDefinitions.HalfLeftLine*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfLeftLine
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfLeftLine
+  name: HalfLeftLine
+  nameWithType: GlyphDefinitions.HalfLeftLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfLeftLine
+- uid: Terminal.Gui.GlyphDefinitions.HalfTopLine*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfTopLine
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfTopLine
+  name: HalfTopLine
+  nameWithType: GlyphDefinitions.HalfTopLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfTopLine
+- uid: Terminal.Gui.GlyphDefinitions.HalfRightLine*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfRightLine
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfRightLine
+  name: HalfRightLine
+  nameWithType: GlyphDefinitions.HalfRightLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfRightLine
+- uid: Terminal.Gui.GlyphDefinitions.HalfBottomLine*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfBottomLine
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfBottomLine
+  name: HalfBottomLine
+  nameWithType: GlyphDefinitions.HalfBottomLine
+  fullName: Terminal.Gui.GlyphDefinitions.HalfBottomLine
+- uid: Terminal.Gui.GlyphDefinitions.HalfLeftLineHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+  name: HalfLeftLineHv
+  nameWithType: GlyphDefinitions.HalfLeftLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HalfLeftLineHv
+- uid: Terminal.Gui.GlyphDefinitions.HalfTopLineHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+  name: HalfTopLineHv
+  nameWithType: GlyphDefinitions.HalfTopLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HalfTopLineHv
+- uid: Terminal.Gui.GlyphDefinitions.HalfRightLineHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+  name: HalfRightLineHv
+  nameWithType: GlyphDefinitions.HalfRightLineHv
+  fullName: Terminal.Gui.GlyphDefinitions.HalfRightLineHv
+- uid: Terminal.Gui.GlyphDefinitions.HalfBottomLineLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+  name: HalfBottomLineLt
+  nameWithType: GlyphDefinitions.HalfBottomLineLt
+  fullName: Terminal.Gui.GlyphDefinitions.HalfBottomLineLt
+- uid: Terminal.Gui.GlyphDefinitions.RightSideLineLtHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+  name: RightSideLineLtHv
+  nameWithType: GlyphDefinitions.RightSideLineLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.RightSideLineLtHv
+- uid: Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+  name: BottomSideLineLtHv
+  nameWithType: GlyphDefinitions.BottomSideLineLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.BottomSideLineLtHv
+- uid: Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+  name: LeftSideLineHvLt
+  nameWithType: GlyphDefinitions.LeftSideLineHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.LeftSideLineHvLt
+- uid: Terminal.Gui.GlyphDefinitions.TopSideLineHvLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+  name: TopSideLineHvLt
+  nameWithType: GlyphDefinitions.TopSideLineHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.TopSideLineHvLt
+- uid: Terminal.Gui.GlyphDefinitions.ULCorner*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCorner
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCorner
+  name: ULCorner
+  nameWithType: GlyphDefinitions.ULCorner
+  fullName: Terminal.Gui.GlyphDefinitions.ULCorner
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerDbl
+  name: ULCornerDbl
+  nameWithType: GlyphDefinitions.ULCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerDbl
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerR*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerR
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerR
+  name: ULCornerR
+  nameWithType: GlyphDefinitions.ULCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerR
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerHv
+  name: ULCornerHv
+  nameWithType: GlyphDefinitions.ULCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerHv
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerHvLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+  name: ULCornerHvLt
+  nameWithType: GlyphDefinitions.ULCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerHvLt
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerLtHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+  name: ULCornerLtHv
+  nameWithType: GlyphDefinitions.ULCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerLtHv
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerDblSingle*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+  name: ULCornerDblSingle
+  nameWithType: GlyphDefinitions.ULCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerDblSingle
+- uid: Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+  name: ULCornerSingleDbl
+  nameWithType: GlyphDefinitions.ULCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.ULCornerSingleDbl
+- uid: Terminal.Gui.GlyphDefinitions.LLCorner*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCorner
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCorner
+  name: LLCorner
+  nameWithType: GlyphDefinitions.LLCorner
+  fullName: Terminal.Gui.GlyphDefinitions.LLCorner
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerHv
+  name: LLCornerHv
+  nameWithType: GlyphDefinitions.LLCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerHv
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerHvLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+  name: LLCornerHvLt
+  nameWithType: GlyphDefinitions.LLCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerHvLt
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerLtHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+  name: LLCornerLtHv
+  nameWithType: GlyphDefinitions.LLCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerLtHv
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerDbl
+  name: LLCornerDbl
+  nameWithType: GlyphDefinitions.LLCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerDbl
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+  name: LLCornerSingleDbl
+  nameWithType: GlyphDefinitions.LLCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerSingleDbl
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerDblSingle*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+  name: LLCornerDblSingle
+  nameWithType: GlyphDefinitions.LLCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerDblSingle
+- uid: Terminal.Gui.GlyphDefinitions.LLCornerR*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LLCornerR
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LLCornerR
+  name: LLCornerR
+  nameWithType: GlyphDefinitions.LLCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.LLCornerR
+- uid: Terminal.Gui.GlyphDefinitions.URCorner*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCorner
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCorner
+  name: URCorner
+  nameWithType: GlyphDefinitions.URCorner
+  fullName: Terminal.Gui.GlyphDefinitions.URCorner
+- uid: Terminal.Gui.GlyphDefinitions.URCornerDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerDbl
+  name: URCornerDbl
+  nameWithType: GlyphDefinitions.URCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerDbl
+- uid: Terminal.Gui.GlyphDefinitions.URCornerR*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerR
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerR
+  name: URCornerR
+  nameWithType: GlyphDefinitions.URCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerR
+- uid: Terminal.Gui.GlyphDefinitions.URCornerHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerHv
+  name: URCornerHv
+  nameWithType: GlyphDefinitions.URCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerHv
+- uid: Terminal.Gui.GlyphDefinitions.URCornerHvLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerHvLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerHvLt
+  name: URCornerHvLt
+  nameWithType: GlyphDefinitions.URCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerHvLt
+- uid: Terminal.Gui.GlyphDefinitions.URCornerLtHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerLtHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerLtHv
+  name: URCornerLtHv
+  nameWithType: GlyphDefinitions.URCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerLtHv
+- uid: Terminal.Gui.GlyphDefinitions.URCornerDblSingle*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+  name: URCornerDblSingle
+  nameWithType: GlyphDefinitions.URCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerDblSingle
+- uid: Terminal.Gui.GlyphDefinitions.URCornerSingleDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+  name: URCornerSingleDbl
+  nameWithType: GlyphDefinitions.URCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.URCornerSingleDbl
+- uid: Terminal.Gui.GlyphDefinitions.LRCorner*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCorner
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCorner
+  name: LRCorner
+  nameWithType: GlyphDefinitions.LRCorner
+  fullName: Terminal.Gui.GlyphDefinitions.LRCorner
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerDbl
+  name: LRCornerDbl
+  nameWithType: GlyphDefinitions.LRCornerDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerDbl
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerR*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerR
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerR
+  name: LRCornerR
+  nameWithType: GlyphDefinitions.LRCornerR
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerR
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerHv
+  name: LRCornerHv
+  nameWithType: GlyphDefinitions.LRCornerHv
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerHv
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerDblSingle*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+  name: LRCornerDblSingle
+  nameWithType: GlyphDefinitions.LRCornerDblSingle
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerDblSingle
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+  name: LRCornerSingleDbl
+  nameWithType: GlyphDefinitions.LRCornerSingleDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerSingleDbl
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerLtHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+  name: LRCornerLtHv
+  nameWithType: GlyphDefinitions.LRCornerLtHv
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerLtHv
+- uid: Terminal.Gui.GlyphDefinitions.LRCornerHvLt*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+  name: LRCornerHvLt
+  nameWithType: GlyphDefinitions.LRCornerHvLt
+  fullName: Terminal.Gui.GlyphDefinitions.LRCornerHvLt
+- uid: Terminal.Gui.GlyphDefinitions.LeftTee*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTee
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTee
+  name: LeftTee
+  nameWithType: GlyphDefinitions.LeftTee
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTee
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+  name: LeftTeeDblH
+  nameWithType: GlyphDefinitions.LeftTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeDblH
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeDblV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+  name: LeftTeeDblV
+  nameWithType: GlyphDefinitions.LeftTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeDblV
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+  name: LeftTeeDbl
+  nameWithType: GlyphDefinitions.LeftTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeDbl
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeHvH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+  name: LeftTeeHvH
+  nameWithType: GlyphDefinitions.LeftTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeHvH
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeHvV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+  name: LeftTeeHvV
+  nameWithType: GlyphDefinitions.LeftTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeHvV
+- uid: Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+  name: LeftTeeHvDblH
+  nameWithType: GlyphDefinitions.LeftTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.LeftTeeHvDblH
+- uid: Terminal.Gui.GlyphDefinitions.RightTee*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTee
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTee
+  name: RightTee
+  nameWithType: GlyphDefinitions.RightTee
+  fullName: Terminal.Gui.GlyphDefinitions.RightTee
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTeeDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTeeDblH
+  name: RightTeeDblH
+  nameWithType: GlyphDefinitions.RightTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeDblH
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeDblV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTeeDblV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTeeDblV
+  name: RightTeeDblV
+  nameWithType: GlyphDefinitions.RightTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeDblV
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTeeDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTeeDbl
+  name: RightTeeDbl
+  nameWithType: GlyphDefinitions.RightTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeDbl
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeHvH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTeeHvH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTeeHvH
+  name: RightTeeHvH
+  nameWithType: GlyphDefinitions.RightTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeHvH
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeHvV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTeeHvV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTeeHvV
+  name: RightTeeHvV
+  nameWithType: GlyphDefinitions.RightTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeHvV
+- uid: Terminal.Gui.GlyphDefinitions.RightTeeHvDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+  name: RightTeeHvDblH
+  nameWithType: GlyphDefinitions.RightTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.RightTeeHvDblH
+- uid: Terminal.Gui.GlyphDefinitions.TopTee*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTee
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTee
+  name: TopTee
+  nameWithType: GlyphDefinitions.TopTee
+  fullName: Terminal.Gui.GlyphDefinitions.TopTee
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTeeDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTeeDblH
+  name: TopTeeDblH
+  nameWithType: GlyphDefinitions.TopTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeDblH
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeDblV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTeeDblV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTeeDblV
+  name: TopTeeDblV
+  nameWithType: GlyphDefinitions.TopTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeDblV
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTeeDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTeeDbl
+  name: TopTeeDbl
+  nameWithType: GlyphDefinitions.TopTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeDbl
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeHvH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTeeHvH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTeeHvH
+  name: TopTeeHvH
+  nameWithType: GlyphDefinitions.TopTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeHvH
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeHvV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTeeHvV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTeeHvV
+  name: TopTeeHvV
+  nameWithType: GlyphDefinitions.TopTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeHvV
+- uid: Terminal.Gui.GlyphDefinitions.TopTeeHvDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+  name: TopTeeHvDblH
+  nameWithType: GlyphDefinitions.TopTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.TopTeeHvDblH
+- uid: Terminal.Gui.GlyphDefinitions.BottomTee*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTee
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTee
+  name: BottomTee
+  nameWithType: GlyphDefinitions.BottomTee
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTee
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+  name: BottomTeeDblH
+  nameWithType: GlyphDefinitions.BottomTeeDblH
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeDblH
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeDblV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+  name: BottomTeeDblV
+  nameWithType: GlyphDefinitions.BottomTeeDblV
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeDblV
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+  name: BottomTeeDbl
+  nameWithType: GlyphDefinitions.BottomTeeDbl
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeDbl
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeHvH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+  name: BottomTeeHvH
+  nameWithType: GlyphDefinitions.BottomTeeHvH
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeHvH
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeHvV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+  name: BottomTeeHvV
+  nameWithType: GlyphDefinitions.BottomTeeHvV
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeHvV
+- uid: Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+  name: BottomTeeHvDblH
+  nameWithType: GlyphDefinitions.BottomTeeHvDblH
+  fullName: Terminal.Gui.GlyphDefinitions.BottomTeeHvDblH
+- uid: Terminal.Gui.GlyphDefinitions.Cross*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.Cross
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.Cross
+  name: Cross
+  nameWithType: GlyphDefinitions.Cross
+  fullName: Terminal.Gui.GlyphDefinitions.Cross
+- uid: Terminal.Gui.GlyphDefinitions.CrossDblH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.CrossDblH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.CrossDblH
+  name: CrossDblH
+  nameWithType: GlyphDefinitions.CrossDblH
+  fullName: Terminal.Gui.GlyphDefinitions.CrossDblH
+- uid: Terminal.Gui.GlyphDefinitions.CrossDblV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.CrossDblV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.CrossDblV
+  name: CrossDblV
+  nameWithType: GlyphDefinitions.CrossDblV
+  fullName: Terminal.Gui.GlyphDefinitions.CrossDblV
+- uid: Terminal.Gui.GlyphDefinitions.CrossDbl*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.CrossDbl
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.CrossDbl
+  name: CrossDbl
+  nameWithType: GlyphDefinitions.CrossDbl
+  fullName: Terminal.Gui.GlyphDefinitions.CrossDbl
+- uid: Terminal.Gui.GlyphDefinitions.CrossHvH*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.CrossHvH
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.CrossHvH
+  name: CrossHvH
+  nameWithType: GlyphDefinitions.CrossHvH
+  fullName: Terminal.Gui.GlyphDefinitions.CrossHvH
+- uid: Terminal.Gui.GlyphDefinitions.CrossHvV*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.CrossHvV
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.CrossHvV
+  name: CrossHvV
+  nameWithType: GlyphDefinitions.CrossHvV
+  fullName: Terminal.Gui.GlyphDefinitions.CrossHvV
+- uid: Terminal.Gui.GlyphDefinitions.CrossHv*
+  commentId: Overload:Terminal.Gui.GlyphDefinitions.CrossHv
+  href: Terminal.Gui.GlyphDefinitions.html#Terminal.Gui.GlyphDefinitions.CrossHv
+  name: CrossHv
+  nameWithType: GlyphDefinitions.CrossHv
+  fullName: Terminal.Gui.GlyphDefinitions.CrossHv
+shouldSkipMarkup: true

@@ -1,0 +1,724 @@
+### YamlMime:ManagedReference
+items:
+- uid: UICatalog.Scenarios.TreeViewFileSystem
+  commentId: T:UICatalog.Scenarios.TreeViewFileSystem
+  id: TreeViewFileSystem
+  parent: UICatalog.Scenarios
+  children:
+  - UICatalog.Scenarios.TreeViewFileSystem.Setup
+  langs:
+  - csharp
+  - vb
+  name: TreeViewFileSystem
+  nameWithType: TreeViewFileSystem
+  fullName: UICatalog.Scenarios.TreeViewFileSystem
+  type: Class
+  source:
+    remote:
+      path: UICatalog/Scenarios/TreeViewFileSystem.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TreeViewFileSystem
+    path: ../UICatalog/Scenarios/TreeViewFileSystem.cs
+    startLine: 9
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  syntax:
+    content: >-
+      [Scenario.ScenarioMetadata("File System Explorer", "Hierarchical file system explorer demonstrating TreeView.")]
+
+      [Scenario.ScenarioCategory("Controls")]
+
+      [Scenario.ScenarioCategory("TreeView")]
+
+      [Scenario.ScenarioCategory("Files and IO")]
+
+      public class TreeViewFileSystem : Scenario, IDisposable
+    content.vb: >-
+      <Scenario.ScenarioMetadata("File System Explorer", "Hierarchical file system explorer demonstrating TreeView.")>
+
+      <Scenario.ScenarioCategory("Controls")>
+
+      <Scenario.ScenarioCategory("TreeView")>
+
+      <Scenario.ScenarioCategory("Files and IO")>
+
+      Public Class TreeViewFileSystem Inherits Scenario Implements IDisposable
+  inheritance:
+  - System.Object
+  - UICatalog.Scenario
+  implements:
+  - System.IDisposable
+  inheritedMembers:
+  - UICatalog.Scenario.Theme
+  - UICatalog.Scenario.TopLevelColorScheme
+  - UICatalog.Scenario.Win
+  - UICatalog.Scenario.Init
+  - UICatalog.Scenario.GetName
+  - UICatalog.Scenario.GetDescription
+  - UICatalog.Scenario.GetCategories
+  - UICatalog.Scenario.ToString
+  - UICatalog.Scenario.Run
+  - UICatalog.Scenario.RequestStop
+  - UICatalog.Scenario.GetScenarios
+  - UICatalog.Scenario.Dispose(System.Boolean)
+  - UICatalog.Scenario.Dispose
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  extensionMethods:
+  - System.Object.UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.String)
+  attributes:
+  - type: UICatalog.Scenario.ScenarioMetadata
+    ctor: UICatalog.Scenario.ScenarioMetadata.#ctor(System.String,System.String)
+    arguments:
+    - type: System.String
+      value: File System Explorer
+    - type: System.String
+      value: Hierarchical file system explorer demonstrating TreeView.
+  - type: UICatalog.Scenario.ScenarioCategory
+    ctor: UICatalog.Scenario.ScenarioCategory.#ctor(System.String)
+    arguments:
+    - type: System.String
+      value: Controls
+  - type: UICatalog.Scenario.ScenarioCategory
+    ctor: UICatalog.Scenario.ScenarioCategory.#ctor(System.String)
+    arguments:
+    - type: System.String
+      value: TreeView
+  - type: UICatalog.Scenario.ScenarioCategory
+    ctor: UICatalog.Scenario.ScenarioCategory.#ctor(System.String)
+    arguments:
+    - type: System.String
+      value: Files and IO
+- uid: UICatalog.Scenarios.TreeViewFileSystem.Setup
+  commentId: M:UICatalog.Scenarios.TreeViewFileSystem.Setup
+  id: Setup
+  parent: UICatalog.Scenarios.TreeViewFileSystem
+  langs:
+  - csharp
+  - vb
+  name: Setup()
+  nameWithType: TreeViewFileSystem.Setup()
+  fullName: UICatalog.Scenarios.TreeViewFileSystem.Setup()
+  type: Method
+  source:
+    remote:
+      path: UICatalog/Scenarios/TreeViewFileSystem.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Setup
+    path: ../UICatalog/Scenarios/TreeViewFileSystem.cs
+    startLine: 39
+  assemblies:
+  - UICatalog
+  namespace: UICatalog.Scenarios
+  summary: Override this to implement the <xref href="UICatalog.Scenario" data-throw-if-not-resolved="false"></xref> setup logic (create controls, etc...).
+  remarks: This is typically the best place to put scenario logic code.
+  example: []
+  syntax:
+    content: public override void Setup()
+    content.vb: Public Overrides Sub Setup()
+  overridden: UICatalog.Scenario.Setup
+  overload: UICatalog.Scenarios.TreeViewFileSystem.Setup*
+references:
+- uid: UICatalog.Scenarios
+  commentId: N:UICatalog.Scenarios
+  href: UICatalog.html
+  name: UICatalog.Scenarios
+  nameWithType: UICatalog.Scenarios
+  fullName: UICatalog.Scenarios
+  spec.csharp:
+  - uid: UICatalog
+    name: UICatalog
+    href: UICatalog.html
+  - name: .
+  - uid: UICatalog.Scenarios
+    name: Scenarios
+    href: UICatalog.Scenarios.html
+  spec.vb:
+  - uid: UICatalog
+    name: UICatalog
+    href: UICatalog.html
+  - name: .
+  - uid: UICatalog.Scenarios
+    name: Scenarios
+    href: UICatalog.Scenarios.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: UICatalog.Scenario
+  commentId: T:UICatalog.Scenario
+  parent: UICatalog
+  href: UICatalog.Scenario.html
+  name: Scenario
+  nameWithType: Scenario
+  fullName: UICatalog.Scenario
+- uid: System.IDisposable
+  commentId: T:System.IDisposable
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.idisposable
+  name: IDisposable
+  nameWithType: IDisposable
+  fullName: System.IDisposable
+- uid: UICatalog.Scenario.Theme
+  commentId: F:UICatalog.Scenario.Theme
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Theme
+  name: Theme
+  nameWithType: Scenario.Theme
+  fullName: UICatalog.Scenario.Theme
+- uid: UICatalog.Scenario.TopLevelColorScheme
+  commentId: F:UICatalog.Scenario.TopLevelColorScheme
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.TopLevelColorScheme
+  name: TopLevelColorScheme
+  nameWithType: Scenario.TopLevelColorScheme
+  fullName: UICatalog.Scenario.TopLevelColorScheme
+- uid: UICatalog.Scenario.Win
+  commentId: P:UICatalog.Scenario.Win
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Win
+  name: Win
+  nameWithType: Scenario.Win
+  fullName: UICatalog.Scenario.Win
+- uid: UICatalog.Scenario.Init
+  commentId: M:UICatalog.Scenario.Init
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Init
+  name: Init()
+  nameWithType: Scenario.Init()
+  fullName: UICatalog.Scenario.Init()
+  spec.csharp:
+  - uid: UICatalog.Scenario.Init
+    name: Init
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Init
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.Init
+    name: Init
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Init
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.GetName
+  commentId: M:UICatalog.Scenario.GetName
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.GetName
+  name: GetName()
+  nameWithType: Scenario.GetName()
+  fullName: UICatalog.Scenario.GetName()
+  spec.csharp:
+  - uid: UICatalog.Scenario.GetName
+    name: GetName
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetName
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.GetName
+    name: GetName
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetName
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.GetDescription
+  commentId: M:UICatalog.Scenario.GetDescription
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.GetDescription
+  name: GetDescription()
+  nameWithType: Scenario.GetDescription()
+  fullName: UICatalog.Scenario.GetDescription()
+  spec.csharp:
+  - uid: UICatalog.Scenario.GetDescription
+    name: GetDescription
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetDescription
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.GetDescription
+    name: GetDescription
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetDescription
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.GetCategories
+  commentId: M:UICatalog.Scenario.GetCategories
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.GetCategories
+  name: GetCategories()
+  nameWithType: Scenario.GetCategories()
+  fullName: UICatalog.Scenario.GetCategories()
+  spec.csharp:
+  - uid: UICatalog.Scenario.GetCategories
+    name: GetCategories
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetCategories
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.GetCategories
+    name: GetCategories
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetCategories
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.ToString
+  commentId: M:UICatalog.Scenario.ToString
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.ToString
+  name: ToString()
+  nameWithType: Scenario.ToString()
+  fullName: UICatalog.Scenario.ToString()
+  spec.csharp:
+  - uid: UICatalog.Scenario.ToString
+    name: ToString
+    href: UICatalog.Scenario.html#UICatalog.Scenario.ToString
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.ToString
+    name: ToString
+    href: UICatalog.Scenario.html#UICatalog.Scenario.ToString
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.Run
+  commentId: M:UICatalog.Scenario.Run
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Run
+  name: Run()
+  nameWithType: Scenario.Run()
+  fullName: UICatalog.Scenario.Run()
+  spec.csharp:
+  - uid: UICatalog.Scenario.Run
+    name: Run
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Run
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.Run
+    name: Run
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Run
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.RequestStop
+  commentId: M:UICatalog.Scenario.RequestStop
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.RequestStop
+  name: RequestStop()
+  nameWithType: Scenario.RequestStop()
+  fullName: UICatalog.Scenario.RequestStop()
+  spec.csharp:
+  - uid: UICatalog.Scenario.RequestStop
+    name: RequestStop
+    href: UICatalog.Scenario.html#UICatalog.Scenario.RequestStop
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.RequestStop
+    name: RequestStop
+    href: UICatalog.Scenario.html#UICatalog.Scenario.RequestStop
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.GetScenarios
+  commentId: M:UICatalog.Scenario.GetScenarios
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.GetScenarios
+  name: GetScenarios()
+  nameWithType: Scenario.GetScenarios()
+  fullName: UICatalog.Scenario.GetScenarios()
+  spec.csharp:
+  - uid: UICatalog.Scenario.GetScenarios
+    name: GetScenarios
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetScenarios
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.GetScenarios
+    name: GetScenarios
+    href: UICatalog.Scenario.html#UICatalog.Scenario.GetScenarios
+  - name: (
+  - name: )
+- uid: UICatalog.Scenario.Dispose(System.Boolean)
+  commentId: M:UICatalog.Scenario.Dispose(System.Boolean)
+  parent: UICatalog.Scenario
+  isExternal: true
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Dispose(System.Boolean)
+  name: Dispose(bool)
+  nameWithType: Scenario.Dispose(bool)
+  fullName: UICatalog.Scenario.Dispose(bool)
+  nameWithType.vb: Scenario.Dispose(Boolean)
+  fullName.vb: UICatalog.Scenario.Dispose(Boolean)
+  name.vb: Dispose(Boolean)
+  spec.csharp:
+  - uid: UICatalog.Scenario.Dispose(System.Boolean)
+    name: Dispose
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Dispose(System.Boolean)
+  - name: (
+  - uid: System.Boolean
+    name: bool
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.Dispose(System.Boolean)
+    name: Dispose
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Dispose(System.Boolean)
+  - name: (
+  - uid: System.Boolean
+    name: Boolean
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.boolean
+  - name: )
+- uid: UICatalog.Scenario.Dispose
+  commentId: M:UICatalog.Scenario.Dispose
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Dispose
+  name: Dispose()
+  nameWithType: Scenario.Dispose()
+  fullName: UICatalog.Scenario.Dispose()
+  spec.csharp:
+  - uid: UICatalog.Scenario.Dispose
+    name: Dispose
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Dispose
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.Dispose
+    name: Dispose
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Dispose
+  - name: (
+  - name: )
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.String)
+  commentId: M:UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  parent: UICatalog.Scenarios.EventExtensions
+  definition: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  name: ClearEventHandlers(object, string)
+  nameWithType: EventExtensions.ClearEventHandlers(object, string)
+  fullName: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(object, string)
+  nameWithType.vb: EventExtensions.ClearEventHandlers(Object, String)
+  fullName.vb: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(Object, String)
+  name.vb: ClearEventHandlers(Object, String)
+  spec.csharp:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: UICatalog
+  commentId: N:UICatalog
+  href: UICatalog.html
+  name: UICatalog
+  nameWithType: UICatalog
+  fullName: UICatalog
+- uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  commentId: M:UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  isExternal: true
+  href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  name: ClearEventHandlers(object, string)
+  nameWithType: EventExtensions.ClearEventHandlers(object, string)
+  fullName: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(object, string)
+  nameWithType.vb: EventExtensions.ClearEventHandlers(Object, String)
+  fullName.vb: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(Object, String)
+  name.vb: ClearEventHandlers(Object, String)
+  spec.csharp:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: string
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+    name: ClearEventHandlers
+    href: UICatalog.Scenarios.EventExtensions.html#UICatalog.Scenarios.EventExtensions.ClearEventHandlers(System.Object,System.String)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.String
+    name: String
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.string
+  - name: )
+- uid: UICatalog.Scenarios.EventExtensions
+  commentId: T:UICatalog.Scenarios.EventExtensions
+  parent: UICatalog.Scenarios
+  href: UICatalog.Scenarios.EventExtensions.html
+  name: EventExtensions
+  nameWithType: EventExtensions
+  fullName: UICatalog.Scenarios.EventExtensions
+- uid: UICatalog.Scenario.Setup
+  commentId: M:UICatalog.Scenario.Setup
+  parent: UICatalog.Scenario
+  href: UICatalog.Scenario.html#UICatalog.Scenario.Setup
+  name: Setup()
+  nameWithType: Scenario.Setup()
+  fullName: UICatalog.Scenario.Setup()
+  spec.csharp:
+  - uid: UICatalog.Scenario.Setup
+    name: Setup
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Setup
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: UICatalog.Scenario.Setup
+    name: Setup
+    href: UICatalog.Scenario.html#UICatalog.Scenario.Setup
+  - name: (
+  - name: )
+- uid: UICatalog.Scenarios.TreeViewFileSystem.Setup*
+  commentId: Overload:UICatalog.Scenarios.TreeViewFileSystem.Setup
+  href: UICatalog.Scenarios.TreeViewFileSystem.html#UICatalog.Scenarios.TreeViewFileSystem.Setup
+  name: Setup
+  nameWithType: TreeViewFileSystem.Setup
+  fullName: UICatalog.Scenarios.TreeViewFileSystem.Setup

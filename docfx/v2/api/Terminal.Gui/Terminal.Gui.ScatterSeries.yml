@@ -1,0 +1,607 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.ScatterSeries
+  commentId: T:Terminal.Gui.ScatterSeries
+  id: ScatterSeries
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.ScatterSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  - Terminal.Gui.ScatterSeries.Fill
+  - Terminal.Gui.ScatterSeries.Points
+  langs:
+  - csharp
+  - vb
+  name: ScatterSeries
+  nameWithType: ScatterSeries
+  fullName: Terminal.Gui.ScatterSeries
+  type: Class
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Series.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ScatterSeries
+    path: ../Terminal.Gui/Views/GraphView/Series.cs
+    startLine: 26
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Series composed of any number of discrete data points
+  example: []
+  syntax:
+    content: 'public class ScatterSeries : ISeries'
+    content.vb: Public Class ScatterSeries Implements ISeries
+  inheritance:
+  - System.Object
+  implements:
+  - Terminal.Gui.ISeries
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.MemberwiseClone
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+- uid: Terminal.Gui.ScatterSeries.Points
+  commentId: P:Terminal.Gui.ScatterSeries.Points
+  id: Points
+  parent: Terminal.Gui.ScatterSeries
+  langs:
+  - csharp
+  - vb
+  name: Points
+  nameWithType: ScatterSeries.Points
+  fullName: Terminal.Gui.ScatterSeries.Points
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Series.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Points
+    path: ../Terminal.Gui/Views/GraphView/Series.cs
+    startLine: 31
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Collection of each discrete point in the series
+  example: []
+  syntax:
+    content: public List<PointF> Points { get; set; }
+    parameters: []
+    return:
+      type: System.Collections.Generic.List{Terminal.Gui.PointF}
+      description: ''
+    content.vb: Public Property Points As List(Of PointF)
+  overload: Terminal.Gui.ScatterSeries.Points*
+- uid: Terminal.Gui.ScatterSeries.Fill
+  commentId: P:Terminal.Gui.ScatterSeries.Fill
+  id: Fill
+  parent: Terminal.Gui.ScatterSeries
+  langs:
+  - csharp
+  - vb
+  name: Fill
+  nameWithType: ScatterSeries.Fill
+  fullName: Terminal.Gui.ScatterSeries.Fill
+  type: Property
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Series.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Fill
+    path: ../Terminal.Gui/Views/GraphView/Series.cs
+    startLine: 38
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    The color and character that will be rendered in the console
+
+    when there are point(s) in the corresponding graph space.
+
+    Defaults to uncolored 'dot'
+  example: []
+  syntax:
+    content: public GraphCellToRender Fill { get; set; }
+    parameters: []
+    return:
+      type: Terminal.Gui.GraphCellToRender
+    content.vb: Public Property Fill As GraphCellToRender
+  overload: Terminal.Gui.ScatterSeries.Fill*
+- uid: Terminal.Gui.ScatterSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.ScatterSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  id: DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.ScatterSeries
+  langs:
+  - csharp
+  - vb
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  nameWithType: ScatterSeries.DrawSeries(GraphView, Rect, RectangleF)
+  fullName: Terminal.Gui.ScatterSeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  type: Method
+  source:
+    remote:
+      path: Terminal.Gui/Views/GraphView/Series.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DrawSeries
+    path: ../Terminal.Gui/Views/GraphView/Series.cs
+    startLine: 43
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Draws all points directly onto the graph
+  example: []
+  syntax:
+    content: public void DrawSeries(GraphView graph, Rect drawBounds, RectangleF graphBounds)
+    parameters:
+    - id: graph
+      type: Terminal.Gui.GraphView
+    - id: drawBounds
+      type: Terminal.Gui.Rect
+    - id: graphBounds
+      type: Terminal.Gui.RectangleF
+    content.vb: Public Sub DrawSeries(graph As GraphView, drawBounds As Rect, graphBounds As RectangleF)
+  overload: Terminal.Gui.ScatterSeries.DrawSeries*
+  implements:
+  - Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+references:
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: Terminal.Gui.ISeries
+  commentId: T:Terminal.Gui.ISeries
+  parent: Terminal.Gui
+  href: Terminal.Gui.ISeries.html
+  name: ISeries
+  nameWithType: ISeries
+  fullName: Terminal.Gui.ISeries
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.MemberwiseClone
+  commentId: M:System.Object.MemberwiseClone
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  name: MemberwiseClone()
+  nameWithType: object.MemberwiseClone()
+  fullName: object.MemberwiseClone()
+  nameWithType.vb: Object.MemberwiseClone()
+  fullName.vb: Object.MemberwiseClone()
+  spec.csharp:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.MemberwiseClone
+    name: MemberwiseClone
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: Terminal.Gui.ScatterSeries.Points*
+  commentId: Overload:Terminal.Gui.ScatterSeries.Points
+  href: Terminal.Gui.ScatterSeries.html#Terminal.Gui.ScatterSeries.Points
+  name: Points
+  nameWithType: ScatterSeries.Points
+  fullName: Terminal.Gui.ScatterSeries.Points
+- uid: System.Collections.Generic.List{Terminal.Gui.PointF}
+  commentId: T:System.Collections.Generic.List{Terminal.Gui.PointF}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.List`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<PointF>
+  nameWithType: List<PointF>
+  fullName: System.Collections.Generic.List<Terminal.Gui.PointF>
+  nameWithType.vb: List(Of PointF)
+  fullName.vb: System.Collections.Generic.List(Of Terminal.Gui.PointF)
+  name.vb: List(Of PointF)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - uid: Terminal.Gui.PointF
+    name: PointF
+    href: Terminal.Gui.PointF.html
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - uid: Terminal.Gui.PointF
+    name: PointF
+    href: Terminal.Gui.PointF.html
+  - name: )
+- uid: System.Collections.Generic.List`1
+  commentId: T:System.Collections.Generic.List`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  name: List<T>
+  nameWithType: List<T>
+  fullName: System.Collections.Generic.List<T>
+  nameWithType.vb: List(Of T)
+  fullName.vb: System.Collections.Generic.List(Of T)
+  name.vb: List(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.List`1
+    name: List
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: Terminal.Gui.ScatterSeries.Fill*
+  commentId: Overload:Terminal.Gui.ScatterSeries.Fill
+  href: Terminal.Gui.ScatterSeries.html#Terminal.Gui.ScatterSeries.Fill
+  name: Fill
+  nameWithType: ScatterSeries.Fill
+  fullName: Terminal.Gui.ScatterSeries.Fill
+- uid: Terminal.Gui.GraphCellToRender
+  commentId: T:Terminal.Gui.GraphCellToRender
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphCellToRender.html
+  name: GraphCellToRender
+  nameWithType: GraphCellToRender
+  fullName: Terminal.Gui.GraphCellToRender
+- uid: Terminal.Gui.ScatterSeries.DrawSeries*
+  commentId: Overload:Terminal.Gui.ScatterSeries.DrawSeries
+  href: Terminal.Gui.ScatterSeries.html#Terminal.Gui.ScatterSeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries
+  nameWithType: ScatterSeries.DrawSeries
+  fullName: Terminal.Gui.ScatterSeries.DrawSeries
+- uid: Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  commentId: M:Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  parent: Terminal.Gui.ISeries
+  href: Terminal.Gui.ISeries.html#Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  name: DrawSeries(GraphView, Rect, RectangleF)
+  nameWithType: ISeries.DrawSeries(GraphView, Rect, RectangleF)
+  fullName: Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView, Terminal.Gui.Rect, Terminal.Gui.RectangleF)
+  spec.csharp:
+  - uid: Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+    name: DrawSeries
+    href: Terminal.Gui.ISeries.html#Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  - name: (
+  - uid: Terminal.Gui.GraphView
+    name: GraphView
+    href: Terminal.Gui.GraphView.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+    href: Terminal.Gui.RectangleF.html
+  - name: )
+  spec.vb:
+  - uid: Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+    name: DrawSeries
+    href: Terminal.Gui.ISeries.html#Terminal.Gui.ISeries.DrawSeries(Terminal.Gui.GraphView,Terminal.Gui.Rect,Terminal.Gui.RectangleF)
+  - name: (
+  - uid: Terminal.Gui.GraphView
+    name: GraphView
+    href: Terminal.Gui.GraphView.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.Rect
+    name: Rect
+    href: Terminal.Gui.Rect.html
+  - name: ','
+  - name: " "
+  - uid: Terminal.Gui.RectangleF
+    name: RectangleF
+    href: Terminal.Gui.RectangleF.html
+  - name: )
+- uid: Terminal.Gui.GraphView
+  commentId: T:Terminal.Gui.GraphView
+  parent: Terminal.Gui
+  href: Terminal.Gui.GraphView.html
+  name: GraphView
+  nameWithType: GraphView
+  fullName: Terminal.Gui.GraphView
+- uid: Terminal.Gui.Rect
+  commentId: T:Terminal.Gui.Rect
+  parent: Terminal.Gui
+  href: Terminal.Gui.Rect.html
+  name: Rect
+  nameWithType: Rect
+  fullName: Terminal.Gui.Rect
+- uid: Terminal.Gui.RectangleF
+  commentId: T:Terminal.Gui.RectangleF
+  parent: Terminal.Gui
+  href: Terminal.Gui.RectangleF.html
+  name: RectangleF
+  nameWithType: RectangleF
+  fullName: Terminal.Gui.RectangleF
+shouldSkipMarkup: true

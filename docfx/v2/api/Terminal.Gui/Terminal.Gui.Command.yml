@@ -1,0 +1,2271 @@
+### YamlMime:ManagedReference
+items:
+- uid: Terminal.Gui.Command
+  commentId: T:Terminal.Gui.Command
+  id: Command
+  parent: Terminal.Gui
+  children:
+  - Terminal.Gui.Command.Accept
+  - Terminal.Gui.Command.BackTab
+  - Terminal.Gui.Command.BottomEnd
+  - Terminal.Gui.Command.BottomEndExtend
+  - Terminal.Gui.Command.Cancel
+  - Terminal.Gui.Command.Collapse
+  - Terminal.Gui.Command.CollapseAll
+  - Terminal.Gui.Command.Copy
+  - Terminal.Gui.Command.Cut
+  - Terminal.Gui.Command.CutToEndLine
+  - Terminal.Gui.Command.CutToStartLine
+  - Terminal.Gui.Command.DeleteAll
+  - Terminal.Gui.Command.DeleteCharLeft
+  - Terminal.Gui.Command.DeleteCharRight
+  - Terminal.Gui.Command.DisableOverwrite
+  - Terminal.Gui.Command.EnableOverwrite
+  - Terminal.Gui.Command.EndOfLine
+  - Terminal.Gui.Command.EndOfLineExtend
+  - Terminal.Gui.Command.EndOfPage
+  - Terminal.Gui.Command.Expand
+  - Terminal.Gui.Command.ExpandAll
+  - Terminal.Gui.Command.KillWordBackwards
+  - Terminal.Gui.Command.KillWordForwards
+  - Terminal.Gui.Command.Left
+  - Terminal.Gui.Command.LeftExtend
+  - Terminal.Gui.Command.LeftHome
+  - Terminal.Gui.Command.LeftHomeExtend
+  - Terminal.Gui.Command.LineDown
+  - Terminal.Gui.Command.LineDownExtend
+  - Terminal.Gui.Command.LineDownToLastBranch
+  - Terminal.Gui.Command.LineUp
+  - Terminal.Gui.Command.LineUpExtend
+  - Terminal.Gui.Command.LineUpToFirstBranch
+  - Terminal.Gui.Command.NewLine
+  - Terminal.Gui.Command.NextView
+  - Terminal.Gui.Command.NextViewOrTop
+  - Terminal.Gui.Command.OpenSelectedItem
+  - Terminal.Gui.Command.PageDown
+  - Terminal.Gui.Command.PageDownExtend
+  - Terminal.Gui.Command.PageLeft
+  - Terminal.Gui.Command.PageRight
+  - Terminal.Gui.Command.PageUp
+  - Terminal.Gui.Command.PageUpExtend
+  - Terminal.Gui.Command.Paste
+  - Terminal.Gui.Command.PreviousView
+  - Terminal.Gui.Command.PreviousViewOrTop
+  - Terminal.Gui.Command.QuitToplevel
+  - Terminal.Gui.Command.Redo
+  - Terminal.Gui.Command.Refresh
+  - Terminal.Gui.Command.Right
+  - Terminal.Gui.Command.RightEnd
+  - Terminal.Gui.Command.RightEndExtend
+  - Terminal.Gui.Command.RightExtend
+  - Terminal.Gui.Command.ScrollDown
+  - Terminal.Gui.Command.ScrollLeft
+  - Terminal.Gui.Command.ScrollRight
+  - Terminal.Gui.Command.ScrollUp
+  - Terminal.Gui.Command.SelectAll
+  - Terminal.Gui.Command.StartOfLine
+  - Terminal.Gui.Command.StartOfLineExtend
+  - Terminal.Gui.Command.StartOfPage
+  - Terminal.Gui.Command.Suspend
+  - Terminal.Gui.Command.Tab
+  - Terminal.Gui.Command.ToggleChecked
+  - Terminal.Gui.Command.ToggleExpandCollapse
+  - Terminal.Gui.Command.ToggleExtend
+  - Terminal.Gui.Command.ToggleOverwrite
+  - Terminal.Gui.Command.TopHome
+  - Terminal.Gui.Command.TopHomeExtend
+  - Terminal.Gui.Command.Undo
+  - Terminal.Gui.Command.UnixEmulation
+  - Terminal.Gui.Command.WordLeft
+  - Terminal.Gui.Command.WordLeftExtend
+  - Terminal.Gui.Command.WordRight
+  - Terminal.Gui.Command.WordRightExtend
+  langs:
+  - csharp
+  - vb
+  name: Command
+  nameWithType: Command
+  fullName: Terminal.Gui.Command
+  type: Enum
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Command
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 9
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Actions which can be performed by the application or bound to keys in a <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> control.
+  example: []
+  syntax:
+    content: public enum Command
+    content.vb: Public Enum Command
+- uid: Terminal.Gui.Command.LineDown
+  commentId: F:Terminal.Gui.Command.LineDown
+  id: LineDown
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LineDown
+  nameWithType: Command.LineDown
+  fullName: Terminal.Gui.Command.LineDown
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineDown
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 14
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves down one item (cell, line, etc...).
+  example: []
+  syntax:
+    content: LineDown = 0
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LineDownExtend
+  commentId: F:Terminal.Gui.Command.LineDownExtend
+  id: LineDownExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LineDownExtend
+  nameWithType: Command.LineDownExtend
+  fullName: Terminal.Gui.Command.LineDownExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineDownExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 19
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection down one (cell, line, etc...).
+  example: []
+  syntax:
+    content: LineDownExtend = 1
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LineDownToLastBranch
+  commentId: F:Terminal.Gui.Command.LineDownToLastBranch
+  id: LineDownToLastBranch
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LineDownToLastBranch
+  nameWithType: Command.LineDownToLastBranch
+  fullName: Terminal.Gui.Command.LineDownToLastBranch
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineDownToLastBranch
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 24
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves down to the last child node of the branch that holds the current selection.
+  example: []
+  syntax:
+    content: LineDownToLastBranch = 2
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ScrollDown
+  commentId: F:Terminal.Gui.Command.ScrollDown
+  id: ScrollDown
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ScrollDown
+  nameWithType: Command.ScrollDown
+  fullName: Terminal.Gui.Command.ScrollDown
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ScrollDown
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 29
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls down one (cell, line, etc...) (without changing the selection).
+  example: []
+  syntax:
+    content: ScrollDown = 3
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LineUp
+  commentId: F:Terminal.Gui.Command.LineUp
+  id: LineUp
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LineUp
+  nameWithType: Command.LineUp
+  fullName: Terminal.Gui.Command.LineUp
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineUp
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 36
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves up one (cell, line, etc...).
+  example: []
+  syntax:
+    content: LineUp = 4
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LineUpExtend
+  commentId: F:Terminal.Gui.Command.LineUpExtend
+  id: LineUpExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LineUpExtend
+  nameWithType: Command.LineUpExtend
+  fullName: Terminal.Gui.Command.LineUpExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineUpExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 41
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection up one item (cell, line, etc...).
+  example: []
+  syntax:
+    content: LineUpExtend = 5
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LineUpToFirstBranch
+  commentId: F:Terminal.Gui.Command.LineUpToFirstBranch
+  id: LineUpToFirstBranch
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LineUpToFirstBranch
+  nameWithType: Command.LineUpToFirstBranch
+  fullName: Terminal.Gui.Command.LineUpToFirstBranch
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LineUpToFirstBranch
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 46
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves up to the first child node of the branch that holds the current selection.
+  example: []
+  syntax:
+    content: LineUpToFirstBranch = 6
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ScrollUp
+  commentId: F:Terminal.Gui.Command.ScrollUp
+  id: ScrollUp
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ScrollUp
+  nameWithType: Command.ScrollUp
+  fullName: Terminal.Gui.Command.ScrollUp
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ScrollUp
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 51
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls up one item (cell, line, etc...) (without changing the selection).
+  example: []
+  syntax:
+    content: ScrollUp = 7
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Left
+  commentId: F:Terminal.Gui.Command.Left
+  id: Left
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Left
+  nameWithType: Command.Left
+  fullName: Terminal.Gui.Command.Left
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Left
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 56
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the selection left one by the minimum increment supported by the <xref href="Terminal.Gui.View" data-throw-if-not-resolved="false"></xref> e.g. single character, cell, item etc.
+  example: []
+  syntax:
+    content: Left = 8
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ScrollLeft
+  commentId: F:Terminal.Gui.Command.ScrollLeft
+  id: ScrollLeft
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ScrollLeft
+  nameWithType: Command.ScrollLeft
+  fullName: Terminal.Gui.Command.ScrollLeft
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ScrollLeft
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 61
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls one item (cell, character, etc...) to the left
+  example: []
+  syntax:
+    content: ScrollLeft = 9
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LeftExtend
+  commentId: F:Terminal.Gui.Command.LeftExtend
+  id: LeftExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LeftExtend
+  nameWithType: Command.LeftExtend
+  fullName: Terminal.Gui.Command.LeftExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 66
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection left one by the minimum increment supported by the view e.g. single character, cell, item etc.
+  example: []
+  syntax:
+    content: LeftExtend = 10
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Right
+  commentId: F:Terminal.Gui.Command.Right
+  id: Right
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Right
+  nameWithType: Command.Right
+  fullName: Terminal.Gui.Command.Right
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Right
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 71
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+  example: []
+  syntax:
+    content: Right = 11
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ScrollRight
+  commentId: F:Terminal.Gui.Command.ScrollRight
+  id: ScrollRight
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ScrollRight
+  nameWithType: Command.ScrollRight
+  fullName: Terminal.Gui.Command.ScrollRight
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ScrollRight
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 76
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Scrolls one item (cell, character, etc...) to the right.
+  example: []
+  syntax:
+    content: ScrollRight = 12
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.RightExtend
+  commentId: F:Terminal.Gui.Command.RightExtend
+  id: RightExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: RightExtend
+  nameWithType: Command.RightExtend
+  fullName: Terminal.Gui.Command.RightExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 81
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection right one by the minimum increment supported by the view e.g. single character, cell, item etc.
+  example: []
+  syntax:
+    content: RightExtend = 13
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.WordLeft
+  commentId: F:Terminal.Gui.Command.WordLeft
+  id: WordLeft
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: WordLeft
+  nameWithType: Command.WordLeft
+  fullName: Terminal.Gui.Command.WordLeft
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WordLeft
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 86
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the caret to the start of the previous word.
+  example: []
+  syntax:
+    content: WordLeft = 14
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.WordLeftExtend
+  commentId: F:Terminal.Gui.Command.WordLeftExtend
+  id: WordLeftExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: WordLeftExtend
+  nameWithType: Command.WordLeftExtend
+  fullName: Terminal.Gui.Command.WordLeftExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WordLeftExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 91
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the start of the previous word.
+  example: []
+  syntax:
+    content: WordLeftExtend = 15
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.WordRight
+  commentId: F:Terminal.Gui.Command.WordRight
+  id: WordRight
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: WordRight
+  nameWithType: Command.WordRight
+  fullName: Terminal.Gui.Command.WordRight
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WordRight
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 96
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the caret to the start of the next word.
+  example: []
+  syntax:
+    content: WordRight = 16
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.WordRightExtend
+  commentId: F:Terminal.Gui.Command.WordRightExtend
+  id: WordRightExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: WordRightExtend
+  nameWithType: Command.WordRightExtend
+  fullName: Terminal.Gui.Command.WordRightExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: WordRightExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 101
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the start of the next word.
+  example: []
+  syntax:
+    content: WordRightExtend = 17
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.CutToEndLine
+  commentId: F:Terminal.Gui.Command.CutToEndLine
+  id: CutToEndLine
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: CutToEndLine
+  nameWithType: Command.CutToEndLine
+  fullName: Terminal.Gui.Command.CutToEndLine
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CutToEndLine
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 106
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Cuts to the clipboard the characters from the current position to the end of the line.
+  example: []
+  syntax:
+    content: CutToEndLine = 18
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.CutToStartLine
+  commentId: F:Terminal.Gui.Command.CutToStartLine
+  id: CutToStartLine
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: CutToStartLine
+  nameWithType: Command.CutToStartLine
+  fullName: Terminal.Gui.Command.CutToStartLine
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CutToStartLine
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 111
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Cuts to the clipboard the characters from the current position to the start of the line.
+  example: []
+  syntax:
+    content: CutToStartLine = 19
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.KillWordForwards
+  commentId: F:Terminal.Gui.Command.KillWordForwards
+  id: KillWordForwards
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: KillWordForwards
+  nameWithType: Command.KillWordForwards
+  fullName: Terminal.Gui.Command.KillWordForwards
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: KillWordForwards
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 116
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Deletes the characters forwards.
+  example: []
+  syntax:
+    content: KillWordForwards = 20
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.KillWordBackwards
+  commentId: F:Terminal.Gui.Command.KillWordBackwards
+  id: KillWordBackwards
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: KillWordBackwards
+  nameWithType: Command.KillWordBackwards
+  fullName: Terminal.Gui.Command.KillWordBackwards
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: KillWordBackwards
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 121
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Deletes the characters backwards.
+  example: []
+  syntax:
+    content: KillWordBackwards = 21
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ToggleOverwrite
+  commentId: F:Terminal.Gui.Command.ToggleOverwrite
+  id: ToggleOverwrite
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ToggleOverwrite
+  nameWithType: Command.ToggleOverwrite
+  fullName: Terminal.Gui.Command.ToggleOverwrite
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleOverwrite
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 127
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Toggles overwrite mode such that newly typed text overwrites the text that is
+
+    already there (typically associated with the Insert key).
+  example: []
+  syntax:
+    content: ToggleOverwrite = 22
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.EnableOverwrite
+  commentId: F:Terminal.Gui.Command.EnableOverwrite
+  id: EnableOverwrite
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: EnableOverwrite
+  nameWithType: Command.EnableOverwrite
+  fullName: Terminal.Gui.Command.EnableOverwrite
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EnableOverwrite
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 133
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Enables overwrite mode such that newly typed text overwrites the text that is
+
+    already there (typically associated with the Insert key).
+  example: []
+  syntax:
+    content: EnableOverwrite = 23
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.DisableOverwrite
+  commentId: F:Terminal.Gui.Command.DisableOverwrite
+  id: DisableOverwrite
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: DisableOverwrite
+  nameWithType: Command.DisableOverwrite
+  fullName: Terminal.Gui.Command.DisableOverwrite
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DisableOverwrite
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 138
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Disables overwrite mode (<xref href="Terminal.Gui.Command.EnableOverwrite" data-throw-if-not-resolved="false"></xref>)
+  example: []
+  syntax:
+    content: DisableOverwrite = 24
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PageDown
+  commentId: F:Terminal.Gui.Command.PageDown
+  id: PageDown
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PageDown
+  nameWithType: Command.PageDown
+  fullName: Terminal.Gui.Command.PageDown
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PageDown
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 143
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move one page down.
+  example: []
+  syntax:
+    content: PageDown = 25
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PageDownExtend
+  commentId: F:Terminal.Gui.Command.PageDownExtend
+  id: PageDownExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PageDownExtend
+  nameWithType: Command.PageDownExtend
+  fullName: Terminal.Gui.Command.PageDownExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PageDownExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 148
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move one page page extending the selection to cover revealed objects/characters.
+  example: []
+  syntax:
+    content: PageDownExtend = 26
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PageUp
+  commentId: F:Terminal.Gui.Command.PageUp
+  id: PageUp
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PageUp
+  nameWithType: Command.PageUp
+  fullName: Terminal.Gui.Command.PageUp
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PageUp
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 153
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move one page up.
+  example: []
+  syntax:
+    content: PageUp = 27
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PageUpExtend
+  commentId: F:Terminal.Gui.Command.PageUpExtend
+  id: PageUpExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PageUpExtend
+  nameWithType: Command.PageUpExtend
+  fullName: Terminal.Gui.Command.PageUpExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PageUpExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 158
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Move one page up extending the selection to cover revealed objects/characters.
+  example: []
+  syntax:
+    content: PageUpExtend = 28
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.TopHome
+  commentId: F:Terminal.Gui.Command.TopHome
+  id: TopHome
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: TopHome
+  nameWithType: Command.TopHome
+  fullName: Terminal.Gui.Command.TopHome
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopHome
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 163
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves to the top/home.
+  example: []
+  syntax:
+    content: TopHome = 29
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.TopHomeExtend
+  commentId: F:Terminal.Gui.Command.TopHomeExtend
+  id: TopHomeExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: TopHomeExtend
+  nameWithType: Command.TopHomeExtend
+  fullName: Terminal.Gui.Command.TopHomeExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: TopHomeExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 168
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the top/home.
+  example: []
+  syntax:
+    content: TopHomeExtend = 30
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.BottomEnd
+  commentId: F:Terminal.Gui.Command.BottomEnd
+  id: BottomEnd
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: BottomEnd
+  nameWithType: Command.BottomEnd
+  fullName: Terminal.Gui.Command.BottomEnd
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomEnd
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 173
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves to the bottom/end.
+  example: []
+  syntax:
+    content: BottomEnd = 31
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.BottomEndExtend
+  commentId: F:Terminal.Gui.Command.BottomEndExtend
+  id: BottomEndExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: BottomEndExtend
+  nameWithType: Command.BottomEndExtend
+  fullName: Terminal.Gui.Command.BottomEndExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BottomEndExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 178
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the bottom/end.
+  example: []
+  syntax:
+    content: BottomEndExtend = 32
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.OpenSelectedItem
+  commentId: F:Terminal.Gui.Command.OpenSelectedItem
+  id: OpenSelectedItem
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: OpenSelectedItem
+  nameWithType: Command.OpenSelectedItem
+  fullName: Terminal.Gui.Command.OpenSelectedItem
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: OpenSelectedItem
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 183
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Open the selected item.
+  example: []
+  syntax:
+    content: OpenSelectedItem = 33
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ToggleChecked
+  commentId: F:Terminal.Gui.Command.ToggleChecked
+  id: ToggleChecked
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ToggleChecked
+  nameWithType: Command.ToggleChecked
+  fullName: Terminal.Gui.Command.ToggleChecked
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleChecked
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 188
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Toggle the checked state.
+  example: []
+  syntax:
+    content: ToggleChecked = 34
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Accept
+  commentId: F:Terminal.Gui.Command.Accept
+  id: Accept
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Accept
+  nameWithType: Command.Accept
+  fullName: Terminal.Gui.Command.Accept
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Accept
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 193
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Accepts the current state (e.g. selection, button press etc).
+  example: []
+  syntax:
+    content: Accept = 35
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ToggleExpandCollapse
+  commentId: F:Terminal.Gui.Command.ToggleExpandCollapse
+  id: ToggleExpandCollapse
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ToggleExpandCollapse
+  nameWithType: Command.ToggleExpandCollapse
+  fullName: Terminal.Gui.Command.ToggleExpandCollapse
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleExpandCollapse
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 198
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Toggles the Expanded or collapsed state of a a list or item (with subitems).
+  example: []
+  syntax:
+    content: ToggleExpandCollapse = 36
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Expand
+  commentId: F:Terminal.Gui.Command.Expand
+  id: Expand
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Expand
+  nameWithType: Command.Expand
+  fullName: Terminal.Gui.Command.Expand
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Expand
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 203
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Expands a list or item (with subitems).
+  example: []
+  syntax:
+    content: Expand = 37
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ExpandAll
+  commentId: F:Terminal.Gui.Command.ExpandAll
+  id: ExpandAll
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ExpandAll
+  nameWithType: Command.ExpandAll
+  fullName: Terminal.Gui.Command.ExpandAll
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ExpandAll
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 208
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Recursively Expands all child items and their child items (if any).
+  example: []
+  syntax:
+    content: ExpandAll = 38
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Collapse
+  commentId: F:Terminal.Gui.Command.Collapse
+  id: Collapse
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Collapse
+  nameWithType: Command.Collapse
+  fullName: Terminal.Gui.Command.Collapse
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Collapse
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 213
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Collapses a list or item (with subitems).
+  example: []
+  syntax:
+    content: Collapse = 39
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.CollapseAll
+  commentId: F:Terminal.Gui.Command.CollapseAll
+  id: CollapseAll
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: CollapseAll
+  nameWithType: Command.CollapseAll
+  fullName: Terminal.Gui.Command.CollapseAll
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: CollapseAll
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 218
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Recursively collapses a list items of their children (if any).
+  example: []
+  syntax:
+    content: CollapseAll = 40
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Cancel
+  commentId: F:Terminal.Gui.Command.Cancel
+  id: Cancel
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Cancel
+  nameWithType: Command.Cancel
+  fullName: Terminal.Gui.Command.Cancel
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Cancel
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 224
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: >-
+    Cancels an action or any temporary states on the control e.g. expanding
+
+    a combo list.
+  example: []
+  syntax:
+    content: Cancel = 41
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.UnixEmulation
+  commentId: F:Terminal.Gui.Command.UnixEmulation
+  id: UnixEmulation
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: UnixEmulation
+  nameWithType: Command.UnixEmulation
+  fullName: Terminal.Gui.Command.UnixEmulation
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: UnixEmulation
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 229
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Unix emulation.
+  example: []
+  syntax:
+    content: UnixEmulation = 42
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.DeleteCharRight
+  commentId: F:Terminal.Gui.Command.DeleteCharRight
+  id: DeleteCharRight
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: DeleteCharRight
+  nameWithType: Command.DeleteCharRight
+  fullName: Terminal.Gui.Command.DeleteCharRight
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DeleteCharRight
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 234
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Deletes the character on the right.
+  example: []
+  syntax:
+    content: DeleteCharRight = 43
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.DeleteCharLeft
+  commentId: F:Terminal.Gui.Command.DeleteCharLeft
+  id: DeleteCharLeft
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: DeleteCharLeft
+  nameWithType: Command.DeleteCharLeft
+  fullName: Terminal.Gui.Command.DeleteCharLeft
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DeleteCharLeft
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 239
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Deletes the character on the left.
+  example: []
+  syntax:
+    content: DeleteCharLeft = 44
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.SelectAll
+  commentId: F:Terminal.Gui.Command.SelectAll
+  id: SelectAll
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: SelectAll
+  nameWithType: Command.SelectAll
+  fullName: Terminal.Gui.Command.SelectAll
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: SelectAll
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 244
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Selects all objects.
+  example: []
+  syntax:
+    content: SelectAll = 45
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.DeleteAll
+  commentId: F:Terminal.Gui.Command.DeleteAll
+  id: DeleteAll
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: DeleteAll
+  nameWithType: Command.DeleteAll
+  fullName: Terminal.Gui.Command.DeleteAll
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: DeleteAll
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 249
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Deletes all objects.
+  example: []
+  syntax:
+    content: DeleteAll = 46
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.StartOfLine
+  commentId: F:Terminal.Gui.Command.StartOfLine
+  id: StartOfLine
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: StartOfLine
+  nameWithType: Command.StartOfLine
+  fullName: Terminal.Gui.Command.StartOfLine
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: StartOfLine
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 254
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the cursor to the start of line.
+  example: []
+  syntax:
+    content: StartOfLine = 47
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.StartOfLineExtend
+  commentId: F:Terminal.Gui.Command.StartOfLineExtend
+  id: StartOfLineExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: StartOfLineExtend
+  nameWithType: Command.StartOfLineExtend
+  fullName: Terminal.Gui.Command.StartOfLineExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: StartOfLineExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 259
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the start of line.
+  example: []
+  syntax:
+    content: StartOfLineExtend = 48
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.EndOfLine
+  commentId: F:Terminal.Gui.Command.EndOfLine
+  id: EndOfLine
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: EndOfLine
+  nameWithType: Command.EndOfLine
+  fullName: Terminal.Gui.Command.EndOfLine
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EndOfLine
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 264
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the cursor to the end of line.
+  example: []
+  syntax:
+    content: EndOfLine = 49
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.EndOfLineExtend
+  commentId: F:Terminal.Gui.Command.EndOfLineExtend
+  id: EndOfLineExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: EndOfLineExtend
+  nameWithType: Command.EndOfLineExtend
+  fullName: Terminal.Gui.Command.EndOfLineExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EndOfLineExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 269
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the end of line.
+  example: []
+  syntax:
+    content: EndOfLineExtend = 50
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.StartOfPage
+  commentId: F:Terminal.Gui.Command.StartOfPage
+  id: StartOfPage
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: StartOfPage
+  nameWithType: Command.StartOfPage
+  fullName: Terminal.Gui.Command.StartOfPage
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: StartOfPage
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 274
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the cursor to the top of page.
+  example: []
+  syntax:
+    content: StartOfPage = 51
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.EndOfPage
+  commentId: F:Terminal.Gui.Command.EndOfPage
+  id: EndOfPage
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: EndOfPage
+  nameWithType: Command.EndOfPage
+  fullName: Terminal.Gui.Command.EndOfPage
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: EndOfPage
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 279
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves the cursor to the bottom of page.
+  example: []
+  syntax:
+    content: EndOfPage = 52
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PageLeft
+  commentId: F:Terminal.Gui.Command.PageLeft
+  id: PageLeft
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PageLeft
+  nameWithType: Command.PageLeft
+  fullName: Terminal.Gui.Command.PageLeft
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PageLeft
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 284
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves to the left page.
+  example: []
+  syntax:
+    content: PageLeft = 53
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PageRight
+  commentId: F:Terminal.Gui.Command.PageRight
+  id: PageRight
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PageRight
+  nameWithType: Command.PageRight
+  fullName: Terminal.Gui.Command.PageRight
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PageRight
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 289
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves to the right page.
+  example: []
+  syntax:
+    content: PageRight = 54
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LeftHome
+  commentId: F:Terminal.Gui.Command.LeftHome
+  id: LeftHome
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LeftHome
+  nameWithType: Command.LeftHome
+  fullName: Terminal.Gui.Command.LeftHome
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftHome
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 294
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves to the left begin.
+  example: []
+  syntax:
+    content: LeftHome = 55
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.LeftHomeExtend
+  commentId: F:Terminal.Gui.Command.LeftHomeExtend
+  id: LeftHomeExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: LeftHomeExtend
+  nameWithType: Command.LeftHomeExtend
+  fullName: Terminal.Gui.Command.LeftHomeExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: LeftHomeExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 299
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the left begin.
+  example: []
+  syntax:
+    content: LeftHomeExtend = 56
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.RightEnd
+  commentId: F:Terminal.Gui.Command.RightEnd
+  id: RightEnd
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: RightEnd
+  nameWithType: Command.RightEnd
+  fullName: Terminal.Gui.Command.RightEnd
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightEnd
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 304
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves to the right end.
+  example: []
+  syntax:
+    content: RightEnd = 57
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.RightEndExtend
+  commentId: F:Terminal.Gui.Command.RightEndExtend
+  id: RightEndExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: RightEndExtend
+  nameWithType: Command.RightEndExtend
+  fullName: Terminal.Gui.Command.RightEndExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: RightEndExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 309
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Extends the selection to the right end.
+  example: []
+  syntax:
+    content: RightEndExtend = 58
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Undo
+  commentId: F:Terminal.Gui.Command.Undo
+  id: Undo
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Undo
+  nameWithType: Command.Undo
+  fullName: Terminal.Gui.Command.Undo
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Undo
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 314
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Undo changes.
+  example: []
+  syntax:
+    content: Undo = 59
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Redo
+  commentId: F:Terminal.Gui.Command.Redo
+  id: Redo
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Redo
+  nameWithType: Command.Redo
+  fullName: Terminal.Gui.Command.Redo
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Redo
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 319
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Redo changes.
+  example: []
+  syntax:
+    content: Redo = 60
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Copy
+  commentId: F:Terminal.Gui.Command.Copy
+  id: Copy
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Copy
+  nameWithType: Command.Copy
+  fullName: Terminal.Gui.Command.Copy
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Copy
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 324
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Copies the current selection.
+  example: []
+  syntax:
+    content: Copy = 61
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Cut
+  commentId: F:Terminal.Gui.Command.Cut
+  id: Cut
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Cut
+  nameWithType: Command.Cut
+  fullName: Terminal.Gui.Command.Cut
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Cut
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 329
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Cuts the current selection.
+  example: []
+  syntax:
+    content: Cut = 62
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Paste
+  commentId: F:Terminal.Gui.Command.Paste
+  id: Paste
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Paste
+  nameWithType: Command.Paste
+  fullName: Terminal.Gui.Command.Paste
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Paste
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 334
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Pastes the current selection.
+  example: []
+  syntax:
+    content: Paste = 63
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.QuitToplevel
+  commentId: F:Terminal.Gui.Command.QuitToplevel
+  id: QuitToplevel
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: QuitToplevel
+  nameWithType: Command.QuitToplevel
+  fullName: Terminal.Gui.Command.QuitToplevel
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: QuitToplevel
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 339
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Quit a <xref href="Terminal.Gui.Toplevel" data-throw-if-not-resolved="false"></xref>.
+  example: []
+  syntax:
+    content: QuitToplevel = 64
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Suspend
+  commentId: F:Terminal.Gui.Command.Suspend
+  id: Suspend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Suspend
+  nameWithType: Command.Suspend
+  fullName: Terminal.Gui.Command.Suspend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Suspend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 344
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Suspend a application (Only implemented in <xref href="Terminal.Gui.CursesDriver" data-throw-if-not-resolved="false"></xref>).
+  example: []
+  syntax:
+    content: Suspend = 65
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.NextView
+  commentId: F:Terminal.Gui.Command.NextView
+  id: NextView
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: NextView
+  nameWithType: Command.NextView
+  fullName: Terminal.Gui.Command.NextView
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NextView
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 349
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves focus to the next view.
+  example: []
+  syntax:
+    content: NextView = 66
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PreviousView
+  commentId: F:Terminal.Gui.Command.PreviousView
+  id: PreviousView
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PreviousView
+  nameWithType: Command.PreviousView
+  fullName: Terminal.Gui.Command.PreviousView
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PreviousView
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 354
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves focuss to the previous view.
+  example: []
+  syntax:
+    content: PreviousView = 67
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.NextViewOrTop
+  commentId: F:Terminal.Gui.Command.NextViewOrTop
+  id: NextViewOrTop
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: NextViewOrTop
+  nameWithType: Command.NextViewOrTop
+  fullName: Terminal.Gui.Command.NextViewOrTop
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NextViewOrTop
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 359
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves focus to the next view or Toplevel (case of Overlapped).
+  example: []
+  syntax:
+    content: NextViewOrTop = 68
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.PreviousViewOrTop
+  commentId: F:Terminal.Gui.Command.PreviousViewOrTop
+  id: PreviousViewOrTop
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: PreviousViewOrTop
+  nameWithType: Command.PreviousViewOrTop
+  fullName: Terminal.Gui.Command.PreviousViewOrTop
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: PreviousViewOrTop
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 364
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Moves focus to the next previous or Toplevel (case of Overlapped).
+  example: []
+  syntax:
+    content: PreviousViewOrTop = 69
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Refresh
+  commentId: F:Terminal.Gui.Command.Refresh
+  id: Refresh
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Refresh
+  nameWithType: Command.Refresh
+  fullName: Terminal.Gui.Command.Refresh
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Refresh
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 369
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Refresh.
+  example: []
+  syntax:
+    content: Refresh = 70
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.ToggleExtend
+  commentId: F:Terminal.Gui.Command.ToggleExtend
+  id: ToggleExtend
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: ToggleExtend
+  nameWithType: Command.ToggleExtend
+  fullName: Terminal.Gui.Command.ToggleExtend
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: ToggleExtend
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 374
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Toggles the selection.
+  example: []
+  syntax:
+    content: ToggleExtend = 71
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.NewLine
+  commentId: F:Terminal.Gui.Command.NewLine
+  id: NewLine
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: NewLine
+  nameWithType: Command.NewLine
+  fullName: Terminal.Gui.Command.NewLine
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: NewLine
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 379
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Inserts a new item.
+  example: []
+  syntax:
+    content: NewLine = 72
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.Tab
+  commentId: F:Terminal.Gui.Command.Tab
+  id: Tab
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: Tab
+  nameWithType: Command.Tab
+  fullName: Terminal.Gui.Command.Tab
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: Tab
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 384
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tabs to the next item.
+  example: []
+  syntax:
+    content: Tab = 73
+    return:
+      type: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.BackTab
+  commentId: F:Terminal.Gui.Command.BackTab
+  id: BackTab
+  parent: Terminal.Gui.Command
+  langs:
+  - csharp
+  - vb
+  name: BackTab
+  nameWithType: Command.BackTab
+  fullName: Terminal.Gui.Command.BackTab
+  type: Field
+  source:
+    remote:
+      path: Terminal.Gui/Input/Command.cs
+      branch: v2_develop
+      repo: tig:tig/Terminal.Gui.git
+    id: BackTab
+    path: ../Terminal.Gui/Input/Command.cs
+    startLine: 389
+  assemblies:
+  - Terminal.Gui
+  namespace: Terminal.Gui
+  summary: Tabs back to the previous item.
+  example: []
+  syntax:
+    content: BackTab = 74
+    return:
+      type: Terminal.Gui.Command
+references:
+- uid: Terminal.Gui.View
+  commentId: T:Terminal.Gui.View
+  parent: Terminal.Gui
+  href: Terminal.Gui.View.html
+  name: View
+  nameWithType: View
+  fullName: Terminal.Gui.View
+- uid: Terminal.Gui
+  commentId: N:Terminal.Gui
+  href: Terminal.html
+  name: Terminal.Gui
+  nameWithType: Terminal.Gui
+  fullName: Terminal.Gui
+  spec.csharp:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+  spec.vb:
+  - uid: Terminal
+    name: Terminal
+    href: Terminal.html
+  - name: .
+  - uid: Terminal.Gui
+    name: Gui
+    href: Terminal.Gui.html
+- uid: Terminal.Gui.Command
+  commentId: T:Terminal.Gui.Command
+  parent: Terminal.Gui
+  href: Terminal.Gui.Command.html
+  name: Command
+  nameWithType: Command
+  fullName: Terminal.Gui.Command
+- uid: Terminal.Gui.Command.EnableOverwrite
+  commentId: F:Terminal.Gui.Command.EnableOverwrite
+  href: Terminal.Gui.Command.html#Terminal.Gui.Command.EnableOverwrite
+  name: EnableOverwrite
+  nameWithType: Command.EnableOverwrite
+  fullName: Terminal.Gui.Command.EnableOverwrite
+- uid: Terminal.Gui.Toplevel
+  commentId: T:Terminal.Gui.Toplevel
+  parent: Terminal.Gui
+  href: Terminal.Gui.Toplevel.html
+  name: Toplevel
+  nameWithType: Toplevel
+  fullName: Terminal.Gui.Toplevel
+- uid: Terminal.Gui.CursesDriver
+  commentId: T:Terminal.Gui.CursesDriver
+  href: Terminal.Gui.CursesDriver.html
+  name: CursesDriver
+  nameWithType: CursesDriver
+  fullName: Terminal.Gui.CursesDriver
+shouldSkipMarkup: true
