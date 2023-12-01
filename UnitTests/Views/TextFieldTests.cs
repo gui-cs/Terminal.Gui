@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
+using static Terminal.Gui.ViewsTests.TextViewTests;
 
 namespace Terminal.Gui.ViewsTests {
 	public class TextFieldTests {
@@ -29,7 +30,9 @@ namespace Terminal.Gui.ViewsTests {
 
 				//                                                    1         2         3 
 				//                                          01234567890123456789012345678901=32 (Length)
-				TextFieldTests._textField = new TextField ("TAB to jump between text fields.");
+				TextFieldTests._textField = new TextField ("TAB to jump between text fields.") {
+					ColorScheme = Colors.Base
+				};
 			}
 
 			public override void After (MethodInfo methodUnderTest)
@@ -40,6 +43,32 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		private static TextField _textField;
+
+		[Fact]
+		[TextFieldTestsAutoInitShutdown]
+		public void Selected_Text_Shows ()
+		{
+			// Proves #3022 is fixed (TextField selected text does not show in v2)
+
+			_textField.CursorPosition = 0;
+			Application.Top.Add (_textField);
+			var rs = Application.Begin (Application.Top);
+
+			var attributes = new Attribute [] {
+				_textField.ColorScheme.Focus,
+				new Attribute(_textField.ColorScheme.Focus.Background, _textField.ColorScheme.Focus.Foreground)
+			};
+
+			//                                             TAB to jump between text fields.
+			TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+			_textField.ProcessKeyPressed (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
+
+			bool first = true;
+			Application.RunIteration (ref rs, ref first);
+			Assert.Equal (4, _textField.CursorPosition);
+			//                                             TAB to jump between text fields.
+			TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
+		}
 
 		[Fact]
 		[TextFieldTestsAutoInitShutdown]
@@ -1258,7 +1287,7 @@ namespace Terminal.Gui.ViewsTests {
 				View = tf
 			};
 
-			Application.OnMouseEvent(new MouseEventEventArgs(mouseEvent));
+			Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
 			Assert.Equal (1, clickCounter);
 
 			// Get a fresh instance that represents a right click.

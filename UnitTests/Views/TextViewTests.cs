@@ -279,6 +279,9 @@ namespace Terminal.Gui.ViewsTests {
 		public void Selected_Text_Shows ()
 		{
 			// Proves #3022 is fixed (TextField selected text does not show in v2)
+			Application.Top.Add (_textView);
+			var rs = Application.Begin (Application.Top);
+
 			_textView.CursorPosition = new Point (0, 0);
 			_textView.SelectionStartColumn = 0;
 			_textView.SelectionStartRow = 0;
@@ -287,14 +290,15 @@ namespace Terminal.Gui.ViewsTests {
 				_textView.ColorScheme.Focus,
 				new Attribute(_textView.ColorScheme.Focus.Background, _textView.ColorScheme.Focus.Foreground)
 			};
-
-			_textView.OnDrawContent(_textView.Bounds);
+			
 			//                                             TAB to jump between text fields.
 			TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
 
 			_textView.ProcessKeyPressed (new (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ()));
 
-			_textView.OnDrawContent (_textView.Bounds);
+			bool first = true;
+			Application.RunIteration (ref rs, ref first);
+			Assert.Equal (new Point(4, 0), _textView.CursorPosition);
 			//                                             TAB to jump between text fields.
 			TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
 		}
