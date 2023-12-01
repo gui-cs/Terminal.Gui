@@ -22,8 +22,15 @@ public partial class View {
 	/// <summary>
 	/// Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has
 	/// focus will cause the <see cref="MouseClick"/> event to fire.
-	/// </summary>
 	/// <remarks>
+	/// <para>
+	/// See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// <para/>
+	/// <c>HotKey</c> - A keyboard chord composed of the Alt key and another character that selects a visible UI item.
+	/// For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T. Or, in a Menu with
+	/// "_File _Edit", Alt-F will select (show) the File menu. If the "_File" menu has a sub-menu of "_New"
+	/// Alt-N will ONLY select the "_New" sub-menu if the "_File" menu is already opened.
+	/// </para>
 	/// <para>
 	/// This API is a helper API for configuring a key binding for the hot key. It uses the <see cref="TextFormatter.HotKey"/>
 	/// to determine the hot key from <see cref="Title"/> by looking for the first character prefixed with <see cref="HotKeySpecifier"/>.
@@ -32,6 +39,7 @@ public partial class View {
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
 	/// </para>
 	/// </remarks>
+	/// </summary>
 	public virtual Key HotKey {
 		get => _hotKey;
 		set {
@@ -174,48 +182,6 @@ public partial class View {
 	
 	#region Low-level Key handling
 	/// <summary>
-	/// A low-level method to support hot keys (e.g. Alt-X). Can be overridden to provide accelerator functionality.
-	/// Typical apps will use <see cref="Command"/> instead.
-	/// </summary>
-	/// <remarks>
-	///   <para>
-	///     Before keys are sent to the subview on the
-	///     current view, all the views are
-	///     processed and the key is passed to the widgets
-	///     to allow some of them to process the keystroke
-	///     as a hot-key. </para>
-	///  <para>
-	///     For example, if you implement a button that
-	///     has a hotkey ok "o", you would catch the
-	///     combination Alt-o here.  If the event is
-	///     caught, you must return true to stop the
-	///     keystroke from being dispatched to other
-	///     views.
-	///  </para>
-	/// </remarks>
-	public virtual bool OnHotKey (KeyEventArgs keyEvent)
-	{
-
-		if (!Enabled) {
-			return false;
-		}
-
-		if (MostFocused?.ProcessKeyPressed (keyEvent) == true) {
-			return true;
-		}
-
-		if (_subviews == null || _subviews.Count == 0) {
-			return false;
-		}
-
-		foreach (var view in _subviews) {
-			if (view.OnHotKey (keyEvent))
-				return true;
-		}
-		return false;
-	}
-	
-	/// <summary>
 	/// Invoked when a key is depressed.
 	/// </summary>
 	/// <remarks>
@@ -333,7 +299,7 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// For processing shortcuts, hot-keys, and commands, use <see cref="Command"/> and <see cref="AddKeyBinding(Key, Command[])"/>instead.
+	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="AddKeyBinding(Key, Command[])"/>instead.
 	/// </para>
 	/// <para>
 	/// Fires the <see cref="KeyPressed"/> event.
@@ -549,7 +515,7 @@ public partial class View {
 	/// <summary>
 	/// Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.
 	/// </summary>
-	/// <param name=""></param>
+	/// <param name="key"></param>
 	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
 	public Command [] GetKeyBindings (Key key)
 	{

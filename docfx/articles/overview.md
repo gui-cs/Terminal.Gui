@@ -42,7 +42,7 @@ the various views that are included. In the following sections, you
 will see how applications are put together.
 
 In the example above, you can see that we have initialized the runtime by calling the 
-[`Init`](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_) method in the Application class - this sets up the environment, initializes the color
+[`Init`](~/api/Terminal.Gui/Terminal.Gui.Application.yml#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_) method in the Application class - this sets up the environment, initializes the color
 schemes available for your application and clears the screen to start your application.
 
 The [`Application`](~/api/Terminal.Gui/Terminal.Gui.Application.yml) class, additionally creates an instance of the [`Toplevel`](~/api/Terminal.Gui/Terminal.Gui.Toplevel.yml) class that is ready to be consumed, 
@@ -354,30 +354,11 @@ View has the focus.
 The library binds the key Tab to focus the next logical view,
 and the Shift-Tab combination to focus the previous logical view. 
 
-Keyboard processing is divided in three stages: HotKey processing, regular processing and
-cold key processing. 
-
-* Hot key processing happens first, and it gives all the views in the current
-  toplevel a chance to monitor whether the key needs to be treated specially. This
-  for example handles the scenarios where the user pressed Alt-o, and a view with a 
-  highlighted "o" is being displayed.
-
-* If no view processed the hotkey, then the key is sent to the currently focused
-  view.
-
-* If the key was not processed by the normal processing, all views are given 
-  a chance to process the keystroke in their cold processing stage. Examples
-  include the processing of the "return" key in a dialog when a button in the
-  dialog has been flagged as the "default" action.
-
-The most common case is the normal processing, which sends the keystrokes to the
-currently focused view.
+See [Keyboard Handling](keyboard.md) for more details on how keyboard events are processed.
 
 Mouse events are processed in visual order, and the event will be sent to the
 view on the screen. The only exception is that no mouse events are delivered
 to background views when a modal view is running. 
-
-More details are available on the [`Keyboard Event Processing`](keyboard.md) document.
 
 ## Colors and Color Schemes
 

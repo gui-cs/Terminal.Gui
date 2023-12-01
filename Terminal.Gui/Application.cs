@@ -29,15 +29,15 @@ namespace Terminal.Gui;
 /// </example>
 /// <remarks>
 ///  <para>
-///   Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
-///   other sources of data. It is accessible via the <see cref="MainLoop"/> property.
+///   Creates a instance of the main loop to process input events, handle timers and
+///   other sources of data. 
 ///  </para>
 ///  <para>
-///   The <see cref="Iteration"/> event is invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
+///   The <see cref="Iteration"/> event is invoked on each iteration of the main loop.
 ///  </para>
 ///  <para>
 ///   When invoked it sets the <see cref="SynchronizationContext"/> to one that is tied
-///   to the <see cref="MainLoop"/>, allowing user code to use async/await.
+///   to the main loop allowing user code to use async/await.
 ///  </para>
 /// </remarks>
 public static partial class Application {
@@ -121,7 +121,7 @@ public static partial class Application {
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
 
-	// INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
+	// INTERNAL function for initializing an app with a Toplevel factory object, driver, and main loop.
 	//
 	// Called from:
 	// 
@@ -564,7 +564,7 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	///  This event is raised on each iteration of the <see cref="MainLoop"/>. 
+	///  This event is raised on each iteration of the main loop.
 	/// </summary>
 	/// <remarks>
 	///  See also <see cref="Timeout"/>
@@ -572,7 +572,7 @@ public static partial class Application {
 	public static event EventHandler<IterationEventArgs> Iteration;
 
 	/// <summary>
-	/// The <see cref="MainLoop"/> driver for the application
+	/// The main loop driver for the application
 	/// </summary>
 	/// <value>The main loop.</value>
 	internal static MainLoop MainLoop { get; private set; }
@@ -620,7 +620,7 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	///  Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
+	///  Building block API: Runs the main loop for the created <see cref="Toplevel"/>.
 	/// </summary>
 	/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
 	public static void RunLoop (RunState state)

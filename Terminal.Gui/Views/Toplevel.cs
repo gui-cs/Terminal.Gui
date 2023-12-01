@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first time. 
 		/// </summary>
-		virtual public void OnLoaded ()
+		public virtual void OnLoaded ()
 		{
 			IsLoaded = true;
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
@@ -341,7 +341,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="View.OnKeyPressed"/> events will NOT propogate keys upwards.</description>
+		///		<description><see cref="View.OnKeyPressed"/> events will NOT propagate keys upwards.</description>
 		///	  </item>
 		///   <item>
 		///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>

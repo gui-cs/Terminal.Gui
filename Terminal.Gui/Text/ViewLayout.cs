@@ -534,7 +534,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="SetNeedsLayout"/> setting on this view.
+		/// Indicates that the view does not need to be laid out.
 		/// </summary>
 		protected void ClearLayoutNeeded ()
 		{

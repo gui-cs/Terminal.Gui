@@ -46,8 +46,8 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The parent of <see cref="MenuItem"/>.  Will be null if menu opening
-		/// is the root (see <see cref="MenuBarItem.IsTopLevel"/>).
+		/// The parent of <see cref="MenuItem"/>. Will be null if menu opening
+		/// is the root.
 		/// </summary>
 		public MenuBarItem Parent { get; }
 

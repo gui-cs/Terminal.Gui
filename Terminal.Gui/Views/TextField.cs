@@ -1306,7 +1306,7 @@ namespace Terminal.Gui {
 		/// exactly as if the user had just typed it
 		/// </summary>
 		/// <param name="toAdd">Text to add</param>
-		/// <param name="useOldCursorPos">If uses the <see cref="_oldCursorPos"/>.</param>
+		/// <param name="useOldCursorPos">Use the previous cursor position.</param>
 		public void InsertText (string toAdd, bool useOldCursorPos = true)
 		{
 			foreach (var ch in toAdd) {

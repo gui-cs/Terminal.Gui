@@ -1294,7 +1294,12 @@ namespace Terminal.Gui {
 		{
 			return ScreenToCell (clientX, clientY, out _, out _);
 		}
-		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+
+		/// <summary>.
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point 
+		/// on the screen (relative to the control client area).  Returns null if the point is
+		/// in the header, no table is loaded or outside the control bounds.
+		/// </summary>
 		/// <param name="clientX">X offset from the top left of the control.</param>
 		/// <param name="clientY">Y offset from the top left of the control.</param>
 		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
@@ -1303,7 +1308,11 @@ namespace Terminal.Gui {
 			return ScreenToCell (clientX, clientY, out headerIfAny, out _);
 		}
 
-		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+		/// <summary>.
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point 
+		/// on the screen (relative to the control client area).  Returns null if the point is
+		/// in the header, no table is loaded or outside the control bounds.
+		/// </summary>
 		/// <param name="clientX">X offset from the top left of the control.</param>
 		/// <param name="clientY">Y offset from the top left of the control.</param>
 		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
