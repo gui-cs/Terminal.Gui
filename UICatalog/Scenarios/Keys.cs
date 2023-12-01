@@ -9,20 +9,12 @@ namespace UICatalog.Scenarios {
 
 		class TestWindow : Window {
 			public List<string> _processKeyList = new List<string> ();
-			public List<string> _processHotKeyList = new List<string> ();
 
 			public override bool OnKeyPressed (KeyEventArgs keyEvent)
 			{
 				_processKeyList.Add (keyEvent.ToString ());
 				return base.OnKeyPressed (keyEvent);
 			}
-
-			public override bool OnHotKey (KeyEventArgs keyEvent)
-			{
-				_processHotKeyList.Add (keyEvent.ToString ());
-				return base.OnHotKey (keyEvent);
-			}
-
 		}
 
 		public override void Init ()
@@ -115,34 +107,6 @@ namespace UICatalog.Scenarios {
 			processKeyListView.ColorScheme = Colors.TopLevel;
 			Win.Add (processKeyListView);
 
-			// ProcessHotKey log:
-			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var processHotKeyLogLabel = new Label ("ProcessHotKey log:") {
-				X = Pos.Right (processKeyListView) + 1,
-				Y = Pos.Top (editLabel) + 4,
-			};
-			Win.Add (processHotKeyLogLabel);
-
-			yOffset = (Application.Top == Application.Top ? 1 : 6);
-			var processHotKeyListView = new ListView (((TestWindow)Win)._processHotKeyList) {
-				X = Pos.Left (processHotKeyLogLabel),
-				Y = Pos.Top (processHotKeyLogLabel) + yOffset,
-				Width = Dim.Percent (20),
-				Height = Dim.Fill (),
-			};
-			processHotKeyListView.ColorScheme = Colors.TopLevel;
-			Win.Add (processHotKeyListView);
-
-			// ProcessColdKey log:
-			// BUGBUG: Label is not positioning right with Pos, so using TextField instead
-			var processColdKeyLogLabel = new Label ("ProcessColdKey log:") {
-				X = Pos.Right (processHotKeyListView) + 1,
-				Y = Pos.Top (editLabel) + 4,
-			};
-			Win.Add (processColdKeyLogLabel);
-
-			yOffset = (Application.Top == Application.Top ? 1 : 6);
-
 			Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
 			Application.KeyPressed += (s, a) => KeyDownPressUp (a, "Press");
 			Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
@@ -154,7 +118,6 @@ namespace UICatalog.Scenarios {
 				keyEventlist.Add (msg);
 				keyEventListView.MoveDown ();
 				processKeyListView.MoveDown ();
-				processHotKeyListView.MoveDown ();
 			}
 		}
 	}
