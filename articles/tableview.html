@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Table View </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Table View ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="table-view">Table View</h1>
+
+<p>This control supports viewing and editing tabular data. It provides a view of a <a href="https://docs.microsoft.com/en-us/dotnet/api/system.data.datatable?view=net-5.0">System.DataTable</a>.</p>
+<p>System.DataTable is a core class of .net standard and can be created very easily</p>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.TableView.html">TableView API Reference</a></p>
+<h2 id="csv-example">Csv Example</h2>
+<p>You can create a DataTable from a CSV file by creating a new instance and adding columns and rows as you read them. For a robust solution however you might want to look into a CSV parser library that deals with escaping, multi line rows etc.</p>
+<pre><code class="lang-csharp">var dt = new DataTable();
+var lines = File.ReadAllLines(filename);
+
+foreach(var h in lines[0].Split(&#39;,&#39;)){
+   dt.Columns.Add(h);
+}
+
+foreach(var line in lines.Skip(1)) {
+    dt.Rows.Add(line.Split(&#39;,&#39;));
+}
+</code></pre><h2 id="database-example">Database Example</h2>
+<p>All Ado.net database providers (Oracle, MySql, SqlServer etc) support reading data as DataTables for example:</p>
+<pre><code class="lang-csharp">var dt = new DataTable();
+
+using(var con = new SqlConnection(&quot;Server=myServerAddress;Database=myDataBase;Trusted_Connection=True;&quot;))
+{
+    con.Open();
+    var cmd = new SqlCommand(&quot;select * from myTable;&quot;,con);
+    var adapter = new SqlDataAdapter(cmd);
+
+    adapter.Fill(dt);
+}
+</code></pre><h2 id="displaying-the-table">Displaying the table</h2>
+<p>Once you have set up your data table set it in the view:</p>
+<pre><code class="lang-csharp">tableView = new TableView () {
+    X = 0,
+    Y = 0,
+    Width = 50,
+    Height = 10,
+};
+
+tableView.Table = yourDataTable;
+</code></pre><h2 id="table-rendering">Table Rendering</h2>
+<p>TableView supports any size of table (limited only by the RAM requirements of <code>System.DataTable</code>). You can have
+thousands of columns and/or millions of rows if you want. Horizontal and vertical scrolling can be done using
+the mouse or keyboard.</p>
+<p>TableView uses <code>ColumnOffset</code> and <code>RowOffset</code> to determine the first visible cell of the <code>System.DataTable</code>.
+Rendering then continues until the avaialble console space is exhausted. Updating the <code>ColumnOffset</code> and 
+<code>RowOffset</code> changes which part of the table is rendered (scrolls the viewport).</p>
+<p>This approach ensures that no matter how big the table, only a small number of columns/rows need to be
+evaluated for rendering.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/blob/develop/docfx/articles/tableview.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

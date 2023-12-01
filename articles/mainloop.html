@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Event Processing and the Application Main Loop </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Event Processing and the Application Main Loop ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="event-processing-and-the-application-main-loop">Event Processing and the Application Main Loop</h1>
+
+<p><em>See also <a href="drivers.html">Cross-platform Driver Model</a></em></p>
+<p>The method <code>Application.Run</code> that we covered before will wait for
+events from either the keyboard or mouse and route those events to the
+proper view.</p>
+<p>The job of waiting for events and dispatching them in the
+<code>Application</code> is implemented by an instance of the
+<a href=""><code>MainLoop</code></a>
+class.</p>
+<p>Mainloops are a common idiom in many user interface toolkits so many
+of the concepts will be familiar to you if you have used other
+toolkits before.</p>
+<p>This class provides the following capabilities:</p>
+<ul>
+<li>Keyboard and mouse processing</li>
+<li>.NET Async support</li>
+<li>Timers processing</li>
+<li>Invoking of UI code from a background thread</li>
+<li>Idle processing handlers</li>
+<li>Possibility of integration with other mainloops.</li>
+<li>On Unix systems, it can monitor file descriptors for readability or writability.</li>
+</ul>
+<p>The <code>MainLoop</code> property in the the
+<a href="../api/Terminal.Gui/Terminal.Gui.Application.html"><code>Application</code></a>
+provides access to these functions.</p>
+<p>When your code invokes <code>Application.Run (Toplevel)</code>, the application
+will prepare the current
+<a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html"><code>Toplevel</code></a> instance by
+redrawing the screen appropriately and then calling the mainloop to
+run.   </p>
+<p>You can configure the Mainloop before calling Application.Run, or you
+can configure the MainLoop in response to events during the execution.</p>
+<p>The keyboard inputs is dispatched by the application class to the
+current TopLevel window this is covered in more detail in the
+<a href="keyboard.html">Keyboard Event Processing</a> document.</p>
+<h2 id="async-execution">Async Execution</h2>
+<p>On startup, the <code>Application</code> class configured the .NET Asynchronous
+machinery to allow you to use the <code>await</code> keyword to run tasks in the
+background and have the execution of those tasks resume on the context
+of the main thread running the main loop.</p>
+<p>Once you invoke <code>Application.Main</code> the async machinery will be ready
+to use, and you can merely call methods using <code>await</code> from your main
+thread, and the awaited code will resume execution on the main
+thread. </p>
+<h2 id="timers-processing">Timers Processing</h2>
+<p>You can register timers to be executed at specified intervals by
+calling the <a href=""><code>AddTimeout</code></a> method, like this:</p>
+<pre><code class="lang-csharp">void UpdateTimer ()
+{
+    time.Text = DateTime.Now.ToString ();
+}
+
+var token = Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (20), UpdateTimer);
+</code></pre><p>The return value from AddTimeout is a token value that you can use if
+you desire to cancel the timer before it runs:</p>
+<pre><code class="lang-csharup">Application.MainLoop.RemoveTimeout (token);
+</code></pre><h2 id="idle-handlers">Idle Handlers</h2>
+<p>You can register code to be executed when the application is idling
+and there are no events to process by calling the
+<a href=""><code>AddIdle</code></a>
+method. This method takes as a parameter a function that will be
+invoked when the application is idling. </p>
+<p>Idle functions should return <code>true</code> if they should be invoked again,
+and <code>false</code> if the idle invocations should stop.</p>
+<p>Like the timer APIs, the return value is a token that can be used to
+cancel the scheduled idle function from being executed.</p>
+<h2 id="threading">Threading</h2>
+<p>Like other UI toolkits, Terminal.Gui is generally not thread safe.
+You should avoid calling methods in the UI classes from a background
+thread as there is no guarantee that they will not corrupt the state
+of the UI application. </p>
+<p>Generally, as there is not much state, you will get lucky, but the
+application will not behave properly.</p>
+<p>You will be served better off by using C# async machinery and the
+various APIs in the <code>System.Threading.Tasks.Task</code> APIs.  But if you
+absolutely must work with threads on your own you should only invoke
+APIs in Terminal.Gui from the main thread.</p>
+<p>To make this simple, you can use the <code>Application.MainLoop.Invoke</code>
+method and pass an <code>Action</code>. This action will be queued for execution
+on the main thread at an appropriate time and will run your code
+there.</p>
+<p>For example, the following shows how to properly update a label from a
+background thread:</p>
+<pre><code>void BackgroundThreadUpdateProgress ()
+{
+    Application.MainLoop.Invoke (() =&gt; {
+        progress.Text = $&quot;Progress: {bytesDownloaded/totalBytes}&quot;;
+        });
+}
+</code></pre><h2 id="integration-with-other-main-loop-drivers">Integration With Other Main Loop Drivers</h2>
+<p>It is possible to run the main loop in a way that it does not take
+over control of your application, but rather in a cooperative way.</p>
+<p>To do this, you must use the lower-level APIs in <code>Application</code>: the
+<code>Begin</code> method to prepare a toplevel for execution, followed by calls
+to <code>MainLoop.EventsPending</code> to determine whether the events must be
+processed, and in that case, calling <code>RunLoop</code> method and finally
+completing the process  by calling <code>End</code>.</p>
+<p>The method <code>Run</code> is implemented like this:</p>
+<pre><code>void Run (Toplevel top)
+{
+    var runToken = Begin (view);
+    RunLoop (runToken);
+    End (runToken);
+}
+</code></pre><h2 id="unix-file-descriptor-monitoring">Unix File Descriptor Monitoring</h2>
+<p>On Unix, it is possible to monitor file descriptors for input being
+available, or for the file descriptor being available for data to be
+written without blocking the application.</p>
+<p>To do this, you on Unix, you can cast the <code>MainLoop</code> instance to a
+<a href=""><code>UnixMainLoop</code></a>
+and use the <code>AddWatch</code> method to register an interest on a particular
+condition.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/blob/develop/docfx/articles/mainloop.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

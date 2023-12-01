@@ -1,0 +1,445 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Terminal.Gui API Overview </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Terminal.Gui API Overview ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Source Sans Pro" rel="stylesheet"> 
+    <link href="https://fonts.googleapis.com/css?family=Source Code Pro" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="../toc.html">
+    
+    <meta property="docfx:rel" content="../">
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../images/logo48.png" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="terminalgui-api-overview">Terminal.Gui API Overview</h1>
+
+<p><code>Terminal.Gui</code> is a library intended to create console-based
+applications using C#. The framework has been designed to make it
+easy to write applications that will work on monochrome terminals, as
+well as modern color terminals with mouse support.</p>
+<p>This library works across Windows, Linux and MacOS.</p>
+<p>This library provides a text-based toolkit as works in a way similar
+to graphic toolkits. There are many controls that can be used to
+create your applications and it is event based, meaning that you
+create the user interface, hook up various events and then let the
+a processing loop run your application, and your code is invoked via
+one or more callbacks.</p>
+<p>The simplest application looks like this:</p>
+<pre><code class="lang-csharp">using Terminal.Gui;
+
+class Demo {
+    static int Main ()
+    {
+        Application.Init ();
+
+        var n = MessageBox.Query (50, 7, 
+            &quot;Question&quot;, &quot;Do you like console apps?&quot;, &quot;Yes&quot;, &quot;No&quot;);
+
+        Application.Shutdown ();
+        return n;
+    }
+}
+</code></pre><p>This example shows a prompt and returns an integer value depending on
+which value was selected by the user (Yes, No, or if they use chose
+not to make a decision and instead pressed the ESC key).</p>
+<p>More interesting user interfaces can be created by composing some of
+the various views that are included. In the following sections, you
+will see how applications are put together.</p>
+<p>In the example above, you can see that we have initialized the runtime by calling the 
+<a href="../api/Terminal.Gui/Terminal.Gui.Application.html#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_Terminal_Gui_IMainLoopDriver_"><code>Init</code></a> method in the Application class - this sets up the environment, initializes the color
+schemes available for your application and clears the screen to start your application.</p>
+<p>The <a href="../api/Terminal.Gui/Terminal.Gui.Application.html"><code>Application</code></a> class, additionally creates an instance of the <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html"><code>Toplevel</code></a> class that is ready to be consumed, 
+this instance is available in the <code>Application.Top</code> property, and can be used like this:</p>
+<pre><code class="lang-csharp">using Terminal.Gui;
+
+class Demo {
+    static int Main ()
+    {
+        Application.Init ();
+
+        var label = new Label (&quot;Hello World&quot;) {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Height = 1,
+        };
+        Application.Top.Add (label);
+        Application.Run ();
+        Application.Shutdown ();
+    }
+}
+</code></pre><p>Typically, you will want your application to have more than a label, you might
+want a menu, and a region for your application to live in, the following code
+does this:</p>
+<pre><code class="lang-csharp">using Terminal.Gui;
+
+class Demo {
+    static int Main ()
+    {
+        Application.Init ();
+        var menu = new MenuBar (new MenuBarItem [] {
+            new MenuBarItem (&quot;_File&quot;, new MenuItem [] {
+                new MenuItem (&quot;_Quit&quot;, &quot;&quot;, () =&gt; { 
+                    Application.RequestStop (); 
+                })
+            }),
+        });
+
+        var win = new Window (&quot;Hello&quot;) {
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill () - 1
+        };
+
+        // Add both menu and win in a single call
+        Application.Top.Add (menu, win);
+        Application.Run ();
+        Application.Shutdown ();
+    }
+}
+</code></pre><h2 id="views">Views</h2>
+<p>All visible elements on a Terminal.Gui application are implemented as
+<a href="../api/Terminal.Gui/Terminal.Gui.View.html">Views</a>. Views are self-contained objects that take care of displaying themselves, can receive keyboard and mouse input and participate in the focus mechanism.</p>
+<p>See the full list of <a href="views.html">Views provided by the Terminal.Gui library here</a>.</p>
+<p>Every view can contain an arbitrary number of children views. These are called
+the Subviews. You can add a view to an existing view, by calling the 
+<a href="../api/Terminal.Gui/Terminal.Gui.View.html#Terminal_Gui_View_Add_Terminal_Gui_View_"><code>Add</code></a> method, for example, to add a couple of buttons to a UI, you can do this:</p>
+<pre><code class="lang-csharp">void SetupMyView (View myView)
+{
+    var label = new Label (&quot;Username: &quot;) {
+        X = 1,
+        Y = 1,
+        Width = 20,
+        Height = 1
+    };
+    myView.Add (label);
+
+    var username = new TextField (&quot;&quot;) {
+        X = 1,
+        Y = 2,
+        Width = 30,
+        Height = 1
+    };
+    myView.Add (username);
+}
+</code></pre><p>The container of a given view is called the <code>SuperView</code> and it is a property of every
+View.</p>
+<h2 id="layout">Layout</h2>
+<p><code>Terminal.Gui</code> supports two different layout systems, absolute and computed \
+(controlled by the <a href="../api/Terminal.Gui/Terminal.Gui.LayoutStyle.html"><code>LayoutStyle</code></a>
+property on the view.</p>
+<p>The absolute system is used when you want the view to be positioned exactly in
+one location and want to manually control where the view is. This is done
+by invoking your View constructor with an argument of type <a href="../api/Terminal.Gui/Terminal.Gui.Rect.html"><code>Rect</code></a>. When you do this, to change the
+position of the View, you can change the <code>Frame</code> property on the View.</p>
+<p>The computed layout system offers a few additional capabilities, like automatic
+centering, expanding of dimensions and a handful of other features. To use
+this you construct your object without an initial <code>Frame</code>, but set the 
+ <code>X</code>, <code>Y</code>, <code>Width</code> and <code>Height</code> properties after the object has been created.</p>
+<p>Examples:</p>
+<pre><code class="lang-csharp">
+// Dynamically computed
+var label = new Label (&quot;Hello&quot;) {
+    X = 1,
+    Y = Pos.Center (),
+    Width = Dim.Fill (),
+    Height = 1
+};
+
+// Absolute position using the provided rectangle
+var label2 = new Label (new Rect (1, 2, 20, 1), &quot;World&quot;)
+</code></pre><p>The computed layout system does not take integers, instead the <code>X</code> and <code>Y</code> properties are of type <a href="../api/Terminal.Gui/Terminal.Gui.Pos.html"><code>Pos</code></a> and the <code>Width</code> and <code>Height</code> properties are of type <a href="../api/Terminal.Gui/Terminal.Gui.Dim.html"><code>Dim</code></a> both which can be created implicitly from integer values.</p>
+<h3 id="the-pos-type">The <code>Pos</code> Type</h3>
+<p>The <code>Pos</code> type on <code>X</code> and <code>Y</code> offers a few options:</p>
+<ul>
+<li>Absolute position, by passing an integer</li>
+<li>Percentage of the parent&#39;s view size - <code>Pos.Percent(n)</code></li>
+<li>Anchored from the end of the dimension - <code>AnchorEnd(int margin=0)</code></li>
+<li>Centered, using <code>Center()</code></li>
+<li>Reference the Left (X), Top (Y), Bottom, Right positions of another view</li>
+</ul>
+<p>The <code>Pos</code> values can be added or subtracted, like this:</p>
+<pre><code class="lang-csharp">// Set the X coordinate to 10 characters left from the center
+view.X = Pos.Center () - 10;
+
+view.Y = Pos.Percent (20);
+
+anotherView.X = AnchorEnd (10);
+anotherView.Width = 9;
+
+myView.X = Pos.X (view);
+myView.Y = Pos.Bottom (anotherView);
+</code></pre><h3 id="the-dim-type">The <code>Dim</code> Type</h3>
+<p>The <code>Dim</code> type is used for the <code>Width</code> and <code>Height</code> properties on the View and offers
+the following options:</p>
+<ul>
+<li>Absolute size, by passing an integer</li>
+<li>Percentage of the parent&#39;s view size - <code>Dim.Percent(n)</code></li>
+<li>Fill to the end - <code>Dim.Fill ()</code></li>
+<li>Reference the Width or Height of another view</li>
+</ul>
+<p>Like, <code>Pos</code>, objects of type <code>Dim</code> can be added an subtracted, like this:</p>
+<pre><code class="lang-csharp">// Set the Width to be 10 characters less than filling 
+// the remaining portion of the screen
+view.Width = Dim.Fill () - 10;
+
+view.Height = Dim.Percent(20) - 1;
+
+anotherView.Height = Dim.Height (view)+1
+</code></pre><h2 id="toplevels-windows-and-dialogs">TopLevels, Windows and Dialogs.</h2>
+<p>Among the many kinds of views, you typically will create a <a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> view (or any of its subclasses,
+like <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> or <a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> which is special kind of views
+that can be executed modally - that is, the view can take over all input and returns
+only when the user chooses to complete their work there. </p>
+<p>The following sections cover the differences.</p>
+<h3 id="toplevel-views">TopLevel Views</h3>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Toplevel.html">Toplevel</a> views have no visible user interface elements and occupy an arbitrary portion of the screen.</p>
+<p>You would use a toplevel Modal view for example to launch an entire new experience in your application, one where you would have a new top-level menu for example. You 
+typically would add a Menu and a Window to your Toplevel, it would look like this:</p>
+<pre><code class="lang-csharp">using Terminal.Gui;
+
+class Demo {
+    static void Edit (string filename)
+    {
+        var top = new Toplevel () { 
+            X = 0, 
+            Y = 0, 
+            Width = Dim.Fill (), 
+            Height = Dim.Fill () 
+        };
+        var menu = new MenuBar (new MenuBarItem [] {
+            new MenuBarItem (&quot;_File&quot;, new MenuItem [] {
+                new MenuItem (&quot;_Close&quot;, &quot;&quot;, () =&gt; { 
+                    Application.RequestStop ();
+                })
+            }),
+        });
+
+        // nest a window for the editor
+        var win = new Window (filename) {
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill () - 1
+        };
+
+        var editor = new TextView () {
+            X = 0, 
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+        editor.Text = System.IO.File.ReadAllText (filename);
+        win.Add (editor);
+
+        // Add both menu and win in a single call
+        top.Add (win, menu);
+        Application.Run (top);
+        Application.Shutdown ();
+    }
+}
+</code></pre><h3 id="window-views">Window Views</h3>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> views extend the Toplevel view by providing a frame and a title around the toplevel - and can be moved on the screen with the mouse (caveat: code is currently disabled)</p>
+<p>From a user interface perspective, you might have more than one Window on the screen at a given time.</p>
+<h3 id="dialogs">Dialogs</h3>
+<p><a href="../api/Terminal.Gui/Terminal.Gui.Dialog.html">Dialog</a> are <a href="../api/Terminal.Gui/Terminal.Gui.Window.html">Window</a> objects that happen to be centered in the middle of the screen.</p>
+<p>Dialogs are instances of a Window that are centered in the screen, and are intended
+to be used modally - that is, they run, and they are expected to return a result 
+before resuming execution of your application.</p>
+<p>Dialogs are a subclass of <code>Window</code> and additionally expose the 
+<a href="https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui/Terminal.Gui.Dialog.yml#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_"><code>AddButton</code></a> API which manages the layout
+of any button passed to it, ensuring that the buttons are at the bottom of the dialog.</p>
+<p>Example:</p>
+<pre><code class="lang-csharp">bool okpressed = false;
+var ok = new Button(&quot;Ok&quot;);
+var cancel = new Button(&quot;Cancel&quot;);
+var dialog = new Dialog (&quot;Quit&quot;, 60, 7, ok, cancel);
+</code></pre><p>Which will show something like this:</p>
+<pre><code>+- Quit -----------------------------------------------+
+|                                                      |
+|                                                      |
+|                  [ Ok ] [ Cancel ]                   |
++------------------------------------------------------+
+</code></pre><h3 id="running-modally">Running Modally</h3>
+<p>To run your Dialog, Window or Toplevel modally, you will invoke the <code>Application.Run</code>
+method on the toplevel. It is up to your code and event handlers to invoke the <code>Application.RequestStop()</code> method to terminate the modal execution.</p>
+<pre><code class="lang-csharp">bool okpressed = false;
+var ok = new Button(3, 14, &quot;Ok&quot;) { 
+    Clicked = () =&gt; { Application.RequestStop (); okpressed = true; }
+};
+var cancel = new Button(10, 14, &quot;Cancel&quot;) {
+    Clicked = () =&gt; Application.RequestStop () 
+};
+var dialog = new Dialog (&quot;Login&quot;, 60, 18, ok, cancel);
+
+var entry = new TextField () {
+    X = 1, 
+    Y = 1,
+    Width = Dim.Fill (),
+    Height = 1
+};
+dialog.Add (entry);
+Application.Run (dialog);
+if (okpressed)
+    Console.WriteLine (&quot;The user entered: &quot; + entry.Text);
+</code></pre><p>There is no return value from running modally, so your code will need to have a mechanism
+of indicating the reason that the execution of the modal dialog was completed, in the 
+case above, the <code>okpressed</code> value is set to true if the user pressed or selected the Ok button.</p>
+<h2 id="input-handling">Input Handling</h2>
+<p>Every view has a focused view, and if that view has nested views, one of those is 
+the focused view. This is called the focus chain, and at any given time, only one
+View has the focus. </p>
+<p>The library binds the key Tab to focus the next logical view,
+and the Shift-Tab combination to focus the previous logical view. </p>
+<p>Keyboard processing is divided in three stages: HotKey processing, regular processing and
+cold key processing. </p>
+<ul>
+<li><p>Hot key processing happens first, and it gives all the views in the current
+toplevel a chance to monitor whether the key needs to be treated specially. This
+for example handles the scenarios where the user pressed Alt-o, and a view with a 
+highlighted &quot;o&quot; is being displayed.</p>
+</li>
+<li><p>If no view processed the hotkey, then the key is sent to the currently focused
+view.</p>
+</li>
+<li><p>If the key was not processed by the normal processing, all views are given 
+a chance to process the keystroke in their cold processing stage. Examples
+include the processing of the &quot;return&quot; key in a dialog when a button in the
+dialog has been flagged as the &quot;default&quot; action.</p>
+</li>
+</ul>
+<p>The most common case is the normal processing, which sends the keystrokes to the
+currently focused view.</p>
+<p>Mouse events are processed in visual order, and the event will be sent to the
+view on the screen. The only exception is that no mouse events are delivered
+to background views when a modal view is running. </p>
+<p>More details are available on the <a href="keyboard.html"><code>Keyboard Event Processing</code></a> document.</p>
+<h2 id="colors-and-color-schemes">Colors and Color Schemes</h2>
+<p>All views have been configured with a color scheme that will work both in color
+terminals as well as the more limited black and white terminals. </p>
+<p>The various styles are captured in the <a href="../api/Terminal.Gui/Terminal.Gui.Colors.html"><code>Colors</code></a> class which defined color schemes for
+the toplevel, the normal views, the menu bar, popup dialog boxes and error dialog boxes, that you can use like this:</p>
+<ul>
+<li><code>Colors.Toplevel</code></li>
+<li><code>Colors.Base</code></li>
+<li><code>Colors.Menu</code></li>
+<li><code>Colors.Dialog</code></li>
+<li><code>Colors.Error</code></li>
+</ul>
+<p>You can use them for example like this to set the colors for a new Window:</p>
+<pre><code>var w = new Window (&quot;Hello&quot;);
+w.ColorScheme = Colors.Error
+</code></pre><p>The <a href="../api/Terminal.Gui/Terminal.Gui.ColorScheme.html"><code>ColorScheme</code></a> represents
+four values, the color used for Normal text, the color used for normal text when
+a view is focused an the colors for the hot-keys both in focused and unfocused modes.</p>
+<p>By using <code>ColorSchemes</code> you ensure that your application will work correctbly both
+in color and black and white terminals.</p>
+<p>Some views support setting individual color attributes, you create an
+attribute for a particular pair of Foreground/Background like this:</p>
+<pre><code>var myColor = Application.Driver.MakeAttribute (Color.Blue, Color.Red);
+var label = new Label (...);
+label.TextColor = myColor
+</code></pre><h2 id="mainloop-threads-and-input-handling">MainLoop, Threads and Input Handling</h2>
+<p>Detailed description of the mainloop is described on the <a href="mainloop.html">Event Processing and the Application Main Loop</a> document.</p>
+<h2 id="cross-platform-drivers">Cross-Platform Drivers</h2>
+<p>See <a href="drivers.html">Cross-platform Driver Model</a>.</p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                  <li>
+                    <a href="https://github.com/gui-cs/Terminal.Gui/blob/develop/docfx/articles/overview.md/#L1" class="contribution-link">Improve this Doc</a>
+                  </li>
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
