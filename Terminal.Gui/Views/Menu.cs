@@ -1247,10 +1247,17 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.F9, Command.Select);
 			AddKeyBinding (Key.CtrlMask | Key.Space, Command.Select);
 
+			// TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
+			// TODO: As a result, _File._Save will have precedence over in "_File _Edit _ScrollbarView"
+			// TODO: Also: Hotkeys should not work for sub-menus if they are not visible!
 			if (Menus != null) {
 				foreach (var menu in Menus?.Where (m => m != null)) {
-					AddKeyBinding ((Key)menu.HotKey.Value | Key.AltMask, Command.Select);
-					AddKeyBinding (menu.Shortcut, Command.Select);
+					if (menu.HotKey != default) {
+						AddKeyBinding ((Key)menu.HotKey.Value | Key.AltMask, Command.Select);
+					}
+					if (menu.Shortcut != Key.Unknown) {
+						AddKeyBinding (menu.Shortcut, Command.Select);
+					}
 					AddKeyBindings (menu);
 				}
 			}
@@ -1262,8 +1269,12 @@ namespace Terminal.Gui {
 				return;
 			}
 			foreach (var menuItem in menuBarItem.Children.Where (m => m != null)) {
-				AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, Command.Select);
-				AddKeyBinding (menuItem.Shortcut, Command.Select);
+				if (menuItem.HotKey != default) {
+					AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, Command.Select);
+				}
+				if (menuItem.Shortcut != Key.Unknown) {
+					AddKeyBinding (menuItem.Shortcut, Command.Select);
+				}
 				var subMenu = menuBarItem.SubMenu (menuItem);
 				AddKeyBindings (subMenu);
 			}
@@ -1273,7 +1284,7 @@ namespace Terminal.Gui {
 		{
 			if (_mbItemToActivate != -1) {
 				Activate (_mbItemToActivate);
-			} else if (_menuItemToActivate != null) {
+			} else if (_menuItemToActivate != null && _menuItemToActivate.Action != null) {
 				Run (_menuItemToActivate.Action);
 			} else {
 				if (IsMenuOpen) {
@@ -1435,6 +1446,9 @@ namespace Terminal.Gui {
 
 		internal void Run (Action action)
 		{
+			if (action == null) {
+				return;
+			}
 			Application.MainLoop.AddIdle (() => {
 				action ();
 				return false;
@@ -2148,6 +2162,13 @@ namespace Terminal.Gui {
 				for (var i = 0; i < Menus.Length; i++) {
 					if (key == ((Key)Menus [i].HotKey.Value | Key.AltMask)) {
 						_mbItemToActivate = i;
+						_menuItemToActivate = Menus [i];
+						break;
+					}
+					var shortcut = Menus [i]?.Shortcut;
+					if (shortcut != null && key == ((Key)shortcut)) {
+						_mbItemToActivate = -1;
+						_menuItemToActivate = Menus [i];
 						break;
 					}
 					if (FindShortcutInChildMenu (key, Menus [i])) {
@@ -2163,7 +2184,13 @@ namespace Terminal.Gui {
 			if (menuBarItem == null || menuBarItem.Children == null) {
 				return false;
 			}
-			foreach (var menuItem in menuBarItem.Children) {
+			for (var c = 0; c < menuBarItem.Children.Length; c++) {
+				var menuItem = menuBarItem.Children [c];
+				if (menuItem?.HotKey.Value != null && key == ((Key)menuItem?.HotKey.Value | Key.AltMask)) {
+					_mbItemToActivate = -1;
+					_menuItemToActivate = menuItem;
+					return true;
+				}
 				if (key == menuItem?.Shortcut) {
 					_mbItemToActivate = -1;
 					_menuItemToActivate = menuItem;

@@ -2766,7 +2766,7 @@ wo
 		Assert.True (CanExecuteNew ());
 		Assert.False (CanExecuteClose ());
 
-		Assert.True (top.OnHotKey (new (Key.N | Key.AltMask, new KeyModifiers () { Alt = true })));
+		Assert.True (top.ProcessKeyPressed(new (Key.N | Key.AltMask, new KeyModifiers () { Alt = true })));
 		Application.MainLoop.RunIteration ();
 		Assert.NotNull (win);
 		Assert.False (CanExecuteNew ());

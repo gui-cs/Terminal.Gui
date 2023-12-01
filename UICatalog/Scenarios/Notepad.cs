@@ -25,7 +25,7 @@ namespace UICatalog.Scenarios {
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "", () => New()),
+					new MenuItem ("_New", "", () => New(), null, null, Key.N | Key.CtrlMask | Key.AltMask),
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
 					new MenuItem ("Save _As", "", () => SaveAs()),
