@@ -66,8 +66,8 @@ jobs:
       with:
         args: install docfx    
 
-    - name: Install dependencies
-      run: dotnet restore        
+    # - name: Install dependencies
+    #   run: dotnet restore        
 
     - name: DocFX Build
       working-directory: docfx
@@ -92,7 +92,7 @@ jobs:
       id: deployment
       uses: actions/deploy-pages@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
         
     # - name: Use docfx to build API Docs
