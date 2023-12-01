@@ -28,20 +28,10 @@ public class StatusItem {
 		CanExecute = canExecute;
 	}
 
-	Key _shortcut;
-
 	/// <summary>
 	/// Gets the global shortcut to invoke the action on the menu.
 	/// </summary>
-	public Key Shortcut {
-		get => _shortcut;
-		set {
-			if (_shortcut == value) {
-				return;
-			}
-			_shortcut = value;
-		}
-	}
+	public Key Shortcut { get; set; }
 
 	/// <summary>
 	/// Gets or sets the title.
@@ -72,7 +62,7 @@ public class StatusItem {
 	/// </summary>
 	public bool IsEnabled ()
 	{
-		return CanExecute == null ? true : CanExecute ();
+		return CanExecute?.Invoke () ?? true;
 	}
 
 	/// <summary>
@@ -86,7 +76,7 @@ public class StatusItem {
 /// A status bar is a <see cref="View"/> that snaps to the bottom of a <see cref="Toplevel"/> displaying set of <see cref="StatusItem"/>s.
 /// The <see cref="StatusBar"/> should be context sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will
 /// be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help.
-/// So for each context must be a new instance of a statusbar.
+/// So for each context must be a new instance of a status bar.
 /// </summary>
 public class StatusBar : View {
 	/// <summary>
@@ -114,7 +104,7 @@ public class StatusBar : View {
 	/// Initializes a new instance of the <see cref="StatusBar"/> class with the specified set of <see cref="StatusItem"/>s.
 	/// The <see cref="StatusBar"/> will be drawn on the lowest line of the terminal or <see cref="View.SuperView"/> (if not null).
 	/// </summary>
-	/// <param name="items">A list of statusbar items.</param>
+	/// <param name="items">A list of status bar items.</param>
 	public StatusBar (StatusItem [] items) : base ()
 	{
 		if (items != null) {
@@ -173,17 +163,17 @@ public class StatusBar : View {
 		}
 		return base.OnInvokeKeyBindings (keyEvent);
 	}
-	static string shortcutDelimiter = "-";
+	static Rune _shortcutDelimiter = (Rune)'=';
 	StatusItem [] _items = new StatusItem [] { };
 
 	/// <summary>
 	/// Gets or sets shortcut delimiter separator. The default is "-".
 	/// </summary>
-	public static string ShortcutDelimiter {
-		get => shortcutDelimiter;
+	public static Rune ShortcutDelimiter {
+		get => _shortcutDelimiter;
 		set {
-			if (shortcutDelimiter != value) {
-				shortcutDelimiter = value == string.Empty ? " " : value;
+			if (_shortcutDelimiter != value) {
+				_shortcutDelimiter = value == default ? (Rune)'=' : value;
 			}
 		}
 	}

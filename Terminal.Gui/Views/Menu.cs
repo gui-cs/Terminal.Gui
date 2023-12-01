@@ -109,7 +109,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.
 		/// </summary>
-		public string ShortcutTag => ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
+		public string ShortcutTag => KeyEventArgs.ToString(_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);// ShortcutHelper.GetShortcutTag (_shortcutHelper.Shortcut);
 
 		/// <summary>
 		/// Gets or sets the title of the menu item .
@@ -1136,15 +1136,15 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static string _shortcutDelimiter = "+";
+		static Rune _shortcutDelimiter = new Rune('+');
 		/// <summary>
 		/// Sets or gets the shortcut delimiter separator. The default is "+".
 		/// </summary>
-		public static string ShortcutDelimiter {
+		public static Rune ShortcutDelimiter {
 			get => _shortcutDelimiter;
 			set {
 				if (_shortcutDelimiter != value) {
-					_shortcutDelimiter = value == string.Empty ? " " : value;
+					_shortcutDelimiter = value == default ? new Rune ('+') : value;
 				}
 			}
 		}

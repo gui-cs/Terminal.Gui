@@ -84,11 +84,11 @@ namespace UICatalog.Scenarios {
 					Height = 4
 				};
 
-				var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter) {
+				var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter.ToString()) {
 					X = Pos.Center (),
 					Width = 2,
 				};
-				_txtDelimiter.TextChanged += (s, _) => MenuBar.ShortcutDelimiter = _txtDelimiter.Text;
+				_txtDelimiter.TextChanged += (s, _) => MenuBar.ShortcutDelimiter = _txtDelimiter.Text.ToRunes()[0];
 				_frmDelimiter.Add (_txtDelimiter);
 
 				Add (_frmDelimiter);
@@ -760,7 +760,7 @@ namespace UICatalog.Scenarios {
 						}
 						return true;
 					}
-					_txtShortcut.Text = ShortcutHelper.GetShortcutTag (k);
+					_txtShortcut.Text = KeyEventArgs.ToString (k, MenuBar.ShortcutDelimiter);// ShortcutHelper.GetShortcutTag (k);
 
 					return true;
 				}

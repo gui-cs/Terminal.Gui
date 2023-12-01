@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Terminal.Gui;
 
@@ -92,31 +93,91 @@ public class KeyEventArgs : EventArgs {
 	/// <returns></returns>
 	public override string ToString ()
 	{
-		string msg = "";
-		var key = this.Key;
-		if (_keyModifiers.Shift) {
-			msg += "Shift-";
-		}
-		if (_keyModifiers.Alt) {
-			msg += "Alt-";
-		}
-		if (_keyModifiers.Ctrl) {
-			msg += "Ctrl-";
-		}
-		if (_keyModifiers.Capslock) {
-			msg += "Capslock-";
-		}
-		if (_keyModifiers.Numlock) {
-			msg += "Numlock-";
-		}
-		if (_keyModifiers.Scrolllock) {
-			msg += "Scrolllock-";
-		}
-
-		msg += $"{((Key)KeyValue != Key.Unknown && ((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
-
-		return msg;
+		return ToString (Key, (Rune)'+');
 	}
+
+	private static string GetKeyString (Key key)
+	{
+		string keyName = Enum.GetName (typeof (Key), key);
+
+		if (key >= Key.A && key <= Key.Z)
+			return ((char)key).ToString ();
+		if (key >= Key.D0 && key <= Key.D9)
+			return ((char)key).ToString ();
+
+		if (!string.IsNullOrEmpty (keyName)) {
+			return keyName;
+		}
+
+		return key.ToString ();
+	}
+
+	/// <summary>
+	/// Formats a <see cref="Key"/> as a string.
+	/// </summary>
+	/// <param name="key">The key to format.</param>
+	/// <param name="separator">The character to use as a separator between modifier keys and and the key itself.</param>
+	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
+	public static string ToString (Key key, Rune separator)
+	{
+		if (key == Key.Null) {
+			return string.Empty;
+		}
+
+		StringBuilder sb = new StringBuilder ();
+
+		// Extract and handle modifiers
+		bool hasModifiers = false;
+		if ((key & Key.CtrlMask) != 0) {
+			sb.Append ($"Ctrl{separator}");
+			hasModifiers = true;
+		}
+		if ((key & Key.AltMask) != 0) {
+			sb.Append ($"Alt{separator}");
+			hasModifiers = true;
+		}
+		if ((key & Key.ShiftMask) != 0) {
+			sb.Append ($"Shift{separator}");
+			hasModifiers = true;
+		}
+
+
+		// Extract the base key (removing modifier flags)
+		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
+
+		// Handle special cases and modifiers on their own
+		if (baseKey == Key.Null && hasModifiers) {
+			//return sb.ToString ().TrimEnd ('-');
+			//} else if (baseKey == Key.Unknown && _keyModifiers.Capslock) {
+			//	result.Append ("Capslock");
+			//} else if (baseKey == Key.Unknown && _keyModifiers.Scrolllock) {
+			//	result.Append ("Scrolllock");
+			//} else if (baseKey == Key.Unknown && _keyModifiers.Numlock) {
+			//	result.Append ("Numlock");
+		} else {
+			// Append the actual key name
+			sb.Append (GetKeyString (baseKey));
+		}
+
+		var result = sb.ToString ();
+		result = TrimEndRune(result, separator);
+		return result;
+	}
+
+	static string TrimEndRune (string input, Rune runeToTrim)
+	{
+		// Convert the Rune to a string (which may be one or two chars)
+		string runeString = runeToTrim.ToString ();
+
+		if (input.EndsWith (runeString)) {
+			// Remove the rune from the end of the string
+			return input.Substring (0, input.Length - runeString.Length);
+		}
+
+		return input;
+	}
+
+
 }
 
 /// <summary>
@@ -645,108 +706,3 @@ public enum Key : uint {
 	Unknown
 }
 
-///// <summary>
-///// Describes a keyboard event.
-///// </summary>
-//public class {
-//	KeyModifiers keyModifiers;
-
-//	/// <summary>
-//	/// Symbolic definition for the key.
-//	/// </summary>
-//	public Key Key;
-
-//	/// <summary>
-//	///   The key value cast to an integer, you will typical use this for
-//	///   extracting the Unicode rune value out of a key, when none of the
-//	///   symbolic options are in use.
-//	/// </summary>
-//	public int KeyValue => (int)Key;
-
-//	/// <summary>
-//	/// Gets a value indicating whether the Shift key was pressed.
-//	/// </summary>
-//	/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-//	public bool IsShift => keyModifiers.Shift || Key == Key.BackTab;
-
-//	/// <summary>
-//	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
-//	/// </summary>
-//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-//	public bool IsAlt => keyModifiers.Alt;
-
-//	/// <summary>
-//	/// Determines whether the value is a control key (and NOT just the ctrl key)
-//	/// </summary>
-//	/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
-//	//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
-//	public bool IsCtrl => keyModifiers.Ctrl;
-
-//	/// <summary>
-//	/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
-//	/// </summary>
-//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-//	public bool IsCapslock => keyModifiers.Capslock;
-
-//	/// <summary>
-//	/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
-//	/// </summary>
-//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-//	public bool IsNumlock => keyModifiers.Numlock;
-
-//	/// <summary>
-//	/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
-//	/// </summary>
-//	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-//	public bool IsScrolllock => keyModifiers.Scrolllock;
-
-//	/// <summary>
-//	/// Constructs a new <see cref="KeyEventArgs"/>
-//	/// </summary>
-//	public ()
-//	{
-//		Key = Key.Unknown;
-//		keyModifiers = new KeyModifiers ();
-//	}
-
-//	/// <summary>
-//	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
-//	/// </summary>
-//	public (Key k, KeyModifiers km)
-//	{
-//		Key = k;
-//		keyModifiers = km;
-//	}
-
-//	/// <summary>
-//	/// Pretty prints the KeyEvent
-//	/// </summary>
-//	/// <returns></returns>
-//	public override string ToString ()
-//	{
-//		string msg = "";
-//		var key = this.Key;
-//		if (keyModifiers.Shift) {
-//			msg += "Shift-";
-//		}
-//		if (keyModifiers.Alt) {
-//			msg += "Alt-";
-//		}
-//		if (keyModifiers.Ctrl) {
-//			msg += "Ctrl-";
-//		}
-//		if (keyModifiers.Capslock) {
-//			msg += "Capslock-";
-//		}
-//		if (keyModifiers.Numlock) {
-//			msg += "Numlock-";
-//		}
-//		if (keyModifiers.Scrolllock) {
-//			msg += "Scrolllock-";
-//		}
-
-//		msg += $"{((Key)KeyValue != Key.Unknown && ((uint)this.KeyValue & (uint)Key.CharMask) > 27 ? $"{(char)this.KeyValue}" : $"{key}")}";
-
-//		return msg;
-//	}
-//}

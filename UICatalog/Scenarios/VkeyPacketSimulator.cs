@@ -103,7 +103,7 @@ namespace UICatalog.Scenarios {
 					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
 					if (!tvOutput.OnKeyPressed (e)) {
 						Application.Invoke (() => {
-							MessageBox.Query ("Keys", $"'{ShortcutHelper.GetShortcutTag (ev)}' pressed!", "Ok");
+							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (ev, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
 						});
 					}
 					e.Handled = true;

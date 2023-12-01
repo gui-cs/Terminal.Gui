@@ -517,11 +517,11 @@ public partial class View {
 	{
 		// Force upper case
 		var mask = toKey & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
+		if (mask is >= Key.a and <= Key.z) {
 			toKey = (Key)((int)toKey - 32);
 		}
 		mask = fromKey & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
+		if (mask is >= Key.a and <= Key.z) {
 			fromKey = (Key)((int)fromKey - 32);
 		}
 		if (ContainsKeyBinding (fromKey)) {
@@ -540,10 +540,28 @@ public partial class View {
 	{
 		// Force upper case
 		var mask = key & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
+		if (mask is >= Key.a and <= Key.z) {
 			key = (Key)((int)key - 32);
 		}
 		return KeyBindings.ContainsKey (key);
+	}
+
+	/// <summary>
+	/// Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
+	public Command [] GetKeyBindings (Key key)
+	{
+		// Force upper case
+		var mask = key & Key.CharMask;
+		if (mask is >= Key.a and <= Key.z) {
+			key = (Key)((int)key - 32);
+		}
+		if (KeyBindings.TryGetValue (key, out var bindings)) {
+			return bindings;
+		}
+		return Array.Empty<Command> ();
 	}
 
 	/// <summary>

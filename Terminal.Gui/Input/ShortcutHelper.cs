@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -57,14 +58,14 @@ public class ShortcutHelper {
 	/// <param name="shortcut">The shortcut key.</param>
 	/// <param name="delimiter">The delimiter string.</param>
 	/// <returns></returns>
-	public static string GetShortcutTag (Key shortcut, string delimiter = null)
+	public static string GetShortcutTag (Key shortcut, Rune delimiter = default)
 	{
 		if (shortcut == Key.Null) {
 			return "";
 		}
 
 		var k = shortcut;
-		if (delimiter == null) {
+		if (delimiter == default) {
 			delimiter = MenuBar.ShortcutDelimiter;
 		}
 		string tag = string.Empty;
@@ -146,7 +147,7 @@ public class ShortcutHelper {
 	/// </summary>
 	/// <param name="tag">The key as string.</param>
 	/// <param name="delimiter">The delimiter string.</param>
-	public static Key GetShortcutFromTag (string tag, string delimiter = null)
+	public static Key GetShortcutFromTag (string tag, Rune delimiter = default)
 	{
 		var sCut = tag;
 		if (string.IsNullOrEmpty (sCut)) {
@@ -155,11 +156,11 @@ public class ShortcutHelper {
 
 		Key key = Key.Null;
 		//var hasCtrl = false;
-		if (delimiter == null) {
+		if (delimiter == default) {
 			delimiter = MenuBar.ShortcutDelimiter;
 		}
 
-		string [] keys = sCut.Split (delimiter);
+		string [] keys = sCut.Split (delimiter.ToString());
 		for (int i = 0; i < keys.Length; i++) {
 			var k = keys [i];
 			if (k == "Ctrl") {
