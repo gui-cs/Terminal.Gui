@@ -189,6 +189,9 @@ public partial class View {
 	/// <para>
 	/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
 	/// </para>
+	/// <para>
+	///	See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
@@ -230,6 +233,9 @@ public partial class View {
 	/// <para>
 	/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
 	/// </para>
+	/// <para>
+	///	See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
@@ -268,6 +274,9 @@ public partial class View {
 	/// If the view is enabled, processes a key pressed event and returns <see langword="true"/> if the event was handled.
 	/// <remarks>
 	/// <para>Calls <see cref="OnKeyPressed(KeyEventArgs)"/> and <see cref="OnInvokeKeyBindings(KeyEventArgs)"/>.</para>
+	/// <para>
+	///	See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
 	/// </summary>
 	/// <param name="keyEvent"></param>
@@ -310,6 +319,9 @@ public partial class View {
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
 	/// </para>
+	/// <para>
+	///	See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
@@ -348,6 +360,9 @@ public partial class View {
 	/// <remarks>
 	/// <para>
 	/// Fires the <see cref="InvokingKeyBindings"/> event.
+	/// </para>
+	/// <para>
+	///	See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// </para>
 	/// </remarks>
 	/// </summary>
