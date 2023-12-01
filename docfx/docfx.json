@@ -13,7 +13,7 @@
           "src": "../Terminal.Gui"
         }
       ],
-      "dest": "api/Terminal.Gui2",
+      "dest": "api/Terminal.Gui",
       "shouldSkipMarkup": true,
       "properties": {
           "TargetFramework": "net7.0"
@@ -32,7 +32,7 @@
           "src": "../UICatalog"
         }
       ],
-      "dest": "api/UICatalog2",
+      "dest": "api/UICatalog",
       "shouldSkipMarkup": false,
       "properties": {
           "TargetFramework": "net7.0"
@@ -87,7 +87,7 @@
         ]
       }
     ],
-    "dest": "../v2docs",
+    "dest": "../v2_docs",
     "globalMetadata": {
       "_enableSearch": "true",
       "_appLogoPath": "images/logo48.png",
