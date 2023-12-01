@@ -34,7 +34,7 @@ jobs:
     - name: DocFX Build
       working-directory: docfx
       run: |
-        rm ../v2_docs -Recurse -Force -ErrorAction SilentlyContinue
+        rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
         rm ../api -Recurse -Force -ErrorAction SilentlyContinue
         $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
         docfx docfx.json
@@ -46,8 +46,8 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        artifact-name: v2_docs
-        path: v2_docs
+        artifact-name: docs
+        path: docs
        
     - name: Deploy to GitHub Pages
       id: deployment
