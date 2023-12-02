@@ -42,7 +42,7 @@
   "build": {
     "template": [
       "default",
-      "./templates/default"
+      "./templates/singulinkfx"
     ],
     "content": [
       {
@@ -89,9 +89,18 @@
     ],
     "dest": "../docs",
     "globalMetadata": {
-      "_enableSearch": "true",
-      "_appLogoPath": "images/logo48.png",
+      "_appTitle": "Terminal.Gui v2 Title",
+      "_appName": "Terminal.Gui v2 AppName",
+      "_appFaviconPath": "images/favicon.png",
+      "_appLogoPath": "images/logo.png",
+      "_appFooter": "<strong>Terminal.Gui Footer</strong>",
+      "_enableSearch": true,
+      "_disableSideFilter": false,
+      "_enableNewTab": true,
       "_disableContribution": false,
+      "_disableBreadcrumb": false,
+
+
       "_gitContribute": {
         "repo": "https://github.com/gui-cs/Terminal.Gui",
         "branch": "v2_develop",
