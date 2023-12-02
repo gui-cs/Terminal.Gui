@@ -5,6 +5,8 @@ $prevPwd = $PWD; Set-Location -ErrorAction Stop -LiteralPath $PSScriptRoot
 try {
     $PWD  # output the current location 
 
+    dotnet tool update -g docfx
+
     dotnet build --configuration Release ../Terminal.sln
 
     rm ../docs -Recurse -Force -ErrorAction SilentlyContinue

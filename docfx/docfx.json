@@ -91,7 +91,7 @@
     "globalMetadata": {
       "_appTitle": "Terminal.Gui v2",
       "_appName": "Terminal.Gui v2",
-      "_appFaviconPath": "images/favicon.png",
+      "_appFaviconPath": "images/icon48.png",
       "_appLogoPath": "images/logo.png",
       "_appFooter": "<strong>Terminal.Gui - Part of the gui-cs Organization</strong>",
       "_enableSearch": true,
@@ -108,6 +108,7 @@
       },
       "_gitUrlPattern": "github"
     },
+    "markdownEngineName": "markdig",
     "globalMetadataFiles": [],
     "fileMetadataFiles": [],
     "postProcessors": ["ExtractSearchIndex"],
