@@ -29,15 +29,15 @@ namespace Terminal.Gui;
 /// </example>
 /// <remarks>
 ///  <para>
-///   Creates a instance of the main loop to process input events, handle timers and
-///   other sources of data. 
+///   Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
+///   other sources of data. It is accessible via the <see cref="MainLoop"/> property.
 ///  </para>
 ///  <para>
-///   The <see cref="Iteration"/> event is invoked on each iteration of the main loop.
+///   The <see cref="Iteration"/> event is invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
 ///  </para>
 ///  <para>
 ///   When invoked it sets the <see cref="SynchronizationContext"/> to one that is tied
-///   to the main loop allowing user code to use async/await.
+///   to the <see cref="MainLoop"/>, allowing user code to use async/await.
 ///  </para>
 /// </remarks>
 public static partial class Application {
@@ -121,7 +121,7 @@ public static partial class Application {
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
 
-	// INTERNAL function for initializing an app with a Toplevel factory object, driver, and main loop.
+	// INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
 	//
 	// Called from:
 	// 
@@ -158,22 +158,14 @@ public static partial class Application {
 		ConfigurationManager.Load (true);
 		ConfigurationManager.Apply ();
 
-		if (Driver == null) {
-			var p = Environment.OSVersion.Platform;
-			if (_forceFakeConsole) {
-				// For Unit Testing only
-				Driver = new FakeDriver ();
-			} else if (UseSystemConsole) {
-				Driver = new NetDriver ();
-			} else if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-				Driver = new WindowsDriver ();
-			} else {
-				Driver = new CursesDriver ();
-			}
-			if (Driver == null) {
-				throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
-			}
-		}
+		Driver ??= Environment.OSVersion.Platform switch {
+			_ when _forceFakeConsole => new FakeDriver (), // for unit testing only
+			_ when UseSystemConsole => new NetDriver (),
+			PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows => new WindowsDriver (),
+			_ => new CursesDriver (),
+		};
+
+		if (Driver == null) throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
 
 		try {
 			MainLoop = Driver.Init ();
@@ -564,7 +556,7 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	///  This event is raised on each iteration of the main loop.
+	///  This event is raised on each iteration of the <see cref="MainLoop"/>. 
 	/// </summary>
 	/// <remarks>
 	///  See also <see cref="Timeout"/>
@@ -572,7 +564,7 @@ public static partial class Application {
 	public static event EventHandler<IterationEventArgs> Iteration;
 
 	/// <summary>
-	/// The main loop driver for the application
+	/// The <see cref="MainLoop"/> driver for the application
 	/// </summary>
 	/// <value>The main loop.</value>
 	internal static MainLoop MainLoop { get; private set; }
@@ -620,7 +612,7 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	///  Building block API: Runs the main loop for the created <see cref="Toplevel"/>.
+	///  Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
 	/// </summary>
 	/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
 	public static void RunLoop (RunState state)
@@ -1411,7 +1403,6 @@ public static partial class Application {
 
 		return false;
 	}
-
 	/// <summary>
 	/// Event fired when a key is pressed (and not yet released). 
 	/// </summary>
