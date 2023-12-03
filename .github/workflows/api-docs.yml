@@ -14,22 +14,11 @@ jobs:
     name: Build and Deploy API docs to github-pages
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}/.github
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: windows-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: 7.0
-        dotnet-quality: 'ga'
-    
-    # - name: Setup DocFX
-    #   uses: crazy-max/ghaction-chocolatey@v2
-    #   with:
-    #     args: install docfx    
 
     - name: DocFX Build
       working-directory: docfx
@@ -46,8 +35,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        artifact-name: docs
-        path: docs
+        path: docfx/_site
        
     - name: Deploy to GitHub Pages
       id: deployment
