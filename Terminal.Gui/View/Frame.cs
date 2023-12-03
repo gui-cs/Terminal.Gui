@@ -198,7 +198,9 @@ namespace Terminal.Gui {
 
 			}
 
-			if (Id == "Border" && canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title)) {
+			if (Id == "Border" && canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title)
+				&& borderBounds.Height > 1) {
+
 				var prevAttr = Driver.GetAttribute ();
 				if (ColorScheme != null) {
 					Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
@@ -212,10 +214,10 @@ namespace Terminal.Gui {
 			if (Id == "Border" && canDrawBorder && BorderStyle != LineStyle.None) {
 				LineCanvas lc = Parent?.LineCanvas;
 
-				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
+				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 0;
 				var drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
-				var drawBottom = Thickness.Bottom > 0 && Frame.Width > 1;
-				var drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+				var drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
+				var drawRight = Thickness.Right > 0 && ((Frame.Width > 1 && Frame.Height > 1) || Thickness.Top == 0);
 
 				var prevAttr = Driver.GetAttribute ();
 				if (ColorScheme != null) {
@@ -227,7 +229,7 @@ namespace Terminal.Gui {
 				if (drawTop) {
 					// ╔╡Title╞═════╗
 					// ╔╡╞═════╗
-					if (borderBounds.Width < 4 || string.IsNullOrEmpty (Parent?.Title)) {
+					if (borderBounds.Width < 4 || borderBounds.Height == 1 || string.IsNullOrEmpty (Parent?.Title)) {
 						// ╔╡╞╗ should be ╔══╗
 						lc.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
 					} else {
@@ -246,15 +248,17 @@ namespace Terminal.Gui {
 							lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
 						}
 
-						// ╔╡Title╞═════╗
-						// Add a short horiz line for ╔╡
-						lc.AddLine (new Point (borderBounds.Location.X, titleY), 2, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
-						// Add a vert line for ╔╡
-						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, Driver.GetAttribute ());
-						// Add a vert line for ╞
-						lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, Driver.GetAttribute ());
-						// Add the right hand line for ╞═════╗
-						lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY), borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+						if (borderBounds.Height > 1) {
+							// ╔╡Title╞═════╗
+							// Add a short horiz line for ╔╡
+							lc.AddLine (new Point (borderBounds.Location.X, titleY), 2, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+							// Add a vert line for ╔╡
+							lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, Driver.GetAttribute ());
+							// Add a vert line for ╞
+							lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, Driver.GetAttribute ());
+							// Add the right hand line for ╞═════╗
+							lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY), borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ()); 
+						}
 					}
 				}
 				if (drawLeft) {
