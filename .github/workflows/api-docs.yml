@@ -2,7 +2,8 @@ name: Build and publish API docs
 
 on:
   push:
-    branches: [main, develop, v2_develop]
+  # only publish v2 (main or develop); v2 is published via the Terminal.GuiV2Docs repo
+    branches: [main, develop]
 
 permissions:
   id-token: write 
@@ -11,7 +12,7 @@ permissions:
 jobs:
   # Single deploy job since we're just deploying
   deploy:
-    name: Build and Deploy API docs to gh-pages
+    name: Build and Deploy API docs to github-pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -20,25 +21,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: 7.0
-        dotnet-quality: 'ga'
-    
-    - name: Setup DocFX
-      uses: crazy-max/ghaction-chocolatey@v2
-      with:
-        args: install docfx    
-
     - name: DocFX Build
       working-directory: docfx
-      # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
       run: |
-        rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
-        rm ../api -Recurse -Force -ErrorAction SilentlyContinue
+        dotnet tool install -g docfx
         $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
-        docfx docfx.json
+        docfx metadata
+        docfx build
       continue-on-error: false
 
     - name: Setup Pages
@@ -47,8 +36,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v2
       with:
-        artifact-name: docs
-        path: docs
+        path: docfx/_site
        
     - name: Deploy to GitHub Pages
       id: deployment
