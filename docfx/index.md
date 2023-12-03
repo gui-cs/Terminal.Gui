@@ -10,16 +10,16 @@ A toolkit for building rich console apps for .NET, .NET Core, and Mono that work
 
 ## Terminal.Gui API Documentation
 
-* [What's new in v2](~/articles/newinv2.md)
-* [API Reference](~/api/Terminal.Gui/Terminal.Gui.yml)
-* [Views and controls built into the Terminal.Gui library](~/articles/views.md)
-* [Terminal.Gui API Overview](~/articles/overview.md)
-* [Keyboard Event Processing](~/articles/keyboard.md)
-* [Event Processing and the Application Main Loop](~/articles/mainloop.md)
-* [Cross-platform Driver Model](~/articles/drivers.md)
-* [Configuration and Theme Manager](~/articles/config.md)
-* [TableView Deep Dive](~/articles/tableview.md)
-* [TreeView Deep Dive](~/articles/treeview.md)
+* [What's new in v2](~/docs/newinv2.md)
+* [API Reference](~/api/Terminal.Gui.yml)
+* [Views and controls built into the Terminal.Gui library](~/docs/views.md)
+* [Terminal.Gui API Overview](~/docs/overview.md)
+* [Keyboard Event Processing](~/docs/keyboard.md)
+* [Event Processing and the Application Main Loop](~/docs/mainloop.md)
+* [Cross-platform Driver Model](~/docs/drivers.md)
+* [Configuration and Theme Manager](~/docs/config.md)
+* [TableView Deep Dive](~/docs/tableview.md)
+* [TreeView Deep Dive](~/docs/treeview.md)
 
 ## UI Catalog
 
