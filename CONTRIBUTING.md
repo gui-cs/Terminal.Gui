@@ -124,7 +124,7 @@ Great care has been provided thus far in ensuring **Terminal.Gui** has great [AP
 - Keep the `<summary></summary>` terse.
 - Use `<see cref=""/>` liberally to cross-link topics.
 - Use `<remarks></remarks>` to add more context and explanation.
-- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/articles/index.html).
+- For complex topics, provide conceptual documentation in the `docfx/articles` folder as a `.md` file. It will automatically get picked up and be added to [Conceptual Documentation](https://gui-cs.github.io/Terminal.Gui/docs/index.html).
 - Use proper English and good grammar.
 
 ### Defining Events
@@ -156,7 +156,7 @@ The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-u
    - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
 4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
 
-See also: https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
+See also: https://www.codeproject.com/docs/20550/C-Event-Implementation-Fundamentals-Best-Practices
 
 ### Defining new `View` classes
 

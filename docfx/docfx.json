@@ -54,7 +54,7 @@
       "pdf": false,
       "_appFaviconPath": "images/icon48.png",
       "_appLogoPath": "images/logo48.png",
-      "_appFooter": "Terminal.Gui - Part of the gui-cs Organization",
+      "_appFooter": "Terminal.Gui - Part of the <a href=https://github.com/gui-cs>gui-cs Organization</a>",
       "_enableSearch": true,
       "_disableSideFilter": false,
       "_enableNewTab": true,

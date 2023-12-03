@@ -1,12 +1,21 @@
-- name: What's new in Terminal.Gui v2
-  href: newinv2.md
 - name: Overview
-  href: overview.md
-- name: Conceptual Docs
   href: index.md
-# - name: API Reference
-#   href: api/Terminal.Gui/
-# - name: UI Catalog API
-#   href: api/UICatalog/
-- name: Source
-  href: https://github.com/gui-cs/Terminal.Gui
+- name: Getting Started
+  href: getting-started.md
+- name: What's new in v2
+  href: newinv2.md
+- name: List of Views
+  href: views.md
+- name: Configuration
+  href: config.md
+- name: Cross-platform Driver Model
+  href: drivers.md
+- name: Event Processing and the Application Main Loop
+  href: mainloop.md
+- name: Keyboard Event Processing
+  href: keyboard.md
+- name: TableView Deep Dive
+  href: tableview.md
+- name: TreeView Deep Dive
+  href: treeview.md
+

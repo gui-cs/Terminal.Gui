@@ -1,17 +1,8 @@
-- name: Docs
+- name: Conceptual Docs
   href: docs/
+
 - name: API
   href: api/
 
-# - name: What's new in Terminal.Gui v2
-#   href: articles/newinv2.md
-# - name: Overview
-#   href: articles/overview.md
-# - name: Conceptual Docs
-#   href: articles/index.md
-# - name: API Reference
-#   href: api/Terminal.Gui/
-# # - name: UI Catalog API
-# #   href: api/UICatalog/
-# - name: Source
-#   href: https://github.com/gui-cs/Terminal.Gui
+- name: Source
+  href: https://github.com/gui-cs/Terminal.Gui
