@@ -509,9 +509,9 @@ namespace Terminal.Gui.ViewsTests {
 			var btn3 = $"{CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}";
 			var expected = @$"
 ┌────────────────────────────────────────────────────┐
-│┌────┐                                              │
+│╭────╮                                              │
 ││Find│                                              │
-││    └─────────────────────────────────────────────┐│
+││    ╰─────────────────────────────────────────────╮│
 ││                                                  ││
 ││   Find: Testing buttons.       {btn1}   ││
 ││                               {btn2}  ││

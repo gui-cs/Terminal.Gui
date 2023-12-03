@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Terminal.Gui;
-using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {
 
@@ -18,6 +12,7 @@ namespace UICatalog.Scenarios {
 		MenuItem miShowTopLine;
 		MenuItem miShowBorder;
 		MenuItem miTabsOnBottom;
+		MenuItem miShowTabViewBorder;
 
 		public override void Setup ()
 		{
@@ -46,6 +41,10 @@ namespace UICatalog.Scenarios {
 					miTabsOnBottom = new MenuItem ("_Tabs On Bottom", "", () => SetTabsOnBottom()){
 						Checked = false,
 						CheckType = MenuItemCheckStyle.Checked
+					},
+					miShowTabViewBorder = new MenuItem ("_Show TabView Border", "", () => ShowTabViewBorder()){
+						Checked = true,
+						CheckType = MenuItemCheckStyle.Checked
 					}
 
 					})
@@ -57,6 +56,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 60,
 				Height = 20,
+				BorderStyle = LineStyle.Single
 			};
 
 			tabView.AddTab (new Tab ("Tab1", new Label ("hodor!")), false);
@@ -189,6 +189,15 @@ namespace UICatalog.Scenarios {
 			miTabsOnBottom.Checked = !miTabsOnBottom.Checked;
 
 			tabView.Style.TabsOnBottom = (bool)miTabsOnBottom.Checked;
+			tabView.ApplyStyleChanges ();
+		}
+
+		private void ShowTabViewBorder ()
+		{
+			miShowTabViewBorder.Checked = !miShowTabViewBorder.Checked;
+
+			tabView.BorderStyle = miShowTabViewBorder.Checked == true ? tabView.BorderStyle = LineStyle.Single
+				: LineStyle.None;
 			tabView.ApplyStyleChanges ();
 		}
 

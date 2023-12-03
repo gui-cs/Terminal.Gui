@@ -198,7 +198,7 @@ namespace UICatalog.Scenarios {
 
 			if (tab.UnsavedChanges) {
 
-				int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.TrimEnd ('*')}", "Yes", "No", "Cancel");
+				int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.DisplayText.TrimEnd ('*')}", "Yes", "No", "Cancel");
 
 				if (result == -1 || result == 2) {
 
@@ -321,7 +321,7 @@ namespace UICatalog.Scenarios {
 			}
 
 			tab.File = new FileInfo (fd.Path);
-			tab.Text = fd.FileName;
+			tab.DisplayText = fd.FileName;
 			tab.Save ();
 
 			return true;
@@ -357,16 +357,16 @@ namespace UICatalog.Scenarios {
 					var areDiff = this.UnsavedChanges;
 
 					if (areDiff) {
-						if (!this.Text.EndsWith ('*')) {
+						if (!this.DisplayText.EndsWith ('*')) {
 
-							this.Text = this.Text + '*';
+							this.DisplayText = this.DisplayText + '*';
 							parent.SetNeedsDisplay ();
 						}
 					} else {
 						
-						if (Text.EndsWith ('*')) {
+						if (DisplayText.EndsWith ('*')) {
 
-							Text = Text.TrimEnd ('*');
+							DisplayText = DisplayText.TrimEnd ('*');
 							parent.SetNeedsDisplay ();
 						}
 					}
@@ -392,7 +392,7 @@ namespace UICatalog.Scenarios {
 			}
 			public OpenedFile CloneTo(TabView other)
 			{
-				var newTab = new OpenedFile (other, base.Text.ToString(), File);
+				var newTab = new OpenedFile (other, base.DisplayText.ToString(), File);
 				other.AddTab (newTab, true);
 				return newTab;
 			}
@@ -403,7 +403,7 @@ namespace UICatalog.Scenarios {
 				System.IO.File.WriteAllText (File.FullName, newText);
 				SavedText = newText;
 
-				Text = Text.TrimEnd ('*');
+				DisplayText = DisplayText.TrimEnd ('*');
 			}
 		}
 
