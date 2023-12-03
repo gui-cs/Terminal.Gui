@@ -3,7 +3,7 @@
 - name: Conceptual Docs
   href: docs/index.md
 - name: API Reference
-  href: api/Terminal.Gui/
+  href: api/Terminal.Gui
 # - name: UI Catalog API
 #   href: api/UICatalog/
 - name: Source
