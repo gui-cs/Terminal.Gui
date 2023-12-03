@@ -177,24 +177,24 @@ public class FrameTests {
 
 		switch (height) {
 		case 0:
-			//Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 0), win.Frame);
 			expected = @"
 ";
 			break;
 		case 1:
-			//Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 1), win.Frame);
 			expected = @"
 ────────────────────";
 			break;
 		case 2:
-			//Assert.Equal (new Rect (0, 0, 17, 1), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 2), win.Frame);
 			expected = @"
 ┌┤1234├────────────┐
 └──────────────────┘
 ";
 			break;
 		case 3:
-			//Assert.Equal (new Rect (0, 0, 17, 2), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 20, 3), win.Frame);
 			expected = @"
 ┌┤1234├────────────┐
 │                  │
@@ -235,21 +235,21 @@ public class FrameTests {
 
 		switch (width) {
 		case 1:
-			//Assert.Equal (new Rect (0, 0, 17, 0), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 1, 3), win.Frame);
 			expected = @"
 │
 │
 │";
 			break;
 		case 2:
-			//Assert.Equal (new Rect (0, 0, 17, 1), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 2, 3), win.Frame);
 			expected = @"
 ┌┐
 ││
 └┘";
 			break;
 		case 3:
-			//Assert.Equal (new Rect (0, 0, 17, 2), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 3, 3), win.Frame);
 			expected = @"
 ┌─┐
 │ │
@@ -257,49 +257,49 @@ public class FrameTests {
 ";
 			break;
 		case 4:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 4, 3), win.Frame);
 			expected = @"
 ┌┤├┐
 │  │
 └──┘";
 			break;
 		case 5:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 5, 3), win.Frame);
 			expected = @"
 ┌┤1├┐
 │   │
 └───┘";
 			break;
 		case 6:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 6, 3), win.Frame);
 			expected = @"
 ┌┤12├┐
 │    │
 └────┘";
 			break;
 		case 7:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 7, 3), win.Frame);
 			expected = @"
 ┌┤123├┐
 │     │
 └─────┘";
 			break;
 		case 8:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 8, 3), win.Frame);
 			expected = @"
 ┌┤1234├┐
 │      │
 └──────┘";
 			break;
 		case 9:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 9, 3), win.Frame);
 			expected = @"
 ┌┤1234├─┐
 │       │
 └───────┘";
 			break;
 		case 10:
-			//Assert.Equal (new Rect (0, 0, 17, 3), subview.Frame);
+			Assert.Equal (new Rect (0, 0, 10, 3), win.Frame);
 			expected = @"
 ┌┤1234├──┐
 │        │
