@@ -739,7 +739,7 @@ namespace UICatalog.Scenarios {
 					case Key.CursorUp:
 					case Key.CursorDown:
 					case Key.Tab:
-					case Key.BackTab:
+					case Key.Tab | Key.ShiftMask:
 						return false;
 					}
 

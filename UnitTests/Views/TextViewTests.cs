@@ -1551,7 +1551,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (_textView.Multiline);
 			_textView.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
-			_textView.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			_textView.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		}
 
@@ -1651,7 +1651,7 @@ namespace Terminal.Gui.ViewsTests {
 				}
 				while (col > 0) {
 					col--;
-					_textView.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1687,7 +1687,7 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (leftCol, _textView.LeftColumn);
 				while (col > 0) {
 					col--;
-					_textView.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1773,7 +1773,7 @@ namespace Terminal.Gui.ViewsTests {
 				}
 				while (col > 0) {
 					col--;
-					_textView.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1829,7 +1829,7 @@ namespace Terminal.Gui.ViewsTests {
 				leftCol = GetLeftCol (leftCol);
 				while (col > 0) {
 					col--;
-					_textView.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+					_textView.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 					Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 					leftCol = GetLeftCol (leftCol);
 					Assert.Equal (leftCol, _textView.LeftColumn);
@@ -3005,11 +3005,11 @@ line.
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t", tv.Text);
 			Assert.True (tv.AllowsTab);
 			tv.AllowsTab = false;
-			Assert.False (tv.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.False (tv.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t", tv.Text);
 			Assert.False (tv.AllowsTab);
 			tv.AllowsTab = true;
-			Assert.True (tv.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 			Assert.True (tv.AllowsTab);
 			Assert.False (tv.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
@@ -5877,7 +5877,7 @@ line.
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5921,7 +5921,7 @@ line.
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (tv.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ("First line.", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (6, 0), tv.CursorPosition);

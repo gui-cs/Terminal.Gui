@@ -836,7 +836,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTreeViewColor ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
-
+			tv.BeginInit ();
+			tv.EndInit ();
 			var n1 = new TreeNode ("normal");
 			var n1_1 = new TreeNode ("pink");
 			var n1_2 = new TreeNode ("normal");

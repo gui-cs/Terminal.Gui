@@ -41,9 +41,9 @@ namespace Terminal.Gui.ViewTests {
 			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			top.ProcessKeyPressed (new (Key.BackTab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKeyPressed (new (Key.BackTab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 			top.Dispose ();
 		}

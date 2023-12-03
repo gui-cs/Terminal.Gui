@@ -54,7 +54,7 @@ public class KeyEventArgs : EventArgs {
 	/// Gets a value indicating whether the Shift key was pressed.
 	/// </summary>
 	/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-	public bool IsShift => _keyModifiers.Shift || Key == Key.BackTab;
+	public bool IsShift => _keyModifiers.Shift;
 
 	/// <summary>
 	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
@@ -608,12 +608,7 @@ public enum Key : uint {
 	/// Delete character key.
 	/// </summary>
 	DeleteChar,
-
-	/// <summary>
-	/// Shift-tab key (backwards tab key).
-	/// </summary>
-	BackTab,
-
+	
 	/// <summary>
 	/// Print screen character key.
 	/// </summary>

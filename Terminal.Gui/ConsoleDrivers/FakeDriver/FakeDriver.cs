@@ -221,7 +221,7 @@ public class FakeDriver : ConsoleDriver {
 		case ConsoleKey.Escape:
 			return MapKeyModifiers (keyInfo, Key.Esc);
 		case ConsoleKey.Tab:
-			return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
+			return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.Tab | Key.ShiftMask : Key.Tab;
 		case ConsoleKey.Clear:
 			return MapKeyModifiers (keyInfo, Key.Clear);
 		case ConsoleKey.Home:

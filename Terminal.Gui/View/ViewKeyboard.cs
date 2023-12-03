@@ -164,8 +164,8 @@ public partial class View {
 	/// Set to <see langword="false"/> to prevent the view from being a stop-point for keyboard navigation.
 	/// </summary>
 	/// <remarks>
-	/// The default keyboard navigation keys are <see cref="Key.Tab"/> and  <see cref="Key.BackTab"/>. These can be
-	/// changed by modifying the key bindings (see <see cref="AddKeyBinding(Key, Command[])"/>) of the SuperView.
+	/// The default keyboard navigation keys are <see cref="Key.Tab"/> and <see cref="Key.ShiftMask"/>|<see cref="Key.Tab"/>.
+	/// These can be changed by modifying the key bindings (see <see cref="AddKeyBinding(Key, Command[])"/>) of the SuperView.
 	/// </remarks>
 	public bool TabStop {
 		get => _tabStop;

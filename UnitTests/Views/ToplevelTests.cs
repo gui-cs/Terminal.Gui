@@ -390,7 +390,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (tvW1, top.MostFocused);
 			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (win1, top.Focused);
@@ -407,7 +407,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (top.Focused.ProcessKeyPressed (new (Key.I | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.BackTab, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
 			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
@@ -524,7 +524,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
 			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.BackTab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
@@ -541,7 +541,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.I | Key.CtrlMask, new KeyModifiers ())));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.BackTab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));

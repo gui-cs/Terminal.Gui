@@ -369,7 +369,7 @@ internal class CursesDriver : ConsoleDriver {
 		case Curses.KeyDeleteChar: return Key.DeleteChar;
 		case Curses.KeyInsertChar: return Key.InsertChar;
 		case Curses.KeyTab: return Key.Tab;
-		case Curses.KeyBackTab: return Key.BackTab;
+		case Curses.KeyBackTab: return Key.Tab | Key.ShiftMask;
 		case Curses.KeyBackspace: return Key.Backspace;
 		case Curses.ShiftKeyUp: return Key.CursorUp | Key.ShiftMask;
 		case Curses.ShiftKeyDown: return Key.CursorDown | Key.ShiftMask;

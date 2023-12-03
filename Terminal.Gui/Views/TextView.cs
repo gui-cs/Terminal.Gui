@@ -1756,7 +1756,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
 			AddKeyBinding (Key.InsertChar, Command.ToggleOverwrite);
 			AddKeyBinding (Key.Tab, Command.Tab);
-			AddKeyBinding (Key.BackTab | Key.ShiftMask, Command.BackTab);
+			AddKeyBinding (Key.Tab | Key.ShiftMask, Command.BackTab);
 
 			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextView);
 			AddKeyBinding (Application.AlternateForwardKey, Command.NextView);
