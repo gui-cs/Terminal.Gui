@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -22,9 +21,10 @@ public partial class View {
 	/// <summary>
 	/// Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has
 	/// focus will cause the <see cref="MouseClick"/> event to fire.
+	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// See <see href="/articles/keyboard.html">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// <para/>
 	/// <c>HotKey</c> - A keyboard chord composed of the Alt key and another character that selects a visible UI item.
 	/// For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T. Or, in a Menu with
@@ -39,7 +39,6 @@ public partial class View {
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
 	/// </para>
 	/// </remarks>
-	/// </summary>
 	public virtual Key HotKey {
 		get => _hotKey;
 		set {
@@ -163,11 +162,11 @@ public partial class View {
 	/// Gets or sets whether the view is a stop-point for keyboard navigation of focus. Will be
 	/// <see langword="true"/> only if the <see cref="CanFocus"/> is also <see langword="true"/>.
 	/// Set to <see langword="false"/> to prevent the view from being a stop-point for keyboard navigation.
+	/// </summary>
 	/// <remarks>
 	/// The default keyboard navigation keys are <see cref="Key.Tab"/> and  <see cref="Key.BackTab"/>. These can be
 	/// changed by modifying the key bindings (see <see cref="AddKeyBinding(Key, Command[])"/>) of the SuperView.
 	/// </remarks>
-	/// </summary>
 	public bool TabStop {
 		get => _tabStop;
 		set {
@@ -183,14 +182,17 @@ public partial class View {
 	#region Low-level Key handling
 	/// <summary>
 	/// Invoked when a key is depressed.
+	/// </summary>
 	/// <remarks>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
 	/// <para>
 	/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
 	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
-	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
 	/// other view should see it.</returns>
@@ -215,26 +217,32 @@ public partial class View {
 
 	/// <summary>
 	/// Invoked when a key is depressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from being processed by other views.
+	/// </summary>
 	/// <remarks>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
-	/// </summary>
 	public event EventHandler<KeyEventArgs> KeyDown;
 
 	/// <summary>
 	/// Method invoked when a key is released. This method will be called after <see cref="OnKeyPressed"/>.
+	/// </summary>
+	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+	/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
+	/// other view should see it.</returns>
 	/// <remarks>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
 	/// <para>
 	/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
 	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
-	/// </summary>
-	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-	/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
-	/// other view should see it.</returns>
 	public virtual bool OnKeyUp (KeyEventArgs keyEvent)
 	{
 		if (!Enabled) {
@@ -260,16 +268,22 @@ public partial class View {
 	/// <remarks>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
 	/// </summary>
 	public event EventHandler<KeyEventArgs> KeyUp;
 
 	/// <summary>
 	/// If the view is enabled, processes a key pressed event and returns <see langword="true"/> if the event was handled.
+	/// </summary>
 	/// <remarks>
 	/// <para>Calls <see cref="OnKeyPressed(KeyEventArgs)"/> and <see cref="OnInvokeKeyBindings(KeyEventArgs)"/>.</para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
-	/// </summary>
 	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the event was handled.</returns>
 	public bool ProcessKeyPressed (KeyEventArgs keyEvent)
@@ -296,6 +310,10 @@ public partial class View {
 
 	/// <summary>
 	/// Low-level API called when a key is pressed. This is called before <see cref="OnInvokeKeyBindings(KeyEventArgs)"/>.
+	/// </summary>
+	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
+	/// the keypress was handled and no other view should see it.</returns>
 	/// <remarks>
 	/// <para>
 	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="AddKeyBinding(Key, Command[])"/>instead.
@@ -311,10 +329,6 @@ public partial class View {
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
 	/// </para>
 	/// </remarks>
-	/// </summary>
-	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
-	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
-	/// the keypress was handled and no other view should see it.</returns>
 	public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
 	{
 		// fire event
@@ -325,13 +339,16 @@ public partial class View {
 	/// <summary>
 	/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
 	/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
+	/// </summary>
 	/// <remarks>
 	/// <para>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
 	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
-	/// </summary>
 	public event EventHandler<KeyEventArgs> KeyPressed;
 	#endregion Low-level Key handling
 
@@ -345,12 +362,15 @@ public partial class View {
 	/// <summary>
 	/// Low-level API called when a key is pressed to invoke any key bindings set on the view.
 	/// This is called after <see cref="OnKeyPressed(KeyEventArgs)"/>. 
+	/// </summary>
 	/// <remarks>
 	/// <para>
 	/// Fires the <see cref="InvokingKeyBindings"/> event.
 	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </remarks>
-	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
 	/// the keypress was handled and no other view should see it.</returns>
@@ -383,6 +403,9 @@ public partial class View {
 	/// <summary>
 	/// Invokes any binding that is registered on this <see cref="View"/>
 	/// and matches the <paramref name="keyEvent"/>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
 	/// </summary>
 	/// <param name="keyEvent">The key event passed.</param>
 	/// <returns>
@@ -448,9 +471,10 @@ public partial class View {
 	/// </para>
 	/// <para>If the key is already bound to a different <see cref="Command"/> it will be
 	/// rebound to this one</para>
-	/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
-	/// cannot be used to switch focus to another view and perform multiple commands there) </remarks>
 	/// </summary>
+	/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
+	/// cannot be used to switch focus to another view and perform multiple commands there)
+	/// </remarks>
 	/// <param name="key"></param>
 	/// <param name="command">The command(s) to run on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When specifying multiple commands, all commands will be applied in sequence. The bound <paramref name="key"/> strike
@@ -600,5 +624,4 @@ public partial class View {
 	}
 
 	#endregion Key Bindings
-
 }

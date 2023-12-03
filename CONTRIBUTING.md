@@ -156,7 +156,7 @@ The [Microsoft .NET Framework Design Guidelines](https://docs.microsoft.com/en-u
    - Sub-classes of the class implementing `EventToRaise` can override `OnEventToRaise` as needed.
 4. Where possible, a subclass of `EventArgs` should be provided and the old and new state should be included. By doing this, event handler methods do not have to query the sender for state.
 
-See also: https://www.codeproject.com/docs/20550/C-Event-Implementation-Fundamentals-Best-Practices
+See also: https://www.codeproject.com../docs/20550/C-Event-Implementation-Fundamentals-Best-Practices
 
 ### Defining new `View` classes
 

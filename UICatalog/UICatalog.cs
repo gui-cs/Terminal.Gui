@@ -273,8 +273,8 @@ namespace UICatalog {
 					_themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 					new MenuBarItem ("_Help", new MenuItem [] {
-						new MenuItem ("_gui.cs API Overview", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui/docs/overview.html"), null, null, Key.F1),
-						new MenuItem ("gui.cs _README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
+						new MenuItem ("_Documentation", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"), null, null, Key.F1),
+						new MenuItem ("_README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
 						new MenuItem ("_About...",
 							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage!.ToString(), 0, false, "_Ok"), null, null, Key.CtrlMask | Key.A),
 					}),
