@@ -2,7 +2,7 @@ name: Build and publish API docs
 
 on:
   push:
-    branches: [main, develop, v2_develop]
+    branches: [main]
 
 jobs:
   generate-docs:
@@ -30,8 +30,6 @@ jobs:
       # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
       run: |
         rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
-        rm ../api -Recurse -Force -ErrorAction SilentlyContinue
-        $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}""
         docfx docfx.json
       continue-on-error: false      
 

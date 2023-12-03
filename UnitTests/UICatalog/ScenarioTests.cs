@@ -63,11 +63,17 @@ namespace UICatalog.Tests {
 
 				// Press QuitKey 
 				Assert.Empty (FakeConsole.MockKeyPresses);
+				// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
+				// by adding this Space it seems to work.
+				//FakeConsole.PushMockKeyPress (Key.Space);
 				FakeConsole.PushMockKeyPress (Application.QuitKey);
 
 				// The only key we care about is the QuitKey
 				Application.Top.KeyPressed += (object sender, KeyEventArgs args) => {
-					output.WriteLine ($"  Keypressed: {args.Key}");
+					output.WriteLine ($"  Keypress: {args.Key}");
+					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
+					// by adding this Space it seems to work.
+					// See #2474 for why this is commented out
 					Assert.Equal (Application.QuitKey, args.Key);
 				};
 
@@ -76,6 +82,7 @@ namespace UICatalog.Tests {
 				Func<bool> forceCloseCallback = () => {
 					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();
+						// See #2474 for why this is commented out
 						Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
 					}
 					return false;

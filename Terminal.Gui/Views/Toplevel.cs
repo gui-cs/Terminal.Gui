@@ -468,7 +468,20 @@ namespace Terminal.Gui {
 				Application.RequestStop ();
 			}
 		}
-		
+
+		/////<inheritdoc/>
+		//public override bool OnColdKey (KeyEventArgs keyEvent)
+		//{
+		//	if (base.OnColdKey (keyEvent)) {
+		//		return true;
+		//	}
+
+		//	if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
+		//		return true;
+		//	}
+		//	return false;
+		//}
+
 		View GetDeepestFocusedSubview (View view)
 		{
 			if (view == null) {

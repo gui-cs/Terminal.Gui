@@ -891,7 +891,7 @@ namespace Terminal.Gui.ViewTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ProcessKeyPressed_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPressed_Event ()
+		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
 		{
 			var sbQuiting = false;
 			var tfQuiting = false;
@@ -955,7 +955,7 @@ namespace Terminal.Gui.ViewTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ProcessKeyPressed_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPressed_Event ()
+		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
 		{
 			var sbQuiting = false;
 			var tfQuiting = false;

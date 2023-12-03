@@ -485,6 +485,27 @@ namespace Terminal.Gui {
 				.ToArray ();
 		}
 
+
+//		/// <inheritdoc/>
+//		public override bool OnHotKey (KeyEventArgs keyEvent)
+//		{
+//#if BROKE_IN_2927
+//			// BUGBUG: Ctrl-F is forward in a TextField. 
+//			if (this.NavigateIf (keyEvent, Key.Alt | Key.F, this.tbFind)) {
+//				return true;
+//			}
+//#endif
+
+//			ClearFeedback ();
+
+//			if (allowedTypeMenuBar != null &&
+//				keyEvent.Key == Key.Tab &&
+//				allowedTypeMenuBar.IsMenuOpen) {
+//				allowedTypeMenuBar.CloseMenu (false, false, false);
+//			}
+
+//			return base.OnHotKey (keyEvent);
+//		}
 		private void RestartSearch ()
 		{
 			if (disposed || State?.Directory == null) {

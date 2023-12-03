@@ -929,15 +929,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Finds the hot key and its location in text. 
+		/// Finds the hotkey and its location in text. 
 		/// </summary>
 		/// <param name="text">The text to look in.</param>
-		/// <param name="hotKeySpecifier">The hot key specifier (e.g. '_') to look for.</param>
-		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hot key will be enabled.
+		/// <param name="hotKeySpecifier">The hotkey specifier (e.g. '_') to look for.</param>
+		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
 		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.</param>
 		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
 		/// <param name="hotKey">Outputs the hotKey.</param>
-		/// <returns><c>true</c> if a hot key was found; <c>false</c> otherwise.</returns>
+		/// <returns><c>true</c> if a hotkey was found; <c>false</c> otherwise.</returns>
 		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
 		{
 			if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
@@ -996,11 +996,11 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Replaces the Rune at the index specified by the <c>hotPos</c> parameter with a tag identifying 
-		/// it as the hot key.
+		/// it as the hotkey.
 		/// </summary>
-		/// <param name="text">The text to tag the hot key in.</param>
-		/// <param name="hotPos">The Rune index of the hot key in <c>text</c>.</param>
-		/// <returns>The text with the hot key tagged.</returns>
+		/// <param name="text">The text to tag the hotkey in.</param>
+		/// <param name="hotPos">The Rune index of the hotkey in <c>text</c>.</param>
+		/// <returns>The text with the hotkey tagged.</returns>
 		/// <remarks>
 		/// The returned string will not render correctly without first un-doing the tag. To undo the tag, search for 
 		/// </remarks>
@@ -1015,12 +1015,12 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the hot key specifier from text.
+		/// Removes the hotkey specifier from text.
 		/// </summary>
 		/// <param name="text">The text to manipulate.</param>
 		/// <param name="hotKeySpecifier">The hot-key specifier (e.g. '_') to look for.</param>
 		/// <param name="hotPos">Returns the position of the hot-key in the text. -1 if not found.</param>
-		/// <returns>The input text with the hot key specifier ('_') removed.</returns>
+		/// <returns>The input text with the hotkey specifier ('_') removed.</returns>
 		public static string RemoveHotKeySpecifier (string text, int hotPos, Rune hotKeySpecifier)
 		{
 			if (string.IsNullOrEmpty (text)) {

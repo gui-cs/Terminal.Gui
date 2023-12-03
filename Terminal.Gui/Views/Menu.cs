@@ -2079,7 +2079,40 @@ public class MenuBar : View {
 		}
 		SetNeedsDisplay ();
 	}
-	
+
+	/////<inheritdoc/>
+	//public override bool OnHotKey (KeyEventArgs a)
+	//{
+	//	if (a.Key == Key) {
+	//		if (Visible && !IsMenuOpen) {
+	//			OpenMenu ();
+	//		} else {
+	//			CloseAllMenus ();
+	//		}
+	//		return true;
+	//	}
+
+	//	a.Key
+	//	// To ncurses simulate a AltMask key pressing Alt+Space because
+	//	// it can't detect an alone special key down was pressed.
+	//	if (a.Key == Key.AltMask && _openMenu == null) {
+	//		OnKeyDown (a);
+	//		OnKeyUp (a);
+	//		return true;
+	//	} else if (((a.Key & Key.AltMask) != 0) || a.IsAlt && !a.IsCtrl && !a.IsShift) {
+	//		// BUGBUG: Note the test for BOTH AltMask and a.IsAlt above. This is because the
+	//		// unit test Separators_Does_Not_Throws_Pressing_Menu_Shortcut calls
+	//		// menu.OnHotKey(new KeyEventArgs (Key.AltMask | Key.Q))) which does not
+	//		// cause a.IsAlt to be set.
+	//		if (FindAndOpenMenuByHotkey (a)) {
+	//			return true;
+	//		}
+	//	}
+	//	//var kc = a.KeyValue;
+
+	//	return base.OnHotKey (a);
+	//}
+
 	///<inheritdoc/>
 	public override bool OnKeyPressed (KeyEventArgs a)
 	{
@@ -2199,7 +2232,13 @@ public class MenuBar : View {
 		OpenMenu (_selected);
 		SetNeedsDisplay ();
 	}
-	
+
+	/////<inheritdoc/>
+	//public override bool OnColdKey (KeyEventArgs a)
+	//{
+	//	return FindAndOpenMenuByShortcut (a);
+	//}
+
 	///<inheritdoc/>
 	public override bool MouseEvent (MouseEvent me)
 	{
