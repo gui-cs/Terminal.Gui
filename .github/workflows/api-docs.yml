@@ -35,10 +35,9 @@ jobs:
       working-directory: docfx
       run: |
         dotnet tool install -g docfx
-        rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
-        rm ../api -Recurse -Force -ErrorAction SilentlyContinue
         $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
-        docfx docfx.json
+        docfx metadata
+        docfx build
       continue-on-error: false
 
     - name: Setup Pages
