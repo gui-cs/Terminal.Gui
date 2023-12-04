@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// View for tabular data based on a <see cref="ITableSource"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
+	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/tableview.html">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class TableView : View {
 
@@ -1229,9 +1229,8 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			// TODO: Revert this (or not) once #2578 is solved
-			var boundsX = me.X - GetFramesThickness ().Left;
-			var boundsY = me.Y - GetFramesThickness ().Top;
+			var boundsX = me.X;
+			var boundsY = me.Y;
 
 			if (me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 

@@ -246,10 +246,10 @@ public class ProgressBar : View {
 			if (_fraction > .5) {
 				attr = new Attribute (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
 			}
-			tf?.Draw (ViewToScreen (Bounds),
+			tf?.Draw (BoundsToScreen (Bounds),
 				attr,
 				ColorScheme.Normal,
-				SuperView?.ViewToScreen (SuperView.Bounds) ?? default,
+				SuperView?.BoundsToScreen (SuperView.Bounds) ?? default,
 				fillRemaining: false);
 
 

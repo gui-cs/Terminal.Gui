@@ -95,7 +95,7 @@ namespace Terminal.Gui {
 			var frame = new Rect (0, 0, View.Driver.Cols, View.Driver.Rows);
 			var position = Position;
 			if (Host != null) {
-				Host.ViewToScreen (frame.X, frame.Y, out int x, out int y);
+				Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
 				var pos = new Point (x, y);
 				pos.Y += Host.Frame.Height - 1;
 				if (position != pos) {
@@ -117,7 +117,7 @@ namespace Terminal.Gui {
 					if (Host == null) {
 						position.Y = frame.Bottom - rect.Height - 1;
 					} else {
-						Host.ViewToScreen (frame.X, frame.Y, out int x, out int y);
+						Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);
 						var pos = new Point (x, y);
 						position.Y = pos.Y - rect.Height - 1;
 					}

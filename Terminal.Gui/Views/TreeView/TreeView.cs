@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Interface for all non generic members of <see cref="TreeView{T}"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.
+	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/treeview.html">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public interface ITreeView {
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 	/// Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes
 	/// implement <see cref="ITreeNode"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.
+	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/treeview.html">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public class TreeView : TreeView<ITreeNode> {
 
@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 	/// Hierarchical tree view with expandable branches. Branch objects are dynamically determined
 	/// when expanded using a user defined <see cref="ITreeBuilder{T}"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/treeview.html">See TreeView Deep Dive for more information</a>.
+	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/treeview.html">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public class TreeView<T> : View, ITreeView where T : class {
 		private int scrollOffsetVertical;
@@ -769,7 +769,7 @@ namespace Terminal.Gui {
 		/// at the provided row. Returns null if no object is at that location.
 		/// <remarks>
 		/// </remarks>
-		/// If you have screen coordinates then use <see cref="View.ScreenToView(int, int)"/>
+		/// If you have screen coordinates then use <see cref="View.ScreenToFrame"/>
 		/// to translate these into the client area of the <see cref="TreeView{T}"/>.
 		/// </summary>
 		/// <param name="row">The row of the <see cref="View.Bounds"/> of the <see cref="TreeView{T}"/>.</param>

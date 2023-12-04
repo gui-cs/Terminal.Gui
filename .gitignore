@@ -5,15 +5,15 @@ obj
 *~
 packages
 .vs
+
 # User-specific files
 *.user
 
 # API Docs
 docfx/api
+docfx/_site
 
-# Never push ./docs folder - the gh-pages branch is now used to publish to GH Pages
-docs/
-
+# Unit Tests
 UnitTests/TestResults
 TestResults
 
