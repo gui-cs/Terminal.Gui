@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 
 internal class FakeMainLoop : IMainLoopDriver {
 
-	public Action<ConsoleKeyInfo> KeyPressed;
+	public Action<ConsoleKeyInfo> MockKeyPressed;
 
 	public FakeMainLoop (ConsoleDriver consoleDriver = null)
 	{
@@ -31,7 +31,7 @@ internal class FakeMainLoop : IMainLoopDriver {
 	public void Iteration ()
 	{
 		if (FakeConsole.MockKeyPresses.Count > 0) {
-			KeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
+			MockKeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
 		}
 	}
 

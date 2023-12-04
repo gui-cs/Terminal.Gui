@@ -5,6 +5,7 @@ using System.Text;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
+using UICatalog.Scenarios;
 
 namespace Terminal.Gui.ViewTests {
 	public class KeyboardTests {
@@ -149,7 +150,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var view = new DerivedView ();
 			view.KeyDown += (s, e) => {
-				Assert.Equal (-1, e.KeyValue);
+				Assert.Equal (Key.Null, e.Key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask);
 				Assert.Equal (shift, e.IsShift);
 				Assert.Equal (alt, e.IsAlt);
 				Assert.Equal (control, e.IsCtrl);
@@ -161,7 +162,7 @@ namespace Terminal.Gui.ViewTests {
 				keyPress = true;
 			};
 			view.KeyUp += (s, e) => {
-				Assert.Equal (-1, e.KeyValue);
+				Assert.Equal (Key.Null, e.Key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask);
 				Assert.Equal (shift, e.IsShift);
 				Assert.Equal (alt, e.IsAlt);
 				Assert.Equal (control, e.IsCtrl);
@@ -180,12 +181,12 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Run ();
 			Application.Shutdown ();
-
+			
 			Assert.True (keyDown);
-			Assert.False (keyPress);
+			Assert.True (keyPress);
 			Assert.True (keyUp);
 			Assert.True (view.IsKeyDown);
-			Assert.False (view.IsKeyPress);
+			Assert.True (view.IsKeyPress);
 			Assert.True (view.IsKeyUp);
 		}
 

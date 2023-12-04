@@ -272,14 +272,14 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (0, tableView.RowOffset);
 
-			tableView.OnKeyPressed (new (Key.PageDown, new KeyModifiers ()));
+			tableView.OnKeyPressed (new (Key.PageDown));
 
 			// window height is 5 rows 2 are header so page down should give 3 new rows
 			Assert.Equal (3, tableView.SelectedRow);
 			Assert.Equal (1, tableView.RowOffset);
 
 			// header is no longer visible so page down should give 5 new rows
-			tableView.OnKeyPressed (new (Key.PageDown, new KeyModifiers ()));
+			tableView.OnKeyPressed (new (Key.PageDown));
 
 			Assert.Equal (8, tableView.SelectedRow);
 			Assert.Equal (4, tableView.RowOffset);
@@ -608,7 +608,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			// pressing enter should activate the first cell (selected cell)
-			tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Enter));
 			Assert.Equal ("R0C0", activatedValue);
 
 			// reset the test
@@ -616,12 +616,12 @@ namespace Terminal.Gui.ViewsTests {
 
 			// clear keybindings and ensure that Enter does not trigger the event anymore
 			tv.ClearKeyBindings ();
-			tv.OnKeyPressed (new (Key.Enter, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Enter));
 			Assert.Null (activatedValue);
 
 			// New method for changing the activation key
 			tv.AddKeyBinding (Key.z, Command.Accept);
-			tv.OnKeyPressed (new (Key.z, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.z));
 			Assert.Equal ("R0C0", activatedValue);
 
 			// reset the test
@@ -630,7 +630,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Old method for changing the activation key
 			tv.CellActivationKey = Key.z;
-			tv.OnKeyPressed (new (Key.z, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.z));
 			Assert.Equal ("R0C0", activatedValue);
 		}
 
@@ -643,12 +643,12 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 1;
 			tv.SelectedRow = 1;
-			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next shift left should be ignored because we are already at the bounds
-			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
@@ -666,12 +666,12 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 0;
 			tv.SelectedRow = 1;
-			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next shift right should be ignored because we are already at the right bounds
-			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
@@ -689,14 +689,14 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 0;
 			tv.SelectedRow = 0;
-			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
-			tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask));
+			tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next moves should be ignored because we already selected the whole table
-			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask, new KeyModifiers { Shift = true }));
-			tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorRight | Key.ShiftMask));
+			tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 			Assert.Equal (1, tv.SelectedColumn);
@@ -715,14 +715,14 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 1;
 			tv.SelectedRow = 1;
-			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
-			tv.OnKeyPressed (new (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask));
+			tv.OnKeyPressed (new (Key.CursorUp | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next moves should be ignored because we already selected the whole table
-			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask, new KeyModifiers { Shift = true }));
-			tv.OnKeyPressed (new (Key.CursorUp | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorLeft | Key.ShiftMask));
+			tv.OnKeyPressed (new (Key.CursorUp | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 			Assert.Equal (0, tv.SelectedColumn);
@@ -2320,7 +2320,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Empty (wrapper.CheckedRows);
 
 			//toggle the top cell
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.Single (wrapper.CheckedRows, 0);
 
@@ -2336,8 +2336,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-			tv.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CursorDown));
+			tv.OnKeyPressed (new (Key.Space));
 
 
 			Assert.Contains (0,wrapper.CheckedRows);
@@ -2358,8 +2358,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// untoggle top one
-			tv.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CursorUp));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.Single (wrapper.CheckedRows, 1);
 
@@ -2388,8 +2388,8 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Table = wrapper;
 
 			//toggle all cells
-			tv.OnKeyPressed (new (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.A | Key.CtrlMask));
+			tv.OnKeyPressed (new (Key.Space));
 
 			tv.Draw();
 
@@ -2408,7 +2408,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (3, wrapper.CheckedRows.Count);
 
 			// Untoggle all again
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 
 			tv.Draw();
 
@@ -2447,10 +2447,10 @@ namespace Terminal.Gui.ViewsTests {
 │☐│1│2│
 │☑│1│2│";
 			//toggle top two at once
-			tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask, new KeyModifiers { Shift = true }));
+			tv.OnKeyPressed (new (Key.CursorDown | Key.ShiftMask));
 			Assert.True (tv.IsSelected (0, 0));
 			Assert.True (tv.IsSelected (0, 1));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 
 			// Because at least 1 of the rows is not yet ticked we toggle them all to ticked
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -2472,7 +2472,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Untoggle the top 2
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 
 			tv.Draw();
 
@@ -2518,7 +2518,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (pets.Where(p=>p.IsPicked));
 
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 			
 			Assert.True (pets.First ().IsPicked);
 
@@ -2536,8 +2536,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CursorDown));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.True (pets.ElementAt(0).IsPicked);
 			Assert.True (pets.ElementAt (1).IsPicked);
@@ -2557,8 +2557,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CursorUp));
+			tv.OnKeyPressed (new (Key.Space));
 
 
 			Assert.False (pets.ElementAt (0).IsPicked);
@@ -2600,8 +2600,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.DoesNotContain (pets, p => p.IsPicked);
 
 			//toggle all cells
-			tv.OnKeyPressed (new (Key.A | Key.CtrlMask, new KeyModifiers { Ctrl = true }));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.A | Key.CtrlMask));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.True (pets.All (p => p.IsPicked));
 
@@ -2619,7 +2619,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.Empty (pets.Where (p => p.IsPicked));
 
@@ -2671,7 +2671,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (pets.Where (p => p.IsPicked));
 
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.True (pets.First ().IsPicked);
 
@@ -2689,8 +2689,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CursorDown));
+			tv.OnKeyPressed (new (Key.Space));
 
 			Assert.False (pets.ElementAt (0).IsPicked);
 			Assert.True (pets.ElementAt (1).IsPicked);
@@ -2710,8 +2710,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ()));
-			tv.OnKeyPressed (new (Key.Space, new KeyModifiers ()));
+			tv.OnKeyPressed (new (Key.CursorUp));
+			tv.OnKeyPressed (new (Key.Space));
 
 
 			Assert.True (pets.ElementAt (0).IsPicked);

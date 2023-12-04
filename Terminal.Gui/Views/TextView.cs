@@ -3796,7 +3796,7 @@ namespace Terminal.Gui {
 			if (!AllowsTab || _isReadOnly) {
 				return ProcessMoveNextView ();
 			}
-			InsertText (new KeyEventArgs ((Key)'\t', null));
+			InsertText (new KeyEventArgs ((Key)'\t'));
 			DoNeededAction ();
 			return true;
 		}

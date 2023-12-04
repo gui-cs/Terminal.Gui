@@ -77,7 +77,7 @@ public class FakeDriver : ConsoleDriver {
 		ClearContents ();
 		
 		_mainLoopDriver = new FakeMainLoop (this);
-		_mainLoopDriver.KeyPressed = ProcessInput;
+		_mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;
 		return new MainLoop (_mainLoopDriver);
 	}
 
@@ -221,7 +221,7 @@ public class FakeDriver : ConsoleDriver {
 		case ConsoleKey.Escape:
 			return MapKeyModifiers (keyInfo, Key.Esc);
 		case ConsoleKey.Tab:
-			return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.Tab | Key.ShiftMask : Key.Tab;
+			return MapKeyModifiers (keyInfo, Key.Tab);
 		case ConsoleKey.Clear:
 			return MapKeyModifiers (keyInfo, Key.Clear);
 		case ConsoleKey.Home:
@@ -270,64 +270,11 @@ public class FakeDriver : ConsoleDriver {
 				return Key.Unknown;
 			}
 
-			return (Key)((uint)keyInfo.KeyChar);
-		}
-
-		var key = keyInfo.Key;
-		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
-			var delta = key - ConsoleKey.A;
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
-			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0) {
-					return (Key)(((uint)Key.AltMask | (uint)Key.CtrlMask) | ((uint)Key.A + delta));
-				} else {
-					return (Key)((uint)keyInfo.KeyChar);
-				}
-			}
-			return (Key)((uint)keyInfo.KeyChar);
-		}
-		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
-			var delta = key - ConsoleKey.D0;
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
-			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
-				}
-			}
-			return (Key)((uint)keyInfo.KeyChar);
-		}
-		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
-			var delta = key - ConsoleKey.F1;
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
-			}
-
-			return (Key)((uint)Key.F1 + delta);
-		}
-		if (keyInfo.KeyChar != 0) {
 			return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 		}
-
-		return (Key)(0xffffffff);
+		
+		return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 	}
-
-	KeyModifiers keyModifiers;
 
 	private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 	{
@@ -347,34 +294,24 @@ public class FakeDriver : ConsoleDriver {
 
 	private CursorVisibility _savedCursorVisibility;
 
-
-	void ProcessInput (ConsoleKeyInfo consoleKey)
+	void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
 	{
-		if (consoleKey.Key == ConsoleKey.Packet) {
-			consoleKey = FromVKPacketToKConsoleKeyInfo (consoleKey);
-		}
-		keyModifiers = new KeyModifiers ();
-		if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
-			keyModifiers.Shift = true;
-		}
-		if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
-			keyModifiers.Alt = true;
-		}
-		if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Control)) {
-			keyModifiers.Ctrl = true;
-		}
-		var map = MapKey (consoleKey);
-		if (map == (Key)0xffffffff) {
-			if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				OnKeyDown(new KeyEventArgs (map, keyModifiers));
-				OnKeyUp (new KeyEventArgs (map, keyModifiers));
-			}
-			return;
+		if (consoleKeyInfo.Key == ConsoleKey.Packet) {
+			consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 		}
 
-		OnKeyDown (new KeyEventArgs (map, keyModifiers));
-		OnKeyPressed (new KeyEventArgs (map, keyModifiers));
-		OnKeyUp (new KeyEventArgs (map, keyModifiers));
+		var map = MapKey (consoleKeyInfo);
+		//if (map == (Key)0xffffffff) {
+		//	if ((consoleKeyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+		//		OnKeyDown(new KeyEventArgs (map));
+		//		OnKeyUp (new KeyEventArgs (map));
+		//	}
+		//	return;
+		//}
+
+		OnKeyDown (new KeyEventArgs (map));
+		OnKeyPressed (new KeyEventArgs (map));
+		OnKeyUp (new KeyEventArgs (map));
 	}
 
 	/// <inheritdoc/>
@@ -410,7 +347,7 @@ public class FakeDriver : ConsoleDriver {
 
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 	{
-		ProcessInput (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
+		MockKeyPressedHandler (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
 	}
 
 	public void SetBufferSize (int width, int height)

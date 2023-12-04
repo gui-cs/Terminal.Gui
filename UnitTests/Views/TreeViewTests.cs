@@ -497,15 +497,15 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.CursorDown));
 
-			tree.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.Enter));
 
 			Assert.True (called);
 			Assert.Same (f, activated);
@@ -570,22 +570,22 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.CursorDown));
 
-			tree.ProcessKeyPressed (new (Key.Enter, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.Enter));
 
 			// Enter is not the activation key in this unit test
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// Delete is the activation key in this test so should result in activation occurring
-			tree.ProcessKeyPressed (new (Key.Delete, new KeyModifiers ()));
+			tree.ProcessKeyPressed (new (Key.Delete));
 
 			Assert.True (called);
 			Assert.Same (f, activated);

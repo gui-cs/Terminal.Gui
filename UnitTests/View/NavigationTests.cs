@@ -34,16 +34,16 @@ namespace Terminal.Gui.ViewTests {
 			frm.Add (frmSubview);
 			top.Add (frm);
 
-			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			top.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ()));
+			top.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 			top.Dispose ();
 		}
@@ -669,7 +669,7 @@ namespace Terminal.Gui.ViewTests {
 			view.Clicked += (s, e) => wasClicked = !wasClicked;
 			Application.Top.Add (view);
 
-			view.ProcessKeyPressed (new (Key.Space, null));
+			view.ProcessKeyPressed (new (Key.Space));
 			Assert.True (wasClicked);
 			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 			Assert.False (wasClicked);
@@ -678,7 +678,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.HasFocus);
 
 			view.Enabled = false;
-			view.ProcessKeyPressed (new (Key.Space, null));
+			view.ProcessKeyPressed (new (Key.Space));
 			Assert.False (wasClicked);
 			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 			Assert.False (wasClicked);
@@ -706,7 +706,7 @@ namespace Terminal.Gui.ViewTests {
 			Application.Iteration += (s, a) => {
 				iterations++;
 
-				win.ProcessKeyPressed (new (Key.Enter, null));
+				win.ProcessKeyPressed (new (Key.Enter));
 				Assert.True (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);
@@ -718,7 +718,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (win.HasFocus);
 
 				win.Enabled = false;
-				button.ProcessKeyPressed (new (Key.Enter, null));
+				button.ProcessKeyPressed (new (Key.Enter));
 				Assert.False (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);
@@ -786,13 +786,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab)));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab)));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -826,14 +826,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -866,13 +866,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -891,7 +891,7 @@ namespace Terminal.Gui.ViewTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+		public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
 		{
 			var sbQuiting = false;
 			var tfQuiting = false;
@@ -900,9 +900,9 @@ namespace Terminal.Gui.ViewTests {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
-			tf.KeyPressed += Tf_KeyPress;
+			tf.KeyPressed += Tf_KeyPressed;
 
-			void Tf_KeyPress (object sender, KeyEventArgs obj)
+			void Tf_KeyPressed (object sender, KeyEventArgs obj)
 			{
 				if (obj.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
@@ -928,7 +928,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (tfQuiting);
 			Assert.False (topQuiting);
 
-			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 			Assert.False (sbQuiting);
 			Assert.True (tfQuiting);
 			Assert.False (topQuiting);
@@ -955,7 +955,7 @@ namespace Terminal.Gui.ViewTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+		public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
 		{
 			var sbQuiting = false;
 			var tfQuiting = false;
@@ -963,9 +963,9 @@ namespace Terminal.Gui.ViewTests {
 				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
-			tf.KeyPressed += Tf_KeyPress;
+			tf.KeyPressed += Tf_KeyPressed;
 
-			void Tf_KeyPress (object sender, KeyEventArgs obj)
+			void Tf_KeyPressed (object sender, KeyEventArgs obj)
 			{
 				if (obj.Key == (Key.Q | Key.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
@@ -981,13 +981,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (sbQuiting);
 			Assert.False (tfQuiting);
 
-			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 			Assert.False (sbQuiting);
 			Assert.True (tfQuiting);
 
-			tf.KeyPressed -= Tf_KeyPress;
+			tf.KeyPressed -= Tf_KeyPressed;
 			tfQuiting = false;
-			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 			Application.MainLoop.RunIteration ();
 #if BROKE_WITH_2927
 			Assert.True (sbQuiting);
@@ -1137,14 +1137,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (removed);
 			Assert.Null (view3);
 
-			Assert.True (top1.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			Assert.True (top1.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.True (top1.HasFocus);
 			Assert.False (view1.HasFocus);
 			Assert.True (view2.HasFocus);
 			Assert.True (removed);
 			Assert.NotNull (view3);
 
-			var exception = Record.Exception (() => top1.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			var exception = Record.Exception (() => top1.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.Null (exception);
 			Assert.True (removed);
 			Assert.Null (view3);

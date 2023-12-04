@@ -933,17 +933,17 @@ internal class WindowsDriver : ConsoleDriver {
 				    WindowsConsole.ControlKeyState.LeftControlPressed |
 				    WindowsConsole.ControlKeyState.EnhancedKey:
 				case WindowsConsole.ControlKeyState.EnhancedKey:
-					key = new (Key.CtrlMask | Key.AltMask, _keyModifiers);
+					key = new (Key.CtrlMask | Key.AltMask);
 					break;
 				case WindowsConsole.ControlKeyState.LeftAltPressed:
-					key = new (Key.AltMask, _keyModifiers);
+					key = new (Key.AltMask);
 					break;
 				case WindowsConsole.ControlKeyState.RightControlPressed:
 				case WindowsConsole.ControlKeyState.LeftControlPressed:
-					key = new (Key.CtrlMask, _keyModifiers);
+					key = new (Key.CtrlMask);
 					break;
 				case WindowsConsole.ControlKeyState.ShiftPressed:
-					key = new (Key.ShiftMask, _keyModifiers);
+					key = new (Key.ShiftMask);
 					break;
 				case WindowsConsole.ControlKeyState.NumlockOn:
 					break;
@@ -953,10 +953,10 @@ internal class WindowsDriver : ConsoleDriver {
 					break;
 				default:
 					key = inputEvent.KeyEvent.wVirtualKeyCode switch {
-						0x10 => new (Key.ShiftMask, _keyModifiers),
-						0x11 => new (Key.CtrlMask, _keyModifiers),
-						0x12 => new (Key.AltMask, _keyModifiers),
-						_ => new (Key.Unknown, _keyModifiers)
+						0x10 => new (Key.ShiftMask),
+						0x11 => new (Key.CtrlMask),
+						0x12 => new (Key.AltMask),
+						_ => new (Key.Unknown)
 					};
 					break;
 				}
@@ -970,22 +970,13 @@ internal class WindowsDriver : ConsoleDriver {
 				}
 			} else {
 				if (inputEvent.KeyEvent.bKeyDown) {
-					// May occurs using SendKeys
-					_keyModifiers ??= new KeyModifiers ();
-
-					//if (_keyDown == (Key)0xffffffff) {
 					// Avoid sending repeat keydowns
-					//	_keyDown = map;
-						OnKeyDown (new KeyEventArgs (map, _keyModifiers));
-					//}
-					OnKeyPressed (new KeyEventArgs (map, _keyModifiers));
+					OnKeyDown (new KeyEventArgs (map));
+					OnKeyPressed (new KeyEventArgs (map));
 				} else {
 					//_keyDown = (Key)0xffffffff;
-					OnKeyUp (new KeyEventArgs (map, _keyModifiers));
+					OnKeyUp (new KeyEventArgs (map));
 				}
-			}
-			if (!inputEvent.KeyEvent.bKeyDown && inputEvent.KeyEvent.dwControlKeyState == 0) {
-				_keyModifiers = null;
 			}
 			break;
 
@@ -1278,8 +1269,6 @@ internal class WindowsDriver : ConsoleDriver {
 		return mouseFlag;
 	}
 
-	KeyModifiers _keyModifiers;
-
 	public WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
 	{
 		var state = keyEvent.dwControlKeyState;
@@ -1290,17 +1279,6 @@ internal class WindowsDriver : ConsoleDriver {
 		var capsLock = (state & (WindowsConsole.ControlKeyState.CapslockOn)) != 0;
 		var numLock = (state & (WindowsConsole.ControlKeyState.NumlockOn)) != 0;
 		var scrollLock = (state & (WindowsConsole.ControlKeyState.ScrolllockOn)) != 0;
-
-		_keyModifiers ??= new KeyModifiers ();
-		if (shift) {
-			_keyModifiers.Shift = true;
-		}
-		if (alt) {
-			_keyModifiers.Alt = true;
-		}
-		if (control) {
-			_keyModifiers.Ctrl = true;
-		}
 
 		var consoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 

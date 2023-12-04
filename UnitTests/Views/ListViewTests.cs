@@ -61,7 +61,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			lv.AddKeyBinding (Key.Space | Key.ShiftMask, Command.ToggleChecked, Command.LineDown);
 
-			var ev = new KeyEventArgs (Key.Space | Key.ShiftMask, new KeyModifiers () { Shift = true });
+			var ev = new KeyEventArgs (Key.Space | Key.ShiftMask);
 
 			// view should indicate that it has accepted and consumed the event
 			Assert.True (lv.OnKeyPressed (ev));
@@ -130,7 +130,7 @@ namespace Terminal.Gui.ViewsTests {
 			// bind shift down to move down twice in control
 			lv.AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDown, Command.LineDown);
 
-			var ev = new KeyEventArgs (Key.CursorDown | Key.ShiftMask, new KeyModifiers () { Shift = true });
+			var ev = new KeyEventArgs (Key.CursorDown | Key.ShiftMask);
 
 			Assert.True (lv.OnKeyPressed (ev), "The first time we move down 2 it should be possible");
 
@@ -177,26 +177,26 @@ namespace Terminal.Gui.ViewsTests {
 			ListView lv = new ListView (source) { Height = 2, AllowsMarking = true };
 			lv.BeginInit (); lv.EndInit ();
 			Assert.Equal (-1, lv.SelectedItem);
-			Assert.True (lv.OnKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.CursorDown)));
 			Assert.Equal (0, lv.SelectedItem);
-			Assert.True (lv.OnKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.CursorUp)));
 			Assert.Equal (0, lv.SelectedItem);
-			Assert.True (lv.OnKeyPressed (new (Key.PageDown, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.PageDown)));
 			Assert.Equal (2, lv.SelectedItem);
 			Assert.Equal (2, lv.TopItem);
-			Assert.True (lv.OnKeyPressed (new (Key.PageUp, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.PageUp)));
 			Assert.Equal (0, lv.SelectedItem);
 			Assert.Equal (0, lv.TopItem);
 			Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-			Assert.True (lv.OnKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.Space)));
 			Assert.True (lv.Source.IsMarked (lv.SelectedItem));
 			var opened = false;
 			lv.OpenSelectedItem += (s, _) => opened = true;
-			Assert.True (lv.OnKeyPressed (new (Key.Enter, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.Enter)));
 			Assert.True (opened);
-			Assert.True (lv.OnKeyPressed (new (Key.End, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.End)));
 			Assert.Equal (2, lv.SelectedItem);
-			Assert.True (lv.OnKeyPressed (new (Key.Home, new KeyModifiers ())));
+			Assert.True (lv.OnKeyPressed (new (Key.Home)));
 			Assert.Equal (0, lv.SelectedItem);
 		}
 

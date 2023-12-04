@@ -11,23 +11,15 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Constructs a new <see cref="KeyEventArgs"/>
 	/// </summary>
-	public KeyEventArgs () : this (Key.Unknown, new KeyModifiers ()) { }
+	public KeyEventArgs () : this (Key.Unknown) { }
 
 	/// <summary>
 	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
 	/// </summary>
 	/// <param name="k">The key</param>
-	public KeyEventArgs (Key k) : this (k, new KeyModifiers ()) { }
-
-	/// <summary>
-	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
-	/// </summary>
-	/// <param name="k">The key</param>
-	/// <param name="km">The key modifiers</param>>
-	public KeyEventArgs (Key k, KeyModifiers km)
+	public KeyEventArgs (Key k)
 	{
 		Key = k;
-		_keyModifiers = km;
 	}
 
 	/// <summary>
@@ -35,8 +27,6 @@ public class KeyEventArgs : EventArgs {
 	/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 	/// </summary>
 	public bool Handled { get; set; } = false;
-
-	KeyModifiers _keyModifiers;
 
 	/// <summary>
 	/// Symbolic definition for the key.
@@ -53,37 +43,20 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Gets a value indicating whether the Shift key was pressed.
 	/// </summary>
-	/// <value><c>true</c> if is shift; otherwise, <c>false</c>.</value>
-	public bool IsShift => _keyModifiers.Shift;
+	/// <value><see langword="true"/> if is shift; otherwise, <see langword="false"/>.</value>
+	public bool IsShift => (Key & Key.ShiftMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
 	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsAlt => _keyModifiers.Alt;
+	/// <value><see langword="true"/> if is alternate; otherwise, <see langword="false"/>.</value>
+	public bool IsAlt => (Key & Key.AltMask) != 0;
 
 	/// <summary>
-	/// Determines whether the value is a control key (and NOT just the ctrl key)
+	/// Gets a value indicating whether the Ctrl key was pressed.
 	/// </summary>
-	/// <value><c>true</c> if is ctrl; otherwise, <c>false</c>.</value>
-	//public bool IsCtrl => ((uint)Key >= 1) && ((uint)Key <= 26);
-	public bool IsCtrl => _keyModifiers.Ctrl;
-
-	/// <summary>
-	/// Updates the modifier masks to match <see cref="IsAlt"/>, <see cref="IsCtrl"/>, and <see cref="IsShift"/>.
-	/// </summary>
-	public void UpdateModifierKeyMasks ()
-	{
-		if (IsAlt && (Key & Key.AltMask) == 0) {
-			Key |= Key.AltMask;
-		}
-		if (IsCtrl && (Key & Key.CtrlMask) == 0) {
-			Key |= Key.CtrlMask;
-		}
-		if (IsShift && (Key & Key.ShiftMask) == 0) {
-			Key |= Key.ShiftMask;
-		}
-	}
+	/// <value><see langword="true"/> if is ctrl; otherwise, <see langword="false"/>.</value>
+	public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
 	/// <summary>
 	/// Pretty prints the KeyEvent
@@ -98,10 +71,12 @@ public class KeyEventArgs : EventArgs {
 	{
 		string keyName = Enum.GetName (typeof (Key), key);
 
-		if (key >= Key.A && key <= Key.Z)
+		if (key >= Key.A && key <= Key.Z) {
 			return ((char)key).ToString ();
-		if (key >= Key.D0 && key <= Key.D9)
+		}
+		if (key >= Key.D0 && key <= Key.D9) {
 			return ((char)key).ToString ();
+		}
 
 		if (!string.IsNullOrEmpty (keyName)) {
 			return keyName;
@@ -166,26 +141,6 @@ public class KeyEventArgs : EventArgs {
 
 		return input;
 	}
-
-
-}
-
-/// <summary>
-/// Identifies the state of the "shift"-keys within a event.
-/// </summary>
-public class KeyModifiers {
-	/// <summary>
-	/// Check if the Shift key was pressed or not.
-	/// </summary>
-	public bool Shift;
-	/// <summary>
-	/// Check if the Alt key was pressed or not.
-	/// </summary>
-	public bool Alt;
-	/// <summary>
-	/// Check if the Ctrl key was pressed or not.
-	/// </summary>
-	public bool Ctrl;
 }
 
 /// <summary>

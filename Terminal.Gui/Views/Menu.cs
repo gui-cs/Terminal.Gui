@@ -2028,7 +2028,6 @@ public class MenuBar : View {
 			children = Menus;
 		}
 
-		a.UpdateModifierKeyMasks ();
 		var key = a.KeyValue;
 		var keys = a.Key; //ShortcutHelper.GetModifiersKey (a);
 		key |= (int)keys;

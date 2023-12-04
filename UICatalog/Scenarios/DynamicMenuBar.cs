@@ -726,8 +726,6 @@ namespace UICatalog.Scenarios {
 					if (!ProcessKey (e)) {
 						return;
 					}
-					// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-					e.UpdateModifierKeyMasks ();
 					if (CheckShortcut (e.Key, true)) {
 						e.Handled = true;
 					}
@@ -766,8 +764,6 @@ namespace UICatalog.Scenarios {
 				}
 
 				_txtShortcut.KeyUp += (s, e) => {
-					// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-					e.UpdateModifierKeyMasks ();
 					if (CheckShortcut (e.Key, false)) {
 						e.Handled = true;
 					}

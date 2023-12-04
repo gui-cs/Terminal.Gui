@@ -419,27 +419,6 @@ internal class CursesDriver : ConsoleDriver {
 		}
 	}
 
-	KeyModifiers _keyModifiers;
-
-	KeyModifiers MapKeyModifiers (Key key)
-	{
-		if (_keyModifiers == null) {
-			_keyModifiers = new KeyModifiers ();
-		}
-
-		if (!_keyModifiers.Shift && (key & Key.ShiftMask) != 0) {
-			_keyModifiers.Shift = true;
-		}
-		if (!_keyModifiers.Alt && (key & Key.AltMask) != 0) {
-			_keyModifiers.Alt = true;
-		}
-		if (!_keyModifiers.Ctrl && (key & Key.CtrlMask) != 0) {
-			_keyModifiers.Ctrl = true;
-		}
-
-		return _keyModifiers;
-	}
-
 	internal void ProcessInput ()
 	{
 		int wch;
@@ -448,8 +427,6 @@ internal class CursesDriver : ConsoleDriver {
 		if (code == Curses.ERR) {
 			return;
 		}
-
-		_keyModifiers = new KeyModifiers ();
 		Key k = Key.Null;
 
 		if (code == Curses.KEY_CODE_YES) {
@@ -497,9 +474,9 @@ internal class CursesDriver : ConsoleDriver {
 				wch -= 60;
 				k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
 			}
-			OnKeyDown (new KeyEventArgs (k, MapKeyModifiers (k)));
-			OnKeyUp (new KeyEventArgs (k, MapKeyModifiers (k)));
-			OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventArgs (k));
+			OnKeyUp (new KeyEventArgs (k));
+			OnKeyPressed (new KeyEventArgs (k));
 			return;
 		}
 
@@ -535,33 +512,31 @@ internal class CursesDriver : ConsoleDriver {
 				} else {
 					// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
 					if (((Key)wch2 & Key.CtrlMask) != 0) {
-						_keyModifiers.Ctrl = true;
+						k = (Key)((uint)Key.CtrlMask + (wch2 & ~((int)Key.CtrlMask)));
 					}
 					if (wch2 == 0) {
 						k = Key.CtrlMask | Key.AltMask | Key.Space;
 					} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
-						_keyModifiers.Shift = true;
-						_keyModifiers.Alt = true;
+						k = Key.ShiftMask | Key.AltMask | Key.Space;
 					} else if (wch2 < 256) {
-						k = (Key)wch2;
-						_keyModifiers.Alt = true;
+						k = (Key)wch2 | Key.AltMask;
 					} else {
 						k = (Key)((uint)(Key.AltMask | Key.CtrlMask) + wch2);
 					}
 				}
-				key = new KeyEventArgs (k, MapKeyModifiers (k));
+				key = new KeyEventArgs (k);
 				OnKeyDown (key);
 				OnKeyUp (key);
 				OnKeyPressed (key);
 			} else {
 				k = Key.Esc;
-				OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
+				OnKeyPressed (new KeyEventArgs (k));
 			}
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
-			OnKeyDown (new KeyEventArgs (k, MapKeyModifiers (k)));
-			OnKeyUp (new KeyEventArgs (k, MapKeyModifiers (k)));
-			OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventArgs (k));
+			OnKeyUp (new KeyEventArgs (k));
+			OnKeyPressed (new KeyEventArgs (k));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (Key)wch;
@@ -572,11 +547,11 @@ internal class CursesDriver : ConsoleDriver {
 					k = Key.CtrlMask | (Key)(wch + 64);
 				}
 			} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
-				_keyModifiers.Shift = true;
+				k = (Key)wch | Key.ShiftMask;
 			}
-			OnKeyDown (new KeyEventArgs (k, MapKeyModifiers (k)));
-			OnKeyUp (new KeyEventArgs (k, MapKeyModifiers (k)));
-			OnKeyPressed (new KeyEventArgs (k, MapKeyModifiers (k)));
+			OnKeyDown (new KeyEventArgs (k));
+			OnKeyUp (new KeyEventArgs (k));
+			OnKeyPressed (new KeyEventArgs (k));
 		}
 		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 		// will not impact KeyUp.
@@ -609,7 +584,7 @@ internal class CursesDriver : ConsoleDriver {
 				} else {
 					k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
-					key = new (k, MapKeyModifiers (k));
+					key = new (k);
 					OnKeyDown (key);
 					OnKeyPressed (key);
 				}
@@ -769,24 +744,9 @@ internal class CursesDriver : ConsoleDriver {
 			key = (Key)keyChar;
 		}
 
-		KeyModifiers km = new KeyModifiers ();
-		if (shift) {
-			if (keyChar == 0) {
-				key |= Key.ShiftMask;
-			}
-			km.Shift = shift;
-		}
-		if (alt) {
-			key |= Key.AltMask;
-			km.Alt = alt;
-		}
-		if (control) {
-			key |= Key.CtrlMask;
-			km.Ctrl = control;
-		}
-		OnKeyDown (new KeyEventArgs (key, km));
-		OnKeyPressed (new KeyEventArgs (key, km));
-		OnKeyUp (new KeyEventArgs (key, km));
+		OnKeyDown (new KeyEventArgs (key));
+		OnKeyPressed (new KeyEventArgs (key));
+		OnKeyUp (new KeyEventArgs (key));
 	}
 
 

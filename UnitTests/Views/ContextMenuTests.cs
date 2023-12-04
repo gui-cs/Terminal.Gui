@@ -191,12 +191,12 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (lbl);
 			Application.Begin (top);
 
-			Assert.True (lbl.ProcessKeyPressed (new (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.ProcessKeyPressed (new (cm.Key)));
 			Assert.Equal ("Replaced", lbl.Text);
 
 			lbl.Text = "Original";
 			cm.Key = Key.Space | Key.CtrlMask;
-			Assert.True (lbl.ProcessKeyPressed (new (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.ProcessKeyPressed (new (cm.Key)));
 			Assert.Equal ("Replaced", lbl.Text);
 		}
 
@@ -531,7 +531,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.True (menu.ProcessKeyPressed (new (menu.Key, new KeyModifiers ())));
+			Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
@@ -540,8 +540,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.False (menu.OnKeyDown (new (Key.AltMask, new KeyModifiers () { Alt = true })));
-			Assert.True (menu.OnKeyUp (new (Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.False (menu.OnKeyDown (new (Key.AltMask)));
+			Assert.True (menu.OnKeyUp (new (Key.AltMask)));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
@@ -902,9 +902,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask)));
 			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-			Assert.True (Application.Top.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.Top.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask)));
 			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 

@@ -1098,24 +1098,18 @@ internal class NetDriver : ConsoleDriver {
 
 		return (Key)(0xffffffff);
 	}
-
-	KeyModifiers _keyModifiers;
-
+	
 	Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 	{
-		_keyModifiers ??= new KeyModifiers ();
 		Key keyMod = new Key ();
 		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
 			keyMod = Key.ShiftMask;
-			_keyModifiers.Shift = true;
 		}
 		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
 			keyMod |= Key.CtrlMask;
-			_keyModifiers.Ctrl = true;
 		}
 		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
 			keyMod |= Key.AltMask;
-			_keyModifiers.Alt = true;
 		}
 
 		return keyMod != Key.Null ? keyMod | key : key;
@@ -1131,18 +1125,17 @@ internal class NetDriver : ConsoleDriver {
 			if (consoleKeyInfo.Key == ConsoleKey.Packet) {
 				consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 			}
-			_keyModifiers = new KeyModifiers ();
 			var map = MapKey (consoleKeyInfo);
 			if (map == (Key)0xffffffff) {
 				return;
 			}
 			if (map == Key.Null) {
-				OnKeyDown (new KeyEventArgs (map, _keyModifiers));
-				OnKeyUp (new KeyEventArgs (map, _keyModifiers));
+				OnKeyDown (new KeyEventArgs (map));
+				OnKeyUp (new KeyEventArgs (map));
 			} else {
-				OnKeyDown (new KeyEventArgs (map, _keyModifiers));
-				OnKeyUp (new KeyEventArgs (map, _keyModifiers));
-				OnKeyPressed (new KeyEventArgs (map, _keyModifiers));
+				OnKeyDown (new KeyEventArgs (map));
+				OnKeyUp (new KeyEventArgs (map));
+				OnKeyPressed (new KeyEventArgs (map));
 			}
 			break;
 		case NetEvents.EventType.Mouse:

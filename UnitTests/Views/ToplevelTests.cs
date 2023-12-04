@@ -57,7 +57,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.R, new KeyModifiers ()));
+					Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 					break;
 				case 1:
 					Assert.Equal ("Top2", Application.Top.Text);
@@ -66,7 +66,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.C, new KeyModifiers ()));
+					Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 					break;
 				case 3:
 					Assert.Equal ("Top1", Application.Top.Text);
@@ -75,7 +75,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.R, new KeyModifiers ()));
+					Application.OnKeyPressed (new (Key.CtrlMask | Key.R));
 					break;
 				case 4:
 					Assert.Equal ("Top2", Application.Top.Text);
@@ -84,7 +84,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.C, new KeyModifiers ()));
+					Application.OnKeyPressed (new (Key.CtrlMask | Key.C));
 					break;
 				case 6:
 					Assert.Equal ("Top1", Application.Top.Text);
@@ -93,7 +93,7 @@ namespace Terminal.Gui.ViewsTests {
 					Assert.Equal (Application.Driver.Cols, Application.Top.Frame.Width);
 					Assert.Equal (Application.Driver.Rows, Application.Top.Frame.Height);
 
-					Application.OnKeyPressed (new (Key.CtrlMask | Key.Q, new KeyModifiers ()));
+					Application.OnKeyPressed (new (Key.CtrlMask | Key.Q));
 					break;
 				}
 				iterations++;
@@ -380,73 +380,73 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (tf1W1, top.MostFocused);
 
 			Assert.True (isRunning);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Application.QuitKey, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Application.QuitKey)));
 			Assert.False (isRunning);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			Assert.False (top.Focused.ProcessKeyPressed (new (Key.F5, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Z | Key.CtrlMask)));
+			Assert.False (top.Focused.ProcessKeyPressed (new (Key.F5)));
 
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab)));
 			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask)));
 			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf1W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorRight)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf1W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorDown)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.I | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.I | Key.CtrlMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.ShiftMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorLeft)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf1W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorUp)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.Equal (win2, top.Focused);
 			Assert.Equal (tf1W2, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask | Key.ShiftMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Application.AlternateForwardKey, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Application.AlternateForwardKey)));
 			Assert.Equal (win2, top.Focused);
 			Assert.Equal (tf1W2, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Application.AlternateBackwardKey, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Application.AlternateBackwardKey)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorUp)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.B | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.B | Key.CtrlMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf1W1, top.MostFocused);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.CursorDown)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
 			Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.End | Key.CtrlMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
 			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.F | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.F | Key.CtrlMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
 
-			Assert.True (top.Focused.ProcessKeyPressed (new (Key.L | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (top.Focused.ProcessKeyPressed (new (Key.L | Key.CtrlMask)));
 		}
 
 		[Fact]
@@ -512,80 +512,80 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (win1, Application.Current);
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			win1.Running = true;
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Application.QuitKey, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Application.QuitKey)));
 			Assert.False (isRunning);
 			Assert.False (win1.Running);
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Z | Key.CtrlMask, new KeyModifiers ())));
-			Assert.False (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.F5, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Z | Key.CtrlMask)));
+			Assert.False (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.F5)));
 
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab)));
 			Assert.True (win1.IsCurrentTop);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab)));
 			Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.ShiftMask)));
 			Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorRight)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorDown)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.I | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.I | Key.CtrlMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.ShiftMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorLeft)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorUp)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask)));
 			Assert.Equal (win2, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W2, win2.MostFocused);
 			tf2W2.SetFocus ();
 			Assert.True (tf2W2.HasFocus);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.Tab | Key.CtrlMask | Key.ShiftMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Application.AlternateForwardKey, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Application.AlternateForwardKey)));
 			Assert.Equal (win2, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W2, win2.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Application.AlternateBackwardKey, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Application.AlternateBackwardKey)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorDown)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.B | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.B | Key.CtrlMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.CursorDown)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.End | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.End | Key.CtrlMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.F | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.F | Key.CtrlMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
 
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.L | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyPressed (new (Key.L | Key.CtrlMask)));
 		}
 
 		[Fact]
@@ -1541,7 +1541,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (topChild);
 			Application.Begin (Application.Top);
 
-			var exception = Record.Exception (() => topChild.ProcessKeyPressed (new (Key.AltMask, new KeyModifiers { Alt = true })));
+			var exception = Record.Exception (() => topChild.ProcessKeyPressed (new (Key.AltMask)));
 			Assert.Null (exception);
 		}
 

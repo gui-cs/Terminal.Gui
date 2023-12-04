@@ -66,7 +66,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Test" }, -1);
 			Assert.Equal (-1, rg.SelectedItem);
-			Assert.True (rg.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (rg.ProcessKeyPressed (new (Key.Space)));
 			Assert.Equal (0, rg.SelectedItem);
 		}
 
@@ -164,11 +164,11 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Test", "New Test" });
 
-			Assert.True (rg.ProcessKeyPressed (new (Key.CursorUp, new KeyModifiers ())));
-			Assert.True (rg.ProcessKeyPressed (new (Key.CursorDown, new KeyModifiers ())));
-			Assert.True (rg.ProcessKeyPressed (new (Key.Home, new KeyModifiers ())));
-			Assert.True (rg.ProcessKeyPressed (new (Key.End, new KeyModifiers ())));
-			Assert.True (rg.ProcessKeyPressed (new (Key.Space, new KeyModifiers ())));
+			Assert.True (rg.ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (rg.ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (rg.ProcessKeyPressed (new (Key.Home)));
+			Assert.True (rg.ProcessKeyPressed (new (Key.End)));
+			Assert.True (rg.ProcessKeyPressed (new (Key.Space)));
 			Assert.Equal (1, rg.SelectedItem);
 		}
 
@@ -177,13 +177,13 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
 
-			Assert.True (rg.ProcessKeyPressed (new (Key.T, new KeyModifiers ())));
+			Assert.True (rg.ProcessKeyPressed (new (Key.T)));
 			Assert.Equal (2, rg.SelectedItem);
-			Assert.True (rg.ProcessKeyPressed (new (Key.L, new KeyModifiers ())));
+			Assert.True (rg.ProcessKeyPressed (new (Key.L)));
 			Assert.Equal (0, rg.SelectedItem);
-			Assert.True (rg.ProcessKeyPressed (new (Key.J, new KeyModifiers ())));
+			Assert.True (rg.ProcessKeyPressed (new (Key.J)));
 			Assert.Equal (3, rg.SelectedItem);
-			Assert.True (rg.ProcessKeyPressed (new (Key.R, new KeyModifiers ())));
+			Assert.True (rg.ProcessKeyPressed (new (Key.R)));
 			Assert.Equal (1, rg.SelectedItem);
 		}
 	}

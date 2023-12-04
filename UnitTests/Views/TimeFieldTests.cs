@@ -61,38 +61,38 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			TimeField tf = new TimeField (TimeSpan.Parse ("12:12:19"));
 			tf.ReadOnly = true;
-			Assert.True (tf.ProcessKeyPressed (new (Key.DeleteChar, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.DeleteChar)));
 			Assert.Equal (" 12:12:19", tf.Text);
 			tf.ReadOnly = false;
-			Assert.True (tf.ProcessKeyPressed (new (Key.D | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.D | Key.CtrlMask)));
 			Assert.Equal (" 02:12:19", tf.Text);
 			tf.CursorPosition = 4;
 			tf.ReadOnly = true;
-			Assert.True (tf.ProcessKeyPressed (new (Key.Delete, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.Delete)));
 			Assert.Equal (" 02:12:19", tf.Text);
 			tf.ReadOnly = false;
-			Assert.True (tf.ProcessKeyPressed (new (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.Backspace)));
 			Assert.Equal (" 02:02:19", tf.Text);
-			Assert.True (tf.ProcessKeyPressed (new (Key.Home, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.Home)));
 			Assert.Equal (1, tf.CursorPosition);
-			Assert.True (tf.ProcessKeyPressed (new (Key.End, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.End)));
 			Assert.Equal (8, tf.CursorPosition);
-			Assert.True (tf.ProcessKeyPressed (new (Key.A | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.A | Key.CtrlMask)));
 			Assert.Equal (1, tf.CursorPosition);
-			Assert.True (tf.ProcessKeyPressed (new (Key.E | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.E | Key.CtrlMask)));
 			Assert.Equal (8, tf.CursorPosition);
-			Assert.True (tf.ProcessKeyPressed (new (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.CursorLeft)));
 			Assert.Equal (7, tf.CursorPosition);
-			Assert.True (tf.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.CursorRight)));
 			Assert.Equal (8, tf.CursorPosition);
 			// Non-numerics are ignored
-			Assert.True (tf.ProcessKeyPressed (new (Key.A, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.A)));
 			tf.ReadOnly = true;
 			tf.CursorPosition = 1;
-			Assert.True (tf.ProcessKeyPressed (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.D1)));
 			Assert.Equal (" 02:02:19", tf.Text);
 			tf.ReadOnly = false;
-			Assert.True (tf.ProcessKeyPressed (new (Key.D1, new KeyModifiers ())));
+			Assert.True (tf.ProcessKeyPressed (new (Key.D1)));
 			Assert.Equal (" 12:02:19", tf.Text);
 		}
 	}

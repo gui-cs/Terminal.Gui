@@ -400,8 +400,6 @@ public class DynamicStatusBar : Scenario {
 					return;
 				}
 
-				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-				e.UpdateModifierKeyMasks ();
 				if (CheckShortcut (e.Key, true)) {
 					e.Handled = true;
 				}
@@ -441,8 +439,6 @@ public class DynamicStatusBar : Scenario {
 			}
 
 			_txtShortcut.KeyUp += (s, e) => {
-				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-				e.UpdateModifierKeyMasks ();
 				if (CheckShortcut (e.Key, true)) {
 					e.Handled = true;
 				}

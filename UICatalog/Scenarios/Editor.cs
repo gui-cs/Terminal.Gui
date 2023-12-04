@@ -177,8 +177,6 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyPressed += (s, e) => {
-				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-				e.UpdateModifierKeyMasks ();
 				if (_winDialog != null && (e.Key == Key.Esc
 								|| e.Key == Application.QuitKey)) {
 					DisposeWinDialog ();

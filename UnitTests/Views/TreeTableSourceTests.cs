@@ -171,13 +171,13 @@ public class TreeTableSourceTests: IDisposable {
 		Assert.Equal (0, tv.SelectedColumn);
 
 		// when pressing right we move to tree column
-		tv.ProcessKeyPressed(new (Key.CursorRight, new KeyModifiers ()));
+		tv.ProcessKeyPressed(new (Key.CursorRight));
 
 		// now we are in tree column
 		Assert.Equal (0, tv.SelectedRow);
 		Assert.Equal (1, tv.SelectedColumn);
 
-		Application.Top.ProcessKeyPressed (new (Key.CursorRight, new KeyModifiers ()));
+		Application.Top.ProcessKeyPressed (new (Key.CursorRight));
 
 		tv.Draw ();
 
@@ -194,8 +194,8 @@ public class TreeTableSourceTests: IDisposable {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		tv.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown,new KeyModifiers ()));
-		tv.ProcessKeyPressed (new KeyEventArgs (Key.Space, new KeyModifiers ()));
+		tv.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown));
+		tv.ProcessKeyPressed (new KeyEventArgs (Key.Space));
 		tv.Draw ();
 
 		expected =

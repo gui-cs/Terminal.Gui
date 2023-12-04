@@ -243,7 +243,7 @@ namespace Terminal.Gui.DriverTests {
 		//					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		//					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
-		//					Assert.True (dlg.ProcessKey (new (Key.Tab, new KeyModifiers ())));
+		//					Assert.True (dlg.ProcessKey (new (Key.Tab)));
 		//					dlg.Draw ();
 
 		//					expected = @"

@@ -99,10 +99,7 @@ namespace UICatalog.Scenarios {
 			tvOutput.KeyPressed += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
-					// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-					e.UpdateModifierKeyMasks ();
-					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
-						if (!tvOutput.OnKeyPressed (e)) {
+					if (!tvOutput.OnKeyPressed (e)) {
 						Application.Invoke (() => {
 							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (e.Key, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
 						});
@@ -156,8 +153,6 @@ namespace UICatalog.Scenarios {
 			tvInput.KeyUp += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
 				//var ke = e;
-				// BUGBUG: This should not be needed. We need to figure out why the masks are not being set.
-				e.UpdateModifierKeyMasks ();
 				if (_wasUnknown && (int)e.Key - (int)(e.Key & (Key.AltMask | Key.CtrlMask | Key.ShiftMask)) != 0) {
 					unknownChar = e;
 				}
@@ -209,13 +204,13 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			btnInput.Clicked += (s,e) => {
+			btnInput.Clicked += (s, e) => {
 				if (!tvInput.HasFocus && _keyboardStrokes.Count == 0) {
 					tvInput.SetFocus ();
 				}
 			};
 
-			btnOutput.Clicked += (s,e) => {
+			btnOutput.Clicked += (s, e) => {
 				if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0) {
 					tvOutput.SetFocus ();
 				}
@@ -237,16 +232,6 @@ namespace UICatalog.Scenarios {
 		private void AddKeyboardStrokes (KeyEventArgs e)
 		{
 			var ke = e;
-			var km = new KeyModifiers ();
-			if (ke.IsShift) {
-				km.Shift = true;
-			}
-			if (ke.IsAlt) {
-				km.Alt = true;
-			}
-			if (ke.IsCtrl) {
-				km.Ctrl = true;
-			}
 			var keyChar = ke.KeyValue;
 			var mK = (int)((Key)ke.KeyValue & (Key.AltMask | Key.CtrlMask | Key.ShiftMask));
 			keyChar &= ~mK;
