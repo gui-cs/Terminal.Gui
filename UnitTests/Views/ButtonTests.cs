@@ -16,8 +16,9 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var btn = new Button ();
 			Assert.Equal (string.Empty, btn.Text);
-			Application.Top.Add (btn);
-			var rs = Application.Begin (Application.Top);
+			var top = Application.Top;
+			top.Add (btn);
+			var rs = Application.Begin (top);
 
 			Assert.Equal ("[  ]", btn.TextFormatter.Text);
 			Assert.False (btn.IsDefault);
@@ -34,8 +35,8 @@ namespace Terminal.Gui.ViewTests {
 			Application.End (rs);
 			btn = new Button ("ARGS", true) { Text = "Test" };
 			Assert.Equal ("Test", btn.Text);
-			Application.Top.Add (btn);
-			rs = Application.Begin (Application.Top);
+			top.Add (btn);
+			rs = Application.Begin (top);
 
 			Assert.Equal ("[◦ Test ◦]", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);
@@ -52,8 +53,8 @@ namespace Terminal.Gui.ViewTests {
 			Application.End (rs);
 			btn = new Button (3, 4, "Test", true);
 			Assert.Equal ("Test", btn.Text);
-			Application.Top.Add (btn);
-			rs = Application.Begin (Application.Top);
+			top.Add (btn);
+			rs = Application.Begin (top);
 
 			Assert.Equal ("[◦ Test ◦]", btn.TextFormatter.Text);
 			Assert.True (btn.IsDefault);

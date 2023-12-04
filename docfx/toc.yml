@@ -1,9 +1,9 @@
 - name: Overview
-  href: articles/overview.md
+  href: docs/overview.md
 - name: Conceptual Docs
-  href: articles/index.md
+  href: docs/index.md
 - name: API Reference
-  href: api/Terminal.Gui/
+  href: api/Terminal.Gui
 # - name: UI Catalog API
 #   href: api/UICatalog/
 - name: Source

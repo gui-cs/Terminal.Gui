@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
+	/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screen and
 	/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
 	/// </summary>
 	/// <remarks>
@@ -220,6 +220,9 @@ namespace Terminal.Gui {
 		{
 			ColorScheme = Colors.TopLevel;
 
+			Application.GrabbingMouse += Application_GrabbingMouse;
+			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
+
 			// Things this view knows how to do
 			AddCommand (Command.QuitToplevel, () => { QuitToplevel (); return true; });
 			AddCommand (Command.Suspend, () => { Driver.Suspend (); ; return true; });
@@ -253,6 +256,24 @@ namespace Terminal.Gui {
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+		}
+
+		private bool  Application_UnGrabbingMouse (View e)
+		{
+			if (dragPosition.HasValue) {
+				return true;
+			}
+
+			return false;
+		}
+
+		private bool Application_GrabbingMouse (View e)
+		{
+			if (Application.MouseGrabView == this && dragPosition.HasValue) {
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -628,7 +649,8 @@ namespace Terminal.Gui {
 			}
 			mb = null; sb = null;
 			if (!(superView is Toplevel)) {
-				nx = x; ny = y;
+				nx = Math.Max (Math.Min (x, top.Frame.Right - 1), 0);
+				ny = Math.Max (Math.Min (y, top.Frame.Bottom - 1), 0);
 				return superView;
 			}
 			var superViewBorder = superView.Border != null ? (superView.Border.DrawMarginFrame ? 1 : 0) : 0;
@@ -835,11 +857,10 @@ namespace Terminal.Gui {
 				// Only start grabbing if the user clicks on the title bar.
 				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
 					start = new Point (mouseEvent.X, mouseEvent.Y);
-					dragPosition = new Point ();
+					Application.GrabMouse (this);
 					nx = mouseEvent.X - mouseEvent.OfX;
 					ny = mouseEvent.Y - mouseEvent.OfY;
 					dragPosition = new Point (nx, ny);
-					Application.GrabMouse (this);
 				}
 
 				//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
@@ -872,8 +893,8 @@ namespace Terminal.Gui {
 			}
 
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && dragPosition.HasValue) {
-				Application.UngrabMouse ();
 				dragPosition = null;
+				Application.UngrabMouse ();
 			}
 
 			//System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
@@ -1031,6 +1052,16 @@ namespace Terminal.Gui {
 		public override bool OnLeave (View view)
 		{
 			return MostFocused?.OnLeave (view) ?? base.OnLeave (view);
+		}
+
+		///<inheritdoc/>
+		protected override void Dispose (bool disposing)
+		{
+			Application.GrabbingMouse -= Application_GrabbingMouse;
+			Application.UnGrabbingMouse -= Application_UnGrabbingMouse;
+
+			dragPosition = null;
+			base.Dispose (disposing);
 		}
 	}
 
