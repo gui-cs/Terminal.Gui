@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 

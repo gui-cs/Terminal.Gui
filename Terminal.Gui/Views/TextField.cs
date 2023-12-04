@@ -13,7 +13,6 @@ using System.Threading;
 using System.Text;
 using Terminal.Gui.Resources;
 
-
 namespace Terminal.Gui {
 	/// <summary>
 	///   Single-line text entry <see cref="View"/>

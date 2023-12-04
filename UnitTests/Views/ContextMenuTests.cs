@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Threading;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;

@@ -976,6 +976,25 @@ internal class WindowsDriver : ConsoleDriver {
 
 		}
 
+		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
+			var delta = key - ConsoleKey.D0;
+			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
+				return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
+			}
+			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
+				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+			}
+			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+			}
+			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				}
+			}
+			return (Key)((uint)keyInfo.KeyChar);
+		}
+
 		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 			var delta = key - ConsoleKey.F1;
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
@@ -983,6 +1002,18 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 
 			return (Key)((uint)Key.F1 + delta);
+		}
+
+		if (key == (ConsoleKey)16) { // Shift
+			return Key.Null | Key.ShiftMask;
+		}
+
+		if (key == (ConsoleKey)17) { // Ctrl
+			return Key.Null | Key.CtrlMask;
+		}
+
+		if (key == (ConsoleKey)18) { // Alt
+			return Key.Null | Key.AltMask;
 		}
 
 		return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
@@ -996,19 +1027,15 @@ internal class WindowsDriver : ConsoleDriver {
 			if (fromPacketKey) {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
-
-			if (inputEvent.KeyEvent.UnicodeChar == 0 && inputEvent.KeyEvent.dwControlKeyState == 0) {
-				// This happens when a shift key combo is pressed without another key. It is a dupe 
-				// so ignore it.
-				break;
-			}
-
 			var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
 
-
-			OnKeyDown (new KeyEventArgs (map));
-			OnKeyUp (new KeyEventArgs (map));
-			OnKeyPressed (new KeyEventArgs (map));
+			if (inputEvent.KeyEvent.bKeyDown) {
+				// Avoid sending repeat keydowns
+				OnKeyDown (new KeyEventArgs (map));
+			} else {
+				OnKeyUp (new KeyEventArgs (map));
+				OnKeyPressed (new KeyEventArgs (map));
+			}
 
 			break;
 

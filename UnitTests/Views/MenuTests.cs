@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 //using static Terminal.Gui.ViewTests.MenuTests;
