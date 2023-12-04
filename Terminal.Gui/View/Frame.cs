@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 				var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 0;
 				var drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 				var drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
-				var drawRight = Thickness.Right > 0 && ((Frame.Width > 1 && Frame.Height > 1) || Thickness.Top == 0);
+				var drawRight = Thickness.Right > 0 && ((Frame.Width > 0 && Frame.Height > 1) || Thickness.Top == 0);
 
 				var prevAttr = Driver.GetAttribute ();
 				if (ColorScheme != null) {

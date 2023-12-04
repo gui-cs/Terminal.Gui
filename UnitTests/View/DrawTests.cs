@@ -348,6 +348,18 @@ t     ", output);
 		}
 
 		[Fact, AutoInitShutdown]
+		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Top ()
+		{
+			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			label.Border.Thickness = new Thickness (1, 0, 1, 1);
+			Application.Top.Add (label);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+││", output);
+		}
+
+		[Fact, AutoInitShutdown]
 		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Bottom ()
 		{
 			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
@@ -360,15 +372,29 @@ t     ", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Top ()
+		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Left ()
 		{
 			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
-			label.Border.Thickness = new Thickness (1, 0, 1, 1);
+			label.Border.Thickness = new Thickness (0, 1, 1, 1);
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
-││", output);
+│
+│", output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Right ()
+		{
+			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			label.Border.Thickness = new Thickness (1, 1, 0, 1);
+			Application.Top.Add (label);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│
+│", output);
 		}
 
 		[Fact, AutoInitShutdown]
