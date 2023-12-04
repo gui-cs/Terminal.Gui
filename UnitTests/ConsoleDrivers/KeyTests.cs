@@ -147,6 +147,15 @@ public class KeyTests {
 	}
 
 	[Fact]
+	public void KeyEnum_ShouldHaveCorrectValues ()
+	{
+		Assert.Equal (0, (int)Key.Null);
+		Assert.Equal (8, (int)Key.Backspace);
+		Assert.Equal (9, (int)Key.Tab);
+		// Continue for other keys...
+	}
+
+	[Fact]
 	public void Key_ToString ()
 	{
 		var k = Key.Y | Key.CtrlMask;

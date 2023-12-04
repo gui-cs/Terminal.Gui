@@ -69,6 +69,10 @@ public class KeyEventArgs : EventArgs {
 
 	private static string GetKeyString (Key key)
 	{
+		if (key is Key.Null or Key.SpecialMask) {
+			return string.Empty;
+		}
+
 		string keyName = Enum.GetName (typeof (Key), key);
 
 		if (key >= Key.A && key <= Key.Z) {
@@ -119,7 +123,7 @@ public class KeyEventArgs : EventArgs {
 		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
 
 		// Handle special cases and modifiers on their own
-		if (baseKey != Key.Null || hasModifiers) {
+		if ((key != Key.SpecialMask) && (baseKey != Key.Null || hasModifiers)) {
 			// Append the actual key name
 			sb.Append (GetKeyString (baseKey));
 		}

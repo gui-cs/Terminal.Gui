@@ -746,8 +746,8 @@ internal class CursesDriver : ConsoleDriver {
 		}
 
 		OnKeyDown (new KeyEventArgs (key));
-		OnKeyPressed (new KeyEventArgs (key));
 		OnKeyUp (new KeyEventArgs (key));
+		OnKeyPressed (new KeyEventArgs (key));
 	}
 
 

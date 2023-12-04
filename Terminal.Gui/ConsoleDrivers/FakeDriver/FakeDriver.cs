@@ -272,8 +272,8 @@ public class FakeDriver : ConsoleDriver {
 
 		var map = MapKey (consoleKeyInfo);
 		OnKeyDown (new KeyEventArgs (map));
-		OnKeyPressed (new KeyEventArgs (map));
 		OnKeyUp (new KeyEventArgs (map));
+		OnKeyPressed (new KeyEventArgs (map));
 	}
 
 	/// <inheritdoc/>
