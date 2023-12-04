@@ -256,9 +256,6 @@ namespace UICatalog {
 			public TableView ScenarioList;
 			private CollectionNavigator _scenarioCollectionNav = new CollectionNavigator ();
 
-			public StatusItem Capslock;
-			public StatusItem Numlock;
-			public StatusItem Scrolllock;
 			public StatusItem DriverName;
 			public StatusItem OS;
 
@@ -280,9 +277,6 @@ namespace UICatalog {
 					}),
 				});
 
-				Capslock = new StatusItem (Key.CharMask, "Caps", null);
-				Numlock = new StatusItem (Key.CharMask, "Num", null);
-				Scrolllock = new StatusItem (Key.CharMask, "Scroll", null);
 				DriverName = new StatusItem (Key.CharMask, "Driver:", null);
 				OS = new StatusItem (Key.CharMask, "OS:", null);
 
@@ -394,8 +388,6 @@ namespace UICatalog {
 				// a shortcut to About.
 				ScenarioList.MultiSelect = false;
 				ScenarioList.ClearKeyBinding (Key.CtrlMask | Key.A);
-
-				KeyDown += KeyDownHandler;
 
 				Add (CategoryList);
 				Add (ScenarioList);
@@ -766,33 +758,6 @@ namespace UICatalog {
 				StatusBar.Visible = UICatalogApp.ShowStatusBar;
 
 				Application.Top.SetNeedsDisplay ();
-			}
-
-			void KeyDownHandler (object? sender, KeyEventArgs? a)
-			{
-				if (a!.IsCapslock) {
-					Capslock.Title = "Caps: On";
-					StatusBar.SetNeedsDisplay ();
-				} else {
-					Capslock.Title = "Caps: Off";
-					StatusBar.SetNeedsDisplay ();
-				}
-
-				if (a!.IsNumlock) {
-					Numlock.Title = "Num: On";
-					StatusBar.SetNeedsDisplay ();
-				} else {
-					Numlock.Title = "Num: Off";
-					StatusBar.SetNeedsDisplay ();
-				}
-
-				if (a!.IsScrolllock) {
-					Scrolllock.Title = "Scroll: On";
-					StatusBar.SetNeedsDisplay ();
-				} else {
-					Scrolllock.Title = "Scroll: Off";
-					StatusBar.SetNeedsDisplay ();
-				}
 			}
 
 			void CategoryView_SelectedChanged (object? sender, ListViewItemEventArgs? e)

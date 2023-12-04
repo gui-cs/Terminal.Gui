@@ -70,24 +70,6 @@ public class KeyEventArgs : EventArgs {
 	public bool IsCtrl => _keyModifiers.Ctrl;
 
 	/// <summary>
-	/// Gets a value indicating whether the Caps lock key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsCapslock => _keyModifiers.Capslock;
-
-	/// <summary>
-	/// Gets a value indicating whether the Num lock key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsNumlock => _keyModifiers.Numlock;
-
-	/// <summary>
-	/// Gets a value indicating whether the Scroll lock key was pressed (real or synthesized)
-	/// </summary>
-	/// <value><c>true</c> if is alternate; otherwise, <c>false</c>.</value>
-	public bool IsScrolllock => _keyModifiers.Scrolllock;
-	
-	/// <summary>
 	/// Updates the modifier masks to match <see cref="IsAlt"/>, <see cref="IsCtrl"/>, and <see cref="IsShift"/>.
 	/// </summary>
 	public void UpdateModifierKeyMasks ()
@@ -102,7 +84,7 @@ public class KeyEventArgs : EventArgs {
 			Key |= Key.ShiftMask;
 		}
 	}
-	
+
 	/// <summary>
 	/// Pretty prints the KeyEvent
 	/// </summary>
@@ -162,21 +144,13 @@ public class KeyEventArgs : EventArgs {
 		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
 
 		// Handle special cases and modifiers on their own
-		if (baseKey == Key.Null && hasModifiers) {
-			//return sb.ToString ().TrimEnd ('-');
-			//} else if (baseKey == Key.Unknown && _keyModifiers.Capslock) {
-			//	result.Append ("Capslock");
-			//} else if (baseKey == Key.Unknown && _keyModifiers.Scrolllock) {
-			//	result.Append ("Scrolllock");
-			//} else if (baseKey == Key.Unknown && _keyModifiers.Numlock) {
-			//	result.Append ("Numlock");
-		} else {
+		if (baseKey != Key.Null && hasModifiers) {
 			// Append the actual key name
 			sb.Append (GetKeyString (baseKey));
 		}
 
 		var result = sb.ToString ();
-		result = TrimEndRune(result, separator);
+		result = TrimEndRune (result, separator);
 		return result;
 	}
 
@@ -212,18 +186,6 @@ public class KeyModifiers {
 	/// Check if the Ctrl key was pressed or not.
 	/// </summary>
 	public bool Ctrl;
-	/// <summary>
-	/// Check if the Caps lock key was pressed or not.
-	/// </summary>
-	public bool Capslock;
-	/// <summary>
-	/// Check if the Num lock key was pressed or not.
-	/// </summary>
-	public bool Numlock;
-	/// <summary>
-	/// Check if the Scroll lock key was pressed or not.
-	/// </summary>
-	public bool Scrolllock;
 }
 
 /// <summary>
@@ -608,7 +570,7 @@ public enum Key : uint {
 	/// Delete character key.
 	/// </summary>
 	DeleteChar,
-	
+
 	/// <summary>
 	/// Print screen character key.
 	/// </summary>

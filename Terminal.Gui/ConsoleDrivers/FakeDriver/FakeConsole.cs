@@ -461,28 +461,6 @@ public static class FakeConsole {
 	public static bool KeyAvailable { get; }
 	//
 	// Summary:
-	//	Gets a value indicating whether the NUM LOCK keyboard toggle is turned on or
-	//	turned off.
-	//
-	// Returns:
-	//	true if NUM LOCK is turned on; false if NUM LOCK is turned off.
-	/// <summary>
-	/// 
-	/// </summary>
-	public static bool NumberLock { get; }
-	//
-	// Summary:
-	//	Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or
-	//	turned off.
-	//
-	// Returns:
-	//	true if CAPS LOCK is turned on; false if CAPS LOCK is turned off.
-	/// <summary>
-	/// 
-	/// </summary>
-	public static bool CapsLock { get; }
-	//
-	// Summary:
 	//	Gets a value that indicates whether input has been redirected from the standard
 	//	input stream.
 	//

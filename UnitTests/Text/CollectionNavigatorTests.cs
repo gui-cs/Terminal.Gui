@@ -399,9 +399,6 @@ namespace Terminal.Gui.TextTests {
 				Alt = false,
 				Ctrl = false,
 				Shift = false,
-				Capslock = true,
-				Numlock = true,
-				Scrolllock = true,
 			})));
 		}
 	}

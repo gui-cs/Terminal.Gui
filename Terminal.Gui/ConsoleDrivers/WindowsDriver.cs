@@ -1301,15 +1301,6 @@ internal class WindowsDriver : ConsoleDriver {
 		if (control) {
 			_keyModifiers.Ctrl = true;
 		}
-		if (capsLock) {
-			_keyModifiers.Capslock = true;
-		}
-		if (numLock) {
-			_keyModifiers.Numlock = true;
-		}
-		if (scrollLock) {
-			_keyModifiers.Scrolllock = true;
-		}
 
 		var consoleKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 
