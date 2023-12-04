@@ -1139,7 +1139,17 @@ namespace Terminal.Gui {
 		public TextDirection Direction {
 			get => _textDirection;
 			set {
-				if (value == (TextDirection)(-1)) {
+				switch (value) {
+				case TextDirection.LeftRight_TopBottom:
+				case TextDirection.TopBottom_LeftRight:
+				case TextDirection.RightLeft_TopBottom:
+				case TextDirection.TopBottom_RightLeft:
+				case TextDirection.LeftRight_BottomTop:
+				case TextDirection.BottomTop_LeftRight:
+				case TextDirection.RightLeft_BottomTop:
+				case TextDirection.BottomTop_RightLeft:
+					break;
+				default:
 					return;
 				}
 
