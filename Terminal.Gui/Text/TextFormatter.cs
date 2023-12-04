@@ -1139,6 +1139,10 @@ namespace Terminal.Gui {
 		public TextDirection Direction {
 			get => _textDirection;
 			set {
+				if (value == (TextDirection)(-1)) {
+					return;
+				}
+
 				var directionWasIndef = _textDirection == (TextDirection)(-1);
 				_textDirection = EnableNeedsFormat (value);
 				if (directionWasIndef || (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)) {

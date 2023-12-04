@@ -1562,5 +1562,38 @@ At 0,0
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
 		}
+
+		[Fact]
+		public void TextDirection_Only_Can_Be_Set_To_Minus_One_On_The_Private_Field ()
+		{
+			var view = new View () { TextDirection = (TextDirection)(-1) };
+			// There was no change here because it's the same value
+			Assert.Equal ((TextDirection)(-1), view.TextDirection);
+
+			// Add a valid value
+			view.TextDirection = TextDirection.TopBottom_LeftRight;
+			Assert.Equal (TextDirection.TopBottom_LeftRight, view.TextDirection);
+
+			// Add a invalid value
+			view.TextDirection = (TextDirection)(-1);
+			Assert.Equal (TextDirection.TopBottom_LeftRight, view.TextDirection);
+
+			view = new View ();
+			// It's the default value
+			Assert.Equal ((TextDirection)(-1), view.TextDirection);
+
+			var container = new View ();
+			container.Add (view);
+			// It's the default value after added
+			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
+
+			view = new View ();
+			// It's the default value
+			Assert.Equal ((TextDirection)(-1), view.TextDirection);
+
+			view.BeginInit ();
+			// It's the default value after initialized
+			Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
+		}
 	}
 }

@@ -1794,5 +1794,21 @@ ssb
 
 			driver.End ();
 		}
+
+		[Fact]
+		public void TextDirection_Only_Can_Be_Set_To_Minus_One_On_The_Private_Field ()
+		{
+			var tf = new TextFormatter () { Direction = (TextDirection)(-1) };
+			// There was no change here because it's the same value
+			Assert.Equal ((TextDirection)(-1), tf.Direction);
+
+			// Add a valid value
+			tf.Direction = TextDirection.TopBottom_LeftRight;
+			Assert.Equal (TextDirection.TopBottom_LeftRight, tf.Direction);
+
+			// Add a invalid value
+			tf.Direction = (TextDirection)(-1);
+			Assert.Equal (TextDirection.TopBottom_LeftRight, tf.Direction);
+		}
 	}
 }
