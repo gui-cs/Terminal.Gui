@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 /// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 
 /// and textual representation of cells (e.g. date formats)
 /// 
-/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
+/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/tableview.html">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class ColumnStyle {
 
