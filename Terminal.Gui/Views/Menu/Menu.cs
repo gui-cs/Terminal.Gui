@@ -299,10 +299,13 @@ class Menu : View {
 		} else {
 
 			_currentChild = -1;
-			for (int i = 0; i < barItems.Children?.Length; i++) if (barItems.Children [i]?.IsEnabled () == true) {
+			for (int i = 0; i < barItems.Children?.Length; i++) {
+				if (barItems.Children [i]?.IsEnabled () == true) {
 					_currentChild = i;
 					break;
 				}
+
+			}
 			ColorScheme = host.ColorScheme;
 			CanFocus = true;
 			WantMousePositionReports = host.WantMousePositionReports;
@@ -349,7 +352,9 @@ class Menu : View {
 
 	void AddKeyBindings (MenuBarItem menuBarItem)
 	{
-		if (menuBarItem == null || menuBarItem.Children == null) return;
+		if (_host != null || menuBarItem == null || menuBarItem.Children == null) {
+			return;
+		}
 		foreach (var menuItem in menuBarItem.Children.Where (m => m != null)) {
 			AddKeyBinding ((Key)menuItem.HotKey.Value, Command.Select);
 			AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, Command.Select);
@@ -361,12 +366,19 @@ class Menu : View {
 
 	bool SelectOrRun ()
 	{
-		if (!IsInitialized || !Visible) return true;
+		if (!IsInitialized || !Visible) {
+			return true;
+		}
 
-		if (_mbItemToActivate != -1) _host.Activate (_mbItemToActivate);
-		else if (_menuItemToActivate != null) _host.Run (_menuItemToActivate.Action);
-		else if (_host.IsMenuOpen) _host.CloseAllMenus ();
-		else _host.OpenMenu ();
+		if (_mbItemToActivate != -1) {
+			_host.Activate (_mbItemToActivate);
+		} else if (_menuItemToActivate != null) {
+			_host.Run (_menuItemToActivate.Action);
+		} else if (_host.IsMenuOpen) {
+			_host.CloseAllMenus ();
+		} else {
+			_host.OpenMenu ();
+		}
 		//_openedByHotKey = true;
 		return true;
 	}
@@ -394,7 +406,9 @@ class Menu : View {
 				var hotKeyValue = _barItems.Children [c]?.HotKey.Value;
 				if (hotKeyValue != null) {
 					var matches = key == (Key)hotKeyValue;
-					if (!_host.IsMenuOpen) matches = key == (Key)hotKeyValue || key == ((Key)hotKeyValue | Key.AltMask);
+					if (!_host.IsMenuOpen) {
+						matches = key == (Key)hotKeyValue || key == ((Key)hotKeyValue | Key.AltMask);
+					}
 
 					if (matches) {
 						_mbItemToActivate = -1;
@@ -711,8 +725,7 @@ class Menu : View {
 			var item = _barItems.Children [_currentChild];
 			if (item?.IsEnabled () != true) {
 				disabled = true;
-			}
-			else disabled = false;
+			} else disabled = false;
 			if (!_host.UseSubMenusSingleFrame && _host.UseKeysUpDownAsKeysLeftRight &&
 			_barItems.SubMenu (_barItems.Children [_currentChild]) != null &&
 			!disabled && _host.IsMenuOpen) {
@@ -812,8 +825,7 @@ class Menu : View {
 			_host.Activate (_host._selected, pos, subMenu);
 		} else if (_host._openSubMenu?.Count == 0 || _host._openSubMenu?.Last ()._barItems.IsSubMenuOf (_barItems.Children [_currentChild]) == false) {
 			return _host.CloseMenu (false, true);
-		}
-		else {
+		} else {
 			SetNeedsDisplay ();
 			SetParentSetNeedsDisplay ();
 		}

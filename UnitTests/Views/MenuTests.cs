@@ -18,6 +18,7 @@ public class MenuTests {
 	public void Constuctors_Defaults ()
 	{
 		var menuBar = new MenuBar ();
+		Assert.Equal (Key.F9, menuBar.Key);
 		var menu = new Menu (menuBar, 0, 0, new MenuBarItem (), null, menuBar.MenusBorderStyle);
 		Assert.Equal (Colors.Menu, menu.ColorScheme);
 		Assert.True (menu.CanFocus);

@@ -2,11 +2,12 @@ using System;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
 /// <summary>
-/// <see cref="MenuBarItem"/> is a menu item on an app's <see cref="MenuBar"/>. 
+/// <see cref="MenuBarItem"/> is a menu item on  <see cref="MenuBar"/>. 
 /// MenuBarItems do not support <see cref="MenuItem.Shortcut"/>.
 /// </summary>
 public class MenuBarItem : MenuItem {
@@ -58,26 +59,35 @@ public class MenuBarItem : MenuItem {
 
 	void Initialize (string title, object children, MenuItem parent = null, bool isTopLevel = false)
 	{
-		if (!isTopLevel && children == null) throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
+		if (!isTopLevel && children == null) {
+			throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");
+		}
 		SetTitle (title ?? "");
 		if (parent != null) Parent = parent;
-		if (children is List<MenuItem []>) {
-			var childrens = new MenuItem [] { };
-			foreach (var item in (List<MenuItem []>)children) for (int i = 0; i < item.Length; i++) {
-					SetChildrensParent (item);
-					Array.Resize (ref childrens, childrens.Length + 1);
-					childrens [childrens.Length - 1] = item [i];
+		if (children is List<MenuItem []> childrenList) {
+			var newChildren = new MenuItem [] { };
+			foreach (var grandChild in childrenList) {
+				foreach (var child in grandChild) {
+					SetParent (grandChild);
+					Array.Resize (ref newChildren, newChildren.Length + 1);
+					newChildren [newChildren.Length - 1] = child;
 				}
-			Children = childrens;
-		} else if (children is MenuItem []) {
-			SetChildrensParent ((MenuItem [])children);
-			Children = (MenuItem [])children;
+
+			}
+			Children = newChildren;
+		} else if (children is MenuItem [] items) {
+			SetParent (items);
+			Children = items;
 		} else Children = null;
 	}
 
-	void SetChildrensParent (MenuItem [] childrens)
+	void SetParent (MenuItem [] children)
 	{
-		foreach (var child in childrens) if (child != null && child.Parent == null) child.Parent = this;
+		foreach (var child in children) {
+			if (child is { Parent: null }) {
+				child.Parent = this;
+			}
+		}
 	}
 
 	/// <summary>
@@ -134,9 +144,9 @@ public class MenuBarItem : MenuItem {
 }
 
 /// <summary>
-///	<para>
-/// Provides a menu bar that spans the top of a <see cref="Toplevel"/> View with drop-down and cascading menus. 
-///	</para>
+/// <para>
+/// Provides a menu bar that spans the top of a <see cref="Toplevel"/> View with drop-down and cascading menus.
+/// </para>
 /// <para>
 /// By default, any sub-sub-menus (sub-menus of the <see cref="MenuItem"/>s added to <see cref="MenuBarItem"/>s) 
 /// are displayed in a cascading manner, where each sub-sub-menu pops out of the sub-menu frame
@@ -146,15 +156,15 @@ public class MenuBarItem : MenuItem {
 /// </para>
 /// </summary>
 /// <remarks>
-///	<para>
-///	The <see cref="MenuBar"/> appears on the first row of the parent <see cref="Toplevel"/> View and uses the full width.
-///	</para>
-///	<para>
-///	The <see cref="MenuBar"/> provides global hotkeys for the application. See <see cref="MenuItem.HotKey"/>.
-///	</para>
-///	<para>
-///	See also: <see cref="ContextMenu"/>
-///	</para>
+/// <para>
+/// The <see cref="MenuBar"/> appears on the first row of the <see cref="Toplevel"/> SuperView and uses the full width.
+/// </para>
+/// <para>
+/// The <see cref="MenuBar"/> provides global hot keys for the application. See <see cref="MenuItem.HotKey"/>.
+/// </para>
+/// <para>
+/// See also: <see cref="ContextMenu"/>
+/// </para>
 /// </remarks>
 public class MenuBar : View {
 	internal int _selected;
@@ -201,11 +211,11 @@ public class MenuBar : View {
 	}
 
 	/// <summary>
-	/// The specifier character for the hotkey to all menus.
+	/// The specifier character for the hot keys.
 	/// </summary>
-	new public static Rune HotKeySpecifier => (Rune)'_';
+	public new static Rune HotKeySpecifier => (Rune)'_';
 
-	private bool _useSubMenusSingleFrame;
+	bool _useSubMenusSingleFrame;
 
 	/// <summary>
 	/// Gets or sets if the sub-menus must be displayed in a single or multiple frames.
@@ -229,8 +239,22 @@ public class MenuBar : View {
 	}
 
 	/// <summary>
-	/// The <see cref="Gui.Key"/> used to activate the menu bar by keyboard.
+	/// The <see cref="Gui.Key"/> used to activate or close the menu bar by keyboard. The default is <see cref="Key.F9"/>.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// The menu bar can also be activated by pressing the <see cref="Key.Alt"/> key. This will highlight the menu bar, but not open any sub-menus.
+	/// </para>
+	/// <para>
+	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
+	/// </para>
+	/// <para>
+	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
+	/// </para>
+	/// <para>
+	/// <see cref="Key.Esc"/> will close the menu bar and any open sub-menus.
+	/// </para>
+	/// </remarks>
 	public Key Key {
 		get => _key;
 		set {
@@ -290,7 +314,6 @@ public class MenuBar : View {
 		AddKeyBinding (Key.CursorLeft, Command.Left);
 		AddKeyBinding (Key.CursorRight, Command.Right);
 		AddKeyBinding (Key.Esc, Command.Cancel);
-		AddKeyBinding (Key.C | Key.CtrlMask, Command.Cancel);
 		AddKeyBinding (Key.CursorDown, Command.Accept);
 		AddKeyBinding (Key.Enter, Command.Accept);
 		AddKeyBinding (this.Key, Command.Select);
@@ -313,6 +336,29 @@ public class MenuBar : View {
 		}
 	}
 
+	#region Keyboard handling
+	Key _key = Key.F9;
+
+	/// <summary>
+	/// Walks through the menu bar items and adds key bindings for each menu item and its sub-menu items.
+	/// Adds key bindings for the menu item's hot key (both alone AND with AltMask) and shortcut, if defined.
+	/// </summary>
+	/// <remarks>
+	/// In OnInvokingKeyBindings we will check if the key pressed matches any of the menu item's hot keys or shortcuts, and
+	/// set set _mbItemToActivate and/or _menuItemToActivate as appropriate. Then, when Command.Select is invoked, we will
+	/// call SelectOrRun().
+	///
+	/// Rules:
+	/// * If the menu bar is not open
+	///   * Any shortcut defined within the menu will be invoked
+	///   * Only hot keys defined for the menu bar items will be invoked, and only if Alt is pressed too.
+	/// * If the menu bar is open
+	///   * Unshifted hot keys defined for the menu bar items will be invoked, only if the menu they belong to is open (the menu bar item's text is visible).
+	///   * Alt-shifted hot keys defined for the menu bar items will be invoked, only if the menu they belong to is open (the menu bar item's text is visible).
+	///   * If there is a visible hot key that duplicates a shortcut (e.g. _File and Alt-F), the hot key wins.
+	/// 
+	/// </remarks>
+	/// <param name="menuBarItem"></param>
 	void AddKeyBindings (MenuBarItem menuBarItem)
 	{
 		if (menuBarItem == null || menuBarItem.Children == null) {
@@ -331,16 +377,26 @@ public class MenuBar : View {
 		}
 	}
 
+	// Set in OnInvokingKeyBindings. -1 means no menu item is selected for activation.
+	int _menuBarItemToActivate;
+	// Set in OnInvokingKeyBindings. null means no sub-menu is selected for activation.
+	MenuItem _menuItemToActivate;
+
+	/// <summary>
+	/// Called when a key bound to Command.Select is pressed. Either activates the menu item or runs it, depending on whether it has a sub-menu.
+	/// If the menu is open, it will close the menu bar.
+	/// </summary>
+	/// <returns></returns>
 	bool SelectOrRun ()
 	{
 		if (!IsInitialized || !Visible) {
 			return true;
 		}
 
-		if (_mbItemToActivate != -1) {
-			Activate (_mbItemToActivate);
+		if (_menuBarItemToActivate != -1) {
+			Activate (_menuBarItemToActivate);
 		} else if (_menuItemToActivate != null && _menuItemToActivate.Action != null) {
-			Run (_menuItemToActivate.Action);
+			Selected (_menuItemToActivate);
 		} else {
 			if (IsMenuOpen) {
 				CloseAllMenus ();
@@ -352,27 +408,6 @@ public class MenuBar : View {
 
 		_openedByHotKey = true;
 		return true;
-	}
-
-	bool _initialCanFocus;
-
-	void MenuBar_Added (object sender, SuperViewChangedEventArgs e)
-	{
-		_initialCanFocus = CanFocus;
-		Added -= MenuBar_Added;
-	}
-
-	bool _openedByAltKey;
-
-	bool _isCleaning;
-
-	///<inheritdoc/>
-	public override bool OnLeave (View view)
-	{
-		if ((!(view is MenuBar) && !(view is Menu) || !(view is MenuBar) && !(view is Menu) && _openMenu != null) && !_isCleaning && !_reopen) {
-			CleanUp ();
-		}
-		return base.OnLeave (view);
 	}
 
 	///<inheritdoc/>
@@ -411,6 +446,178 @@ public class MenuBar : View {
 		}
 		return false;
 	}
+
+	///<inheritdoc/>
+	public override bool OnKeyPressed (KeyEventArgs a)
+	{
+		if (base.OnKeyPressed (a)) {
+			return true;
+		}
+		var key = a.KeyValue;
+		if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
+			char c = Char.ToUpper ((char)key);
+
+			if (_selected == -1 || Menus [_selected].IsTopLevel)
+				return false;
+
+			foreach (var mi in Menus [_selected].Children) {
+				if (mi == null)
+					continue;
+				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
+				if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
+					if (mi.Title [p + 1] == c) {
+						Selected (mi);
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+	public override bool OnInvokeKeyBindings (KeyEventArgs keyEvent)
+	{
+		// This is a bit of a hack. We want to handle the key bindings for menu bar but
+		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
+		// So before we call the base class we set SelectedItem appropriately.
+
+		// Force upper case
+		var key = keyEvent.Key;
+		var mask = key & Key.CharMask;
+		if (mask >= Key.a && mask <= Key.z) {
+			key = (Key)((int)key - 32);
+		}
+
+		if (key == (Key.D1 | Key.AltMask)) {
+
+		}
+		if (ContainsKeyBinding (key)) {
+			_menuBarItemToActivate = -1;
+			_menuItemToActivate = null;
+
+			// Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
+			for (var i = 0; i < Menus.Length; i++) {
+				// Recurse through the menu to find one with the shortcut.
+				if (FindShortcutInChildMenu (key, Menus [i])) {
+					return base.OnInvokeKeyBindings (keyEvent);
+				}
+
+				// Now see if any of the menu bar items have a hot key that matches
+				// Technically this is not possible because menu bar items don't have 
+				// shortcuts or Actions. But it's here for completeness. 
+				var shortcut = Menus [i]?.Shortcut;
+				if (key == shortcut) {
+					throw new InvalidOperationException ("Menu bar items cannot have shortcuts");
+					//_menuBarItemToActivate = -1;
+					//_menuItemToActivate = Menus [i];
+					//return base.OnInvokeKeyBindings (keyEvent);
+				}
+
+			}
+
+			// Search for hot keys next.
+			for (var i = 0; i < Menus.Length; i++) {
+				if (IsMenuOpen) {
+					// Check if any of the submenu items have a hot key that matches
+					if (FindHotKeyInChildMenu (key, Menus [i])) {
+						break;
+					}
+				} 
+
+				// No submenu item matched (or the menu is closed)
+				
+				// Check if one of the menu bar item has a hot key that matches
+				var hotKeyValue = Menus [i]?.HotKey.Value ?? default;
+				var hotKey = (Key)hotKeyValue;
+				if (hotKey != Key.Null) {
+					var matches = key == hotKey || key == (hotKey | Key.AltMask);
+					if (IsMenuOpen) {
+						// If the menu is open, only match if Alt is not pressed.
+						matches = key == hotKey;
+					}
+
+					if (matches) {
+						_menuBarItemToActivate = i;
+						_menuItemToActivate = Menus [i];
+						break;
+					}
+				}
+
+			}
+		}
+		return base.OnInvokeKeyBindings (keyEvent);
+	}
+
+	// Recurse the child menus looking for a shortcut that matches the key
+	bool FindShortcutInChildMenu (Key key, MenuBarItem menuBarItem)
+	{
+		if (menuBarItem?.Children == null) {
+			return false;
+		}
+
+		for (var c = 0; c < menuBarItem.Children.Length; c++) {
+			var menuItem = menuBarItem.Children [c];
+			if (key == menuItem?.Shortcut) {
+				_menuBarItemToActivate = -1;
+				_menuItemToActivate = menuItem;
+				return true;
+			}
+			var subMenu = menuBarItem.SubMenu (menuItem);
+			FindShortcutInChildMenu (key, subMenu);
+		}
+		return false;
+	}
+
+	// Search the menu bar items for a shortcut that matches the key. Do NOT recurse.
+	bool FindHotKeyInChildMenu (Key key, MenuBarItem menuBarItem)
+	{
+		if (menuBarItem?.Children == null) {
+			return false;
+		}
+
+		for (var c = 0; c < menuBarItem.Children.Length; c++) {
+			var menuItem = menuBarItem.Children [c];
+			if (menuItem?.HotKey.Value != null) {
+				var matches = key == ((Key)menuItem?.HotKey.Value);
+				if (!IsMenuOpen) {
+					matches = (key == (Key)menuItem?.HotKey.Value) || (key == ((Key)menuItem?.HotKey.Value | Key.AltMask));
+				}
+				if (matches) {
+					_menuBarItemToActivate = -1;
+					_menuItemToActivate = menuItem;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool _openedByHotKey;
+	#endregion Keyboard handling
+
+	bool _initialCanFocus;
+
+	void MenuBar_Added (object sender, SuperViewChangedEventArgs e)
+	{
+		_initialCanFocus = CanFocus;
+		Added -= MenuBar_Added;
+	}
+
+	bool _openedByAltKey;
+
+	bool _isCleaning;
+
+	///<inheritdoc/>
+	public override bool OnLeave (View view)
+	{
+		if ((!(view is MenuBar) && !(view is Menu) || !(view is MenuBar) && !(view is Menu) && _openMenu != null) && !_isCleaning && !_reopen) {
+			CleanUp ();
+		}
+		return base.OnLeave (view);
+	}
+
 
 	internal void CleanUp ()
 	{
@@ -1014,100 +1221,6 @@ public class MenuBar : View {
 		}
 	}
 
-	bool _openedByHotKey;
-	internal bool FindAndOpenMenuByHotkey (KeyEventArgs a)
-	{
-		//int pos = 0;
-		var c = ((uint)a.Key & (uint)Key.CharMask);
-		for (int i = 0; i < Menus.Length; i++) {
-			// TODO: this code is duplicated, hotkey should be part of the MenuBarItem
-			var mi = Menus [i];
-			int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
-			if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
-				if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
-					ProcessMenu (i, mi);
-					return true;
-				} else if (mi.Children?.Length > 0) {
-					if (FindAndOpenChildrenMenuByHotkey (a, mi.Children)) {
-						return true;
-					}
-				}
-			} else if (mi.Children?.Length > 0) {
-				if (FindAndOpenChildrenMenuByHotkey (a, mi.Children)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	bool FindAndOpenChildrenMenuByHotkey (KeyEventArgs a, MenuItem [] children)
-	{
-		var c = ((uint)a.Key & (uint)Key.CharMask);
-		for (int i = 0; i < children.Length; i++) {
-			var mi = children [i];
-
-			if (mi == null) {
-				continue;
-			}
-
-			int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
-			if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
-				if (Char.ToUpperInvariant ((char)mi.Title [p + 1]) == c) {
-					if (mi.IsEnabled ()) {
-						var action = mi.Action;
-						if (action != null) {
-							Run (action);
-						}
-					}
-					return true;
-				} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
-					if (FindAndOpenChildrenMenuByHotkey (a, menuBarItem.Children)) {
-						return true;
-					}
-				}
-			} else if (mi is MenuBarItem menuBarItem && menuBarItem?.Children.Length > 0) {
-				if (FindAndOpenChildrenMenuByHotkey (a, menuBarItem.Children)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	internal bool FindAndOpenMenuByShortcut (KeyEventArgs a, MenuItem [] children = null)
-	{
-		if (children == null) {
-			children = Menus;
-		}
-
-		var key = a.KeyValue;
-		var keys = a.Key; //ShortcutHelper.GetModifiersKey (a);
-		key |= (int)keys;
-		for (int i = 0; i < children.Length; i++) {
-			var mi = children [i];
-			if (mi == null) {
-				continue;
-			}
-			if ((!(mi is MenuBarItem mbiTopLevel) || mbiTopLevel.IsTopLevel) && mi.Shortcut != Key.Null && mi.Shortcut == (Key)key) {
-				var action = mi.Action;
-				if (action != null) {
-					Application.MainLoop.AddIdle (() => {
-						action ();
-						return false;
-					});
-				}
-				return true;
-			}
-			if (mi is MenuBarItem menuBarItem && menuBarItem.Children != null && !menuBarItem.IsTopLevel && FindAndOpenMenuByShortcut (a, menuBarItem.Children)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	private void ProcessMenu (int i, MenuBarItem mi)
 	{
 		if (_selected < 0 && IsMenuOpen) {
@@ -1133,150 +1246,6 @@ public class MenuBar : View {
 		SetNeedsDisplay ();
 	}
 
-	/////<inheritdoc/>
-	//public override bool OnHotKey (KeyEventArgs a)
-	//{
-	//	if (a.Key == Key) {
-	//		if (Visible && !IsMenuOpen) {
-	//			OpenMenu ();
-	//		} else {
-	//			CloseAllMenus ();
-	//		}
-	//		return true;
-	//	}
-
-	//	a.Key
-	//	// To ncurses simulate a AltMask key pressing Alt+Space because
-	//	// it can't detect an alone special key down was pressed.
-	//	if (a.Key == Key.AltMask && _openMenu == null) {
-	//		OnKeyDown (a);
-	//		OnKeyUp (a);
-	//		return true;
-	//	} else if (((a.Key & Key.AltMask) != 0) || a.IsAlt && !a.IsCtrl && !a.IsShift) {
-	//		// BUGBUG: Note the test for BOTH AltMask and a.IsAlt above. This is because the
-	//		// unit test Separators_Does_Not_Throws_Pressing_Menu_Shortcut calls
-	//		// menu.OnHotKey(new KeyEventArgs (Key.AltMask | Key.Q))) which does not
-	//		// cause a.IsAlt to be set.
-	//		if (FindAndOpenMenuByHotkey (a)) {
-	//			return true;
-	//		}
-	//	}
-	//	//var kc = a.KeyValue;
-
-	//	return base.OnHotKey (a);
-	//}
-
-	///<inheritdoc/>
-	public override bool OnKeyPressed (KeyEventArgs a)
-	{
-		if (base.OnKeyPressed (a)) {
-			return true;
-		}
-		var key = a.KeyValue;
-		if ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
-			char c = Char.ToUpper ((char)key);
-
-			if (_selected == -1 || Menus [_selected].IsTopLevel)
-				return false;
-
-			foreach (var mi in Menus [_selected].Children) {
-				if (mi == null)
-					continue;
-				int p = mi.Title.IndexOf (MenuBar.HotKeySpecifier.ToString ());
-				if (p != -1 && p + 1 < mi.Title.GetRuneCount ()) {
-					if (mi.Title [p + 1] == c) {
-						Selected (mi);
-						return true;
-					}
-				}
-			}
-		}
-
-		return false;
-	}
-
-	int _mbItemToActivate;
-	MenuItem _menuItemToActivate;
-
-	/// <inheritdoc/>
-	public override bool OnInvokeKeyBindings (KeyEventArgs keyEvent)
-	{
-		// This is a bit of a hack. We want to handle the key bindings for menu bar but
-		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
-		// So before we call the base class we set SelectedItem appropriately.
-
-		// Force upper case
-		var key = keyEvent.Key;
-		var mask = key & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
-			key = (Key)((int)key - 32);
-		}
-
-		if (key == (Key.D1 | Key.AltMask)) {
-
-		}
-		if (ContainsKeyBinding (key)) {
-			_mbItemToActivate = -1;
-			_menuItemToActivate = null;
-			// Search  
-			for (var i = 0; i < Menus.Length; i++) {
-				var hotKeyValue = Menus [i]?.HotKey.Value;
-				if (hotKeyValue != null) {
-					var matches = key == ((Key)Menus [i].HotKey.Value);
-					if (!IsMenuOpen) {
-						matches = (key == (Key)Menus [i].HotKey.Value) || (key == ((Key)Menus [i].HotKey.Value | Key.AltMask));
-					}
-
-					if (matches) {
-						_mbItemToActivate = i;
-						_menuItemToActivate = Menus [i];
-						break;
-					}
-				}
-				var shortcut = Menus [i]?.Shortcut;
-				if (key == shortcut) {
-					_mbItemToActivate = -1;
-					_menuItemToActivate = Menus [i];
-					break;
-				}
-				if (FindShortcutInChildMenu (key, Menus [i])) {
-					break;
-				}
-			}
-		}
-		return base.OnInvokeKeyBindings (keyEvent);
-	}
-
-	bool FindShortcutInChildMenu (Key key, MenuBarItem menuBarItem)
-	{
-		if (menuBarItem?.Children == null) {
-			return false;
-		}
-		
-		for (var c = 0; c < menuBarItem.Children.Length; c++) {
-			var menuItem = menuBarItem.Children [c];
-			if (menuItem?.HotKey.Value != null) {
-				var matches = key == ((Key)menuItem?.HotKey.Value);
-				if (!IsMenuOpen) {
-					matches = (key == (Key)menuItem?.HotKey.Value) || (key == ((Key)menuItem?.HotKey.Value | Key.AltMask));
-				}
-
-				if (matches) {
-					_mbItemToActivate = -1;
-					_menuItemToActivate = menuItem;
-					return true;
-				}
-			}
-			if (key == menuItem?.Shortcut) {
-				_mbItemToActivate = -1;
-				_menuItemToActivate = menuItem;
-				return true;
-			}
-			var subMenu = menuBarItem.SubMenu (menuItem);
-			FindShortcutInChildMenu (key, subMenu);
-		}
-		return false;
-	}
 
 	void CloseMenuBar ()
 	{
@@ -1307,12 +1276,7 @@ public class MenuBar : View {
 		SetNeedsDisplay ();
 	}
 
-	/////<inheritdoc/>
-	//public override bool OnColdKey (KeyEventArgs a)
-	//{
-	//	return FindAndOpenMenuByShortcut (a);
-	//}
-
+	#region Mouse Handling
 	///<inheritdoc/>
 	public override bool MouseEvent (MouseEvent me)
 	{
@@ -1378,7 +1342,6 @@ public class MenuBar : View {
 
 	internal bool _handled;
 	internal bool _isContextMenuLoading;
-	Key _key = Key.F9;
 
 	internal bool HandleGrabView (MouseEvent me, View current)
 	{
@@ -1473,6 +1436,7 @@ public class MenuBar : View {
 
 		return hostView != hostGrabView ? hostGrabView : null;
 	}
+	#endregion Mouse Handling
 
 	///<inheritdoc/>
 	public override bool OnEnter (View view)
