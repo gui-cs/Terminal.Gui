@@ -268,12 +268,10 @@ namespace Terminal.Gui {
 			}
 
 			SetFocus ();
-			if (me.X < GetFramesThickness ().Left || me.Y < GetFramesThickness ().Top || me.X > Bounds.Width || me.Y > Bounds.Height) {
+			if (me.X > Bounds.Width || me.Y > Bounds.Height) {
 				return true;
 			}
-			//var x = Math.Max (GetFramesThickness().Left, me.X);
-			//var y = Math.Max (GetFramesThickness ().Top, me.Y);
-			Cursor = new Point ((me.X - GetFramesThickness ().Left) / _boxWidth, (me.Y - GetFramesThickness ().Top) / _boxHeight);
+			Cursor = new Point ((me.X ) / _boxWidth, (me.Y) / _boxHeight);
 
 			return true;
 		}

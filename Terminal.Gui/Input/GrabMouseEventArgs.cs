@@ -2,7 +2,7 @@
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Args for events that relate to specific <see cref="Application.MouseGrabView"/>
+	/// Args <see cref="Application.GrabMouse"/> related events.
 	/// </summary>
 	public class GrabMouseEventArgs : EventArgs {
 
@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The view that the event is about.
+		/// Gets the view that grabbed the mouse.
 		/// </summary>
 		public View View { get; }
 

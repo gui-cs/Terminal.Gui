@@ -105,6 +105,19 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
+		/// Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside of
+		/// the rectangle described by <see cref="GetInside(Rect)"/>.
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
+		public bool Contains (Rect outside, int x, int y)
+		{
+			var inside = GetInside (outside);
+			return outside.Contains (x, y) && !inside.Contains (x, y);
+		}
+
+		/// <summary>
 		/// Returns a rectangle describing the location and size of the inside area of <paramref name="rect"/>
 		/// with the thickness widths subtracted. The height and width of the returned rectangle will
 		/// never be less than 0.

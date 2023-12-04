@@ -1,21 +1,27 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewsTests {
 	public class OverlappedTests {
-		public OverlappedTests ()
+		readonly ITestOutputHelper output;
+
+		public OverlappedTests (ITestOutputHelper output)
 		{
+			this.output = output;
 #if DEBUG_IDISPOSABLE
 			Responder.Instances.Clear ();
 			RunState.Instances.Clear ();
+			this.output = output;
+
 #endif
 		}
 
@@ -673,6 +679,69 @@ namespace Terminal.Gui.ViewsTests {
 		public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter ()
 		{
 			Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void Visible_False_Does_Not_Clear ()
+		{
+			var overlapped = new Overlapped ();
+			var win1 = new Window () { Width = 5, Height = 5, Visible = false };
+			var win2 = new Window () { X = 1, Y = 1, Width = 5, Height = 5 };
+			((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+			var rs = Application.Begin (overlapped);
+			Application.Begin (win1);
+			Application.Begin (win2);
+			Assert.Equal (win2, Application.Current);
+			var firstIteration = false;
+			Application.RunIteration (ref rs, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ ┌───┐
+ │   │
+ │   │
+ │   │
+ └───┘", output);
+			var attributes = new Attribute [] {
+				// 0
+				Colors.TopLevel.Normal,
+				// 1
+				Colors.Base.Normal
+			};
+			TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0111110000
+0111110000
+0111110000
+0111110000
+0111110000
+0000000000
+0000000000
+0000000000
+0000000000", null, attributes);
+
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }));
+			Assert.Equal (win2, Application.MouseGrabView);
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
+			Application.RunIteration (ref rs, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌───┐
+  │   │
+  │   │
+  │   │
+  └───┘", output);
+			TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0000000000
+0011111000
+0011111000
+0011111000
+0011111000
+0011111000
+0000000000
+0000000000
+0000000000", null, attributes);
+
+			Application.Shutdown ();
 		}
 	}
 }

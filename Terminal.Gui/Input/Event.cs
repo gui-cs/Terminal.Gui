@@ -770,45 +770,58 @@ namespace Terminal.Gui {
 
 	/// <summary>
 	/// Low-level construct that conveys the details of mouse events, such
-	/// as coordinates and button state, from ConsoleDrivers up to <see cref="Application"/> and
+	/// as coordinates and button state, from ConsoleDrivers up to <see cref="Application"/> and then to
 	/// Views.
 	/// </summary>
-	/// <remarks>The <see cref="Application"/> class includes the <see cref="Application.MouseEvent"/>
-	/// Action which takes a MouseEvent argument.</remarks>
+	/// <remarks>See <see cref="Application.OnMouseEvent(MouseEventEventArgs)"/> and <see cref="Responder.OnMouseEnter(MouseEvent)"/>.</remarks>
 	public class MouseEvent {
 		/// <summary>
-		/// The X (column) location for the mouse event.
+		/// The X (column) location for the mouse event relative to <see cref="View.Bounds"/>.
 		/// </summary>
 		public int X { get; set; }
 
 		/// <summary>
-		/// The Y (column) location for the mouse event.
+		/// The Y (column) location for the mouse event relative to <see cref="View.Bounds"/>.
 		/// </summary>
 		public int Y { get; set; }
 
 		/// <summary>
-		/// Flags indicating the kind of mouse event that is being posted.
+		/// Gets or sets the flags that indicate the kind of mouse event that is being posted.
 		/// </summary>
 		public MouseFlags Flags { get; set; }
 
 		/// <summary>
-		/// The offset X (column) location for the mouse event.
+		/// Provides the X (column) mouse position offset from the grabbed view (see <see cref="Application.GrabMouse"/>.
 		/// </summary>
+		/// <remarks>
+		/// Calculated and processed in <see cref="Application.OnMouseEvent(MouseEventEventArgs)"/>.
+		/// Whichever view that has called <see cref="Application.GrabMouse"/>, will receive all the mouse event
+		/// with <see cref="View.Bounds"/> relative coordinates. The <see cref="OfX"/> and <see cref="OfY"/> provide
+		/// the screen-relative offset of these coordinates.
+		/// Using these properties, the view that has grabbed the mouse will know how much the mouse has moved.
+		/// </remarks>
 		public int OfX { get; set; }
 
 		/// <summary>
-		/// The offset Y (column) location for the mouse event.
+		/// Provides the Y (row) mouse position offset from the grabbed view (see <see cref="Application.GrabMouse"/>.
 		/// </summary>
+		/// <remarks>
+		/// Calculated and processed in <see cref="Application.OnMouseEvent(MouseEventEventArgs)"/>.
+		/// Whichever view that has called <see cref="Application.GrabMouse"/>, will receive all the mouse event
+		/// with <see cref="View.Bounds"/> relative coordinates. The <see cref="OfX"/> and <see cref="OfY"/> provide
+		/// the screen-relative offset of these coordinates.
+		/// Using these properties, the view that has grabbed the mouse will know how much the mouse has moved.
+		/// </remarks>
 		public int OfY { get; set; }
 
 		/// <summary>
-		/// The current view at the location for the mouse event.
+		/// Gets or sets the view that should process the mouse event.
 		/// </summary>
 		public View View { get; set; }
 
 		/// <summary>
-		/// Indicates if the current mouse event has already been processed and the driver should stop notifying any other event subscriber.
-		/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
+		/// Indicates if the mouse event has been handled by a view and other subscribers should ignore the event.
+		/// IMPORTANT: Set this value to <see langword="true"/> when updating any View's layout from inside the subscriber method.
 		/// </summary>
 		public bool Handled { get; set; }
 

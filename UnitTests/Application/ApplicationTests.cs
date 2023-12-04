@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -12,8 +13,11 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests {
-	public ApplicationTests ()
+	readonly ITestOutputHelper output;
+
+	public ApplicationTests (ITestOutputHelper output)
 	{
+		this.output = output;
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -414,6 +418,109 @@ public class ApplicationTests {
 		Application.Run ();
 		Application.Shutdown ();
 		Assert.Equal (3, count);
+	}
+
+	[Fact]
+	public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
+	{
+		Init ();
+		var count = 0;
+		Dialog d = null;
+		var top = Application.Top;
+		top.DrawContent += (s, a) => count++;
+		var iteration = -1;
+		Application.Iteration += (s, a) => {
+			iteration++;
+			if (iteration == 0) {
+				d = new Dialog ();
+				d.DrawContent += (s, a) => count++;
+				Application.Run (d);
+			} else if (iteration < 3) {
+				Application.OnMouseEvent (new (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }));
+				Assert.False (top.NeedsDisplay);
+				Assert.False (top.SubViewNeedsDisplay);
+				Assert.False (top.LayoutNeeded);
+				Assert.False (d.NeedsDisplay);
+				Assert.False (d.SubViewNeedsDisplay);
+				Assert.False (d.LayoutNeeded);
+			} else {
+				Application.RequestStop ();
+			}
+		};
+		Application.Run ();
+		Application.Shutdown ();
+		// 1 - First top load, 1 - Dialog load, 1 - Dialog unload, Total - 3.
+		Assert.Equal (3, count);
+	}
+
+	[Fact]
+	public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
+	{
+		Init ();
+		var d = new Dialog () { Width = 5, Height = 5 };
+		((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+		var rs = Application.Begin (d);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌───┐
+  │   │
+  │   │
+  │   │
+  └───┘", output);
+
+		var attributes = new Attribute [] {
+			// 0
+			new Attribute (ColorName.White, ColorName.Black),
+			// 1
+			Colors.Dialog.Normal
+		};
+		TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0000000000
+0011111000
+0011111000
+0011111000
+0011111000
+0011111000
+0000000000
+0000000000
+0000000000
+", null, attributes);
+
+		// TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
+		// TODO: Move the mouse grap/drag mode from Toplevel to Border.
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed }));
+		Assert.Equal (d, Application.MouseGrabView);
+
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+ ┌───┐
+ │   │
+ │   │
+ │   │
+ └───┘", output);
+
+		attributes = new Attribute [] {
+			// 0
+			new Attribute (ColorName.White, ColorName.Black),
+			// 1
+			Colors.Dialog.Normal
+		};
+		TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0111110000
+0111110000
+0111110000
+0111110000
+0111110000
+0000000000
+0000000000
+0000000000
+0000000000
+", null, attributes);
+
+		Application.End (rs);
+		Application.Shutdown ();
 	}
 
 	// TODO: Add tests for Run that test errorHandler
@@ -873,142 +980,4 @@ public class ApplicationTests {
 		Assert.Equal (1, actionCalled);
 		Application.Shutdown ();
 	}
-
-
-	#region mousegrabtests
-	[Fact, AutoInitShutdown]
-	public void MouseGrabView_WithNullMouseEventView ()
-	{
-		var tf = new TextField () { Width = 10 };
-		var sv = new ScrollView () {
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			ContentSize = new Size (100, 100)
-		};
-
-		sv.Add (tf);
-		Application.Top.Add (sv);
-
-		var iterations = -1;
-
-		Application.Iteration += (s, a) => {
-			iterations++;
-			if (iterations == 0) {
-				Assert.True (tf.HasFocus);
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 5,
-					Y = 5,
-					Flags = MouseFlags.ReportMousePosition
-				}));
-
-				Assert.Equal (sv, Application.MouseGrabView);
-
-				MessageBox.Query ("Title", "Test", "Ok");
-
-				Assert.Null (Application.MouseGrabView);
-			} else if (iterations == 1) {
-				// Application.MouseGrabView is null because
-				// another toplevel (Dialog) was opened
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 5,
-					Y = 5,
-					Flags = MouseFlags.ReportMousePosition
-				}));
-
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 40,
-					Y = 12,
-					Flags = MouseFlags.ReportMousePosition
-				}));
-
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 0,
-					Y = 0,
-					Flags = MouseFlags.Button1Pressed
-				}));
-
-				Assert.Null (Application.MouseGrabView);
-
-				Application.RequestStop ();
-			} else if (iterations == 2) {
-				Assert.Null (Application.MouseGrabView);
-
-				Application.RequestStop ();
-			}
-		};
-
-		Application.Run ();
-	}
-
-	[Fact, AutoInitShutdown]
-	public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
-	{
-		View grabView = null;
-		var count = 0;
-
-		var view1 = new View ();
-		var view2 = new View ();
-
-		Application.GrabbedMouse += Application_GrabbedMouse;
-		Application.UnGrabbedMouse += Application_UnGrabbedMouse;
-
-		Application.GrabMouse (view1);
-		Assert.Equal (0, count);
-		Assert.Equal (grabView, view1);
-		Assert.Equal (view1, Application.MouseGrabView);
-
-		Application.UngrabMouse ();
-		Assert.Equal (1, count);
-		Assert.Equal (grabView, view1);
-		Assert.Null (Application.MouseGrabView);
-
-		Application.GrabbedMouse += Application_GrabbedMouse;
-		Application.UnGrabbedMouse += Application_UnGrabbedMouse;
-
-		Application.GrabMouse (view2);
-		Assert.Equal (1, count);
-		Assert.Equal (grabView, view2);
-		Assert.Equal (view2, Application.MouseGrabView);
-
-		Application.UngrabMouse ();
-		Assert.Equal (2, count);
-		Assert.Equal (grabView, view2);
-		Assert.Null (Application.MouseGrabView);
-
-		void Application_GrabbedMouse (object sender, ViewEventArgs e)
-		{
-			if (count == 0) {
-				Assert.Equal (view1, e.View);
-				grabView = view1;
-			} else {
-				Assert.Equal (view2, e.View);
-				grabView = view2;
-			}
-
-			Application.GrabbedMouse -= Application_GrabbedMouse;
-		}
-
-		void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
-		{
-			if (count == 0) {
-				Assert.Equal (view1, e.View);
-				Assert.Equal (grabView, e.View);
-			} else {
-				Assert.Equal (view2, e.View);
-				Assert.Equal (grabView, e.View);
-			}
-			count++;
-
-			Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
-		}
-	}
-	#endregion
 }

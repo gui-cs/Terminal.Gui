@@ -1,0 +1,4 @@
+<div class="footer">
+  {{{_appFooter}}}
+  {{^_appFooter}}<strong><a href='https://dotnet.github.io/docfx/'>DocFX</a> + <a href='https://www.singulink.com'>Singulink</a> = ♥</strong>{{/_appFooter}}
+</div>

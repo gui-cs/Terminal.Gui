@@ -495,7 +495,7 @@ namespace Terminal.Gui {
 		protected override void Dispose (bool disposing)
 		{
 			LineCanvas.Dispose ();
-			
+
 			Margin?.Dispose ();
 			Margin = null;
 			Border?.Dispose ();
@@ -513,8 +513,9 @@ namespace Terminal.Gui {
 				Remove (subview);
 				subview.Dispose ();
 			}
-			
+
 			base.Dispose (disposing);
+			System.Diagnostics.Debug.Assert (InternalSubviews.Count == 0);
 		}
 	}
 }
