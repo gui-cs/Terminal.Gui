@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 

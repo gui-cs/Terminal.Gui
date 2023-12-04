@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 using Rune = System.Text.Rune;
 
 namespace Terminal.Gui;

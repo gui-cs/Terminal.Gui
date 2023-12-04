@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using Terminal.Gui.ConsoleDrivers;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "VkeyPacketSimulator", Description: "Simulates the Virtual Key Packet")]

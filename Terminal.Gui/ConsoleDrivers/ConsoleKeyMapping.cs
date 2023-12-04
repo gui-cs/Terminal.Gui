@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.ConsoleDrivers;
 /// <summary>
 /// Helper class to handle the scan code and virtual key from a <see cref="ConsoleKey"/>.
 /// </summary>
@@ -24,10 +24,10 @@ public static class ConsoleKeyMapping {
 
 		public bool Equals (ScanCodeMapping other)
 		{
-			return (this.ScanCode.Equals (other.ScanCode) &&
-				this.VirtualKey.Equals (other.VirtualKey) &&
-				this.Modifiers.Equals (other.Modifiers) &&
-				this.UnicodeChar.Equals (other.UnicodeChar));
+			return ScanCode.Equals (other.ScanCode) &&
+				VirtualKey.Equals (other.VirtualKey) &&
+				Modifiers.Equals (other.Modifiers) &&
+				UnicodeChar.Equals (other.UnicodeChar);
 		}
 	}
 
@@ -36,14 +36,11 @@ public static class ConsoleKeyMapping {
 		if (modifiers.HasFlag (ConsoleModifiers.Shift) &&
 			!modifiers.HasFlag (ConsoleModifiers.Alt) &&
 			!modifiers.HasFlag (ConsoleModifiers.Control)) {
-
 			return ConsoleModifiers.Shift;
 		} else if (modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control)) {
 			return modifiers;
-		} else if ((!isConsoleKey || (isConsoleKey && (modifiers.HasFlag (ConsoleModifiers.Shift) ||
-			modifiers.HasFlag (ConsoleModifiers.Alt) || modifiers.HasFlag (ConsoleModifiers.Control)))) &&
-			unicodeChar >= 65 && unicodeChar <= 90) {
-
+		} else if ((!isConsoleKey || isConsoleKey && (modifiers.HasFlag (ConsoleModifiers.Shift) || 
+			modifiers.HasFlag (ConsoleModifiers.Alt) || modifiers.HasFlag (ConsoleModifiers.Control))) &&  unicodeChar >= 65 && unicodeChar <= 90) {
 			return ConsoleModifiers.Shift;
 		}
 		return 0;
@@ -76,7 +73,7 @@ public static class ConsoleKeyMapping {
 	/// <returns></returns>
 	public static ConsoleKey GetConsoleKeyFromKey (Key key)
 	{
-		ConsoleModifiers mod = new ConsoleModifiers ();
+		var mod = new ConsoleModifiers ();
 		if (key.HasFlag (Key.ShiftMask)) {
 			mod |= ConsoleModifiers.Shift;
 		}
@@ -86,7 +83,7 @@ public static class ConsoleKeyMapping {
 		if (key.HasFlag (Key.CtrlMask)) {
 			mod |= ConsoleModifiers.Control;
 		}
-		return (ConsoleKey)ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask), mod, out _, out _);
+		return (ConsoleKey)GetConsoleKeyFromKey ((uint)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask), mod, out _, out _);
 	}
 
 	/// <summary>
@@ -101,9 +98,7 @@ public static class ConsoleKeyMapping {
 	{
 		scanCode = 0;
 		outputChar = keyValue;
-		if (keyValue == 0) {
-			return 0;
-		}
+		if (keyValue == 0) 			return 0;
 
 		uint consoleKey = MapKeyToConsoleKey (keyValue, out bool mappable);
 		if (mappable) {
@@ -114,7 +109,7 @@ public static class ConsoleKeyMapping {
 				scanCode = scode.ScanCode;
 				outputChar = scode.UnicodeChar;
 			} else {
-				consoleKey = consoleKey < 0xff ? (uint)(consoleKey & 0xff | 0xff << 8) : consoleKey;
+				consoleKey = consoleKey < 0xff ? consoleKey & 0xff | 0xff << 8 : consoleKey;
 			}
 		} else {
 			var mod = GetModifiers (keyValue, modifiers, false);
@@ -362,13 +357,16 @@ public static class ConsoleKeyMapping {
 	/// <returns>The <see cref="Key"/> with <see cref="ConsoleModifiers"/> or the <paramref name="key"/></returns>
 	public static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
 	{
-		Key keyMod = new Key ();
-		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+		var keyMod = new Key ();
+		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
 			keyMod = Key.ShiftMask;
-		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0)
+		}
+		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
 			keyMod |= Key.CtrlMask;
-		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
+		}
+		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
 			keyMod |= Key.AltMask;
+		}
 
 		return keyMod != Key.Null ? keyMod | key : key;
 	}
@@ -556,4 +554,25 @@ public static class ConsoleKeyMapping {
 		new ScanCodeMapping (88,123,0,0),	// F12
 		new ScanCodeMapping (88,123,ConsoleModifiers.Shift,0)
 	};
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="consoleKeyInfo"></param>
+	/// <returns></returns>
+	public static ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+	{
+		if (consoleKeyInfo.Key != ConsoleKey.Packet) {
+			return consoleKeyInfo;
+		}
+
+		var mod = consoleKeyInfo.Modifiers;
+		var shift = (mod & ConsoleModifiers.Shift) != 0;
+		var alt = (mod & ConsoleModifiers.Alt) != 0;
+		var control = (mod & ConsoleModifiers.Control) != 0;
+
+		var keyChar = GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
+
+		return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
+	}
 }

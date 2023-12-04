@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 using Unix.Terminal;
 
 namespace Terminal.Gui;

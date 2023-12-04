@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Terminal.Gui;
+using Terminal.Gui.ConsoleDrivers;
 using Xunit;
 using Xunit.Abstractions;
 

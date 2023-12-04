@@ -119,7 +119,7 @@ public class KeyEventArgs : EventArgs {
 		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
 
 		// Handle special cases and modifiers on their own
-		if (baseKey != Key.Null && hasModifiers) {
+		if (baseKey != Key.Null || hasModifiers) {
 			// Append the actual key name
 			sb.Append (GetKeyString (baseKey));
 		}

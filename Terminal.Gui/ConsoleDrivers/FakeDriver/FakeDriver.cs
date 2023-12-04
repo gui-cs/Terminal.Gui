@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -199,59 +200,44 @@ public class FakeDriver : ConsoleDriver {
 
 	#endregion
 
-	public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
-	{
-		if (consoleKeyInfo.Key != ConsoleKey.Packet) {
-			return consoleKeyInfo;
-		}
-
-		var mod = consoleKeyInfo.Modifiers;
-		var shift = (mod & ConsoleModifiers.Shift) != 0;
-		var alt = (mod & ConsoleModifiers.Alt) != 0;
-		var control = (mod & ConsoleModifiers.Control) != 0;
-
-		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
-
-		return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
-	}
 
 	Key MapKey (ConsoleKeyInfo keyInfo)
 	{
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return MapKeyModifiers (keyInfo, Key.Esc);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Esc);
 		case ConsoleKey.Tab:
-			return MapKeyModifiers (keyInfo, Key.Tab);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Tab);
 		case ConsoleKey.Clear:
-			return MapKeyModifiers (keyInfo, Key.Clear);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Clear);
 		case ConsoleKey.Home:
-			return MapKeyModifiers (keyInfo, Key.Home);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Home);
 		case ConsoleKey.End:
-			return MapKeyModifiers (keyInfo, Key.End);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.End);
 		case ConsoleKey.LeftArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorLeft);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorRight);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorRight);
 		case ConsoleKey.UpArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorUp);
 		case ConsoleKey.DownArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorDown);
 		case ConsoleKey.PageUp:
-			return MapKeyModifiers (keyInfo, Key.PageUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PageUp);
 		case ConsoleKey.PageDown:
-			return MapKeyModifiers (keyInfo, Key.PageDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PageDown);
 		case ConsoleKey.Enter:
-			return MapKeyModifiers (keyInfo, Key.Enter);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Enter);
 		case ConsoleKey.Spacebar:
-			return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return MapKeyModifiers (keyInfo, Key.Backspace);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Backspace);
 		case ConsoleKey.Delete:
-			return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.DeleteChar);
 		case ConsoleKey.Insert:
-			return MapKeyModifiers (keyInfo, Key.InsertChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.InsertChar);
 		case ConsoleKey.PrintScreen:
-			return MapKeyModifiers (keyInfo, Key.PrintScreen);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PrintScreen);
 
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
@@ -270,45 +256,21 @@ public class FakeDriver : ConsoleDriver {
 				return Key.Unknown;
 			}
 
-			return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 		}
 		
-		return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+		return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 	}
-
-	private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
-	{
-		Key keyMod = new Key ();
-		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
-			keyMod = Key.ShiftMask;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
-			keyMod |= Key.CtrlMask;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
-			keyMod |= Key.AltMask;
-		}
-
-		return keyMod != Key.Null ? keyMod | key : key;
-	}
-
+	
 	private CursorVisibility _savedCursorVisibility;
 
 	void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
 	{
 		if (consoleKeyInfo.Key == ConsoleKey.Packet) {
-			consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
+			consoleKeyInfo = ConsoleKeyMapping.FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 		}
 
 		var map = MapKey (consoleKeyInfo);
-		//if (map == (Key)0xffffffff) {
-		//	if ((consoleKeyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-		//		OnKeyDown(new KeyEventArgs (map));
-		//		OnKeyUp (new KeyEventArgs (map));
-		//	}
-		//	return;
-		//}
-
 		OnKeyDown (new KeyEventArgs (map));
 		OnKeyPressed (new KeyEventArgs (map));
 		OnKeyUp (new KeyEventArgs (map));
