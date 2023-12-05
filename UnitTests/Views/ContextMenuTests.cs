@@ -539,8 +539,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.False (menu.OnKeyDown (new (Key.AltMask)));
-			Assert.True (menu.OnKeyUp (new (Key.AltMask)));
+			Assert.True (menu.ProcessKeyPressed (new (Key.AltMask)));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
