@@ -373,13 +373,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			switch (keyEvent.Key) {
-			case Key.AltMask:
-			case Key.AltMask | Key.Space:
-			case Key.CtrlMask | Key.Space:
-			case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
-				return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
-			}
+			//switch (keyEvent.Key) {
+			//case Key.AltMask:
+			//case Key.AltMask | Key.Space:
+			//case Key.CtrlMask | Key.Space:
+			//case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
+			//	return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
+			//}
 
 			return false;
 		}
@@ -391,15 +391,15 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			switch (keyEvent.Key) {
-			case Key.AltMask:
-			case Key.AltMask | Key.Space:
-			case Key.CtrlMask | Key.Space:
-				if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
-					return true;
-				}
-				break;
-			}
+			//switch (keyEvent.Key) {
+			//case Key.AltMask:
+			//case Key.AltMask | Key.Space:
+			//case Key.CtrlMask | Key.Space:
+			//	if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
+			//		return true;
+			//	}
+			//	break;
+			//}
 
 			return false;
 		}

@@ -446,16 +446,8 @@ public class MenuBar : View {
 		// So before we call the base class we set SelectedItem appropriately.
 		// TODO: Figure out if there's a way to have KeyBindings pass context instead. Maybe a KeyBindingContext property?
 
-		// Force upper case
 		var key = keyEvent.Key;
-		var mask = key & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
-			key = (Key)((int)key - 32);
-		}
 
-		if (key == (Key.D1 | Key.AltMask)) {
-
-		}
 		if (ContainsKeyBinding (key)) {
 			_menuBarItemToActivate = -1;
 			_menuItemToSelect = null;

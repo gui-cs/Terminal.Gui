@@ -456,12 +456,7 @@ class Menu : View {
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
 		// So before we call the base class we set SelectedItem appropriately.
 
-		// Force upper case
 		var key = keyEvent.Key;
-		var mask = key & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
-			key = (Key)((int)key - 32);
-		}
 
 		if (ContainsKeyBinding (key)) {
 			_menuBarItemToActivate = -1;

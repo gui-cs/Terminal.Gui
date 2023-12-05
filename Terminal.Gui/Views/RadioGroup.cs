@@ -195,10 +195,6 @@ public class RadioGroup : View {
 		
 		// Force upper case
 		var key = keyEvent.Key;
-		var mask = key & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
-			key = (Key)((int)key - 32);
-		}
 		if (ContainsKeyBinding (key)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {

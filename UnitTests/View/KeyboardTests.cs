@@ -29,7 +29,7 @@ namespace Terminal.Gui.ViewTests {
 			text.KeyPressed += (s, e) => {
 				e.Handled = true;
 				Assert.True (e.Handled);
-				Assert.Equal (Key.N, e.Key);
+				Assert.Equal ((Key)'n', e.Key);
 			};
 			top.Add (text);
 
@@ -56,21 +56,21 @@ namespace Terminal.Gui.ViewTests {
 
 			var view = new DerivedView ();
 			view.KeyDown += (s, e) => {
-				Assert.Equal (Key.a, e.Key);
+				Assert.Equal ((Key)'a', e.Key);
 				Assert.False (keyDown);
 				Assert.False (view.IsKeyDown);
 				e.Handled = true;
 				keyDown = true;
 			};
 			view.KeyPressed += (s, e) => {
-				Assert.Equal (Key.a, e.Key);
+				Assert.Equal ((Key)'a', e.Key);
 				Assert.False (keyPress);
 				Assert.False (view.IsKeyPress);
 				e.Handled = true;
 				keyPress = true;
 			};
 			view.KeyUp += (s, e) => {
-				Assert.Equal (Key.a, e.Key);
+				Assert.Equal ((Key)'a', e.Key);
 				Assert.False (keyUp);
 				Assert.False (view.IsKeyUp);
 				e.Handled = true;

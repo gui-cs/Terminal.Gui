@@ -129,8 +129,8 @@ public class Button : View {
 		//}
 		AddKeyBinding (Key.Space, Command.Accept);
 		if (HotKey != Key.Null) {
-			AddKeyBinding (Key.Space | HotKey, Command.Accept);
-			AddKeyBinding (Key.Space | HotKey | Key.AltMask, Command.Accept);
+			AddKeyBinding (HotKey, Command.Accept);
+			AddKeyBinding (HotKey | Key.AltMask, Command.Accept);
 		}
 	}
 
@@ -140,25 +140,18 @@ public class Button : View {
 		set {
 			var prev = base.HotKey;
 			if (prev != value) {
-
 				var v = value == Key.Unknown ? Key.Null : value;
-				// Force upper case
-				var mask = v & Key.CharMask;
-				if (mask >= Key.a && mask <= Key.z) {
-					v = (Key)((int)v - 32);
-				}
-
 				base.HotKey = TextFormatter.HotKey = v;
 
 				// Also add Alt+HotKey
-				if (prev != Key.Null && ContainsKeyBinding (Key.Space | prev | Key.AltMask)) {
+				if (prev != Key.Null && ContainsKeyBinding (prev | Key.AltMask)) {
 					if (v == Key.Null) {
-						ClearKeyBinding (Key.Space | prev | Key.AltMask);
+						ClearKeyBinding (prev | Key.AltMask);
 					} else {
-						ReplaceKeyBinding (Key.Space | prev | Key.AltMask, Key.Space | v | Key.AltMask);
+						ReplaceKeyBinding (prev | Key.AltMask, v | Key.AltMask);
 					}
 				} else if (v != Key.Null) {
-					AddKeyBinding (Key.Space | v | Key.AltMask, Command.Accept);
+					AddKeyBinding (v | Key.AltMask, Command.Accept);
 				}
 			}
 		}

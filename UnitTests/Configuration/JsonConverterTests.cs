@@ -251,9 +251,9 @@ namespace Terminal.Gui.ConfigurationTests {
 	public class KeyJsonConverterTests {
 		[Theory, AutoInitShutdown]
 		[InlineData (Key.A, "A")]
-		[InlineData (Key.a | Key.ShiftMask, "a, ShiftMask")]
+		[InlineData (Key.A | Key.ShiftMask, "A, ShiftMask")]
 		[InlineData (Key.A | Key.CtrlMask, "A, CtrlMask")]
-		[InlineData (Key.a | Key.AltMask | Key.CtrlMask, "a, CtrlMask, AltMask")]
+		[InlineData (Key.A | Key.AltMask | Key.CtrlMask, "A, CtrlMask, AltMask")]
 		[InlineData (Key.Delete | Key.AltMask | Key.CtrlMask, "Delete, CtrlMask, AltMask")]
 		[InlineData (Key.D4, "D4")]
 		[InlineData (Key.Esc, "Esc")]

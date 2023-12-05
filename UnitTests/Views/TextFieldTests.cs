@@ -1260,13 +1260,13 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("a", tf.Text);
 
 			// SuppressKey suppresses the 'j' key
-			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
+			Application.Driver.SendKeys ('j', ConsoleKey.J, false, false, false);
 			Assert.Equal ("a", tf.Text);
-
+			
 			Application.KeyPressed -= SuppressKey;
 
 			// Now that the delegate has been removed we can type j again
-			Application.Driver.SendKeys ('j', ConsoleKey.A, false, false, false);
+			Application.Driver.SendKeys ('j', ConsoleKey.J, false, false, false);
 			Assert.Equal ("aj", tf.Text);
 		}
 		[Fact]

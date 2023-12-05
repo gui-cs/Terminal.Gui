@@ -583,21 +583,21 @@ internal class WindowsConsole {
 		public override readonly string ToString () => $"Left={Left},Top={Top},Right={Right},Bottom={Bottom}";
 	}
 
-	//[StructLayout (LayoutKind.Sequential)]
-	//public struct ConsoleKeyInfoEx {
-	//	public ConsoleKeyInfo ConsoleKeyInfo;
-	//	public bool CapsLock;
-	//	public bool NumLock;
-	//	public bool ScrollLock;
+	[StructLayout (LayoutKind.Sequential)]
+	public struct ConsoleKeyInfoEx {
+		public ConsoleKeyInfo ConsoleKeyInfo;
+		public bool CapsLock;
+		public bool NumLock;
+		public bool ScrollLock;
 
-	//	public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
-	//	{
-	//		ConsoleKeyInfo = consoleKeyInfo;
-	//		CapsLock = capslock;
-	//		NumLock = numlock;
-	//		ScrollLock = scrolllock;
-	//	}
-	//}
+		public ConsoleKeyInfoEx (ConsoleKeyInfo consoleKeyInfo, bool capslock, bool numlock, bool scrolllock)
+		{
+			ConsoleKeyInfo = consoleKeyInfo;
+			CapsLock = capslock;
+			NumLock = numlock;
+			ScrollLock = scrolllock;
+		}
+	}
 
 	[DllImport ("kernel32.dll", SetLastError = true)]
 	static extern IntPtr GetStdHandle (int nStdHandle);
@@ -877,9 +877,9 @@ internal class WindowsDriver : ConsoleDriver {
 	}
 #endif
 
-	Key MapKey (ConsoleKeyInfo keyInfo)
+	Key MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 	{
-		//ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)keyInfo.Key);
+		var keyInfo = keyInfoEx.ConsoleKeyInfo;
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
 			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Esc);
@@ -954,7 +954,7 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		var key = keyInfo.Key;
-		//var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
+		var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
 
 		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
@@ -972,8 +972,8 @@ internal class WindowsDriver : ConsoleDriver {
 					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
 				}
 			}
-			//return (Key)((uint)alphaBase + delta);
-			return (Key)((uint)keyInfo.KeyChar);
+			return (Key)((uint)alphaBase + delta);
+			//return (Key)((uint)keyInfo.KeyChar);
 
 		}
 
@@ -1030,11 +1030,11 @@ internal class WindowsDriver : ConsoleDriver {
 			if (fromPacketKey) {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
-			var keyInfo = ToConsoleKeyInfo (inputEvent.KeyEvent);
+			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
 			var map = MapKey (keyInfo);
 
 			if (inputEvent.KeyEvent.bKeyDown) {
-				_altDown = keyInfo.Modifiers == ConsoleModifiers.Alt;
+				_altDown = keyInfo.ConsoleKeyInfo.Modifiers == ConsoleModifiers.Alt;
 				// Avoid sending repeat keydowns
 				OnKeyDown (new KeyEventArgs (map));
 			} else {
@@ -1046,7 +1046,7 @@ internal class WindowsDriver : ConsoleDriver {
 				// keypressed event for just `Alt` will be suppressed. 
 				// This allows MenuBar to have `Alt` as a keybinding
 				if (map != Key.AltMask) {
-					if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+					if (keyInfo.ConsoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
 						if (_altDown) {
 							_altDown = false;
 							OnKeyUp (new KeyEventArgs (map));
@@ -1358,15 +1358,19 @@ internal class WindowsDriver : ConsoleDriver {
 		return mouseFlag;
 	}
 
-	public ConsoleKeyInfo ToConsoleKeyInfo (WindowsConsole.KeyEventRecord keyEvent)
+	public WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
 	{
 		var state = keyEvent.dwControlKeyState;
 
 		var shift = (state & WindowsConsole.ControlKeyState.ShiftPressed) != 0;
 		var alt = (state & (WindowsConsole.ControlKeyState.LeftAltPressed | WindowsConsole.ControlKeyState.RightAltPressed)) != 0;
 		var control = (state & (WindowsConsole.ControlKeyState.LeftControlPressed | WindowsConsole.ControlKeyState.RightControlPressed)) != 0;
+		var capslock = (state & WindowsConsole.ControlKeyState.CapslockOn) != 0;
+		var numlock = (state & WindowsConsole.ControlKeyState.NumlockOn) != 0;
+		var scrolllock = (state & WindowsConsole.ControlKeyState.ScrolllockOn) != 0;
 
-		return new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+		var cki = new ConsoleKeyInfo(keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+		return new WindowsConsole.ConsoleKeyInfoEx (cki, capslock, numlock, scrolllock);
 	}
 
 	public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)

@@ -28,7 +28,7 @@ namespace Terminal.Gui.TextTests {
 			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
-			tf.OnKeyPressed (new (Key.f));
+			tf.OnKeyPressed (new ((Key)'f'));
 
 			tf.Draw ();
 			tf.PositionCursor ();
@@ -61,10 +61,10 @@ namespace Terminal.Gui.TextTests {
 			tf.Draw ();
 			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
-			tf.OnKeyPressed (new (Key.m));
-			tf.OnKeyPressed (new (Key.y));
+			tf.OnKeyPressed (new ((Key)'m'));
+			tf.OnKeyPressed (new ((Key)'y'));
 			tf.OnKeyPressed (new (Key.Space));
-			tf.OnKeyPressed (new (Key.f));
+			tf.OnKeyPressed (new ((Key)'f'));
 
 			// Even though there is no match on case we should still get the suggestion
 			tf.Draw ();
@@ -194,7 +194,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("f", tf.Text);
 
 			// x is typed and suggestion should disapear
-			Application.Driver.SendKeys ('x', ConsoleKey.F, false, false, false);
+			Application.Driver.SendKeys ('x', ConsoleKey.X, false, false, false);
 			tf.Draw ();
 			TestHelpers.AssertDriverContentsAre ("fx", output);
 			Assert.Equal ("fx", tf.Text);

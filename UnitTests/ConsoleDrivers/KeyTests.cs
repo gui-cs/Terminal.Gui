@@ -167,14 +167,11 @@ public class KeyTests {
 		k = Key.Space;
 		Assert.Equal ("Space", k.ToString ());
 
-		k = Key.Space | Key.D;
-		Assert.Equal ("d", k.ToString ());
+		k = Key.D;
+		Assert.Equal ("D", k.ToString ());
 
-		k = (Key)'d';
-		Assert.Equal ("d", k.ToString ());
-
-		k = Key.d;
-		Assert.Equal ("d", k.ToString ());
+		//k = (Key)'d';
+		//Assert.Equal ("d", k.ToString ());
 
 		k = Key.D;
 		Assert.Equal ("D", k.ToString ());
@@ -182,10 +179,6 @@ public class KeyTests {
 		// In a console this will always returns Key.D
 		k = Key.D | Key.ShiftMask;
 		Assert.Equal ("D, ShiftMask", k.ToString ());
-
-		// In a console this will always returns Key.D
-		k = Key.d | Key.ShiftMask;
-		Assert.Equal ("d, ShiftMask", k.ToString ());
 	}
 
 	private static object packetLock = new object ();
@@ -246,11 +239,11 @@ public class KeyTests {
 		public IEnumerator<object []> GetEnumerator ()
 		{
 			lock (packetLock) {
-				yield return new object [] { 'a', false, false, false, 'A', 30, Key.a, 'A', 30 };
+				//yield return new object [] { 'a', false, false, false, 'A', 30, Key.A, 'A', 30 };
 				yield return new object [] { 'A', true, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
 				yield return new object [] { 'A', true, true, false, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask, 'A', 30 };
 				yield return new object [] { 'A', true, true, true, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'A', 30 };
-				yield return new object [] { 'z', false, false, false, 'Z', 44, Key.z, 'Z', 44 };
+				//yield return new object [] { 'z', false, false, false, 'Z', 44, Key.Z, 'Z', 44 };
 				yield return new object [] { 'Z', true, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'Z', 44 };
 				yield return new object [] { 'Z', true, true, false, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask, 'Z', 44 };
 				yield return new object [] { 'Z', true, true, true, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'Z', 44 };

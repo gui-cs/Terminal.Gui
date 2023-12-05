@@ -3774,13 +3774,13 @@ line.
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.n)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'n')));
 			Assert.Equal ("On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.e)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'e')));
 			Assert.Equal ("One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -3798,13 +3798,13 @@ line.
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.w)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'w')));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.o)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'o')));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
@@ -3822,25 +3822,25 @@ line.
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.h)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'h')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.r)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'r')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.e)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'e')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.e)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'e')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
@@ -4058,13 +4058,13 @@ line.
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.n)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'n')));
 			Assert.Equal ("On", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (2, 0), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.e)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'e')));
 			Assert.Equal ("One", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -4082,13 +4082,13 @@ line.
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.w)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'w')));
 			Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (2, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.o)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'o')));
 			Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (3, 1), tv.CursorPosition);
@@ -4100,31 +4100,31 @@ line.
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.T)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'T')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.h)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'h')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (2, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.r)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'r')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (3, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.e)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'e')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (4, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.e)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'e')));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (5, 2), tv.CursorPosition);
@@ -5571,7 +5571,7 @@ line.
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.a)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'a')));
 			Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5640,7 +5640,7 @@ line.
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.a)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'a')));
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 			Assert.Equal (4, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
@@ -5710,7 +5710,7 @@ line.
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.a)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'a')));
 			Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5778,7 +5778,7 @@ line.
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.a)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'a')));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5849,7 +5849,7 @@ line.
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.a)));
+			Assert.True (tv.ProcessKeyPressed (new ((Key)'a')));
 			Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -6016,7 +6016,7 @@ line.
 			tv.ScrollTo (50);
 			Assert.Equal (0, tv.CursorPosition.Y);
 
-			tv.ProcessKeyPressed (new (Key.p));
+			tv.ProcessKeyPressed (new (Key.P));
 		}
 
 		[Fact]

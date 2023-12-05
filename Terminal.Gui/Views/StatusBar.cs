@@ -144,13 +144,7 @@ public class StatusBar : View {
 		// This is a bit of a hack. We want to handle the key bindings for status bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
 		// So before we call the base class we set SelectedItem appropriately.
-
-		// Force upper case
 		var key = keyEvent.Key;
-		var mask = key & Key.CharMask;
-		if (mask >= Key.a && mask <= Key.z) {
-			key = (Key)((int)key - 32);
-		}
 		if (ContainsKeyBinding (key)) {
 			// Search RadioLabels 
 			foreach (var item in Items) {

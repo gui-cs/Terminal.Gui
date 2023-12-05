@@ -620,8 +620,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (activatedValue);
 
 			// New method for changing the activation key
-			tv.AddKeyBinding (Key.z, Command.Accept);
-			tv.OnKeyPressed (new (Key.z));
+			tv.AddKeyBinding (Key.Z, Command.Accept);
+			tv.OnKeyPressed (new (Key.Z));
 			Assert.Equal ("R0C0", activatedValue);
 
 			// reset the test
@@ -629,8 +629,8 @@ namespace Terminal.Gui.ViewsTests {
 			tv.ClearKeyBindings ();
 
 			// Old method for changing the activation key
-			tv.CellActivationKey = Key.z;
-			tv.OnKeyPressed (new (Key.z));
+			tv.CellActivationKey = Key.Z;
+			tv.OnKeyPressed (new (Key.Z));
 			Assert.Equal ("R0C0", activatedValue);
 		}
 
@@ -3126,11 +3126,11 @@ A B C
 			Assert.False (tv.HasFocus);
 
 			// already on fish
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.f });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.F });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// not focused
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.z });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.Z });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// ensure that TableView has the input focus
@@ -3141,19 +3141,19 @@ A B C
 			Assert.True (tv.HasFocus);
 
 			// already on fish
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.f });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.F });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// move to zoo
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.z });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.Z });
 			Assert.Equal (3, tv.SelectedRow);
 
 			// move to troll
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.t });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.T });
 			Assert.Equal (1, tv.SelectedRow);
 
 			// move to trap
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.t });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.T });
 			Assert.Equal (2, tv.SelectedRow);
 
 			// change columns to navigate by column 2
@@ -3162,17 +3162,17 @@ A B C
 			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.CursorRight });
 			Assert.Equal (1, tv.SelectedColumn);
 			Assert.Equal (2, tv.SelectedRow);
-
+			
 			// nothing ends with t so stay where you are
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.t });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.T });
 			Assert.Equal (2, tv.SelectedRow);
 
 			//jump to fish which ends in h
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.h });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.H });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// jump to zoo which ends in o
-			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.o });
+			tv.OnKeyPressed (new KeyEventArgs () { Key = Key.O });
 			Assert.Equal (3, tv.SelectedRow);
 
 

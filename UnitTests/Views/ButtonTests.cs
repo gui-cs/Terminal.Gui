@@ -99,14 +99,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.ProcessKeyPressed (new (Key.Space)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressed (new ((Key)'t')));
+			Assert.True (btn.ProcessKeyPressed (new ((Key)'T')));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressed (new (Key.Space | btn.HotKey)));
+			Assert.True (btn.ProcessKeyPressed (new (btn.HotKey)));
 			Assert.True (clicked);
 			btn.Text = "Te_st";
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressed (new (Key.Space | btn.HotKey)));
+			Assert.True (btn.ProcessKeyPressed (new (btn.HotKey)));
 			Assert.True (clicked);
 		}
 
@@ -164,10 +164,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
-			btn.AddKeyBinding (Key.b, Command.Accept);
+			btn.AddKeyBinding (Key.B, Command.Accept);
 
 			// now pressing B should call the button click event
-			Application.Driver.SendKeys ('b', ConsoleKey.B, false, false, false);
+			Application.Driver.SendKeys ('B', ConsoleKey.B, true, false, false);
 			Assert.Equal (2, pressed);
 		}
 
@@ -605,7 +605,7 @@ namespace Terminal.Gui.ViewsTests {
 				
 			};
 
-			btn.HotKey = Key.r;
+			btn.HotKey = Key.R;
 			Assert.Same (btn, sender);
 			Assert.Equal (Key.Y, args.OldKey);
 			Assert.Equal (Key.R, args.NewKey);
@@ -625,7 +625,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			};
 
-			btn.HotKey = Key.r;
+			btn.HotKey = Key.R;
 			Assert.Same (btn, sender);
 			Assert.Equal (Key.Null, args.OldKey);
 			Assert.Equal (Key.R, args.NewKey);

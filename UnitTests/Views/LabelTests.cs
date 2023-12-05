@@ -344,10 +344,10 @@ Test
 
 		//	};
 
-		//	label.HotKey = Key.r;
+		//	label.HotKey = Key.R;
 		//	Assert.Same (label, sender);
 		//	Assert.Equal (Key.Y, args.OldKey);
-		//	Assert.Equal (Key.r, args.NewKey);
+		//	Assert.Equal (Key.R, args.NewKey);
 
 		//}
 
@@ -365,7 +365,7 @@ Test
 
 			};
 
-			label.HotKey = Key.r;
+			label.HotKey = Key.R;
 			Assert.Same (label, sender);
 			Assert.Equal (Key.Null, args.OldKey);
 			Assert.Equal (Key.R, args.NewKey);

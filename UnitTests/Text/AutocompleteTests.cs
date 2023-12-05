@@ -202,7 +202,7 @@ This a long line and against TextView.
      and                              
      against                          ", output);
 
-			Assert.True (tv.OnKeyPressed (new (Key.g)));
+			Assert.True (tv.OnKeyPressed (new (Key.G)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
@@ -240,7 +240,7 @@ This a long line and against TextView.
      and                              
      against                          ", output);
 
-			Assert.True (tv.OnKeyPressed (new (Key.n)));
+			Assert.True (tv.OnKeyPressed (new (Key.N)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This an long line and against TextView.
