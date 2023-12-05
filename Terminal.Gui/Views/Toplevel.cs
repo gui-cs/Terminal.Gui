@@ -193,7 +193,6 @@ namespace Terminal.Gui {
 		void SetInitialProperties ()
 		{
 			ColorScheme = Colors.TopLevel;
-			TextDirection = TextDirection.LeftRight_TopBottom;
 			Application.GrabbingMouse += Application_GrabbingMouse;
 			Application.UnGrabbingMouse += Application_UnGrabbingMouse;
 
