@@ -70,7 +70,6 @@ namespace Terminal.Gui {
 		void Initialize (TimeSpan time, bool isShort = false)
 		{
 			CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-			LayoutStyle = LayoutStyle.Computed;
 			sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
 			longFormat = $" hh\\{sepChar}mm\\{sepChar}ss";
 			shortFormat = $" hh\\{sepChar}mm";
@@ -147,10 +146,19 @@ namespace Terminal.Gui {
 			get => isShort;
 			set {
 				isShort = value;
-				if (isShort)
-					Width = 7;
-				else
-					Width = 10;
+				if (isShort) {
+					if (LayoutStyle == LayoutStyle.Absolute) {
+						Frame = new Rect (Frame.Location, new Size (7, Frame.Height));
+					} else {
+						Width = 7;
+					}
+				} else {
+					if (LayoutStyle == LayoutStyle.Absolute) {
+						Frame = new Rect (Frame.Location, new Size (10, Frame.Height));
+					} else {
+						Width = 10;
+					}
+				}
 				var ro = ReadOnly;
 				if (ro)
 					ReadOnly = false;
