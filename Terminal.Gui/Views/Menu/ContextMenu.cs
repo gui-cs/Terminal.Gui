@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Terminal.Gui;
+
 /// <summary>
 /// ContextMenu provides a pop-up menu that can be positioned anywhere within a <see cref="View"/>. 
 /// ContextMenu is analogous to <see cref="MenuBar"/> and, once activated, works like a sub-menu 
@@ -28,10 +29,10 @@ public sealed class ContextMenu : IDisposable {
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
 	public static Key DefaultKey { get; set; } = Key.F10 | Key.ShiftMask;
 
-	private static MenuBar _menuBar;
-	private Key _key = DefaultKey;
-	private MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
-	private Toplevel _container;
+	static MenuBar _menuBar;
+	Key _key = DefaultKey;
+	MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
+	Toplevel _container;
 
 	/// <summary>
 	/// Initializes a context menu with no menu items.
@@ -67,7 +68,7 @@ public sealed class ContextMenu : IDisposable {
 		Position = new Point (x, y);
 	}
 
-	private void MenuBar_MenuAllClosed (object sender, EventArgs e)
+	void MenuBar_MenuAllClosed (object sender, EventArgs e)
 	{
 		Dispose ();
 	}
@@ -151,7 +152,7 @@ public sealed class ContextMenu : IDisposable {
 		_menuBar.OpenMenu ();
 	}
 
-	private void Container_Closing (object sender, ToplevelClosingEventArgs obj)
+	void Container_Closing (object sender, ToplevelClosingEventArgs obj)
 	{
 		Hide ();
 	}
@@ -230,7 +231,7 @@ public sealed class ContextMenu : IDisposable {
 	/// <summary>
 	/// Gets the <see cref="Views.Menu.MenuBar"/> that is hosting this context menu.
 	/// </summary>
-	public MenuBar MenuBar { get => _menuBar; }
+	public MenuBar MenuBar => _menuBar;
 
 	/// <summary>
 	/// Gets or sets if sub-menus will be displayed using a "single frame" menu style. If <see langword="true"/>, the ContextMenu
@@ -239,4 +240,3 @@ public sealed class ContextMenu : IDisposable {
 	/// </summary>
 	public bool UseSubMenusSingleFrame { get; set; }
 }
-

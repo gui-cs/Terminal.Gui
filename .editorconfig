@@ -9,15 +9,30 @@ csharp_new_line_before_finally = false
 end_of_line = crlf
 
 csharp_indent_case_contents = true
-csharp_indent_switch_labels = false
+csharp_indent_switch_labels = true
 csharp_indent_labels = flush_left
 csharp_space_after_keywords_in_control_flow_statements = true
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_method_call_parameter_list_parentheses = false
 csharp_preserve_single_line_blocks = true
 dotnet_style_require_accessibility_modifiers = never
-csharp_style_var_when_type_is_apparent = true
-csharp_prefer_braces = false
+csharp_style_var_when_type_is_apparent = true:none
+csharp_prefer_braces = true:none
 csharp_space_before_open_square_brackets = true
 csharp_space_between_method_call_name_and_opening_parenthesis = true
 csharp_space_between_method_declaration_name_and_open_parenthesis = true
+
+# Microsoft .NET properties
+csharp_style_var_elsewhere = true:none
+
+# ReSharper properties
+resharper_align_linq_query = true
+resharper_align_multiline_calls_chain = true
+resharper_align_multiline_extends_list = true
+resharper_align_multiline_parameter = true
+resharper_blank_lines_around_region = 1
+resharper_braces_redundant = true
+resharper_csharp_stick_comment = false
+resharper_indent_type_constraints = true
+resharper_remove_blank_lines_near_braces_in_declarations = true
+resharper_use_roslyn_logic_for_evident_types = true

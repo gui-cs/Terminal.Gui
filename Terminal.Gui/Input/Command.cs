@@ -8,6 +8,10 @@ namespace Terminal.Gui {
 	/// Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.
 	/// </summary>
 	public enum Command {
+		/// <summary>
+		/// Activates the default command. e.g for menus this is the shortcut.
+		/// </summary>
+		Default,
 
 		/// <summary>
 		/// Moves down one item (cell, line, etc...).

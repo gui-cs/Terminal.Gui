@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
+
 //using static Terminal.Gui.ViewTests.MenuTests;
 
 namespace Terminal.Gui.ViewsTests;
+
 public class MenuTests {
 	readonly ITestOutputHelper output;
 
@@ -103,15 +105,15 @@ public class MenuTests {
 	[AutoInitShutdown]
 	public void MenuOpening_MenuOpened_MenuClosing_Events ()
 	{
-		var miAction = "";
-		var isMenuClosed = true;
-		var cancelClosing = false;
+		string miAction = "";
+		bool isMenuClosed = true;
+		bool cancelClosing = false;
 
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "Creates new file.", New)
-				})
-			});
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "Creates new file.", New)
+			})
+		});
 		menu.MenuOpening += (s, e) => {
 			Assert.Equal ("_File", e.CurrentMenu.Title);
 			Assert.Equal ("_New", e.CurrentMenu.Children [0].Title);
@@ -120,8 +122,8 @@ public class MenuTests {
 			e.CurrentMenu.Children [0].Action ();
 			Assert.Equal ("New", miAction);
 			e.NewMenuBarItem = new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "Copies the selection.", Copy)
-				});
+				new MenuItem ("_Copy", "Copies the selection.", Copy)
+			});
 		};
 		menu.MenuOpened += (s, e) => {
 			var mi = e.MenuItem;
@@ -138,17 +140,19 @@ public class MenuTests {
 			if (cancelClosing) {
 				e.Cancel = true;
 				isMenuClosed = false;
-			} else isMenuClosed = true;
+			} else {
+				isMenuClosed = true;
+			}
 		};
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		isMenuClosed = !menu.IsMenuOpen;
 		Assert.False (isMenuClosed);
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
 Edit
 ┌──────────────────────────────┐
 │ Copy   Copies the selection. │
@@ -157,7 +161,7 @@ Edit
 		TestHelpers.AssertDriverContentsAre (expected, output);
 
 		cancelClosing = true;
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (isMenuClosed);
 		Application.Top.Draw ();
@@ -170,7 +174,7 @@ Edit
 		TestHelpers.AssertDriverContentsAre (expected, output);
 
 		cancelClosing = false;
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.True (isMenuClosed);
 		Application.Top.Draw ();
@@ -179,25 +183,31 @@ Edit
 ";
 		TestHelpers.AssertDriverContentsAre (expected, output);
 
-		void New () => miAction = "New";
-		void Copy () => miAction = "Copy";
+		void New ()
+		{
+			miAction = "New";
+		}
+		void Copy ()
+		{
+			miAction = "Copy";
+		}
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuOpened_On_Disabled_MenuItem ()
 	{
 		MenuItem miCurrent = null;
 		Menu mCurrent = null;
 
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuBarItem ("_New", new MenuItem [] {
-						new MenuItem ("_New doc", "Creates new doc.", null, () => false)
-					}),
-					null,
-					new MenuItem ("_Save", "Saves the file.", null, null)
-				})
-			});
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuBarItem ("_New", new MenuItem [] {
+					new MenuItem ("_New doc", "Creates new doc.", null, () => false)
+				}),
+				null,
+				new MenuItem ("_Save", "Saves the file.", null, null)
+			})
+		});
 		menu.MenuOpened += (s, e) => {
 			miCurrent = e.MenuItem;
 			mCurrent = menu._openMenu;
@@ -257,24 +267,24 @@ Edit
 		Assert.False (menu.IsMenuOpen);
 
 		// open the menu
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		// The _New doc isn't enabled because it can't execute and so can't be selected
 		Assert.Equal ("_File", miCurrent.Parent.Title);
 		Assert.Equal ("_New", miCurrent.Title);
 
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", miCurrent.Parent.Title);
 		Assert.Equal ("_Save", miCurrent.Title);
 
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", miCurrent.Parent.Title);
 		Assert.Equal ("_New", miCurrent.Title);
 
 		// close the menu
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 	}
 
@@ -285,17 +295,17 @@ Edit
 		MenuItem miCurrent = null;
 		Menu mCurrent = null;
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "", null),
-					new MenuItem ("_Open", "", null),
-					new MenuItem ("_Save", "", null)
-				}),
-				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", null),
-					new MenuItem ("C_ut", "", null),
-					new MenuItem ("_Paste", "", null)
-				})
-			});
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "", null),
+				new MenuItem ("_Open", "", null),
+				new MenuItem ("_Save", "", null)
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", null),
+				new MenuItem ("C_ut", "", null),
+				new MenuItem ("_Paste", "", null)
+			})
+		});
 		menu.MenuOpened += (s, e) => {
 			miCurrent = e.MenuItem;
 			mCurrent = menu.openCurrentMenu;
@@ -323,20 +333,21 @@ Edit
 		Assert.Equal ("_Paste", miCurrent.Title);
 
 		for (int i = 2; i >= -1; i--) {
-			if (i == -1)
+			if (i == -1) {
 				Assert.False (mCurrent.MouseEvent (new MouseEvent () {
 					X = 10,
 					Y = i,
 					Flags = MouseFlags.ReportMousePosition,
 					View = menu
 				}));
-			else
+			} else {
 				Assert.True (mCurrent.MouseEvent (new MouseEvent () {
 					X = 10,
 					Y = i,
 					Flags = MouseFlags.ReportMousePosition,
 					View = mCurrent
 				}));
+			}
 			Assert.True (menu.IsMenuOpen);
 			if (i == 2) {
 				Assert.Equal ("_Edit", miCurrent.Parent.Title);
@@ -358,31 +369,31 @@ Edit
 	[AutoInitShutdown]
 	public void KeyBindings_Command ()
 	{
-		var miAction = "";
+		string miAction = "";
 		MenuItem mbiCurrent = null;
 		MenuItem miCurrent = null;
 		Menu mCurrent = null;
 
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "", () => miAction = "New"),
-					new MenuItem ("_Open", "", () => miAction = "Open"),
-					new MenuItem ("_Save", "", () => miAction = "Save"),
-					null,
-					new MenuItem ("_Quit", "", () => miAction = "Quit"),
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "", () => miAction = "New"),
+				new MenuItem ("_Open", "", () => miAction = "Open"),
+				new MenuItem ("_Save", "", () => miAction = "Save"),
+				null,
+				new MenuItem ("_Quit", "", () => miAction = "Quit")
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", () => miAction = "Copy"),
+				new MenuItem ("C_ut", "", () => miAction = "Cut"),
+				new MenuItem ("_Paste", "", () => miAction = "Paste"),
+				new MenuBarItem ("_Find and Replace", new MenuItem [] {
+					new MenuItem ("F_ind", "", null),
+					new MenuItem ("_Replace", "", null)
 				}),
-				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", () => miAction = "Copy"),
-					new MenuItem ("C_ut", "", () => miAction = "Cut"),
-					new MenuItem ("_Paste", "", () => miAction = "Paste"),
-					new MenuBarItem ("_Find and Replace", new MenuItem [] {
-						new MenuItem ("F_ind", "", null),
-						new MenuItem ("_Replace", "", null)
-					}),
-					new MenuItem ("_Select All", "", () => miAction = "Select All")
-				}),
-				new MenuBarItem ("_About", "Top-Level", () => miAction = "About")
-			});
+				new MenuItem ("_Select All", "", () => miAction = "Select All")
+			}),
+			new MenuBarItem ("_About", "Top-Level", () => miAction = "About")
+		});
 		menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
 		menu.MenuOpened += (s, e) => {
 			miCurrent = e.MenuItem;
@@ -397,191 +408,182 @@ Edit
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.Space | Key.CtrlMask)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.Space | Key.CtrlMask)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.Space | Key.CtrlMask)));
-		Assert.False(menu.IsMenuOpen);
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.Space | Key.CtrlMask)));
+		Assert.False (menu.IsMenuOpen);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_About", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.Esc)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.Esc)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
-		Assert.True (menu.ProcessKeyPressed (new (Key.C | Key.CtrlMask)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.Esc)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
-		Assert.True (menu.ProcessKeyPressed (new (Key.Esc)));
+
+		Assert.False (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.Tab)));
+		Assert.True (menu.IsMenuOpen);
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.Tab)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
-
-		Assert.False (mCurrent.ProcessKeyPressed (new (Key.Tab)));
-		Assert.True (menu.IsMenuOpen);
-		Assert.True (Application.Top.ProcessKeyPressed (new (Key.Tab)));
-		Assert.False (menu.IsMenuOpen);
-		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
-		Assert.Equal ("None", GetCurrentMenuTitle ());
-
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
-		Assert.True (menu.IsMenuOpen);
-		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
-		Assert.Equal ("_New", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Quit", GetCurrentMenuTitle ());
 
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_About", GetCurrentMenuTitle ());
 
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
 
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.Esc)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.Esc)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
 		Application.MainLoop.RunIteration ();
 		Assert.Equal ("New", miAction);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_About", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_About", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
 		Application.MainLoop.RunIteration ();
 		Assert.Equal ("About", miAction);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_New", GetCurrentMenuTitle ());
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Copy", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("C_ut", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("_Paste", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("F_ind", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("_Replace", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("F_ind", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("_Find and Replace", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("_Select All", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Find and Replace", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("F_ind", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("_Find and Replace", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Edit", GetCurrenParenttMenuItemTitle ());
 		Assert.Equal ("_Paste", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("C_ut", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_Edit", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("_Copy", GetCurrentMenuTitle ());
-		Assert.True (mCurrent.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (mCurrent.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.Equal ("Closed", GetCurrentMenuBarItemTitle ());
 		Assert.Equal ("None", GetCurrentMenuTitle ());
@@ -604,13 +606,13 @@ Edit
 		}
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void ShortCut_Activates ()
 	{
-		var saveAction = false;
+		bool saveAction = false;
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Save", "Saves the file.", action: () => { saveAction = true; }, canExecute: null, parent: null, Key.S | Key.CtrlMask)
+				new MenuItem ("_Save", "Saves the file.", () => { saveAction = true; }, null, null, Key.S | Key.CtrlMask)
 			})
 		});
 
@@ -624,22 +626,22 @@ Edit
 
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void DrawFrame_With_Positive_Positions ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem (new MenuItem [] {
-				    new MenuItem ("One", "", null),
-				    new MenuItem ("Two", "", null)
-				})
-			    });
+			new MenuBarItem (new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			})
+		});
 
 		Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 
 		menu.OpenMenu ();
 		Application.Begin (Application.Top);
 
-		var expected = @"
+		string expected = @"
 ┌──────┐
 │ One  │
 │ Two  │
@@ -650,15 +652,15 @@ Edit
 		Assert.Equal (new Rect (0, 1, 8, 4), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void DrawFrame_With_Negative_Positions ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem (new MenuItem [] {
-				    new MenuItem ("One", "", null),
-				    new MenuItem ("Two", "", null)
-				})
-			    }) {
+			new MenuBarItem (new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			})
+		}) {
 			X = -1,
 			Y = -1
 		};
@@ -668,7 +670,7 @@ Edit
 		menu.OpenMenu ();
 		Application.Begin (Application.Top);
 
-		var expected = @"
+		string expected = @"
 ──────┐
  One  │
  Two  │
@@ -724,19 +726,19 @@ Edit
 		Assert.Equal (new Rect (0, 0, 7, 3), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_False_By_Keyboard ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("Numbers", new MenuItem [] {
-		    new MenuItem ("One", "", null),
-		    new MenuBarItem ("Two", new MenuItem [] {
-			new MenuItem ("Sub-Menu 1", "", null),
-			new MenuItem ("Sub-Menu 2", "", null)
-		    }),
-		    new MenuItem ("Three", "", null),
-		})
-	    });
+			new MenuBarItem ("Numbers", new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", new MenuItem [] {
+					new MenuItem ("Sub-Menu 1", "", null),
+					new MenuItem ("Sub-Menu 2", "", null)
+				}),
+				new MenuItem ("Three", "", null)
+			})
+		});
 		menu.UseKeysUpDownAsKeysLeftRight = true;
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -745,13 +747,13 @@ Edit
 		Assert.False (menu.UseSubMenusSingleFrame);
 
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
 ";
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers  
@@ -764,7 +766,7 @@ Edit
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers                 
@@ -778,7 +780,7 @@ Edit
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		Assert.True (Application.Top.Subviews [2].ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (Application.Top.Subviews [2].ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers  
@@ -791,7 +793,7 @@ Edit
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.Esc)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.Esc)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers
@@ -800,19 +802,19 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_False_By_Mouse ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("Numbers", new MenuItem [] {
-		    new MenuItem ("One", "", null),
-		    new MenuBarItem ("Two", new MenuItem [] {
-			new MenuItem ("Sub-Menu 1", "", null),
-			new MenuItem ("Sub-Menu 2", "", null)
-		    }),
-		    new MenuItem ("Three", "", null),
-		})
-	    });
+			new MenuBarItem ("Numbers", new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", new MenuItem [] {
+					new MenuItem ("Sub-Menu 1", "", null),
+					new MenuItem ("Sub-Menu 2", "", null)
+				}),
+				new MenuItem ("Three", "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -821,7 +823,7 @@ Edit
 		Assert.False (menu.UseSubMenusSingleFrame);
 
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
 ";
 
@@ -901,19 +903,19 @@ Edit
 		Assert.Equal (new Rect (1, 0, 8, 1), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_True_By_Keyboard ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("Numbers", new MenuItem [] {
-				    new MenuItem ("One", "", null),
-				    new MenuBarItem ("Two", new MenuItem [] {
+			new MenuBarItem ("Numbers", new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", new MenuItem [] {
 					new MenuItem ("Sub-Menu 1", "", null),
 					new MenuItem ("Sub-Menu 2", "", null)
-				    }),
-				    new MenuItem ("Three", "", null),
-				})
-			    });
+				}),
+				new MenuItem ("Three", "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -924,14 +926,14 @@ Edit
 		Assert.True (menu.UseSubMenusSingleFrame);
 
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
 ";
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		Assert.Equal (new Rect (1, 0, 8, 1), pos);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers  
@@ -945,8 +947,8 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers       
@@ -961,7 +963,7 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		Assert.Equal (new Rect (1, 0, 15, 7), pos);
 
-		Assert.True (Application.Top.Subviews [2].ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (Application.Top.Subviews [2].ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers  
@@ -975,7 +977,7 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.Esc)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.Esc)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers
@@ -985,19 +987,19 @@ Edit
 		Assert.Equal (new Rect (1, 0, 8, 1), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_True_By_Mouse ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("Numbers", new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuBarItem ("Two", new MenuItem [] {
+			new MenuBarItem ("Numbers", new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", new MenuItem [] {
 					new MenuItem ("Sub-Menu 1", "", null),
 					new MenuItem ("Sub-Menu 2", "", null)
-					}),
-					new MenuItem ("Three", "", null),
-				})
-			});
+				}),
+				new MenuItem ("Three", "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -1008,7 +1010,7 @@ Edit
 		Assert.True (menu.UseSubMenusSingleFrame);
 
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
 ";
 
@@ -1088,20 +1090,20 @@ Edit
 		Assert.Equal (new Rect (1, 0, 8, 1), pos);
 	}
 
-	[Fact, AutoInitShutdown]
-	public void HotKey_MenuBar_OnKeyDown_OnKeyUp_ProcessHotKey_ProcessKey ()
+	[Fact] [AutoInitShutdown]
+	public void HotKey_MenuBar_OnKeyDown_OnKeyUp_ProcessKeyPressed ()
 	{
-		var newAction = false;
-		var copyAction = false;
+		bool newAction = false;
+		bool copyAction = false;
 
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("_File", new MenuItem [] {
-		    new MenuItem ("_New", "", () => newAction = true)
-		}),
-		new MenuBarItem ("_Edit", new MenuItem [] {
-		    new MenuItem ("_Copy", "", () => copyAction = true)
-		})
-	    });
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "", () => newAction = true)
+			}),
+			new MenuBarItem ("_Edit", new MenuItem [] {
+				new MenuItem ("_Copy", "", () => copyAction = true)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -1109,23 +1111,35 @@ Edit
 		Assert.False (newAction);
 		Assert.False (copyAction);
 
-		Assert.False (menu.OnKeyDown (new (Key.AltMask)));
-		Assert.True (menu.OnKeyUp (new (Key.AltMask)));
+		Assert.False (menu.OnKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.False (menu.OnKeyUp (new KeyEventArgs (Key.AltMask)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.AltMask)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  File  Edit
 ";
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		Assert.Equal (new Rect (1, 0, 11, 1), pos);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.N)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.N)));
+		Application.MainLoop.RunIteration ();
+		Assert.False (newAction); // not yet, hot keys don't work if the item is not visible
+
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.F)));
+		Application.MainLoop.RunIteration ();
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.N)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (newAction);
+		Application.Top.Draw ();
+		expected = @"
+ File  Edit
+";
 
-		Assert.False (menu.OnKeyDown (new (Key.AltMask)));
-		Assert.True (menu.OnKeyUp (new (Key.AltMask)));
+		Assert.False (Application.Top.OnKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.False (Application.Top.OnKeyUp (new KeyEventArgs (Key.AltMask)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.AltMask)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		expected = @"
@@ -1135,8 +1149,8 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		Assert.Equal (new Rect (1, 0, 11, 1), pos);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
-		Assert.True (menu.ProcessKeyPressed (new (Key.C)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.C)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (copyAction);
 	}
@@ -1161,8 +1175,9 @@ Edit
 		public string MenuBarText {
 			get {
 				string txt = string.Empty;
-				foreach (var m in Menus)
+				foreach (var m in Menus) {
 					txt += " " + m.Title + " ";
+				}
 				return txt;
 			}
 		}
@@ -1189,57 +1204,71 @@ Edit
 		// 
 		// The width of the Frame is determined in Menu.cs line 144, where `Width` is calculated
 		//   1 space before the Title and 2 spaces after the Title/Check/Help
-		public string expectedTopRow (int i) => $"{CM.Glyphs.ULCorner}{new string (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.URCorner}  \n";
+		public string expectedTopRow (int i)
+		{
+			return $"{CM.Glyphs.ULCorner}{new string (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.URCorner}  \n";
+		}
+
 		// The 3 spaces at end are a result of Menu.cs line 1062 where `pos` is calculated (` + spacesAfterTitle`)
-		public string expectedMenuItemRow (int i) => $"{CM.Glyphs.VLine} {Menus [i].Children [0].Title}  {CM.Glyphs.VLine}   \n";
-		public string expectedBottomRow (int i) => $"{CM.Glyphs.LLCorner}{new string (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.LRCorner}  \n";
+		public string expectedMenuItemRow (int i)
+		{
+			return $"{CM.Glyphs.VLine} {Menus [i].Children [0].Title}  {CM.Glyphs.VLine}   \n";
+		}
+
+		public string expectedBottomRow (int i)
+		{
+			return $"{CM.Glyphs.LLCorner}{new string (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.LRCorner}  \n";
+		}
 
 		// The fulll expected string for an open sub menu
-		public string expectedSubMenuOpen (int i) => ClosedMenuText +
-		    (Menus [i].Children.Length > 0 ?
-			padding (i) + expectedTopRow (i) +
-			padding (i) + expectedMenuItemRow (i) +
-			padding (i) + expectedBottomRow (i)
-		    :
-		    "");
-
-		public ExpectedMenuBar (MenuBarItem [] menus) : base (menus)
+		public string expectedSubMenuOpen (int i)
 		{
+			return ClosedMenuText +
+				(Menus [i].Children.Length > 0 ?
+					padding (i) + expectedTopRow (i) +
+					padding (i) + expectedMenuItemRow (i) +
+					padding (i) + expectedBottomRow (i)
+					:
+					"");
 		}
+
+		public ExpectedMenuBar (MenuBarItem [] menus) : base (menus) { }
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_Submenus_Alignment_Correct ()
 	{
 		// Define the expected menu
 		var expectedMenu = new ExpectedMenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("Really Long Sub Menu", "",  null)
-		}),
-		new MenuBarItem ("123", new MenuItem [] {
-		    new MenuItem ("Copy", "", null)
-		}),
-		new MenuBarItem ("Format", new MenuItem [] {
-		    new MenuItem ("Word Wrap", "", null)
-		}),
-		new MenuBarItem ("Help", new MenuItem [] {
-		    new MenuItem ("About", "", null)
-		}),
-		new MenuBarItem ("1", new MenuItem [] {
-		    new MenuItem ("2", "", null)
-		}),
-		new MenuBarItem ("3", new MenuItem [] {
-		    new MenuItem ("2", "", null)
-		}),
-		new MenuBarItem ("Last one", new MenuItem [] {
-		    new MenuItem ("Test", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("Really Long Sub Menu", "", null)
+			}),
+			new MenuBarItem ("123", new MenuItem [] {
+				new MenuItem ("Copy", "", null)
+			}),
+			new MenuBarItem ("Format", new MenuItem [] {
+				new MenuItem ("Word Wrap", "", null)
+			}),
+			new MenuBarItem ("Help", new MenuItem [] {
+				new MenuItem ("About", "", null)
+			}),
+			new MenuBarItem ("1", new MenuItem [] {
+				new MenuItem ("2", "", null)
+			}),
+			new MenuBarItem ("3", new MenuItem [] {
+				new MenuItem ("2", "", null)
+			}),
+			new MenuBarItem ("Last one", new MenuItem [] {
+				new MenuItem ("Test", "", null)
+			})
+		});
 
 		var items = new MenuBarItem [expectedMenu.Menus.Length];
-		for (var i = 0; i < expectedMenu.Menus.Length; i++) items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, new MenuItem [] {
-		    new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null)
-		});
+		for (int i = 0; i < expectedMenu.Menus.Length; i++) {
+			items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, new MenuItem [] {
+				new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null)
+			});
+		}
 		var menu = new MenuBar (items);
 
 		Application.Top.Add (menu);
@@ -1248,7 +1277,7 @@ Edit
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
-		for (var i = 0; i < expectedMenu.Menus.Length; i++) {
+		for (int i = 0; i < expectedMenu.Menus.Length; i++) {
 			menu.OpenMenu (i);
 			Assert.True (menu.IsMenuOpen);
 			Application.Top.Draw ();
@@ -1256,31 +1285,31 @@ Edit
 		}
 	}
 
-	[Fact, AutoInitShutdown]
-	public void HotKey_MenuBar_ProcessHotKey_Menu_ProcessKey ()
+	[Fact] [AutoInitShutdown]
+	public void HotKey_MenuBar_ProcessKeyPressed_Menu_ProcessKey ()
 	{
-		var newAction = false;
-		var copyAction = false;
+		bool newAction = false;
+		bool copyAction = false;
 
 		// Define the expected menu
 		var expectedMenu = new ExpectedMenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("New", "",  null)
-		}),
-		new MenuBarItem ("Edit", new MenuItem [] {
-		    new MenuItem ("Copy", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuItem ("Copy", "", null)
+			})
+		});
 
 		// The real menu
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("_" + expectedMenu.Menus[0].Title, new MenuItem [] {
-		    new MenuItem ("_" + expectedMenu.Menus[0].Children[0].Title, "",  () => newAction = true)
-		}),
-		new MenuBarItem ("_" + expectedMenu.Menus[1].Title, new MenuItem [] {
-		    new MenuItem ("_" + expectedMenu.Menus[1].Children[0].Title, "",  () => copyAction = true)
-		}),
-	    });
+			new MenuBarItem ("_" + expectedMenu.Menus [0].Title, new MenuItem [] {
+				new MenuItem ("_" + expectedMenu.Menus [0].Children [0].Title, "", () => newAction = true)
+			}),
+			new MenuBarItem ("_" + expectedMenu.Menus [1].Title, new MenuItem [] {
+				new MenuItem ("_" + expectedMenu.Menus [1].Children [0].Title, "", () => copyAction = true)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -1288,65 +1317,65 @@ Edit
 		Assert.False (newAction);
 		Assert.False (copyAction);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.AltMask | Key.F)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.AltMask | Key.F)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.N)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.N)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (newAction);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.AltMask | Key.E)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.AltMask | Key.E)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.C)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.C)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (copyAction);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_Position_And_Size_With_HotKeys_Is_The_Same_As_Without_HotKeys ()
 	{
 		// Define the expected menu
 		var expectedMenu = new ExpectedMenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("12", "",  null)
-		}),
-		new MenuBarItem ("Edit", new MenuItem [] {
-		    new MenuItem ("Copy", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("12", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuItem ("Copy", "", null)
+			})
+		});
 
 		// Test without HotKeys first
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem (expectedMenu.Menus[0].Title, new MenuItem [] {
-		    new MenuItem (expectedMenu.Menus[0].Children[0].Title, "", null)
-		}),
-		new MenuBarItem (expectedMenu.Menus[1].Title, new MenuItem [] {
-		    new MenuItem (expectedMenu.Menus[1].Children[0].Title, "", null)
-		})
-	    });
+			new MenuBarItem (expectedMenu.Menus [0].Title, new MenuItem [] {
+				new MenuItem (expectedMenu.Menus [0].Children [0].Title, "", null)
+			}),
+			new MenuBarItem (expectedMenu.Menus [1].Title, new MenuItem [] {
+				new MenuItem (expectedMenu.Menus [1].Children [0].Title, "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
 		// Open first
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 		// Open second
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 		// Close menu
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
@@ -1355,57 +1384,57 @@ Edit
 
 		// Now test WITH HotKeys
 		menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("_" + expectedMenu.Menus[0].Title, new MenuItem [] {
-		    new MenuItem ("_" + expectedMenu.Menus[0].Children[0].Title, "",  null)
-		}),
-		new MenuBarItem ("_" + expectedMenu.Menus[1].Title, new MenuItem [] {
-		    new MenuItem ("_" + expectedMenu.Menus[1].Children[0].Title, "",  null)
-		}),
-	    });
+			new MenuBarItem ("_" + expectedMenu.Menus [0].Title, new MenuItem [] {
+				new MenuItem ("_" + expectedMenu.Menus [0].Children [0].Title, "", null)
+			}),
+			new MenuBarItem ("_" + expectedMenu.Menus [1].Title, new MenuItem [] {
+				new MenuItem ("_" + expectedMenu.Menus [1].Children [0].Title, "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 
 		// Open first
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 		// Open second
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 		// Close menu
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_ButtonPressed_Open_The_Menu_ButtonPressed_Again_Close_The_Menu ()
 	{
 		// Define the expected menu
 		var expectedMenu = new ExpectedMenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("Open", "",  null)
-		}),
-		new MenuBarItem ("Edit", new MenuItem [] {
-		    new MenuItem ("Copy", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("Open", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuItem ("Copy", "", null)
+			})
+		});
 
 		// Test without HotKeys first
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("_" + expectedMenu.Menus[0].Title, new MenuItem [] {
-		    new MenuItem ("_" + expectedMenu.Menus[0].Children[0].Title, "",  null)
-		}),
-		new MenuBarItem ("_" + expectedMenu.Menus[1].Title, new MenuItem [] {
-		    new MenuItem ("_" + expectedMenu.Menus[1].Children[0].Title, "",  null)
-		}),
-	    });
+			new MenuBarItem ("_" + expectedMenu.Menus [0].Title, new MenuItem [] {
+				new MenuItem ("_" + expectedMenu.Menus [0].Children [0].Title, "", null)
+			}),
+			new MenuBarItem ("_" + expectedMenu.Menus [1].Title, new MenuItem [] {
+				new MenuItem ("_" + expectedMenu.Menus [1].Children [0].Title, "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -1438,7 +1467,7 @@ Edit
 		Assert.True (menu.UseSubMenusSingleFrame);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Parent_MenuItem_Stay_Focused_If_Child_MenuItem_Is_Empty_By_Mouse ()
 	{
 		// File  Edit  Format
@@ -1448,24 +1477,24 @@ Edit
 
 		// Define the expected menu
 		var expectedMenu = new ExpectedMenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("New", "",  null)
-		}),
-		new MenuBarItem ("Edit", new MenuItem [] {}),
-		new MenuBarItem ("Format", new MenuItem [] {
-		    new MenuItem ("Wrap", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] { }),
+			new MenuBarItem ("Format", new MenuItem [] {
+				new MenuItem ("Wrap", "", null)
+			})
+		});
 
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem (expectedMenu.Menus[0].Title, new MenuItem [] {
-		    new MenuItem (expectedMenu.Menus[0].Children[0].Title, "", null)
-		}),
-		new MenuBarItem (expectedMenu.Menus[1].Title, new MenuItem [] {}),
-		new MenuBarItem (expectedMenu.Menus[2].Title, new MenuItem [] {
-		    new MenuItem (expectedMenu.Menus[2].Children[0].Title, "", null)
-		})
-	    });
+			new MenuBarItem (expectedMenu.Menus [0].Title, new MenuItem [] {
+				new MenuItem (expectedMenu.Menus [0].Children [0].Title, "", null)
+			}),
+			new MenuBarItem (expectedMenu.Menus [1].Title, new MenuItem [] { }),
+			new MenuBarItem (expectedMenu.Menus [2].Title, new MenuItem [] {
+				new MenuItem (expectedMenu.Menus [2].Children [0].Title, "", null)
+			})
+		});
 
 		var tf = new TextField () { Y = 2, Width = 10 };
 		Application.Top.Add (menu, tf);
@@ -1509,25 +1538,27 @@ Edit
 		TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Parent_MenuItem_Stay_Focused_If_Child_MenuItem_Is_Empty_By_Keyboard ()
 	{
 		var expectedMenu = new ExpectedMenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("New", "", null)
-		}),
-		new MenuBarItem ("Edit", Array.Empty<MenuItem> ()),
-		new MenuBarItem ("Format", new MenuItem [] {
-		    new MenuItem ("Wrap", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			}),
+			new MenuBarItem ("Edit", Array.Empty<MenuItem> ()),
+			new MenuBarItem ("Format", new MenuItem [] {
+				new MenuItem ("Wrap", "", null)
+			})
+		});
 
 		var items = new MenuBarItem [expectedMenu.Menus.Length];
-		for (var i = 0; i < expectedMenu.Menus.Length; i++) items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
-			? new MenuItem [] {
-			new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null),
-			}
-			: Array.Empty<MenuItem> ());
+		for (int i = 0; i < expectedMenu.Menus.Length; i++) {
+			items [i] = new MenuBarItem (expectedMenu.Menus [i].Title, expectedMenu.Menus [i].Children.Length > 0
+				? new MenuItem [] {
+					new MenuItem (expectedMenu.Menus [i].Children [0].Title, "", null)
+				}
+				: Array.Empty<MenuItem> ());
+		}
 		var menu = new MenuBar (items);
 
 		var tf = new TextField () { Y = 2, Width = 10 };
@@ -1535,99 +1566,99 @@ Edit
 
 		Application.Begin (Application.Top);
 		Assert.True (tf.HasFocus);
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
 		// Right - Edit has no sub menu; this tests that no sub menu shows
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
 		// Right - Format
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (2), output);
 
 		// Left - Edit
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), output);
 
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorLeft)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), output);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 		Assert.True (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Key_Open_And_Close_The_MenuBar ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("File", new MenuItem [] {
-		    new MenuItem ("New", "", null)
-		})
-	    });
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			})
+		});
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 
 		menu.Key = Key.F10 | Key.ShiftMask;
-		Assert.False (menu.ProcessKeyPressed (new (Key.F9)));
+		Assert.False (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.F9)));
 		Assert.False (menu.IsMenuOpen);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.F10 | Key.ShiftMask)));
 		Assert.True (menu.IsMenuOpen);
-		Assert.True (menu.ProcessKeyPressed (new (Key.F10 | Key.ShiftMask)));
+		Assert.True (Application.Top.ProcessKeyPressed (new KeyEventArgs (Key.F10 | Key.ShiftMask)));
 		Assert.False (menu.IsMenuOpen);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Disabled_MenuItem_Is_Never_Selected ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem ("Menu", new MenuItem [] {
-		    new MenuItem ("Enabled 1", "", null),
-		    new MenuItem ("Disabled", "", null, () => false),
-		    null,
-		    new MenuItem ("Enabled 2", "", null)
-		})
-	    });
+			new MenuBarItem ("Menu", new MenuItem [] {
+				new MenuItem ("Enabled 1", "", null),
+				new MenuItem ("Disabled", "", null, () => false),
+				null,
+				new MenuItem ("Enabled 2", "", null)
+			})
+		});
 
 		var top = Application.Top;
 		top.Add (menu);
 		Application.Begin (top);
 
 		var attributes = new Attribute [] {
-				// 0
-				menu.ColorScheme.Normal,
-				// 1
-				menu.ColorScheme.Focus,
-				// 2
-				menu.ColorScheme.Disabled
-	    };
+			// 0
+			menu.ColorScheme.Normal,
+			// 1
+			menu.ColorScheme.Focus,
+			// 2
+			menu.ColorScheme.Disabled
+		};
 
 		TestHelpers.AssertDriverColorsAre (@"
-00000000000000", driver: Application.Driver, attributes);
+00000000000000", Application.Driver, attributes);
 
 		Assert.True (menu.MouseEvent (new MouseEvent {
 			X = 0,
@@ -1643,7 +1674,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", driver: Application.Driver, attributes);
+00000000000000", Application.Driver, attributes);
 
 		Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
 			X = 0,
@@ -1659,7 +1690,7 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", driver: Application.Driver, attributes);
+00000000000000", Application.Driver, attributes);
 
 		Assert.True (top.Subviews [1].MouseEvent (new MouseEvent {
 			X = 0,
@@ -1675,42 +1706,41 @@ Edit
 02222222222220
 00000000000000
 00000000000000
-00000000000000", driver: Application.Driver, attributes);
+00000000000000", Application.Driver, attributes);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_With_Action_But_Without_MenuItems_Not_Throw ()
 	{
 		var menu = new MenuBar (
-		    menus: new []
-		    {
+			menus: new [] {
 				new MenuBarItem { Title = "Test 1", Action = () => { } },
-				new MenuBarItem { Title = "Test 2", Action = () => { } },
-		    });
+				new MenuBarItem { Title = "Test 2", Action = () => { } }
+			});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Assert.False (Application.Top.OnKeyDown (new (Key.AltMask)));
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.False (Application.Top.OnKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_In_Window_Without_Other_Views_With_Top_Init_With_Parameterless_Run ()
 	{
 		var win = new Window ();
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("New", "", null)
-				}),
-				new MenuBarItem ("Edit", new MenuItem [] {
-					new MenuBarItem ("Delete", new MenuItem [] {
-						new MenuItem ("All", "", null),
-						new MenuItem ("Selected", "", null)
-					})
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuBarItem ("Delete", new MenuItem [] {
+					new MenuItem ("All", "", null),
+					new MenuItem ("Selected", "", null)
 				})
-			});
+			})
+		});
 		win.Add (menu);
 		var top = Application.Top;
 		top.Add (win);
@@ -1728,7 +1758,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (win.ProcessKeyPressed (new (menu.Key)));
+			Assert.True (win.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1740,7 +1770,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
+			Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1752,7 +1782,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+			Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1764,7 +1794,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+			Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1782,21 +1812,21 @@ Edit
 		Application.Run ();
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_In_Window_Without_Other_Views_With_Top_Init ()
 	{
 		var win = new Window ();
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("New", "", null)
-				}),
-				new MenuBarItem ("Edit", new MenuItem [] {
-					new MenuBarItem ("Delete", new MenuItem [] {
-						new MenuItem ("All", "", null),
-						new MenuItem ("Selected", "", null)
-					})
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuBarItem ("Delete", new MenuItem [] {
+					new MenuItem ("All", "", null),
+					new MenuItem ("Selected", "", null)
 				})
-			});
+			})
+		});
 		win.Add (menu);
 		var top = Application.Top;
 		top.Add (win);
@@ -1813,7 +1843,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (win.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (win.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		top.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1825,7 +1855,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1837,7 +1867,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		top.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1849,7 +1879,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		top.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1862,21 +1892,21 @@ Edit
 └──────────────────────────────────────┘", output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init ()
 	{
 		var win = new Window ();
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("New", "", null)
-				}),
-				new MenuBarItem ("Edit", new MenuItem [] {
-					new MenuBarItem ("Delete", new MenuItem [] {
-						new MenuItem ("All", "", null),
-						new MenuItem ("Selected", "", null)
-					})
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			}),
+			new MenuBarItem ("Edit", new MenuItem [] {
+				new MenuBarItem ("Delete", new MenuItem [] {
+					new MenuItem ("All", "", null),
+					new MenuItem ("Selected", "", null)
 				})
-			});
+			})
+		});
 		win.Add (menu);
 		((FakeDriver)Application.Driver).SetBufferSize (40, 8);
 		Application.Begin (win);
@@ -1891,7 +1921,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (win.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (win.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		win.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1903,7 +1933,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (menu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1915,7 +1945,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		win.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1927,7 +1957,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 		win.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1940,7 +1970,7 @@ Edit
 └──────────────────────────────────────┘", output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBar_In_Window_Without_Other_Views_Without_Top_Init_With_Run_T ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (40, 8);
@@ -1958,7 +1988,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (top.ProcessKeyPressed (new (Key.F9)));
+			Assert.True (top.ProcessKeyPressed (new KeyEventArgs (Key.F9)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1970,7 +2000,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (top.Subviews [0].ProcessKeyPressed (new (Key.CursorRight)));
+			Assert.True (top.Subviews [0].ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1982,7 +2012,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1994,7 +2024,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", output);
 
-			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyPressed (new (Key.CursorRight)));
+			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -2012,25 +2042,25 @@ Edit
 		Application.Run<CustomWindow> ();
 	}
 
-	private class CustomWindow : Window {
+	class CustomWindow : Window {
 		public CustomWindow ()
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
-					new MenuBarItem ("File", new MenuItem [] {
-						new MenuItem ("New", "", null)
-					}),
-					new MenuBarItem ("Edit", new MenuItem [] {
-						new MenuBarItem ("Delete", new MenuItem [] {
-							new MenuItem ("All", "", null),
-							new MenuItem ("Selected", "", null)
-						})
+				new MenuBarItem ("File", new MenuItem [] {
+					new MenuItem ("New", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new MenuBarItem ("Delete", new MenuItem [] {
+						new MenuItem ("All", "", null),
+						new MenuItem ("Selected", "", null)
 					})
-				});
+				})
+			});
 			Add (menu);
 		}
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void AllowNullChecked_Get_Set ()
 	{
 		var mi = new MenuItem ("Check this out 你", "", null) {
@@ -2038,18 +2068,18 @@ Edit
 		};
 		mi.Action = mi.ToggleChecked;
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem("Nullable Checked",new MenuItem [] {
-					mi
-				})
-			});
+			new MenuBarItem ("Nullable Checked", new MenuItem [] {
+				mi
+			})
+		});
 		new CheckBox ();
 		var top = Application.Top;
 		top.Add (menu);
 		Application.Begin (top);
 
 		Assert.False (mi.Checked);
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (mi.Checked);
 		Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2068,8 +2098,8 @@ Edit
 		Assert.False (mi.Checked);
 
 		mi.AllowNullChecked = true;
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Application.MainLoop.RunIteration ();
 		Assert.Null (mi.Checked);
 		Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2092,8 +2122,8 @@ Edit
 		}));
 		Application.MainLoop.RunIteration ();
 		Assert.True (mi.Checked);
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
-		Assert.True (menu._openMenu.ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
+		Assert.True (menu._openMenu.ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Application.MainLoop.RunIteration ();
 		Assert.False (mi.Checked);
 		Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2121,16 +2151,16 @@ Edit
 		Assert.Throws<InvalidOperationException> (mi.ToggleChecked);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Menu_With_Separator ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem("File",new MenuItem [] {
-				    new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
-				    null,
-				    new MenuItem("_Quit","",null)
-				})
-			});
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+				null,
+				new MenuItem ("_Quit", "", null)
+			})
+		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -2146,16 +2176,16 @@ Edit
 └────────────────────────────┘", output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Menu_With_Separator_Disabled_Border ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem("File",new MenuItem [] {
-		    new MenuItem("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
-		    null,
-		    new MenuItem("_Quit","",null)
-		})
-	    }) { MenusBorderStyle = LineStyle.None };
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+				null,
+				new MenuItem ("_Quit", "", null)
+			})
+		}) { MenusBorderStyle = LineStyle.None };
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -2169,22 +2199,22 @@ Edit
  Quit                       ", output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void DrawFrame_With_Positive_Positions_Disabled_Border ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem (new MenuItem [] {
-				    new MenuItem ("One", "", null),
-				    new MenuItem ("Two", "", null)
-				})
-			    }) { MenusBorderStyle = LineStyle.None };
+			new MenuBarItem (new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			})
+		}) { MenusBorderStyle = LineStyle.None };
 
 		Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 
 		menu.OpenMenu ();
 		Application.Begin (Application.Top);
 
-		var expected = @"
+		string expected = @"
  One
  Two
 ";
@@ -2192,15 +2222,15 @@ Edit
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void DrawFrame_With_Negative_Positions_Disabled_Border ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-		new MenuBarItem (new MenuItem [] {
-		    new MenuItem ("One", "", null),
-		    new MenuItem ("Two", "", null)
-		})
-	    }) {
+			new MenuBarItem (new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			})
+		}) {
 			X = -2,
 			Y = -1,
 			MenusBorderStyle = LineStyle.None
@@ -2211,7 +2241,7 @@ Edit
 		menu.OpenMenu ();
 		Application.Begin (Application.Top);
 
-		var expected = @"
+		string expected = @"
 ne
 wo
 ";
@@ -2255,19 +2285,19 @@ wo
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_False_Disabled_Border ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("Numbers", new MenuItem [] {
 				new MenuItem ("One", "", null),
 				new MenuBarItem ("Two", new MenuItem [] {
-				new MenuItem ("Sub-Menu 1", "", null),
-				new MenuItem ("Sub-Menu 2", "", null)
+					new MenuItem ("Sub-Menu 1", "", null),
+					new MenuItem ("Sub-Menu 2", "", null)
 				}),
-				new MenuItem ("Three", "", null),
+				new MenuItem ("Three", "", null)
 			})
-			}) { MenusBorderStyle = LineStyle.None };
+		}) { MenusBorderStyle = LineStyle.None };
 
 		menu.UseKeysUpDownAsKeysLeftRight = true;
 		Application.Top.Add (menu);
@@ -2276,9 +2306,9 @@ wo
 		Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 		Assert.False (menu.UseSubMenusSingleFrame);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
  One    
  Two   ►
@@ -2286,7 +2316,7 @@ wo
 
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers           
@@ -2297,19 +2327,19 @@ wo
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_True_Disabled_Border ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("Numbers", new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuBarItem ("Two", new MenuItem [] {
+			new MenuBarItem ("Numbers", new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", new MenuItem [] {
 					new MenuItem ("Sub-Menu 1", "", null),
 					new MenuItem ("Sub-Menu 2", "", null)
-					}),
-				new MenuItem ("Three", "", null),
-				})
-			}) { MenusBorderStyle = LineStyle.None };
+				}),
+				new MenuItem ("Three", "", null)
+			})
+		}) { MenusBorderStyle = LineStyle.None };
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -2320,9 +2350,9 @@ wo
 		Assert.True (menu.UseSubMenusSingleFrame);
 
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
  One    
  Two   ►
@@ -2330,8 +2360,8 @@ wo
 
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
-		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new (Key.Enter)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyPressed (new KeyEventArgs (Key.Enter)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers     
@@ -2343,7 +2373,7 @@ wo
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Draw_A_Menu_Over_A_Dialog ()
 	{
 		var top = Application.Top;
@@ -2374,15 +2404,15 @@ wo
 		var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
 		var menu = new MenuBar () { X = Pos.Center (), Width = 10 };
 		menu.Menus = new MenuBarItem [] {
-				new MenuBarItem("File", new MenuItem [] {
-					new MenuItem(items[0], "Create a new file", () => ChangeMenuTitle("New"),null,null, Key.CtrlMask | Key.N),
-					new MenuItem(items[1], "Open a file", () => ChangeMenuTitle("Open"),null,null, Key.CtrlMask | Key.O),
-					new MenuItem(items[2], "Close a file", () => ChangeMenuTitle("Close"),null,null, Key.CtrlMask | Key.C),
-					new MenuItem(items[3], "Save a file", () => ChangeMenuTitle("Save"),null,null, Key.CtrlMask | Key.S),
-					new MenuItem(items[4], "Save a file as", () => ChangeMenuTitle("Save As"),null,null, Key.CtrlMask | Key.A),
-					new MenuItem(items[5], "Delete a file", () => ChangeMenuTitle("Delete"),null,null, Key.CtrlMask | Key.A),
-				})
-			};
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem (items [0], "Create a new file", () => ChangeMenuTitle ("New"), null, null, Key.CtrlMask | Key.N),
+				new MenuItem (items [1], "Open a file", () => ChangeMenuTitle ("Open"), null, null, Key.CtrlMask | Key.O),
+				new MenuItem (items [2], "Close a file", () => ChangeMenuTitle ("Close"), null, null, Key.CtrlMask | Key.C),
+				new MenuItem (items [3], "Save a file", () => ChangeMenuTitle ("Save"), null, null, Key.CtrlMask | Key.S),
+				new MenuItem (items [4], "Save a file as", () => ChangeMenuTitle ("Save As"), null, null, Key.CtrlMask | Key.A),
+				new MenuItem (items [5], "Delete a file", () => ChangeMenuTitle ("Delete"), null, null, Key.CtrlMask | Key.A)
+			})
+		};
 		dialog.Add (menu);
 
 		void ChangeMenuTitle (string title)
@@ -2413,7 +2443,7 @@ wo
 
 		Assert.Equal ("File", menu.Menus [0].Title);
 		menu.OpenMenu ();
-		var firstIteration = false;
+		bool firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -2496,7 +2526,7 @@ wo
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Draw_A_Menu_Over_A_Top_Dialog ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (40, 15);
@@ -2508,15 +2538,15 @@ wo
 		var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
 		var menu = new MenuBar () { X = Pos.Center (), Width = 10 };
 		menu.Menus = new MenuBarItem [] {
-				new MenuBarItem("File", new MenuItem [] {
-					new MenuItem(items[0], "Create a new file", () => ChangeMenuTitle("New"),null,null, Key.CtrlMask | Key.N),
-					new MenuItem(items[1], "Open a file", () => ChangeMenuTitle("Open"),null,null, Key.CtrlMask | Key.O),
-					new MenuItem(items[2], "Close a file", () => ChangeMenuTitle("Close"),null,null, Key.CtrlMask | Key.C),
-					new MenuItem(items[3], "Save a file", () => ChangeMenuTitle("Save"),null,null, Key.CtrlMask | Key.S),
-					new MenuItem(items[4], "Save a file as", () => ChangeMenuTitle("Save As"),null,null, Key.CtrlMask | Key.A),
-					new MenuItem(items[5], "Delete a file", () => ChangeMenuTitle("Delete"),null,null, Key.CtrlMask | Key.A),
-				})
-			};
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem (items [0], "Create a new file", () => ChangeMenuTitle ("New"), null, null, Key.CtrlMask | Key.N),
+				new MenuItem (items [1], "Open a file", () => ChangeMenuTitle ("Open"), null, null, Key.CtrlMask | Key.O),
+				new MenuItem (items [2], "Close a file", () => ChangeMenuTitle ("Close"), null, null, Key.CtrlMask | Key.C),
+				new MenuItem (items [3], "Save a file", () => ChangeMenuTitle ("Save"), null, null, Key.CtrlMask | Key.S),
+				new MenuItem (items [4], "Save a file as", () => ChangeMenuTitle ("Save As"), null, null, Key.CtrlMask | Key.A),
+				new MenuItem (items [5], "Delete a file", () => ChangeMenuTitle ("Delete"), null, null, Key.CtrlMask | Key.A)
+			})
+		};
 		dialog.Add (menu);
 
 		void ChangeMenuTitle (string title)
@@ -2536,7 +2566,7 @@ wo
 
 		Assert.Equal ("File", menu.Menus [0].Title);
 		menu.OpenMenu ();
-		var firstIteration = false;
+		bool firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐                       
@@ -2598,19 +2628,19 @@ wo
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Resizing_Close_Menus ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem("Open", "Open a file", () => {},null,null, Key.CtrlMask | Key.O)
-				})
-			});
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O)
+			})
+		});
 		Application.Top.Add (menu);
 		var rs = Application.Begin (Application.Top);
 
 		menu.OpenMenu ();
-		var firstIteration = false;
+		bool firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
  File                         
@@ -2627,19 +2657,19 @@ wo
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void UseSubMenusSingleFrame_True_Without_Border ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("Numbers", new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuBarItem ("Two", new MenuItem [] {
+			new MenuBarItem ("Numbers", new MenuItem [] {
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", new MenuItem [] {
 					new MenuItem ("Sub-Menu 1", "", null),
 					new MenuItem ("Sub-Menu 2", "", null)
-					}),
-					new MenuItem ("Three", "", null),
-				})
-			}) { UseSubMenusSingleFrame = true, MenusBorderStyle = LineStyle.None };
+				}),
+				new MenuItem ("Three", "", null)
+			})
+		}) { UseSubMenusSingleFrame = true, MenusBorderStyle = LineStyle.None };
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -2649,7 +2679,7 @@ wo
 		Assert.Equal (LineStyle.None, menu.MenusBorderStyle);
 
 		Application.Top.Draw ();
-		var expected = @"
+		string expected = @"
  Numbers
 ";
 
@@ -2723,39 +2753,45 @@ wo
 		Assert.Equal (new Rect (1, 0, 8, 1), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void MenuBarItem_Children_Null_Does_Not_Throw ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem("Test", "", null)
-			});
+			new MenuBarItem ("Test", "", null)
+		});
 		Application.Top.Add (menu);
 
-		var exception = Record.Exception (() => menu.ProcessKeyPressed (new (Key.Space)));
+		var exception = Record.Exception (() => menu.ProcessKeyPressed (new KeyEventArgs (Key.Space)));
 		Assert.Null (exception);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void CanExecute_ProcessHotKey ()
 	{
 		Window win = null;
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("_New", "", New, CanExecuteNew),
-					new MenuItem ("_Close", "", Close, CanExecuteClose)
-				}),
-			});
+			new MenuBarItem ("_File", new MenuItem [] {
+				new MenuItem ("_New", "", New, CanExecuteNew),
+				new MenuItem ("_Close", "", Close, CanExecuteClose)
+			})
+		});
 		var top = Application.Top;
 		top.Add (menu);
 
-		bool CanExecuteNew () => win == null;
+		bool CanExecuteNew ()
+		{
+			return win == null;
+		}
 
 		void New ()
 		{
 			win = new Window ();
 		}
 
-		bool CanExecuteClose () => win != null;
+		bool CanExecuteClose ()
+		{
+			return win != null;
+		}
 
 		void Close ()
 		{
@@ -2768,32 +2804,33 @@ wo
 		Assert.True (CanExecuteNew ());
 		Assert.False (CanExecuteClose ());
 
-		Assert.True (top.ProcessKeyPressed(new (Key.N | Key.AltMask)));
+		Assert.True (top.ProcessKeyPressed (new KeyEventArgs (Key.F | Key.AltMask)));
+		Assert.True (top.ProcessKeyPressed (new KeyEventArgs (Key.N | Key.AltMask)));
 		Application.MainLoop.RunIteration ();
 		Assert.NotNull (win);
 		Assert.False (CanExecuteNew ());
 		Assert.True (CanExecuteClose ());
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Visible_False_Key_Does_Not_Open_And_Close_All_Opened_Menus ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("New", "", null)
-				})
-			});
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("New", "", null)
+			})
+		});
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
 		Assert.True (menu.Visible);
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.True (menu.IsMenuOpen);
 
 		menu.Visible = false;
 		Assert.False (menu.IsMenuOpen);
 
-		Assert.True (menu.ProcessKeyPressed (new (menu.Key)));
+		Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 	}
 
@@ -2801,15 +2838,14 @@ wo
 	public void Separators_Does_Not_Throws_Pressing_Menu_Shortcut ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", new MenuItem [] {
-					new MenuItem ("_New", "", null),
-					null,
-					new MenuItem ("_Quit", "", null)
-				})
-			});
+			new MenuBarItem ("File", new MenuItem [] {
+				new MenuItem ("_New", "", null),
+				null,
+				new MenuItem ("_Quit", "", null)
+			})
+		});
 
 		var exception = Record.Exception (() => Assert.True (menu.ProcessKeyPressed (new KeyEventArgs (Key.AltMask | Key.Q))));
 		Assert.Null (exception);
 	}
 }
-

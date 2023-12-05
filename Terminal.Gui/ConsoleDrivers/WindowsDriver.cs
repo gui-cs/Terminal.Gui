@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Terminal.Gui.ConsoleDrivers;
+using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui;
 
@@ -1019,6 +1020,8 @@ internal class WindowsDriver : ConsoleDriver {
 		return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 	}
 
+	bool _altDown = false;
+
 	internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
 	{
 		switch (inputEvent.EventType) {
@@ -1027,14 +1030,41 @@ internal class WindowsDriver : ConsoleDriver {
 			if (fromPacketKey) {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
-			var map = MapKey (ToConsoleKeyInfo (inputEvent.KeyEvent));
+			var keyInfo = ToConsoleKeyInfo (inputEvent.KeyEvent);
+			var map = MapKey (keyInfo);
 
 			if (inputEvent.KeyEvent.bKeyDown) {
+				_altDown = keyInfo.Modifiers == ConsoleModifiers.Alt;
 				// Avoid sending repeat keydowns
 				OnKeyDown (new KeyEventArgs (map));
 			} else {
-				OnKeyUp (new KeyEventArgs (map));
-				OnKeyPressed (new KeyEventArgs (map));
+				var keyPressedEventArgs = new KeyEventArgs (map);
+
+				// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
+				// However, if while the 'Alt' key is down, if another key is pressed and
+				// released, there will be a keypressed event for that and the
+				// keypressed event for just `Alt` will be suppressed. 
+				// This allows MenuBar to have `Alt` as a keybinding
+				if (map != Key.AltMask) {
+					if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+						if (_altDown) {
+							_altDown = false;
+							OnKeyUp (new KeyEventArgs (map));
+							//OnKeyPressed (new (Key.AltMask));
+						}
+
+						_altDown = false;
+					}
+					// KeyUp of an Alt-key press. 
+					OnKeyUp (keyPressedEventArgs);
+					OnKeyPressed (keyPressedEventArgs);
+				} else {
+					OnKeyUp (keyPressedEventArgs);
+					if (_altDown) {
+						_altDown = false;
+						OnKeyPressed (keyPressedEventArgs);
+					}
+				}
 			}
 
 			break;

@@ -228,7 +228,7 @@ public partial class View {
 	public event EventHandler<KeyEventArgs> KeyDown;
 
 	/// <summary>
-	/// Method invoked when a key is released. This method will be called after <see cref="OnKeyPressed"/>.
+	/// Method invoked when a key is released. This method will be called before <see cref="OnKeyPressed"/>.
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
@@ -292,7 +292,6 @@ public partial class View {
 			return false;
 		}
 
-		// TODO: Figure out how to enable a view to see the key event regardless of whether a child view is focused or not.
 		if (Focused?.ProcessKeyPressed (keyEvent) == true) {
 			return true;
 		}
@@ -304,6 +303,7 @@ public partial class View {
 		if (OnInvokeKeyBindings (keyEvent)) {
 			return true;
 		}
+
 
 		return false;
 	}
@@ -319,10 +319,13 @@ public partial class View {
 	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="AddKeyBinding(Key, Command[])"/>instead.
 	/// </para>
 	/// <para>
-	/// Fires the <see cref="KeyPressed"/> event.
+	/// Fires the <see cref="KeyPressed"/> event. 
 	/// </para>
 	/// <para>
-	/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
+	/// Called after <see cref="OnKeyDown"/> and <see cref="OnKeyUp"/>.
+	/// </para>
+	/// <para>
+	/// SubViews can use the <see cref="KeyPressed"/> of their super view to intercept key presses.
 	/// </para>
 	/// <para>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
@@ -338,9 +341,12 @@ public partial class View {
 
 	/// <summary>
 	/// Invoked when a key is pressed. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
-	/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
+	/// being processed by other views. Invoked after <see cref="KeyDown"/> and <see cref="KeyUp"/>.
 	/// </summary>
 	/// <remarks>
+	/// <para>
+	/// SubViews can use the <see cref="KeyPressed"/> of their super view to intercept key presses.
+	/// </para>
 	/// <para>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPressed"/>.
