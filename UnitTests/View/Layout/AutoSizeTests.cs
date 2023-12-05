@@ -58,7 +58,7 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_GetAutoSize_Vertical()
+		public void AutoSize_GetAutoSize_Vertical ()
 		{
 			var text = "text";
 			var view = new View () {
@@ -103,7 +103,7 @@ namespace Terminal.Gui.ViewTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void AutoSize_GetAutoSize_Left()
+		public void AutoSize_GetAutoSize_Left ()
 		{
 			var text = "This is some text.";
 			var view = new View () {
@@ -528,6 +528,7 @@ namespace Terminal.Gui.ViewTests {
 			Application.Begin (Application.Top);
 			((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
+			Assert.Equal (LayoutStyle.Computed, label.LayoutStyle);
 			Assert.Equal (5, text.Length);
 			Assert.False (label.AutoSize);
 			Assert.Equal (new Rect (0, 0, 3, 1), label.Frame);

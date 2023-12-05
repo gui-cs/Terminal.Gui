@@ -1046,7 +1046,7 @@ namespace Terminal.Gui {
 		string _text = null;
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
-		TextDirection _textDirection = (TextDirection)(-1);
+		TextDirection _textDirection;
 		Key _hotKey;
 		int _hotKeyPos = -1;
 		Size _size;
@@ -1069,9 +1069,6 @@ namespace Terminal.Gui {
 			set {
 				var textWasNull = _text == null && value != null;
 				_text = EnableNeedsFormat (value);
-				if (Direction == (TextDirection)(-1)) {
-					return;
-				}
 				if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty)) {
 					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
@@ -1139,23 +1136,8 @@ namespace Terminal.Gui {
 		public TextDirection Direction {
 			get => _textDirection;
 			set {
-				switch (value) {
-				case TextDirection.LeftRight_TopBottom:
-				case TextDirection.TopBottom_LeftRight:
-				case TextDirection.RightLeft_TopBottom:
-				case TextDirection.TopBottom_RightLeft:
-				case TextDirection.LeftRight_BottomTop:
-				case TextDirection.BottomTop_LeftRight:
-				case TextDirection.RightLeft_BottomTop:
-				case TextDirection.BottomTop_RightLeft:
-					break;
-				default:
-					return;
-				}
-
-				var directionWasIndef = _textDirection == (TextDirection)(-1);
 				_textDirection = EnableNeedsFormat (value);
-				if (directionWasIndef || (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified)) {
+				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
 					Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
 				}
 			}
@@ -1238,7 +1220,7 @@ namespace Terminal.Gui {
 		public Size Size {
 			get => _size;
 			set {
-				if (Direction != (TextDirection)(-1) && AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
+				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
 					_size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
 				} else {
 					_size = EnableNeedsFormat (value);
@@ -1408,10 +1390,6 @@ namespace Terminal.Gui {
 			// With this check, we protect against subclasses with overrides of Text (like Button)
 			if (string.IsNullOrEmpty (_text)) {
 				return;
-			}
-
-			if (Direction == (TextDirection)(-1)) {
-				Direction = TextDirection.LeftRight_TopBottom;
 			}
 
 			if (driver == null) {

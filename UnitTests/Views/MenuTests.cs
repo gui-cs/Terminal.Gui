@@ -627,11 +627,6 @@ Edit
 			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
 			Assert.Equal (new Rect (0, 0, 0, 1), menu.Frame);
 
-			menu.LayoutStyle = LayoutStyle.Absolute;
-			Assert.Equal (LayoutStyle.Absolute, menu.LayoutStyle);
-			Assert.Equal (Point.Empty, new Point (menu.Frame.X, menu.Frame.Y));
-			Assert.Equal (Rect.Empty, menu.Frame);
-
 			menu.Frame = new Rect (-1, -1, menu.Frame.Width, menu.Frame.Height);
 			menu.OpenMenu ();
 			Application.Begin (Application.Top);

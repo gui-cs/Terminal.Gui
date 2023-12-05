@@ -393,12 +393,15 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			Application.Top.Add (win);
 
+			Assert.Equal (LayoutStyle.Computed, label.LayoutStyle);
 			Assert.True (label.IsAdded);
 
 			Assert.True (label.AutoSize);
 			// Text is empty but height=1 by default, see Label view
-			// LayoutSubviews has not been called, so width is 0
-			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
+			// LayoutSubviews has not been called, so width is 0 and height is 0
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			Application.Top.LayoutSubviews ();
+			Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
 
 			label.Text = "First line\nSecond line";
 			Application.Top.LayoutSubviews ();
@@ -438,8 +441,11 @@ namespace Terminal.Gui.ViewTests {
 			Application.Top.Add (win);
 
 			// Text is empty but height=1 by default, see Label view
+			// LayoutSubviews has not been called, so width is 0 and height is 0
 			Assert.True (label.AutoSize);
-			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			Application.Top.LayoutSubviews ();
+			Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
 
 			// Set ForceValidatePosDim to true to maintain the Dim.Fill
 			label.ForceValidatePosDim = true;
@@ -1335,6 +1341,9 @@ Y
 			Assert.False (view4.IsInitialized);
 			Assert.False (view5.IsInitialized);
 			Assert.True (view1.AutoSize);
+			// LayoutSubviews has not been called, so width and height are the text size
+			Assert.Equal (new Rect (0, 0, 18, 1), view1.Frame);
+			Application.Top.LayoutSubviews ();
 			Assert.Equal (new Rect (0, 0, 18, 5), view1.Frame);
 			Assert.Equal ("Absolute(10)", view1.Width.ToString ());
 			Assert.Equal ("Absolute(5)", view1.Height.ToString ());
