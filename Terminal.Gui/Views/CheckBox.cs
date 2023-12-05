@@ -89,7 +89,6 @@ namespace Terminal.Gui {
 			Checked = is_checked;
 			HotKeySpecifier = (Rune)'_';
 			CanFocus = true;
-			TextDirection = TextDirection.LeftRight_TopBottom;
 			AutoSize = true;
 			Text = s;
 
