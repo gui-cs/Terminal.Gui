@@ -98,6 +98,11 @@ public class MouseTests {
 		Application.Top.Y = pos.Y;
 		Application.Top.Width = size.Width;
 		Application.Top.Height = size.Height;
+		Assert.Equal (LayoutStyle.Absolute, Application.Top.LayoutStyle);
+		Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
+		Application.Top.LayoutStyle = LayoutStyle.Computed;
+		Application.Top.SetRelativeLayout (new Rect (Point.Empty, new Size (Application.Driver.Cols, Application.Driver.Rows)));
+		Assert.Equal (new Rect (offset, offset, 10, 10), Application.Top.Frame);
 
 		var mouseEvent = new MouseEvent () {
 			X = clickX,

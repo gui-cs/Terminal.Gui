@@ -112,31 +112,19 @@ namespace Terminal.Gui {
 		public virtual TextDirection TextDirection {
 			get => TextFormatter.Direction;
 			set {
-				if (IsAdded || IsInitialized) {
-					UpdateTextDirection (value);
-				}
+				UpdateTextDirection (value);
 				TextFormatter.Direction = value;
 			}
 		}
 
 		private void UpdateTextDirection (TextDirection newDirection)
 		{
-			if (TextDirection == (TextDirection)(-1) && newDirection == (TextDirection)(-1)) {
-				TextFormatter.Direction = TextDirection.LeftRight_TopBottom;
-				if (LayoutStyle == LayoutStyle.Absolute) {
-					return;
-				}
-
-				_frame = new Rect (new Point (_frame.X, _frame.Y),
-					new Size (Math.Max (TextFormatter.Size.Width, _frame.Width),
-					Math.Max (TextFormatter.Size.Height, _frame.Height)));
-
+			if (!IsInitialized) {
 				return;
 			}
 
-			var directionChanged = TextDirection == (TextDirection)(-1) ||
-				(TextFormatter.IsHorizontalDirection (TextFormatter.Direction) !=
-				TextFormatter.IsHorizontalDirection (newDirection));
+			var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction) !=
+				TextFormatter.IsHorizontalDirection (newDirection);
 			TextFormatter.Direction = newDirection;
 
 			var isValidOldAutoSize = AutoSize && IsValidAutoSize (out var _);

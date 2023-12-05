@@ -45,13 +45,7 @@ namespace Terminal.Gui {
 		/// </para>
 		/// </remarks>
 		public virtual Rect Frame {
-			get {
-				if (!IsAdded && !IsInitialized && LayoutStyle == LayoutStyle.Computed) {
-					return new Rect (_x is Pos.PosAbsolute ? _x.Anchor (0) : _frame.X, _y is Pos.PosAbsolute ? _y.Anchor (0) : _frame.Y,
-						_width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width, _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height);
-				}
-				return _frame;
-			}
+			get => _frame;
 			set {
 				_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
 				if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
@@ -274,8 +268,14 @@ namespace Terminal.Gui {
 						value.Size.Height + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical
 						)
 					);
+
+				if (!IsAdded && !IsInitialized) {
+					_frameWasSetByBounds = true;
+				}
 			}
 		}
+
+		private bool _frameWasSetByBounds;
 
 		private Rect FrameGetInsideBounds ()
 		{
@@ -502,12 +502,27 @@ namespace Terminal.Gui {
 		/// </remarks>
 		protected virtual void OnResizeNeeded ()
 		{
-			if (TextDirection == (TextDirection)(-1)) {
-				return;
-			}
-
 			var actX = _x is Pos.PosAbsolute ? _x.Anchor (0) : Frame.X;
 			var actY = _y is Pos.PosAbsolute ? _y.Anchor (0) : Frame.Y;
+
+			if (!IsInitialized) {
+				if (LayoutStyle == LayoutStyle.Absolute) {
+					if (AutoSize) {
+						_frame = new Rect (new Point (actX, actY), GetAutoSize ()); // Set _frame, not Frame!
+					}
+				} else {
+					if (AutoSize) {
+						_frame = new Rect (new Point (actX, actY), GetAutoSize ()); // Set _frame, not Frame!
+					} else if (!_frameWasSetByBounds) {
+						var w = _width != null && _width is Dim.DimAbsolute ? _width.Anchor (0) : GetAutoSize ().Width;
+						var h = _height != null && _height is Dim.DimAbsolute ? _height.Anchor (0) : GetAutoSize ().Height;
+						_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set _frame, not Frame!
+					}
+					SetNeedsLayout ();
+					SetNeedsDisplay ();
+				}
+				return;
+			}
 
 			if (AutoSize) {
 				//if (TextAlignment == TextAlignment.Justified) {
@@ -516,15 +531,18 @@ namespace Terminal.Gui {
 				var s = GetAutoSize ();
 				var w = _width is Dim.DimAbsolute && _width.Anchor (0) > s.Width ? _width.Anchor (0) : s.Width;
 				var h = _height is Dim.DimAbsolute && _height.Anchor (0) > s.Height ? _height.Anchor (0) : s.Height;
-				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
+				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set _frame, not Frame!
 			} else {
 				var w = _width is Dim.DimAbsolute ? _width.Anchor (0) : Frame.Width;
 				var h = _height is Dim.DimAbsolute ? _height.Anchor (0) : Frame.Height;
 				// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
 				// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
-				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
+				_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set _frame, not Frame!
 			}
-			//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+			// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+			// It isn't a bug, this call needs to be called when AutoSize is also false
+			// See the AutoSize_False_Label_Height_Zero_Returns_Minimum_Height unit test on AutoSizeTests.cs
+			// Comment the follow code and the unit test will fail
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 				SetBoundsToFitFrame ();
 				LayoutFrames ();
@@ -1102,8 +1120,8 @@ namespace Terminal.Gui {
 				y = Bounds.Y;
 			}
 			var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
-			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
-			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
+			var newWidth = rect.Size.Width - GetHotKeySpecifierLength ();
+			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false);
 			return new Size (newWidth, newHeight);
 		}
 
