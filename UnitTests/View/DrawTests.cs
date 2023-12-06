@@ -336,62 +336,72 @@ t     ", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_Minimum_Full_Border_Width_One_Height_One ()
+		public void Draw_Minimum_Full_Border_With_Empty_Bounds ()
 		{
-			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
+			Assert.Equal ("(0,0,2,2)", label.Frame.ToString ());
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌┐
 └┘", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Top ()
+		public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Top ()
 		{
-			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
 			label.Border.Thickness = new Thickness (1, 0, 1, 1);
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
+			Assert.Equal ("(0,0,2,1)", label.Frame.ToString ());
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ││", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Bottom ()
+		public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Bottom ()
 		{
-			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
 			label.Border.Thickness = new Thickness (1, 1, 1, 0);
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
+			Assert.Equal ("(0,0,2,1)", label.Frame.ToString ());
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ──", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Left ()
+		public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Left ()
 		{
-			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
 			label.Border.Thickness = new Thickness (0, 1, 1, 1);
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
+			Assert.Equal ("(0,0,1,2)", label.Frame.ToString ());
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │
 │", output);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void Draw_Minimum_Full_Border_Width_One_Height_One_Without_Right ()
+		public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Right ()
 		{
-			var label = new Label () { Width = 1, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
 			label.Border.Thickness = new Thickness (1, 1, 0, 1);
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
+			Assert.Equal ("(0,0,1,2)", label.Frame.ToString ());
+			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │
 │", output);
@@ -400,7 +410,7 @@ t     ", output);
 		[Fact, AutoInitShutdown]
 		public void Test_Label_Full_Border ()
 		{
-			var label = new Label () { Text = "Test", Width = 4, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);
 
@@ -415,26 +425,29 @@ t     ", output);
 		[Fact, AutoInitShutdown]
 		public void Test_Label_Without_Top_Border ()
 		{
-			var label = new Label () { Text = "Test", Width = 4, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
 			label.Border.Thickness = new Thickness (1, 0, 1, 1);
 			Application.Top.Add (label);
+			Application.Begin (Application.Top);
 
-			Assert.Equal (new Rect (0, 0, 6, 2), label.Frame);
-			Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+			Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
+			Assert.Equal (new Rect (0, 0, 4, 2), label.Bounds);
 			Application.Begin (Application.Top);
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │Test│
+│    │
 └────┘", output);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void Test_Label_With_Top_Margin_Without_Top_Border ()
 		{
-			var label = new Label () { Text = "Test", Width = 4, Height = 1, BorderStyle = LineStyle.Single };
+			var label = new Label () { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
 			label.Margin.Thickness = new Thickness (0, 1, 0, 0);
 			label.Border.Thickness = new Thickness (1, 0, 1, 1);
 			Application.Top.Add (label);
+			Application.Begin (Application.Top);
 
 			Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
 			Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
