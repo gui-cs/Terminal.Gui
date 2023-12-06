@@ -270,7 +270,7 @@ public class FakeDriver : ConsoleDriver {
 			|| keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
 				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
 			}
-			var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift)) ? 'A' : 'a';
+			var alphaBase = ((keyInfo.Modifiers != ConsoleModifiers.Shift)) ? 'A' : 'a';
 			return (Key)((uint)alphaBase + delta);
 		}
 

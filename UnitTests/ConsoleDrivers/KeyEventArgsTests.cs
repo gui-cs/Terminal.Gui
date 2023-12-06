@@ -82,8 +82,8 @@ public class KeyEventArgsTests {
 	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, "Ctrl+Alt+Shift+ç")]
 
 	[InlineData ((Key)'a', "a")] // 97 or Key.Space | Key.A
-	[InlineData ((Key)'A', "a")] // 65 or equivalent to Key.A
-	[InlineData (Key.A, "a")] // 65 equivalent to (Key)'A'
+	[InlineData ((Key)'A', "a")] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
+	[InlineData (Key.A, "a")] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (Key.ShiftMask | Key.A, "Shift+A")]
 	[InlineData (Key.CtrlMask | Key.A, "Ctrl+A")]
 	[InlineData (Key.AltMask | Key.A, "Alt+A")]

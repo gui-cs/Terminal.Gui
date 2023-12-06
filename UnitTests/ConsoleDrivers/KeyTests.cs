@@ -170,8 +170,8 @@ namespace Terminal.Gui.InputTests {
 			k = Key.D;
 			Assert.Equal ("D", k.ToString ());
 
-			//k = (Key)'d';
-			//Assert.Equal ("d", k.ToString ());
+			k = (Key)'d';
+			Assert.Equal ("d", ((char)k).ToString ());
 
 			k = Key.D;
 			Assert.Equal ("D", k.ToString ());
@@ -211,23 +211,28 @@ namespace Terminal.Gui.InputTests {
 				}
 				uint mappedConsoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode, out uint outputChar);
 
-				//if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) {
-				//	Assert.Equal (mappedConsoleKey, initialVirtualKey);
-				//} else {
-				//	Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
-				//}
+				if ((scanCode > 0 || mappedConsoleKey == 0) && mappedConsoleKey == initialVirtualKey) {
+					Assert.Equal (mappedConsoleKey, initialVirtualKey);
+				} else {
+					Assert.Equal (mappedConsoleKey, outputChar < 0xff ? outputChar & 0xff | 0xff << 8 : outputChar);
+				}
 				Assert.Equal (scanCode, initialScanCode);
 
 				uint keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (mappedConsoleKey, modifiers, out uint consoleKey, out scanCode);
 
 				//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
 				if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) {
-					//Assert.Equal (0, (double)keyChar);
+					Assert.Equal (0, (double)keyChar);
 				} else {
+//#if BROKE_WITH_2927
+					// This test is now bogus?
 					//Assert.Equal (keyChar, unicodeCharacter);
+//#endif
 				}
-				//Assert.Equal (consoleKey, expectedVirtualKey);
-				//Assert.Equal (scanCode, expectedScanCode);
+//#if BROKE_WITH_2927
+				Assert.Equal (consoleKey, expectedVirtualKey);
+//#endif
+				Assert.Equal (scanCode, expectedScanCode);
 
 				var top = Application.Top;
 
@@ -254,12 +259,20 @@ namespace Terminal.Gui.InputTests {
 			public IEnumerator<object []> GetEnumerator ()
 			{
 				lock (packetLock) {
+					// unicodeCharacter, shift, alt, control, initialVirtualKey, initialScanCode, expectedRemapping, expectedVirtualKey, expectedScanCode
 					yield return new object [] { 'a', false, false, false, 'A', 30, Key.A, 'a', 30 };
+					//#if BROKE_WITH_2927
+					// If the input unicode char is `A`, the output should be `A` (which means Key.A | Key.ShiftMask) and not `a` .
+					// It think the bug is in GetKeyCharFromConsoleKey
 					yield return new object [] { 'A', false, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
+//#endif
 					yield return new object [] { 'A', true, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
 					yield return new object [] { 'A', true, true, false, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask, 'A', 30 };
 					yield return new object [] { 'A', true, true, true, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'A', 30 };
 					yield return new object [] { 'z', false, false, false, 'Z', 44, Key.Z, 'z', 44 };
+#if BROKE_WITH_2927
+					yield return new object [] { 'Z', false, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'A', 44 };
+#endif
 					yield return new object [] { 'Z', true, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'Z', 44 };
 					yield return new object [] { 'Z', true, true, false, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask, 'Z', 44 };
 					yield return new object [] { 'Z', true, true, true, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'Z', 44 };
