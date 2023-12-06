@@ -7002,7 +7002,7 @@ Line 2.", output);
 			TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", output);
 
 			Assert.True (_textView.ProcessKey (new KeyEvent (Key.H, new KeyModifiers ())));
-			Assert.NotEqual (Rect.Empty, _textView.NeedDisplay);
+			Assert.NotEqual (Rect.Empty, _textView._needsDisplayRect);
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 H      
