@@ -31,9 +31,8 @@ public class Keys : Scenario {
 
 
 		edit.InvokingKeyBindings += (s, a) => {
-			if (edit.ContainsKeyBinding (a.Key)) {
-				var cmds = edit.GetKeyBindings (a.Key);
-				invokingKeyBindingsList.Add ($"{a}: {string.Join (",", cmds)}");
+			if (edit.TryGetKeyBinding (a.Key, out var commands)) {
+				invokingKeyBindingsList.Add ($"{a}: {string.Join (",", commands)}");
 			}
 		};
 

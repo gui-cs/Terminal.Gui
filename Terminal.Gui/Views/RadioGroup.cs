@@ -192,10 +192,10 @@ public class RadioGroup : View {
 		// InvokeKeyBindings doesn't pass any context so we can't tell if the key binding is for
 		// the radio group or for one of the radio buttons. So before we call the base class
 		// we set SelectedItem appropriately.
-		
+
 		// Force upper case
 		var key = keyEvent.Key;
-		if (ContainsKeyBinding (key)) {
+		if (TryGetKeyBinding (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {
 				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out Key hotKey) && hotKey == key) {
@@ -319,7 +319,7 @@ public class RadioGroup : View {
 		_selected = selectedItem;
 		SelectedItemChanged?.Invoke (this, new SelectedItemChangedArgs (selectedItem, previousSelectedItem));
 	}
-	
+
 	void SelectItem ()
 	{
 		SelectedItem = _cursor;

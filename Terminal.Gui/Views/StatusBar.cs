@@ -145,7 +145,7 @@ public class StatusBar : View {
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
 		// So before we call the base class we set SelectedItem appropriately.
 		var key = keyEvent.Key;
-		if (ContainsKeyBinding (key)) {
+		if (TryGetKeyBinding(key, out _)) {
 			// Search RadioLabels 
 			foreach (var item in Items) {
 				if (item.Shortcut == key) {

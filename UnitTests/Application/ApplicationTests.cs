@@ -837,11 +837,17 @@ public class ApplicationTests {
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.QuitKey = Key.C | Key.CtrlMask;
+		Application.OnKeyPressed(new KeyEventArgs( Key.Q | Key.CtrlMask));
+		Assert.True (isQuiting);
 
+		isQuiting = false;
+		Application.QuitKey = Key.C | Key.CtrlMask;
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.False (isQuiting);
-		Application.Driver.SendKeys ('C', ConsoleKey.C, false, false, true);
+		Application.OnKeyPressed (new KeyEventArgs (Key.Q | Key.CtrlMask));
+		Assert.False (isQuiting);
+
+		Application.OnKeyPressed (new KeyEventArgs (Application.QuitKey));
 		Assert.True (isQuiting);
 
 		// Reset the QuitKey to avoid throws errors on another tests

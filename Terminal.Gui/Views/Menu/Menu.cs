@@ -458,7 +458,7 @@ class Menu : View {
 
 		var key = keyEvent.Key;
 
-		if (ContainsKeyBinding (key)) {
+		if (TryGetKeyBinding(key, out _)) {
 			_menuBarItemToActivate = -1;
 			_menuItemToSelect = null;
 

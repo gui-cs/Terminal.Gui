@@ -144,7 +144,7 @@ public class Button : View {
 				base.HotKey = TextFormatter.HotKey = v;
 
 				// Also add Alt+HotKey
-				if (prev != Key.Null && ContainsKeyBinding (prev | Key.AltMask)) {
+				if (prev != Key.Null && TryGetKeyBinding (prev | Key.AltMask, out _)) {
 					if (v == Key.Null) {
 						ClearKeyBinding (prev | Key.AltMask);
 					} else {

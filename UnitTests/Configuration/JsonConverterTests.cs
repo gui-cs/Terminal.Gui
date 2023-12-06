@@ -254,6 +254,8 @@ namespace Terminal.Gui.ConfigurationTests {
 		[InlineData (Key.A | Key.ShiftMask, "A, ShiftMask")]
 		[InlineData (Key.A | Key.CtrlMask, "A, CtrlMask")]
 		[InlineData (Key.A | Key.AltMask | Key.CtrlMask, "A, CtrlMask, AltMask")]
+		[InlineData ((Key)'a' | Key.AltMask | Key.CtrlMask, "Space, A, CtrlMask, AltMask")]
+		[InlineData ((Key)'a' | Key.ShiftMask, "Space, A, ShiftMask")]
 		[InlineData (Key.Delete | Key.AltMask | Key.CtrlMask, "Delete, CtrlMask, AltMask")]
 		[InlineData (Key.D4, "D4")]
 		[InlineData (Key.Esc, "Esc")]

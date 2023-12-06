@@ -348,7 +348,7 @@ public class MenuBar : View {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// The menu bar can also be activated by pressing the <see cref="Key.Alt"/> key. This will highlight the menu bar, but not open any sub-menus.
+	/// The menu bar can also be activated by pressing the <see cref="Key.AltMask"/> key. This will highlight the menu bar, but not open any sub-menus.
 	/// </para>
 	/// <para>
 	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
@@ -448,7 +448,7 @@ public class MenuBar : View {
 
 		var key = keyEvent.Key;
 
-		if (ContainsKeyBinding (key)) {
+		if (TryGetKeyBinding (key, out _)) {
 			_menuBarItemToActivate = -1;
 			_menuItemToSelect = null;
 
@@ -507,7 +507,7 @@ public class MenuBar : View {
 	{
 		menuItemToSelect = null;
 
-		if (menuBarItem?.Children == null) {
+		if (key == Key.Null || menuBarItem?.Children == null) {
 			return false;
 		}
 

@@ -223,13 +223,13 @@ namespace Terminal.Gui {
 		private MenuBarItem BuildContextMenuBarItem ()
 		{
 			return new MenuBarItem (new MenuItem [] {
-					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommand (Command.SelectAll)),
-					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommand (Command.DeleteAll)),
-					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommand (Command.Copy)),
-					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommand (Command.Cut)),
-					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommand (Command.Paste)),
-					new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommand (Command.Undo)),
-					new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommand (Command.Redo)),
+					new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommands (Command.SelectAll)),
+					new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommands (Command.DeleteAll)),
+					new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommands (Command.Copy)),
+					new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommands (Command.Cut)),
+					new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommands (Command.Paste)),
+					new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommands (Command.Undo)),
+					new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommands (Command.Redo)),
 				});
 		}
 

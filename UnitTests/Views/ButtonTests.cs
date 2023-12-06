@@ -178,6 +178,10 @@ namespace Terminal.Gui.ViewsTests {
 			Application.OnKeyPressed (new (Key.AltMask | Key.B));
 			Assert.Equal (4, pressed);
 
+			// now pressing Shift-Alt-B should call the button click event
+			Application.OnKeyPressed (new (Key.ShiftMask | Key.AltMask | Key.B));
+			Assert.Equal (4, pressed);
+
 		}
 
 		[Fact]
@@ -611,7 +615,7 @@ namespace Terminal.Gui.ViewsTests {
 			btn.HotKeyChanged += (s, e) => {
 				sender = s;
 				args = e;
-				
+
 			};
 
 			btn.HotKey = Key.R;

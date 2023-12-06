@@ -983,6 +983,7 @@ namespace Terminal.Gui {
 			if (hot_key != (Rune)0 && hot_pos != -1) {
 				hotPos = hot_pos;
 
+				// BUGBUG: Why are only letters & digits supported?
 				if (Rune.IsValid (hot_key.Value) && char.IsLetterOrDigit ((char)hot_key.Value)) {
 					hotKey = (Key)char.ToUpperInvariant ((char)hot_key.Value);
 					return true;

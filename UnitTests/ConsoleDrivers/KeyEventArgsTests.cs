@@ -75,7 +75,7 @@ public class KeyEventArgsTests {
 	[InlineData ((Key)'☑', "☑")]
 	[InlineData ((Key)'英', "英")]
 	[InlineData ((Key)'{', "{")]
-	//[InlineData ((Key)'\'', "\'")]
+	[InlineData ((Key)'\'', "\'")]
 	[InlineData ((Key)'ó', "ó")]
 	[InlineData ((Key)'ó' | Key.ShiftMask, "Shift+ó")] // is this right???
 	[InlineData ((Key)'Ó', "Ó")]

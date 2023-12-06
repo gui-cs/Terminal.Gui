@@ -1,10 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui;
 public partial class View {
+
+	void AddCommands ()
+	{
+		// By default, the accept command is bound to the HotKey enabling focus
+		AddCommand (Command.Accept, () => {
+			if (CanFocus) {
+				SuperView.SetFocus (this);
+				return true;
+			}
+			return false;
+		});
+	}
+
 	#region HotKey Support
 	/// <summary>
 	/// Invoked when the <see cref="HotKey"/> is changed.
@@ -20,20 +35,32 @@ public partial class View {
 
 	/// <summary>
 	/// Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has
-	/// focus will cause the <see cref="MouseClick"/> event to fire.
+	/// focus will invoke the <see cref="Command.Accept"/> command. By default, the HotKey is automatically set to the first
+	/// character of <see cref="Text"/> that is prefixed with with <see cref="HotKeySpecifier"/>.
+	/// <para>
+	/// A HotKey is a keypress that selects a visible UI item. For selecting items across <see cref="View"/>`s
+	/// (e.g.a <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="Key.AltMask"/> modifier.
+	/// For selecting items within a View that are not Views themselves, the keypress can be key without the Alt modifier.
+	/// For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T.
+	/// Or, in a <see cref="Menu"/> with "_File _Edit", Alt-F will select (show) the "_File" menu.
+	/// If the "_File" menu has a sub-menu of "_New" `Alt-N` or `N` will ONLY select the "_New" sub-menu if the "_File" menu is already opened.
+	/// </para>
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
-	/// <para/>
-	/// <c>HotKey</c> - A keyboard chord composed of the Alt key and another character that selects a visible UI item.
-	/// For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T. Or, in a Menu with
-	/// "_File _Edit", Alt-F will select (show) the File menu. If the "_File" menu has a sub-menu of "_New"
-	/// Alt-N will ONLY select the "_New" sub-menu if the "_File" menu is already opened.
+	/// See <see href="../docs/keyboard.md"/> for an overview of Terminal.Gui keyboard APIs.
 	/// </para>
 	/// <para>
-	/// This API is a helper API for configuring a key binding for the hot key. It uses the <see cref="TextFormatter.HotKey"/>
-	/// to determine the hot key from <see cref="Title"/> by looking for the first character prefixed with <see cref="HotKeySpecifier"/>.
+	/// This is a helper API for configuring a key binding for the hot key. By default, this property is set whenever <see cref="Text"/> changes.
+	/// </para>
+	/// <para>
+	/// By default, when the Hot Key is set, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key (e.g. <see cref="Key.D3"/> | <see cref="Key.AltMask"/>).
+	/// This behavior can be overriden by overriding <see cref="HotKey"/>.
+	/// </para>
+	/// <para>
+	/// By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will be added for both the un-shifted and shifted
+	/// versions. This means if the HotKey is <see cref="Key.A"/>, key bindings for <see cref="Key.A"/> and <see cref="Key.A"/> | <see cref="Key.ShiftMask"/>
+	/// will be added. This behavior can be overriden by overriding <see cref="HotKey"/>.
 	/// </para>
 	/// <para>
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
@@ -43,24 +70,58 @@ public partial class View {
 		get => _hotKey;
 		set {
 			if (_hotKey != value) {
-				var v = value == Key.Unknown ? Key.Null : value;
-				if (_hotKey != Key.Null && ContainsKeyBinding (_hotKey)) {
-					if (v == Key.Null) {
-						ClearKeyBinding (_hotKey);
-					} else {
-						ReplaceKeyBinding (_hotKey, v);
+				var newKey = value == Key.Unknown ? Key.Null : value;
+
+				var baseKey = newKey & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
+				if (newKey != baseKey) {
+					if ((newKey & Key.AltMask) != 0 || (newKey & Key.CtrlMask) != 0) {
+						throw new ArgumentException (@$"HotKey does not support AltMask or CtrlMask ({value}).");
 					}
-				} else if (v != Key.Null) {
-					AddKeyBinding (v, Command.Accept);
+					if (baseKey is >= Key.A and <= Key.Z && (newKey & Key.ShiftMask) != 0) {
+						// Strip off the shift mask
+						newKey = baseKey;
+					}
 				}
-				_hotKey = TextFormatter.HotKey = v;
+
+				// Remove base version
+				if (TryGetKeyBinding (_hotKey, out _)) {
+					ClearKeyBinding (_hotKey);
+				}
+
+				// Remove the Alt version
+				if (TryGetKeyBinding (_hotKey | Key.AltMask, out _)) {
+					ClearKeyBinding (_hotKey | Key.AltMask);
+				}
+
+				if (_hotKey is >= Key.A and <= Key.Z) {
+					// Remove base and shift version
+					if (TryGetKeyBinding (_hotKey | Key.ShiftMask, out _)) {
+						ClearKeyBinding (_hotKey | Key.ShiftMask);
+					}
+				}
+
+				// Add the new 
+				if (newKey != Key.Null) {
+					// Add the base and Alt key
+					AddKeyBinding (newKey, Command.Accept);
+					AddKeyBinding (newKey | Key.AltMask, Command.Accept);
+
+					// If the Key is A..Z, add ShiftMask
+					if (newKey is >= Key.A and <= Key.Z) {
+						AddKeyBinding (newKey | Key.ShiftMask, Command.Accept);
+					}
+
+					AddKeyBinding (newKey, Command.Accept);
+				}
+				// This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
+				_hotKey = TextFormatter.HotKey = value;
 			}
 		}
 	}
 
 	/// <summary>
-	/// Gets or sets the specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View instance.
-	/// The default is '\xffff'. 
+	/// Gets or sets the specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable automatic hot key setting
+	/// support for this View instance. The default is '\xffff'. 
 	/// </summary>
 	public virtual Rune HotKeySpecifier {
 		get {
@@ -78,7 +139,7 @@ public partial class View {
 
 	void SetHotKey ()
 	{
-		if (TextFormatter == null || HotKeySpecifier == new Rune('\xFFFF')) {
+		if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF')) {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
 		TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
@@ -418,16 +479,16 @@ public partial class View {
 	{
 		bool? toReturn = null;
 		var key = keyEvent.Key;
-		if (KeyBindings.TryGetValue (key, out var binding)) {
+		if (TryGetKeyBinding (key, out var commands)) {
 
-			foreach (var command in binding) {
+			foreach (var command in commands) {
 
 				if (!CommandImplementations.ContainsKey (command)) {
 					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
 				}
 
 				// each command has its own return value
-				var thisReturn = InvokeCommand(command);
+				var thisReturn = InvokeCommand (command);
 
 				// if we haven't got anything yet, the current command result should be used
 				toReturn ??= thisReturn;
@@ -460,40 +521,43 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// <para>Adds a new key combination that will trigger the given <paramref name="command"/>
-	/// (if supported by the View - see <see cref="GetSupportedCommands"/>)
+	/// <para>
+	/// Adds a new key combination that will trigger the commands in <paramref name="commands"/>
+	/// (if supported by the View - see <see cref="GetSupportedCommands"/>).
 	/// </para>
-	/// <para>If the key is already bound to a different <see cref="Command"/> it will be
-	/// rebound to this one</para>
+	/// <para>
+	/// If the key is already bound to a different array of <see cref="Command"/>s it will be
+	/// rebound <paramref name="commands"/>.</para>
 	/// </summary>
-	/// <remarks>Commands are only ever applied to the current <see cref="View"/>(i.e. this feature
-	/// cannot be used to switch focus to another view and perform multiple commands there)
+	/// <remarks>
+	/// Commands are only ever applied to the current <see cref="View"/> (i.e. this feature
+	/// cannot be used to switch focus to another view and perform multiple commands there).
 	/// </remarks>
 	/// <param name="key"></param>
-	/// <param name="command">The command(s) to run on the <see cref="View"/> when <paramref name="key"/> is pressed.
-	/// When specifying multiple commands, all commands will be applied in sequence. The bound <paramref name="key"/> strike
+	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
+	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
-	public void AddKeyBinding (Key key, params Command [] command)
+	public void AddKeyBinding (Key key, params Command [] commands)
 	{
-		if (command.Length == 0) {
-			throw new ArgumentException ("At least one command must be specified", nameof (command));
+		if (commands.Length == 0) {
+			throw new ArgumentException ("At least one command must be specified", nameof (commands));
 		}
 
-		if (KeyBindings.ContainsKey (key)) {
-			KeyBindings [key] = command;
+		if (TryGetKeyBinding (key, out _)) {
+			KeyBindings [key] = commands;
 		} else {
-			KeyBindings.Add (key, command);
+			KeyBindings.Add (key, commands);
 		}
 	}
 
 	/// <summary>
-	/// Replaces a key combination already bound to <see cref="Command"/>.
+	/// Replaces a key combination already bound to a set of <see cref="Command"/>s.
 	/// </summary>
 	/// <param name="fromKey">The key to be replaced.</param>
 	/// <param name="toKey">The new key to be used.</param>
 	protected void ReplaceKeyBinding (Key fromKey, Key toKey)
 	{
-		if (ContainsKeyBinding (fromKey)) {
+		if (TryGetKeyBinding (fromKey, out var commands)) {
 			var value = KeyBindings [fromKey];
 			KeyBindings.Remove (fromKey);
 			KeyBindings [toKey] = value;
@@ -501,13 +565,19 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Checks if the key binding already exists.
+	/// Gets the commands bound with the specified Key.
 	/// </summary>
 	/// <param name="key">The key to check.</param>
-	/// <returns><see langword="true"/> If the key already exist, <see langword="false"/> otherwise.</returns>
-	public bool ContainsKeyBinding (Key key)
+	/// <param name="commands">
+	/// When this method returns, contains the commands bound with the specified Key, if the Key is found;
+	/// otherwise, null. This parameter is passed uninitialized.
+	/// </param>
+	/// <returns>
+	/// <see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.
+	/// </returns>
+	public bool TryGetKeyBinding (Key key, out Command [] commands)
 	{
-		return KeyBindings.ContainsKey (key);
+		return KeyBindings.TryGetValue (key, out commands);
 	}
 
 	/// <summary>
@@ -515,9 +585,9 @@ public partial class View {
 	/// </summary>
 	/// <param name="key"></param>
 	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
-	public Command [] GetKeyBindings (Key key)
+	public Command [] GetKeyBinding (Key key)
 	{
-		if (KeyBindings.TryGetValue (key, out var bindings)) {
+		if (TryGetKeyBinding (key, out var bindings)) {
 			return bindings;
 		}
 		return Array.Empty<Command> ();
@@ -532,7 +602,7 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Clears the existing keybinding (if any) for the given <paramref name="key"/>.
+	/// Clears the key binding (if any) for the given <paramref name="key"/>.
 	/// </summary>
 	/// <param name="key"></param>
 	public void ClearKeyBinding (Key key)
@@ -541,8 +611,8 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Removes all key bindings that trigger the given command. Views can have multiple different
-	/// keys bound to the same command and this method will clear all of them.
+	/// Removes all key bindings that trigger the given command set. Views can have multiple different
+	/// keys bound to the same command sets and this method will clear all of them.
 	/// </summary>
 	/// <param name="command"></param>
 	public void ClearKeyBinding (params Command [] command)
@@ -553,11 +623,12 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// <para>States that the given <see cref="View"/> supports a given <paramref name="command"/>
-	/// and what <paramref name="f"/> to perform to make that command happen
+	/// <para>
+	/// Sets the function that will be invoked for a <see cref="Command"/>. Views should call <see cref="AddCommand"/>
+	/// for each command they support. 
 	/// </para>
-	/// <para>If the <paramref name="command"/> already has an implementation the <paramref name="f"/>
-	/// will replace the old one</para>
+	/// <para>
+	/// If <see cref="AddCommand"/> has already been called for <paramref name="command"/> <paramref name="f"/> will replace the old one.</para>
 	/// </summary>
 	/// <param name="command">The command.</param>
 	/// <param name="f">The function.</param>
@@ -583,14 +654,19 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets the key used by a command.
+	/// Gets the Key used by a set of commands.
 	/// </summary>
-	/// <param name="command">The command to search.</param>
+	/// <remarks>
+	/// </remarks>
+	/// <param name="commands">The set of commands to search.</param>
 	/// <returns>The <see cref="Key"/> used by a <see cref="Command"/></returns>
-	public Key GetKeyFromCommand (params Command [] command)
+	/// <exception cref="InvalidOperationException">If no matching set of commands was found.</exception>
+	public Key GetKeyFromCommands (params Command [] commands)
 	{
-		return KeyBindings.First (a => a.Value.SequenceEqual (command)).Key;
+		return KeyBindings.First (a => a.Value.SequenceEqual (commands)).Key;
 	}
+
+	// TODO: Add GetKeysBoundToCommand() - given a Command, return all Keys that would invoke it
 
 	#endregion Key Bindings
 }

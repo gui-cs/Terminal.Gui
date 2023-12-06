@@ -229,7 +229,7 @@ public sealed class ContextMenu : IDisposable {
 	public bool ForceMinimumPosToZero { get; set; } = true;
 
 	/// <summary>
-	/// Gets the <see cref="Views.Menu.MenuBar"/> that is hosting this context menu.
+	/// Gets the <see cref="MenuBar"/> that is hosting this context menu.
 	/// </summary>
 	public MenuBar MenuBar => _menuBar;
 

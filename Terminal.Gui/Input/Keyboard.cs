@@ -73,7 +73,7 @@ public class KeyEventArgs : EventArgs {
 			return string.Empty;
 		}
 		if (key > Key.Space && key < Key.D1) {
-			key = (Key)(key - Key.Space);
+			//key = (Key)(key - Key.Space);
 		}
 
 		string keyName = Enum.GetName (typeof (Key), key);
@@ -81,7 +81,8 @@ public class KeyEventArgs : EventArgs {
 		if (key >= Key.A && key <= Key.Z) {
 			return ((char)key).ToString ().ToLowerInvariant ();
 		}
-		if (key >= Key.D0 && key <= Key.D9) {
+
+		if (key >= Key.Space && key < Key.A) {
 			return ((char)key).ToString ();
 		}
 
@@ -131,7 +132,6 @@ public class KeyEventArgs : EventArgs {
 			sb.Append ($"Shift{separator}");
 			hasModifiers = true;
 		}
-
 
 		// Extract the base key (removing modifier flags)
 		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
