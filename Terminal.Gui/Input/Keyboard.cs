@@ -74,7 +74,7 @@ public class KeyEventArgs : EventArgs {
 		}
 
 		bool lowerCase = false;
-		if (key.HasFlag (Key.Space)) {
+		if (key > Key.Space && key < Key.D1) {
 			key = (Key)(key - Key.Space);
 			lowerCase = true;
 		}
@@ -82,10 +82,7 @@ public class KeyEventArgs : EventArgs {
 		string keyName = Enum.GetName (typeof (Key), key);
 
 		if (key >= Key.A && key <= Key.Z) {
-			if (lowerCase) {
-				return ((char)key).ToString ().ToLowerInvariant ();
-			}
-			return ((char)key).ToString ();
+			return ((char)key).ToString ().ToLowerInvariant ();
 		}
 		if (key >= Key.D0 && key <= Key.D9) {
 			return ((char)key).ToString ();
@@ -95,9 +92,20 @@ public class KeyEventArgs : EventArgs {
 			return keyName;
 		}
 
-		return key.ToString ();
+		return ((char)key).ToString ();
 	}
 
+
+	/// <summary>
+	/// Formats a <see cref="Key"/> as a string using the default separator of '+'
+	/// </summary>
+	/// <param name="key">The key to format.</param>
+	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
+	public static string ToString (Key key)
+	{
+		return ToString (key, (Rune)'+');
+	}
+	
 	/// <summary>
 	/// Formats a <see cref="Key"/> as a string.
 	/// </summary>
@@ -133,8 +141,12 @@ public class KeyEventArgs : EventArgs {
 
 		// Handle special cases and modifiers on their own
 		if ((key != Key.SpecialMask) && (baseKey != Key.Null || hasModifiers)) {
-			// Append the actual key name
-			sb.Append (GetKeyString (baseKey));
+			if ((key & Key.SpecialMask) != 0 && baseKey >= Key.A && baseKey <= Key.Z) {
+				sb.Append (baseKey);
+			} else {
+				// Append the actual key name
+				sb.Append (GetKeyString (baseKey));
+			}
 		}
 
 		var result = sb.ToString ();

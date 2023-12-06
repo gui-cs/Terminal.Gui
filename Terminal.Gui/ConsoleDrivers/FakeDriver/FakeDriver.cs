@@ -11,6 +11,7 @@ using Terminal.Gui.ConsoleDrivers;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui;
+
 /// <summary>
 /// Implements a mock ConsoleDriver for unit testing
 /// </summary>
@@ -18,9 +19,10 @@ public class FakeDriver : ConsoleDriver {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 	public class Behaviors {
-
 		public bool UseFakeClipboard { get; internal set; }
+
 		public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
+
 		public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
 
 		public Behaviors (bool useFakeClipboard = false, bool fakeClipboardAlwaysThrowsNotSupportedException = false, bool fakeClipboardIsSupportedAlwaysTrue = false)
@@ -76,7 +78,7 @@ public class FakeDriver : ConsoleDriver {
 		ResizeScreen ();
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		ClearContents ();
-		
+
 		_mainLoopDriver = new FakeMainLoop (this);
 		_mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;
 		return new MainLoop (_mainLoopDriver);
@@ -182,7 +184,6 @@ public class FakeDriver : ConsoleDriver {
 	}
 
 	#region Color Handling
-
 	///// <remarks>
 	///// In the FakeDriver, colors are encoded as an int; same as NetDriver
 	///// However, the foreground color is stored in the most significant 16 bits, 
@@ -197,7 +198,6 @@ public class FakeDriver : ConsoleDriver {
 	//		background: background
 	//	);
 	//}
-
 	#endregion
 
 
@@ -262,29 +262,21 @@ public class FakeDriver : ConsoleDriver {
 		var key = keyInfo.Key;
 		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+			if (keyInfo.KeyChar != (uint)key) {
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)keyInfo.KeyChar);
 			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
-			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)
+			|| keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
+			|| keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
 				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
-				}
 			}
 			var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift)) ? 'A' : 'a';
 			return (Key)((uint)alphaBase + delta);
-			return (Key)((uint)keyInfo.KeyChar);
-
 		}
 
 		return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
 	}
-	
+
 	private CursorVisibility _savedCursorVisibility;
 
 	void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
@@ -402,9 +394,7 @@ public class FakeDriver : ConsoleDriver {
 			if (Col >= 0 && Col < FakeConsole.BufferWidth && Row >= 0 && Row < FakeConsole.BufferHeight) {
 				FakeConsole.SetCursorPosition (Col, Row);
 			}
-		} catch (System.IO.IOException) {
-		} catch (ArgumentOutOfRangeException) {
-		}
+		} catch (System.IO.IOException) { } catch (ArgumentOutOfRangeException) { }
 	}
 
 	#region Not Implemented
