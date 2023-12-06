@@ -13,11 +13,11 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
 	public ApplicationTests (ITestOutputHelper output)
 	{
-		this.output = output;
+		this._output = output;
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -465,7 +465,7 @@ public class ApplicationTests {
   │   │
   │   │
   │   │
-  └───┘", output);
+  └───┘", _output);
 
 		var attributes = new Attribute [] {
 			// 0
@@ -498,7 +498,7 @@ public class ApplicationTests {
  │   │
  │   │
  │   │
- └───┘", output);
+ └───┘", _output);
 
 		attributes = new Attribute [] {
 			// 0
@@ -833,15 +833,15 @@ public class ApplicationTests {
 		top.Running = true;
 
 		Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-		Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.True (isQuiting);
 
 		isQuiting = false;
 		Application.QuitKey = Key.C | Key.CtrlMask;
 
-		Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.False (isQuiting);
-		Application.Driver.SendKeys ('c', ConsoleKey.C, false, false, true);
+		Application.Driver.SendKeys ('C', ConsoleKey.C, false, false, true);
 		Assert.True (isQuiting);
 
 		// Reset the QuitKey to avoid throws errors on another tests

@@ -153,22 +153,31 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			// default keybinding is Enter which results in keypress
-			Application.Driver.SendKeys (' ', ConsoleKey.Spacebar, false, false, false);
+			Application.OnKeyPressed (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Enter)
 			btn.ClearKeyBinding (Command.Accept);
 
 			// After clearing the default keystroke the Enter button no longer does anything for the Button
-			Application.Driver.SendKeys (' ', ConsoleKey.Spacebar, false, false, false);
+			Application.OnKeyPressed (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
 			btn.AddKeyBinding (Key.B, Command.Accept);
 
 			// now pressing B should call the button click event
-			Application.Driver.SendKeys ('B', ConsoleKey.B, true, false, false);
+			Application.OnKeyPressed (new (Key.B));
 			Assert.Equal (2, pressed);
+
+			// now pressing Shift-B should call the button click event
+			Application.OnKeyPressed (new (Key.ShiftMask | Key.B));
+			Assert.Equal (3, pressed);
+
+			// now pressing Alt-B should call the button click event
+			Application.OnKeyPressed (new (Key.AltMask | Key.B));
+			Assert.Equal (4, pressed);
+
 		}
 
 		[Fact]

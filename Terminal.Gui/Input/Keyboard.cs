@@ -72,11 +72,8 @@ public class KeyEventArgs : EventArgs {
 		if (key is Key.Null or Key.SpecialMask) {
 			return string.Empty;
 		}
-
-		bool lowerCase = false;
 		if (key > Key.Space && key < Key.D1) {
 			key = (Key)(key - Key.Space);
-			lowerCase = true;
 		}
 
 		string keyName = Enum.GetName (typeof (Key), key);
