@@ -19,7 +19,7 @@ public class KeyboardEventTests {
 	{
 		Application.Init (new FakeDriver ());
 
-		Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
+		Application.OnKeyPressed (new (Key.N));
 
 		var top = Application.Top;
 
@@ -27,12 +27,12 @@ public class KeyboardEventTests {
 		text.KeyPressed += (s, e) => {
 			e.Handled = true;
 			Assert.True (e.Handled);
-			Assert.Equal ((Key)'n', e.Key);
+			Assert.Equal (Key.N, e.Key);
 		};
 		top.Add (text);
 
 		Application.Iteration += (s, a) => {
-			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('N', ConsoleKey.N, false, false, false));
+			Application.OnKeyPressed (new (Key.N));
 			Assert.Equal ("", text.Text);
 
 			Application.RequestStop ();
