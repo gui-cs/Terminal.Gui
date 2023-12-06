@@ -2344,6 +2344,8 @@ namespace Terminal.Gui {
 				selectionStartRow = nStartRow;
 				selectionStartColumn = nStartCol;
 				wrapNeeded = true;
+
+				SetNeedsDisplay ();
 			}
 			if (currentCaller != null)
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {currentCaller} call.");
@@ -2531,7 +2533,6 @@ namespace Terminal.Gui {
 			if (!wrapNeeded) {
 				SetNeedsDisplay (new Rect (0, prow, Math.Max (Frame.Width, 0), Math.Max (prow + 1, 0)));
 			}
-
 		}
 
 		ustring StringFromRunes (List<Rune> runes)
