@@ -2881,7 +2881,9 @@ namespace Terminal.Gui {
 				_selectionStartRow = nStartRow;
 				_selectionStartColumn = nStartCol;
 				_wrapNeeded = true;
-			}
+
+                SetNeedsDisplay();
+            }
 			if (_currentCaller != null)
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {_currentCaller} call.");
 		}
