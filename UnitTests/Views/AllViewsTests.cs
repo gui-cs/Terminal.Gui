@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Xunit;
 using System.IO;
+using System.Text;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 
@@ -28,7 +29,80 @@ public class AllViewsTests {
 		Application.Shutdown ();
 	}
 
-	public bool Constructors_FullTest (Type type)
+
+	[Fact]
+	public void AllViews_Enter_Leave_Events ()
+	{
+		foreach (var type in GetAllViewClasses ()) {
+			_output.WriteLine ($"Testing {type.Name}");
+
+			Application.Init (new FakeDriver ());
+
+			var top = Application.Top;
+			var vType = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
+			if (vType == null) {
+				Application.Shutdown ();
+				continue;
+			}
+			vType.X = 0;
+			vType.Y = 0;
+			vType.Width = 10;
+			vType.Height = 1;
+
+			var view = new View () {
+				X = 0,
+				Y = 1,
+				Width = 10,
+				Height = 1,
+				CanFocus = true
+			};
+			var vTypeEnter = 0;
+			var vTypeLeave = 0;
+			var viewEnter = 0;
+			var viewLeave = 0;
+
+			vType.Enter += (s, e) => vTypeEnter++;
+			vType.Leave += (s, e) => vTypeLeave++;
+			view.Enter += (s, e) => viewEnter++;
+			view.Leave += (s, e) => viewLeave++;
+
+			top.Add (vType, view);
+			Application.Begin (top);
+
+			if (!vType.CanFocus || (vType is Toplevel && ((Toplevel)vType).Modal)) {
+				Application.Shutdown ();
+				continue;
+			}
+
+			if (vType is TextView) {
+				top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask));
+			} else {
+				top.ProcessKeyPressed (new (Key.Tab));
+			}
+			top.ProcessKeyPressed (new (Key.Tab));
+
+			Assert.Equal (2, vTypeEnter);
+			Assert.Equal (1, vTypeLeave);
+			Assert.Equal (1, viewEnter);
+			Assert.Equal (1, viewLeave);
+
+			Application.Shutdown ();
+		}
+	}
+
+	//[Fact]
+	//public void AllViews_HotKey_Works ()
+	//{
+	//	foreach (var type in GetAllViewClasses ()) {
+	//		_output.WriteLine ($"Testing {type.Name}");
+	//		var view = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
+	//		view.HotKeySpecifier = (Rune)'^';
+	//		view.Text = "^text";
+	//		Assert.Equal(Key.T, view.HotKey);
+	//	}
+	//}
+
+	public bool Constructors_FullTest (Type type)	
 	{
 		foreach (var ctor in type.GetConstructors ()) {
 			var view = GetTypeInitializer (type, ctor);
@@ -127,65 +201,5 @@ public class AllViewsTests {
 		return typeof (View).Assembly.GetTypes ()
 			.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))
 			.ToList ();
-	}
-
-	[Fact]
-	public void AllViews_Enter_Leave_Events ()
-	{
-		foreach (var type in GetAllViewClasses ()) {
-			_output.WriteLine ($"Testing {type.Name}");
-
-			Application.Init (new FakeDriver ());
-
-			var top = Application.Top;
-			var vType = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
-			if (vType == null) {
-				Application.Shutdown ();
-				continue;
-			}
-			vType.X = 0;
-			vType.Y = 0;
-			vType.Width = 10;
-			vType.Height = 1;
-
-			var view = new View () {
-				X = 0,
-				Y = 1,
-				Width = 10,
-				Height = 1,
-				CanFocus = true
-			};
-			var vTypeEnter = 0;
-			var vTypeLeave = 0;
-			var viewEnter = 0;
-			var viewLeave = 0;
-
-			vType.Enter += (s, e) => vTypeEnter++;
-			vType.Leave += (s, e) => vTypeLeave++;
-			view.Enter += (s, e) => viewEnter++;
-			view.Leave += (s, e) => viewLeave++;
-
-			top.Add (vType, view);
-			Application.Begin (top);
-
-			if (!vType.CanFocus || (vType is Toplevel && ((Toplevel)vType).Modal)) {
-				Application.Shutdown ();
-				continue;
-			}
-
-			if (vType is TextView) {
-				top.ProcessKeyPressed (new (Key.Tab | Key.CtrlMask));
-			} else {
-				top.ProcessKeyPressed (new (Key.Tab));
-			}
-			top.ProcessKeyPressed (new (Key.Tab));
-
-			Assert.Equal (2, vTypeEnter);
-			Assert.Equal (1, vTypeLeave);
-			Assert.Equal (1, viewEnter);
-			Assert.Equal (1, viewLeave);
-
-			Application.Shutdown ();
-		}
 	}
 }

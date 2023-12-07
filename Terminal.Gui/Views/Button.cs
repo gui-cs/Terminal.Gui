@@ -123,38 +123,7 @@ public class Button : View {
 		// Things this view knows how to do
 		AddCommand (Command.Accept, () => AcceptKey ());
 
-		//// Default key bindings for this view
-		//if (IsDefault) {
-		//	AddKeyBinding (Key.Enter, Command.Accept);
-		//}
 		AddKeyBinding (Key.Space, Command.Accept);
-		if (HotKey != Key.Null) {
-			AddKeyBinding (HotKey, Command.Accept);
-			AddKeyBinding (HotKey | Key.AltMask, Command.Accept);
-		}
-	}
-
-	/// <inheritdoc/>
-	public override Key HotKey {
-		get => base.HotKey;
-		set {
-			var prev = base.HotKey;
-			if (prev != value) {
-				var v = value == Key.Unknown ? Key.Null : value;
-				base.HotKey = TextFormatter.HotKey = v;
-
-				// Also add Alt+HotKey
-				if (prev != Key.Null && TryGetKeyBinding (prev | Key.AltMask, out _)) {
-					if (v == Key.Null) {
-						ClearKeyBinding (prev | Key.AltMask);
-					} else {
-						ReplaceKeyBinding (prev | Key.AltMask, v | Key.AltMask);
-					}
-				} else if (v != Key.Null) {
-					AddKeyBinding (v | Key.AltMask, Command.Accept);
-				}
-			}
-		}
 	}
 
 	/// <summary>

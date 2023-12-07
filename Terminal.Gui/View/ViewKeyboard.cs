@@ -74,13 +74,15 @@ public partial class View {
 
 				var baseKey = newKey & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
 				if (newKey != baseKey) {
-					if ((newKey & Key.AltMask) != 0 || (newKey & Key.CtrlMask) != 0) {
-						throw new ArgumentException (@$"HotKey does not support AltMask or CtrlMask ({value}).");
+					if ((newKey & Key.CtrlMask) != 0) {
+						throw new ArgumentException (@$"HotKey does not support CtrlMask ({value}).");
 					}
+					// Strip off the shift mask if it's A...Z
 					if (baseKey is >= Key.A and <= Key.Z && (newKey & Key.ShiftMask) != 0) {
-						// Strip off the shift mask
-						newKey = baseKey;
+						newKey &= ~Key.ShiftMask;
 					}
+					// Strip off the Alt mask
+					newKey &= ~Key.AltMask;
 				}
 
 				// Remove base version
@@ -142,9 +144,12 @@ public partial class View {
 		if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF')) {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
-		TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk);
-		if (_hotKey != hk) {
-			HotKey = hk;
+		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
+			if (_hotKey != hk && hk != Key.Unknown) {
+				HotKey = hk;
+			}
+		} else {
+			HotKey = Key.Null;
 		}
 	}
 
@@ -533,7 +538,9 @@ public partial class View {
 	/// Commands are only ever applied to the current <see cref="View"/> (i.e. this feature
 	/// cannot be used to switch focus to another view and perform multiple commands there).
 	/// </remarks>
-	/// <param name="key"></param>
+	/// <param name="key">
+	/// The key to check.
+	/// </param>
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
@@ -553,6 +560,8 @@ public partial class View {
 	/// <summary>
 	/// Replaces a key combination already bound to a set of <see cref="Command"/>s.
 	/// </summary>
+	/// <remarks>
+	/// </remarks>
 	/// <param name="fromKey">The key to be replaced.</param>
 	/// <param name="toKey">The new key to be used.</param>
 	protected void ReplaceKeyBinding (Key fromKey, Key toKey)
@@ -567,7 +576,11 @@ public partial class View {
 	/// <summary>
 	/// Gets the commands bound with the specified Key.
 	/// </summary>
-	/// <param name="key">The key to check.</param>
+	/// <remarks>
+	/// </remarks>
+	/// <param name="key">
+	/// The key to check.
+	/// </param>
 	/// <param name="commands">
 	/// When this method returns, contains the commands bound with the specified Key, if the Key is found;
 	/// otherwise, null. This parameter is passed uninitialized.
@@ -583,7 +596,9 @@ public partial class View {
 	/// <summary>
 	/// Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.
 	/// </summary>
-	/// <param name="key"></param>
+	/// <param name="key">
+	/// The key to check.
+	/// </param>
 	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
 	public Command [] GetKeyBinding (Key key)
 	{
@@ -604,7 +619,8 @@ public partial class View {
 	/// <summary>
 	/// Clears the key binding (if any) for the given <paramref name="key"/>.
 	/// </summary>
-	/// <param name="key"></param>
+	/// <param name="key">
+	/// </param>
 	public void ClearKeyBinding (Key key)
 	{
 		KeyBindings.Remove (key);

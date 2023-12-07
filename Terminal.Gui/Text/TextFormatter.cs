@@ -936,13 +936,13 @@ namespace Terminal.Gui {
 		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
 		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.</param>
 		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
-		/// <param name="hotKey">Outputs the hotKey.</param>
+		/// <param name="hotKey">Outputs the hotKey. <see cref="Key.Null"/> if not found.</param>
 		/// <returns><c>true</c> if a hotkey was found; <c>false</c> otherwise.</returns>
 		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
 		{
 			if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
 				hotPos = -1;
-				hotKey = Key.Unknown;
+				hotKey = Key.Null;
 				return false;
 			}
 
@@ -991,7 +991,7 @@ namespace Terminal.Gui {
 			}
 
 			hotPos = -1;
-			hotKey = Key.Unknown;
+			hotKey = Key.Null;
 			return false;
 		}
 

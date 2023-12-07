@@ -65,13 +65,13 @@ public class HotKeyTests {
 	public void Set_Throws_If_Modifiers_Are_Included ()
 	{
 		var view = new View ();
-		// A..Z must be naked
-		Assert.Throws<ArgumentException> (() => view.HotKey = Key.A | Key.AltMask);
+		// A..Z must be naked (Alt is assumed)
+		view.HotKey = Key.A | Key.AltMask;
 		Assert.Throws<ArgumentException> (() => view.HotKey = Key.A | Key.CtrlMask);
 		Assert.Throws<ArgumentException> (() => view.HotKey = Key.A | Key.ShiftMask | Key.AltMask | Key.CtrlMask);
 
-		// All others must not have Ctrl or Alt
-		Assert.Throws<ArgumentException> (() => view.HotKey = Key.D1 | Key.AltMask);
+		// All others must not have Ctrl (Alt is assumed)
+		view.HotKey = Key.D1 | Key.AltMask;
 		Assert.Throws<ArgumentException> (() => view.HotKey = Key.D1 | Key.CtrlMask);
 		Assert.Throws<ArgumentException> (() => view.HotKey = Key.D1 | Key.ShiftMask | Key.AltMask | Key.CtrlMask);
 
@@ -94,6 +94,26 @@ public class HotKeyTests {
 		// BUGBUG: '!' should be supported. Line 968 of TextFormatter filters on char.IsLetterOrDigit 
 		//view.Text = "Title_!";
 		//Assert.Equal (Key.D1 | Key.ShiftMask, view.HotKey);
+	}
+
+	[Fact]
+	public void Text_Sets_HotKey_To_KeyNull ()
+	{
+		var view = new View () {
+			HotKeySpecifier = (Rune)'^',
+			Text = "^Test"
+		};
+
+		Assert.Equal ("^Test", view.Text);
+		Assert.Equal (Key.T, view.HotKey);
+
+		view.Text = string.Empty;
+		Assert.Equal ("", view.Text);
+		Assert.Equal (Key.Null, view.HotKey);
+
+		view.Text = "Te^st";
+		Assert.Equal ("Te^st", view.Text);
+		Assert.Equal (Key.S, view.HotKey);
 	}
 
 }

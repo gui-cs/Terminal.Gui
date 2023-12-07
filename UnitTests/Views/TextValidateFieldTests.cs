@@ -7,6 +7,8 @@ using Xunit;
 
 namespace Terminal.Gui.ViewsTests {
 
+	// TODO: These tests shouild not rely on AutoInitShutdown / Application
+
 	public class TextValidateField_NET_Provider_Tests {
 
 		[Fact]

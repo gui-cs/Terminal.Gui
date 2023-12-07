@@ -26,7 +26,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
+
+			Assert.Equal (string.Empty, btn.Title);
 			Assert.Equal (Key.Null, btn.HotKey);
+
 			var expected = @$"
 {CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
 ";
@@ -144,6 +147,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			int pressed = 0;
 			var btn = new Button ("Press Me");
+
 			btn.Clicked += (s, e) => pressed++;
 
 			// The Button class supports the Accept command
@@ -170,18 +174,17 @@ namespace Terminal.Gui.ViewsTests {
 			Application.OnKeyPressed (new (Key.B));
 			Assert.Equal (2, pressed);
 
-			// now pressing Shift-B should call the button click event
+			// now pressing Shift-B should NOT call the button click event
 			Application.OnKeyPressed (new (Key.ShiftMask | Key.B));
-			Assert.Equal (3, pressed);
+			Assert.Equal (2, pressed);
 
-			// now pressing Alt-B should call the button click event
+			// now pressing Alt-B should NOT call the button click event
 			Application.OnKeyPressed (new (Key.AltMask | Key.B));
-			Assert.Equal (4, pressed);
+			Assert.Equal (2, pressed);
 
-			// now pressing Shift-Alt-B should call the button click event
+			// now pressing Shift-Alt-B should NOT call the button click event
 			Application.OnKeyPressed (new (Key.ShiftMask | Key.AltMask | Key.B));
-			Assert.Equal (4, pressed);
-
+			Assert.Equal (2, pressed);
 		}
 
 		[Fact]
