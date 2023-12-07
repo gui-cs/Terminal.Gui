@@ -190,7 +190,8 @@ namespace Terminal.Gui.InputTests {
 		/// when telling the rest of the framework what button was pressed. For full details
 		/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
 		/// </summary>
-		[Theory] [AutoInitShutdown]
+		[Theory]
+		[AutoInitShutdown]
 		[ClassData (typeof (PacketTest))]
 		public void TestVKPacket (uint unicodeCharacter, bool shift, bool alt, bool control, uint initialVirtualKey,
 					uint initialScanCode, Key expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
@@ -224,14 +225,14 @@ namespace Terminal.Gui.InputTests {
 				if (scanCode > 0 && keyChar == 0 && consoleKey == mappedConsoleKey) {
 					Assert.Equal (0, (double)keyChar);
 				} else {
-//#if BROKE_WITH_2927
+					//#if BROKE_WITH_2927
 					// This test is now bogus?
 					//Assert.Equal (keyChar, unicodeCharacter);
-//#endif
+					//#endif
 				}
-//#if BROKE_WITH_2927
+				//#if BROKE_WITH_2927
 				Assert.Equal (consoleKey, expectedVirtualKey);
-//#endif
+				//#endif
 				Assert.Equal (scanCode, expectedScanCode);
 
 				var top = Application.Top;
@@ -260,18 +261,19 @@ namespace Terminal.Gui.InputTests {
 			{
 				lock (packetLock) {
 					// unicodeCharacter, shift, alt, control, initialVirtualKey, initialScanCode, expectedRemapping, expectedVirtualKey, expectedScanCode
-					yield return new object [] { 'a', false, false, false, 'A', 30, Key.A, 'a', 30 };
-					//#if BROKE_WITH_2927
+					yield return new object [] { 'a', false, false, false, 'A', 30, Key.A, 'A', 30 };
+#if BROKE_WITH_2927
 					// If the input unicode char is `A`, the output should be `A` (which means Key.A | Key.ShiftMask) and not `a` .
 					// It think the bug is in GetKeyCharFromConsoleKey
 					yield return new object [] { 'A', false, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
-//#endif
+#endif
 					yield return new object [] { 'A', true, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
 					yield return new object [] { 'A', true, true, false, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask, 'A', 30 };
 					yield return new object [] { 'A', true, true, true, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'A', 30 };
-					yield return new object [] { 'z', false, false, false, 'Z', 44, Key.Z, 'z', 44 };
+					
+					yield return new object [] { 'z', false, false, false, 'Z', 44, Key.Z, 'Z', 44 };
 #if BROKE_WITH_2927
-					yield return new object [] { 'Z', false, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'A', 44 };
+					yield return new object [] { 'Z', false, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'Z', 44 };
 #endif
 					yield return new object [] { 'Z', true, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'Z', 44 };
 					yield return new object [] { 'Z', true, true, false, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask, 'Z', 44 };
