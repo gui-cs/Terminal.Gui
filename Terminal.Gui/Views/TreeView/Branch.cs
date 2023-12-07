@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 					// use it
 					modelColor = isSelected ? modelScheme.Focus : modelScheme.Normal;
 				} else {
-					modelColor = Attribute.Default;
+					modelColor = new Attribute (Attribute.Default.Foreground, Attribute.Default.Background);
 				}
 			}
 
