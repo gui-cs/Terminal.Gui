@@ -832,7 +832,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (tv.GetObjectRow (n1_2));
 			Assert.Equal (0, tv.GetObjectRow (n2));
 		}
-
 		[Fact, AutoInitShutdown]
 		public void TestTreeViewColor ()
 		{
@@ -850,8 +849,8 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Expand (n1);
 
 			tv.ColorScheme = new ColorScheme ();
-			Application.Top.Add(tv);
-			Application.Begin(Application.Top);
+			tv.LayoutSubviews ();
+			tv.Draw ();
 
 			// create a new color scheme
 			var pink = new Attribute (Color.Magenta, Color.Black);
@@ -884,7 +883,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// redraw now that the custom color
 			// delegate is registered
-			Application.Refresh();
+			tv.Draw ();
 
 			// Same text
 			TestHelpers.AssertDriverContentsAre (@"
