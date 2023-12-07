@@ -618,7 +618,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (a.Key < Key.Space || a.Key > Key.CharMask) {
+			if (a.AsRune == default) {
 				return false;
 			}
 

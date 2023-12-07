@@ -75,20 +75,23 @@ public class KeyEventArgs : EventArgs {
 			return default;
 		}
 
-		if (key is >= Key.A and <= Key.Z) {
-			return Rune.ToLowerInvariant (new Rune ((char)key));
+		// Extract the base key (removing modifier flags)
+		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
+
+		switch (baseKey) {
+		case >= Key.A and <= Key.Z when !key.HasFlag (Key.ShiftMask):
+			return new Rune ((char)(baseKey + 32));
+		case >= Key.A and <= Key.Z:
+			return new Rune ((char)baseKey);
+		case >= Key.Space and < Key.A:
+			return new Rune ((char)baseKey);
 		}
 
-		if (key is >= Key.Space and < Key.A) {
-			return new Rune ((char)key);
-		}
-		
-		string keyName = Enum.GetName (typeof (Key), key);
-		if (!string.IsNullOrEmpty (keyName)) {
+		if (Enum.IsDefined(typeof(Key), baseKey)) {
 			return default;
 		}
 
-		return new Rune ((char)key);
+		return new Rune ((char)baseKey);
 	}
 
 	private static string GetKeyString (Key key)
@@ -96,21 +99,19 @@ public class KeyEventArgs : EventArgs {
 		if (key is Key.Null or Key.SpecialMask) {
 			return string.Empty;
 		}
+		// Extract the base key (removing modifier flags)
+		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
 
-		if (key >= Key.A && key <= Key.Z) {
-			return ((char)key).ToString ().ToLowerInvariant ();
+		if (!key.HasFlag (Key.ShiftMask) && baseKey is >= Key.A and <= Key.Z) {
+			return ((char)(key + 32)).ToString ();
 		}
 
-		if (key >= Key.Space && key < Key.A) {
+		if (key is >= Key.Space and < Key.A) {
 			return ((char)key).ToString ();
 		}
 
 		string keyName = Enum.GetName (typeof (Key), key);
-		if (!string.IsNullOrEmpty (keyName)) {
-			return keyName;
-		}
-
-		return ((char)key).ToString ();
+		return !string.IsNullOrEmpty (keyName) ? keyName : ((char)key).ToString ();
 	}
 
 
@@ -123,7 +124,7 @@ public class KeyEventArgs : EventArgs {
 	{
 		return ToString (key, (Rune)'+');
 	}
-	
+
 	/// <summary>
 	/// Formats a <see cref="Key"/> as a string.
 	/// </summary>

@@ -655,7 +655,7 @@ namespace Terminal.Gui {
 			}
 
 			// Ignore other control characters.
-			if (a.Key < Key.Space || a.Key > Key.CharMask) {
+			if (a.AsRune == default) {
 				return false;
 			}
 
@@ -680,7 +680,7 @@ namespace Terminal.Gui {
 			if (!useOldCursorPos) {
 				_oldCursorPos = _point;
 			}
-			var kbstr = ((Rune)(uint)a.Key).ToString ().EnumerateRunes ();
+			var kbstr = a.AsRune.ToString ().EnumerateRunes ();
 			if (Used) {
 				_point++;
 				if (_point == newText.Count + 1) {

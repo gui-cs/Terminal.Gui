@@ -3423,7 +3423,7 @@ namespace Terminal.Gui {
 
 			ResetColumnTrack ();
 			// Ignore control characters and other special keys
-			if (a.Key < Key.Space || a.Key > Key.CharMask) {
+			if (a.AsRune == default) {
 				return false;
 			}
 
@@ -4340,18 +4340,18 @@ namespace Terminal.Gui {
 				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
-			} else if ((uint)a.Key == 13) {
+			} else if ((uint)a.Key == '\r') {
 				_currentColumn = 0;
 			} else {
 				if (Used) {
-					Insert (new RuneCell { Rune = (Rune)(uint)a.Key, ColorScheme = colorScheme });
+					Insert (new RuneCell { Rune = a.AsRune, ColorScheme = colorScheme });
 					_currentColumn++;
 					if (_currentColumn >= _leftColumn + Frame.Width) {
 						_leftColumn++;
 						SetNeedsDisplay ();
 					}
 				} else {
-					Insert (new RuneCell { Rune = (Rune)(uint)a.Key, ColorScheme = colorScheme });
+					Insert (new RuneCell { Rune = a.AsRune, ColorScheme = colorScheme });
 					_currentColumn++;
 				}
 			}
