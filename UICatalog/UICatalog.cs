@@ -368,7 +368,7 @@ namespace UICatalog {
 				// user to type and the items that match get selected). We implement it in the app instead. 
 				ScenarioList.KeyDown += (s, a) => {
 					if (CollectionNavigator.IsCompatibleKey (a)) {
-						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.KeyValue);
+						var newItem = _scenarioCollectionNav?.GetNextMatchingItem (ScenarioList.SelectedRow, (char)a.AsRune.Value);
 						if (newItem is int v && newItem != -1) {
 							ScenarioList.SelectedRow = v;
 							ScenarioList.EnsureSelectedCellIsVisible ();

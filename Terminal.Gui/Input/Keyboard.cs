@@ -34,11 +34,13 @@ public class KeyEventArgs : EventArgs {
 	public Key Key { get; set; }
 
 	/// <summary>
-	///   The key value cast to an integer, you will typical use this for
-	///   extracting the Unicode rune value out of a key, when none of the
-	///   symbolic options are in use.
+	/// The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
 	/// </summary>
-	public int KeyValue => (int)Key;
+	/// <remarks>
+	/// If the key pressed is a letter, this will be the upper or lower case letter depending on whether the shift key is pressed.
+	/// If the key is outside of the <see cref="Key.CharMask"/> range, this will be <see langword="null"/>.
+	/// </remarks>
+	public Rune AsRune => GetKeyAsRune (Key);
 
 	/// <summary>
 	/// Gets a value indicating whether the Shift key was pressed.
@@ -67,16 +69,33 @@ public class KeyEventArgs : EventArgs {
 		return ToString (Key, (Rune)'+');
 	}
 
+	private static Rune GetKeyAsRune (Key key)
+	{
+		if (key is Key.Null or Key.SpecialMask) {
+			return default;
+		}
+
+		if (key is >= Key.A and <= Key.Z) {
+			return Rune.ToLowerInvariant (new Rune ((char)key));
+		}
+
+		if (key is >= Key.Space and < Key.A) {
+			return new Rune ((char)key);
+		}
+		
+		string keyName = Enum.GetName (typeof (Key), key);
+		if (!string.IsNullOrEmpty (keyName)) {
+			return default;
+		}
+
+		return new Rune ((char)key);
+	}
+
 	private static string GetKeyString (Key key)
 	{
 		if (key is Key.Null or Key.SpecialMask) {
 			return string.Empty;
 		}
-		if (key > Key.Space && key < Key.D1) {
-			//key = (Key)(key - Key.Space);
-		}
-
-		string keyName = Enum.GetName (typeof (Key), key);
 
 		if (key >= Key.A && key <= Key.Z) {
 			return ((char)key).ToString ().ToLowerInvariant ();
@@ -86,6 +105,7 @@ public class KeyEventArgs : EventArgs {
 			return ((char)key).ToString ();
 		}
 
+		string keyName = Enum.GetName (typeof (Key), key);
 		if (!string.IsNullOrEmpty (keyName)) {
 			return keyName;
 		}

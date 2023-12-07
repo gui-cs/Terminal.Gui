@@ -780,7 +780,7 @@ namespace Terminal.Gui {
 		private void SuppressIfBadChar (KeyEventArgs k)
 		{
 			// don't let user type bad letters
-			var ch = (char)k.KeyValue;
+			var ch = (char)k.AsRune.Value;
 
 			if (badChars.Contains (ch)) {
 				k.Handled = true;
@@ -789,7 +789,7 @@ namespace Terminal.Gui {
 
 		private bool TreeView_KeyDown (KeyEventArgs keyEvent)
 		{
-			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent.KeyValue)) {
+			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent.AsRune.Value)) {
 				this.tbPath.FocusFirst ();
 
 				// let that keystroke go through on the tbPath instead

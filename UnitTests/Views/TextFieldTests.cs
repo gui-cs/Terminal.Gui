@@ -1314,7 +1314,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		private void SuppressKey (object s, KeyEventArgs arg)
 		{
-			if (arg.KeyValue == 'j') {
+			if (arg.AsRune == new Rune('j')) {
 				arg.Handled = true;
 			}
 		}

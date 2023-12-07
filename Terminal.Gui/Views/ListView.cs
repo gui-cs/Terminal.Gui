@@ -429,7 +429,7 @@ namespace Terminal.Gui {
 
 			// Enable user to find & select an item by typing text
 			if (CollectionNavigator.IsCompatibleKey (a)) {
-				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a.KeyValue);
+				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a.AsRune.Value);
 				if (newItem is int && newItem != -1) {
 					SelectedItem = (int)newItem;
 					EnsureSelectedItemVisible ();

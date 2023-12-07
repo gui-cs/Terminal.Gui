@@ -71,7 +71,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (char.IsLetterOrDigit ((char)a.KeyValue)) {
+			if (char.IsLetterOrDigit ((char)a.AsRune.Value)) {
 				_suspendSuggestions = false;
 			}
 

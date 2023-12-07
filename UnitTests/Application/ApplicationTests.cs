@@ -694,7 +694,7 @@ public class ApplicationTests {
 		var output = string.Empty;
 		Application.Top.KeyUp += (object sender, KeyEventArgs args) => {
 			if (args.Key != (Key.CtrlMask | Key.Q)) {
-				output += (char)args.KeyValue;
+				output += args.AsRune;
 			}
 			keyUps++;
 		};

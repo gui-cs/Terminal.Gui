@@ -626,7 +626,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 			
-			var key = new Rune ((uint)a.KeyValue);
+			var key = a.AsRune;
 
 			var inserted = provider.InsertAt ((char)key.Value, cursorPosition);
 

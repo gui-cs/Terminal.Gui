@@ -643,7 +643,7 @@ namespace Terminal.Gui {
 
 					// Find the current selected object within the tree
 					var current = map.IndexOf (b => b.Model == SelectedObject);
-					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent.KeyValue);
+					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent.AsRune.Value);
 
 					if (newIndex is int && newIndex != -1) {
 						SelectedObject = map.ElementAt ((int)newIndex).Model;

@@ -776,14 +776,14 @@ namespace Terminal.Gui {
 				PositionCursor ();
 				return true;
 			}
-
+			
 			if (CollectionNavigator != null &&
 				this.HasFocus &&
 				Table.Rows != 0 &&
 				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
 				!keyEvent.Key.HasFlag (Key.CtrlMask) &&
 				!keyEvent.Key.HasFlag (Key.AltMask) &&
-				char.IsLetterOrDigit ((char)keyEvent.KeyValue)) {
+				Rune.IsLetterOrDigit (keyEvent.AsRune)) {
 				return CycleToNextTableEntryBeginningWith (keyEvent);
 			}
 
@@ -799,7 +799,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyValue);
+			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent.AsRune.Value);
 
 			if (match != -1) {
 				SelectedRow = match;

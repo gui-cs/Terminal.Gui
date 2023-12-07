@@ -232,9 +232,8 @@ namespace UICatalog.Scenarios {
 
 		private void AddKeyboardStrokes (KeyEventArgs e)
 		{
-			var ke = e;
-			var keyChar = ke.KeyValue;
-			var mK = (int)((Key)ke.KeyValue & (Key.AltMask | Key.CtrlMask | Key.ShiftMask));
+			var keyChar = e.AsRune.Value;
+			var mK = (int)(e.Key & (Key.AltMask | Key.CtrlMask | Key.ShiftMask));
 			keyChar &= ~mK;
 			_keyboardStrokes.Add (keyChar);
 		}
