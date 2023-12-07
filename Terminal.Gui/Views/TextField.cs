@@ -206,7 +206,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.InsertChar, Command.ToggleOverwrite);
 			AddKeyBinding (Key.C | Key.CtrlMask, Command.Copy);
 			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
-			AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
+			//AddKeyBinding (Key.V | Key.CtrlMask, Command.Paste);
 			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
 
 			AddKeyBinding (Key.R | Key.CtrlMask, Command.DeleteAll);

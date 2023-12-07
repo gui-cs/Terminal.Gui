@@ -92,8 +92,7 @@ public class KeyEventArgs : EventArgs {
 			if (IsAlt || IsCtrl) {
 				return false;
 			}
-			var key = Key & Key.CharMask;
-			return key is >= Key.A and <= Key.Z;
+			return (Key & Key.CharMask) is >= Key.A and <= Key.Z;
 		}
 	}
 

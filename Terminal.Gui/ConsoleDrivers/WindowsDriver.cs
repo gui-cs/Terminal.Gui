@@ -954,7 +954,6 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		var key = keyInfo.Key;
-		var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
 
 		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
@@ -972,8 +971,12 @@ internal class WindowsDriver : ConsoleDriver {
 					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
 				}
 			}
-			return (Key)((uint)alphaBase + delta);
-			//return (Key)((uint)keyInfo.KeyChar);
+
+			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
+				return (Key)((uint)Key.A + delta) | Key.ShiftMask;
+			}
+
+			return (Key)((uint)keyInfo.KeyChar);
 
 		}
 
