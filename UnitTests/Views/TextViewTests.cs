@@ -1479,7 +1479,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			_textView.Text = "ay";
 			Assert.Equal (1, eventcount);
-			_textView.ProcessKeyPressed (new (Key.Y));
+			_textView.ProcessKeyPressed (new (Key.Y | Key.ShiftMask));
 			Assert.Equal (1, eventcount);
 			Assert.Equal ("Yay", _textView.Text);
 		}
@@ -2592,7 +2592,7 @@ line.
 			Assert.False (tv.ProcessKeyPressed (new (Key.CursorRight)));
 			Assert.NotNull (tv.Autocomplete);
 			Assert.Empty (g.AllSuggestions);
-			Assert.True (tv.ProcessKeyPressed (new (Key.F)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.F | Key.ShiftMask)));
 			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
@@ -2621,7 +2621,7 @@ line.
 			Assert.Equal ("line", g.AllSuggestions [4]);
 			Assert.Equal ("second", g.AllSuggestions [5]);
 			Assert.Equal ("third", g.AllSuggestions [^1]);
-			Assert.True (tv.ProcessKeyPressed (new (Key.F)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.F | Key.ShiftMask)));
 			tv.Draw ();
 			Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 			Assert.Equal (new Point (24, 2), tv.CursorPosition);
@@ -3768,7 +3768,7 @@ line.
 			Assert.Equal (Point.Empty, tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.O)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.O | Key.ShiftMask)));
 			Assert.Equal ("O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -3792,7 +3792,7 @@ line.
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.T)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.T | Key.ShiftMask)));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -3816,7 +3816,7 @@ line.
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.T)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.T | Key.ShiftMask)));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
@@ -4052,7 +4052,7 @@ line.
 			Assert.Equal (Point.Empty, tv.CursorPosition);
 			Assert.False (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.O)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.O | Key.ShiftMask)));
 			Assert.Equal ("O", tv.Text);
 			Assert.Equal (1, tv.Lines);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -4076,7 +4076,7 @@ line.
 			Assert.Equal (new Point (0, 1), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new (Key.T)));
+			Assert.True (tv.ProcessKeyPressed (new (Key.T | Key.ShiftMask)));
 			Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 			Assert.Equal (2, tv.Lines);
 			Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -4100,7 +4100,7 @@ line.
 			Assert.Equal (new Point (0, 2), tv.CursorPosition);
 			Assert.True (tv.IsDirty);
 
-			Assert.True (tv.ProcessKeyPressed (new ((Key)'T')));
+			Assert.True (tv.ProcessKeyPressed (new (Key.T | Key.ShiftMask)));
 			Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 			Assert.Equal (3, tv.Lines);
 			Assert.Equal (new Point (1, 2), tv.CursorPosition);
@@ -6736,7 +6736,7 @@ This is the second line.
 			Assert.Equal (2, eventcount);
 
 			expectedCol = 1;
-			tv.ProcessKeyPressed (new (Key.Y));
+			tv.ProcessKeyPressed (new (Key.Y | Key.ShiftMask));
 			Assert.Equal (3, eventcount);
 			Assert.Equal ("Yay", tv.Text);
 		}

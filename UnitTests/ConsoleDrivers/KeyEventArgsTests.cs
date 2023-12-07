@@ -40,6 +40,22 @@ public class KeyEventArgsTests {
 	}
 
 	[Theory]
+	[InlineData (Key.A, true)]
+	[InlineData (Key.A | Key.ShiftMask, true)]
+	[InlineData (Key.F, true)]
+	[InlineData (Key.F | Key.ShiftMask, true)]
+	[InlineData (Key.A | Key.CtrlMask, false)]
+	[InlineData (Key.A | Key.AltMask, false)]
+	[InlineData (Key.D0, false)]
+	[InlineData (Key.Esc, false)]
+	[InlineData (Key.Tab, false)]
+	public void IsAlpha (Key key, bool expected)
+	{
+		var eventArgs = new KeyEventArgs (key);
+		Assert.Equal (expected, eventArgs.IsAlpha);
+	}
+
+	[Theory]
 	[InlineData ((Key)'❿', '❿')]
 	[InlineData ((Key)'☑', '☑')]
 	[InlineData ((Key)'英', '英')]
@@ -49,18 +65,18 @@ public class KeyEventArgsTests {
 	[InlineData ((Key)'ó', 'ó')]
 	[InlineData ((Key)'ó' | Key.ShiftMask, 'ó')]
 	[InlineData ((Key)'Ó', 'Ó')]
-	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'ç')]
+	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, default)]
 
 	[InlineData ((Key)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((Key)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
 	[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (Key.ShiftMask | Key.A, 65)]
-	[InlineData (Key.CtrlMask | Key.A, 97)]
-	[InlineData (Key.AltMask | Key.A, 97)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.A, 65)]
-	[InlineData (Key.ShiftMask | Key.AltMask | Key.A, 65)]
-	[InlineData (Key.AltMask | Key.CtrlMask | Key.A, 97)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.A, 65)]
+	[InlineData (Key.CtrlMask | Key.A, default)]
+	[InlineData (Key.AltMask | Key.A, default)]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.A, default)]
+	[InlineData (Key.ShiftMask | Key.AltMask | Key.A, default)]
+	[InlineData (Key.AltMask | Key.CtrlMask | Key.A, default)]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.A, default)]
 	
 	[InlineData ((Key)'z', 'z')]
 	[InlineData ((Key)'Z', 'z')]
@@ -68,14 +84,18 @@ public class KeyEventArgsTests {
 
 	[InlineData ((Key)'1', '1')]
 	[InlineData (Key.ShiftMask | Key.D1, '1')]
-	[InlineData (Key.CtrlMask | Key.D1, '1')]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.D1, '1')]
+	[InlineData (Key.CtrlMask | Key.D1, default)]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.D1, default)]
 
 	[InlineData (Key.F1, default)]
 	[InlineData (Key.ShiftMask | Key.F1, default)]
 	[InlineData (Key.CtrlMask | Key.F1, default)]
 
-	[InlineData (Key.Enter, default)]
+	[InlineData (Key.Enter, '\n')]
+	[InlineData (Key.Tab, '\t')]
+	[InlineData (Key.Esc, 0x1b)]
+	[InlineData (Key.Space, ' ')]
+
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Enter, default)]
 
 	[InlineData (Key.Null, default)]

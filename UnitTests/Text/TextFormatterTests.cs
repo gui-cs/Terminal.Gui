@@ -233,20 +233,20 @@ namespace Terminal.Gui.TextTests {
 			result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out hotPos, out hotKey);
 			Assert.False (result);
 			Assert.Equal (-1, hotPos);
-			Assert.Equal (Key.Unknown, hotKey);
+			Assert.Equal (Key.Null, hotKey);
 		}
 
 		[Theory]
 		[InlineData ("_K Before", true, 0, (Key)'K')]
 		[InlineData ("a_K Second", true, 1, (Key)'K')]
 		[InlineData ("Last _K", true, 5, (Key)'K')]
-		[InlineData ("After K_", false, -1, Key.Unknown)]
+		[InlineData ("After K_", false, -1, Key.Null)]
 		[InlineData ("Multiple _K and _R", true, 9, (Key)'K')]
 		[InlineData ("Non-english: _Кдать", true, 13, (Key)'К')] // Cryllic K (К)
 		[InlineData ("_K Before", true, 0, (Key)'K', true)] // Turn on FirstUpperCase and verify same results
 		[InlineData ("a_K Second", true, 1, (Key)'K', true)]
 		[InlineData ("Last _K", true, 5, (Key)'K', true)]
-		[InlineData ("After K_", false, -1, Key.Unknown, true)]
+		[InlineData ("After K_", false, -1, Key.Null, true)]
 		[InlineData ("Multiple _K and _R", true, 9, (Key)'K', true)]
 		[InlineData ("Non-english: _Кдать", true, 13, (Key)'К', true)] // Cryllic K (К)
 		public void FindHotKey_AlphaUpperCase_Succeeds (string text, bool expectedResult, int expectedHotPos, Key expectedKey, bool supportFirstUpperCase = false)
@@ -268,13 +268,13 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("_k Before", true, 0, (Key)'K')] // lower case should return uppercase Hotkey
 		[InlineData ("a_k Second", true, 1, (Key)'K')]
 		[InlineData ("Last _k", true, 5, (Key)'K')]
-		[InlineData ("After k_", false, -1, Key.Unknown)]
+		[InlineData ("After k_", false, -1, Key.Null)]
 		[InlineData ("Multiple _k and _R", true, 9, (Key)'K')]
 		[InlineData ("Non-english: _кдать", true, 13, (Key)'К')] // Lower case Cryllic K (к)
 		[InlineData ("_k Before", true, 0, (Key)'K', true)] // Turn on FirstUpperCase and verify same results
 		[InlineData ("a_k Second", true, 1, (Key)'K', true)]
 		[InlineData ("Last _k", true, 5, (Key)'K', true)]
-		[InlineData ("After k_", false, -1, Key.Unknown, true)]
+		[InlineData ("After k_", false, -1, Key.Null, true)]
 		[InlineData ("Multiple _k and _r", true, 9, (Key)'K', true)]
 		[InlineData ("Non-english: _кдать", true, 13, (Key)'К', true)] // Cryllic K (К)
 		public void FindHotKey_AlphaLowerCase_Succeeds (string text, bool expectedResult, int expectedHotPos, Key expectedKey, bool supportFirstUpperCase = false)
@@ -296,12 +296,12 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("_1 Before", true, 0, (Key)'1')] // Digits 
 		[InlineData ("a_1 Second", true, 1, (Key)'1')]
 		[InlineData ("Last _1", true, 5, (Key)'1')]
-		[InlineData ("After 1_", false, -1, Key.Unknown)]
+		[InlineData ("After 1_", false, -1, Key.Null)]
 		[InlineData ("Multiple _1 and _2", true, 9, (Key)'1')]
 		[InlineData ("_1 Before", true, 0, (Key)'1', true)] // Turn on FirstUpperCase and verify same results
 		[InlineData ("a_1 Second", true, 1, (Key)'1', true)]
 		[InlineData ("Last _1", true, 5, (Key)'1', true)]
-		[InlineData ("After 1_", false, -1, Key.Unknown, true)]
+		[InlineData ("After 1_", false, -1, Key.Null, true)]
 		[InlineData ("Multiple _1 and _2", true, 9, (Key)'1', true)]
 		public void FindHotKey_Numeric_Succeeds (string text, bool expectedResult, int expectedHotPos, Key expectedKey, bool supportFirstUpperCase = false)
 		{
@@ -359,7 +359,7 @@ namespace Terminal.Gui.TextTests {
 			var result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out int hotPos, out Key hotKey);
 			Assert.False (result);
 			Assert.Equal (-1, hotPos);
-			Assert.Equal (Key.Unknown, hotKey);
+			Assert.Equal (Key.Null, hotKey);
 		}
 
 		[Theory]

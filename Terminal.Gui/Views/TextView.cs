@@ -3422,8 +3422,9 @@ namespace Terminal.Gui {
 			}
 
 			ResetColumnTrack ();
+
 			// Ignore control characters and other special keys
-			if (a.AsRune == default) {
+			if (!a.IsAlpha && (a.Key < Key.Space || a.Key > Key.CharMask)) {
 				return false;
 			}
 
@@ -4326,8 +4327,9 @@ namespace Terminal.Gui {
 		bool InsertText (KeyEventArgs a, ColorScheme? colorScheme = null)
 		{
 			//So that special keys like tab can be processed
-			if (_isReadOnly)
+			if (_isReadOnly) {
 				return true;
+			}
 
 			SetWrapModel ();
 

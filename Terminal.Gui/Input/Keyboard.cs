@@ -40,7 +40,31 @@ public class KeyEventArgs : EventArgs {
 	/// If the key pressed is a letter, this will be the upper or lower case letter depending on whether the shift key is pressed.
 	/// If the key is outside of the <see cref="Key.CharMask"/> range, this will be <see langword="null"/>.
 	/// </remarks>
-	public Rune AsRune => GetKeyAsRune (Key);
+	public Rune AsRune {
+		get {
+			if (Key is Key.Null or Key.SpecialMask || Key.HasFlag (Key.CtrlMask) || Key.HasFlag (Key.AltMask)) {
+				return default;
+			}
+
+			// Extract the base key (removing modifier flags)
+			Key baseKey = Key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
+
+			switch (baseKey) {
+			case >= Key.A and <= Key.Z when !Key.HasFlag (Key.ShiftMask):
+				return new Rune ((char)(baseKey + 32));
+			case >= Key.A and <= Key.Z:
+				return new Rune ((char)baseKey);
+			case >= Key.Null and < Key.A:
+				return new Rune ((char)baseKey);
+			}
+
+			if (Enum.IsDefined (typeof (Key), baseKey)) {
+				return default;
+			}
+
+			return new Rune ((char)baseKey);
+		}
+	}
 
 	/// <summary>
 	/// Gets a value indicating whether the Shift key was pressed.
@@ -61,37 +85,43 @@ public class KeyEventArgs : EventArgs {
 	public bool IsCtrl => (Key & Key.CtrlMask) != 0;
 
 	/// <summary>
+	/// Gets a value indicating whether the key is a letter (a-z or A-Z). This is independent of the shift key.
+	/// </summary>	
+	public bool IsAlpha {
+		get {
+			if (IsAlt || IsCtrl) {
+				return false;
+			}
+			var key = Key & Key.CharMask;
+			return key is >= Key.A and <= Key.Z;
+		}
+	}
+
+	#region Operators
+	/// <summary>
+	/// Cast to a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
+	/// </summary>
+	/// <remarks>
+	/// Uses <see cref="AsRune"/>.
+	/// </remarks>
+	/// <param name="kea"></param>
+	public static implicit operator Rune (KeyEventArgs kea) => kea.AsRune;
+
+	/// <summary>
+	/// Cast to a char.
+	/// </summary>
+	/// <param name="kea"></param>
+	public static explicit operator char (KeyEventArgs kea) => (char)kea.AsRune.Value;
+	#endregion Operators
+
+	#region String conversion
+	/// <summary>
 	/// Pretty prints the KeyEvent
 	/// </summary>
 	/// <returns></returns>
 	public override string ToString ()
 	{
 		return ToString (Key, (Rune)'+');
-	}
-
-	private static Rune GetKeyAsRune (Key key)
-	{
-		if (key is Key.Null or Key.SpecialMask) {
-			return default;
-		}
-
-		// Extract the base key (removing modifier flags)
-		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
-
-		switch (baseKey) {
-		case >= Key.A and <= Key.Z when !key.HasFlag (Key.ShiftMask):
-			return new Rune ((char)(baseKey + 32));
-		case >= Key.A and <= Key.Z:
-			return new Rune ((char)baseKey);
-		case >= Key.Space and < Key.A:
-			return new Rune ((char)baseKey);
-		}
-
-		if (Enum.IsDefined(typeof(Key), baseKey)) {
-			return default;
-		}
-
-		return new Rune ((char)baseKey);
 	}
 
 	private static string GetKeyString (Key key)
@@ -184,6 +214,7 @@ public class KeyEventArgs : EventArgs {
 
 		return input;
 	}
+	#endregion
 }
 
 /// <summary>

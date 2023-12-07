@@ -819,12 +819,12 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var tf = new TextField ();
 			tf.EnsureFocus ();
-			tf.ProcessKeyPressed (new (Key.A));
+			tf.ProcessKeyPressed (new (Key.A | Key.ShiftMask));
 			Assert.Equal ("A", tf.Text);
 
 			// cancel the next keystroke
 			tf.TextChanging += (s, e) => e.Cancel = e.NewText == "AB";
-			tf.ProcessKeyPressed (new (Key.B));
+			tf.ProcessKeyPressed (new (Key.B | Key.ShiftMask));
 
 			// B was canceled so should just be A
 			Assert.Equal ("A", tf.Text);
@@ -1353,7 +1353,7 @@ namespace Terminal.Gui.ViewsTests {
 			tf.ClearHistoryChanges ();
 			Assert.False (tf.IsDirty);
 
-			Assert.True (tf.ProcessKeyPressed (new (Key.A)));
+			Assert.True (tf.ProcessKeyPressed (new (Key.A | Key.ShiftMask)));
 			Assert.Equal ($"{text}A", tf.Text);
 			Assert.True (tf.IsDirty);
 		}

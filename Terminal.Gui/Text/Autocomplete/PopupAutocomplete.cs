@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
 		public override bool ProcessKey (KeyEventArgs a)
 		{
-			if (SuggestionGenerator.IsWordChar (a.AsRune)) {
+			if (SuggestionGenerator.IsWordChar (a)) {
 				Visible = true;
 				ManipulatePopup ();
 				closed = false;

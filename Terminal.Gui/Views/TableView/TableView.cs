@@ -783,7 +783,7 @@ namespace Terminal.Gui {
 				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
 				!keyEvent.Key.HasFlag (Key.CtrlMask) &&
 				!keyEvent.Key.HasFlag (Key.AltMask) &&
-				Rune.IsLetterOrDigit (keyEvent.AsRune)) {
+				Rune.IsLetterOrDigit (keyEvent)) {
 				return CycleToNextTableEntryBeginningWith (keyEvent);
 			}
 
@@ -799,7 +799,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent.AsRune.Value);
+			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent);
 
 			if (match != -1) {
 				SelectedRow = match;

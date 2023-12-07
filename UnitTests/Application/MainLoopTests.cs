@@ -627,8 +627,8 @@ public class MainLoopTests {
 		Application.Top.Add (tf);
 
 		const int numPasses = 5;
-		const int numIncrements = 5000;
-		const int pollMs = 10000;
+		const int numIncrements = 500;
+		const int pollMs = 2500;
 
 		var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
 

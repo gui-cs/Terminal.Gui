@@ -113,7 +113,7 @@ namespace Terminal.Gui {
 			// Ignore non-numeric characters.
 			if (a.Key is >= (Key)(int)Key.D0 and <= (Key)(int)Key.D9) {
 				if (!ReadOnly) {
-					if (SetText (a.AsRune.ToString ().EnumerateRunes ().First ())) {
+					if (SetText (a)) {
 						IncCursorPosition ();
 					}
 				}

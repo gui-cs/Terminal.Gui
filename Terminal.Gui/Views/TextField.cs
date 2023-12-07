@@ -655,7 +655,7 @@ namespace Terminal.Gui {
 			}
 
 			// Ignore other control characters.
-			if (a.AsRune == default) {
+			if (!a.IsAlpha && (a.Key < Key.Space || a.Key > Key.CharMask)) {
 				return false;
 			}
 
