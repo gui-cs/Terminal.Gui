@@ -617,8 +617,29 @@ public partial class View {
 		if (handled != null && (bool)handled) {
 			return true;
 		}
+		
+		// TODO: Refactor this per https://github.com/gui-cs/Terminal.Gui/pull/2927#discussion_r1420415162
+		// TODO: The problem that needs to be solved is:
+		// TODO: - If a subview defines a key binding, but is never focused, it's commands will never get invoked
+		// TODO:   Potential solution: A subview that wishes to provide "super-view level commands" must subscribe to
+		// TODO:   superview.InvokingKeyBindings
+		// TODO: Q: Do we have any views that actually require this?
 
 
+		// View base class doesn't have to knowing about a derived class TopLevel.
+		// The isolation principle is affected. If a derived class has a different behavior the it must overridden
+		// the related method and deal with the right actions. I know you want to get rid of the TopLevel but this derived view has specific
+		// functionalities that only have to belong to him.
+		//
+		// Another problem with this design is that are a lot of views that have KeyBindings that only must be run if they are focused.
+		// TextView is one of that and this call will invoke an action even if it isn't focused and thus having unexpected behavior.
+		// With this design force all the TextView methods called by KeyBindings to check if it's focused which is a nightmare.
+		//foreach (var view in Subviews.Where (v => v is not Toplevel && v.Enabled && !v.HasFocus && v.KeyBindings.Count > 0)) {
+		//	handled = view.OnInvokeKeyBindings (keyEvent);
+		//	if (handled != null && (bool)handled) {
+		//		return true;
+		//	}
+		//}
 		return false;
 	}
 
