@@ -282,11 +282,12 @@ public partial class View {
 			return true;
 		}
 
-		// After (fire the cancellable event InvokingKeyBindings)
+		// After (fire the cancellable event)
 		// TODO: Until there's a clear use-case, we will not define an 'after' event (e.g. OnAfterKeyDown). 
 
 		return false;
 	}
+	
 	/// <summary>
 	/// Invoked when a key is pressed down. This is called before <see cref="OnKeyPress"/>.
 	/// </summary>
@@ -360,9 +361,26 @@ public partial class View {
 	public virtual bool OnProcessKeyDown (KeyEventArgs keyEvent)
 	{
 		// fire event
-		ProcessKeyPress?.Invoke (this, keyEvent);
+		ProcessKeyDown?.Invoke (this, keyEvent);
 		return keyEvent.Handled;
 	}
+
+	/// <summary>
+	/// Invoked when the users presses a key to allow processing of the key down event.
+	/// Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
+	/// being processed by other views.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Not all terminals support key distinct down/up notifications, Applications should avoid
+	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPress"/>.
+	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
+	/// </remarks>
+	public event EventHandler<KeyEventArgs> ProcessKeyDown;
+
 	#endregion
 
 	#region Key Press Event
@@ -411,8 +429,8 @@ public partial class View {
 			return true;
 		}
 
-		// After (fire the cancellable event InvokingKeyBindings)
-
+		// After (fire the cancellable event)
+		// TODO: Until there's a clear use-case, we will not define an 'after' event (e.g. OnAfterKeyPress). 
 
 		return false;
 	}
@@ -526,6 +544,50 @@ public partial class View {
 
 	#region Key Up Event
 	/// <summary>
+	/// If the view is enabled, processes a key up event and returns <see langword="true"/> if the event was handled.
+	/// Called before <see cref="ProcessKeyPressEvent"/>.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// If the view has a sub view that is focused, <see cref="ProcessKeyUpEvent"/> will be called on the focused view first.
+	/// </para>
+	/// <para>
+	/// If the focused sub view does not handle the key press, this method calls <see cref="OnKeyUp"/>
+	/// then <see cref="OnProcessKeyUp"/>, both of which are cancellable.
+	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
+	/// </remarks>
+	/// <param name="keyEvent"></param>
+	/// <returns><see langword="true"/> if the event was handled.</returns>
+	public bool ProcessKeyUpEvent (KeyEventArgs keyEvent)
+	{
+		if (!Enabled) {
+			return false;
+		}
+
+		if (Focused?.ProcessKeyUpEvent (keyEvent) == true) {
+			return true;
+		}
+
+		// Before (fire the cancellable event KeyPress)
+		if (OnKeyUp (keyEvent)) {
+			return true;
+		}
+
+		// During (this is what can be cancelled)
+		if (OnProcessKeyUp (keyEvent)) {
+			return true;
+		}
+
+		// After (fire the cancellable event InvokingKeyBindings)
+		// TODO: Until there's a clear use-case, we will not define an 'after' event (e.g. OnAfterKeyUp). 
+
+		return false;
+	}
+
+	/// <summary>
 	/// Method invoked when a key is released. This method will be called after <see cref="OnProcessKeyPress"/>.
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
@@ -535,7 +597,7 @@ public partial class View {
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPress"/>.
 	/// <para>
-	/// Overrides must call into the base and return <see langword="true"/> if the base returns  <see langword="true"/>.
+	/// Overrides must call into the base and return <see langword="true"/> if the base returns <see langword="true"/>.
 	/// </para>
 	/// <para>
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
@@ -572,6 +634,44 @@ public partial class View {
 	/// </remarks>
 	/// </summary>
 	public event EventHandler<KeyEventArgs> KeyUp;
+	
+	/// <summary>
+	/// Low-level API allowing views to process key up events.
+	/// </summary>
+	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
+	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
+	/// the keypress was handled and no other view should see it.</returns>
+	/// <remarks>
+	/// <para>
+	/// Fires the <see cref="ProcessKeyUp"/> event. 
+	/// </para>
+	/// <para>
+	/// Not all terminals support key distinct down/up notifications, Applications should avoid
+	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="OnProcessKeyPress"/>.
+	/// </para>
+	/// </remarks>
+	public virtual bool OnProcessKeyUp (KeyEventArgs keyEvent)
+	{
+		// fire event
+		ProcessKeyUp?.Invoke (this, keyEvent);
+		return keyEvent.Handled;
+	}
+
+	/// <summary>
+	/// Invoked when the users presses a key to allow processing of the key up event.
+	/// Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
+	/// being processed by other views.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Not all terminals support key distinct down/up notifications, Applications should avoid
+	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyPress"/>.
+	/// </para>
+	/// <para>
+	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
+	/// </para>
+	/// </remarks>
+	public event EventHandler<KeyEventArgs> ProcessKeyUp;
 
 	#endregion Key Up Event
 	#endregion Low-level Key handling
@@ -640,7 +740,7 @@ public partial class View {
 		//		return true;
 		//	}
 		//}
-		return false;
+		return handled;
 	}
 
 	/// <summary>
