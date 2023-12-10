@@ -544,16 +544,6 @@ namespace Terminal.Gui {
 			Driver.AddRune (CM.Glyphs.DownArrow);
 		}
 
-		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs e)
-		{
-			var result = InvokeKeyBindings (e);
-			if (result != null)
-				return (bool)result;
-
-			return base.OnKeyPressed (e);
-		}
-
 		bool UnixEmulation ()
 		{
 			// Unix emulation

@@ -133,7 +133,7 @@ namespace UICatalog.Scenarios {
 			public StagingUIController (DateTime? start, List<string> list)
 			{
 				top = new Toplevel (Application.Top.Frame);
-				top.KeyPressed += (s,e) => {
+				top.KeyPress += (s,e) => {
 					// Prevents Ctrl+Q from closing this.
 					// Only Ctrl+C is allowed.
 					if (e.Key == Application.QuitKey) {

@@ -180,7 +180,7 @@ namespace UICatalog {
 
 			// prompt user to hit a key
 			var dlg = new Dialog () { Title = "Enter Key" };
-			dlg.KeyPressed += (s, k) => {
+			dlg.KeyPress += (s, k) => {
 				key = k.Key;
 				Application.RequestStop ();
 			};

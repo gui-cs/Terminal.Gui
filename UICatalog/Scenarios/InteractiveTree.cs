@@ -30,7 +30,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 			};
-			treeView.KeyPressed += TreeView_KeyPress;
+			treeView.KeyPress += TreeView_KeyPress;
 
 			Win.Add (treeView);
 

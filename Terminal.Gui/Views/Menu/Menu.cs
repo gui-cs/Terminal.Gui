@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Linq;
+using System.Reflection.Metadata;
 
 namespace Terminal.Gui;
 
@@ -450,7 +451,7 @@ class Menu : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool OnInvokeKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokeKeyBindings (KeyEventArgs keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for menu bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
@@ -499,11 +500,11 @@ class Menu : View {
 
 					return base.OnInvokeKeyBindings (keyEvent);
 				}
-
 			}
 		}
 
-		if (base.OnInvokeKeyBindings (keyEvent)) {
+		var handled = base.OnInvokeKeyBindings (keyEvent);
+		if (handled != null && (bool)handled) {
 			return true;
 		}
 

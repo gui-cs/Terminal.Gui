@@ -443,7 +443,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
 		{
 			bool focusMoved = false;
 
@@ -463,7 +463,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			return base.OnKeyPressed (keyEvent);
+			return false;
 		}
 
 		private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
@@ -803,16 +803,6 @@ namespace Terminal.Gui {
 				AddKeyBinding (Key.CursorLeft, Command.Left);
 				AddKeyBinding (Key.CursorUp, Command.LineUp);
 				AddKeyBinding (Key.CursorDown, Command.LineDown);
-			}
-
-			public override bool OnKeyPressed (KeyEventArgs a)
-			{
-				// Do nothing if we're not focused
-				if (!CanFocus || !HasFocus) {
-					return true;
-				}
-
-				return base.OnKeyPressed (a);
 			}
 
 			public override void PositionCursor ()

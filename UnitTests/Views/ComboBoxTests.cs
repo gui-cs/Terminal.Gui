@@ -79,7 +79,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (comboBox);
 
 			foreach (var key in (Key [])Enum.GetValues (typeof (Key))) {
-				Assert.Null (Record.Exception (() => comboBox.ProcessKeyPressed (new (key))));
+				Assert.Null (Record.Exception (() => comboBox.ProcessKeyPressEvent (new (key))));
 			}
 		}
 
@@ -96,28 +96,28 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (string.Empty, cb.Text);
 			var opened = false;
 			cb.OpenSelectedItem += (s, _) => opened = true;
-			Assert.True (cb.ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.False (opened);
 			cb.Text = "Tw";
-			Assert.True (cb.ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.True (opened);
 			Assert.Equal ("Tw", cb.Text);
 			Assert.False (cb.IsShow);
 			cb.SetSource (null);
-			Assert.False (cb.ProcessKeyPressed (new (Key.Enter)));
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4))); // with no source also expand empty
+			Assert.False (cb.ProcessKeyPressEvent (new (Key.Enter)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4))); // with no source also expand empty
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
 			cb.SetSource (source);
 			cb.Text = "";
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4))); // collapse
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4))); // collapse
 			Assert.False (cb.IsShow);
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4))); // expand
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4))); // expand
 			Assert.True (cb.IsShow);
 			cb.Collapse ();
 			Assert.False (cb.IsShow);
 			Assert.True (cb.HasFocus);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorDown))); // losing focus
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorDown))); // losing focus
 			Assert.False (cb.IsShow);
 			Assert.False (cb.HasFocus);
 			Application.Top.FocusFirst (); // Gets focus again
@@ -127,27 +127,27 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorUp)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorUp)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorUp)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
@@ -157,7 +157,7 @@ One      ▼
 One       
 ", output);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.PageDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.PageDown)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
@@ -167,7 +167,7 @@ Two      ▼
 Two       
 ", output);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.PageDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.PageDown)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
@@ -176,43 +176,43 @@ Two
 Three    ▼
 Three     
 ", output);
-			Assert.True (cb.ProcessKeyPressed (new (Key.PageUp)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.PageUp)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.PageUp)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.PageUp)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.False (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.End)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.End)));
 			Assert.False (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.Home)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Home)));
 			Assert.False (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.End)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.End)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.Home)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Home)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.Esc)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Esc)));
 			Assert.False (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.CursorDown))); // losing focus
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.CursorDown))); // losing focus
 			Assert.False (cb.HasFocus);
 			Assert.False (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
@@ -222,7 +222,7 @@ Three
 			Assert.False (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.U | Key.CtrlMask)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.U | Key.CtrlMask)));
 			Assert.True (cb.HasFocus);
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
@@ -247,7 +247,7 @@ Three
 			source.Add ("One");
 			Assert.Equal (1, cb.Source.Count);
 			Assert.Equal (-1, cb.SelectedItem);
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
@@ -258,12 +258,12 @@ Three
 			Assert.True (cb.IsShow);
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("T", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.Source.Count);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("T", cb.Text);
-			Assert.True (cb.ProcessKeyPressed (new (Key.Esc)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Esc)));
 			Assert.False (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem); // retains last accept selected item
 			Assert.Equal ("", cb.Text); // clear text
@@ -396,7 +396,7 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
@@ -417,7 +417,7 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorUp)));
 			Assert.True (cb.MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
@@ -458,30 +458,30 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("Two", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("Two", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.Esc)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Esc)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
@@ -518,30 +518,30 @@ Three
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("Two", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("Two", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.Esc)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Esc)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
@@ -579,30 +579,30 @@ Three
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("Two", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
 			Assert.Equal ("Two", cb.Text);
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("Two", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.Esc)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.Esc)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
@@ -638,8 +638,8 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
@@ -675,8 +675,8 @@ Three
 			Assert.Equal (0, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("Two", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (1, cb.SelectedItem);
@@ -727,7 +727,7 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
@@ -747,7 +747,7 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
@@ -767,7 +767,7 @@ Three
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.True (cb.Subviews [1].MouseEvent (new MouseEvent {
 				X = cb.Bounds.Right - 1,
 				Y = 0,
@@ -838,7 +838,7 @@ Three ", output);
 222222
 222222", driver: Application.Driver, attributes);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
@@ -850,7 +850,7 @@ Three ", output);
 000002
 222222", driver: Application.Driver, attributes);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorDown)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorDown)));
 			Assert.Equal ("", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
@@ -862,13 +862,13 @@ Three ", output);
 222222
 000002", driver: Application.Driver, attributes);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.Enter)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.Enter)));
 			Assert.Equal ("Three", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("Three", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
@@ -880,7 +880,7 @@ Three ", output);
 222222
 000002", driver: Application.Driver, attributes);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorUp)));
 			Assert.Equal ("Three", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
@@ -892,7 +892,7 @@ Three ", output);
 000002
 111112", driver: Application.Driver, attributes);
 
-			Assert.True (cb.Subviews [1].ProcessKeyPressed (new (Key.CursorUp)));
+			Assert.True (cb.Subviews [1].ProcessKeyPressEvent (new (Key.CursorUp)));
 			Assert.Equal ("Three", selected);
 			Assert.True (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
@@ -904,7 +904,7 @@ Three ", output);
 222222
 111112", driver: Application.Driver, attributes);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Equal ("Three", selected);
 			Assert.False (cb.IsShow);
 			Assert.Equal (2, cb.SelectedItem);
@@ -931,13 +931,13 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.NotNull (cb.Source);
 			Assert.True (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 
-			Assert.True (cb.ProcessKeyPressed (new (Key.F4)));
+			Assert.True (cb.ProcessKeyPressEvent (new (Key.F4)));
 			Assert.Null (cb.Source);
 			Assert.False (cb.IsShow);
 			Assert.Equal (-1, cb.SelectedItem);

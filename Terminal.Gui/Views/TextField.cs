@@ -616,6 +616,17 @@ namespace Terminal.Gui {
 
 		int _oldCursorPos;
 
+		///<inheritdoc/>
+		public override bool? OnInvokeKeyBindings (KeyEventArgs a)
+		{
+			// Give autocomplete first opportunity to respond to key presses
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
+				return true;
+			}
+			return base.OnInvokeKeyBindings (a);
+		}
+
+		/// TODO: Flush out these docs
 		/// <summary>
 		/// Processes key presses for the <see cref="TextField"/>.
 		/// <remarks>
@@ -634,25 +645,12 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnProcessKeyPress (KeyEventArgs a)
 		{
 			// remember current cursor position
 			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
 			_oldCursorPos = _point;
-
-			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
-				return true;
-			}
-
-			if (base.OnKeyPressed (a)) {
-				return true;
-			}
-
-			if (OnInvokeKeyBindings (a)) {
-				return true;
-			}
 
 			// Ignore other control characters.
 			if (!a.IsAlpha && (a.Key < Key.Space || a.Key > Key.CharMask)) {

@@ -107,9 +107,9 @@ namespace Terminal.Gui.FileServicesTests {
 #if BROKE_IN_2927
 			Send ('f', ConsoleKey.F, false, true, false);
 #else
-			Application.OnKeyPressed (new KeyEventArgs (Key.Tab));
-			Application.OnKeyPressed (new KeyEventArgs (Key.Tab));
-			Application.OnKeyPressed (new KeyEventArgs (Key.Tab));
+			Application.OnKeyPress (new KeyEventArgs (Key.Tab));
+			Application.OnKeyPress (new KeyEventArgs (Key.Tab));
+			Application.OnKeyPress (new KeyEventArgs (Key.Tab));
 #endif
 
 			Assert.IsType<TextField> (dlg.MostFocused);

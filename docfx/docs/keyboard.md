@@ -50,28 +50,65 @@ The `Shortcut` is provided by setting the [Shortcut](~/api/Terminal.Gui.MenuItem
 
 The [ShortcutDelimiter](~/api/Terminal.Gui.MenuBar.yml#Terminal_Gui_MenuBar_ShortcutDelimiter) (`+` by default) is used to separate the `Shortcut` from the `Text` of the `MenuItem` or `StatusItem`. For example, the `Shortcut` for `Quit` is `Ctrl+Q` and the `Text` is `Quit`. 
 
-### **[KeyPressed Events](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyPressed)**
+### **[Keyboard Press Events](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyPress)**
 
 Keyboard events are retrieved from [Console Drivers](drivers.md) and passed on 
 to the [Application](~/api/Terminal.Gui.Application.yml) class by the [Main Loop](mainloop.md). 
 
 [Application](~/api/Terminal.Gui.Application.yml) then determines the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view
-(either the default created by calling `Application.Init`, or the one set by calling `Application.Run`). The mouse event, using [Bounds-relative coordinates](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_Bounds) is then passed to the [ProcessKeyPressed](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_ProcessKeyPressed_Terminal_Gui_KeyEventArgs_) method of the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view. 
+(either the default created by calling `Application.Init`, or the one set by calling `Application.Run`). The mouse event, using [Bounds-relative coordinates](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_Bounds) is then passed to the [ProcessKeyPress](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_ProcessKeyPress_Terminal_Gui_KeyEventArgs_) method of the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view. 
 
-If the view is enabled [ProcessKeyPressed](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_ProcessKeyPressed_Terminal_Gui_KeyEventArgs_) will 
+If the view is enabled [ProcessKeyPress](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_ProcessKeyPress_Terminal_Gui_KeyEventArgs_) will 
 
-1) If the view has a subview that has focus, 'ProcessKeyPressed' on the focused view will be called. If the focused view handles the keypress, processing stops.
-2) If there is no focused sub-view, or the focused sub-view does not handle the keypress, [OnKeyPressed](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyPressed_Terminal_Gui_KeyEventArgs_) will be called. If the view handles the keypress, processing stops.
+1) If the view has a subview that has focus, 'ProcessKeyPress' on the focused view will be called. If the focused view handles the keypress, processing stops.
+2) If there is no focused sub-view, or the focused sub-view does not handle the keypress, [OnKeyPress](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyPress_Terminal_Gui_KeyEventArgs_) will be called. If the view handles the keypress, processing stops.
 3) If the view does not handle the keypress, [OnInvokeKeyBindings](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnInvokeKeyBindings_Terminal_Gui_KeyEventArgs_) will be called. This method calls[InvokeKeyBindings](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_InvokeKeyBindings_Terminal_Gui_KeyEventArgs_) to invoke any keys bound to commands. If the key is bound and handled, processing stops.
 
 
-## **[Global Key Handling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_KeyPressed)**
+## **[Global Key Handling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_KeyPress)**
 
-To define global key handling logic for an entire application in cases where the methods listed above are not suitable, use the `Application.KeyPressed` event. 
+To define global key handling logic for an entire application in cases where the methods listed above are not suitable, use the `Application.KeyPress` event. 
 
 
 ## **[Key Down/Up Events](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyDown)**
 
-*Terminal.Gui* supports key up/down events, but not all [Console Drivers](drivers.md) do. To receive key down and key up events, you must use a driver that supports them (e.g. `WindowsDriver`).
+*Terminal.Gui* supports key up/down events with [OnKeyDown](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyDown_Terminal_Gui_KeyEventArgs_) and [OnKeyUp](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyUp_Terminal_Gui_KeyEventArgs_), but not all [Console Drivers](drivers.md) do. To receive these key down and key up events, you must use a driver that supports them (e.g. `WindowsDriver`).
 
-Note that the order of key events is not guaranteed. For example, if you press `Shift-A`, you may receive the key down event for `Shift` before the key down event for `A`, or you may receive the key down event for `A` before the key down event for `Shift`. In addition, the order in which the events are fired is `KeyDown`, `KeyUp`, `KeyPressed`.
+Note that the order of key events is not guaranteed. For example, if you press `Shift-A`, you may receive the key down event for `Shift` before the key down event for `A`, or you may receive the key down event for `A` before the key down event for `Shift`. In addition, the order in which the events are fired is `KeyDown`, `KeyPress`, `KeyUp`.
+
+# General input model
+
+- Key events (Down, Press, Up) are generated by `ConsoleDriver`. 
+- `Application` subscribes to `ConsoleDriver.Down/Press/Up` events and forwards them to the most-focused `TopLevel` view. 
+- The base (`View`) implementation of `virtual bool OnKeyPress`:
+  - We firm up the definition of `View.Enabled` - if `Enabled == false` that view should *never* see keyboard (or mouse input) 
+    - (this is not the case today; `Application.OnKeyPress` forwards the event to ALL `TopLevels`.
+  - Invokes `KeyPress`. If `Handled == true` on return, the method returns.
+  - Assuming the key wasn't handled by the event handler, the most-focused View is identified and `OnKeyPress` is called on it.
+  - Assuming THAT call returns false (indicating the key wasn't handled)
+     - `InvokeKeyBindings` is called to invoke any bound commands.
+
+- Subclasses of `View` can (rarely) override `OnKeyPress` 
+  - If they do override, they MUST call `base.OnKeyPress` and honor the result before returning. If they don't keybindings won't work and `KeyPress` events won't fire.
+  - This gives every SubView a chance to see the key and set `Handled = true`. 
+  - This enables container Views to control what keys it's SubViews see. 
+  - This enables super-classes to control what keys base classes see (e.g. DateField prevents TextField from seeing non-numeric input)
+
+- Subclasses of `View` can Subscribe to `KeyPress` (instead of overriding `OnKeyPress`)
+  - If they do override, they MUST invoke `base.KeyPress` and honor the result before returning.
+  - This gives every SubView a chance to see the key and set `Handled = true`. 
+  - This enables container Views to control what keys it's SubViews see. 
+  - This enables super-classes to control what keys base classes see (e.g. DateField prevents TextField from seeing non-numeric input)
+
+## ConsoleDriver
+
+* No concept of `Command` or `KeyBindings`
+* Exposes non-cancelable `KeyDown/Up/Press` events. The `OnKey/Down/Up/Press` methods are public and can be used to simulate keyboard input (in addition to SendKeys).
+
+## Application
+
+* No concept of `Command` or `KeyBindings`
+  * A future refinement could support `Command` and `KeyBindings` - Replace existing `AlternateForward/BackKey` with a `Command` and `KeyBinding` for Tab/Ctrl-Tab
+* Exposes cancelable `KeyDown/Up/Press` events (via `Handled = true`). The `OnKey/Down/Up/Press` methods are public and can be used to simulate keyboard input.
+
+  

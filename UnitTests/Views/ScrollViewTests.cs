@@ -70,114 +70,114 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (sv.KeepContentAlwaysInViewport);
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorUp)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorUp)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorDown)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorDown)));
 			Assert.Equal (new Point (0, -1), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorUp)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorUp)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageUp)));
+			Assert.False (sv.OnKeyPress (new (Key.PageUp)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageDown)));
+			Assert.True (sv.OnKeyPress (new (Key.PageDown)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageDown)));
+			Assert.False (sv.OnKeyPress (new (Key.PageDown)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorDown)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorDown)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new ((Key)'v' | Key.AltMask)));
+			Assert.True (sv.OnKeyPress (new ((Key)'v' | Key.AltMask)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.V | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.V | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorLeft)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorLeft)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorRight)));
 			Assert.Equal (new Point (-1, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorLeft)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorLeft)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageUp | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.PageUp | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageDown | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.PageDown | Key.CtrlMask)));
 			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorRight)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorRight)));
 			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.Home)));
+			Assert.True (sv.OnKeyPress (new (Key.Home)));
 			Assert.Equal (new Point (-20, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.Home)));
+			Assert.False (sv.OnKeyPress (new (Key.Home)));
 			Assert.Equal (new Point (-20, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.End)));
+			Assert.True (sv.OnKeyPress (new (Key.End)));
 			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.End)));
+			Assert.False (sv.OnKeyPress (new (Key.End)));
 			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.Home | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.Home | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.Home | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.Home | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.End | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.End | Key.CtrlMask)));
 			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.End | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.End | Key.CtrlMask)));
 			Assert.Equal (new Point (-20, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.Home)));
+			Assert.True (sv.OnKeyPress (new (Key.Home)));
 			Assert.Equal (new Point (-20, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.Home | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.Home | Key.CtrlMask)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
 
 			sv.KeepContentAlwaysInViewport = false;
 			Assert.False (sv.KeepContentAlwaysInViewport);
 			Assert.True (sv.AutoHideScrollBars);
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorUp)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorUp)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorDown)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorDown)));
 			Assert.Equal (new Point (0, -1), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorUp)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorUp)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageUp)));
+			Assert.False (sv.OnKeyPress (new (Key.PageUp)));
 			Assert.Equal (new Point (0, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageDown)));
+			Assert.True (sv.OnKeyPress (new (Key.PageDown)));
 			Assert.Equal (new Point (0, -10), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageDown)));
+			Assert.True (sv.OnKeyPress (new (Key.PageDown)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageDown)));
+			Assert.False (sv.OnKeyPress (new (Key.PageDown)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorDown)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorDown)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new ((Key)'v' | Key.AltMask)));
+			Assert.True (sv.OnKeyPress (new ((Key)'v' | Key.AltMask)));
 			Assert.Equal (new Point (0, -9), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.V | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.V | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorLeft)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorLeft)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorRight)));
 			Assert.Equal (new Point (-1, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.CursorLeft)));
+			Assert.True (sv.OnKeyPress (new (Key.CursorLeft)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageUp | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.PageUp | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageDown | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.PageDown | Key.CtrlMask)));
 			Assert.Equal (new Point (-20, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageDown | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.PageDown | Key.CtrlMask)));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.PageDown | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.PageDown | Key.CtrlMask)));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.CursorRight)));
+			Assert.False (sv.OnKeyPress (new (Key.CursorRight)));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.PageUp | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.PageUp | Key.CtrlMask)));
 			Assert.Equal (new Point (-19, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.Home)));
+			Assert.True (sv.OnKeyPress (new (Key.Home)));
 			Assert.Equal (new Point (-19, 0), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.Home)));
+			Assert.False (sv.OnKeyPress (new (Key.Home)));
 			Assert.Equal (new Point (-19, 0), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.End)));
+			Assert.True (sv.OnKeyPress (new (Key.End)));
 			Assert.Equal (new Point (-19, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.End)));
+			Assert.False (sv.OnKeyPress (new (Key.End)));
 			Assert.Equal (new Point (-19, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.Home | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.Home | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.Home | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.Home | Key.CtrlMask)));
 			Assert.Equal (new Point (0, -19), sv.ContentOffset);
-			Assert.True (sv.OnKeyPressed (new (Key.End | Key.CtrlMask)));
+			Assert.True (sv.OnKeyPress (new (Key.End | Key.CtrlMask)));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
-			Assert.False (sv.OnKeyPressed (new (Key.End | Key.CtrlMask)));
+			Assert.False (sv.OnKeyPress (new (Key.End | Key.CtrlMask)));
 			Assert.Equal (new Point (-39, -19), sv.ContentOffset);
 		}
 
@@ -644,7 +644,7 @@ namespace Terminal.Gui.ViewsTests {
 			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -668,7 +668,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -692,7 +692,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -716,7 +716,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -740,7 +740,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -764,7 +764,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -788,7 +788,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorRight)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorRight)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -811,7 +811,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CtrlMask | Key.End)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CtrlMask | Key.End)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -834,8 +834,8 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CtrlMask | Key.Home)));
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorDown)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CtrlMask | Key.Home)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorDown)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -858,7 +858,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorDown)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorDown)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -881,7 +881,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.CursorDown)));
+			Assert.True (scrollView.OnKeyPress (new (Key.CursorDown)));
 			Application.Top.Draw ();
 
 			expected = @"
@@ -904,7 +904,7 @@ namespace Terminal.Gui.ViewsTests {
 			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Assert.Equal (new Rect (1, 1, 21, 14), pos);
 
-			Assert.True (scrollView.OnKeyPressed (new (Key.End)));
+			Assert.True (scrollView.OnKeyPress (new (Key.End)));
 			Application.Top.Draw ();
 
 			expected = @"

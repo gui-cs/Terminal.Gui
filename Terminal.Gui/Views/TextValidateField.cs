@@ -612,7 +612,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnProcessKeyPress (KeyEventArgs a)
 		{
 			if (provider == null) {
 				return false;
@@ -620,10 +620,6 @@ namespace Terminal.Gui {
 
 			if (a.AsRune == default) {
 				return false;
-			}
-
-			if (base.OnInvokeKeyBindings (a)) {
-				return true;
 			}
 			
 			var key = a.AsRune;
@@ -634,9 +630,6 @@ namespace Terminal.Gui {
 				CursorRight ();
 			}
 
-			if (base.OnKeyPressed (a)) {
-				return true;
-			}
 			return false;
 		}
 

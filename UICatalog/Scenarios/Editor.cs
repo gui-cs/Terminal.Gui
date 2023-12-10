@@ -176,7 +176,7 @@ namespace UICatalog.Scenarios {
 				_scrollBar.Refresh ();
 			};
 
-			Win.KeyPressed += (s, e) => {
+			Win.KeyPress += (s, e) => {
 				if (_winDialog != null && (e.Key == Key.Esc
 								|| e.Key == Application.QuitKey)) {
 					DisposeWinDialog ();

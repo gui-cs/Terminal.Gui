@@ -38,7 +38,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	{
 		_tableView = table;
 		_tree = tree;
-		_tableView.KeyPressed += Table_KeyPress;
+		_tableView.KeyPress += Table_KeyPress;
 		_tableView.MouseClick += Table_MouseClick;
 
 		var colList = subsequentColumns.Keys.ToList ();
@@ -68,7 +68,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	/// <inheritdoc/>
 	public void Dispose ()
 	{
-		_tableView.KeyPressed -= Table_KeyPress;
+		_tableView.KeyPress -= Table_KeyPress;
 		_tableView.MouseClick -= Table_MouseClick;
 		_tree.Dispose ();
 	}

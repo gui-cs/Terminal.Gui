@@ -247,7 +247,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnProcessKeyPress (KeyEventArgs a)
 		{
 			// Ignore non-numeric characters.
 			if (a.Key is >= (Key)(int)Key.D0 and <= (Key)(int)Key.D9) {
@@ -256,10 +256,6 @@ namespace Terminal.Gui {
 						IncCursorPosition ();
 					}
 				}
-				return true;
-			}
-
-			if (base.OnKeyPressed (a)) {
 				return true;
 			}
 			

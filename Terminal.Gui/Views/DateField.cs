@@ -105,7 +105,7 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
 
-			KeyPressed += DateField_KeyPressed;
+			KeyPress += DateField_KeyPressed;
 		}
 
 		void DateField_KeyPressed (object sender, KeyEventArgs a)

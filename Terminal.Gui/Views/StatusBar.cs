@@ -139,7 +139,7 @@ public class StatusBar : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool OnInvokeKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokeKeyBindings (KeyEventArgs keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for status bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.

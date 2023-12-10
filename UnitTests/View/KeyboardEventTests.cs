@@ -19,12 +19,12 @@ public class KeyboardEventTests {
 	{
 		Application.Init (new FakeDriver ());
 
-		Application.OnKeyPressed (new (Key.N));
+		Application.OnKeyPress (new (Key.N));
 
 		var top = Application.Top;
 
 		var text = new TextField ("");
-		text.KeyPressed += (s, e) => {
+		text.KeyPress += (s, e) => {
 			e.Handled = true;
 			Assert.True (e.Handled);
 			Assert.Equal (Key.N, e.Key);
@@ -32,7 +32,8 @@ public class KeyboardEventTests {
 		top.Add (text);
 
 		Application.Iteration += (s, a) => {
-			Application.OnKeyPressed (new (Key.N));
+			var handled = Application.OnKeyPress (new (Key.N));
+			Assert.True (handled);
 			Assert.Equal ("", text.Text);
 
 			Application.RequestStop ();
@@ -60,7 +61,7 @@ public class KeyboardEventTests {
 			e.Handled = true;
 			keyDown = true;
 		};
-		view.KeyPressed += (s, e) => {
+		view.KeyPress += (s, e) => {
 			Assert.Equal ((Key)'a', e.Key);
 			Assert.False (keyPress);
 			Assert.False (view.IsKeyPress);
@@ -115,12 +116,8 @@ public class KeyboardEventTests {
 			return true;
 		}
 
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
 		{
-			if (base.OnKeyPressed (keyEvent)) {
-				return true;
-			}
-
 			IsKeyPress = true;
 			return true;
 		}
@@ -156,7 +153,7 @@ public class KeyboardEventTests {
 			Assert.False (view.IsKeyDown);
 			keyDown = true;
 		};
-		view.KeyPressed += (s, e) => {
+		view.KeyPress += (s, e) => {
 			keyPress = true;
 		};
 		view.KeyUp += (s, e) => {

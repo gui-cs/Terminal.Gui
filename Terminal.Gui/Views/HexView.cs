@@ -446,12 +446,8 @@ public partial class HexView : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool OnKeyPressed (KeyEventArgs keyEvent)
+	public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
 	{
-		if (base.OnKeyPressed (keyEvent)) {
-			return true;
-		}
-
 		if (!AllowEdits) {
 			return false;
 		}

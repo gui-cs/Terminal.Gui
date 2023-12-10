@@ -229,18 +229,6 @@ namespace Terminal.Gui {
 			SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
 		}
 
-		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
-		{
-			if (HasFocus && CanFocus && Focused == tabsBar) {
-				var result = InvokeKeyBindings (keyEvent);
-				if (result != null)
-					return (bool)result;
-			}
-
-			return base.OnKeyPressed (keyEvent);
-		}
-
 		/// <summary>
 		/// Changes the <see cref="SelectedTab"/> by the given <paramref name="amount"/>.  
 		/// Positive for right, negative for left.  If no tab is currently selected then

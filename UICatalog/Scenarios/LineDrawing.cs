@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyPressed += (s,e) => { e.Handled = canvas.OnKeyPressed (e); };
+			Win.KeyPress += (s,e) => { e.Handled = canvas.OnKeyPress (e); };
 		}
 
 		class ToolsView : Window {
@@ -108,8 +108,9 @@ namespace UICatalog.Scenarios {
 
 			Stack<StraightLine> undoHistory = new ();
 
-			public override bool OnKeyPressed (KeyEventArgs e)
+			public override bool OnProcessKeyPress (KeyEventArgs e)
 			{
+				// BUGBUG: These should be implemented with key bindings
 				if (e.Key == (Key.Z | Key.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();
 					if(pop != null) {
@@ -127,9 +128,9 @@ namespace UICatalog.Scenarios {
 						return true;
 					}
 				}
-
-				return base.OnKeyPressed (e);
+				return false;
 			}
+			
 			internal void AddLayer ()
 			{
 				_currentLayer = new LineCanvas ();

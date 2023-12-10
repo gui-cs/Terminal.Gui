@@ -186,7 +186,7 @@ public class RadioGroup : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool OnInvokeKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokeKeyBindings (KeyEventArgs keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for the radio group but
 		// InvokeKeyBindings doesn't pass any context so we can't tell if the key binding is for

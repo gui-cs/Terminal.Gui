@@ -178,7 +178,7 @@ public static partial class Application {
 		}
 
 		Driver.SizeChanged += (s, args) => OnSizeChanging (args);
-		Driver.KeyPressed += (s, args) => OnKeyPressed (args);
+		Driver.KeyPressed += (s, args) => OnKeyPress (args);
 		Driver.KeyDown += (s, args) => OnKeyDown (args);
 		Driver.KeyUp += (s, args) => OnKeyUp (args);
 		Driver.MouseEvent += (s, args) => OnMouseEvent (args);
@@ -234,7 +234,7 @@ public static partial class Application {
 		MouseEvent = null;
 		KeyDown = null;
 		KeyUp = null;
-		KeyPressed = null;
+		KeyPress = null;
 		SizeChanging = null;
 		_mainThreadId = -1;
 		NotifyNewRunState = null;
@@ -1368,53 +1368,22 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	/// Event fired after a key has been pressed and released.
-	/// <para>Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to suppress the event.</para>
+	/// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
 	/// </summary>
 	/// <remarks>
-	/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
-	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-	/// </remarks>
-	public static event EventHandler<KeyEventArgs> KeyPressed;
-
-	/// <summary>
-	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
-	/// <para>
-	/// Called for new KeyPressed events before any processing is performed or
-	/// views evaluate. Use for global key handling and/or debugging.
-	/// </para>
-	/// </summary>
-	/// <param name="a"></param>
-	/// <returns><see langword="true"/> if the key was handled.</returns>
-	public static bool OnKeyPressed (KeyEventArgs a)
-	{
-		KeyPressed?.Invoke (null, a);
-		if (a.Handled) {
-			return true;
-		}
-
-		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.ProcessKeyPressed (a)) {
-				return true;
-			}
-			if (topLevel.Modal)
-				break;
-		}
-
-		return false;
-	}
-	/// <summary>
-	/// Event fired when a key is pressed (and not yet released). 
-	/// </summary>
-	/// <remarks>
-	/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+	/// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
 	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
 	/// </remarks>
 	public static event EventHandler<KeyEventArgs> KeyDown;
 
 	/// <summary>
-	/// Called when a key is pressed (and not yet released). Fires the <see cref="KeyDown"/> event.
+	/// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
+	/// Fires the <see cref="KeyDown"/> event
+	/// then calls <see cref="View.ProcessKeyDownEvent(KeyEventArgs)"/> on all top level views.
 	/// </summary>
+	/// <remarks>
+	/// Can be used to simulate key down events.
+	/// </remarks>
 	/// <param name="a"></param>
 	public static bool OnKeyDown (KeyEventArgs a)
 	{
@@ -1424,7 +1393,7 @@ public static partial class Application {
 		}
 
 		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.OnKeyDown (a)) {
+			if (topLevel.ProcessKeyDownEvent (a)) {
 				return true;
 			}
 			if (topLevel.Modal) {
@@ -1435,18 +1404,77 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	/// Event fired when a key is released. 
+	/// Event fired when the user presses a key. Fired by <see cref="OnKeyPress"/>. 
+	/// <para>
+	/// Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to indicate the key was handled and
+	/// to prevent additional processing.
+	/// </para>
 	/// </summary>
 	/// <remarks>
-	/// All drivers support firing the <see cref="KeyPressed"/> event. Some drivers (Curses)
+	/// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
 	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+	/// <para>
+	/// Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
+	/// </para>
+	/// </remarks>
+	public static event EventHandler<KeyEventArgs> KeyPress;
+
+	/// <summary>
+	/// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
+	/// Fires the <see cref="KeyPress"/> event
+	/// then calls <see cref="View.ProcessKeyPressEvent(KeyEventArgs)"/> on all top level views.
+	/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
+	/// </summary>
+	/// <remarks>
+	/// Can be used to simulate key press events.
+	/// </remarks>
+	/// <param name="a"></param>
+	/// <returns><see langword="true"/> if the key was handled.</returns>
+	public static bool OnKeyPress (KeyEventArgs a)
+	{
+		KeyPress?.Invoke (null, a);
+		if (a.Handled) {
+			return true;
+		}
+
+		foreach (var topLevel in _topLevels.ToList ()) {
+			if (topLevel.ProcessKeyPressEvent (a)) {
+				return true;
+			}
+			if (topLevel.Modal)
+				break;
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
+	/// <para>
+	/// Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to indicate the key was handled and
+	/// to prevent additional processing.
+	/// </para>
+	/// </summary>
+	/// <remarks>
+	/// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
+	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+	/// <para>
+	/// Fired after <see cref="KeyPress"/>.
+	/// </para>
 	/// </remarks>
 	public static event EventHandler<KeyEventArgs> KeyUp;
 
 	/// <summary>
-	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+	/// Called by the <see cref="ConsoleDriver"/> when the user releases a key.
+	/// Fires the <see cref="KeyUp"/> event
+	/// then calls <see cref="View.ProcessKeyUpEvent(KeyEventArgs)"/> on all top level views.
+	/// Called after <see cref="OnKeyPress"/>.
 	/// </summary>
+	/// <remarks>
+	/// Can be used to simulate key press events.
+	/// </remarks>
 	/// <param name="a"></param>
+	/// <returns><see langword="true"/> if the key was handled.</returns>
 	public static bool OnKeyUp (KeyEventArgs a)
 	{
 		KeyUp?.Invoke (null, a);

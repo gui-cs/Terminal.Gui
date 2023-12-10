@@ -621,18 +621,19 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
 			try {
-				// First of all deal with any registered keybindings
-				if (base.OnKeyPressed (keyEvent)) {
-					return true;
-				}
+				//// First of all deal with any registered keybindings
+				//if (base.OnKeyPressed (keyEvent)) {
+				//	return true;
+				//}
 
+				// BUGBUG: this should move to OnInvokingKeyBindings
 				// If not a keybinding, is the key a searchable key press?
 				if (CollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
 					IReadOnlyCollection<Branch<T>> map;

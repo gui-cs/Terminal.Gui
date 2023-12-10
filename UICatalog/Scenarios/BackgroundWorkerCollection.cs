@@ -338,7 +338,7 @@ namespace UICatalog.Scenarios {
 				close.Clicked += OnReportClosed;
 				Add (close);
 
-				KeyPressed += (s, e) => {
+				KeyPress += (s, e) => {
 					if (e.Key == Key.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}

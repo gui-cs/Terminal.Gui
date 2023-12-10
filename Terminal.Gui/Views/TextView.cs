@@ -2517,9 +2517,9 @@ namespace Terminal.Gui {
 		{
 			// BUGBUG: (v2 truecolor) This code depends on 8-bit color names; disabling for now
 			//if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
-				Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
+			Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
 			//} else {
-				//Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background, colorScheme.Focus.Foreground));
+			//Driver.SetAttribute (new Attribute (colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background, colorScheme.Focus.Foreground));
 			//}
 		}
 
@@ -3402,24 +3402,23 @@ namespace Terminal.Gui {
 		bool _shiftSelecting;
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool? OnInvokeKeyBindings (KeyEventArgs a)
+		{
+			// Give autocomplete first opportunity to respond to key presses
+			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
+				return true;
+			}
+			return base.OnInvokeKeyBindings (a);
+		}
+
+		///<inheritdoc/>
+		public override bool OnProcessKeyPress (KeyEventArgs a)
 		{
 			if (!CanFocus) {
 				return true;
 			}
 
-			// Give autocomplete first opportunity to respond to key presses
-			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
-				return true;
-			}
 
-			if (base.OnKeyPressed (a)) {
-				return true;
-			}
-
-			if (base.OnInvokeKeyBindings (a)) {
-				return true;
-			}
 
 			ResetColumnTrack ();
 

@@ -243,18 +243,6 @@ namespace Terminal.Gui {
 			return base.OnEnter (view);
 		}
 
-		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
-		{
-			if (HasFocus && CanFocus) {
-				var result = InvokeKeyBindings (keyEvent);
-				if (result != null)
-					return (bool)result;
-			}
-
-			return base.OnKeyPressed (keyEvent);
-		}
-
 		/// <summary>
 		/// Scrolls the graph up 1 page
 		/// </summary>
