@@ -71,7 +71,7 @@ public class Buttons : Scenario {
 		}
 
 		Button button;
-		Win.Add (button = new Button ("A super long _Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
+		Win.Add (button = new Button ("A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
 			X = 2,
 			Y = Pos.Bottom (colorButtonsLabel) + 1,
 		});

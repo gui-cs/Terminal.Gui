@@ -558,6 +558,8 @@ public partial class View {
 		//   `InvokeKeyBindings` returns `true`. Continue passing the event (return `false` from `OnInvokeKeyBindings`).
 		var handled = InvokeKeyBindings (keyEvent);
 		if (handled != null && (bool)handled) {
+			// Stop processing if any key binding handled the key.
+			// DO NOT stop processing if there are no matching key bindings or none of the key bindings handled the key
 			return true;
 		}
 

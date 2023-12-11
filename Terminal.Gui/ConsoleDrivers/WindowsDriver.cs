@@ -937,15 +937,15 @@ internal class WindowsDriver : ConsoleDriver {
 		//case ConsoleKey.NumPad9:
 		//	return keyInfoEx.NumLock ? Key.D9 : Key.PageUp;
 
-		case ConsoleKey.Oem1:
-		case ConsoleKey.Oem2:
-		case ConsoleKey.Oem3:
-		case ConsoleKey.Oem4:
-		case ConsoleKey.Oem5:
-		case ConsoleKey.Oem6:
-		case ConsoleKey.Oem7:
-		case ConsoleKey.Oem8:
-		case ConsoleKey.Oem102:
+		//case ConsoleKey.Oem1:
+		//case ConsoleKey.Oem2: 
+		//case ConsoleKey.Oem3:
+		//case ConsoleKey.Oem4:
+		//case ConsoleKey.Oem5:
+		//case ConsoleKey.Oem6:
+		//case ConsoleKey.Oem7:
+		//case ConsoleKey.Oem8:
+		//case ConsoleKey.Oem102:
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
@@ -1056,8 +1056,8 @@ internal class WindowsDriver : ConsoleDriver {
 							//OnKeyPressed (new (Key.AltMask));
 						}
 
-						_altDown = false;
 					}
+					_altDown = false;
 					// KeyUp of an Alt-key press. 
 					OnKeyUp (keyPressedEventArgs);
 					//OnKeyPressed (keyPressedEventArgs);
@@ -1372,7 +1372,7 @@ internal class WindowsDriver : ConsoleDriver {
 		var numlock = (state & WindowsConsole.ControlKeyState.NumlockOn) != 0;
 		var scrolllock = (state & WindowsConsole.ControlKeyState.ScrolllockOn) != 0;
 
-		var cki = new ConsoleKeyInfo(keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
+		var cki = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 		return new WindowsConsole.ConsoleKeyInfoEx (cki, capslock, numlock, scrolllock);
 	}
 

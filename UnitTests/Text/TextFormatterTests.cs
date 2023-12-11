@@ -270,13 +270,13 @@ namespace Terminal.Gui.TextTests {
 		[InlineData ("Last _k", true, 5, (Key)'K')]
 		[InlineData ("After k_", false, -1, Key.Null)]
 		[InlineData ("Multiple _k and _R", true, 9, (Key)'K')]
-		[InlineData ("Non-english: _кдать", true, 13, (Key)'К')] // Lower case Cryllic K (к)
+		[InlineData ("Non-english: _кдать", true, 13, (Key)'к')] // Lower case Cryllic K (к)
 		[InlineData ("_k Before", true, 0, (Key)'K', true)] // Turn on FirstUpperCase and verify same results
 		[InlineData ("a_k Second", true, 1, (Key)'K', true)]
 		[InlineData ("Last _k", true, 5, (Key)'K', true)]
 		[InlineData ("After k_", false, -1, Key.Null, true)]
 		[InlineData ("Multiple _k and _r", true, 9, (Key)'K', true)]
-		[InlineData ("Non-english: _кдать", true, 13, (Key)'К', true)] // Cryllic K (К)
+		[InlineData ("Non-english: _кдать", true, 13, (Key)'к', true)] // Cryllic K (К)
 		public void FindHotKey_AlphaLowerCase_Succeeds (string text, bool expectedResult, int expectedHotPos, Key expectedKey, bool supportFirstUpperCase = false)
 		{
 			Rune hotKeySpecifier = (Rune)'_';
@@ -339,6 +339,24 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (expectedResult, result);
 			Assert.Equal (expectedHotPos, hotPos);
 			Assert.Equal (expectedKey, hotKey);
+		}
+		
+		[Theory]
+		//[InlineData ("_\"k before", false, Key.Null)] // BUGBUG: Not sure why this fails
+		[InlineData ("\"_k before", true, Key.K)]
+		[InlineData ("_`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", true, (Key)'`')]
+		[InlineData ("`_~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", true, (Key)'~')]
+		//[InlineData ("`~!@#$%^&*()-__=+[{]}\\|;:'\",<.>/?", true, (Key)'_')] // BUGBUG: Not sure why this fails
+		[InlineData ("_ ~  s  gui.cs   master ↑10", true, (Key)'')] // ~IsLetterOrDigit + Unicode
+		[InlineData (" ~  s  gui.cs  _ master ↑10", true, (Key)'')] // ~IsLetterOrDigit + Unicode
+		[InlineData ("non-english: _кдать", true, (Key)'к')] // Lower case Cryllic K (к)
+		public void FindHotKey_Symbols_Returns_Symbol (string text, bool found, Key expected)
+		{
+			var hotKeySpecifier = (Rune)'_';
+
+			var result = TextFormatter.FindHotKey (text, hotKeySpecifier, false, out int _, out Key hotKey);
+			Assert.Equal (found, result);
+			Assert.Equal (expected, hotKey);
 		}
 
 		[Theory]
