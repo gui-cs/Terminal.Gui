@@ -2495,6 +2495,37 @@ line.
 				Assert.Equal (CursorVisibility.Invisible, tv.DesiredCursorVisibility);
 			}
 		}
+
+		[Theory]
+		[TextViewTestsAutoInitShutdown]
+		[InlineData (Key.Delete)]
+		[InlineData (Key.DeleteChar)]
+		public void WordWrap_Draw_Typed_Keys_After_Text_Is_Deleted (Key del)
+		{
+			Application.Top.Add (_textView);
+			_textView.Text = "Line 1.\nLine 2.";
+			_textView.WordWrap = true;
+			Application.Begin (Application.Top);
+
+			Assert.True (_textView.WordWrap);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+Line 1.
+Line 2.", output);
+
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.End | Key.ShiftMask, new KeyModifiers () { Shift = true })));
+			Assert.Equal ("Line 1.", _textView.SelectedText);
+
+			Assert.True (_textView.ProcessKey (new KeyEvent (del, new KeyModifiers ())));
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", output);
+
+			Assert.True (_textView.ProcessKey (new KeyEvent (Key.H, new KeyModifiers ())));
+			Assert.NotEqual (Rect.Empty, _textView._needsDisplayRect);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+H      
+Line 2.", output);
+		}
 	}
 
 	// WHY IS THIS FAILING TO BUILD!!!
