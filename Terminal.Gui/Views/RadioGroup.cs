@@ -163,17 +163,17 @@ public class RadioGroup : View {
 	public string [] RadioLabels {
 		get => _radioLabels.ToArray ();
 		set {
-			// Remove key bindings
+			// Remove old hot key bindings
 			foreach (var label in _radioLabels) {
 				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out Key hotKey)) {
-					ClearKeyBinding (hotKey);
+					AddKeyBindingsForHotKey (hotKey, Key.Null);
 				}
 			}
 			var prevCount = _radioLabels.Count;
 			_radioLabels = value.ToList ();
 			foreach (var label in _radioLabels) {
 				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out Key hotKey)) {
-					AddKeyBinding (hotKey, Command.Accept);
+					AddKeyBindingsForHotKey (Key.Null, hotKey);
 				}
 			}
 			if (prevCount != _radioLabels.Count) {
@@ -198,7 +198,8 @@ public class RadioGroup : View {
 		if (TryGetKeyBinding (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {
-				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out Key hotKey) && hotKey == key) {
+				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out Key hotKey) 
+					&& (key & ~Key.ShiftMask & ~Key.AltMask) == hotKey) {
 					SelectedItem = i;
 					break;
 				}
