@@ -2497,6 +2497,8 @@ line.
 		}
 	}
 
+	// WHY IS THIS FAILING TO BUILD!!!
+	// Error: /home/runner/work/Terminal.Gui/Terminal.Gui/UnitTests/Views/TextViewTests.cs(2503,3): error CS0106: The modifier 'public' is not valid for this item 
 	[Fact]
 	[TextViewTestsAutoInitShutdown]
 	public void DesiredCursorVisibility_Horizontal_Navigation ()
