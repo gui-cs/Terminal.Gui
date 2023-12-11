@@ -15,7 +15,7 @@ namespace Terminal.Gui;
 /// <remarks>
 /// <para>
 ///   Provides a button showing text that raises the <see cref="Clicked"/> event when clicked on with a mouse
-///   or when the user presses SPACE, ENTER, or the <see cref="HotKey"/>. The hot key is the first letter or digit following the first underscore ('_') 
+///   or when the user presses SPACE, ENTER, or the <see cref="View.HotKey"/>. The hot key is the first letter or digit following the first underscore ('_') 
 ///   in the button text. 
 /// </para>
 /// <para>
