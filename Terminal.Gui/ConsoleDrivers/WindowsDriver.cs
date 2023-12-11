@@ -378,6 +378,8 @@ internal class WindowsConsole {
 		public char UnicodeChar;
 		[FieldOffset (12), MarshalAs (UnmanagedType.U4)]
 		public ControlKeyState dwControlKeyState;
+
+		public override readonly string ToString () => $"[KeyEventRecord({(bKeyDown ? "down" : "up")},{wRepeatCount},{wVirtualKeyCode},{wVirtualScanCode},{new Rune(UnicodeChar).MakePrintable()},{dwControlKeyState})]";
 	}
 
 	[Flags]
@@ -597,7 +599,29 @@ internal class WindowsConsole {
 			NumLock = numlock;
 			ScrollLock = scrolllock;
 		}
+
+		/// <summary>
+		/// Prints a ConsoleKeyInfoEx structure
+		/// </summary>
+		/// <param name="ex"></param>
+		/// <returns></returns>
+		public readonly string ToString (ConsoleKeyInfoEx ex)
+		{
+			var ke = new KeyEventArgs ((Key)ex.ConsoleKeyInfo.KeyChar);
+			var sb = new StringBuilder ();
+			sb.Append ($"Key: {(Key)ex.ConsoleKeyInfo.Key} ({ex.ConsoleKeyInfo.Key})");
+			sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
+			sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0 ? " | Control" : string.Empty);
+			sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0 ? " | Alt" : string.Empty);
+			sb.Append ($", KeyChar: {ke.AsRune.MakePrintable ()} ({(uint)ex.ConsoleKeyInfo.KeyChar}) ");
+			sb.Append ((ex.CapsLock ? "caps," : string.Empty));
+			sb.Append ((ex.NumLock ? "num," : string.Empty));
+			sb.Append ((ex.ScrollLock ? "scroll," : string.Empty));
+			var s = sb.ToString ().TrimEnd (',').TrimEnd(' ');
+			return $"[ConsoleKeyInfoEx({s})]";
+		}
 	}
+
 
 	[DllImport ("kernel32.dll", SetLastError = true)]
 	static extern IntPtr GetStdHandle (int nStdHandle);
@@ -979,10 +1003,15 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
-				return (Key)((uint)Key.A + delta) | Key.ShiftMask;
+				if (keyInfo.KeyChar <= (uint)Key.Z) {
+					return (Key)((uint)Key.A + delta) | Key.ShiftMask;
+				} 
 			}
 
-			return (Key)((uint)keyInfo.KeyChar) & ~Key.Space;
+			if (((Key)((uint)keyInfo.KeyChar) & Key.Space) == 0) {
+				return (Key)((uint)keyInfo.KeyChar) & ~Key.Space;
+			}
+			return (Key)(uint)keyInfo.KeyChar;
 
 		}
 
@@ -1040,6 +1069,9 @@ internal class WindowsDriver : ConsoleDriver {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
+			Debug.WriteLine ($"event: {inputEvent.ToString()} {keyInfo.ToString (keyInfo)}");
+
+
 			var map = MapKey (keyInfo);
 
 			if (inputEvent.KeyEvent.bKeyDown) {

@@ -2520,7 +2520,7 @@ Line 2.", _output);
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
-		Assert.True (_textView.ProcessKeyDown (new (Key.H)));
+		Assert.True (_textView.ProcessKeyDown (new (Key.H | Key.ShiftMask)));
 		Assert.NotEqual (Rect.Empty, _textView._needsDisplayRect);
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"

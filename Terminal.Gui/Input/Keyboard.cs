@@ -291,6 +291,21 @@ public enum Key : uint {
 	Clear = 12,
 
 	/// <summary>
+	/// The key code for the Shift key
+	/// </summary>
+	Shift = 16,
+
+	/// <summary>
+	/// The key code for the Ctrl key
+	/// </summary>
+	Ctrl = 17,
+
+	/// <summary>
+	/// The key code for the Alt key
+	/// </summary>
+	Alt = 18,
+
+	/// <summary>
 	/// The key code for the user pressing the escape key
 	/// </summary>
 	Esc = 27,

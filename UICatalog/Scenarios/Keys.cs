@@ -53,7 +53,7 @@ public class Keys : Scenario {
 
 		edit.KeyDown += (s, e) => labelTextViewKeypress.Text = e.ToString ();
 
-		keyPressedLabel = new Label ("Last Application.KeyPressed:") {
+		keyPressedLabel = new Label ("Last Application.KeyDown:") {
 			X = Pos.Left (keyPressedLabel),
 			Y = Pos.Bottom (keyPressedLabel),
 		};
@@ -81,14 +81,14 @@ public class Keys : Scenario {
 		var keyEventListView = new ListView (keyEventlist) {
 			X = 0,
 			Y = Pos.Top (keyLogLabel) + yOffset,
-			Width = "Key Pressed:".Length + maxKeyString,
+			Width = "Key Down:".Length + maxKeyString,
 			Height = Dim.Fill (),
 		};
 		keyEventListView.ColorScheme = Colors.TopLevel;
 		Win.Add (keyEventListView);
 
 		// OnKeyPressed
-		var onKeyPressedLabel = new Label ("TextView KeyPressed:") {
+		var onKeyPressedLabel = new Label ("TextView KeyDown:") {
 			X = Pos.Right (keyEventListView) + 1,
 			Y = Pos.Top (editLabel) + 4,
 		};
@@ -121,7 +121,7 @@ public class Keys : Scenario {
 		Win.Add (onInvokingKeyBindingsListView);
 
 		//Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
-		Application.KeyDown += (s, a) => KeyDownPressUp (a, "Press");
+		Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
 		Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
 		void KeyDownPressUp (KeyEventArgs args, string updown)

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using static Terminal.Gui.WindowsConsole;
+using System.Text;
 
 namespace Terminal.Gui.ConsoleDrivers {
 	/// <summary>
