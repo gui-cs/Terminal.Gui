@@ -97,10 +97,10 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			tvOutput.KeyPress += (s, e) => {
+			tvOutput.KeyPressed += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
-					if (!tvOutput.OnKeyPress (e)) {
+					if (!tvOutput.OnKeyDown (e)) {
 						Application.Invoke (() => {
 							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (e.Key, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
 						});
@@ -123,7 +123,7 @@ namespace UICatalog.Scenarios {
 
 			KeyEventArgs unknownChar = null;
 
-			tvInput.KeyPress += (s, e) => {
+			tvInput.KeyPressed += (s, e) => {
 				if (e.Key == (Key.Q | Key.CtrlMask)) {
 					Application.RequestStop ();
 					return;

@@ -80,7 +80,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Iteration += (s, a) => {
 				if (iteration == 0) {
 					Assert.Equal ("", msg);
-					sb.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Q));
+					sb.ProcessKeyDown (new (Key.CtrlMask | Key.Q));
 				} else if (iteration == 1) {
 					Assert.Equal ("Quiting...", msg);
 					msg = "";
@@ -192,7 +192,7 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 			Assert.True (CanExecuteNew ());
 			Assert.False (CanExecuteClose ());
 
-			Assert.True (top.ProcessKeyPressEvent (new (Key.N | Key.CtrlMask)));
+			Assert.True (top.ProcessKeyDown (new (Key.N | Key.CtrlMask)));
 			Application.MainLoop.RunIteration ();
 			Assert.NotNull (win);
 			Assert.False (CanExecuteNew ());

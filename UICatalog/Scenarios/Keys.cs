@@ -25,7 +25,7 @@ public class Keys : Scenario {
 		};
 		Win.Add (edit);
 
-		edit.KeyPress += (s, a) => {
+		edit.KeyDown += (s, a) => {
 			keyPressedList.Add (a.ToString ());
 		};
 
@@ -51,7 +51,7 @@ public class Keys : Scenario {
 		};
 		Win.Add (labelTextViewKeypress);
 
-		edit.KeyPress += (s, e) => labelTextViewKeypress.Text = e.ToString ();
+		edit.KeyDown += (s, e) => labelTextViewKeypress.Text = e.ToString ();
 
 		keyPressedLabel = new Label ("Last Application.KeyPressed:") {
 			X = Pos.Left (keyPressedLabel),
@@ -67,7 +67,7 @@ public class Keys : Scenario {
 		};
 		Win.Add (labelAppKeypress);
 
-		Win.KeyPress += (s, e) => labelAppKeypress.Text = e.ToString ();
+		Win.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
 
 		// Key stroke log:
 		var keyLogLabel = new Label ("Application Key Events:") {
@@ -120,8 +120,8 @@ public class Keys : Scenario {
 		onInvokingKeyBindingsListView.ColorScheme = Colors.TopLevel;
 		Win.Add (onInvokingKeyBindingsListView);
 
-		Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
-		Application.KeyPress += (s, a) => KeyDownPressUp (a, "Pressed");
+		//Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
+		Application.KeyDown += (s, a) => KeyDownPressUp (a, "Press");
 		Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
 		void KeyDownPressUp (KeyEventArgs args, string updown)

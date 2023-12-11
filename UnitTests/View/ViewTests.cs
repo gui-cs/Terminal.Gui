@@ -125,8 +125,8 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var r = new View ();
 
-			Assert.False (r.OnKeyPress (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
+			//Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.OnKeyUp (new KeyEventArgs () { Key = Key.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -978,7 +978,7 @@ cccccccccccccccccccc", output);
 				return true;
 			}
 
-			public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
+			public override bool OnKeyPressed (KeyEventArgs keyEvent)
 			{
 				IsKeyPress = true;
 				return true;

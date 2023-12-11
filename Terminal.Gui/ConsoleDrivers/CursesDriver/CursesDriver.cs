@@ -477,7 +477,7 @@ internal class CursesDriver : ConsoleDriver {
 			}
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
-			OnKeyPressed (new KeyEventArgs (k));
+			//OnKeyPressed (new KeyEventArgs (k));
 			return;
 		}
 
@@ -528,16 +528,16 @@ internal class CursesDriver : ConsoleDriver {
 				key = new KeyEventArgs (k);
 				OnKeyDown (key);
 				OnKeyUp (key);
-				OnKeyPressed (key);
+				//OnKeyPressed (key);
 			} else {
 				k = Key.Esc;
-				OnKeyPressed (new KeyEventArgs (k));
+				//OnKeyPressed (new KeyEventArgs (k));
 			}
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
-			OnKeyPressed (new KeyEventArgs (k));
+			//OnKeyPressed (new KeyEventArgs (k));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (Key)wch;
@@ -552,7 +552,7 @@ internal class CursesDriver : ConsoleDriver {
 			}
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
-			OnKeyPressed (new KeyEventArgs (k));
+			//OnKeyPressed (new KeyEventArgs (k));
 		}
 		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 		// will not impact KeyUp.
@@ -587,7 +587,7 @@ internal class CursesDriver : ConsoleDriver {
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
 					key = new (k);
 					OnKeyDown (key);
-					OnKeyPressed (key);
+					//OnKeyPressed (key);
 				}
 			} else {
 				cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
@@ -747,7 +747,7 @@ internal class CursesDriver : ConsoleDriver {
 
 		OnKeyDown (new KeyEventArgs (key));
 		OnKeyUp (new KeyEventArgs (key));
-		OnKeyPressed (new KeyEventArgs (key));
+		//OnKeyPressed (new KeyEventArgs (key));
 	}
 
 

@@ -237,7 +237,7 @@ namespace Terminal.Gui.InputTests {
 
 				var top = Application.Top;
 
-				top.KeyPress += (s, e) => {
+				top.KeyDown += (s, e) => {
 					Assert.Equal (KeyEventArgs.ToString (expectedRemapping), KeyEventArgs.ToString (e.Key));
 					e.Handled = true;
 					Application.RequestStop ();

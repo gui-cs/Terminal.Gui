@@ -178,7 +178,7 @@ public static partial class Application {
 		}
 
 		Driver.SizeChanged += (s, args) => OnSizeChanging (args);
-		Driver.KeyPressed += (s, args) => OnKeyPress (args);
+		//Driver.KeyPressed += (s, args) => OnKeyPress (args);
 		Driver.KeyDown += (s, args) => OnKeyDown (args);
 		Driver.KeyUp += (s, args) => OnKeyUp (args);
 		Driver.MouseEvent += (s, args) => OnMouseEvent (args);
@@ -232,9 +232,9 @@ public static partial class Application {
 		Driver = null;
 		Iteration = null;
 		MouseEvent = null;
-		KeyDown = null;
+		//KeyDown = null;
 		KeyUp = null;
-		KeyPress = null;
+		KeyDown = null;
 		SizeChanging = null;
 		_mainThreadId = -1;
 		NotifyNewRunState = null;
@@ -1367,24 +1367,69 @@ public static partial class Application {
 		}
 	}
 
+	///// <summary>
+	///// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
+	///// </summary>
+	///// <remarks>
+	///// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
+	///// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+	///// </remarks>
+	//public static event EventHandler<KeyEventArgs> KeyDown;
+
+	///// <summary>
+	///// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
+	///// Fires the <see cref="KeyDown"/> event
+	///// then calls <see cref="View.ProcessKeyDownEvent(KeyEventArgs)"/> on all top level views.
+	///// </summary>
+	///// <remarks>
+	///// Can be used to simulate key down events.
+	///// </remarks>
+	///// <param name="a"></param>
+	//public static bool OnKeyDown (KeyEventArgs a)
+	//{
+	//	KeyDown?.Invoke (null, a);
+	//	if (a.Handled) {
+	//		return true;
+	//	}
+
+	//	foreach (var topLevel in _topLevels.ToList ()) {
+	//		if (topLevel.ProcessKeyPressEvent (a)) {
+	//			return true;
+	//		}
+	//		if (topLevel.Modal) {
+	//			break;
+	//		}
+	//	}
+	//	return false;
+	//}
+
 	/// <summary>
-	/// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
+	/// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>. 
+	/// <para>
+	/// Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to indicate the key was handled and
+	/// to prevent additional processing.
+	/// </para>
 	/// </summary>
 	/// <remarks>
-	/// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
+	/// All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses)
 	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+	/// <para>
+	/// Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
+	/// </para>
 	/// </remarks>
 	public static event EventHandler<KeyEventArgs> KeyDown;
 
 	/// <summary>
 	/// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
 	/// Fires the <see cref="KeyDown"/> event
-	/// then calls <see cref="View.ProcessKeyDownEvent(KeyEventArgs)"/> on all top level views.
+	/// then calls <see cref="View.ProcessKeyDown"/> on all top level views.
+	/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
 	/// </summary>
 	/// <remarks>
-	/// Can be used to simulate key down events.
+	/// Can be used to simulate key press events.
 	/// </remarks>
 	/// <param name="a"></param>
+	/// <returns><see langword="true"/> if the key was handled.</returns>
 	public static bool OnKeyDown (KeyEventArgs a)
 	{
 		KeyDown?.Invoke (null, a);
@@ -1393,52 +1438,7 @@ public static partial class Application {
 		}
 
 		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.ProcessKeyDownEvent (a)) {
-				return true;
-			}
-			if (topLevel.Modal) {
-				break;
-			}
-		}
-		return false;
-	}
-
-	/// <summary>
-	/// Event fired when the user presses a key. Fired by <see cref="OnKeyPress"/>. 
-	/// <para>
-	/// Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to indicate the key was handled and
-	/// to prevent additional processing.
-	/// </para>
-	/// </summary>
-	/// <remarks>
-	/// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
-	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-	/// <para>
-	/// Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
-	/// </para>
-	/// </remarks>
-	public static event EventHandler<KeyEventArgs> KeyPress;
-
-	/// <summary>
-	/// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
-	/// Fires the <see cref="KeyPress"/> event
-	/// then calls <see cref="View.ProcessKeyPressEvent(KeyEventArgs)"/> on all top level views.
-	/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
-	/// </summary>
-	/// <remarks>
-	/// Can be used to simulate key press events.
-	/// </remarks>
-	/// <param name="a"></param>
-	/// <returns><see langword="true"/> if the key was handled.</returns>
-	public static bool OnKeyPress (KeyEventArgs a)
-	{
-		KeyPress?.Invoke (null, a);
-		if (a.Handled) {
-			return true;
-		}
-
-		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.ProcessKeyPressEvent (a)) {
+			if (topLevel.ProcessKeyDown (a)) {
 				return true;
 			}
 			if (topLevel.Modal)
@@ -1456,10 +1456,10 @@ public static partial class Application {
 	/// </para>
 	/// </summary>
 	/// <remarks>
-	/// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
+	/// All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses)
 	/// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
 	/// <para>
-	/// Fired after <see cref="KeyPress"/>.
+	/// Fired after <see cref="KeyDown"/>.
 	/// </para>
 	/// </remarks>
 	public static event EventHandler<KeyEventArgs> KeyUp;
@@ -1467,8 +1467,8 @@ public static partial class Application {
 	/// <summary>
 	/// Called by the <see cref="ConsoleDriver"/> when the user releases a key.
 	/// Fires the <see cref="KeyUp"/> event
-	/// then calls <see cref="View.ProcessKeyUpEvent(KeyEventArgs)"/> on all top level views.
-	/// Called after <see cref="OnKeyPress"/>.
+	/// then calls <see cref="View.ProcessKeyUp"/> on all top level views.
+	/// Called after <see cref="OnKeyDown"/>.
 	/// </summary>
 	/// <remarks>
 	/// Can be used to simulate key press events.

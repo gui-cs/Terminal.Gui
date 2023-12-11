@@ -976,7 +976,7 @@ internal class WindowsDriver : ConsoleDriver {
 				return (Key)((uint)Key.A + delta) | Key.ShiftMask;
 			}
 
-			return (Key)((uint)keyInfo.KeyChar);
+			return (Key)((uint)keyInfo.KeyChar) & ~Key.Space;
 
 		}
 
@@ -1060,12 +1060,12 @@ internal class WindowsDriver : ConsoleDriver {
 					}
 					// KeyUp of an Alt-key press. 
 					OnKeyUp (keyPressedEventArgs);
-					OnKeyPressed (keyPressedEventArgs);
+					//OnKeyPressed (keyPressedEventArgs);
 				} else {
 					OnKeyUp (keyPressedEventArgs);
 					if (_altDown) {
 						_altDown = false;
-						OnKeyPressed (keyPressedEventArgs);
+						//OnKeyPressed (keyPressedEventArgs);
 					}
 				}
 			}

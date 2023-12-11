@@ -741,62 +741,62 @@ public class ApplicationTests {
 		Application.Iteration += (s, a) => {
 			Assert.True (v1.HasFocus);
 			// Using default keys.
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyPressEvent (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
 			Assert.True (v1.HasFocus);
 
 			// Using another's alternate keys.
 			Application.AlternateForwardKey = Key.F7;
 			Application.AlternateBackwardKey = Key.F6;
 
-			top.ProcessKeyPressEvent (new (Key.F7));
+			top.ProcessKeyDown (new (Key.F7));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.F7));
+			top.ProcessKeyDown (new (Key.F7));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.F7));
+			top.ProcessKeyDown (new (Key.F7));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.F7));
+			top.ProcessKeyDown (new (Key.F7));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyPressEvent (new (Key.F6));
+			top.ProcessKeyDown (new (Key.F6));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.F6));
+			top.ProcessKeyDown (new (Key.F6));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.F6));
+			top.ProcessKeyDown (new (Key.F6));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyPressEvent (new (Key.F6));
+			top.ProcessKeyDown (new (Key.F6));
 			Assert.True (v1.HasFocus);
 
 			Application.RequestStop ();
@@ -837,17 +837,17 @@ public class ApplicationTests {
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.OnKeyPress(new KeyEventArgs( Key.Q | Key.CtrlMask));
+		Application.OnKeyDown(new KeyEventArgs( Key.Q | Key.CtrlMask));
 		Assert.True (isQuiting);
 
 		isQuiting = false;
 		Application.QuitKey = Key.C | Key.CtrlMask;
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.False (isQuiting);
-		Application.OnKeyPress (new KeyEventArgs (Key.Q | Key.CtrlMask));
+		Application.OnKeyDown (new KeyEventArgs (Key.Q | Key.CtrlMask));
 		Assert.False (isQuiting);
 
-		Application.OnKeyPress (new KeyEventArgs (Application.QuitKey));
+		Application.OnKeyDown (new KeyEventArgs (Application.QuitKey));
 		Assert.True (isQuiting);
 
 		// Reset the QuitKey to avoid throws errors on another tests
@@ -875,14 +875,14 @@ public class ApplicationTests {
 		Assert.False (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 		Assert.True (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 		Assert.True (win.CanFocus);
 		Assert.True (win.HasFocus);
 		Assert.True (win2.CanFocus);
@@ -927,14 +927,14 @@ public class ApplicationTests {
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 		Assert.True (win2.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyPressEvent (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
 		Assert.False (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);

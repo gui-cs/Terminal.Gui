@@ -416,7 +416,7 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
-		public override bool OnProcessKeyPress (KeyEventArgs a)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			var result = InvokeKeyBindings (a);
 			if (result != null) {

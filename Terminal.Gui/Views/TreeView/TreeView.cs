@@ -621,7 +621,7 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		/// <inheritdoc/>
-		public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
+		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (!Enabled) {
 				return false;

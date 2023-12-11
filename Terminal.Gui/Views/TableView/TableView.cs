@@ -761,7 +761,7 @@ namespace Terminal.Gui {
 
 
 		/// <inheritdoc/>
-		public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
+		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
 			if (TableIsNullOrInvisible ()) {
 				PositionCursor ();

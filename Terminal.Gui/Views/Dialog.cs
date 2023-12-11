@@ -230,7 +230,7 @@ namespace Terminal.Gui {
 
 		// BUGBUG: Why is this not handled by a key binding???
 		///<inheritdoc/>
-		public override bool OnProcessKeyPress (KeyEventArgs a)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			switch (a.Key) {
 			case Key.Esc:

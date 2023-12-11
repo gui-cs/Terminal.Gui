@@ -88,7 +88,7 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += OnSelectedCellChanged;
 			tableView.CellActivated += EditCurrentCell;
-			tableView.KeyPress += TableViewKeyPress;
+			tableView.KeyDown += TableViewKeyPress;
 
 			SetupScrollBar ();
 		}

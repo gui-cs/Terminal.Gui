@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (_detailsFrame);
 			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
-			treeViewFiles.KeyPress += TreeViewFiles_KeyPress;
+			treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
 			treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
 			SetupFileTree ();

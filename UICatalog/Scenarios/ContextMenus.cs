@@ -65,7 +65,7 @@ public class ContextMenus : Scenario {
 
 		Point mousePos = default;
 
-		Win.KeyPress += (s, e) => {
+		Win.KeyDown += (s, e) => {
 			if (e.Key == winContextMenuKey) {
 				ShowContextMenu (mousePos.X, mousePos.Y);
 				e.Handled = true;

@@ -272,14 +272,14 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (0, tableView.RowOffset);
 
-			tableView.ProcessKeyPressEvent (new (Key.PageDown));
+			tableView.ProcessKeyDown (new (Key.PageDown));
 
 			// window height is 5 rows 2 are header so page down should give 3 new rows
 			Assert.Equal (3, tableView.SelectedRow);
 			Assert.Equal (1, tableView.RowOffset);
 
 			// header is no longer visible so page down should give 5 new rows
-			tableView.ProcessKeyPressEvent (new (Key.PageDown));
+			tableView.ProcessKeyDown (new (Key.PageDown));
 
 			Assert.Equal (8, tableView.SelectedRow);
 			Assert.Equal (4, tableView.RowOffset);
@@ -608,7 +608,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			// pressing enter should activate the first cell (selected cell)
-			tv.ProcessKeyPressEvent (new (Key.Enter));
+			tv.ProcessKeyDown (new (Key.Enter));
 			Assert.Equal ("R0C0", activatedValue);
 
 			// reset the test
@@ -616,12 +616,12 @@ namespace Terminal.Gui.ViewsTests {
 
 			// clear keybindings and ensure that Enter does not trigger the event anymore
 			tv.ClearKeyBindings ();
-			tv.ProcessKeyPressEvent (new (Key.Enter));
+			tv.ProcessKeyDown (new (Key.Enter));
 			Assert.Null (activatedValue);
 
 			// New method for changing the activation key
 			tv.AddKeyBinding (Key.Z, Command.Accept);
-			tv.ProcessKeyPressEvent (new (Key.Z));
+			tv.ProcessKeyDown (new (Key.Z));
 			Assert.Equal ("R0C0", activatedValue);
 
 			// reset the test
@@ -630,7 +630,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Old method for changing the activation key
 			tv.CellActivationKey = Key.Z;
-			tv.ProcessKeyPressEvent (new (Key.Z));
+			tv.ProcessKeyDown (new (Key.Z));
 			Assert.Equal ("R0C0", activatedValue);
 		}
 
@@ -643,12 +643,12 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 1;
 			tv.SelectedRow = 1;
-			tv.ProcessKeyPressEvent (new (Key.CursorLeft | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorLeft | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next shift left should be ignored because we are already at the bounds
-			tv.ProcessKeyPressEvent (new (Key.CursorLeft | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorLeft | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
@@ -666,12 +666,12 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 0;
 			tv.SelectedRow = 1;
-			tv.ProcessKeyPressEvent (new (Key.CursorRight | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorRight | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next shift right should be ignored because we are already at the right bounds
-			tv.ProcessKeyPressEvent (new (Key.CursorRight | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorRight | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 1, 2, 1), tv.MultiSelectedRegions.Single ().Rect);
 
@@ -689,14 +689,14 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 0;
 			tv.SelectedRow = 0;
-			tv.ProcessKeyPressEvent (new (Key.CursorRight | Key.ShiftMask));
-			tv.ProcessKeyPressEvent (new (Key.CursorDown | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorRight | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorDown | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next moves should be ignored because we already selected the whole table
-			tv.ProcessKeyPressEvent (new (Key.CursorRight | Key.ShiftMask));
-			tv.ProcessKeyPressEvent (new (Key.CursorDown | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorRight | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorDown | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 			Assert.Equal (1, tv.SelectedColumn);
@@ -715,14 +715,14 @@ namespace Terminal.Gui.ViewsTests {
 			tv.MultiSelect = true;
 			tv.SelectedColumn = 1;
 			tv.SelectedRow = 1;
-			tv.ProcessKeyPressEvent (new (Key.CursorLeft | Key.ShiftMask));
-			tv.ProcessKeyPressEvent (new (Key.CursorUp | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorLeft | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorUp | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 
 			// this next moves should be ignored because we already selected the whole table
-			tv.ProcessKeyPressEvent (new (Key.CursorLeft | Key.ShiftMask));
-			tv.ProcessKeyPressEvent (new (Key.CursorUp | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorLeft | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorUp | Key.ShiftMask));
 
 			Assert.Equal (new Rect (0, 0, 2, 2), tv.MultiSelectedRegions.Single ().Rect);
 			Assert.Equal (0, tv.SelectedColumn);
@@ -1118,7 +1118,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.SelectedRow = 3; // row is 0 indexed so this is the 4th visible row
 
 			// Scroll down
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorDown });
 
 			// Scrolled off the page by 1 row so it should only have moved down 1 line of RowOffset
 			Assert.Equal (4, tableView.SelectedRow);
@@ -1167,7 +1167,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Scroll right
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			tableView.Draw ();
 
@@ -1228,7 +1228,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Scroll right
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			tableView.Draw ();
 
@@ -1426,12 +1426,12 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
 			tableView.SelectedColumn = 0;
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			// Expect the cursor navigation to skip over the invisible column(s)
 			Assert.Equal (2, tableView.SelectedColumn);
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorLeft });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorLeft });
 
 			// Expect the cursor navigation backwards to skip over invisible column too
 			Assert.Equal (0, tableView.SelectedColumn);
@@ -1454,7 +1454,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.EnsureValidSelection ();
 			Assert.Equal (1, tableView.SelectedColumn);
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () {
+			tableView.ProcessKeyDown (new KeyEventArgs () {
 				Key = useHome ? Key.Home : Key.CursorLeft
 			});
 
@@ -1474,7 +1474,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.SelectedRow = 1;
 			tableView.SelectedColumn = 1;
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () {
+			tableView.ProcessKeyDown (new KeyEventArgs () {
 				Key = Key.Home | Key.CtrlMask
 			});
 
@@ -1488,7 +1488,7 @@ namespace Terminal.Gui.ViewsTests {
 				Assert.Equal (0, tableView.SelectedRow);
 			}
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () {
+			tableView.ProcessKeyDown (new KeyEventArgs () {
 				Key = Key.End | Key.CtrlMask
 			});
 
@@ -1522,7 +1522,7 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.EnsureValidSelection ();
 			Assert.Equal (2, tableView.SelectedColumn);
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () {
+			tableView.ProcessKeyDown (new KeyEventArgs () {
 				Key = useEnd ? Key.End : Key.CursorRight
 			});
 
@@ -1571,7 +1571,7 @@ namespace Terminal.Gui.ViewsTests {
 			// if middle column is invisible
 			tableView.Style.GetOrCreateColumnStyle (1).Visible = false;
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight | Key.ShiftMask });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight | Key.ShiftMask });
 
 			// Selection should extend from A to C but skip B
 			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
@@ -1599,14 +1599,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, selectedCell.Y);
 
 			// Go Right
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			selectedCell = tableView.GetAllSelectedCells ().Single ();
 			Assert.Equal (1, selectedCell.X);
 			Assert.Equal (0, selectedCell.Y);
 
 			// Toggle Select
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 			var m = tableView.MultiSelectedRegions.Single ();
 			Assert.True (m.IsToggled);
 			Assert.Equal (1, m.Origin.X);
@@ -1616,7 +1616,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, selectedCell.Y);
 
 			// Go Left
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorLeft });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorLeft });
 
 			// Both Toggled and Moved to should be selected
 			Assert.Equal (2, tableView.GetAllSelectedCells ().Count ());
@@ -1628,7 +1628,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, s2.Y);
 
 			// Go Down
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorDown });
 
 			// Both Toggled and Moved to should be selected but not 0,0
 			// which we moved down from
@@ -1641,14 +1641,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, s2.Y);
 
 			// Go back to the toggled cell
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorUp });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorUp });
 
 			// Toggle off 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 
 			// Go Left
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorLeft });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorLeft });
 
 			selectedCell = tableView.GetAllSelectedCells ().Single ();
 			Assert.Equal (0, selectedCell.X);
@@ -1667,10 +1667,10 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 
 			// Toggle Select Cell 0,0
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 
 			// Go Down
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorDown });
 
 			var m = tableView.MultiSelectedRegions.Single ();
 			Assert.True (m.IsToggled);
@@ -1680,13 +1680,13 @@ namespace Terminal.Gui.ViewsTests {
 			//First row toggled and Second row active = 12 selected cells
 			Assert.Equal (12, tableView.GetAllSelectedCells ().Count ());
 
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorUp });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorUp });
 
 			Assert.Single (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
 
 			// Can untoggle at 1,0 even though 0,0 was initial toggle because FullRowSelect is on
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 
 			Assert.Empty (tableView.MultiSelectedRegions.Where (r => r.IsToggled));
 
@@ -1704,16 +1704,16 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 
 			// Make a square selection
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorRight });
 
 			Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
 			// Toggle the square selected region on
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 
 			// Go Right
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			//Toggled on square + the active cell (x=2,y=1)
 			Assert.Equal (5, tableView.GetAllSelectedCells ().Count ());
@@ -1722,11 +1722,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Untoggle the rectangular region by hitting toggle in
 			// any cell in that rect
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorUp });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorLeft });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorUp });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorLeft });
 
 			Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 			Assert.Single (tableView.GetAllSelectedCells ());
 		}
 
@@ -1745,17 +1745,17 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
 
 			// Make first square selection (0,0 to 1,1)
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorRight });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Space });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
 			Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
 			// Make second square selection leaving 1 unselected line between them
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorLeft });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorDown });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorDown });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorLeft });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorRight });
 
 			// 2 square selections
 			Assert.Equal (8, tableView.GetAllSelectedCells ().Count ());
@@ -2018,7 +2018,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Scroll right
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			// since A is now pushed off screen we get indicator showing
 			// that user can scroll left to see first column
@@ -2033,8 +2033,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Scroll right twice more (to end of columns)
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
-			tableView.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
+			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 
 			tableView.Draw ();
 
@@ -2320,7 +2320,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Empty (wrapper.CheckedRows);
 
 			//toggle the top cell
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.Single (wrapper.CheckedRows, 0);
 
@@ -2336,8 +2336,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-			tv.ProcessKeyPressEvent (new (Key.CursorDown));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.CursorDown));
+			tv.ProcessKeyDown (new (Key.Space));
 
 
 			Assert.Contains (0,wrapper.CheckedRows);
@@ -2358,8 +2358,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// untoggle top one
-			tv.ProcessKeyPressEvent (new (Key.CursorUp));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.CursorUp));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.Single (wrapper.CheckedRows, 1);
 
@@ -2388,8 +2388,8 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Table = wrapper;
 
 			//toggle all cells
-			tv.ProcessKeyPressEvent (new (Key.A | Key.CtrlMask));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.A | Key.CtrlMask));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			tv.Draw();
 
@@ -2408,7 +2408,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (3, wrapper.CheckedRows.Count);
 
 			// Untoggle all again
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			tv.Draw();
 
@@ -2447,10 +2447,10 @@ namespace Terminal.Gui.ViewsTests {
 │☐│1│2│
 │☑│1│2│";
 			//toggle top two at once
-			tv.ProcessKeyPressEvent (new (Key.CursorDown | Key.ShiftMask));
+			tv.ProcessKeyDown (new (Key.CursorDown | Key.ShiftMask));
 			Assert.True (tv.IsSelected (0, 0));
 			Assert.True (tv.IsSelected (0, 1));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			// Because at least 1 of the rows is not yet ticked we toggle them all to ticked
 			TestHelpers.AssertDriverContentsAre (expected, output);
@@ -2472,7 +2472,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Untoggle the top 2
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			tv.Draw();
 
@@ -2518,7 +2518,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (pets.Where(p=>p.IsPicked));
 
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 			
 			Assert.True (pets.First ().IsPicked);
 
@@ -2536,8 +2536,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.ProcessKeyPressEvent (new (Key.CursorDown));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.CursorDown));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.True (pets.ElementAt(0).IsPicked);
 			Assert.True (pets.ElementAt (1).IsPicked);
@@ -2557,8 +2557,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.ProcessKeyPressEvent (new (Key.CursorUp));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.CursorUp));
+			tv.ProcessKeyDown (new (Key.Space));
 
 
 			Assert.False (pets.ElementAt (0).IsPicked);
@@ -2600,8 +2600,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.DoesNotContain (pets, p => p.IsPicked);
 
 			//toggle all cells
-			tv.ProcessKeyPressEvent (new (Key.A | Key.CtrlMask));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.A | Key.CtrlMask));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.True (pets.All (p => p.IsPicked));
 
@@ -2619,7 +2619,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.Empty (pets.Where (p => p.IsPicked));
 
@@ -2671,7 +2671,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (pets.Where (p => p.IsPicked));
 
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.True (pets.First ().IsPicked);
 
@@ -2689,8 +2689,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.ProcessKeyPressEvent (new (Key.CursorDown));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.CursorDown));
+			tv.ProcessKeyDown (new (Key.Space));
 
 			Assert.False (pets.ElementAt (0).IsPicked);
 			Assert.True (pets.ElementAt (1).IsPicked);
@@ -2710,8 +2710,8 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 
-			tv.ProcessKeyPressEvent (new (Key.CursorUp));
-			tv.ProcessKeyPressEvent (new (Key.Space));
+			tv.ProcessKeyDown (new (Key.CursorUp));
+			tv.ProcessKeyDown (new (Key.Space));
 
 
 			Assert.True (pets.ElementAt (0).IsPicked);
@@ -3126,11 +3126,11 @@ A B C
 			Assert.False (tv.HasFocus);
 
 			// already on fish
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.F });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.F });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// not focused
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Z });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.Z });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// ensure that TableView has the input focus
@@ -3141,38 +3141,38 @@ A B C
 			Assert.True (tv.HasFocus);
 
 			// already on fish
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.F });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.F });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// move to zoo
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.Z });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.Z });
 			Assert.Equal (3, tv.SelectedRow);
 
 			// move to troll
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.T });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.T });
 			Assert.Equal (1, tv.SelectedRow);
 
 			// move to trap
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.T });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.T });
 			Assert.Equal (2, tv.SelectedRow);
 
 			// change columns to navigate by column 2
 			Assert.Equal (0, tv.SelectedColumn);
 			Assert.Equal (2, tv.SelectedRow);
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.CursorRight });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.CursorRight });
 			Assert.Equal (1, tv.SelectedColumn);
 			Assert.Equal (2, tv.SelectedRow);
 			
 			// nothing ends with t so stay where you are
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.T });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.T });
 			Assert.Equal (2, tv.SelectedRow);
 
 			//jump to fish which ends in h
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.H });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.H });
 			Assert.Equal (0, tv.SelectedRow);
 
 			// jump to zoo which ends in o
-			tv.ProcessKeyPressEvent (new KeyEventArgs () { Key = Key.O });
+			tv.ProcessKeyDown (new KeyEventArgs () { Key = Key.O });
 			Assert.Equal (3, tv.SelectedRow);
 
 

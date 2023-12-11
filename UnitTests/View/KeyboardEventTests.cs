@@ -22,7 +22,7 @@ public class KeyboardEventTests {
 		bool processKeyPressInvoked = false;
 		bool setHandledTo = false;
 
-		view.KeyPress += (s, e) => {
+		view.KeyDown += (s, e) => {
 			e.Handled = setHandledTo;
 			Assert.Equal (setHandledTo, e.Handled);
 			Assert.Equal (Key.N, e.Key);
@@ -34,20 +34,20 @@ public class KeyboardEventTests {
 			Assert.Equal (Key.N, e.Key);
 		};
 
-		view.ProcessKeyPress += (s, e) => {
+		view.KeyPressed += (s, e) => {
 			processKeyPressInvoked = true;
 			Assert.False (e.Handled);
 			Assert.Equal (Key.N, e.Key);
 		};
 
-		view.ProcessKeyPressEvent (new (Key.N));
+		view.ProcessKeyDown (new (Key.N));
 		Assert.True (invokingKeyBindingsInvoked);
 		Assert.True (processKeyPressInvoked);
 
 		invokingKeyBindingsInvoked = false;
 		processKeyPressInvoked = false;
 		setHandledTo = true;
-		view.ProcessKeyPressEvent (new (Key.N));
+		view.ProcessKeyDown (new (Key.N));
 		Assert.False (invokingKeyBindingsInvoked);
 		Assert.False (processKeyPressInvoked);
 	}
@@ -61,7 +61,7 @@ public class KeyboardEventTests {
 		bool processKeyPressInvoked = false;
 		bool setHandledTo = false;
 
-		view.KeyPress += (s, e) => {
+		view.KeyDown += (s, e) => {
 			keyPressInvoked = true;
 			Assert.False (e.Handled);
 			Assert.Equal (Key.N, e.Key);
@@ -74,14 +74,14 @@ public class KeyboardEventTests {
 			Assert.Equal (Key.N, e.Key);
 		};
 
-		view.ProcessKeyPress += (s, e) => {
+		view.KeyPressed += (s, e) => {
 			processKeyPressInvoked = true;
 			processKeyPressInvoked = true;
 			Assert.False (e.Handled);
 			Assert.Equal (Key.N, e.Key);
 		};
 
-		view.ProcessKeyPressEvent (new (Key.N));
+		view.ProcessKeyDown (new (Key.N));
 		Assert.True (keyPressInvoked);
 		Assert.True (invokingKeyBindingsInvoked);
 		Assert.True (processKeyPressInvoked);
@@ -90,7 +90,7 @@ public class KeyboardEventTests {
 		invokingKeyBindingsInvoked = false;
 		processKeyPressInvoked = false;
 		setHandledTo = true;
-		view.ProcessKeyPressEvent (new (Key.N));
+		view.ProcessKeyDown (new (Key.N));
 		Assert.True (keyPressInvoked);
 		Assert.True (invokingKeyBindingsInvoked);
 		Assert.False (processKeyPressInvoked);
@@ -100,21 +100,21 @@ public class KeyboardEventTests {
 	[InlineData (null, null)]
 	[InlineData (true, true)]
 	[InlineData (false, false)]
-	public void InvokeKeyBindings_Returns_Nullable_Properly (bool? toReturn, bool? expected)
+	public void OnInvokingKeyBindings_Returns_Nullable_Properly (bool? toReturn, bool? expected)
 	{
-		var view = new InvokeKeyBindingsTestView ();
+		var view = new KeyBindingsTestView ();
 		view.CommandReturns = toReturn;
 
-		var result = view.OnInvokeKeyBindings (new (Key.A));
+		var result = view.OnInvokingKeyBindings (new (Key.A));
 		Assert.Equal (expected, result);
 	}
 
 	/// <summary>
 	/// A view that overrides the OnKey* methods so we can test that they are called. 
 	/// </summary>
-	public class InvokeKeyBindingsTestView: View {
+	public class KeyBindingsTestView: View {
 		public bool? CommandReturns { get; set; }
-		public InvokeKeyBindingsTestView ()
+		public KeyBindingsTestView ()
 		{
 			CanFocus = true;
 			AddCommand (Command.Default, () => CommandReturns);
@@ -123,31 +123,11 @@ public class KeyboardEventTests {
 	}
 
 	[Fact]
-	public void KeyPress_Handled_To_True_Stops_Processing ()
-	{
-		var view = new View ();
-		view.KeyPress += (s, e) => {
-			e.Handled = true;
-			Assert.True (e.Handled);
-			Assert.Equal (Key.N, e.Key);
-		};
-
-		bool processKeyPressInvoked = false;
-		view.ProcessKeyPress += (s, e) => {
-			processKeyPressInvoked = true;
-		};
-
-		Application.OnKeyPress (new (Key.N));
-		Assert.False (processKeyPressInvoked);
-	}
-
-
-	[Fact]
-	public void OnKey_Events_Fire_Before_And_Cancel_VirtualMethods ()
+	public void KeyDown_Handled_True_Stops_Processing ()
 	{
 		var keyDown = false;
-		var keyPress = false;
-		var keyUp = false;
+		var invokingKeyBindings = false;
+		var keyPressed = false;
 
 		var view = new OnKeyTestView ();
 		Assert.True (view.CanFocus);
@@ -156,84 +136,147 @@ public class KeyboardEventTests {
 		view.KeyDown += (s, e) => {
 			Assert.Equal (Key.A, e.Key);
 			Assert.False (keyDown);
-			Assert.False (view.OnKeyDownWasCalled);
+			Assert.False (view.OnKeyDownContinued);
 			e.Handled = true;
 			keyDown = true;
 		};
-		view.KeyPress += (s, e) => {
+		view.InvokingKeyBindings += (s, e) => {
 			Assert.Equal (Key.A, e.Key);
-			Assert.False (keyPress);
-			Assert.False (view.OnKeyPressWasCalled);
+			Assert.False (keyPressed);
+			Assert.False (view.OnInvokingKeyBindingsContinued);
 			e.Handled = true;
-			keyPress = true;
+			invokingKeyBindings = true;
 		};
-		view.KeyUp += (s, e) => {
+		view.KeyPressed += (s, e) => {
 			Assert.Equal (Key.A, e.Key);
-			Assert.False (keyUp);
-			Assert.False (view.OnKeyUpWasCalled);
+			Assert.False (keyPressed);
+			Assert.False (view.OnKeyPressedContinued);
 			e.Handled = true;
-			keyUp = true;
+			keyPressed = true;
 		};
 
-		view.ProcessKeyDownEvent (new (Key.A));
+		view.ProcessKeyDown (new (Key.A));
 		Assert.True (keyDown);
+		Assert.False (invokingKeyBindings);
+		Assert.False (keyPressed);
 
-		view.ProcessKeyPressEvent (new (Key.A));
-		Assert.True (keyPress);
-
-		view.ProcessKeyUpEvent (new (Key.A));
-		Assert.True (keyUp);
-
-		Assert.False (view.OnKeyDownWasCalled);
-		Assert.False (view.OnKeyPressWasCalled);
-		Assert.False (view.OnKeyUpWasCalled);
+		Assert.False (view.OnKeyDownContinued);
+		Assert.False (view.OnInvokingKeyBindingsContinued);
+		Assert.False (view.OnKeyPressedContinued);
 	}
 
 	[Fact]
-	public void OnProcessKey_Events_Fire_Before_And_Cancel_VirtualMethods ()
+	public void InvokingKeyBindings_Handled_True_Stops_Processing ()
 	{
 		var keyDown = false;
-		var keyPress = false;
+		var invokingKeyBindings = false;
+		var keyPressed = false;
+
+		var view = new OnKeyTestView ();
+		Assert.True (view.CanFocus);
+		view.CancelVirtualMethods = false;
+
+		view.KeyDown += (s, e) => {
+			Assert.Equal (Key.A, e.Key);
+			Assert.False (keyDown);
+			Assert.False (view.OnKeyDownContinued);
+			e.Handled = false;
+			keyDown = true;
+		};
+		view.InvokingKeyBindings += (s, e) => {
+			Assert.Equal (Key.A, e.Key);
+			Assert.False (keyPressed);
+			Assert.False (view.OnInvokingKeyBindingsContinued);
+			e.Handled = true;
+			invokingKeyBindings = true;
+		};
+		view.KeyPressed += (s, e) => {
+			Assert.Equal (Key.A, e.Key);
+			Assert.False (keyPressed);
+			Assert.False (view.OnKeyPressedContinued);
+			e.Handled = true;
+			keyPressed = true;
+		};
+
+		view.ProcessKeyDown (new (Key.A));
+		Assert.True (keyDown);
+		Assert.True (invokingKeyBindings);
+		Assert.False (keyPressed);
+
+		Assert.True (view.OnKeyDownContinued);
+		Assert.False (view.OnInvokingKeyBindingsContinued);
+		Assert.False (view.OnKeyPressedContinued);
+	}
+
+
+	[Fact]
+	public void KeyPressed_Handled_True_Stops_Processing ()
+	{
+		var keyDown = false;
+		var invokingKeyBindings = false;
+		var keyPressed = false;
+
+		var view = new OnKeyTestView ();
+		Assert.True (view.CanFocus);
+		view.CancelVirtualMethods = false;
+
+		view.KeyDown += (s, e) => {
+			Assert.Equal (Key.A, e.Key);
+			Assert.False (keyDown);
+			Assert.False (view.OnKeyDownContinued);
+			e.Handled = false;
+			keyDown = true;
+		};
+		view.InvokingKeyBindings += (s, e) => {
+			Assert.Equal (Key.A, e.Key);
+			Assert.False (keyPressed);
+			Assert.False (view.OnInvokingKeyBindingsContinued);
+			e.Handled = false;
+			invokingKeyBindings = true;
+		};
+		view.KeyPressed += (s, e) => {
+			Assert.Equal (Key.A, e.Key);
+			Assert.False (keyPressed);
+			Assert.False (view.OnKeyPressedContinued);
+			e.Handled = true;
+			keyPressed = true;
+		};
+
+		view.ProcessKeyDown (new (Key.A));
+		Assert.True (keyDown);
+		Assert.True (invokingKeyBindings);
+		Assert.True (keyPressed);
+
+		Assert.True (view.OnKeyDownContinued);
+		Assert.True (view.OnInvokingKeyBindingsContinued);
+		Assert.False (view.OnKeyPressedContinued);
+	}
+
+
+	[Fact]
+	public void KeyUp_Handled_True_Stops_Processing ()
+	{
 		var keyUp = false;
 
 		var view = new OnKeyTestView ();
-		view.CancelVirtualMethods = false;
 		Assert.True (view.CanFocus);
+		view.CancelVirtualMethods = false;
 
-		view.ProcessKeyDown += (s, e) => {
-			Assert.Equal (Key.A, e.Key);
-			Assert.False (keyDown);
-			Assert.False (view.OnProcessKeyDownWasCalled);
-			e.Handled = true;
-			keyDown = true;
-		};
-		view.ProcessKeyPress += (s, e) => {
-			Assert.Equal (Key.A, e.Key);
-			Assert.False (keyPress);
-			Assert.False (view.OnProcessKeyPressWasCalled);
-			e.Handled = true;
-			keyPress = true;
-		};
-		view.ProcessKeyUp += (s, e) => {
+		view.KeyUp += (s, e) => {
 			Assert.Equal (Key.A, e.Key);
 			Assert.False (keyUp);
-			Assert.False (view.OnProcessKeyUpWasCalled);
+			Assert.False (view.OnKeyPressedContinued);
 			e.Handled = true;
 			keyUp = true;
 		};
 
-		view.ProcessKeyDownEvent (new (Key.A));
-		Assert.True (keyDown);
-
-		view.ProcessKeyPressEvent (new (Key.A));
-		Assert.True (keyPress);
-
-		view.ProcessKeyUpEvent (new (Key.A));
+		view.ProcessKeyUp (new (Key.A));
 		Assert.True (keyUp);
 
-		Assert.False (view.OnProcessKeyDownWasCalled);
-		Assert.False (view.OnProcessKeyPressWasCalled);
-		Assert.False (view.OnProcessKeyUpWasCalled);
+		Assert.False (view.OnKeyUpContinued);
+		Assert.False (view.OnKeyDownContinued);
+		Assert.False (view.OnInvokingKeyBindingsContinued);
+		Assert.False (view.OnKeyPressedContinued);
 	}
 
 	/// <summary>
@@ -248,9 +291,10 @@ public class KeyboardEventTests {
 
 		public override string Text { get; set; }
 
-		public bool OnKeyDownWasCalled { get; set; }
-		public bool OnKeyPressWasCalled { get; set; }
-		public bool OnKeyUpWasCalled { get; set; }
+		public bool OnKeyDownContinued { get; set; }
+		public bool OnInvokingKeyBindingsContinued { get; set; }
+		public bool OnKeyPressedContinued { get; set; }
+		public bool OnKeyUpContinued { get; set; }
 
 		public override bool OnKeyDown (KeyEventArgs keyEvent)
 		{
@@ -258,17 +302,28 @@ public class KeyboardEventTests {
 				return true;
 			}
 
-			OnKeyDownWasCalled = true;
+			OnKeyDownContinued = true;
 			return CancelVirtualMethods;
 		}
 
-		public override bool OnKeyPress (KeyEventArgs keyEvent)
+		public override bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
 		{
-			if (base.OnKeyPress (keyEvent)) {
+			var handled = base.OnInvokingKeyBindings (keyEvent);
+			if (handled != null && (bool)handled) {
 				return true;
 			}
 
-			OnKeyPressWasCalled = true;
+			OnInvokingKeyBindingsContinued = true;
+			return CancelVirtualMethods;
+		}
+
+		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		{
+			if (base.OnKeyPressed (keyEvent)) {
+				return true;
+			}
+
+			OnKeyPressedContinued = true;
 			return CancelVirtualMethods;
 		}
 
@@ -278,41 +333,7 @@ public class KeyboardEventTests {
 				return true;
 			}
 
-			OnKeyUpWasCalled = true;
-			return CancelVirtualMethods;
-		}
-
-		public bool OnProcessKeyDownWasCalled { get; set; }
-		public bool OnProcessKeyPressWasCalled { get; set; }
-		public bool OnProcessKeyUpWasCalled { get; set; }
-
-		public override bool OnProcessKeyDown (KeyEventArgs keyEvent)
-		{
-			if (base.OnProcessKeyDown (keyEvent)) {
-				return true;
-			}
-
-			OnProcessKeyDownWasCalled = true;
-			return CancelVirtualMethods;
-		}
-
-		public override bool OnProcessKeyPress (KeyEventArgs keyEvent)
-		{
-			if (base.OnProcessKeyPress (keyEvent)) {
-				return true;
-			}
-
-			OnProcessKeyPressWasCalled = true;
-			return CancelVirtualMethods;
-		}
-
-		public override bool OnProcessKeyUp (KeyEventArgs keyEvent)
-		{
-			if (base.OnProcessKeyUp (keyEvent)) {
-				return true;
-			}
-
-			OnProcessKeyUpWasCalled = true;
+			OnKeyUpContinued = true;
 			return CancelVirtualMethods;
 		}
 	}
@@ -324,7 +345,7 @@ public class KeyboardEventTests {
 	public void Events_Are_Called_With_Only_Key_Modifiers (bool shift, bool alt, bool control)
 	{
 		var keyDown = false;
-		var keyPress = false;
+		var keyPressed = false;
 		var keyUp = false;
 
 		var view = new OnKeyTestView ();
@@ -336,11 +357,11 @@ public class KeyboardEventTests {
 			Assert.Equal (alt, e.IsAlt);
 			Assert.Equal (control, e.IsCtrl);
 			Assert.False (keyDown);
-			Assert.False (view.OnKeyDownWasCalled);
+			Assert.False (view.OnKeyDownContinued);
 			keyDown = true;
 		};
-		view.KeyPress += (s, e) => {
-			keyPress = true;
+		view.KeyPressed += (s, e) => {
+			keyPressed = true;
 		};
 		view.KeyUp += (s, e) => {
 			Assert.Equal (Key.Null, e.Key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask);
@@ -348,24 +369,23 @@ public class KeyboardEventTests {
 			Assert.Equal (alt, e.IsAlt);
 			Assert.Equal (control, e.IsCtrl);
 			Assert.False (keyUp);
-			Assert.False (view.OnKeyUpWasCalled);
+			Assert.False (view.OnKeyUpContinued);
 			keyUp = true;
 		};
 
-		view.ProcessKeyDownEvent (new (Key.Null | (shift ? Key.ShiftMask : 0) | (alt ? Key.AltMask : 0) | (control ? Key.CtrlMask : 0)));
-		Assert.True (keyDown);
-		Assert.True (view.OnKeyDownWasCalled);
-		Assert.True (view.OnProcessKeyDownWasCalled);
+		//view.ProcessKeyDownEvent (new (Key.Null | (shift ? Key.ShiftMask : 0) | (alt ? Key.AltMask : 0) | (control ? Key.CtrlMask : 0)));
+		//Assert.True (keyDown);
+		//Assert.True (view.OnKeyDownWasCalled);
+		//Assert.True (view.OnProcessKeyDownWasCalled);
 
-		view.ProcessKeyPressEvent (new (Key.Null | (shift ? Key.ShiftMask : 0) | (alt ? Key.AltMask : 0) | (control ? Key.CtrlMask : 0)));
-		Assert.True (keyPress);
-		Assert.True (view.OnKeyPressWasCalled);
-		Assert.True (view.OnProcessKeyPressWasCalled);
+		view.ProcessKeyDown (new (Key.Null | (shift ? Key.ShiftMask : 0) | (alt ? Key.AltMask : 0) | (control ? Key.CtrlMask : 0)));
+		Assert.True (keyPressed);
+		Assert.True (view.OnKeyDownContinued);
+		Assert.True (view.OnKeyPressedContinued);
 
-		view.ProcessKeyUpEvent (new (Key.Null | (shift ? Key.ShiftMask : 0) | (alt ? Key.AltMask : 0) | (control ? Key.CtrlMask : 0)));
+		view.ProcessKeyUp (new (Key.Null | (shift ? Key.ShiftMask : 0) | (alt ? Key.AltMask : 0) | (control ? Key.CtrlMask : 0)));
 		Assert.True (keyUp);
-		Assert.True (view.OnKeyUpWasCalled);
-		Assert.True (view.OnProcessKeyUpWasCalled);
+		Assert.True (view.OnKeyUpContinued);
 	}
 
 	//[Fact]

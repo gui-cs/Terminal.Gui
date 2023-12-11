@@ -473,40 +473,45 @@ public abstract class ConsoleDriver {
 	#endregion
 
 	#region Mouse and Keyboard
-
 	/// <summary>
-	/// Event fired after a key has been pressed and released.
+	/// Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.
 	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyPressed;
+	public event EventHandler<KeyEventArgs> KeyDown;
 
 	/// <summary>
-	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+	/// Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to <see cref="OnKeyUp"/>.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyPressed (KeyEventArgs a) => KeyPressed?.Invoke(this, a);
+	public void OnKeyDown (KeyEventArgs a) => KeyDown?.Invoke (this, a);
+
+	///// <summary>
+	///// Event fired after a key has been pressed and released.
+	///// </summary>
+	//public event EventHandler<KeyEventArgs> KeyPressed;
+
+	///// <summary>
+	///// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+	///// </summary>
+	///// <param name="a"></param>
+	//public void OnKeyPressed (KeyEventArgs a) => KeyPressed?.Invoke(this, a);
 
 	/// <summary>
-	/// Event fired when a key is released.
+	/// Event fired when a key is released. 
 	/// </summary>
+	/// <remarks>
+	/// Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is complete.
+	/// </remarks>
 	public event EventHandler<KeyEventArgs> KeyUp;
 
 	/// <summary>
 	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
 	/// </summary>
+	/// <remarks>
+	/// Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is complete.
+	/// </remarks>
 	/// <param name="a"></param>
 	public void OnKeyUp (KeyEventArgs a) => KeyUp?.Invoke (this, a);
 
-	/// <summary>
-	/// Event fired when a key is pressed.
-	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyDown;
-
-	/// <summary>
-	/// Called when a key is pressed. Fires the <see cref="KeyDown"/> event.
-	/// </summary>
-	/// <param name="a"></param>
-	public void OnKeyDown (KeyEventArgs a) => KeyDown?.Invoke (this, a);
-	
 	/// <summary>
 	/// Event fired when a mouse event occurs.
 	/// </summary>

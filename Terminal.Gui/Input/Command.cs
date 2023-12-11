@@ -9,7 +9,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum Command {
 		/// <summary>
-		/// Activates the default command. e.g for menus this is the shortcut.
+		/// The default command. e.g for menus this is the shortcut.
 		/// </summary>
 		Default,
 

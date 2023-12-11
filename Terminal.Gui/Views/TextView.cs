@@ -3402,17 +3402,17 @@ namespace Terminal.Gui {
 		bool _shiftSelecting;
 
 		///<inheritdoc/>
-		public override bool? OnInvokeKeyBindings (KeyEventArgs a)
+		public override bool? OnInvokingKeyBindings (KeyEventArgs a)
 		{
 			// Give autocomplete first opportunity to respond to key presses
 			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
 				return true;
 			}
-			return base.OnInvokeKeyBindings (a);
+			return base.OnInvokingKeyBindings (a);
 		}
 
 		///<inheritdoc/>
-		public override bool OnProcessKeyPress (KeyEventArgs a)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (!CanFocus) {
 				return true;

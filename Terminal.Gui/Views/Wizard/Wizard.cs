@@ -153,7 +153,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>
-		public override bool OnProcessKeyPress (KeyEventArgs a)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (!Modal) {
 				switch (a.Key) {

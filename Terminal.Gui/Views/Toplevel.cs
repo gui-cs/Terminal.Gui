@@ -330,7 +330,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="View.OnKeyPress"/> events will propagate keys upwards.</description>
+		///		<description><see cref="View.OnKeyDown"/> events will propagate keys upwards.</description>
 		///   </item>
 		///   <item>
 		///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
@@ -341,7 +341,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="View.OnKeyPress"/> events will NOT propagate keys upwards.</description>
+		///		<description><see cref="View.OnKeyDown"/> events will NOT propagate keys upwards.</description>
 		///	  </item>
 		///   <item>
 		///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
@@ -366,45 +366,45 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool IsLoaded { get; private set; }
 
-		// BUGBUG: This probably can be removed.
-		///<inheritdoc/>
-		public override bool OnKeyDown (KeyEventArgs keyEvent)
-		{
-			if (base.OnKeyDown (keyEvent)) {
-				return true;
-			}
+		//// BUGBUG: This probably can be removed.
+		/////<inheritdoc/>
+		//public override bool OnKeyDown (KeyEventArgs keyEvent)
+		//{
+		//	if (base.OnKeyDown (keyEvent)) {
+		//		return true;
+		//	}
 
-			//switch (keyEvent.Key) {
-			//case Key.AltMask:
-			//case Key.AltMask | Key.Space:
-			//case Key.CtrlMask | Key.Space:
-			//case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
-			//	return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
-			//}
+		//	//switch (keyEvent.Key) {
+		//	//case Key.AltMask:
+		//	//case Key.AltMask | Key.Space:
+		//	//case Key.CtrlMask | Key.Space:
+		//	//case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
+		//	//	return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
+		//	//}
 
-			return false;
-		}
+		//	return false;
+		//}
 
-		// BUGBUG: This probably can be removed.
-		///<inheritdoc/>
-		public override bool OnKeyUp (KeyEventArgs keyEvent)
-		{
-			if (base.OnKeyUp (keyEvent)) {
-				return true;
-			}
+		//// BUGBUG: This probably can be removed.
+		/////<inheritdoc/>
+		//public override bool OnKeyUp (KeyEventArgs keyEvent)
+		//{
+		//	if (base.OnKeyUp (keyEvent)) {
+		//		return true;
+		//	}
 
-			//switch (keyEvent.Key) {
-			//case Key.AltMask:
-			//case Key.AltMask | Key.Space:
-			//case Key.CtrlMask | Key.Space:
-			//	if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
-			//		return true;
-			//	}
-			//	break;
-			//}
+		//	//switch (keyEvent.Key) {
+		//	//case Key.AltMask:
+		//	//case Key.AltMask | Key.Space:
+		//	//case Key.CtrlMask | Key.Space:
+		//	//	if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
+		//	//		return true;
+		//	//	}
+		//	//	break;
+		//	//}
 
-			return false;
-		}
+		//	return false;
+		//}
 
 		private void MovePreviousViewOrTop ()
 		{

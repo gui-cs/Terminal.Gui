@@ -205,7 +205,7 @@ namespace UICatalog.Scenarios {
 					button.Clicked += Button_Clicked;
 					button.PointerEnter += Button_PointerEnter;
 					button.MouseClick += Button_MouseClick;
-					button.KeyPress += Button_KeyPress;
+					button.KeyDown += Button_KeyPress;
 					scrollView.Add (button);
 					buttons.Add (button);
 					prevButton = button;
@@ -215,7 +215,7 @@ namespace UICatalog.Scenarios {
 				closeButton.Clicked += Button_Clicked;
 				closeButton.PointerEnter += Button_PointerEnter;
 				closeButton.MouseClick += Button_MouseClick;
-				closeButton.KeyPress += Button_KeyPress;
+				closeButton.KeyDown += Button_KeyPress;
 				scrollView.Add (closeButton);
 				buttons.Add (closeButton);
 

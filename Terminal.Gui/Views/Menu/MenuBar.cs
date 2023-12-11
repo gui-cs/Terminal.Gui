@@ -439,7 +439,7 @@ public class MenuBar : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool? OnInvokeKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for menu bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
@@ -457,7 +457,7 @@ public class MenuBar : View {
 				// Recurse through the menu to find one with the shortcut.
 				if (FindShortcutInChildMenu (key, Menus [i], out _menuItemToSelect)) {
 					_menuBarItemToActivate = i;
-					return base.OnInvokeKeyBindings (keyEvent);
+					return base.OnInvokingKeyBindings (keyEvent);
 				}
 
 				// Now see if any of the menu bar items have a hot key that matches
@@ -499,7 +499,7 @@ public class MenuBar : View {
 
 			}
 		}
-		return base.OnInvokeKeyBindings (keyEvent);
+		return base.OnInvokingKeyBindings (keyEvent);
 	}
 
 	// Recurse the child menus looking for a shortcut that matches the key

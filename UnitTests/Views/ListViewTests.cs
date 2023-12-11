@@ -64,7 +64,7 @@ namespace Terminal.Gui.ViewsTests {
 			var ev = new KeyEventArgs (Key.Space | Key.ShiftMask);
 
 			// view should indicate that it has accepted and consumed the event
-			Assert.True (lv.ProcessKeyPressEvent (ev));
+			Assert.True (lv.ProcessKeyDown (ev));
 
 			// first item should now be selected
 			Assert.Equal (0, lv.SelectedItem);
@@ -75,7 +75,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (lv.Source.IsMarked (2));
 
 			// Press key combo again
-			Assert.True (lv.ProcessKeyPressEvent (ev));
+			Assert.True (lv.ProcessKeyDown (ev));
 
 			// second item should now be selected
 			Assert.Equal (1, lv.SelectedItem);
@@ -86,21 +86,21 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (lv.Source.IsMarked (2));
 
 			// Press key combo again
-			Assert.True (lv.ProcessKeyPressEvent (ev));
+			Assert.True (lv.ProcessKeyDown (ev));
 			Assert.Equal (2, lv.SelectedItem);
 			Assert.True (lv.Source.IsMarked (0));
 			Assert.True (lv.Source.IsMarked (1));
 			Assert.False (lv.Source.IsMarked (2));
 
 			// Press key combo again
-			Assert.True (lv.ProcessKeyPressEvent (ev));
+			Assert.True (lv.ProcessKeyDown (ev));
 			Assert.Equal (2, lv.SelectedItem); // cannot move down any further
 			Assert.True (lv.Source.IsMarked (0));
 			Assert.True (lv.Source.IsMarked (1));
 			Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
 
 			// Press key combo again 
-			Assert.True (lv.ProcessKeyPressEvent (ev));
+			Assert.True (lv.ProcessKeyDown (ev));
 			Assert.Equal (2, lv.SelectedItem); // cannot move down any further
 			Assert.True (lv.Source.IsMarked (0));
 			Assert.True (lv.Source.IsMarked (1));
@@ -115,7 +115,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		/// <summary>
 		/// Tests that when none of the Commands in a chained keybinding are possible
-		/// the <see cref="View.ProcessKeyPressEvent"/> returns the appropriate result
+		/// the <see cref="View.ProcessKeyDown"/> returns the appropriate result
 		/// </summary>
 		[Fact]
 		public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
@@ -132,7 +132,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			var ev = new KeyEventArgs (Key.CursorDown | Key.ShiftMask);
 
-			Assert.True (lv.ProcessKeyPressEvent (ev), "The first time we move down 2 it should be possible");
+			Assert.True (lv.ProcessKeyDown (ev), "The first time we move down 2 it should be possible");
 
 			// After moving down twice from -1 we should be at 'Two'
 			Assert.Equal (1, lv.SelectedItem);
@@ -141,7 +141,7 @@ namespace Terminal.Gui.ViewsTests {
 			lv.SetSource (null);
 
 			// Press key combo again - return should be false this time as none of the Commands are allowable
-			Assert.False (lv.ProcessKeyPressEvent (ev), "We cannot move down so will not respond to this");
+			Assert.False (lv.ProcessKeyDown (ev), "We cannot move down so will not respond to this");
 		}
 
 		private class NewListDataSource : IListDataSource {
@@ -177,26 +177,26 @@ namespace Terminal.Gui.ViewsTests {
 			ListView lv = new ListView (source) { Height = 2, AllowsMarking = true };
 			lv.BeginInit (); lv.EndInit ();
 			Assert.Equal (-1, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.CursorDown)));
+			Assert.True (lv.ProcessKeyDown (new (Key.CursorDown)));
 			Assert.Equal (0, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.CursorUp)));
+			Assert.True (lv.ProcessKeyDown (new (Key.CursorUp)));
 			Assert.Equal (0, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.PageDown)));
+			Assert.True (lv.ProcessKeyDown (new (Key.PageDown)));
 			Assert.Equal (2, lv.SelectedItem);
 			Assert.Equal (2, lv.TopItem);
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.PageUp)));
+			Assert.True (lv.ProcessKeyDown (new (Key.PageUp)));
 			Assert.Equal (0, lv.SelectedItem);
 			Assert.Equal (0, lv.TopItem);
 			Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.Space)));
+			Assert.True (lv.ProcessKeyDown (new (Key.Space)));
 			Assert.True (lv.Source.IsMarked (lv.SelectedItem));
 			var opened = false;
 			lv.OpenSelectedItem += (s, _) => opened = true;
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.Enter)));
+			Assert.True (lv.ProcessKeyDown (new (Key.Enter)));
 			Assert.True (opened);
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.End)));
+			Assert.True (lv.ProcessKeyDown (new (Key.End)));
 			Assert.Equal (2, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyPressEvent (new (Key.Home)));
+			Assert.True (lv.ProcessKeyDown (new (Key.Home)));
 			Assert.Equal (0, lv.SelectedItem);
 		}
 

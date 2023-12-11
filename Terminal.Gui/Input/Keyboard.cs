@@ -37,33 +37,43 @@ public class KeyEventArgs : EventArgs {
 	/// The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
 	/// </summary>
 	/// <remarks>
-	/// If the key pressed is a letter, this will be the upper or lower case letter depending on whether the shift key is pressed.
-	/// If the key is outside of the <see cref="Key.CharMask"/> range, this will be <see langword="null"/>.
+	/// If the key pressed is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
+	/// If the key is outside of the <see cref="Key.CharMask"/> range, this will be <see langword="default"/>.
 	/// </remarks>
-	public Rune AsRune {
-		get {
-			if (Key is Key.Null or Key.SpecialMask || Key.HasFlag (Key.CtrlMask) || Key.HasFlag (Key.AltMask)) {
-				return default;
-			}
+	public Rune AsRune => ToRune (Key);
 
-			// Extract the base key (removing modifier flags)
-			Key baseKey = Key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
+	/// <summary>
+	/// Converts a <see cref="Key"/> to a <see cref="Rune"/>.
+	/// </summary>
+	/// <remarks>
+	/// If the key is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
+	/// If the key is outside of the <see cref="Key.CharMask"/> range, this will be <see langword="default"/>.
+	/// </remarks>
+	/// <param name="key"></param>
+	/// <returns>The key converted to a rune. <see langword="default"/> if conversion is not possible.</returns>
+	public static Rune ToRune (Key key)
+	{
+		if (key is Key.Null or Key.SpecialMask || key.HasFlag (Key.CtrlMask) || key.HasFlag (Key.AltMask)) {
+			return default;
+		}
 
-			switch (baseKey) {
-			case >= Key.A and <= Key.Z when !Key.HasFlag (Key.ShiftMask):
-				return new Rune ((char)(baseKey + 32));
-			case >= Key.A and <= Key.Z:
-				return new Rune ((char)baseKey);
-			case >= Key.Null and < Key.A:
-				return new Rune ((char)baseKey);
-			}
+		// Extract the base key (removing modifier flags)
+		Key baseKey = key & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
 
-			if (Enum.IsDefined (typeof (Key), baseKey)) {
-				return default;
-			}
-
+		switch (baseKey) {
+		case >= Key.A and <= Key.Z when !key.HasFlag (Key.ShiftMask):
+			return new Rune ((char)(baseKey + 32));
+		case >= Key.A and <= Key.Z:
+			return new Rune ((char)baseKey);
+		case >= Key.Null and < Key.A:
 			return new Rune ((char)baseKey);
 		}
+
+		if (Enum.IsDefined (typeof (Key), baseKey)) {
+			return default;
+		}
+
+		return new Rune ((char)baseKey);
 	}
 
 	/// <summary>

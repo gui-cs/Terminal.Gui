@@ -30,11 +30,12 @@ public class HotKeyTests {
 	[Theory]
 	[InlineData (Key.A)]
 	[InlineData ((Key)'a')]
-	[InlineData ((Key)'A')]
 	[InlineData (Key.A | Key.ShiftMask)]
 	[InlineData (Key.D1)]
 	[InlineData (Key.D1 | Key.ShiftMask)]
 	[InlineData ((Key)'!')]
+	[InlineData ((Key)'х')]  // Cyrillic x
+	[InlineData ((Key)'你')] // Chinese ni
 	public void Set_SupportsKeys (Key key)
 	{
 		var view = new View ();
@@ -47,6 +48,8 @@ public class HotKeyTests {
 	[InlineData (Key.A | Key.ShiftMask)]
 	[InlineData (Key.D1)]
 	[InlineData (Key.D1 | Key.ShiftMask)] // '!'
+	[InlineData ((Key)'х')]  // Cyrillic x
+	[InlineData ((Key)'你')] // Chinese ni
 	public void Set_SetsKeyBindings (Key key)
 	{
 		var view = new View ();
@@ -196,7 +199,7 @@ public class HotKeyTests {
 
 	// BUGBUG: Default command is currently Accept. Should be Default.
 	[Theory]
-	[InlineData (Key.Null, true)]
+	[InlineData (Key.Null, true)] // non-shift
 	[InlineData (Key.ShiftMask, true)]
 	[InlineData (Key.AltMask, true)]
 	[InlineData (Key.ShiftMask | Key.AltMask, true)]
@@ -210,10 +213,11 @@ public class HotKeyTests {
 		};
 		view.CanFocus = true;
 		Assert.False (view.HasFocus);
-		view.ProcessKeyPressEvent (new (Key.T | mask));
+		view.ProcessKeyDown (new (Key.T | mask));
 		Assert.Equal (expected, view.HasFocus);
 	}
 
+	// BUGBUG: Default command is currently Accept. Should be Default.
 	[Fact]
 	public void KeyPress_Runs_Default_HotKey_Command_With_SuperView ()
 	{
@@ -228,7 +232,7 @@ public class HotKeyTests {
 		view.CanFocus = true;
 		Assert.False (view.HasFocus);
 
-		superView.ProcessKeyPressEvent (new (Key.T));
+		superView.ProcessKeyDown (new (Key.T));
 		Assert.True (view.HasFocus);
 
 

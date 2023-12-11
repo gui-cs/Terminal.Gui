@@ -23,8 +23,8 @@ public class ResponderTests {
 	{
 		var r = new View ();
 
+		//Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
 		Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-		Assert.False (r.OnKeyPress (new KeyEventArgs () { Key = Key.Unknown }));
 		Assert.False (r.OnKeyUp (new KeyEventArgs () { Key = Key.Unknown }));
 		Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 		Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -47,11 +47,11 @@ public class ResponderTests {
 		var r = new View ();
 		var args = new KeyEventArgs () { Key = Key.Unknown };
 
-		Assert.False (r.OnKeyPress (args));
+		Assert.False (r.OnKeyDown (args));
 		Assert.False (args.Handled);
 
-		r.KeyPress += (s, a) => a.Handled = true;
-		Assert.True (r.OnKeyPress (args));
+		r.KeyDown += (s, a) => a.Handled = true;
+		Assert.True (r.OnKeyDown (args));
 		Assert.True (args.Handled);
 
 		r.Dispose ();

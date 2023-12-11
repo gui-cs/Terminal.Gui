@@ -875,7 +875,7 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count < 20) field.ProcessKeyPressEvent (new (Key.Enter));
+				while (count < 20) field.ProcessKeyDown (new (Key.Enter));
 
 				Application.RequestStop ();
 			};
@@ -933,7 +933,9 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count > 0) field.ProcessKeyPressEvent (new (Key.Enter));
+				while (count > 0) {
+					field.ProcessKeyDown (new (Key.Enter));
+				}
 
 				Application.RequestStop ();
 			};

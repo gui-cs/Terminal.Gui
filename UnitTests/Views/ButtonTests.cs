@@ -73,49 +73,49 @@ namespace Terminal.Gui.ViewsTests {
 		public void KeyBindings_Command ()
 		{
 			var clicked = false;
-			Button btn = new Button ("Test");
+			Button btn = new Button ("_Test");
 			btn.Clicked += (s, e) => clicked = true;
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
 			Assert.Equal (Key.T, btn.HotKey);
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.T)));
+			Assert.True (btn.ProcessKeyDown (new (Key.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.T | Key.AltMask)));
+			Assert.True (btn.ProcessKeyDown (new (Key.T | Key.AltMask)));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.False (btn.IsDefault);
-			Assert.False (btn.ProcessKeyPressEvent (new (Key.Enter)));
+			Assert.False (btn.ProcessKeyDown (new (Key.Enter)));
 			Assert.False (clicked);
 			btn.IsDefault = true;
-			Assert.False (btn.ProcessKeyPressEvent (new (Key.Enter)));
-			Assert.True (Application.Top.ProcessKeyPressEvent (new (Key.Enter)));
+			Assert.False (btn.ProcessKeyDown (new (Key.Enter)));
+			Assert.True (Application.Top.ProcessKeyDown (new (Key.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.AltMask | Key.T)));
+			Assert.True (btn.ProcessKeyDown (new (Key.AltMask | Key.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (Application.Top.ProcessKeyPressEvent (new (Key.Enter)));
+			Assert.True (Application.Top.ProcessKeyDown (new (Key.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.Space)));
+			Assert.True (btn.ProcessKeyDown (new (Key.Space)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new ((Key)'T')));
+			Assert.True (btn.ProcessKeyDown (new ((Key)'T')));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new (btn.HotKey)));
+			Assert.True (btn.ProcessKeyDown (new (btn.HotKey)));
 			Assert.True (clicked);
 			btn.Text = "Te_st";
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new (btn.HotKey)));
+			Assert.True (btn.ProcessKeyDown (new (btn.HotKey)));
 			Assert.True (clicked);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ChangeHotKey ()
+		public void HotKeyChange_Works ()
 		{
 			var clicked = false;
 			Button btn = new Button ("Test");
@@ -124,16 +124,16 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			Assert.Equal (Key.T, btn.HotKey);
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.T)));
+			Assert.True (btn.ProcessKeyDown (new (Key.T)));
 			Assert.True (clicked);
 
 			clicked = false;
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.T | Key.AltMask)));
+			Assert.True (btn.ProcessKeyDown (new (Key.T | Key.AltMask)));
 			Assert.True (clicked);
 
 			clicked = false;
 			btn.HotKey = Key.E;
-			Assert.True (btn.ProcessKeyPressEvent (new (Key.E | Key.AltMask)));
+			Assert.True (btn.ProcessKeyDown (new (Key.E | Key.AltMask)));
 			Assert.True (clicked);
 		}
 
@@ -157,33 +157,33 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			// default keybinding is Enter which results in keypress
-			Application.OnKeyPress (new ((Key)' '));
+			Application.OnKeyDown (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Enter)
 			btn.ClearKeyBinding (Command.Accept);
 
 			// After clearing the default keystroke the Enter button no longer does anything for the Button
-			Application.OnKeyPress (new ((Key)' '));
+			Application.OnKeyDown (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
 			btn.AddKeyBinding (Key.B, Command.Accept);
 
 			// now pressing B should call the button click event
-			Application.OnKeyPress (new (Key.B));
+			Application.OnKeyDown (new (Key.B));
 			Assert.Equal (2, pressed);
 
 			// now pressing Shift-B should NOT call the button click event
-			Application.OnKeyPress (new (Key.ShiftMask | Key.B));
+			Application.OnKeyDown (new (Key.ShiftMask | Key.B));
 			Assert.Equal (2, pressed);
 
 			// now pressing Alt-B should NOT call the button click event
-			Application.OnKeyPress (new (Key.AltMask | Key.B));
+			Application.OnKeyDown (new (Key.AltMask | Key.B));
 			Assert.Equal (2, pressed);
 
 			// now pressing Shift-Alt-B should NOT call the button click event
-			Application.OnKeyPress (new (Key.ShiftMask | Key.AltMask | Key.B));
+			Application.OnKeyDown (new (Key.ShiftMask | Key.AltMask | Key.B));
 			Assert.Equal (2, pressed);
 		}
 

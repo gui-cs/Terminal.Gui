@@ -451,7 +451,7 @@ class Menu : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool? OnInvokeKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for menu bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
@@ -465,7 +465,7 @@ class Menu : View {
 
 			var children = _barItems.Children;
 			if (children == null) {
-				return base.OnInvokeKeyBindings (keyEvent);
+				return base.OnInvokingKeyBindings (keyEvent);
 			}
 
 			// Search for shortcuts first. If there's a shortcut, we don't want to activate the menu item.
@@ -473,11 +473,11 @@ class Menu : View {
 				if (key == c?.Shortcut) {
 					_menuBarItemToActivate = -1;
 					_menuItemToSelect = c;
-					return base.OnInvokeKeyBindings (keyEvent);
+					return base.OnInvokingKeyBindings (keyEvent);
 				}
 				var subMenu = _barItems.SubMenu (c);
 				if (FindShortcutInChildMenu (key, subMenu)) {
-					return base.OnInvokeKeyBindings (keyEvent);
+					return base.OnInvokingKeyBindings (keyEvent);
 				}
 			}
 
@@ -498,18 +498,18 @@ class Menu : View {
 					_menuItemToSelect = children [c];
 					_currentChild = c;
 
-					return base.OnInvokeKeyBindings (keyEvent);
+					return base.OnInvokingKeyBindings (keyEvent);
 				}
 			}
 		}
 
-		var handled = base.OnInvokeKeyBindings (keyEvent);
+		var handled = base.OnInvokingKeyBindings (keyEvent);
 		if (handled != null && (bool)handled) {
 			return true;
 		}
 
 		// This supports the case where the menu bar is a context menu
-		return _host.OnInvokeKeyBindings (keyEvent);
+		return _host.OnInvokingKeyBindings (keyEvent);
 	}
 
 	bool FindShortcutInChildMenu (Key key, MenuBarItem menuBarItem)

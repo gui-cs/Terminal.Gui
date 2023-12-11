@@ -101,7 +101,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (selectedCellLabel);
 
 			listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{listColView.SelectedRow},{listColView.SelectedColumn}"; };
-			listColView.KeyPress += TableViewKeyPress;
+			listColView.KeyDown += TableViewKeyPress;
 
 			SetupScrollBar ();
 

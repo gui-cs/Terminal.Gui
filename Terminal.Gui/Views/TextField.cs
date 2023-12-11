@@ -617,13 +617,13 @@ namespace Terminal.Gui {
 		int _preTextChangedCursorPos;
 
 		///<inheritdoc/>
-		public override bool? OnInvokeKeyBindings (KeyEventArgs a)
+		public override bool? OnInvokingKeyBindings (KeyEventArgs a)
 		{
 			// Give autocomplete first opportunity to respond to key presses
 			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
 				return true;
 			}
-			return base.OnInvokeKeyBindings (a);
+			return base.OnInvokingKeyBindings (a);
 		}
 
 		/// TODO: Flush out these docs
@@ -645,7 +645,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>
-		public override bool OnProcessKeyPress (KeyEventArgs a)
+		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			// Remember the cursor position because the new calculated cursor position is needed
 			// to be set BEFORE the TextChanged event is triggered.

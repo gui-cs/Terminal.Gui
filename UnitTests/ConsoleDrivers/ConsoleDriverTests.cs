@@ -63,7 +63,7 @@ namespace Terminal.Gui.DriverTests {
 			var count = 0;
 			var wasKeyPressed = false;
 
-			view.KeyPress += (s, e) => {
+			view.KeyDown += (s, e) => {
 				wasKeyPressed = true;
 			};
 			top.Add (view);
@@ -104,7 +104,7 @@ namespace Terminal.Gui.DriverTests {
 			var rText = "";
 			var idx = 0;
 
-			view.KeyPress += (s, e) => {
+			view.KeyDown += (s, e) => {
 				Assert.Equal (text [idx], (char)e.Key);
 				rText += (char)e.Key;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
