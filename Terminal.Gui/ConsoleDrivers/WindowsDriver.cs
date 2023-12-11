@@ -937,15 +937,22 @@ internal class WindowsDriver : ConsoleDriver {
 		//case ConsoleKey.NumPad9:
 		//	return keyInfoEx.NumLock ? Key.D9 : Key.PageUp;
 
-		//case ConsoleKey.Oem1:
-		//case ConsoleKey.Oem2: 
-		//case ConsoleKey.Oem3:
-		//case ConsoleKey.Oem4:
-		//case ConsoleKey.Oem5:
-		//case ConsoleKey.Oem6:
-		//case ConsoleKey.Oem7:
-		//case ConsoleKey.Oem8:
-		//case ConsoleKey.Oem102:
+		case ConsoleKey.Oem1:
+		case ConsoleKey.Oem2:
+		case ConsoleKey.Oem3:
+		case ConsoleKey.Oem4:
+		case ConsoleKey.Oem5:
+		case ConsoleKey.Oem6:
+		case ConsoleKey.Oem7:
+		case ConsoleKey.Oem8:
+		case ConsoleKey.Oem102:
+			var ret = ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			if (ret.HasFlag (Key.ShiftMask)) {
+				ret &= ~Key.ShiftMask;
+			}
+			return ret;
+			break;
+
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
