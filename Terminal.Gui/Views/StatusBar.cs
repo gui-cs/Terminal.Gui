@@ -117,15 +117,6 @@ public class StatusBar : View {
 		Width = Dim.Fill ();
 		Height = 1;
 		AddCommand (Command.Accept, InvokeItem);
-
-		Initialized += StatusBar_Initialized;
-	}
-
-	void StatusBar_Initialized (object sender, EventArgs e)
-	{
-		//foreach (var item in Items) {
-		//	SuperView?.AddKeyBinding (item.Shortcut, Command.Accept);
-		//}
 	}
 
 	StatusItem _itemToInvoke;

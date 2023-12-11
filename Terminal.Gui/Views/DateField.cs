@@ -80,7 +80,7 @@ namespace Terminal.Gui {
 
 			// Things this view knows how to do
 			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
-			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (false); return true; });
 			AddCommand (Command.LeftHome, () => MoveHome ());
 			AddCommand (Command.Left, () => MoveLeft ());
 			AddCommand (Command.RightEnd, () => MoveEnd ());

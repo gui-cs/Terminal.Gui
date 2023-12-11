@@ -14,7 +14,7 @@ public partial class View {
 		// By default, the accept command is bound to the HotKey enabling focus
 		AddCommand (Command.Accept, () => {
 			if (CanFocus) {
-				SuperView.SetFocus (this);
+				SetFocus ();
 				return true;
 			}
 			return false;
@@ -55,7 +55,8 @@ public partial class View {
 	/// This is a helper API for configuring a key binding for the hot key. By default, this property is set whenever <see cref="Text"/> changes.
 	/// </para>
 	/// <para>
-	/// By default, when the Hot Key is set, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key (e.g. <see cref="Key.D3"/> | <see cref="Key.AltMask"/>).
+	/// By default, when the Hot Key is set, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and
+	/// the Alt-shifted key (e.g. <see cref="Key.D3"/> | <see cref="Key.AltMask"/>).
 	/// This behavior can be overriden by overriding <see cref="HotKey"/>.
 	/// </para>
 	/// <para>
@@ -74,6 +75,10 @@ public partial class View {
 				var newKey = value == Key.Unknown ? Key.Null : value;
 
 				var baseKey = newKey & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
+				if (newKey != Key.Null && baseKey is >= Key.Delete or <= Key.Space) {
+					throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({value}).");
+				}
+
 				if (newKey != baseKey) {
 					if ((newKey & Key.CtrlMask) != 0) {
 						throw new ArgumentException (@$"HotKey does not support CtrlMask ({value}).");
@@ -97,9 +102,13 @@ public partial class View {
 				}
 
 				if (_hotKey is >= Key.A and <= Key.Z) {
-					// Remove base and shift version
+					// Remove the shift version
 					if (TryGetKeyBinding (_hotKey | Key.ShiftMask, out _)) {
 						ClearKeyBinding (_hotKey | Key.ShiftMask);
+					}
+					// Remove alt | shift version
+					if (TryGetKeyBinding (_hotKey | Key.ShiftMask | Key.AltMask, out _)) {
+						ClearKeyBinding (_hotKey | Key.ShiftMask | Key.AltMask);
 					}
 				}
 
@@ -109,9 +118,10 @@ public partial class View {
 					AddKeyBinding (newKey, Command.Accept);
 					AddKeyBinding (newKey | Key.AltMask, Command.Accept);
 
-					// If the Key is A..Z, add ShiftMask
+					// If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
 					if (newKey is >= Key.A and <= Key.Z) {
 						AddKeyBinding (newKey | Key.ShiftMask, Command.Accept);
+						AddKeyBinding (newKey | Key.ShiftMask | Key.AltMask, Command.Accept);
 					}
 
 					AddKeyBinding (newKey, Command.Accept);
@@ -272,7 +282,7 @@ public partial class View {
 			return true;
 		}
 
-		// Before (fire the cancellable event KeyPress)
+		// Before (fire the cancellable event)
 		if (OnKeyDown (keyEvent)) {
 			return true;
 		}
@@ -412,7 +422,7 @@ public partial class View {
 			return true;
 		}
 
-		// Before (fire the cancellable event KeyPress)
+		// Before (fire the cancellable event)
 		if (OnKeyPress (keyEvent)) {
 			return true;
 		}
@@ -571,7 +581,7 @@ public partial class View {
 			return true;
 		}
 
-		// Before (fire the cancellable event KeyPress)
+		// Before (fire the cancellable event)
 		if (OnKeyUp (keyEvent)) {
 			return true;
 		}
@@ -717,29 +727,17 @@ public partial class View {
 		if (handled != null && (bool)handled) {
 			return true;
 		}
-		
+
 		// TODO: Refactor this per https://github.com/gui-cs/Terminal.Gui/pull/2927#discussion_r1420415162
 		// TODO: The problem that needs to be solved is:
-		// TODO: - If a subview defines a key binding, but is never focused, it's commands will never get invoked
-		// TODO:   Potential solution: A subview that wishes to provide "super-view level commands" must subscribe to
-		// TODO:   superview.InvokingKeyBindings
-		// TODO: Q: Do we have any views that actually require this?
-
-
-		// View base class doesn't have to knowing about a derived class TopLevel.
-		// The isolation principle is affected. If a derived class has a different behavior the it must overridden
-		// the related method and deal with the right actions. I know you want to get rid of the TopLevel but this derived view has specific
-		// functionalities that only have to belong to him.
-		//
-		// Another problem with this design is that are a lot of views that have KeyBindings that only must be run if they are focused.
-		// TextView is one of that and this call will invoke an action even if it isn't focused and thus having unexpected behavior.
-		// With this design force all the TextView methods called by KeyBindings to check if it's focused which is a nightmare.
-		//foreach (var view in Subviews.Where (v => v is not Toplevel && v.Enabled && !v.HasFocus && v.KeyBindings.Count > 0)) {
-		//	handled = view.OnInvokeKeyBindings (keyEvent);
-		//	if (handled != null && (bool)handled) {
-		//		return true;
-		//	}
-		//}
+		// TODO: - How to enable a view to define global key bindings like StatusBar and MenuBar?
+		// see https://github.com/gui-cs/Terminal.Gui/issues/3042
+		foreach (var view in Subviews.Where (v => v is StatusBar or MenuBar || keyEvent.BareKey == v.HotKey)) {
+			handled = view.OnInvokeKeyBindings (keyEvent);
+			if (handled != null && (bool)handled) {
+				return true;
+			}
+		}
 		return handled;
 	}
 

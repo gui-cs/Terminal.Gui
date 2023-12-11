@@ -22,7 +22,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public class TextField : View {
 		List<Rune> _text;
-		int _first, _point;
+		int _first, _cursorPosition;
 		int _selectedStart = -1; // -1 represents there is no text selection.
 		string _selectedText;
 		HistoryText _historyText = new HistoryText ();
@@ -99,8 +99,8 @@ namespace Terminal.Gui {
 				text = "";
 
 			this._text = text.Split ("\n") [0].EnumerateRunes ().ToList ();
-			_point = text.GetRuneCount ();
-			_first = _point > w + 1 ? _point - w + 1 : 0;
+			_cursorPosition = text.GetRuneCount ();
+			_first = _cursorPosition > w + 1 ? _cursorPosition - w + 1 : 0;
 			CanFocus = true;
 			Used = true;
 			WantMousePositionReports = true;
@@ -112,7 +112,7 @@ namespace Terminal.Gui {
 
 			// Things this view knows how to do
 			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
-			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (false); return true; });
 			AddCommand (Command.LeftHomeExtend, () => { MoveHomeExtend (); return true; });
 			AddCommand (Command.RightEndExtend, () => { MoveEndExtend (); return true; });
 			AddCommand (Command.LeftHome, () => { MoveHome (); return true; });
@@ -311,8 +311,8 @@ namespace Terminal.Gui {
 
 				var newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
 				if (newText.Cancel) {
-					if (_point > _text.Count) {
-						_point = _text.Count;
+					if (_cursorPosition > _text.Count) {
+						_cursorPosition = _text.Count;
 					}
 					return;
 				}
@@ -321,8 +321,8 @@ namespace Terminal.Gui {
 
 				if (!Secret && !_historyText.IsFromHistory) {
 					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCellList (oldText) },
-						new Point (_point, 0));
-					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0)
+						new Point (_cursorPosition, 0));
+					_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_cursorPosition, 0)
 						, HistoryText.LineStatus.Replaced);
 				}
 
@@ -330,8 +330,8 @@ namespace Terminal.Gui {
 
 				ProcessAutocomplete ();
 
-				if (_point > _text.Count) {
-					_point = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+				if (_cursorPosition > _text.Count) {
+					_cursorPosition = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
 				}
 
 				Adjust ();
@@ -351,16 +351,16 @@ namespace Terminal.Gui {
 		///    Sets or gets the current cursor position.
 		/// </summary>
 		public virtual int CursorPosition {
-			get { return _point; }
+			get { return _cursorPosition; }
 			set {
 				if (value < 0) {
-					_point = 0;
+					_cursorPosition = 0;
 				} else if (value > _text.Count) {
-					_point = _text.Count;
+					_cursorPosition = _text.Count;
 				} else {
-					_point = value;
+					_cursorPosition = value;
 				}
-				PrepareSelection (_selectedStart, _point - _selectedStart);
+				PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
 			}
 		}
 
@@ -395,12 +395,12 @@ namespace Terminal.Gui {
 
 			var col = 0;
 			for (int idx = _first < 0 ? 0 : _first; idx < _text.Count; idx++) {
-				if (idx == _point)
+				if (idx == _cursorPosition)
 					break;
 				var cols = _text [idx].GetColumns ();
 				TextModel.SetCol (ref col, Frame.Width - 1, cols);
 			}
-			var pos = _point - _first + Math.Min (Frame.X, 0);
+			var pos = _cursorPosition - _first + Math.Min (Frame.X, 0);
 			var offB = OffSetBackground ();
 			var containerFrame = SuperView?.BoundsToScreen (SuperView.Bounds) ?? default;
 			var thisFrame = BoundsToScreen (Bounds);
@@ -458,7 +458,7 @@ namespace Terminal.Gui {
 			for (int idx = p; idx < tcount; idx++) {
 				var rune = _text [idx];
 				var cols = rune.GetColumns ();
-				if (idx == _point && HasFocus && !Used && _length == 0 && !ReadOnly) {
+				if (idx == _cursorPosition && HasFocus && !Used && _length == 0 && !ReadOnly) {
 					Driver.SetAttribute (selColor);
 				} else if (ReadOnly) {
 					Driver.SetAttribute (idx >= _start && _length > 0 && idx < _start + _length ? selColor : roc);
@@ -565,14 +565,14 @@ namespace Terminal.Gui {
 
 			int offB = OffSetBackground ();
 			bool need = NeedsDisplay || !Used;
-			if (_point < _first) {
-				_first = _point;
+			if (_cursorPosition < _first) {
+				_first = _cursorPosition;
 				need = true;
-			} else if (Frame.Width > 0 && (_first + _point - (Frame.Width + offB) == 0 ||
-				  TextModel.DisplaySize (_text, _first, _point).size >= Frame.Width + offB)) {
+			} else if (Frame.Width > 0 && (_first + _cursorPosition - (Frame.Width + offB) == 0 ||
+				  TextModel.DisplaySize (_text, _first, _cursorPosition).size >= Frame.Width + offB)) {
 
 				_first = Math.Max (TextModel.CalculateLeftColumn (_text, _first,
-					_point, Frame.Width + offB), 0);
+					_cursorPosition, Frame.Width + offB), 0);
 				need = true;
 			}
 			if (need) {
@@ -614,7 +614,7 @@ namespace Terminal.Gui {
 				Clipboard.Contents = StringExtensions.ToString (text.ToList ());
 		}
 
-		int _oldCursorPos;
+		int _preTextChangedCursorPos;
 
 		///<inheritdoc/>
 		public override bool? OnInvokeKeyBindings (KeyEventArgs a)
@@ -647,10 +647,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override bool OnProcessKeyPress (KeyEventArgs a)
 		{
-			// remember current cursor position
-			// because the new calculated cursor position is needed to be set BEFORE the change event is triggest
+			// Remember the cursor position because the new calculated cursor position is needed
+			// to be set BEFORE the TextChanged event is triggered.
 			// Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
-			_oldCursorPos = _point;
+			_preTextChangedCursorPos = _cursorPosition;
 
 			// Ignore other control characters.
 			if (!a.IsAlpha && (a.Key < Key.Space || a.Key > Key.CharMask)) {
@@ -661,37 +661,37 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			InsertText (a);
+			InsertText (a, true);
 
 			return true;
 		}
 
-		void InsertText (KeyEventArgs a, bool useOldCursorPos = true)
+		void InsertText (KeyEventArgs a, bool usePreTextChangedCursorPos)
 		{
-			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_cursorPosition, 0));
 
 			List<Rune> newText = _text;
 			if (_length > 0) {
 				newText = DeleteSelectedText ();
-				_oldCursorPos = _point;
+				_preTextChangedCursorPos = _cursorPosition;
 			}
-			if (!useOldCursorPos) {
-				_oldCursorPos = _point;
+			if (!usePreTextChangedCursorPos) {
+				_preTextChangedCursorPos = _cursorPosition;
 			}
 			var kbstr = a.AsRune.ToString ().EnumerateRunes ();
 			if (Used) {
-				_point++;
-				if (_point == newText.Count + 1) {
+				_cursorPosition++;
+				if (_cursorPosition == newText.Count + 1) {
 					SetText (newText.Concat (kbstr).ToList ());
 				} else {
-					if (_oldCursorPos > newText.Count) {
-						_oldCursorPos = newText.Count;
+					if (_preTextChangedCursorPos > newText.Count) {
+						_preTextChangedCursorPos = newText.Count;
 					}
-					SetText (newText.GetRange (0, _oldCursorPos).Concat (kbstr).Concat (newText.GetRange (_oldCursorPos, Math.Min (newText.Count - _oldCursorPos, newText.Count))));
+					SetText (newText.GetRange (0, _preTextChangedCursorPos).Concat (kbstr).Concat (newText.GetRange (_preTextChangedCursorPos, Math.Min (newText.Count - _preTextChangedCursorPos, newText.Count))));
 				}
 			} else {
-				SetText (newText.GetRange (0, _oldCursorPos).Concat (kbstr).Concat (newText.GetRange (Math.Min (_oldCursorPos + 1, newText.Count), Math.Max (newText.Count - _oldCursorPos - 1, 0))));
-				_point++;
+				SetText (newText.GetRange (0, _preTextChangedCursorPos).Concat (kbstr).Concat (newText.GetRange (Math.Min (_preTextChangedCursorPos + 1, newText.Count), Math.Max (newText.Count - _preTextChangedCursorPos - 1, 0))));
+				_cursorPosition++;
 			}
 			Adjust ();
 		}
@@ -715,11 +715,11 @@ namespace Terminal.Gui {
 		public virtual void KillWordBackwards ()
 		{
 			ClearAllSelection ();
-			var newPos = GetModel ().WordBackward (_point, 0);
+			var newPos = GetModel ().WordBackward (_cursorPosition, 0);
 			if (newPos == null) return;
 			if (newPos.Value.col != -1) {
-				SetText (_text.GetRange (0, newPos.Value.col).Concat (_text.GetRange (_point, _text.Count - _point)));
-				_point = newPos.Value.col;
+				SetText (_text.GetRange (0, newPos.Value.col).Concat (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition)));
+				_cursorPosition = newPos.Value.col;
 			}
 			Adjust ();
 		}
@@ -730,10 +730,10 @@ namespace Terminal.Gui {
 		public virtual void KillWordForwards ()
 		{
 			ClearAllSelection ();
-			var newPos = GetModel ().WordForward (_point, 0);
+			var newPos = GetModel ().WordForward (_cursorPosition, 0);
 			if (newPos == null) return;
 			if (newPos.Value.col != -1) {
-				SetText (_text.GetRange (0, _point).Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col)));
+				SetText (_text.GetRange (0, _cursorPosition).Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col)));
 			}
 			Adjust ();
 		}
@@ -741,20 +741,20 @@ namespace Terminal.Gui {
 		void MoveWordRight ()
 		{
 			ClearAllSelection ();
-			var newPos = GetModel ().WordForward (_point, 0);
+			var newPos = GetModel ().WordForward (_cursorPosition, 0);
 			if (newPos == null) return;
 			if (newPos.Value.col != -1)
-				_point = newPos.Value.col;
+				_cursorPosition = newPos.Value.col;
 			Adjust ();
 		}
 
 		void MoveWordLeft ()
 		{
 			ClearAllSelection ();
-			var newPos = GetModel ().WordBackward (_point, 0);
+			var newPos = GetModel ().WordBackward (_cursorPosition, 0);
 			if (newPos == null) return;
 			if (newPos.Value.col != -1)
-				_point = newPos.Value.col;
+				_cursorPosition = newPos.Value.col;
 			Adjust ();
 		}
 
@@ -803,11 +803,11 @@ namespace Terminal.Gui {
 				return;
 
 			ClearAllSelection ();
-			if (_point == 0)
+			if (_cursorPosition == 0)
 				return;
-			SetClipboard (_text.GetRange (0, _point));
-			SetText (_text.GetRange (_point, _text.Count - _point));
-			_point = 0;
+			SetClipboard (_text.GetRange (0, _cursorPosition));
+			SetText (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition));
+			_cursorPosition = 0;
 			Adjust ();
 		}
 
@@ -817,19 +817,19 @@ namespace Terminal.Gui {
 				return;
 
 			ClearAllSelection ();
-			if (_point >= _text.Count)
+			if (_cursorPosition >= _text.Count)
 				return;
-			SetClipboard (_text.GetRange (_point, _text.Count - _point));
-			SetText (_text.GetRange (0, _point));
+			SetClipboard (_text.GetRange (_cursorPosition, _text.Count - _cursorPosition));
+			SetText (_text.GetRange (0, _cursorPosition));
 			Adjust ();
 		}
 
 		void MoveRight ()
 		{
 			ClearAllSelection ();
-			if (_point == _text.Count)
+			if (_cursorPosition == _text.Count)
 				return;
-			_point++;
+			_cursorPosition++;
 			Adjust ();
 		}
 
@@ -839,40 +839,40 @@ namespace Terminal.Gui {
 		public void MoveEnd ()
 		{
 			ClearAllSelection ();
-			_point = _text.Count;
+			_cursorPosition = _text.Count;
 			Adjust ();
 		}
 
 		void MoveLeft ()
 		{
 			ClearAllSelection ();
-			if (_point > 0) {
-				_point--;
+			if (_cursorPosition > 0) {
+				_cursorPosition--;
 				Adjust ();
 			}
 		}
 
 		void MoveWordRightExtend ()
 		{
-			if (_point < _text.Count) {
-				int x = _start > -1 && _start > _point ? _start : _point;
+			if (_cursorPosition < _text.Count) {
+				int x = _start > -1 && _start > _cursorPosition ? _start : _cursorPosition;
 				var newPos = GetModel ().WordForward (x, 0);
 				if (newPos == null) return;
 				if (newPos.Value.col != -1)
-					_point = newPos.Value.col;
+					_cursorPosition = newPos.Value.col;
 				PrepareSelection (x, newPos.Value.col - x);
 			}
 		}
 
 		void MoveWordLeftExtend ()
 		{
-			if (_point > 0) {
-				int x = Math.Min (_start > -1 && _start > _point ? _start : _point, _text.Count);
+			if (_cursorPosition > 0) {
+				int x = Math.Min (_start > -1 && _start > _cursorPosition ? _start : _cursorPosition, _text.Count);
 				if (x > 0) {
 					var newPos = GetModel ().WordBackward (x, 0);
 					if (newPos == null) return;
 					if (newPos.Value.col != -1)
-						_point = newPos.Value.col;
+						_cursorPosition = newPos.Value.col;
 					PrepareSelection (x, newPos.Value.col - x);
 				}
 			}
@@ -880,65 +880,68 @@ namespace Terminal.Gui {
 
 		void MoveRightExtend ()
 		{
-			if (_point < _text.Count) {
-				PrepareSelection (_point++, 1);
+			if (_cursorPosition < _text.Count) {
+				PrepareSelection (_cursorPosition++, 1);
 			}
 		}
 
 		void MoveLeftExtend ()
 		{
-			if (_point > 0) {
-				PrepareSelection (_point--, -1);
+			if (_cursorPosition > 0) {
+				PrepareSelection (_cursorPosition--, -1);
 			}
 		}
 
 		void MoveHome ()
 		{
 			ClearAllSelection ();
-			_point = 0;
+			_cursorPosition = 0;
 			Adjust ();
 		}
 
 		void MoveEndExtend ()
 		{
-			if (_point <= _text.Count) {
-				int x = _point;
-				_point = _text.Count;
-				PrepareSelection (x, _point - x);
+			if (_cursorPosition <= _text.Count) {
+				int x = _cursorPosition;
+				_cursorPosition = _text.Count;
+				PrepareSelection (x, _cursorPosition - x);
 			}
 		}
 
 		void MoveHomeExtend ()
 		{
-			if (_point > 0) {
-				int x = _point;
-				_point = 0;
-				PrepareSelection (x, _point - x);
+			if (_cursorPosition > 0) {
+				int x = _cursorPosition;
+				_cursorPosition = 0;
+				PrepareSelection (x, _cursorPosition - x);
 			}
 		}
 
 		/// <summary>
-		/// Deletes the left character.
+		/// Deletes the character to the left.
 		/// </summary>
-		public virtual void DeleteCharLeft (bool useOldCursorPos = true)
+		/// <param name="usePreTextChangedCursorPos">If set to <see langword="true">true</see> use the cursor position cached
+		/// ; otherwise use <see cref="CursorPosition"/>.
+		/// use .</param>
+		public virtual void DeleteCharLeft (bool usePreTextChangedCursorPos)
 		{
 			if (ReadOnly)
 				return;
 
-			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_cursorPosition, 0));
 
 			if (_length == 0) {
-				if (_point == 0)
+				if (_cursorPosition == 0)
 					return;
 
-				if (!useOldCursorPos) {
-					_oldCursorPos = _point;
+				if (!usePreTextChangedCursorPos) {
+					_preTextChangedCursorPos = _cursorPosition;
 				}
-				_point--;
-				if (_oldCursorPos < _text.Count) {
-					SetText (_text.GetRange (0, _oldCursorPos - 1).Concat (_text.GetRange (_oldCursorPos, _text.Count - _oldCursorPos)));
+				_cursorPosition--;
+				if (_preTextChangedCursorPos < _text.Count) {
+					SetText (_text.GetRange (0, _preTextChangedCursorPos - 1).Concat (_text.GetRange (_preTextChangedCursorPos, _text.Count - _preTextChangedCursorPos)));
 				} else {
-					SetText (_text.GetRange (0, _oldCursorPos - 1));
+					SetText (_text.GetRange (0, _preTextChangedCursorPos - 1));
 				}
 				Adjust ();
 			} else {
@@ -949,20 +952,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Deletes the right character.
+		/// Deletes the character to the right.
 		/// </summary>
 		public virtual void DeleteCharRight ()
 		{
 			if (ReadOnly)
 				return;
 
-			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_point, 0));
+			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_cursorPosition, 0));
 
 			if (_length == 0) {
-				if (_text.Count == 0 || _text.Count == _point)
+				if (_text.Count == 0 || _text.Count == _cursorPosition)
 					return;
 
-				SetText (_text.GetRange (0, _point).Concat (_text.GetRange (_point + 1, _text.Count - (_point + 1))));
+				SetText (_text.GetRange (0, _cursorPosition).Concat (_text.GetRange (_cursorPosition + 1, _text.Count - (_cursorPosition + 1))));
 				Adjust ();
 			} else {
 				var newText = DeleteSelectedText ();
@@ -1007,7 +1010,7 @@ namespace Terminal.Gui {
 
 			_selectedStart = 0;
 			MoveEndExtend ();
-			DeleteCharLeft ();
+			DeleteCharLeft (false);
 			SetNeedsDisplay ();
 		}
 
@@ -1024,7 +1027,7 @@ namespace Terminal.Gui {
 				} else {
 					_selectedStart = value;
 				}
-				PrepareSelection (_selectedStart, _point - _selectedStart);
+				PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
 			}
 		}
 
@@ -1105,7 +1108,7 @@ namespace Terminal.Gui {
 				if (newPosFw == null) return true;
 				ClearAllSelection ();
 				if (newPosFw.Value.col != -1 && sbw != -1) {
-					_point = newPosFw.Value.col;
+					_cursorPosition = newPosFw.Value.col;
 				}
 				PrepareSelection (sbw, newPosFw.Value.col - sbw);
 			} else if (ev.Flags == MouseFlags.Button1TripleClicked) {
@@ -1148,14 +1151,14 @@ namespace Terminal.Gui {
 				pX = TextModel.GetColFromX (_text, _first, x);
 			}
 			if (_first + pX > _text.Count) {
-				_point = _text.Count;
+				_cursorPosition = _text.Count;
 			} else if (_first + pX < _first) {
-				_point = 0;
+				_cursorPosition = 0;
 			} else {
-				_point = _first + pX;
+				_cursorPosition = _first + pX;
 			}
 
-			return _point;
+			return _cursorPosition;
 		}
 
 		void PrepareSelection (int x, int direction = 0)
@@ -1200,8 +1203,8 @@ namespace Terminal.Gui {
 
 		void SetSelectedStartSelectedLength ()
 		{
-			if (SelectedStart > -1 && _point < SelectedStart) {
-				_start = _point;
+			if (SelectedStart > -1 && _cursorPosition < SelectedStart) {
+				_start = _cursorPosition;
 			} else {
 				_start = SelectedStart;
 			}
@@ -1235,12 +1238,12 @@ namespace Terminal.Gui {
 		List<Rune> DeleteSelectedText ()
 		{
 			SetSelectedStartSelectedLength ();
-			int selStart = SelectedStart > -1 ? _start : _point;
+			int selStart = SelectedStart > -1 ? _start : _cursorPosition;
 			var newText = StringExtensions.ToString (_text.GetRange (0, selStart)) +
 				 StringExtensions.ToString (_text.GetRange (selStart + _length, _text.Count - (selStart + _length)));
 
 			ClearAllSelection ();
-			_point = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
+			_cursorPosition = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
 			return newText.ToRuneList ();
 		}
 
@@ -1260,7 +1263,7 @@ namespace Terminal.Gui {
 				cbTxt +
 				StringExtensions.ToString (_text.GetRange (selStart + _length, _text.Count - (selStart + _length)));
 
-			_point = selStart + cbTxt.GetRuneCount ();
+			_cursorPosition = selStart + cbTxt.GetRuneCount ();
 			ClearAllSelection ();
 			SetNeedsDisplay ();
 			Adjust ();
