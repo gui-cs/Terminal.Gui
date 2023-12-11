@@ -119,15 +119,15 @@ namespace UICatalog.Scenarios {
 				if (e.Key == Key.Unknown) {
 					_wasUnknown = true;
 				}
+				if (e.Key == Application.QuitKey) {
+					Application.RequestStop ();
+					return;
+				}
 			};
 
 			KeyEventArgs unknownChar = null;
 
 			tvInput.KeyPressed += (s, e) => {
-				if (e.Key == (Key.Q | Key.CtrlMask)) {
-					Application.RequestStop ();
-					return;
-				}
 				if (e.Key == Key.Unknown) {
 					_wasUnknown = true;
 					e.Handled = true;

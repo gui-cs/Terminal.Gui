@@ -1721,7 +1721,7 @@ Edit
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.True (Application.OnKeyDown (new KeyEventArgs (Key.AltMask))); // changed to true because Alt activates menu bar
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
 	}

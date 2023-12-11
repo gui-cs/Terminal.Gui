@@ -181,7 +181,7 @@ namespace Terminal.Gui.FileServicesTests {
 			// Down to the directory
 			Assert.True (dlg.Canceled);
 			// Alt+O to open (enter would just navigate into the child dir)
-			Send ('o', ConsoleKey.O, false, true);
+			Send ('O', ConsoleKey.O, false, true);
 			Assert.False (dlg.Canceled);
 
 			AssertIsTheSubfolder (dlg.Path);
@@ -215,7 +215,7 @@ namespace Terminal.Gui.FileServicesTests {
 			if (acceptWithEnter) {
 				Send ('\n', ConsoleKey.Enter);
 			} else {
-				Send ('o', ConsoleKey.O, false, true);
+				Send ('O', ConsoleKey.O, false, true);
 			}
 			Assert.False (dlg.Canceled);
 
