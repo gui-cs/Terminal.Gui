@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -2502,7 +2501,6 @@ line.
 	public void DesiredCursorVisibility_Horizontal_Navigation ()
 	{
 		string text = "";
-
 		for (int i = 0; i < 12; i++) {
 			text += $"{i.ToString () [^1]}";
 		}

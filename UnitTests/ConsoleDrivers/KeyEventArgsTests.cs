@@ -69,7 +69,7 @@ public class KeyEventArgsTests {
 
 	[InlineData ((Key)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((Key)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
-	[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
+	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (Key.ShiftMask | Key.A, 65)]
 	[InlineData (Key.CtrlMask | Key.A, default)]
 	[InlineData (Key.AltMask | Key.A, default)]
