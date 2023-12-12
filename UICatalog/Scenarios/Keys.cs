@@ -67,7 +67,7 @@ public class Keys : Scenario {
 		};
 		Win.Add (labelAppKeypress);
 
-		Win.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
+		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.Key.ToString();
 
 		// Key stroke log:
 		var keyLogLabel = new Label ("Application Key Events:") {
