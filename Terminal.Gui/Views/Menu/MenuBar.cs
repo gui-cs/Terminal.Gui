@@ -332,15 +332,17 @@ public class MenuBar : View {
 			}
 		}
 
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
 		// Enable the Alt key as a menu activator
 		Initialized += (s, e) => {
 			if (SuperView != null) {
 				SuperView.KeyUp += SuperView_KeyUp;
 			}
 		};
-	
+#endif       
 	}
 
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
 	void SuperView_KeyUp (object sender, KeyEventArgs e)
 	{
 		if (SuperView == null || SuperView.CanFocus == false || SuperView.Visible == false) {
@@ -348,7 +350,8 @@ public class MenuBar : View {
 		}
 		AltKeyUpHandler(e);
 	}
-
+#endif
+	
 	internal void AltKeyUpHandler (KeyEventArgs e)
 	{
 		if (e.Key == Key.AltMask) {

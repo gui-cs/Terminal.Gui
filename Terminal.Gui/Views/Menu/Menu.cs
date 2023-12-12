@@ -386,15 +386,17 @@ class Menu : View {
 		AddKeyBinding (Key.CtrlMask | Key.Space, Command.ToggleExpandCollapse);
 
 		AddKeyBindings (barItems);
-
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
 		Initialized += (s, e) => {
 			if (SuperView != null) {
 				SuperView.KeyUp += SuperView_KeyUp;
 			}
 		};
+#endif
 	}
 
 
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
 	void SuperView_KeyUp (object sender, KeyEventArgs e)
 	{
 		if (SuperView == null || SuperView.CanFocus == false || SuperView.Visible == false) {
@@ -402,7 +404,7 @@ class Menu : View {
 		}
 		_host.AltKeyUpHandler (e);
 	}
-
+#endif
 
 	void AddKeyBindings (MenuBarItem menuBarItem)
 	{

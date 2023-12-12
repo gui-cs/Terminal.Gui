@@ -48,7 +48,7 @@ public class CharacterMap : Scenario {
 		};
 		Application.Top.Add (_charMap);
 
-		var jumpLabel = new Label ("Jump To Code Point:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap) };
+		var jumpLabel = new Label ("_Jump To Code Point:") { X = Pos.Right (_charMap) + 1, Y = Pos.Y (_charMap), HotKeySpecifier = (Rune)'_' };
 		Application.Top.Add (jumpLabel);
 		var jumpEdit = new TextField () { X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3" };
 		Application.Top.Add (jumpEdit);

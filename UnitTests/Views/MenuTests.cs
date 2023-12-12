@@ -1111,6 +1111,7 @@ Edit
 		Assert.False (newAction);
 		Assert.False (copyAction);
 
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
 		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
 		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
 		Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
@@ -1153,6 +1154,7 @@ Edit
 		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.C)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (copyAction);
+#endif
 	}
 
 	// Defines the expected strings for a Menu. Currently supports 
@@ -1708,7 +1710,7 @@ Edit
 00000000000000
 00000000000000", Application.Driver, attributes);
 	}
-
+	
 	[Fact] [AutoInitShutdown]
 	public void MenuBar_With_Action_But_Without_MenuItems_Not_Throw ()
 	{
@@ -1721,7 +1723,9 @@ Edit
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
 		Assert.True (Application.OnKeyUp (new KeyEventArgs (Key.AltMask))); // changed to true because Alt activates menu bar
+#endif
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
 	}
