@@ -1367,42 +1367,6 @@ public static partial class Application {
 		}
 	}
 
-	///// <summary>
-	///// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
-	///// </summary>
-	///// <remarks>
-	///// All drivers support firing the <see cref="KeyPress"/> event. Some drivers (Curses)
-	///// do not support firing the <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-	///// </remarks>
-	//public static event EventHandler<KeyEventArgs> KeyDown;
-
-	///// <summary>
-	///// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
-	///// Fires the <see cref="KeyDown"/> event
-	///// then calls <see cref="View.ProcessKeyDownEvent(KeyEventArgs)"/> on all top level views.
-	///// </summary>
-	///// <remarks>
-	///// Can be used to simulate key down events.
-	///// </remarks>
-	///// <param name="a"></param>
-	//public static bool OnKeyDown (KeyEventArgs a)
-	//{
-	//	KeyDown?.Invoke (null, a);
-	//	if (a.Handled) {
-	//		return true;
-	//	}
-
-	//	foreach (var topLevel in _topLevels.ToList ()) {
-	//		if (topLevel.ProcessKeyPressEvent (a)) {
-	//			return true;
-	//		}
-	//		if (topLevel.Modal) {
-	//			break;
-	//		}
-	//	}
-	//	return false;
-	//}
-
 	/// <summary>
 	/// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>. 
 	/// <para>
