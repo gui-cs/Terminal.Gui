@@ -477,7 +477,6 @@ internal class CursesDriver : ConsoleDriver {
 			}
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
-			//OnKeyPressed (new KeyEventArgs (k));
 			return;
 		}
 
@@ -490,8 +489,8 @@ internal class CursesDriver : ConsoleDriver {
 			if (code == Curses.KEY_CODE_YES) {
 				k = Key.AltMask | MapCursesKey (wch);
 			}
+			KeyEventArgs key = null;
 			if (code == 0) {
-				KeyEventArgs key = null;
 
 				// The ESC-number handling, debatable.
 				// Simulates the AltMask itself by pressing Alt + Space.
@@ -526,18 +525,15 @@ internal class CursesDriver : ConsoleDriver {
 					}
 				}
 				key = new KeyEventArgs (k);
-				OnKeyDown (key);
-				OnKeyUp (key);
-				//OnKeyPressed (key);
 			} else {
-				k = Key.Esc;
-				//OnKeyPressed (new KeyEventArgs (k));
+				key = new KeyEventArgs (Key.Esc);
 			}
+			OnKeyDown (key);
+			OnKeyUp (key);
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
-			//OnKeyPressed (new KeyEventArgs (k));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (Key)wch;
@@ -549,10 +545,11 @@ internal class CursesDriver : ConsoleDriver {
 				}
 			} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 				k = (Key)wch | Key.ShiftMask;
-			}
+			} else if (wch <= 'z') {
+				k = (Key)wch & ~Key.Space;
+			} 
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
-			//OnKeyPressed (new KeyEventArgs (k));
 		}
 		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
 		// will not impact KeyUp.
