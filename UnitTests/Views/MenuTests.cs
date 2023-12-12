@@ -1111,9 +1111,9 @@ Edit
 		Assert.False (newAction);
 		Assert.False (copyAction);
 
-		Assert.False (menu.OnKeyDown (new KeyEventArgs (Key.AltMask)));
-		Assert.False (menu.OnKeyUp (new KeyEventArgs (Key.AltMask)));
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		string expected = @"
@@ -1136,10 +1136,10 @@ Edit
 		expected = @"
  File  Edit
 ";
-
-		Assert.False (Application.Top.OnKeyDown (new KeyEventArgs (Key.AltMask)));
-		Assert.False (Application.Top.OnKeyUp (new KeyEventArgs (Key.AltMask)));
-		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+		
+		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.AltMask)));
+		Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
+		Assert.True (Application.Top.ProcessKeyUp (new KeyEventArgs (Key.AltMask)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		expected = @"
@@ -1721,7 +1721,7 @@ Edit
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Assert.True (Application.OnKeyDown (new KeyEventArgs (Key.AltMask))); // changed to true because Alt activates menu bar
+		Assert.True (Application.OnKeyUp (new KeyEventArgs (Key.AltMask))); // changed to true because Alt activates menu bar
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
 	}

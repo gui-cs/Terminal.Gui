@@ -30,7 +30,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public enum Command {
 		/// <summary>
-		/// The default command. e.g for menus this is the shortcut.
+		/// The default command. For <see cref="View"/> this focuses the view.
 		/// </summary>
 		Default,
 

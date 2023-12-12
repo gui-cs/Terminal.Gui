@@ -150,25 +150,26 @@ namespace Terminal.Gui.ViewsTests {
 
 			btn.Clicked += (s, e) => pressed++;
 
-			// The Button class supports the Accept command
+			// The Button class supports the Default and Accept command
+			Assert.Contains (Command.Default, btn.GetSupportedCommands ());
 			Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
-			// default keybinding is Enter which results in keypress
+			// default keybinding is Space which results in keypress
 			Application.OnKeyDown (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
-			// remove the default keybinding (Enter)
-			btn.ClearKeyBinding (Command.Accept);
+			// remove the default keybinding (Space)
+			btn.ClearKeyBinding (Command.Default, Command.Accept);
 
-			// After clearing the default keystroke the Enter button no longer does anything for the Button
+			// After clearing the default keystroke the Space button no longer does anything for the Button
 			Application.OnKeyDown (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
-			btn.AddKeyBinding (Key.B, Command.Accept);
+			btn.AddKeyBinding (Key.B, Command.Default, Command.Accept);
 
 			// now pressing B should call the button click event
 			Application.OnKeyDown (new (Key.B));

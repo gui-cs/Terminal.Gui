@@ -371,7 +371,7 @@ class Menu : View {
 			RunSelected ();
 			return true;
 		});
-		AddCommand (Command.Select, () => SelectOrRun ());
+		AddCommand (Command.Select, () => _host?.SelectItem (_menuItemToSelect));
 		AddCommand (Command.ToggleExpandCollapse, () => SelectOrRun ());
 		AddCommand (Command.Default, () => _host?.SelectItem (_menuItemToSelect));
 
@@ -386,6 +386,21 @@ class Menu : View {
 		AddKeyBinding (Key.CtrlMask | Key.Space, Command.ToggleExpandCollapse);
 
 		AddKeyBindings (barItems);
+
+		Initialized += (s, e) => {
+			if (SuperView != null) {
+				SuperView.KeyUp += SuperView_KeyUp;
+			}
+		};
+	}
+
+
+	void SuperView_KeyUp (object sender, KeyEventArgs e)
+	{
+		if (SuperView == null || SuperView.CanFocus == false || SuperView.Visible == false) {
+			return;
+		}
+		_host.AltKeyUpHandler (e);
 	}
 
 
@@ -398,7 +413,7 @@ class Menu : View {
 			AddKeyBinding ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
 			AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, Command.ToggleExpandCollapse);
 			if (menuItem.Shortcut != Key.Unknown) {
-				AddKeyBinding (menuItem.Shortcut, Command.Default);
+				AddKeyBinding (menuItem.Shortcut, Command.Select);
 			}
 			var subMenu = menuBarItem.SubMenu (menuItem);
 			AddKeyBindings (subMenu);

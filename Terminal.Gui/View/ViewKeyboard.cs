@@ -8,14 +8,17 @@ public partial class View {
 
 	void AddCommands ()
 	{
-		// By default, the accept command is bound to the HotKey enabling focus
-		AddCommand (Command.Accept, () => {
+		// By default, the Default command is bound to the HotKey enabling focus
+		AddCommand (Command.Default, () => {
 			if (CanFocus) {
 				SetFocus ();
 				return true;
 			}
 			return false;
 		});
+
+		// By default the Accept command does nothing
+		AddCommand (Command.Accept, () => false);
 	}
 
 	#region HotKey Support
@@ -33,8 +36,8 @@ public partial class View {
 
 	/// <summary>
 	/// Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has
-	/// focus will invoke the <see cref="Command.Default"/> command, which, by default, causes the view to be
-	/// focused.
+	/// focus will invoke the <see cref="Command.Default"/> and <see cref="Command.Accept"/> commands. <see cref="Command.Default"/>
+	/// causes the view to be focused and <see cref="Command.Accept"/> does nothing.
 	/// By default, the HotKey is automatically set to the first
 	/// character of <see cref="Text"/> that is prefixed with with <see cref="HotKeySpecifier"/>.
 	/// <para>
@@ -92,6 +95,9 @@ public partial class View {
 	/// versions. This means if the HotKey is <see cref="Key.A"/>, key bindings for <see cref="Key.A"/> and <see cref="Key.A"/> | <see cref="Key.ShiftMask"/>
 	/// will be added. This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
+	/// <para>
+	/// For each of the bound keys <see cref="Command.Default"/> causes the view to be focused and <see cref="Command.Accept"/> does nothing.
+	/// </para>
 	/// </remarks>
 	/// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
 	/// <param name="hotKey">The new HotKey. If <see cre="Key.Null"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
@@ -146,16 +152,14 @@ public partial class View {
 		// Add the new 
 		if (newKey != Key.Null) {
 			// Add the base and Alt key
-			AddKeyBinding (newKey, Command.Accept);
-			AddKeyBinding (newKey | Key.AltMask, Command.Accept);
+			AddKeyBinding (newKey, Command.Default, Command.Accept);
+			AddKeyBinding (newKey | Key.AltMask, Command.Default, Command.Accept);
 
 			// If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
 			if (newKey is >= Key.A and <= Key.Z) {
-				AddKeyBinding (newKey | Key.ShiftMask, Command.Accept);
-				AddKeyBinding (newKey | Key.ShiftMask | Key.AltMask, Command.Accept);
+				AddKeyBinding (newKey | Key.ShiftMask, Command.Default, Command.Accept);
+				AddKeyBinding (newKey | Key.ShiftMask | Key.AltMask, Command.Default, Command.Accept);
 			}
-
-			AddKeyBinding (newKey, Command.Accept);
 		}
 		return true;
 	}

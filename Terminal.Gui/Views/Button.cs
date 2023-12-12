@@ -121,16 +121,9 @@ public class Button : View {
 		OnResizeNeeded ();
 
 		// Override default behavior of View
-		AddCommand (Command.Accept, () => {
-			if (!HasFocus) {
-				SetFocus ();
-			}
-			AcceptKey ();
-			return true;
-		});
-		AddCommand (Command.Select, () => AcceptKey ());
-
-		AddKeyBinding (Key.Space, Command.Accept);
+		// Command.Default sets focus
+		AddCommand (Command.Accept, () => { OnClicked (); return true; });
+		AddKeyBinding (Key.Space, Command.Default, Command.Accept);
 	}
 
 	/// <summary>

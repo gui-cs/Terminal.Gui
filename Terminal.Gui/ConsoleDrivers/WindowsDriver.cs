@@ -1008,7 +1008,7 @@ internal class WindowsDriver : ConsoleDriver {
 				} 
 			}
 
-			if (((Key)((uint)keyInfo.KeyChar) & Key.Space) == 0) {
+			if (((Key)((uint)keyInfo.KeyChar) & Key.Space) == Key.Space) {
 				return (Key)((uint)keyInfo.KeyChar) & ~Key.Space;
 			}
 			return (Key)(uint)keyInfo.KeyChar;
