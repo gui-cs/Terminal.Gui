@@ -157,7 +157,9 @@ public class RadioGroup : View {
 	List<string> _radioLabels = new List<string> ();
 
 	/// <summary>
-	/// The radio labels to display
+	/// The radio labels to display. A key binding will be added for each radio radio enabling the user
+	/// to select and/or focus the radio label using the keyboard. See <see cref="View.HotKey"/> for details
+	/// on how HotKeys work.
 	/// </summary>
 	/// <value>The radio labels.</value>
 	public string [] RadioLabels {

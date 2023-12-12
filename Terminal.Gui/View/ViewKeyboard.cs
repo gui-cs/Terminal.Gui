@@ -528,8 +528,7 @@ public partial class View {
 
 	/// <summary>
 	/// Low-level API called when a user presses a key; invokes any key bindings set on the view.
-	/// This is called during <see cref="OnKeyPressed"/> after <see cref="OnKeyDown"/> has returned,
-	/// and before <see cref="OnKeyUp"/>.
+	/// This is called during <see cref="ProcessKeyDown"/> after <see cref="OnKeyDown"/> has returned.
 	/// </summary>
 	/// <remarks>
 	/// <para>
