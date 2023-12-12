@@ -4,6 +4,27 @@ using System;
 
 namespace Terminal.Gui {
 
+
+	/// <summary>
+	/// Defines the scope of a <see cref="Command"/> that has been bound to a key with <see cref="View.AddKeyBinding"/>.
+	/// </summary>
+	public enum CommandScope {
+		/// <summary>
+		/// The command is scoped to just the view that adds the key binding.
+		/// </summary>
+		View = 0,
+
+		/// <summary>
+		/// The command is scoped to the view that adds the key binding and that view's <see cref="View.SuperView"/>.
+		/// </summary>
+		SuperView,
+
+		/// <summary>
+		/// The command is scoped to the view that adds the key binding and <see cref="Application"/>.
+		/// </summary>
+		App
+	}
+
 	/// <summary>
 	/// Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.
 	/// </summary>

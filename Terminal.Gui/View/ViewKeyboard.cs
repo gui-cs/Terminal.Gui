@@ -520,10 +520,11 @@ public partial class View {
 	#endregion Low-level Key handling
 
 	#region Key Bindings
+
 	/// <summary>
 	/// Gets the key bindings for this view.
 	/// </summary>
-	private Dictionary<Key, Command []> KeyBindings { get; set; } = new Dictionary<Key, Command []> ();
+	private Dictionary<Key, (Command [] commands, CommandScope scope)> KeyBindings { get; set; } = new Dictionary<Key, (Command [], CommandScope)> ();
 	private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 	/// <summary>
@@ -566,12 +567,23 @@ public partial class View {
 		// TODO: The problem that needs to be solved is:
 		// TODO: - How to enable a view to define global key bindings like StatusBar and MenuBar?
 		// see https://github.com/gui-cs/Terminal.Gui/issues/3042
-		foreach (var view in Subviews.Where (v => v is StatusBar or MenuBar or RadioGroup || keyEvent.BareKey == v.HotKey)) {
+		foreach (var view in Subviews.Where (v => v is StatusBar or RadioGroup || keyEvent.BareKey == v.HotKey)) {
 			handled = view.OnInvokingKeyBindings (keyEvent);
 			if (handled != null && (bool)handled) {
 				return true;
 			}
 		}
+
+		foreach (var view in Subviews.Where (v => v is MenuBar || keyEvent.BareKey == v.HotKey)) {
+			var binding = view.GetKeyBindingWithScope (keyEvent.Key);
+			if (binding.commands.Length > 0 && binding.scope == CommandScope.SuperView) {
+				handled = view.OnInvokingKeyBindings (keyEvent);
+				if (handled != null && (bool)handled) {
+					return true;
+				}
+			}
+		}
+
 		return handled;
 	}
 
@@ -598,9 +610,9 @@ public partial class View {
 	{
 		bool? toReturn = null;
 		var key = keyEvent.Key;
-		if (TryGetKeyBinding (key, out var commands)) {
+		if (TryGetKeyBinding (key, out var binding)) {
 
-			foreach (var command in commands) {
+			foreach (var command in binding.commands) {
 
 				if (!CommandImplementations.ContainsKey (command)) {
 					throw new NotSupportedException ($"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
@@ -655,21 +667,52 @@ public partial class View {
 	/// <param name="key">
 	/// The key to check.
 	/// </param>
+	/// <param name="scope">The scope for the command.</param>
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
-	public void AddKeyBinding (Key key, params Command [] commands)
+	public void AddKeyBinding (Key key, CommandScope scope, params Command [] commands)
 	{
 		if (commands.Length == 0) {
 			throw new ArgumentException ("At least one command must be specified", nameof (commands));
 		}
 
+		if (key == Key.Null || key == Key.Unknown) {
+			//throw new ArgumentException ("Invalid Key", nameof (commands));
+			return;
+		}
+
 		if (TryGetKeyBinding (key, out _)) {
-			KeyBindings [key] = commands;
+			KeyBindings [key] = (commands, scope);
 		} else {
-			KeyBindings.Add (key, commands);
+			KeyBindings.Add (key, (commands, scope));
 		}
 	}
+
+	/// <summary>
+	/// <para>
+	/// Adds a new key combination that will trigger the commands in <paramref name="commands"/>
+	/// (if supported by the View - see <see cref="GetSupportedCommands"/>).
+	/// </para>
+	/// <para>
+	/// This is a helper function for <see cref="AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.CommandScope,Terminal.Gui.Command[])"/>
+	/// for <see cref="CommandScope.View"/> scoped commands.
+	/// </para>
+	/// <para>
+	/// If the key is already bound to a different array of <see cref="Command"/>s it will be
+	/// rebound <paramref name="commands"/>.</para>
+	/// </summary>
+	/// <remarks>
+	/// Commands are only ever applied to the current <see cref="View"/> (i.e. this feature
+	/// cannot be used to switch focus to another view and perform multiple commands there).
+	/// </remarks>
+	/// <param name="key">
+	/// The key to check.
+	/// </param>
+	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
+	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
+	/// will be consumed if any took effect.</param>
+	public void AddKeyBinding (Key key, params Command [] commands) => AddKeyBinding(key, CommandScope.View, commands);
 
 	/// <summary>
 	/// Replaces a key combination already bound to a set of <see cref="Command"/>s.
@@ -695,16 +738,35 @@ public partial class View {
 	/// <param name="key">
 	/// The key to check.
 	/// </param>
-	/// <param name="commands">
+	/// <param name="binding">
 	/// When this method returns, contains the commands bound with the specified Key, if the Key is found;
 	/// otherwise, null. This parameter is passed uninitialized.
 	/// </param>
 	/// <returns>
 	/// <see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.
 	/// </returns>
-	public bool TryGetKeyBinding (Key key, out Command [] commands)
+	public bool TryGetKeyBinding (Key key, out (Command [] commands, CommandScope scope) binding)
 	{
-		return KeyBindings.TryGetValue (key, out commands);
+		if (key == Key.Null || key == Key.Unknown) {
+			binding = (Array.Empty<Command> (), CommandScope.View);
+			return false;
+		}
+		return KeyBindings.TryGetValue (key, out binding);
+	}
+
+	/// <summary>
+	/// Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.
+	/// </summary>
+	/// <param name="key">
+	/// The key to check.
+	/// </param>
+	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
+	public (Command [] commands, CommandScope scope) GetKeyBindingWithScope (Key key)
+	{
+		if (TryGetKeyBinding (key, out var bindings)) {
+			return bindings;
+		}
+		return (Array.Empty<Command> (), CommandScope.View);
 	}
 
 	/// <summary>
@@ -717,10 +779,11 @@ public partial class View {
 	public Command [] GetKeyBinding (Key key)
 	{
 		if (TryGetKeyBinding (key, out var bindings)) {
-			return bindings;
+			return bindings.commands;
 		}
-		return Array.Empty<Command> ();
+		return (Array.Empty<Command> ());
 	}
+
 
 	/// <summary>
 	/// Removes all bound keys from the View and resets the default bindings.
@@ -747,7 +810,7 @@ public partial class View {
 	/// <param name="command"></param>
 	public void ClearKeyBinding (params Command [] command)
 	{
-		foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.SequenceEqual (command)).ToArray ()) {
+		foreach (var kvp in KeyBindings.Where (kvp => kvp.Value.commands.SequenceEqual (command)).ToArray ()) {
 			KeyBindings.Remove (kvp.Key);
 		}
 	}
@@ -793,7 +856,7 @@ public partial class View {
 	/// <exception cref="InvalidOperationException">If no matching set of commands was found.</exception>
 	public Key GetKeyFromCommands (params Command [] commands)
 	{
-		return KeyBindings.First (a => a.Value.SequenceEqual (commands)).Key;
+		return KeyBindings.First (a => a.Value.commands.SequenceEqual (commands)).Key;
 	}
 
 	// TODO: Add GetKeysBoundToCommand() - given a Command, return all Keys that would invoke it

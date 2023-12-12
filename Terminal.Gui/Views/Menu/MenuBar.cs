@@ -156,10 +156,10 @@ public class MenuBarItem : MenuItem {
 		foreach (var menuItem in Children.Where (m => m != null)) {
 			if (menuItem.HotKey != default) {
 				menuBar.AddKeyBinding ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
-				menuBar.AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, Command.ToggleExpandCollapse);
+				menuBar.AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, CommandScope.SuperView, Command.ToggleExpandCollapse);
 			}
-			if (menuItem.Shortcut != Key.Unknown) {
-				menuBar.AddKeyBinding (menuItem.Shortcut, Command.Default);
+			if (menuItem.Shortcut != Key.Unknown && menuItem.Shortcut != Key.Null) {
+				menuBar.AddKeyBinding (menuItem.Shortcut, CommandScope.SuperView, Command.Default);
 			}
 			SubMenu (menuItem)?.AddKeyBindings (menuBar);
 		}
@@ -295,9 +295,9 @@ public class MenuBar : View {
 		AddKeyBinding (Key.Esc, Command.Cancel);
 		AddKeyBinding (Key.CursorDown, Command.Accept);
 		AddKeyBinding (Key.Enter, Command.Accept);
-		AddKeyBinding (this.Key, Command.ToggleExpandCollapse);
-		AddKeyBinding (Key.CtrlMask | Key.Space, Command.ToggleExpandCollapse);
-		AddKeyBinding (Key.AltMask, Command.Select);
+		AddKeyBinding (this.Key, CommandScope.SuperView, Command.ToggleExpandCollapse);
+		AddKeyBinding (Key.CtrlMask | Key.Space, CommandScope.SuperView, Command.ToggleExpandCollapse);
+		AddKeyBinding (Key.AltMask, CommandScope.SuperView, Command.Select);
 
 		// TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
 		// TODO: As a result, _File._Save will have precedence over in "_File _Edit _ScrollbarView"
@@ -306,10 +306,10 @@ public class MenuBar : View {
 			foreach (var menu in Menus?.Where (m => m != null)) {
 				if (menu.HotKey != default) {
 					AddKeyBinding ((Key)menu.HotKey.Value, Command.ToggleExpandCollapse);
-					AddKeyBinding ((Key)menu.HotKey.Value | Key.AltMask, Command.ToggleExpandCollapse);
+					AddKeyBinding ((Key)menu.HotKey.Value | Key.AltMask, CommandScope.SuperView, Command.ToggleExpandCollapse);
 				}
-				if (menu.Shortcut != Key.Unknown) {
-					AddKeyBinding (menu.Shortcut, Command.Default);
+				if (menu.Shortcut != Key.Unknown && menu.Shortcut != Key.Null) {
+					AddKeyBinding (menu.Shortcut, CommandScope.SuperView, Command.Default);
 				}
 				menu.AddKeyBindings (this);
 			}
@@ -367,7 +367,7 @@ public class MenuBar : View {
 				return;
 			}
 			ClearKeyBinding (_key);
-			AddKeyBinding (value, Command.Select);
+			AddKeyBinding (value, CommandScope.SuperView, Command.ToggleExpandCollapse);
 			_key = value;
 		}
 	}
