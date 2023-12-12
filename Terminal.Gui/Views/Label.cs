@@ -59,22 +59,19 @@ namespace Terminal.Gui {
 			Height = 1;
 			AutoSize = autosize;
 			// Things this view knows how to do
-			AddCommand (Command.Accept, () => AcceptKey ());
-			AddCommand (Command.NextView, () => {
+			AddCommand (Command.Default, () => {
 				// BUGBUG: This is a hack, but it does work.
 				var can = CanFocus;
 				CanFocus = true;
 				SetFocus ();
-				FocusNext ();
+				SuperView.FocusNext ();
 				CanFocus = can;
-				return true; 
+				return true;
 			});
+			AddCommand (Command.Accept, () => AcceptKey ());
 
 			// Default key bindings for this view
 			AddKeyBinding (Key.Space, Command.Accept);
-			if (HotKey != Key.Null) {
-				AddKeyBinding (HotKey, Command.NextView);
-			}
 		}
 
 		bool AcceptKey ()
@@ -84,30 +81,6 @@ namespace Terminal.Gui {
 			}
 			OnClicked ();
 			return true;
-		}
-
-
-		/// <inheritdoc/>
-		public override Key HotKey {
-			get => base.HotKey;
-			set {
-				var prev = base.HotKey;
-				if (prev != value) {
-					var v = value == Key.Unknown ? Key.Null : value;
-					base.HotKey = TextFormatter.HotKey = v;
-
-					// Also add Alt+HotKey
-					if (prev != Key.Null && TryGetKeyBinding(prev | Key.AltMask, out _)) {
-						if (v == Key.Null) {
-							ClearKeyBinding (prev | Key.AltMask);
-						} else {
-							ReplaceKeyBinding (prev | Key.AltMask, v | Key.AltMask);
-						}
-					} else if (v != Key.Null) {
-						AddKeyBinding (v | Key.AltMask, Command.NextView);
-					}
-				}
-			}
 		}
 		
 		/// <summary>
