@@ -178,7 +178,6 @@ public static partial class Application {
 		}
 
 		Driver.SizeChanged += (s, args) => OnSizeChanging (args);
-		//Driver.KeyPressed += (s, args) => OnKeyPress (args);
 		Driver.KeyDown += (s, args) => OnKeyDown (args);
 		Driver.KeyUp += (s, args) => OnKeyUp (args);
 		Driver.MouseEvent += (s, args) => OnMouseEvent (args);
@@ -232,9 +231,8 @@ public static partial class Application {
 		Driver = null;
 		Iteration = null;
 		MouseEvent = null;
-		//KeyDown = null;
-		KeyUp = null;
 		KeyDown = null;
+		KeyUp = null;
 		SizeChanging = null;
 		_mainThreadId = -1;
 		NotifyNewRunState = null;
