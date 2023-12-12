@@ -3,11 +3,8 @@
 //
 using System.Text;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using static Terminal.Gui.ColorScheme;
 using System.Linq;
-using System.Data;
 
 namespace Terminal.Gui;
 
@@ -88,18 +85,9 @@ public abstract class ConsoleDriver {
 	/// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
 	/// is called.
 	/// <remarks>
-	/// The format of the array is rows, columns, and 3 values on the last column: Rune, Attribute and Dirty Flag
+	/// The format of the array is rows, columns. The first index is the row, the second index is the column.
 	/// </remarks>
 	/// </summary>
-	//public int [,,] Contents { get; internal set; }
-
-	///// <summary>
-	///// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
-	///// is called.
-	///// <remarks>
-	///// The format of the array is rows, columns. The first index is the row, the second index is the column.
-	///// </remarks>
-	///// </summary>
 	public Cell [,] Contents { get; internal set; }
 
 	/// <summary>
@@ -483,17 +471,6 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	/// <param name="a"></param>
 	public void OnKeyDown (KeyEventArgs a) => KeyDown?.Invoke (this, a);
-
-	///// <summary>
-	///// Event fired after a key has been pressed and released.
-	///// </summary>
-	//public event EventHandler<KeyEventArgs> KeyPressed;
-
-	///// <summary>
-	///// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
-	///// </summary>
-	///// <param name="a"></param>
-	//public void OnKeyPressed (KeyEventArgs a) => KeyPressed?.Invoke(this, a);
 
 	/// <summary>
 	/// Event fired when a key is released. 
