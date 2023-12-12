@@ -1128,6 +1128,7 @@ internal class NetDriver : ConsoleDriver {
 		return (Key)(uint)keyInfo.KeyChar;
 	}
 
+	// TODO: Remove this - I threw it in here to quickly get netdriver working again
 	/// <summary>
 	/// Identifies the state of the "shift"-keys within a event.
 	/// </summary>
