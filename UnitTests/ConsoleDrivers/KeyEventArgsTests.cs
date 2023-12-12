@@ -65,18 +65,18 @@ public class KeyEventArgsTests {
 	[InlineData ((Key)'ó', 'ó')]
 	[InlineData ((Key)'ó' | Key.ShiftMask, 'ó')]
 	[InlineData ((Key)'Ó', 'Ó')]
-	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, default)]
+	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '\0')]
 
 	[InlineData ((Key)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((Key)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
 	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (Key.ShiftMask | Key.A, 65)]
-	[InlineData (Key.CtrlMask | Key.A, default)]
-	[InlineData (Key.AltMask | Key.A, default)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.A, default)]
-	[InlineData (Key.ShiftMask | Key.AltMask | Key.A, default)]
-	[InlineData (Key.AltMask | Key.CtrlMask | Key.A, default)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.A, default)]
+	[InlineData (Key.CtrlMask | Key.A, '\0')]
+	[InlineData (Key.AltMask | Key.A, '\0')]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.A, '\0')]
+	[InlineData (Key.ShiftMask | Key.AltMask | Key.A, '\0')]
+	[InlineData (Key.AltMask | Key.CtrlMask | Key.A, '\0')]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.A, '\0')]
 	
 	[InlineData ((Key)'z', 'z')]
 	[InlineData ((Key)'Z', 'z')]
@@ -84,25 +84,25 @@ public class KeyEventArgsTests {
 
 	[InlineData ((Key)'1', '1')]
 	[InlineData (Key.ShiftMask | Key.D1, '1')]
-	[InlineData (Key.CtrlMask | Key.D1, default)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.D1, default)]
+	[InlineData (Key.CtrlMask | Key.D1, '\0')]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.D1, '\0')]
 
-	[InlineData (Key.F1, default)]
-	[InlineData (Key.ShiftMask | Key.F1, default)]
-	[InlineData (Key.CtrlMask | Key.F1, default)]
+	[InlineData (Key.F1, '\0')]
+	[InlineData (Key.ShiftMask | Key.F1, '\0')]
+	[InlineData (Key.CtrlMask | Key.F1, '\0')]
 
 	[InlineData (Key.Enter, '\n')]
 	[InlineData (Key.Tab, '\t')]
 	[InlineData (Key.Esc, 0x1b)]
 	[InlineData (Key.Space, ' ')]
 
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Enter, default)]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Enter, '\0')]
 
-	[InlineData (Key.Null, default)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Null, default)]
+	[InlineData (Key.Null, '\0')]
+	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Null, '\0')]
 
-	[InlineData (Key.CharMask, default)]
-	[InlineData (Key.SpecialMask, default)]
+	[InlineData (Key.CharMask, '\0')]
+	[InlineData (Key.SpecialMask, '\0')]
 	public void AsRune_ShouldReturnCorrectIntValue (Key key, Rune expected)
 	{
 		var eventArgs = new KeyEventArgs (key);
@@ -129,9 +129,9 @@ public class KeyEventArgsTests {
 	[Theory]
 	[InlineData (Key.CtrlMask | Key.A, '+', "Ctrl+A")]
 	[InlineData (Key.AltMask | Key.B, '-', "Alt-B")]
-	public void ToStringWithSeparator_ShouldReturnFormattedString (Key key, Rune separator, string expected)
+	public void ToStringWithSeparator_ShouldReturnFormattedString (Key key, char separator, string expected)
 	{
-		Assert.Equal (expected, KeyEventArgs.ToString (key, separator));
+		Assert.Equal (expected, KeyEventArgs.ToString (key, (Rune)separator));
 	}
 
 	[Theory]
