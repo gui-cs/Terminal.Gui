@@ -233,13 +233,14 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
 
 			AddKeyBinding (Key.F5, Command.Refresh);
+			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+
 #if UNIX_KEY_BINDINGS
 			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
 			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);// Unix
 			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);// Unix
 			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
-			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
 #endif
 			// This enables the default button to be activated by the Enter key.

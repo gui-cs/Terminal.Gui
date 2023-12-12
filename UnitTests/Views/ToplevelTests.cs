@@ -382,7 +382,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OnKeyDown (new (Application.QuitKey)));
 			Assert.False (isRunning);
 			Assert.True (Application.OnKeyDown (new (Key.Z | Key.CtrlMask)));
-			Assert.False (Application.OnKeyDown (new (Key.F5)));
+
+			Assert.True (Application.OnKeyDown (new (Key.F5))); // refresh
 
 			Assert.True (Application.OnKeyDown (new (Key.Tab)));
 			Assert.Equal (win1, top.Focused);
@@ -403,9 +404,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OnKeyDown (new (Key.CursorDown)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OnKeyDown (new (Key.I | Key.CtrlMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
+#endif
 			Assert.True (Application.OnKeyDown (new (Key.Tab | Key.ShiftMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
@@ -430,9 +433,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OnKeyDown (new (Key.CursorUp)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OnKeyDown (new (Key.B | Key.CtrlMask)));
+#else
+			Assert.True (Application.OnKeyDown (new (Key.CursorLeft)));
+#endif
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf1W1, top.MostFocused);
+
 			Assert.True (Application.OnKeyDown (new (Key.CursorDown)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
@@ -441,11 +449,19 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tvW1, top.MostFocused);
 			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OnKeyDown (new (Key.F | Key.CtrlMask)));
+#else
+			Assert.True (Application.OnKeyDown (new (Key.CursorRight)));
+#endif
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
 
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OnKeyDown (new (Key.L | Key.CtrlMask)));
+#else
+			Assert.True (Application.OnKeyDown (new (Key.F5)));
+#endif
 		}
 
 		[Fact]
@@ -516,7 +532,8 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (win1.Running);
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.Z | Key.CtrlMask)));
-			Assert.False (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F5)));
+
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F5))); // refresh
 
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.Tab)));
 			Assert.True (win1.IsCurrentTop);
@@ -537,9 +554,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.CursorDown)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.I | Key.CtrlMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
+#endif
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.Tab | Key.ShiftMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
@@ -569,7 +588,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.CursorDown)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.B | Key.CtrlMask)));
+#else
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.CursorLeft)));
+#endif
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.CursorDown)));
@@ -580,11 +603,17 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tvW1, win1.MostFocused);
 			Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F | Key.CtrlMask)));
+#else
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.CursorRight)));
+#endif
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W1, win1.MostFocused);
 
+#if UNIX_KEY_BINDINGS
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.L | Key.CtrlMask)));
+#endif
 		}
 
 		[Fact]

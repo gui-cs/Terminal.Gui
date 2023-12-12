@@ -383,7 +383,6 @@ Edit
 	// Hotkeys
 	[InlineData ("_File", "_New", "", Key.AltMask | Key.F)]
 	[InlineData ("Closed", "None", "", Key.AltMask | Key.ShiftMask | Key.F)]
-	[InlineData ("Closed", "None", "", Key.AltMask | Key.ShiftMask | Key.F)]
 	[InlineData ("Closed", "None", "", Key.AltMask | Key.F, Key.Esc)]
 	[InlineData ("Closed", "None", "", Key.AltMask | Key.F, Key.AltMask | Key.F)]
 	[InlineData ("Closed", "None", "Open", Key.AltMask | Key.F, Key.O)]
@@ -398,7 +397,6 @@ Edit
 	[InlineData ("Closed", "None", "1", Key.AltMask | Key.E, Key.F, Key.D3, Key.D1)]
 	[InlineData ("Closed", "None", "1", Key.AltMask | Key.E, Key.F, Key.D3, Key.Enter)]
 	[InlineData ("Closed", "None", "", Key.AltMask | Key.E, Key.F, Key.D3, Key.D4)] // BUGBUG: Should be back on _3rd Level
-	[InlineData ("Closed", "None", "1", Key.AltMask | Key.E, Key.F, Key.D3, Key.D1)]
 	[InlineData ("Closed", "None", "5", Key.AltMask | Key.E, Key.F, Key.D4, Key.D5)]
 	[InlineData ("_About", "_About", "", Key.AltMask | Key.A)]
 	public void KeyBindings_Navigation_Commands (string expectedBarTitle, string expectedItemTitle, string expectedAction, params Key [] keys)
