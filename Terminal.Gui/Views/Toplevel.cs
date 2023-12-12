@@ -221,29 +221,27 @@ namespace Terminal.Gui {
 
 			// Default keybindings for this view
 			AddKeyBinding (Application.QuitKey, Command.QuitToplevel);
-			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
-
-			AddKeyBinding (Key.Tab, Command.NextView);
 
 			AddKeyBinding (Key.CursorRight, Command.NextView);
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);
-
 			AddKeyBinding (Key.CursorDown, Command.NextView);
-			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
-
-			AddKeyBinding (Key.Tab | Key.ShiftMask, Command.PreviousView);
 			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
 			AddKeyBinding (Key.CursorUp, Command.PreviousView);
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);
 
+			AddKeyBinding (Key.Tab, Command.NextView);
+			AddKeyBinding (Key.Tab | Key.ShiftMask, Command.PreviousView);
 			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
-			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-
 			AddKeyBinding (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
+
+			AddKeyBinding (Key.F5, Command.Refresh);
+#if UNIX_KEY_BINDINGS
+			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
+			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);// Unix
+			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);// Unix
+			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
+			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
 			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
-
-			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
-
+			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
+#endif
 			// This enables the default button to be activated by the Enter key.
 			AddKeyBinding (Key.Enter, Command.Accept);
 		}

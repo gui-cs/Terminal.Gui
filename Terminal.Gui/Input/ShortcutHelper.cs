@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -143,6 +144,7 @@ public class ShortcutHelper {
 			((key & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) != 0 && knm != Key.Null && knm != Key.Unknown)) {
 			return true;
 		}
+		Debug.WriteLine ($"WARNING: {KeyEventArgs.ToString (key)} is not a valid shortcut key.");
 		return false;
 	}
 }

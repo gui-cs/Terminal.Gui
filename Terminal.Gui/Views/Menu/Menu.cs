@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -316,11 +317,20 @@ class Menu : View {
 	}
 
 	public Menu (MenuBar host, int x, int y, MenuBarItem barItems, Menu parent = null, LineStyle border = LineStyle.Single)
-		: base (MakeFrame (x, y, barItems.Children, parent, border))
+		: base (MakeFrame (x, y, barItems?.Children, parent, border))
 	{
-		_barItems = barItems;
+		if (host == null) {
+			throw new ArgumentNullException (nameof (host));
+		}
+
+		if (barItems == null) {
+			throw new ArgumentNullException (nameof (barItems));
+		} 
+		
 		_host = host;
-		if (barItems.IsTopLevel) {
+		_barItems = barItems;
+
+		if (barItems is { IsTopLevel: true }) {
 			// This is a standalone MenuItem on a MenuBar
 			ColorScheme = host.ColorScheme;
 			CanFocus = true;
@@ -393,6 +403,8 @@ class Menu : View {
 			}
 		};
 #endif
+		// Debugging aid so ToString() is helpful
+		Text = _barItems.Title;
 	}
 
 

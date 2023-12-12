@@ -563,7 +563,11 @@ public class MenuBar : View {
 				return true;
 			}
 			var subMenu = menuBarItem.SubMenu (menuItem);
-			FindShortcutInChildMenu (key, subMenu, out menuItemToSelect);
+			if (subMenu != null) {
+				if (FindShortcutInChildMenu (key, subMenu, out menuItemToSelect)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
