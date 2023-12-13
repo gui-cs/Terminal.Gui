@@ -303,7 +303,6 @@ public class MenuBar : View {
 		});
 
 		AddCommand (Command.ToggleExpandCollapse, () => SelectOrRun ());
-		AddCommand (Command.Select, () => SelectOrRun ());
 		AddCommand (Command.Select, () => Run (_menuItemToSelect?.Action));
 
 		// Default key bindings for this view
