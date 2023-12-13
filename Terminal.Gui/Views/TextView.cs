@@ -3425,7 +3425,7 @@ namespace Terminal.Gui {
 			ResetColumnTrack ();
 
 			// Ignore control characters and other special keys
-			if (!a.IsAlpha && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
+			if (!a.IsLowerCaseAtoZ && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
 				return false;
 			}
 

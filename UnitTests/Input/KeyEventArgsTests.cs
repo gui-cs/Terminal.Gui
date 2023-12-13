@@ -49,7 +49,7 @@ public class KeyEventArgsTests {
 	public void IsAlpha (ConsoleDriverKey key, bool expected)
 	{
 		var eventArgs = new KeyEventArgs (key);
-		Assert.Equal (expected, eventArgs.IsAlpha);
+		Assert.Equal (expected, eventArgs.IsLowerCaseAtoZ);
 	}
 
 	[Theory]

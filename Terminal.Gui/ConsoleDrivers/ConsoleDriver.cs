@@ -680,42 +680,57 @@ public enum ConsoleDriverKey : uint {
 	Backspace = 8,
 
 	/// <summary>
-	/// The key code for the user pressing the tab key (forwards tab key).
+	/// The key code for the tab key (forwards tab key).
 	/// </summary>
 	Tab = 9,
 
 	/// <summary>
-	/// The key code for the user pressing the return key.
+	/// The key code for the return key.
 	/// </summary>
 	Enter = '\n',
 
 	/// <summary>
-	/// The key code for the user pressing the clear key.
+	/// The key code for the clear key.
 	/// </summary>
 	Clear = 12,
 
 	/// <summary>
-	/// The key code for the Shift key
+	/// The key code for the Shift key.
 	/// </summary>
-	Shift = 16,
+	ShiftKey = 16,
 
 	/// <summary>
-	/// The key code for the Ctrl key
+	/// The key code for the Ctrl key.
 	/// </summary>
-	Ctrl = 17,
+	CtrlKey = 17,
 
 	/// <summary>
-	/// The key code for the Alt key
+	/// The key code for the Alt key.
 	/// </summary>
-	Alt = 18,
+	AltKey = 18,
 
 	/// <summary>
-	/// The key code for the user pressing the escape key
+	/// The key code for the CapsLock key.
+	/// </summary>
+	CapsLock = 20,
+
+	///// <summary>
+	///// The key code for the NumLock key.
+	///// </summary>
+	//NumLock = 144,
+
+	///// <summary>
+	///// The key code for the ScrollLock key.
+	///// </summary>
+	//ScrollLock = 145,
+
+	/// <summary>
+	/// The key code for the escape key.
 	/// </summary>
 	Esc = 27,
 
 	/// <summary>
-	/// The key code for the user pressing the space bar
+	/// The key code for the space bar key.
 	/// </summary>
 	Space = 32,
 

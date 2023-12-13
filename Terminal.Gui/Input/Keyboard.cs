@@ -14,7 +14,7 @@ public class KeyEventArgs : EventArgs {
 	public KeyEventArgs () : this (ConsoleDriverKey.Unknown) { }
 
 	/// <summary>
-	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value - can be a rune cast into a Key value
+	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value
 	/// </summary>
 	/// <param name="k">The key</param>
 	public KeyEventArgs (ConsoleDriverKey k)
@@ -22,11 +22,22 @@ public class KeyEventArgs : EventArgs {
 		ConsoleDriverKey = k;
 	}
 
+	///// <summary>
+	/////   Constructs a new <see cref="KeyEventArgs"/> from the provided unicode character
+	///// </summary>
+	///// <param name="k">The key</param>
+	//public KeyEventArgs (char c)
+	//{
+	//	Char = c;
+	//}
+
 	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
 	/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 	/// </summary>
 	public bool Handled { get; set; } = false;
+
+	public char Char { get; set; }
 
 	/// <summary>
 	/// Symbolic definition for the key.
@@ -100,9 +111,13 @@ public class KeyEventArgs : EventArgs {
 	public bool IsCtrl => (ConsoleDriverKey & ConsoleDriverKey.CtrlMask) != 0;
 
 	/// <summary>
-	/// Gets a value indicating whether the key is a letter (a-z or A-Z). This is independent of the shift key.
+	/// Gets a value indicating whether the key is an lower case letter from 'a' to 'z', independent of the shift key.
+	/// This is needed because <see cref="ConsoleDriverKey"/> defines <see cref="ConsoleDriverKey.A"/> through <see cref="ConsoleDriverKey.Z"/>
+	/// using the ASCII codes for the uppercase letter (e.g. <see cref="ConsoleDriverKey.A"/> is <c>65</c>) while <c>(ConsoleKeyDriver)'a'</c> =
+	/// <c>97</c>. Thus, to specify an uppercase 'a', one must use <c>ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask</c> and to
+	/// specify a lowercase 'a', on must use <c>ConsoleDriverKey.A</c> or <c>(ConsoleDriverKey)'a'</c>.
 	/// </summary>	
-	public bool IsAlpha {
+	public bool IsLowerCaseAtoZ {
 		get {
 			if (IsAlt || IsCtrl) {
 				return false;
@@ -117,6 +132,31 @@ public class KeyEventArgs : EventArgs {
 	public ConsoleDriverKey BareKey => ConsoleDriverKey & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
 
 	#region Standard Key Definitions
+
+
+	/// <summary>
+	/// The Shift modifier flag. Combine with a key code property to indicate the shift modifier. E.g. <c>key.Enter | key.Shift</c>.
+	/// </summary>
+	/// <remarks>
+	/// <see cref="IsShift"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Shift modifier applied.
+	/// </remarks>
+	public const uint Shift = (uint)ConsoleDriverKey.ShiftMask;
+
+	/// <summary>
+	/// The Ctrl modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
+	/// </summary>
+	/// <remarks>
+	/// <see cref="IsCtrl"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Ctrl modifier applied.
+	/// </remarks>
+	public const uint Ctrl = (uint)ConsoleDriverKey.CtrlMask;
+
+	/// <summary>
+	/// The Alt modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
+	/// </summary>
+	/// <remarks>
+	/// <see cref="IsAlt"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Alt modifier applied.
+	/// </remarks>
+	public const uint Alt = (uint)ConsoleDriverKey.AltMask;
 
 	/// <summary>
 	/// The key code for the Backspace key.
@@ -141,17 +181,22 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// The key code for the Shift key
 	/// </summary>
-	public const uint Shift = (uint)ConsoleDriverKey.Shift;
+	public const uint ShiftKey = (uint)ConsoleDriverKey.ShiftKey;
 
 	/// <summary>
 	/// The key code for the Ctrl key
 	/// </summary>
-	public const uint Ctrl = (uint)ConsoleDriverKey.Ctrl;
+	public const uint CtrlKey = (uint)ConsoleDriverKey.CtrlKey;
 
 	/// <summary>
 	/// The key code for the Alt key
 	/// </summary>
-	public const uint Alt = (uint)ConsoleDriverKey.Alt;
+	public const uint AltKey = (uint)ConsoleDriverKey.AltKey;
+
+	/// <summary>
+	/// The key code for the CapsLock key
+	/// </summary>
+	public const uint CapsLock = (uint)ConsoleDriverKey.CapsLock;
 
 	/// <summary>
 	/// The key code for the user pressing the escape key
@@ -317,7 +362,7 @@ public class KeyEventArgs : EventArgs {
 
 	#region Operators
 	/// <summary>
-	/// Cast to a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
+	/// Cast a <see cref="KeyEventArgs"/> to a <see cref="Rune"/>. 
 	/// </summary>
 	/// <remarks>
 	/// Uses <see cref="AsRune"/>.
@@ -326,10 +371,29 @@ public class KeyEventArgs : EventArgs {
 	public static implicit operator Rune (KeyEventArgs kea) => kea.AsRune;
 
 	/// <summary>
-	/// Cast to a char.
+	/// Cast <see cref="KeyEventArgs"/> to a <see langword="char"/>.
 	/// </summary>
 	/// <param name="kea"></param>
 	public static explicit operator char (KeyEventArgs kea) => (char)kea.AsRune.Value;
+
+	///// <summary>
+	///// Cast <see cref="KeyEventArgs"/> to a <see cref="ConsoleDriverKey"/>.
+	///// </summary>
+	///// <param name="kea"></param>
+	//public static explicit operator ConsoleDriverKey (KeyEventArgs kea) => (ConsoleDriverKey)kea.AsRune.Value;
+
+	///// <summary>
+	///// Cast a <see langword="char"/> to a <see cref="KeyEventArgs"/>.
+	///// </summary>
+	///// <param name="c"></param>
+	//public static explicit operator KeyEventArgs (char c) => new KeyEventArgs((ConsoleDriverKey)c);
+
+	///// <summary>
+	///// Cast a <see cref="ConsoleDriverKey"/> to a <see cref="KeyEventArgs"/>.
+	///// </summary>
+	///// <param name="key"></param>
+	//public static explicit operator KeyEventArgs (ConsoleDriverKey key) => (KeyEventArgs)(char)key;
+
 	#endregion Operators
 
 	#region String conversion

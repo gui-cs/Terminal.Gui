@@ -653,7 +653,7 @@ namespace Terminal.Gui {
 			_preTextChangedCursorPos = _cursorPosition;
 
 			// Ignore other control characters.
-			if (!a.IsAlpha && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
+			if (!a.IsLowerCaseAtoZ && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
 				return false;
 			}
 
