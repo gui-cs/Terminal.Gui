@@ -8,15 +8,15 @@ namespace Terminal.Gui;
 /// Represents a helper to manipulate shortcut keys used on views.
 /// </summary>
 public class ShortcutHelper {
-	private Key shortcut;
+	private ConsoleDriverKey shortcut;
 
 	/// <summary>
 	/// This is the global setting that can be used as a global shortcut to invoke the action on the view.
 	/// </summary>
-	public virtual Key Shortcut {
+	public virtual ConsoleDriverKey Shortcut {
 		get => shortcut;
 		set {
-			if (shortcut != value && (PostShortcutValidation (value) || value == Key.Null)) {
+			if (shortcut != value && (PostShortcutValidation (value) || value == ConsoleDriverKey.Null)) {
 				shortcut = value;
 			}
 		}
@@ -32,44 +32,44 @@ public class ShortcutHelper {
 	/// </summary>
 	/// <param name="key">The key to extract.</param>
 	/// <param name="knm">Correspond to the non modifier key.</param>
-	static string GetKeyToString (Key key, out Key knm)
+	static string GetKeyToString (ConsoleDriverKey key, out ConsoleDriverKey knm)
 	{
-		if (key == Key.Null) {
-			knm = Key.Null;
+		if (key == ConsoleDriverKey.Null) {
+			knm = ConsoleDriverKey.Null;
 			return "";
 		}
 
 		knm = key;
-		var mK = key & (Key.AltMask | Key.CtrlMask | Key.ShiftMask);
+		var mK = key & (ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask);
 		knm &= ~mK;
-		for (uint i = (uint)Key.F1; i < (uint)Key.F12; i++) {
-			if (knm == (Key)i) {
-				mK |= (Key)i;
+		for (uint i = (uint)ConsoleDriverKey.F1; i < (uint)ConsoleDriverKey.F12; i++) {
+			if (knm == (ConsoleDriverKey)i) {
+				mK |= (ConsoleDriverKey)i;
 			}
 		}
 		knm &= ~mK;
 		uint.TryParse (knm.ToString (), out uint c);
-		var s = mK == Key.Null ? "" : mK.ToString ();
-		if (s != "" && (knm != Key.Null || c > 0)) {
+		var s = mK == ConsoleDriverKey.Null ? "" : mK.ToString ();
+		if (s != "" && (knm != ConsoleDriverKey.Null || c > 0)) {
 			s += ",";
 		}
-		s += c == 0 ? knm == Key.Null ? "" : knm.ToString () : ((char)c).ToString ();
+		s += c == 0 ? knm == ConsoleDriverKey.Null ? "" : knm.ToString () : ((char)c).ToString ();
 		return s;
 	}
 
 	/// <summary>
-	/// Allows to retrieve a <see cref="Key"/> from a <see cref="ShortcutTag"/>
+	/// Allows to retrieve a <see cref="ConsoleDriverKey"/> from a <see cref="ShortcutTag"/>
 	/// </summary>
 	/// <param name="tag">The key as string.</param>
 	/// <param name="delimiter">The delimiter string.</param>
-	public static Key GetShortcutFromTag (string tag, Rune delimiter = default)
+	public static ConsoleDriverKey GetShortcutFromTag (string tag, Rune delimiter = default)
 	{
 		var sCut = tag;
 		if (string.IsNullOrEmpty (sCut)) {
 			return default;
 		}
 
-		Key key = Key.Null;
+		ConsoleDriverKey key = ConsoleDriverKey.Null;
 		//var hasCtrl = false;
 		if (delimiter == default) {
 			delimiter = MenuBar.ShortcutDelimiter;
@@ -80,21 +80,21 @@ public class ShortcutHelper {
 			var k = keys [i];
 			if (k == "Ctrl") {
 				//hasCtrl = true;
-				key |= Key.CtrlMask;
+				key |= ConsoleDriverKey.CtrlMask;
 			} else if (k == "Shift") {
-				key |= Key.ShiftMask;
+				key |= ConsoleDriverKey.ShiftMask;
 			} else if (k == "Alt") {
-				key |= Key.AltMask;
+				key |= ConsoleDriverKey.AltMask;
 			} else if (k.StartsWith ("F") && k.Length > 1) {
 				int.TryParse (k.Substring (1).ToString (), out int n);
-				for (uint j = (uint)Key.F1; j <= (uint)Key.F12; j++) {
-					int.TryParse (((Key)j).ToString ().Substring (1), out int f);
+				for (uint j = (uint)ConsoleDriverKey.F1; j <= (uint)ConsoleDriverKey.F12; j++) {
+					int.TryParse (((ConsoleDriverKey)j).ToString ().Substring (1), out int f);
 					if (f == n) {
-						key |= (Key)j;
+						key |= (ConsoleDriverKey)j;
 					}
 				}
 			} else {
-				key |= (Key)Enum.Parse (typeof (Key), k.ToString ());
+				key |= (ConsoleDriverKey)Enum.Parse (typeof (ConsoleDriverKey), k.ToString ());
 			}
 		}
 
@@ -102,15 +102,15 @@ public class ShortcutHelper {
 	}
 
 	/// <summary>
-	/// Lookup for a <see cref="Key"/> on range of keys.
+	/// Lookup for a <see cref="ConsoleDriverKey"/> on range of keys.
 	/// </summary>
 	/// <param name="key">The source key.</param>
 	/// <param name="first">First key in range.</param>
 	/// <param name="last">Last key in range.</param>
-	public static bool CheckKeysFlagRange (Key key, Key first, Key last)
+	public static bool CheckKeysFlagRange (ConsoleDriverKey key, ConsoleDriverKey first, ConsoleDriverKey last)
 	{
 		for (uint i = (uint)first; i < (uint)last; i++) {
-			if ((key | (Key)i) == key) {
+			if ((key | (ConsoleDriverKey)i) == key) {
 				return true;
 			}
 		}
@@ -122,9 +122,9 @@ public class ShortcutHelper {
 	/// </summary>
 	/// <param name="key">The key to validate.</param>
 	/// <returns><c>true</c> if is valid.<c>false</c>otherwise.</returns>
-	public static bool PreShortcutValidation (Key key)
+	public static bool PreShortcutValidation (ConsoleDriverKey key)
 	{
-		if ((key & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) == 0 && !CheckKeysFlagRange (key, Key.F1, Key.F12)) {
+		if ((key & (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask)) == 0 && !CheckKeysFlagRange (key, ConsoleDriverKey.F1, ConsoleDriverKey.F12)) {
 			return false;
 		}
 
@@ -136,12 +136,12 @@ public class ShortcutHelper {
 	/// </summary>
 	/// <param name="key">The key to validate.</param>
 	/// <returns><c>true</c> if is valid.<c>false</c>otherwise.</returns>
-	public static bool PostShortcutValidation (Key key)
+	public static bool PostShortcutValidation (ConsoleDriverKey key)
 	{
-		GetKeyToString (key, out Key knm);
+		GetKeyToString (key, out ConsoleDriverKey knm);
 
-		if (CheckKeysFlagRange (key, Key.F1, Key.F12) ||
-			((key & (Key.CtrlMask | Key.ShiftMask | Key.AltMask)) != 0 && knm != Key.Null && knm != Key.Unknown)) {
+		if (CheckKeysFlagRange (key, ConsoleDriverKey.F1, ConsoleDriverKey.F12) ||
+			((key & (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask)) != 0 && knm != ConsoleDriverKey.Null && knm != ConsoleDriverKey.Unknown)) {
 			return true;
 		}
 		Debug.WriteLine ($"WARNING: {KeyEventArgs.ToString (key)} is not a valid shortcut key.");

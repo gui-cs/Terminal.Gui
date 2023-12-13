@@ -159,10 +159,10 @@ public class MenuBarItem : MenuItem {
 		}
 		foreach (var menuItem in Children.Where (m => m != null)) {
 			if (menuItem.HotKey != default) {
-				menuBar.KeyBindings.Add ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
-				menuBar.KeyBindings.Add ((Key)menuItem.HotKey.Value | Key.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+				menuBar.KeyBindings.Add ((ConsoleDriverKey)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
+				menuBar.KeyBindings.Add ((ConsoleDriverKey)menuItem.HotKey.Value | ConsoleDriverKey.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 			}
-			if (menuItem.Shortcut != Key.Unknown && menuItem.Shortcut != Key.Null) {
+			if (menuItem.Shortcut != ConsoleDriverKey.Unknown && menuItem.Shortcut != ConsoleDriverKey.Null) {
 				menuBar.KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			SubMenu (menuItem)?.AddKeyBindings (menuBar);
@@ -306,13 +306,13 @@ public class MenuBar : View {
 		AddCommand (Command.Select, () => Run (_menuItemToSelect?.Action));
 
 		// Default key bindings for this view
-		KeyBindings.Add (Key.CursorLeft, Command.Left);
-		KeyBindings.Add (Key.CursorRight, Command.Right);
-		KeyBindings.Add (Key.Esc, Command.Cancel);
-		KeyBindings.Add (Key.CursorDown, Command.Accept);
-		KeyBindings.Add (Key.Enter, Command.Accept);
+		KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
+		KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
+		KeyBindings.Add (ConsoleDriverKey.Esc, Command.Cancel);
+		KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.Accept);
+		KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
 		KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
-		KeyBindings.Add (Key.CtrlMask | Key.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+		KeyBindings.Add (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
 		// TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
 		// TODO: As a result, _File._Save will have precedence over in "_File _Edit _ScrollbarView"
@@ -320,10 +320,10 @@ public class MenuBar : View {
 		if (Menus != null) {
 			foreach (var menuBarItem in Menus?.Where (m => m != null)) {
 				if (menuBarItem.HotKey != default) {
-					KeyBindings.Add ((Key)menuBarItem.HotKey.Value, Command.ToggleExpandCollapse);
-					KeyBindings.Add ((Key)menuBarItem.HotKey.Value | Key.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+					KeyBindings.Add ((ConsoleDriverKey)menuBarItem.HotKey.Value, Command.ToggleExpandCollapse);
+					KeyBindings.Add ((ConsoleDriverKey)menuBarItem.HotKey.Value | ConsoleDriverKey.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 				}
-				if (menuBarItem.Shortcut != Key.Unknown && menuBarItem.Shortcut != Key.Null) {
+				if (menuBarItem.Shortcut != ConsoleDriverKey.Unknown && menuBarItem.Shortcut != ConsoleDriverKey.Null) {
 					// Technically this will will never run because MenuBarItems don't have shortcuts
 					KeyBindings.Add (menuBarItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 				}
@@ -353,7 +353,7 @@ public class MenuBar : View {
 	
 	internal void AltKeyUpHandler (KeyEventArgs e)
 	{
-		if (e.Key == Key.AltMask) {
+		if (e.Key == ConsoleDriverKey.AltMask) {
 			e.Handled = true;
 			// User pressed Alt 
 			if (!IsMenuOpen && _openMenu == null && !_openedByAltKey) {
@@ -382,14 +382,14 @@ public class MenuBar : View {
 	}
 
 	#region Keyboard handling
-	Key _key = Key.F9;
+	ConsoleDriverKey _key = ConsoleDriverKey.F9;
 
 	/// <summary>
-	/// The <see cref="Gui.Key"/> used to activate or close the menu bar by keyboard. The default is <see cref="Key.F9"/>.
+	/// The <see cref="ConsoleDriverKey"/> used to activate or close the menu bar by keyboard. The default is <see cref="ConsoleDriverKey.F9"/>.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// The menu bar can also be activated by pressing the <see cref="Key.AltMask"/> key. This will highlight the menu bar, but not open any sub-menus.
+	/// The menu bar can also be activated by pressing the <see cref="ConsoleDriverKey.AltMask"/> key. This will highlight the menu bar, but not open any sub-menus.
 	/// </para>
 	/// <para>
 	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
@@ -398,10 +398,10 @@ public class MenuBar : View {
 	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
 	/// </para>
 	/// <para>
-	/// <see cref="Key.Esc"/> will close the menu bar and any open sub-menus.
+	/// <see cref="ConsoleDriverKey.Esc"/> will close the menu bar and any open sub-menus.
 	/// </para>
 	/// </remarks>
-	public Key Key {
+	public ConsoleDriverKey Key {
 		get => _key;
 		set {
 			if (_key == value) {
@@ -528,9 +528,9 @@ public class MenuBar : View {
 
 				// Check if one of the menu bar item has a hot key that matches
 				int hotKeyValue = Menus [i]?.HotKey.Value ?? default;
-				var hotKey = (Key)hotKeyValue;
-				if (hotKey != Key.Null) {
-					bool matches = key == hotKey || key == (hotKey | Key.AltMask);
+				var hotKey = (ConsoleDriverKey)hotKeyValue;
+				if (hotKey != ConsoleDriverKey.Null) {
+					bool matches = key == hotKey || key == (hotKey | ConsoleDriverKey.AltMask);
 					if (IsMenuOpen) {
 						// If the menu is open, only match if Alt is not pressed.
 						matches = key == hotKey;
@@ -549,11 +549,11 @@ public class MenuBar : View {
 	}
 
 	// Recurse the child menus looking for a shortcut that matches the key
-	bool FindShortcutInChildMenu (Key key, MenuBarItem menuBarItem, out MenuItem menuItemToSelect)
+	bool FindShortcutInChildMenu (ConsoleDriverKey key, MenuBarItem menuBarItem, out MenuItem menuItemToSelect)
 	{
 		menuItemToSelect = null;
 
-		if (key == Key.Null || menuBarItem?.Children == null) {
+		if (key == ConsoleDriverKey.Null || menuBarItem?.Children == null) {
 			return false;
 		}
 

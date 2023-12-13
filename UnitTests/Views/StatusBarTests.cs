@@ -15,7 +15,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void StatusItem_Constructor ()
 		{
 			var si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", null);
-			Assert.Equal (Key.CtrlMask | Key.Q, si.Shortcut);
+			Assert.Equal (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, si.Shortcut);
 			Assert.Equal ($"{Application.QuitKey} to Quit", si.Title);
 			Assert.Null (si.Action);
 			si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => { });
@@ -80,7 +80,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Iteration += (s, a) => {
 				if (iteration == 0) {
 					Assert.Equal ("", msg);
-					sb.ProcessKeyDown (new (Key.CtrlMask | Key.Q));
+					sb.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q));
 				} else if (iteration == 1) {
 					Assert.Equal ("Quiting...", msg);
 					msg = "";
@@ -101,7 +101,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void Redraw_Output ()
 		{
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O, "~^O~ Open", null),
 				new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit!", null)
 			});
 			Application.Top.Add (sb);
@@ -119,8 +119,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void Redraw_Output_CTRLQ ()
 		{
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.O, "~CTRL-O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~CTRL-Q~ Quit", null)
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O, "~CTRL-O~ Open", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~CTRL-Q~ Quit", null)
 			});
 			Application.Top.Add (sb);
 			sb.OnDrawContent (sb.Bounds);
@@ -136,12 +136,12 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 		public void AddItemAt_RemoveItem_Replacing ()
 		{
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~^O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^S~ Save", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^O~ Open", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^S~ Save", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^Q~ Quit", null)
 			});
 
-			sb.AddItemAt (2, new StatusItem (Key.CtrlMask | Key.Q, "~^C~ Close", null));
+			sb.AddItemAt (2, new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^C~ Close", null));
 
 			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
 			Assert.Equal ("~^S~ Save", sb.Items [1].Title);
@@ -154,7 +154,7 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 			Assert.Equal ("~^C~ Close", sb.Items [1].Title);
 			Assert.Equal ("~^Q~ Quit", sb.Items [^1].Title);
 
-			sb.Items [1] = new StatusItem (Key.CtrlMask | Key.A, "~^A~ Save As", null);
+			sb.Items [1] = new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A, "~^A~ Save As", null);
 
 			Assert.Equal ("~^O~ Open", sb.Items [0].Title);
 			Assert.Equal ("~^A~ Save As", sb.Items [1].Title);
@@ -166,8 +166,8 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 		{
 			Window win = null;
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.N, "~^N~ New", New, CanExecuteNew),
-				new StatusItem (Key.CtrlMask | Key.C, "~^C~ Close", Close, CanExecuteClose)
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N, "~^N~ New", New, CanExecuteNew),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C, "~^C~ Close", Close, CanExecuteClose)
 			});
 			var top = Application.Top;
 			top.Add (statusBar);
@@ -192,7 +192,7 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 			Assert.True (CanExecuteNew ());
 			Assert.False (CanExecuteClose ());
 
-			Assert.True (top.ProcessKeyDown (new (Key.N | Key.CtrlMask)));
+			Assert.True (top.ProcessKeyDown (new (ConsoleDriverKey.N | ConsoleDriverKey.CtrlMask)));
 			Application.MainLoop.RunIteration ();
 			Assert.NotNull (win);
 			Assert.False (CanExecuteNew ());

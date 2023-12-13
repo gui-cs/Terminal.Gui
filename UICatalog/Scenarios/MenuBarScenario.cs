@@ -16,35 +16,35 @@ public class MenuBarScenario : Scenario {
 	{
 		var mb = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_New", "", () => actionFn ("New"), null, null, Key.CtrlMask | Key.N),
-				new MenuItem ("_Open", "", () => actionFn ("Open"), null, null, Key.CtrlMask | Key.O),
-				new MenuItem ("_Save", "", () => actionFn ("Save"), null, null, Key.CtrlMask | Key.S),
+				new MenuItem ("_New", "", () => actionFn ("New"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N),
+				new MenuItem ("_Open", "", () => actionFn ("Open"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O),
+				new MenuItem ("_Save", "", () => actionFn ("Save"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S),
 				null,
 				// Don't use Ctrl-Q so we can disambiguate between quitting and closing the toplevel
-				new MenuItem ("_Quit", "", () => actionFn ("Quit"), null, null, Key.AltMask | Key.CtrlMask | Key.Q)
+				new MenuItem ("_Quit", "", () => actionFn ("Quit"), null, null, ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q)
 			}),
 			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", () => actionFn ("Copy"), null, null, Key.CtrlMask | Key.C),
-				new MenuItem ("C_ut", "", () => actionFn ("Cut"), null, null, Key.CtrlMask | Key.X),
-				new MenuItem ("_Paste", "", () => actionFn ("Paste"), null, null, Key.CtrlMask | Key.V),
+				new MenuItem ("_Copy", "", () => actionFn ("Copy"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C),
+				new MenuItem ("C_ut", "", () => actionFn ("Cut"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.X),
+				new MenuItem ("_Paste", "", () => actionFn ("Paste"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.V),
 				new MenuBarItem ("_Find and Replace", new MenuItem [] {
-					new MenuItem ("F_ind", "", () => actionFn ("Find"), null, null, Key.CtrlMask | Key.F),
-					new MenuItem ("_Replace", "", () => actionFn ("Replace"), null, null, Key.CtrlMask | Key.H),
+					new MenuItem ("F_ind", "", () => actionFn ("Find"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.F),
+					new MenuItem ("_Replace", "", () => actionFn ("Replace"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.H),
 					new MenuBarItem ("_3rd Level", new MenuItem [] {
-						new MenuItem ("_1st", "", () => actionFn ("1"), null, null, Key.F1),
-						new MenuItem ("_2nd", "", () => actionFn ("2"), null, null, Key.F2),
+						new MenuItem ("_1st", "", () => actionFn ("1"), null, null, ConsoleDriverKey.F1),
+						new MenuItem ("_2nd", "", () => actionFn ("2"), null, null, ConsoleDriverKey.F2),
 					}),
 					new MenuBarItem ("_4th Level", new MenuItem [] {
-						new MenuItem ("_5th", "", () => actionFn ("5"), null, null, Key.CtrlMask | Key.D5),
-						new MenuItem ("_6th", "", () => actionFn ("6"), null, null, Key.CtrlMask | Key.D6),
+						new MenuItem ("_5th", "", () => actionFn ("5"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.D5),
+						new MenuItem ("_6th", "", () => actionFn ("6"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.D6),
 					}),
 				}),
-				new MenuItem ("_Select All", "", () => actionFn ("Select All"), null, null, Key.CtrlMask | Key.ShiftMask | Key.S),
+				new MenuItem ("_Select All", "", () => actionFn ("Select All"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.S),
 			}),
 			new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"), null, null),
 		});
 		mb.UseKeysUpDownAsKeysLeftRight = true;
-		mb.Key = Key.F9;
+		mb.Key = ConsoleDriverKey.F9;
 		mb.Title = "TestMenuBar";
 		return mb;
 	}

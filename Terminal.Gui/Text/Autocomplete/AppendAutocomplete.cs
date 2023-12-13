@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 		public AppendAutocomplete (TextField textField)
 		{
 			this.textField = textField;
-			SelectionKey = Key.Tab;
+			SelectionKey = ConsoleDriverKey.Tab;
 
 			ColorScheme = new ColorScheme {
 				Normal = new Attribute (Color.DarkGray, Color.Black),
@@ -60,10 +60,10 @@ namespace Terminal.Gui {
 			if (key == SelectionKey) {
 				return this.AcceptSelectionIfAny ();
 			} else
-			if (key == Key.CursorUp) {
+			if (key == ConsoleDriverKey.CursorUp) {
 				return this.CycleSuggestion (1);
 			} else
-			if (key == Key.CursorDown) {
+			if (key == ConsoleDriverKey.CursorDown) {
 				return this.CycleSuggestion (-1);
 			} else if (key == CloseKey && Suggestions.Any ()) {
 				ClearSuggestions ();

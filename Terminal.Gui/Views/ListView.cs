@@ -166,9 +166,9 @@ namespace Terminal.Gui {
 			set {
 				allowsMarking = value;
 				if (allowsMarking) {
-					KeyBindings.Add (Key.Space, Command.ToggleChecked);
+					KeyBindings.Add (ConsoleDriverKey.Space, Command.ToggleChecked);
 				} else {
-					KeyBindings.Remove (Key.Space);
+					KeyBindings.Remove (ConsoleDriverKey.Space);
 				}
 
 				SetNeedsDisplay ();
@@ -330,22 +330,22 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
 
 			// Default keybindings for all ListViews
-			KeyBindings.Add (Key.CursorUp, Command.LineUp);
-			KeyBindings.Add (Key.P | Key.CtrlMask, Command.LineUp);
+			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
+			KeyBindings.Add (ConsoleDriverKey.P | ConsoleDriverKey.CtrlMask, Command.LineUp);
 
-			KeyBindings.Add (Key.CursorDown, Command.LineDown);
-			KeyBindings.Add (Key.N | Key.CtrlMask, Command.LineDown);
+			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
+			KeyBindings.Add (ConsoleDriverKey.N | ConsoleDriverKey.CtrlMask, Command.LineDown);
 
-			KeyBindings.Add (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
 
-			KeyBindings.Add (Key.PageDown, Command.PageDown);
-			KeyBindings.Add (Key.V | Key.CtrlMask, Command.PageDown);
+			KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
+			KeyBindings.Add (ConsoleDriverKey.V | ConsoleDriverKey.CtrlMask, Command.PageDown);
 
-			KeyBindings.Add (Key.Home, Command.TopHome);
+			KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
 
-			KeyBindings.Add (Key.End, Command.BottomEnd);
+			KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
 
-			KeyBindings.Add (Key.Enter, Command.OpenSelectedItem);
+			KeyBindings.Add (ConsoleDriverKey.Enter, Command.OpenSelectedItem);
 		}
 
 		///<inheritdoc/>

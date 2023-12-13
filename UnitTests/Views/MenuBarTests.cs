@@ -23,7 +23,7 @@ public class MenuBarTests {
 	public void Constuctors_Defaults ()
 	{
 		var menuBar = new MenuBar ();
-		Assert.Equal (Key.F9, menuBar.Key);
+		Assert.Equal (ConsoleDriverKey.F9, menuBar.Key);
 		var menu = new Menu (menuBar, 0, 0, new MenuBarItem (), null, menuBar.MenusBorderStyle);
 		Assert.Equal (Colors.Menu, menu.ColorScheme);
 		Assert.True (menu.CanFocus);
@@ -76,7 +76,7 @@ public class MenuBarTests {
 		Assert.Null (menuBarItem.Action);
 		Assert.Null (menuBarItem.CanExecute);
 		Assert.Null (menuBarItem.Parent);
-		Assert.Equal (Key.Null, menuBarItem.Shortcut);
+		Assert.Equal (ConsoleDriverKey.Null, menuBarItem.Shortcut);
 		
 	}
 
@@ -260,12 +260,12 @@ Edit
 		Assert.Equal ("_File", miCurrent.Parent.Title);
 		Assert.Equal ("_New", miCurrent.Title);
 
-		Assert.True (mCurrent.ProcessKeyDown (new KeyEventArgs (Key.CursorDown)));
+		Assert.True (mCurrent.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", miCurrent.Parent.Title);
 		Assert.Equal ("_Save", miCurrent.Title);
 
-		Assert.True (mCurrent.ProcessKeyDown (new KeyEventArgs (Key.CursorUp)));
+		Assert.True (mCurrent.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorUp)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.Equal ("_File", miCurrent.Parent.Title);
 		Assert.Equal ("_New", miCurrent.Title);
@@ -354,52 +354,52 @@ Edit
 
 	[Theory]
 	[AutoInitShutdown]
-	[InlineData ("_File", "_New", "", Key.Space | Key.CtrlMask)]
-	[InlineData ("Closed", "None", "", Key.Space | Key.CtrlMask, Key.Space | Key.CtrlMask)]
-	[InlineData ("_File", "_New", "", Key.F9)]
-	[InlineData ("Closed", "None", "", Key.F9, Key.F9)]
-	[InlineData ("_File", "_Open", "", Key.F9, Key.CursorDown)]
-	[InlineData ("_File", "_Save", "", Key.F9, Key.CursorDown, Key.CursorDown)]
-	[InlineData ("_File", "_Quit", "", Key.F9, Key.CursorDown, Key.CursorDown, Key.CursorDown)]
-	[InlineData ("_File", "_New", "", Key.F9, Key.CursorDown, Key.CursorDown, Key.CursorDown, Key.CursorDown)]
-	[InlineData ("_File", "_New", "", Key.F9, Key.CursorDown, Key.CursorUp)]
-	[InlineData ("_File", "_Quit", "", Key.F9, Key.CursorUp)]
-	[InlineData ("_File", "_New", "", Key.F9, Key.CursorUp, Key.CursorDown)]
-	[InlineData ("Closed", "None", "Open", Key.F9, Key.CursorDown, Key.Enter)]
-	[InlineData ("_Edit", "_Copy", "", Key.F9, Key.CursorRight)]
-	[InlineData ("_About", "_About", "", Key.F9, Key.CursorLeft)]
-	[InlineData ("_Edit", "_Copy", "", Key.F9, Key.CursorLeft, Key.CursorLeft)]
-	[InlineData ("_Edit", "_Select All", "", Key.F9, Key.CursorRight, Key.CursorUp)]
-	[InlineData ("_File", "_New", "", Key.F9, Key.CursorRight, Key.CursorDown, Key.CursorLeft)]
-	[InlineData ("_About", "_About", "", Key.F9, Key.CursorRight, Key.CursorRight)]
-	[InlineData ("Closed", "None", "New", Key.F9, Key.Enter)]
-	[InlineData ("Closed", "None", "Quit", Key.F9, Key.CursorUp, Key.Enter)]
-	[InlineData ("Closed", "None", "Copy", Key.F9, Key.CursorRight, Key.Enter)]
-	[InlineData ("Closed", "None", "Find", Key.F9, Key.CursorRight, Key.CursorUp, Key.CursorUp, Key.Enter)]
-	[InlineData ("Closed", "None", "Replace", Key.F9, Key.CursorRight, Key.CursorUp, Key.CursorUp, Key.CursorDown, Key.Enter)]
-	[InlineData ("_Edit", "F_ind", "", Key.F9, Key.CursorRight, Key.CursorUp, Key.CursorUp, Key.CursorLeft, Key.Enter)]
-	[InlineData ("Closed", "None", "About", Key.F9, Key.CursorRight, Key.CursorRight, Key.Enter)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask, ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.F9)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.F9, ConsoleDriverKey.F9)]
+	[InlineData ("_File", "_Open", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorDown)]
+	[InlineData ("_File", "_Save", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorDown)]
+	[InlineData ("_File", "_Quit", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorDown)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorDown)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorUp)]
+	[InlineData ("_File", "_Quit", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorUp)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorUp, ConsoleDriverKey.CursorDown)]
+	[InlineData ("Closed", "None", "Open", ConsoleDriverKey.F9, ConsoleDriverKey.CursorDown, ConsoleDriverKey.Enter)]
+	[InlineData ("_Edit", "_Copy", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight)]
+	[InlineData ("_About", "_About", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorLeft)]
+	[InlineData ("_Edit", "_Copy", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorLeft, ConsoleDriverKey.CursorLeft)]
+	[InlineData ("_Edit", "_Select All", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorUp)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorDown, ConsoleDriverKey.CursorLeft)]
+	[InlineData ("_About", "_About", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorRight)]
+	[InlineData ("Closed", "None", "New", ConsoleDriverKey.F9, ConsoleDriverKey.Enter)]
+	[InlineData ("Closed", "None", "Quit", ConsoleDriverKey.F9, ConsoleDriverKey.CursorUp, ConsoleDriverKey.Enter)]
+	[InlineData ("Closed", "None", "Copy", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.Enter)]
+	[InlineData ("Closed", "None", "Find", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorUp, ConsoleDriverKey.CursorUp, ConsoleDriverKey.Enter)]
+	[InlineData ("Closed", "None", "Replace", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorUp, ConsoleDriverKey.CursorUp, ConsoleDriverKey.CursorDown, ConsoleDriverKey.Enter)]
+	[InlineData ("_Edit", "F_ind", "", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorUp, ConsoleDriverKey.CursorUp, ConsoleDriverKey.CursorLeft, ConsoleDriverKey.Enter)]
+	[InlineData ("Closed", "None", "About", ConsoleDriverKey.F9, ConsoleDriverKey.CursorRight, ConsoleDriverKey.CursorRight, ConsoleDriverKey.Enter)]
 
 	// Hotkeys
-	[InlineData ("_File", "_New", "", Key.AltMask | Key.F)]
-	[InlineData ("Closed", "None", "", Key.AltMask | Key.ShiftMask | Key.F)]
-	[InlineData ("Closed", "None", "", Key.AltMask | Key.F, Key.Esc)]
-	[InlineData ("Closed", "None", "", Key.AltMask | Key.F, Key.AltMask | Key.F)]
-	[InlineData ("Closed", "None", "Open", Key.AltMask | Key.F, Key.O)]
-	[InlineData ("_File", "_New", "", Key.AltMask | Key.F, Key.ShiftMask | Key.O)]
-	[InlineData ("Closed", "None", "Open", Key.AltMask | Key.F, Key.AltMask | Key.O)]
-	[InlineData ("_Edit", "_Copy", "", Key.AltMask | Key.E)]
-	[InlineData ("_Edit", "F_ind", "", Key.AltMask | Key.E, Key.F)]
-	[InlineData ("_Edit", "F_ind", "", Key.AltMask | Key.E, Key.AltMask | Key.F)]
-	[InlineData ("Closed", "None", "Replace", Key.AltMask | Key.E, Key.F, Key.R)]
-	[InlineData ("Closed", "None", "", Key.AltMask | Key.E, Key.F, Key.C)] // BUGBUG: Action should be "Copy"
-	[InlineData ("_Edit", "_1st", "", Key.AltMask | Key.E, Key.F, Key.D3)]
-	[InlineData ("Closed", "None", "1", Key.AltMask | Key.E, Key.F, Key.D3, Key.D1)]
-	[InlineData ("Closed", "None", "1", Key.AltMask | Key.E, Key.F, Key.D3, Key.Enter)]
-	[InlineData ("Closed", "None", "", Key.AltMask | Key.E, Key.F, Key.D3, Key.D4)] // BUGBUG: Should be back on _3rd Level
-	[InlineData ("Closed", "None", "5", Key.AltMask | Key.E, Key.F, Key.D4, Key.D5)]
-	[InlineData ("_About", "_About", "", Key.AltMask | Key.A)]
-	public void KeyBindings_Navigation_Commands (string expectedBarTitle, string expectedItemTitle, string expectedAction, params Key [] keys)
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.F)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.F)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.F, ConsoleDriverKey.Esc)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.F, ConsoleDriverKey.AltMask | ConsoleDriverKey.F)]
+	[InlineData ("Closed", "None", "Open", ConsoleDriverKey.AltMask | ConsoleDriverKey.F, ConsoleDriverKey.O)]
+	[InlineData ("_File", "_New", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.F, ConsoleDriverKey.ShiftMask | ConsoleDriverKey.O)]
+	[InlineData ("Closed", "None", "Open", ConsoleDriverKey.AltMask | ConsoleDriverKey.F, ConsoleDriverKey.AltMask | ConsoleDriverKey.O)]
+	[InlineData ("_Edit", "_Copy", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.E)]
+	[InlineData ("_Edit", "F_ind", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F)]
+	[InlineData ("_Edit", "F_ind", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.AltMask | ConsoleDriverKey.F)]
+	[InlineData ("Closed", "None", "Replace", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.R)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.C)] // BUGBUG: Action should be "Copy"
+	[InlineData ("_Edit", "_1st", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.D3)]
+	[InlineData ("Closed", "None", "1", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.D3, ConsoleDriverKey.D1)]
+	[InlineData ("Closed", "None", "1", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.D3, ConsoleDriverKey.Enter)]
+	[InlineData ("Closed", "None", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.D3, ConsoleDriverKey.D4)] // BUGBUG: Should be back on _3rd Level
+	[InlineData ("Closed", "None", "5", ConsoleDriverKey.AltMask | ConsoleDriverKey.E, ConsoleDriverKey.F, ConsoleDriverKey.D4, ConsoleDriverKey.D5)]
+	[InlineData ("_About", "_About", "", ConsoleDriverKey.AltMask | ConsoleDriverKey.A)]
+	public void KeyBindings_Navigation_Commands (string expectedBarTitle, string expectedItemTitle, string expectedAction, params ConsoleDriverKey [] keys)
 	{
 		string miAction = "";
 		MenuItem mbiCurrent = null;
@@ -409,7 +409,7 @@ Edit
 			miAction = s;
 			return true;
 		});
-		menu.Key = Key.F9;
+		menu.Key = ConsoleDriverKey.F9;
 		menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
 		menu.MenuOpened += (s, e) => {
 			miCurrent = e.MenuItem;
@@ -433,13 +433,13 @@ Edit
 
 	[Theory]
 	[AutoInitShutdown]
-	[InlineData ("New", Key.CtrlMask | Key.N)]
-	[InlineData ("Quit", Key.AltMask | Key.CtrlMask | Key.Q)]
-	[InlineData ("Copy", Key.CtrlMask | Key.C)]
-	[InlineData ("Replace", Key.CtrlMask | Key.H)]
-	[InlineData ("1", Key.F1)]
-	[InlineData ("5", Key.CtrlMask | Key.D5)]
-	public void KeyBindings_Shortcut_Commands (string expectedAction, params Key [] keys)
+	[InlineData ("New", ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N)]
+	[InlineData ("Quit", ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q)]
+	[InlineData ("Copy", ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C)]
+	[InlineData ("Replace", ConsoleDriverKey.CtrlMask | ConsoleDriverKey.H)]
+	[InlineData ("1", ConsoleDriverKey.F1)]
+	[InlineData ("5", ConsoleDriverKey.CtrlMask | ConsoleDriverKey.D5)]
+	public void KeyBindings_Shortcut_Commands (string expectedAction, params ConsoleDriverKey [] keys)
 	{
 		string miAction = "";
 		MenuItem mbiCurrent = null;
@@ -449,7 +449,7 @@ Edit
 			miAction = s;
 			return true;
 		});
-		menu.Key = Key.F9;
+		menu.Key = ConsoleDriverKey.F9;
 		menu.MenuOpening += (s, e) => mbiCurrent = e.CurrentMenu;
 		menu.MenuOpened += (s, e) => {
 			miCurrent = e.MenuItem;
@@ -477,14 +477,14 @@ Edit
 		bool saveAction = false;
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Save", "Saves the file.", () => { saveAction = true; }, null, null, Key.S | Key.CtrlMask)
+				new MenuItem ("_Save", "Saves the file.", () => { saveAction = true; }, null, null, ConsoleDriverKey.S | ConsoleDriverKey.CtrlMask)
 			})
 		});
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new KeyEventArgs (Key.S | Key.CtrlMask));
+		Application.OnKeyDown (new KeyEventArgs (ConsoleDriverKey.S | ConsoleDriverKey.CtrlMask));
 		Application.MainLoop.RunIteration ();
 
 		Assert.True (saveAction);
@@ -634,7 +634,7 @@ Edit
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorDown)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers                 
@@ -648,7 +648,7 @@ Edit
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		Assert.True (Application.Top.Subviews [2].ProcessKeyDown (new KeyEventArgs (Key.CursorLeft)));
+		Assert.True (Application.Top.Subviews [2].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorLeft)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers  
@@ -661,7 +661,7 @@ Edit
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.Esc)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Esc)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers
@@ -817,8 +817,8 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.CursorDown)));
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.Enter)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Enter)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers       
@@ -833,7 +833,7 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (1, 0, 15, 7), pos);
 
-		Assert.True (Application.Top.Subviews [2].ProcessKeyDown (new KeyEventArgs (Key.Enter)));
+		Assert.True (Application.Top.Subviews [2].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Enter)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers  
@@ -847,7 +847,7 @@ Edit
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (1, 0, 10, 6), pos);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.Esc)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Esc)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers
@@ -1193,21 +1193,21 @@ Edit
 		Assert.False (newAction);
 		Assert.False (copyAction);
 
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.AltMask | Key.F)));
+		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.AltMask | ConsoleDriverKey.F)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), _output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.N)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.N)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (newAction);
 
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.AltMask | Key.E)));
+		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.AltMask | ConsoleDriverKey.E)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), _output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.C)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.C)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (copyAction);
 	}
@@ -1246,7 +1246,7 @@ Edit
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), _output);
 
 		// Open second
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), _output);
@@ -1278,7 +1278,7 @@ Edit
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), _output);
 
 		// Open second
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), _output);
@@ -1453,27 +1453,27 @@ Edit
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (0), _output);
 
 		// Right - Edit has no sub menu; this tests that no sub menu shows
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), _output);
 
 		// Right - Format
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (2), _output);
 
 		// Left - Edit
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorLeft)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.expectedSubMenuOpen (1), _output);
 
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorLeft)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorLeft)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
 		Application.Top.Draw ();
@@ -1503,13 +1503,13 @@ Edit
 		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (menu.Key)));
 		Assert.False (menu.IsMenuOpen);
 
-		menu.Key = Key.F10 | Key.ShiftMask;
-		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.F9)));
+		menu.Key = ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask;
+		Assert.False (Application.Top.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.F9)));
 		Assert.False (menu.IsMenuOpen);
 
-		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.F10 | Key.ShiftMask)));
+		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask)));
 		Assert.True (menu.IsMenuOpen);
-		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.F10 | Key.ShiftMask)));
+		Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask)));
 		Assert.False (menu.IsMenuOpen);
 	}
 
@@ -1607,8 +1607,8 @@ Edit
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
 		Assert.True (Application.OnKeyUp (new KeyEventArgs (Key.AltMask))); // changed to true because Alt activates menu bar
 #endif
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
+		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 	}
 
 	[Fact]
@@ -1656,7 +1656,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+			Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1668,7 +1668,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+			Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1680,7 +1680,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+			Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1742,7 +1742,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1754,7 +1754,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		top.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1766,7 +1766,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", _output);
 
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		top.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1821,7 +1821,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1833,7 +1833,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		win.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1845,7 +1845,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", _output);
 
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 		win.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1877,7 +1877,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (top.ProcessKeyDown (new KeyEventArgs (Key.F9)));
+			Assert.True (top.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.F9)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1889,7 +1889,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (top.Subviews [0].ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+			Assert.True (top.Subviews [0].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1901,7 +1901,7 @@ Edit
 │                                      │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1913,7 +1913,7 @@ Edit
 │                 └───────────┘        │
 └──────────────────────────────────────┘", _output);
 
-			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
+			Assert.True (((MenuBar)top.Subviews [0])._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorRight)));
 			top.Draw ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────────────────────────┐
@@ -1969,7 +1969,7 @@ Edit
 
 		Assert.False (mi.Checked);
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (menu.Key)));
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.Enter)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Enter)));
 		Application.MainLoop.RunIteration ();
 		Assert.True (mi.Checked);
 		Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -1989,7 +1989,7 @@ Edit
 
 		mi.AllowNullChecked = true;
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (menu.Key)));
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.Enter)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Enter)));
 		Application.MainLoop.RunIteration ();
 		Assert.Null (mi.Checked);
 		Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2013,7 +2013,7 @@ Edit
 		Application.MainLoop.RunIteration ();
 		Assert.True (mi.Checked);
 		Assert.True (menu.ProcessKeyDown (new KeyEventArgs (menu.Key)));
-		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (Key.Enter)));
+		Assert.True (menu._openMenu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Enter)));
 		Application.MainLoop.RunIteration ();
 		Assert.False (mi.Checked);
 		Assert.True (menu.MouseEvent (new MouseEvent () {
@@ -2047,7 +2047,7 @@ Edit
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("File", new MenuItem [] {
-				new MenuItem ("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+				new MenuItem ("_Open", "Open a file", () => { }, null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O),
 				null,
 				new MenuItem ("_Quit", "", null)
 			})
@@ -2073,7 +2073,7 @@ Edit
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("File", new MenuItem [] {
-				new MenuItem ("_Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O),
+				new MenuItem ("_Open", "Open a file", () => { }, null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O),
 				null,
 				new MenuItem ("_Quit", "", null)
 			})
@@ -2211,7 +2211,7 @@ wo
 
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorDown)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers           
@@ -2256,8 +2256,8 @@ wo
 
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.CursorDown)));
-		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (Key.Enter)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.CursorDown)));
+		Assert.True (Application.Top.Subviews [1].ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Enter)));
 		Application.Top.Draw ();
 		expected = @"
  Numbers     
@@ -2302,12 +2302,12 @@ wo
 		var menu = new MenuBar () { X = Pos.Center (), Width = 10 };
 		menu.Menus = new MenuBarItem [] {
 			new MenuBarItem ("File", new MenuItem [] {
-				new MenuItem (items [0], "Create a new file", () => ChangeMenuTitle ("New"), null, null, Key.CtrlMask | Key.N),
-				new MenuItem (items [1], "Open a file", () => ChangeMenuTitle ("Open"), null, null, Key.CtrlMask | Key.O),
-				new MenuItem (items [2], "Close a file", () => ChangeMenuTitle ("Close"), null, null, Key.CtrlMask | Key.C),
-				new MenuItem (items [3], "Save a file", () => ChangeMenuTitle ("Save"), null, null, Key.CtrlMask | Key.S),
-				new MenuItem (items [4], "Save a file as", () => ChangeMenuTitle ("Save As"), null, null, Key.CtrlMask | Key.A),
-				new MenuItem (items [5], "Delete a file", () => ChangeMenuTitle ("Delete"), null, null, Key.CtrlMask | Key.A)
+				new MenuItem (items [0], "Create a new file", () => ChangeMenuTitle ("New"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N),
+				new MenuItem (items [1], "Open a file", () => ChangeMenuTitle ("Open"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O),
+				new MenuItem (items [2], "Close a file", () => ChangeMenuTitle ("Close"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C),
+				new MenuItem (items [3], "Save a file", () => ChangeMenuTitle ("Save"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S),
+				new MenuItem (items [4], "Save a file as", () => ChangeMenuTitle ("Save As"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A),
+				new MenuItem (items [5], "Delete a file", () => ChangeMenuTitle ("Delete"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A)
 			})
 		};
 		dialog.Add (menu);
@@ -2437,12 +2437,12 @@ wo
 		var menu = new MenuBar () { X = Pos.Center (), Width = 10 };
 		menu.Menus = new MenuBarItem [] {
 			new MenuBarItem ("File", new MenuItem [] {
-				new MenuItem (items [0], "Create a new file", () => ChangeMenuTitle ("New"), null, null, Key.CtrlMask | Key.N),
-				new MenuItem (items [1], "Open a file", () => ChangeMenuTitle ("Open"), null, null, Key.CtrlMask | Key.O),
-				new MenuItem (items [2], "Close a file", () => ChangeMenuTitle ("Close"), null, null, Key.CtrlMask | Key.C),
-				new MenuItem (items [3], "Save a file", () => ChangeMenuTitle ("Save"), null, null, Key.CtrlMask | Key.S),
-				new MenuItem (items [4], "Save a file as", () => ChangeMenuTitle ("Save As"), null, null, Key.CtrlMask | Key.A),
-				new MenuItem (items [5], "Delete a file", () => ChangeMenuTitle ("Delete"), null, null, Key.CtrlMask | Key.A)
+				new MenuItem (items [0], "Create a new file", () => ChangeMenuTitle ("New"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N),
+				new MenuItem (items [1], "Open a file", () => ChangeMenuTitle ("Open"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O),
+				new MenuItem (items [2], "Close a file", () => ChangeMenuTitle ("Close"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C),
+				new MenuItem (items [3], "Save a file", () => ChangeMenuTitle ("Save"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S),
+				new MenuItem (items [4], "Save a file as", () => ChangeMenuTitle ("Save As"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A),
+				new MenuItem (items [5], "Delete a file", () => ChangeMenuTitle ("Delete"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A)
 			})
 		};
 		dialog.Add (menu);
@@ -2532,7 +2532,7 @@ wo
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("File", new MenuItem [] {
-				new MenuItem ("Open", "Open a file", () => { }, null, null, Key.CtrlMask | Key.O)
+				new MenuItem ("Open", "Open a file", () => { }, null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O)
 			})
 		});
 		Application.Top.Add (menu);
@@ -2662,7 +2662,7 @@ wo
 		});
 		Application.Top.Add (menu);
 
-		var exception = Record.Exception (() => menu.ProcessKeyDown (new KeyEventArgs (Key.Space)));
+		var exception = Record.Exception (() => menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.Space)));
 		Assert.Null (exception);
 	}
 
@@ -2706,8 +2706,8 @@ wo
 		Assert.True (CanExecuteNew ());
 		Assert.False (CanExecuteClose ());
 
-		Assert.True (top.ProcessKeyDown (new KeyEventArgs (Key.F | Key.AltMask)));
-		Assert.True (top.ProcessKeyDown (new KeyEventArgs (Key.N | Key.AltMask)));
+		Assert.True (top.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.F | ConsoleDriverKey.AltMask)));
+		Assert.True (top.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.N | ConsoleDriverKey.AltMask)));
 		Application.MainLoop.RunIteration ();
 		Assert.NotNull (win);
 		Assert.False (CanExecuteNew ());
@@ -2748,7 +2748,7 @@ wo
 			})
 		});
 
-		var exception = Record.Exception (() => Assert.True (menu.ProcessKeyDown (new KeyEventArgs (Key.AltMask | Key.Q))));
+		var exception = Record.Exception (() => Assert.True (menu.ProcessKeyDown (new KeyEventArgs (ConsoleDriverKey.AltMask | ConsoleDriverKey.Q))));
 		Assert.Null (exception);
 	}
 }

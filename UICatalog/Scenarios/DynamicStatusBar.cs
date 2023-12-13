@@ -408,17 +408,17 @@ public class DynamicStatusBar : Scenario {
 			bool ProcessKey (KeyEventArgs ev)
 			{
 				switch (ev.Key) {
-				case Key.CursorUp:
-				case Key.CursorDown:
-				case Key.Tab:
-				case Key.Tab | Key.ShiftMask:
+				case ConsoleDriverKey.CursorUp:
+				case ConsoleDriverKey.CursorDown:
+				case ConsoleDriverKey.Tab:
+				case ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask:
 					return false;
 				}
 
 				return true;
 			}
 
-			bool CheckShortcut (Key k, bool pre)
+			bool CheckShortcut (ConsoleDriverKey k, bool pre)
 			{
 				var m = _statusItem != null ? _statusItem : new StatusItem (k, "", null);
 				if (pre && !ShortcutHelper.PreShortcutValidation (k)) {

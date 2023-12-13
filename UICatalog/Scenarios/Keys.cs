@@ -75,7 +75,7 @@ public class Keys : Scenario {
 			Y = Pos.Top (editLabel) + 4,
 		};
 		Win.Add (keyLogLabel);
-		var maxKeyString = KeyEventArgs.ToString (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.CursorRight, MenuBar.ShortcutDelimiter).Length;
+		var maxKeyString = KeyEventArgs.ToString (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CursorRight, MenuBar.ShortcutDelimiter).Length;
 		var yOffset = 1;
 		var keyEventlist = new List<string> ();
 		var keyEventListView = new ListView (keyEventlist) {

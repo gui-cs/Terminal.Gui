@@ -222,17 +222,17 @@ namespace Terminal.Gui {
 			// Default keybindings for this view
 			KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
-			KeyBindings.Add (Key.CursorRight, Command.NextView);
-			KeyBindings.Add (Key.CursorDown, Command.NextView);
-			KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
-			KeyBindings.Add (Key.CursorUp, Command.PreviousView);
+			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.NextView);
+			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.NextView);
+			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.PreviousView);
+			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.PreviousView);
 
-			KeyBindings.Add (Key.Tab, Command.NextView);
-			KeyBindings.Add (Key.Tab | Key.ShiftMask, Command.PreviousView);
-			KeyBindings.Add (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
-			KeyBindings.Add (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
+			KeyBindings.Add (ConsoleDriverKey.Tab, Command.NextView);
+			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask, Command.PreviousView);
+			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask, Command.NextViewOrTop);
+			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask, Command.PreviousViewOrTop);
 
-			KeyBindings.Add (Key.F5, Command.Refresh);
+			KeyBindings.Add (ConsoleDriverKey.F5, Command.Refresh);
 			KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
 			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
 #endif
 			// This enables the default button to be activated by the Enter key.
-			KeyBindings.Add (Key.Enter, Command.Accept);
+			KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
 		}
 
 		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)

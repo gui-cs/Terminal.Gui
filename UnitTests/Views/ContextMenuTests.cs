@@ -194,7 +194,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("Replaced", lbl.Text);
 
 			lbl.Text = "Original";
-			cm.Key = Key.Space | Key.CtrlMask;
+			cm.Key = ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask;
 			Assert.True (lbl.ProcessKeyDown (new (cm.Key)));
 			Assert.Equal ("Replaced", lbl.Text);
 		}
@@ -229,14 +229,14 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void KeyChanged_Event ()
 		{
-			var oldKey = Key.Null;
+			var oldKey = ConsoleDriverKey.Null;
 			var cm = new ContextMenu ();
 
 			cm.KeyChanged += (s, e) => oldKey = e.OldKey;
 
-			cm.Key = Key.Space | Key.CtrlMask;
-			Assert.Equal (Key.Space | Key.CtrlMask, cm.Key);
-			Assert.Equal (Key.F10 | Key.ShiftMask, oldKey);
+			cm.Key = ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask;
+			Assert.Equal (ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask, cm.Key);
+			Assert.Equal (ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask, oldKey);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -582,8 +582,8 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F1, "~F1~ Help", null),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem(ConsoleDriverKey.F1, "~F1~ Help", null),
+				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^Q~ Quit", null)
 			});
 
 			Application.Top.Add (menu, label, tf, statusBar);
@@ -646,8 +646,8 @@ namespace Terminal.Gui.ViewsTests {
 			win.Add (label, tf);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.F1, "~F1~ Help", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem (ConsoleDriverKey.F1, "~F1~ Help", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^Q~ Quit", null)
 			});
 
 			Application.Top.Add (menu, win, statusBar);
@@ -902,9 +902,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tf);
 			Application.Begin (Application.Top);
 
-			Assert.True (Application.Top.ProcessKeyDown (new (Key.F10 | Key.ShiftMask)));
+			Assert.True (Application.Top.ProcessKeyDown (new (ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask)));
 			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-			Assert.True (Application.Top.ProcessKeyDown (new (Key.F10 | Key.ShiftMask)));
+			Assert.True (Application.Top.ProcessKeyDown (new (ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask)));
 			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 

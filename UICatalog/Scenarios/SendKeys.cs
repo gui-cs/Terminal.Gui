@@ -117,7 +117,7 @@ namespace UICatalog.Scenarios {
 			button.Clicked += (s,e) => ProcessInput ();
 
 			Win.KeyDown += (s, e) => {
-				if (e.Key == Key.Enter) {
+				if (e.Key == ConsoleDriverKey.Enter) {
 					ProcessInput ();
 					e.Handled = true;
 				}

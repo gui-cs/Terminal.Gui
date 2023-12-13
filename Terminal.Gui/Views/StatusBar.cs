@@ -20,7 +20,7 @@ public class StatusItem {
 	/// <param name="title">Title for the <see cref="StatusItem"/>.</param>
 	/// <param name="action">Action to invoke when the <see cref="StatusItem"/> is activated.</param>
 	/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-	public StatusItem (Key shortcut, string title, Action action, Func<bool> canExecute = null)
+	public StatusItem (ConsoleDriverKey shortcut, string title, Action action, Func<bool> canExecute = null)
 	{
 		Title = title ?? "";
 		Shortcut = shortcut;
@@ -31,7 +31,7 @@ public class StatusItem {
 	/// <summary>
 	/// Gets the global shortcut to invoke the action on the menu.
 	/// </summary>
-	public Key Shortcut { get; set; }
+	public ConsoleDriverKey Shortcut { get; set; }
 
 	/// <summary>
 	/// Gets or sets the title.

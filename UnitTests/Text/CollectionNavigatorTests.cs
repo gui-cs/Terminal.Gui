@@ -388,10 +388,10 @@ public class CollectionNavigatorTests {
 	public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys ()
 	{
 		// test all Keys
-		foreach (Key key in Enum.GetValues (typeof (Key))) {
+		foreach (ConsoleDriverKey key in Enum.GetValues (typeof (ConsoleDriverKey))) {
 			var ke = new KeyEventArgs (key);
 			_output.WriteLine ($"Testing {key}");
-			if (key == Key.AltMask || key == Key.CtrlMask || key == Key.SpecialMask) {
+			if (key == ConsoleDriverKey.AltMask || key == ConsoleDriverKey.CtrlMask || key == ConsoleDriverKey.SpecialMask) {
 				Assert.False (CollectionNavigator.IsCompatibleKey (ke));
 			} else {
 				Assert.True (CollectionNavigator.IsCompatibleKey (ke));
@@ -399,6 +399,6 @@ public class CollectionNavigatorTests {
 		}
 
 		// test Capslock, Numlock and Scrolllock
-		Assert.True (CollectionNavigator.IsCompatibleKey (new (Key.Null)));
+		Assert.True (CollectionNavigator.IsCompatibleKey (new (ConsoleDriverKey.Null)));
 	}
 }

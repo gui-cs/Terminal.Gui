@@ -1293,13 +1293,13 @@ public static partial class Application {
 
 	#region Keyboard handling
 
-	static Key _alternateForwardKey = Key.PageDown | Key.CtrlMask;
+	static ConsoleDriverKey _alternateForwardKey = ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask;
 
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-	public static Key AlternateForwardKey {
+	public static ConsoleDriverKey AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
 			if (_alternateForwardKey != value) {
@@ -1317,13 +1317,13 @@ public static partial class Application {
 		}
 	}
 
-	static Key _alternateBackwardKey = Key.PageUp | Key.CtrlMask;
+	static ConsoleDriverKey _alternateBackwardKey = ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask;
 
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-	public static Key AlternateBackwardKey {
+	public static ConsoleDriverKey AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
 			if (_alternateBackwardKey != value) {
@@ -1341,13 +1341,13 @@ public static partial class Application {
 		}
 	}
 
-	static Key _quitKey = Key.Q | Key.CtrlMask;
+	static ConsoleDriverKey _quitKey = ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask;
 
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-	public static Key QuitKey {
+	public static ConsoleDriverKey QuitKey {
 		get => _quitKey;
 		set {
 			if (_quitKey != value) {

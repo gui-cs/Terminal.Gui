@@ -21,7 +21,7 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// Escape key code (ASCII 27/0x1B).
 	/// </summary>
-	public static readonly char KeyEsc = (char)Key.Esc;
+	public static readonly char KeyEsc = (char)ConsoleDriverKey.Esc;
 
 	/// <summary>
 	/// ESC [ - The CSI (Control Sequence Introducer).

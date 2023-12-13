@@ -104,23 +104,23 @@ public class ScrollView : View {
 		AddCommand (Command.RightEnd, () => ScrollRight (_contentSize.Width));
 
 		// Default keybindings for this view
-		KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
-		KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
-		KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
-		KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
+		KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.ScrollUp);
+		KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.ScrollDown);
+		KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.ScrollLeft);
+		KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.ScrollRight);
 
-		KeyBindings.Add (Key.PageUp, Command.PageUp);
-		KeyBindings.Add ((Key)'v' | Key.AltMask, Command.PageUp);
+		KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
+		KeyBindings.Add ((ConsoleDriverKey)'v' | ConsoleDriverKey.AltMask, Command.PageUp);
 
-		KeyBindings.Add (Key.PageDown, Command.PageDown);
-		KeyBindings.Add (Key.V | Key.CtrlMask, Command.PageDown);
+		KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
+		KeyBindings.Add (ConsoleDriverKey.V | ConsoleDriverKey.CtrlMask, Command.PageDown);
 
-		KeyBindings.Add (Key.PageUp | Key.CtrlMask, Command.PageLeft);
-		KeyBindings.Add (Key.PageDown | Key.CtrlMask, Command.PageRight);
-		KeyBindings.Add (Key.Home, Command.TopHome);
-		KeyBindings.Add (Key.End, Command.BottomEnd);
-		KeyBindings.Add (Key.Home | Key.CtrlMask, Command.LeftHome);
-		KeyBindings.Add (Key.End | Key.CtrlMask, Command.RightEnd);
+		KeyBindings.Add (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, Command.PageLeft);
+		KeyBindings.Add (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, Command.PageRight);
+		KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
+		KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
+		KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask, Command.LeftHome);
+		KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask, Command.RightEnd);
 
 		Initialized += (s, e) => {
 			if (!_vertical.IsInitialized) {

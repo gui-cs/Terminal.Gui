@@ -23,7 +23,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (label.AutoSize);
 			Assert.False (label.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
-			Assert.Equal (Key.Null, label.HotKey);
+			Assert.Equal (ConsoleDriverKey.Null, label.HotKey);
 			var expected = @"";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Application.End (rs);
@@ -365,10 +365,10 @@ Test
 
 			};
 
-			label.HotKey = Key.R;
+			label.HotKey = ConsoleDriverKey.R;
 			Assert.Same (label, sender);
-			Assert.Equal (Key.Null, args.OldKey);
-			Assert.Equal (Key.R, args.NewKey);
+			Assert.Equal (ConsoleDriverKey.Null, args.OldKey);
+			Assert.Equal (ConsoleDriverKey.R, args.NewKey);
 		}
 
 		[Fact, AutoInitShutdown]

@@ -59,9 +59,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (lv.Source.IsMarked (1));
 			Assert.False (lv.Source.IsMarked (2));
 
-			lv.KeyBindings.Add (Key.Space | Key.ShiftMask, Command.ToggleChecked, Command.LineDown);
+			lv.KeyBindings.Add (ConsoleDriverKey.Space | ConsoleDriverKey.ShiftMask, Command.ToggleChecked, Command.LineDown);
 
-			var ev = new KeyEventArgs (Key.Space | Key.ShiftMask);
+			var ev = new KeyEventArgs (ConsoleDriverKey.Space | ConsoleDriverKey.ShiftMask);
 
 			// view should indicate that it has accepted and consumed the event
 			Assert.True (lv.ProcessKeyDown (ev));
@@ -110,7 +110,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void SettingEmptyKeybindingThrows ()
 		{
 			var lv = new ListView (new List<string> () { "One", "Two", "Three" });
-			Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
+			Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (ConsoleDriverKey.Space));
 		}
 
 		/// <summary>
@@ -128,9 +128,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (-1, lv.SelectedItem);
 
 			// bind shift down to move down twice in control
-			lv.KeyBindings.Add (Key.CursorDown | Key.ShiftMask, Command.LineDown, Command.LineDown);
+			lv.KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask, Command.LineDown, Command.LineDown);
 
-			var ev = new KeyEventArgs (Key.CursorDown | Key.ShiftMask);
+			var ev = new KeyEventArgs (ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask);
 
 			Assert.True (lv.ProcessKeyDown (ev), "The first time we move down 2 it should be possible");
 
@@ -177,26 +177,26 @@ namespace Terminal.Gui.ViewsTests {
 			ListView lv = new ListView (source) { Height = 2, AllowsMarking = true };
 			lv.BeginInit (); lv.EndInit ();
 			Assert.Equal (-1, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyDown (new (Key.CursorDown)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.CursorDown)));
 			Assert.Equal (0, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyDown (new (Key.CursorUp)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.CursorUp)));
 			Assert.Equal (0, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyDown (new (Key.PageDown)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.PageDown)));
 			Assert.Equal (2, lv.SelectedItem);
 			Assert.Equal (2, lv.TopItem);
-			Assert.True (lv.ProcessKeyDown (new (Key.PageUp)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.PageUp)));
 			Assert.Equal (0, lv.SelectedItem);
 			Assert.Equal (0, lv.TopItem);
 			Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-			Assert.True (lv.ProcessKeyDown (new (Key.Space)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.Space)));
 			Assert.True (lv.Source.IsMarked (lv.SelectedItem));
 			var opened = false;
 			lv.OpenSelectedItem += (s, _) => opened = true;
-			Assert.True (lv.ProcessKeyDown (new (Key.Enter)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
 			Assert.True (opened);
-			Assert.True (lv.ProcessKeyDown (new (Key.End)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.End)));
 			Assert.Equal (2, lv.SelectedItem);
-			Assert.True (lv.ProcessKeyDown (new (Key.Home)));
+			Assert.True (lv.ProcessKeyDown (new (ConsoleDriverKey.Home)));
 			Assert.Equal (0, lv.SelectedItem);
 		}
 

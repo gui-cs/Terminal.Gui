@@ -9,7 +9,7 @@ namespace UICatalog {
 
 	class KeyBindingsDialog : Dialog {
 
-		static Dictionary<Command,Key> CurrentBindings = new Dictionary<Command,Key>();
+		static Dictionary<Command,ConsoleDriverKey> CurrentBindings = new Dictionary<Command,ConsoleDriverKey>();
 		private Command[] commands;
 		private ListView commandsListView;
 		private Label keyLabel;
@@ -28,7 +28,7 @@ namespace UICatalog {
 			Dictionary<View, bool> knownViews = new Dictionary<View, bool> ();
 
 			private object lockKnownViews = new object ();
-			private Dictionary<Command, Key> keybindings;
+			private Dictionary<Command, ConsoleDriverKey> keybindings;
 
 			public ViewTracker (View top)
 			{
@@ -70,7 +70,7 @@ namespace UICatalog {
 				Instance = new ViewTracker (Application.Top);
 			}
 
-			internal void StartUsingNewKeyMap (Dictionary<Command, Key> currentBindings)
+			internal void StartUsingNewKeyMap (Dictionary<Command, ConsoleDriverKey> currentBindings)
 			{
 				lock (lockKnownViews) {
 
@@ -176,7 +176,7 @@ namespace UICatalog {
 		private void RemapKey (object sender, EventArgs e)
 		{
 			var cmd = commands [commandsListView.SelectedItem];
-			Key? key = null;
+			ConsoleDriverKey? key = null;
 
 			// prompt user to hit a key
 			var dlg = new Dialog () { Title = "Enter Key" };

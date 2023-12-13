@@ -49,7 +49,7 @@ public class KeyboardTests {
 		int keyUps = 0;
 		var output = string.Empty;
 		Application.Top.KeyUp += (object sender, KeyEventArgs args) => {
-			if (args.Key != (Key.CtrlMask | Key.Q)) {
+			if (args.Key != (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q)) {
 				output += args.AsRune;
 			}
 			keyUps++;
@@ -97,62 +97,62 @@ public class KeyboardTests {
 		Application.Iteration += (s, a) => {
 			Assert.True (v1.HasFocus);
 			// Using default keys.
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyDown (new (Key.ShiftMask | Key.CtrlMask | Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageDown));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageDown));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageDown));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageDown));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageDown));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageUp));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageUp));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageUp));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyDown (new (Key.CtrlMask | Key.PageUp));
+			top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.PageUp));
 			Assert.True (v1.HasFocus);
 
 			// Using another's alternate keys.
-			Application.AlternateForwardKey = Key.F7;
-			Application.AlternateBackwardKey = Key.F6;
+			Application.AlternateForwardKey = ConsoleDriverKey.F7;
+			Application.AlternateBackwardKey = ConsoleDriverKey.F6;
 
-			top.ProcessKeyDown (new (Key.F7));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F7));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyDown (new (Key.F7));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F7));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyDown (new (Key.F7));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F7));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyDown (new (Key.F7));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F7));
 			Assert.True (v1.HasFocus);
 
-			top.ProcessKeyDown (new (Key.F6));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F6));
 			Assert.True (v4.HasFocus);
-			top.ProcessKeyDown (new (Key.F6));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F6));
 			Assert.True (v3.HasFocus);
-			top.ProcessKeyDown (new (Key.F6));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F6));
 			Assert.True (v2.HasFocus);
-			top.ProcessKeyDown (new (Key.F6));
+			top.ProcessKeyDown (new (ConsoleDriverKey.F6));
 			Assert.True (v1.HasFocus);
 
 			Application.RequestStop ();
@@ -161,13 +161,13 @@ public class KeyboardTests {
 		Application.Run (top);
 
 		// Replacing the defaults keys to avoid errors on others unit tests that are using it.
-		Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
-		Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
-		Application.QuitKey = Key.Q | Key.CtrlMask;
+		Application.AlternateForwardKey = ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask;
+		Application.AlternateBackwardKey = ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask;
+		Application.QuitKey = ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask;
 
-		Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
-		Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
-		Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+		Assert.Equal (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, Application.AlternateForwardKey);
+		Assert.Equal (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, Application.AlternateBackwardKey);
+		Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, Application.QuitKey);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -188,26 +188,26 @@ public class KeyboardTests {
 		Application.Begin (top);
 		top.Running = true;
 
-		Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+		Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, Application.QuitKey);
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.OnKeyDown(new KeyEventArgs( Key.Q | Key.CtrlMask));
+		Application.OnKeyDown(new KeyEventArgs( ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask));
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.QuitKey = Key.C | Key.CtrlMask;
+		Application.QuitKey = ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask;
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.False (isQuiting);
-		Application.OnKeyDown (new KeyEventArgs (Key.Q | Key.CtrlMask));
+		Application.OnKeyDown (new KeyEventArgs (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask));
 		Assert.False (isQuiting);
 
 		Application.OnKeyDown (new KeyEventArgs (Application.QuitKey));
 		Assert.True (isQuiting);
 
 		// Reset the QuitKey to avoid throws errors on another tests
-		Application.QuitKey = Key.Q | Key.CtrlMask;
+		Application.QuitKey = ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask;
 	}
 
 	[Fact]
@@ -231,14 +231,14 @@ public class KeyboardTests {
 		Assert.False (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 		Assert.True (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 		Assert.True (win.CanFocus);
 		Assert.True (win.HasFocus);
 		Assert.True (win2.CanFocus);
@@ -283,14 +283,14 @@ public class KeyboardTests {
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 		Assert.True (win2.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.ProcessKeyDown (new (Key.CtrlMask | Key.Tab));
+		top.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Tab));
 		Assert.False (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
@@ -319,9 +319,9 @@ public class KeyboardTests {
 			AddCommand (Command.Select, () => SelectCommand = true);
 			AddCommand (Command.Left, () => LeftCommand = true);
 
-			KeyBindings.Add (Key.G, KeyBindingScope.Global, Command.Default);
-			KeyBindings.Add (Key.H, KeyBindingScope.HotKey, Command.Select);
-			KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
+			KeyBindings.Add (ConsoleDriverKey.G, KeyBindingScope.Global, Command.Default);
+			KeyBindings.Add (ConsoleDriverKey.H, KeyBindingScope.HotKey, Command.Select);
+			KeyBindings.Add (ConsoleDriverKey.F, KeyBindingScope.Focused, Command.Left);
 		}
 	}
 
@@ -336,16 +336,16 @@ public class KeyboardTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (Key.G));
+		Application.OnKeyDown (new (ConsoleDriverKey.G));
 		Assert.True (invoked);
 
 		invoked = false;
-		Application.OnKeyDown (new (Key.H));
+		Application.OnKeyDown (new (ConsoleDriverKey.H));
 		Assert.True (invoked);
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (Key.L));
+		Application.OnKeyDown (new (ConsoleDriverKey.L));
 		Assert.False (invoked);
 
 		Assert.True (view.DefaultCommand);
@@ -364,7 +364,7 @@ public class KeyboardTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (Key.A));
+		Application.OnKeyDown (new (ConsoleDriverKey.A));
 		Assert.False (invoked);
 		Assert.False (view.DefaultCommand);
 		Assert.False (view.SelectCommand);
@@ -372,7 +372,7 @@ public class KeyboardTests {
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (Key.L));
+		Application.OnKeyDown (new (ConsoleDriverKey.L));
 		Assert.False (invoked);
 		Assert.False (view.DefaultCommand);
 		Assert.False (view.SelectCommand);

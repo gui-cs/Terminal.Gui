@@ -67,8 +67,8 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.O, "~^O~ Open", () => Open()),
-				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
+				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O, "~^O~ Open", () => Open()),
+				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S, "~^S~ Save", () => Save()),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -467,7 +467,7 @@ namespace UICatalog.Scenarios {
 
 		private void TableViewKeyPress (object sender, KeyEventArgs e)
 		{
-			if (e.Key == Key.DeleteChar) {
+			if (e.Key == ConsoleDriverKey.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

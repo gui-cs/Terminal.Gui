@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 		public override void RenderOverlay (Point renderAt)
 		{
 			if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true) {
-				ProcessKey (new ((Key)(Suggestions [0].Title [0])));
+				ProcessKey (new ((ConsoleDriverKey)(Suggestions [0].Title [0])));
 			} else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
 				LastPopupPos = null;
 				Visible = false;
@@ -300,12 +300,12 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (a.Key == Key.CursorDown) {
+			if (a.Key == ConsoleDriverKey.CursorDown) {
 				MoveDown ();
 				return true;
 			}
 
-			if (a.Key == Key.CursorUp) {
+			if (a.Key == ConsoleDriverKey.CursorUp) {
 				MoveUp ();
 				return true;
 			}

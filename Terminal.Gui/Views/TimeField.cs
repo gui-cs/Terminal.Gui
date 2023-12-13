@@ -87,23 +87,23 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => MoveRight ());
 
 			// Default keybindings for this view
-			KeyBindings.Add (Key.DeleteChar, Command.DeleteCharRight);
-			KeyBindings.Add (Key.D | Key.CtrlMask, Command.DeleteCharRight);
+			KeyBindings.Add (ConsoleDriverKey.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (ConsoleDriverKey.D | ConsoleDriverKey.CtrlMask, Command.DeleteCharRight);
 
-			KeyBindings.Add (Key.Delete, Command.DeleteCharLeft);
-			KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (ConsoleDriverKey.Delete, Command.DeleteCharLeft);
+			KeyBindings.Add (ConsoleDriverKey.Backspace, Command.DeleteCharLeft);
 
-			KeyBindings.Add (Key.Home, Command.LeftHome);
-			KeyBindings.Add (Key.A | Key.CtrlMask, Command.LeftHome);
+			KeyBindings.Add (ConsoleDriverKey.Home, Command.LeftHome);
+			KeyBindings.Add (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, Command.LeftHome);
 
-			KeyBindings.Add (Key.CursorLeft, Command.Left);
-			KeyBindings.Add (Key.B | Key.CtrlMask, Command.Left);
+			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
+			KeyBindings.Add (ConsoleDriverKey.B | ConsoleDriverKey.CtrlMask, Command.Left);
 
-			KeyBindings.Add (Key.End, Command.RightEnd);
-			KeyBindings.Add (Key.E | Key.CtrlMask, Command.RightEnd);
+			KeyBindings.Add (ConsoleDriverKey.End, Command.RightEnd);
+			KeyBindings.Add (ConsoleDriverKey.E | ConsoleDriverKey.CtrlMask, Command.RightEnd);
 
-			KeyBindings.Add (Key.CursorRight, Command.Right);
-			KeyBindings.Add (Key.F | Key.CtrlMask, Command.Right);
+			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
+			KeyBindings.Add (ConsoleDriverKey.F | ConsoleDriverKey.CtrlMask, Command.Right);
 		}
 
 		void TextField_TextChanged (object sender, TextChangedEventArgs e)
@@ -250,7 +250,7 @@ namespace Terminal.Gui {
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			// Ignore non-numeric characters.
-			if (a.Key is >= (Key)(int)Key.D0 and <= (Key)(int)Key.D9) {
+			if (a.Key is >= (ConsoleDriverKey)(int)ConsoleDriverKey.D0 and <= (ConsoleDriverKey)(int)ConsoleDriverKey.D9) {
 				if (!ReadOnly) {
 					if (SetText (a)) {
 						IncCursorPosition ();

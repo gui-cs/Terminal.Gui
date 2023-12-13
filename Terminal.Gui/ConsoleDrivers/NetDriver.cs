@@ -209,11 +209,11 @@ internal class NetEvents : IDisposable {
 					} catch (OperationCanceledException) {
 						return;
 					}
-					if ((consoleKeyInfo.KeyChar == (char)Key.Esc && !_isEscSeq)
-						|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
+					if ((consoleKeyInfo.KeyChar == (char)ConsoleDriverKey.Esc && !_isEscSeq)
+						|| (consoleKeyInfo.KeyChar != (char)ConsoleDriverKey.Esc && _isEscSeq)) {
 
-						if (_cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq) {
-							_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)Key.Esc, 0,
+						if (_cki == null && consoleKeyInfo.KeyChar != (char)ConsoleDriverKey.Esc && _isEscSeq) {
+							_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)ConsoleDriverKey.Esc, 0,
 							    false, false, false), _cki);
 						}
 						_isEscSeq = true;
@@ -224,7 +224,7 @@ internal class NetEvents : IDisposable {
 						_cki = null;
 						_isEscSeq = false;
 						break;
-					} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
+					} else if (consoleKeyInfo.KeyChar == (char)ConsoleDriverKey.Esc && _isEscSeq && _cki != null) {
 						ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
 						_cki = null;
 						if (Console.KeyAvailable) {
@@ -1003,39 +1003,39 @@ internal class NetDriver : ConsoleDriver {
 		return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
 	}
 
-	Key MapKey (ConsoleKeyInfo keyInfo)
+	ConsoleDriverKey MapKey (ConsoleKeyInfo keyInfo)
 	{
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Esc);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.Esc);
 		case ConsoleKey.Tab:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Tab);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.Tab);
 		case ConsoleKey.Home:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Home);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.Home);
 		case ConsoleKey.End:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.End);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.End);
 		case ConsoleKey.LeftArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorLeft);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorRight);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.CursorRight);
 		case ConsoleKey.UpArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.CursorUp);
 		case ConsoleKey.DownArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.CursorDown);
 		case ConsoleKey.PageUp:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PageUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.PageUp);
 		case ConsoleKey.PageDown:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PageDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.PageDown);
 		case ConsoleKey.Enter:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Enter);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.Enter);
 		case ConsoleKey.Spacebar:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? ConsoleDriverKey.Space : (ConsoleDriverKey)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Backspace);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.Backspace);
 		case ConsoleKey.Delete:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.DeleteChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.DeleteChar);
 		case ConsoleKey.Insert:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.InsertChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, ConsoleDriverKey.InsertChar);
 
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
@@ -1046,9 +1046,9 @@ internal class NetDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
-			var ret = ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
-			if (ret.HasFlag (Key.ShiftMask)) {
-				ret &= ~Key.ShiftMask;
+			var ret = ConsoleKeyMapping.MapKeyModifiers (keyInfo, (ConsoleDriverKey)((uint)keyInfo.KeyChar));
+			if (ret.HasFlag (ConsoleDriverKey.ShiftMask)) {
+				ret &= ~ConsoleDriverKey.ShiftMask;
 			}
 			return ret;
 
@@ -1056,75 +1056,75 @@ internal class NetDriver : ConsoleDriver {
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
 		case ConsoleKey.OemMinus:
-			return (Key)((uint)keyInfo.KeyChar);
+			return (ConsoleDriverKey)((uint)keyInfo.KeyChar);
 		}
 
 		var key = keyInfo.Key;
 		if (key is >= ConsoleKey.A and <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+				return (ConsoleDriverKey)(((uint)ConsoleDriverKey.CtrlMask) | ((uint)ConsoleDriverKey.A + delta));
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
+				return (ConsoleDriverKey)(((uint)ConsoleDriverKey.AltMask) | ((uint)ConsoleDriverKey.A + delta));
 			}
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (ConsoleDriverKey)((uint)ConsoleDriverKey.A + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (ConsoleDriverKey)((uint)ConsoleDriverKey.A + delta));
 				}
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) /*^ (keyInfoEx.CapsLock)*/)) {
-				if (keyInfo.KeyChar <= (uint)Key.Z) {
-					return (Key)((uint)Key.A + delta) | Key.ShiftMask;
+				if (keyInfo.KeyChar <= (uint)ConsoleDriverKey.Z) {
+					return (ConsoleDriverKey)((uint)ConsoleDriverKey.A + delta) | ConsoleDriverKey.ShiftMask;
 				}
 			}
 
-			if (((Key)((uint)keyInfo.KeyChar) & Key.Space) == Key.Space) {
-				return (Key)((uint)keyInfo.KeyChar) & ~Key.Space;
+			if (((ConsoleDriverKey)((uint)keyInfo.KeyChar) & ConsoleDriverKey.Space) == ConsoleDriverKey.Space) {
+				return (ConsoleDriverKey)((uint)keyInfo.KeyChar) & ~ConsoleDriverKey.Space;
 			}
-			return (Key)(uint)keyInfo.KeyChar;
+			return (ConsoleDriverKey)(uint)keyInfo.KeyChar;
 		}
 		if (key is >= ConsoleKey.D0 and <= ConsoleKey.D9) {
 			var delta = key - ConsoleKey.D0;
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
+				return (ConsoleDriverKey)(((uint)ConsoleDriverKey.AltMask) | ((uint)ConsoleDriverKey.D0 + delta));
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+				return (ConsoleDriverKey)(((uint)ConsoleDriverKey.CtrlMask) | ((uint)ConsoleDriverKey.D0 + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
-					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)ConsoleDriverKey.D0 + delta)) {
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (ConsoleDriverKey)((uint)ConsoleDriverKey.D0 + delta));
 				}
 			}
-			return (Key)((uint)keyInfo.KeyChar);
+			return (ConsoleDriverKey)((uint)keyInfo.KeyChar);
 		}
 		if (key is >= ConsoleKey.F1 and <= ConsoleKey.F12) {
 			var delta = key - ConsoleKey.F1;
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (ConsoleDriverKey)((uint)ConsoleDriverKey.F1 + delta));
 			}
 
-			return (Key)((uint)Key.F1 + delta);
+			return (ConsoleDriverKey)((uint)ConsoleDriverKey.F1 + delta);
 		}
 
 		// Is it a key between a..z?
 		if ((char)keyInfo.KeyChar is >= 'a' and <= 'z') {
 			// 'a' should be Key.A
-			return (Key)((uint)keyInfo.KeyChar) & ~Key.Space;
+			return (ConsoleDriverKey)((uint)keyInfo.KeyChar) & ~ConsoleDriverKey.Space;
 		}
 
 		// Is it a key between A..Z?
-		if (((Key)((uint)keyInfo.KeyChar) & ~Key.Space) is >= Key.A and <= Key.Z) {
+		if (((ConsoleDriverKey)((uint)keyInfo.KeyChar) & ~ConsoleDriverKey.Space) is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
 			// It's Key.A...Z.  Make it Key.A | Key.ShiftMask
-			return (Key)((uint)keyInfo.KeyChar) & ~Key.Space | Key.ShiftMask;
+			return (ConsoleDriverKey)((uint)keyInfo.KeyChar) & ~ConsoleDriverKey.Space | ConsoleDriverKey.ShiftMask;
 		}
 
-		return (Key)(uint)keyInfo.KeyChar;
+		return (ConsoleDriverKey)(uint)keyInfo.KeyChar;
 	}
 
 	volatile bool _winSizeChanging;

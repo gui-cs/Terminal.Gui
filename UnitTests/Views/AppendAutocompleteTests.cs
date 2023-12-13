@@ -28,7 +28,7 @@ namespace Terminal.Gui.TextTests {
 			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
 
-			tf.ProcessKeyDown (new ((Key)'f'));
+			tf.ProcessKeyDown (new ((ConsoleDriverKey)'f'));
 
 			tf.Draw ();
 			tf.PositionCursor ();
@@ -61,10 +61,10 @@ namespace Terminal.Gui.TextTests {
 			tf.Draw ();
 			tf.PositionCursor ();
 			TestHelpers.AssertDriverContentsAre ("", output);
-			tf.ProcessKeyDown (new ((Key)'m'));
-			tf.ProcessKeyDown (new ((Key)'y'));
-			tf.ProcessKeyDown (new (Key.Space));
-			tf.ProcessKeyDown (new ((Key)'f'));
+			tf.ProcessKeyDown (new ((ConsoleDriverKey)'m'));
+			tf.ProcessKeyDown (new ((ConsoleDriverKey)'y'));
+			tf.ProcessKeyDown (new (ConsoleDriverKey.Space));
+			tf.ProcessKeyDown (new ((ConsoleDriverKey)'f'));
 			Assert.Equal ("my f", tf.Text);
 
 			// Even though there is no match on case we should still get the suggestion

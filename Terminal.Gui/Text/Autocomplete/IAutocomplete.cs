@@ -56,17 +56,17 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
 		/// </summary>
-		Key SelectionKey { get; set; }
+		ConsoleDriverKey SelectionKey { get; set; }
 
 		/// <summary>
 		/// The key that the user can press to close the currently popped autocomplete menu
 		/// </summary>
-		Key CloseKey { get; set; }
+		ConsoleDriverKey CloseKey { get; set; }
 
 		/// <summary>
 		/// The key that the user can press to reopen the currently popped autocomplete menu
 		/// </summary>
-		Key Reopen { get; set; }
+		ConsoleDriverKey Reopen { get; set; }
 
 		/// <summary>
 		/// The context used by the autocomplete menu.

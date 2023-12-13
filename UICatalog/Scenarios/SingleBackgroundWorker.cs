@@ -28,16 +28,16 @@ namespace UICatalog.Scenarios {
 			{
 				var menu = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_Options", new MenuItem [] {
-						new MenuItem ("_Run Worker", "", () => RunWorker(), null, null, Key.CtrlMask | Key.R),
+						new MenuItem ("_Run Worker", "", () => RunWorker(), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R),
 						null,
-						new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, Key.CtrlMask | Key.Q)
+						new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q)
 					})
 				});
 				Add (menu);
 
 				var statusBar = new StatusBar (new [] {
 					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Application.RequestStop()),
-					new StatusItem(Key.CtrlMask | Key.P, "~^R~ Run Worker", () => RunWorker())
+					new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.P, "~^R~ Run Worker", () => RunWorker())
 				});
 				Add (statusBar);
 
@@ -149,13 +149,13 @@ namespace UICatalog.Scenarios {
 
 				var menu = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_Stage", new MenuItem [] {
-						new MenuItem ("_Close", "", () => { if (Close()) { Application.RequestStop(); } }, null, null, Key.CtrlMask | Key.C)
+						new MenuItem ("_Close", "", () => { if (Close()) { Application.RequestStop(); } }, null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C)
 					})
 				});
 				top.Add (menu);
 
 				var statusBar = new StatusBar (new [] {
-					new StatusItem(Key.CtrlMask | Key.C, "~^C~ Close", () => { if (Close()) { Application.RequestStop(); } }),
+					new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C, "~^C~ Close", () => { if (Close()) { Application.RequestStop(); } }),
 				});
 				top.Add (statusBar);
 

@@ -71,7 +71,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.Accept, () => AcceptKey ());
 
 			// Default key bindings for this view
-			KeyBindings.Add (Key.Space, Command.Accept);
+			KeyBindings.Add (ConsoleDriverKey.Space, Command.Accept);
 		}
 
 		bool AcceptKey ()

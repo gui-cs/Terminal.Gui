@@ -125,22 +125,22 @@ public class KeyTests {
 	[Fact]
 	public void Key_Enum_Ambiguity_Check ()
 	{
-		var key = Key.Y | Key.CtrlMask;
+		var key = ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask;
 
 		// This will not be well compared.
-		Assert.True (key.HasFlag (Key.Q | Key.CtrlMask));
-		Assert.True ((key & (Key.Q | Key.CtrlMask)) != 0);
-		Assert.Equal (Key.Y | Key.CtrlMask, key);
+		Assert.True (key.HasFlag (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask));
+		Assert.True ((key & (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask)) != 0);
+		Assert.Equal (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask, key);
 		Assert.Equal ("Y, CtrlMask", key.ToString ());
 
 		// This will be well compared, because the Key.CtrlMask have a high value.
 		Assert.False (key == Application.QuitKey);
 		switch (key) {
-		case Key.Q | Key.CtrlMask:
+		case ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask:
 			// Never goes here.
 			break;
-		case Key.Y | Key.CtrlMask:
-			Assert.True (key == (Key.Y | Key.CtrlMask));
+		case ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask:
+			Assert.True (key == (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask));
 			break;
 		default:
 			// Never goes here.
@@ -151,35 +151,35 @@ public class KeyTests {
 	[Fact]
 	public void KeyEnum_ShouldHaveCorrectValues ()
 	{
-		Assert.Equal (0, (int)Key.Null);
-		Assert.Equal (8, (int)Key.Backspace);
-		Assert.Equal (9, (int)Key.Tab);
+		Assert.Equal (0, (int)ConsoleDriverKey.Null);
+		Assert.Equal (8, (int)ConsoleDriverKey.Backspace);
+		Assert.Equal (9, (int)ConsoleDriverKey.Tab);
 		// Continue for other keys...
 	}
 
 	[Fact]
 	public void Key_ToString ()
 	{
-		var k = Key.Y | Key.CtrlMask;
+		var k = ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask;
 		Assert.Equal ("Y, CtrlMask", k.ToString ());
 
-		k = Key.CtrlMask | Key.Y;
+		k = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Y;
 		Assert.Equal ("Y, CtrlMask", k.ToString ());
 
-		k = Key.Space;
+		k = ConsoleDriverKey.Space;
 		Assert.Equal ("Space", k.ToString ());
 
-		k = Key.D;
+		k = ConsoleDriverKey.D;
 		Assert.Equal ("D", k.ToString ());
 
-		k = (Key)'d';
+		k = (ConsoleDriverKey)'d';
 		Assert.Equal ("d", ((char)k).ToString ());
 
-		k = Key.D;
+		k = ConsoleDriverKey.D;
 		Assert.Equal ("D", k.ToString ());
 
 		// In a console this will always returns Key.D
-		k = Key.D | Key.ShiftMask;
+		k = ConsoleDriverKey.D | ConsoleDriverKey.ShiftMask;
 		Assert.Equal ("D, ShiftMask", k.ToString ());
 	}
 
@@ -196,7 +196,7 @@ public class KeyTests {
 	[AutoInitShutdown]
 	[ClassData (typeof (PacketTest))]
 	public void TestVKPacket (uint unicodeCharacter, bool shift, bool alt, bool control, uint initialVirtualKey,
-				uint initialScanCode, Key expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
+				uint initialScanCode, ConsoleDriverKey expectedRemapping, uint expectedVirtualKey, uint expectedScanCode)
 	{
 		lock (packetLock) {
 			Application._forceFakeConsole = true;
@@ -263,124 +263,124 @@ public class KeyTests {
 		{
 			lock (packetLock) {
 				// unicodeCharacter, shift, alt, control, initialVirtualKey, initialScanCode, expectedRemapping, expectedVirtualKey, expectedScanCode
-				yield return new object [] { 'a', false, false, false, 'A', 30, Key.A, 'A', 30 };
+				yield return new object [] { 'a', false, false, false, 'A', 30, ConsoleDriverKey.A, 'A', 30 };
 #if BROKE_WITH_2927
 					// If the input unicode char is `A`, the output should be `A` (which means Key.A | Key.ShiftMask) and not `a` .
 					// It think the bug is in GetKeyCharFromConsoleKey
 					yield return new object [] { 'A', false, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
 #endif
-				yield return new object [] { 'A', true, false, false, 'A', 30, Key.A | Key.ShiftMask, 'A', 30 };
-				yield return new object [] { 'A', true, true, false, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask, 'A', 30 };
-				yield return new object [] { 'A', true, true, true, 'A', 30, Key.A | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'A', 30 };
+				yield return new object [] { 'A', true, false, false, 'A', 30, ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask, 'A', 30 };
+				yield return new object [] { 'A', true, true, false, 'A', 30, ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 'A', 30 };
+				yield return new object [] { 'A', true, true, true, 'A', 30, ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 'A', 30 };
 
-				yield return new object [] { 'z', false, false, false, 'Z', 44, Key.Z, 'Z', 44 };
+				yield return new object [] { 'z', false, false, false, 'Z', 44, ConsoleDriverKey.Z, 'Z', 44 };
 #if BROKE_WITH_2927
 					yield return new object [] { 'Z', false, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'Z', 44 };
 #endif
-				yield return new object [] { 'Z', true, false, false, 'Z', 44, Key.Z | Key.ShiftMask, 'Z', 44 };
-				yield return new object [] { 'Z', true, true, false, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask, 'Z', 44 };
-				yield return new object [] { 'Z', true, true, true, 'Z', 44, Key.Z | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 'Z', 44 };
-				yield return new object [] { '英', false, false, false, '\0', 0, (Key)'英', '\0', 0 };
-				yield return new object [] { '英', true, false, false, '\0', 0, (Key)'英' | Key.ShiftMask, '\0', 0 };
-				yield return new object [] { '英', true, true, false, '\0', 0, (Key)'英' | Key.ShiftMask | Key.AltMask, '\0', 0 };
-				yield return new object [] { '英', true, true, true, '\0', 0, (Key)'英' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '\0', 0 };
-				yield return new object [] { '+', false, false, false, 187, 26, (Key)'+', 187, 26 };
-				yield return new object [] { '*', true, false, false, 187, 26, (Key)'*' | Key.ShiftMask, 187, 26 };
-				yield return new object [] { '+', true, true, false, 187, 26, (Key)'+' | Key.ShiftMask | Key.AltMask, 187, 26 };
-				yield return new object [] { '+', true, true, true, 187, 26, (Key)'+' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 187, 26 };
-				yield return new object [] { '1', false, false, false, '1', 2, Key.D1, '1', 2 };
-				yield return new object [] { '!', true, false, false, '1', 2, (Key)'!' | Key.ShiftMask, '1', 2 };
-				yield return new object [] { '1', true, true, false, '1', 2, Key.D1 | Key.ShiftMask | Key.AltMask, '1', 2 };
-				yield return new object [] { '1', true, true, true, '1', 2, Key.D1 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '1', 2 };
-				yield return new object [] { '1', false, true, true, '1', 2, Key.D1 | Key.AltMask | Key.CtrlMask, '1', 2 };
-				yield return new object [] { '2', false, false, false, '2', 3, Key.D2, '2', 3 };
-				yield return new object [] { '"', true, false, false, '2', 3, (Key)'"' | Key.ShiftMask, '2', 3 };
-				yield return new object [] { '2', true, true, false, '2', 3, Key.D2 | Key.ShiftMask | Key.AltMask, '2', 3 };
-				yield return new object [] { '2', true, true, true, '2', 3, Key.D2 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '2', 3 };
-				yield return new object [] { '@', false, true, true, '2', 3, (Key)'@' | Key.AltMask | Key.CtrlMask, '2', 3 };
-				yield return new object [] { '3', false, false, false, '3', 4, Key.D3, '3', 4 };
-				yield return new object [] { '#', true, false, false, '3', 4, (Key)'#' | Key.ShiftMask, '3', 4 };
-				yield return new object [] { '3', true, true, false, '3', 4, Key.D3 | Key.ShiftMask | Key.AltMask, '3', 4 };
-				yield return new object [] { '3', true, true, true, '3', 4, Key.D3 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '3', 4 };
-				yield return new object [] { '£', false, true, true, '3', 4, (Key)'£' | Key.AltMask | Key.CtrlMask, '3', 4 };
-				yield return new object [] { '4', false, false, false, '4', 5, Key.D4, '4', 5 };
-				yield return new object [] { '$', true, false, false, '4', 5, (Key)'$' | Key.ShiftMask, '4', 5 };
-				yield return new object [] { '4', true, true, false, '4', 5, Key.D4 | Key.ShiftMask | Key.AltMask, '4', 5 };
-				yield return new object [] { '4', true, true, true, '4', 5, Key.D4 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '4', 5 };
-				yield return new object [] { '§', false, true, true, '4', 5, (Key)'§' | Key.AltMask | Key.CtrlMask, '4', 5 };
-				yield return new object [] { '5', false, false, false, '5', 6, Key.D5, '5', 6 };
-				yield return new object [] { '%', true, false, false, '5', 6, (Key)'%' | Key.ShiftMask, '5', 6 };
-				yield return new object [] { '5', true, true, false, '5', 6, Key.D5 | Key.ShiftMask | Key.AltMask, '5', 6 };
-				yield return new object [] { '5', true, true, true, '5', 6, Key.D5 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '5', 6 };
-				yield return new object [] { '€', false, true, true, '5', 6, (Key)'€' | Key.AltMask | Key.CtrlMask, '5', 6 };
-				yield return new object [] { '6', false, false, false, '6', 7, Key.D6, '6', 7 };
-				yield return new object [] { '&', true, false, false, '6', 7, (Key)'&' | Key.ShiftMask, '6', 7 };
-				yield return new object [] { '6', true, true, false, '6', 7, Key.D6 | Key.ShiftMask | Key.AltMask, '6', 7 };
-				yield return new object [] { '6', true, true, true, '6', 7, Key.D6 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '6', 7 };
-				yield return new object [] { '6', false, true, true, '6', 7, Key.D6 | Key.AltMask | Key.CtrlMask, '6', 7 };
-				yield return new object [] { '7', false, false, false, '7', 8, Key.D7, '7', 8 };
-				yield return new object [] { '/', true, false, false, '7', 8, (Key)'/' | Key.ShiftMask, '7', 8 };
-				yield return new object [] { '7', true, true, false, '7', 8, Key.D7 | Key.ShiftMask | Key.AltMask, '7', 8 };
-				yield return new object [] { '7', true, true, true, '7', 8, Key.D7 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '7', 8 };
-				yield return new object [] { '{', false, true, true, '7', 8, (Key)'{' | Key.AltMask | Key.CtrlMask, '7', 8 };
-				yield return new object [] { '8', false, false, false, '8', 9, Key.D8, '8', 9 };
-				yield return new object [] { '(', true, false, false, '8', 9, (Key)'(' | Key.ShiftMask, '8', 9 };
-				yield return new object [] { '8', true, true, false, '8', 9, Key.D8 | Key.ShiftMask | Key.AltMask, '8', 9 };
-				yield return new object [] { '8', true, true, true, '8', 9, Key.D8 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '8', 9 };
-				yield return new object [] { '[', false, true, true, '8', 9, (Key)'[' | Key.AltMask | Key.CtrlMask, '8', 9 };
-				yield return new object [] { '9', false, false, false, '9', 10, Key.D9, '9', 10 };
-				yield return new object [] { ')', true, false, false, '9', 10, (Key)')' | Key.ShiftMask, '9', 10 };
-				yield return new object [] { '9', true, true, false, '9', 10, Key.D9 | Key.ShiftMask | Key.AltMask, '9', 10 };
-				yield return new object [] { '9', true, true, true, '9', 10, Key.D9 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '9', 10 };
-				yield return new object [] { ']', false, true, true, '9', 10, (Key)']' | Key.AltMask | Key.CtrlMask, '9', 10 };
-				yield return new object [] { '0', false, false, false, '0', 11, Key.D0, '0', 11 };
-				yield return new object [] { '=', true, false, false, '0', 11, (Key)'=' | Key.ShiftMask, '0', 11 };
-				yield return new object [] { '0', true, true, false, '0', 11, Key.D0 | Key.ShiftMask | Key.AltMask, '0', 11 };
-				yield return new object [] { '0', true, true, true, '0', 11, Key.D0 | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '0', 11 };
-				yield return new object [] { '}', false, true, true, '0', 11, (Key)'}' | Key.AltMask | Key.CtrlMask, '0', 11 };
-				yield return new object [] { '\'', false, false, false, 219, 12, (Key)'\'', 219, 12 };
-				yield return new object [] { '?', true, false, false, 219, 12, (Key)'?' | Key.ShiftMask, 219, 12 };
-				yield return new object [] { '\'', true, true, false, 219, 12, (Key)'\'' | Key.ShiftMask | Key.AltMask, 219, 12 };
-				yield return new object [] { '\'', true, true, true, 219, 12, (Key)'\'' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 219, 12 };
-				yield return new object [] { '«', false, false, false, 221, 13, (Key)'«', 221, 13 };
-				yield return new object [] { '»', true, false, false, 221, 13, (Key)'»' | Key.ShiftMask, 221, 13 };
-				yield return new object [] { '«', true, true, false, 221, 13, (Key)'«' | Key.ShiftMask | Key.AltMask, 221, 13 };
-				yield return new object [] { '«', true, true, true, 221, 13, (Key)'«' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 221, 13 };
-				yield return new object [] { 'á', false, false, false, 'á', 0, (Key)'á', 'A', 30 };
-				yield return new object [] { 'Á', true, false, false, 'Á', 0, (Key)'Á' | Key.ShiftMask, 'A', 30 };
-				yield return new object [] { 'à', false, false, false, 'à', 0, (Key)'à', 'A', 30 };
-				yield return new object [] { 'À', true, false, false, 'À', 0, (Key)'À' | Key.ShiftMask, 'A', 30 };
-				yield return new object [] { 'é', false, false, false, 'é', 0, (Key)'é', 'E', 18 };
-				yield return new object [] { 'É', true, false, false, 'É', 0, (Key)'É' | Key.ShiftMask, 'E', 18 };
-				yield return new object [] { 'è', false, false, false, 'è', 0, (Key)'è', 'E', 18 };
-				yield return new object [] { 'È', true, false, false, 'È', 0, (Key)'È' | Key.ShiftMask, 'E', 18 };
-				yield return new object [] { 'í', false, false, false, 'í', 0, (Key)'í', 'I', 23 };
-				yield return new object [] { 'Í', true, false, false, 'Í', 0, (Key)'Í' | Key.ShiftMask, 'I', 23 };
-				yield return new object [] { 'ì', false, false, false, 'ì', 0, (Key)'ì', 'I', 23 };
-				yield return new object [] { 'Ì', true, false, false, 'Ì', 0, (Key)'Ì' | Key.ShiftMask, 'I', 23 };
-				yield return new object [] { 'ó', false, false, false, 'ó', 0, (Key)'ó', 'O', 24 };
-				yield return new object [] { 'Ó', true, false, false, 'Ó', 0, (Key)'Ó' | Key.ShiftMask, 'O', 24 };
-				yield return new object [] { 'ò', false, false, false, 'Ó', 0, (Key)'ò', 'O', 24 };
-				yield return new object [] { 'Ò', true, false, false, 'Ò', 0, (Key)'Ò' | Key.ShiftMask, 'O', 24 };
-				yield return new object [] { 'ú', false, false, false, 'ú', 0, (Key)'ú', 'U', 22 };
-				yield return new object [] { 'Ú', true, false, false, 'Ú', 0, (Key)'Ú' | Key.ShiftMask, 'U', 22 };
-				yield return new object [] { 'ù', false, false, false, 'ù', 0, (Key)'ù', 'U', 22 };
-				yield return new object [] { 'Ù', true, false, false, 'Ù', 0, (Key)'Ù' | Key.ShiftMask, 'U', 22 };
-				yield return new object [] { 'ö', false, false, false, 'ó', 0, (Key)'ö', 'O', 24 };
-				yield return new object [] { 'Ö', true, false, false, 'Ó', 0, (Key)'Ö' | Key.ShiftMask, 'O', 24 };
-				yield return new object [] { '<', false, false, false, 226, 86, (Key)'<', 226, 86 };
-				yield return new object [] { '>', true, false, false, 226, 86, (Key)'>' | Key.ShiftMask, 226, 86 };
-				yield return new object [] { '<', true, true, false, 226, 86, (Key)'<' | Key.ShiftMask | Key.AltMask, 226, 86 };
-				yield return new object [] { '<', true, true, true, 226, 86, (Key)'<' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 226, 86 };
-				yield return new object [] { 'ç', false, false, false, 192, 39, (Key)'ç', 192, 39 };
-				yield return new object [] { 'Ç', true, false, false, 192, 39, (Key)'Ç' | Key.ShiftMask, 192, 39 };
-				yield return new object [] { 'ç', true, true, false, 192, 39, (Key)'ç' | Key.ShiftMask | Key.AltMask, 192, 39 };
-				yield return new object [] { 'ç', true, true, true, 192, 39, (Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 192, 39 };
-				yield return new object [] { '¨', false, true, true, 187, 26, (Key)'¨' | Key.AltMask | Key.CtrlMask, 187, 26 };
-				yield return new object [] { (uint)Key.PageUp, false, false, false, 33, 73, Key.PageUp, 33, 73 };
-				yield return new object [] { (uint)Key.PageUp, true, false, false, 33, 73, Key.PageUp | Key.ShiftMask, 33, 73 };
-				yield return new object [] { (uint)Key.PageUp, true, true, false, 33, 73, Key.PageUp | Key.ShiftMask | Key.AltMask, 33, 73 };
-				yield return new object [] { (uint)Key.PageUp, true, true, true, 33, 73, Key.PageUp | Key.ShiftMask | Key.AltMask | Key.CtrlMask, 33, 73 };
+				yield return new object [] { 'Z', true, false, false, 'Z', 44, ConsoleDriverKey.Z | ConsoleDriverKey.ShiftMask, 'Z', 44 };
+				yield return new object [] { 'Z', true, true, false, 'Z', 44, ConsoleDriverKey.Z | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 'Z', 44 };
+				yield return new object [] { 'Z', true, true, true, 'Z', 44, ConsoleDriverKey.Z | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 'Z', 44 };
+				yield return new object [] { '英', false, false, false, '\0', 0, (ConsoleDriverKey)'英', '\0', 0 };
+				yield return new object [] { '英', true, false, false, '\0', 0, (ConsoleDriverKey)'英' | ConsoleDriverKey.ShiftMask, '\0', 0 };
+				yield return new object [] { '英', true, true, false, '\0', 0, (ConsoleDriverKey)'英' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '\0', 0 };
+				yield return new object [] { '英', true, true, true, '\0', 0, (ConsoleDriverKey)'英' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '\0', 0 };
+				yield return new object [] { '+', false, false, false, 187, 26, (ConsoleDriverKey)'+', 187, 26 };
+				yield return new object [] { '*', true, false, false, 187, 26, (ConsoleDriverKey)'*' | ConsoleDriverKey.ShiftMask, 187, 26 };
+				yield return new object [] { '+', true, true, false, 187, 26, (ConsoleDriverKey)'+' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 187, 26 };
+				yield return new object [] { '+', true, true, true, 187, 26, (ConsoleDriverKey)'+' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 187, 26 };
+				yield return new object [] { '1', false, false, false, '1', 2, ConsoleDriverKey.D1, '1', 2 };
+				yield return new object [] { '!', true, false, false, '1', 2, (ConsoleDriverKey)'!' | ConsoleDriverKey.ShiftMask, '1', 2 };
+				yield return new object [] { '1', true, true, false, '1', 2, ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '1', 2 };
+				yield return new object [] { '1', true, true, true, '1', 2, ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '1', 2 };
+				yield return new object [] { '1', false, true, true, '1', 2, ConsoleDriverKey.D1 | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '1', 2 };
+				yield return new object [] { '2', false, false, false, '2', 3, ConsoleDriverKey.D2, '2', 3 };
+				yield return new object [] { '"', true, false, false, '2', 3, (ConsoleDriverKey)'"' | ConsoleDriverKey.ShiftMask, '2', 3 };
+				yield return new object [] { '2', true, true, false, '2', 3, ConsoleDriverKey.D2 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '2', 3 };
+				yield return new object [] { '2', true, true, true, '2', 3, ConsoleDriverKey.D2 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '2', 3 };
+				yield return new object [] { '@', false, true, true, '2', 3, (ConsoleDriverKey)'@' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '2', 3 };
+				yield return new object [] { '3', false, false, false, '3', 4, ConsoleDriverKey.D3, '3', 4 };
+				yield return new object [] { '#', true, false, false, '3', 4, (ConsoleDriverKey)'#' | ConsoleDriverKey.ShiftMask, '3', 4 };
+				yield return new object [] { '3', true, true, false, '3', 4, ConsoleDriverKey.D3 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '3', 4 };
+				yield return new object [] { '3', true, true, true, '3', 4, ConsoleDriverKey.D3 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '3', 4 };
+				yield return new object [] { '£', false, true, true, '3', 4, (ConsoleDriverKey)'£' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '3', 4 };
+				yield return new object [] { '4', false, false, false, '4', 5, ConsoleDriverKey.D4, '4', 5 };
+				yield return new object [] { '$', true, false, false, '4', 5, (ConsoleDriverKey)'$' | ConsoleDriverKey.ShiftMask, '4', 5 };
+				yield return new object [] { '4', true, true, false, '4', 5, ConsoleDriverKey.D4 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '4', 5 };
+				yield return new object [] { '4', true, true, true, '4', 5, ConsoleDriverKey.D4 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '4', 5 };
+				yield return new object [] { '§', false, true, true, '4', 5, (ConsoleDriverKey)'§' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '4', 5 };
+				yield return new object [] { '5', false, false, false, '5', 6, ConsoleDriverKey.D5, '5', 6 };
+				yield return new object [] { '%', true, false, false, '5', 6, (ConsoleDriverKey)'%' | ConsoleDriverKey.ShiftMask, '5', 6 };
+				yield return new object [] { '5', true, true, false, '5', 6, ConsoleDriverKey.D5 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '5', 6 };
+				yield return new object [] { '5', true, true, true, '5', 6, ConsoleDriverKey.D5 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '5', 6 };
+				yield return new object [] { '€', false, true, true, '5', 6, (ConsoleDriverKey)'€' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '5', 6 };
+				yield return new object [] { '6', false, false, false, '6', 7, ConsoleDriverKey.D6, '6', 7 };
+				yield return new object [] { '&', true, false, false, '6', 7, (ConsoleDriverKey)'&' | ConsoleDriverKey.ShiftMask, '6', 7 };
+				yield return new object [] { '6', true, true, false, '6', 7, ConsoleDriverKey.D6 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '6', 7 };
+				yield return new object [] { '6', true, true, true, '6', 7, ConsoleDriverKey.D6 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '6', 7 };
+				yield return new object [] { '6', false, true, true, '6', 7, ConsoleDriverKey.D6 | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '6', 7 };
+				yield return new object [] { '7', false, false, false, '7', 8, ConsoleDriverKey.D7, '7', 8 };
+				yield return new object [] { '/', true, false, false, '7', 8, (ConsoleDriverKey)'/' | ConsoleDriverKey.ShiftMask, '7', 8 };
+				yield return new object [] { '7', true, true, false, '7', 8, ConsoleDriverKey.D7 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '7', 8 };
+				yield return new object [] { '7', true, true, true, '7', 8, ConsoleDriverKey.D7 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '7', 8 };
+				yield return new object [] { '{', false, true, true, '7', 8, (ConsoleDriverKey)'{' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '7', 8 };
+				yield return new object [] { '8', false, false, false, '8', 9, ConsoleDriverKey.D8, '8', 9 };
+				yield return new object [] { '(', true, false, false, '8', 9, (ConsoleDriverKey)'(' | ConsoleDriverKey.ShiftMask, '8', 9 };
+				yield return new object [] { '8', true, true, false, '8', 9, ConsoleDriverKey.D8 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '8', 9 };
+				yield return new object [] { '8', true, true, true, '8', 9, ConsoleDriverKey.D8 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '8', 9 };
+				yield return new object [] { '[', false, true, true, '8', 9, (ConsoleDriverKey)'[' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '8', 9 };
+				yield return new object [] { '9', false, false, false, '9', 10, ConsoleDriverKey.D9, '9', 10 };
+				yield return new object [] { ')', true, false, false, '9', 10, (ConsoleDriverKey)')' | ConsoleDriverKey.ShiftMask, '9', 10 };
+				yield return new object [] { '9', true, true, false, '9', 10, ConsoleDriverKey.D9 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '9', 10 };
+				yield return new object [] { '9', true, true, true, '9', 10, ConsoleDriverKey.D9 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '9', 10 };
+				yield return new object [] { ']', false, true, true, '9', 10, (ConsoleDriverKey)']' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '9', 10 };
+				yield return new object [] { '0', false, false, false, '0', 11, ConsoleDriverKey.D0, '0', 11 };
+				yield return new object [] { '=', true, false, false, '0', 11, (ConsoleDriverKey)'=' | ConsoleDriverKey.ShiftMask, '0', 11 };
+				yield return new object [] { '0', true, true, false, '0', 11, ConsoleDriverKey.D0 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, '0', 11 };
+				yield return new object [] { '0', true, true, true, '0', 11, ConsoleDriverKey.D0 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '0', 11 };
+				yield return new object [] { '}', false, true, true, '0', 11, (ConsoleDriverKey)'}' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, '0', 11 };
+				yield return new object [] { '\'', false, false, false, 219, 12, (ConsoleDriverKey)'\'', 219, 12 };
+				yield return new object [] { '?', true, false, false, 219, 12, (ConsoleDriverKey)'?' | ConsoleDriverKey.ShiftMask, 219, 12 };
+				yield return new object [] { '\'', true, true, false, 219, 12, (ConsoleDriverKey)'\'' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 219, 12 };
+				yield return new object [] { '\'', true, true, true, 219, 12, (ConsoleDriverKey)'\'' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 219, 12 };
+				yield return new object [] { '«', false, false, false, 221, 13, (ConsoleDriverKey)'«', 221, 13 };
+				yield return new object [] { '»', true, false, false, 221, 13, (ConsoleDriverKey)'»' | ConsoleDriverKey.ShiftMask, 221, 13 };
+				yield return new object [] { '«', true, true, false, 221, 13, (ConsoleDriverKey)'«' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 221, 13 };
+				yield return new object [] { '«', true, true, true, 221, 13, (ConsoleDriverKey)'«' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 221, 13 };
+				yield return new object [] { 'á', false, false, false, 'á', 0, (ConsoleDriverKey)'á', 'A', 30 };
+				yield return new object [] { 'Á', true, false, false, 'Á', 0, (ConsoleDriverKey)'Á' | ConsoleDriverKey.ShiftMask, 'A', 30 };
+				yield return new object [] { 'à', false, false, false, 'à', 0, (ConsoleDriverKey)'à', 'A', 30 };
+				yield return new object [] { 'À', true, false, false, 'À', 0, (ConsoleDriverKey)'À' | ConsoleDriverKey.ShiftMask, 'A', 30 };
+				yield return new object [] { 'é', false, false, false, 'é', 0, (ConsoleDriverKey)'é', 'E', 18 };
+				yield return new object [] { 'É', true, false, false, 'É', 0, (ConsoleDriverKey)'É' | ConsoleDriverKey.ShiftMask, 'E', 18 };
+				yield return new object [] { 'è', false, false, false, 'è', 0, (ConsoleDriverKey)'è', 'E', 18 };
+				yield return new object [] { 'È', true, false, false, 'È', 0, (ConsoleDriverKey)'È' | ConsoleDriverKey.ShiftMask, 'E', 18 };
+				yield return new object [] { 'í', false, false, false, 'í', 0, (ConsoleDriverKey)'í', 'I', 23 };
+				yield return new object [] { 'Í', true, false, false, 'Í', 0, (ConsoleDriverKey)'Í' | ConsoleDriverKey.ShiftMask, 'I', 23 };
+				yield return new object [] { 'ì', false, false, false, 'ì', 0, (ConsoleDriverKey)'ì', 'I', 23 };
+				yield return new object [] { 'Ì', true, false, false, 'Ì', 0, (ConsoleDriverKey)'Ì' | ConsoleDriverKey.ShiftMask, 'I', 23 };
+				yield return new object [] { 'ó', false, false, false, 'ó', 0, (ConsoleDriverKey)'ó', 'O', 24 };
+				yield return new object [] { 'Ó', true, false, false, 'Ó', 0, (ConsoleDriverKey)'Ó' | ConsoleDriverKey.ShiftMask, 'O', 24 };
+				yield return new object [] { 'ò', false, false, false, 'Ó', 0, (ConsoleDriverKey)'ò', 'O', 24 };
+				yield return new object [] { 'Ò', true, false, false, 'Ò', 0, (ConsoleDriverKey)'Ò' | ConsoleDriverKey.ShiftMask, 'O', 24 };
+				yield return new object [] { 'ú', false, false, false, 'ú', 0, (ConsoleDriverKey)'ú', 'U', 22 };
+				yield return new object [] { 'Ú', true, false, false, 'Ú', 0, (ConsoleDriverKey)'Ú' | ConsoleDriverKey.ShiftMask, 'U', 22 };
+				yield return new object [] { 'ù', false, false, false, 'ù', 0, (ConsoleDriverKey)'ù', 'U', 22 };
+				yield return new object [] { 'Ù', true, false, false, 'Ù', 0, (ConsoleDriverKey)'Ù' | ConsoleDriverKey.ShiftMask, 'U', 22 };
+				yield return new object [] { 'ö', false, false, false, 'ó', 0, (ConsoleDriverKey)'ö', 'O', 24 };
+				yield return new object [] { 'Ö', true, false, false, 'Ó', 0, (ConsoleDriverKey)'Ö' | ConsoleDriverKey.ShiftMask, 'O', 24 };
+				yield return new object [] { '<', false, false, false, 226, 86, (ConsoleDriverKey)'<', 226, 86 };
+				yield return new object [] { '>', true, false, false, 226, 86, (ConsoleDriverKey)'>' | ConsoleDriverKey.ShiftMask, 226, 86 };
+				yield return new object [] { '<', true, true, false, 226, 86, (ConsoleDriverKey)'<' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 226, 86 };
+				yield return new object [] { '<', true, true, true, 226, 86, (ConsoleDriverKey)'<' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 226, 86 };
+				yield return new object [] { 'ç', false, false, false, 192, 39, (ConsoleDriverKey)'ç', 192, 39 };
+				yield return new object [] { 'Ç', true, false, false, 192, 39, (ConsoleDriverKey)'Ç' | ConsoleDriverKey.ShiftMask, 192, 39 };
+				yield return new object [] { 'ç', true, true, false, 192, 39, (ConsoleDriverKey)'ç' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 192, 39 };
+				yield return new object [] { 'ç', true, true, true, 192, 39, (ConsoleDriverKey)'ç' | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 192, 39 };
+				yield return new object [] { '¨', false, true, true, 187, 26, (ConsoleDriverKey)'¨' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 187, 26 };
+				yield return new object [] { (uint)ConsoleDriverKey.PageUp, false, false, false, 33, 73, ConsoleDriverKey.PageUp, 33, 73 };
+				yield return new object [] { (uint)ConsoleDriverKey.PageUp, true, false, false, 33, 73, ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask, 33, 73 };
+				yield return new object [] { (uint)ConsoleDriverKey.PageUp, true, true, false, 33, 73, ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, 33, 73 };
+				yield return new object [] { (uint)ConsoleDriverKey.PageUp, true, true, true, 33, 73, ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, 33, 73 };
 			}
 		}
 

@@ -73,23 +73,23 @@ namespace Terminal.Gui.ConsoleDrivers {
 		}
 
 		/// <summary>
-		/// Gets the <see cref="ConsoleKey"/> from the provided <see cref="Key"/>.
+		/// Gets the <see cref="ConsoleKey"/> from the provided <see cref="ConsoleDriverKey"/>.
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>
-		public static ConsoleKey GetConsoleKeyFromKey (Key key)
+		public static ConsoleKey GetConsoleKeyFromKey (ConsoleDriverKey key)
 		{
 			var mod = new ConsoleModifiers ();
-			if (key.HasFlag (Key.ShiftMask)) {
+			if (key.HasFlag (ConsoleDriverKey.ShiftMask)) {
 				mod |= ConsoleModifiers.Shift;
 			}
-			if (key.HasFlag (Key.AltMask)) {
+			if (key.HasFlag (ConsoleDriverKey.AltMask)) {
 				mod |= ConsoleModifiers.Alt;
 			}
-			if (key.HasFlag (Key.CtrlMask)) {
+			if (key.HasFlag (ConsoleDriverKey.CtrlMask)) {
 				mod |= ConsoleModifiers.Control;
 			}
-			return (ConsoleKey)GetConsoleKeyFromKey ((uint)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask), mod, out _, out _);
+			return (ConsoleKey)GetConsoleKeyFromKey ((uint)(key & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.ShiftMask & ~ConsoleDriverKey.AltMask), mod, out _, out _);
 		}
 
 		/// <summary>
@@ -108,7 +108,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 				return 0;
 			}
 
-			uint consoleKey = MapKeyToConsoleKey ((Key)keyValue, out bool mappable);
+			uint consoleKey = MapKeyToConsoleKey ((ConsoleDriverKey)keyValue, out bool mappable);
 			if (mappable) {
 				var mod = GetModifiers (keyValue, modifiers, false);
 				var scode = GetScanCode ("UnicodeChar", keyValue, mod);
@@ -190,84 +190,84 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// <see langword="false"/> means the return value is in the ConsoleKey enum.
 		/// </param>
 		/// <returns>The <see cref="ConsoleKey"/> or the <paramref name="keyValue"/>.</returns>
-		public static uint MapKeyToConsoleKey (Key keyValue, out bool isMappable)
+		public static uint MapKeyToConsoleKey (ConsoleDriverKey keyValue, out bool isMappable)
 		{
 			isMappable = false;
 
 			switch (keyValue) {
-			case Key.Delete:
+			case ConsoleDriverKey.Delete:
 				return (uint)ConsoleKey.Delete;
-			case Key.CursorUp:
+			case ConsoleDriverKey.CursorUp:
 				return (uint)ConsoleKey.UpArrow;
-			case Key.CursorDown:
+			case ConsoleDriverKey.CursorDown:
 				return (uint)ConsoleKey.DownArrow;
-			case Key.CursorLeft:
+			case ConsoleDriverKey.CursorLeft:
 				return (uint)ConsoleKey.LeftArrow;
-			case Key.CursorRight:
+			case ConsoleDriverKey.CursorRight:
 				return (uint)ConsoleKey.RightArrow;
-			case Key.PageUp:
+			case ConsoleDriverKey.PageUp:
 				return (uint)ConsoleKey.PageUp;
-			case Key.PageDown:
+			case ConsoleDriverKey.PageDown:
 				return (uint)ConsoleKey.PageDown;
-			case Key.Home:
+			case ConsoleDriverKey.Home:
 				return (uint)ConsoleKey.Home;
-			case Key.End:
+			case ConsoleDriverKey.End:
 				return (uint)ConsoleKey.End;
-			case Key.InsertChar:
+			case ConsoleDriverKey.InsertChar:
 				return (uint)ConsoleKey.Insert;
-			case Key.DeleteChar:
+			case ConsoleDriverKey.DeleteChar:
 				return (uint)ConsoleKey.Delete;
-			case Key.F1:
+			case ConsoleDriverKey.F1:
 				return (uint)ConsoleKey.F1;
-			case Key.F2:
+			case ConsoleDriverKey.F2:
 				return (uint)ConsoleKey.F2;
-			case Key.F3:
+			case ConsoleDriverKey.F3:
 				return (uint)ConsoleKey.F3;
-			case Key.F4:
+			case ConsoleDriverKey.F4:
 				return (uint)ConsoleKey.F4;
-			case Key.F5:
+			case ConsoleDriverKey.F5:
 				return (uint)ConsoleKey.F5;
-			case Key.F6:
+			case ConsoleDriverKey.F6:
 				return (uint)ConsoleKey.F6;
-			case Key.F7:
+			case ConsoleDriverKey.F7:
 				return (uint)ConsoleKey.F7;
-			case Key.F8:
+			case ConsoleDriverKey.F8:
 				return (uint)ConsoleKey.F8;
-			case Key.F9:
+			case ConsoleDriverKey.F9:
 				return (uint)ConsoleKey.F9;
-			case Key.F10:
+			case ConsoleDriverKey.F10:
 				return (uint)ConsoleKey.F10;
-			case Key.F11:
+			case ConsoleDriverKey.F11:
 				return (uint)ConsoleKey.F11;
-			case Key.F12:
+			case ConsoleDriverKey.F12:
 				return (uint)ConsoleKey.F12;
-			case Key.F13:
+			case ConsoleDriverKey.F13:
 				return (uint)ConsoleKey.F13;
-			case Key.F14:
+			case ConsoleDriverKey.F14:
 				return (uint)ConsoleKey.F14;
-			case Key.F15:
+			case ConsoleDriverKey.F15:
 				return (uint)ConsoleKey.F15;
-			case Key.F16:
+			case ConsoleDriverKey.F16:
 				return (uint)ConsoleKey.F16;
-			case Key.F17:
+			case ConsoleDriverKey.F17:
 				return (uint)ConsoleKey.F17;
-			case Key.F18:
+			case ConsoleDriverKey.F18:
 				return (uint)ConsoleKey.F18;
-			case Key.F19:
+			case ConsoleDriverKey.F19:
 				return (uint)ConsoleKey.F19;
-			case Key.F20:
+			case ConsoleDriverKey.F20:
 				return (uint)ConsoleKey.F20;
-			case Key.F21:
+			case ConsoleDriverKey.F21:
 				return (uint)ConsoleKey.F21;
-			case Key.F22:
+			case ConsoleDriverKey.F22:
 				return (uint)ConsoleKey.F22;
-			case Key.F23:
+			case ConsoleDriverKey.F23:
 				return (uint)ConsoleKey.F23;
-			case Key.F24:
+			case ConsoleDriverKey.F24:
 				return (uint)ConsoleKey.F24;
-			case Key.Tab | Key.ShiftMask:
+			case ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask:
 				return (uint)ConsoleKey.Tab;
-			case Key.Unknown:
+			case ConsoleDriverKey.Unknown:
 				isMappable = true;
 				return 0;
 			}
@@ -282,116 +282,116 @@ namespace Terminal.Gui.ConsoleDrivers {
 		}
 
 		/// <summary>
-		/// Maps a <see cref="ConsoleKey"/> to a <see cref="Key"/>.
+		/// Maps a <see cref="ConsoleKey"/> to a <see cref="ConsoleDriverKey"/>.
 		/// </summary>
 		/// <param name="consoleKey">The console key.</param>
 		/// <param name="isMappable">If <see langword="true"/> is mapped to a valid character, otherwise <see langword="false"/>.</param>
-		/// <returns>The <see cref="Key"/> or the <paramref name="consoleKey"/>.</returns>
-		public static Key MapConsoleKeyToKey (ConsoleKey consoleKey, out bool isMappable)
+		/// <returns>The <see cref="ConsoleDriverKey"/> or the <paramref name="consoleKey"/>.</returns>
+		public static ConsoleDriverKey MapConsoleKeyToKey (ConsoleKey consoleKey, out bool isMappable)
 		{
 			isMappable = false;
 
 			switch (consoleKey) {
 			case ConsoleKey.Delete:
-				return Key.Delete;
+				return ConsoleDriverKey.Delete;
 			case ConsoleKey.UpArrow:
-				return Key.CursorUp;
+				return ConsoleDriverKey.CursorUp;
 			case ConsoleKey.DownArrow:
-				return Key.CursorDown;
+				return ConsoleDriverKey.CursorDown;
 			case ConsoleKey.LeftArrow:
-				return Key.CursorLeft;
+				return ConsoleDriverKey.CursorLeft;
 			case ConsoleKey.RightArrow:
-				return Key.CursorRight;
+				return ConsoleDriverKey.CursorRight;
 			case ConsoleKey.PageUp:
-				return Key.PageUp;
+				return ConsoleDriverKey.PageUp;
 			case ConsoleKey.PageDown:
-				return Key.PageDown;
+				return ConsoleDriverKey.PageDown;
 			case ConsoleKey.Home:
-				return Key.Home;
+				return ConsoleDriverKey.Home;
 			case ConsoleKey.End:
-				return Key.End;
+				return ConsoleDriverKey.End;
 			case ConsoleKey.Insert:
-				return Key.InsertChar;
+				return ConsoleDriverKey.InsertChar;
 			case ConsoleKey.F1:
-				return Key.F1;
+				return ConsoleDriverKey.F1;
 			case ConsoleKey.F2:
-				return Key.F2;
+				return ConsoleDriverKey.F2;
 			case ConsoleKey.F3:
-				return Key.F3;
+				return ConsoleDriverKey.F3;
 			case ConsoleKey.F4:
-				return Key.F4;
+				return ConsoleDriverKey.F4;
 			case ConsoleKey.F5:
-				return Key.F5;
+				return ConsoleDriverKey.F5;
 			case ConsoleKey.F6:
-				return Key.F6;
+				return ConsoleDriverKey.F6;
 			case ConsoleKey.F7:
-				return Key.F7;
+				return ConsoleDriverKey.F7;
 			case ConsoleKey.F8:
-				return Key.F8;
+				return ConsoleDriverKey.F8;
 			case ConsoleKey.F9:
-				return Key.F9;
+				return ConsoleDriverKey.F9;
 			case ConsoleKey.F10:
-				return Key.F10;
+				return ConsoleDriverKey.F10;
 			case ConsoleKey.F11:
-				return Key.F11;
+				return ConsoleDriverKey.F11;
 			case ConsoleKey.F12:
-				return Key.F12;
+				return ConsoleDriverKey.F12;
 			case ConsoleKey.F13:
-				return Key.F13;
+				return ConsoleDriverKey.F13;
 			case ConsoleKey.F14:
-				return Key.F14;
+				return ConsoleDriverKey.F14;
 			case ConsoleKey.F15:
-				return Key.F15;
+				return ConsoleDriverKey.F15;
 			case ConsoleKey.F16:
-				return Key.F16;
+				return ConsoleDriverKey.F16;
 			case ConsoleKey.F17:
-				return Key.F17;
+				return ConsoleDriverKey.F17;
 			case ConsoleKey.F18:
-				return Key.F18;
+				return ConsoleDriverKey.F18;
 			case ConsoleKey.F19:
-				return Key.F19;
+				return ConsoleDriverKey.F19;
 			case ConsoleKey.F20:
-				return Key.F20;
+				return ConsoleDriverKey.F20;
 			case ConsoleKey.F21:
-				return Key.F21;
+				return ConsoleDriverKey.F21;
 			case ConsoleKey.F22:
-				return Key.F22;
+				return ConsoleDriverKey.F22;
 			case ConsoleKey.F23:
-				return Key.F23;
+				return ConsoleDriverKey.F23;
 			case ConsoleKey.F24:
-				return Key.F24;
+				return ConsoleDriverKey.F24;
 			case ConsoleKey.Tab:
-				return Key.Tab;
+				return ConsoleDriverKey.Tab;
 			}
 			isMappable = true;
 
 			if (consoleKey is >= ConsoleKey.A and <= ConsoleKey.Z) {
-				return (Key)(consoleKey + 32);
+				return (ConsoleDriverKey)(consoleKey + 32);
 			}
 
-			return (Key)consoleKey;
+			return (ConsoleDriverKey)consoleKey;
 		}
 
 		/// <summary>
-		/// Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="Key"/>.
+		/// Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="ConsoleDriverKey"/>.
 		/// </summary>
 		/// <param name="keyInfo">The console key info.</param>
 		/// <param name="key">The key.</param>
-		/// <returns>The <see cref="Key"/> with <see cref="ConsoleModifiers"/> or the <paramref name="key"/></returns>
-		public static Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
+		/// <returns>The <see cref="ConsoleDriverKey"/> with <see cref="ConsoleModifiers"/> or the <paramref name="key"/></returns>
+		public static ConsoleDriverKey MapKeyModifiers (ConsoleKeyInfo keyInfo, ConsoleDriverKey key)
 		{
-			var keyMod = new Key ();
+			var keyMod = new ConsoleDriverKey ();
 			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
-				keyMod = Key.ShiftMask;
+				keyMod = ConsoleDriverKey.ShiftMask;
 			}
 			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
-				keyMod |= Key.CtrlMask;
+				keyMod |= ConsoleDriverKey.CtrlMask;
 			}
 			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
-				keyMod |= Key.AltMask;
+				keyMod |= ConsoleDriverKey.AltMask;
 			}
 
-			return keyMod != Key.Null ? keyMod | key : key;
+			return keyMod != ConsoleDriverKey.Null ? keyMod | key : key;
 		}
 
 		static HashSet<ScanCodeMapping> scanCodes = new HashSet<ScanCodeMapping> {

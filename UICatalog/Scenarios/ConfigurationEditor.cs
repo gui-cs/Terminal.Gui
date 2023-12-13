@@ -49,11 +49,11 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (_tileView);
 
-			_lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
+			_lenStatusItem = new StatusItem (ConsoleDriverKey.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} Quit", () => Quit()),
-				new StatusItem(Key.F5, "~F5~ Reload", () => Reload()),
-				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
+				new StatusItem(ConsoleDriverKey.F5, "~F5~ Reload", () => Reload()),
+				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S, "~^S~ Save", () => Save()),
 				_lenStatusItem,
 			});
 

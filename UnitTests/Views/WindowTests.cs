@@ -107,9 +107,9 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null),
-				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.C, "~^C~ Copy", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, "~^Q~ Quit", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.O, "~^O~ Open", null),
+				new StatusItem (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C, "~^C~ Copy", null),
 			});
 
 			var fv = new FrameView ("Frame View") {
@@ -206,7 +206,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);
 
-			var exception = Record.Exception (() => win.ProcessKeyDown (new (Key.AltMask)));
+			var exception = Record.Exception (() => win.ProcessKeyDown (new (ConsoleDriverKey.AltMask)));
 			Assert.Null (exception);
 		}
 	}

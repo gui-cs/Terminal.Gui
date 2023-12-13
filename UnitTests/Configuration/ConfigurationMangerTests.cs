@@ -217,16 +217,16 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Locations = ConfigLocations.DefaultOnly;
 			// arrange
 			ConfigurationManager.Reset ();
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = ConsoleDriverKey.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = ConsoleDriverKey.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = ConsoleDriverKey.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
 
 			// assert apply worked
-			Assert.Equal (Key.Q, Application.QuitKey);
-			Assert.Equal (Key.F, Application.AlternateForwardKey);
-			Assert.Equal (Key.B, Application.AlternateBackwardKey);
+			Assert.Equal (ConsoleDriverKey.Q, Application.QuitKey);
+			Assert.Equal (ConsoleDriverKey.F, Application.AlternateForwardKey);
+			Assert.Equal (ConsoleDriverKey.B, Application.AlternateBackwardKey);
 			Assert.True (Application.IsMouseDisabled);
 
 			//act
@@ -235,15 +235,15 @@ namespace Terminal.Gui.ConfigurationTests {
 			// assert
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
-			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
-			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, Application.QuitKey);
+			Assert.Equal (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.IsMouseDisabled);
 
 			// arrange
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = ConsoleDriverKey.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = ConsoleDriverKey.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = ConsoleDriverKey.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 			ConfigurationManager.Settings.Apply ();
 
@@ -256,9 +256,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			// assert
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
-			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-			Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
-			Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
+			Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, Application.QuitKey);
+			Assert.Equal (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, Application.AlternateForwardKey);
+			Assert.Equal (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, Application.AlternateBackwardKey);
 			Assert.False (Application.IsMouseDisabled);
 
 		}
@@ -320,7 +320,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 			Assert.True (ConfigurationManager.Themes.ContainsKey ("Default"));
 
-			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
+			Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, Application.QuitKey);
 
 			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
 			Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
@@ -501,8 +501,8 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			ConfigurationManager.Settings.Update (json, "TestConfigurationManagerUpdateFromJson");
 
-			Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-			Assert.Equal (Key.Z | Key.AltMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+			Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, Application.QuitKey);
+			Assert.Equal (ConsoleDriverKey.Z | ConsoleDriverKey.AltMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
 
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
@@ -516,7 +516,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Now re-apply
 			ConfigurationManager.Apply ();
 
-			Assert.Equal (Key.Z | Key.AltMask, Application.QuitKey);
+			Assert.Equal (ConsoleDriverKey.Z | ConsoleDriverKey.AltMask, Application.QuitKey);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
 			Assert.Equal (new Color (Color.White), Colors.ColorSchemes ["Base"].Normal.Foreground);
@@ -735,9 +735,9 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			ConfigurationManager.Reset ();
 
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = ConsoleDriverKey.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = ConsoleDriverKey.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = ConsoleDriverKey.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
 			ConfigurationManager.Updated += ConfigurationManager_Updated;
@@ -746,9 +746,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			{
 				fired = true;
 				// assert
-				Assert.Equal (Key.Q | Key.CtrlMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
-				Assert.Equal (Key.PageDown | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
-				Assert.Equal (Key.PageUp | Key.CtrlMask, ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
+				Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+				Assert.Equal (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
+				Assert.Equal (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
 				Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
 			}
 
@@ -770,16 +770,16 @@ namespace Terminal.Gui.ConfigurationTests {
 			{
 				fired = true;
 				// assert
-				Assert.Equal (Key.Q, Application.QuitKey);
-				Assert.Equal (Key.F, Application.AlternateForwardKey);
-				Assert.Equal (Key.B, Application.AlternateBackwardKey);
+				Assert.Equal (ConsoleDriverKey.Q, Application.QuitKey);
+				Assert.Equal (ConsoleDriverKey.F, Application.AlternateForwardKey);
+				Assert.Equal (ConsoleDriverKey.B, Application.AlternateBackwardKey);
 				Assert.True (Application.IsMouseDisabled);
 			}
 
 			// act
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = ConsoleDriverKey.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = ConsoleDriverKey.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = ConsoleDriverKey.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
 			ConfigurationManager.Apply ();

@@ -270,15 +270,15 @@ namespace UICatalog {
 					_themeMenuBarItem,
 					new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems()),
 					new MenuBarItem ("_Help", new MenuItem [] {
-						new MenuItem ("_Documentation", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"), null, null, Key.F1),
-						new MenuItem ("_README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, Key.F2),
+						new MenuItem ("_Documentation", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"), null, null, ConsoleDriverKey.F1),
+						new MenuItem ("_README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, ConsoleDriverKey.F2),
 						new MenuItem ("_About...",
-							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage!.ToString(), 0, false, "_Ok"), null, null, Key.CtrlMask | Key.A),
+							"About UI Catalog", () =>  MessageBox.Query ("About UI Catalog", _aboutMessage!.ToString(), 0, false, "_Ok"), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A),
 					}),
 				});
 
-				DriverName = new StatusItem (Key.CharMask, "Driver:", null);
-				OS = new StatusItem (Key.CharMask, "OS:", null);
+				DriverName = new StatusItem (ConsoleDriverKey.CharMask, "Driver:", null);
+				OS = new StatusItem (ConsoleDriverKey.CharMask, "OS:", null);
 
 				StatusBar = new StatusBar () {
 					Visible = UICatalogApp.ShowStatusBar
@@ -294,7 +294,7 @@ namespace UICatalog {
 							_selectedScenario.RequestStop();
 						}
 					}),
-					new StatusItem(Key.F10, "~F10~ Status Bar", () => {
+					new StatusItem(ConsoleDriverKey.F10, "~F10~ Status Bar", () => {
 						StatusBar.Visible = !StatusBar.Visible;
 						//ContentPane!.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 						LayoutSubviews();
@@ -380,14 +380,14 @@ namespace UICatalog {
 				ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
 				// TableView typically is a grid where nav keys are biased for moving left/right.
-				ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
-				ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
+				ScenarioList.KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
+				ScenarioList.KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
 
 				// Ideally, TableView.MultiSelect = false would turn off any keybindings for
 				// multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
 				// a shortcut to About.
 				ScenarioList.MultiSelect = false;
-				ScenarioList.KeyBindings.Remove (Key.CtrlMask | Key.A);
+				ScenarioList.KeyBindings.Remove (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.A);
 
 				Add (CategoryList);
 				Add (ScenarioList);
@@ -488,7 +488,7 @@ namespace UICatalog {
 				miUseSubMenusSingleFrame = new MenuItem {
 					Title = "Enable _Sub-Menus Single Frame"
 				};
-				miUseSubMenusSingleFrame.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miUseSubMenusSingleFrame!.Title!.Substring (8, 1) [0];
+				miUseSubMenusSingleFrame.Shortcut = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask | (ConsoleDriverKey)miUseSubMenusSingleFrame!.Title!.Substring (8, 1) [0];
 				miUseSubMenusSingleFrame.CheckType |= MenuItemCheckStyle.Checked;
 				miUseSubMenusSingleFrame.Action += () => {
 					miUseSubMenusSingleFrame.Checked = (bool)!miUseSubMenusSingleFrame.Checked!;
@@ -506,7 +506,7 @@ namespace UICatalog {
 				miIsMenuBorderDisabled = new MenuItem {
 					Title = "Disable Menu _Border"
 				};
-				miIsMenuBorderDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0];
+				miIsMenuBorderDisabled.Shortcut = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask | (ConsoleDriverKey)miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0];
 				miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMenuBorderDisabled.Action += () => {
 					miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
@@ -523,7 +523,7 @@ namespace UICatalog {
 				List<MenuItem> menuItems = new List<MenuItem> ();
 				miForce16Colors = new MenuItem {
 					Title = "Force _16 Colors",
-					Shortcut = Key.F6,
+					Shortcut = ConsoleDriverKey.F6,
 					Checked = Application.Force16Colors,
 					CanExecute = () => (bool)Application.Driver.SupportsTrueColor
 				};
@@ -543,7 +543,7 @@ namespace UICatalog {
 				miIsMouseDisabled = new MenuItem {
 					Title = "_Disable Mouse"
 				};
-				miIsMouseDisabled.Shortcut = Key.CtrlMask | Key.AltMask | (Key)miIsMouseDisabled!.Title!.Substring (1, 1) [0];
+				miIsMouseDisabled.Shortcut = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask | (ConsoleDriverKey)miIsMouseDisabled!.Title!.Substring (1, 1) [0];
 				miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 				miIsMouseDisabled.Action += () => {
 					miIsMouseDisabled.Checked = Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked!;
@@ -582,7 +582,7 @@ namespace UICatalog {
 				foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ())) {
 					var item = new MenuItem {
 						Title = GetDiagnosticsTitle (diag),
-						Shortcut = Key.AltMask + index.ToString () [0]
+						Shortcut = ConsoleDriverKey.AltMask + index.ToString () [0]
 					};
 					index++;
 					item.CheckType |= MenuItemCheckStyle.Checked;
@@ -675,7 +675,7 @@ namespace UICatalog {
 				foreach (var theme in CM.Themes!) {
 					var item = new MenuItem {
 						Title = $"_{theme.Key}",
-						Shortcut = Key.CtrlMask | (Key)((int)Key.D1 + schemeCount++)
+						Shortcut = ConsoleDriverKey.CtrlMask | (ConsoleDriverKey)((int)ConsoleDriverKey.D1 + schemeCount++)
 					};
 					item.CheckType |= MenuItemCheckStyle.Checked;
 					item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;

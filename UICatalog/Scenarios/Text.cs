@@ -119,8 +119,8 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Key keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
-			Key keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
+			ConsoleDriverKey keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
+			ConsoleDriverKey keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
 			chxCaptureTabs.Toggled += (s, e) => {
 				if (e.NewValue == true) {
 					textView.KeyBindings.Add (keyTab, Command.Tab);

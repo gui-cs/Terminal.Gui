@@ -99,29 +99,29 @@ public class CheckBox : View {
 		});
 
 		// Default keybindings for this view
-		KeyBindings.Add ((Key)' ', Command.ToggleChecked);
-		KeyBindings.Add (Key.Space, Command.ToggleChecked);
+		KeyBindings.Add ((ConsoleDriverKey)' ', Command.ToggleChecked);
+		KeyBindings.Add (ConsoleDriverKey.Space, Command.ToggleChecked);
 	}
 
 
 	/// <inheritdoc/>
-	public override Key HotKey {
+	public override ConsoleDriverKey HotKey {
 		get => base.HotKey;
 		set {
 			var prev = base.HotKey;
 			if (prev != value) {
-				var v = value == Key.Unknown ? Key.Null : value;
+				var v = value == ConsoleDriverKey.Unknown ? ConsoleDriverKey.Null : value;
 				base.HotKey = TextFormatter.HotKey = v;
 
 				// Also add Alt+HotKey
-				if (prev != Key.Null && KeyBindings.TryGet (prev | Key.AltMask, out _)) {
-					if (v == Key.Null) {
-						KeyBindings.Remove (prev | Key.AltMask);
+				if (prev != ConsoleDriverKey.Null && KeyBindings.TryGet (prev | ConsoleDriverKey.AltMask, out _)) {
+					if (v == ConsoleDriverKey.Null) {
+						KeyBindings.Remove (prev | ConsoleDriverKey.AltMask);
 					} else {
-						KeyBindings.Replace (prev | Key.AltMask, v | Key.AltMask);
+						KeyBindings.Replace (prev | ConsoleDriverKey.AltMask, v | ConsoleDriverKey.AltMask);
 					}
-				} else if (v != Key.Null) {
-					KeyBindings.Add (v | Key.AltMask, Command.Accept);
+				} else if (v != ConsoleDriverKey.Null) {
+					KeyBindings.Add (v | ConsoleDriverKey.AltMask, Command.Accept);
 				}
 			}
 		}

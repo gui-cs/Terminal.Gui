@@ -250,16 +250,16 @@ namespace Terminal.Gui.ConfigurationTests {
 
 	public class KeyJsonConverterTests {
 		[Theory, AutoInitShutdown]
-		[InlineData (Key.A, "A")]
-		[InlineData (Key.A | Key.ShiftMask, "A, ShiftMask")]
-		[InlineData (Key.A | Key.CtrlMask, "A, CtrlMask")]
-		[InlineData (Key.A | Key.AltMask | Key.CtrlMask, "A, CtrlMask, AltMask")]
-		[InlineData ((Key)'a' | Key.AltMask | Key.CtrlMask, "Space, A, CtrlMask, AltMask")]
-		[InlineData ((Key)'a' | Key.ShiftMask, "Space, A, ShiftMask")]
-		[InlineData (Key.Delete | Key.AltMask | Key.CtrlMask, "Delete, CtrlMask, AltMask")]
-		[InlineData (Key.D4, "D4")]
-		[InlineData (Key.Esc, "Esc")]
-		public void TestKeyRoundTripConversion (Key key, string expectedStringTo)
+		[InlineData (ConsoleDriverKey.A, "A")]
+		[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask, "A, ShiftMask")]
+		[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, "A, CtrlMask")]
+		[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, "A, CtrlMask, AltMask")]
+		[InlineData ((ConsoleDriverKey)'a' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, "Space, A, CtrlMask, AltMask")]
+		[InlineData ((ConsoleDriverKey)'a' | ConsoleDriverKey.ShiftMask, "Space, A, ShiftMask")]
+		[InlineData (ConsoleDriverKey.Delete | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, "Delete, CtrlMask, AltMask")]
+		[InlineData (ConsoleDriverKey.D4, "D4")]
+		[InlineData (ConsoleDriverKey.Esc, "Esc")]
+		public void TestKeyRoundTripConversion (ConsoleDriverKey key, string expectedStringTo)
 		{
 			// Arrange
 			var options = new JsonSerializerOptions ();
@@ -267,7 +267,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Act
 			var json = JsonSerializer.Serialize (key, options);
-			var deserializedKey = JsonSerializer.Deserialize<Key> (json, options);
+			var deserializedKey = JsonSerializer.Deserialize<ConsoleDriverKey> (json, options);
 
 			// Assert
 			Assert.Equal (expectedStringTo, deserializedKey.ToString ());

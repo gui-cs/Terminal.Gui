@@ -18,24 +18,24 @@ public class HotKeyTests {
 	{
 		var view = new View ();
 		Assert.Equal (string.Empty, view.Title);
-		Assert.Equal (Key.Null, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.Null, view.HotKey);
 
 		// Verify key bindings were set
-		var commands = view.KeyBindings.GetCommands (Key.Null);
+		var commands = view.KeyBindings.GetCommands (ConsoleDriverKey.Null);
 		Assert.Empty (commands);
 	}
 
 	[Theory]
-	[InlineData (Key.A)]
-	[InlineData ((Key)'a')]
-	[InlineData (Key.A | Key.ShiftMask)]
-	[InlineData (Key.D1)]
-	[InlineData (Key.D1 | Key.ShiftMask)]
-	[InlineData ((Key)'!')]
-	[InlineData ((Key)'х')]  // Cyrillic x
-	[InlineData ((Key)'你')] // Chinese ni
-	[InlineData ((Key)'ö')] // German o umlaut
-	public void Set_SupportsKeys (Key key)
+	[InlineData (ConsoleDriverKey.A)]
+	[InlineData ((ConsoleDriverKey)'a')]
+	[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask)]
+	[InlineData (ConsoleDriverKey.D1)]
+	[InlineData (ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask)]
+	[InlineData ((ConsoleDriverKey)'!')]
+	[InlineData ((ConsoleDriverKey)'х')]  // Cyrillic x
+	[InlineData ((ConsoleDriverKey)'你')] // Chinese ni
+	[InlineData ((ConsoleDriverKey)'ö')] // German o umlaut
+	public void Set_SupportsKeys (ConsoleDriverKey key)
 	{
 		var view = new View ();
 		view.HotKey = key;
@@ -43,14 +43,14 @@ public class HotKeyTests {
 	}
 
 	[Theory]
-	[InlineData (Key.A)]
-	[InlineData (Key.A | Key.ShiftMask)]
-	[InlineData (Key.D1)]
-	[InlineData (Key.D1 | Key.ShiftMask)] // '!'
-	[InlineData ((Key)'х')]  // Cyrillic x
-	[InlineData ((Key)'你')] // Chinese ni
-	[InlineData ((Key)'ö')] // German o umlaut
-	public void Set_SetsKeyBindings (Key key)
+	[InlineData (ConsoleDriverKey.A)]
+	[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask)]
+	[InlineData (ConsoleDriverKey.D1)]
+	[InlineData (ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask)] // '!'
+	[InlineData ((ConsoleDriverKey)'х')]  // Cyrillic x
+	[InlineData ((ConsoleDriverKey)'你')] // Chinese ni
+	[InlineData ((ConsoleDriverKey)'ö')] // German o umlaut
+	public void Set_SetsKeyBindings (ConsoleDriverKey key)
 	{
 		var view = new View ();
 		view.HotKey = key;
@@ -62,27 +62,27 @@ public class HotKeyTests {
 		// As passed
 		var commands = view.KeyBindings.GetCommands (key);
 		Assert.Contains (Command.Accept, commands);
-		commands = view.KeyBindings.GetCommands (key | Key.AltMask);
+		commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.AltMask);
 		Assert.Contains (Command.Accept, commands);
 
-		var baseKey = key & ~Key.ShiftMask;
+		var baseKey = key & ~ConsoleDriverKey.ShiftMask;
 		// If A...Z, with and without shift
-		if (baseKey is >= Key.A and <= Key.Z) {
-			commands = view.KeyBindings.GetCommands (key | Key.ShiftMask);
+		if (baseKey is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
+			commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.ShiftMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~Key.ShiftMask);
+			commands = view.KeyBindings.GetCommands (key & ~ConsoleDriverKey.ShiftMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key | Key.AltMask);
+			commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.AltMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~Key.ShiftMask | Key.AltMask);
+			commands = view.KeyBindings.GetCommands (key & ~ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask);
 			Assert.Contains (Command.Accept, commands);
 		} else {
 			// Non A..Z keys should not have shift bindings
-			if (key.HasFlag (Key.ShiftMask)) {
-				commands = view.KeyBindings.GetCommands (key & ~Key.ShiftMask);
+			if (key.HasFlag (ConsoleDriverKey.ShiftMask)) {
+				commands = view.KeyBindings.GetCommands (key & ~ConsoleDriverKey.ShiftMask);
 				Assert.Empty (commands);
 			} else {
-				commands = view.KeyBindings.GetCommands (key | Key.ShiftMask);
+				commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.ShiftMask);
 				Assert.Empty (commands);
 			}
 		}
@@ -92,38 +92,38 @@ public class HotKeyTests {
 	public void Set_RemovesOldKeyBindings ()
 	{
 		var view = new View ();
-		view.HotKey = Key.A;
+		view.HotKey = ConsoleDriverKey.A;
 		Assert.Equal (string.Empty, view.Title);
-		Assert.Equal (Key.A, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.A, view.HotKey);
 
 		// Verify key bindings were set
-		var commands = view.KeyBindings.GetCommands (Key.A);
+		var commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A);
 		Assert.Contains (Command.Accept, commands);
 
-		commands = view.KeyBindings.GetCommands (Key.A | Key.ShiftMask);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask);
 		Assert.Contains (Command.Accept, commands);
 
-		commands = view.KeyBindings.GetCommands (Key.A | Key.AltMask);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A | ConsoleDriverKey.AltMask);
 		Assert.Contains (Command.Accept, commands);
 
-		commands = view.KeyBindings.GetCommands (Key.A | Key.ShiftMask | Key.AltMask);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask);
 		Assert.Contains (Command.Accept, commands);
 
 		// Now set again
-		view.HotKey = Key.B;
+		view.HotKey = ConsoleDriverKey.B;
 		Assert.Equal (string.Empty, view.Title);
-		Assert.Equal (Key.B, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.B, view.HotKey);
 
-		commands = view.KeyBindings.GetCommands (Key.A);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A);
 		Assert.DoesNotContain (Command.Accept, commands);
 
-		commands = view.KeyBindings.GetCommands (Key.A | Key.ShiftMask);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask);
 		Assert.DoesNotContain (Command.Accept, commands);
 
-		commands = view.KeyBindings.GetCommands (Key.A | Key.AltMask);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A | ConsoleDriverKey.AltMask);
 		Assert.DoesNotContain (Command.Accept, commands);
 
-		commands = view.KeyBindings.GetCommands (Key.A | Key.ShiftMask | Key.AltMask);
+		commands = view.KeyBindings.GetCommands (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask);
 		Assert.DoesNotContain (Command.Accept, commands);
 	}
 
@@ -132,100 +132,100 @@ public class HotKeyTests {
 	{
 		var view = new View ();
 		// A..Z must be naked (Alt is assumed)
-		view.HotKey = Key.A | Key.AltMask;
-		Assert.Throws<ArgumentException> (() => view.HotKey = Key.A | Key.CtrlMask);
-		Assert.Throws<ArgumentException> (() => view.HotKey = Key.A | Key.ShiftMask | Key.AltMask | Key.CtrlMask);
+		view.HotKey = ConsoleDriverKey.A | ConsoleDriverKey.AltMask;
+		Assert.Throws<ArgumentException> (() => view.HotKey = ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask);
+		Assert.Throws<ArgumentException> (() => view.HotKey = ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask);
 
 		// All others must not have Ctrl (Alt is assumed)
-		view.HotKey = Key.D1 | Key.AltMask;
-		Assert.Throws<ArgumentException> (() => view.HotKey = Key.D1 | Key.CtrlMask);
-		Assert.Throws<ArgumentException> (() => view.HotKey = Key.D1 | Key.ShiftMask | Key.AltMask | Key.CtrlMask);
+		view.HotKey = ConsoleDriverKey.D1 | ConsoleDriverKey.AltMask;
+		Assert.Throws<ArgumentException> (() => view.HotKey = ConsoleDriverKey.D1 | ConsoleDriverKey.CtrlMask);
+		Assert.Throws<ArgumentException> (() => view.HotKey = ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask);
 
 		// Shift is ok (e.g. this is '!')
-		view.HotKey = Key.D1 | Key.ShiftMask;
+		view.HotKey = ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask;
 	}
 
 	[Theory]
-	[InlineData (Key.A)]
-	[InlineData (Key.A | Key.ShiftMask)]
-	[InlineData (Key.D1)]
-	[InlineData (Key.D1 | Key.ShiftMask)] // '!'
-	[InlineData ((Key)'х')]  // Cyrillic x
-	[InlineData ((Key)'你')] // Chinese ni
-	public void AddKeyBindingsForHotKey_Sets (Key key)
+	[InlineData (ConsoleDriverKey.A)]
+	[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask)]
+	[InlineData (ConsoleDriverKey.D1)]
+	[InlineData (ConsoleDriverKey.D1 | ConsoleDriverKey.ShiftMask)] // '!'
+	[InlineData ((ConsoleDriverKey)'х')]  // Cyrillic x
+	[InlineData ((ConsoleDriverKey)'你')] // Chinese ni
+	public void AddKeyBindingsForHotKey_Sets (ConsoleDriverKey key)
 	{
 		var view = new View ();
-		view.HotKey = Key.Z;
+		view.HotKey = ConsoleDriverKey.Z;
 		Assert.Equal (string.Empty, view.Title);
-		Assert.Equal (Key.Z, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.Z, view.HotKey);
 
-		view.AddKeyBindingsForHotKey (Key.Null, key);
+		view.AddKeyBindingsForHotKey (ConsoleDriverKey.Null, key);
 
 		// Verify key bindings were set
 
 		// As passed
 		var commands = view.KeyBindings.GetCommands (key);
 		Assert.Contains (Command.Accept, commands);
-		commands = view.KeyBindings.GetCommands (key | Key.AltMask);
+		commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.AltMask);
 		Assert.Contains (Command.Accept, commands);
 
-		var baseKey = key & ~Key.ShiftMask;
+		var baseKey = key & ~ConsoleDriverKey.ShiftMask;
 		// If A...Z, with and without shift
-		if (baseKey is >= Key.A and <= Key.Z) {
-			commands = view.KeyBindings.GetCommands (key | Key.ShiftMask);
+		if (baseKey is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
+			commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.ShiftMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~Key.ShiftMask);
+			commands = view.KeyBindings.GetCommands (key & ~ConsoleDriverKey.ShiftMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key | Key.AltMask);
+			commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.AltMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~Key.ShiftMask | Key.AltMask);
+			commands = view.KeyBindings.GetCommands (key & ~ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask);
 			Assert.Contains (Command.Accept, commands);
 		} else {
 			// Non A..Z keys should not have shift bindings
-			if (key.HasFlag (Key.ShiftMask)) {
-				commands = view.KeyBindings.GetCommands (key & ~Key.ShiftMask);
+			if (key.HasFlag (ConsoleDriverKey.ShiftMask)) {
+				commands = view.KeyBindings.GetCommands (key & ~ConsoleDriverKey.ShiftMask);
 				Assert.Empty (commands);
 			} else {
-				commands = view.KeyBindings.GetCommands (key | Key.ShiftMask);
+				commands = view.KeyBindings.GetCommands (key | ConsoleDriverKey.ShiftMask);
 				Assert.Empty (commands);
 			}
 		}
 	}
 
 	[Theory]
-	[InlineData (Key.Delete)]
-	[InlineData (Key.Backspace)]
-	[InlineData (Key.Tab)]
-	[InlineData (Key.Enter)]
-	[InlineData (Key.Esc)]
-	[InlineData (Key.Space)]
-	[InlineData (Key.CursorLeft)]
-	[InlineData (Key.F1)]
-	public void Set_Throws_With_Invalid_HotKeys (Key key)
+	[InlineData (ConsoleDriverKey.Delete)]
+	[InlineData (ConsoleDriverKey.Backspace)]
+	[InlineData (ConsoleDriverKey.Tab)]
+	[InlineData (ConsoleDriverKey.Enter)]
+	[InlineData (ConsoleDriverKey.Esc)]
+	[InlineData (ConsoleDriverKey.Space)]
+	[InlineData (ConsoleDriverKey.CursorLeft)]
+	[InlineData (ConsoleDriverKey.F1)]
+	public void Set_Throws_With_Invalid_HotKeys (ConsoleDriverKey key)
 	{
 		var view = new View ();
 		Assert.Throws<ArgumentException> (() => view.HotKey = key);
 	}
 
 	[Theory]
-	[InlineData ("Test", Key.T)]
-	[InlineData ("^Test", Key.T)]
-	[InlineData ("T^est", Key.E)]
-	[InlineData ("Te^st", Key.S)]
-	[InlineData ("Tes^t", Key.T)]
-	[InlineData ("other", Key.Null)]
-	[InlineData ("oTher", Key.T)]
-	[InlineData ("^Öther", (Key)'Ö')]
-	[InlineData ("^öther", (Key)'ö')]
+	[InlineData ("Test", ConsoleDriverKey.T)]
+	[InlineData ("^Test", ConsoleDriverKey.T)]
+	[InlineData ("T^est", ConsoleDriverKey.E)]
+	[InlineData ("Te^st", ConsoleDriverKey.S)]
+	[InlineData ("Tes^t", ConsoleDriverKey.T)]
+	[InlineData ("other", ConsoleDriverKey.Null)]
+	[InlineData ("oTher", ConsoleDriverKey.T)]
+	[InlineData ("^Öther", (ConsoleDriverKey)'Ö')]
+	[InlineData ("^öther", (ConsoleDriverKey)'ö')]
 	// BUGBUG: '!' should be supported. Line 968 of TextFormatter filters on char.IsLetterOrDigit 
 	//[InlineData ("Test^!", (Key)'!')]
-	public void Text_Change_Sets_HotKey (string text, Key expectedHotKey)
+	public void Text_Change_Sets_HotKey (string text, ConsoleDriverKey expectedHotKey)
 	{
 		var view = new View () {
 			HotKeySpecifier = new Rune ('^'),
 			Text = "^Hello"
 		};
-		Assert.Equal (Key.H, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.H, view.HotKey);
 		
 		view.Text = text;
 		Assert.Equal (expectedHotKey, view.HotKey);
@@ -242,22 +242,22 @@ public class HotKeyTests {
 		};
 
 		Assert.Equal (text, view.Text);
-		Assert.Equal (Key.T, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.T, view.HotKey);
 
 		view.Text = string.Empty;
 		Assert.Equal ("", view.Text);
-		Assert.Equal (Key.Null, view.HotKey);
+		Assert.Equal (ConsoleDriverKey.Null, view.HotKey);
 	}
 
 	// BUGBUG: Default command is currently Accept. Should be Default.
 	[Theory]
-	[InlineData (Key.Null, true)] // non-shift
-	[InlineData (Key.ShiftMask, true)]
-	[InlineData (Key.AltMask, true)]
-	[InlineData (Key.ShiftMask | Key.AltMask, true)]
-	[InlineData (Key.CtrlMask, false)]
-	[InlineData (Key.ShiftMask | Key.CtrlMask, false)]
-	public void KeyPress_Runs_Default_HotKey_Command (Key mask, bool expected)
+	[InlineData (ConsoleDriverKey.Null, true)] // non-shift
+	[InlineData (ConsoleDriverKey.ShiftMask, true)]
+	[InlineData (ConsoleDriverKey.AltMask, true)]
+	[InlineData (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, true)]
+	[InlineData (ConsoleDriverKey.CtrlMask, false)]
+	[InlineData (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask, false)]
+	public void KeyPress_Runs_Default_HotKey_Command (ConsoleDriverKey mask, bool expected)
 	{
 		var view = new View () {
 			HotKeySpecifier = (Rune)'^',
@@ -265,7 +265,7 @@ public class HotKeyTests {
 		};
 		view.CanFocus = true;
 		Assert.False (view.HasFocus);
-		view.ProcessKeyDown (new (Key.T | mask));
+		view.ProcessKeyDown (new (ConsoleDriverKey.T | mask));
 		Assert.Equal (expected, view.HasFocus);
 	}
 
@@ -283,7 +283,7 @@ public class HotKeyTests {
 		view.CanFocus = true;
 		Assert.False (view.HasFocus);
 
-		var ke = new KeyEventArgs (Key.T);
+		var ke = new KeyEventArgs (ConsoleDriverKey.T);
 		superView.ProcessKeyDown (ke);
 		Assert.True (view.HasFocus);
 
@@ -294,7 +294,7 @@ public class HotKeyTests {
 	public void ProcessKeyDown_Ignores_KeyBindings_Out_Of_Scope_SuperView ()
 	{
 		var view = new View ();
-		view.KeyBindings.Add (Key.A, Command.Default);
+		view.KeyBindings.Add (ConsoleDriverKey.A, Command.Default);
 		view.InvokingKeyBindings += (s, e) => {
 			Assert.Fail ();
 		};
@@ -302,7 +302,7 @@ public class HotKeyTests {
 		var superView = new View ();
 		superView.Add (view);
 
-		var ke = new KeyEventArgs (Key.A);
+		var ke = new KeyEventArgs (ConsoleDriverKey.A);
 		superView.ProcessKeyDown (ke);
 	}
 

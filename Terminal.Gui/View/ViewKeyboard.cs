@@ -27,7 +27,7 @@ public partial class View {
 	/// </summary>
 	public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
-	Key _hotKey = Key.Null;
+	ConsoleDriverKey _hotKey = ConsoleDriverKey.Null;
 
 	void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 	{
@@ -42,7 +42,7 @@ public partial class View {
 	/// character of <see cref="Text"/> that is prefixed with with <see cref="HotKeySpecifier"/>.
 	/// <para>
 	/// A HotKey is a keypress that selects a visible UI item. For selecting items across <see cref="View"/>`s
-	/// (e.g.a <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="Key.AltMask"/> modifier.
+	/// (e.g.a <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="ConsoleDriverKey.AltMask"/> modifier.
 	/// For selecting items within a View that are not Views themselves, the keypress can be key without the Alt modifier.
 	/// For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T.
 	/// Or, in a <see cref="Menu"/> with "_File _Edit", Alt-F will select (show) the "_File" menu.
@@ -57,20 +57,20 @@ public partial class View {
 	/// This is a helper API for configuring a key binding for the hot key. By default, this property is set whenever <see cref="Text"/> changes.
 	/// </para>
 	/// <para>
-	/// By default, when the Hot Key is set, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and
-	/// the Alt-shifted key (e.g. <see cref="Key.D3"/> | <see cref="Key.AltMask"/>).
+	/// By default, when the Hot Key is set, key bindings are added for both the base key (e.g. <see cref="ConsoleDriverKey.D3"/>) and
+	/// the Alt-shifted key (e.g. <see cref="ConsoleDriverKey.D3"/> | <see cref="ConsoleDriverKey.AltMask"/>).
 	/// This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
 	/// </para>
 	/// <para>
-	/// By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will be added for both the un-shifted and shifted
-	/// versions. This means if the HotKey is <see cref="Key.A"/>, key bindings for <see cref="Key.A"/> and <see cref="Key.A"/> | <see cref="Key.ShiftMask"/>
+	/// By default, when the HotKey is set to <see cref="ConsoleDriverKey.A"/> through <see cref="ConsoleDriverKey.Z"/> key bindings will be added for both the un-shifted and shifted
+	/// versions. This means if the HotKey is <see cref="ConsoleDriverKey.A"/>, key bindings for <see cref="ConsoleDriverKey.A"/> and <see cref="ConsoleDriverKey.A"/> | <see cref="ConsoleDriverKey.ShiftMask"/>
 	/// will be added. This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
 	/// </para>
 	/// <para>
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
 	/// </para>
 	/// </remarks>
-	public virtual Key HotKey {
+	public virtual ConsoleDriverKey HotKey {
 		get => _hotKey;
 		set {
 			if (AddKeyBindingsForHotKey (_hotKey, value)) {
@@ -86,13 +86,13 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// By default key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and
-	/// the Alt-shifted key (e.g. <see cref="Key.D3"/> | <see cref="Key.AltMask"/>).
+	/// By default key bindings are added for both the base key (e.g. <see cref="ConsoleDriverKey.D3"/>) and
+	/// the Alt-shifted key (e.g. <see cref="ConsoleDriverKey.D3"/> | <see cref="ConsoleDriverKey.AltMask"/>).
 	/// This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
 	/// </para>
 	/// <para>
-	/// By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will be added for both the un-shifted and shifted
-	/// versions. This means if the HotKey is <see cref="Key.A"/>, key bindings for <see cref="Key.A"/> and <see cref="Key.A"/> | <see cref="Key.ShiftMask"/>
+	/// By default, when <paramref name="hotKey"/> is <see cref="ConsoleDriverKey.A"/> through <see cref="ConsoleDriverKey.Z"/> key bindings will be added for both the un-shifted and shifted
+	/// versions. This means if the HotKey is <see cref="ConsoleDriverKey.A"/>, key bindings for <see cref="ConsoleDriverKey.A"/> and <see cref="ConsoleDriverKey.A"/> | <see cref="ConsoleDriverKey.ShiftMask"/>
 	/// will be added. This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
 	/// </para>
 	/// <para>
@@ -103,29 +103,29 @@ public partial class View {
 	/// <param name="hotKey">The new HotKey. If <see cre="Key.Null"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
 	/// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
 	/// <exception cref="ArgumentException"></exception>
-	public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
+	public virtual bool AddKeyBindingsForHotKey (ConsoleDriverKey prevHotKey, ConsoleDriverKey hotKey)
 	{
 		if (_hotKey == hotKey) {
 			return false;
 		}
 
-		var newKey = hotKey == Key.Unknown ? Key.Null : hotKey;
+		var newKey = hotKey == ConsoleDriverKey.Unknown ? ConsoleDriverKey.Null : hotKey;
 
-		var baseKey = newKey & ~Key.CtrlMask & ~Key.AltMask & ~Key.ShiftMask;
-		if (newKey != Key.Null && (baseKey == Key.Space || Rune.IsControl (KeyEventArgs.ToRune (baseKey)))) {
+		var baseKey = newKey & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
+		if (newKey != ConsoleDriverKey.Null && (baseKey == ConsoleDriverKey.Space || Rune.IsControl (KeyEventArgs.ToRune (baseKey)))) {
 			throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
 		}
 
 		if (newKey != baseKey) {
-			if ((newKey & Key.CtrlMask) != 0) {
+			if ((newKey & ConsoleDriverKey.CtrlMask) != 0) {
 				throw new ArgumentException (@$"HotKey does not support CtrlMask ({hotKey}).");
 			}
 			// Strip off the shift mask if it's A...Z
-			if (baseKey is >= Key.A and <= Key.Z && (newKey & Key.ShiftMask) != 0) {
-				newKey &= ~Key.ShiftMask;
+			if (baseKey is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z && (newKey & ConsoleDriverKey.ShiftMask) != 0) {
+				newKey &= ~ConsoleDriverKey.ShiftMask;
 			}
 			// Strip off the Alt mask
-			newKey &= ~Key.AltMask;
+			newKey &= ~ConsoleDriverKey.AltMask;
 		}
 
 		// Remove base version
@@ -134,31 +134,31 @@ public partial class View {
 		}
 
 		// Remove the Alt version
-		if (KeyBindings.TryGet (prevHotKey | Key.AltMask, out _)) {
-			KeyBindings.Remove (prevHotKey | Key.AltMask);
+		if (KeyBindings.TryGet (prevHotKey | ConsoleDriverKey.AltMask, out _)) {
+			KeyBindings.Remove (prevHotKey | ConsoleDriverKey.AltMask);
 		}
 
-		if (_hotKey is >= Key.A and <= Key.Z) {
+		if (_hotKey is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
 			// Remove the shift version
-			if (KeyBindings.TryGet (prevHotKey | Key.ShiftMask, out _)) {
-				KeyBindings.Remove (prevHotKey | Key.ShiftMask);
+			if (KeyBindings.TryGet (prevHotKey | ConsoleDriverKey.ShiftMask, out _)) {
+				KeyBindings.Remove (prevHotKey | ConsoleDriverKey.ShiftMask);
 			}
 			// Remove alt | shift version
-			if (KeyBindings.TryGet (prevHotKey | Key.ShiftMask | Key.AltMask, out _)) {
-				KeyBindings.Remove (prevHotKey | Key.ShiftMask | Key.AltMask);
+			if (KeyBindings.TryGet (prevHotKey | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, out _)) {
+				KeyBindings.Remove (prevHotKey | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask);
 			}
 		}
 
 		// Add the new 
-		if (newKey != Key.Null) {
+		if (newKey != ConsoleDriverKey.Null) {
 			// Add the base and Alt key
 			KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-			KeyBindings.Add (newKey | Key.AltMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+			KeyBindings.Add (newKey | ConsoleDriverKey.AltMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
 
 			// If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
-			if (newKey is >= Key.A and <= Key.Z) {
-				KeyBindings.Add (newKey | Key.ShiftMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-				KeyBindings.Add (newKey | Key.ShiftMask | Key.AltMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+			if (newKey is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
+				KeyBindings.Add (newKey | ConsoleDriverKey.ShiftMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+				KeyBindings.Add (newKey | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
 			}
 		}
 		return true;
@@ -189,11 +189,11 @@ public partial class View {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
 		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
-			if (_hotKey != hk && hk != Key.Unknown) {
+			if (_hotKey != hk && hk != ConsoleDriverKey.Unknown) {
 				HotKey = hk;
 			}
 		} else {
-			HotKey = Key.Null;
+			HotKey = ConsoleDriverKey.Null;
 		}
 	}
 
@@ -269,8 +269,8 @@ public partial class View {
 	/// Set to <see langword="false"/> to prevent the view from being a stop-point for keyboard navigation.
 	/// </summary>
 	/// <remarks>
-	/// The default keyboard navigation keys are <see cref="Key.Tab"/> and <see cref="Key.ShiftMask"/>|<see cref="Key.Tab"/>.
-	/// These can be changed by modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
+	/// The default keyboard navigation keys are <see cref="ConsoleDriverKey.Tab"/> and <see cref="ConsoleDriverKey.ShiftMask"/>|<see cref="ConsoleDriverKey.Tab"/>.
+	/// These can be changed by modifying the key bindings (see <see cref="KeyBindings.Add(ConsoleDriverKey, Command[])"/>) of the SuperView.
 	/// </remarks>
 	public bool TabStop {
 		get => _tabStop;
@@ -346,7 +346,7 @@ public partial class View {
 	/// the keypress was handled and no other view should see it.</returns>
 	/// <remarks>
 	/// <para>
-	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(Key, Command[])"/>instead.
+	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(ConsoleDriverKey, Command[])"/>instead.
 	/// </para>
 	/// <para>
 	/// Fires the <see cref="KeyDown"/> event. 
@@ -388,7 +388,7 @@ public partial class View {
 	/// Override <see cref="OnKeyPressed"/> to override the behavior of how the base class processes key down events.
 	/// </para>
 	/// <para>
-	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(Key, Command[])"/>instead.
+	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(ConsoleDriverKey, Command[])"/>instead.
 	/// </para>
 	/// <para>
 	/// Fires the <see cref="KeyPressed"/> event. 

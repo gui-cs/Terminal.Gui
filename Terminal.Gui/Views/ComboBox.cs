@@ -343,16 +343,16 @@ namespace Terminal.Gui {
 			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
 			// Default keybindings for this view
-			KeyBindings.Add (Key.Enter, Command.Accept);
-			KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
-			KeyBindings.Add (Key.CursorDown, Command.LineDown);
-			KeyBindings.Add (Key.CursorUp, Command.LineUp);
-			KeyBindings.Add (Key.PageDown, Command.PageDown);
-			KeyBindings.Add (Key.PageUp, Command.PageUp);
-			KeyBindings.Add (Key.Home, Command.TopHome);
-			KeyBindings.Add (Key.End, Command.BottomEnd);
-			KeyBindings.Add (Key.Esc, Command.Cancel);
-			KeyBindings.Add (Key.U | Key.CtrlMask, Command.UnixEmulation);
+			KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
+			KeyBindings.Add (ConsoleDriverKey.F4, Command.ToggleExpandCollapse);
+			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
+			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
+			KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
+			KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
+			KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
+			KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
+			KeyBindings.Add (ConsoleDriverKey.Esc, Command.Cancel);
+			KeyBindings.Add (ConsoleDriverKey.U | ConsoleDriverKey.CtrlMask, Command.UnixEmulation);
 		}
 
 		private bool isShow = false;

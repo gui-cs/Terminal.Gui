@@ -75,11 +75,11 @@ public class AllViewsTests {
 			}
 
 			if (vType is TextView) {
-				top.ProcessKeyDown (new (Key.Tab | Key.CtrlMask));
+				top.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask));
 			} else {
-				top.ProcessKeyDown (new (Key.Tab));
+				top.ProcessKeyDown (new (ConsoleDriverKey.Tab));
 			}
-			top.ProcessKeyDown (new (Key.Tab));
+			top.ProcessKeyDown (new (ConsoleDriverKey.Tab));
 
 			Assert.Equal (2, vTypeEnter);
 			Assert.Equal (1, vTypeLeave);

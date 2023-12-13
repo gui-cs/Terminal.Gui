@@ -4,18 +4,18 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui {
-	class KeyJsonConverter : JsonConverter<Key> {
-		public override Key Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+	class KeyJsonConverter : JsonConverter<ConsoleDriverKey> {
+		public override ConsoleDriverKey Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			if (reader.TokenType == JsonTokenType.StartObject) {
-				Key key = Key.Unknown;
-				Dictionary<string, Key> modifierDict = new Dictionary<string, Key> (comparer: StringComparer.InvariantCultureIgnoreCase) {
-					{ "Shift", Key.ShiftMask },
-					{ "Ctrl", Key.CtrlMask },
-					{ "Alt", Key.AltMask }
+				ConsoleDriverKey key = ConsoleDriverKey.Unknown;
+				Dictionary<string, ConsoleDriverKey> modifierDict = new Dictionary<string, ConsoleDriverKey> (comparer: StringComparer.InvariantCultureIgnoreCase) {
+					{ "Shift", ConsoleDriverKey.ShiftMask },
+					{ "Ctrl", ConsoleDriverKey.CtrlMask },
+					{ "Alt", ConsoleDriverKey.AltMask }
 				};
 
-				List<Key> modifiers = new List<Key> ();
+				List<ConsoleDriverKey> modifiers = new List<ConsoleDriverKey> ();
 
 				while (reader.Read ()) {
 					if (reader.TokenType == JsonTokenType.EndObject) {
@@ -38,13 +38,13 @@ namespace Terminal.Gui {
 									break;
 								}
 
-								if (key == Key.Unknown || key == Key.Null) {
+								if (key == ConsoleDriverKey.Unknown || key == ConsoleDriverKey.Null) {
 									throw new JsonException ($"The value \"{reader.GetString ()}\" is not a valid Key.");
 								}
 
 							} else if (reader.TokenType == JsonTokenType.Number) {
 								try {
-									key = (Key)reader.GetInt32 ();
+									key = (ConsoleDriverKey)reader.GetInt32 ();
 								} catch (InvalidOperationException ioe) {
 									throw new JsonException ($"Error parsing Key value: {ioe.Message}", ioe);
 								} catch (FormatException ioe) {
@@ -87,22 +87,22 @@ namespace Terminal.Gui {
 			throw new JsonException ($"Unexpected StartObject token when parsing Key: {reader.TokenType}.");
 		}
 
-		public override void Write (Utf8JsonWriter writer, Key value, JsonSerializerOptions options)
+		public override void Write (Utf8JsonWriter writer, ConsoleDriverKey value, JsonSerializerOptions options)
 		{
 			writer.WriteStartObject ();
 
-			var keyName = (value & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask).ToString ();
+			var keyName = (value & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.ShiftMask & ~ConsoleDriverKey.AltMask).ToString ();
 			if (keyName != null) {
 				writer.WriteString ("Key", keyName);
 			} else {
-				writer.WriteNumber ("Key", (uint)(value & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask));
+				writer.WriteNumber ("Key", (uint)(value & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.ShiftMask & ~ConsoleDriverKey.AltMask));
 			}
 
-			Dictionary<string, Key> modifierDict = new Dictionary<string, Key>
+			Dictionary<string, ConsoleDriverKey> modifierDict = new Dictionary<string, ConsoleDriverKey>
 			{
-				{ "Shift", Key.ShiftMask },
-				{ "Ctrl", Key.CtrlMask },
-				{ "Alt", Key.AltMask }
+				{ "Shift", ConsoleDriverKey.ShiftMask },
+				{ "Ctrl", ConsoleDriverKey.CtrlMask },
+				{ "Alt", ConsoleDriverKey.AltMask }
 			    };
 
 			List<string> modifiers = new List<string> ();
