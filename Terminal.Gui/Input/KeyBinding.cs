@@ -227,6 +227,7 @@ public class KeyBindings {
 	/// Gets the <see cref="KeyBinding"/> for the specified <see cref="ConsoleDriverKey"/>.
 	/// </summary>
 	/// <param name="key"></param>
+	/// <param name="scope"></param>
 	/// <returns></returns>
 	public KeyBinding Get (ConsoleDriverKey key, KeyBindingScope scope) => TryGet (key, scope, out var binding) ? binding : null;
 
