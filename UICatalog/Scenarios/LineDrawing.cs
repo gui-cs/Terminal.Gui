@@ -111,7 +111,7 @@ namespace UICatalog.Scenarios {
 			public override bool OnKeyPressed (KeyEventArgs e)
 			{
 				// BUGBUG: These should be implemented with key bindings
-				if (e.Key == (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)) {
+				if (e.ConsoleDriverKey == (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();
 					if(pop != null) {
 						undoHistory.Push (pop);
@@ -120,7 +120,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 
-				if (e.Key == (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)) {
+				if (e.ConsoleDriverKey == (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)) {
 					if (undoHistory.Any()) {
 						var pop = undoHistory.Pop ();
 						_currentLayer.AddLine(pop);
