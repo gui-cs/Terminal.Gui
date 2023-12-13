@@ -59,12 +59,12 @@ public partial class View {
 	/// <para>
 	/// By default, when the Hot Key is set, key bindings are added for both the base key (e.g. <see cref="ConsoleDriverKey.D3"/>) and
 	/// the Alt-shifted key (e.g. <see cref="ConsoleDriverKey.D3"/> | <see cref="ConsoleDriverKey.AltMask"/>).
-	/// This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
+	/// This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
 	/// By default, when the HotKey is set to <see cref="ConsoleDriverKey.A"/> through <see cref="ConsoleDriverKey.Z"/> key bindings will be added for both the un-shifted and shifted
 	/// versions. This means if the HotKey is <see cref="ConsoleDriverKey.A"/>, key bindings for <see cref="ConsoleDriverKey.A"/> and <see cref="ConsoleDriverKey.A"/> | <see cref="ConsoleDriverKey.ShiftMask"/>
-	/// will be added. This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
+	/// will be added. This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
@@ -88,12 +88,12 @@ public partial class View {
 	/// <para>
 	/// By default key bindings are added for both the base key (e.g. <see cref="ConsoleDriverKey.D3"/>) and
 	/// the Alt-shifted key (e.g. <see cref="ConsoleDriverKey.D3"/> | <see cref="ConsoleDriverKey.AltMask"/>).
-	/// This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
+	/// This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
 	/// By default, when <paramref name="hotKey"/> is <see cref="ConsoleDriverKey.A"/> through <see cref="ConsoleDriverKey.Z"/> key bindings will be added for both the un-shifted and shifted
 	/// versions. This means if the HotKey is <see cref="ConsoleDriverKey.A"/>, key bindings for <see cref="ConsoleDriverKey.A"/> and <see cref="ConsoleDriverKey.A"/> | <see cref="ConsoleDriverKey.ShiftMask"/>
-	/// will be added. This behavior can be overriden by overriding <see cref="KeyBindings.AddsForHotKey"/>.
+	/// will be added. This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
 	/// For each of the bound keys <see cref="Command.Default"/> causes the view to be focused and <see cref="Command.Accept"/> does nothing.

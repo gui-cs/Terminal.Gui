@@ -1390,7 +1390,7 @@ public static partial class Application {
 	/// <remarks>
 	/// Can be used to simulate key press events.
 	/// </remarks>
-	/// <param name="a"></param>
+	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the key was handled.</returns>
 	public static bool OnKeyDown (KeyEventArgs keyEvent)
 	{
