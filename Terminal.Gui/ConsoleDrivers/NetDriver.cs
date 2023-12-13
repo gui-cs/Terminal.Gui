@@ -1005,38 +1005,37 @@ internal class NetDriver : ConsoleDriver {
 
 	Key MapKey (ConsoleKeyInfo keyInfo)
 	{
-		//MapKeyModifiers (keyInfo, (Key)keyInfo.Key);
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return MapKeyModifiers (keyInfo, Key.Esc);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Esc);
 		case ConsoleKey.Tab:
-			return MapKeyModifiers (keyInfo, Key.Tab);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Tab);
 		case ConsoleKey.Home:
-			return MapKeyModifiers (keyInfo, Key.Home);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Home);
 		case ConsoleKey.End:
-			return MapKeyModifiers (keyInfo, Key.End);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.End);
 		case ConsoleKey.LeftArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorLeft);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorRight);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorRight);
 		case ConsoleKey.UpArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorUp);
 		case ConsoleKey.DownArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.CursorDown);
 		case ConsoleKey.PageUp:
-			return MapKeyModifiers (keyInfo, Key.PageUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PageUp);
 		case ConsoleKey.PageDown:
-			return MapKeyModifiers (keyInfo, Key.PageDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.PageDown);
 		case ConsoleKey.Enter:
-			return MapKeyModifiers (keyInfo, Key.Enter);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Enter);
 		case ConsoleKey.Spacebar:
-			return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return MapKeyModifiers (keyInfo, Key.Backspace);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.Backspace);
 		case ConsoleKey.Delete:
-			return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.DeleteChar);
 		case ConsoleKey.Insert:
-			return MapKeyModifiers (keyInfo, Key.InsertChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, Key.InsertChar);
 
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
@@ -1099,7 +1098,7 @@ internal class NetDriver : ConsoleDriver {
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
 				}
 			}
 			return (Key)((uint)keyInfo.KeyChar);
@@ -1107,7 +1106,7 @@ internal class NetDriver : ConsoleDriver {
 		if (key is >= ConsoleKey.F1 and <= ConsoleKey.F12) {
 			var delta = key - ConsoleKey.F1;
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
 			}
 
 			return (Key)((uint)Key.F1 + delta);
@@ -1128,59 +1127,6 @@ internal class NetDriver : ConsoleDriver {
 		return (Key)(uint)keyInfo.KeyChar;
 	}
 
-	// TODO: Remove this - I threw it in here to quickly get netdriver working again
-	/// <summary>
-	/// Identifies the state of the "shift"-keys within a event.
-	/// </summary>
-	public class KeyModifiers {
-		/// <summary>
-		/// Check if the Shift key was pressed or not.
-		/// </summary>
-		public bool Shift;
-		/// <summary>
-		/// Check if the Alt key was pressed or not.
-		/// </summary>
-		public bool Alt;
-		/// <summary>
-		/// Check if the Ctrl key was pressed or not.
-		/// </summary>
-		public bool Ctrl;
-		/// <summary>
-		/// Check if the Caps lock key was pressed or not.
-		/// </summary>
-		public bool Capslock;
-		/// <summary>
-		/// Check if the Num lock key was pressed or not.
-		/// </summary>
-		public bool Numlock;
-		/// <summary>
-		/// Check if the Scroll lock key was pressed or not.
-		/// </summary>
-		public bool Scrolllock;
-	}
-
-	KeyModifiers _keyModifiers;
-
-	Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
-	{
-		_keyModifiers ??= new KeyModifiers ();
-		Key keyMod = new Key ();
-		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
-			keyMod = Key.ShiftMask;
-			_keyModifiers.Shift = true;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
-			keyMod |= Key.CtrlMask;
-			_keyModifiers.Ctrl = true;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
-			keyMod |= Key.AltMask;
-			_keyModifiers.Alt = true;
-		}
-
-		return keyMod != Key.Null ? keyMod | key : key;
-	}
-
 	volatile bool _winSizeChanging;
 
 	void ProcessInput (NetEvents.InputResult inputEvent)
@@ -1191,7 +1137,6 @@ internal class NetDriver : ConsoleDriver {
 			if (consoleKeyInfo.Key == ConsoleKey.Packet) {
 				consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 			}
-			_keyModifiers = new KeyModifiers ();
 			var map = MapKey (consoleKeyInfo);
 
 			OnKeyDown (new KeyEventArgs (map));
