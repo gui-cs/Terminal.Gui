@@ -528,7 +528,7 @@ public partial class View {
 	/// <summary>
 	/// Gets the key bindings for this view.
 	/// </summary>
-	private Dictionary<Key, (Command [] commands, CommandScope scope)> KeyBindings { get; set; } = new Dictionary<Key, (Command [], CommandScope)> ();
+	private Dictionary<Key, (Command [] commands, KeyBindingScope scope)> KeyBindings { get; set; } = new Dictionary<Key, (Command [], KeyBindingScope)> ();
 	private Dictionary<Command, Func<bool?>> CommandImplementations { get; set; } = new Dictionary<Command, Func<bool?>> ();
 
 	/// <summary>
@@ -580,7 +580,7 @@ public partial class View {
 
 		foreach (var view in Subviews.Where (v => v is MenuBar || keyEvent.BareKey == v.HotKey)) {
 			var binding = view.GetKeyBindingWithScope (keyEvent.Key);
-			if (binding.commands.Length > 0 && binding.scope == CommandScope.SuperView) {
+			if (binding.commands.Length > 0 && binding.scope == KeyBindingScope.SuperView) {
 				handled = view.OnInvokingKeyBindings (keyEvent);
 				if (handled != null && (bool)handled) {
 					return true;
@@ -675,7 +675,7 @@ public partial class View {
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
-	public void AddKeyBinding (Key key, CommandScope scope, params Command [] commands)
+	public void AddKeyBinding (Key key, KeyBindingScope scope, params Command [] commands)
 	{
 		if (commands.Length == 0) {
 			throw new ArgumentException ("At least one command must be specified", nameof (commands));
@@ -699,8 +699,8 @@ public partial class View {
 	/// (if supported by the View - see <see cref="GetSupportedCommands"/>).
 	/// </para>
 	/// <para>
-	/// This is a helper function for <see cref="AddKeyBinding(Terminal.Gui.Key,Terminal.Gui.CommandScope,Terminal.Gui.Command[])"/>
-	/// for <see cref="CommandScope.View"/> scoped commands.
+	/// This is a helper function for <see cref="AddKeyBinding(Terminal.Gui.Key,KeyBindingScope,Terminal.Gui.Command[])"/>
+	/// for <see cref="KeyBindingScope.View"/> scoped commands.
 	/// </para>
 	/// <para>
 	/// If the key is already bound to a different array of <see cref="Command"/>s it will be
@@ -716,7 +716,7 @@ public partial class View {
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
-	public void AddKeyBinding (Key key, params Command [] commands) => AddKeyBinding(key, CommandScope.View, commands);
+	public void AddKeyBinding (Key key, params Command [] commands) => AddKeyBinding(key, KeyBindingScope.View, commands);
 
 	/// <summary>
 	/// Replaces a key combination already bound to a set of <see cref="Command"/>s.
@@ -749,10 +749,10 @@ public partial class View {
 	/// <returns>
 	/// <see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.
 	/// </returns>
-	public bool TryGetKeyBinding (Key key, out (Command [] commands, CommandScope scope) binding)
+	public bool TryGetKeyBinding (Key key, out (Command [] commands, KeyBindingScope scope) binding)
 	{
 		if (key == Key.Null || key == Key.Unknown) {
-			binding = (Array.Empty<Command> (), CommandScope.View);
+			binding = (Array.Empty<Command> (), KeyBindingScope.View);
 			return false;
 		}
 		return KeyBindings.TryGetValue (key, out binding);
@@ -765,12 +765,12 @@ public partial class View {
 	/// The key to check.
 	/// </param>
 	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
-	public (Command [] commands, CommandScope scope) GetKeyBindingWithScope (Key key)
+	public (Command [] commands, KeyBindingScope scope) GetKeyBindingWithScope (Key key)
 	{
 		if (TryGetKeyBinding (key, out var bindings)) {
 			return bindings;
 		}
-		return (Array.Empty<Command> (), CommandScope.View);
+		return (Array.Empty<Command> (), KeyBindingScope.View);
 	}
 
 	/// <summary>
