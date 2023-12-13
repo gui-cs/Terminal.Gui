@@ -343,16 +343,16 @@ namespace Terminal.Gui {
 			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Enter, Command.Accept);
-			AddKeyBinding (Key.F4, Command.ToggleExpandCollapse);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.Home, Command.TopHome);
-			AddKeyBinding (Key.End, Command.BottomEnd);
-			AddKeyBinding (Key.Esc, Command.Cancel);
-			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
+			KeyBindings.Add (Key.Enter, Command.Accept);
+			KeyBindings.Add (Key.F4, Command.ToggleExpandCollapse);
+			KeyBindings.Add (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (Key.CursorUp, Command.LineUp);
+			KeyBindings.Add (Key.PageDown, Command.PageDown);
+			KeyBindings.Add (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (Key.Home, Command.TopHome);
+			KeyBindings.Add (Key.End, Command.BottomEnd);
+			KeyBindings.Add (Key.Esc, Command.Cancel);
+			KeyBindings.Add (Key.U | Key.CtrlMask, Command.UnixEmulation);
 		}
 
 		private bool isShow = false;

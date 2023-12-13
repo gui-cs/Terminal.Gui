@@ -386,14 +386,14 @@ class Menu : View {
 		AddCommand (Command.Default, () => _host?.SelectItem (_menuItemToSelect));
 
 		// Default key bindings for this view
-		AddKeyBinding (Key.CursorUp, Command.LineUp);
-		AddKeyBinding (Key.CursorDown, Command.LineDown);
-		AddKeyBinding (Key.CursorLeft, Command.Left);
-		AddKeyBinding (Key.CursorRight, Command.Right);
-		AddKeyBinding (Key.Esc, Command.Cancel);
-		AddKeyBinding (Key.Enter, Command.Accept);
-		AddKeyBinding (Key.F9, Command.ToggleExpandCollapse);
-		AddKeyBinding (Key.CtrlMask | Key.Space, Command.ToggleExpandCollapse);
+		KeyBindings.Add (Key.CursorUp, Command.LineUp);
+		KeyBindings.Add (Key.CursorDown, Command.LineDown);
+		KeyBindings.Add (Key.CursorLeft, Command.Left);
+		KeyBindings.Add (Key.CursorRight, Command.Right);
+		KeyBindings.Add (Key.Esc, Command.Cancel);
+		KeyBindings.Add (Key.Enter, Command.Accept);
+		KeyBindings.Add (Key.F9, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+		KeyBindings.Add (Key.CtrlMask | Key.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
 		AddKeyBindings (barItems);
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
@@ -424,10 +424,10 @@ class Menu : View {
 			return;
 		}
 		foreach (var menuItem in menuBarItem.Children.Where (m => m != null)) {
-			AddKeyBinding ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
-			AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, Command.ToggleExpandCollapse);
+			KeyBindings.Add ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
+			KeyBindings.Add ((Key)menuItem.HotKey.Value | Key.AltMask, Command.ToggleExpandCollapse);
 			if (menuItem.Shortcut != Key.Unknown) {
-				AddKeyBinding (menuItem.Shortcut, Command.Select);
+				KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			var subMenu = menuBarItem.SubMenu (menuItem);
 			AddKeyBindings (subMenu);
@@ -488,7 +488,7 @@ class Menu : View {
 
 		var key = keyEvent.Key;
 
-		if (TryGetKeyBinding(key, out _)) {
+		if (KeyBindings.TryGet(key, out _)) {
 			_menuBarItemToActivate = -1;
 			_menuItemToSelect = null;
 
@@ -502,10 +502,12 @@ class Menu : View {
 				if (key == c?.Shortcut) {
 					_menuBarItemToActivate = -1;
 					_menuItemToSelect = c;
+					keyEvent.Scope = KeyBindingScope.HotKey;
 					return base.OnInvokingKeyBindings (keyEvent);
 				}
 				var subMenu = _barItems.SubMenu (c);
 				if (FindShortcutInChildMenu (key, subMenu)) {
+					keyEvent.Scope = KeyBindingScope.HotKey;
 					return base.OnInvokingKeyBindings (keyEvent);
 				}
 			}
@@ -526,7 +528,6 @@ class Menu : View {
 				if (matches) {
 					_menuItemToSelect = children [c];
 					_currentChild = c;
-
 					return base.OnInvokingKeyBindings (keyEvent);
 				}
 			}

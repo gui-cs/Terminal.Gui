@@ -1403,31 +1403,31 @@ public class Slider<T> : View {
 	void SetKeyBindings ()
 	{
 		if (_config._sliderOrientation == Orientation.Horizontal) {
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			ClearKeyBinding (Key.CursorDown);
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			ClearKeyBinding (Key.CursorUp);
+			KeyBindings.Add (Key.CursorRight, Command.Right);
+			KeyBindings.Remove (Key.CursorDown);
+			KeyBindings.Add (Key.CursorLeft, Command.Left);
+			KeyBindings.Remove (Key.CursorUp);
 
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.RightExtend);
-			ClearKeyBinding (Key.CursorDown | Key.CtrlMask);
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.LeftExtend);
-			ClearKeyBinding (Key.CursorUp | Key.CtrlMask);
+			KeyBindings.Add (Key.CursorRight | Key.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (Key.CursorDown | Key.CtrlMask);
+			KeyBindings.Add (Key.CursorLeft | Key.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (Key.CursorUp | Key.CtrlMask);
 		} else {
-			ClearKeyBinding (Key.CursorRight);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			ClearKeyBinding (Key.CursorLeft);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			KeyBindings.Remove (Key.CursorRight);
+			KeyBindings.Add (Key.CursorDown, Command.LineDown);
+			KeyBindings.Remove (Key.CursorLeft);
+			KeyBindings.Add (Key.CursorUp, Command.LineUp);
 
-			ClearKeyBinding (Key.CursorRight | Key.CtrlMask);
-			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.RightExtend);
-			ClearKeyBinding (Key.CursorLeft | Key.CtrlMask);
-			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (Key.CursorRight | Key.CtrlMask);
+			KeyBindings.Add (Key.CursorDown | Key.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (Key.CursorLeft | Key.CtrlMask);
+			KeyBindings.Add (Key.CursorUp | Key.CtrlMask, Command.LeftExtend);
 
 		}
-		AddKeyBinding (Key.Home, Command.LeftHome);
-		AddKeyBinding (Key.End, Command.RightEnd);
-		AddKeyBinding (Key.Enter, Command.Accept);
-		AddKeyBinding (Key.Space, Command.Accept);
+		KeyBindings.Add (Key.Home, Command.LeftHome);
+		KeyBindings.Add (Key.End, Command.RightEnd);
+		KeyBindings.Add (Key.Enter, Command.Accept);
+		KeyBindings.Add (Key.Space, Command.Accept);
 
 	}
 

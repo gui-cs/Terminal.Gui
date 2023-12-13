@@ -119,7 +119,7 @@ namespace UICatalog.Scenarios {
 				listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 			};
 
-			listColView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			listColView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 		}
 
 		private void SetupScrollBar ()

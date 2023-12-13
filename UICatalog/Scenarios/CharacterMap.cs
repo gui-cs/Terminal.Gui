@@ -376,7 +376,7 @@ class CharMap : ScrollView {
 			SelectedCodePoint = MaxCodePoint;
 			return true;
 		});
-		AddKeyBinding (Key.Enter, Command.Accept);
+		KeyBindings.Add (Key.Enter, Command.Accept);
 		AddCommand (Command.Accept, () => {
 			ShowDetails ();
 			return true;

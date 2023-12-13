@@ -1392,19 +1392,32 @@ public static partial class Application {
 	/// </remarks>
 	/// <param name="a"></param>
 	/// <returns><see langword="true"/> if the key was handled.</returns>
-	public static bool OnKeyDown (KeyEventArgs a)
+	public static bool OnKeyDown (KeyEventArgs keyEvent)
 	{
-		KeyDown?.Invoke (null, a);
-		if (a.Handled) {
+		KeyDown?.Invoke (null, keyEvent);
+		if (keyEvent.Handled) {
 			return true;
 		}
 
 		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.ProcessKeyDown (a)) {
+			if (topLevel.ProcessKeyDown (keyEvent)) {
 				return true;
 			}
 			if (topLevel.Modal)
 				break;
+		}
+
+		// Invoke any Global KeyBindings
+		foreach (var topLevel in _topLevels.ToList ()) {
+			foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.Key, KeyBindingScope.Global, out var _))) {
+				if (view.KeyBindings.TryGet (keyEvent.Key, KeyBindingScope.Global, out var _)) {
+					keyEvent.Scope = KeyBindingScope.Global;
+					var handled = view.OnInvokingKeyBindings (keyEvent);
+					if (handled != null && (bool)handled) {
+						return true;
+					}
+				}
+			}
 		}
 
 		return false;

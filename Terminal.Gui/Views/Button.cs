@@ -123,7 +123,7 @@ public class Button : View {
 		// Override default behavior of View
 		// Command.Default sets focus
 		AddCommand (Command.Accept, () => { OnClicked (); return true; });
-		AddKeyBinding (Key.Space, Command.Default, Command.Accept);
+		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
 	}
 
 	/// <summary>

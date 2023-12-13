@@ -87,23 +87,23 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => MoveRight ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
-			AddKeyBinding (Key.D | Key.CtrlMask, Command.DeleteCharRight);
+			KeyBindings.Add (Key.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (Key.D | Key.CtrlMask, Command.DeleteCharRight);
 
-			AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
-			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (Key.Delete, Command.DeleteCharLeft);
+			KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.LeftHome);
+			KeyBindings.Add (Key.Home, Command.LeftHome);
+			KeyBindings.Add (Key.A | Key.CtrlMask, Command.LeftHome);
 
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.Left);
+			KeyBindings.Add (Key.CursorLeft, Command.Left);
+			KeyBindings.Add (Key.B | Key.CtrlMask, Command.Left);
 
-			AddKeyBinding (Key.End, Command.RightEnd);
-			AddKeyBinding (Key.E | Key.CtrlMask, Command.RightEnd);
+			KeyBindings.Add (Key.End, Command.RightEnd);
+			KeyBindings.Add (Key.E | Key.CtrlMask, Command.RightEnd);
 
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
+			KeyBindings.Add (Key.CursorRight, Command.Right);
+			KeyBindings.Add (Key.F | Key.CtrlMask, Command.Right);
 		}
 
 		void TextField_TextChanged (object sender, TextChangedEventArgs e)

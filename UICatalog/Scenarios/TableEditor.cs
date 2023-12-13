@@ -170,7 +170,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 		}
 
 		private void ShowAllColumns ()

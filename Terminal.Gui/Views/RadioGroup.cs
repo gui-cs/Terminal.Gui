@@ -72,11 +72,11 @@ public class RadioGroup : View {
 		AddCommand (Command.Accept, () => { SelectItem (); return true; });
 
 		// Default keybindings for this view
-		AddKeyBinding (Key.CursorUp, Command.LineUp);
-		AddKeyBinding (Key.CursorDown, Command.LineDown);
-		AddKeyBinding (Key.Home, Command.TopHome);
-		AddKeyBinding (Key.End, Command.BottomEnd);
-		AddKeyBinding (Key.Space, Command.Accept);
+		KeyBindings.Add (Key.CursorUp, Command.LineUp);
+		KeyBindings.Add (Key.CursorDown, Command.LineDown);
+		KeyBindings.Add (Key.Home, Command.TopHome);
+		KeyBindings.Add (Key.End, Command.BottomEnd);
+		KeyBindings.Add (Key.Space, Command.Accept);
 
 		LayoutStarted += RadioGroup_LayoutStarted;
 	}
@@ -197,12 +197,13 @@ public class RadioGroup : View {
 
 		// Force upper case
 		var key = keyEvent.Key;
-		if (TryGetKeyBinding (key, out _)) {
+		if (KeyBindings.TryGet (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {
 				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out Key hotKey) 
 					&& (key & ~Key.ShiftMask & ~Key.AltMask) == hotKey) {
 					SelectedItem = i;
+					keyEvent.Scope = KeyBindingScope.HotKey;
 					break;
 				}
 			}

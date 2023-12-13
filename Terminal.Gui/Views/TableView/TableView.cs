@@ -176,11 +176,11 @@ namespace Terminal.Gui {
 			get => cellActivationKey;
 			set {
 				if (cellActivationKey != value) {
-					ReplaceKeyBinding (cellActivationKey, value);
+					KeyBindings.Replace (cellActivationKey, value);
 
 					// of API user is mixing and matching old and new methods of keybinding then they may have lost
-					// the old binding (e.g. with ClearKeybindings) so ReplaceKeyBinding alone will fail
-					AddKeyBinding (value, Command.Accept);
+					// the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
+					KeyBindings.Add (value, Command.Accept);
 					cellActivationKey = value;
 				}
 			}
@@ -239,30 +239,30 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => { ToggleCurrentCellSelection (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.End, Command.RightEnd);
-			AddKeyBinding (Key.Home | Key.CtrlMask, Command.TopHome);
-			AddKeyBinding (Key.End | Key.CtrlMask, Command.BottomEnd);
+			KeyBindings.Add (Key.CursorLeft, Command.Left);
+			KeyBindings.Add (Key.CursorRight, Command.Right);
+			KeyBindings.Add (Key.CursorUp, Command.LineUp);
+			KeyBindings.Add (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (Key.PageDown, Command.PageDown);
+			KeyBindings.Add (Key.Home, Command.LeftHome);
+			KeyBindings.Add (Key.End, Command.RightEnd);
+			KeyBindings.Add (Key.Home | Key.CtrlMask, Command.TopHome);
+			KeyBindings.Add (Key.End | Key.CtrlMask, Command.BottomEnd);
 
-			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
-			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
-			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
-			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
-			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
-			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
-			AddKeyBinding (Key.Home | Key.ShiftMask, Command.LeftHomeExtend);
-			AddKeyBinding (Key.End | Key.ShiftMask, Command.RightEndExtend);
-			AddKeyBinding (Key.Home | Key.CtrlMask | Key.ShiftMask, Command.TopHomeExtend);
-			AddKeyBinding (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
+			KeyBindings.Add (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
+			KeyBindings.Add (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
+			KeyBindings.Add (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (Key.Home | Key.ShiftMask, Command.LeftHomeExtend);
+			KeyBindings.Add (Key.End | Key.ShiftMask, Command.RightEndExtend);
+			KeyBindings.Add (Key.Home | Key.CtrlMask | Key.ShiftMask, Command.TopHomeExtend);
+			KeyBindings.Add (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
 
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
-			AddKeyBinding (CellActivationKey, Command.Accept);
+			KeyBindings.Add (Key.A | Key.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (CellActivationKey, Command.Accept);
 		}
 
 		///<inheritdoc/>

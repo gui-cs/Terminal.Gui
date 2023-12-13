@@ -1,30 +1,7 @@
 ﻿// These classes use a keybinding system based on the design implemented in Scintilla.Net which is an
 // MIT licensed open source project https://github.com/jacobslusser/ScintillaNET/blob/master/src/ScintillaNET/Command.cs
 
-using System;
-
-namespace Terminal.Gui; 
-
-/// <summary>
-/// Defines the scope of a <see cref="Command"/> that has been bound to a key with <see cref="View.AddKeyBinding(Terminal.Gui.Key, Terminal.Gui.Command[])"/>.
-/// </summary>
-public enum KeyBindingScope {
-	/// <summary>
-	/// The command is scoped to just the view that adds the key binding.
-	/// </summary>
-	View = 0,
-
-	/// <summary>
-	/// The keybinding will be triggered even when the View is not in focus.  So long as it's SuperView still contains focus.
-	/// <remarks>Use for Views such as MenuBar and StatusBar which provide commands that trigger even when not focused.</remarks>
-	/// </summary>
-	SuperView,
-
-	/// <summary>
-	/// The command is scoped to the view that adds the key binding and <see cref="Application"/>.
-	/// </summary>
-	App
-}
+namespace Terminal.Gui;
 
 /// <summary>
 /// Actions which can be performed by the application or bound to keys in a <see cref="View"/> control.

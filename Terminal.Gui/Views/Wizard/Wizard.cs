@@ -93,8 +93,8 @@ namespace Terminal.Gui {
 			TitleChanged += Wizard_TitleChanged;
 
 			if (Modal) {
-				ClearKeyBinding (Command.QuitToplevel);
-				AddKeyBinding (Key.Esc, Command.QuitToplevel);
+				KeyBindings.Clear (Command.QuitToplevel);
+				KeyBindings.Add (Key.Esc, Command.QuitToplevel);
 			}
 			SetNeedsLayout ();
 

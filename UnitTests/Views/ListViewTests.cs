@@ -59,7 +59,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (lv.Source.IsMarked (1));
 			Assert.False (lv.Source.IsMarked (2));
 
-			lv.AddKeyBinding (Key.Space | Key.ShiftMask, Command.ToggleChecked, Command.LineDown);
+			lv.KeyBindings.Add (Key.Space | Key.ShiftMask, Command.ToggleChecked, Command.LineDown);
 
 			var ev = new KeyEventArgs (Key.Space | Key.ShiftMask);
 
@@ -110,7 +110,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void SettingEmptyKeybindingThrows ()
 		{
 			var lv = new ListView (new List<string> () { "One", "Two", "Three" });
-			Assert.Throws<ArgumentException> (() => lv.AddKeyBinding (Key.Space));
+			Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (Key.Space));
 		}
 
 		/// <summary>
@@ -128,7 +128,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (-1, lv.SelectedItem);
 
 			// bind shift down to move down twice in control
-			lv.AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDown, Command.LineDown);
+			lv.KeyBindings.Add (Key.CursorDown | Key.ShiftMask, Command.LineDown, Command.LineDown);
 
 			var ev = new KeyEventArgs (Key.CursorDown | Key.ShiftMask);
 

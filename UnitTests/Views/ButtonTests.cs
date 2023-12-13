@@ -162,14 +162,14 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Space)
-			btn.ClearKeyBinding (Command.Default, Command.Accept);
+			btn.KeyBindings.Clear (Command.Default, Command.Accept);
 
 			// After clearing the default keystroke the Space button no longer does anything for the Button
 			Application.OnKeyDown (new ((Key)' '));
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
-			btn.AddKeyBinding (Key.B, Command.Default, Command.Accept);
+			btn.KeyBindings.Add (Key.B, Command.Default, Command.Accept);
 
 			// now pressing B should call the button click event
 			Application.OnKeyDown (new (Key.B));

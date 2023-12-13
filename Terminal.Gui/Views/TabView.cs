@@ -123,10 +123,10 @@ namespace Terminal.Gui {
 			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.End, Command.RightEnd);
+			KeyBindings.Add (Key.CursorLeft, Command.Left);
+			KeyBindings.Add (Key.CursorRight, Command.Right);
+			KeyBindings.Add (Key.Home, Command.LeftHome);
+			KeyBindings.Add (Key.End, Command.RightEnd);
 		}
 
 		/// <summary>

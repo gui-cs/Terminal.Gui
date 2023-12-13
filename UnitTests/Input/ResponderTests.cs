@@ -4,8 +4,9 @@ using Xunit;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.InputTests;
+
 public class ResponderTests {
-	[Fact, TestRespondersDisposed]
+	[Fact] [TestRespondersDisposed]
 	public void New_Initializes ()
 	{
 		var r = new Responder ();
@@ -18,7 +19,7 @@ public class ResponderTests {
 		r.Dispose ();
 	}
 
-	[Fact, TestRespondersDisposed]
+	[Fact] [TestRespondersDisposed]
 	public void New_Methods_Return_False ()
 	{
 		var r = new View ();
@@ -58,7 +59,7 @@ public class ResponderTests {
 	}
 
 	// Generic lifetime (IDisposable) tests
-	[Fact, TestRespondersDisposed]
+	[Fact] [TestRespondersDisposed]
 	public void Dispose_Works ()
 	{
 
@@ -74,9 +75,7 @@ public class ResponderTests {
 	}
 
 	public class DerivedView : View {
-		public DerivedView ()
-		{
-		}
+		public DerivedView () { }
 
 		public override bool OnKeyDown (KeyEventArgs keyEvent)
 		{
@@ -84,7 +83,7 @@ public class ResponderTests {
 		}
 	}
 
-	[Fact, TestRespondersDisposed]
+	[Fact] [TestRespondersDisposed]
 	public void IsOverridden_False_IfNotOverridden ()
 	{
 		// MouseEvent IS defined on Responder but NOT overridden
@@ -107,7 +106,7 @@ public class ResponderTests {
 #endif
 	}
 
-	[Fact, TestRespondersDisposed]
+	[Fact] [TestRespondersDisposed]
 	public void IsOverridden_True_IfOverridden ()
 	{
 		// MouseEvent is defined on Responder IS overriden on ScrollBarView (but not View)

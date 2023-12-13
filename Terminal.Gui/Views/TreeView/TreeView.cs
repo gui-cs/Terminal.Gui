@@ -127,7 +127,7 @@ namespace Terminal.Gui {
 			get => objectActivationKey;
 			set {
 				if (objectActivationKey != value) {
-					ReplaceKeyBinding (ObjectActivationKey, value);
+					KeyBindings.Replace (ObjectActivationKey, value);
 					objectActivationKey = value;
 				}
 			}
@@ -286,27 +286,27 @@ namespace Terminal.Gui {
 			AddCommand (Command.Accept, () => { ActivateSelectedObjectIfAny (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
-			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
-			AddKeyBinding (Key.CursorRight, Command.Expand);
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.ExpandAll);
-			AddKeyBinding (Key.CursorLeft, Command.Collapse);
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.CollapseAll);
+			KeyBindings.Add (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (Key.PageDown, Command.PageDown);
+			KeyBindings.Add (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (Key.CursorRight, Command.Expand);
+			KeyBindings.Add (Key.CursorRight | Key.CtrlMask, Command.ExpandAll);
+			KeyBindings.Add (Key.CursorLeft, Command.Collapse);
+			KeyBindings.Add (Key.CursorLeft | Key.CtrlMask, Command.CollapseAll);
 
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
-			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.LineUpToFirstBranch);
+			KeyBindings.Add (Key.CursorUp, Command.LineUp);
+			KeyBindings.Add (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (Key.CursorUp | Key.CtrlMask, Command.LineUpToFirstBranch);
 
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
-			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.LineDownToLastBranch);
+			KeyBindings.Add (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (Key.CursorDown | Key.CtrlMask, Command.LineDownToLastBranch);
 
-			AddKeyBinding (Key.Home, Command.TopHome);
-			AddKeyBinding (Key.End, Command.BottomEnd);
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
-			AddKeyBinding (ObjectActivationKey, Command.Accept);
+			KeyBindings.Add (Key.Home, Command.TopHome);
+			KeyBindings.Add (Key.End, Command.BottomEnd);
+			KeyBindings.Add (Key.A | Key.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (ObjectActivationKey, Command.Accept);
 		}
 
 		/// <summary>

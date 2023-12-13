@@ -220,31 +220,31 @@ namespace Terminal.Gui {
 			});
 
 			// Default keybindings for this view
-			AddKeyBinding (Application.QuitKey, Command.QuitToplevel);
+			KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
-			AddKeyBinding (Key.CursorRight, Command.NextView);
-			AddKeyBinding (Key.CursorDown, Command.NextView);
-			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
-			AddKeyBinding (Key.CursorUp, Command.PreviousView);
+			KeyBindings.Add (Key.CursorRight, Command.NextView);
+			KeyBindings.Add (Key.CursorDown, Command.NextView);
+			KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
+			KeyBindings.Add (Key.CursorUp, Command.PreviousView);
 
-			AddKeyBinding (Key.Tab, Command.NextView);
-			AddKeyBinding (Key.Tab | Key.ShiftMask, Command.PreviousView);
-			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
-			AddKeyBinding (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
+			KeyBindings.Add (Key.Tab, Command.NextView);
+			KeyBindings.Add (Key.Tab | Key.ShiftMask, Command.PreviousView);
+			KeyBindings.Add (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
+			KeyBindings.Add (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
 
-			AddKeyBinding (Key.F5, Command.Refresh);
-			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+			KeyBindings.Add (Key.F5, Command.Refresh);
+			KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
-			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
-			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);// Unix
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);// Unix
-			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
+			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
+			KeyBindings.Add (Key.L | Key.CtrlMask, Command.Refresh);// Unix
+			KeyBindings.Add (Key.F | Key.CtrlMask, Command.NextView);// Unix
+			KeyBindings.Add (Key.I | Key.CtrlMask, Command.NextView); // Unix
+			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
 #endif
 			// This enables the default button to be activated by the Enter key.
-			AddKeyBinding (Key.Enter, Command.Accept);
+			KeyBindings.Add (Key.Enter, Command.Accept);
 		}
 
 		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
@@ -272,7 +272,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey, e.NewKey);
 			AlternateForwardKeyChanged?.Invoke (this, e);
 		}
 
@@ -287,7 +287,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey, e.NewKey);
 			AlternateBackwardKeyChanged?.Invoke (this, e);
 		}
 
@@ -302,7 +302,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey, e.NewKey);
 			QuitKeyChanged?.Invoke (this, e);
 		}
 

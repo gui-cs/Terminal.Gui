@@ -400,15 +400,15 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => { CursorRight (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.End, Command.RightEnd);
+			KeyBindings.Add (Key.Home, Command.LeftHome);
+			KeyBindings.Add (Key.End, Command.RightEnd);
 
-			AddKeyBinding (Key.Delete, Command.DeleteCharRight);
-			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+			KeyBindings.Add (Key.DeleteChar, Command.DeleteCharRight);
 
-			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
+			KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (Key.CursorLeft, Command.Left);
+			KeyBindings.Add (Key.CursorRight, Command.Right);
 		}
 
 		/// <summary>

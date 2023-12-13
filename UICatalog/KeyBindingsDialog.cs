@@ -109,8 +109,8 @@ namespace UICatalog {
 						if(supported.Contains(kvp.Key))
 						{
 							// if the key was bound to any other commands clear that
-							view.ClearKeyBinding (kvp.Key);
-							view.AddKeyBinding (kvp.Value,kvp.Key);
+							view.KeyBindings.Remove (kvp.Value);
+							view.KeyBindings.Add (kvp.Value,kvp.Key);
 						}
 
 						// mark that we have done this view so don't need to set keybindings again on it

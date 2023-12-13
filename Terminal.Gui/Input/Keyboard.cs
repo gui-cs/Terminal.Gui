@@ -34,6 +34,11 @@ public class KeyEventArgs : EventArgs {
 	public Key Key { get; set; }
 
 	/// <summary>
+	/// Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.
+	/// </summary>
+	public KeyBindingScope Scope { get; set; } = KeyBindingScope.Focused;
+
+	/// <summary>
 	/// The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
 	/// </summary>
 	/// <remarks>

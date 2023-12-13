@@ -799,10 +799,10 @@ namespace Terminal.Gui {
 					return MoveSplitter (0, 1);
 				});
 
-				AddKeyBinding (Key.CursorRight, Command.Right);
-				AddKeyBinding (Key.CursorLeft, Command.Left);
-				AddKeyBinding (Key.CursorUp, Command.LineUp);
-				AddKeyBinding (Key.CursorDown, Command.LineDown);
+				KeyBindings.Add (Key.CursorRight, Command.Right);
+				KeyBindings.Add (Key.CursorLeft, Command.Left);
+				KeyBindings.Add (Key.CursorUp, Command.LineUp);
+				KeyBindings.Add (Key.CursorDown, Command.LineDown);
 			}
 
 			public override void PositionCursor ()

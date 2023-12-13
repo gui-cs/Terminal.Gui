@@ -77,24 +77,24 @@ public partial class HexView : View {
 		AddCommand (Command.EndOfPage, () => MoveDown (bytesPerLine * (Frame.Height - 1 - (int)(position - displayStart) / bytesPerLine)));
 
 		// Default keybindings for this view
-		AddKeyBinding (Key.CursorLeft, Command.Left);
-		AddKeyBinding (Key.CursorRight, Command.Right);
-		AddKeyBinding (Key.CursorDown, Command.LineDown);
-		AddKeyBinding (Key.CursorUp, Command.LineUp);
-		AddKeyBinding (Key.Enter, Command.ToggleChecked);
+		KeyBindings.Add (Key.CursorLeft, Command.Left);
+		KeyBindings.Add (Key.CursorRight, Command.Right);
+		KeyBindings.Add (Key.CursorDown, Command.LineDown);
+		KeyBindings.Add (Key.CursorUp, Command.LineUp);
+		KeyBindings.Add (Key.Enter, Command.ToggleChecked);
 
-		AddKeyBinding ('v' + Key.AltMask, Command.PageUp);
-		AddKeyBinding (Key.PageUp, Command.PageUp);
+		KeyBindings.Add ('v' + Key.AltMask, Command.PageUp);
+		KeyBindings.Add (Key.PageUp, Command.PageUp);
 
-		AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
-		AddKeyBinding (Key.PageDown, Command.PageDown);
+		KeyBindings.Add (Key.V | Key.CtrlMask, Command.PageDown);
+		KeyBindings.Add (Key.PageDown, Command.PageDown);
 
-		AddKeyBinding (Key.Home, Command.TopHome);
-		AddKeyBinding (Key.End, Command.BottomEnd);
-		AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.StartOfLine);
-		AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.EndOfLine);
-		AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.StartOfPage);
-		AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.EndOfPage);
+		KeyBindings.Add (Key.Home, Command.TopHome);
+		KeyBindings.Add (Key.End, Command.BottomEnd);
+		KeyBindings.Add (Key.CursorLeft | Key.CtrlMask, Command.StartOfLine);
+		KeyBindings.Add (Key.CursorRight | Key.CtrlMask, Command.EndOfLine);
+		KeyBindings.Add (Key.CursorUp | Key.CtrlMask, Command.StartOfPage);
+		KeyBindings.Add (Key.CursorDown | Key.CtrlMask, Command.EndOfPage);
 	}
 
 	/// <summary>

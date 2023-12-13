@@ -104,23 +104,23 @@ public class ScrollView : View {
 		AddCommand (Command.RightEnd, () => ScrollRight (_contentSize.Width));
 
 		// Default keybindings for this view
-		AddKeyBinding (Key.CursorUp, Command.ScrollUp);
-		AddKeyBinding (Key.CursorDown, Command.ScrollDown);
-		AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
-		AddKeyBinding (Key.CursorRight, Command.ScrollRight);
+		KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
+		KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+		KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+		KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
 
-		AddKeyBinding (Key.PageUp, Command.PageUp);
-		AddKeyBinding ((Key)'v' | Key.AltMask, Command.PageUp);
+		KeyBindings.Add (Key.PageUp, Command.PageUp);
+		KeyBindings.Add ((Key)'v' | Key.AltMask, Command.PageUp);
 
-		AddKeyBinding (Key.PageDown, Command.PageDown);
-		AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+		KeyBindings.Add (Key.PageDown, Command.PageDown);
+		KeyBindings.Add (Key.V | Key.CtrlMask, Command.PageDown);
 
-		AddKeyBinding (Key.PageUp | Key.CtrlMask, Command.PageLeft);
-		AddKeyBinding (Key.PageDown | Key.CtrlMask, Command.PageRight);
-		AddKeyBinding (Key.Home, Command.TopHome);
-		AddKeyBinding (Key.End, Command.BottomEnd);
-		AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
-		AddKeyBinding (Key.End | Key.CtrlMask, Command.RightEnd);
+		KeyBindings.Add (Key.PageUp | Key.CtrlMask, Command.PageLeft);
+		KeyBindings.Add (Key.PageDown | Key.CtrlMask, Command.PageRight);
+		KeyBindings.Add (Key.Home, Command.TopHome);
+		KeyBindings.Add (Key.End, Command.BottomEnd);
+		KeyBindings.Add (Key.Home | Key.CtrlMask, Command.LeftHome);
+		KeyBindings.Add (Key.End | Key.CtrlMask, Command.RightEnd);
 
 		Initialized += (s, e) => {
 			if (!_vertical.IsInitialized) {

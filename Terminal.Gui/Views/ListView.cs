@@ -166,9 +166,9 @@ namespace Terminal.Gui {
 			set {
 				allowsMarking = value;
 				if (allowsMarking) {
-					AddKeyBinding (Key.Space, Command.ToggleChecked);
+					KeyBindings.Add (Key.Space, Command.ToggleChecked);
 				} else {
-					ClearKeyBinding (Key.Space);
+					KeyBindings.Remove (Key.Space);
 				}
 
 				SetNeedsDisplay ();
@@ -330,22 +330,22 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
 
 			// Default keybindings for all ListViews
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
+			KeyBindings.Add (Key.CursorUp, Command.LineUp);
+			KeyBindings.Add (Key.P | Key.CtrlMask, Command.LineUp);
 
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
+			KeyBindings.Add (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (Key.N | Key.CtrlMask, Command.LineDown);
 
-			AddKeyBinding (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (Key.PageUp, Command.PageUp);
 
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+			KeyBindings.Add (Key.PageDown, Command.PageDown);
+			KeyBindings.Add (Key.V | Key.CtrlMask, Command.PageDown);
 
-			AddKeyBinding (Key.Home, Command.TopHome);
+			KeyBindings.Add (Key.Home, Command.TopHome);
 
-			AddKeyBinding (Key.End, Command.BottomEnd);
+			KeyBindings.Add (Key.End, Command.BottomEnd);
 
-			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
+			KeyBindings.Add (Key.Enter, Command.OpenSelectedItem);
 		}
 
 		///<inheritdoc/>

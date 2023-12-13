@@ -171,14 +171,14 @@ public class RadioGroupTests {
 	public void KeyBindings_Are_Added_Correctly ()
 	{
 		var rg = new RadioGroup (new string [] { "Left", "Right" });
-		Assert.NotEmpty (rg.GetKeyBinding (Key.L));
-		Assert.NotEmpty (rg.GetKeyBinding (Key.R));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R));
 
-		Assert.NotEmpty (rg.GetKeyBinding (Key.L | Key.ShiftMask));
-		Assert.NotEmpty (rg.GetKeyBinding (Key.L | Key.AltMask));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L | Key.ShiftMask));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L | Key.AltMask));
 
-		Assert.NotEmpty (rg.GetKeyBinding (Key.R | Key.ShiftMask));
-		Assert.NotEmpty (rg.GetKeyBinding (Key.R | Key.AltMask));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R | Key.ShiftMask));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R | Key.AltMask));
 
 	}
 
@@ -186,9 +186,9 @@ public class RadioGroupTests {
 	public void KeyBindings_HotKeys ()
 	{
 		var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
-		Assert.NotEmpty (rg.GetKeyBinding (Key.L));
-		Assert.NotEmpty (rg.GetKeyBinding (Key.L | Key.ShiftMask));
-		Assert.NotEmpty (rg.GetKeyBinding (Key.L | Key.AltMask));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L | Key.ShiftMask));
+		Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L | Key.AltMask));
 
 		// BUGBUG: These tests only test that RG works on it's own, not if it's a subview
 		Assert.True (rg.ProcessKeyDown (new (Key.T)));

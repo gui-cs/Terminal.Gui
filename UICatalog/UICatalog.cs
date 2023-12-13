@@ -380,14 +380,14 @@ namespace UICatalog {
 				ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
 				// TableView typically is a grid where nav keys are biased for moving left/right.
-				ScenarioList.AddKeyBinding (Key.Home, Command.TopHome);
-				ScenarioList.AddKeyBinding (Key.End, Command.BottomEnd);
+				ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+				ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
 
 				// Ideally, TableView.MultiSelect = false would turn off any keybindings for
 				// multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
 				// a shortcut to About.
 				ScenarioList.MultiSelect = false;
-				ScenarioList.ClearKeyBinding (Key.CtrlMask | Key.A);
+				ScenarioList.KeyBindings.Remove (Key.CtrlMask | Key.A);
 
 				Add (CategoryList);
 				Add (ScenarioList);

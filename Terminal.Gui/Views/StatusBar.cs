@@ -86,11 +86,11 @@ public class StatusBar : View {
 		get => _items;
 		set {
 			foreach (var item in _items) {
-				ClearKeyBinding (item.Shortcut);
+				KeyBindings.Remove (item.Shortcut);
 			}
 			_items = value;
 			foreach (var item in _items) {
-				AddKeyBinding (item.Shortcut, Command.Accept);
+				KeyBindings.Add (item.Shortcut, KeyBindingScope.HotKey, Command.Accept);
 			}
 		}
 	}
@@ -136,11 +136,12 @@ public class StatusBar : View {
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
 		// So before we call the base class we set SelectedItem appropriately.
 		var key = keyEvent.Key;
-		if (TryGetKeyBinding(key, out _)) {
+		if (KeyBindings.TryGet(key, out _)) {
 			// Search RadioLabels 
 			foreach (var item in Items) {
 				if (item.Shortcut == key) {
 					_itemToInvoke = item;
+					keyEvent.Scope = KeyBindingScope.HotKey;
 					break;
 				}
 			}

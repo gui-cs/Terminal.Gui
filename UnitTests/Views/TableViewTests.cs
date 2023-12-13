@@ -615,18 +615,18 @@ namespace Terminal.Gui.ViewsTests {
 			activatedValue = null;
 
 			// clear keybindings and ensure that Enter does not trigger the event anymore
-			tv.ClearKeyBindings ();
+			tv.KeyBindings.Clear ();
 			tv.ProcessKeyDown (new (Key.Enter));
 			Assert.Null (activatedValue);
 
 			// New method for changing the activation key
-			tv.AddKeyBinding (Key.Z, Command.Accept);
+			tv.KeyBindings.Add (Key.Z, Command.Accept);
 			tv.ProcessKeyDown (new (Key.Z));
 			Assert.Equal ("R0C0", activatedValue);
 
 			// reset the test
 			activatedValue = null;
-			tv.ClearKeyBindings ();
+			tv.KeyBindings.Clear ();
 
 			// Old method for changing the activation key
 			tv.CellActivationKey = Key.Z;
@@ -1592,7 +1592,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 
 			tableView.MultiSelect = true;
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 
 			var selectedCell = tableView.GetAllSelectedCells ().Single ();
 			Assert.Equal (0, selectedCell.X);
@@ -1664,7 +1664,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tableView.FullRowSelect = true;
 			tableView.MultiSelect = true;
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 
 			// Toggle Select Cell 0,0
 			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.Space });
@@ -1701,7 +1701,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tableView.MultiSelect = true;
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 
 			// Make a square selection
 			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });
@@ -1742,7 +1742,7 @@ namespace Terminal.Gui.ViewsTests {
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			dt.Rows.Add (1, 2, 3, 4, 5, 6);
 			tableView.MultiSelect = true;
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 
 			// Make first square selection (0,0 to 1,1)
 			tableView.ProcessKeyDown (new KeyEventArgs () { Key = Key.ShiftMask | Key.CursorDown });

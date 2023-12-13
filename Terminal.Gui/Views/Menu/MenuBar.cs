@@ -159,11 +159,11 @@ public class MenuBarItem : MenuItem {
 		}
 		foreach (var menuItem in Children.Where (m => m != null)) {
 			if (menuItem.HotKey != default) {
-				menuBar.AddKeyBinding ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
-				menuBar.AddKeyBinding ((Key)menuItem.HotKey.Value | Key.AltMask, KeyBindingScope.SuperView, Command.ToggleExpandCollapse);
+				menuBar.KeyBindings.Add ((Key)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
+				menuBar.KeyBindings.Add ((Key)menuItem.HotKey.Value | Key.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 			}
 			if (menuItem.Shortcut != Key.Unknown && menuItem.Shortcut != Key.Null) {
-				menuBar.AddKeyBinding (menuItem.Shortcut, KeyBindingScope.SuperView, Command.Select);
+				menuBar.KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			SubMenu (menuItem)?.AddKeyBindings (menuBar);
 		}
@@ -306,13 +306,13 @@ public class MenuBar : View {
 		AddCommand (Command.Select, () => Run (_menuItemToSelect?.Action));
 
 		// Default key bindings for this view
-		AddKeyBinding (Key.CursorLeft, Command.Left);
-		AddKeyBinding (Key.CursorRight, Command.Right);
-		AddKeyBinding (Key.Esc, Command.Cancel);
-		AddKeyBinding (Key.CursorDown, Command.Accept);
-		AddKeyBinding (Key.Enter, Command.Accept);
-		AddKeyBinding (Key, KeyBindingScope.SuperView, Command.ToggleExpandCollapse);
-		AddKeyBinding (Key.CtrlMask | Key.Space, KeyBindingScope.SuperView, Command.ToggleExpandCollapse);
+		KeyBindings.Add (Key.CursorLeft, Command.Left);
+		KeyBindings.Add (Key.CursorRight, Command.Right);
+		KeyBindings.Add (Key.Esc, Command.Cancel);
+		KeyBindings.Add (Key.CursorDown, Command.Accept);
+		KeyBindings.Add (Key.Enter, Command.Accept);
+		KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+		KeyBindings.Add (Key.CtrlMask | Key.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
 		// TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
 		// TODO: As a result, _File._Save will have precedence over in "_File _Edit _ScrollbarView"
@@ -320,12 +320,12 @@ public class MenuBar : View {
 		if (Menus != null) {
 			foreach (var menuBarItem in Menus?.Where (m => m != null)) {
 				if (menuBarItem.HotKey != default) {
-					AddKeyBinding ((Key)menuBarItem.HotKey.Value, Command.ToggleExpandCollapse);
-					AddKeyBinding ((Key)menuBarItem.HotKey.Value | Key.AltMask, KeyBindingScope.SuperView, Command.ToggleExpandCollapse);
+					KeyBindings.Add ((Key)menuBarItem.HotKey.Value, Command.ToggleExpandCollapse);
+					KeyBindings.Add ((Key)menuBarItem.HotKey.Value | Key.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 				}
 				if (menuBarItem.Shortcut != Key.Unknown && menuBarItem.Shortcut != Key.Null) {
 					// Technically this will will never run because MenuBarItems don't have shortcuts
-					AddKeyBinding (menuBarItem.Shortcut, KeyBindingScope.SuperView, Command.Select);
+					KeyBindings.Add (menuBarItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 				}
 				menuBarItem.AddKeyBindings (this);
 			}
@@ -407,8 +407,8 @@ public class MenuBar : View {
 			if (_key == value) {
 				return;
 			}
-			ClearKeyBinding (_key);
-			AddKeyBinding (value, KeyBindingScope.SuperView, Command.ToggleExpandCollapse);
+			KeyBindings.Remove (_key);
+			KeyBindings.Add (value, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 			_key = value;
 		}
 	}
@@ -494,7 +494,7 @@ public class MenuBar : View {
 
 		var key = keyEvent.Key;
 
-		if (TryGetKeyBinding (key, out _)) {
+		if (KeyBindings.TryGet (key, out _)) {
 			_menuBarItemToActivate = -1;
 			_menuItemToSelect = null;
 
@@ -503,6 +503,7 @@ public class MenuBar : View {
 				// Recurse through the menu to find one with the shortcut.
 				if (FindShortcutInChildMenu (key, Menus [i], out _menuItemToSelect)) {
 					_menuBarItemToActivate = i;
+					keyEvent.Scope = KeyBindingScope.HotKey;
 					return base.OnInvokingKeyBindings (keyEvent);
 				}
 
@@ -537,6 +538,7 @@ public class MenuBar : View {
 
 					if (matches) {
 						_menuBarItemToActivate = i;
+						keyEvent.Scope = KeyBindingScope.HotKey;
 						break;
 					}
 				}

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using Terminal.Gui.ConsoleDrivers;
+﻿using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.InputTests;
+
 public class KeyEventArgsTests {
 	readonly ITestOutputHelper _output;
 
@@ -66,7 +63,6 @@ public class KeyEventArgsTests {
 	[InlineData ((Key)'ó' | Key.ShiftMask, 'ó')]
 	[InlineData ((Key)'Ó', 'Ó')]
 	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, '\0')]
-
 	[InlineData ((Key)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((Key)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
 	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
@@ -77,30 +73,23 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.A, '\0')]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.A, '\0')]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.A, '\0')]
-	
 	[InlineData ((Key)'z', 'z')]
 	[InlineData ((Key)'Z', 'z')]
 	[InlineData (Key.ShiftMask | Key.Z, 'Z')]
-
 	[InlineData ((Key)'1', '1')]
 	[InlineData (Key.ShiftMask | Key.D1, '1')]
 	[InlineData (Key.CtrlMask | Key.D1, '\0')]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.D1, '\0')]
-
 	[InlineData (Key.F1, '\0')]
 	[InlineData (Key.ShiftMask | Key.F1, '\0')]
 	[InlineData (Key.CtrlMask | Key.F1, '\0')]
-
 	[InlineData (Key.Enter, '\n')]
 	[InlineData (Key.Tab, '\t')]
 	[InlineData (Key.Esc, 0x1b)]
 	[InlineData (Key.Space, ' ')]
-
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Enter, '\0')]
-
 	[InlineData (Key.Null, '\0')]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Null, '\0')]
-
 	[InlineData (Key.CharMask, '\0')]
 	[InlineData (Key.SpecialMask, '\0')]
 	public void AsRune_ShouldReturnCorrectIntValue (Key key, Rune expected)
@@ -143,7 +132,6 @@ public class KeyEventArgsTests {
 	[InlineData ((Key)'ó' | Key.ShiftMask, "Shift+ó")] // is this right???
 	[InlineData ((Key)'Ó', "Ó")]
 	[InlineData ((Key)'ç' | Key.ShiftMask | Key.AltMask | Key.CtrlMask, "Ctrl+Alt+Shift+ç")]
-
 	[InlineData ((Key)'a', "a")] // 97 or Key.Space | Key.A
 	[InlineData ((Key)'A', "a")] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
 	//[InlineData (Key.A, "a")] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
@@ -154,7 +142,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.A, "Alt+Shift+A")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.A, "Ctrl+Alt+A")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.A, "Ctrl+Alt+Shift+A")]
-
 	[InlineData ((Key)'z', "z")]
 	[InlineData ((Key)'Z', "z")]
 	[InlineData (Key.ShiftMask | Key.Z, "Shift+Z")]
@@ -164,7 +151,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.Z, "Alt+Shift+Z")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.Z, "Ctrl+Alt+Z")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Z, "Ctrl+Alt+Shift+Z")]
-
 	[InlineData ((Key)'1', "1")]
 	[InlineData (Key.ShiftMask | Key.D1, "Shift+1")]
 	[InlineData (Key.CtrlMask | Key.D1, "Ctrl+1")]
@@ -173,7 +159,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.D1, "Alt+Shift+1")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.D1, "Ctrl+Alt+1")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.D1, "Ctrl+Alt+Shift+1")]
-
 	[InlineData (Key.F1, "F1")]
 	[InlineData (Key.ShiftMask | Key.F1, "Shift+F1")]
 	[InlineData (Key.CtrlMask | Key.F1, "Ctrl+F1")]
@@ -182,7 +167,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.F1, "Alt+Shift+F1")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.F1, "Ctrl+Alt+F1")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.F1, "Ctrl+Alt+Shift+F1")]
-
 	[InlineData (Key.Enter, "Enter")]
 	[InlineData (Key.ShiftMask | Key.Enter, "Shift+Enter")]
 	[InlineData (Key.CtrlMask | Key.Enter, "Ctrl+Enter")]
@@ -191,7 +175,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.Enter, "Alt+Shift+Enter")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.Enter, "Ctrl+Alt+Enter")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Enter, "Ctrl+Alt+Shift+Enter")]
-
 	[InlineData (Key.Delete, "Delete")]
 	[InlineData (Key.ShiftMask | Key.Delete, "Shift+Delete")]
 	[InlineData (Key.CtrlMask | Key.Delete, "Ctrl+Delete")]
@@ -200,7 +183,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.Delete, "Alt+Shift+Delete")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.Delete, "Ctrl+Alt+Delete")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Delete, "Ctrl+Alt+Shift+Delete")]
-
 	[InlineData (Key.CursorUp, "CursorUp")]
 	[InlineData (Key.ShiftMask | Key.CursorUp, "Shift+CursorUp")]
 	[InlineData (Key.CtrlMask | Key.CursorUp, "Ctrl+CursorUp")]
@@ -209,7 +191,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.CursorUp, "Alt+Shift+CursorUp")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.CursorUp, "Ctrl+Alt+CursorUp")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.CursorUp, "Ctrl+Alt+Shift+CursorUp")]
-
 	[InlineData (Key.Unknown, "Unknown")]
 	[InlineData (Key.ShiftMask | Key.Unknown, "Shift+Unknown")]
 	[InlineData (Key.CtrlMask | Key.Unknown, "Ctrl+Unknown")]
@@ -218,7 +199,6 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.Unknown, "Alt+Shift+Unknown")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.Unknown, "Ctrl+Alt+Unknown")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Unknown, "Ctrl+Alt+Shift+Unknown")]
-	
 	[InlineData (Key.Null, "")]
 	[InlineData (Key.ShiftMask | Key.Null, "Shift")]
 	[InlineData (Key.CtrlMask | Key.Null, "Ctrl")]
@@ -227,12 +207,10 @@ public class KeyEventArgsTests {
 	[InlineData (Key.ShiftMask | Key.AltMask | Key.Null, "Alt+Shift")]
 	[InlineData (Key.AltMask | Key.CtrlMask | Key.Null, "Ctrl+Alt")]
 	[InlineData (Key.ShiftMask | Key.CtrlMask | Key.AltMask | Key.Null, "Ctrl+Alt+Shift")]
-
 	[InlineData (Key.CharMask, "CharMask")]
 	[InlineData (Key.SpecialMask, "Ctrl+Alt+Shift")]
-
 	public void ToString_ShouldReturnFormattedString (Key key, string expected)
 	{
-		Assert.Equal (expected, KeyEventArgs.ToString(key));
+		Assert.Equal (expected, KeyEventArgs.ToString (key));
 	}
 }

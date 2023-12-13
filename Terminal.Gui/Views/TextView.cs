@@ -1673,127 +1673,127 @@ namespace Terminal.Gui {
 			});
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+			KeyBindings.Add (Key.PageDown, Command.PageDown);
+			KeyBindings.Add (Key.V | Key.CtrlMask, Command.PageDown);
 
-			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
 
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (((int)'V' + Key.AltMask), Command.PageUp);
+			KeyBindings.Add (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (((int)'V' + Key.AltMask), Command.PageUp);
 
-			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
 
-			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (Key.N | Key.CtrlMask, Command.LineDown);
+			KeyBindings.Add (Key.CursorDown, Command.LineDown);
 
-			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
 
-			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			KeyBindings.Add (Key.P | Key.CtrlMask, Command.LineUp);
+			KeyBindings.Add (Key.CursorUp, Command.LineUp);
 
-			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
 
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
-			AddKeyBinding (Key.CursorRight, Command.Right);
+			KeyBindings.Add (Key.F | Key.CtrlMask, Command.Right);
+			KeyBindings.Add (Key.CursorRight, Command.Right);
 
-			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
+			KeyBindings.Add (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
 
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.Left);
-			AddKeyBinding (Key.CursorLeft, Command.Left);
+			KeyBindings.Add (Key.B | Key.CtrlMask, Command.Left);
+			KeyBindings.Add (Key.CursorLeft, Command.Left);
 
-			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
+			KeyBindings.Add (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
 
-			AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
-			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (Key.Delete, Command.DeleteCharLeft);
+			KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
-			AddKeyBinding (Key.Home, Command.StartOfLine);
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.StartOfLine);
+			KeyBindings.Add (Key.Home, Command.StartOfLine);
+			KeyBindings.Add (Key.A | Key.CtrlMask, Command.StartOfLine);
 
-			AddKeyBinding (Key.Home | Key.ShiftMask, Command.StartOfLineExtend);
+			KeyBindings.Add (Key.Home | Key.ShiftMask, Command.StartOfLineExtend);
 
-			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
-			AddKeyBinding (Key.D | Key.CtrlMask, Command.DeleteCharRight);
+			KeyBindings.Add (Key.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (Key.D | Key.CtrlMask, Command.DeleteCharRight);
 
-			AddKeyBinding (Key.End, Command.EndOfLine);
-			AddKeyBinding (Key.E | Key.CtrlMask, Command.EndOfLine);
+			KeyBindings.Add (Key.End, Command.EndOfLine);
+			KeyBindings.Add (Key.E | Key.CtrlMask, Command.EndOfLine);
 
-			AddKeyBinding (Key.End | Key.ShiftMask, Command.EndOfLineExtend);
+			KeyBindings.Add (Key.End | Key.ShiftMask, Command.EndOfLineExtend);
 
-			AddKeyBinding (Key.K | Key.CtrlMask, Command.CutToEndLine); // kill-to-end
-			AddKeyBinding (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, Command.CutToEndLine); // kill-to-end
+			KeyBindings.Add (Key.K | Key.CtrlMask, Command.CutToEndLine); // kill-to-end
+			KeyBindings.Add (Key.DeleteChar | Key.CtrlMask | Key.ShiftMask, Command.CutToEndLine); // kill-to-end
 
-			AddKeyBinding (Key.K | Key.AltMask, Command.CutToStartLine); // kill-to-start
-			AddKeyBinding (Key.Backspace | Key.CtrlMask | Key.ShiftMask, Command.CutToStartLine); // kill-to-start
+			KeyBindings.Add (Key.K | Key.AltMask, Command.CutToStartLine); // kill-to-start
+			KeyBindings.Add (Key.Backspace | Key.CtrlMask | Key.ShiftMask, Command.CutToStartLine); // kill-to-start
 
-			AddKeyBinding (Key.Y | Key.CtrlMask, Command.Paste); // Control-y, yank
-			AddKeyBinding (Key.Space | Key.CtrlMask, Command.ToggleExtend);
+			KeyBindings.Add (Key.Y | Key.CtrlMask, Command.Paste); // Control-y, yank
+			KeyBindings.Add (Key.Space | Key.CtrlMask, Command.ToggleExtend);
 
-			AddKeyBinding (((int)'C' + Key.AltMask), Command.Copy);
-			AddKeyBinding (Key.C | Key.CtrlMask, Command.Copy);
+			KeyBindings.Add (((int)'C' + Key.AltMask), Command.Copy);
+			KeyBindings.Add (Key.C | Key.CtrlMask, Command.Copy);
 
-			AddKeyBinding (((int)'W' + Key.AltMask), Command.Cut);
-			AddKeyBinding (Key.W | Key.CtrlMask, Command.Cut);
-			AddKeyBinding (Key.X | Key.CtrlMask, Command.Cut);
+			KeyBindings.Add (((int)'W' + Key.AltMask), Command.Cut);
+			KeyBindings.Add (Key.W | Key.CtrlMask, Command.Cut);
+			KeyBindings.Add (Key.X | Key.CtrlMask, Command.Cut);
 
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.WordLeft);
-			AddKeyBinding ((Key)((int)'B' + Key.AltMask), Command.WordLeft);
+			KeyBindings.Add (Key.CursorLeft | Key.CtrlMask, Command.WordLeft);
+			KeyBindings.Add ((Key)((int)'B' + Key.AltMask), Command.WordLeft);
 
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, Command.WordLeftExtend);
+			KeyBindings.Add (Key.CursorLeft | Key.CtrlMask | Key.ShiftMask, Command.WordLeftExtend);
 
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.WordRight);
-			AddKeyBinding ((Key)((int)'F' + Key.AltMask), Command.WordRight);
+			KeyBindings.Add (Key.CursorRight | Key.CtrlMask, Command.WordRight);
+			KeyBindings.Add ((Key)((int)'F' + Key.AltMask), Command.WordRight);
 
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, Command.WordRightExtend);
-			AddKeyBinding (Key.DeleteChar | Key.CtrlMask, Command.KillWordForwards); // kill-word-forwards
-			AddKeyBinding (Key.Backspace | Key.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
+			KeyBindings.Add (Key.CursorRight | Key.CtrlMask | Key.ShiftMask, Command.WordRightExtend);
+			KeyBindings.Add (Key.DeleteChar | Key.CtrlMask, Command.KillWordForwards); // kill-word-forwards
+			KeyBindings.Add (Key.Backspace | Key.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
 
 			// BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
-			AddKeyBinding (Key.Enter, Command.NewLine);
-			AddKeyBinding (Key.End | Key.CtrlMask, Command.BottomEnd);
-			AddKeyBinding (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
-			AddKeyBinding (Key.Home | Key.CtrlMask, Command.TopHome);
-			AddKeyBinding (Key.Home | Key.CtrlMask | Key.ShiftMask, Command.TopHomeExtend);
-			AddKeyBinding (Key.T | Key.CtrlMask, Command.SelectAll);
-			AddKeyBinding (Key.InsertChar, Command.ToggleOverwrite);
-			AddKeyBinding (Key.Tab, Command.Tab);
-			AddKeyBinding (Key.Tab | Key.ShiftMask, Command.BackTab);
+			KeyBindings.Add (Key.Enter, Command.NewLine);
+			KeyBindings.Add (Key.End | Key.CtrlMask, Command.BottomEnd);
+			KeyBindings.Add (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
+			KeyBindings.Add (Key.Home | Key.CtrlMask, Command.TopHome);
+			KeyBindings.Add (Key.Home | Key.CtrlMask | Key.ShiftMask, Command.TopHomeExtend);
+			KeyBindings.Add (Key.T | Key.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
+			KeyBindings.Add (Key.Tab, Command.Tab);
+			KeyBindings.Add (Key.Tab | Key.ShiftMask, Command.BackTab);
 
-			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextView);
-			AddKeyBinding (Application.AlternateForwardKey, Command.NextView);
+			KeyBindings.Add (Key.Tab | Key.CtrlMask, Command.NextView);
+			KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
 
-			AddKeyBinding (Key.Tab | Key.CtrlMask | Key.ShiftMask, Command.PreviousView);
-			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousView);
+			KeyBindings.Add (Key.Tab | Key.CtrlMask | Key.ShiftMask, Command.PreviousView);
+			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
 
-			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Undo);
-			AddKeyBinding (Key.R | Key.CtrlMask, Command.Redo);
+			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Undo);
+			KeyBindings.Add (Key.R | Key.CtrlMask, Command.Redo);
 
-			AddKeyBinding (Key.G | Key.CtrlMask, Command.DeleteAll);
-			AddKeyBinding (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
+			KeyBindings.Add (Key.G | Key.CtrlMask, Command.DeleteAll);
+			KeyBindings.Add (Key.D | Key.CtrlMask | Key.ShiftMask, Command.DeleteAll);
 
 			_currentCulture = Thread.CurrentThread.CurrentUICulture;
 
 			ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
-			AddKeyBinding (ContextMenu.Key, Command.Accept);
+			KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.Accept);
 		}
 
 		private MenuBarItem BuildContextMenuBarItem ()
 		{
 			return new MenuBarItem (new MenuItem [] {
-				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, GetKeyFromCommands (Command.SelectAll)),
-				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, GetKeyFromCommands (Command.DeleteAll)),
-				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, GetKeyFromCommands (Command.Copy)),
-				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, GetKeyFromCommands (Command.Cut)),
-				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, GetKeyFromCommands (Command.Paste)),
-				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, GetKeyFromCommands (Command.Undo)),
-				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, GetKeyFromCommands (Command.Redo)),
+				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, KeyBindings.GetKeyFromCommands (Command.SelectAll)),
+				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
+				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, KeyBindings.GetKeyFromCommands (Command.Copy)),
+				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, KeyBindings.GetKeyFromCommands (Command.Cut)),
+				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, KeyBindings.GetKeyFromCommands (Command.Paste)),
+				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, KeyBindings.GetKeyFromCommands (Command.Undo)),
+				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, KeyBindings.GetKeyFromCommands (Command.Redo)),
 			});
 		}
 
 		private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey, e.NewKey);
 		}
 
 		private void Model_LinesLoaded (object sender, EventArgs e)
@@ -1867,12 +1867,12 @@ namespace Terminal.Gui {
 
 		void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey, e.NewKey);
 		}
 
 		void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey, e.NewKey);
 		}
 
 		/// <summary>

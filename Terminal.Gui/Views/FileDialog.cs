@@ -208,7 +208,7 @@ namespace Terminal.Gui {
 				FullRowSelect = true,
 				CollectionNavigator = new FileDialogCollectionNavigator (this)
 			};
-			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			this.tableView.KeyBindings.Add (Key.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
 			tableView.Style.InvertSelectedCellFirstCharacter = true;
 			Style.TableStyle = tableView.Style;
@@ -321,10 +321,10 @@ namespace Terminal.Gui {
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 
-			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
-			this.tableView.AddKeyBinding (Key.End, Command.BottomEnd);
-			this.tableView.AddKeyBinding (Key.Home | Key.ShiftMask, Command.TopHomeExtend);
-			this.tableView.AddKeyBinding (Key.End | Key.ShiftMask, Command.BottomEndExtend);
+			this.tableView.KeyBindings.Add (Key.Home, Command.TopHome);
+			this.tableView.KeyBindings.Add (Key.End, Command.BottomEnd);
+			this.tableView.KeyBindings.Add (Key.Home | Key.ShiftMask, Command.TopHomeExtend);
+			this.tableView.KeyBindings.Add (Key.End | Key.ShiftMask, Command.BottomEndExtend);
 
 			this.treeView.KeyDown += (s, k) => {
 
