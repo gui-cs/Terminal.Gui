@@ -353,7 +353,7 @@ public class MenuBar : View {
 	
 	internal void AltKeyUpHandler (KeyEventArgs e)
 	{
-		if (e.Key == ConsoleDriverKey.AltMask) {
+		if (e.ConsoleDriverKey == ConsoleDriverKey.AltMask) {
 			e.Handled = true;
 			// User pressed Alt 
 			if (!IsMenuOpen && _openMenu == null && !_openedByAltKey) {

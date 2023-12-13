@@ -389,7 +389,7 @@ public class CollectionNavigatorTests {
 	{
 		// test all Keys
 		foreach (ConsoleDriverKey key in Enum.GetValues (typeof (ConsoleDriverKey))) {
-			var ke = new Key (key);
+			var ke = new KeyEventArgs (key);
 			_output.WriteLine ($"Testing {key}");
 			if (key == ConsoleDriverKey.AltMask || key == ConsoleDriverKey.CtrlMask || key == ConsoleDriverKey.SpecialMask) {
 				Assert.False (CollectionNavigator.IsCompatibleKey (ke));

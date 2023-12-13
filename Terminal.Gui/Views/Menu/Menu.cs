@@ -127,7 +127,7 @@ public class MenuItem {
 	/// <summary>
 	/// Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.
 	/// </summary>
-	public string ShortcutTag => Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
+	public string ShortcutTag => KeyEventArgs.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
 	#endregion Keyboard Handling
 
 	/// <summary>

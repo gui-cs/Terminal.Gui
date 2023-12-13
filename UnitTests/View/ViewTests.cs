@@ -125,9 +125,9 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var r = new View ();
 
-			Assert.False (r.OnKeyDown (new Key () { Key = ConsoleDriverKey.Unknown }));
+			Assert.False (r.OnKeyDown (new KeyEventArgs () { ConsoleDriverKey = ConsoleDriverKey.Unknown }));
 			//Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyUp (new Key () { Key = ConsoleDriverKey.Unknown }));
+			Assert.False (r.OnKeyUp (new KeyEventArgs () { ConsoleDriverKey = ConsoleDriverKey.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
