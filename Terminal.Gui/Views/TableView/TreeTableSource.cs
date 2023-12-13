@@ -118,13 +118,13 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 			return;
 		}
 
-		if (e.Key == ConsoleDriverKey.CursorLeft) {
+		if (e.ConsoleDriverKey == ConsoleDriverKey.CursorLeft) {
 			if (_tree.IsExpanded (obj)) {
 				_tree.Collapse (obj);
 				e.Handled = true;
 			}
 		}
-		if (e.Key == ConsoleDriverKey.CursorRight) {
+		if (e.ConsoleDriverKey == ConsoleDriverKey.CursorRight) {
 			if (_tree.CanExpand (obj) && !_tree.IsExpanded (obj)) {
 				_tree.Expand (obj);
 				e.Handled = true;

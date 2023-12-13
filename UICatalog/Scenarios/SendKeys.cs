@@ -58,7 +58,7 @@ namespace UICatalog.Scenarios {
 			var IsCtrl = false;
 
 			txtResult.KeyDown += (s, e) => {
-				rKeys += (char)e.Key;
+				rKeys += (char)e.ConsoleDriverKey;
 				if (!IsShift && e.IsShift) {
 					rControlKeys += " Shift ";
 					IsShift = true;
@@ -117,7 +117,7 @@ namespace UICatalog.Scenarios {
 			button.Clicked += (s,e) => ProcessInput ();
 
 			Win.KeyDown += (s, e) => {
-				if (e.Key == ConsoleDriverKey.Enter) {
+				if (e.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 					ProcessInput ();
 					e.Handled = true;
 				}

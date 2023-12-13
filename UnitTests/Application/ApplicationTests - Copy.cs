@@ -48,7 +48,7 @@ public class KeyboardTests {
 
 		int keyUps = 0;
 		var output = string.Empty;
-		Application.Top.KeyUp += (object sender, KeyEventArgs args) => {
+		Application.Top.KeyUp += (object sender, Key args) => {
 			if (args.Key != (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q)) {
 				output += args.AsRune;
 			}
@@ -193,7 +193,7 @@ public class KeyboardTests {
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.OnKeyDown(new KeyEventArgs( ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask));
+		Application.OnKeyDown(new Key( ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask));
 		Assert.True (isQuiting);
 
 		isQuiting = false;
@@ -203,7 +203,7 @@ public class KeyboardTests {
 		Application.OnKeyDown (new KeyEventArgs (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask));
 		Assert.False (isQuiting);
 
-		Application.OnKeyDown (new KeyEventArgs (Application.QuitKey));
+		Application.OnKeyDown (new Key (Application.QuitKey));
 		Assert.True (isQuiting);
 
 		// Reset the QuitKey to avoid throws errors on another tests

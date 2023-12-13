@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool ProcessKey (KeyEventArgs a)
 		{
-			var key = a.Key;
+			var key = a.ConsoleDriverKey;
 			if (key == SelectionKey) {
 				return this.AcceptSelectionIfAny ();
 			} else

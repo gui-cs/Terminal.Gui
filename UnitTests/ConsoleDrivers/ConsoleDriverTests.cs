@@ -105,8 +105,8 @@ namespace Terminal.Gui.DriverTests {
 			var idx = 0;
 
 			view.KeyDown += (s, e) => {
-				Assert.Equal (text [idx], (char)e.Key);
-				rText += (char)e.Key;
+				Assert.Equal (text [idx], (char)e.ConsoleDriverKey);
+				rText += (char)e.ConsoleDriverKey;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
 				e.Handled = true;
 				idx++;

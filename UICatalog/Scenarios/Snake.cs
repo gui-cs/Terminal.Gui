@@ -128,19 +128,19 @@ namespace UICatalog.Scenarios {
 			// BUGBUG: Should (can) this use key bindings instead.
 			public override bool OnKeyDown (KeyEventArgs keyEvent)
 			{
-				if (keyEvent.Key == ConsoleDriverKey.CursorUp) {
+				if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.CursorUp) {
 					State.PlannedDirection = Direction.Up;
 					return true;
 				}
-				if (keyEvent.Key == ConsoleDriverKey.CursorDown) {
+				if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.CursorDown) {
 					State.PlannedDirection = Direction.Down;
 					return true;
 				}
-				if (keyEvent.Key == ConsoleDriverKey.CursorLeft) {
+				if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.CursorLeft) {
 					State.PlannedDirection = Direction.Left;
 					return true;
 				}
-				if (keyEvent.Key == ConsoleDriverKey.CursorRight) {
+				if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.CursorRight) {
 					State.PlannedDirection = Direction.Right;
 					return true;
 				}

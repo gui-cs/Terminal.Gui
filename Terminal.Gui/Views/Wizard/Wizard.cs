@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			if (!Modal) {
-				switch (a.Key) {
+				switch (a.ConsoleDriverKey) {
 				// BUGBUG: This should be hanlded by Dialog 
 				case ConsoleDriverKey.Esc:
 					var args = new WizardButtonEventArgs ();

@@ -2883,8 +2883,8 @@ namespace Terminal.Gui {
 				_selectionStartColumn = nStartCol;
 				_wrapNeeded = true;
 
-                SetNeedsDisplay();
-            }
+				SetNeedsDisplay ();
+			}
 			if (_currentCaller != null)
 				throw new InvalidOperationException ($"WordWrap settings was changed after the {_currentCaller} call.");
 		}
@@ -3068,7 +3068,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEventArgs () { Key = key });
+				InsertText (new KeyEventArgs() { ConsoleDriverKey = key });
 			}
 
 			if (NeedsDisplay) {
@@ -3425,7 +3425,7 @@ namespace Terminal.Gui {
 			ResetColumnTrack ();
 
 			// Ignore control characters and other special keys
-			if (!a.IsAlpha && (a.Key < ConsoleDriverKey.Space || a.Key > ConsoleDriverKey.CharMask)) {
+			if (!a.IsAlpha && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
 				return false;
 			}
 
@@ -4339,11 +4339,11 @@ namespace Terminal.Gui {
 			if (_selecting) {
 				ClearSelectedRegion ();
 			}
-			if (a.Key == ConsoleDriverKey.Enter) {
+			if (a.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
-			} else if ((uint)a.Key == '\r') {
+			} else if ((uint)a.ConsoleDriverKey == '\r') {
 				_currentColumn = 0;
 			} else {
 				if (Used) {
@@ -4398,7 +4398,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEventArgs a)
 		{
-			switch (a.Key) {
+			switch (a.ConsoleDriverKey) {
 			case ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask:
 				return true;
 			}

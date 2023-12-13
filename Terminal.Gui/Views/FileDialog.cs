@@ -288,12 +288,12 @@ namespace Terminal.Gui {
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
 			tbFind.KeyDown += (s, o) => {
-				if (o.Key == ConsoleDriverKey.Enter) {
+				if (o.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 					RestartSearch ();
 					o.Handled = true;
 				}
 
-				if (o.Key == ConsoleDriverKey.Esc) {
+				if (o.ConsoleDriverKey == ConsoleDriverKey.Esc) {
 					if (CancelSearch ()) {
 						o.Handled = true;
 					}
@@ -499,7 +499,7 @@ namespace Terminal.Gui {
 //			ClearFeedback ();
 
 //			if (allowedTypeMenuBar != null &&
-//				keyEvent.Key == Key.Tab &&
+//				keyEvent.ConsoleDriverKey == Key.Tab &&
 //				allowedTypeMenuBar.IsMenuOpen) {
 //				allowedTypeMenuBar.CloseMenu (false, false, false);
 //			}
@@ -801,7 +801,7 @@ namespace Terminal.Gui {
 
 		private void AcceptIf (KeyEventArgs keyEvent, ConsoleDriverKey isKey)
 		{
-			if (!keyEvent.Handled && keyEvent.Key == isKey) {
+			if (!keyEvent.Handled && keyEvent.ConsoleDriverKey == isKey) {
 				keyEvent.Handled = true;
 
 				// User hit Enter in text box so probably wants the
@@ -887,7 +887,7 @@ namespace Terminal.Gui {
 
 		private bool NavigateIf (KeyEventArgs keyEvent, ConsoleDriverKey isKey, View to)
 		{
-			if (keyEvent.Key == isKey) {
+			if (keyEvent.ConsoleDriverKey == isKey) {
 
 				to.FocusFirst ();
 				if (to == tbPath) {
@@ -953,26 +953,26 @@ namespace Terminal.Gui {
 
 		private bool TableView_KeyUp (KeyEventArgs keyEvent)
 		{
-			if (keyEvent.Key == ConsoleDriverKey.Backspace) {
+			if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.Backspace) {
 				return this.history.Back ();
 			}
-			if (keyEvent.Key == (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.Backspace)) {
+			if (keyEvent.ConsoleDriverKey == (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.Backspace)) {
 				return this.history.Forward ();
 			}
 
-			if (keyEvent.Key == ConsoleDriverKey.DeleteChar) {
+			if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
 
 				Delete ();
 				return true;
 			}
 
-			if (keyEvent.Key == (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R)) {
+			if (keyEvent.ConsoleDriverKey == (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R)) {
 
 				Rename ();
 				return true;
 			}
 
-			if (keyEvent.Key == (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N)) {
+			if (keyEvent.ConsoleDriverKey == (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N)) {
 				New ();
 				return true;
 			}

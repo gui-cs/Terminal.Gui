@@ -15,7 +15,7 @@ public class KeyEventArgsTests {
 	[Fact]
 	public void Constructor_Default_ShouldSetKeyToUnknown ()
 	{
-		var eventArgs = new KeyEventArgs ();
+		var eventArgs = new Key ();
 		Assert.Equal (ConsoleDriverKey.Unknown, eventArgs.Key);
 	}
 
@@ -25,14 +25,14 @@ public class KeyEventArgsTests {
 	[InlineData (ConsoleDriverKey.A)]
 	public void Constructor_WithKey_ShouldSetCorrectKey (ConsoleDriverKey key)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (key, eventArgs.Key);
 	}
 
 	[Fact]
 	public void HandledProperty_ShouldBeFalseByDefault ()
 	{
-		var eventArgs = new KeyEventArgs ();
+		var eventArgs = new Key ();
 		Assert.False (eventArgs.Handled);
 	}
 
@@ -48,7 +48,7 @@ public class KeyEventArgsTests {
 	[InlineData (ConsoleDriverKey.Tab, false)]
 	public void IsAlpha (ConsoleDriverKey key, bool expected)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (expected, eventArgs.IsAlpha);
 	}
 
@@ -94,7 +94,7 @@ public class KeyEventArgsTests {
 	[InlineData (ConsoleDriverKey.SpecialMask, '\0')]
 	public void AsRune_ShouldReturnCorrectIntValue (ConsoleDriverKey key, Rune expected)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (expected, eventArgs.AsRune);
 	}
 
@@ -103,7 +103,7 @@ public class KeyEventArgsTests {
 	[InlineData (ConsoleDriverKey.A, false)]
 	public void IsAlt_ShouldReturnCorrectValue (ConsoleDriverKey key, bool expected)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (expected, eventArgs.IsAlt);
 	}
 
@@ -120,7 +120,7 @@ public class KeyEventArgsTests {
 	[InlineData (ConsoleDriverKey.AltMask | ConsoleDriverKey.B, '-', "Alt-B")]
 	public void ToStringWithSeparator_ShouldReturnFormattedString (ConsoleDriverKey key, char separator, string expected)
 	{
-		Assert.Equal (expected, KeyEventArgs.ToString (key, (Rune)separator));
+		Assert.Equal (expected, Key.ToString (key, (Rune)separator));
 	}
 
 	[Theory]
@@ -211,6 +211,6 @@ public class KeyEventArgsTests {
 	[InlineData (ConsoleDriverKey.SpecialMask, "Ctrl+Alt+Shift")]
 	public void ToString_ShouldReturnFormattedString (ConsoleDriverKey key, string expected)
 	{
-		Assert.Equal (expected, KeyEventArgs.ToString (key));
+		Assert.Equal (expected, Key.ToString (key));
 	}
 }

@@ -196,7 +196,7 @@ public class RadioGroup : View {
 		// we set SelectedItem appropriately.
 
 		// Force upper case
-		var key = keyEvent.Key;
+		var key = keyEvent.ConsoleDriverKey;
 		if (KeyBindings.TryGet (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {

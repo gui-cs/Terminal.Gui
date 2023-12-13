@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 
 		private void TreeViewFiles_KeyPress (object sender, KeyEventArgs obj)
 		{
-			if (obj.Key == (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)) {
+			if (obj.ConsoleDriverKey == (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)) {
 
 				var selected = treeViewFiles.SelectedObject;
 

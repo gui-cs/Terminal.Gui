@@ -127,7 +127,7 @@ public class MenuItem {
 	/// <summary>
 	/// Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.
 	/// </summary>
-	public string ShortcutTag => KeyEventArgs.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
+	public string ShortcutTag => Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
 	#endregion Keyboard Handling
 
 	/// <summary>
@@ -486,7 +486,7 @@ class Menu : View {
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
 		// So before we call the base class we set SelectedItem appropriately.
 
-		var key = keyEvent.Key;
+		var key = keyEvent.ConsoleDriverKey;
 
 		if (KeyBindings.TryGet(key, out _)) {
 			_menuBarItemToActivate = -1;

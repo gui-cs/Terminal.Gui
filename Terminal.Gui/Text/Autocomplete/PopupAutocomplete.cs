@@ -287,7 +287,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (a.Key == Reopen) {
+			if (a.ConsoleDriverKey == Reopen) {
 				Context.Canceled = false;
 				return ReopenSuggestions ();
 			}
@@ -300,19 +300,19 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (a.Key == ConsoleDriverKey.CursorDown) {
+			if (a.ConsoleDriverKey == ConsoleDriverKey.CursorDown) {
 				MoveDown ();
 				return true;
 			}
 
-			if (a.Key == ConsoleDriverKey.CursorUp) {
+			if (a.ConsoleDriverKey == ConsoleDriverKey.CursorUp) {
 				MoveUp ();
 				return true;
 			}
 
 			// TODO : Revisit this
-			/*if (a.Key == Key.CursorLeft || a.Key == Key.CursorRight) {
-				GenerateSuggestions (a.Key == Key.CursorLeft ? -1 : 1);
+			/*if (a.ConsoleDriverKey == Key.CursorLeft || a.ConsoleDriverKey == Key.CursorRight) {
+				GenerateSuggestions (a.ConsoleDriverKey == Key.CursorLeft ? -1 : 1);
 				if (Suggestions.Count == 0) {
 					Visible = false;
 					if (!closed) {
@@ -322,11 +322,11 @@ namespace Terminal.Gui {
 				return false;
 			}*/
 
-			if (a.Key == SelectionKey) {
+			if (a.ConsoleDriverKey == SelectionKey) {
 				return Select ();
 			}
 
-			if (a.Key == CloseKey) {
+			if (a.ConsoleDriverKey == CloseKey) {
 				Close ();
 				Context.Canceled = true;
 				return true;

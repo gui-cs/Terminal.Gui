@@ -492,7 +492,7 @@ public class MenuBar : View {
 		// So before we call the base class we set SelectedItem appropriately.
 		// TODO: Figure out if there's a way to have KeyBindings pass context instead. Maybe a KeyBindingContext property?
 
-		var key = keyEvent.Key;
+		var key = keyEvent.ConsoleDriverKey;
 
 		if (KeyBindings.TryGet (key, out _)) {
 			_menuBarItemToActivate = -1;

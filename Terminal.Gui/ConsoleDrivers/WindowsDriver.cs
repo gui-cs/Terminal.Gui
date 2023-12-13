@@ -607,7 +607,7 @@ internal class WindowsConsole {
 		/// <returns></returns>
 		public readonly string ToString (ConsoleKeyInfoEx ex)
 		{
-			var ke = new KeyEventArgs ((ConsoleDriverKey)ex.ConsoleKeyInfo.KeyChar);
+			var ke = new Key ((ConsoleDriverKey)ex.ConsoleKeyInfo.KeyChar);
 			var sb = new StringBuilder ();
 			sb.Append ($"Key: {(ConsoleDriverKey)ex.ConsoleKeyInfo.Key} ({ex.ConsoleKeyInfo.Key})");
 			sb.Append ((ex.ConsoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
@@ -1085,9 +1085,9 @@ internal class WindowsDriver : ConsoleDriver {
 			if (inputEvent.KeyEvent.bKeyDown) {
 				_altDown = keyInfo.ConsoleKeyInfo.Modifiers == ConsoleModifiers.Alt;
 				// Avoid sending repeat keydowns
-				OnKeyDown (new KeyEventArgs (map));
+				OnKeyDown (new Key (map));
 			} else {
-				var keyPressedEventArgs = new KeyEventArgs (map);
+				var keyPressedEventArgs = new Key (map);
 
 				// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
 				// However, if while the 'Alt' key is down, if another key is pressed and
@@ -1098,7 +1098,7 @@ internal class WindowsDriver : ConsoleDriver {
 					if (keyInfo.ConsoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
 						if (_altDown) {
 							_altDown = false;
-							OnKeyUp (new KeyEventArgs (map));
+							OnKeyUp (new Key (map));
 							//OnKeyPressed (new (Key.AltMask));
 						}
 

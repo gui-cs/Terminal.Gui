@@ -570,8 +570,8 @@ public partial class View {
 			return true;
 		}
 
-		foreach (var view in Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.Key, KeyBindingScope.HotKey, out var _))) {
-			if (view.KeyBindings.TryGet (keyEvent.Key, KeyBindingScope.HotKey, out var binding)) {
+		foreach (var view in Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.HotKey, out var _))) {
+			if (view.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.HotKey, out var binding)) {
 				keyEvent.Scope = KeyBindingScope.HotKey;
 				handled = view.OnInvokingKeyBindings (keyEvent);
 				if (handled != null && (bool)handled) {
@@ -592,7 +592,7 @@ public partial class View {
 		//}
 
 		//foreach (var view in Subviews.Where (v => v is MenuBar)) {
-		//	if (view.KeyBindings.TryGet (keyEvent.Key, KeyBindingScope.SuperView, out var binding)) {
+		//	if (view.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.SuperView, out var binding)) {
 		//		handled = view.OnInvokingKeyBindings (keyEvent);
 		//		if (handled != null && (bool)handled) {
 		//			return true;
@@ -625,14 +625,14 @@ public partial class View {
 	protected bool? InvokeKeyBindings (KeyEventArgs keyEvent)
 	{
 		bool? toReturn = null;
-		var key = keyEvent.Key;
+		var key = keyEvent.ConsoleDriverKey;
 		if (!KeyBindings.TryGet (key, out var binding)) {
 			return null;
 		}
 		foreach (var command in binding.Commands) {
 
 			if (!CommandImplementations.ContainsKey (command)) {
-				throw new NotSupportedException (@$"A KeyBinding was set up for the command {command} ({keyEvent.Key}) but that command is not supported by this View ({GetType ().Name})");
+				throw new NotSupportedException (@$"A KeyBinding was set up for the command {command} ({keyEvent.ConsoleDriverKey}) but that command is not supported by this View ({GetType ().Name})");
 			}
 
 			// each command has its own return value

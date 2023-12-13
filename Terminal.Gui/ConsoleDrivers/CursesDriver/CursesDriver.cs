@@ -442,14 +442,14 @@ internal class CursesDriver : ConsoleDriver {
 				int wch2 = wch;
 
 				while (wch2 == Curses.KeyMouse) {
-					KeyEventArgs key = null;
+					KeyEventArgs kea = null;
 					ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
 							new ConsoleKeyInfo ((char)ConsoleDriverKey.Esc, 0, false, false, false),
 							new ConsoleKeyInfo ('[', 0, false, false, false),
 							new ConsoleKeyInfo ('<', 0, false, false, false)
 						};
 					code = 0;
-					HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
+					HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea, ref cki);
 				}
 				return;
 			}
@@ -561,7 +561,7 @@ internal class CursesDriver : ConsoleDriver {
 		//}
 	}
 
-	void HandleEscSeqResponse (ref int code, ref ConsoleDriverKey k, ref int wch2, ref KeyEventArgs key, ref ConsoleKeyInfo [] cki)
+	void HandleEscSeqResponse (ref int code, ref ConsoleDriverKey k, ref int wch2, ref KeyEventArgs keyEventArgs, ref ConsoleKeyInfo [] cki)
 	{
 		ConsoleKey ck = 0;
 		ConsoleModifiers mod = 0;
@@ -582,8 +582,8 @@ internal class CursesDriver : ConsoleDriver {
 				} else {
 					k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
-					key = new (k);
-					OnKeyDown (key);
+					keyEventArgs = new (k);
+					OnKeyDown (keyEventArgs);
 					//OnKeyPressed (key);
 				}
 			} else {
@@ -744,7 +744,7 @@ internal class CursesDriver : ConsoleDriver {
 
 		OnKeyDown (new KeyEventArgs (key));
 		OnKeyUp (new KeyEventArgs (key));
-		//OnKeyPressed (new KeyEventArgs (key));
+		//OnKeyPressed (new KeyEventArgsEventArgs (key));
 	}
 
 

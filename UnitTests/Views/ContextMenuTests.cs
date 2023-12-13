@@ -180,7 +180,7 @@ namespace Terminal.Gui.ViewsTests {
 			var cm = new ContextMenu ();
 
 			lbl.KeyDown += (s, e) => {
-				if (e.Key == cm.Key) {
+				if (e.ConsoleDriverKey == cm.Key) {
 					lbl.Text = "Replaced";
 					e.Handled = true;
 				}

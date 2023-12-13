@@ -177,20 +177,20 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyDown += (s, e) => {
-				if (_winDialog != null && (e.Key == ConsoleDriverKey.Esc
-								|| e.Key == Application.QuitKey)) {
+				if (_winDialog != null && (e.ConsoleDriverKey == ConsoleDriverKey.Esc
+								|| e.ConsoleDriverKey == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.Key == Application.QuitKey) {
+				} else if (e.ConsoleDriverKey == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
-				} else if (_winDialog != null && e.Key == (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask)) {
+				} else if (_winDialog != null && e.ConsoleDriverKey == (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (_winDialog != null && e.Key == (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)) {
+				} else if (_winDialog != null && e.ConsoleDriverKey == (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {

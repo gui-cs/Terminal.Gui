@@ -26,7 +26,7 @@ namespace Terminal.Gui;
 /// </para>
 /// <para>
 ///   When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
-///   the ENTER key, if no other <see cref="View"/> processes the <see cref="KeyEventArgs"/>, the <see cref="Button"/>'s
+///   the ENTER key, if no other <see cref="View"/> processes the <see cref="Key"/>, the <see cref="Button"/>'s
 ///   <see cref="Clicked"/> event will will be fired.
 /// </para>
 /// </remarks>

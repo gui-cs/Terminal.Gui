@@ -92,7 +92,7 @@ namespace UICatalog.Scenarios {
 			tvOutput.KeyDown += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyDown: {e.Key}");
 				e.Handled = true;
-				if (e.Key == ConsoleDriverKey.Unknown) {
+				if (e.ConsoleDriverKey == ConsoleDriverKey.Unknown) {
 					_wasUnknown = true;
 				}
 			};
@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
 					if (!tvOutput.OnKeyDown (e)) {
 						Application.Invoke (() => {
-							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (e.Key, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
+							MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (e.ConsoleDriverKey, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
 						});
 					}
 					e.Handled = true;
@@ -116,10 +116,10 @@ namespace UICatalog.Scenarios {
 			tvInput.KeyDown += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyDown: {e.Key}");
 				e.Handled = true;
-				if (e.Key == ConsoleDriverKey.Unknown) {
+				if (e.ConsoleDriverKey == ConsoleDriverKey.Unknown) {
 					_wasUnknown = true;
 				}
-				if (e.Key == Application.QuitKey) {
+				if (e.ConsoleDriverKey == Application.QuitKey) {
 					Application.RequestStop ();
 					return;
 				}
@@ -128,14 +128,14 @@ namespace UICatalog.Scenarios {
 			KeyEventArgs unknownChar = null;
 
 			tvInput.KeyPressed += (s, e) => {
-				if (e.Key == ConsoleDriverKey.Unknown) {
+				if (e.ConsoleDriverKey == ConsoleDriverKey.Unknown) {
 					_wasUnknown = true;
 					e.Handled = true;
 					return;
 				}
 				if (_wasUnknown && _keyboardStrokes.Count == 1) {
 					_wasUnknown = false;
-				} else if (_wasUnknown && char.IsLetter ((char)e.Key)) {
+				} else if (_wasUnknown && char.IsLetter ((char)e.ConsoleDriverKey)) {
 					_wasUnknown = false;
 				} else if (!_wasUnknown && _keyboardStrokes.Count > 0) {
 					e.Handled = true;
@@ -154,7 +154,7 @@ namespace UICatalog.Scenarios {
 			tvInput.KeyUp += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
 				//var ke = e;
-				if (_wasUnknown && (int)e.Key - (int)(e.Key & (ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)) != 0) {
+				if (_wasUnknown && (int)e.ConsoleDriverKey - (int)(e.ConsoleDriverKey & (ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)) != 0) {
 					unknownChar = e;
 				}
 				e.Handled = true;
@@ -168,13 +168,13 @@ namespace UICatalog.Scenarios {
 						while (_outputStarted) {
 							try {
 								ConsoleModifiers mod = new ConsoleModifiers ();
-								if (e.Key.HasFlag (ConsoleDriverKey.ShiftMask)) {
+								if (e.ConsoleDriverKey.HasFlag (ConsoleDriverKey.ShiftMask)) {
 									mod |= ConsoleModifiers.Shift;
 								}
-								if (e.Key.HasFlag (ConsoleDriverKey.AltMask)) {
+								if (e.ConsoleDriverKey.HasFlag (ConsoleDriverKey.AltMask)) {
 									mod |= ConsoleModifiers.Alt;
 								}
-								if (e.Key.HasFlag (ConsoleDriverKey.CtrlMask)) {
+								if (e.ConsoleDriverKey.HasFlag (ConsoleDriverKey.CtrlMask)) {
 									mod |= ConsoleModifiers.Control;
 								}
 								for (int i = 0; i < _keyboardStrokes.Count; i++) {
@@ -233,7 +233,7 @@ namespace UICatalog.Scenarios {
 		private void AddKeyboardStrokes (KeyEventArgs e)
 		{
 			var keyChar = e.AsRune.Value;
-			var mK = (int)(e.Key & (ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			var mK = (int)(e.ConsoleDriverKey & (ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
 			keyChar &= ~mK;
 			_keyboardStrokes.Add (keyChar);
 		}

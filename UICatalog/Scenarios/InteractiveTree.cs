@@ -46,7 +46,7 @@ namespace UICatalog.Scenarios {
 
 		private void TreeView_KeyPress (object sender, KeyEventArgs obj)
 		{
-			if (obj.Key == ConsoleDriverKey.DeleteChar) {
+			if (obj.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
 
 				var toDelete = treeView.SelectedObject;
 

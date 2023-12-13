@@ -240,7 +240,7 @@ public class KeyTests {
 			var top = Application.Top;
 
 			top.KeyDown += (s, e) => {
-				Assert.Equal (KeyEventArgs.ToString (expectedRemapping), KeyEventArgs.ToString (e.Key));
+				Assert.Equal (KeyEventArgs.ToString (expectedRemapping), KeyEventArgs.ToString (e.ConsoleDriverKey));
 				e.Handled = true;
 				Application.RequestStop ();
 			};

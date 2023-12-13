@@ -688,7 +688,7 @@ namespace Terminal.Gui.ViewTests {
 			var count = 0;
 
 			field.KeyDown += (s, k) => {
-				if (k.Key == ConsoleDriverKey.Enter) {
+				if (k.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 					view.Add (label);
@@ -1050,7 +1050,7 @@ namespace Terminal.Gui.ViewTests {
 			var listLabels = new List<Label> ();
 
 			field.KeyDown += (s, k) => {
-				if (k.Key == ConsoleDriverKey.Enter) {
+				if (k.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
 					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
 					Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
@@ -1125,7 +1125,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 
 			field.KeyDown += (s, k) => {
-				if (k.Key == ConsoleDriverKey.Enter) {
+				if (k.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
 					listLabels [count - 1].Dispose ();
@@ -1192,7 +1192,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 
 			field.KeyDown += (s, k) => {
-				if (k.Key == ConsoleDriverKey.Enter) {
+				if (k.ConsoleDriverKey == ConsoleDriverKey.Enter) {
 					((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
 					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
 					Assert.Equal (new Rect (0, 0, 22, count + 4), pos);

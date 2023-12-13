@@ -373,11 +373,11 @@ namespace Terminal.Gui {
 		//		return true;
 		//	}
 
-		//	//switch (keyEvent.Key) {
+		//	//switch (keyEvent.ConsoleDriverKey) {
 		//	//case Key.AltMask:
 		//	//case Key.AltMask | Key.Space:
 		//	//case Key.CtrlMask | Key.Space:
-		//	//case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
+		//	//case Key _ when (keyEvent.ConsoleDriverKey & Key.AltMask) == Key.AltMask:
 		//	//	return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
 		//	//}
 
@@ -392,7 +392,7 @@ namespace Terminal.Gui {
 		//		return true;
 		//	}
 
-		//	//switch (keyEvent.Key) {
+		//	//switch (keyEvent.ConsoleDriverKey) {
 		//	//case Key.AltMask:
 		//	//case Key.AltMask | Key.Space:
 		//	//case Key.CtrlMask | Key.Space:

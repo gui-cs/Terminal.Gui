@@ -111,7 +111,7 @@ namespace Terminal.Gui {
 		void DateField_KeyPressed (object sender, KeyEventArgs a)
 		{
 			// Ignore non-numeric characters.
-			if (a.Key is >= (ConsoleDriverKey)(int)ConsoleDriverKey.D0 and <= (ConsoleDriverKey)(int)ConsoleDriverKey.D9) {
+			if (a.ConsoleDriverKey is >= (ConsoleDriverKey)(int)ConsoleDriverKey.D0 and <= (ConsoleDriverKey)(int)ConsoleDriverKey.D9) {
 				if (!ReadOnly) {
 					if (SetText (a)) {
 						IncCursorPosition ();

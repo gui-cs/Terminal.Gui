@@ -653,7 +653,7 @@ namespace Terminal.Gui {
 			_preTextChangedCursorPos = _cursorPosition;
 
 			// Ignore other control characters.
-			if (!a.IsAlpha && (a.Key < ConsoleDriverKey.Space || a.Key > ConsoleDriverKey.CharMask)) {
+			if (!a.IsAlpha && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
 				return false;
 			}
 
@@ -1316,7 +1316,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEventArgs () { Key = key }, useOldCursorPos);
+				InsertText (new KeyEventArgs () { ConsoleDriverKey = key }, useOldCursorPos);
 			}
 		}
 

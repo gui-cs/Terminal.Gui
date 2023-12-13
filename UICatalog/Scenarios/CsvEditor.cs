@@ -467,7 +467,7 @@ namespace UICatalog.Scenarios {
 
 		private void TableViewKeyPress (object sender, KeyEventArgs e)
 		{
-			if (e.Key == ConsoleDriverKey.DeleteChar) {
+			if (e.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

@@ -19,7 +19,7 @@ public class KeyEventArgs : EventArgs {
 	/// <param name="k">The key</param>
 	public KeyEventArgs (ConsoleDriverKey k)
 	{
-		Key = k;
+		ConsoleDriverKey = k;
 	}
 
 	/// <summary>
@@ -31,7 +31,7 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Symbolic definition for the key.
 	/// </summary>
-	public ConsoleDriverKey Key { get; set; }
+	public ConsoleDriverKey ConsoleDriverKey { get; set; }
 
 	/// <summary>
 	/// Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.
@@ -45,10 +45,10 @@ public class KeyEventArgs : EventArgs {
 	/// If the key pressed is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
 	/// If the key is outside of the <see cref="ConsoleDriverKey.CharMask"/> range, this will be <see langword="default"/>.
 	/// </remarks>
-	public Rune AsRune => ToRune (Key);
+	public Rune AsRune => ToRune (ConsoleDriverKey);
 
 	/// <summary>
-	/// Converts a <see cref="Key"/> to a <see cref="Rune"/>.
+	/// Converts a <see cref="ConsoleDriverKey"/> to a <see cref="Rune"/>.
 	/// </summary>
 	/// <remarks>
 	/// If the key is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
@@ -85,19 +85,19 @@ public class KeyEventArgs : EventArgs {
 	/// Gets a value indicating whether the Shift key was pressed.
 	/// </summary>
 	/// <value><see langword="true"/> if is shift; otherwise, <see langword="false"/>.</value>
-	public bool IsShift => (Key & ConsoleDriverKey.ShiftMask) != 0;
+	public bool IsShift => (ConsoleDriverKey & ConsoleDriverKey.ShiftMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
 	/// </summary>
 	/// <value><see langword="true"/> if is alternate; otherwise, <see langword="false"/>.</value>
-	public bool IsAlt => (Key & ConsoleDriverKey.AltMask) != 0;
+	public bool IsAlt => (ConsoleDriverKey & ConsoleDriverKey.AltMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Ctrl key was pressed.
 	/// </summary>
 	/// <value><see langword="true"/> if is ctrl; otherwise, <see langword="false"/>.</value>
-	public bool IsCtrl => (Key & ConsoleDriverKey.CtrlMask) != 0;
+	public bool IsCtrl => (ConsoleDriverKey & ConsoleDriverKey.CtrlMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the key is a letter (a-z or A-Z). This is independent of the shift key.
@@ -107,14 +107,14 @@ public class KeyEventArgs : EventArgs {
 			if (IsAlt || IsCtrl) {
 				return false;
 			}
-			return (Key & ConsoleDriverKey.CharMask) is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z;
+			return (ConsoleDriverKey & ConsoleDriverKey.CharMask) is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z;
 		}
 	}
 
 	/// <summary>
 	/// Gets the key without any shift modifiers. 
 	/// </summary>
-	public ConsoleDriverKey BareKey => Key & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
+	public ConsoleDriverKey BareKey => ConsoleDriverKey & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
 
 	#region Standard Key Definitions
 
@@ -339,7 +339,7 @@ public class KeyEventArgs : EventArgs {
 	/// <returns></returns>
 	public override string ToString ()
 	{
-		return ToString (Key, (Rune)'+');
+		return ToString (ConsoleDriverKey, (Rune)'+');
 	}
 
 	private static string GetKeyString (ConsoleDriverKey key)
@@ -364,7 +364,7 @@ public class KeyEventArgs : EventArgs {
 
 
 	/// <summary>
-	/// Formats a <see cref="Key"/> as a string using the default separator of '+'
+	/// Formats a <see cref="ConsoleDriverKey"/> as a string using the default separator of '+'
 	/// </summary>
 	/// <param name="key">The key to format.</param>
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
@@ -374,7 +374,7 @@ public class KeyEventArgs : EventArgs {
 	}
 
 	/// <summary>
-	/// Formats a <see cref="Key"/> as a string.
+	/// Formats a <see cref="ConsoleDriverKey"/> as a string.
 	/// </summary>
 	/// <param name="key">The key to format.</param>
 	/// <param name="separator">The character to use as a separator between modifier keys and and the key itself.</param>

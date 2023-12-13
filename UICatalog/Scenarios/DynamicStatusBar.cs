@@ -400,14 +400,14 @@ public class DynamicStatusBar : Scenario {
 					return;
 				}
 
-				if (CheckShortcut (e.Key, true)) {
+				if (CheckShortcut (e.ConsoleDriverKey, true)) {
 					e.Handled = true;
 				}
 			};
 
 			bool ProcessKey (KeyEventArgs ev)
 			{
-				switch (ev.Key) {
+				switch (ev.ConsoleDriverKey) {
 				case ConsoleDriverKey.CursorUp:
 				case ConsoleDriverKey.CursorDown:
 				case ConsoleDriverKey.Tab:
@@ -439,7 +439,7 @@ public class DynamicStatusBar : Scenario {
 			}
 
 			_txtShortcut.KeyUp += (s, e) => {
-				if (CheckShortcut (e.Key, true)) {
+				if (CheckShortcut (e.ConsoleDriverKey, true)) {
 					e.Handled = true;
 				}
 			};
