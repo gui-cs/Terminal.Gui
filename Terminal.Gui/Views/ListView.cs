@@ -415,13 +415,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
+		//// BUGBUG: Why is this not handled by a key binding???
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			var result = InvokeKeyBindings (a);
-			if (result != null) {
-				return (bool)result;
-			}
+			//var result = InvokeKeyBindings (a);
+			//if (result != null) {
+			//	return (bool)result;
+			//}
 
 			// Enable user to find & select an item by typing text
 			if (CollectionNavigator.IsCompatibleKey (a)) {

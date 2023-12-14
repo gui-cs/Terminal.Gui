@@ -108,7 +108,8 @@ namespace UICatalog.Scenarios {
 
 			Stack<StraightLine> undoHistory = new ();
 
-			public override bool OnKeyPressed (KeyEventArgs e)
+			//// BUGBUG: Why is this not handled by a key binding???
+			public override bool OnKeyDown (KeyEventArgs e)
 			{
 				// BUGBUG: These should be implemented with key bindings
 				if (e.ConsoleDriverKey == (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)) {

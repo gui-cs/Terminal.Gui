@@ -442,6 +442,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
+		//// BUGBUG: Why is this not handled by a key binding???
 		/// <inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{

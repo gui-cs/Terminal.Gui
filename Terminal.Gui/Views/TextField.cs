@@ -626,6 +626,7 @@ namespace Terminal.Gui {
 			return base.OnInvokingKeyBindings (a);
 		}
 
+		//// BUGBUG: Why is this not handled by a key binding???
 		/// TODO: Flush out these docs
 		/// <summary>
 		/// Processes key presses for the <see cref="TextField"/>.

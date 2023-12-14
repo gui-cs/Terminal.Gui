@@ -3068,7 +3068,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEventArgs() { ConsoleDriverKey = key });
+				InsertText (new KeyEventArgs () { ConsoleDriverKey = key });
 			}
 
 			if (NeedsDisplay) {
@@ -4403,7 +4403,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			return false;
+			return base.OnKeyUp (a);
 		}
 
 		void DoNeededAction ()

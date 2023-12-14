@@ -620,6 +620,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
+		//// BUGBUG: Why is this not handled by a key binding???
 		/// <inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{

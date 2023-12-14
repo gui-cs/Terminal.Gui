@@ -177,10 +177,10 @@ public static partial class Application {
 			throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 		}
 
-		Driver.SizeChanged += (s, args) => OnSizeChanging (args);
-		Driver.KeyDown += (s, args) => OnKeyDown (args);
-		Driver.KeyUp += (s, args) => OnKeyUp (args);
-		Driver.MouseEvent += (s, args) => OnMouseEvent (args);
+		Driver.SizeChanged += Driver_SizeChanged;
+		Driver.KeyDown += Driver_KeyDown; 
+		Driver.KeyUp += Driver_KeyUp;
+		Driver.MouseEvent += Driver_MouseEvent;
 
 		SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
@@ -190,6 +190,11 @@ public static partial class Application {
 		_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 		_initialized = true;
 	}
+
+	private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) => OnSizeChanging (e);
+	private static void Driver_KeyDown (object sender, KeyEventArgs e) => OnKeyDown (e);
+	private static void Driver_KeyUp (object sender, KeyEventArgs e) => OnKeyUp (e);
+	private static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
 
 	/// <summary>
@@ -227,8 +232,14 @@ public static partial class Application {
 
 		MainLoop?.Dispose ();
 		MainLoop = null;
-		Driver?.End ();
-		Driver = null;
+		if (Driver != null) {
+			Driver.SizeChanged -= Driver_SizeChanged;
+			Driver.KeyDown -= Driver_KeyDown;
+			Driver.KeyUp -= Driver_KeyUp;
+			Driver.MouseEvent -= Driver_MouseEvent;
+			Driver?.End ();
+			Driver = null;
+		}
 		Iteration = null;
 		MouseEvent = null;
 		KeyDown = null;
@@ -629,6 +640,10 @@ public static partial class Application {
 			}
 			RunIteration (ref state, ref firstIteration);
 		}
+		// Run one last iteration to consume any outstanding input events from Driver
+		// This is important for remaining OnKeyUp events.
+		firstIteration = false;
+		RunIteration (ref state, ref firstIteration);
 	}
 
 	/// <summary>
@@ -1394,6 +1409,10 @@ public static partial class Application {
 	/// <returns><see langword="true"/> if the key was handled.</returns>
 	public static bool OnKeyDown (KeyEventArgs keyEvent)
 	{
+		if (!_initialized) {
+			return true;
+		}
+
 		KeyDown?.Invoke (null, keyEvent);
 		if (keyEvent.Handled) {
 			return true;
@@ -1452,6 +1471,10 @@ public static partial class Application {
 	/// <returns><see langword="true"/> if the key was handled.</returns>
 	public static bool OnKeyUp (KeyEventArgs a)
 	{
+		if (!_initialized) {
+			return true;
+		}
+
 		KeyUp?.Invoke (null, a);
 		if (a.Handled) {
 			return true;
