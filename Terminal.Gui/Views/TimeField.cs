@@ -246,7 +246,6 @@ namespace Terminal.Gui {
 				CursorPosition++;
 		}
 
-		//// BUGBUG: Why is this not handled by a key binding???
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{

@@ -145,8 +145,6 @@ namespace Terminal.Gui {
 			}
 		}
 
-		//// BUGBUG: Why is this not handled by a key binding???
-
 		/// <summary>
 		/// <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
 		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="OnKeyPressed"/>
@@ -157,6 +155,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override bool OnKeyDown (KeyEventArgs a)
 		{
+			//// BUGBUG: Why is this not handled by a key binding???
 			if (!Modal) {
 				switch (a.ConsoleDriverKey) {
 				// BUGBUG: This should be hanlded by Dialog 

@@ -620,7 +620,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
-		//// BUGBUG: Why is this not handled by a key binding???
 		/// <inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
@@ -629,11 +628,6 @@ namespace Terminal.Gui {
 			}
 
 			try {
-				//// First of all deal with any registered keybindings
-				//if (base.OnKeyPressed (keyEvent)) {
-				//	return true;
-				//}
-
 				// BUGBUG: this should move to OnInvokingKeyBindings
 				// If not a keybinding, is the key a searchable key press?
 				if (CollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {

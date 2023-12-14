@@ -758,9 +758,6 @@ namespace Terminal.Gui {
 			return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0).ToArray ());
 		}
 
-
-
-		//// BUGBUG: Why is this not handled by a key binding???
 		/// <inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs keyEvent)
 		{
