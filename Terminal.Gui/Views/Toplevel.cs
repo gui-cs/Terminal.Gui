@@ -365,46 +365,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool IsLoaded { get; private set; }
 
-		//// BUGBUG: This probably can be removed.
-		/////<inheritdoc/>
-		//public override bool OnKeyDown (KeyEventArgs keyEvent)
-		//{
-		//	if (base.OnKeyDown (keyEvent)) {
-		//		return true;
-		//	}
-
-		//	//switch (keyEvent.ConsoleDriverKey) {
-		//	//case Key.AltMask:
-		//	//case Key.AltMask | Key.Space:
-		//	//case Key.CtrlMask | Key.Space:
-		//	//case Key _ when (keyEvent.ConsoleDriverKey & Key.AltMask) == Key.AltMask:
-		//	//	return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
-		//	//}
-
-		//	return false;
-		//}
-
-		//// BUGBUG: This probably can be removed.
-		/////<inheritdoc/>
-		//public override bool OnKeyUp (KeyEventArgs keyEvent)
-		//{
-		//	if (base.OnKeyUp (keyEvent)) {
-		//		return true;
-		//	}
-
-		//	//switch (keyEvent.ConsoleDriverKey) {
-		//	//case Key.AltMask:
-		//	//case Key.AltMask | Key.Space:
-		//	//case Key.CtrlMask | Key.Space:
-		//	//	if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
-		//	//		return true;
-		//	//	}
-		//	//	break;
-		//	//}
-
-		//	return false;
-		//}
-
 		private void MovePreviousViewOrTop ()
 		{
 			if (Application.OverlappedTop == null) {
@@ -469,19 +429,6 @@ namespace Terminal.Gui {
 				Application.RequestStop ();
 			}
 		}
-
-		/////<inheritdoc/>
-		//public override bool OnColdKey (KeyEventArgs keyEvent)
-		//{
-		//	if (base.OnColdKey (keyEvent)) {
-		//		return true;
-		//	}
-
-		//	if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
-		//		return true;
-		//	}
-		//	return false;
-		//}
 
 		View GetDeepestFocusedSubview (View view)
 		{
