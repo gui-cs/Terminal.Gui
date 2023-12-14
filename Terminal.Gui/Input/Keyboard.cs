@@ -113,11 +113,12 @@ public class KeyEventArgs : EventArgs {
 
 	/// <summary>
 	/// Gets a value indicating whether the key is an lower case letter from 'a' to 'z', independent of the shift key.
-	/// This is needed because <see cref="KeyCode"/> defines <see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/>
-	/// using the ASCII codes for the uppercase letter (e.g. <see cref="KeyCode.A"/> is <c>65</c>) while <c>(ConsoleKeyDriver)'a'</c> =
-	/// <c>97</c>. Thus, to specify an uppercase 'a', one must use <c>ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask</c> and to
-	/// specify a lowercase 'a', on must use <c>ConsoleDriverKey.A</c> or <c>(ConsoleDriverKey)'a'</c>.
-	/// </summary>	
+	/// </summary>
+	/// <remarks>
+	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="KeyEventArgs.KeyCode"/> as values between 65 and 90 corresponding to
+	/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
+	/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+	/// </remarks>
 	public bool IsLowerCaseAtoZ {
 		get {
 			if (IsAlt || IsCtrl) {
@@ -376,7 +377,7 @@ public class KeyEventArgs : EventArgs {
 	/// </summary>
 	/// <param name="kea"></param>
 	public static explicit operator char (KeyEventArgs kea) => (char)kea.AsRune.Value;
-	
+
 	#endregion Operators
 
 	#region String conversion

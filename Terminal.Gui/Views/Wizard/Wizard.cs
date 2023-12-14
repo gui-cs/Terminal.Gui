@@ -147,9 +147,8 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="OnKeyPressed"/>
+		/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="OnKeyDown"/>
 		/// to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a non-modal (see <see cref="Wizard.Modal"/>.
-		/// See <see cref="OnKeyPressed"/> for more.
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>
@@ -158,7 +157,7 @@ namespace Terminal.Gui {
 			//// BUGBUG: Why is this not handled by a key binding???
 			if (!Modal) {
 				switch (a.KeyCode) {
-				// BUGBUG: This should be hanlded by Dialog 
+				// BUGBUG: This should be handled by Dialog 
 				case KeyCode.Esc:
 					var args = new WizardButtonEventArgs ();
 					Cancelled?.Invoke (this, args);

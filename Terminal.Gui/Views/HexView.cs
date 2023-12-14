@@ -266,7 +266,7 @@ public partial class HexView : View {
 					} else if (b > 127) {
 						c = (Rune)'.';
 					} else {
-						Rune.DecodeFromUtf8 (new ReadOnlySpan<byte> (b), out c, out _);
+						Rune.DecodeFromUtf8 (new ReadOnlySpan<byte> (ref b), out c, out _);
 					}
 				}
 				if (offset + displayStart == position || edited) {
