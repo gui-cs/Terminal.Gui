@@ -308,12 +308,12 @@ public class KeyboardTests {
 	}
 
 	// test Global key Bindings
-	public class GlobalKeyView : View {
+	public class ApplicationKeyBindingView : View {
 		public bool DefaultCommand { get; set; }
 		public bool SelectCommand { get; set; }
 		public bool LeftCommand { get; set; }
 
-		public GlobalKeyView ()
+		public ApplicationKeyBindingView ()
 		{
 			AddCommand (Command.Default, () => DefaultCommand = true);
 			AddCommand (Command.Select, () => SelectCommand = true);
@@ -327,9 +327,9 @@ public class KeyboardTests {
 
 	[Fact]
 	[AutoInitShutdown]
-	public void OnKeyDown_Global_KeyBinding ()
+	public void OnKeyDown_Application_KeyBinding ()
 	{
-		var view = new GlobalKeyView ();
+		var view = new ApplicationKeyBindingView ();
 		var invoked = false;
 		view.InvokingKeyBindings += (s, e) => invoked = true;
 		
@@ -355,9 +355,9 @@ public class KeyboardTests {
 
 	[Fact]
 	[AutoInitShutdown]
-	public void OnKeyDown_Global_KeyBinding_Negative ()
+	public void OnKeyDown_Application_KeyBinding_Negative ()
 	{
-		var view = new GlobalKeyView ();
+		var view = new ApplicationKeyBindingView ();
 		var invoked = false;
 		view.InvokingKeyBindings += (s, e) => invoked = true;
 
