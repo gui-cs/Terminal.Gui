@@ -570,7 +570,9 @@ public partial class View {
 			return true;
 		}
 
+		// Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
 		foreach (var view in Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.HotKey, out var _))) {
+			// TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
 			if (view.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.HotKey, out var binding)) {
 				keyEvent.Scope = KeyBindingScope.HotKey;
 				handled = view.OnInvokingKeyBindings (keyEvent);
@@ -579,27 +581,7 @@ public partial class View {
 				}
 			}
 		}
-
-		//// TODO: Refactor this per https://github.com/gui-cs/Terminal.Gui/pull/2927#discussion_r1420415162
-		//// TODO: The problem that needs to be solved is:
-		//// TODO: - How to enable a view to define global key bindings like StatusBar and MenuBar?
-		//// see https://github.com/gui-cs/Terminal.Gui/issues/3042
-		//foreach (var view in Subviews.Where (v => v is StatusBar or RadioGroup || keyEvent.BareKey == v.HotKey)) {
-		//	handled = view.OnInvokingKeyBindings (keyEvent);
-		//	if (handled != null && (bool)handled) {
-		//		return true;
-		//	}
-		//}
-
-		//foreach (var view in Subviews.Where (v => v is MenuBar)) {
-		//	if (view.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.SuperView, out var binding)) {
-		//		handled = view.OnInvokingKeyBindings (keyEvent);
-		//		if (handled != null && (bool)handled) {
-		//			return true;
-		//		}
-		//	}
-		//}
-
+		
 		return handled;
 	}
 

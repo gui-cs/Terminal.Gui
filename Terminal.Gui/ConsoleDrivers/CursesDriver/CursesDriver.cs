@@ -551,14 +551,6 @@ internal class CursesDriver : ConsoleDriver {
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
 		}
-		// Cause OnKeyUp and OnKeyPressed. Note that the special handling for ESC above 
-		// will not impact KeyUp.
-		// This is causing ESC firing even if another keystroke was handled.
-		//if (wch == Curses.KeyTab) {
-		//	keyUpHandler (new (MapCursesKey (wch), keyModifiers));
-		//} else {
-		//	keyUpHandler (new ((Key)wch, keyModifiers));
-		//}
 	}
 
 	void HandleEscSeqResponse (ref int code, ref ConsoleDriverKey k, ref int wch2, ref KeyEventArgs keyEventArgs, ref ConsoleKeyInfo [] cki)
@@ -584,7 +576,6 @@ internal class CursesDriver : ConsoleDriver {
 					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
 					keyEventArgs = new (k);
 					OnKeyDown (keyEventArgs);
-					//OnKeyPressed (key);
 				}
 			} else {
 				cki = EscSeqUtils.ResizeArray (consoleKeyInfo, cki);
