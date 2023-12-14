@@ -31,11 +31,11 @@ namespace UICatalog.Tests {
 			// Put a QuitKey in at the end
 			FakeConsole.PushMockKeyPress (Application.QuitKey);
 			foreach (var c in input.Reverse ()) {
-				ConsoleDriverKey key = ConsoleDriverKey.Unknown;
+				KeyCode key = KeyCode.Unknown;
 				if (char.IsLetter (c)) {
-					key = (ConsoleDriverKey)char.ToUpper (c) | (char.IsUpper (c) ? ConsoleDriverKey.ShiftMask : (ConsoleDriverKey)0);
+					key = (KeyCode)char.ToUpper (c) | (char.IsUpper (c) ? KeyCode.ShiftMask : (KeyCode)0);
 				} else {
-					key = (ConsoleDriverKey)c;
+					key = (KeyCode)c;
 				}
 				FakeConsole.PushMockKeyPress (key);
 			}
@@ -155,7 +155,7 @@ namespace UICatalog.Tests {
 
 			Application.Top.KeyDown += (object sender, KeyEventArgs args) => {
 				// See #2474 for why this is commented out
-				Assert.Equal (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Q, args.ConsoleDriverKey);
+				Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.ConsoleDriverKey);
 			};
 
 			generic.Init ();

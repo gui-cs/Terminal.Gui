@@ -27,10 +27,10 @@ public sealed class ContextMenu : IDisposable {
 	/// The default shortcut key for activating the context menu.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-	public static ConsoleDriverKey DefaultKey { get; set; } = ConsoleDriverKey.F10 | ConsoleDriverKey.ShiftMask;
+	public static KeyCode DefaultKey { get; set; } = KeyCode.F10 | KeyCode.ShiftMask;
 
 	static MenuBar _menuBar;
-	ConsoleDriverKey _key = DefaultKey;
+	KeyCode _key = DefaultKey;
 	MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
 	Toplevel _container;
 
@@ -187,9 +187,9 @@ public sealed class ContextMenu : IDisposable {
 	public MenuBarItem MenuItems { get; set; }
 
 	/// <summary>
-	/// <see cref="ConsoleDriverKey"/> specifies they keyboard key that will activate the context menu with the keyboard.
+	/// <see cref="KeyCode"/> specifies they keyboard key that will activate the context menu with the keyboard.
 	/// </summary>
-	public ConsoleDriverKey Key {
+	public KeyCode Key {
 		get => _key;
 		set {
 			var oldKey = _key;

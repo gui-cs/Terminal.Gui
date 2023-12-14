@@ -149,7 +149,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X < _textView.Text.Length) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (4, _textView.CursorPosition.X);
@@ -212,7 +212,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X > 0) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorLeft | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (31, _textView.CursorPosition.X);
@@ -295,7 +295,7 @@ public class TextViewTests {
 		//                                             TAB to jump between text fields.
 		TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
 
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+		_textView.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
 		bool first = true;
 		Application.RunIteration (ref rs, ref first);
@@ -314,7 +314,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X < _textView.Text.Length) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (4, _textView.CursorPosition.X);
@@ -379,7 +379,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X > 0) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (31, _textView.CursorPosition.X);
@@ -452,7 +452,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X < _textView.Text.Length) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (12, _textView.CursorPosition.X);
@@ -501,7 +501,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X > 0) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (7, _textView.CursorPosition.X);
@@ -543,7 +543,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X < _textView.Text.Length) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (6, _textView.CursorPosition.X);
@@ -649,7 +649,7 @@ public class TextViewTests {
 		var iteration = 0;
 
 		while (_textView.CursorPosition.X > 0) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorLeft | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (54, _textView.CursorPosition.X);
@@ -761,7 +761,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (23, _textView.CursorPosition.X);
@@ -891,7 +891,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+			_textView.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (5, _textView.CursorPosition.X);
@@ -1000,28 +1000,28 @@ public class TextViewTests {
 		while (!iterationsFinished) {
 			switch (iteration) {
 			case 0:
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask));
+				_textView.ProcessKeyDown (new (KeyCode.K | KeyCode.CtrlMask));
 				Assert.Equal (0, _textView.CursorPosition.X);
 				Assert.Equal (0, _textView.CursorPosition.Y);
 				Assert.Equal ($"{Environment.NewLine}This is the second line.", _textView.Text);
 				Assert.Equal ("This is the first line.", Clipboard.Contents);
 				break;
 			case 1:
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+				_textView.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask | KeyCode.ShiftMask));
 				Assert.Equal (0, _textView.CursorPosition.X);
 				Assert.Equal (0, _textView.CursorPosition.Y);
 				Assert.Equal ("This is the second line.", _textView.Text);
 				Assert.Equal ($"This is the first line.{Environment.NewLine}", Clipboard.Contents);
 				break;
 			case 2:
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask));
+				_textView.ProcessKeyDown (new (KeyCode.K | KeyCode.CtrlMask));
 				Assert.Equal (0, _textView.CursorPosition.X);
 				Assert.Equal (0, _textView.CursorPosition.Y);
 				Assert.Equal ("", _textView.Text);
 				Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
 
 				// Paste
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask));
+				_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask));
 				Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
 				break;
 			default:
@@ -1044,28 +1044,28 @@ public class TextViewTests {
 		while (!iterationsFinished) {
 			switch (iteration) {
 			case 0:
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.AltMask));
+				_textView.ProcessKeyDown (new (KeyCode.K | KeyCode.AltMask));
 				Assert.Equal (0, _textView.CursorPosition.X);
 				Assert.Equal (1, _textView.CursorPosition.Y);
 				Assert.Equal ($"This is the first line.{Environment.NewLine}", _textView.Text);
 				Assert.Equal ($"This is the second line.", Clipboard.Contents);
 				break;
 			case 1:
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask));
+				_textView.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask));
 				Assert.Equal (23, _textView.CursorPosition.X);
 				Assert.Equal (0, _textView.CursorPosition.Y);
 				Assert.Equal ("This is the first line.", _textView.Text);
 				Assert.Equal ($"This is the second line.{Environment.NewLine}", Clipboard.Contents);
 				break;
 			case 2:
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.AltMask));
+				_textView.ProcessKeyDown (new (KeyCode.K | KeyCode.AltMask));
 				Assert.Equal (0, _textView.CursorPosition.X);
 				Assert.Equal (0, _textView.CursorPosition.Y);
 				Assert.Equal ("", _textView.Text);
 				Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
 
 				// Paste inverted
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask));
+				_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask));
 				Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
 				break;
 			default:
@@ -1085,7 +1085,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (0, _textView.CursorPosition.X);
@@ -1130,7 +1130,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (22, _textView.CursorPosition.X);
@@ -1180,7 +1180,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (0, _textView.CursorPosition.X);
@@ -1261,7 +1261,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask));
+			_textView.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (23, _textView.CursorPosition.X);
@@ -1347,9 +1347,9 @@ public class TextViewTests {
 	{
 		_textView.SelectionStartColumn = 0;
 		_textView.SelectionStartRow = 0;
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("", _textView.SelectedText);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)); // Cut
+		_textView.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)); // Cut
 		Assert.Equal ("", _textView.SelectedText);
 	}
 
@@ -1360,9 +1360,9 @@ public class TextViewTests {
 		_textView.SelectionStartColumn = 20;
 		_textView.SelectionStartRow = 0;
 		_textView.CursorPosition = new Point (24, 0);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("text", _textView.SelectedText);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)); // Cut
+		_textView.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)); // Cut
 		Assert.Equal ("", _textView.SelectedText);
 	}
 
@@ -1373,15 +1373,15 @@ public class TextViewTests {
 		_textView.SelectionStartColumn = 20;
 		_textView.SelectionStartRow = 0;
 		_textView.CursorPosition = new Point (24, 0);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("text", _textView.SelectedText);
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		_textView.SelectionStartColumn = 20;
 		_textView.SelectionStartRow = 0;
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)); // Cut
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)); // Cut
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 	}
 
@@ -1392,7 +1392,7 @@ public class TextViewTests {
 		_textView.SelectionStartColumn = 20;
 		_textView.SelectionStartRow = 0;
 		_textView.CursorPosition = new Point (24, 0);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("text", _textView.SelectedText);
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 		_textView.SelectionStartColumn = 0;
@@ -1400,13 +1400,13 @@ public class TextViewTests {
 		Assert.Equal (new Point (24, 0), _textView.CursorPosition);
 		Assert.True (_textView.Selecting);
 		_textView.Selecting = false;
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal (new Point (28, 0), _textView.CursorPosition);
 		Assert.False (_textView.Selecting);
 		Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
 		_textView.SelectionStartColumn = 24;
 		_textView.SelectionStartRow = 0;
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)); // Cut
+		_textView.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)); // Cut
 		Assert.Equal (new Point (24, 0), _textView.CursorPosition);
 		Assert.False (_textView.Selecting);
 		Assert.Equal ("", _textView.SelectedText);
@@ -1414,7 +1414,7 @@ public class TextViewTests {
 		_textView.SelectionStartColumn = 0;
 		_textView.SelectionStartRow = 0;
 		_textView.Selecting = false;
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal (new Point (28, 0), _textView.CursorPosition);
 		Assert.False (_textView.Selecting);
 		Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
@@ -1428,16 +1428,16 @@ public class TextViewTests {
 		_textView.SelectionStartColumn = 20;
 		_textView.SelectionStartRow = 0;
 		_textView.CursorPosition = new Point (24, 0);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("text", _textView.SelectedText);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)); // Selecting is set to false after Cut.
+		_textView.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)); // Selecting is set to false after Cut.
 		Assert.Equal ("", _textView.SelectedText);
 		_textView.ReadOnly = false;
 		Assert.False (_textView.Selecting);
 		_textView.Selecting = true; // Needed to set Selecting to true.
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("text", _textView.SelectedText);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)); // Cut
+		_textView.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)); // Cut
 		Assert.Equal ("", _textView.SelectedText);
 	}
 
@@ -1448,9 +1448,9 @@ public class TextViewTests {
 		_textView.SelectionStartColumn = 20;
 		_textView.SelectionStartRow = 0;
 		_textView.CursorPosition = new Point (24, 0);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
 		Assert.Equal ("text", _textView.SelectedText);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal ("", _textView.SelectedText);
 	}
 
@@ -1480,7 +1480,7 @@ public class TextViewTests {
 
 		_textView.Text = "ay";
 		Assert.Equal (1, eventcount);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.ShiftMask));
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.ShiftMask));
 		Assert.Equal (1, eventcount);
 		Assert.Equal ("Yay", _textView.Text);
 	}
@@ -1491,13 +1491,13 @@ public class TextViewTests {
 	{
 		_textView.CursorPosition = new Point (10, 0);
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x75)); // u
+		_textView.ProcessKeyDown (new ((KeyCode)0x75)); // u
 		Assert.Equal ("TAB to jumup between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x73)); // s
+		_textView.ProcessKeyDown (new ((KeyCode)0x73)); // s
 		Assert.Equal ("TAB to jumusp between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x65)); // e
+		_textView.ProcessKeyDown (new ((KeyCode)0x65)); // e
 		Assert.Equal ("TAB to jumusep between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x64)); // d
+		_textView.ProcessKeyDown (new ((KeyCode)0x64)); // d
 		Assert.Equal ("TAB to jumusedp between text fields.", _textView.Text);
 	}
 
@@ -1508,13 +1508,13 @@ public class TextViewTests {
 		_textView.Used = false;
 		_textView.CursorPosition = new Point (10, 0);
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x75)); // u
+		_textView.ProcessKeyDown (new ((KeyCode)0x75)); // u
 		Assert.Equal ("TAB to jumu between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x73)); // s
+		_textView.ProcessKeyDown (new ((KeyCode)0x73)); // s
 		Assert.Equal ("TAB to jumusbetween text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x65)); // e
+		_textView.ProcessKeyDown (new ((KeyCode)0x65)); // e
 		Assert.Equal ("TAB to jumuseetween text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new ((ConsoleDriverKey)0x64)); // d
+		_textView.ProcessKeyDown (new ((KeyCode)0x64)); // d
 		Assert.Equal ("TAB to jumusedtween text fields.", _textView.Text);
 	}
 
@@ -1524,15 +1524,15 @@ public class TextViewTests {
 	{
 		_textView.Text = "This is the first line.\nThis is the second line.\n";
 		_textView.CursorPosition = new Point (0, _textView.Lines - 1);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 		_textView.CursorPosition = new Point (3, 1);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)); // Copy
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)); // Copy
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 		Assert.Equal (new Point (3, 2), _textView.CursorPosition);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)); // Paste
+		_textView.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)); // Paste
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
 		Assert.Equal (new Point (3, 3), _textView.CursorPosition);
 	}
@@ -1550,9 +1550,9 @@ public class TextViewTests {
 		Assert.True (_textView.AllowsTab);
 		Assert.True (_textView.AllowsReturn);
 		Assert.True (_textView.Multiline);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+		_textView.ProcessKeyDown (new (KeyCode.Tab));
 		Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask));
+		_textView.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask));
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
 	}
 
@@ -1580,7 +1580,7 @@ public class TextViewTests {
 		Assert.True (_textView.Multiline);
 		Assert.Equal (4, _textView.TabWidth);
 		Assert.True (_textView.AllowsTab);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+		_textView.ProcessKeyDown (new (KeyCode.Enter));
 		Assert.Equal (Environment.NewLine +
 			"TAB to jump between text fields.", _textView.Text);
 
@@ -1589,7 +1589,7 @@ public class TextViewTests {
 		Assert.False (_textView.Multiline);
 		Assert.Equal (0, _textView.TabWidth);
 		Assert.False (_textView.AllowsTab);
-		_textView.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+		_textView.ProcessKeyDown (new (KeyCode.Enter));
 		Assert.Equal (Environment.NewLine +
 			"TAB to jump between text fields.", _textView.Text);
 	}
@@ -1645,14 +1645,14 @@ public class TextViewTests {
 			var tabWidth = _textView.TabWidth;
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+				_textView.ProcessKeyDown (new (KeyCode.Tab));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
 			while (col > 0) {
 				col--;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask));
+				_textView.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1688,14 +1688,14 @@ public class TextViewTests {
 			Assert.Equal (leftCol, _textView.LeftColumn);
 			while (col > 0) {
 				col--;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask));
+				_textView.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+				_textView.ProcessKeyDown (new (KeyCode.Tab));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1724,21 +1724,21 @@ public class TextViewTests {
 			var tabWidth = _textView.TabWidth;
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+				_textView.ProcessKeyDown (new (KeyCode.Tab));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
 			while (col > 0) {
 				col--;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft));
+				_textView.ProcessKeyDown (new (KeyCode.CursorLeft));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight));
+				_textView.ProcessKeyDown (new (KeyCode.CursorRight));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1767,14 +1767,14 @@ public class TextViewTests {
 			Assert.Equal (leftCol, _textView.LeftColumn);
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+				_textView.ProcessKeyDown (new (KeyCode.Tab));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
 			while (col > 0) {
 				col--;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask));
+				_textView.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1805,18 +1805,18 @@ public class TextViewTests {
 			Assert.Equal (32, _textView.Text.Length);
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+				_textView.ProcessKeyDown (new (KeyCode.Tab));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.Home));
+			_textView.ProcessKeyDown (new (KeyCode.Home));
 			col = 0;
 			Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 			leftCol = 0;
 			Assert.Equal (leftCol, _textView.LeftColumn);
 
-			_textView.ProcessKeyDown (new (ConsoleDriverKey.End));
+			_textView.ProcessKeyDown (new (KeyCode.End));
 			col = _textView.Text.Length;
 			Assert.Equal (132, _textView.Text.Length);
 			Assert.Equal (new Point (col, 0), _textView.CursorPosition);
@@ -1830,7 +1830,7 @@ public class TextViewTests {
 			leftCol = GetLeftCol (leftCol);
 			while (col > 0) {
 				col--;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask));
+				_textView.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1861,7 +1861,7 @@ public class TextViewTests {
 			var tabWidth = _textView.TabWidth;
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.Tab));
+				_textView.ProcessKeyDown (new (KeyCode.Tab));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -1869,14 +1869,14 @@ public class TextViewTests {
 			Assert.Equal (132, _textView.Text.Length);
 			while (col > 0) {
 				col--;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft));
+				_textView.ProcessKeyDown (new (KeyCode.CursorLeft));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
 			}
 			while (col < 100) {
 				col++;
-				_textView.ProcessKeyDown (new (ConsoleDriverKey.CursorRight));
+				_textView.ProcessKeyDown (new (KeyCode.CursorRight));
 				Assert.Equal (new Point (col, 0), _textView.CursorPosition);
 				leftCol = GetLeftCol (leftCol);
 				Assert.Equal (leftCol, _textView.LeftColumn);
@@ -2141,35 +2141,35 @@ aaaa
 ", _output);
 
 		tv.CursorPosition = new Point (5, 0);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Application.Refresh ();
 		Assert.Equal (0, tv.LeftColumn);
 		TestHelpers.AssertDriverContentsAre (@"
 aaa
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Application.Refresh ();
 		Assert.Equal (0, tv.LeftColumn);
 		TestHelpers.AssertDriverContentsAre (@"
 aa
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Application.Refresh ();
 		Assert.Equal (0, tv.LeftColumn);
 		TestHelpers.AssertDriverContentsAre (@"
 a
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Application.Refresh ();
 		Assert.Equal (0, tv.LeftColumn);
 		TestHelpers.AssertDriverContentsAre (@"
 
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Application.Refresh ();
 		Assert.Equal (0, tv.LeftColumn);
 		TestHelpers.AssertDriverContentsAre (@"
@@ -2315,7 +2315,7 @@ line.
 		var tv = new TextView () { Width = 10, Height = 10, BottomOffset = 1 };
 		tv.Text = text;
 
-		tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.End));
+		tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.End));
 
 		Assert.Equal (4, tv.TopRow);
 		Assert.Equal (1, tv.BottomOffset);
@@ -2345,7 +2345,7 @@ line.
 		var tv = new TextView () { Width = 10, Height = 10, RightOffset = 1 };
 		tv.Text = text;
 
-		tv.ProcessKeyDown (new (ConsoleDriverKey.End));
+		tv.ProcessKeyDown (new (KeyCode.End));
 
 		Assert.Equal (4, tv.LeftColumn);
 		Assert.Equal (1, tv.RightOffset);
@@ -2499,9 +2499,9 @@ line.
 
 	[Theory]
 	[TextViewTestsAutoInitShutdown]
-	[InlineData (ConsoleDriverKey.Delete)]
-	[InlineData (ConsoleDriverKey.DeleteChar)]
-	public void WordWrap_Draw_Typed_Keys_After_Text_Is_Deleted (ConsoleDriverKey del)
+	[InlineData (KeyCode.Delete)]
+	[InlineData (KeyCode.DeleteChar)]
+	public void WordWrap_Draw_Typed_Keys_After_Text_Is_Deleted (KeyCode del)
 	{
 		Application.Top.Add (_textView);
 		_textView.Text = "Line 1.\nLine 2.";
@@ -2513,14 +2513,14 @@ line.
 Line 1.
 Line 2.", _output);
 
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.End | KeyCode.ShiftMask)));
 		Assert.Equal ("Line 1.", _textView.SelectedText);
 
 		Assert.True (_textView.ProcessKeyDown (new (del)));
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.H | ConsoleDriverKey.ShiftMask)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.H | KeyCode.ShiftMask)));
 		Assert.NotEqual (Rect.Empty, _textView._needsDisplayRect);
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -2581,7 +2581,7 @@ Line 2.", _output);
 		Assert.Equal (new Point (9, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.LeftColumn);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorRight)));
 		tv.CursorPosition = new Point (10, 0);
 		Assert.Equal (new Point (10, 0), tv.CursorPosition);
 		Assert.Equal (1, tv.LeftColumn);
@@ -2610,35 +2610,35 @@ Line 2.", _output);
 		var g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
 
 		tv.CanFocus = false;
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorLeft)));
 		tv.CanFocus = true;
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft)));
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.CursorLeft)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorRight)));
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
 		Assert.Equal (2, tv.CurrentRow);
 		Assert.Equal (23, tv.CurrentColumn);
 		Assert.Equal (tv.CurrentColumn, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.CursorRight)));
 		Assert.NotNull (tv.Autocomplete);
 		Assert.Empty (g.AllSuggestions);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.F | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.F | KeyCode.ShiftMask)));
 		tv.Draw ();
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 		Assert.Equal (new Point (24, 2), tv.CursorPosition);
 		Assert.Empty (tv.Autocomplete.Suggestions);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		tv.Draw ();
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
 		Assert.Empty (tv.Autocomplete.Suggestions);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		tv.Draw ();
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 		Assert.Equal (new Point (24, 2), tv.CursorPosition);
 		Assert.Empty (tv.Autocomplete.Suggestions);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
 		g.AllSuggestions = Regex.Matches (tv.Text, "\\w+")
@@ -2652,13 +2652,13 @@ Line 2.", _output);
 		Assert.Equal ("line", g.AllSuggestions [4]);
 		Assert.Equal ("second", g.AllSuggestions [5]);
 		Assert.Equal ("third", g.AllSuggestions [^1]);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.F | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.F | KeyCode.ShiftMask)));
 		tv.Draw ();
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
 		Assert.Equal (new Point (24, 2), tv.CursorPosition);
 		Assert.Single (tv.Autocomplete.Suggestions);
 		Assert.Equal ("first", tv.Autocomplete.Suggestions [0].Replacement);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (28, 2), tv.CursorPosition);
 		Assert.Empty (tv.Autocomplete.Suggestions);
@@ -2667,140 +2667,140 @@ Line 2.", _output);
 		tv.Autocomplete.ClearSuggestions ();
 		Assert.Empty (g.AllSuggestions);
 		Assert.Empty (tv.Autocomplete.Suggestions);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.PageUp)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.PageUp)));
 		Assert.Equal (24, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (24, 1), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (((int)'V' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new (((int)'V' + KeyCode.AltMask))));
 		Assert.Equal (23, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (23, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.PageDown)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.PageDown)));
 		Assert.Equal (24, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (23, 1), tv.CursorPosition); // gets the previous length
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.V | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.V | KeyCode.CtrlMask)));
 		Assert.Equal (28, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition); // gets the previous length
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.PageUp | KeyCode.ShiftMask)));
 		Assert.Equal (24, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (23, 1), tv.CursorPosition); // gets the previous length
 		Assert.Equal (24 + Environment.NewLine.Length, tv.SelectedLength);
 		Assert.Equal ($".{Environment.NewLine}This is the third line.", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.PageDown | KeyCode.ShiftMask)));
 		Assert.Equal (28, tv.GetCurrentLine ().Count);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition); // gets the previous length
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
 		Assert.Equal (Point.Empty, tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.N | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.N | KeyCode.CtrlMask)));
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.P | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.P | KeyCode.CtrlMask)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorDown)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorDown)));
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorUp)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorUp)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorDown | KeyCode.ShiftMask)));
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (23 + Environment.NewLine.Length, tv.SelectedLength);
 		Assert.Equal ($"This is the first line.{Environment.NewLine}", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorUp | KeyCode.ShiftMask)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.F | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.F | KeyCode.CtrlMask)));
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.B | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.B | KeyCode.CtrlMask)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorRight)));
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorLeft)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorRight | KeyCode.ShiftMask)));
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (1, tv.SelectedLength);
 		Assert.Equal ("T", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorLeft | KeyCode.ShiftMask)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		Assert.Equal ($"his is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End)));
 		Assert.Equal ($"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (21, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Delete)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Delete)));
 		Assert.Equal ($"is is the first line{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (20, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Home)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Home)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.ShiftMask)));
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (19, tv.SelectedLength);
 		Assert.Equal ("is is the first lin", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Home | KeyCode.ShiftMask)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.E | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.E | KeyCode.CtrlMask)));
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.A | KeyCode.CtrlMask)));
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
 		Assert.Equal ("is is the first lin", Clipboard.Contents);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2808,35 +2808,35 @@ Line 2.", _output);
 		Assert.False (tv.Selecting);
 		Assert.Equal ("is is the first lin", Clipboard.Contents);
 		tv.CursorPosition = Point.Empty;
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
 		Assert.Equal ("is is the first lin", Clipboard.Contents);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
 		Assert.Equal ("is is the first lin", Clipboard.Contents);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.AltMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.AltMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
 		tv.ReadOnly = true;
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
 		tv.ReadOnly = false;
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2844,7 +2844,7 @@ Line 2.", _output);
 		Assert.False (tv.Selecting);
 		Assert.Equal (0, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Space | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2852,7 +2852,7 @@ Line 2.", _output);
 		Assert.True (tv.Selecting);
 		Assert.Equal (19, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Space | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2861,7 +2861,7 @@ Line 2.", _output);
 		Assert.Equal (19, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
 		tv.SelectionStartColumn = 0;
-		Assert.True (tv.ProcessKeyDown (new (((int)'C' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new (((int)'C' + KeyCode.AltMask))));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (19, tv.SelectedLength);
@@ -2869,7 +2869,7 @@ Line 2.", _output);
 		Assert.True (tv.Selecting);
 		Assert.Equal (0, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)));
 		Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (19, 0), tv.CursorPosition);
 		Assert.Equal (19, tv.SelectedLength);
@@ -2877,7 +2877,7 @@ Line 2.", _output);
 		Assert.True (tv.Selecting);
 		Assert.Equal (0, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
-		Assert.True (tv.ProcessKeyDown (new (((int)'W' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new (((int)'W' + KeyCode.AltMask))));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2886,7 +2886,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
 		Assert.Equal ("is is the first lin", Clipboard.Contents);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2895,7 +2895,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
 		Assert.Equal ("", Clipboard.Contents);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.X | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.X | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2904,78 +2904,78 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectionStartColumn);
 		Assert.Equal (0, tv.SelectionStartRow);
 		Assert.Equal ("", Clipboard.Contents);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (28, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.CursorLeft)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.CursorLeft)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.CursorLeft | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (12, 2), tv.CursorPosition);
 		Assert.Equal (6, tv.SelectedLength);
 		Assert.Equal ("third ", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)((int)'B' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)((int)'B' + KeyCode.AltMask))));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (8, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.CursorRight)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.CursorRight)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (12, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.CursorRight | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 		Assert.Equal (6, tv.SelectedLength);
 		Assert.Equal ("third ", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)((int)'F' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)((int)'F' + KeyCode.AltMask))));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (22, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)((int)'F' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)((int)'F' + KeyCode.AltMask))));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)((int)'F' + ConsoleDriverKey.AltMask))));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)((int)'F' + KeyCode.AltMask))));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (28, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Home | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
-		Assert.False (tv.Selecting); Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask)));
+		Assert.False (tv.Selecting); Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (28, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.False (tv.Selecting); Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.False (tv.Selecting); Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2985,7 +2985,7 @@ Line 2.", _output);
 		tv.AllowsReturn = false;
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.False (tv.Selecting);
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2994,58 +2994,58 @@ Line 2.", _output);
 		Assert.False (tv.AllowsReturn);
 		tv.AllowsReturn = true;
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
 		Assert.True (tv.AllowsReturn);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.End | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 		Assert.Equal (42 + Environment.NewLine.Length, tv.SelectedLength);
 		Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.Home | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (Environment.NewLine.Length, tv.SelectedLength);
 		Assert.Equal ($"{Environment.NewLine}", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.T | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 		Assert.Equal (42 + Environment.NewLine.Length * 2, tv.SelectedLength);
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
 		Assert.True (tv.Selecting);
 		Assert.True (tv.Used);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.InsertChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.InsertChar)));
 		Assert.False (tv.Used);
 		Assert.True (tv.AllowsTab);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 		tv.AllowsTab = false;
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.Tab)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.False (tv.AllowsTab);
 		tv.AllowsTab = true;
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 		Assert.True (tv.Selecting);
 		tv.Selecting = false;
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Tab)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t", tv.Text);
 		Assert.True (tv.AllowsTab);
 		tv.AllowsTab = false;
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third \t", tv.Text);
 		Assert.False (tv.AllowsTab);
 		tv.AllowsTab = true;
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.True (tv.AllowsTab);
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.CtrlMask)));
 		Assert.False (tv.ProcessKeyDown (new (Application.AlternateForwardKey)));
-		Assert.False (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)));
+		Assert.False (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.False (tv.ProcessKeyDown (new (Application.AlternateBackwardKey)));
 	}
 
@@ -3091,14 +3091,14 @@ Line 2.", _output);
 		Assert.Equal (new Point (13, 1), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3133,14 +3133,14 @@ Line 2.", _output);
 		Assert.Equal (new Point (4, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3175,14 +3175,14 @@ Line 2.", _output);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3221,7 +3221,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3231,7 +3231,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3275,7 +3275,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3285,7 +3285,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This  second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3329,7 +3329,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3339,7 +3339,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This isecond line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3387,42 +3387,42 @@ Line 2.", _output);
 		Assert.Equal (new Point (13, 2), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (13, 1), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (13, 0), tv.CursorPosition);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is messy the first line.{Environment.NewLine}This is messy the second line.{Environment.NewLine}This is messy the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3473,7 +3473,7 @@ Line 2.", _output);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 
 			switch (i) {
 			case 0:
@@ -3495,7 +3495,7 @@ Line 2.", _output);
 		Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 
 			switch (i) {
 			case 0:
@@ -3517,7 +3517,7 @@ Line 2.", _output);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 
 			switch (i) {
 			case 0:
@@ -3539,21 +3539,21 @@ Line 2.", _output);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 0), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This the first line.{Environment.NewLine}This the second line.{Environment.NewLine}This the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3604,42 +3604,42 @@ Line 2.", _output);
 		Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 2), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
 		for (int i = 0; i < ntimes; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		}
 		Assert.Equal ($"This ise first line.{Environment.NewLine}This ise second line.{Environment.NewLine}This ise third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
@@ -3708,7 +3708,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 
 			switch (i) {
 			case 0:
@@ -3745,7 +3745,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 
 		for (int i = 0; i < messy.Length; i++) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 
 			switch (i) {
 			case 0:
@@ -3799,267 +3799,267 @@ Line 2.", _output);
 		Assert.Equal (Point.Empty, tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.O | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.O | KeyCode.ShiftMask)));
 		Assert.Equal ("O", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'n')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'n')));
 		Assert.Equal ("On", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'e')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'e')));
 		Assert.Equal ("One", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.T | KeyCode.ShiftMask)));
 		Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'w')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'w')));
 		Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'o')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'o')));
 		Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (3, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.T | KeyCode.ShiftMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'h')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'h')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (2, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'r')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'r')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (3, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'e')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'e')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'e')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'e')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (5, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 3), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
 		// Undoing
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (5, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (3, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (2, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (3, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"On", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"O", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redoing
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"O", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"On", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (3, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (2, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (3, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (5, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 3), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 3), tv.CursorPosition);
@@ -4083,85 +4083,85 @@ Line 2.", _output);
 		Assert.Equal (Point.Empty, tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.O | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.O | KeyCode.ShiftMask)));
 		Assert.Equal ("O", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'n')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'n')));
 		Assert.Equal ("On", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'e')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'e')));
 		Assert.Equal ("One", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.T | KeyCode.ShiftMask)));
 		Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'w')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'w')));
 		Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'o')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'o')));
 		Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (3, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.T | KeyCode.ShiftMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'h')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'h')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (2, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'r')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'r')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (3, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'e')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'e')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'e')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'e')));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (5, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 3), tv.CursorPosition);
@@ -4172,7 +4172,7 @@ Line 2.", _output);
 		tv.CursorPosition = new Point (0, 1);
 		Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D1)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D1)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -4184,7 +4184,7 @@ Line 2.", _output);
 		tv.CursorPosition = new Point (1, 1);
 		Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D2)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D2)));
 		Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -4192,118 +4192,118 @@ Line 2.", _output);
 		Assert.True (tv.IsDirty);
 
 		// Undoing
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (5, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (3, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (2, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (3, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"On", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"O", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.False (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -4311,112 +4311,112 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 
 		// Redoing
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"O", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"On", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}T", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Tw", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (3, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}T", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Th", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (2, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thr", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (3, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Thre", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (5, 2), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 3), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -4448,7 +4448,7 @@ Line 2.", _output);
 		tv.CursorPosition = new Point (0, 1);
 		Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D1)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D1)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -4459,32 +4459,32 @@ Line 2.", _output);
 		tv.CursorPosition = new Point (1, 1);
 		Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D2)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D2)));
 		Assert.Equal ("12hree", tv.Text);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.False (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three", tv.Text);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("12hree", tv.Text);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -4515,7 +4515,7 @@ Line 2.", _output);
 		tv.CursorPosition = new Point (0, 1);
 		Assert.Equal (3 + Environment.NewLine.Length, tv.SelectedLength);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D1)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D1)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -4526,32 +4526,32 @@ Line 2.", _output);
 		tv.CursorPosition = new Point (1, 1);
 		Assert.Equal (4 + Environment.NewLine.Length, tv.SelectedLength);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D2)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D2)));
 		Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"One{Environment.NewLine}Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.False (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"1Two{Environment.NewLine}Three{Environment.NewLine}", tv.Text);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"12hree{Environment.NewLine}", tv.Text);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -4569,42 +4569,42 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 		Assert.False (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D1)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D1)));
 		Assert.Equal ("1", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 		Assert.True (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"1{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 		Assert.True (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D2)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D2)));
 		Assert.Equal ($"1{Environment.NewLine}2", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 		Assert.True (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Assert.Equal ($"1{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 		Assert.True (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Assert.Equal ($"1", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 		Assert.True (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Assert.Equal ($"", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -4627,7 +4627,7 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 		Assert.False (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4636,7 +4636,7 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 		Assert.False (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
@@ -4646,7 +4646,7 @@ Line 2.", _output);
 		Assert.True (tv.HasHistoryChanges);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4656,7 +4656,7 @@ Line 2.", _output);
 		Assert.True (tv.HasHistoryChanges);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
@@ -4678,7 +4678,7 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 		Assert.False (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4687,7 +4687,7 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 		Assert.False (tv.HasHistoryChanges);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
@@ -4697,7 +4697,7 @@ Line 2.", _output);
 		Assert.True (tv.HasHistoryChanges);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4707,7 +4707,7 @@ Line 2.", _output);
 		Assert.True (tv.HasHistoryChanges);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
@@ -4726,26 +4726,26 @@ Line 2.", _output);
 
 		tv.CursorPosition = new Point (23, 0);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ("This is the first line.", Clipboard.Contents);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (23, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (23, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (23, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (23, 1), tv.CursorPosition);
@@ -4761,7 +4761,7 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (17, 0);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("first", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4770,19 +4770,19 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (11, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
@@ -4798,7 +4798,7 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4806,19 +4806,19 @@ Line 2.", _output);
 
 		tv.Selecting = false;
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the secondfirst line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
@@ -4834,7 +4834,7 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ($"first line.{Environment.NewLine}This is the second", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4843,19 +4843,19 @@ Line 2.", _output);
 		tv.Selecting = false;
 		tv.CursorPosition = new Point (17, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 1), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the seconfirst line.{Environment.NewLine}This is the secondd line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
@@ -4868,25 +4868,25 @@ Line 2.", _output);
 		var text = "\nThis is the first line.\nThis is the second line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.C | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -4906,19 +4906,19 @@ Line 2.", _output);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"Inserted{Environment.NewLine}NewLineThis is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"Inserted{Environment.NewLine}NewLineThis is the first line.{Environment.NewLine}This is the second line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
@@ -4934,7 +4934,7 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (17, 0);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -4943,19 +4943,19 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (11, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
@@ -4971,7 +4971,7 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
@@ -4979,19 +4979,19 @@ Line 2.", _output);
 
 		tv.Selecting = false;
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
@@ -5007,7 +5007,7 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (17, 0);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.W | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (3, tv.Lines);
@@ -5017,29 +5017,29 @@ Line 2.", _output);
 		tv.SelectionStartRow = 1;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (12, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the  line.{Environment.NewLine}This is the first line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 1), tv.CursorPosition);
@@ -5051,122 +5051,122 @@ Line 2.", _output);
 		var text = "First line.\nSecond line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ("First line", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ("First ", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("First ", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("First line", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (11, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second ", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (7, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("First line", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (10, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("First ", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5178,80 +5178,80 @@ Line 2.", _output);
 		var text = "First line.\nSecond line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
 		Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
 		Assert.Equal ("line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5264,27 +5264,27 @@ Line 2.", _output);
 		var text = "First line.\nSecond line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.AltMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.AltMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ("Second line.", Clipboard.Contents);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.AltMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.AltMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ($"Second line.{Environment.NewLine}", Clipboard.Contents);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.AltMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.AltMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ($"Second line.{Environment.NewLine}First line.", Clipboard.Contents);
@@ -5292,33 +5292,33 @@ Line 2.", _output);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (12, 1), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (11, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5331,21 +5331,21 @@ Line 2.", _output);
 		var text = "First line.\nSecond line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ("First line.", Clipboard.Contents);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ($"First line.{Environment.NewLine}", Clipboard.Contents);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.K | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", Clipboard.Contents);
@@ -5353,33 +5353,33 @@ Line 2.", _output);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5390,34 +5390,34 @@ Line 2.", _output);
 	{
 		var tv = new TextView ();
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D1)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D1)));
 		Assert.Equal ("1", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D2)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D2)));
 		Assert.Equal ("12", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D3)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D3)));
 		Assert.Equal ("123", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("12", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.D4)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.D4)));
 		Assert.Equal ("124", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("124", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -5432,33 +5432,33 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (17, 0);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5473,33 +5473,33 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5514,33 +5514,33 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (17, 2);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -5556,33 +5556,33 @@ Line 2.", _output);
 		tv.SelectionStartRow = 1;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
@@ -5597,60 +5597,60 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (17, 0);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'a')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'a')));
 		Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (17, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine} line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}a line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5666,60 +5666,60 @@ Line 2.", _output);
 		tv.SelectionStartRow = 1;
 		tv.CursorPosition = new Point (18, 1);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'a')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'a')));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (18, 1), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine} line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 2), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the {Environment.NewLine}a line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (1, 2), tv.CursorPosition);
@@ -5731,65 +5731,65 @@ Line 2.", _output);
 		var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'a')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'a')));
 		Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (23, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}a", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5804,60 +5804,60 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (12, 2);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'a')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'a')));
 		Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (12, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (12, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5875,23 +5875,23 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 12;
 		tv.CursorPosition = new Point (12, 2);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new ((ConsoleDriverKey)'a')));
+		Assert.True (tv.ProcessKeyDown (new ((KeyCode)'a')));
 		Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}third line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the {Environment.NewLine}athird line.{Environment.NewLine}", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 1), tv.CursorPosition);
@@ -5903,36 +5903,36 @@ Line 2.", _output);
 		var text = "First line.\nSecond line.\nThird line.";
 		var tv = new TextView () { Width = 80, Height = 5, Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Tab)));
 		Assert.Equal ($"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"\tFirst line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (1, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -5947,36 +5947,36 @@ Line 2.", _output);
 		tv.SelectionStartColumn = 6;
 		tv.CursorPosition = new Point (6, 2);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Tab)));
 		Assert.Equal ("First \tline.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.ShiftMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (6, 0), tv.CursorPosition);
 
 		// Undo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ("First \tline.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 		Assert.True (tv.IsDirty);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal ($"First line.{Environment.NewLine}Second line.{Environment.NewLine}Third line.", tv.Text);
 		Assert.Equal (3, tv.Lines);
 		Assert.Equal (new Point (6, 2), tv.CursorPosition);
 		Assert.False (tv.IsDirty);
 
 		// Redo
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("First \tline.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (7, 0), tv.CursorPosition);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal ("First line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (6, 0), tv.CursorPosition);
@@ -5988,7 +5988,7 @@ Line 2.", _output);
 		var text = "This is the first line.\nThis is the second line.\nThis is the third line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
@@ -6047,7 +6047,7 @@ Line 2.", _output);
 		tv.ScrollTo (50);
 		Assert.Equal (0, tv.CursorPosition.Y);
 
-		tv.ProcessKeyDown (new (ConsoleDriverKey.P));
+		tv.ProcessKeyDown (new (KeyCode.P));
 	}
 
 	[Fact]
@@ -6199,7 +6199,7 @@ d
 line.
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorRight)));
 		tv.Draw ();
 		Assert.Equal (new Point (0, 3), tv.CursorPosition);
 		Assert.Equal (new Point (12, 0), cp);
@@ -6218,7 +6218,7 @@ d
 line.
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.CursorRight)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.CursorRight)));
 		tv.Draw ();
 		Assert.Equal (new Point (1, 3), tv.CursorPosition);
 		Assert.Equal (new Point (13, 0), cp);
@@ -6280,7 +6280,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (3, 0);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		tv.Draw ();
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6290,14 +6290,14 @@ This is the second line.
 
 		tv.CursorPosition = new Point (0, 1);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		tv.Draw ();
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		tv.Draw ();
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6306,7 +6306,7 @@ This is the second line.
 ", _output);
 
 		while (tv.Text != envText) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal (envText, tv.Text);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -6337,7 +6337,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (3, 0);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		tv.Draw ();
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6347,14 +6347,14 @@ This is the second line.
 
 		tv.CursorPosition = new Point (0, 1);
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Backspace)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Backspace)));
 		tv.Draw ();
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		tv.Draw ();
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6363,7 +6363,7 @@ This is the second line.
 ", _output);
 
 		while (tv.Text != envText) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal (envText, tv.Text);
 		Assert.Equal (new Point (3, 0), tv.CursorPosition);
@@ -6393,7 +6393,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (2, 0);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		tv.Draw ();
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6403,14 +6403,14 @@ This is the second line.
 
 		tv.CursorPosition = new Point (22, 0);
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		tv.Draw ();
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		tv.Draw ();
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6419,7 +6419,7 @@ This is the second line.
 ", _output);
 
 		while (tv.Text != envText) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal (envText, tv.Text);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -6450,7 +6450,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (2, 0);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		tv.Draw ();
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6460,14 +6460,14 @@ This is the second line.
 
 		tv.CursorPosition = new Point (22, 0);
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.DeleteChar)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.DeleteChar)));
 		tv.Draw ();
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 Ths is the first line.This is the second line.
 ", _output);
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		tv.Draw ();
 		Assert.Equal (new Point (0, 1), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6476,7 +6476,7 @@ This is the second line.
 ", _output);
 
 		while (tv.Text != envText) {
-			Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+			Assert.True (tv.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		}
 		Assert.Equal (envText, tv.Text);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
@@ -6767,7 +6767,7 @@ This is the second line.
 		Assert.Equal (2, eventcount);
 
 		expectedCol = 1;
-		tv.ProcessKeyDown (new (ConsoleDriverKey.Y | ConsoleDriverKey.ShiftMask));
+		tv.ProcessKeyDown (new (KeyCode.Y | KeyCode.ShiftMask));
 		Assert.Equal (3, eventcount);
 		Assert.Equal ("Yay", tv.Text);
 	}
@@ -6878,27 +6878,27 @@ This is the second line.
 		Assert.Equal (expectedEventCount, eventcount);
 
 		expectedEventCount++;
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal (expectedEventCount, eventcount);
 
 		// Undo
 		expectedEventCount++;
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal (expectedEventCount, eventcount);
 
 		// Redo
 		expectedEventCount++;
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal (expectedEventCount, eventcount);
 
 		// Undo
 		expectedEventCount++;
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 		Assert.Equal (expectedEventCount, eventcount);
 
 		// Redo
 		expectedEventCount++;
-		Assert.True (_textView.ProcessKeyDown (new (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask)));
+		Assert.True (_textView.ProcessKeyDown (new (KeyCode.R | KeyCode.CtrlMask)));
 		Assert.Equal (expectedEventCount, eventcount);
 	}
 
@@ -6917,7 +6917,7 @@ This is the second line.
 			eventcount++;
 		};
 
-		Assert.True (tv.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+		Assert.True (tv.ProcessKeyDown (new (KeyCode.Enter)));
 		Assert.Equal ($"{Environment.NewLine}This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.", tv.Text);
 		Assert.Equal (4, tv.Lines);
 

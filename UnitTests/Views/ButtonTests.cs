@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 
 			Assert.Equal (string.Empty, btn.Title);
-			Assert.Equal (ConsoleDriverKey.Null, btn.HotKey);
+			Assert.Equal (KeyCode.Null, btn.HotKey);
 
 			var expected = @$"
 {CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
@@ -48,7 +48,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
-			Assert.Equal (ConsoleDriverKey.T, btn.HotKey);
+			Assert.Equal (KeyCode.T, btn.HotKey);
 			Application.End (rs);
 
 			btn = new Button (3, 4, "Test", true);
@@ -63,7 +63,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
-			Assert.Equal (ConsoleDriverKey.T, btn.HotKey);
+			Assert.Equal (KeyCode.T, btn.HotKey);
 
 			Application.End (rs);
 		}
@@ -78,31 +78,31 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
-			Assert.Equal (ConsoleDriverKey.T, btn.HotKey);
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.T)));
+			Assert.Equal (KeyCode.T, btn.HotKey);
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.AltMask)));
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.T | KeyCode.AltMask)));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.False (btn.IsDefault);
-			Assert.False (btn.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+			Assert.False (btn.ProcessKeyDown (new (KeyCode.Enter)));
 			Assert.False (clicked);
 			btn.IsDefault = true;
-			Assert.False (btn.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
-			Assert.True (Application.Top.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+			Assert.False (btn.ProcessKeyDown (new (KeyCode.Enter)));
+			Assert.True (Application.Top.ProcessKeyDown (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.AltMask | ConsoleDriverKey.T)));
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.AltMask | KeyCode.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (Application.Top.ProcessKeyDown (new (ConsoleDriverKey.Enter)));
+			Assert.True (Application.Top.ProcessKeyDown (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.Space)));
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.Space)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new ((ConsoleDriverKey)'T')));
+			Assert.True (btn.ProcessKeyDown (new ((KeyCode)'T')));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.True (btn.ProcessKeyDown (new (btn.HotKey)));
@@ -123,17 +123,17 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
-			Assert.Equal (ConsoleDriverKey.T, btn.HotKey);
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.T)));
+			Assert.Equal (KeyCode.T, btn.HotKey);
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.T)));
 			Assert.True (clicked);
 
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.T | ConsoleDriverKey.AltMask)));
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.T | KeyCode.AltMask)));
 			Assert.True (clicked);
 
 			clicked = false;
-			btn.HotKey = ConsoleDriverKey.E;
-			Assert.True (btn.ProcessKeyDown (new (ConsoleDriverKey.E | ConsoleDriverKey.AltMask)));
+			btn.HotKey = KeyCode.E;
+			Assert.True (btn.ProcessKeyDown (new (KeyCode.E | KeyCode.AltMask)));
 			Assert.True (clicked);
 		}
 
@@ -158,33 +158,33 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			// default keybinding is Space which results in keypress
-			Application.OnKeyDown (new ((ConsoleDriverKey)' '));
+			Application.OnKeyDown (new ((KeyCode)' '));
 			Assert.Equal (1, pressed);
 
 			// remove the default keybinding (Space)
 			btn.KeyBindings.Clear (Command.Default, Command.Accept);
 
 			// After clearing the default keystroke the Space button no longer does anything for the Button
-			Application.OnKeyDown (new ((ConsoleDriverKey)' '));
+			Application.OnKeyDown (new ((KeyCode)' '));
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
-			btn.KeyBindings.Add (ConsoleDriverKey.B, Command.Default, Command.Accept);
+			btn.KeyBindings.Add (KeyCode.B, Command.Default, Command.Accept);
 
 			// now pressing B should call the button click event
-			Application.OnKeyDown (new (ConsoleDriverKey.B));
+			Application.OnKeyDown (new (KeyCode.B));
 			Assert.Equal (2, pressed);
 
 			// now pressing Shift-B should NOT call the button click event
-			Application.OnKeyDown (new (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.B));
+			Application.OnKeyDown (new (KeyCode.ShiftMask | KeyCode.B));
 			Assert.Equal (2, pressed);
 
 			// now pressing Alt-B should NOT call the button click event
-			Application.OnKeyDown (new (ConsoleDriverKey.AltMask | ConsoleDriverKey.B));
+			Application.OnKeyDown (new (KeyCode.AltMask | KeyCode.B));
 			Assert.Equal (2, pressed);
 
 			// now pressing Shift-Alt-B should NOT call the button click event
-			Application.OnKeyDown (new (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.B));
+			Application.OnKeyDown (new (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.B));
 			Assert.Equal (2, pressed);
 		}
 
@@ -212,15 +212,15 @@ namespace Terminal.Gui.ViewsTests {
 			super.EndInit ();
 
 			Assert.Equal ("Test", btn.Text);
-			Assert.Equal (ConsoleDriverKey.T, btn.HotKey);
+			Assert.Equal (KeyCode.T, btn.HotKey);
 
 			btn.Text = string.Empty;
 			Assert.Equal ("", btn.Text);
-			Assert.Equal (ConsoleDriverKey.Null, btn.HotKey);
+			Assert.Equal (KeyCode.Null, btn.HotKey);
 
 			btn.Text = "Te_st";
 			Assert.Equal ("Te_st", btn.Text);
-			Assert.Equal (ConsoleDriverKey.S, btn.HotKey);
+			Assert.Equal (KeyCode.S, btn.HotKey);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -622,10 +622,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			};
 
-			btn.HotKey = ConsoleDriverKey.R;
+			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
-			Assert.Equal (ConsoleDriverKey.Y, args.OldKey);
-			Assert.Equal (ConsoleDriverKey.R, args.NewKey);
+			Assert.Equal (KeyCode.Y, args.OldKey);
+			Assert.Equal (KeyCode.R, args.NewKey);
 
 		}
 		[Fact, AutoInitShutdown]
@@ -642,10 +642,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			};
 
-			btn.HotKey = ConsoleDriverKey.R;
+			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
-			Assert.Equal (ConsoleDriverKey.Null, args.OldKey);
-			Assert.Equal (ConsoleDriverKey.R, args.NewKey);
+			Assert.Equal (KeyCode.Null, args.OldKey);
+			Assert.Equal (KeyCode.R, args.NewKey);
 
 		}
 	}

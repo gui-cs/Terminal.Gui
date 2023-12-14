@@ -33,8 +33,8 @@ namespace UICatalog.Scenarios {
 
 				menu = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_Options", new MenuItem [] {
-						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R),
-						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C),
+						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, KeyCode.CtrlMask | KeyCode.R),
+						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, KeyCode.CtrlMask | KeyCode.C),
 						null,
 						new MenuItem ("_Quit", "", () => Quit(), null, null, Application.QuitKey)
 					}),
@@ -46,8 +46,8 @@ namespace UICatalog.Scenarios {
 
 				var statusBar = new StatusBar (new [] {
 					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-					new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
-					new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
+					new StatusItem(KeyCode.CtrlMask | KeyCode.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
+					new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
 				});
 				Add (statusBar);
 
@@ -339,7 +339,7 @@ namespace UICatalog.Scenarios {
 				Add (close);
 
 				KeyDown += (s, e) => {
-					if (e.ConsoleDriverKey == ConsoleDriverKey.Esc) {
+					if (e.ConsoleDriverKey == KeyCode.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}
 				};

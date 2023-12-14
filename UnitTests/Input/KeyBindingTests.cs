@@ -25,12 +25,12 @@ public class KeyBindingTests {
 	public void Add_Single_Adds ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Default);
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, Command.Default);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Default, resultCommands);
 
-		keyBindings.Add (ConsoleDriverKey.B, Command.Default);
-		resultCommands = keyBindings.GetCommands (ConsoleDriverKey.B);
+		keyBindings.Add (KeyCode.B, Command.Default);
+		resultCommands = keyBindings.GetCommands (KeyCode.B);
 		Assert.Contains (Command.Default, resultCommands);
 	}
 
@@ -43,13 +43,13 @@ public class KeyBindingTests {
 			Command.Left
 		};
 
-		keyBindings.Add (ConsoleDriverKey.A, commands);
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, commands);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
 
-		keyBindings.Add (ConsoleDriverKey.B, commands);
-		resultCommands = keyBindings.GetCommands (ConsoleDriverKey.B);
+		keyBindings.Add (KeyCode.B, commands);
+		resultCommands = keyBindings.GetCommands (KeyCode.B);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
 	}
@@ -59,7 +59,7 @@ public class KeyBindingTests {
 	{
 		var keyBindings = new KeyBindings ();
 		var commands = new List<Command> ();
-		Assert.Throws<ArgumentException> (() => keyBindings.Add (ConsoleDriverKey.A, commands.ToArray ()));
+		Assert.Throws<ArgumentException> (() => keyBindings.Add (KeyCode.A, commands.ToArray ()));
 	}
 
 	// Add with scope does the right things
@@ -75,16 +75,16 @@ public class KeyBindingTests {
 			Command.Left
 		};
 
-		keyBindings.Add (ConsoleDriverKey.A, scope, commands);
-		var binding = keyBindings.Get (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, scope, commands);
+		var binding = keyBindings.Get (KeyCode.A);
 		Assert.Contains (Command.Right, binding.Commands);
 		Assert.Contains (Command.Left, binding.Commands);
 
-		binding = keyBindings.Get (ConsoleDriverKey.A, scope);
+		binding = keyBindings.Get (KeyCode.A, scope);
 		Assert.Contains (Command.Right, binding.Commands);
 		Assert.Contains (Command.Left, binding.Commands);
 
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
 	}
@@ -101,20 +101,20 @@ public class KeyBindingTests {
 			Command.Left
 		};
 
-		keyBindings.Add (ConsoleDriverKey.A, scope, commands);
-		var binding = keyBindings.Get (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, scope, commands);
+		var binding = keyBindings.Get (KeyCode.A);
 		Assert.Contains (Command.Right, binding.Commands);
 		Assert.Contains (Command.Left, binding.Commands);
 
-		binding = keyBindings.Get (ConsoleDriverKey.A, scope);
+		binding = keyBindings.Get (KeyCode.A, scope);
 		Assert.Contains (Command.Right, binding.Commands);
 		Assert.Contains (Command.Left, binding.Commands);
 
 		// negative test
-		binding = keyBindings.Get (ConsoleDriverKey.A, (KeyBindingScope)(int)-1);
+		binding = keyBindings.Get (KeyCode.A, (KeyBindingScope)(int)-1);
 		Assert.Null (binding);
 
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
 	}
@@ -124,12 +124,12 @@ public class KeyBindingTests {
 	public void Clear_Clears ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Default);
-		keyBindings.Add (ConsoleDriverKey.B, Command.Default);
+		keyBindings.Add (KeyCode.A, Command.Default);
+		keyBindings.Add (KeyCode.B, Command.Default);
 		keyBindings.Clear ();
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Empty (resultCommands);
-		resultCommands = keyBindings.GetCommands (ConsoleDriverKey.B);
+		resultCommands = keyBindings.GetCommands (KeyCode.B);
 		Assert.Empty (resultCommands);
 	}
 
@@ -138,7 +138,7 @@ public class KeyBindingTests {
 	public void GetCommands_Unknown_ReturnsEmpty ()
 	{
 		var keyBindings = new KeyBindings ();
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Empty (resultCommands);
 	}
 
@@ -146,8 +146,8 @@ public class KeyBindingTests {
 	public void GetCommands_WithCommands_ReturnsCommands ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Default);
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, Command.Default);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Default, resultCommands);
 	}
 
@@ -159,8 +159,8 @@ public class KeyBindingTests {
 			Command.Right,
 			Command.Left
 		};
-		keyBindings.Add (ConsoleDriverKey.A, commands);
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, commands);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
 	}
@@ -173,12 +173,12 @@ public class KeyBindingTests {
 			Command.Right,
 			Command.Left
 		};
-		keyBindings.Add (ConsoleDriverKey.A, commands);
-		keyBindings.Add (ConsoleDriverKey.B, commands);
-		var resultCommands = keyBindings.GetCommands (ConsoleDriverKey.A);
+		keyBindings.Add (KeyCode.A, commands);
+		keyBindings.Add (KeyCode.B, commands);
+		var resultCommands = keyBindings.GetCommands (KeyCode.A);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
-		resultCommands = keyBindings.GetCommands (ConsoleDriverKey.B);
+		resultCommands = keyBindings.GetCommands (KeyCode.B);
 		Assert.Contains (Command.Right, resultCommands);
 		Assert.Contains (Command.Left, resultCommands);
 	}
@@ -195,35 +195,35 @@ public class KeyBindingTests {
 	public void GetKeyFromCommands_WithCommands_ReturnsKey ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Default);
+		keyBindings.Add (KeyCode.A, Command.Default);
 		var resultKey = keyBindings.GetKeyFromCommands (Command.Default);
-		Assert.Equal (ConsoleDriverKey.A, resultKey);
+		Assert.Equal (KeyCode.A, resultKey);
 	}
 
 	[Fact]
 	public void Replace_Key ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Default);
-		keyBindings.Add (ConsoleDriverKey.B, Command.Default);
-		keyBindings.Add (ConsoleDriverKey.C, Command.Default);
-		keyBindings.Add (ConsoleDriverKey.D, Command.Default);
+		keyBindings.Add (KeyCode.A, Command.Default);
+		keyBindings.Add (KeyCode.B, Command.Default);
+		keyBindings.Add (KeyCode.C, Command.Default);
+		keyBindings.Add (KeyCode.D, Command.Default);
 
-		keyBindings.Replace (ConsoleDriverKey.A, ConsoleDriverKey.E);
-		Assert.Empty (keyBindings.GetCommands (ConsoleDriverKey.A));
-		Assert.Contains (Command.Default, keyBindings.GetCommands (ConsoleDriverKey.E));
+		keyBindings.Replace (KeyCode.A, KeyCode.E);
+		Assert.Empty (keyBindings.GetCommands (KeyCode.A));
+		Assert.Contains (Command.Default, keyBindings.GetCommands (KeyCode.E));
 
-		keyBindings.Replace (ConsoleDriverKey.B, ConsoleDriverKey.E);
-		Assert.Empty (keyBindings.GetCommands (ConsoleDriverKey.B));
-		Assert.Contains (Command.Default, keyBindings.GetCommands (ConsoleDriverKey.E));
+		keyBindings.Replace (KeyCode.B, KeyCode.E);
+		Assert.Empty (keyBindings.GetCommands (KeyCode.B));
+		Assert.Contains (Command.Default, keyBindings.GetCommands (KeyCode.E));
 
-		keyBindings.Replace (ConsoleDriverKey.C, ConsoleDriverKey.E);
-		Assert.Empty (keyBindings.GetCommands (ConsoleDriverKey.C));
-		Assert.Contains (Command.Default, keyBindings.GetCommands (ConsoleDriverKey.E));
+		keyBindings.Replace (KeyCode.C, KeyCode.E);
+		Assert.Empty (keyBindings.GetCommands (KeyCode.C));
+		Assert.Contains (Command.Default, keyBindings.GetCommands (KeyCode.E));
 
-		keyBindings.Replace (ConsoleDriverKey.D, ConsoleDriverKey.E);
-		Assert.Empty (keyBindings.GetCommands (ConsoleDriverKey.D));
-		Assert.Contains (Command.Default, keyBindings.GetCommands (ConsoleDriverKey.E));
+		keyBindings.Replace (KeyCode.D, KeyCode.E);
+		Assert.Empty (keyBindings.GetCommands (KeyCode.D));
+		Assert.Contains (Command.Default, keyBindings.GetCommands (KeyCode.E));
 	}
 
 	// TryGet
@@ -231,7 +231,7 @@ public class KeyBindingTests {
 	public void TryGet_Unknown_ReturnsFalse ()
 	{
 		var keyBindings = new KeyBindings ();
-		var result = keyBindings.TryGet (ConsoleDriverKey.A, out var commands);
+		var result = keyBindings.TryGet (KeyCode.A, out var commands);
 		Assert.False (result);
 	}
 
@@ -239,8 +239,8 @@ public class KeyBindingTests {
 	public void TryGet_WithCommands_ReturnsTrue ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Default);
-		var result = keyBindings.TryGet (ConsoleDriverKey.A, out var bindings);
+		keyBindings.Add (KeyCode.A, Command.Default);
+		var result = keyBindings.TryGet (KeyCode.A, out var bindings);
 		Assert.True (result);
 		Assert.Contains (Command.Default, bindings.Commands);
 	}
@@ -250,10 +250,10 @@ public class KeyBindingTests {
 	public void GetKeyFromCommands_OneCommand ()
 	{
 		var keyBindings = new KeyBindings ();
-		keyBindings.Add (ConsoleDriverKey.A, Command.Right);
+		keyBindings.Add (KeyCode.A, Command.Right);
 
 		var key = keyBindings.GetKeyFromCommands (Command.Right);
-		Assert.Equal (ConsoleDriverKey.A, key);
+		Assert.Equal (KeyCode.A, key);
 
 		// Negative case
 		Assert.Throws<InvalidOperationException> (() => key = keyBindings.GetKeyFromCommands (Command.Left));
@@ -268,19 +268,19 @@ public class KeyBindingTests {
 			Command.Right,
 			Command.Left
 		};
-		keyBindings.Add (ConsoleDriverKey.A, commands1);
+		keyBindings.Add (KeyCode.A, commands1);
 
 		var commands2 = new Command [] {
 			Command.LineUp,
 			Command.LineDown
 		};
-		keyBindings.Add (ConsoleDriverKey.B, commands2);
+		keyBindings.Add (KeyCode.B, commands2);
 
 		var key = keyBindings.GetKeyFromCommands (commands1);
-		Assert.Equal (ConsoleDriverKey.A, key);
+		Assert.Equal (KeyCode.A, key);
 
 		key = keyBindings.GetKeyFromCommands (commands2);
-		Assert.Equal (ConsoleDriverKey.B, key);
+		Assert.Equal (KeyCode.B, key);
 
 		// Negative case
 		Assert.Throws<InvalidOperationException> (() => key = keyBindings.GetKeyFromCommands (Command.EndOfLine));

@@ -29,7 +29,7 @@ namespace Terminal.Gui {
 			this.Wrapping = toWrap;
 			this.tableView = tableView;
 
-			tableView.KeyBindings.Add (ConsoleDriverKey.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 
 			tableView.MouseClick += TableView_MouseClick;
 			tableView.CellToggled += TableView_CellToggled;

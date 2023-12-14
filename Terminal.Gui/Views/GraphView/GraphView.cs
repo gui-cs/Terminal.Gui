@@ -81,10 +81,10 @@ namespace Terminal.Gui {
 			AddCommand (Command.PageUp, () => { PageUp (); return true; });
 			AddCommand (Command.PageDown, () => { PageDown (); return true; });
 
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.ScrollRight);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.ScrollLeft);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.ScrollUp);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.ScrollDown);
+			KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
+			KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
 
 			// Not bound by default (preserves backwards compatibility)
 			//KeyBindings.Add (Key.PageUp, Command.PageUp);

@@ -1580,7 +1580,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Invoked when the used color is drawn. The Used Color is used to indicate
-		/// if the <see cref="ConsoleDriverKey.InsertChar"/> was pressed and enabled.
+		/// if the <see cref="KeyCode.InsertChar"/> was pressed and enabled.
 		/// </summary>
 		public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
 
@@ -1673,102 +1673,102 @@ namespace Terminal.Gui {
 			});
 
 			// Default keybindings for this view
-			KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
-			KeyBindings.Add (ConsoleDriverKey.V | ConsoleDriverKey.CtrlMask, Command.PageDown);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
 
-			KeyBindings.Add (ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
-			KeyBindings.Add (((int)'V' + ConsoleDriverKey.AltMask), Command.PageUp);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+			KeyBindings.Add (((int)'V' + KeyCode.AltMask), Command.PageUp);
 
-			KeyBindings.Add (ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.N | ConsoleDriverKey.CtrlMask, Command.LineDown);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.N | KeyCode.CtrlMask, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.P | ConsoleDriverKey.CtrlMask, Command.LineUp);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.P | KeyCode.CtrlMask, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.F | ConsoleDriverKey.CtrlMask, Command.Right);
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask, Command.RightExtend);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.B | ConsoleDriverKey.CtrlMask, Command.Left);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.B | KeyCode.CtrlMask, Command.Left);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask, Command.LeftExtend);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.Delete, Command.DeleteCharLeft);
-			KeyBindings.Add (ConsoleDriverKey.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharLeft);
+			KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
 
-			KeyBindings.Add (ConsoleDriverKey.Home, Command.StartOfLine);
-			KeyBindings.Add (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, Command.StartOfLine);
+			KeyBindings.Add (KeyCode.Home, Command.StartOfLine);
+			KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.StartOfLine);
 
-			KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask, Command.StartOfLineExtend);
+			KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.StartOfLineExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.DeleteChar, Command.DeleteCharRight);
-			KeyBindings.Add (ConsoleDriverKey.D | ConsoleDriverKey.CtrlMask, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
 
-			KeyBindings.Add (ConsoleDriverKey.End, Command.EndOfLine);
-			KeyBindings.Add (ConsoleDriverKey.E | ConsoleDriverKey.CtrlMask, Command.EndOfLine);
+			KeyBindings.Add (KeyCode.End, Command.EndOfLine);
+			KeyBindings.Add (KeyCode.E | KeyCode.CtrlMask, Command.EndOfLine);
 
-			KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask, Command.EndOfLineExtend);
+			KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.EndOfLineExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.K | ConsoleDriverKey.CtrlMask, Command.CutToEndLine); // kill-to-end
-			KeyBindings.Add (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.CutToEndLine); // kill-to-end
+			KeyBindings.Add (KeyCode.K | KeyCode.CtrlMask, Command.CutToEndLine); // kill-to-end
+			KeyBindings.Add (KeyCode.DeleteChar | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToEndLine); // kill-to-end
 
-			KeyBindings.Add (ConsoleDriverKey.K | ConsoleDriverKey.AltMask, Command.CutToStartLine); // kill-to-start
-			KeyBindings.Add (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.CutToStartLine); // kill-to-start
+			KeyBindings.Add (KeyCode.K | KeyCode.AltMask, Command.CutToStartLine); // kill-to-start
+			KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToStartLine); // kill-to-start
 
-			KeyBindings.Add (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask, Command.Paste); // Control-y, yank
-			KeyBindings.Add (ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask, Command.ToggleExtend);
+			KeyBindings.Add (KeyCode.Y | KeyCode.CtrlMask, Command.Paste); // Control-y, yank
+			KeyBindings.Add (KeyCode.Space | KeyCode.CtrlMask, Command.ToggleExtend);
 
-			KeyBindings.Add (((int)'C' + ConsoleDriverKey.AltMask), Command.Copy);
-			KeyBindings.Add (ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask, Command.Copy);
+			KeyBindings.Add (((int)'C' + KeyCode.AltMask), Command.Copy);
+			KeyBindings.Add (KeyCode.C | KeyCode.CtrlMask, Command.Copy);
 
-			KeyBindings.Add (((int)'W' + ConsoleDriverKey.AltMask), Command.Cut);
-			KeyBindings.Add (ConsoleDriverKey.W | ConsoleDriverKey.CtrlMask, Command.Cut);
-			KeyBindings.Add (ConsoleDriverKey.X | ConsoleDriverKey.CtrlMask, Command.Cut);
+			KeyBindings.Add (((int)'W' + KeyCode.AltMask), Command.Cut);
+			KeyBindings.Add (KeyCode.W | KeyCode.CtrlMask, Command.Cut);
+			KeyBindings.Add (KeyCode.X | KeyCode.CtrlMask, Command.Cut);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask, Command.WordLeft);
-			KeyBindings.Add ((ConsoleDriverKey)((int)'B' + ConsoleDriverKey.AltMask), Command.WordLeft);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.WordLeft);
+			KeyBindings.Add ((KeyCode)((int)'B' + KeyCode.AltMask), Command.WordLeft);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.WordLeftExtend);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.WordLeftExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask, Command.WordRight);
-			KeyBindings.Add ((ConsoleDriverKey)((int)'F' + ConsoleDriverKey.AltMask), Command.WordRight);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.WordRight);
+			KeyBindings.Add ((KeyCode)((int)'F' + KeyCode.AltMask), Command.WordRight);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.WordRightExtend);
-			KeyBindings.Add (ConsoleDriverKey.DeleteChar | ConsoleDriverKey.CtrlMask, Command.KillWordForwards); // kill-word-forwards
-			KeyBindings.Add (ConsoleDriverKey.Backspace | ConsoleDriverKey.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.WordRightExtend);
+			KeyBindings.Add (KeyCode.DeleteChar | KeyCode.CtrlMask, Command.KillWordForwards); // kill-word-forwards
+			KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
 
 			// BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
-			KeyBindings.Add (ConsoleDriverKey.Enter, Command.NewLine);
-			KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask, Command.BottomEnd);
-			KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.BottomEndExtend);
-			KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask, Command.TopHome);
-			KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.TopHomeExtend);
-			KeyBindings.Add (ConsoleDriverKey.T | ConsoleDriverKey.CtrlMask, Command.SelectAll);
-			KeyBindings.Add (ConsoleDriverKey.InsertChar, Command.ToggleOverwrite);
-			KeyBindings.Add (ConsoleDriverKey.Tab, Command.Tab);
-			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask, Command.BackTab);
+			KeyBindings.Add (KeyCode.Enter, Command.NewLine);
+			KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.BottomEndExtend);
+			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.TopHome);
+			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.TopHomeExtend);
+			KeyBindings.Add (KeyCode.T | KeyCode.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (KeyCode.InsertChar, Command.ToggleOverwrite);
+			KeyBindings.Add (KeyCode.Tab, Command.Tab);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.BackTab);
 
-			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask, Command.NextView);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextView);
 			KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
 
-			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.PreviousView);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.PreviousView);
 			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
 
-			KeyBindings.Add (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask, Command.Undo);
-			KeyBindings.Add (ConsoleDriverKey.R | ConsoleDriverKey.CtrlMask, Command.Redo);
+			KeyBindings.Add (KeyCode.Z | KeyCode.CtrlMask, Command.Undo);
+			KeyBindings.Add (KeyCode.R | KeyCode.CtrlMask, Command.Redo);
 
-			KeyBindings.Add (ConsoleDriverKey.G | ConsoleDriverKey.CtrlMask, Command.DeleteAll);
-			KeyBindings.Add (ConsoleDriverKey.D | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.DeleteAll);
+			KeyBindings.Add (KeyCode.G | KeyCode.CtrlMask, Command.DeleteAll);
+			KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.DeleteAll);
 
 			_currentCulture = Thread.CurrentThread.CurrentUICulture;
 
@@ -3059,10 +3059,10 @@ namespace Terminal.Gui {
 		{
 			foreach (var ch in toAdd) {
 
-				ConsoleDriverKey key;
+				KeyCode key;
 
 				try {
-					key = (ConsoleDriverKey)ch;
+					key = (KeyCode)ch;
 				} catch (Exception) {
 
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
@@ -3425,7 +3425,7 @@ namespace Terminal.Gui {
 			ResetColumnTrack ();
 
 			// Ignore control characters and other special keys
-			if (!a.IsLowerCaseAtoZ && (a.ConsoleDriverKey < ConsoleDriverKey.Space || a.ConsoleDriverKey > ConsoleDriverKey.CharMask)) {
+			if (!a.IsLowerCaseAtoZ && (a.ConsoleDriverKey < KeyCode.Space || a.ConsoleDriverKey > KeyCode.CharMask)) {
 				return false;
 			}
 
@@ -3798,7 +3798,7 @@ namespace Terminal.Gui {
 			if (!AllowsTab || _isReadOnly) {
 				return ProcessMoveNextView ();
 			}
-			InsertText (new KeyEventArgs ((ConsoleDriverKey)'\t'));
+			InsertText (new KeyEventArgs ((KeyCode)'\t'));
 			DoNeededAction ();
 			return true;
 		}
@@ -4339,7 +4339,7 @@ namespace Terminal.Gui {
 			if (_selecting) {
 				ClearSelectedRegion ();
 			}
-			if (a.ConsoleDriverKey == ConsoleDriverKey.Enter) {
+			if (a.ConsoleDriverKey == KeyCode.Enter) {
 				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
@@ -4399,7 +4399,7 @@ namespace Terminal.Gui {
 		public override bool OnKeyUp (KeyEventArgs a)
 		{
 			switch (a.ConsoleDriverKey) {
-			case ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask:
+			case KeyCode.Space | KeyCode.CtrlMask:
 				return true;
 			}
 

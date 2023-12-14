@@ -34,7 +34,7 @@ namespace Terminal.Gui {
 		private int selectedColumn;
 		private ITableSource table;
 		private TableStyle style = new TableStyle ();
-		private ConsoleDriverKey cellActivationKey = ConsoleDriverKey.Enter;
+		private KeyCode cellActivationKey = KeyCode.Enter;
 
 		Point? scrollLeftPoint;
 		Point? scrollRightPoint;
@@ -172,7 +172,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
 		/// </summary>
-		public ConsoleDriverKey CellActivationKey {
+		public KeyCode CellActivationKey {
 			get => cellActivationKey;
 			set {
 				if (cellActivationKey != value) {
@@ -239,29 +239,29 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => { ToggleCurrentCellSelection (); return true; });
 
 			// Default keybindings for this view
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
-			KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
-			KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
-			KeyBindings.Add (ConsoleDriverKey.Home, Command.LeftHome);
-			KeyBindings.Add (ConsoleDriverKey.End, Command.RightEnd);
-			KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask, Command.TopHome);
-			KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+			KeyBindings.Add (KeyCode.End, Command.RightEnd);
+			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.TopHome);
+			KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.BottomEnd);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask, Command.LeftExtend);
-			KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask, Command.RightExtend);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask, Command.LineUpExtend);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask, Command.LineDownExtend);
-			KeyBindings.Add (ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask, Command.PageUpExtend);
-			KeyBindings.Add (ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask, Command.PageDownExtend);
-			KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask, Command.LeftHomeExtend);
-			KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask, Command.RightEndExtend);
-			KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.TopHomeExtend);
-			KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask, Command.BottomEndExtend);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.LeftHomeExtend);
+			KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.RightEndExtend);
+			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.TopHomeExtend);
+			KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.BottomEndExtend);
 
-			KeyBindings.Add (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
 			KeyBindings.Add (CellActivationKey, Command.Accept);
 		}
 
@@ -771,8 +771,8 @@ namespace Terminal.Gui {
 				this.HasFocus &&
 				Table.Rows != 0 &&
 				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
-				!keyEvent.ConsoleDriverKey.HasFlag (ConsoleDriverKey.CtrlMask) &&
-				!keyEvent.ConsoleDriverKey.HasFlag (ConsoleDriverKey.AltMask) &&
+				!keyEvent.ConsoleDriverKey.HasFlag (KeyCode.CtrlMask) &&
+				!keyEvent.ConsoleDriverKey.HasFlag (KeyCode.AltMask) &&
 				Rune.IsLetterOrDigit (keyEvent)) {
 				return CycleToNextTableEntryBeginningWith (keyEvent);
 			}

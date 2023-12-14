@@ -123,7 +123,7 @@ namespace Terminal.Gui {
 		/// Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>.
 		/// Defaults to Enter.
 		/// </summary>
-		public ConsoleDriverKey ObjectActivationKey {
+		public KeyCode ObjectActivationKey {
 			get => objectActivationKey;
 			set {
 				if (objectActivationKey != value) {
@@ -162,7 +162,7 @@ namespace Terminal.Gui {
 		/// (nodes added but no tree builder set).
 		/// </summary>
 		public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
-		private ConsoleDriverKey objectActivationKey = ConsoleDriverKey.Enter;
+		private KeyCode objectActivationKey = KeyCode.Enter;
 
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes.
@@ -286,26 +286,26 @@ namespace Terminal.Gui {
 			AddCommand (Command.Accept, () => { ActivateSelectedObjectIfAny (); return true; });
 
 			// Default keybindings for this view
-			KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
-			KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
-			KeyBindings.Add (ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask, Command.PageUpExtend);
-			KeyBindings.Add (ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask, Command.PageDownExtend);
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Expand);
-			KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask, Command.ExpandAll);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Collapse);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask, Command.CollapseAll);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Expand);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.ExpandAll);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Collapse);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.CollapseAll);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask, Command.LineUpExtend);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp | ConsoleDriverKey.CtrlMask, Command.LineUpToFirstBranch);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LineUpToFirstBranch);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask, Command.LineDownExtend);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.CtrlMask, Command.LineDownToLastBranch);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.LineDownToLastBranch);
 
-			KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
-			KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
-			KeyBindings.Add (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (KeyCode.Home, Command.TopHome);
+			KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
 			KeyBindings.Add (ObjectActivationKey, Command.Accept);
 		}
 

@@ -72,11 +72,11 @@ public class RadioGroup : View {
 		AddCommand (Command.Accept, () => { SelectItem (); return true; });
 
 		// Default keybindings for this view
-		KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-		KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
-		KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
-		KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
-		KeyBindings.Add (ConsoleDriverKey.Space, Command.Accept);
+		KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+		KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+		KeyBindings.Add (KeyCode.Home, Command.TopHome);
+		KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+		KeyBindings.Add (KeyCode.Space, Command.Accept);
 
 		LayoutStarted += RadioGroup_LayoutStarted;
 	}
@@ -167,15 +167,15 @@ public class RadioGroup : View {
 		set {
 			// Remove old hot key bindings
 			foreach (var label in _radioLabels) {
-				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out ConsoleDriverKey hotKey)) {
-					AddKeyBindingsForHotKey (hotKey, ConsoleDriverKey.Null);
+				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out KeyCode hotKey)) {
+					AddKeyBindingsForHotKey (hotKey, KeyCode.Null);
 				}
 			}
 			var prevCount = _radioLabels.Count;
 			_radioLabels = value.ToList ();
 			foreach (var label in _radioLabels) {
-				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out ConsoleDriverKey hotKey)) {
-					AddKeyBindingsForHotKey (ConsoleDriverKey.Null, hotKey);
+				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out KeyCode hotKey)) {
+					AddKeyBindingsForHotKey (KeyCode.Null, hotKey);
 				}
 			}
 			if (prevCount != _radioLabels.Count) {
@@ -200,8 +200,8 @@ public class RadioGroup : View {
 		if (KeyBindings.TryGet (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {
-				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out ConsoleDriverKey hotKey) 
-					&& (key & ~ConsoleDriverKey.ShiftMask & ~ConsoleDriverKey.AltMask) == hotKey) {
+				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out KeyCode hotKey) 
+					&& (key & ~KeyCode.ShiftMask & ~KeyCode.AltMask) == hotKey) {
 					SelectedItem = i;
 					keyEvent.Scope = KeyBindingScope.HotKey;
 					break;
@@ -244,8 +244,8 @@ public class RadioGroup : View {
 			var rl = _radioLabels [i];
 			Driver.SetAttribute (GetNormalColor ());
 			Driver.AddStr ($"{(i == _selected ? CM.Glyphs.Selected : CM.Glyphs.UnSelected)} ");
-			TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out ConsoleDriverKey hotKey);
-			if (hotPos != -1 && (hotKey != ConsoleDriverKey.Null || hotKey != ConsoleDriverKey.Unknown)) {
+			TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out KeyCode hotKey);
+			if (hotPos != -1 && (hotKey != KeyCode.Null || hotKey != KeyCode.Unknown)) {
 				var rlRunes = rl.ToRunes ();
 				for (int j = 0; j < rlRunes.Length; j++) {
 					Rune rune = rlRunes [j];

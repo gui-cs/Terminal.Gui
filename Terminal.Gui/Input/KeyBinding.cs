@@ -8,7 +8,7 @@ using System.Linq;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Defines the scope of a <see cref="Command"/> that has been bound to a key with <see cref="KeyBindings.Add(ConsoleDriverKey, Terminal.Gui.Command[])"/>.
+/// Defines the scope of a <see cref="Command"/> that has been bound to a key with <see cref="KeyBindings.Add(KeyCode, Terminal.Gui.Command[])"/>.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -72,26 +72,26 @@ public class KeyBinding {
 }
 
 /// <summary>
-/// A class that provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="ConsoleDriverKey"/>.
+/// A class that provides a collection of <see cref="KeyBinding"/> objects bound to a <see cref="KeyCode"/>.
 /// </summary>
 public class KeyBindings {
 	/// <summary>
 	/// The collection of <see cref="KeyBinding"/> objects.
 	/// </summary>
-	public Dictionary<ConsoleDriverKey, KeyBinding> Bindings { get; } = new ();
+	public Dictionary<KeyCode, KeyBinding> Bindings { get; } = new ();
 
 	/// <summary>
 	/// Adds a <see cref="KeyBinding"/> to the collection.
 	/// </summary>
 	/// <param name="key"></param>
 	/// <param name="binding"></param>
-	public void Add (ConsoleDriverKey key, KeyBinding binding) => Bindings.Add (key, binding);
+	public void Add (KeyCode key, KeyBinding binding) => Bindings.Add (key, binding);
 
 	/// <summary>
 	/// Removes a <see cref="KeyBinding"/> from the collection.
 	/// </summary>
 	/// <param name="key"></param>
-	public void Remove (ConsoleDriverKey key) => Bindings.Remove (key);
+	public void Remove (KeyCode key) => Bindings.Remove (key);
 
 	/// <summary>
 	/// Removes all <see cref="KeyBinding"/> objects from the collection.
@@ -117,13 +117,13 @@ public class KeyBindings {
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
-	public void Add (ConsoleDriverKey key, KeyBindingScope scope, params Command [] commands)
+	public void Add (KeyCode key, KeyBindingScope scope, params Command [] commands)
 	{
 		if (commands.Length == 0) {
 			throw new ArgumentException (@"At least one command must be specified", nameof (commands));
 		}
 
-		if (key == ConsoleDriverKey.Null || key == ConsoleDriverKey.Unknown) {
+		if (key == KeyCode.Null || key == KeyCode.Unknown) {
 			//throw new ArgumentException ("Invalid Key", nameof (commands));
 			return;
 		}
@@ -141,7 +141,7 @@ public class KeyBindings {
 	/// (if supported by the View - see <see cref="View.GetSupportedCommands"/>).
 	/// </para>
 	/// <para>
-	/// This is a helper function for <see cref="Add(ConsoleDriverKey,KeyBindingScope,Terminal.Gui.Command[])"/>
+	/// This is a helper function for <see cref="Add(KeyCode,KeyBindingScope,Terminal.Gui.Command[])"/>
 	/// for <see cref="KeyBindingScope.Focused"/> scoped commands.
 	/// </para>
 	/// <para>
@@ -158,7 +158,7 @@ public class KeyBindings {
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
 	/// will be consumed if any took effect.</param>
-	public void Add (ConsoleDriverKey key, params Command [] commands) => Add (key, KeyBindingScope.Focused, commands);
+	public void Add (KeyCode key, params Command [] commands) => Add (key, KeyBindingScope.Focused, commands);
 
 	/// <summary>
 	/// Replaces a key combination already bound to a set of <see cref="Command"/>s.
@@ -167,7 +167,7 @@ public class KeyBindings {
 	/// </remarks>
 	/// <param name="fromKey">The key to be replaced.</param>
 	/// <param name="toKey">The new key to be used.</param>
-	public void Replace (ConsoleDriverKey fromKey, ConsoleDriverKey toKey)
+	public void Replace (KeyCode fromKey, KeyCode toKey)
 	{
 		if (!TryGet (fromKey, out var _)) {
 			return;
@@ -192,9 +192,9 @@ public class KeyBindings {
 	/// <returns>
 	/// <see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.
 	/// </returns>
-	public bool TryGet (ConsoleDriverKey key, out KeyBinding binding)
+	public bool TryGet (KeyCode key, out KeyBinding binding)
 	{
-		if (key is not (ConsoleDriverKey.Null or ConsoleDriverKey.Unknown)) {
+		if (key is not (KeyCode.Null or KeyCode.Unknown)) {
 			return Bindings.TryGetValue (key, out binding);
 		}
 		binding = new KeyBinding (Array.Empty<Command> (), KeyBindingScope.Focused);
@@ -202,11 +202,11 @@ public class KeyBindings {
 	}
 
 	/// <summary>
-	/// Gets the <see cref="KeyBinding"/> for the specified <see cref="ConsoleDriverKey"/>.
+	/// Gets the <see cref="KeyBinding"/> for the specified <see cref="KeyCode"/>.
 	/// </summary>
 	/// <param name="key"></param>
 	/// <returns></returns>
-	public KeyBinding Get (ConsoleDriverKey key) => TryGet (key, out var binding) ? binding : null;
+	public KeyBinding Get (KeyCode key) => TryGet (key, out var binding) ? binding : null;
 
 	/// <summary>
 	/// Gets the commands bound with the specified Key that are scoped to a particular scope.
@@ -224,9 +224,9 @@ public class KeyBindings {
 	/// <returns>
 	/// <see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.
 	/// </returns>
-	public bool TryGet (ConsoleDriverKey key, KeyBindingScope scope, out KeyBinding binding)
+	public bool TryGet (KeyCode key, KeyBindingScope scope, out KeyBinding binding)
 	{
-		if (key is not (ConsoleDriverKey.Null or ConsoleDriverKey.Unknown)) {
+		if (key is not (KeyCode.Null or KeyCode.Unknown)) {
 			if (Bindings.TryGetValue (key, out binding)) {
 				if (binding.Scope == scope) {
 					return true;
@@ -238,12 +238,12 @@ public class KeyBindings {
 	}
 
 	/// <summary>
-	/// Gets the <see cref="KeyBinding"/> for the specified <see cref="ConsoleDriverKey"/>.
+	/// Gets the <see cref="KeyBinding"/> for the specified <see cref="KeyCode"/>.
 	/// </summary>
 	/// <param name="key"></param>
 	/// <param name="scope"></param>
 	/// <returns></returns>
-	public KeyBinding Get (ConsoleDriverKey key, KeyBindingScope scope) => TryGet (key, scope, out var binding) ? binding : null;
+	public KeyBinding Get (KeyCode key, KeyBindingScope scope) => TryGet (key, scope, out var binding) ? binding : null;
 
 	/// <summary>
 	/// Gets the array of <see cref="Command"/>s bound to <paramref name="key"/> if it exists.
@@ -252,7 +252,7 @@ public class KeyBindings {
 	/// The key to check.
 	/// </param>
 	/// <returns>The array of <see cref="Command"/>s if <paramref name="key"/> is bound. An empty <see cref="Command"/> array if not.</returns>
-	public Command [] GetCommands (ConsoleDriverKey key)
+	public Command [] GetCommands (KeyCode key)
 	{
 		if (TryGet (key, out var bindings)) {
 			return bindings.Commands;
@@ -278,9 +278,9 @@ public class KeyBindings {
 	/// <remarks>
 	/// </remarks>
 	/// <param name="commands">The set of commands to search.</param>
-	/// <returns>The <see cref="ConsoleDriverKey"/> used by a <see cref="Command"/></returns>
+	/// <returns>The <see cref="KeyCode"/> used by a <see cref="Command"/></returns>
 	/// <exception cref="InvalidOperationException">If no matching set of commands was found.</exception>
-	public ConsoleDriverKey GetKeyFromCommands (params Command [] commands)
+	public KeyCode GetKeyFromCommands (params Command [] commands)
 	{
 		return Bindings.First (a => a.Value.Commands.SequenceEqual (commands)).Key;
 	}

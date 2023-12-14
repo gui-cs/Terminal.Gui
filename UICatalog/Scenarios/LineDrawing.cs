@@ -112,7 +112,7 @@ namespace UICatalog.Scenarios {
 			public override bool OnKeyDown (KeyEventArgs e)
 			{
 				// BUGBUG: These should be implemented with key bindings
-				if (e.ConsoleDriverKey == (ConsoleDriverKey.Z | ConsoleDriverKey.CtrlMask)) {
+				if (e.ConsoleDriverKey == (KeyCode.Z | KeyCode.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();
 					if(pop != null) {
 						undoHistory.Push (pop);
@@ -121,7 +121,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 
-				if (e.ConsoleDriverKey == (ConsoleDriverKey.Y | ConsoleDriverKey.CtrlMask)) {
+				if (e.ConsoleDriverKey == (KeyCode.Y | KeyCode.CtrlMask)) {
 					if (undoHistory.Any()) {
 						var pop = undoHistory.Pop ();
 						_currentLayer.AddLine(pop);

@@ -52,11 +52,11 @@ namespace UICatalog.Scenarios {
 		{
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(ConsoleDriverKey.F2, "~F2~ Toggle Frame Ruler", () => {
+				new StatusItem(KeyCode.F2, "~F2~ Toggle Frame Ruler", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 					Application.Top.SetNeedsDisplay ();
 				}),
-				new StatusItem(ConsoleDriverKey.F3, "~F3~ Toggle Frame Padding", () => {
+				new StatusItem(KeyCode.F3, "~F3~ Toggle Frame Padding", () => {
 					ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
 					Application.Top.SetNeedsDisplay ();
 				}),

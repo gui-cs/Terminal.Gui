@@ -25,7 +25,7 @@ namespace UICatalog.Scenarios {
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "", () => New(), null, null, ConsoleDriverKey.N | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask),
+					new MenuItem ("_New", "", () => New(), null, null, KeyCode.N | KeyCode.CtrlMask | KeyCode.AltMask),
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
 					new MenuItem ("Save _As", "", () => SaveAs()),
@@ -53,7 +53,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (split);
 
-			lenStatusItem = new StatusItem (ConsoleDriverKey.CharMask, "Len: ", null);
+			lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 
@@ -61,8 +61,8 @@ namespace UICatalog.Scenarios {
 				//new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
 				//new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
 
-				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S, "~^S~ Save", () => Save()),
-				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.W, "~^W~ Close", () => Close()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.W, "~^W~ Close", () => Close()),
 				lenStatusItem,
 			});
 			focusedTabView = tabView;

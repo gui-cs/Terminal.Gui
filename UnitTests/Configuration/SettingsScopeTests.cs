@@ -21,9 +21,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.NotEmpty (ConfigurationManager.Themes);
 			Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
 
-			Assert.True (ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue is ConsoleDriverKey);
-			Assert.True (ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue is ConsoleDriverKey);
-			Assert.True (ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue is ConsoleDriverKey);
+			Assert.True (ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue is KeyCode);
+			Assert.True (ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue is KeyCode);
+			Assert.True (ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue is KeyCode);
 			Assert.True (ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue is bool);
 
 			Assert.True (ConfigurationManager.Settings ["Theme"].PropertyValue is string);
@@ -38,42 +38,42 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void Apply_ShouldApplyProperties ()
 		{
 			// arrange
-			Assert.Equal (ConsoleDriverKey.Q | ConsoleDriverKey.CtrlMask, (ConsoleDriverKey)ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
-			Assert.Equal (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, (ConsoleDriverKey)ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
-			Assert.Equal (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, (ConsoleDriverKey)ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
+			Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, (KeyCode)ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+			Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, (KeyCode)ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
+			Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, (KeyCode)ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
 			Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
 
 			// act
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = ConsoleDriverKey.Q;
-			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = ConsoleDriverKey.F;
-			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = ConsoleDriverKey.B;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = KeyCode.Q;
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = KeyCode.F;
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = KeyCode.B;
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
 			ConfigurationManager.Settings.Apply ();
 
 			// assert
-			Assert.Equal (ConsoleDriverKey.Q, Application.QuitKey);
-			Assert.Equal (ConsoleDriverKey.F, Application.AlternateForwardKey);
-			Assert.Equal (ConsoleDriverKey.B, Application.AlternateBackwardKey);
+			Assert.Equal (KeyCode.Q, Application.QuitKey);
+			Assert.Equal (KeyCode.F, Application.AlternateForwardKey);
+			Assert.Equal (KeyCode.B, Application.AlternateBackwardKey);
 			Assert.True (Application.IsMouseDisabled);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void CopyUpdatedProperitesFrom_ShouldCopyChangedPropertiesOnly ()
 		{
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = ConsoleDriverKey.End;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = KeyCode.End;
 
 			var updatedSettings = new SettingsScope ();
 
 			///Don't set Quitkey
-			updatedSettings["Application.AlternateForwardKey"].PropertyValue = ConsoleDriverKey.F;
-			updatedSettings["Application.AlternateBackwardKey"].PropertyValue = ConsoleDriverKey.B;
+			updatedSettings["Application.AlternateForwardKey"].PropertyValue = KeyCode.F;
+			updatedSettings["Application.AlternateBackwardKey"].PropertyValue = KeyCode.B;
 			updatedSettings["Application.IsMouseDisabled"].PropertyValue = true;
 
 			ConfigurationManager.Settings.Update (updatedSettings);
-			Assert.Equal (ConsoleDriverKey.End, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
-			Assert.Equal (ConsoleDriverKey.F, updatedSettings ["Application.AlternateForwardKey"].PropertyValue);
-			Assert.Equal (ConsoleDriverKey.B, updatedSettings ["Application.AlternateBackwardKey"].PropertyValue);
+			Assert.Equal (KeyCode.End, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
+			Assert.Equal (KeyCode.F, updatedSettings ["Application.AlternateForwardKey"].PropertyValue);
+			Assert.Equal (KeyCode.B, updatedSettings ["Application.AlternateBackwardKey"].PropertyValue);
 			Assert.True ((bool)updatedSettings ["Application.IsMouseDisabled"].PropertyValue);
 		}
 	}

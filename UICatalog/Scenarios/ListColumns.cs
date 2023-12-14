@@ -80,9 +80,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(ConsoleDriverKey.F2, "~F2~ OpenBigListEx", () => OpenSimpleList (true)),
-				new StatusItem(ConsoleDriverKey.F3, "~F3~ CloseExample", () => CloseExample ()),
-				new StatusItem(ConsoleDriverKey.F4, "~F4~ OpenSmListEx", () => OpenSimpleList (false)),
+				new StatusItem(KeyCode.F2, "~F2~ OpenBigListEx", () => OpenSimpleList (true)),
+				new StatusItem(KeyCode.F3, "~F3~ CloseExample", () => CloseExample ()),
+				new StatusItem(KeyCode.F4, "~F4~ OpenSmListEx", () => OpenSimpleList (false)),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -119,7 +119,7 @@ namespace UICatalog.Scenarios {
 				listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 			};
 
-			listColView.KeyBindings.Add (ConsoleDriverKey.Space, Command.ToggleChecked);
+			listColView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 		}
 
 		private void SetupScrollBar ()
@@ -155,7 +155,7 @@ namespace UICatalog.Scenarios {
 
 		private void TableViewKeyPress (object sender, KeyEventArgs e)
 		{
-			if (e.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
+			if (e.ConsoleDriverKey == KeyCode.DeleteChar) {
 
 				// set all selected cells to null
 				foreach (var pt in listColView.GetAllSelectedCells ()) {

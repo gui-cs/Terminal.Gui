@@ -143,10 +143,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		private void AddKeyBindings ()
 		{
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 		}
 
 		///<inheritdoc/>

@@ -344,79 +344,79 @@ internal class CursesDriver : ConsoleDriver {
 
 	public Curses.Window _window;
 
-	static ConsoleDriverKey MapCursesKey (int cursesKey)
+	static KeyCode MapCursesKey (int cursesKey)
 	{
 		switch (cursesKey) {
-		case Curses.KeyF1: return ConsoleDriverKey.F1;
-		case Curses.KeyF2: return ConsoleDriverKey.F2;
-		case Curses.KeyF3: return ConsoleDriverKey.F3;
-		case Curses.KeyF4: return ConsoleDriverKey.F4;
-		case Curses.KeyF5: return ConsoleDriverKey.F5;
-		case Curses.KeyF6: return ConsoleDriverKey.F6;
-		case Curses.KeyF7: return ConsoleDriverKey.F7;
-		case Curses.KeyF8: return ConsoleDriverKey.F8;
-		case Curses.KeyF9: return ConsoleDriverKey.F9;
-		case Curses.KeyF10: return ConsoleDriverKey.F10;
-		case Curses.KeyF11: return ConsoleDriverKey.F11;
-		case Curses.KeyF12: return ConsoleDriverKey.F12;
-		case Curses.KeyUp: return ConsoleDriverKey.CursorUp;
-		case Curses.KeyDown: return ConsoleDriverKey.CursorDown;
-		case Curses.KeyLeft: return ConsoleDriverKey.CursorLeft;
-		case Curses.KeyRight: return ConsoleDriverKey.CursorRight;
-		case Curses.KeyHome: return ConsoleDriverKey.Home;
-		case Curses.KeyEnd: return ConsoleDriverKey.End;
-		case Curses.KeyNPage: return ConsoleDriverKey.PageDown;
-		case Curses.KeyPPage: return ConsoleDriverKey.PageUp;
-		case Curses.KeyDeleteChar: return ConsoleDriverKey.DeleteChar;
-		case Curses.KeyInsertChar: return ConsoleDriverKey.InsertChar;
-		case Curses.KeyTab: return ConsoleDriverKey.Tab;
-		case Curses.KeyBackTab: return ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask;
-		case Curses.KeyBackspace: return ConsoleDriverKey.Backspace;
-		case Curses.ShiftKeyUp: return ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyDown: return ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyLeft: return ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyRight: return ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyHome: return ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyEnd: return ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyNPage: return ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask;
-		case Curses.ShiftKeyPPage: return ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask;
-		case Curses.AltKeyUp: return ConsoleDriverKey.CursorUp | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyDown: return ConsoleDriverKey.CursorDown | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyLeft: return ConsoleDriverKey.CursorLeft | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyRight: return ConsoleDriverKey.CursorRight | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyHome: return ConsoleDriverKey.Home | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyEnd: return ConsoleDriverKey.End | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyNPage: return ConsoleDriverKey.PageDown | ConsoleDriverKey.AltMask;
-		case Curses.AltKeyPPage: return ConsoleDriverKey.PageUp | ConsoleDriverKey.AltMask;
-		case Curses.CtrlKeyUp: return ConsoleDriverKey.CursorUp | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyDown: return ConsoleDriverKey.CursorDown | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyLeft: return ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyRight: return ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyHome: return ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyEnd: return ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyNPage: return ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask;
-		case Curses.CtrlKeyPPage: return ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyUp: return ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyDown: return ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyLeft: return ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyRight: return ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyHome: return ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyEnd: return ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyNPage: return ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftCtrlKeyPPage: return ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask;
-		case Curses.ShiftAltKeyUp: return ConsoleDriverKey.CursorUp | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyDown: return ConsoleDriverKey.CursorDown | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyLeft: return ConsoleDriverKey.CursorLeft | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyRight: return ConsoleDriverKey.CursorRight | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyNPage: return ConsoleDriverKey.PageDown | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyPPage: return ConsoleDriverKey.PageUp | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyHome: return ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.ShiftAltKeyEnd: return ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask;
-		case Curses.AltCtrlKeyNPage: return ConsoleDriverKey.PageDown | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask;
-		case Curses.AltCtrlKeyPPage: return ConsoleDriverKey.PageUp | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask;
-		case Curses.AltCtrlKeyHome: return ConsoleDriverKey.Home | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask;
-		case Curses.AltCtrlKeyEnd: return ConsoleDriverKey.End | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask;
-		default: return ConsoleDriverKey.Unknown;
+		case Curses.KeyF1: return KeyCode.F1;
+		case Curses.KeyF2: return KeyCode.F2;
+		case Curses.KeyF3: return KeyCode.F3;
+		case Curses.KeyF4: return KeyCode.F4;
+		case Curses.KeyF5: return KeyCode.F5;
+		case Curses.KeyF6: return KeyCode.F6;
+		case Curses.KeyF7: return KeyCode.F7;
+		case Curses.KeyF8: return KeyCode.F8;
+		case Curses.KeyF9: return KeyCode.F9;
+		case Curses.KeyF10: return KeyCode.F10;
+		case Curses.KeyF11: return KeyCode.F11;
+		case Curses.KeyF12: return KeyCode.F12;
+		case Curses.KeyUp: return KeyCode.CursorUp;
+		case Curses.KeyDown: return KeyCode.CursorDown;
+		case Curses.KeyLeft: return KeyCode.CursorLeft;
+		case Curses.KeyRight: return KeyCode.CursorRight;
+		case Curses.KeyHome: return KeyCode.Home;
+		case Curses.KeyEnd: return KeyCode.End;
+		case Curses.KeyNPage: return KeyCode.PageDown;
+		case Curses.KeyPPage: return KeyCode.PageUp;
+		case Curses.KeyDeleteChar: return KeyCode.DeleteChar;
+		case Curses.KeyInsertChar: return KeyCode.InsertChar;
+		case Curses.KeyTab: return KeyCode.Tab;
+		case Curses.KeyBackTab: return KeyCode.Tab | KeyCode.ShiftMask;
+		case Curses.KeyBackspace: return KeyCode.Backspace;
+		case Curses.ShiftKeyUp: return KeyCode.CursorUp | KeyCode.ShiftMask;
+		case Curses.ShiftKeyDown: return KeyCode.CursorDown | KeyCode.ShiftMask;
+		case Curses.ShiftKeyLeft: return KeyCode.CursorLeft | KeyCode.ShiftMask;
+		case Curses.ShiftKeyRight: return KeyCode.CursorRight | KeyCode.ShiftMask;
+		case Curses.ShiftKeyHome: return KeyCode.Home | KeyCode.ShiftMask;
+		case Curses.ShiftKeyEnd: return KeyCode.End | KeyCode.ShiftMask;
+		case Curses.ShiftKeyNPage: return KeyCode.PageDown | KeyCode.ShiftMask;
+		case Curses.ShiftKeyPPage: return KeyCode.PageUp | KeyCode.ShiftMask;
+		case Curses.AltKeyUp: return KeyCode.CursorUp | KeyCode.AltMask;
+		case Curses.AltKeyDown: return KeyCode.CursorDown | KeyCode.AltMask;
+		case Curses.AltKeyLeft: return KeyCode.CursorLeft | KeyCode.AltMask;
+		case Curses.AltKeyRight: return KeyCode.CursorRight | KeyCode.AltMask;
+		case Curses.AltKeyHome: return KeyCode.Home | KeyCode.AltMask;
+		case Curses.AltKeyEnd: return KeyCode.End | KeyCode.AltMask;
+		case Curses.AltKeyNPage: return KeyCode.PageDown | KeyCode.AltMask;
+		case Curses.AltKeyPPage: return KeyCode.PageUp | KeyCode.AltMask;
+		case Curses.CtrlKeyUp: return KeyCode.CursorUp | KeyCode.CtrlMask;
+		case Curses.CtrlKeyDown: return KeyCode.CursorDown | KeyCode.CtrlMask;
+		case Curses.CtrlKeyLeft: return KeyCode.CursorLeft | KeyCode.CtrlMask;
+		case Curses.CtrlKeyRight: return KeyCode.CursorRight | KeyCode.CtrlMask;
+		case Curses.CtrlKeyHome: return KeyCode.Home | KeyCode.CtrlMask;
+		case Curses.CtrlKeyEnd: return KeyCode.End | KeyCode.CtrlMask;
+		case Curses.CtrlKeyNPage: return KeyCode.PageDown | KeyCode.CtrlMask;
+		case Curses.CtrlKeyPPage: return KeyCode.PageUp | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyUp: return KeyCode.CursorUp | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyDown: return KeyCode.CursorDown | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyLeft: return KeyCode.CursorLeft | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyRight: return KeyCode.CursorRight | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyHome: return KeyCode.Home | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyEnd: return KeyCode.End | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyNPage: return KeyCode.PageDown | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftCtrlKeyPPage: return KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.CtrlMask;
+		case Curses.ShiftAltKeyUp: return KeyCode.CursorUp | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyDown: return KeyCode.CursorDown | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyLeft: return KeyCode.CursorLeft | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyRight: return KeyCode.CursorRight | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyNPage: return KeyCode.PageDown | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyPPage: return KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyHome: return KeyCode.Home | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.ShiftAltKeyEnd: return KeyCode.End | KeyCode.ShiftMask | KeyCode.AltMask;
+		case Curses.AltCtrlKeyNPage: return KeyCode.PageDown | KeyCode.AltMask | KeyCode.CtrlMask;
+		case Curses.AltCtrlKeyPPage: return KeyCode.PageUp | KeyCode.AltMask | KeyCode.CtrlMask;
+		case Curses.AltCtrlKeyHome: return KeyCode.Home | KeyCode.AltMask | KeyCode.CtrlMask;
+		case Curses.AltCtrlKeyEnd: return KeyCode.End | KeyCode.AltMask | KeyCode.CtrlMask;
+		default: return KeyCode.Unknown;
 		}
 	}
 
@@ -428,7 +428,7 @@ internal class CursesDriver : ConsoleDriver {
 		if (code == Curses.ERR) {
 			return;
 		}
-		ConsoleDriverKey k = ConsoleDriverKey.Null;
+		KeyCode k = KeyCode.Null;
 
 		if (code == Curses.KEY_CODE_YES) {
 			while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
@@ -444,7 +444,7 @@ internal class CursesDriver : ConsoleDriver {
 				while (wch2 == Curses.KeyMouse) {
 					KeyEventArgs kea = null;
 					ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
-							new ConsoleKeyInfo ((char)ConsoleDriverKey.Esc, 0, false, false, false),
+							new ConsoleKeyInfo ((char)KeyCode.Esc, 0, false, false, false),
 							new ConsoleKeyInfo ('[', 0, false, false, false),
 							new ConsoleKeyInfo ('<', 0, false, false, false)
 						};
@@ -457,23 +457,23 @@ internal class CursesDriver : ConsoleDriver {
 			if (wch >= 277 && wch <= 288) {
 				// Shift+(F1 - F12)
 				wch -= 12;
-				k = ConsoleDriverKey.ShiftMask | MapCursesKey (wch);
+				k = KeyCode.ShiftMask | MapCursesKey (wch);
 			} else if (wch >= 289 && wch <= 300) {
 				// Ctrl+(F1 - F12)
 				wch -= 24;
-				k = ConsoleDriverKey.CtrlMask | MapCursesKey (wch);
+				k = KeyCode.CtrlMask | MapCursesKey (wch);
 			} else if (wch >= 301 && wch <= 312) {
 				// Ctrl+Shift+(F1 - F12)
 				wch -= 36;
-				k = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | MapCursesKey (wch);
+				k = KeyCode.CtrlMask | KeyCode.ShiftMask | MapCursesKey (wch);
 			} else if (wch >= 313 && wch <= 324) {
 				// Alt+(F1 - F12)
 				wch -= 48;
-				k = ConsoleDriverKey.AltMask | MapCursesKey (wch);
+				k = KeyCode.AltMask | MapCursesKey (wch);
 			} else if (wch >= 325 && wch <= 327) {
 				// Shift+Alt+(F1 - F3)
 				wch -= 60;
-				k = ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | MapCursesKey (wch);
+				k = KeyCode.ShiftMask | KeyCode.AltMask | MapCursesKey (wch);
 			}
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
@@ -487,46 +487,46 @@ internal class CursesDriver : ConsoleDriver {
 			code = Curses.get_wch (out int wch2);
 
 			if (code == Curses.KEY_CODE_YES) {
-				k = ConsoleDriverKey.AltMask | MapCursesKey (wch);
+				k = KeyCode.AltMask | MapCursesKey (wch);
 			}
 			KeyEventArgs key = null;
 			if (code == 0) {
 
 				// The ESC-number handling, debatable.
 				// Simulates the AltMask itself by pressing Alt + Space.
-				if (wch2 == (int)ConsoleDriverKey.Space) {
-					k = ConsoleDriverKey.AltMask;
-				} else if (wch2 - (int)ConsoleDriverKey.Space >= (uint)ConsoleDriverKey.A && wch2 - (int)ConsoleDriverKey.Space <= (uint)ConsoleDriverKey.Z) {
-					k = (ConsoleDriverKey)((uint)ConsoleDriverKey.AltMask + (wch2 - (int)ConsoleDriverKey.Space));
-				} else if (wch2 >= (uint)ConsoleDriverKey.A - 64 && wch2 <= (uint)ConsoleDriverKey.Z - 64) {
-					k = (ConsoleDriverKey)((uint)(ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask) + (wch2 + 64));
-				} else if (wch2 >= (uint)ConsoleDriverKey.D0 && wch2 <= (uint)ConsoleDriverKey.D9) {
-					k = (ConsoleDriverKey)((uint)ConsoleDriverKey.AltMask + (uint)ConsoleDriverKey.D0 + (wch2 - (uint)ConsoleDriverKey.D0));
+				if (wch2 == (int)KeyCode.Space) {
+					k = KeyCode.AltMask;
+				} else if (wch2 - (int)KeyCode.Space >= (uint)KeyCode.A && wch2 - (int)KeyCode.Space <= (uint)KeyCode.Z) {
+					k = (KeyCode)((uint)KeyCode.AltMask + (wch2 - (int)KeyCode.Space));
+				} else if (wch2 >= (uint)KeyCode.A - 64 && wch2 <= (uint)KeyCode.Z - 64) {
+					k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + (wch2 + 64));
+				} else if (wch2 >= (uint)KeyCode.D0 && wch2 <= (uint)KeyCode.D9) {
+					k = (KeyCode)((uint)KeyCode.AltMask + (uint)KeyCode.D0 + (wch2 - (uint)KeyCode.D0));
 				} else if (wch2 == Curses.KeyCSI) {
 					ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
-							new ConsoleKeyInfo ((char)ConsoleDriverKey.Esc, 0, false, false, false),
+							new ConsoleKeyInfo ((char)KeyCode.Esc, 0, false, false, false),
 							new ConsoleKeyInfo ('[', 0, false, false, false)
 						};
 					HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 					return;
 				} else {
 					// Unfortunately there are no way to differentiate Ctrl+Alt+alfa and Ctrl+Shift+Alt+alfa.
-					if (((ConsoleDriverKey)wch2 & ConsoleDriverKey.CtrlMask) != 0) {
-						k = (ConsoleDriverKey)((uint)ConsoleDriverKey.CtrlMask + (wch2 & ~((int)ConsoleDriverKey.CtrlMask)));
+					if (((KeyCode)wch2 & KeyCode.CtrlMask) != 0) {
+						k = (KeyCode)((uint)KeyCode.CtrlMask + (wch2 & ~((int)KeyCode.CtrlMask)));
 					}
 					if (wch2 == 0) {
-						k = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.Space;
-					} else if (wch >= (uint)ConsoleDriverKey.A && wch <= (uint)ConsoleDriverKey.Z) {
-						k = ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.Space;
+						k = KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Space;
+					} else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z) {
+						k = KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Space;
 					} else if (wch2 < 256) {
-						k = (ConsoleDriverKey)wch2 | ConsoleDriverKey.AltMask;
+						k = (KeyCode)wch2 | KeyCode.AltMask;
 					} else {
-						k = (ConsoleDriverKey)((uint)(ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask) + wch2);
+						k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
 					}
 				}
 				key = new KeyEventArgs (k);
 			} else {
-				key = new KeyEventArgs (ConsoleDriverKey.Esc);
+				key = new KeyEventArgs (KeyCode.Esc);
 			}
 			OnKeyDown (key);
 			OnKeyUp (key);
@@ -536,24 +536,24 @@ internal class CursesDriver : ConsoleDriver {
 			OnKeyUp (new KeyEventArgs (k));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
-			k = (ConsoleDriverKey)wch;
+			k = (KeyCode)wch;
 			if (wch == 0) {
-				k = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Space;
-			} else if (wch >= (uint)ConsoleDriverKey.A - 64 && wch <= (uint)ConsoleDriverKey.Z - 64) {
-				if ((ConsoleDriverKey)(wch + 64) != ConsoleDriverKey.J) {
-					k = ConsoleDriverKey.CtrlMask | (ConsoleDriverKey)(wch + 64);
+				k = KeyCode.CtrlMask | KeyCode.Space;
+			} else if (wch >= (uint)KeyCode.A - 64 && wch <= (uint)KeyCode.Z - 64) {
+				if ((KeyCode)(wch + 64) != KeyCode.J) {
+					k = KeyCode.CtrlMask | (KeyCode)(wch + 64);
 				}
-			} else if (wch >= (uint)ConsoleDriverKey.A && wch <= (uint)ConsoleDriverKey.Z) {
-				k = (ConsoleDriverKey)wch | ConsoleDriverKey.ShiftMask;
+			} else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z) {
+				k = (KeyCode)wch | KeyCode.ShiftMask;
 			} else if (wch <= 'z') {
-				k = (ConsoleDriverKey)wch & ~ConsoleDriverKey.Space;
+				k = (KeyCode)wch & ~KeyCode.Space;
 			} 
 			OnKeyDown (new KeyEventArgs (k));
 			OnKeyUp (new KeyEventArgs (k));
 		}
 	}
 
-	void HandleEscSeqResponse (ref int code, ref ConsoleDriverKey k, ref int wch2, ref KeyEventArgs keyEventArgs, ref ConsoleKeyInfo [] cki)
+	void HandleEscSeqResponse (ref int code, ref KeyCode k, ref int wch2, ref KeyEventArgs keyEventArgs, ref ConsoleKeyInfo [] cki)
 	{
 		ConsoleKey ck = 0;
 		ConsoleModifiers mod = 0;
@@ -568,7 +568,7 @@ internal class CursesDriver : ConsoleDriver {
 					}
 					cki = null;
 					if (wch2 == 27) {
-						cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)ConsoleDriverKey.Esc, 0,
+						cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)KeyCode.Esc, 0,
 							false, false, false), cki);
 					}
 				} else {
@@ -711,7 +711,7 @@ internal class CursesDriver : ConsoleDriver {
 
 	public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
 	{
-		ConsoleDriverKey key;
+		KeyCode key;
 
 		if (consoleKey == ConsoleKey.Packet) {
 			ConsoleModifiers mod = new ConsoleModifiers ();
@@ -727,10 +727,10 @@ internal class CursesDriver : ConsoleDriver {
 			var kchar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyChar, mod, out uint ckey, out _);
 			key = ConsoleKeyMapping.MapConsoleKeyToKey ((ConsoleKey)ckey, out bool mappable);
 			if (mappable) {
-				key = (ConsoleDriverKey)kchar;
+				key = (KeyCode)kchar;
 			}
 		} else {
-			key = (ConsoleDriverKey)keyChar;
+			key = (KeyCode)keyChar;
 		}
 
 		OnKeyDown (new KeyEventArgs (key));

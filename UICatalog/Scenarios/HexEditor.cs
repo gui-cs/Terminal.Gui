@@ -55,10 +55,10 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			_statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(ConsoleDriverKey.F2, "~F2~ Open", () => Open()),
-				new StatusItem(ConsoleDriverKey.F3, "~F3~ Save", () => Save()),
+				new StatusItem(KeyCode.F2, "~F2~ Open", () => Open()),
+				new StatusItem(KeyCode.F3, "~F3~ Save", () => Save()),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				_siPositionChanged = new StatusItem(ConsoleDriverKey.Null,
+				_siPositionChanged = new StatusItem(KeyCode.Null,
 					$"Position: {_hexView.Position} Line: {_hexView.CursorPosition.Y} Col: {_hexView.CursorPosition.X} Line length: {_hexView.BytesPerLine}", () => {})
 			});
 			Application.Top.Add (_statusBar);

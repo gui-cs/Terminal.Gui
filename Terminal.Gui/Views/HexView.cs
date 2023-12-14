@@ -77,24 +77,24 @@ public partial class HexView : View {
 		AddCommand (Command.EndOfPage, () => MoveDown (bytesPerLine * (Frame.Height - 1 - (int)(position - displayStart) / bytesPerLine)));
 
 		// Default keybindings for this view
-		KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
-		KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
-		KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
-		KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-		KeyBindings.Add (ConsoleDriverKey.Enter, Command.ToggleChecked);
+		KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+		KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+		KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+		KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+		KeyBindings.Add (KeyCode.Enter, Command.ToggleChecked);
 
-		KeyBindings.Add ('v' + ConsoleDriverKey.AltMask, Command.PageUp);
-		KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
+		KeyBindings.Add ('v' + KeyCode.AltMask, Command.PageUp);
+		KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
 
-		KeyBindings.Add (ConsoleDriverKey.V | ConsoleDriverKey.CtrlMask, Command.PageDown);
-		KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
+		KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
+		KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
 
-		KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
-		KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
-		KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask, Command.StartOfLine);
-		KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask, Command.EndOfLine);
-		KeyBindings.Add (ConsoleDriverKey.CursorUp | ConsoleDriverKey.CtrlMask, Command.StartOfPage);
-		KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.CtrlMask, Command.EndOfPage);
+		KeyBindings.Add (KeyCode.Home, Command.TopHome);
+		KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+		KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.StartOfLine);
+		KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.EndOfLine);
+		KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.StartOfPage);
+		KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.EndOfPage);
 	}
 
 	/// <summary>
@@ -453,7 +453,7 @@ public partial class HexView : View {
 		}
 
 		// Ignore control characters and other special keys
-		if (keyEvent.ConsoleDriverKey < ConsoleDriverKey.Space || keyEvent.ConsoleDriverKey > ConsoleDriverKey.CharMask) {
+		if (keyEvent.ConsoleDriverKey < KeyCode.Space || keyEvent.ConsoleDriverKey > KeyCode.CharMask) {
 			return false;
 		}
 

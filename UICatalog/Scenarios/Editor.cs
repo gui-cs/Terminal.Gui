@@ -75,19 +75,19 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", () => Copy(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C),
-					new MenuItem ("C_ut", "", () => Cut(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.W),
-					new MenuItem ("_Paste", "", () => Paste(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Y),
+					new MenuItem ("_Copy", "", () => Copy(),null,null, KeyCode.CtrlMask | KeyCode.C),
+					new MenuItem ("C_ut", "", () => Cut(),null,null, KeyCode.CtrlMask | KeyCode.W),
+					new MenuItem ("_Paste", "", () => Paste(),null,null, KeyCode.CtrlMask | KeyCode.Y),
 					null,
-					new MenuItem ("_Find", "", () => Find(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.S),
-					new MenuItem ("Find _Next", "", () => FindNext(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.S),
-					new MenuItem ("Find P_revious", "", () => FindPrevious(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.S),
-					new MenuItem ("_Replace", "", () => Replace(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R),
-					new MenuItem ("Replace Ne_xt", "", () => ReplaceNext(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.R),
-					new MenuItem ("Replace Pre_vious", "", () => ReplacePrevious(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.R),
-					new MenuItem ("Replace _All", "", () => ReplaceAll(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.AltMask | ConsoleDriverKey.A),
+					new MenuItem ("_Find", "", () => Find(),null,null, KeyCode.CtrlMask | KeyCode.S),
+					new MenuItem ("Find _Next", "", () => FindNext(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.S),
+					new MenuItem ("Find P_revious", "", () => FindPrevious(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.S),
+					new MenuItem ("_Replace", "", () => Replace(),null,null, KeyCode.CtrlMask | KeyCode.R),
+					new MenuItem ("Replace Ne_xt", "", () => ReplaceNext(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.R),
+					new MenuItem ("Replace Pre_vious", "", () => ReplacePrevious(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.R),
+					new MenuItem ("Replace _All", "", () => ReplaceAll(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.A),
 					null,
-					new MenuItem ("_Select All", "", () => SelectAll(),null,null, ConsoleDriverKey.CtrlMask | ConsoleDriverKey.T)
+					new MenuItem ("_Select All", "", () => SelectAll(),null,null, KeyCode.CtrlMask | KeyCode.T)
 				}),
 				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
 				new MenuBarItem ("_Cursor", CreateCursorRadio ()),
@@ -113,15 +113,15 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (menu);
 
-			var siCursorPosition = new StatusItem (ConsoleDriverKey.Null, "", null);
+			var siCursorPosition = new StatusItem (KeyCode.Null, "", null);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				siCursorPosition,
-				new StatusItem(ConsoleDriverKey.F2, "~F2~ Open", () => Open()),
-				new StatusItem(ConsoleDriverKey.F3, "~F3~ Save", () => Save()),
-				new StatusItem(ConsoleDriverKey.F4, "~F4~ Save As", () => SaveAs()),
+				new StatusItem(KeyCode.F2, "~F2~ Open", () => Open()),
+				new StatusItem(KeyCode.F3, "~F3~ Save", () => Save()),
+				new StatusItem(KeyCode.F4, "~F4~ Save As", () => SaveAs()),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(ConsoleDriverKey.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
+				new StatusItem(KeyCode.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
 
 			_textView.UnwrappedCursorPosition += (s, e) => {
@@ -177,20 +177,20 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyDown += (s, e) => {
-				if (_winDialog != null && (e.ConsoleDriverKey == ConsoleDriverKey.Esc
+				if (_winDialog != null && (e.ConsoleDriverKey == KeyCode.Esc
 								|| e.ConsoleDriverKey == Application.QuitKey)) {
 					DisposeWinDialog ();
 				} else if (e.ConsoleDriverKey == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
-				} else if (_winDialog != null && e.ConsoleDriverKey == (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask)) {
+				} else if (_winDialog != null && e.ConsoleDriverKey == (KeyCode.Tab | KeyCode.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (_winDialog != null && e.ConsoleDriverKey == (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.ShiftMask)) {
+				} else if (_winDialog != null && e.ConsoleDriverKey == (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {

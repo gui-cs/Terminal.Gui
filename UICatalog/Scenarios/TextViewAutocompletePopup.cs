@@ -87,8 +87,8 @@ namespace UICatalog.Scenarios {
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				siMultiline = new StatusItem(ConsoleDriverKey.Null, "", null),
-				siWrap = new StatusItem(ConsoleDriverKey.Null, "", null)
+				siMultiline = new StatusItem(KeyCode.Null, "", null),
+				siWrap = new StatusItem(KeyCode.Null, "", null)
 			});
 			Application.Top.Add (statusBar);
 

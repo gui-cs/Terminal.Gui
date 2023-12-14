@@ -40,13 +40,13 @@ namespace Terminal.Gui {
 		public abstract ColorScheme ColorScheme { get; set; }
 
 		/// <inheritdoc/>
-		public virtual ConsoleDriverKey SelectionKey { get; set; } = ConsoleDriverKey.Enter;
+		public virtual KeyCode SelectionKey { get; set; } = KeyCode.Enter;
 
 		/// <inheritdoc/>
-		public virtual ConsoleDriverKey CloseKey { get; set; } = ConsoleDriverKey.Esc;
+		public virtual KeyCode CloseKey { get; set; } = KeyCode.Esc;
 
 		/// <inheritdoc/>
-		public virtual ConsoleDriverKey Reopen { get; set; } = ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask | ConsoleDriverKey.AltMask;
+		public virtual KeyCode Reopen { get; set; } = KeyCode.Space | KeyCode.CtrlMask | KeyCode.AltMask;
 
 		/// <inheritdoc/>
 		public virtual AutocompleteContext Context { get; set; }

@@ -147,8 +147,8 @@ namespace Terminal.Gui {
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
 			this.btnOk.KeyDown += (s, k) => {
-				this.NavigateIf (k, ConsoleDriverKey.CursorLeft, this.btnCancel);
-				this.NavigateIf (k, ConsoleDriverKey.CursorUp, this.tableView);
+				this.NavigateIf (k, KeyCode.CursorLeft, this.btnCancel);
+				this.NavigateIf (k, KeyCode.CursorUp, this.tableView);
 			};
 
 			this.btnCancel = new Button (Strings.btnCancel) {
@@ -156,9 +156,9 @@ namespace Terminal.Gui {
 				X = Pos.Right (btnOk) + 1
 			};
 			this.btnCancel.KeyDown += (s, k) => {
-				this.NavigateIf (k, ConsoleDriverKey.CursorLeft, this.btnToggleSplitterCollapse);
-				this.NavigateIf (k, ConsoleDriverKey.CursorUp, this.tableView);
-				this.NavigateIf (k, ConsoleDriverKey.CursorRight, this.btnOk);
+				this.NavigateIf (k, KeyCode.CursorLeft, this.btnToggleSplitterCollapse);
+				this.NavigateIf (k, KeyCode.CursorUp, this.tableView);
+				this.NavigateIf (k, KeyCode.CursorRight, this.btnOk);
 			};
 			this.btnCancel.Clicked += (s, e) => {
 				Application.RequestStop ();
@@ -184,7 +184,7 @@ namespace Terminal.Gui {
 
 				ClearFeedback ();
 
-				this.AcceptIf (k, ConsoleDriverKey.Enter);
+				this.AcceptIf (k, KeyCode.Enter);
 
 				this.SuppressIfBadChar (k);
 			};
@@ -208,7 +208,7 @@ namespace Terminal.Gui {
 				FullRowSelect = true,
 				CollectionNavigator = new FileDialogCollectionNavigator (this)
 			};
-			this.tableView.KeyBindings.Add (ConsoleDriverKey.Space, Command.ToggleChecked);
+			this.tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
 			tableView.Style.InvertSelectedCellFirstCharacter = true;
 			Style.TableStyle = tableView.Style;
@@ -231,14 +231,14 @@ namespace Terminal.Gui {
 
 			this.tableView.KeyDown += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
-					this.NavigateIf (k, ConsoleDriverKey.CursorUp, this.tbPath);
+					this.NavigateIf (k, KeyCode.CursorUp, this.tbPath);
 				}
 				if (this.tableView.SelectedRow == this.tableView.Table.Rows - 1) {
-					this.NavigateIf (k, ConsoleDriverKey.CursorDown, this.btnToggleSplitterCollapse);
+					this.NavigateIf (k, KeyCode.CursorDown, this.btnToggleSplitterCollapse);
 				}
 
 				if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
-					this.NavigateIf (k, ConsoleDriverKey.CursorLeft, this.treeView);
+					this.NavigateIf (k, KeyCode.CursorLeft, this.treeView);
 				}
 
 				if (k.Handled) {
@@ -278,7 +278,7 @@ namespace Terminal.Gui {
 				CaptionColor = new Color (Color.Black),
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
-				HotKey = ConsoleDriverKey.F | ConsoleDriverKey.AltMask
+				HotKey = KeyCode.F | KeyCode.AltMask
 			};
 			spinnerView = new SpinnerView () {
 				X = Pos.Right (tbFind) + 1,
@@ -288,21 +288,21 @@ namespace Terminal.Gui {
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
 			tbFind.KeyDown += (s, o) => {
-				if (o.ConsoleDriverKey == ConsoleDriverKey.Enter) {
+				if (o.ConsoleDriverKey == KeyCode.Enter) {
 					RestartSearch ();
 					o.Handled = true;
 				}
 
-				if (o.ConsoleDriverKey == ConsoleDriverKey.Esc) {
+				if (o.ConsoleDriverKey == KeyCode.Esc) {
 					if (CancelSearch ()) {
 						o.Handled = true;
 					}
 				}
 				if (tbFind.CursorIsAtEnd ()) {
-					NavigateIf (o, ConsoleDriverKey.CursorRight, btnCancel);
+					NavigateIf (o, KeyCode.CursorRight, btnCancel);
 				}
 				if (tbFind.CursorIsAtStart ()) {
-					NavigateIf (o, ConsoleDriverKey.CursorLeft, btnToggleSplitterCollapse);
+					NavigateIf (o, KeyCode.CursorLeft, btnToggleSplitterCollapse);
 				}
 			};
 
@@ -321,20 +321,20 @@ namespace Terminal.Gui {
 			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 
-			this.tableView.KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
-			this.tableView.KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
-			this.tableView.KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.ShiftMask, Command.TopHomeExtend);
-			this.tableView.KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.ShiftMask, Command.BottomEndExtend);
+			this.tableView.KeyBindings.Add (KeyCode.Home, Command.TopHome);
+			this.tableView.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+			this.tableView.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.TopHomeExtend);
+			this.tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.BottomEndExtend);
 
 			this.treeView.KeyDown += (s, k) => {
 
 				var selected = treeView.SelectedObject;
 				if (selected != null) {
 					if (!treeView.CanExpand (selected) || treeView.IsExpanded (selected)) {
-						this.NavigateIf (k, ConsoleDriverKey.CursorRight, this.tableView);
+						this.NavigateIf (k, KeyCode.CursorRight, this.tableView);
 					} else
 					if (treeView.GetObjectRow (selected) == 0) {
-						this.NavigateIf (k, ConsoleDriverKey.CursorUp, this.tbPath);
+						this.NavigateIf (k, KeyCode.CursorUp, this.tbPath);
 					}
 				}
 
@@ -799,7 +799,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void AcceptIf (KeyEventArgs keyEvent, ConsoleDriverKey isKey)
+		private void AcceptIf (KeyEventArgs keyEvent, KeyCode isKey)
 		{
 			if (!keyEvent.Handled && keyEvent.ConsoleDriverKey == isKey) {
 				keyEvent.Handled = true;
@@ -885,7 +885,7 @@ namespace Terminal.Gui {
 			Application.RequestStop ();
 		}
 
-		private bool NavigateIf (KeyEventArgs keyEvent, ConsoleDriverKey isKey, View to)
+		private bool NavigateIf (KeyEventArgs keyEvent, KeyCode isKey, View to)
 		{
 			if (keyEvent.ConsoleDriverKey == isKey) {
 
@@ -953,26 +953,26 @@ namespace Terminal.Gui {
 
 		private bool TableView_KeyUp (KeyEventArgs keyEvent)
 		{
-			if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.Backspace) {
+			if (keyEvent.ConsoleDriverKey == KeyCode.Backspace) {
 				return this.history.Back ();
 			}
-			if (keyEvent.ConsoleDriverKey == (ConsoleDriverKey.ShiftMask | ConsoleDriverKey.Backspace)) {
+			if (keyEvent.ConsoleDriverKey == (KeyCode.ShiftMask | KeyCode.Backspace)) {
 				return this.history.Forward ();
 			}
 
-			if (keyEvent.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
+			if (keyEvent.ConsoleDriverKey == KeyCode.DeleteChar) {
 
 				Delete ();
 				return true;
 			}
 
-			if (keyEvent.ConsoleDriverKey == (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R)) {
+			if (keyEvent.ConsoleDriverKey == (KeyCode.CtrlMask | KeyCode.R)) {
 
 				Rename ();
 				return true;
 			}
 
-			if (keyEvent.ConsoleDriverKey == (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.N)) {
+			if (keyEvent.ConsoleDriverKey == (KeyCode.CtrlMask | KeyCode.N)) {
 				New ();
 				return true;
 			}

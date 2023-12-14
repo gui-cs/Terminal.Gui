@@ -28,9 +28,9 @@ public class ViewKeyBindingTests {
 			AddCommand (Command.Default, () => HotKeyCommand = true);
 			AddCommand (Command.Left, () => FocusedCommand = true);
 			
-			KeyBindings.Add (ConsoleDriverKey.A, KeyBindingScope.Application, Command.Save);
-			HotKey = ConsoleDriverKey.H;
-			KeyBindings.Add (ConsoleDriverKey.F, KeyBindingScope.Focused, Command.Left);
+			KeyBindings.Add (KeyCode.A, KeyBindingScope.Application, Command.Save);
+			HotKey = KeyCode.H;
+			KeyBindings.Add (KeyCode.F, KeyBindingScope.Focused, Command.Left);
 		}
 	}
 	
@@ -45,16 +45,16 @@ public class ViewKeyBindingTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (ConsoleDriverKey.A));
+		Application.OnKeyDown (new (KeyCode.A));
 		Assert.True (invoked);
 
 		invoked = false;
-		Application.OnKeyDown (new (ConsoleDriverKey.H));
+		Application.OnKeyDown (new (KeyCode.H));
 		Assert.True (invoked);
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (ConsoleDriverKey.F));
+		Application.OnKeyDown (new (KeyCode.F));
 		Assert.False (invoked);
 		Assert.False (view.FocusedCommand);
 
@@ -62,7 +62,7 @@ public class ViewKeyBindingTests {
 		view.CanFocus = true;
 		view.SetFocus ();
 		Assert.True (view.HasFocus);
-		Application.OnKeyDown (new (ConsoleDriverKey.F));
+		Application.OnKeyDown (new (KeyCode.F));
 		Assert.True (invoked);
 		
 		Assert.True (view.ApplicationCommand);
@@ -81,7 +81,7 @@ public class ViewKeyBindingTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (ConsoleDriverKey.Z));
+		Application.OnKeyDown (new (KeyCode.Z));
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		Assert.False (view.HotKeyCommand);
@@ -89,7 +89,7 @@ public class ViewKeyBindingTests {
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (ConsoleDriverKey.F));
+		Application.OnKeyDown (new (KeyCode.F));
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		Assert.False (view.HotKeyCommand);
@@ -109,18 +109,18 @@ public class ViewKeyBindingTests {
 		Application.Begin (Application.Top);
 
 		invoked = false;
-		Application.OnKeyDown (new (ConsoleDriverKey.H));
+		Application.OnKeyDown (new (KeyCode.H));
 		Assert.True (invoked);
 		Assert.True (view.HotKeyCommand);
 
-		view.HotKey = ConsoleDriverKey.Z;
+		view.HotKey = KeyCode.Z;
 		invoked = false;
 		view.HotKeyCommand = false;
-		Application.OnKeyDown (new (ConsoleDriverKey.H)); // old hot key
+		Application.OnKeyDown (new (KeyCode.H)); // old hot key
 		Assert.False (invoked);
 		Assert.False (view.HotKeyCommand);
 
-		Application.OnKeyDown (new (ConsoleDriverKey.Z)); // new hot key
+		Application.OnKeyDown (new (KeyCode.Z)); // new hot key
 		Assert.True (invoked);
 		Assert.True (view.HotKeyCommand);
 
@@ -137,12 +137,12 @@ public class ViewKeyBindingTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (ConsoleDriverKey.Z));
+		Application.OnKeyDown (new (KeyCode.Z));
 		Assert.False (invoked);
 		Assert.False (view.HotKeyCommand);
 
 		invoked = false;
-		Application.OnKeyDown (new (ConsoleDriverKey.F));
+		Application.OnKeyDown (new (KeyCode.F));
 		Assert.False (view.HotKeyCommand);
 	}
 }

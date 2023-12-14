@@ -104,23 +104,23 @@ public class ScrollView : View {
 		AddCommand (Command.RightEnd, () => ScrollRight (_contentSize.Width));
 
 		// Default keybindings for this view
-		KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.ScrollUp);
-		KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.ScrollDown);
-		KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.ScrollLeft);
-		KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.ScrollRight);
+		KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
+		KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
+		KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
+		KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
 
-		KeyBindings.Add (ConsoleDriverKey.PageUp, Command.PageUp);
-		KeyBindings.Add ((ConsoleDriverKey)'v' | ConsoleDriverKey.AltMask, Command.PageUp);
+		KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+		KeyBindings.Add ((KeyCode)'v' | KeyCode.AltMask, Command.PageUp);
 
-		KeyBindings.Add (ConsoleDriverKey.PageDown, Command.PageDown);
-		KeyBindings.Add (ConsoleDriverKey.V | ConsoleDriverKey.CtrlMask, Command.PageDown);
+		KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+		KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
 
-		KeyBindings.Add (ConsoleDriverKey.PageUp | ConsoleDriverKey.CtrlMask, Command.PageLeft);
-		KeyBindings.Add (ConsoleDriverKey.PageDown | ConsoleDriverKey.CtrlMask, Command.PageRight);
-		KeyBindings.Add (ConsoleDriverKey.Home, Command.TopHome);
-		KeyBindings.Add (ConsoleDriverKey.End, Command.BottomEnd);
-		KeyBindings.Add (ConsoleDriverKey.Home | ConsoleDriverKey.CtrlMask, Command.LeftHome);
-		KeyBindings.Add (ConsoleDriverKey.End | ConsoleDriverKey.CtrlMask, Command.RightEnd);
+		KeyBindings.Add (KeyCode.PageUp | KeyCode.CtrlMask, Command.PageLeft);
+		KeyBindings.Add (KeyCode.PageDown | KeyCode.CtrlMask, Command.PageRight);
+		KeyBindings.Add (KeyCode.Home, Command.TopHome);
+		KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+		KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.LeftHome);
+		KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.RightEnd);
 
 		Initialized += (s, e) => {
 			if (!_vertical.IsInitialized) {

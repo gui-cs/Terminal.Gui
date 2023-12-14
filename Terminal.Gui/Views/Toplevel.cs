@@ -222,17 +222,17 @@ namespace Terminal.Gui {
 			// Default keybindings for this view
 			KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.NextView);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.NextView);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.PreviousView);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.PreviousView);
+			KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
+			KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.PreviousView);
+			KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
 
-			KeyBindings.Add (ConsoleDriverKey.Tab, Command.NextView);
-			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask, Command.PreviousView);
-			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.CtrlMask, Command.NextViewOrTop);
-			KeyBindings.Add (ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask, Command.PreviousViewOrTop);
+			KeyBindings.Add (KeyCode.Tab, Command.NextView);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.PreviousView);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextViewOrTop);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
-			KeyBindings.Add (ConsoleDriverKey.F5, Command.Refresh);
+			KeyBindings.Add (KeyCode.F5, Command.Refresh);
 			KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
 			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
@@ -244,7 +244,7 @@ namespace Terminal.Gui {
 			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
 #endif
 			// This enables the default button to be activated by the Enter key.
-			KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
+			KeyBindings.Add (KeyCode.Enter, Command.Accept);
 		}
 
 		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)

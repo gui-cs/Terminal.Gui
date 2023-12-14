@@ -11,13 +11,13 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Constructs a new <see cref="KeyEventArgs"/>
 	/// </summary>
-	public KeyEventArgs () : this (ConsoleDriverKey.Unknown) { }
+	public KeyEventArgs () : this (KeyCode.Unknown) { }
 
 	/// <summary>
 	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value
 	/// </summary>
 	/// <param name="k">The key</param>
-	public KeyEventArgs (ConsoleDriverKey k)
+	public KeyEventArgs (KeyCode k)
 	{
 		ConsoleDriverKey = k;
 	}
@@ -42,7 +42,7 @@ public class KeyEventArgs : EventArgs {
 	/// <summary>
 	/// Symbolic definition for the key.
 	/// </summary>
-	public ConsoleDriverKey ConsoleDriverKey { get; set; }
+	public KeyCode ConsoleDriverKey { get; set; }
 
 	/// <summary>
 	/// Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.
@@ -54,7 +54,7 @@ public class KeyEventArgs : EventArgs {
 	/// </summary>
 	/// <remarks>
 	/// If the key pressed is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
-	/// If the key is outside of the <see cref="ConsoleDriverKey.CharMask"/> range, this will be <see langword="default"/>.
+	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, this will be <see langword="default"/>.
 	/// </remarks>
 	public Rune AsRune => ToRune (ConsoleDriverKey);
 
@@ -63,29 +63,29 @@ public class KeyEventArgs : EventArgs {
 	/// </summary>
 	/// <remarks>
 	/// If the key is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
-	/// If the key is outside of the <see cref="ConsoleDriverKey.CharMask"/> range, this will be <see langword="default"/>.
+	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, this will be <see langword="default"/>.
 	/// </remarks>
 	/// <param name="key"></param>
 	/// <returns>The key converted to a rune. <see langword="default"/> if conversion is not possible.</returns>
-	public static Rune ToRune (ConsoleDriverKey key)
+	public static Rune ToRune (KeyCode key)
 	{
-		if (key is ConsoleDriverKey.Null or ConsoleDriverKey.SpecialMask || key.HasFlag (ConsoleDriverKey.CtrlMask) || key.HasFlag (ConsoleDriverKey.AltMask)) {
+		if (key is KeyCode.Null or KeyCode.SpecialMask || key.HasFlag (KeyCode.CtrlMask) || key.HasFlag (KeyCode.AltMask)) {
 			return default;
 		}
 
 		// Extract the base key (removing modifier flags)
-		ConsoleDriverKey baseKey = key & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
+		KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		switch (baseKey) {
-		case >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z when !key.HasFlag (ConsoleDriverKey.ShiftMask):
+		case >= KeyCode.A and <= KeyCode.Z when !key.HasFlag (KeyCode.ShiftMask):
 			return new Rune ((char)(baseKey + 32));
-		case >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z:
+		case >= KeyCode.A and <= KeyCode.Z:
 			return new Rune ((char)baseKey);
-		case >= ConsoleDriverKey.Null and < ConsoleDriverKey.A:
+		case >= KeyCode.Null and < KeyCode.A:
 			return new Rune ((char)baseKey);
 		}
 
-		if (Enum.IsDefined (typeof (ConsoleDriverKey), baseKey)) {
+		if (Enum.IsDefined (typeof (KeyCode), baseKey)) {
 			return default;
 		}
 
@@ -96,24 +96,24 @@ public class KeyEventArgs : EventArgs {
 	/// Gets a value indicating whether the Shift key was pressed.
 	/// </summary>
 	/// <value><see langword="true"/> if is shift; otherwise, <see langword="false"/>.</value>
-	public bool IsShift => (ConsoleDriverKey & ConsoleDriverKey.ShiftMask) != 0;
+	public bool IsShift => (ConsoleDriverKey & KeyCode.ShiftMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
 	/// </summary>
 	/// <value><see langword="true"/> if is alternate; otherwise, <see langword="false"/>.</value>
-	public bool IsAlt => (ConsoleDriverKey & ConsoleDriverKey.AltMask) != 0;
+	public bool IsAlt => (ConsoleDriverKey & KeyCode.AltMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Ctrl key was pressed.
 	/// </summary>
 	/// <value><see langword="true"/> if is ctrl; otherwise, <see langword="false"/>.</value>
-	public bool IsCtrl => (ConsoleDriverKey & ConsoleDriverKey.CtrlMask) != 0;
+	public bool IsCtrl => (ConsoleDriverKey & KeyCode.CtrlMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the key is an lower case letter from 'a' to 'z', independent of the shift key.
-	/// This is needed because <see cref="ConsoleDriverKey"/> defines <see cref="ConsoleDriverKey.A"/> through <see cref="ConsoleDriverKey.Z"/>
-	/// using the ASCII codes for the uppercase letter (e.g. <see cref="ConsoleDriverKey.A"/> is <c>65</c>) while <c>(ConsoleKeyDriver)'a'</c> =
+	/// This is needed because <see cref="ConsoleDriverKey"/> defines <see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/>
+	/// using the ASCII codes for the uppercase letter (e.g. <see cref="KeyCode.A"/> is <c>65</c>) while <c>(ConsoleKeyDriver)'a'</c> =
 	/// <c>97</c>. Thus, to specify an uppercase 'a', one must use <c>ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask</c> and to
 	/// specify a lowercase 'a', on must use <c>ConsoleDriverKey.A</c> or <c>(ConsoleDriverKey)'a'</c>.
 	/// </summary>	
@@ -122,14 +122,14 @@ public class KeyEventArgs : EventArgs {
 			if (IsAlt || IsCtrl) {
 				return false;
 			}
-			return (ConsoleDriverKey & ConsoleDriverKey.CharMask) is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z;
+			return (ConsoleDriverKey & KeyCode.CharMask) is >= KeyCode.A and <= KeyCode.Z;
 		}
 	}
 
 	/// <summary>
 	/// Gets the key without any shift modifiers. 
 	/// </summary>
-	public ConsoleDriverKey BareKey => ConsoleDriverKey & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
+	public KeyCode BareKey => ConsoleDriverKey & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 	#region Standard Key Definitions
 
@@ -140,7 +140,7 @@ public class KeyEventArgs : EventArgs {
 	/// <remarks>
 	/// <see cref="IsShift"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Shift modifier applied.
 	/// </remarks>
-	public const uint Shift = (uint)ConsoleDriverKey.ShiftMask;
+	public const uint Shift = (uint)KeyCode.ShiftMask;
 
 	/// <summary>
 	/// The Ctrl modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
@@ -148,7 +148,7 @@ public class KeyEventArgs : EventArgs {
 	/// <remarks>
 	/// <see cref="IsCtrl"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Ctrl modifier applied.
 	/// </remarks>
-	public const uint Ctrl = (uint)ConsoleDriverKey.CtrlMask;
+	public const uint Ctrl = (uint)KeyCode.CtrlMask;
 
 	/// <summary>
 	/// The Alt modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
@@ -156,207 +156,207 @@ public class KeyEventArgs : EventArgs {
 	/// <remarks>
 	/// <see cref="IsAlt"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Alt modifier applied.
 	/// </remarks>
-	public const uint Alt = (uint)ConsoleDriverKey.AltMask;
+	public const uint Alt = (uint)KeyCode.AltMask;
 
 	/// <summary>
 	/// The key code for the Backspace key.
 	/// </summary>
-	public const uint Backspace = (uint)ConsoleDriverKey.Backspace;
+	public const uint Backspace = (uint)KeyCode.Backspace;
 
 	/// <summary>
 	/// The key code for the user pressing the tab key (forwards tab key).
 	/// </summary>
-	public const uint Tab = (uint)ConsoleDriverKey.Tab;
+	public const uint Tab = (uint)KeyCode.Tab;
 
 	/// <summary>
 	/// The key code for the user pressing the return key.
 	/// </summary>
-	public const uint Enter = (uint)ConsoleDriverKey.Enter;
+	public const uint Enter = (uint)KeyCode.Enter;
 
 	/// <summary>
 	/// The key code for the user pressing the clear key.
 	/// </summary>
-	public const uint Clear = (uint)ConsoleDriverKey.Clear;
+	public const uint Clear = (uint)KeyCode.Clear;
 
 	/// <summary>
 	/// The key code for the Shift key
 	/// </summary>
-	public const uint ShiftKey = (uint)ConsoleDriverKey.ShiftKey;
+	public const uint ShiftKey = (uint)KeyCode.ShiftKey;
 
 	/// <summary>
 	/// The key code for the Ctrl key
 	/// </summary>
-	public const uint CtrlKey = (uint)ConsoleDriverKey.CtrlKey;
+	public const uint CtrlKey = (uint)KeyCode.CtrlKey;
 
 	/// <summary>
 	/// The key code for the Alt key
 	/// </summary>
-	public const uint AltKey = (uint)ConsoleDriverKey.AltKey;
+	public const uint AltKey = (uint)KeyCode.AltKey;
 
 	/// <summary>
 	/// The key code for the CapsLock key
 	/// </summary>
-	public const uint CapsLock = (uint)ConsoleDriverKey.CapsLock;
+	public const uint CapsLock = (uint)KeyCode.CapsLock;
 
 	/// <summary>
 	/// The key code for the user pressing the escape key
 	/// </summary>
-	public const uint Esc = (uint)ConsoleDriverKey.Esc;
+	public const uint Esc = (uint)KeyCode.Esc;
 
 	/// <summary>
 	/// The key code for the user pressing the space bar
 	/// </summary>
-	public const uint Space = (uint)ConsoleDriverKey.Space;
+	public const uint Space = (uint)KeyCode.Space;
 
 	/// <summary>
 	/// The key code for the user pressing DEL
 	/// </summary>
-	public const uint Delete = (uint)ConsoleDriverKey.Delete;
+	public const uint Delete = (uint)KeyCode.Delete;
 
 	/// <summary>
 	/// Cursor up key
 	/// </summary>
-	public const uint CursorUp = (uint)ConsoleDriverKey.CursorUp;
+	public const uint CursorUp = (uint)KeyCode.CursorUp;
 	/// <summary>
 	/// Cursor down key.
 	/// </summary>
-	public const uint CursorDown = (uint)ConsoleDriverKey.CursorDown;
+	public const uint CursorDown = (uint)KeyCode.CursorDown;
 	/// <summary>
 	/// Cursor left key.
 	/// </summary>
-	public const uint CursorLeft = (uint)ConsoleDriverKey.CursorLeft;
+	public const uint CursorLeft = (uint)KeyCode.CursorLeft;
 	/// <summary>
 	/// Cursor right key.
 	/// </summary>
-	public const uint CursorRight = (uint)ConsoleDriverKey.CursorRight;
+	public const uint CursorRight = (uint)KeyCode.CursorRight;
 	/// <summary>
 	/// Page Up key.
 	/// </summary>
-	public const uint PageUp = (uint)ConsoleDriverKey.PageUp;
+	public const uint PageUp = (uint)KeyCode.PageUp;
 	/// <summary>
 	/// Page Down key.
 	/// </summary>
-	public const uint PageDown = (uint)ConsoleDriverKey.PageDown;
+	public const uint PageDown = (uint)KeyCode.PageDown;
 	/// <summary>
 	/// Home key.
 	/// </summary>
-	public const uint Home = (uint)ConsoleDriverKey.Home;
+	public const uint Home = (uint)KeyCode.Home;
 	/// <summary>
 	/// End key.
 	/// </summary>
-	public const uint End = (uint)ConsoleDriverKey.End;
+	public const uint End = (uint)KeyCode.End;
 
 	/// <summary>
 	/// Insert character key.
 	/// </summary>
-	public const uint InsertChar = (uint)ConsoleDriverKey.InsertChar;
+	public const uint InsertChar = (uint)KeyCode.InsertChar;
 
 	/// <summary>
 	/// Delete character key.
 	/// </summary>
-	public const uint DeleteChar = (uint)ConsoleDriverKey.DeleteChar;
+	public const uint DeleteChar = (uint)KeyCode.DeleteChar;
 
 	/// <summary>
 	/// Print screen character key.
 	/// </summary>
-	public const uint PrintScreen = (uint)ConsoleDriverKey.PrintScreen;
+	public const uint PrintScreen = (uint)KeyCode.PrintScreen;
 
 	/// <summary>
 	/// F1 key.
 	/// </summary>
-	public const uint F1 = (uint)ConsoleDriverKey.F1;
+	public const uint F1 = (uint)KeyCode.F1;
 	/// <summary>
 	/// F2 key.
 	/// </summary>
-	public const uint F2 = (uint)ConsoleDriverKey.F2;
+	public const uint F2 = (uint)KeyCode.F2;
 	/// <summary>
 	/// F3 key.
 	/// </summary>
-	public const uint F3 = (uint)ConsoleDriverKey.F3;
+	public const uint F3 = (uint)KeyCode.F3;
 	/// <summary>
 	/// F4 key.
 	/// </summary>
-	public const uint F4 = (uint)ConsoleDriverKey.F4;
+	public const uint F4 = (uint)KeyCode.F4;
 	/// <summary>
 	/// F5 key.
 	/// </summary>
-	public const uint F5 = (uint)ConsoleDriverKey.F5;
+	public const uint F5 = (uint)KeyCode.F5;
 	/// <summary>
 	/// F6 key.
 	/// </summary>
-	public const uint F6 = (uint)ConsoleDriverKey.F6;
+	public const uint F6 = (uint)KeyCode.F6;
 	/// <summary>
 	/// F7 key.
 	/// </summary>
-	public const uint F7 = (uint)ConsoleDriverKey.F7;
+	public const uint F7 = (uint)KeyCode.F7;
 	/// <summary>
 	/// F8 key.
 	/// </summary>
-	public const uint F8 = (uint)ConsoleDriverKey.F8;
+	public const uint F8 = (uint)KeyCode.F8;
 	/// <summary>
 	/// F9 key.
 	/// </summary>
-	public const uint F9 = (uint)ConsoleDriverKey.F9;
+	public const uint F9 = (uint)KeyCode.F9;
 	/// <summary>
 	/// F10 key.
 	/// </summary>
-	public const uint F10 = (uint)ConsoleDriverKey.F10;
+	public const uint F10 = (uint)KeyCode.F10;
 	/// <summary>
 	/// F11 key.
 	/// </summary>
-	public const uint F11 = (uint)ConsoleDriverKey.F11;
+	public const uint F11 = (uint)KeyCode.F11;
 	/// <summary>
 	/// F12 key.
 	/// </summary>
-	public const uint F12 = (uint)ConsoleDriverKey.F12;
+	public const uint F12 = (uint)KeyCode.F12;
 	/// <summary>
 	/// F13 key.
 	/// </summary>
-	public const uint F13 = (uint)ConsoleDriverKey.F13;
+	public const uint F13 = (uint)KeyCode.F13;
 	/// <summary>
 	/// F14 key.
 	/// </summary>
-	public const uint F14 = (uint)ConsoleDriverKey.F14;
+	public const uint F14 = (uint)KeyCode.F14;
 	/// <summary>
 	/// F15 key.
 	/// </summary>
-	public const uint F15 = (uint)ConsoleDriverKey.F15;
+	public const uint F15 = (uint)KeyCode.F15;
 	/// <summary>
 	/// F16 key.
 	/// </summary>
-	public const uint F16 = (uint)ConsoleDriverKey.F16;
+	public const uint F16 = (uint)KeyCode.F16;
 	/// <summary>
 	/// F17 key.
 	/// </summary>
-	public const uint F17 = (uint)ConsoleDriverKey.F17;
+	public const uint F17 = (uint)KeyCode.F17;
 	/// <summary>
 	/// F18 key.
 	/// </summary>
-	public const uint F18 = (uint)ConsoleDriverKey.F18;
+	public const uint F18 = (uint)KeyCode.F18;
 	/// <summary>
 	/// F19 key.
 	/// </summary>
-	public const uint F19 = (uint)ConsoleDriverKey.F19;
+	public const uint F19 = (uint)KeyCode.F19;
 	/// <summary>
 	/// F20 key.
 	/// </summary>
-	public const uint F20 = (uint)ConsoleDriverKey.F20;
+	public const uint F20 = (uint)KeyCode.F20;
 	/// <summary>
 	/// F21 key.
 	/// </summary>
-	public const uint F21 = (uint)ConsoleDriverKey.F21;
+	public const uint F21 = (uint)KeyCode.F21;
 	/// <summary>
 	/// F22 key.
 	/// </summary>
-	public const uint F22 = (uint)ConsoleDriverKey.F22;
+	public const uint F22 = (uint)KeyCode.F22;
 	/// <summary>
 	/// F23 key.
 	/// </summary>
-	public const uint F23 = (uint)ConsoleDriverKey.F23;
+	public const uint F23 = (uint)KeyCode.F23;
 	/// <summary>
 	/// F24 key.
 	/// </summary>
-	public const uint F24 = (uint)ConsoleDriverKey.F24;
+	public const uint F24 = (uint)KeyCode.F24;
 
 	#endregion
 
@@ -406,23 +406,23 @@ public class KeyEventArgs : EventArgs {
 		return ToString (ConsoleDriverKey, (Rune)'+');
 	}
 
-	private static string GetKeyString (ConsoleDriverKey key)
+	private static string GetKeyString (KeyCode key)
 	{
-		if (key is ConsoleDriverKey.Null or ConsoleDriverKey.SpecialMask) {
+		if (key is KeyCode.Null or KeyCode.SpecialMask) {
 			return string.Empty;
 		}
 		// Extract the base key (removing modifier flags)
-		ConsoleDriverKey baseKey = key & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
+		KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
-		if (!key.HasFlag (ConsoleDriverKey.ShiftMask) && baseKey is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
+		if (!key.HasFlag (KeyCode.ShiftMask) && baseKey is >= KeyCode.A and <= KeyCode.Z) {
 			return ((char)(key + 32)).ToString ();
 		}
 
-		if (key is >= ConsoleDriverKey.Space and < ConsoleDriverKey.A) {
+		if (key is >= KeyCode.Space and < KeyCode.A) {
 			return ((char)key).ToString ();
 		}
 
-		string keyName = Enum.GetName (typeof (ConsoleDriverKey), key);
+		string keyName = Enum.GetName (typeof (KeyCode), key);
 		return !string.IsNullOrEmpty (keyName) ? keyName : ((char)key).ToString ();
 	}
 
@@ -432,7 +432,7 @@ public class KeyEventArgs : EventArgs {
 	/// </summary>
 	/// <param name="key">The key to format.</param>
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
-	public static string ToString (ConsoleDriverKey key)
+	public static string ToString (KeyCode key)
 	{
 		return ToString (key, (Rune)'+');
 	}
@@ -443,9 +443,9 @@ public class KeyEventArgs : EventArgs {
 	/// <param name="key">The key to format.</param>
 	/// <param name="separator">The character to use as a separator between modifier keys and and the key itself.</param>
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
-	public static string ToString (ConsoleDriverKey key, Rune separator)
+	public static string ToString (KeyCode key, Rune separator)
 	{
-		if (key == ConsoleDriverKey.Null) {
+		if (key == KeyCode.Null) {
 			return string.Empty;
 		}
 
@@ -453,25 +453,25 @@ public class KeyEventArgs : EventArgs {
 
 		// Extract and handle modifiers
 		bool hasModifiers = false;
-		if ((key & ConsoleDriverKey.CtrlMask) != 0) {
+		if ((key & KeyCode.CtrlMask) != 0) {
 			sb.Append ($"Ctrl{separator}");
 			hasModifiers = true;
 		}
-		if ((key & ConsoleDriverKey.AltMask) != 0) {
+		if ((key & KeyCode.AltMask) != 0) {
 			sb.Append ($"Alt{separator}");
 			hasModifiers = true;
 		}
-		if ((key & ConsoleDriverKey.ShiftMask) != 0) {
+		if ((key & KeyCode.ShiftMask) != 0) {
 			sb.Append ($"Shift{separator}");
 			hasModifiers = true;
 		}
 
 		// Extract the base key (removing modifier flags)
-		ConsoleDriverKey baseKey = key & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.AltMask & ~ConsoleDriverKey.ShiftMask;
+		KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		// Handle special cases and modifiers on their own
-		if ((key != ConsoleDriverKey.SpecialMask) && (baseKey != ConsoleDriverKey.Null || hasModifiers)) {
-			if ((key & ConsoleDriverKey.SpecialMask) != 0 && baseKey >= ConsoleDriverKey.A && baseKey <= ConsoleDriverKey.Z) {
+		if ((key != KeyCode.SpecialMask) && (baseKey != KeyCode.Null || hasModifiers)) {
+			if ((key & KeyCode.SpecialMask) != 0 && baseKey >= KeyCode.A && baseKey <= KeyCode.Z) {
 				sb.Append (baseKey);
 			} else {
 				// Append the actual key name

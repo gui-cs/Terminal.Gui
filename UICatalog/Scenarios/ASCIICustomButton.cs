@@ -234,24 +234,24 @@ namespace UICatalog.Scenarios {
 			private void Button_KeyPress (object sender, KeyEventArgs obj)
 			{
 				switch (obj.ConsoleDriverKey) {
-				case ConsoleDriverKey.End:
+				case KeyCode.End:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 -(scrollView.ContentSize.Height - scrollView.Frame.Height
 						 + (scrollView.ShowHorizontalScrollIndicator ? 1 : 0)));
 					obj.Handled = true;
 					return;
-				case ConsoleDriverKey.Home:
+				case KeyCode.Home:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X, 0);
 					obj.Handled = true;
 					return;
-				case ConsoleDriverKey.PageDown:
+				case KeyCode.PageDown:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 Math.Max (scrollView.ContentOffset.Y - scrollView.Frame.Height,
 						 -(scrollView.ContentSize.Height - scrollView.Frame.Height
 						 + (scrollView.ShowHorizontalScrollIndicator ? 1 : 0))));
 					obj.Handled = true;
 					return;
-				case ConsoleDriverKey.PageUp:
+				case KeyCode.PageUp:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 Math.Min (scrollView.ContentOffset.Y + scrollView.Frame.Height, 0));
 					obj.Handled = true;

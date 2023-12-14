@@ -100,9 +100,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(ConsoleDriverKey.F2, "~F2~ OpenExample", () => OpenExample(true)),
-				new StatusItem(ConsoleDriverKey.F3, "~F3~ CloseExample", () => CloseExample()),
-				new StatusItem(ConsoleDriverKey.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
+				new StatusItem(KeyCode.F2, "~F2~ OpenExample", () => OpenExample(true)),
+				new StatusItem(KeyCode.F3, "~F3~ CloseExample", () => CloseExample()),
+				new StatusItem(KeyCode.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -170,7 +170,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			tableView.KeyBindings.Add (ConsoleDriverKey.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 		}
 
 		private void ShowAllColumns ()
@@ -392,7 +392,7 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			if (e.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
+			if (e.ConsoleDriverKey == KeyCode.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

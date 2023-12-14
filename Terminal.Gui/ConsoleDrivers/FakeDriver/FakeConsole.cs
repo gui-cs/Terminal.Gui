@@ -793,17 +793,17 @@ public static class FakeConsole {
 	public static Stack<ConsoleKeyInfo> MockKeyPresses = new Stack<ConsoleKeyInfo> ();
 
 	/// <summary>
-	///  Helper to push a <see cref="ConsoleDriverKey"/> onto <see cref="MockKeyPresses"/>.
+	///  Helper to push a <see cref="KeyCode"/> onto <see cref="MockKeyPresses"/>.
 	/// </summary>
 	/// <param name="key"></param>
-	public static void PushMockKeyPress (ConsoleDriverKey key)
+	public static void PushMockKeyPress (KeyCode key)
 	{
 		MockKeyPresses.Push (new ConsoleKeyInfo (
-			(char)(key & ~ConsoleDriverKey.CtrlMask & ~ConsoleDriverKey.ShiftMask & ~ConsoleDriverKey.AltMask),
+			(char)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask),
 			ConsoleKeyMapping.GetConsoleKeyFromKey (key),
-			key.HasFlag (ConsoleDriverKey.ShiftMask),
-			key.HasFlag (ConsoleDriverKey.AltMask),
-			key.HasFlag (ConsoleDriverKey.CtrlMask)));
+			key.HasFlag (KeyCode.ShiftMask),
+			key.HasFlag (KeyCode.AltMask),
+			key.HasFlag (KeyCode.CtrlMask)));
 	}
 
 	//

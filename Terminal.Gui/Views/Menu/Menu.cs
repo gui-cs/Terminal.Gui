@@ -48,7 +48,7 @@ public class MenuItem {
 	/// <summary>
 	/// Initializes a new instance of <see cref="MenuItem"/>
 	/// </summary>
-	public MenuItem (ConsoleDriverKey shortcut = ConsoleDriverKey.Null) : this ("", "", null, null, null, shortcut) { }
+	public MenuItem (KeyCode shortcut = KeyCode.Null) : this ("", "", null, null, null, shortcut) { }
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="MenuItem"/>.
@@ -59,7 +59,7 @@ public class MenuItem {
 	/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
 	/// <param name="parent">The <see cref="Parent"/> of this menu item.</param>
 	/// <param name="shortcut">The <see cref="Shortcut"/> keystroke combination.</param>
-	public MenuItem (string title, string help, Action action, Func<bool> canExecute = null, MenuItem parent = null, ConsoleDriverKey shortcut = ConsoleDriverKey.Null)
+	public MenuItem (string title, string help, Action action, Func<bool> canExecute = null, MenuItem parent = null, KeyCode shortcut = KeyCode.Null)
 	{
 		Title = title ?? "";
 		Help = help ?? "";
@@ -67,7 +67,7 @@ public class MenuItem {
 		CanExecute = canExecute;
 		Parent = parent;
 		_shortcutHelper = new ShortcutHelper ();
-		if (shortcut != ConsoleDriverKey.Null) {
+		if (shortcut != KeyCode.Null) {
 			Shortcut = shortcut;
 		}
 	}
@@ -111,14 +111,14 @@ public class MenuItem {
 	/// Shortcut defines a key binding to the MenuItem that will invoke the MenuItem's action globally for the <see cref="View"/> that is
 	/// the parent of the <see cref="MenuBar"/> or <see cref="ContextMenu"/> this <see cref="MenuItem"/>.
 	/// <para>
-	/// The <see cref="ConsoleDriverKey"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and <see cref="Help"/> text. See <see cref="ShortcutTag"/>.
+	/// The <see cref="KeyCode"/> will be drawn on the MenuItem to the right of the <see cref="Title"/> and <see cref="Help"/> text. See <see cref="ShortcutTag"/>.
 	/// </para>
 	/// </summary>
-	public ConsoleDriverKey Shortcut {
+	public KeyCode Shortcut {
 		get => _shortcutHelper.Shortcut;
 		set {
 
-			if (_shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == ConsoleDriverKey.Null)) {
+			if (_shortcutHelper.Shortcut != value && (ShortcutHelper.PostShortcutValidation (value) || value == KeyCode.Null)) {
 				_shortcutHelper.Shortcut = value;
 			}
 		}
@@ -386,14 +386,14 @@ class Menu : View {
 		AddCommand (Command.Default, () => _host?.SelectItem (_menuItemToSelect));
 
 		// Default key bindings for this view
-		KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-		KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
-		KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
-		KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
-		KeyBindings.Add (ConsoleDriverKey.Esc, Command.Cancel);
-		KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
-		KeyBindings.Add (ConsoleDriverKey.F9, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
-		KeyBindings.Add (ConsoleDriverKey.CtrlMask | ConsoleDriverKey.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+		KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+		KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+		KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+		KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+		KeyBindings.Add (KeyCode.Esc, Command.Cancel);
+		KeyBindings.Add (KeyCode.Enter, Command.Accept);
+		KeyBindings.Add (KeyCode.F9, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+		KeyBindings.Add (KeyCode.CtrlMask | KeyCode.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
 		AddKeyBindings (barItems);
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
@@ -424,9 +424,9 @@ class Menu : View {
 			return;
 		}
 		foreach (var menuItem in menuBarItem.Children.Where (m => m != null)) {
-			KeyBindings.Add ((ConsoleDriverKey)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
-			KeyBindings.Add ((ConsoleDriverKey)menuItem.HotKey.Value | ConsoleDriverKey.AltMask, Command.ToggleExpandCollapse);
-			if (menuItem.Shortcut != ConsoleDriverKey.Unknown) {
+			KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
+			KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, Command.ToggleExpandCollapse);
+			if (menuItem.Shortcut != KeyCode.Unknown) {
 				KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			var subMenu = menuBarItem.SubMenu (menuItem);
@@ -515,11 +515,11 @@ class Menu : View {
 			// Search for hot keys next.
 			for (int c = 0; c < children.Length; c++) {
 				int hotKeyValue = children [c]?.HotKey.Value ?? default;
-				var hotKey = (ConsoleDriverKey)hotKeyValue;
-				if (hotKey == ConsoleDriverKey.Null) {
+				var hotKey = (KeyCode)hotKeyValue;
+				if (hotKey == KeyCode.Null) {
 					continue;
 				}
-				bool matches = key == hotKey || key == (hotKey | ConsoleDriverKey.AltMask);
+				bool matches = key == hotKey || key == (hotKey | KeyCode.AltMask);
 				if (!_host.IsMenuOpen) {
 					// If the menu is open, only match if Alt is not pressed.
 					matches = key == hotKey;
@@ -542,7 +542,7 @@ class Menu : View {
 		return _host.OnInvokingKeyBindings (keyEvent);
 	}
 
-	bool FindShortcutInChildMenu (ConsoleDriverKey key, MenuBarItem menuBarItem)
+	bool FindShortcutInChildMenu (KeyCode key, MenuBarItem menuBarItem)
 	{
 		if (menuBarItem == null || menuBarItem.Children == null) {
 			return false;

@@ -376,7 +376,7 @@ class CharMap : ScrollView {
 			SelectedCodePoint = MaxCodePoint;
 			return true;
 		});
-		KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
+		KeyBindings.Add (KeyCode.Enter, Command.Accept);
 		AddCommand (Command.Accept, () => {
 			ShowDetails ();
 			return true;
@@ -572,8 +572,8 @@ class CharMap : ScrollView {
 			SelectedCodePoint = val;
 			_contextMenu = new ContextMenu (me.X + 1, me.Y + 1,
 				new MenuBarItem (new MenuItem [] {
-					new MenuItem ("_Copy Glyph", "", () => CopyGlyph (), null, null, ConsoleDriverKey.C | ConsoleDriverKey.CtrlMask),
-					new MenuItem ("Copy Code _Point", "", () => CopyCodePoint (), null, null, ConsoleDriverKey.C | ConsoleDriverKey.ShiftMask | ConsoleDriverKey.CtrlMask),
+					new MenuItem ("_Copy Glyph", "", () => CopyGlyph (), null, null, KeyCode.C | KeyCode.CtrlMask),
+					new MenuItem ("Copy Code _Point", "", () => CopyCodePoint (), null, null, KeyCode.C | KeyCode.ShiftMask | KeyCode.CtrlMask),
 				}) {
 
 				}

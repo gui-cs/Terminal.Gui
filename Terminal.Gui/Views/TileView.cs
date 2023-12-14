@@ -16,7 +16,7 @@ namespace Terminal.Gui {
 		/// The keyboard key that the user can press to toggle resizing
 		/// of splitter lines.  Mouse drag splitting is always enabled.
 		/// </summary>
-		public ConsoleDriverKey ToggleResizable { get; set; } = ConsoleDriverKey.CtrlMask | ConsoleDriverKey.F10;
+		public KeyCode ToggleResizable { get; set; } = KeyCode.CtrlMask | KeyCode.F10;
 
 		List<Tile> _tiles;
 		private List<Pos> _splitterDistances;
@@ -800,10 +800,10 @@ namespace Terminal.Gui {
 					return MoveSplitter (0, 1);
 				});
 
-				KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
-				KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
-				KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
-				KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
+				KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+				KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+				KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+				KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 			}
 
 			public override void PositionCursor ()

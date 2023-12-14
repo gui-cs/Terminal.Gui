@@ -94,7 +94,7 @@ namespace Terminal.Gui {
 
 			if (Modal) {
 				KeyBindings.Clear (Command.QuitToplevel);
-				KeyBindings.Add (ConsoleDriverKey.Esc, Command.QuitToplevel);
+				KeyBindings.Add (KeyCode.Esc, Command.QuitToplevel);
 			}
 			SetNeedsLayout ();
 
@@ -159,7 +159,7 @@ namespace Terminal.Gui {
 			if (!Modal) {
 				switch (a.ConsoleDriverKey) {
 				// BUGBUG: This should be hanlded by Dialog 
-				case ConsoleDriverKey.Esc:
+				case KeyCode.Esc:
 					var args = new WizardButtonEventArgs ();
 					Cancelled?.Invoke (this, args);
 					return false;

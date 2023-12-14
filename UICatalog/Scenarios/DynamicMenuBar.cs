@@ -734,17 +734,17 @@ namespace UICatalog.Scenarios {
 				bool ProcessKey (KeyEventArgs ev)
 				{
 					switch (ev.ConsoleDriverKey) {
-					case ConsoleDriverKey.CursorUp:
-					case ConsoleDriverKey.CursorDown:
-					case ConsoleDriverKey.Tab:
-					case ConsoleDriverKey.Tab | ConsoleDriverKey.ShiftMask:
+					case KeyCode.CursorUp:
+					case KeyCode.CursorDown:
+					case KeyCode.Tab:
+					case KeyCode.Tab | KeyCode.ShiftMask:
 						return false;
 					}
 
 					return true;
 				}
 
-				bool CheckShortcut (ConsoleDriverKey k, bool pre)
+				bool CheckShortcut (KeyCode k, bool pre)
 				{
 					var m = _menuItem != null ? _menuItem : new MenuItem ();
 					if (pre && !ShortcutHelper.PreShortcutValidation (k)) {

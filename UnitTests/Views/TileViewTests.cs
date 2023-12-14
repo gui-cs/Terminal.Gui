@@ -30,7 +30,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Keyboard movement on splitter should have no effect if it is not focused
-            tileView.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            tileView.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             TestHelpers.AssertDriverContentsAre(looksLike, output);
@@ -51,7 +51,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Keyboard movement on splitter should have no effect if it is not focused
-            tileView.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            tileView.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             TestHelpers.AssertDriverContentsAre(looksLike, output);
@@ -73,7 +73,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Now while focused move the splitter 1 unit right
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.Draw();
 
             looksLike =
@@ -84,8 +84,8 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // and 2 to the left
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.Draw();
 
             looksLike =
@@ -112,7 +112,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Now while focused move the splitter 1 unit right
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.Draw();
 
             looksLike =
@@ -123,8 +123,8 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // and 2 to the left
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.Draw();
 
             looksLike =
@@ -153,7 +153,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Now while focused move the splitter 1 unit right
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.Draw();
 
             looksLike =
@@ -167,8 +167,8 @@ namespace Terminal.Gui.ViewsTests
             Assert.IsType<Pos.PosFactor>(tileView.SplitterDistances.ElementAt(0));
 
             // and 2 to the left
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.Draw();
 
             looksLike =
@@ -196,7 +196,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Keyboard movement on splitter should have no effect if it is not focused
-            var handled = tileView.ProcessKeyDown(new(ConsoleDriverKey.CursorDown));
+            var handled = tileView.ProcessKeyDown(new(KeyCode.CursorDown));
             Assert.False(handled);
             tileView.SetNeedsDisplay();
             tileView.Draw();
@@ -228,13 +228,13 @@ namespace Terminal.Gui.ViewsTests
 
             // Keyboard movement on splitter should have no effect because it
             // would take us below the minimum splitter size
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // but we can continue to move the splitter right if we want
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.SetNeedsDisplay();
             tileView.Draw();
 
@@ -272,13 +272,13 @@ namespace Terminal.Gui.ViewsTests
 
             // Keyboard movement on splitter should have no effect because it
             // would take us below the minimum splitter size
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // but we can continue to move the splitter right if we want
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.SetNeedsDisplay();
             tileView.Draw();
 
@@ -316,13 +316,13 @@ namespace Terminal.Gui.ViewsTests
 
             // Keyboard movement on splitter should have no effect because it
             // would take us below the minimum splitter size
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // but we can continue to move the splitter left if we want
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.SetNeedsDisplay();
             tileView.Draw();
 
@@ -360,13 +360,13 @@ namespace Terminal.Gui.ViewsTests
 
             // Keyboard movement on splitter should have no effect because it
             // would take us below the minimum splitter size
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorRight));
+            line.ProcessKeyDown(new(KeyCode.CursorRight));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // but we can continue to move the splitter left if we want
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorLeft));
+            line.ProcessKeyDown(new(KeyCode.CursorLeft));
             tileView.SetNeedsDisplay();
             tileView.Draw();
 
@@ -450,7 +450,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Now move splitter line down
-            tileView.ProcessKeyDown(new(ConsoleDriverKey.CursorDown));
+            tileView.ProcessKeyDown(new(KeyCode.CursorDown));
 
             tileView.Draw();
             looksLike =
@@ -461,8 +461,8 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // And 2 up
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorUp));
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorUp));
+            line.ProcessKeyDown(new(KeyCode.CursorUp));
+            line.ProcessKeyDown(new(KeyCode.CursorUp));
             tileView.SetNeedsDisplay();
             tileView.Draw();
             looksLike =
@@ -497,7 +497,7 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // Now move splitter line down (allowed
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorDown));
+            line.ProcessKeyDown(new(KeyCode.CursorDown));
             tileView.Draw();
             looksLike =
 @"    
@@ -507,8 +507,8 @@ namespace Terminal.Gui.ViewsTests
             TestHelpers.AssertDriverContentsAre(looksLike, output);
 
             // And up 2 (only 1 is allowed because of minimum size of 1 on view1)
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorUp));
-            line.ProcessKeyDown(new(ConsoleDriverKey.CursorUp));
+            line.ProcessKeyDown(new(KeyCode.CursorUp));
+            line.ProcessKeyDown(new(KeyCode.CursorUp));
 
             tileView.SetNeedsDisplay();
             tileView.Draw();

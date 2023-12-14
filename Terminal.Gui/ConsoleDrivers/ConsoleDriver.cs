@@ -636,7 +636,7 @@ public enum CursorVisibility {
 
 
 /// <summary>
-/// The <see cref="ConsoleDriverKey"/> enumeration contains special encoding for some keys, but can also
+/// The <see cref="KeyCode"/> enumeration contains special encoding for some keys, but can also
 /// encode all the unicode values that can be passed.   
 /// </summary>
 /// <remarks>
@@ -655,7 +655,7 @@ public enum CursorVisibility {
 /// </para>
 /// </remarks>
 [Flags]
-public enum ConsoleDriverKey : uint {
+public enum KeyCode : uint {
 	/// <summary>
 	/// Mask that indicates that this is a character value, values outside this range
 	/// indicate special characters like Alt-key combinations or special keys on the

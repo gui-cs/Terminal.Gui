@@ -250,16 +250,16 @@ namespace Terminal.Gui.ConfigurationTests {
 
 	public class KeyJsonConverterTests {
 		[Theory, AutoInitShutdown]
-		[InlineData (ConsoleDriverKey.A, "A")]
-		[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask, "A, ShiftMask")]
-		[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, "A, CtrlMask")]
-		[InlineData (ConsoleDriverKey.A | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, "A, CtrlMask, AltMask")]
-		[InlineData ((ConsoleDriverKey)'a' | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, "Space, A, CtrlMask, AltMask")]
-		[InlineData ((ConsoleDriverKey)'a' | ConsoleDriverKey.ShiftMask, "Space, A, ShiftMask")]
-		[InlineData (ConsoleDriverKey.Delete | ConsoleDriverKey.AltMask | ConsoleDriverKey.CtrlMask, "Delete, CtrlMask, AltMask")]
-		[InlineData (ConsoleDriverKey.D4, "D4")]
-		[InlineData (ConsoleDriverKey.Esc, "Esc")]
-		public void TestKeyRoundTripConversion (ConsoleDriverKey key, string expectedStringTo)
+		[InlineData (KeyCode.A, "A")]
+		[InlineData (KeyCode.A | KeyCode.ShiftMask, "A, ShiftMask")]
+		[InlineData (KeyCode.A | KeyCode.CtrlMask, "A, CtrlMask")]
+		[InlineData (KeyCode.A | KeyCode.AltMask | KeyCode.CtrlMask, "A, CtrlMask, AltMask")]
+		[InlineData ((KeyCode)'a' | KeyCode.AltMask | KeyCode.CtrlMask, "Space, A, CtrlMask, AltMask")]
+		[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, "Space, A, ShiftMask")]
+		[InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "Delete, CtrlMask, AltMask")]
+		[InlineData (KeyCode.D4, "D4")]
+		[InlineData (KeyCode.Esc, "Esc")]
+		public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo)
 		{
 			// Arrange
 			var options = new JsonSerializerOptions ();
@@ -267,7 +267,7 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Act
 			var json = JsonSerializer.Serialize (key, options);
-			var deserializedKey = JsonSerializer.Deserialize<ConsoleDriverKey> (json, options);
+			var deserializedKey = JsonSerializer.Deserialize<KeyCode> (json, options);
 
 			// Assert
 			Assert.Equal (expectedStringTo, deserializedKey.ToString ());

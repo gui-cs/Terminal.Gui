@@ -215,7 +215,7 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 
 			var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
-			var status = new StatusBar (new StatusItem [] { new (ConsoleDriverKey.F1, "~F1~ Help", null) });
+			var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
 			var top = Application.Top;
 			top.Add (win, menu, status);
 			var rs = Application.Begin (top);
@@ -275,7 +275,7 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 
 			var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
-			var status = new StatusBar (new StatusItem [] { new (ConsoleDriverKey.F1, "~F1~ Help", null) });
+			var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
 			var top = Application.Top;
 			top.Add (win, menu, status);
 			var rs = Application.Begin (top);
@@ -860,7 +860,7 @@ namespace Terminal.Gui.ViewTests {
 			var count = 0;
 
 			field.KeyDown += (s, k) => {
-				if (k.ConsoleDriverKey == ConsoleDriverKey.Enter) {
+				if (k.ConsoleDriverKey == KeyCode.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 					view.Add (label);
@@ -875,7 +875,7 @@ namespace Terminal.Gui.ViewTests {
 			};
 
 			Application.Iteration += (s, a) => {
-				while (count < 20) field.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+				while (count < 20) field.ProcessKeyDown (new (KeyCode.Enter));
 
 				Application.RequestStop ();
 			};
@@ -920,7 +920,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 
 			field.KeyDown += (s, k) => {
-				if (k.ConsoleDriverKey == ConsoleDriverKey.Enter) {
+				if (k.ConsoleDriverKey == KeyCode.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
 					listLabels [count - 1].Dispose ();
@@ -934,7 +934,7 @@ namespace Terminal.Gui.ViewTests {
 
 			Application.Iteration += (s, a) => {
 				while (count > 0) {
-					field.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+					field.ProcessKeyDown (new (KeyCode.Enter));
 				}
 
 				Application.RequestStop ();

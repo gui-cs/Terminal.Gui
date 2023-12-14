@@ -19,7 +19,7 @@ public class ContextMenus : Scenario {
 	{
 		var text = "Context Menu";
 		var width = 20;
-		ConsoleDriverKey winContextMenuKey = ConsoleDriverKey.Space | ConsoleDriverKey.CtrlMask;
+		KeyCode winContextMenuKey = KeyCode.Space | KeyCode.CtrlMask;
 
 		var label = new Label ($"Press '{winContextMenuKey}' to open the Window context menu.") {
 			X = Pos.Center (),
@@ -100,7 +100,7 @@ public class ContextMenus : Scenario {
 			new MenuBarItem (new MenuItem [] {
 					new MenuItem ("_Configuration", "Show configuration", () => MessageBox.Query (50, 5, "Info", "This would open settings dialog", "Ok")),
 					new MenuBarItem ("More options", new MenuItem [] {
-						new MenuItem ("_Setup", "Change settings", () => MessageBox.Query (50, 5, "Info", "This would open setup dialog", "Ok"), shortcut: ConsoleDriverKey.T | ConsoleDriverKey.CtrlMask),
+						new MenuItem ("_Setup", "Change settings", () => MessageBox.Query (50, 5, "Info", "This would open setup dialog", "Ok"), shortcut: KeyCode.T | KeyCode.CtrlMask),
 						new MenuItem ("_Maintenance", "Maintenance mode", () => MessageBox.Query (50, 5, "Info", "This would open maintenance dialog", "Ok")),
 					}),
 					new MenuBarItem ("_Languages", GetSupportedCultures ()),

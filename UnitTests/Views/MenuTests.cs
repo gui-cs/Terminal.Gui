@@ -36,15 +36,15 @@ public class MenuTests {
 		Assert.Null (menuItem.Action);
 		Assert.Null (menuItem.CanExecute);
 		Assert.Null (menuItem.Parent);
-		Assert.Equal (ConsoleDriverKey.Null, menuItem.Shortcut);
+		Assert.Equal (KeyCode.Null, menuItem.Shortcut);
 
-		menuItem = new MenuItem ("Test", "Help", Run, () => { return true; }, new MenuItem (), ConsoleDriverKey.F1);
+		menuItem = new MenuItem ("Test", "Help", Run, () => { return true; }, new MenuItem (), KeyCode.F1);
 		Assert.Equal ("Test", menuItem.Title);
 		Assert.Equal ("Help", menuItem.Help);
 		Assert.Equal (Run, menuItem.Action);
 		Assert.NotNull (menuItem.CanExecute);
 		Assert.NotNull (menuItem.Parent);
-		Assert.Equal (ConsoleDriverKey.F1, menuItem.Shortcut);
+		Assert.Equal (KeyCode.F1, menuItem.Shortcut);
 
 		void Run () { }
 	}

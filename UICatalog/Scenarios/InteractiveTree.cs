@@ -36,9 +36,9 @@ namespace UICatalog.Scenarios {
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.C, "~^C~ Add Child", () => AddChildNode()),
-				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.T, "~^T~ Add Root", () => AddRootNode()),
-				new StatusItem(ConsoleDriverKey.CtrlMask | ConsoleDriverKey.R, "~^R~ Rename Node", () => RenameNode()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Add Child", () => AddChildNode()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.T, "~^T~ Add Root", () => AddRootNode()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.R, "~^R~ Rename Node", () => RenameNode()),
 			});
 			Application.Top.Add (statusBar);
 
@@ -46,7 +46,7 @@ namespace UICatalog.Scenarios {
 
 		private void TreeView_KeyPress (object sender, KeyEventArgs obj)
 		{
-			if (obj.ConsoleDriverKey == ConsoleDriverKey.DeleteChar) {
+			if (obj.ConsoleDriverKey == KeyCode.DeleteChar) {
 
 				var toDelete = treeView.SelectedObject;
 

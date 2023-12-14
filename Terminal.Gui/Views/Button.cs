@@ -123,7 +123,7 @@ public class Button : View {
 		// Override default behavior of View
 		// Command.Default sets focus
 		AddCommand (Command.Accept, () => { OnClicked (); return true; });
-		KeyBindings.Add (ConsoleDriverKey.Space, Command.Default, Command.Accept);
+		KeyBindings.Add (KeyCode.Space, Command.Default, Command.Accept);
 	}
 
 	/// <summary>
@@ -215,7 +215,7 @@ public class Button : View {
 	///<inheritdoc/>
 	public override void PositionCursor ()
 	{
-		if (HotKey == ConsoleDriverKey.Unknown && Text != "") {
+		if (HotKey == KeyCode.Unknown && Text != "") {
 			for (int i = 0; i < TextFormatter.Text.GetRuneCount (); i++) {
 				if (TextFormatter.Text [i] == Text [0]) {
 					Move (i, 0);

@@ -936,13 +936,13 @@ namespace Terminal.Gui {
 		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
 		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.</param>
 		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
-		/// <param name="hotKey">Outputs the hotKey. <see cref="ConsoleDriverKey.Null"/> if not found.</param>
+		/// <param name="hotKey">Outputs the hotKey. <see cref="KeyCode.Null"/> if not found.</param>
 		/// <returns><c>true</c> if a hotkey was found; <c>false</c> otherwise.</returns>
-		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out ConsoleDriverKey hotKey)
+		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out KeyCode hotKey)
 		{
 			if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
 				hotPos = -1;
-				hotKey = ConsoleDriverKey.Null;
+				hotKey = KeyCode.Null;
 				return false;
 			}
 
@@ -983,10 +983,10 @@ namespace Terminal.Gui {
 			if (hot_key != (Rune)0 && hot_pos != -1) {
 				hotPos = hot_pos;
 
-				var newHotKey = (ConsoleDriverKey)hot_key.Value;
-				if (newHotKey != ConsoleDriverKey.Null && !(newHotKey == ConsoleDriverKey.Space || Rune.IsControl (hot_key))) {
-					if ((newHotKey & ~ConsoleDriverKey.Space) is >= ConsoleDriverKey.A and <= ConsoleDriverKey.Z) {
-						newHotKey &= ~ConsoleDriverKey.Space;
+				var newHotKey = (KeyCode)hot_key.Value;
+				if (newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (hot_key))) {
+					if ((newHotKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
+						newHotKey &= ~KeyCode.Space;
 					}
 					hotKey = newHotKey;
 					return true;
@@ -994,7 +994,7 @@ namespace Terminal.Gui {
 			}
 
 			hotPos = -1;
-			hotKey = ConsoleDriverKey.Null;
+			hotKey = KeyCode.Null;
 			return false;
 		}
 
@@ -1051,7 +1051,7 @@ namespace Terminal.Gui {
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
 		TextDirection _textDirection;
-		ConsoleDriverKey _hotKey;
+		KeyCode _hotKey;
 		int _hotKeyPos = -1;
 		Size _size;
 		private bool _autoSize;
@@ -1241,7 +1241,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the hot key. Must be be an upper case letter or digit. Fires the <see cref="HotKeyChanged"/> event.
 		/// </summary>
-		public ConsoleDriverKey HotKey {
+		public KeyCode HotKey {
 			get => _hotKey;
 			internal set {
 				if (_hotKey != value) {
@@ -1294,7 +1294,7 @@ namespace Terminal.Gui {
 
 				if (NeedsFormat) {
 					var shown_text = _text;
-					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out ConsoleDriverKey newHotKey)) {
+					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out KeyCode newHotKey)) {
 						HotKey = newHotKey;
 						shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);

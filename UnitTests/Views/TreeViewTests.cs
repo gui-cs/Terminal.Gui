@@ -497,15 +497,15 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+			tree.ProcessKeyDown (new (KeyCode.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKeyDown (new (ConsoleDriverKey.CursorDown));
+			tree.ProcessKeyDown (new (KeyCode.CursorDown));
 
-			tree.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+			tree.ProcessKeyDown (new (KeyCode.Enter));
 
 			Assert.True (called);
 			Assert.Same (f, activated);
@@ -557,7 +557,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			InitFakeDriver ();
 
-			tree.ObjectActivationKey = ConsoleDriverKey.Delete;
+			tree.ObjectActivationKey = KeyCode.Delete;
 			object activated = null;
 			bool called = false;
 
@@ -570,22 +570,22 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+			tree.ProcessKeyDown (new (KeyCode.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKeyDown (new (ConsoleDriverKey.CursorDown));
+			tree.ProcessKeyDown (new (KeyCode.CursorDown));
 
-			tree.ProcessKeyDown (new (ConsoleDriverKey.Enter));
+			tree.ProcessKeyDown (new (KeyCode.Enter));
 
 			// Enter is not the activation key in this unit test
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// Delete is the activation key in this test so should result in activation occurring
-			tree.ProcessKeyDown (new (ConsoleDriverKey.Delete));
+			tree.ProcessKeyDown (new (KeyCode.Delete));
 
 			Assert.True (called);
 			Assert.Same (f, activated);

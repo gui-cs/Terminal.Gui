@@ -1403,31 +1403,31 @@ public class Slider<T> : View {
 	void SetKeyBindings ()
 	{
 		if (_config._sliderOrientation == Orientation.Horizontal) {
-			KeyBindings.Add (ConsoleDriverKey.CursorRight, Command.Right);
-			KeyBindings.Remove (ConsoleDriverKey.CursorDown);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft, Command.Left);
-			KeyBindings.Remove (ConsoleDriverKey.CursorUp);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Remove (KeyCode.CursorDown);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Remove (KeyCode.CursorUp);
 
-			KeyBindings.Add (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask, Command.RightExtend);
-			KeyBindings.Remove (ConsoleDriverKey.CursorDown | ConsoleDriverKey.CtrlMask);
-			KeyBindings.Add (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask, Command.LeftExtend);
-			KeyBindings.Remove (ConsoleDriverKey.CursorUp | ConsoleDriverKey.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (KeyCode.CursorDown | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (KeyCode.CursorUp | KeyCode.CtrlMask);
 		} else {
-			KeyBindings.Remove (ConsoleDriverKey.CursorRight);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown, Command.LineDown);
-			KeyBindings.Remove (ConsoleDriverKey.CursorLeft);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp, Command.LineUp);
+			KeyBindings.Remove (KeyCode.CursorRight);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Remove (KeyCode.CursorLeft);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
 
-			KeyBindings.Remove (ConsoleDriverKey.CursorRight | ConsoleDriverKey.CtrlMask);
-			KeyBindings.Add (ConsoleDriverKey.CursorDown | ConsoleDriverKey.CtrlMask, Command.RightExtend);
-			KeyBindings.Remove (ConsoleDriverKey.CursorLeft | ConsoleDriverKey.CtrlMask);
-			KeyBindings.Add (ConsoleDriverKey.CursorUp | ConsoleDriverKey.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (KeyCode.CursorRight | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (KeyCode.CursorLeft | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LeftExtend);
 
 		}
-		KeyBindings.Add (ConsoleDriverKey.Home, Command.LeftHome);
-		KeyBindings.Add (ConsoleDriverKey.End, Command.RightEnd);
-		KeyBindings.Add (ConsoleDriverKey.Enter, Command.Accept);
-		KeyBindings.Add (ConsoleDriverKey.Space, Command.Accept);
+		KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+		KeyBindings.Add (KeyCode.End, Command.RightEnd);
+		KeyBindings.Add (KeyCode.Enter, Command.Accept);
+		KeyBindings.Add (KeyCode.Space, Command.Accept);
 
 	}
 
