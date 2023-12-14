@@ -249,7 +249,6 @@ public class HotKeyTests {
 		Assert.Equal (ConsoleDriverKey.Null, view.HotKey);
 	}
 
-	// BUGBUG: Default command is currently Accept. Should be Default.
 	[Theory]
 	[InlineData (ConsoleDriverKey.Null, true)] // non-shift
 	[InlineData (ConsoleDriverKey.ShiftMask, true)]
@@ -305,18 +304,4 @@ public class HotKeyTests {
 		var ke = new KeyEventArgs (ConsoleDriverKey.A);
 		superView.ProcessKeyDown (ke);
 	}
-
-	public class HotKeyTestView : View {
-		public bool HotKeyCommandWasCalled { get; set; }
-		public HotKeyTestView ()
-		{
-			HotKeySpecifier = (Rune)'^';
-			Text = "^Test";
-			//AddCommand (Command.Accept, () => {
-			//	HotKeyCommandWasCalled = true;
-			//	return true;
-			//});
-		}
-	}
-
 }

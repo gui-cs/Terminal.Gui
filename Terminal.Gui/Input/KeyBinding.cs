@@ -17,13 +17,13 @@ namespace Terminal.Gui;
 /// </remarks>
 public enum KeyBindingScope {
 	/// <summary>
-	/// The command is scoped to just the view that has focus.
+	/// The key binding is scoped to just the view that has focus.
 	/// </summary>
 	Focused = 0,
 
 	/// <summary>
-	/// The key binding will be triggered even when the View does not have focus, as it's SuperView does have focus.
-	/// This is typically used for <see cref="View.HotKey"/>.
+	/// The key binding is scoped to the View's SuperView and will be triggered even when the View does not have focus, as long as the
+	/// SuperView does have focus. This is typically used for <see cref="View.HotKey"/>s.
 	/// <remarks>
 	/// <para>
 	/// Use for Views such as MenuBar and StatusBar which provide commands (shortcuts etc...) that trigger even when not focused.
