@@ -2366,6 +2366,8 @@ wo
 		}));
 
 		firstIteration = false;
+		// Need to fool MainLoop into thinking it's running
+		Application.MainLoop.Running = true;
 		Application.RunIteration (ref rs, ref firstIteration);
 		Assert.Equal (items [0], menu.Menus [0].Title);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -2485,6 +2487,8 @@ wo
 		}));
 
 		firstIteration = false;
+		// Need to fool MainLoop into thinking it's running
+		Application.MainLoop.Running = true;
 		Application.RunIteration (ref rs, ref firstIteration);
 		Assert.Equal (items [0], menu.Menus [0].Title);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
