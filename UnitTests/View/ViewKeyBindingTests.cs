@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.InputTests;
+namespace Terminal.Gui.ViewTests;
 
-public class KeyBindingTests {
+public class ViewKeyBindingTests {
 	readonly ITestOutputHelper _output;
 
-	public KeyBindingTests (ITestOutputHelper output)
+	public ViewKeyBindingTests (ITestOutputHelper output)
 	{
 		this._output = output;
 	}
