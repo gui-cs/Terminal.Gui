@@ -307,20 +307,20 @@ public class KeyboardTests {
 		Assert.Null (Toplevel._dragPosition);
 	}
 
-	// test Global key Bindings
-	public class ApplicationKeyBindingView : View {
-		public bool DefaultCommand { get; set; }
-		public bool SelectCommand { get; set; }
-		public bool LeftCommand { get; set; }
+	// test Application key Bindings
+	public class ScopedKeyBindingView : View {
+		public bool ApplicationCommand { get; set; }
+		public bool HotKeyCommand { get; set; }
+		public bool FocusedCommand { get; set; }
 
-		public ApplicationKeyBindingView ()
+		public ScopedKeyBindingView ()
 		{
-			AddCommand (Command.Default, () => DefaultCommand = true);
-			AddCommand (Command.Select, () => SelectCommand = true);
-			AddCommand (Command.Left, () => LeftCommand = true);
+			AddCommand (Command.Save, () => ApplicationCommand = true);
+			AddCommand (Command.Default, () => HotKeyCommand = true);
+			AddCommand (Command.Left, () => FocusedCommand = true);
 
-			KeyBindings.Add (ConsoleDriverKey.G, KeyBindingScope.Application, Command.Default);
-			KeyBindings.Add (ConsoleDriverKey.H, KeyBindingScope.HotKey, Command.Select);
+			KeyBindings.Add (ConsoleDriverKey.A, KeyBindingScope.Application, Command.Save);
+			HotKey = ConsoleDriverKey.H;
 			KeyBindings.Add (ConsoleDriverKey.F, KeyBindingScope.Focused, Command.Left);
 		}
 	}
@@ -329,15 +329,30 @@ public class KeyboardTests {
 	[AutoInitShutdown]
 	public void OnKeyDown_Application_KeyBinding ()
 	{
-		var view = new ApplicationKeyBindingView ();
+		var view = new ScopedKeyBindingView ();
 		var invoked = false;
 		view.InvokingKeyBindings += (s, e) => invoked = true;
 		
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (ConsoleDriverKey.G));
+		Application.OnKeyDown (new (ConsoleDriverKey.A));
 		Assert.True (invoked);
+		Assert.True (view.ApplicationCommand);
+
+		invoked = false;
+		view.ApplicationCommand = false;
+		view.KeyBindings.Remove (ConsoleDriverKey.A);
+		Application.OnKeyDown (new (ConsoleDriverKey.A)); // old
+		Assert.False (invoked);
+		Assert.False (view.ApplicationCommand);
+		view.KeyBindings.Add (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask, KeyBindingScope.Application, Command.Save);
+		Application.OnKeyDown (new (ConsoleDriverKey.A)); // old
+		Assert.False (invoked);
+		Assert.False (view.ApplicationCommand);
+		Application.OnKeyDown (new (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask)); // new
+		Assert.True (invoked);
+		Assert.True (view.ApplicationCommand);
 
 		invoked = false;
 		Application.OnKeyDown (new (ConsoleDriverKey.H));
@@ -345,37 +360,37 @@ public class KeyboardTests {
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (ConsoleDriverKey.L));
+		Application.OnKeyDown (new (ConsoleDriverKey.F));
 		Assert.False (invoked);
 
-		Assert.True (view.DefaultCommand);
-		Assert.True (view.SelectCommand);
-		Assert.False (view.LeftCommand);
+		Assert.True (view.ApplicationCommand);
+		Assert.True (view.HotKeyCommand);
+		Assert.False (view.FocusedCommand);
 	}
 
 	[Fact]
 	[AutoInitShutdown]
 	public void OnKeyDown_Application_KeyBinding_Negative ()
 	{
-		var view = new ApplicationKeyBindingView ();
+		var view = new ScopedKeyBindingView ();
 		var invoked = false;
 		view.InvokingKeyBindings += (s, e) => invoked = true;
 
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (ConsoleDriverKey.A));
+		Application.OnKeyDown (new (ConsoleDriverKey.A | ConsoleDriverKey.CtrlMask));
 		Assert.False (invoked);
-		Assert.False (view.DefaultCommand);
-		Assert.False (view.SelectCommand);
-		Assert.False (view.LeftCommand);
+		Assert.False (view.ApplicationCommand);
+		Assert.False (view.HotKeyCommand);
+		Assert.False (view.FocusedCommand);
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (ConsoleDriverKey.L));
+		Application.OnKeyDown (new (ConsoleDriverKey.Z));
 		Assert.False (invoked);
-		Assert.False (view.DefaultCommand);
-		Assert.False (view.SelectCommand);
-		Assert.False (view.LeftCommand);
+		Assert.False (view.ApplicationCommand);
+		Assert.False (view.HotKeyCommand);
+		Assert.False (view.FocusedCommand);
 	}
 }
