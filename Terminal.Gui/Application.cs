@@ -178,7 +178,7 @@ public static partial class Application {
 		}
 
 		Driver.SizeChanged += Driver_SizeChanged;
-		Driver.KeyDown += Driver_KeyDown; 
+		Driver.KeyDown += Driver_KeyDown;
 		Driver.KeyUp += Driver_KeyUp;
 		Driver.MouseEvent += Driver_MouseEvent;
 
@@ -635,14 +635,15 @@ public static partial class Application {
 
 		var firstIteration = true;
 		for (state.Toplevel.Running = true; state.Toplevel.Running;) {
+			MainLoop.Running = true;
 			if (EndAfterFirstIteration && !firstIteration) {
 				return;
 			}
 			RunIteration (ref state, ref firstIteration);
 		}
+		MainLoop.Running = false;
 		// Run one last iteration to consume any outstanding input events from Driver
 		// This is important for remaining OnKeyUp events.
-		firstIteration = false;
 		RunIteration (ref state, ref firstIteration);
 	}
 
@@ -654,7 +655,7 @@ public static partial class Application {
 	/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
 	public static void RunIteration (ref RunState state, ref bool firstIteration)
 	{
-		if (MainLoop.EventsPending ()) {
+		if (MainLoop.EventsPending () && MainLoop.Running) {
 			// Notify Toplevel it's ready
 			if (firstIteration) {
 				state.Toplevel.OnReady ();
@@ -662,7 +663,6 @@ public static partial class Application {
 
 			MainLoop.RunIteration ();
 			Iteration?.Invoke (null, new IterationEventArgs ());
-
 			EnsureModalOrVisibleAlwaysOnTop (state.Toplevel);
 			if (state.Toplevel != Current) {
 				OverlappedTop?.OnDeactivate (state.Toplevel);
@@ -676,7 +676,7 @@ public static partial class Application {
 		firstIteration = false;
 
 		if (state.Toplevel != Top &&
-			(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+		(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 			state.Toplevel.SetNeedsDisplay (state.Toplevel.Frame);
 			Top.Draw ();
 			foreach (var top in _topLevels.Reverse ()) {

@@ -295,7 +295,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Used for unit tests.
 		/// </summary>
-		internal bool Running { get; private set; }
+		internal bool Running { get; set; }
 
 		/// <summary>
 		///   Determines whether there are pending events to be processed.

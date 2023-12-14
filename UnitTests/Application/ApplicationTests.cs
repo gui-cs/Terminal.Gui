@@ -671,6 +671,7 @@ public class ApplicationTests {
 
 		var actionCalled = 0;
 		Application.Invoke (() => { actionCalled++; });
+		Application.MainLoop.Running = true;
 		Application.RunIteration (ref rs, ref firstIteration);
 		Assert.Equal (1, actionCalled);
 		Application.Shutdown ();

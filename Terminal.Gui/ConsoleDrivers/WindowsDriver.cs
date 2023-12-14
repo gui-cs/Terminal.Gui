@@ -1100,19 +1100,16 @@ internal class WindowsDriver : ConsoleDriver {
 						if (_altDown) {
 							_altDown = false;
 							OnKeyUp (new KeyEventArgs (map));
-							//OnKeyPressed (new (Key.AltMask));
 						}
 
 					}
 					_altDown = false;
 					// KeyUp of an Alt-key press. 
 					OnKeyUp (keyPressedEventArgs);
-					//OnKeyPressed (keyPressedEventArgs);
 				} else {
 					OnKeyUp (keyPressedEventArgs);
 					if (_altDown) {
 						_altDown = false;
-						//OnKeyPressed (keyPressedEventArgs);
 					}
 				}
 			}
