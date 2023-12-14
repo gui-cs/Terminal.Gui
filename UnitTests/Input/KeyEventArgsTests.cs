@@ -15,7 +15,7 @@ public class KeyEventArgsTests {
 	[Fact]
 	public void Constructor_Default_ShouldSetKeyToUnknown ()
 	{
-		var eventArgs = new KeyEventArgs ();
+		var eventArgs = new Key ();
 		Assert.Equal (KeyCode.Unknown, eventArgs.KeyCode);
 	}
 
@@ -25,14 +25,14 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.A)]
 	public void Constructor_WithKey_ShouldSetCorrectKey (KeyCode key)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (key, eventArgs.KeyCode);
 	}
 
 	[Fact]
 	public void HandledProperty_ShouldBeFalseByDefault ()
 	{
-		var eventArgs = new KeyEventArgs ();
+		var eventArgs = new Key ();
 		Assert.False (eventArgs.Handled);
 	}
 
@@ -48,7 +48,7 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.Tab, false)]
 	public void IsLowerCaseAtoZ (KeyCode key, bool expected)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (expected, eventArgs.IsLowerCaseAtoZ);
 	}
 
@@ -94,7 +94,7 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.SpecialMask, '\0')]
 	public void AsRune_ShouldReturnCorrectIntValue (KeyCode key, Rune expected)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (expected, eventArgs.AsRune);
 	}
 
@@ -103,7 +103,7 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.A, false)]
 	public void IsAlt_ShouldReturnCorrectValue (KeyCode key, bool expected)
 	{
-		var eventArgs = new KeyEventArgs (key);
+		var eventArgs = new Key (key);
 		Assert.Equal (expected, eventArgs.IsAlt);
 	}
 
@@ -111,7 +111,7 @@ public class KeyEventArgsTests {
 	[Fact]
 	public void ToString_ShouldReturnReadableString ()
 	{
-		var eventArgs = new KeyEventArgs (KeyCode.CtrlMask | KeyCode.A);
+		var eventArgs = new Key (KeyCode.CtrlMask | KeyCode.A);
 		Assert.Equal ("Ctrl+A", eventArgs.ToString ());
 	}
 
@@ -120,7 +120,7 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.AltMask | KeyCode.B, '-', "Alt-B")]
 	public void ToStringWithSeparator_ShouldReturnFormattedString (KeyCode key, char separator, string expected)
 	{
-		Assert.Equal (expected, KeyEventArgs.ToString (key, (Rune)separator));
+		Assert.Equal (expected, Key.ToString (key, (Rune)separator));
 	}
 
 	[Theory]
@@ -208,6 +208,6 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
 	public void ToString_ShouldReturnFormattedString (KeyCode key, string expected)
 	{
-		Assert.Equal (expected, KeyEventArgs.ToString (key));
+		Assert.Equal (expected, Key.ToString (key));
 	}
 }

@@ -108,7 +108,7 @@ namespace Terminal.Gui {
 			KeyDown += DateField_KeyPressed;
 		}
 
-		void DateField_KeyPressed (object sender, KeyEventArgs a)
+		void DateField_KeyPressed (object sender, Key a)
 		{
 			// Ignore non-numeric characters.
 			if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9) {

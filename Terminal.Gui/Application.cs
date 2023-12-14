@@ -192,8 +192,8 @@ public static partial class Application {
 	}
 
 	private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) => OnSizeChanging (e);
-	private static void Driver_KeyDown (object sender, KeyEventArgs e) => OnKeyDown (e);
-	private static void Driver_KeyUp (object sender, KeyEventArgs e) => OnKeyUp (e);
+	private static void Driver_KeyDown (object sender, Key e) => OnKeyDown (e);
+	private static void Driver_KeyUp (object sender, Key e) => OnKeyUp (e);
 	private static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
 
@@ -1308,13 +1308,13 @@ public static partial class Application {
 
 	#region Keyboard handling
 
-	static KeyCode _alternateForwardKey = KeyCode.PageDown | KeyCode.CtrlMask;
+	static Key _alternateForwardKey = new Key (KeyCode.PageDown | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-	public static KeyCode AlternateForwardKey {
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyCodeJsonConverter))]
+	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
 			if (_alternateForwardKey != value) {
@@ -1332,13 +1332,13 @@ public static partial class Application {
 		}
 	}
 
-	static KeyCode _alternateBackwardKey = KeyCode.PageUp | KeyCode.CtrlMask;
+	static Key _alternateBackwardKey = new Key (KeyCode.PageUp | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-	public static KeyCode AlternateBackwardKey {
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyCodeJsonConverter))]
+	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
 			if (_alternateBackwardKey != value) {
@@ -1356,13 +1356,13 @@ public static partial class Application {
 		}
 	}
 
-	static KeyCode _quitKey = KeyCode.Q | KeyCode.CtrlMask;
+	static Key _quitKey = new Key (KeyCode.Q | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
-	public static KeyCode QuitKey {
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyCodeJsonConverter))]
+	public static Key QuitKey {
 		get => _quitKey;
 		set {
 			if (_quitKey != value) {
@@ -1383,7 +1383,7 @@ public static partial class Application {
 	/// <summary>
 	/// Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>. 
 	/// <para>
-	/// Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to indicate the key was handled and
+	/// Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and
 	/// to prevent additional processing.
 	/// </para>
 	/// </summary>
@@ -1394,7 +1394,7 @@ public static partial class Application {
 	/// Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.
 	/// </para>
 	/// </remarks>
-	public static event EventHandler<KeyEventArgs> KeyDown;
+	public static event EventHandler<Key> KeyDown;
 
 	/// <summary>
 	/// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
@@ -1407,7 +1407,7 @@ public static partial class Application {
 	/// </remarks>
 	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the key was handled.</returns>
-	public static bool OnKeyDown (KeyEventArgs keyEvent)
+	public static bool OnKeyDown (Key keyEvent)
 	{
 		if (!_initialized) {
 			return true;
@@ -1445,7 +1445,7 @@ public static partial class Application {
 	/// <summary>
 	/// Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
 	/// <para>
-	/// Set <see cref="KeyEventArgs.Handled"/> to <see langword="true"/> to indicate the key was handled and
+	/// Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and
 	/// to prevent additional processing.
 	/// </para>
 	/// </summary>
@@ -1456,7 +1456,7 @@ public static partial class Application {
 	/// Fired after <see cref="KeyDown"/>.
 	/// </para>
 	/// </remarks>
-	public static event EventHandler<KeyEventArgs> KeyUp;
+	public static event EventHandler<Key> KeyUp;
 
 	/// <summary>
 	/// Called by the <see cref="ConsoleDriver"/> when the user releases a key.
@@ -1469,7 +1469,7 @@ public static partial class Application {
 	/// </remarks>
 	/// <param name="a"></param>
 	/// <returns><see langword="true"/> if the key was handled.</returns>
-	public static bool OnKeyUp (KeyEventArgs a)
+	public static bool OnKeyUp (Key a)
 	{
 		if (!_initialized) {
 			return true;

@@ -152,7 +152,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>
-		public override bool OnKeyDown (KeyEventArgs a)
+		public override bool OnKeyDown (Key a)
 		{
 			//// BUGBUG: Why is this not handled by a key binding???
 			if (!Modal) {

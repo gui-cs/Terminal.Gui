@@ -61,7 +61,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			lv.KeyBindings.Add (KeyCode.Space | KeyCode.ShiftMask, Command.ToggleChecked, Command.LineDown);
 
-			var ev = new KeyEventArgs (KeyCode.Space | KeyCode.ShiftMask);
+			var ev = new Key (KeyCode.Space | KeyCode.ShiftMask);
 
 			// view should indicate that it has accepted and consumed the event
 			Assert.True (lv.ProcessKeyDown (ev));
@@ -130,7 +130,7 @@ namespace Terminal.Gui.ViewsTests {
 			// bind shift down to move down twice in control
 			lv.KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDown, Command.LineDown);
 
-			var ev = new KeyEventArgs (KeyCode.CursorDown | KeyCode.ShiftMask);
+			var ev = new Key (KeyCode.CursorDown | KeyCode.ShiftMask);
 
 			Assert.True (lv.ProcessKeyDown (ev), "The first time we move down 2 it should be possible");
 

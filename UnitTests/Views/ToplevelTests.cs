@@ -379,7 +379,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (tf1W1, top.MostFocused);
 
 			Assert.True (isRunning);
-			Assert.True (Application.OnKeyDown (new (Application.QuitKey)));
+			Assert.True (Application.OnKeyDown (Application.QuitKey));
 			Assert.False (isRunning);
 			Assert.True (Application.OnKeyDown (new (KeyCode.Z | KeyCode.CtrlMask)));
 
@@ -424,10 +424,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OnKeyDown (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
-			Assert.True (Application.OnKeyDown (new (Application.AlternateForwardKey)));
+			Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
 			Assert.Equal (win2, top.Focused);
 			Assert.Equal (tf1W2, top.MostFocused);
-			Assert.True (Application.OnKeyDown (new (Application.AlternateBackwardKey)));
+			Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
 			Assert.Equal (win1, top.Focused);
 			Assert.Equal (tf2W1, top.MostFocused);
 			Assert.True (Application.OnKeyDown (new (KeyCode.CursorUp)));
@@ -527,7 +527,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (win1, Application.Current);
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			win1.Running = true;
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Application.QuitKey)));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (Application.QuitKey));
 			Assert.False (isRunning);
 			Assert.False (win1.Running);
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
@@ -579,10 +579,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Application.AlternateForwardKey)));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (Application.AlternateForwardKey));
 			Assert.Equal (win2, Application.OverlappedChildren [0]);
 			Assert.Equal (tf2W2, win2.MostFocused);
-			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Application.AlternateBackwardKey)));
+			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (Application.AlternateBackwardKey));
 			Assert.Equal (win1, Application.OverlappedChildren [0]);
 			Assert.Equal (tf1W1, win1.MostFocused);
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (KeyCode.CursorDown)));
@@ -619,9 +619,9 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact]
 		public void Added_Event_Should_Not_Be_Used_To_Initialize_Toplevel_Events ()
 		{
-			KeyCode alternateForwardKey = default;
-			KeyCode alternateBackwardKey = default;
-			KeyCode quitKey = default;
+			Key alternateForwardKey = default;
+			Key alternateBackwardKey = default;
+			Key quitKey = default;
 			var wasAdded = false;
 
 			var view = new View ();
@@ -629,9 +629,9 @@ namespace Terminal.Gui.ViewsTests {
 
 			void View_Added (object sender, SuperViewChangedEventArgs e)
 			{
-				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = e.OldKey);
-				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = e.OldKey);
-				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (s, e) => quitKey = e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateForwardKeyChanged += (s, e) => alternateForwardKey = (KeyCode)e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.AlternateBackwardKeyChanged += (s, e) => alternateBackwardKey = (KeyCode)e.OldKey);
+				Assert.Throws<NullReferenceException> (() => Application.Top.QuitKeyChanged += (s, e) => quitKey = (KeyCode)e.OldKey);
 				Assert.False (wasAdded);
 				wasAdded = true;
 				view.Added -= View_Added;
@@ -652,9 +652,9 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
 		{
-			KeyCode alternateForwardKey = default;
-			KeyCode alternateBackwardKey = default;
-			KeyCode quitKey = default;
+			Key alternateForwardKey = default;
+			Key alternateBackwardKey = default;
+			Key quitKey = default;
 
 			var view = new View ();
 			view.Initialized += View_Initialized;

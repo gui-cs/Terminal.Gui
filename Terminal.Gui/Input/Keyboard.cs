@@ -4,27 +4,31 @@ using System.Text;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Defines the event arguments for keyboard events.
+/// Provides an abstraction for common keyboard operations and state. Used for processing keyboard input and raising keyboard events.
 /// </summary>
 /// <remarks>
 /// <para>
-/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="KeyEventArgs.KeyCode"/>) as values between 65 and 90 corresponding to
+/// This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class
+/// instead of the <see cref="Terminal.Gui.KeyCode"/> enumeration for keyboard input whenever possible.
+/// </para>
+/// <para>
+/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Key.KeyCode"/>) as values between 65 and 90 corresponding to
 /// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
 /// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 /// </para>
 /// </remarks>
-public class KeyEventArgs : EventArgs {
+public class Key : EventArgs {
 
 	/// <summary>
-	/// Constructs a new <see cref="KeyEventArgs"/>
+	/// Constructs a new <see cref="Key"/>
 	/// </summary>
-	public KeyEventArgs () : this (KeyCode.Unknown) { }
+	public Key () : this (KeyCode.Unknown) { }
 
 	/// <summary>
-	///   Constructs a new <see cref="KeyEventArgs"/> from the provided Key value
+	///   Constructs a new <see cref="Key"/> from the provided Key value
 	/// </summary>
 	/// <param name="k">The key</param>
-	public KeyEventArgs (KeyCode k)
+	public Key (KeyCode k)
 	{
 		KeyCode = k;
 	}
@@ -115,7 +119,7 @@ public class KeyEventArgs : EventArgs {
 	/// Gets a value indicating whether the key is an lower case letter from 'a' to 'z', independent of the shift key.
 	/// </summary>
 	/// <remarks>
-	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="KeyEventArgs.KeyCode"/> as values between 65 and 90 corresponding to
+	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to
 	/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
 	/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </remarks>
@@ -140,7 +144,7 @@ public class KeyEventArgs : EventArgs {
 	/// The Shift modifier flag. Combine with a key code property to indicate the shift modifier. E.g. <c>key.Enter | key.Shift</c>.
 	/// </summary>
 	/// <remarks>
-	/// <see cref="IsShift"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Shift modifier applied.
+	/// <see cref="IsShift"/> provides a helper to determine if the <see cref="Key"/> has the Shift modifier applied.
 	/// </remarks>
 	public const uint Shift = (uint)KeyCode.ShiftMask;
 
@@ -148,7 +152,7 @@ public class KeyEventArgs : EventArgs {
 	/// The Ctrl modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
 	/// </summary>
 	/// <remarks>
-	/// <see cref="IsCtrl"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Ctrl modifier applied.
+	/// <see cref="IsCtrl"/> provides a helper to determine if the <see cref="Key"/> has the Ctrl modifier applied.
 	/// </remarks>
 	public const uint Ctrl = (uint)KeyCode.CtrlMask;
 
@@ -156,7 +160,7 @@ public class KeyEventArgs : EventArgs {
 	/// The Alt modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
 	/// </summary>
 	/// <remarks>
-	/// <see cref="IsAlt"/> provides a helper to determine if the <see cref="KeyEventArgs"/> has the Alt modifier applied.
+	/// <see cref="IsAlt"/> provides a helper to determine if the <see cref="Key"/> has the Alt modifier applied.
 	/// </remarks>
 	public const uint Alt = (uint)KeyCode.AltMask;
 
@@ -364,19 +368,31 @@ public class KeyEventArgs : EventArgs {
 
 	#region Operators
 	/// <summary>
-	/// Explicitly cast a <see cref="KeyEventArgs"/> to a <see cref="Rune"/>. The conversion is lossy. 
+	/// Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy. 
 	/// </summary>
 	/// <remarks>
 	/// Uses <see cref="AsRune"/>.
 	/// </remarks>
 	/// <param name="kea"></param>
-	public static explicit operator Rune (KeyEventArgs kea) => kea.AsRune;
+	public static explicit operator Rune (Key kea) => kea.AsRune;
 
 	/// <summary>
-	/// Cast <see cref="KeyEventArgs"/> to a <see langword="char"/>. The conversion is lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see langword="char"/>. The conversion is lossy. 
 	/// </summary>
 	/// <param name="kea"></param>
-	public static explicit operator char (KeyEventArgs kea) => (char)kea.AsRune.Value;
+	public static explicit operator char (Key kea) => (char)kea.AsRune.Value;
+
+	/// <summary>
+	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy. 
+	/// </summary>
+	/// <param name="key"></param>
+	public static explicit operator KeyCode (Key key) => (KeyCode)key.AsRune.Value;
+
+	/// <summary>
+	/// Cast <see cref="KeyCode"/> to a <see cref="Key"/>. 
+	/// </summary>
+	/// <param name="keyCode"></param>
+	public static implicit operator Key (KeyCode keyCode) => new Key (keyCode);
 
 	#endregion Operators
 

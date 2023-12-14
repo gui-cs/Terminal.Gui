@@ -263,7 +263,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		{
 			// Arrange
 			var options = new JsonSerializerOptions ();
-			options.Converters.Add (new KeyJsonConverter ());
+			options.Converters.Add (new KeyCodeJsonConverter ());
 
 			// Act
 			var json = JsonSerializer.Serialize (key, options);

@@ -563,7 +563,7 @@ public class ScrollView : View {
 	}
 
 	///<inheritdoc/>
-	public override bool OnKeyDown (KeyEventArgs a)
+	public override bool OnKeyDown (Key a)
 	{
 		if (base.OnKeyDown (a))
 			return true;

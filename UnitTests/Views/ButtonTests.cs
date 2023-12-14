@@ -105,11 +105,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.ProcessKeyDown (new ((KeyCode)'T')));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (btn.HotKey)));
+			Assert.True (btn.ProcessKeyDown (btn.HotKey));
 			Assert.True (clicked);
 			btn.Text = "Te_st";
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (btn.HotKey)));
+			Assert.True (btn.ProcessKeyDown (btn.HotKey));
 			Assert.True (clicked);
 		}
 

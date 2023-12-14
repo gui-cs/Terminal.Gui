@@ -217,7 +217,7 @@ namespace Terminal.Gui {
 			ContextMenu = new ContextMenu (this, BuildContextMenuBarItem ());
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
-			KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+			KeyBindings.Add (ContextMenu.Key.KeyCode, KeyBindingScope.HotKey, Command.ShowContextMenu);
 		}
 
 		private MenuBarItem BuildContextMenuBarItem ()
@@ -235,7 +235,7 @@ namespace Terminal.Gui {
 
 		private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
 		}
 
 		private void HistoryText_ChangeText (object sender, HistoryText.HistoryTextItem obj)
@@ -617,7 +617,7 @@ namespace Terminal.Gui {
 		int _preTextChangedCursorPos;
 
 		///<inheritdoc/>
-		public override bool? OnInvokingKeyBindings (KeyEventArgs a)
+		public override bool? OnInvokingKeyBindings (Key a)
 		{
 			// Give autocomplete first opportunity to respond to key presses
 			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
@@ -645,7 +645,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a"></param>
 		/// <returns></returns>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnKeyPressed (Key a)
 		{
 			// Remember the cursor position because the new calculated cursor position is needed
 			// to be set BEFORE the TextChanged event is triggered.
@@ -666,7 +666,7 @@ namespace Terminal.Gui {
 			return true;
 		}
 
-		void InsertText (KeyEventArgs a, bool usePreTextChangedCursorPos)
+		void InsertText (Key a, bool usePreTextChangedCursorPos)
 		{
 			_historyText.Add (new List<List<RuneCell>> () { TextModel.ToRuneCells (_text) }, new Point (_cursorPosition, 0));
 
@@ -1316,7 +1316,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEventArgs () { KeyCode = key }, useOldCursorPos);
+				InsertText (new Key () { KeyCode = key }, useOldCursorPos);
 			}
 		}
 

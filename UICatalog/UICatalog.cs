@@ -746,7 +746,7 @@ namespace UICatalog {
 
 				//ContentPane.LineStyle = FrameView.DefaultBorderStyle;
 
-				MenuBar.Menus [0].Children [0].Shortcut = Application.QuitKey;
+				MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
 				StatusBar.Items [0].Shortcut = Application.QuitKey;
 				StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
 

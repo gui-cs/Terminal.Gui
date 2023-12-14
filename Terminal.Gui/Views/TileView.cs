@@ -444,7 +444,7 @@ namespace Terminal.Gui {
 
 		//// BUGBUG: Why is this not handled by a key binding???
 		/// <inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs keyEvent)
+		public override bool OnKeyPressed (Key keyEvent)
 		{
 			bool focusMoved = false;
 

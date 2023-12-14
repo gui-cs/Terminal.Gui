@@ -731,7 +731,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				bool ProcessKey (KeyEventArgs ev)
+				bool ProcessKey (Key ev)
 				{
 					switch (ev.KeyCode) {
 					case KeyCode.CursorUp:
@@ -758,7 +758,7 @@ namespace UICatalog.Scenarios {
 						}
 						return true;
 					}
-					_txtShortcut.Text = KeyEventArgs.ToString (k, MenuBar.ShortcutDelimiter);// ShortcutHelper.GetShortcutTag (k);
+					_txtShortcut.Text = Key.ToString (k, MenuBar.ShortcutDelimiter);// ShortcutHelper.GetShortcutTag (k);
 
 					return true;
 				}

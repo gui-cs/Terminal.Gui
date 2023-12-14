@@ -464,13 +464,13 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.
 	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyDown;
+	public event EventHandler<Key> KeyDown;
 
 	/// <summary>
 	/// Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to <see cref="OnKeyUp"/>.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyDown (KeyEventArgs a) => KeyDown?.Invoke (this, a);
+	public void OnKeyDown (Key a) => KeyDown?.Invoke (this, a);
 
 	/// <summary>
 	/// Event fired when a key is released. 
@@ -478,7 +478,7 @@ public abstract class ConsoleDriver {
 	/// <remarks>
 	/// Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is complete.
 	/// </remarks>
-	public event EventHandler<KeyEventArgs> KeyUp;
+	public event EventHandler<Key> KeyUp;
 
 	/// <summary>
 	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
@@ -487,7 +487,7 @@ public abstract class ConsoleDriver {
 	/// Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is complete.
 	/// </remarks>
 	/// <param name="a"></param>
-	public void OnKeyUp (KeyEventArgs a) => KeyUp?.Invoke (this, a);
+	public void OnKeyUp (Key a) => KeyUp?.Invoke (this, a);
 
 	/// <summary>
 	/// Event fired when a mouse event occurs.
@@ -639,8 +639,8 @@ public enum CursorVisibility {
 /// The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a consistent
 /// way for application code to specify keys and receive key events. 
 /// <para>
-/// The <see cref="KeyEventArgs"/> class provides a higher-level abstraction, with helper methods and properties for common
-/// operations. For example, <see cref="KeyEventArgs.IsAlt"/> and <see cref="KeyEventArgs.IsCtrl"/> provide a convenient way
+/// The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for common
+/// operations. For example, <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way
 /// to check whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
 /// </para>
 /// </summary>

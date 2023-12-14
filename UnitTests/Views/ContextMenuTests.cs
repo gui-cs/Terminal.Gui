@@ -180,7 +180,7 @@ namespace Terminal.Gui.ViewsTests {
 			var cm = new ContextMenu ();
 
 			lbl.KeyDown += (s, e) => {
-				if (e.KeyCode == cm.Key) {
+				if (e == cm.Key) {
 					lbl.Text = "Replaced";
 					e.Handled = true;
 				}
@@ -190,12 +190,12 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (lbl);
 			Application.Begin (top);
 
-			Assert.True (lbl.ProcessKeyDown (new (cm.Key)));
+			Assert.True (lbl.ProcessKeyDown (cm.Key));
 			Assert.Equal ("Replaced", lbl.Text);
 
 			lbl.Text = "Original";
 			cm.Key = KeyCode.Space | KeyCode.CtrlMask;
-			Assert.True (lbl.ProcessKeyDown (new (cm.Key)));
+			Assert.True (lbl.ProcessKeyDown (cm.Key));
 			Assert.Equal ("Replaced", lbl.Text);
 		}
 
@@ -232,7 +232,7 @@ namespace Terminal.Gui.ViewsTests {
 			var oldKey = KeyCode.Null;
 			var cm = new ContextMenu ();
 
-			cm.KeyChanged += (s, e) => oldKey = e.OldKey;
+			cm.KeyChanged += (s, e) => oldKey = (KeyCode)e.OldKey;
 
 			cm.Key = KeyCode.Space | KeyCode.CtrlMask;
 			Assert.Equal (KeyCode.Space | KeyCode.CtrlMask, cm.Key);
@@ -530,7 +530,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.True (menu.ProcessKeyDown (new (menu.Key)));
+			Assert.True (menu.ProcessKeyDown (menu.Key));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);

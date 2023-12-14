@@ -20,7 +20,7 @@ public class StatusItem {
 	/// <param name="title">Title for the <see cref="StatusItem"/>.</param>
 	/// <param name="action">Action to invoke when the <see cref="StatusItem"/> is activated.</param>
 	/// <param name="canExecute">Function to determine if the action can currently be executed.</param>
-	public StatusItem (KeyCode shortcut, string title, Action action, Func<bool> canExecute = null)
+	public StatusItem (Key shortcut, string title, Action action, Func<bool> canExecute = null)
 	{
 		Title = title ?? "";
 		Shortcut = shortcut;
@@ -31,7 +31,7 @@ public class StatusItem {
 	/// <summary>
 	/// Gets the global shortcut to invoke the action on the menu.
 	/// </summary>
-	public KeyCode Shortcut { get; set; }
+	public Key Shortcut { get; set; }
 
 	/// <summary>
 	/// Gets or sets the title.
@@ -86,11 +86,11 @@ public class StatusBar : View {
 		get => _items;
 		set {
 			foreach (var item in _items) {
-				KeyBindings.Remove (item.Shortcut);
+				KeyBindings.Remove ((KeyCode)item.Shortcut);
 			}
 			_items = value;
 			foreach (var item in _items) {
-				KeyBindings.Add (item.Shortcut, KeyBindingScope.HotKey, Command.Accept);
+				KeyBindings.Add ((KeyCode)item.Shortcut, KeyBindingScope.HotKey, Command.Accept);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ public class StatusBar : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokingKeyBindings (Key keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for status bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.
@@ -139,7 +139,7 @@ public class StatusBar : View {
 		if (KeyBindings.TryGet(key, out _)) {
 			// Search RadioLabels 
 			foreach (var item in Items) {
-				if (item.Shortcut == key) {
+				if ((KeyCode)item.Shortcut == key) {
 					_itemToInvoke = item;
 					keyEvent.Scope = KeyBindingScope.HotKey;
 					break;

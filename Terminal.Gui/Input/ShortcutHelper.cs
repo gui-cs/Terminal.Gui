@@ -25,7 +25,7 @@ public class ShortcutHelper {
 	/// <summary>
 	/// The keystroke combination used in the <see cref="Shortcut"/> as string.
 	/// </summary>
-	public virtual string ShortcutTag => KeyEventArgs.ToString (shortcut, MenuBar.ShortcutDelimiter);
+	public virtual string ShortcutTag => Key.ToString (shortcut, MenuBar.ShortcutDelimiter);
 	
 	/// <summary>
 	/// Return key as string.
@@ -144,7 +144,7 @@ public class ShortcutHelper {
 			((key & (KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask)) != 0 && knm != KeyCode.Null && knm != KeyCode.Unknown)) {
 			return true;
 		}
-		Debug.WriteLine ($"WARNING: {KeyEventArgs.ToString (key)} is not a valid shortcut key.");
+		Debug.WriteLine ($"WARNING: {Key.ToString (key)} is not a valid shortcut key.");
 		return false;
 	}
 }

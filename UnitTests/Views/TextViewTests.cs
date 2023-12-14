@@ -3044,9 +3044,9 @@ Line 2.", _output);
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.Text);
 		Assert.True (tv.AllowsTab);
 		Assert.False (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.CtrlMask)));
-		Assert.False (tv.ProcessKeyDown (new (Application.AlternateForwardKey)));
+		Assert.False (tv.ProcessKeyDown (Application.AlternateForwardKey));
 		Assert.False (tv.ProcessKeyDown (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
-		Assert.False (tv.ProcessKeyDown (new (Application.AlternateBackwardKey)));
+		Assert.False (tv.ProcessKeyDown (Application.AlternateBackwardKey));
 	}
 
 	[Fact]

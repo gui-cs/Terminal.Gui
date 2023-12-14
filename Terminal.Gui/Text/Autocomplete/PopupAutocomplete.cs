@@ -278,7 +278,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public override bool ProcessKey (KeyEventArgs a)
+		public override bool ProcessKey (Key a)
 		{
 			if (SuggestionGenerator.IsWordChar ((Rune)a)) {
 				Visible = true;

@@ -282,7 +282,7 @@ public class HotKeyTests {
 		view.CanFocus = true;
 		Assert.False (view.HasFocus);
 
-		var ke = new KeyEventArgs (KeyCode.T);
+		var ke = new Key (KeyCode.T);
 		superView.ProcessKeyDown (ke);
 		Assert.True (view.HasFocus);
 
@@ -301,7 +301,7 @@ public class HotKeyTests {
 		var superView = new View ();
 		superView.Add (view);
 
-		var ke = new KeyEventArgs (KeyCode.A);
+		var ke = new Key (KeyCode.A);
 		superView.ProcessKeyDown (ke);
 	}
 }

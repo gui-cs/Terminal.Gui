@@ -126,7 +126,7 @@ namespace UICatalog.Scenarios {
 			}
 			
 			// BUGBUG: Should (can) this use key bindings instead.
-			public override bool OnKeyDown (KeyEventArgs keyEvent)
+			public override bool OnKeyDown (Key keyEvent)
 			{
 				if (keyEvent.KeyCode == KeyCode.CursorUp) {
 					State.PlannedDirection = Direction.Up;

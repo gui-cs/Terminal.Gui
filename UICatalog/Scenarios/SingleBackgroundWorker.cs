@@ -136,7 +136,7 @@ namespace UICatalog.Scenarios {
 				top.KeyDown += (s,e) => {
 					// Prevents Ctrl+Q from closing this.
 					// Only Ctrl+C is allowed.
-					if (e.KeyCode == Application.QuitKey) {
+					if (e == Application.QuitKey) {
 						e.Handled = true;
 					}
 				};

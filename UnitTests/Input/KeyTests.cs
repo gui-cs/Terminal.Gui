@@ -134,7 +134,7 @@ public class KeyTests {
 		Assert.Equal ("Y, CtrlMask", key.ToString ());
 
 		// This will be well compared, because the Key.CtrlMask have a high value.
-		Assert.False (key == Application.QuitKey);
+		Assert.False ((Key)key == Application.QuitKey);
 		switch (key) {
 		case KeyCode.Q | KeyCode.CtrlMask:
 			// Never goes here.
@@ -240,7 +240,7 @@ public class KeyTests {
 			var top = Application.Top;
 
 			top.KeyDown += (s, e) => {
-				Assert.Equal (KeyEventArgs.ToString (expectedRemapping), KeyEventArgs.ToString (e.KeyCode));
+				Assert.Equal (Key.ToString (expectedRemapping), Key.ToString (e.KeyCode));
 				e.Handled = true;
 				Application.RequestStop ();
 			};

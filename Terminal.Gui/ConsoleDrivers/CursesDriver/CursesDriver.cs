@@ -442,7 +442,7 @@ internal class CursesDriver : ConsoleDriver {
 				int wch2 = wch;
 
 				while (wch2 == Curses.KeyMouse) {
-					KeyEventArgs kea = null;
+					Key kea = null;
 					ConsoleKeyInfo [] cki = new ConsoleKeyInfo [] {
 							new ConsoleKeyInfo ((char)KeyCode.Esc, 0, false, false, false),
 							new ConsoleKeyInfo ('[', 0, false, false, false),
@@ -475,8 +475,8 @@ internal class CursesDriver : ConsoleDriver {
 				wch -= 60;
 				k = KeyCode.ShiftMask | KeyCode.AltMask | MapCursesKey (wch);
 			}
-			OnKeyDown (new KeyEventArgs (k));
-			OnKeyUp (new KeyEventArgs (k));
+			OnKeyDown (new Key (k));
+			OnKeyUp (new Key (k));
 			return;
 		}
 
@@ -489,7 +489,7 @@ internal class CursesDriver : ConsoleDriver {
 			if (code == Curses.KEY_CODE_YES) {
 				k = KeyCode.AltMask | MapCursesKey (wch);
 			}
-			KeyEventArgs key = null;
+			Key key = null;
 			if (code == 0) {
 
 				// The ESC-number handling, debatable.
@@ -524,16 +524,16 @@ internal class CursesDriver : ConsoleDriver {
 						k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
 					}
 				}
-				key = new KeyEventArgs (k);
+				key = new Key (k);
 			} else {
-				key = new KeyEventArgs (KeyCode.Esc);
+				key = new Key (KeyCode.Esc);
 			}
 			OnKeyDown (key);
 			OnKeyUp (key);
 		} else if (wch == Curses.KeyTab) {
 			k = MapCursesKey (wch);
-			OnKeyDown (new KeyEventArgs (k));
-			OnKeyUp (new KeyEventArgs (k));
+			OnKeyDown (new Key (k));
+			OnKeyUp (new Key (k));
 		} else {
 			// Unfortunately there are no way to differentiate Ctrl+alfa and Ctrl+Shift+alfa.
 			k = (KeyCode)wch;
@@ -548,12 +548,12 @@ internal class CursesDriver : ConsoleDriver {
 			} else if (wch <= 'z') {
 				k = (KeyCode)wch & ~KeyCode.Space;
 			} 
-			OnKeyDown (new KeyEventArgs (k));
-			OnKeyUp (new KeyEventArgs (k));
+			OnKeyDown (new Key (k));
+			OnKeyUp (new Key (k));
 		}
 	}
 
-	void HandleEscSeqResponse (ref int code, ref KeyCode k, ref int wch2, ref KeyEventArgs keyEventArgs, ref ConsoleKeyInfo [] cki)
+	void HandleEscSeqResponse (ref int code, ref KeyCode k, ref int wch2, ref Key keyEventArgs, ref ConsoleKeyInfo [] cki)
 	{
 		ConsoleKey ck = 0;
 		ConsoleModifiers mod = 0;
@@ -733,8 +733,8 @@ internal class CursesDriver : ConsoleDriver {
 			key = (KeyCode)keyChar;
 		}
 
-		OnKeyDown (new KeyEventArgs (key));
-		OnKeyUp (new KeyEventArgs (key));
+		OnKeyDown (new Key (key));
+		OnKeyUp (new Key (key));
 		//OnKeyPressed (new KeyEventArgsEventArgs (key));
 	}
 

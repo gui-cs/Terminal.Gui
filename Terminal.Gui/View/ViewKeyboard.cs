@@ -27,7 +27,7 @@ public partial class View {
 	/// </summary>
 	public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
-	KeyCode _hotKey = KeyCode.Null;
+	Key _hotKey = null;
 
 	void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 	{
@@ -70,10 +70,10 @@ public partial class View {
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
 	/// </para>
 	/// </remarks>
-	public virtual KeyCode HotKey {
+	public virtual Key HotKey {
 		get => _hotKey;
 		set {
-			if (AddKeyBindingsForHotKey (_hotKey, value)) {
+			if (_hotKey != null && AddKeyBindingsForHotKey ((KeyCode)_hotKey, (KeyCode)value)) {
 				// This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
 				_hotKey = TextFormatter.HotKey = value;
 			}
@@ -105,14 +105,14 @@ public partial class View {
 	/// <exception cref="ArgumentException"></exception>
 	public virtual bool AddKeyBindingsForHotKey (KeyCode prevHotKey, KeyCode hotKey)
 	{
-		if (_hotKey == hotKey) {
+		if ((KeyCode)_hotKey == hotKey) {
 			return false;
 		}
 
 		var newKey = hotKey == KeyCode.Unknown ? KeyCode.Null : hotKey;
 
 		var baseKey = newKey & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
-		if (newKey != KeyCode.Null && (baseKey == KeyCode.Space || Rune.IsControl (KeyEventArgs.ToRune (baseKey)))) {
+		if (newKey != KeyCode.Null && (baseKey == KeyCode.Space || Rune.IsControl (Key.ToRune (baseKey)))) {
 			throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
 		}
 
@@ -138,7 +138,7 @@ public partial class View {
 			KeyBindings.Remove (prevHotKey | KeyCode.AltMask);
 		}
 
-		if (_hotKey is >= KeyCode.A and <= KeyCode.Z) {
+		if (_hotKey.KeyCode is >= KeyCode.A and <= KeyCode.Z) {
 			// Remove the shift version
 			if (KeyBindings.TryGet (prevHotKey | KeyCode.ShiftMask, out _)) {
 				KeyBindings.Remove (prevHotKey | KeyCode.ShiftMask);
@@ -189,7 +189,7 @@ public partial class View {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
 		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
-			if (_hotKey != hk && hk != KeyCode.Unknown) {
+			if ((KeyCode)_hotKey != hk && hk != KeyCode.Unknown) {
 				HotKey = hk;
 			}
 		} else {
@@ -306,7 +306,7 @@ public partial class View {
 	/// </remarks>
 	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the event was handled.</returns>
-	public bool ProcessKeyDown (KeyEventArgs keyEvent)
+	public bool ProcessKeyDown (Key keyEvent)
 	{
 		if (!Enabled) {
 			return false;
@@ -352,7 +352,7 @@ public partial class View {
 	/// Fires the <see cref="KeyDown"/> event. 
 	/// </para>
 	/// </remarks>
-	public virtual bool OnKeyDown (KeyEventArgs keyEvent)
+	public virtual bool OnKeyDown (Key keyEvent)
 	{
 		// fire event
 		KeyDown?.Invoke (this, keyEvent);
@@ -362,7 +362,7 @@ public partial class View {
 	/// <summary>
 	/// Invoked when the user presses a key, allowing subscribers to preprocess the key down event.
 	/// This is fired from <see cref="OnKeyDown"/> before <see cref="OnInvokingKeyBindings"/>.
-	/// Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
+	/// Set <see cref="Key.Handled"/> to true to stop the key from
 	/// being processed by other views. 
 	/// </summary>
 	/// <remarks>
@@ -374,7 +374,7 @@ public partial class View {
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// </para>
 	/// </remarks>
-	public event EventHandler<KeyEventArgs> KeyDown;
+	public event EventHandler<Key> KeyDown;
 
 	/// <summary>
 	/// Low-level API called when the user presses a key, allowing views do things during key press events.
@@ -398,7 +398,7 @@ public partial class View {
 	/// depending on distinct KeyUp events.
 	/// </para>
 	/// </remarks>
-	public virtual bool OnKeyPressed (KeyEventArgs keyEvent)
+	public virtual bool OnKeyPressed (Key keyEvent)
 	{
 		// fire event
 		KeyPressed?.Invoke (this, keyEvent);
@@ -407,7 +407,7 @@ public partial class View {
 
 	/// <summary>
 	/// Invoked when the users presses a key, allowing subscribers to do things during key down events.
-	/// Set <see cref="KeyEventArgs.Handled"/> to true to stop the key from
+	/// Set <see cref="Key.Handled"/> to true to stop the key from
 	/// being processed by other views. Invoked after <see cref="KeyDown"/> and before <see cref="InvokingKeyBindings"/>.
 	/// </summary>
 	/// <remarks>
@@ -423,7 +423,7 @@ public partial class View {
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// </para>
 	/// </remarks>
-	public event EventHandler<KeyEventArgs> KeyPressed;
+	public event EventHandler<Key> KeyPressed;
 
 	#endregion KeyDown Event
 
@@ -449,7 +449,7 @@ public partial class View {
 	/// </remarks>
 	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the event was handled.</returns>
-	public bool ProcessKeyUp (KeyEventArgs keyEvent)
+	public bool ProcessKeyUp (Key keyEvent)
 	{
 		if (!Enabled) {
 			return false;
@@ -489,7 +489,7 @@ public partial class View {
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// </para>
 	/// </remarks>
-	public virtual bool OnKeyUp (KeyEventArgs keyEvent)
+	public virtual bool OnKeyUp (Key keyEvent)
 	{
 		if (!Enabled) {
 			return false;
@@ -510,7 +510,7 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Invoked when a key is released. Set <see cref="KeyEventArgs.Handled"/> to true to stop the key up event from being processed by other views.
+	/// Invoked when a key is released. Set <see cref="Key.Handled"/> to true to stop the key up event from being processed by other views.
 	/// <remarks>
 	/// Not all terminals support key distinct down/up notifications, Applications should avoid
 	/// depending on distinct KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
@@ -519,7 +519,7 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	/// </summary>
-	public event EventHandler<KeyEventArgs> KeyUp;
+	public event EventHandler<Key> KeyUp;
 
 	#endregion KeyUp Event
 
@@ -548,7 +548,7 @@ public partial class View {
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
 	/// the keypress was handled and no other view should see it.</returns>
-	public virtual bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
+	public virtual bool? OnInvokingKeyBindings (Key keyEvent)
 	{
 		// fire event
 		// BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
@@ -586,10 +586,10 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="KeyEventArgs.Handled"/>
+	/// Invoked when a key is pressed that may be mapped to a key binding. Set <see cref="Key.Handled"/>
 	/// to true to stop the key from being processed by other views. 
 	/// </summary>
-	public event EventHandler<KeyEventArgs> InvokingKeyBindings;
+	public event EventHandler<Key> InvokingKeyBindings;
 
 	/// <summary>
 	/// Invokes any binding that is registered on this <see cref="View"/>
@@ -604,7 +604,7 @@ public partial class View {
 	/// <see langword="true"/> if commands were invoked and at least one handled the command.
 	/// <see langword="false"/> if commands were invoked and at none handled the command.
 	/// </returns>	
-	protected bool? InvokeKeyBindings (KeyEventArgs keyEvent)
+	protected bool? InvokeKeyBindings (Key keyEvent)
 	{
 		bool? toReturn = null;
 		var key = keyEvent.KeyCode;

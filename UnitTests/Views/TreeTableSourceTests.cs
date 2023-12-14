@@ -194,8 +194,8 @@ public class TreeTableSourceTests: IDisposable {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		tv.ProcessKeyDown (new KeyEventArgs (KeyCode.CursorDown));
-		tv.ProcessKeyDown (new KeyEventArgs (KeyCode.Space));
+		tv.ProcessKeyDown (new Key (KeyCode.CursorDown));
+		tv.ProcessKeyDown (new Key (KeyCode.Space));
 		tv.Draw ();
 
 		expected =

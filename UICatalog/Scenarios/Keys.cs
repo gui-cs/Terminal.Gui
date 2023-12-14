@@ -75,7 +75,7 @@ public class Keys : Scenario {
 			Y = Pos.Top (editLabel) + 4,
 		};
 		Win.Add (keyLogLabel);
-		var maxKeyString = KeyEventArgs.ToString (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorRight, MenuBar.ShortcutDelimiter).Length;
+		var maxKeyString = Key.ToString (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorRight, MenuBar.ShortcutDelimiter).Length;
 		var yOffset = 1;
 		var keyEventlist = new List<string> ();
 		var keyEventListView = new ListView (keyEventlist) {
@@ -124,7 +124,7 @@ public class Keys : Scenario {
 		Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
 		Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
-		void KeyDownPressUp (KeyEventArgs args, string updown)
+		void KeyDownPressUp (Key args, string updown)
 		{
 			// BUGBUG: KeyEvent.ToString is badly broken
 			var msg = $"Key{updown,-7}: {args}";

@@ -416,7 +416,7 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnKeyPressed (Key a)
 		{
 			// Enable user to find & select an item by typing text
 			if (CollectionNavigator.IsCompatibleKey (a)) {

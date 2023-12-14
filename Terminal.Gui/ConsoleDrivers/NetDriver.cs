@@ -1139,8 +1139,8 @@ internal class NetDriver : ConsoleDriver {
 			}
 			var map = MapKey (consoleKeyInfo);
 
-			OnKeyDown (new KeyEventArgs (map));
-			OnKeyUp (new KeyEventArgs (map));
+			OnKeyDown (new Key (map));
+			OnKeyUp (new Key (map));
 			break;
 		case NetEvents.EventType.Mouse:
 			OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));

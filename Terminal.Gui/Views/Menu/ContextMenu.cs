@@ -27,10 +27,10 @@ public sealed class ContextMenu : IDisposable {
 	/// The default shortcut key for activating the context menu.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-	public static KeyCode DefaultKey { get; set; } = KeyCode.F10 | KeyCode.ShiftMask;
+	public static Key DefaultKey { get; set; } = new Key (KeyCode.F10 | KeyCode.ShiftMask);
 
 	static MenuBar _menuBar;
-	KeyCode _key = DefaultKey;
+	Key _key = DefaultKey;
 	MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
 	Toplevel _container;
 
@@ -187,9 +187,9 @@ public sealed class ContextMenu : IDisposable {
 	public MenuBarItem MenuItems { get; set; }
 
 	/// <summary>
-	/// <see cref="KeyCode"/> specifies they keyboard key that will activate the context menu with the keyboard.
+	/// Specifies the key that will activate the context menu.
 	/// </summary>
-	public KeyCode Key {
+	public Key Key {
 		get => _key;
 		set {
 			var oldKey = _key;

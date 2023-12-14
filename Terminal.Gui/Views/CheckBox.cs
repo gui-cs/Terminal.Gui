@@ -105,23 +105,23 @@ public class CheckBox : View {
 
 
 	/// <inheritdoc/>
-	public override KeyCode HotKey {
+	public override Key HotKey {
 		get => base.HotKey;
 		set {
 			var prev = base.HotKey;
 			if (prev != value) {
-				var v = value == KeyCode.Unknown ? KeyCode.Null : value;
+				var v = value == (Key)KeyCode.Unknown ? KeyCode.Null : value;
 				base.HotKey = TextFormatter.HotKey = v;
 
 				// Also add Alt+HotKey
-				if (prev != KeyCode.Null && KeyBindings.TryGet (prev | KeyCode.AltMask, out _)) {
-					if (v == KeyCode.Null) {
-						KeyBindings.Remove (prev | KeyCode.AltMask);
+				if (prev != (Key)KeyCode.Null && KeyBindings.TryGet (prev.KeyCode | KeyCode.AltMask, out _)) {
+					if (v.KeyCode == KeyCode.Null) {
+						KeyBindings.Remove (prev.KeyCode | KeyCode.AltMask);
 					} else {
-						KeyBindings.Replace (prev | KeyCode.AltMask, v | KeyCode.AltMask);
+						KeyBindings.Replace (prev.KeyCode | KeyCode.AltMask, v.KeyCode | KeyCode.AltMask);
 					}
-				} else if (v != KeyCode.Null) {
-					KeyBindings.Add (v | KeyCode.AltMask, Command.Accept);
+				} else if (v.KeyCode != KeyCode.Null) {
+					KeyBindings.Add (v.KeyCode | KeyCode.AltMask, Command.Accept);
 				}
 			}
 		}

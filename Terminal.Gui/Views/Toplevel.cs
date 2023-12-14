@@ -220,7 +220,7 @@ namespace Terminal.Gui {
 			});
 
 			// Default keybindings for this view
-			KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
+			KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
 
 			KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
 			KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
@@ -233,8 +233,8 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
 			KeyBindings.Add (KeyCode.F5, Command.Refresh);
-			KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+			KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+			KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
 			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
@@ -272,7 +272,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 			AlternateForwardKeyChanged?.Invoke (this, e);
 		}
 
@@ -287,7 +287,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 			AlternateBackwardKeyChanged?.Invoke (this, e);
 		}
 
@@ -302,7 +302,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 			QuitKeyChanged?.Invoke (this, e);
 		}
 

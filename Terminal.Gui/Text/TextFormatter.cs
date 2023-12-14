@@ -1051,7 +1051,7 @@ namespace Terminal.Gui {
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
 		TextDirection _textDirection;
-		KeyCode _hotKey;
+		Key _hotKey;
 		int _hotKeyPos = -1;
 		Size _size;
 		private bool _autoSize;
@@ -1241,7 +1241,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets or sets the hot key. Must be be an upper case letter or digit. Fires the <see cref="HotKeyChanged"/> event.
 		/// </summary>
-		public KeyCode HotKey {
+		public Key HotKey {
 			get => _hotKey;
 			internal set {
 				if (_hotKey != value) {

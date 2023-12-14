@@ -1311,7 +1311,7 @@ public class TextFieldTests {
 		Assert.Equal (2, clickCounter);
 	}
 
-	private void SuppressKey (object s, KeyEventArgs arg)
+	private void SuppressKey (object s, Key arg)
 	{
 		if (arg.AsRune == new Rune ('j')) {
 			arg.Handled = true;

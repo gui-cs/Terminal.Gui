@@ -21,7 +21,7 @@ namespace UICatalog.Scenarios {
 						CheckType = MenuItemCheckStyle.Checked
 					},
 					null,
-					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, Application.QuitKey)
+					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, (KeyCode)Application.QuitKey)
 				})
 			});
 			Application.Top.Add (menu, _scrollViewTestWindow);
@@ -231,7 +231,7 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_KeyPress (object sender, KeyEventArgs obj)
+			private void Button_KeyPress (object sender, Key obj)
 			{
 				switch (obj.KeyCode) {
 				case KeyCode.End:
