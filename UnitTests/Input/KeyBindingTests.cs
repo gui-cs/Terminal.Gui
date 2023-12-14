@@ -66,7 +66,7 @@ public class KeyBindingTests {
 	[Theory]
 	[InlineData (KeyBindingScope.Focused)]
 	[InlineData (KeyBindingScope.HotKey)]
-	[InlineData (KeyBindingScope.Global)]
+	[InlineData (KeyBindingScope.Application)]
 	public void Scope_Add_Adds (KeyBindingScope scope)
 	{
 		var keyBindings = new KeyBindings ();
@@ -92,7 +92,7 @@ public class KeyBindingTests {
 	[Theory]
 	[InlineData (KeyBindingScope.Focused)]
 	[InlineData (KeyBindingScope.HotKey)]
-	[InlineData (KeyBindingScope.Global)]
+	[InlineData (KeyBindingScope.Application)]
 	public void Scope_Get_Filters (KeyBindingScope scope)
 	{
 		var keyBindings = new KeyBindings ();

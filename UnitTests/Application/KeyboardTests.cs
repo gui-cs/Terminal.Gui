@@ -319,7 +319,7 @@ public class KeyboardTests {
 			AddCommand (Command.Select, () => SelectCommand = true);
 			AddCommand (Command.Left, () => LeftCommand = true);
 
-			KeyBindings.Add (ConsoleDriverKey.G, KeyBindingScope.Global, Command.Default);
+			KeyBindings.Add (ConsoleDriverKey.G, KeyBindingScope.Application, Command.Default);
 			KeyBindings.Add (ConsoleDriverKey.H, KeyBindingScope.HotKey, Command.Select);
 			KeyBindings.Add (ConsoleDriverKey.F, KeyBindingScope.Focused, Command.Left);
 		}

@@ -10,6 +10,11 @@ namespace Terminal.Gui;
 /// <summary>
 /// Defines the scope of a <see cref="Command"/> that has been bound to a key with <see cref="KeyBindings.Add(ConsoleDriverKey, Terminal.Gui.Command[])"/>.
 /// </summary>
+/// <remarks>
+/// <para>
+/// Key bindings are scoped to the most-focused view (<see cref="Focused"/>) by default.
+/// </para>
+/// </remarks>
 public enum KeyBindingScope {
 	/// <summary>
 	/// The command is scoped to just the view that has focus.
@@ -20,15 +25,24 @@ public enum KeyBindingScope {
 	/// The key binding will be triggered even when the View does not have focus, as it's SuperView does have focus.
 	/// This is typically used for <see cref="View.HotKey"/>.
 	/// <remarks>
+	/// <para>
 	/// Use for Views such as MenuBar and StatusBar which provide commands (shortcuts etc...) that trigger even when not focused.
+	/// </para>
+	/// <para>
+	/// HotKey-scoped key bindings are only invoked if the key down event was not handled by the focused view or any of its subviews.
+	/// </para>
 	/// </remarks>
 	/// </summary>
 	HotKey,
 
 	/// <summary>
-	/// The key binding will be triggered regardless of the View's focus. 
+	/// The key binding will be triggered regardless of which view has focus. This is typically used for global commands.
 	/// </summary>
-	Global
+	/// <remarks>
+	/// Application-scoped key bindings are only invoked if the key down event was not handled by the focused view or any of its subviews,
+	/// and if the key down event was not bound to a <see cref="View.HotKey"/>.
+	/// </remarks>
+	Application
 }
 
 /// <summary>
