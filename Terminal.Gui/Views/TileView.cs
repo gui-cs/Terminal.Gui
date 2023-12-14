@@ -448,7 +448,7 @@ namespace Terminal.Gui {
 		{
 			bool focusMoved = false;
 
-			if (keyEvent.ConsoleDriverKey == ToggleResizable) {
+			if (keyEvent.KeyCode == ToggleResizable) {
 				foreach (var l in _splitterLines) {
 
 					var iniBefore = l.IsInitialized;

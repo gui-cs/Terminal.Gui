@@ -339,7 +339,7 @@ namespace UICatalog.Scenarios {
 				Add (close);
 
 				KeyDown += (s, e) => {
-					if (e.ConsoleDriverKey == KeyCode.Esc) {
+					if (e.KeyCode == KeyCode.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}
 				};

@@ -453,13 +453,13 @@ public partial class HexView : View {
 		}
 
 		// Ignore control characters and other special keys
-		if (keyEvent.ConsoleDriverKey < KeyCode.Space || keyEvent.ConsoleDriverKey > KeyCode.CharMask) {
+		if (keyEvent.KeyCode < KeyCode.Space || keyEvent.KeyCode > KeyCode.CharMask) {
 			return false;
 		}
 
 		if (leftSide) {
 			int value;
-			char k = (char)keyEvent.ConsoleDriverKey;
+			char k = (char)keyEvent.KeyCode;
 			if (k >= 'A' && k <= 'F') {
 				value = k - 'A' + 10;
 			} else if (k >= 'a' && k <= 'f') {

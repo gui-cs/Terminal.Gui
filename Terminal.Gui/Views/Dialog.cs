@@ -232,7 +232,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
-			switch (a.ConsoleDriverKey) {
+			switch (a.KeyCode) {
 			case KeyCode.Esc:
 				Application.RequestStop (this);
 				return true;

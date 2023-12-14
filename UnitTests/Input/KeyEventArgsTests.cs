@@ -16,7 +16,7 @@ public class KeyEventArgsTests {
 	public void Constructor_Default_ShouldSetKeyToUnknown ()
 	{
 		var eventArgs = new KeyEventArgs ();
-		Assert.Equal (KeyCode.Unknown, eventArgs.ConsoleDriverKey);
+		Assert.Equal (KeyCode.Unknown, eventArgs.KeyCode);
 	}
 
 	[Theory]
@@ -26,7 +26,7 @@ public class KeyEventArgsTests {
 	public void Constructor_WithKey_ShouldSetCorrectKey (KeyCode key)
 	{
 		var eventArgs = new KeyEventArgs (key);
-		Assert.Equal (key, eventArgs.ConsoleDriverKey);
+		Assert.Equal (key, eventArgs.KeyCode);
 	}
 
 	[Fact]

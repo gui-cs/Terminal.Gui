@@ -726,14 +726,14 @@ namespace UICatalog.Scenarios {
 					if (!ProcessKey (e)) {
 						return;
 					}
-					if (CheckShortcut (e.ConsoleDriverKey, true)) {
+					if (CheckShortcut (e.KeyCode, true)) {
 						e.Handled = true;
 					}
 				};
 
 				bool ProcessKey (KeyEventArgs ev)
 				{
-					switch (ev.ConsoleDriverKey) {
+					switch (ev.KeyCode) {
 					case KeyCode.CursorUp:
 					case KeyCode.CursorDown:
 					case KeyCode.Tab:
@@ -764,7 +764,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				_txtShortcut.KeyUp += (s, e) => {
-					if (CheckShortcut (e.ConsoleDriverKey, false)) {
+					if (CheckShortcut (e.KeyCode, false)) {
 						e.Handled = true;
 					}
 				};

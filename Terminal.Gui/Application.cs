@@ -1428,8 +1428,8 @@ public static partial class Application {
 
 		// Invoke any Global KeyBindings
 		foreach (var topLevel in _topLevels.ToList ()) {
-			foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.Application, out var _))) {
-				if (view.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.Application, out var _)) {
+			foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _))) {
+				if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _)) {
 					keyEvent.Scope = KeyBindingScope.Application;
 					var handled = view.OnInvokingKeyBindings (keyEvent);
 					if (handled != null && (bool)handled) {

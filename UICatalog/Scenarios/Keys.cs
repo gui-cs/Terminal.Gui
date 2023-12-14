@@ -31,7 +31,7 @@ public class Keys : Scenario {
 
 
 		edit.InvokingKeyBindings += (s, a) => {
-			if (edit.KeyBindings.TryGet (a.ConsoleDriverKey, out var commands)) {
+			if (edit.KeyBindings.TryGet (a.KeyCode, out var commands)) {
 				invokingKeyBindingsList.Add ($"{a}: {string.Join (",", commands)}");
 			}
 		};
@@ -67,7 +67,7 @@ public class Keys : Scenario {
 		};
 		Win.Add (labelAppKeypress);
 
-		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ConsoleDriverKey.ToString();
+		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.KeyCode.ToString();
 
 		// Key stroke log:
 		var keyLogLabel = new Label ("Application Key Events:") {

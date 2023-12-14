@@ -250,9 +250,9 @@ namespace Terminal.Gui {
 		public override bool OnKeyPressed (KeyEventArgs a)
 		{
 			// Ignore non-numeric characters.
-			if (a.ConsoleDriverKey is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9) {
+			if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9) {
 				if (!ReadOnly) {
-					if (SetText (a)) {
+					if (SetText ((Rune)a)) {
 						IncCursorPosition ();
 					}
 				}

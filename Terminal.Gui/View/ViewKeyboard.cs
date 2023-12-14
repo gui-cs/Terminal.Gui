@@ -571,9 +571,9 @@ public partial class View {
 		}
 
 		// Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
-		foreach (var view in Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.HotKey, out var _))) {
+		foreach (var view in Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out var _))) {
 			// TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
-			if (view.KeyBindings.TryGet (keyEvent.ConsoleDriverKey, KeyBindingScope.HotKey, out var binding)) {
+			if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out var binding)) {
 				keyEvent.Scope = KeyBindingScope.HotKey;
 				handled = view.OnInvokingKeyBindings (keyEvent);
 				if (handled != null && (bool)handled) {
@@ -607,14 +607,14 @@ public partial class View {
 	protected bool? InvokeKeyBindings (KeyEventArgs keyEvent)
 	{
 		bool? toReturn = null;
-		var key = keyEvent.ConsoleDriverKey;
+		var key = keyEvent.KeyCode;
 		if (!KeyBindings.TryGet (key, out var binding)) {
 			return null;
 		}
 		foreach (var command in binding.Commands) {
 
 			if (!CommandImplementations.ContainsKey (command)) {
-				throw new NotSupportedException (@$"A KeyBinding was set up for the command {command} ({keyEvent.ConsoleDriverKey}) but that command is not supported by this View ({GetType ().Name})");
+				throw new NotSupportedException (@$"A KeyBinding was set up for the command {command} ({keyEvent.KeyCode}) but that command is not supported by this View ({GetType ().Name})");
 			}
 
 			// each command has its own return value

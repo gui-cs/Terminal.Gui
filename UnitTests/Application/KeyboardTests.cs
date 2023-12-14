@@ -49,7 +49,7 @@ public class KeyboardTests {
 		int keyUps = 0;
 		var output = string.Empty;
 		Application.Top.KeyUp += (object sender, KeyEventArgs args) => {
-			if (args.ConsoleDriverKey != (KeyCode.CtrlMask | KeyCode.Q)) {
+			if (args.KeyCode != (KeyCode.CtrlMask | KeyCode.Q)) {
 				output += args.AsRune;
 			}
 			keyUps++;

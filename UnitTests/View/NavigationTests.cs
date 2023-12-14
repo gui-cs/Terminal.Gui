@@ -904,7 +904,7 @@ namespace Terminal.Gui.ViewTests {
 
 			void Tf_KeyPressed (object sender, KeyEventArgs obj)
 			{
-				if (obj.ConsoleDriverKey == (KeyCode.Q | KeyCode.CtrlMask)) {
+				if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -916,7 +916,7 @@ namespace Terminal.Gui.ViewTests {
 
 			void Top_KeyPress (object sender, KeyEventArgs obj)
 			{
-				if (obj.ConsoleDriverKey == (KeyCode.Q | KeyCode.CtrlMask)) {
+				if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
 					obj.Handled = topQuiting = true;
 				}
 			}
@@ -967,7 +967,7 @@ namespace Terminal.Gui.ViewTests {
 
 			void Tf_KeyPressed (object sender, KeyEventArgs obj)
 			{
-				if (obj.ConsoleDriverKey == (KeyCode.Q | KeyCode.CtrlMask)) {
+				if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
 				}
 			}

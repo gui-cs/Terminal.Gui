@@ -288,12 +288,12 @@ namespace Terminal.Gui {
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
 			tbFind.KeyDown += (s, o) => {
-				if (o.ConsoleDriverKey == KeyCode.Enter) {
+				if (o.KeyCode == KeyCode.Enter) {
 					RestartSearch ();
 					o.Handled = true;
 				}
 
-				if (o.ConsoleDriverKey == KeyCode.Esc) {
+				if (o.KeyCode == KeyCode.Esc) {
 					if (CancelSearch ()) {
 						o.Handled = true;
 					}
@@ -801,7 +801,7 @@ namespace Terminal.Gui {
 
 		private void AcceptIf (KeyEventArgs keyEvent, KeyCode isKey)
 		{
-			if (!keyEvent.Handled && keyEvent.ConsoleDriverKey == isKey) {
+			if (!keyEvent.Handled && keyEvent.KeyCode == isKey) {
 				keyEvent.Handled = true;
 
 				// User hit Enter in text box so probably wants the
@@ -887,7 +887,7 @@ namespace Terminal.Gui {
 
 		private bool NavigateIf (KeyEventArgs keyEvent, KeyCode isKey, View to)
 		{
-			if (keyEvent.ConsoleDriverKey == isKey) {
+			if (keyEvent.KeyCode == isKey) {
 
 				to.FocusFirst ();
 				if (to == tbPath) {
@@ -953,26 +953,26 @@ namespace Terminal.Gui {
 
 		private bool TableView_KeyUp (KeyEventArgs keyEvent)
 		{
-			if (keyEvent.ConsoleDriverKey == KeyCode.Backspace) {
+			if (keyEvent.KeyCode == KeyCode.Backspace) {
 				return this.history.Back ();
 			}
-			if (keyEvent.ConsoleDriverKey == (KeyCode.ShiftMask | KeyCode.Backspace)) {
+			if (keyEvent.KeyCode == (KeyCode.ShiftMask | KeyCode.Backspace)) {
 				return this.history.Forward ();
 			}
 
-			if (keyEvent.ConsoleDriverKey == KeyCode.DeleteChar) {
+			if (keyEvent.KeyCode == KeyCode.DeleteChar) {
 
 				Delete ();
 				return true;
 			}
 
-			if (keyEvent.ConsoleDriverKey == (KeyCode.CtrlMask | KeyCode.R)) {
+			if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.R)) {
 
 				Rename ();
 				return true;
 			}
 
-			if (keyEvent.ConsoleDriverKey == (KeyCode.CtrlMask | KeyCode.N)) {
+			if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.N)) {
 				New ();
 				return true;
 			}

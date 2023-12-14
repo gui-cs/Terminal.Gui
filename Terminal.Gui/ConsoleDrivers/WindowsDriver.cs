@@ -975,7 +975,6 @@ internal class WindowsDriver : ConsoleDriver {
 				ret &= ~KeyCode.ShiftMask;
 			}
 			return ret;
-			break;
 
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:

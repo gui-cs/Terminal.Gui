@@ -3068,7 +3068,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEventArgs () { ConsoleDriverKey = key });
+				InsertText (new KeyEventArgs () { KeyCode = key });
 			}
 
 			if (NeedsDisplay) {
@@ -3425,7 +3425,7 @@ namespace Terminal.Gui {
 			ResetColumnTrack ();
 
 			// Ignore control characters and other special keys
-			if (!a.IsLowerCaseAtoZ && (a.ConsoleDriverKey < KeyCode.Space || a.ConsoleDriverKey > KeyCode.CharMask)) {
+			if (!a.IsLowerCaseAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask)) {
 				return false;
 			}
 
@@ -4339,11 +4339,11 @@ namespace Terminal.Gui {
 			if (_selecting) {
 				ClearSelectedRegion ();
 			}
-			if (a.ConsoleDriverKey == KeyCode.Enter) {
+			if (a.KeyCode == KeyCode.Enter) {
 				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
-			} else if ((uint)a.ConsoleDriverKey == '\r') {
+			} else if ((uint)a.KeyCode == '\r') {
 				_currentColumn = 0;
 			} else {
 				if (Used) {
@@ -4398,7 +4398,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnKeyUp (KeyEventArgs a)
 		{
-			switch (a.ConsoleDriverKey) {
+			switch (a.KeyCode) {
 			case KeyCode.Space | KeyCode.CtrlMask:
 				return true;
 			}

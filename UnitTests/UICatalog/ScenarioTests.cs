@@ -70,11 +70,11 @@ namespace UICatalog.Tests {
 
 				// The only key we care about is the QuitKey
 				Application.Top.KeyDown += (object sender, KeyEventArgs args) => {
-					output.WriteLine ($"  Keypress: {args.ConsoleDriverKey}");
+					output.WriteLine ($"  Keypress: {args.KeyCode}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey, args.ConsoleDriverKey);
+					Assert.Equal (Application.QuitKey, args.KeyCode);
 				};
 
 				uint abortTime = 500;
@@ -155,7 +155,7 @@ namespace UICatalog.Tests {
 
 			Application.Top.KeyDown += (object sender, KeyEventArgs args) => {
 				// See #2474 for why this is commented out
-				Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.ConsoleDriverKey);
+				Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
 			};
 
 			generic.Init ();

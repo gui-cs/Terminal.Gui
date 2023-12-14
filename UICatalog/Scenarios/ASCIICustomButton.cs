@@ -233,7 +233,7 @@ namespace UICatalog.Scenarios {
 
 			private void Button_KeyPress (object sender, KeyEventArgs obj)
 			{
-				switch (obj.ConsoleDriverKey) {
+				switch (obj.KeyCode) {
 				case KeyCode.End:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 -(scrollView.ContentSize.Height - scrollView.Frame.Height

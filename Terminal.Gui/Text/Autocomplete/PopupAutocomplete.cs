@@ -280,14 +280,14 @@ namespace Terminal.Gui {
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
 		public override bool ProcessKey (KeyEventArgs a)
 		{
-			if (SuggestionGenerator.IsWordChar (a)) {
+			if (SuggestionGenerator.IsWordChar ((Rune)a)) {
 				Visible = true;
 				ManipulatePopup ();
 				closed = false;
 				return false;
 			}
 
-			if (a.ConsoleDriverKey == Reopen) {
+			if (a.KeyCode == Reopen) {
 				Context.Canceled = false;
 				return ReopenSuggestions ();
 			}
@@ -300,12 +300,12 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (a.ConsoleDriverKey == KeyCode.CursorDown) {
+			if (a.KeyCode == KeyCode.CursorDown) {
 				MoveDown ();
 				return true;
 			}
 
-			if (a.ConsoleDriverKey == KeyCode.CursorUp) {
+			if (a.KeyCode == KeyCode.CursorUp) {
 				MoveUp ();
 				return true;
 			}
@@ -322,11 +322,11 @@ namespace Terminal.Gui {
 				return false;
 			}*/
 
-			if (a.ConsoleDriverKey == SelectionKey) {
+			if (a.KeyCode == SelectionKey) {
 				return Select ();
 			}
 
-			if (a.ConsoleDriverKey == CloseKey) {
+			if (a.KeyCode == CloseKey) {
 				Close ();
 				Context.Canceled = true;
 				return true;

@@ -157,7 +157,7 @@ namespace Terminal.Gui {
 		{
 			//// BUGBUG: Why is this not handled by a key binding???
 			if (!Modal) {
-				switch (a.ConsoleDriverKey) {
+				switch (a.KeyCode) {
 				// BUGBUG: This should be hanlded by Dialog 
 				case KeyCode.Esc:
 					var args = new WizardButtonEventArgs ();

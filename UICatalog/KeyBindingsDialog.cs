@@ -181,7 +181,7 @@ namespace UICatalog {
 			// prompt user to hit a key
 			var dlg = new Dialog () { Title = "Enter Key" };
 			dlg.KeyDown += (s, k) => {
-				key = k.ConsoleDriverKey;
+				key = k.KeyCode;
 				Application.RequestStop ();
 			};
 			Application.Run (dlg);

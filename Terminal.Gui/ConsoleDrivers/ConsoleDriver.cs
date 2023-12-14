@@ -636,22 +636,37 @@ public enum CursorVisibility {
 
 
 /// <summary>
-/// The <see cref="KeyCode"/> enumeration contains special encoding for some keys, but can also
-/// encode all the unicode values that can be passed.   
+/// The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a consistent
+/// way for application code to specify keys and receive key events. 
+/// <para>
+/// The <see cref="KeyEventArgs"/> class provides a higher-level abstraction, with helper methods and properties for common
+/// operations. For example, <see cref="KeyEventArgs.IsAlt"/> and <see cref="KeyEventArgs.IsCtrl"/> provide a convenient way
+/// to check whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
+/// </para>
 /// </summary>
 /// <remarks>
 /// <para>
-///   If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
-///   otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>)
-/// <para>
-///   Numerics keys are the values between 48 and 57 corresponding to 0 to 9
-/// </para>
-/// </para>
-/// <para>
-///   Upper alpha keys are the values between 65 and 90 corresponding to A to Z
+/// Lowercase alpha keys are encoded as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
+/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
+/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+/// TODO: Strongly consider renaming these from .A to .Z to .A_Lowercase to .Z_Lowercase (or .a to .z).
 /// </para>
 /// <para>
-///   Unicode runes are also stored here, the letter 'A" for example is encoded as a value 65 (not surfaced in the enum).
+/// Numeric keys are the values between 48 and 57 corresponding to 0 to 9 (e.g. <see cref="KeyCode.D0"/>, <see cref="KeyCode.D1"/>, etc.).
+/// </para>
+/// <para>
+/// The shift modifiers (<see cref="KeyCode.ShiftMask"/>, <see cref="KeyCode.CtrlMask"/>, and <see cref="KeyCode.AltMask"/>) can be combined (with logical or)
+/// with the other key codes to represent shifted keys. For example, the <see cref="KeyCode.A"/> enum value represents the un-shifted 'a' key, while
+/// <see cref="KeyCode.ShiftMask"/> | <see cref="KeyCode.A"/> represents the 'A' key (shifted 'a' key). Likewise, <see cref="KeyCode.AltMask"/> | <see cref="KeyCode.A"/>
+/// represents the 'Alt+A' key combination.
+/// </para>
+/// <para>
+/// All other keys that produce a printable character are encoded as the Unicode value of the character. For example, the <see cref="KeyCode"/>
+/// for the '!' character is 33, which is the Unicode value for '!'. Likewise, `â` is 226, `Â` is 194, etc.
+/// </para>
+/// <para>
+/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+/// otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>).
 /// </para>
 /// </remarks>
 [Flags]

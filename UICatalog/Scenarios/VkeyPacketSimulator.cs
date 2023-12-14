@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 			tvOutput.KeyDown += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyDown: {e.Key}");
 				//e.Handled = true;
-				if (e.ConsoleDriverKey == KeyCode.Unknown) {
+				if (e.KeyCode == KeyCode.Unknown) {
 					_wasUnknown = true;
 				}
 			};
@@ -123,14 +123,14 @@ namespace UICatalog.Scenarios {
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
 				//var ke = e;
 
-				if (e.ConsoleDriverKey == KeyCode.Unknown) {
+				if (e.KeyCode == KeyCode.Unknown) {
 					_wasUnknown = true;
 					e.Handled = true;
 					return;
 				}
 				if (_wasUnknown && _keyboardStrokes.Count == 1) {
 					_wasUnknown = false;
-				} else if (_wasUnknown && char.IsLetter ((char)e.ConsoleDriverKey)) {
+				} else if (_wasUnknown && char.IsLetter ((char)e.KeyCode)) {
 					_wasUnknown = false;
 				}
 				if (_keyboardStrokes.Count == 0) {
@@ -138,7 +138,7 @@ namespace UICatalog.Scenarios {
 				} else {
 					_keyboardStrokes.Insert (0, 0);
 				}
-				if (_wasUnknown && (int)e.ConsoleDriverKey - (int)(e.ConsoleDriverKey & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask)) != 0) {
+				if (_wasUnknown && (int)e.KeyCode - (int)(e.KeyCode & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask)) != 0) {
 					unknownChar = e;
 				}
 				e.Handled = true;
@@ -152,13 +152,13 @@ namespace UICatalog.Scenarios {
 						while (_outputStarted) {
 							try {
 								ConsoleModifiers mod = new ConsoleModifiers ();
-								if (e.ConsoleDriverKey.HasFlag (KeyCode.ShiftMask)) {
+								if (e.KeyCode.HasFlag (KeyCode.ShiftMask)) {
 									mod |= ConsoleModifiers.Shift;
 								}
-								if (e.ConsoleDriverKey.HasFlag (KeyCode.AltMask)) {
+								if (e.KeyCode.HasFlag (KeyCode.AltMask)) {
 									mod |= ConsoleModifiers.Alt;
 								}
-								if (e.ConsoleDriverKey.HasFlag (KeyCode.CtrlMask)) {
+								if (e.KeyCode.HasFlag (KeyCode.CtrlMask)) {
 									mod |= ConsoleModifiers.Control;
 								}
 								for (int i = 0; i < _keyboardStrokes.Count; i++) {
@@ -216,8 +216,8 @@ namespace UICatalog.Scenarios {
 
 		private void AddKeyboardStrokes (KeyEventArgs e)
 		{
-			var keyChar = (int)e.ConsoleDriverKey;
-			var mK = (int)(e.ConsoleDriverKey & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask));
+			var keyChar = (int)e.KeyCode;
+			var mK = (int)(e.KeyCode & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			keyChar &= ~mK;
 			_keyboardStrokes.Add (keyChar);
 		}

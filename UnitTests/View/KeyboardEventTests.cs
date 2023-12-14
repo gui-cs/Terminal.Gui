@@ -26,19 +26,19 @@ public class KeyboardEventTests {
 		view.KeyDown += (s, e) => {
 			e.Handled = setHandledTo;
 			Assert.Equal (setHandledTo, e.Handled);
-			Assert.Equal (KeyCode.N, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.N, e.KeyCode);
 		};
 
 		view.InvokingKeyBindings += (s, e) => {
 			invokingKeyBindingsInvoked = true;
 			Assert.False (e.Handled);
-			Assert.Equal (KeyCode.N, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.N, e.KeyCode);
 		};
 
 		view.KeyPressed += (s, e) => {
 			processKeyPressInvoked = true;
 			Assert.False (e.Handled);
-			Assert.Equal (KeyCode.N, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.N, e.KeyCode);
 		};
 
 		view.ProcessKeyDown (new KeyEventArgs (KeyCode.N));
@@ -65,21 +65,21 @@ public class KeyboardEventTests {
 		view.KeyDown += (s, e) => {
 			keyPressInvoked = true;
 			Assert.False (e.Handled);
-			Assert.Equal (KeyCode.N, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.N, e.KeyCode);
 		};
 
 		view.InvokingKeyBindings += (s, e) => {
 			invokingKeyBindingsInvoked = true;
 			e.Handled = setHandledTo;
 			Assert.Equal (setHandledTo, e.Handled);
-			Assert.Equal (KeyCode.N, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.N, e.KeyCode);
 		};
 
 		view.KeyPressed += (s, e) => {
 			processKeyPressInvoked = true;
 			processKeyPressInvoked = true;
 			Assert.False (e.Handled);
-			Assert.Equal (KeyCode.N, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.N, e.KeyCode);
 		};
 
 		view.ProcessKeyDown (new KeyEventArgs (KeyCode.N));
@@ -136,21 +136,21 @@ public class KeyboardEventTests {
 		view.CancelVirtualMethods = false;
 
 		view.KeyDown += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyDown);
 			Assert.False (view.OnKeyDownContinued);
 			e.Handled = true;
 			keyDown = true;
 		};
 		view.InvokingKeyBindings += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyPressed);
 			Assert.False (view.OnInvokingKeyBindingsContinued);
 			e.Handled = true;
 			invokingKeyBindings = true;
 		};
 		view.KeyPressed += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyPressed);
 			Assert.False (view.OnKeyPressedContinued);
 			e.Handled = true;
@@ -179,21 +179,21 @@ public class KeyboardEventTests {
 		view.CancelVirtualMethods = false;
 
 		view.KeyDown += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyDown);
 			Assert.False (view.OnKeyDownContinued);
 			e.Handled = false;
 			keyDown = true;
 		};
 		view.InvokingKeyBindings += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyPressed);
 			Assert.False (view.OnInvokingKeyBindingsContinued);
 			e.Handled = true;
 			invokingKeyBindings = true;
 		};
 		view.KeyPressed += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyPressed);
 			Assert.False (view.OnKeyPressedContinued);
 			e.Handled = true;
@@ -223,21 +223,21 @@ public class KeyboardEventTests {
 		view.CancelVirtualMethods = false;
 
 		view.KeyDown += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyDown);
 			Assert.False (view.OnKeyDownContinued);
 			e.Handled = false;
 			keyDown = true;
 		};
 		view.InvokingKeyBindings += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyPressed);
 			Assert.False (view.OnInvokingKeyBindingsContinued);
 			e.Handled = false;
 			invokingKeyBindings = true;
 		};
 		view.KeyPressed += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyPressed);
 			Assert.False (view.OnKeyPressedContinued);
 			e.Handled = true;
@@ -265,7 +265,7 @@ public class KeyboardEventTests {
 		view.CancelVirtualMethods = false;
 
 		view.KeyUp += (s, e) => {
-			Assert.Equal (KeyCode.A, e.ConsoleDriverKey);
+			Assert.Equal (KeyCode.A, e.KeyCode);
 			Assert.False (keyUp);
 			Assert.False (view.OnKeyPressedContinued);
 			e.Handled = true;
@@ -358,7 +358,7 @@ public class KeyboardEventTests {
 		view.CancelVirtualMethods = false;
 
 		view.KeyDown += (s, e) => {
-			Assert.Equal (KeyCode.Null, e.ConsoleDriverKey & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask);
+			Assert.Equal (KeyCode.Null, e.KeyCode & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask);
 			Assert.Equal (shift, e.IsShift);
 			Assert.Equal (alt, e.IsAlt);
 			Assert.Equal (control, e.IsCtrl);
@@ -370,7 +370,7 @@ public class KeyboardEventTests {
 			keyPressed = true;
 		};
 		view.KeyUp += (s, e) => {
-			Assert.Equal (KeyCode.Null, e.ConsoleDriverKey & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask);
+			Assert.Equal (KeyCode.Null, e.KeyCode & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask);
 			Assert.Equal (shift, e.IsShift);
 			Assert.Equal (alt, e.IsAlt);
 			Assert.Equal (control, e.IsCtrl);

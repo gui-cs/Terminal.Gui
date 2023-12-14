@@ -6,6 +6,13 @@ namespace Terminal.Gui;
 /// <summary>
 /// Defines the event arguments for keyboard events.
 /// </summary>
+/// <remarks>
+/// <para>
+/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="KeyEventArgs.KeyCode"/>) as values between 65 and 90 corresponding to
+/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
+/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+/// </para>
+/// </remarks>
 public class KeyEventArgs : EventArgs {
 
 	/// <summary>
@@ -19,17 +26,8 @@ public class KeyEventArgs : EventArgs {
 	/// <param name="k">The key</param>
 	public KeyEventArgs (KeyCode k)
 	{
-		ConsoleDriverKey = k;
+		KeyCode = k;
 	}
-
-	///// <summary>
-	/////   Constructs a new <see cref="KeyEventArgs"/> from the provided unicode character
-	///// </summary>
-	///// <param name="k">The key</param>
-	//public KeyEventArgs (char c)
-	//{
-	//	Char = c;
-	//}
 
 	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
@@ -37,12 +35,15 @@ public class KeyEventArgs : EventArgs {
 	/// </summary>
 	public bool Handled { get; set; } = false;
 
-	public char Char { get; set; }
-
 	/// <summary>
-	/// Symbolic definition for the key.
+	/// The encoded key value.
 	/// </summary>
-	public KeyCode ConsoleDriverKey { get; set; }
+	/// <para>
+	/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
+	/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
+	/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+	/// </para>
+	public KeyCode KeyCode { get; set; }
 
 	/// <summary>
 	/// Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.
@@ -56,10 +57,10 @@ public class KeyEventArgs : EventArgs {
 	/// If the key pressed is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
 	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, this will be <see langword="default"/>.
 	/// </remarks>
-	public Rune AsRune => ToRune (ConsoleDriverKey);
+	public Rune AsRune => ToRune (KeyCode);
 
 	/// <summary>
-	/// Converts a <see cref="ConsoleDriverKey"/> to a <see cref="Rune"/>.
+	/// Converts a <see cref="KeyCode"/> to a <see cref="Rune"/>.
 	/// </summary>
 	/// <remarks>
 	/// If the key is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
@@ -96,23 +97,23 @@ public class KeyEventArgs : EventArgs {
 	/// Gets a value indicating whether the Shift key was pressed.
 	/// </summary>
 	/// <value><see langword="true"/> if is shift; otherwise, <see langword="false"/>.</value>
-	public bool IsShift => (ConsoleDriverKey & KeyCode.ShiftMask) != 0;
+	public bool IsShift => (KeyCode & KeyCode.ShiftMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Alt key was pressed (real or synthesized)
 	/// </summary>
 	/// <value><see langword="true"/> if is alternate; otherwise, <see langword="false"/>.</value>
-	public bool IsAlt => (ConsoleDriverKey & KeyCode.AltMask) != 0;
+	public bool IsAlt => (KeyCode & KeyCode.AltMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the Ctrl key was pressed.
 	/// </summary>
 	/// <value><see langword="true"/> if is ctrl; otherwise, <see langword="false"/>.</value>
-	public bool IsCtrl => (ConsoleDriverKey & KeyCode.CtrlMask) != 0;
+	public bool IsCtrl => (KeyCode & KeyCode.CtrlMask) != 0;
 
 	/// <summary>
 	/// Gets a value indicating whether the key is an lower case letter from 'a' to 'z', independent of the shift key.
-	/// This is needed because <see cref="ConsoleDriverKey"/> defines <see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/>
+	/// This is needed because <see cref="KeyCode"/> defines <see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/>
 	/// using the ASCII codes for the uppercase letter (e.g. <see cref="KeyCode.A"/> is <c>65</c>) while <c>(ConsoleKeyDriver)'a'</c> =
 	/// <c>97</c>. Thus, to specify an uppercase 'a', one must use <c>ConsoleDriverKey.A | ConsoleDriverKey.ShiftMask</c> and to
 	/// specify a lowercase 'a', on must use <c>ConsoleDriverKey.A</c> or <c>(ConsoleDriverKey)'a'</c>.
@@ -122,14 +123,14 @@ public class KeyEventArgs : EventArgs {
 			if (IsAlt || IsCtrl) {
 				return false;
 			}
-			return (ConsoleDriverKey & KeyCode.CharMask) is >= KeyCode.A and <= KeyCode.Z;
+			return (KeyCode & KeyCode.CharMask) is >= KeyCode.A and <= KeyCode.Z;
 		}
 	}
 
 	/// <summary>
 	/// Gets the key without any shift modifiers. 
 	/// </summary>
-	public KeyCode BareKey => ConsoleDriverKey & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
+	public KeyCode BareKey => KeyCode & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 	#region Standard Key Definitions
 
@@ -362,38 +363,20 @@ public class KeyEventArgs : EventArgs {
 
 	#region Operators
 	/// <summary>
-	/// Cast a <see cref="KeyEventArgs"/> to a <see cref="Rune"/>. 
+	/// Explicitly cast a <see cref="KeyEventArgs"/> to a <see cref="Rune"/>. The conversion is lossy. 
 	/// </summary>
 	/// <remarks>
 	/// Uses <see cref="AsRune"/>.
 	/// </remarks>
 	/// <param name="kea"></param>
-	public static implicit operator Rune (KeyEventArgs kea) => kea.AsRune;
+	public static explicit operator Rune (KeyEventArgs kea) => kea.AsRune;
 
 	/// <summary>
-	/// Cast <see cref="KeyEventArgs"/> to a <see langword="char"/>.
+	/// Cast <see cref="KeyEventArgs"/> to a <see langword="char"/>. The conversion is lossy. 
 	/// </summary>
 	/// <param name="kea"></param>
 	public static explicit operator char (KeyEventArgs kea) => (char)kea.AsRune.Value;
-
-	///// <summary>
-	///// Cast <see cref="KeyEventArgs"/> to a <see cref="ConsoleDriverKey"/>.
-	///// </summary>
-	///// <param name="kea"></param>
-	//public static explicit operator ConsoleDriverKey (KeyEventArgs kea) => (ConsoleDriverKey)kea.AsRune.Value;
-
-	///// <summary>
-	///// Cast a <see langword="char"/> to a <see cref="KeyEventArgs"/>.
-	///// </summary>
-	///// <param name="c"></param>
-	//public static explicit operator KeyEventArgs (char c) => new KeyEventArgs((ConsoleDriverKey)c);
-
-	///// <summary>
-	///// Cast a <see cref="ConsoleDriverKey"/> to a <see cref="KeyEventArgs"/>.
-	///// </summary>
-	///// <param name="key"></param>
-	//public static explicit operator KeyEventArgs (ConsoleDriverKey key) => (KeyEventArgs)(char)key;
-
+	
 	#endregion Operators
 
 	#region String conversion
@@ -403,7 +386,7 @@ public class KeyEventArgs : EventArgs {
 	/// <returns></returns>
 	public override string ToString ()
 	{
-		return ToString (ConsoleDriverKey, (Rune)'+');
+		return ToString (KeyCode, (Rune)'+');
 	}
 
 	private static string GetKeyString (KeyCode key)
@@ -428,7 +411,7 @@ public class KeyEventArgs : EventArgs {
 
 
 	/// <summary>
-	/// Formats a <see cref="ConsoleDriverKey"/> as a string using the default separator of '+'
+	/// Formats a <see cref="KeyCode"/> as a string using the default separator of '+'
 	/// </summary>
 	/// <param name="key">The key to format.</param>
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
@@ -438,7 +421,7 @@ public class KeyEventArgs : EventArgs {
 	}
 
 	/// <summary>
-	/// Formats a <see cref="ConsoleDriverKey"/> as a string.
+	/// Formats a <see cref="KeyCode"/> as a string.
 	/// </summary>
 	/// <param name="key">The key to format.</param>
 	/// <param name="separator">The character to use as a separator between modifier keys and and the key itself.</param>

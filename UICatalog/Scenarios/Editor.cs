@@ -177,20 +177,20 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyDown += (s, e) => {
-				if (_winDialog != null && (e.ConsoleDriverKey == KeyCode.Esc
-								|| e.ConsoleDriverKey == Application.QuitKey)) {
+				if (_winDialog != null && (e.KeyCode == KeyCode.Esc
+								|| e.KeyCode == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.ConsoleDriverKey == Application.QuitKey) {
+				} else if (e.KeyCode == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
-				} else if (_winDialog != null && e.ConsoleDriverKey == (KeyCode.Tab | KeyCode.CtrlMask)) {
+				} else if (_winDialog != null && e.KeyCode == (KeyCode.Tab | KeyCode.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (_winDialog != null && e.ConsoleDriverKey == (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)) {
+				} else if (_winDialog != null && e.KeyCode == (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {

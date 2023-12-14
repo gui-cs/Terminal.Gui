@@ -771,9 +771,9 @@ namespace Terminal.Gui {
 				this.HasFocus &&
 				Table.Rows != 0 &&
 				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
-				!keyEvent.ConsoleDriverKey.HasFlag (KeyCode.CtrlMask) &&
-				!keyEvent.ConsoleDriverKey.HasFlag (KeyCode.AltMask) &&
-				Rune.IsLetterOrDigit (keyEvent)) {
+				!keyEvent.KeyCode.HasFlag (KeyCode.CtrlMask) &&
+				!keyEvent.KeyCode.HasFlag (KeyCode.AltMask) &&
+				Rune.IsLetterOrDigit ((Rune)keyEvent)) {
 				return CycleToNextTableEntryBeginningWith (keyEvent);
 			}
 

@@ -860,7 +860,7 @@ namespace Terminal.Gui.ViewTests {
 			var count = 0;
 
 			field.KeyDown += (s, k) => {
-				if (k.ConsoleDriverKey == KeyCode.Enter) {
+				if (k.KeyCode == KeyCode.Enter) {
 					field.Text = $"Label {count}";
 					var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 					view.Add (label);
@@ -920,7 +920,7 @@ namespace Terminal.Gui.ViewTests {
 			}
 
 			field.KeyDown += (s, k) => {
-				if (k.ConsoleDriverKey == KeyCode.Enter) {
+				if (k.KeyCode == KeyCode.Enter) {
 					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
 					view.Remove (listLabels [count - 1]);
 					listLabels [count - 1].Dispose ();
