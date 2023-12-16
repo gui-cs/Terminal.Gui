@@ -450,6 +450,7 @@ public class KeyboardEventTests {
 			};
 
 			Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
+			Assert.True (keyUp);
 			view.Dispose ();
 		}
 

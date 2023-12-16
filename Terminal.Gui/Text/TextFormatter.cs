@@ -929,16 +929,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Finds the hotkey and its location in text. 
+		/// Finds the HotKey and its location in text. 
 		/// </summary>
 		/// <param name="text">The text to look in.</param>
-		/// <param name="hotKeySpecifier">The hotkey specifier (e.g. '_') to look for.</param>
-		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
+		/// <param name="hotKeySpecifier">The HotKey specifier (e.g. '_') to look for.</param>
+		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the HotKey will be enabled.
 		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.</param>
 		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
-		/// <param name="hotKey">Outputs the hotKey. <see cref="KeyCode.Null"/> if not found.</param>
-		/// <returns><c>true</c> if a hotkey was found; <c>false</c> otherwise.</returns>
-		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out KeyCode hotKey)
+		/// <param name="hotKey">Outputs the hotKey. <see cref="Key.Empty"/> if not found.</param>
+		/// <returns><c>true</c> if a HotKey was found; <c>false</c> otherwise.</returns>
+		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
 		{
 			if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
 				hotPos = -1;
@@ -1291,10 +1291,10 @@ namespace Terminal.Gui {
 					NeedsFormat = false;
 					return _lines;
 				}
-
+				
 				if (NeedsFormat) {
 					var shown_text = _text;
-					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out KeyCode newHotKey)) {
+					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out var newHotKey)) {
 						HotKey = newHotKey;
 						shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);

@@ -42,7 +42,7 @@ public partial class View {
 	/// character of <see cref="Text"/> that is prefixed with with <see cref="HotKeySpecifier"/>.
 	/// <para>
 	/// A HotKey is a keypress that selects a visible UI item. For selecting items across <see cref="View"/>`s
-	/// (e.g.a <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="KeyCode.AltMask"/> modifier.
+	/// (e.g.a <see cref="Button"/> in a <see cref="Dialog"/>) the keypress must include the <see cref="Key.WithAlt"/> modifier.
 	/// For selecting items within a View that are not Views themselves, the keypress can be key without the Alt modifier.
 	/// For example, in a Dialog, a Button with the text of "_Text" can be selected with Alt-T.
 	/// Or, in a <see cref="Menu"/> with "_File _Edit", Alt-F will select (show) the "_File" menu.
@@ -62,8 +62,8 @@ public partial class View {
 	/// This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
-	/// By default, when the HotKey is set to <see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/> key bindings will be added for both the un-shifted and shifted
-	/// versions. This means if the HotKey is <see cref="KeyCode.A"/>, key bindings for <see cref="KeyCode.A"/> and <see cref="KeyCode.A"/> | <see cref="KeyCode.ShiftMask"/>
+	/// By default, when the HotKey is set to <see cref="Key.A"/> through <see cref="KeyCode.Z"/> key bindings will be added for both the un-shifted and shifted
+	/// versions. This means if the HotKey is <see cref="Key.A"/>, key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c>
 	/// will be added. This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
@@ -76,10 +76,10 @@ public partial class View {
 	public virtual Key HotKey {
 		get => _hotKey;
 		set {
-			if (value is null || value.KeyCode is KeyCode.Unknown) {
-				throw new ArgumentException (nameof (value));
+			if (value is null || value.KeyCode == KeyCode.Unknown) {
+				throw new ArgumentException (@"HotKey must not be null. Use Key.Empty to clear the HotKey.", nameof (value));
 			}
-			if (AddKeyBindingsForHotKey ((KeyCode)_hotKey, (KeyCode)value)) {
+			if (AddKeyBindingsForHotKey (_hotKey, value)) {
 				// This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
 				_hotKey = TextFormatter.HotKey = value;
 			}
@@ -92,13 +92,13 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// By default key bindings are added for both the base key (e.g. <see cref="KeyCode.D3"/>) and
-	/// the Alt-shifted key (e.g. <see cref="KeyCode.D3"/> | <see cref="KeyCode.AltMask"/>).
+	/// By default key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and
+	/// the Alt-shifted key (e.g. <c>Key.D3.WithAlt</c>
 	/// This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
-	/// By default, when <paramref name="hotKey"/> is <see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/> key bindings will be added for both the un-shifted and shifted
-	/// versions. This means if the HotKey is <see cref="KeyCode.A"/>, key bindings for <see cref="KeyCode.A"/> and <see cref="KeyCode.A"/> | <see cref="KeyCode.ShiftMask"/>
+	/// By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings will be added for both the un-shifted and shifted
+	/// versions. This means if the HotKey is <see cref="Key.A"/>, key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c>
 	/// will be added. This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>.
 	/// </para>
 	/// <para>
@@ -106,10 +106,10 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	/// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
-	/// <param name="hotKey">The new HotKey. If <see cre="Key.Null"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
+	/// <param name="hotKey">The new HotKey. If <see cref="Key.Empty"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
 	/// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
 	/// <exception cref="ArgumentException"></exception>
-	public virtual bool AddKeyBindingsForHotKey (KeyCode prevHotKey, KeyCode hotKey)
+	public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey)
 	{
 		if ((KeyCode)_hotKey == hotKey) {
 			return false;
@@ -117,21 +117,21 @@ public partial class View {
 
 		var newKey = hotKey == KeyCode.Unknown ? KeyCode.Null : hotKey;
 
-		var baseKey = newKey & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
-		if (newKey != KeyCode.Null && (baseKey == KeyCode.Space || Rune.IsControl (Key.ToRune (baseKey)))) {
+		var baseKey = newKey.NoAlt.NoShift.NoCtrl;
+		if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune))) {
 			throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
 		}
 
 		if (newKey != baseKey) {
-			if ((newKey & KeyCode.CtrlMask) != 0) {
+			if (newKey.IsCtrl) {
 				throw new ArgumentException (@$"HotKey does not support CtrlMask ({hotKey}).");
 			}
 			// Strip off the shift mask if it's A...Z
-			if (baseKey is >= KeyCode.A and <= KeyCode.Z && (newKey & KeyCode.ShiftMask) != 0) {
-				newKey &= ~KeyCode.ShiftMask;
+			if (baseKey.IsKeyCodeAtoZ) {
+				newKey = newKey.NoShift;
 			}
 			// Strip off the Alt mask
-			newKey &= ~KeyCode.AltMask;
+			newKey = newKey.NoAlt;
 		}
 
 		// Remove base version
@@ -140,18 +140,18 @@ public partial class View {
 		}
 
 		// Remove the Alt version
-		if (KeyBindings.TryGet (prevHotKey | KeyCode.AltMask, out _)) {
-			KeyBindings.Remove (prevHotKey | KeyCode.AltMask);
+		if (KeyBindings.TryGet (prevHotKey.WithAlt, out _)) {
+			KeyBindings.Remove (prevHotKey.WithAlt);
 		}
 
 		if (_hotKey.KeyCode is >= KeyCode.A and <= KeyCode.Z) {
 			// Remove the shift version
-			if (KeyBindings.TryGet (prevHotKey | KeyCode.ShiftMask, out _)) {
-				KeyBindings.Remove (prevHotKey | KeyCode.ShiftMask);
+			if (KeyBindings.TryGet (prevHotKey.WithShift, out _)) {
+				KeyBindings.Remove (prevHotKey.WithShift);
 			}
 			// Remove alt | shift version
-			if (KeyBindings.TryGet (prevHotKey | KeyCode.ShiftMask | KeyCode.AltMask, out _)) {
-				KeyBindings.Remove (prevHotKey | KeyCode.ShiftMask | KeyCode.AltMask);
+			if (KeyBindings.TryGet (prevHotKey.WithShift.WithAlt, out _)) {
+				KeyBindings.Remove (prevHotKey.WithShift.WithAlt);
 			}
 		}
 
@@ -159,12 +159,12 @@ public partial class View {
 		if (newKey != KeyCode.Null) {
 			// Add the base and Alt key
 			KeyBindings.Add (newKey, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-			KeyBindings.Add (newKey | KeyCode.AltMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+			KeyBindings.Add (newKey.WithAlt, KeyBindingScope.HotKey, Command.Default, Command.Accept);
 
 			// If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
-			if (newKey is >= KeyCode.A and <= KeyCode.Z) {
-				KeyBindings.Add (newKey | KeyCode.ShiftMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
-				KeyBindings.Add (newKey | KeyCode.ShiftMask | KeyCode.AltMask, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+			if (newKey.IsKeyCodeAtoZ) {
+				KeyBindings.Add (newKey.WithShift, KeyBindingScope.HotKey, Command.Default, Command.Accept);
+				KeyBindings.Add (newKey.WithShift.WithAlt, KeyBindingScope.HotKey, Command.Default, Command.Accept);
 			}
 		}
 		return true;

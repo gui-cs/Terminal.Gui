@@ -51,7 +51,7 @@ public class HotKeyTests {
 	[InlineData ((KeyCode)'х')]  // Cyrillic x
 	[InlineData ((KeyCode)'你')] // Chinese ni
 	[InlineData ((KeyCode)'ö')] // German o umlaut
-	public void Set_SetsKeyBindings (KeyCode key)
+	public void Set_SetsKeyBindings (Key key)
 	{
 		var view = new View ();
 		view.HotKey = key;
@@ -63,27 +63,25 @@ public class HotKeyTests {
 		// As passed
 		var commands = view.KeyBindings.GetCommands (key);
 		Assert.Contains (Command.Accept, commands);
-		commands = view.KeyBindings.GetCommands (key | KeyCode.AltMask);
-		Assert.Contains (Command.Accept, commands);
 
-		var baseKey = key & ~KeyCode.ShiftMask;
+		var baseKey = key.NoShift;
 		// If A...Z, with and without shift
-		if (baseKey is >= KeyCode.A and <= KeyCode.Z) {
-			commands = view.KeyBindings.GetCommands (key | KeyCode.ShiftMask);
+		if (baseKey.IsKeyCodeAtoZ) {
+			commands = view.KeyBindings.GetCommands (key.WithShift);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~KeyCode.ShiftMask);
+			commands = view.KeyBindings.GetCommands (key.NoShift);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key | KeyCode.AltMask);
+			commands = view.KeyBindings.GetCommands (key.WithAlt);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~KeyCode.ShiftMask | KeyCode.AltMask);
+			commands = view.KeyBindings.GetCommands (key.NoShift.WithAlt);
 			Assert.Contains (Command.Accept, commands);
 		} else {
 			// Non A..Z keys should not have shift bindings
-			if (key.HasFlag (KeyCode.ShiftMask)) {
-				commands = view.KeyBindings.GetCommands (key & ~KeyCode.ShiftMask);
+			if (key.IsShift) {
+				commands = view.KeyBindings.GetCommands (key.NoShift);
 				Assert.Empty (commands);
 			} else {
-				commands = view.KeyBindings.GetCommands (key | KeyCode.ShiftMask);
+				commands = view.KeyBindings.GetCommands (key.WithShift);
 				Assert.Empty (commands);
 			}
 		}

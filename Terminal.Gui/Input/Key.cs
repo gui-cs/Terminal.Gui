@@ -19,8 +19,7 @@ namespace Terminal.Gui;
 /// 
 /// </para>
 /// <para>
-/// The default value for <see cref="Key.KeyCode"/> is <see cref="KeyCode.Null"/>. This is used to indicate that the key has not been
-/// set. 
+/// The default value for <see cref="Key"/> is <see cref="KeyCode.Null"/> and can be tested using <see cref="Key.Empty"/>.
 /// </para>
 /// <para>
 /// <list type="table">
@@ -85,13 +84,16 @@ public class Key : EventArgs, IEquatable<Key> {
 	public bool Handled { get; set; } = false;
 
 	/// <summary>
-	/// The encoded key value.
+	/// The encoded key value. 
 	/// </summary>
 	/// <para>
 	/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
 	/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
 	/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </para>
+	/// <remarks>
+	/// This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.
+	/// </remarks>
 	[JsonInclude] [JsonConverter (typeof (KeyCodeJsonConverter))]
 	public KeyCode KeyCode { get; set; }
 
@@ -166,7 +168,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// </summary>
 	/// <remarks>
 	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to
-	/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
+	/// the un-shifted A to Z keys on a keyboard. Helper properties are provided these (e.g. <see cref="Key.A"/>, <see cref="Key.B"/>, etc.).
 	/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </remarks>
 	public bool IsKeyCodeAtoZ => GetIsKeyCodeAtoZ (KeyCode);
@@ -176,7 +178,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// </summary>
 	/// <remarks>
 	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to
-	/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
+	/// the un-shifted A to Z keys on a keyboard. Helper properties are provided these (e.g. <see cref="Key.A"/>, <see cref="Key.B"/>, etc.).
 	/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </remarks>
 	public static bool GetIsKeyCodeAtoZ (KeyCode keyCode)
