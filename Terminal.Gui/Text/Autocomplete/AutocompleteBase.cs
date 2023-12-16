@@ -39,12 +39,15 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public abstract ColorScheme ColorScheme { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <inheritdoc/>
 		public virtual KeyCode SelectionKey { get; set; } = KeyCode.Enter;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <inheritdoc/>
 		public virtual KeyCode CloseKey { get; set; } = KeyCode.Esc;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <inheritdoc/>
 		public virtual KeyCode Reopen { get; set; } = KeyCode.Space | KeyCode.CtrlMask | KeyCode.AltMask;
 

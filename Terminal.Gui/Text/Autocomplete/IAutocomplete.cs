@@ -53,16 +53,19 @@ namespace Terminal.Gui {
 		/// </summary>
 		ColorScheme ColorScheme { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
 		/// </summary>
 		KeyCode SelectionKey { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key that the user can press to close the currently popped autocomplete menu
 		/// </summary>
 		KeyCode CloseKey { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key that the user can press to reopen the currently popped autocomplete menu
 		/// </summary>

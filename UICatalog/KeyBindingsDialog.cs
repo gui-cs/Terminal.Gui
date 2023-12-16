@@ -8,7 +8,7 @@ using Terminal.Gui;
 namespace UICatalog {
 
 	class KeyBindingsDialog : Dialog {
-
+		// TODO: Update to use Key instead of KeyCode
 		static Dictionary<Command,KeyCode> CurrentBindings = new Dictionary<Command,KeyCode>();
 		private Command[] commands;
 		private ListView commandsListView;

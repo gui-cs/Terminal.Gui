@@ -382,23 +382,17 @@ public class MenuBar : View {
 	}
 
 	#region Keyboard handling
-	Key _key = KeyCode.F9;
+	Key _key = Key.F9;
 
 	/// <summary>
-	/// The <see cref="KeyCode"/> used to activate or close the menu bar by keyboard. The default is <see cref="KeyCode.F9"/>.
+	/// The <see cref="Key"/> used to activate or close the menu bar by keyboard. The default is <see cref="Key.F9"/>.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// The menu bar can also be activated by pressing the <see cref="KeyCode.AltMask"/> key. This will highlight the menu bar, but not open any sub-menus.
-	/// </para>
-	/// <para>
 	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
 	/// </para>
 	/// <para>
-	/// If the user presses any <see cref="MenuItem.HotKey"/>s defined in the <see cref="MenuBarItem"/>s, the menu bar will be activated and the sub-menu will be opened.
-	/// </para>
-	/// <para>
-	/// <see cref="KeyCode.Esc"/> will close the menu bar and any open sub-menus.
+	/// <see cref="Key.Esc"/> will close the menu bar and any open sub-menus.
 	/// </para>
 	/// </remarks>
 	public Key Key {
@@ -407,8 +401,8 @@ public class MenuBar : View {
 			if (_key == value) {
 				return;
 			}
-			KeyBindings.Remove ((KeyCode)_key);
-			KeyBindings.Add ((KeyCode)value, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+			KeyBindings.Remove (_key);
+			KeyBindings.Add (value, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 			_key = value;
 		}
 	}
@@ -548,6 +542,7 @@ public class MenuBar : View {
 		return base.OnInvokingKeyBindings (keyEvent);
 	}
 
+	// TODO: Update to use Key instead of KeyCode
 	// Recurse the child menus looking for a shortcut that matches the key
 	bool FindShortcutInChildMenu (KeyCode key, MenuBarItem menuBarItem, out MenuItem menuItemToSelect)
 	{
@@ -572,7 +567,7 @@ public class MenuBar : View {
 		}
 		return false;
 	}
-	#endregion Keyboard handling
+#endregion Keyboard handling
 
 	bool _initialCanFocus;
 

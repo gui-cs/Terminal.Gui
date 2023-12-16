@@ -8,6 +8,7 @@ namespace Terminal.Gui;
 /// Represents a helper to manipulate shortcut keys used on views.
 /// </summary>
 public class ShortcutHelper {
+	// TODO: Update this to use Key, not KeyCode
 	private KeyCode shortcut;
 
 	/// <summary>

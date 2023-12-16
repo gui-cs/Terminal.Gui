@@ -119,6 +119,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<ObjectActivatedEventArgs<T>> ObjectActivated;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>.
 		/// Defaults to Enter.

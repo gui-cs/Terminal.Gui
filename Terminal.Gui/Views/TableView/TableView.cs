@@ -34,6 +34,7 @@ namespace Terminal.Gui {
 		private int selectedColumn;
 		private ITableSource table;
 		private TableStyle style = new TableStyle ();
+		// TODO: Update to use Key instead of KeyCode
 		private KeyCode cellActivationKey = KeyCode.Enter;
 
 		Point? scrollLeftPoint;
@@ -169,6 +170,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<CellToggledEventArgs> CellToggled;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
 		/// </summary>

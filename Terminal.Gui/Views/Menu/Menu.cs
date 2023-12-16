@@ -45,11 +45,13 @@ public class MenuItem {
 	/// <remarks>This property is not used internally.</remarks>
 	public object Data { get; set; }
 
+	// TODO: Update to use Key instead of KeyCode
 	/// <summary>
 	/// Initializes a new instance of <see cref="MenuItem"/>
 	/// </summary>
 	public MenuItem (KeyCode shortcut = KeyCode.Null) : this ("", "", null, null, null, shortcut) { }
 
+	// TODO: Update to use Key instead of KeyCode
 	/// <summary>
 	/// Initializes a new instance of <see cref="MenuItem"/>.
 	/// </summary>
@@ -73,6 +75,8 @@ public class MenuItem {
 	}
 
 	#region Keyboard Handling
+
+	// TODO: Update to use Key instead of Rune
 	/// <summary>
 	/// The HotKey is used to activate a <see cref="MenuItem"/> with the keyboard. HotKeys are defined by prefixing the <see cref="Title"/>
 	/// of a MenuItem with an underscore ('_'). 
@@ -107,6 +111,8 @@ public class MenuItem {
 		}
 	}
 
+
+	// TODO: Update to use Key instead of KeyCode
 	/// <summary>
 	/// Shortcut defines a key binding to the MenuItem that will invoke the MenuItem's action globally for the <see cref="View"/> that is
 	/// the parent of the <see cref="MenuBar"/> or <see cref="ContextMenu"/> this <see cref="MenuItem"/>.

@@ -11,7 +11,8 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TileView : View {
 		TileView parentTileView;
-
+		
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The keyboard key that the user can press to toggle resizing
 		/// of splitter lines.  Mouse drag splitting is always enabled.

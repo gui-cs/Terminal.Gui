@@ -637,7 +637,7 @@ namespace Terminal.Gui {
 		///        <description>Function</description>
 		///    </listheader>
 		///    <item>
-		///        <term><see cref="KeyCode.Delete"/>, <see cref="KeyCode.Backspace"/></term>
+		///        <term><see cref="Key.Delete"/>, <see cref="Key.Backspace"/></term>
 		///        <description>Deletes the character before cursor.</description>
 		///    </item>
 		/// </list>

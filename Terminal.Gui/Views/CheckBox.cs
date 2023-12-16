@@ -99,8 +99,7 @@ public class CheckBox : View {
 		});
 
 		// Default keybindings for this view
-		KeyBindings.Add ((KeyCode)' ', Command.ToggleChecked);
-		KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+		KeyBindings.Add (Key.Space, Command.ToggleChecked);
 	}
 
 
@@ -114,18 +113,18 @@ public class CheckBox : View {
 
 			var prev = base.HotKey;
 			if (prev != value) {
-				var v = value == (Key)KeyCode.Unknown ? KeyCode.Null : value;
+				var v = value == KeyCode.Unknown ? Key.Empty: value;
 				base.HotKey = TextFormatter.HotKey = v;
 
 				// Also add Alt+HotKey
-				if (prev != (Key)KeyCode.Null && KeyBindings.TryGet (prev.KeyCode | KeyCode.AltMask, out _)) {
+				if (prev != (Key)KeyCode.Null && KeyBindings.TryGet (prev.WithAlt, out _)) {
 					if (v.KeyCode == KeyCode.Null) {
-						KeyBindings.Remove (prev.KeyCode | KeyCode.AltMask);
+						KeyBindings.Remove (prev.WithAlt);
 					} else {
-						KeyBindings.Replace (prev.KeyCode | KeyCode.AltMask, v.KeyCode | KeyCode.AltMask);
+						KeyBindings.Replace (prev.WithAlt, v.WithAlt);
 					}
 				} else if (v.KeyCode != KeyCode.Null) {
-					KeyBindings.Add (v.KeyCode | KeyCode.AltMask, Command.Accept);
+					KeyBindings.Add (v.WithAlt, Command.Accept);
 				}
 			}
 		}

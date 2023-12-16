@@ -139,7 +139,7 @@ public class StatusBar : View {
 		if (KeyBindings.TryGet(key, out _)) {
 			// Search RadioLabels 
 			foreach (var item in Items) {
-				if ((KeyCode)item.Shortcut == key) {
+				if (item.Shortcut == key) {
 					_itemToInvoke = item;
 					keyEvent.Scope = KeyBindingScope.HotKey;
 					break;

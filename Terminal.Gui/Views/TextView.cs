@@ -1580,7 +1580,7 @@ namespace Terminal.Gui {
 
 		/// <summary>
 		/// Invoked when the used color is drawn. The Used Color is used to indicate
-		/// if the <see cref="KeyCode.InsertChar"/> was pressed and enabled.
+		/// if the <see cref="Key.InsertChar"/> was pressed and enabled.
 		/// </summary>
 		public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
 
