@@ -270,15 +270,15 @@ class UICatalogApp {
 				_themeMenuBarItem,
 				new ("Diag_nostics", CreateDiagnosticMenuItems ()),
 				new ("_Help", new MenuItem [] {
-					new ("_Documentation", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"), null, null, KeyCode.F1),
-					new ("_README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, KeyCode.F2),
+					new ("_Documentation", "", () => OpenUrl ("https://gui-cs.github.io/Terminal.GuiV2Docs"), null, null, (KeyCode)Key.F1),
+					new ("_README", "", () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"), null, null, (KeyCode)Key.F2),
 					new ("_About...",
-						"About UI Catalog", () => MessageBox.Query ("About UI Catalog", _aboutMessage!.ToString (), 0, false, "_Ok"), null, null, KeyCode.CtrlMask | KeyCode.A)
+						"About UI Catalog", () => MessageBox.Query ("About UI Catalog", _aboutMessage!.ToString (), 0, false, "_Ok"), null, null, (KeyCode)Key.A.WithCtrl)
 				})
 			});
 
-			DriverName = new StatusItem (KeyCode.CharMask, "Driver:", null);
-			OS = new StatusItem (KeyCode.CharMask, "OS:", null);
+			DriverName = new StatusItem (Key.Empty, "Driver:", null);
+			OS = new StatusItem (Key.Empty, "OS:", null);
 
 			StatusBar = new StatusBar () {
 				Visible = ShowStatusBar
@@ -294,7 +294,7 @@ class UICatalogApp {
 						_selectedScenario.RequestStop ();
 					}
 				}),
-				new (KeyCode.F10, "~F10~ Status Bar", () => {
+				new (Key.F10, "~F10~ Status Bar", () => {
 					StatusBar.Visible = !StatusBar.Visible;
 					//ContentPane!.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
 					LayoutSubviews ();
@@ -380,14 +380,14 @@ class UICatalogApp {
 			ScenarioList.CellActivated += ScenarioView_OpenSelectedItem;
 
 			// TableView typically is a grid where nav keys are biased for moving left/right.
-			ScenarioList.KeyBindings.Add (KeyCode.Home, Command.TopHome);
-			ScenarioList.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+			ScenarioList.KeyBindings.Add (Key.Home, Command.TopHome);
+			ScenarioList.KeyBindings.Add (Key.End, Command.BottomEnd);
 
 			// Ideally, TableView.MultiSelect = false would turn off any keybindings for
 			// multi-select options. But it currently does not. UI Catalog uses Ctrl-A for
 			// a shortcut to About.
 			ScenarioList.MultiSelect = false;
-			ScenarioList.KeyBindings.Remove (KeyCode.CtrlMask | KeyCode.A);
+			ScenarioList.KeyBindings.Remove (Key.A.WithCtrl);
 
 			Add (CategoryList);
 			Add (ScenarioList);
@@ -506,7 +506,7 @@ class UICatalogApp {
 			miIsMenuBorderDisabled = new MenuItem {
 				Title = "Disable Menu _Border"
 			};
-			miIsMenuBorderDisabled.Shortcut = KeyCode.CtrlMask | KeyCode.AltMask | (KeyCode)miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0];
+			miIsMenuBorderDisabled.Shortcut = (KeyCode)((Key)miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt.WithCtrl;
 			miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 			miIsMenuBorderDisabled.Action += () => {
 				miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
@@ -523,7 +523,7 @@ class UICatalogApp {
 			var menuItems = new List<MenuItem> ();
 			miForce16Colors = new MenuItem {
 				Title = "Force _16 Colors",
-				Shortcut = KeyCode.F6,
+				Shortcut = (KeyCode)Key.F6,
 				Checked = Application.Force16Colors,
 				CanExecute = () => (bool)Application.Driver.SupportsTrueColor
 			};
@@ -543,7 +543,7 @@ class UICatalogApp {
 			miIsMouseDisabled = new MenuItem {
 				Title = "_Disable Mouse"
 			};
-			miIsMouseDisabled.Shortcut = KeyCode.CtrlMask | KeyCode.AltMask | (KeyCode)miIsMouseDisabled!.Title!.Substring (1, 1) [0];
+			miIsMouseDisabled.Shortcut = (KeyCode)((Key)miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl;
 			miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 			miIsMouseDisabled.Action += () => {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked!;
@@ -582,7 +582,7 @@ class UICatalogApp {
 			foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ())) {
 				var item = new MenuItem {
 					Title = GetDiagnosticsTitle (diag),
-					Shortcut = KeyCode.AltMask + index.ToString () [0]
+					Shortcut = (KeyCode)((Key)index.ToString () [0]).WithAlt
 				};
 				index++;
 				item.CheckType |= MenuItemCheckStyle.Checked;
@@ -675,7 +675,7 @@ class UICatalogApp {
 			foreach (var theme in Themes!) {
 				var item = new MenuItem {
 					Title = $"_{theme.Key}",
-					Shortcut = KeyCode.CtrlMask | (KeyCode)((int)KeyCode.D1 + schemeCount++)
+					Shortcut = (KeyCode)((Key)((int)KeyCode.D1 + schemeCount++)).WithCtrl
 				};
 				item.CheckType |= MenuItemCheckStyle.Checked;
 				item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;

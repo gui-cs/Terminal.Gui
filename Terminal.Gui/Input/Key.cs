@@ -25,6 +25,7 @@ namespace Terminal.Gui;
 /// set. 
 /// </para>
 /// </remarks>
+[JsonConverter (typeof (KeyJsonConverter))]
 public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// Constructs a new <see cref="Key"/>
@@ -486,6 +487,10 @@ public class Key : EventArgs, IEquatable<Key> {
 
 
 	#region Standard Key Definitions
+	/// <summary>
+	/// An uninitialized The <see cref="Key"/> object.
+	/// </summary>
+	public static readonly Key Empty = new ();
 
 	/// <summary>
 	/// The <see cref="Key"/> object for the Backspace key.
