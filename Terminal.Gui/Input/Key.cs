@@ -25,7 +25,7 @@ namespace Terminal.Gui;
 /// <para>
 /// <list type="table">
 ///	<listheader>
-///		<term>Concept</term><description>Definition</description>
+///	<term>Concept</term><description>Definition</description>
 ///	</listheader>
 ///	<item>
 ///	<term>Testing Shift State</term>
@@ -55,9 +55,16 @@ namespace Terminal.Gui;
 ///	Even though the encoded values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 ///	</description>
 ///	</item>
+///	<item>
+///     <term>Persistence as strings</term>
+///	<description>
+///     Keys are persisted as <c>"[Modifiers]+[Key]</c>. For example <c>new Key(Key.Delete).WithAlt.WithDel</c> is persisted as <c>"Ctrl+Alt+Delete"</c>. See <see cref="ToString()"/>
+///     and <see cref="TryParse(string, out Terminal.Gui.Key)"/> for more information.
+///	</description>
+///	</item>
 /// </list>
 /// </para>
-///  </remarks>
+/// </remarks>
 [JsonConverter (typeof (KeyJsonConverter))]
 public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
@@ -188,7 +195,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// Indicates whether the <see cref="Key"/> is valid or not. 
 	/// </summary>
-	public bool IsValid => !(KeyCode == KeyCode.Null || KeyCode == KeyCode.Unknown);
+	public bool IsValid => KeyCode is not (KeyCode.Null or KeyCode.Unknown);
 
 	/// <summary>
 	/// Helper for specifying a shifted <see cref="Key"/>.
