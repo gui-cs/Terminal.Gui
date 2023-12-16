@@ -1390,7 +1390,7 @@ public static partial class Application {
 	/// <summary>
 	/// Called by the <see cref="ConsoleDriver"/> when the user presses a key.
 	/// Fires the <see cref="KeyDown"/> event
-	/// then calls <see cref="View.ProcessKeyDown"/> on all top level views.
+	/// then calls <see cref="View.NewKeyDownEvent"/> on all top level views.
 	/// Called after <see cref="OnKeyDown"/> and before <see cref="OnKeyUp"/>.
 	/// </summary>
 	/// <remarks>
@@ -1410,7 +1410,7 @@ public static partial class Application {
 		}
 
 		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.ProcessKeyDown (keyEvent)) {
+			if (topLevel.NewKeyDownEvent (keyEvent)) {
 				return true;
 			}
 			if (topLevel.Modal) {
@@ -1453,7 +1453,7 @@ public static partial class Application {
 	/// <summary>
 	/// Called by the <see cref="ConsoleDriver"/> when the user releases a key.
 	/// Fires the <see cref="KeyUp"/> event
-	/// then calls <see cref="View.ProcessKeyUp"/> on all top level views.
+	/// then calls <see cref="View.NewKeyUpEvent"/> on all top level views.
 	/// Called after <see cref="OnKeyDown"/>.
 	/// </summary>
 	/// <remarks>

@@ -294,17 +294,17 @@ public partial class View {
 
 	#region Key Down Event
 	/// <summary>
-	/// If the view is enabled, processes a key down event and returns <see langword="true"/> if the event was handled.
+	/// If the view is enabled, processes a new key down event and returns <see langword="true"/> if the event was handled.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// If the view has a sub view that is focused, <see cref="ProcessKeyDown"/> will be called on the focused view first.
+	/// If the view has a sub view that is focused, <see cref="NewKeyDownEvent"/> will be called on the focused view first.
 	/// </para>
 	/// <para>
 	/// If the focused sub view does not handle the key press, this method calls <see cref="OnKeyDown"/> to allow the view
 	/// to pre-process the key press. If <see cref="OnKeyDown"/> returns <see langword="false"/>, this method then calls
 	/// <see cref="OnInvokingKeyBindings"/> to invoke any key bindings. Then, only if no key bindings are handled,
-	/// <see cref="OnKeyPressed"/> will be called allowing the view to process the key press.
+	/// <see cref="OnProcessKeyDown"/> will be called allowing the view to process the key press.
 	/// </para>
 	/// <para>
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
@@ -312,7 +312,7 @@ public partial class View {
 	/// </remarks>
 	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the event was handled.</returns>
-	public bool ProcessKeyDown (Key keyEvent)
+	public bool NewKeyDownEvent (Key keyEvent)
 	{
 		if (!Enabled) {
 			return false;
@@ -320,7 +320,7 @@ public partial class View {
 
 		// By default the KeyBindingScope is View
 
-		if (Focused?.ProcessKeyDown (keyEvent) == true) {
+		if (Focused?.NewKeyDownEvent (keyEvent) == true) {
 			return true;
 		}
 
@@ -336,7 +336,7 @@ public partial class View {
 		}
 
 		// After (fire the cancellable event)
-		if (OnKeyPressed (keyEvent)) {
+		if (OnProcessKeyDown (keyEvent)) {
 			return true;
 		}
 
@@ -344,8 +344,8 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Low-level API called when the user presses a key, allowing a view to preprocess the key down event.
-	/// This is called from <see cref="ProcessKeyDown"/> before <see cref="OnInvokingKeyBindings"/>.
+	/// Low-level API called when the user presses a key, allowing a view to pre-process the key down event.
+	/// This is called from <see cref="NewKeyDownEvent"/> before <see cref="OnInvokingKeyBindings"/>.
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
@@ -366,7 +366,7 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Invoked when the user presses a key, allowing subscribers to preprocess the key down event.
+	/// Invoked when the user presses a key, allowing subscribers to pre-process the key down event.
 	/// This is fired from <see cref="OnKeyDown"/> before <see cref="OnInvokingKeyBindings"/>.
 	/// Set <see cref="Key.Handled"/> to true to stop the key from
 	/// being processed by other views. 
@@ -383,31 +383,31 @@ public partial class View {
 	public event EventHandler<Key> KeyDown;
 
 	/// <summary>
-	/// Low-level API called when the user presses a key, allowing views do things during key press events.
-	/// This is called from <see cref="ProcessKeyDown"/> after <see cref="OnInvokingKeyBindings"/>. 
+	/// Low-level API called when the user presses a key, allowing views do things during key down events.
+	/// This is called from <see cref="NewKeyDownEvent"/> after <see cref="OnInvokingKeyBindings"/>. 
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key press was not handled. <see langword="true"/> if
 	/// the keypress was handled and no other view should see it.</returns>
 	/// <remarks>
 	/// <para>
-	/// Override <see cref="OnKeyPressed"/> to override the behavior of how the base class processes key down events.
+	/// Override <see cref="OnProcessKeyDown"/> to override the behavior of how the base class processes key down events.
 	/// </para>
 	/// <para>
 	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(Key, Command[])"/>instead.
 	/// </para>
 	/// <para>
-	/// Fires the <see cref="KeyPressed"/> event. 
+	/// Fires the <see cref="ProcessKeyDown"/> event. 
 	/// </para>
 	/// <para>
 	/// Not all terminals support distinct key up notifications; applications should avoid
 	/// depending on distinct KeyUp events.
 	/// </para>
 	/// </remarks>
-	public virtual bool OnKeyPressed (Key keyEvent)
+	public virtual bool OnProcessKeyDown (Key keyEvent)
 	{
 		// fire event
-		KeyPressed?.Invoke (this, keyEvent);
+		ProcessKeyDown?.Invoke (this, keyEvent);
 		return keyEvent.Handled;
 	}
 
@@ -418,7 +418,7 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// SubViews can use the <see cref="KeyPressed"/> of their super view override the default behavior of
+	/// SubViews can use the <see cref="ProcessKeyDown"/> of their super view override the default behavior of
 	/// when key bindings are invoked.
 	/// </para>
 	/// <para>
@@ -429,14 +429,14 @@ public partial class View {
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// </para>
 	/// </remarks>
-	public event EventHandler<Key> KeyPressed;
+	public event EventHandler<Key> ProcessKeyDown;
 
 	#endregion KeyDown Event
 
 	#region KeyUp Event
 	/// <summary>
-	/// If the view is enabled, processes a key up event and returns <see langword="true"/> if the event was handled.
-	/// Called before <see cref="ProcessKeyDown"/>.
+	/// If the view is enabled, processes a new key up event and returns <see langword="true"/> if the event was handled.
+	/// Called before <see cref="NewKeyDownEvent"/>.
 	/// </summary>
 	/// <remarks>
 	/// <para>
@@ -444,7 +444,7 @@ public partial class View {
 	/// depending on distinct KeyUp events.
 	/// </para>
 	/// <para>
-	/// If the view has a sub view that is focused, <see cref="ProcessKeyUp"/> will be called on the focused view first.
+	/// If the view has a sub view that is focused, <see cref="NewKeyUpEvent"/> will be called on the focused view first.
 	/// </para>
 	/// <para>
 	/// If the focused sub view does not handle the key press, this method calls <see cref="OnKeyUp"/>, which is cancellable.
@@ -455,13 +455,13 @@ public partial class View {
 	/// </remarks>
 	/// <param name="keyEvent"></param>
 	/// <returns><see langword="true"/> if the event was handled.</returns>
-	public bool ProcessKeyUp (Key keyEvent)
+	public bool NewKeyUpEvent (Key keyEvent)
 	{
 		if (!Enabled) {
 			return false;
 		}
 
-		if (Focused?.ProcessKeyUp (keyEvent) == true) {
+		if (Focused?.NewKeyUpEvent (keyEvent) == true) {
 			return true;
 		}
 
@@ -480,7 +480,7 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Method invoked when a key is released. This method is called from <see cref="ProcessKeyUp"/>.
+	/// Method invoked when a key is released. This method is called from <see cref="NewKeyUpEvent"/>.
 	/// </summary>
 	/// <param name="keyEvent">Contains the details about the key that produced the event.</param>
 	/// <returns><see langword="false"/> if the key stroke was not handled. <see langword="true"/> if no
@@ -541,7 +541,7 @@ public partial class View {
 
 	/// <summary>
 	/// Low-level API called when a user presses a key; invokes any key bindings set on the view.
-	/// This is called during <see cref="ProcessKeyDown"/> after <see cref="OnKeyDown"/> has returned.
+	/// This is called during <see cref="NewKeyDownEvent"/> after <see cref="OnKeyDown"/> has returned.
 	/// </summary>
 	/// <remarks>
 	/// <para>

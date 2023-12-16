@@ -61,7 +61,7 @@ public class RadioGroupTests {
 	{
 		var rg = new RadioGroup (new string [] { "Test" }, -1);
 		Assert.Equal (-1, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.Space)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.Space)));
 		Assert.Equal (0, rg.SelectedItem);
 	}
 
@@ -159,11 +159,11 @@ public class RadioGroupTests {
 	{
 		var rg = new RadioGroup (new string [] { "Test", "New Test" });
 
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.CursorUp)));
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.CursorDown)));
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.Home)));
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.End)));
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.Space)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.CursorUp)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.CursorDown)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.Home)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.End)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.Space)));
 		Assert.Equal (1, rg.SelectedItem);
 	}
 
@@ -191,42 +191,42 @@ public class RadioGroupTests {
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
 
 		// BUGBUG: These tests only test that RG works on it's own, not if it's a subview
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.T)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.T)));
 		Assert.Equal (2, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.L)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.L)));
 		Assert.Equal (0, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.J)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.J)));
 		Assert.Equal (3, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.R)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.R)));
 		Assert.Equal (1, rg.SelectedItem);
 
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.T | KeyCode.AltMask)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
 		Assert.Equal (2, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.L | KeyCode.AltMask)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.L | KeyCode.AltMask)));
 		Assert.Equal (0, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.J | KeyCode.AltMask)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.J | KeyCode.AltMask)));
 		Assert.Equal (3, rg.SelectedItem);
-		Assert.True (rg.ProcessKeyDown (new (KeyCode.R | KeyCode.AltMask)));
+		Assert.True (rg.NewKeyDownEvent (new (KeyCode.R | KeyCode.AltMask)));
 		Assert.Equal (1, rg.SelectedItem);
 
 		var superView = new View ();
 		superView.Add (rg);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.T)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.T)));
 		Assert.Equal (2, rg.SelectedItem);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.L)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.L)));
 		Assert.Equal (0, rg.SelectedItem);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.J)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.J)));
 		Assert.Equal (3, rg.SelectedItem);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.R)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.R)));
 		Assert.Equal (1, rg.SelectedItem);
 
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.T | KeyCode.AltMask)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
 		Assert.Equal (2, rg.SelectedItem);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.L | KeyCode.AltMask)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.L | KeyCode.AltMask)));
 		Assert.Equal (0, rg.SelectedItem);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.J | KeyCode.AltMask)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.J | KeyCode.AltMask)));
 		Assert.Equal (3, rg.SelectedItem);
-		Assert.True (superView.ProcessKeyDown (new (KeyCode.R | KeyCode.AltMask)));
+		Assert.True (superView.NewKeyDownEvent (new (KeyCode.R | KeyCode.AltMask)));
 		Assert.Equal (1, rg.SelectedItem);
 
 	}

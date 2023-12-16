@@ -79,37 +79,37 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			Assert.Equal (KeyCode.T, btn.HotKey);
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.T)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.T | KeyCode.AltMask)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.False (btn.IsDefault);
-			Assert.False (btn.ProcessKeyDown (new (KeyCode.Enter)));
+			Assert.False (btn.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.False (clicked);
 			btn.IsDefault = true;
-			Assert.False (btn.ProcessKeyDown (new (KeyCode.Enter)));
-			Assert.True (Application.Top.ProcessKeyDown (new (KeyCode.Enter)));
+			Assert.False (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.AltMask | KeyCode.T)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.AltMask | KeyCode.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (Application.Top.ProcessKeyDown (new (KeyCode.Enter)));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.Space)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.Space)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new ((KeyCode)'T')));
+			Assert.True (btn.NewKeyDownEvent (new ((KeyCode)'T')));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (btn.HotKey));
+			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
 			Assert.True (clicked);
 			btn.Text = "Te_st";
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (btn.HotKey));
+			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
 			Assert.True (clicked);
 		}
 
@@ -124,16 +124,16 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (Application.Top);
 
 			Assert.Equal (KeyCode.T, btn.HotKey);
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.T)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
 			Assert.True (clicked);
 
 			clicked = false;
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.T | KeyCode.AltMask)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
 			Assert.True (clicked);
 
 			clicked = false;
 			btn.HotKey = KeyCode.E;
-			Assert.True (btn.ProcessKeyDown (new (KeyCode.E | KeyCode.AltMask)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.E | KeyCode.AltMask)));
 			Assert.True (clicked);
 		}
 

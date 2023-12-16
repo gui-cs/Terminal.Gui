@@ -247,7 +247,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (Key a)
+		public override bool OnProcessKeyDown (Key a)
 		{
 			// Ignore non-numeric characters.
 			if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9) {

@@ -26,7 +26,7 @@ public class AppendAutocompleteTests {
 		tf.PositionCursor ();
 		TestHelpers.AssertDriverContentsAre ("", output);
 
-		tf.ProcessKeyDown ('f');
+		tf.NewKeyDownEvent ('f');
 
 		tf.Draw ();
 		tf.PositionCursor ();
@@ -59,10 +59,10 @@ public class AppendAutocompleteTests {
 		tf.Draw ();
 		tf.PositionCursor ();
 		TestHelpers.AssertDriverContentsAre ("", output);
-		tf.ProcessKeyDown (new Key ((KeyCode)'m'));
-		tf.ProcessKeyDown (new Key ((KeyCode)'y'));
-		tf.ProcessKeyDown (new Key (KeyCode.Space));
-		tf.ProcessKeyDown (new Key ((KeyCode)'f'));
+		tf.NewKeyDownEvent (new Key ((KeyCode)'m'));
+		tf.NewKeyDownEvent (new Key ((KeyCode)'y'));
+		tf.NewKeyDownEvent (new Key (KeyCode.Space));
+		tf.NewKeyDownEvent (new Key ((KeyCode)'f'));
 		Assert.Equal ("my f", tf.Text);
 
 		// Even though there is no match on case we should still get the suggestion

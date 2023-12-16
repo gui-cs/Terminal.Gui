@@ -978,7 +978,7 @@ cccccccccccccccccccc", output);
 				return true;
 			}
 
-			public override bool OnKeyPressed (Key keyEvent)
+			public override bool OnProcessKeyDown (Key keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
