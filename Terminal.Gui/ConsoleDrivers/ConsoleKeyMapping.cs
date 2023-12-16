@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using static Terminal.Gui.WindowsConsole;
-using System.Text;
 
 namespace Terminal.Gui.ConsoleDrivers {
 	/// <summary>
@@ -33,7 +31,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 			}
 		}
 
-		static ConsoleModifiers GetModifiers (uint unicodeChar, ConsoleModifiers modifiers, bool isConsoleKey)
+		static ConsoleModifiers GetModifiers (ConsoleModifiers modifiers)
 		{
 			if (modifiers.HasFlag (ConsoleModifiers.Shift)
 			&& !modifiers.HasFlag (ConsoleModifiers.Alt)
@@ -41,14 +39,8 @@ namespace Terminal.Gui.ConsoleDrivers {
 				return ConsoleModifiers.Shift;
 			} else if (modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control)) {
 				return modifiers;
-			} else if ((!isConsoleKey || modifiers.HasFlag (ConsoleModifiers.Shift)
-						|| modifiers.HasFlag (ConsoleModifiers.Alt)
-						|| modifiers.HasFlag (ConsoleModifiers.Control))
-				&& unicodeChar >= (uint)ConsoleKey.A && unicodeChar <= (uint)ConsoleKey.Z) {
-				// BUGBUG: I think this is the bug. We should not be adding shift to ConsoleKey.A as it should
-				// result in unicodeChar of 97 ('a')
-				return ConsoleModifiers.Shift;
 			}
+
 			return 0;
 		}
 
@@ -77,7 +69,7 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// </summary>
 		/// <param name="key"></param>
 		/// <returns></returns>
-		public static ConsoleKey GetConsoleKeyFromKey (KeyCode key)
+		public static ConsoleKeyInfo GetConsoleKeyFromKey (KeyCode key)
 		{
 			var mod = new ConsoleModifiers ();
 			if (key.HasFlag (KeyCode.ShiftMask)) {
@@ -89,28 +81,28 @@ namespace Terminal.Gui.ConsoleDrivers {
 			if (key.HasFlag (KeyCode.CtrlMask)) {
 				mod |= ConsoleModifiers.Control;
 			}
-			return (ConsoleKey)GetConsoleKeyFromKey ((uint)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask), mod, out _, out _);
+			return GetConsoleKeyFromKey ((uint)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask), mod, out _);
 		}
 
 		/// <summary>
-		/// Get the <see cref="ConsoleKey"/> from a unicode character and modifiers (e.g. (Key)'a' and (Key)Key.CtrlMask).
+		/// Get the <see cref="ConsoleKeyInfo"/> from a unicode character and modifiers (e.g. (Key)'a' and (Key)Key.CtrlMask).
 		/// </summary>
 		/// <param name="keyValue">The key as a unicode codepoint.</param>
 		/// <param name="modifiers">The modifier keys.</param>
 		/// <param name="scanCode">The resulting scan code.</param>
-		/// <param name="outputChar">The resulting output character.</param>
-		/// <returns>The <see cref="ConsoleKey"/> or the <paramref name="outputChar"/>.</returns>
-		public static uint GetConsoleKeyFromKey (uint keyValue, ConsoleModifiers modifiers, out uint scanCode, out uint outputChar)
+		/// <returns>The <see cref="ConsoleKeyInfo"/>.</returns>
+		public static ConsoleKeyInfo GetConsoleKeyFromKey (uint keyValue, ConsoleModifiers modifiers, out uint scanCode)
 		{
 			scanCode = 0;
-			outputChar = keyValue;
+			uint outputChar = keyValue;
 			if (keyValue == 0) {
-				return 0;
+				return new ConsoleKeyInfo ((char)keyValue, ConsoleKey.None, modifiers.HasFlag (ConsoleModifiers.Shift),
+					modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
 			}
 
-			uint consoleKey = MapKeyToConsoleKey ((KeyCode)keyValue, out bool mappable);
+			uint consoleKey = (uint)MapKeyToConsoleKey ((KeyCode)keyValue, modifiers, out bool mappable);
 			if (mappable) {
-				var mod = GetModifiers (keyValue, modifiers, false);
+				var mod = GetModifiers (modifiers);
 				var scode = GetScanCode ("UnicodeChar", keyValue, mod);
 				if (scode != null) {
 					consoleKey = scode.VirtualKey;
@@ -118,11 +110,13 @@ namespace Terminal.Gui.ConsoleDrivers {
 					outputChar = scode.UnicodeChar;
 				} else {
 					// If the consoleKey is < 255, retain the lower 8 bits of the key value and set the upper bits to 0xff.
-					// But why????
+					// This is a shifted value that will be used by the GetKeyCharFromConsoleKey to do the correct action
+					// because keyValue maybe a UnicodeChar or a ConsoleKey, e.g. for PageUp is passed the ConsoleKey.PageUp
 					consoleKey = consoleKey < 0xff ? consoleKey & 0xff | 0xff << 8 : consoleKey;
+					outputChar = GetKeyCharFromConsoleKey (consoleKey, modifiers, out consoleKey, out scanCode);
 				}
 			} else {
-				var mod = GetModifiers (keyValue, modifiers, false);
+				var mod = GetModifiers (modifiers);
 				var scode = GetScanCode ("VirtualKey", consoleKey, mod);
 				if (scode != null) {
 					consoleKey = scode.VirtualKey;
@@ -131,23 +125,25 @@ namespace Terminal.Gui.ConsoleDrivers {
 				}
 			}
 
-			return consoleKey;
+			return new ConsoleKeyInfo ((char)outputChar, (ConsoleKey)consoleKey, modifiers.HasFlag (ConsoleModifiers.Shift),
+					modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
 		}
 
 		/// <summary>
-		/// Get the output character from the <see cref="ConsoleKey"/>.
+		/// Get the output character from the <see cref="ConsoleKey"/>, the correct <see cref="ConsoleKey"/>
+		/// and the scan code used on <see cref="WindowsDriver"/>.
 		/// </summary>
 		/// <param name="unicodeChar">The unicode character.</param>
 		/// <param name="modifiers">The modifiers keys.</param>
 		/// <param name="consoleKey">The resulting console key.</param>
 		/// <param name="scanCode">The resulting scan code.</param>
 		/// <returns>The output character or the <paramref name="consoleKey"/>.</returns>
-		public static uint GetKeyCharFromConsoleKey (uint unicodeChar, ConsoleModifiers modifiers, out uint consoleKey, out uint scanCode)
+		static uint GetKeyCharFromConsoleKey (uint unicodeChar, ConsoleModifiers modifiers, out uint consoleKey, out uint scanCode)
 		{
 			uint decodedChar = unicodeChar >> 8 == 0xff ? unicodeChar & 0xff : unicodeChar;
 			uint keyChar = decodedChar;
 			consoleKey = 0;
-			var mod = GetModifiers (decodedChar, modifiers, true);
+			var mod = GetModifiers (modifiers);
 			scanCode = 0;
 			var scode = unicodeChar != 0 && unicodeChar >> 8 != 0xff ? GetScanCode ("VirtualKey", decodedChar, mod) : null;
 			if (scode != null) {
@@ -180,93 +176,93 @@ namespace Terminal.Gui.ConsoleDrivers {
 			return keyChar;
 		}
 
-		// BUGBUG: This API should take a Key and return a ConsoleKey, not uints
 		/// <summary>
 		/// Maps a unicode character (e.g. (Key)'a') to a uint representing a <see cref="ConsoleKey"/>.
 		/// </summary>
 		/// <param name="keyValue">The key value.</param>
+		/// <param name="modifiers">The modifiers keys.</param>
 		/// <param name="isMappable">
 		/// <see langword="true"/> means the return value can be mapped to a valid unicode character.
 		/// <see langword="false"/> means the return value is in the ConsoleKey enum.
 		/// </param>
 		/// <returns>The <see cref="ConsoleKey"/> or the <paramref name="keyValue"/>.</returns>
-		public static uint MapKeyToConsoleKey (KeyCode keyValue, out bool isMappable)
+		public static ConsoleKey MapKeyToConsoleKey (KeyCode keyValue, ConsoleModifiers modifiers, out bool isMappable)
 		{
 			isMappable = false;
 
 			switch (keyValue) {
 			case KeyCode.Delete:
-				return (uint)ConsoleKey.Delete;
+				return ConsoleKey.Delete;
 			case KeyCode.CursorUp:
-				return (uint)ConsoleKey.UpArrow;
+				return ConsoleKey.UpArrow;
 			case KeyCode.CursorDown:
-				return (uint)ConsoleKey.DownArrow;
+				return ConsoleKey.DownArrow;
 			case KeyCode.CursorLeft:
-				return (uint)ConsoleKey.LeftArrow;
+				return ConsoleKey.LeftArrow;
 			case KeyCode.CursorRight:
-				return (uint)ConsoleKey.RightArrow;
+				return ConsoleKey.RightArrow;
 			case KeyCode.PageUp:
-				return (uint)ConsoleKey.PageUp;
+				return ConsoleKey.PageUp;
 			case KeyCode.PageDown:
-				return (uint)ConsoleKey.PageDown;
+				return ConsoleKey.PageDown;
 			case KeyCode.Home:
-				return (uint)ConsoleKey.Home;
+				return ConsoleKey.Home;
 			case KeyCode.End:
-				return (uint)ConsoleKey.End;
+				return ConsoleKey.End;
 			case KeyCode.InsertChar:
-				return (uint)ConsoleKey.Insert;
+				return ConsoleKey.Insert;
 			case KeyCode.DeleteChar:
-				return (uint)ConsoleKey.Delete;
+				return ConsoleKey.Delete;
 			case KeyCode.F1:
-				return (uint)ConsoleKey.F1;
+				return ConsoleKey.F1;
 			case KeyCode.F2:
-				return (uint)ConsoleKey.F2;
+				return ConsoleKey.F2;
 			case KeyCode.F3:
-				return (uint)ConsoleKey.F3;
+				return ConsoleKey.F3;
 			case KeyCode.F4:
-				return (uint)ConsoleKey.F4;
+				return ConsoleKey.F4;
 			case KeyCode.F5:
-				return (uint)ConsoleKey.F5;
+				return ConsoleKey.F5;
 			case KeyCode.F6:
-				return (uint)ConsoleKey.F6;
+				return ConsoleKey.F6;
 			case KeyCode.F7:
-				return (uint)ConsoleKey.F7;
+				return ConsoleKey.F7;
 			case KeyCode.F8:
-				return (uint)ConsoleKey.F8;
+				return ConsoleKey.F8;
 			case KeyCode.F9:
-				return (uint)ConsoleKey.F9;
+				return ConsoleKey.F9;
 			case KeyCode.F10:
-				return (uint)ConsoleKey.F10;
+				return ConsoleKey.F10;
 			case KeyCode.F11:
-				return (uint)ConsoleKey.F11;
+				return ConsoleKey.F11;
 			case KeyCode.F12:
-				return (uint)ConsoleKey.F12;
+				return ConsoleKey.F12;
 			case KeyCode.F13:
-				return (uint)ConsoleKey.F13;
+				return ConsoleKey.F13;
 			case KeyCode.F14:
-				return (uint)ConsoleKey.F14;
+				return ConsoleKey.F14;
 			case KeyCode.F15:
-				return (uint)ConsoleKey.F15;
+				return ConsoleKey.F15;
 			case KeyCode.F16:
-				return (uint)ConsoleKey.F16;
+				return ConsoleKey.F16;
 			case KeyCode.F17:
-				return (uint)ConsoleKey.F17;
+				return ConsoleKey.F17;
 			case KeyCode.F18:
-				return (uint)ConsoleKey.F18;
+				return ConsoleKey.F18;
 			case KeyCode.F19:
-				return (uint)ConsoleKey.F19;
+				return ConsoleKey.F19;
 			case KeyCode.F20:
-				return (uint)ConsoleKey.F20;
+				return ConsoleKey.F20;
 			case KeyCode.F21:
-				return (uint)ConsoleKey.F21;
+				return ConsoleKey.F21;
 			case KeyCode.F22:
-				return (uint)ConsoleKey.F22;
+				return ConsoleKey.F22;
 			case KeyCode.F23:
-				return (uint)ConsoleKey.F23;
+				return ConsoleKey.F23;
 			case KeyCode.F24:
-				return (uint)ConsoleKey.F24;
+				return ConsoleKey.F24;
 			case KeyCode.Tab | KeyCode.ShiftMask:
-				return (uint)ConsoleKey.Tab;
+				return ConsoleKey.Tab;
 			case KeyCode.Unknown:
 				isMappable = true;
 				return 0;
@@ -274,11 +270,18 @@ namespace Terminal.Gui.ConsoleDrivers {
 
 			isMappable = true;
 
-			//if (keyValue is >= Key.A and <= Key.Z) {
-			//	return (uint)keyValue + 32;
-			//}
+			if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= KeyCode.A and <= KeyCode.Z) {
+				return (ConsoleKey)(keyValue - 32);
+			} else if (modifiers == ConsoleModifiers.None && keyValue is >= KeyCode.A and <= KeyCode.Z) {
+				return (ConsoleKey)(keyValue + 32);
+			}
+			if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
+				return (ConsoleKey)(keyValue - 32);
+			} else if (modifiers == ConsoleModifiers.None && keyValue is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
+				return (ConsoleKey)(keyValue + 32);
+			}
 
-			return (uint)keyValue;
+			return (ConsoleKey)keyValue;
 		}
 
 		/// <summary>
@@ -579,24 +582,20 @@ namespace Terminal.Gui.ConsoleDrivers {
 		};
 
 		/// <summary>
-		/// 
+		/// Decode a <see cref="ConsoleKeyInfo"/> that is using <see cref="ConsoleKey.Packet"/>.
 		/// </summary>
-		/// <param name="consoleKeyInfo"></param>
-		/// <returns></returns>
+		/// <param name="consoleKeyInfo">The console key info.</param>
+		/// <returns>The decoded <see cref="ConsoleKeyInfo"/> or the <paramref name="consoleKeyInfo"/>.</returns>
+		/// <remarks>If it's a <see cref="ConsoleKey.Packet"/> the <see cref="ConsoleKeyInfo.KeyChar"/> may be
+		/// a <see cref="ConsoleKeyInfo.Key"/> or a <see cref="ConsoleKeyInfo.KeyChar"/> value.
+		/// </remarks>
 		public static ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 		{
 			if (consoleKeyInfo.Key != ConsoleKey.Packet) {
 				return consoleKeyInfo;
 			}
 
-			var mod = consoleKeyInfo.Modifiers;
-			bool shift = (mod & ConsoleModifiers.Shift) != 0;
-			bool alt = (mod & ConsoleModifiers.Alt) != 0;
-			bool control = (mod & ConsoleModifiers.Control) != 0;
-
-			uint keyChar = GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
-
-			return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
+			return GetConsoleKeyFromKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out _);
 		}
 	}
 }
