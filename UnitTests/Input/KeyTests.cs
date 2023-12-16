@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -67,10 +68,10 @@ public class KeyTests {
 	[InlineData (KeyCode.D0, false)]
 	[InlineData (KeyCode.Esc, false)]
 	[InlineData (KeyCode.Tab, false)]
-	public void IsLowerCaseAtoZ (KeyCode key, bool expected)
+	public void IsKeyCodeAtoZ (KeyCode key, bool expected)
 	{
 		var eventArgs = new Key (key);
-		Assert.Equal (expected, eventArgs.IsLowerCaseAtoZ);
+		Assert.Equal (expected, eventArgs.IsKeyCodeAtoZ);
 	}
 
 	[Theory]
@@ -163,7 +164,6 @@ public class KeyTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.A, "Alt+Shift+A")]
 	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.A, "Ctrl+Alt+A")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.A, "Ctrl+Alt+Shift+A")]
-	[InlineData (KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.A, "Ctrl+Alt+A")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.Z, "Z")]
 	[InlineData (KeyCode.CtrlMask | KeyCode.Z, "Ctrl+Z")]
 	[InlineData (KeyCode.AltMask | KeyCode.Z, "Alt+Z")]

@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (a.IsLowerCaseAtoZ) {
+			if (a.IsKeyCodeAtoZ) {
 				return true;
 			}
 			

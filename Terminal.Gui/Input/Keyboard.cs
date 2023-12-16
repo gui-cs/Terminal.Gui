@@ -2,12 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Reflection.PortableExecutable;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Terminal.Gui;
 
@@ -30,7 +26,6 @@ namespace Terminal.Gui;
 /// </para>
 /// </remarks>
 public class Key : EventArgs, IEquatable<Key> {
-
 	/// <summary>
 	/// Constructs a new <see cref="Key"/>
 	/// </summary>
@@ -43,18 +38,6 @@ public class Key : EventArgs, IEquatable<Key> {
 	public Key (KeyCode k)
 	{
 		KeyCode = k;
-	}
-
-	public Key (KeyCode k, params string [] modifiers)
-	{
-		KeyCode = k;
-		foreach (var mod in modifiers) {
-			if (_modifierDict.TryGetValue (mod.ToLowerInvariant (), out var m)) {
-				KeyCode |= m;
-			} else {
-				throw new ArgumentException ($"Invalid modifier: {mod}");
-			}
-		}
 	}
 
 	/// <summary>
@@ -105,7 +88,7 @@ public class Key : EventArgs, IEquatable<Key> {
 		}
 
 		// Extract the base key (removing modifier flags)
-		KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
+		var baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		switch (baseKey) {
 		case >= KeyCode.A and <= KeyCode.Z when !key.HasFlag (KeyCode.ShiftMask):
@@ -142,14 +125,14 @@ public class Key : EventArgs, IEquatable<Key> {
 	public bool IsCtrl => (KeyCode & KeyCode.CtrlMask) != 0;
 
 	/// <summary>
-	/// Gets a value indicating whether the KeyCode is a lower case letter from 'a' to 'z', independent of the shift key.
+	/// Gets a value indicating whether the KeyCode is composed of a lower case letter from 'a' to 'z', independent of the shift key.
 	/// </summary>
 	/// <remarks>
 	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to
 	/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
 	/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </remarks>
-	public bool IsLowerCaseAtoZ => Key.TestLowerCaseAtoZ (KeyCode);
+	public bool IsKeyCodeAtoZ => GetIsKeyCodeAtoZ (KeyCode);
 
 	/// <summary>
 	/// Tests if a KeyCode is composed of a lower case letter from 'a' to 'z', independent of the shift key.
@@ -159,9 +142,9 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
 	/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </remarks>
-	public static bool TestLowerCaseAtoZ (KeyCode keyCode)
+	public static bool GetIsKeyCodeAtoZ (KeyCode keyCode)
 	{
-		if (((keyCode & KeyCode.AltMask) != 0) || (keyCode & KeyCode.CtrlMask) != 0) {
+		if ((keyCode & KeyCode.AltMask) != 0 || (keyCode & KeyCode.CtrlMask) != 0) {
 			return false;
 		}
 
@@ -177,11 +160,12 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// </summary>
 	public KeyCode BareKey => KeyCode & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
+	/// <summary>
+	/// Indicates whether the <see cref="Key"/> is valid or not. 
+	/// </summary>
 	public bool IsValid => !(KeyCode == KeyCode.Null || KeyCode == KeyCode.Unknown);
 
 	#region Standard Key Definitions
-
-
 	/// <summary>
 	/// The Shift modifier flag. Combine with a key code property to indicate the shift modifier. E.g. <c>key.Enter | key.Shift</c>.
 	/// </summary>
@@ -265,30 +249,37 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Cursor up key
 	/// </summary>
 	public const uint CursorUp = (uint)KeyCode.CursorUp;
+
 	/// <summary>
 	/// Cursor down key.
 	/// </summary>
 	public const uint CursorDown = (uint)KeyCode.CursorDown;
+
 	/// <summary>
 	/// Cursor left key.
 	/// </summary>
 	public const uint CursorLeft = (uint)KeyCode.CursorLeft;
+
 	/// <summary>
 	/// Cursor right key.
 	/// </summary>
 	public const uint CursorRight = (uint)KeyCode.CursorRight;
+
 	/// <summary>
 	/// Page Up key.
 	/// </summary>
 	public const uint PageUp = (uint)KeyCode.PageUp;
+
 	/// <summary>
 	/// Page Down key.
 	/// </summary>
 	public const uint PageDown = (uint)KeyCode.PageDown;
+
 	/// <summary>
 	/// Home key.
 	/// </summary>
 	public const uint Home = (uint)KeyCode.Home;
+
 	/// <summary>
 	/// End key.
 	/// </summary>
@@ -313,99 +304,121 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// F1 key.
 	/// </summary>
 	public const uint F1 = (uint)KeyCode.F1;
+
 	/// <summary>
 	/// F2 key.
 	/// </summary>
 	public const uint F2 = (uint)KeyCode.F2;
+
 	/// <summary>
 	/// F3 key.
 	/// </summary>
 	public const uint F3 = (uint)KeyCode.F3;
+
 	/// <summary>
 	/// F4 key.
 	/// </summary>
 	public const uint F4 = (uint)KeyCode.F4;
+
 	/// <summary>
 	/// F5 key.
 	/// </summary>
 	public const uint F5 = (uint)KeyCode.F5;
+
 	/// <summary>
 	/// F6 key.
 	/// </summary>
 	public const uint F6 = (uint)KeyCode.F6;
+
 	/// <summary>
 	/// F7 key.
 	/// </summary>
 	public const uint F7 = (uint)KeyCode.F7;
+
 	/// <summary>
 	/// F8 key.
 	/// </summary>
 	public const uint F8 = (uint)KeyCode.F8;
+
 	/// <summary>
 	/// F9 key.
 	/// </summary>
 	public const uint F9 = (uint)KeyCode.F9;
+
 	/// <summary>
 	/// F10 key.
 	/// </summary>
 	public const uint F10 = (uint)KeyCode.F10;
+
 	/// <summary>
 	/// F11 key.
 	/// </summary>
 	public const uint F11 = (uint)KeyCode.F11;
+
 	/// <summary>
 	/// F12 key.
 	/// </summary>
 	public const uint F12 = (uint)KeyCode.F12;
+
 	/// <summary>
 	/// F13 key.
 	/// </summary>
 	public const uint F13 = (uint)KeyCode.F13;
+
 	/// <summary>
 	/// F14 key.
 	/// </summary>
 	public const uint F14 = (uint)KeyCode.F14;
+
 	/// <summary>
 	/// F15 key.
 	/// </summary>
 	public const uint F15 = (uint)KeyCode.F15;
+
 	/// <summary>
 	/// F16 key.
 	/// </summary>
 	public const uint F16 = (uint)KeyCode.F16;
+
 	/// <summary>
 	/// F17 key.
 	/// </summary>
 	public const uint F17 = (uint)KeyCode.F17;
+
 	/// <summary>
 	/// F18 key.
 	/// </summary>
 	public const uint F18 = (uint)KeyCode.F18;
+
 	/// <summary>
 	/// F19 key.
 	/// </summary>
 	public const uint F19 = (uint)KeyCode.F19;
+
 	/// <summary>
 	/// F20 key.
 	/// </summary>
 	public const uint F20 = (uint)KeyCode.F20;
+
 	/// <summary>
 	/// F21 key.
 	/// </summary>
 	public const uint F21 = (uint)KeyCode.F21;
+
 	/// <summary>
 	/// F22 key.
 	/// </summary>
 	public const uint F22 = (uint)KeyCode.F22;
+
 	/// <summary>
 	/// F23 key.
 	/// </summary>
 	public const uint F23 = (uint)KeyCode.F23;
+
 	/// <summary>
 	/// F24 key.
 	/// </summary>
 	public const uint F24 = (uint)KeyCode.F24;
-
 	#endregion
 
 	#region Operators
@@ -416,47 +429,74 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Uses <see cref="AsRune"/>.
 	/// </remarks>
 	/// <param name="kea"></param>
-	public static explicit operator Rune (Key kea) => kea.AsRune;
+	public static explicit operator Rune (Key kea)
+	{
+		return kea.AsRune;
+	}
 
 	/// <summary>
 	/// Explicitly cast <see cref="Key"/> to a <see langword="char"/>. The conversion is lossy. 
 	/// </summary>
 	/// <param name="kea"></param>
-	public static explicit operator char (Key kea) => (char)kea.AsRune.Value;
+	public static explicit operator char (Key kea)
+	{
+		return (char)kea.AsRune.Value;
+	}
 
 	/// <summary>
 	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy. 
 	/// </summary>
 	/// <param name="key"></param>
-	public static explicit operator KeyCode (Key key) => key.KeyCode;
+	public static explicit operator KeyCode (Key key)
+	{
+		return key.KeyCode;
+	}
 
 	/// <summary>
 	/// Cast <see cref="KeyCode"/> to a <see cref="Key"/>. 
 	/// </summary>
 	/// <param name="keyCode"></param>
-	public static implicit operator Key (KeyCode keyCode) => new Key (keyCode);
-	
-	/// <inheritdoc/>
-	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;
+	public static implicit operator Key (KeyCode keyCode)
+	{
+		return new Key (keyCode);
+	}
 
 	/// <inheritdoc/>
-	public override int GetHashCode () => (int)KeyCode;
+	public override bool Equals (object obj)
+	{
+		return obj is Key k && k.KeyCode == KeyCode;
+	}
+
+	/// <inheritdoc/>
+	public override int GetHashCode ()
+	{
+		return (int)KeyCode;
+	}
 
 	/// <summary>
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
 	/// <returns></returns>
-	public static bool operator == (Key a, Key b) => a?.KeyCode == b?.KeyCode;
+	public static bool operator == (Key a, Key b)
+	{
+		return a?.KeyCode == b?.KeyCode;
+	}
 
 	/// <summary>
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
 	/// <returns></returns>
-	public static bool operator != (Key a, Key b) => a?.KeyCode != b?.KeyCode;
+	public static bool operator != (Key a, Key b)
+	{
+		return a?.KeyCode != b?.KeyCode;
+	}
 
-	bool IEquatable<Key>.Equals (Key other) => Equals ((object)other);
+	bool IEquatable<Key>.Equals (Key other)
+	{
+		return Equals ((object)other);
+	}
 	#endregion Operators
 
 	#region String conversion
@@ -469,13 +509,13 @@ public class Key : EventArgs, IEquatable<Key> {
 		return ToString (KeyCode, (Rune)'+');
 	}
 
-	private static string GetKeyString (KeyCode key)
+	static string GetKeyString (KeyCode key)
 	{
 		if (key is KeyCode.Null or KeyCode.Unknown or KeyCode.SpecialMask) {
 			return string.Empty;
 		}
 		// Extract the base key (removing modifier flags)
-		KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
+		var baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		if (!key.HasFlag (KeyCode.ShiftMask) && baseKey is >= KeyCode.A and <= KeyCode.Z) {
 			return ((char)(key + 32)).ToString ();
@@ -512,10 +552,10 @@ public class Key : EventArgs, IEquatable<Key> {
 			return string.Empty;
 		}
 
-		StringBuilder sb = new StringBuilder ();
+		var sb = new StringBuilder ();
 
 		// Extract the base key (removing modifier flags)
-		KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
+		var baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		// Extract and handle modifiers
 		bool hasModifiers = false;
@@ -527,13 +567,13 @@ public class Key : EventArgs, IEquatable<Key> {
 			sb.Append ($"Alt{separator}");
 			hasModifiers = true;
 		}
-		if ((key & KeyCode.ShiftMask) != 0 && !Key.TestLowerCaseAtoZ (key)) {
+		if ((key & KeyCode.ShiftMask) != 0 && !GetIsKeyCodeAtoZ (key)) {
 			sb.Append ($"Shift{separator}");
 			hasModifiers = true;
 		}
 
 		// Handle special cases and modifiers on their own
-		if ((key != KeyCode.SpecialMask) && (baseKey != KeyCode.Null || hasModifiers)) {
+		if (key != KeyCode.SpecialMask && (baseKey != KeyCode.Null || hasModifiers)) {
 			if ((key & KeyCode.SpecialMask) != 0 && (baseKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
 				sb.Append (baseKey & ~KeyCode.Space);
 			} else {
@@ -542,7 +582,7 @@ public class Key : EventArgs, IEquatable<Key> {
 			}
 		}
 
-		var result = sb.ToString ();
+		string result = sb.ToString ();
 		result = TrimEndRune (result, separator);
 		return result;
 	}
@@ -560,11 +600,11 @@ public class Key : EventArgs, IEquatable<Key> {
 		return input;
 	}
 
-	private static readonly Dictionary<string, KeyCode> _modifierDict = new Dictionary<string, KeyCode> (comparer: StringComparer.InvariantCultureIgnoreCase) {
-			{ "Shift", KeyCode.ShiftMask },
-			{ "Ctrl", KeyCode.CtrlMask },
-			{ "Alt", KeyCode.AltMask }
-		};
+	static readonly Dictionary<string, KeyCode> _modifierDict = new (comparer: StringComparer.InvariantCultureIgnoreCase) {
+		{ "Shift", KeyCode.ShiftMask },
+		{ "Ctrl", KeyCode.CtrlMask },
+		{ "Alt", KeyCode.AltMask }
+	};
 
 	/// <summary>
 	/// Converts the provided string to a new <see cref="Key"/> instance.
@@ -607,9 +647,9 @@ public class Key : EventArgs, IEquatable<Key> {
 			}
 		}
 
-		KeyCode modifiers = KeyCode.Null;
+		var modifiers = KeyCode.Null;
 		for (int index = 0; index < parts.Length; index++) {
-			if (_modifierDict.TryGetValue (parts [index].ToLowerInvariant (), out KeyCode modifier)) {
+			if (_modifierDict.TryGetValue (parts [index].ToLowerInvariant (), out var modifier)) {
 				modifiers |= modifier;
 				parts [index] = string.Empty; // eat it
 			}
@@ -617,9 +657,9 @@ public class Key : EventArgs, IEquatable<Key> {
 
 		// we now have the modifiers
 
-		var partNotFound = parts.FirstOrDefault (p => !string.IsNullOrEmpty (p), string.Empty);
+		string partNotFound = parts.FirstOrDefault (p => !string.IsNullOrEmpty (p), string.Empty);
 		var parsedKeyCode = KeyCode.Null;
-		var parsedInt = 0;
+		int parsedInt = 0;
 		if (partNotFound.Length == 1) {
 			var keyCode = (KeyCode)partNotFound [0];
 			// if it's a single digit int, treat it as such
@@ -631,7 +671,7 @@ public class Key : EventArgs, IEquatable<Key> {
 			} else if (Enum.TryParse (partNotFound, false, out parsedKeyCode)) {
 				if ((KeyCode)parsedKeyCode != KeyCode.Null) {
 					if (parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0) {
-						key = new Key (((KeyCode)parsedKeyCode) | KeyCode.ShiftMask);
+						key = new Key ((KeyCode)parsedKeyCode | KeyCode.ShiftMask);
 						return true;
 					}
 					key = new Key ((KeyCode)parsedKeyCode | modifiers);
@@ -645,7 +685,7 @@ public class Key : EventArgs, IEquatable<Key> {
 		if (Enum.TryParse (partNotFound, true, out parsedKeyCode)) {
 			if ((KeyCode)parsedKeyCode != KeyCode.Null) {
 				if ((KeyCode)parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0) {
-					key = new Key (((KeyCode)parsedKeyCode) | KeyCode.ShiftMask);
+					key = new Key ((KeyCode)parsedKeyCode | KeyCode.ShiftMask);
 					return true;
 				}
 				key = new Key ((KeyCode)parsedKeyCode | modifiers);
@@ -661,16 +701,16 @@ public class Key : EventArgs, IEquatable<Key> {
 				return false;
 			}
 			if ((KeyCode)parsedInt is >= KeyCode.A and <= KeyCode.Z && modifiers == 0) {
-				key = new Key (((KeyCode)parsedInt) | KeyCode.ShiftMask);
+				key = new Key ((KeyCode)parsedInt | KeyCode.ShiftMask);
 				return true;
 			}
-			key = new Key (((KeyCode)parsedInt));
+			key = new Key ((KeyCode)parsedInt);
 			return true;
 		}
 
 		if (Enum.TryParse (partNotFound, true, out parsedKeyCode)) {
-			if (Key.TestLowerCaseAtoZ ((KeyCode)parsedKeyCode)) {
-				key = new Key (((KeyCode)parsedKeyCode) | modifiers & ~KeyCode.Space);
+			if (GetIsKeyCodeAtoZ ((KeyCode)parsedKeyCode)) {
+				key = new Key ((KeyCode)parsedKeyCode | modifiers & ~KeyCode.Space);
 				return true;
 			}
 		}
