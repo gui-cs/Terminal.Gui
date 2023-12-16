@@ -29,17 +29,7 @@ namespace Terminal.Gui;
 /// </code>
 /// </example>
 /// <remarks>
-///  <para>
-///   Creates a instance of <see cref="Terminal.Gui.MainLoop"/> to process input events, handle timers and
-///   other sources of data. It is accessible via the <see cref="MainLoop"/> property.
-///  </para>
-///  <para>
-///   The <see cref="Iteration"/> event is invoked on each iteration of the <see cref="Terminal.Gui.MainLoop"/>.
-///  </para>
-///  <para>
-///   When invoked it sets the <see cref="SynchronizationContext"/> to one that is tied
-///   to the <see cref="MainLoop"/>, allowing user code to use async/await.
-///  </para>
+/// TODO: Flush this out.
 /// </remarks>
 public static partial class Application {
 	/// <summary>
@@ -564,7 +554,7 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	///  This event is raised on each iteration of the <see cref="MainLoop"/>. 
+	///  This event is raised on each iteration of the main loop.
 	/// </summary>
 	/// <remarks>
 	///  See also <see cref="Timeout"/>
@@ -614,7 +604,7 @@ public static partial class Application {
 	}
 
 	/// <summary>
-	///  Building block API: Runs the <see cref="MainLoop"/> for the created <see cref="Toplevel"/>.
+	///  Building block API: Runs the main loop for the created <see cref="Toplevel"/>.
 	/// </summary>
 	/// <param name="state">The state returned by the <see cref="Begin(Toplevel)"/> method.</param>
 	public static void RunLoop (RunState state)

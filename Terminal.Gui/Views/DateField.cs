@@ -116,7 +116,7 @@ public class DateField : TextField {
 	public override bool OnProcessKeyDown (Key a)
 	{
 		// Ignore non-numeric characters.
-		if (a.KeyCode >= Key.D0.KeyCode && a.KeyCode <= Key.D9.KeyCode) {
+		if (a >= Key.D0 && a <= Key.D9) {
 			if (!ReadOnly) {
 				if (SetText ((Rune)a)) {
 					IncCursorPosition ();

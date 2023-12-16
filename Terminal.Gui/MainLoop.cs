@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace Terminal.Gui {
 	/// <summary>
-	/// Public interface to create a platform specific <see cref="MainLoop"/> driver.
+	/// Interface to create a platform specific <see cref="MainLoop"/> driver.
 	/// </summary>
 	internal interface IMainLoopDriver {
 		/// <summary>

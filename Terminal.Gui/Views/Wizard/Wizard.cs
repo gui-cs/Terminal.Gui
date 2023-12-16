@@ -143,7 +143,7 @@ public class Wizard : Dialog {
 
 	/// <summary>
 	/// <see cref="Wizard"/> is derived from <see cref="Dialog"/> and Dialog causes <c>Esc</c> to call
-	/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="OnKeyDown"/>
+	/// <see cref="Application.RequestStop(Toplevel)"/>, closing the Dialog. Wizard overrides <see cref="OnProcessKeyDown"/>
 	/// to instead fire the <see cref="Cancelled"/> event when Wizard is being used as a non-modal (see <see cref="Wizard.Modal"/>.
 	/// </summary>
 	/// <param name="a"></param>

@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public partial class Toplevel : View {
 		/// <summary>
-		/// Gets or sets whether the <see cref="MainLoop"/> for this <see cref="Toplevel"/> is running or not. 
+		/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not. 
 		/// </summary>
 		/// <remarks>
 		///    Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead. 
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		public event EventHandler Loaded;
 
 		/// <summary>
-		/// Invoked when the <see cref="Toplevel"/> <see cref="MainLoop"/> has started it's first iteration.
+		/// Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration.
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
 		/// changes. 
 		/// <para>A Ready event handler is a good place to finalize initialization after calling 

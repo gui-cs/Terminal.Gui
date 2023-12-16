@@ -16,15 +16,48 @@ namespace Terminal.Gui;
 /// instead of the <see cref="Terminal.Gui.KeyCode"/> enumeration for keyboard input whenever possible.
 /// </para>
 /// <para>
-/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Key.KeyCode"/>) as values between 65 and 90 corresponding to
-/// the un-shifted A to Z keys on a keyboard. Enum values are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.).
-/// Even though the values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+/// 
 /// </para>
 /// <para>
 /// The default value for <see cref="Key.KeyCode"/> is <see cref="KeyCode.Null"/>. This is used to indicate that the key has not been
 /// set. 
 /// </para>
-/// </remarks>
+/// <para>
+/// <list type="table">
+///	<listheader>
+///		<term>Concept</term><description>Definition</description>
+///	</listheader>
+///	<item>
+///	<term>Testing Shift State</term>
+///	<description>
+///	The <c>Is</c> properties (<see cref="IsShift"/>,<see cref="IsCtrl"/>, <see cref="IsAlt"/>) test for shift state; whether the key press was modified by a shift key.
+///	</description>
+///	</item>
+///	<item>
+/// 	<term>Adding Shift State</term>
+///	<description>
+///	The <c>With</c> properties (<see cref="WithShift"/>,<see cref="WithCtrl"/>, <see cref="WithAlt"/>) return a copy of the Key with the shift modifier applied. This
+///     is useful for specifying a key that requires a shift modifier (e.g. <c>var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;</c>.
+///	</description>
+///	</item>
+///	<item>
+/// 	<term>Removing Shift State</term>
+///	<description>
+///	The <c>No</c> properties (<see cref="NoShift"/>,<see cref="NoCtrl"/>, <see cref="NoAlt"/>) return a copy of the Key with the shift modifier removed. This
+///     is useful for specifying a key that does not require a shift modifier (e.g. <c>var ControlDelete = ControlAltDelete.NoCtrl;</c>.
+///	</description>
+///	</item>
+///	<item>
+///	<term>Encoding of A..Z</term>
+///	<description>
+///	Lowercase alpha keys are encoded (in <see cref="Key.KeyCode"/>) as values between 65 and 90 corresponding to
+///	the un-shifted A to Z keys on a keyboard. Properties are provided for these (e.g. <see cref="Key.A"/>, <see cref="Key.B"/>, etc.).
+///	Even though the encoded values are the same as the ASCII values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+///	</description>
+///	</item>
+/// </list>
+/// </para>
+///  </remarks>
 [JsonConverter (typeof (KeyJsonConverter))]
 public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
@@ -246,6 +279,8 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <inheritdoc/>
 	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;
 
+	bool IEquatable<Key>.Equals (Key other) => Equals ((object)other);
+
 	/// <inheritdoc/>
 	public override int GetHashCode () => (int)KeyCode;
 
@@ -263,7 +298,37 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <returns></returns>
 	public static bool operator != (Key a, Key b) => a?.KeyCode != b?.KeyCode;
 
-	bool IEquatable<Key>.Equals (Key other) => Equals ((object)other);
+	/// <summary>
+	/// Compares two <see cref="Key"/>s for less-than.
+	/// </summary>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
+	public static bool operator < (Key a, Key b) => a?.KeyCode < b?.KeyCode;
+
+	/// <summary>
+	/// Compares two <see cref="Key"/>s for greater-than.
+	/// </summary>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
+	public static bool operator > (Key a, Key b) => a?.KeyCode > b?.KeyCode;
+
+	/// <summary>
+	/// Compares two <see cref="Key"/>s for greater-than-or-equal-to.
+	/// </summary>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
+	public static bool operator <= (Key a, Key b) => a?.KeyCode <= b?.KeyCode;
+
+	/// <summary>
+	/// Compares two <see cref="Key"/>s for greater-than-or-equal-to.
+	/// </summary>
+	/// <param name="a"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
+	public static bool operator >= (Key a, Key b) => a?.KeyCode >= b?.KeyCode;
 	#endregion Operators
 
 	#region String conversion
@@ -430,9 +495,9 @@ public class Key : EventArgs, IEquatable<Key> {
 				out parsedInt)) {
 				keyCode = (KeyCode)((int)KeyCode.D0 + parsedInt);
 			} else if (Enum.TryParse (partNotFound, false, out parsedKeyCode)) {
-				if ((KeyCode)parsedKeyCode != KeyCode.Null) {
+				if (parsedKeyCode != KeyCode.Null) {
 					if (parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0) {
-						key = new Key ((KeyCode)parsedKeyCode | KeyCode.ShiftMask);
+						key = new Key (parsedKeyCode | KeyCode.ShiftMask);
 						return true;
 					}
 					key = new Key ((KeyCode)parsedKeyCode | modifiers);
@@ -444,12 +509,12 @@ public class Key : EventArgs, IEquatable<Key> {
 		}
 
 		if (Enum.TryParse (partNotFound, true, out parsedKeyCode)) {
-			if ((KeyCode)parsedKeyCode != KeyCode.Null) {
-				if ((KeyCode)parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0) {
-					key = new Key ((KeyCode)parsedKeyCode | KeyCode.ShiftMask);
+			if (parsedKeyCode != KeyCode.Null) {
+				if (parsedKeyCode is >= KeyCode.A and <= KeyCode.Z && modifiers == 0) {
+					key = new Key (parsedKeyCode | KeyCode.ShiftMask);
 					return true;
 				}
-				key = new Key ((KeyCode)parsedKeyCode | modifiers);
+				key = new Key (parsedKeyCode | modifiers);
 				return true;
 			}
 		}
@@ -469,11 +534,13 @@ public class Key : EventArgs, IEquatable<Key> {
 			return true;
 		}
 
-		if (Enum.TryParse (partNotFound, true, out parsedKeyCode)) {
-			if (GetIsKeyCodeAtoZ ((KeyCode)parsedKeyCode)) {
-				key = new Key ((KeyCode)parsedKeyCode | modifiers & ~KeyCode.Space);
-				return true;
-			}
+		if (!Enum.TryParse (partNotFound, true, out parsedKeyCode)) {
+			return false;
+		}
+
+		if (GetIsKeyCodeAtoZ (parsedKeyCode)) {
+			key = new Key (parsedKeyCode | modifiers & ~KeyCode.Space);
+			return true;
 		}
 
 		return false;
@@ -485,7 +552,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// An uninitialized The <see cref="Key"/> object.
 	/// </summary>
-	public static readonly Key Empty = new ();
+	public new static readonly Key Empty = new ();
 
 	/// <summary>
 	/// The <see cref="Key"/> object for the Backspace key.

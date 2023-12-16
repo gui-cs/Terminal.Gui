@@ -947,7 +947,7 @@ namespace Terminal.Gui {
 		/// response to the container view or terminal resizing.
 		/// </summary>
 		/// <remarks>
-		/// Calls <see cref="OnLayoutComplete"/> (which raises the <see cref="LayoutComplete"/> event) before it returns.
+		/// Raises the <see cref="LayoutComplete"/> event) before it returns.
 		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
