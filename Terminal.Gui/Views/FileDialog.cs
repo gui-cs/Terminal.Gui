@@ -142,22 +142,23 @@ namespace Terminal.Gui {
 
 			this.btnOk = new Button (Style.OkButtonText) {
 				Y = Pos.AnchorEnd (1),
-				X = Pos.Function (CalculateOkButtonPosX)
+				X = Pos.Function (CalculateOkButtonPosX),
+				IsDefault = true
 			};
 			this.btnOk.Clicked += (s, e) => this.Accept (true);
-			this.btnOk.KeyPressed += (s, k) => {
-				this.NavigateIf (k, Key.CursorLeft, this.btnCancel);
-				this.NavigateIf (k, Key.CursorUp, this.tableView);
+			this.btnOk.KeyDown += (s, k) => {
+				this.NavigateIf (k, KeyCode.CursorLeft, this.btnCancel);
+				this.NavigateIf (k, KeyCode.CursorUp, this.tableView);
 			};
 
 			this.btnCancel = new Button (Strings.btnCancel) {
 				Y = Pos.AnchorEnd (1),
 				X = Pos.Right (btnOk) + 1
 			};
-			this.btnCancel.KeyPressed += (s, k) => {
-				this.NavigateIf (k, Key.CursorLeft, this.btnToggleSplitterCollapse);
-				this.NavigateIf (k, Key.CursorUp, this.tableView);
-				this.NavigateIf (k, Key.CursorRight, this.btnOk);
+			this.btnCancel.KeyDown += (s, k) => {
+				this.NavigateIf (k, KeyCode.CursorLeft, this.btnToggleSplitterCollapse);
+				this.NavigateIf (k, KeyCode.CursorUp, this.tableView);
+				this.NavigateIf (k, KeyCode.CursorRight, this.btnOk);
 			};
 			this.btnCancel.Clicked += (s, e) => {
 				Application.RequestStop ();
@@ -179,11 +180,11 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				CaptionColor = new Color (Color.Black)
 			};
-			this.tbPath.KeyPressed += (s, k) => {
+			this.tbPath.KeyDown += (s, k) => {
 
 				ClearFeedback ();
 
-				this.AcceptIf (k, Key.Enter);
+				this.AcceptIf (k, KeyCode.Enter);
 
 				this.SuppressIfBadChar (k);
 			};
@@ -207,7 +208,7 @@ namespace Terminal.Gui {
 				FullRowSelect = true,
 				CollectionNavigator = new FileDialogCollectionNavigator (this)
 			};
-			this.tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			this.tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 			this.tableView.MouseClick += OnTableViewMouseClick;
 			tableView.Style.InvertSelectedCellFirstCharacter = true;
 			Style.TableStyle = tableView.Style;
@@ -228,16 +229,16 @@ namespace Terminal.Gui {
 			typeStyle.MinWidth = 6;
 			typeStyle.ColorGetter = this.ColorGetter;
 
-			this.tableView.KeyPressed += (s, k) => {
+			this.tableView.KeyDown += (s, k) => {
 				if (this.tableView.SelectedRow <= 0) {
-					this.NavigateIf (k, Key.CursorUp, this.tbPath);
+					this.NavigateIf (k, KeyCode.CursorUp, this.tbPath);
 				}
 				if (this.tableView.SelectedRow == this.tableView.Table.Rows - 1) {
-					this.NavigateIf (k, Key.CursorDown, this.btnToggleSplitterCollapse);
+					this.NavigateIf (k, KeyCode.CursorDown, this.btnToggleSplitterCollapse);
 				}
 
 				if (splitContainer.Tiles.First ().ContentView.Visible && tableView.SelectedColumn == 0) {
-					this.NavigateIf (k, Key.CursorLeft, this.treeView);
+					this.NavigateIf (k, KeyCode.CursorLeft, this.treeView);
 				}
 
 				if (k.Handled) {
@@ -277,6 +278,7 @@ namespace Terminal.Gui {
 				CaptionColor = new Color (Color.Black),
 				Width = 30,
 				Y = Pos.AnchorEnd (1),
+				HotKey = KeyCode.F | KeyCode.AltMask
 			};
 			spinnerView = new SpinnerView () {
 				X = Pos.Right (tbFind) + 1,
@@ -285,22 +287,22 @@ namespace Terminal.Gui {
 			};
 
 			tbFind.TextChanged += (s, o) => RestartSearch ();
-			tbFind.KeyPressed += (s, o) => {
-				if (o.KeyEvent.Key == Key.Enter) {
+			tbFind.KeyDown += (s, o) => {
+				if (o.KeyCode == KeyCode.Enter) {
 					RestartSearch ();
 					o.Handled = true;
 				}
 
-				if (o.KeyEvent.Key == Key.Esc) {
+				if (o.KeyCode == KeyCode.Esc) {
 					if (CancelSearch ()) {
 						o.Handled = true;
 					}
 				}
 				if (tbFind.CursorIsAtEnd ()) {
-					NavigateIf (o, Key.CursorRight, btnCancel);
+					NavigateIf (o, KeyCode.CursorRight, btnCancel);
 				}
 				if (tbFind.CursorIsAtStart ()) {
-					NavigateIf (o, Key.CursorLeft, btnToggleSplitterCollapse);
+					NavigateIf (o, KeyCode.CursorLeft, btnToggleSplitterCollapse);
 				}
 			};
 
@@ -316,23 +318,23 @@ namespace Terminal.Gui {
 			this.tbPath.TextChanged += (s, e) => this.PathChanged ();
 
 			this.tableView.CellActivated += this.CellActivate;
-			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k.KeyEvent);
+			this.tableView.KeyUp += (s, k) => k.Handled = this.TableView_KeyUp (k);
 			this.tableView.SelectedCellChanged += this.TableView_SelectedCellChanged;
 
-			this.tableView.AddKeyBinding (Key.Home, Command.TopHome);
-			this.tableView.AddKeyBinding (Key.End, Command.BottomEnd);
-			this.tableView.AddKeyBinding (Key.Home | Key.ShiftMask, Command.TopHomeExtend);
-			this.tableView.AddKeyBinding (Key.End | Key.ShiftMask, Command.BottomEndExtend);
+			this.tableView.KeyBindings.Add (KeyCode.Home, Command.TopHome);
+			this.tableView.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+			this.tableView.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.TopHomeExtend);
+			this.tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.BottomEndExtend);
 
 			this.treeView.KeyDown += (s, k) => {
 
 				var selected = treeView.SelectedObject;
 				if (selected != null) {
 					if (!treeView.CanExpand (selected) || treeView.IsExpanded (selected)) {
-						this.NavigateIf (k, Key.CursorRight, this.tableView);
+						this.NavigateIf (k, KeyCode.CursorRight, this.tableView);
 					} else
 					if (treeView.GetObjectRow (selected) == 0) {
-						this.NavigateIf (k, Key.CursorUp, this.tbPath);
+						this.NavigateIf (k, KeyCode.CursorUp, this.tbPath);
 					}
 				}
 
@@ -340,7 +342,7 @@ namespace Terminal.Gui {
 					return;
 				}
 
-				k.Handled = this.TreeView_KeyDown (k.KeyEvent);
+				k.Handled = this.TreeView_KeyDown (k);
 
 			};
 
@@ -484,23 +486,26 @@ namespace Terminal.Gui {
 		}
 
 
-		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent keyEvent)
-		{
-			if (this.NavigateIf (keyEvent, Key.CtrlMask | Key.F, this.tbFind)) {
-				return true;
-			}
+//		/// <inheritdoc/>
+//		public override bool OnHotKey (KeyEventArgs keyEvent)
+//		{
+//#if BROKE_IN_2927
+//			// BUGBUG: Ctrl-F is forward in a TextField. 
+//			if (this.NavigateIf (keyEvent, Key.Alt | Key.F, this.tbFind)) {
+//				return true;
+//			}
+//#endif
 
-			ClearFeedback ();
+//			ClearFeedback ();
 
-			if (allowedTypeMenuBar != null &&
-				keyEvent.Key == Key.Tab &&
-				allowedTypeMenuBar.IsMenuOpen) {
-				allowedTypeMenuBar.CloseMenu (false, false, false);
-			}
+//			if (allowedTypeMenuBar != null &&
+//				keyEvent.ConsoleDriverKey == Key.Tab &&
+//				allowedTypeMenuBar.IsMenuOpen) {
+//				allowedTypeMenuBar.CloseMenu (false, false, false);
+//			}
 
-			return base.ProcessHotKey (keyEvent);
-		}
+//			return base.OnHotKey (keyEvent);
+//		}
 		private void RestartSearch ()
 		{
 			if (disposed || State?.Directory == null) {
@@ -772,19 +777,19 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SuppressIfBadChar (KeyEventEventArgs k)
+		private void SuppressIfBadChar (Key k)
 		{
 			// don't let user type bad letters
-			var ch = (char)k.KeyEvent.KeyValue;
+			var ch = (char)k;
 
 			if (badChars.Contains (ch)) {
 				k.Handled = true;
 			}
 		}
 
-		private bool TreeView_KeyDown (KeyEvent keyEvent)
+		private bool TreeView_KeyDown (Key keyEvent)
 		{
-			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent.KeyValue)) {
+			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent)) {
 				this.tbPath.FocusFirst ();
 
 				// let that keystroke go through on the tbPath instead
@@ -794,9 +799,9 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void AcceptIf (KeyEventEventArgs keyEvent, Key isKey)
+		private void AcceptIf (Key keyEvent, KeyCode isKey)
 		{
-			if (!keyEvent.Handled && keyEvent.KeyEvent.Key == isKey) {
+			if (!keyEvent.Handled && keyEvent.KeyCode == isKey) {
 				keyEvent.Handled = true;
 
 				// User hit Enter in text box so probably wants the
@@ -880,19 +885,9 @@ namespace Terminal.Gui {
 			Application.RequestStop ();
 		}
 
-		private void NavigateIf (KeyEventEventArgs keyEvent, Key isKey, View to)
+		private bool NavigateIf (Key keyEvent, KeyCode isKey, View to)
 		{
-			if (!keyEvent.Handled) {
-
-				if (NavigateIf (keyEvent.KeyEvent, isKey, to)) {
-					keyEvent.Handled = true;
-				}
-			}
-		}
-
-		private bool NavigateIf (KeyEvent keyEvent, Key isKey, View to)
-		{
-			if (keyEvent.Key == isKey) {
+			if (keyEvent.KeyCode == isKey) {
 
 				to.FocusFirst ();
 				if (to == tbPath) {
@@ -956,28 +951,28 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool TableView_KeyUp (KeyEvent keyEvent)
+		private bool TableView_KeyUp (Key keyEvent)
 		{
-			if (keyEvent.Key == Key.Backspace) {
+			if (keyEvent.KeyCode == KeyCode.Backspace) {
 				return this.history.Back ();
 			}
-			if (keyEvent.Key == (Key.ShiftMask | Key.Backspace)) {
+			if (keyEvent.KeyCode == (KeyCode.ShiftMask | KeyCode.Backspace)) {
 				return this.history.Forward ();
 			}
 
-			if (keyEvent.Key == Key.DeleteChar) {
+			if (keyEvent.KeyCode == KeyCode.DeleteChar) {
 
 				Delete ();
 				return true;
 			}
 
-			if (keyEvent.Key == (Key.CtrlMask | Key.R)) {
+			if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.R)) {
 
 				Rename ();
 				return true;
 			}
 
-			if (keyEvent.Key == (Key.CtrlMask | Key.N)) {
+			if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.N)) {
 				New ();
 				return true;
 			}

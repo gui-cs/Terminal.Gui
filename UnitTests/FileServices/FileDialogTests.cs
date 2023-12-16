@@ -104,8 +104,13 @@ namespace Terminal.Gui.FileServicesTests {
 			var openIn = Path.Combine (Environment.CurrentDirectory, "zz");
 			Directory.CreateDirectory (openIn);
 			dlg.Path = openIn + Path.DirectorySeparatorChar;
-
-			Send ('f', ConsoleKey.F, false, false, true);
+#if BROKE_IN_2927
+			Send ('f', ConsoleKey.F, false, true, false);
+#else
+			Application.OnKeyDown (new Key (KeyCode.Tab));
+			Application.OnKeyDown (new Key (KeyCode.Tab));
+			Application.OnKeyDown (new Key (KeyCode.Tab));
+#endif
 
 			Assert.IsType<TextField> (dlg.MostFocused);
 			var tf = (TextField)dlg.MostFocused;
@@ -176,7 +181,7 @@ namespace Terminal.Gui.FileServicesTests {
 			// Down to the directory
 			Assert.True (dlg.Canceled);
 			// Alt+O to open (enter would just navigate into the child dir)
-			Send ('o', ConsoleKey.O, false, true);
+			Send ('O', ConsoleKey.O, false, true);
 			Assert.False (dlg.Canceled);
 
 			AssertIsTheSubfolder (dlg.Path);
@@ -210,7 +215,7 @@ namespace Terminal.Gui.FileServicesTests {
 			if (acceptWithEnter) {
 				Send ('\n', ConsoleKey.Enter);
 			} else {
-				Send ('o', ConsoleKey.O, false, true);
+				Send ('O', ConsoleKey.O, false, true);
 			}
 			Assert.False (dlg.Canceled);
 
@@ -323,7 +328,7 @@ namespace Terminal.Gui.FileServicesTests {
 			if (acceptWithEnter) {
 				Send ('\n', ConsoleKey.Enter);
 			} else {
-				Send ('o', ConsoleKey.O, false, true);
+				Send ('O', ConsoleKey.O, false, true);
 			}
 			Assert.False (dlg.Canceled);
 
@@ -398,7 +403,7 @@ namespace Terminal.Gui.FileServicesTests {
 │                                                                         │
 │                                                                         │
 │                                                                         │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                   {CM.Glyphs.LeftBracket} OK {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
@@ -434,7 +439,7 @@ namespace Terminal.Gui.FileServicesTests {
 ││mybinary.exe│7.00 B    │2001-01-01T11:44:42           │.exe            ││
 │                                                                         │
 │                                                                         │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                   {CM.Glyphs.LeftBracket} OK {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);

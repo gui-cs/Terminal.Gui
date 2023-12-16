@@ -17,7 +17,7 @@ From now on, you can use `.ObserveOn(RxApp.MainThreadScheduler)` to return to th
 
 ### Data Bindings
 
-If you wish to implement `OneWay` data binding, then use the `WhenAnyValue` [ReactiveUI extension method](https://www.reactiveui.net/docs/handbook/when-any/) that listens to `INotifyPropertyChanged` events of the specified property, and converts that events into `IObservable<TProperty>`:
+If you wish to implement `OneWay` data binding, then use the `WhenAnyValue` [ReactiveUI extension method](https://www.reactiveui.net../docs/handbook/when-any/) that listens to `INotifyPropertyChanged` events of the specified property, and converts that events into `IObservable<TProperty>`:
 
 ```cs
 // 'usernameInput' is 'TextField' 

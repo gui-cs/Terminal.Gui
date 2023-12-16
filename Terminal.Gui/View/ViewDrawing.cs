@@ -200,6 +200,9 @@ namespace Terminal.Gui {
 		/// <param name="regionScreen">The screen-relative rectangle to clear.</param>
 		public void Clear (Rect regionScreen)
 		{
+			if (Driver == null) {
+				return;
+			}
 			var prev = Driver.SetAttribute (GetNormalColor ());
 			Driver.FillRect (regionScreen);
 			Driver.SetAttribute (prev);

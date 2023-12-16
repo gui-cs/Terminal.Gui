@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyPressed += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
+			Win.KeyDown += (s,e) => { e.Handled = canvas.OnKeyDown (e); };
 		}
 
 		class ToolsView : Window {
@@ -108,9 +108,11 @@ namespace UICatalog.Scenarios {
 
 			Stack<StraightLine> undoHistory = new ();
 
-			public override bool ProcessKey (KeyEvent e)
+			//// BUGBUG: Why is this not handled by a key binding???
+			public override bool OnKeyDown (Key e)
 			{
-				if (e.Key == (Key.Z | Key.CtrlMask)) {
+				// BUGBUG: These should be implemented with key bindings
+				if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();
 					if(pop != null) {
 						undoHistory.Push (pop);
@@ -119,7 +121,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 
-				if (e.Key == (Key.Y | Key.CtrlMask)) {
+				if (e.KeyCode == (KeyCode.Y | KeyCode.CtrlMask)) {
 					if (undoHistory.Any()) {
 						var pop = undoHistory.Pop ();
 						_currentLayer.AddLine(pop);
@@ -127,9 +129,9 @@ namespace UICatalog.Scenarios {
 						return true;
 					}
 				}
-
-				return base.ProcessKey (e);
+				return false;
 			}
+			
 			internal void AddLayer ()
 			{
 				_currentLayer = new LineCanvas ();

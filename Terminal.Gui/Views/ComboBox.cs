@@ -343,16 +343,16 @@ namespace Terminal.Gui {
 			AddCommand (Command.UnixEmulation, () => UnixEmulation ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Enter, Command.Accept);
-			AddKeyBinding (Key.F4, Command.ToggleExpandCollapse);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.Home, Command.TopHome);
-			AddKeyBinding (Key.End, Command.BottomEnd);
-			AddKeyBinding (Key.Esc, Command.Cancel);
-			AddKeyBinding (Key.U | Key.CtrlMask, Command.UnixEmulation);
+			KeyBindings.Add (KeyCode.Enter, Command.Accept);
+			KeyBindings.Add (KeyCode.F4, Command.ToggleExpandCollapse);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+			KeyBindings.Add (KeyCode.Home, Command.TopHome);
+			KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.Esc, Command.Cancel);
+			KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
 		}
 
 		private bool isShow = false;
@@ -542,16 +542,6 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (ColorScheme.Focus);
 			Move (Bounds.Right - 1, 0);
 			Driver.AddRune (CM.Glyphs.DownArrow);
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent e)
-		{
-			var result = InvokeKeybindings (e);
-			if (result != null)
-				return (bool)result;
-
-			return base.ProcessKey (e);
 		}
 
 		bool UnixEmulation ()

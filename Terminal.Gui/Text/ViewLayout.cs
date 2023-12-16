@@ -534,7 +534,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Removes the <see cref="SetNeedsLayout"/> setting on this view.
+		/// Indicates that the view does not need to be laid out.
 		/// </summary>
 		protected void ClearLayoutNeeded ()
 		{
@@ -947,7 +947,7 @@ namespace Terminal.Gui {
 		/// response to the container view or terminal resizing.
 		/// </summary>
 		/// <remarks>
-		/// Calls <see cref="OnLayoutComplete"/> (which raises the <see cref="LayoutComplete"/> event) before it returns.
+		/// Raises the <see cref="LayoutComplete"/> event) before it returns.
 		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{

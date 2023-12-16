@@ -100,9 +100,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
-				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample()),
-				new StatusItem(Key.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
+				new StatusItem(KeyCode.F2, "~F2~ OpenExample", () => OpenExample(true)),
+				new StatusItem(KeyCode.F3, "~F3~ CloseExample", () => CloseExample()),
+				new StatusItem(KeyCode.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -122,7 +122,7 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
 			tableView.CellActivated += EditCurrentCell;
-			tableView.KeyPressed += TableViewKeyPress;
+			tableView.KeyDown += TableViewKeyPress;
 
 			SetupScrollBar ();
 
@@ -170,7 +170,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 		}
 
 		private void ShowAllColumns ()
@@ -386,13 +386,13 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, Key e)
 		{
 			if(currentTable == null) {
 				return;
 			}
 
-			if (e.KeyEvent.Key == Key.DeleteChar) {
+			if (e.KeyCode == KeyCode.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

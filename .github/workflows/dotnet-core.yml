@@ -9,15 +9,15 @@ on:
 jobs:
   build_and_test:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0
+        dotnet-version: 8.0
         dotnet-quality: 'ga'
 
     - name: Install dependencies
@@ -30,7 +30,7 @@ jobs:
     - name: Test
       run: |
         sed -i 's/"stopOnFail": false/"stopOnFail": true/g' UnitTests/xunit.runner.json
-        dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings
+        dotnet test --no-restore --verbosity normal --collect:"XPlat Code Coverage"  --settings UnitTests/coverlet.runsettings --blame
         mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
 
     # Note: this step is currently not writing to the gist for some reason
