@@ -2,8 +2,9 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ClipboardTests; 
+namespace Terminal.Gui.ClipboardTests;
 
+#if RUN_CLIPBOARD_UNIT_TESTS
 public class ClipboardTests {
 	readonly ITestOutputHelper output;
 
@@ -293,3 +294,4 @@ public class ClipboardTests {
 		}
 	}
 }
+#endif

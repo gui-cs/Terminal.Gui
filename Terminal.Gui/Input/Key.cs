@@ -153,11 +153,6 @@ public class Key : EventArgs, IEquatable<Key> {
 	}
 
 	/// <summary>
-	/// Gets the key without any shift modifiers. 
-	/// </summary>
-	public KeyCode BareKey => KeyCode & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
-
-	/// <summary>
 	/// Indicates whether the <see cref="Key"/> is valid or not. 
 	/// </summary>
 	public bool IsValid => !(KeyCode == KeyCode.Null || KeyCode == KeyCode.Unknown);
