@@ -162,8 +162,8 @@ namespace UICatalog.Scenarios {
 									mod |= ConsoleModifiers.Control;
 								}
 								for (int i = 0; i < _keyboardStrokes.Count; i++) {
-									var consoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)_keyboardStrokes [i], mod, out _, out _);
-									Application.Driver.SendKeys ((char)consoleKey, ConsoleKey.Packet, mod.HasFlag (ConsoleModifiers.Shift),
+									var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)_keyboardStrokes [i], mod, out _);
+									Application.Driver.SendKeys (consoleKeyInfo.KeyChar, ConsoleKey.Packet, mod.HasFlag (ConsoleModifiers.Shift),
 										mod.HasFlag (ConsoleModifiers.Alt), mod.HasFlag (ConsoleModifiers.Control));
 								}
 								//}

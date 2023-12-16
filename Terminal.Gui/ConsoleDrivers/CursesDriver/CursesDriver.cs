@@ -724,10 +724,10 @@ internal class CursesDriver : ConsoleDriver {
 			if (control) {
 				mod |= ConsoleModifiers.Control;
 			}
-			var kchar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyChar, mod, out uint ckey, out _);
-			key = ConsoleKeyMapping.MapConsoleKeyToKey ((ConsoleKey)ckey, out bool mappable);
+			var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (keyChar, mod, out _);
+			key = ConsoleKeyMapping.MapConsoleKeyToKey ((ConsoleKey)cKeyInfo.Key, out bool mappable);
 			if (mappable) {
-				key = (KeyCode)kchar;
+				key = (KeyCode)cKeyInfo.KeyChar;
 			}
 		} else {
 			key = (KeyCode)keyChar;

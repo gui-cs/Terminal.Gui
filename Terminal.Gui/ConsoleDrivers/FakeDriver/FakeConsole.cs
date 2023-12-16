@@ -800,7 +800,7 @@ public static class FakeConsole {
 	{
 		MockKeyPresses.Push (new ConsoleKeyInfo (
 			(char)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask),
-			ConsoleKeyMapping.GetConsoleKeyFromKey (key),
+			ConsoleKeyMapping.GetConsoleKeyFromKey (key).Key,
 			key.HasFlag (KeyCode.ShiftMask),
 			key.HasFlag (KeyCode.AltMask),
 			key.HasFlag (KeyCode.CtrlMask)));

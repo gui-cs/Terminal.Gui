@@ -65,7 +65,7 @@ public class KeyEventArgsTests {
 	[InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '\0')]
 	[InlineData ((KeyCode)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((KeyCode)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
-	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
+	//[InlineData (KeyCode.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (KeyCode.ShiftMask | KeyCode.A, 65)]
 	[InlineData (KeyCode.CtrlMask | KeyCode.A, '\0')]
 	[InlineData (KeyCode.AltMask | KeyCode.A, '\0')]
@@ -92,10 +92,10 @@ public class KeyEventArgsTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, '\0')]
 	[InlineData (KeyCode.CharMask, '\0')]
 	[InlineData (KeyCode.SpecialMask, '\0')]
-	public void AsRune_ShouldReturnCorrectIntValue (KeyCode key, Rune expected)
+	public void AsRune_ShouldReturnCorrectIntValue (KeyCode key, char expected) // This can´t be Rune because won't run the tests
 	{
 		var eventArgs = new KeyEventArgs (key);
-		Assert.Equal (expected, eventArgs.AsRune);
+		Assert.Equal ((Rune)expected, eventArgs.AsRune);
 	}
 
 	[Theory]

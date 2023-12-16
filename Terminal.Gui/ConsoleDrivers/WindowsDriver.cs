@@ -379,7 +379,7 @@ internal class WindowsConsole {
 		[FieldOffset (12), MarshalAs (UnmanagedType.U4)]
 		public ControlKeyState dwControlKeyState;
 
-		public override readonly string ToString () => $"[KeyEventRecord({(bKeyDown ? "down" : "up")},{wRepeatCount},{wVirtualKeyCode},{wVirtualScanCode},{new Rune(UnicodeChar).MakePrintable()},{dwControlKeyState})]";
+		public override readonly string ToString () => $"[KeyEventRecord({(bKeyDown ? "down" : "up")},{wRepeatCount},{wVirtualKeyCode},{wVirtualScanCode},{new Rune (UnicodeChar).MakePrintable ()},{dwControlKeyState})]";
 	}
 
 	[Flags]
@@ -617,7 +617,7 @@ internal class WindowsConsole {
 			sb.Append ((ex.CapsLock ? "caps," : string.Empty));
 			sb.Append ((ex.NumLock ? "num," : string.Empty));
 			sb.Append ((ex.ScrollLock ? "scroll," : string.Empty));
-			var s = sb.ToString ().TrimEnd (',').TrimEnd(' ');
+			var s = sb.ToString ().TrimEnd (',').TrimEnd (' ');
 			return $"[ConsoleKeyInfoEx({s})]";
 		}
 	}
@@ -1005,12 +1005,12 @@ internal class WindowsDriver : ConsoleDriver {
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
 				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
 					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
-				} 
+				}
 			}
 
 			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
 				return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			} 
+			}
 
 			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) != 0) {
 				if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) == (KeyCode)keyInfo.Key) {
@@ -1077,7 +1077,7 @@ internal class WindowsDriver : ConsoleDriver {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
-			Debug.WriteLine ($"event: {inputEvent.ToString()} {keyInfo.ToString (keyInfo)}");
+			Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
 
 			var map = MapKey (keyInfo);
@@ -1437,14 +1437,14 @@ internal class WindowsDriver : ConsoleDriver {
 		    keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed)) {
 			mod |= ConsoleModifiers.Control;
 		}
-		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyEvent.UnicodeChar, mod, out uint virtualKey, out uint scanCode);
+		var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (keyEvent.UnicodeChar, mod, out uint scanCode);
 
 		return new WindowsConsole.KeyEventRecord {
-			UnicodeChar = (char)keyChar,
+			UnicodeChar = cKeyInfo.KeyChar,
 			bKeyDown = keyEvent.bKeyDown,
 			dwControlKeyState = keyEvent.dwControlKeyState,
 			wRepeatCount = keyEvent.wRepeatCount,
-			wVirtualKeyCode = (ushort)virtualKey,
+			wVirtualKeyCode = (ushort)cKeyInfo.Key,
 			wVirtualScanCode = (ushort)scanCode
 		};
 	}

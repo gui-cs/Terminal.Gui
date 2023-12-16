@@ -998,9 +998,9 @@ internal class NetDriver : ConsoleDriver {
 		var alt = (mod & ConsoleModifiers.Alt) != 0;
 		var control = (mod & ConsoleModifiers.Control) != 0;
 
-		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
+		var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out _);
 
-		return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
+		return new ConsoleKeyInfo (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
 	}
 
 	KeyCode MapKey (ConsoleKeyInfo keyInfo)
