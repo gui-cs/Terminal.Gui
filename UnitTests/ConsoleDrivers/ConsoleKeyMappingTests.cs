@@ -63,7 +63,6 @@ public class ConsoleKeyMappingTests {
 			Assert.Equal ((uint)consoleKeyInfo.Key, initialVirtualKey);
 
 
-			//if (scanCode > 0 && consoleKey == keyChar && consoleKey > 48 && consoleKey > 57 && consoleKey < 65 && consoleKey > 91) {
 			if (scanCode > 0 && consoleKeyInfo.KeyChar == 0) {
 				Assert.Equal (0, (double)consoleKeyInfo.KeyChar);
 			} else {
