@@ -543,6 +543,56 @@ public class Key : EventArgs, IEquatable<Key> {
 	public static readonly Key Space = new (KeyCode.Space);
 
 	/// <summary>
+	/// The <see cref="Key"/> object for 0 key.
+	/// </summary>
+	public static readonly Key D0 = new (KeyCode.D0);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 1 key.
+	/// </summary>
+	public static readonly Key D1 = new (KeyCode.D1);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 2 key.
+	/// </summary>
+	public static readonly Key D2 = new (KeyCode.D2);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 3 key.
+	/// </summary>
+	public static readonly Key D3 = new (KeyCode.D3);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 4 key.
+	/// </summary>
+	public static readonly Key D4 = new (KeyCode.D4);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 5 key.
+	/// </summary>
+	public static readonly Key D5 = new (KeyCode.D5);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 6 key.
+	/// </summary>
+	public static readonly Key D6 = new (KeyCode.D6);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 7 key.
+	/// </summary>
+	public static readonly Key D7 = new (KeyCode.D7);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 8 key.
+	/// </summary>
+	public static readonly Key D8 = new (KeyCode.D8);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for 9 key.
+	/// </summary>
+	public static readonly Key D9 = new (KeyCode.D9);
+
+	/// <summary>
 	/// The <see cref="Key"/> object for the A key (un-shifted). Use <c>Key.A.WithShift</c> for uppercase 'A'.
 	/// </summary>
 	public static readonly Key A = new (KeyCode.A);

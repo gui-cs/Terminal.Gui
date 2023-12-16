@@ -10,10 +10,7 @@ namespace Terminal.Gui.ViewTests;
 public class KeyboardEventTests {
 	readonly ITestOutputHelper _output;
 
-	public KeyboardEventTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+	public KeyboardEventTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void KeyPress_Handled_Cancels ()
@@ -287,10 +284,7 @@ public class KeyboardEventTests {
 	public class OnKeyTestView : View {
 		public bool CancelVirtualMethods { set; private get; }
 
-		public OnKeyTestView ()
-		{
-			CanFocus = true;
-		}
+		public OnKeyTestView () => CanFocus = true;
 
 		public override string Text { get; set; }
 
@@ -394,25 +388,70 @@ public class KeyboardEventTests {
 		Assert.True (view.OnKeyUpContinued);
 	}
 
-	//[Fact]
-	//public void AllViews_OnKeyPressed_CallsResponder ()
-	//{
-	//	foreach (var view in TestHelpers.GetAllViews ()) {
-	//		if (view == null) {
-	//			_output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
-	//			continue;
-	//		}
-	//		_output.WriteLine($"Testing {view.GetType().Name}");
-	//		var keyPressed = false;
-	//		view.KeyPressed += (s, a) => {
-	//			a.Handled = true;
-	//			keyPressed = true;
-	//		};
+	/// <summary>
+	/// This tests that when a new key down event is sent to the view
+	/// the view will fire the 3 key-down related events: KeyDown, InvokingKeyBindings, and ProcessKeyDown.
+	/// Note that KeyUp is independent.
+	/// </summary>
+	[Fact]
+	public void AllViews_KeyDown_All_EventsFire ()
+	{
+		foreach (var view in TestHelpers.GetAllViews ()) {
+			if (view == null) {
+				_output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+				continue;
+			}
+			_output.WriteLine ($"Testing {view.GetType ().Name}");
 
-	//		var handled = view.OnKeyPressed (new KeyEventArgs (Key.A));
-	//		Assert.True (handled);
-	//		Assert.True (keyPressed);
-	//		view.Dispose ();
-	//	}
-	//}
+			bool keyDown = false;
+			view.KeyDown += (s, a) => {
+				a.Handled = false; // don't handle it so the other events are called
+				keyDown = true;
+			};
+
+			bool invokingKeyBindings = false;
+			view.InvokingKeyBindings += (s, a) => {
+				a.Handled = false; // don't handle it so the other events are called
+				invokingKeyBindings = true;
+			};
+
+			bool keyDownProcessed = false;
+			view.ProcessKeyDown += (s, a) => {
+				a.Handled = true;
+				keyDownProcessed = true;
+			};
+
+			Assert.True (view.NewKeyDownEvent (Key.A)); // this will be true because the ProcessKeyDown event handled it
+			Assert.True (keyDown);
+			Assert.True (invokingKeyBindings);
+			Assert.True (keyDownProcessed);
+			view.Dispose ();
+		}
+	}
+
+	/// <summary>
+	/// This tests that when a new key up event is sent to the view
+	/// the view will fire the 1 key-up related event: KeyUp
+	/// </summary>
+	[Fact]
+	public void AllViews_KeyUp_All_EventsFire ()
+	{
+		foreach (var view in TestHelpers.GetAllViews ()) {
+			if (view == null) {
+				_output.WriteLine ($"ERROR: null view from {nameof (TestHelpers.GetAllViews)}");
+				continue;
+			}
+			_output.WriteLine ($"Testing {view.GetType ().Name}");
+
+			bool keyUp = false;
+			view.KeyUp += (s, a) => {
+				a.Handled = true;  
+				keyUp = true;
+			};
+
+			Assert.True (view.NewKeyUpEvent (Key.A)); // this will be true because the KeyUp event handled it
+			view.Dispose ();
+		}
+
+	}
 }

@@ -335,12 +335,17 @@ public partial class View {
 			return true;
 		}
 
+		// TODO: The below is not right. OnXXX handlers are supposed to fire the events.
+		// TODO: But I've moved it outside of the v-function to test something.
 		// After (fire the cancellable event)
-		if (OnProcessKeyDown (keyEvent)) {
+		// fire event
+		ProcessKeyDown?.Invoke (this, keyEvent);
+		if (!keyEvent.Handled && OnProcessKeyDown (keyEvent)) {
 			return true;
 		}
 
-		return false;
+
+		return keyEvent.Handled;
 	}
 
 	/// <summary>
@@ -406,8 +411,6 @@ public partial class View {
 	/// </remarks>
 	public virtual bool OnProcessKeyDown (Key keyEvent)
 	{
-		// fire event
-		ProcessKeyDown?.Invoke (this, keyEvent);
 		return keyEvent.Handled;
 	}
 
@@ -497,22 +500,8 @@ public partial class View {
 	/// </remarks>
 	public virtual bool OnKeyUp (Key keyEvent)
 	{
-		if (!Enabled) {
-			return false;
-		}
-
-		// fire event
 		KeyUp?.Invoke (this, keyEvent);
-		if (keyEvent.Handled) {
-			return true;
-		}
-
-		if (Focused?.OnKeyUp (keyEvent) == true) {
-			return true;
-		}
-
-		return false;
-
+		return keyEvent.Handled;
 	}
 
 	/// <summary>
