@@ -80,30 +80,30 @@ namespace Terminal.Gui {
 
 			// Things this view knows how to do
 			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
-			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (false); return true; });
 			AddCommand (Command.LeftHome, () => MoveHome ());
 			AddCommand (Command.Left, () => MoveLeft ());
 			AddCommand (Command.RightEnd, () => MoveEnd ());
 			AddCommand (Command.Right, () => MoveRight ());
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
-			AddKeyBinding (Key.D | Key.CtrlMask, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
 
-			AddKeyBinding (Key.Delete, Command.DeleteCharLeft);
-			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharLeft);
+			KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
 
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.LeftHome);
+			KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+			KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.LeftHome);
 
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.Left);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.B | KeyCode.CtrlMask, Command.Left);
 
-			AddKeyBinding (Key.End, Command.RightEnd);
-			AddKeyBinding (Key.E | Key.CtrlMask, Command.RightEnd);
+			KeyBindings.Add (KeyCode.End, Command.RightEnd);
+			KeyBindings.Add (KeyCode.E | KeyCode.CtrlMask, Command.RightEnd);
 
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.Right);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
 		}
 
 		void TextField_TextChanged (object sender, TextChangedEventArgs e)
@@ -256,23 +256,23 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnProcessKeyDown (Key a)
 		{
-			var result = InvokeKeybindings (kb);
-			if (result != null)
-				return (bool)result;
-
 			// Ignore non-numeric characters.
-			if (kb.Key < (Key)((int)Key.D0) || kb.Key > (Key)((int)Key.D9))
-				return false;
-
-			if (ReadOnly)
+			if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9) {
+				if (!ReadOnly) {
+					if (SetText ((Rune)a)) {
+						IncCursorPosition ();
+					}
+				}
 				return true;
+			}
 
-			if (SetText (((Rune)(uint)kb.Key).ToString ().EnumerateRunes ().First ()))
-				IncCursorPosition ();
-
-			return true;
+			if (a.IsKeyCodeAtoZ) {
+				return true;
+			}
+			
+			return false;
 		}
 
 		bool MoveRight ()

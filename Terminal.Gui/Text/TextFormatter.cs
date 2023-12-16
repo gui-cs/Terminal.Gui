@@ -929,20 +929,20 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Finds the hotkey and its location in text. 
+		/// Finds the HotKey and its location in text. 
 		/// </summary>
 		/// <param name="text">The text to look in.</param>
-		/// <param name="hotKeySpecifier">The hotkey specifier (e.g. '_') to look for.</param>
-		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the hotkey will be enabled.
+		/// <param name="hotKeySpecifier">The HotKey specifier (e.g. '_') to look for.</param>
+		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the HotKey will be enabled.
 		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.</param>
 		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
-		/// <param name="hotKey">Outputs the hotKey.</param>
-		/// <returns><c>true</c> if a hotkey was found; <c>false</c> otherwise.</returns>
+		/// <param name="hotKey">Outputs the hotKey. <see cref="Key.Empty"/> if not found.</param>
+		/// <returns><c>true</c> if a HotKey was found; <c>false</c> otherwise.</returns>
 		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
 		{
 			if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
 				hotPos = -1;
-				hotKey = Key.Unknown;
+				hotKey = KeyCode.Null;
 				return false;
 			}
 
@@ -983,14 +983,18 @@ namespace Terminal.Gui {
 			if (hot_key != (Rune)0 && hot_pos != -1) {
 				hotPos = hot_pos;
 
-				if (Rune.IsValid (hot_key.Value) && char.IsLetterOrDigit ((char)hot_key.Value)) {
-					hotKey = (Key)char.ToUpperInvariant ((char)hot_key.Value);
+				var newHotKey = (KeyCode)hot_key.Value;
+				if (newHotKey != KeyCode.Unknown && newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (hot_key))) {
+					if ((newHotKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
+						newHotKey &= ~KeyCode.Space;
+					}
+					hotKey = newHotKey;
 					return true;
 				}
 			}
 
 			hotPos = -1;
-			hotKey = Key.Unknown;
+			hotKey = KeyCode.Null;
 			return false;
 		}
 
@@ -1047,7 +1051,7 @@ namespace Terminal.Gui {
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
 		TextDirection _textDirection;
-		Key _hotKey;
+		Key _hotKey = new Key ();
 		int _hotKeyPos = -1;
 		Size _size;
 		private bool _autoSize;
@@ -1229,17 +1233,17 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// The specifier character for the hotkey (e.g. '_'). Set to '\xffff' to disable hotkey support for this View instance. The default is '\xffff'.
+		/// The specifier character for the hot key (e.g. '_'). Set to '\xffff' to disable hot key support for this View instance. The default is '\xffff'.
 		/// </summary>
 		public Rune HotKeySpecifier { get; set; } = (Rune)0xFFFF;
 
 		/// <summary>
-		/// The position in the text of the hotkey. The hotkey will be rendered using the hot color.
+		/// The position in the text of the hot key. The hot key will be rendered using the hot color.
 		/// </summary>
 		public int HotKeyPos { get => _hotKeyPos; internal set => _hotKeyPos = value; }
 
 		/// <summary>
-		/// Gets the hotkey. Will be an upper case letter or digit.
+		/// Gets or sets the hot key. Must be be an upper case letter or digit. Fires the <see cref="HotKeyChanged"/> event.
 		/// </summary>
 		public Key HotKey {
 			get => _hotKey;
@@ -1291,10 +1295,10 @@ namespace Terminal.Gui {
 					NeedsFormat = false;
 					return _lines;
 				}
-
+				
 				if (NeedsFormat) {
 					var shown_text = _text;
-					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out Key newHotKey)) {
+					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out var newHotKey)) {
 						HotKey = newHotKey;
 						shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);

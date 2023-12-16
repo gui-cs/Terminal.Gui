@@ -497,15 +497,15 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.CursorDown));
 
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			Assert.True (called);
 			Assert.Same (f, activated);
@@ -557,7 +557,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			InitFakeDriver ();
 
-			tree.ObjectActivationKey = Key.Delete;
+			tree.ObjectActivationKey = KeyCode.Delete;
 			object activated = null;
 			bool called = false;
 
@@ -570,22 +570,22 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.CursorDown));
 
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			// Enter is not the activation key in this unit test
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// Delete is the activation key in this test so should result in activation occurring
-			tree.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Delete));
 
 			Assert.True (called);
 			Assert.Same (f, activated);
@@ -836,7 +836,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTreeViewColor ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
-
+			tv.BeginInit ();
+			tv.EndInit ();
 			var n1 = new TreeNode ("normal");
 			var n1_1 = new TreeNode ("pink");
 			var n1_2 = new TreeNode ("normal");

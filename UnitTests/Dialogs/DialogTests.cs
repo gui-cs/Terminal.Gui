@@ -799,7 +799,7 @@ namespace Terminal.Gui.DialogTests {
 			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
-					Assert.True (btn1.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+					Assert.True (btn1.NewKeyDownEvent (new (KeyCode.Space)));
 				} else if (iterations == 1) {
 					expected = @$"
       ┌──────────────────────────────────────────────────────────────────┐
@@ -825,7 +825,7 @@ namespace Terminal.Gui.DialogTests {
       └──────────────────────────────────────────────────────────────────┘";
 					TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-					Assert.True (btn2.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+					Assert.True (btn2.NewKeyDownEvent (new (KeyCode.Space)));
 				} else if (iterations == 2) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
       ┌──────────────────────────────────────────────────────────────────┐
@@ -850,11 +850,11 @@ namespace Terminal.Gui.DialogTests {
       │                      {CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket}                      │
       └──────────────────────────────────────────────────────────────────┘", output);
 
-					Assert.True (Application.Current.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+					Assert.True (Application.Current.NewKeyDownEvent (new (KeyCode.Enter)));
 				} else if (iterations == 3) {
 					TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-					Assert.True (btn3.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+					Assert.True (btn3.NewKeyDownEvent (new (KeyCode.Space)));
 				} else if (iterations == 4) {
 					TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 

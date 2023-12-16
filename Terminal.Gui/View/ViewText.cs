@@ -48,11 +48,6 @@ namespace Terminal.Gui {
 		/// </summary>
 		public TextFormatter TextFormatter { get; set; }
 
-		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
-		{
-			HotKeyChanged?.Invoke (this, e);
-		}
-
 		/// <summary>
 		/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
 		///  different format than the default.
