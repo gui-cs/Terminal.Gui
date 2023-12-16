@@ -108,6 +108,10 @@ public class CheckBox : View {
 	public override Key HotKey {
 		get => base.HotKey;
 		set {
+			if (value is null || value.KeyCode is KeyCode.Unknown) {
+				throw new ArgumentException (nameof (value));
+			}
+
 			var prev = base.HotKey;
 			if (prev != value) {
 				var v = value == (Key)KeyCode.Unknown ? KeyCode.Null : value;

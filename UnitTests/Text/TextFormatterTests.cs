@@ -1456,7 +1456,7 @@ namespace Terminal.Gui.TextTests {
 		public void Internal_Tests ()
 		{
 			var tf = new TextFormatter ();
-			Assert.Equal (KeyCode.Null, tf.HotKey);
+			Assert.Equal (KeyCode.Unknown, tf.HotKey);
 			tf.HotKey = KeyCode.CtrlMask | KeyCode.Q;
 			Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, tf.HotKey);
 		}

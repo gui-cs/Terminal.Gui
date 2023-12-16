@@ -16,7 +16,7 @@ public class ShortcutHelper {
 	public virtual KeyCode Shortcut {
 		get => shortcut;
 		set {
-			if (shortcut != value && (PostShortcutValidation (value) || value == KeyCode.Null)) {
+			if (shortcut != value && (PostShortcutValidation (value) || value is KeyCode.Null or KeyCode.Unknown)) {
 				shortcut = value;
 			}
 		}

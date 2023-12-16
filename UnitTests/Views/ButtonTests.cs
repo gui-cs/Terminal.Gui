@@ -28,7 +28,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 
 			Assert.Equal (string.Empty, btn.Title);
-			Assert.Equal (KeyCode.Null, btn.HotKey);
+			Assert.Equal (KeyCode.Unknown, btn.HotKey);
 
 			var expected = @$"
 {CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
@@ -216,7 +216,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			btn.Text = string.Empty;
 			Assert.Equal ("", btn.Text);
-			Assert.Equal (KeyCode.Null, btn.HotKey);
+			Assert.Equal (KeyCode.Unknown, btn.HotKey);
 
 			btn.Text = "Te_st";
 			Assert.Equal ("Te_st", btn.Text);
@@ -644,7 +644,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
-			Assert.Equal (KeyCode.Null, args.OldKey);
+			Assert.Equal (KeyCode.Unknown, args.OldKey);
 			Assert.Equal (KeyCode.R, args.NewKey);
 
 		}

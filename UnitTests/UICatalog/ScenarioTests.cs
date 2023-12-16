@@ -74,7 +74,7 @@ namespace UICatalog.Tests {
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey, args.KeyCode);
+					Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
 				};
 
 				uint abortTime = 500;

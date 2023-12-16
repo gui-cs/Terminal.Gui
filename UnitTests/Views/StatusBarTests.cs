@@ -109,7 +109,7 @@ namespace Terminal.Gui.ViewsTests {
 			sb.OnDrawContent (sb.Bounds);
 
 			string expected = @$"
-^O Open {CM.Glyphs.VLine} Q, CtrlMask to Quit!
+^O Open {CM.Glyphs.VLine} Ctrl+Q to Quit!
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}

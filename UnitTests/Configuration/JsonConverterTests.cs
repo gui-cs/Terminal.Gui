@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using Xunit;
 
 namespace Terminal.Gui.ConfigurationTests {
@@ -173,7 +175,7 @@ namespace Terminal.Gui.ConfigurationTests {
 	}
 
 	public class AttributeJsonConverterTests {
-		[Fact, AutoInitShutdown]
+		[Fact]
 		public void TestDeserialize ()
 		{
 			// Test deserializing from human-readable color names
@@ -248,8 +250,8 @@ namespace Terminal.Gui.ConfigurationTests {
 		}
 	}
 
-	public class KeyJsonConverterTests {
-		[Theory, AutoInitShutdown]
+	public class KeyCodeJsonConverterTests {
+		[Theory]
 		[InlineData (KeyCode.A, "A")]
 		[InlineData (KeyCode.A | KeyCode.ShiftMask, "A, ShiftMask")]
 		[InlineData (KeyCode.A | KeyCode.CtrlMask, "A, CtrlMask")]
@@ -268,6 +270,62 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Act
 			var json = JsonSerializer.Serialize (key, options);
 			var deserializedKey = JsonSerializer.Deserialize<KeyCode> (json, options);
+
+			// Assert
+			Assert.Equal (expectedStringTo, deserializedKey.ToString ());
+		}
+	}
+
+
+	public class KeyJsonConverterTests {
+		[Theory]
+		[InlineData (KeyCode.A, "{\"Key\":\"a\"}")]
+		[InlineData ((KeyCode)'â', "{\"Key\":\"â\"}")]
+		[InlineData (KeyCode.A | KeyCode.ShiftMask, "{\"Key\":\"A\"}")]
+		[InlineData (KeyCode.A | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+A\"}")]
+		[InlineData (KeyCode.A | KeyCode.AltMask | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+Alt+A\"}")]
+		[InlineData ((KeyCode)'a' | KeyCode.AltMask | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+Alt+A\"}")]
+		[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, "{\"Key\":\"A\"}")]
+		[InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+Alt+Delete\"}")]
+		[InlineData (KeyCode.D4, "{\"Key\":\"4\"}")]
+		[InlineData (KeyCode.Esc, "{\"Key\":\"Esc\"}")]
+		public void TestKey_Serialize (KeyCode key, string expected)
+		{
+			// Arrange
+			var options = new JsonSerializerOptions ();
+			options.Converters.Add (new KeyJsonConverter ());
+			options.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+
+			// Act
+			var json = JsonSerializer.Serialize ((Key)key, options);
+
+			// Assert
+			Assert.Equal (expected, json);
+		}
+
+		[Theory]
+		[InlineData (KeyCode.A, "a")]
+		[InlineData (KeyCode.A | KeyCode.ShiftMask, "A")]
+		[InlineData (KeyCode.A | KeyCode.CtrlMask, "Ctrl+A")]
+		[InlineData (KeyCode.A | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt+A")]
+		[InlineData ((KeyCode)'a' | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt+A")]
+		[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, "A")]
+		[InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt+Delete")]
+		[InlineData (KeyCode.D4, "4")]
+		[InlineData (KeyCode.Esc, "Esc")]
+		public void TestKeyRoundTripConversion (KeyCode key, string expectedStringTo)
+		{
+			// Arrange
+			var options = new JsonSerializerOptions ();
+			options.Converters.Add (new KeyJsonConverter ());
+			var encoderSettings = new TextEncoderSettings ();
+			encoderSettings.AllowCharacters ('+', '-');
+			encoderSettings.AllowRange (UnicodeRanges.BasicLatin);
+			options.Encoder = JavaScriptEncoder.Create(encoderSettings);
+
+			// Act
+			var json = JsonSerializer.Serialize ((Key)key, options);
+			var deserializedKey = JsonSerializer.Deserialize<Key> (json, options);
 
 			// Assert
 			Assert.Equal (expectedStringTo, deserializedKey.ToString ());

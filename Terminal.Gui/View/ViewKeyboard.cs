@@ -27,7 +27,7 @@ public partial class View {
 	/// </summary>
 	public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
 
-	Key _hotKey = null;
+	Key _hotKey = new Key ();
 
 	void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 	{
@@ -69,11 +69,17 @@ public partial class View {
 	/// <para>
 	/// If the hot key is changed, the <see cref="HotKeyChanged"/> event is fired.
 	/// </para>
+	/// <para>
+	/// Set to <see cref="KeyCode.Null"/> to disable the hot key.
+	/// </para>
 	/// </remarks>
 	public virtual Key HotKey {
 		get => _hotKey;
 		set {
-			if (_hotKey != null && AddKeyBindingsForHotKey ((KeyCode)_hotKey, (KeyCode)value)) {
+			if (value is null || value.KeyCode is KeyCode.Unknown) {
+				throw new ArgumentException (nameof (value));
+			}
+			if (AddKeyBindingsForHotKey ((KeyCode)_hotKey, (KeyCode)value)) {
 				// This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
 				_hotKey = TextFormatter.HotKey = value;
 			}
@@ -189,7 +195,7 @@ public partial class View {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
 		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
-			if ((KeyCode)_hotKey != hk && hk != KeyCode.Unknown) {
+			if (_hotKey.KeyCode != hk && hk != KeyCode.Unknown) {
 				HotKey = hk;
 			}
 		} else {
@@ -581,7 +587,7 @@ public partial class View {
 				}
 			}
 		}
-		
+
 		return handled;
 	}
 

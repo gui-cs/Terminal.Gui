@@ -35,7 +35,8 @@ public class HotKeyTests {
 	[InlineData ((KeyCode)'х')]  // Cyrillic x
 	[InlineData ((KeyCode)'你')] // Chinese ni
 	[InlineData ((KeyCode)'ö')] // German o umlaut
-	public void Set_SupportsKeys (KeyCode key)
+	[InlineData (KeyCode.Null)]
+	public void Set_Sets_WithValidKey (KeyCode key)
 	{
 		var view = new View ();
 		view.HotKey = key;
@@ -201,7 +202,8 @@ public class HotKeyTests {
 	[InlineData (KeyCode.Space)]
 	[InlineData (KeyCode.CursorLeft)]
 	[InlineData (KeyCode.F1)]
-	public void Set_Throws_With_Invalid_HotKeys (KeyCode key)
+	[InlineData (KeyCode.Unknown)]
+	public void Set_Throws_With_Invalid_Key (KeyCode key)
 	{
 		var view = new View ();
 		Assert.Throws<ArgumentException> (() => view.HotKey = key);
@@ -234,7 +236,7 @@ public class HotKeyTests {
 
 	[Theory]
 	[InlineData("^Test")]
-	public void Text_Sets_HotKey_To_KeyNull (string text)
+	public void Text_Empty_Sets_HotKey_To_Null (string text)
 	{
 		var view = new View () {
 			HotKeySpecifier = (Rune)'^',

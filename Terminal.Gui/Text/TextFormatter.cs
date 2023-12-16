@@ -984,7 +984,7 @@ namespace Terminal.Gui {
 				hotPos = hot_pos;
 
 				var newHotKey = (KeyCode)hot_key.Value;
-				if (newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (hot_key))) {
+				if (newHotKey != KeyCode.Unknown && newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (hot_key))) {
 					if ((newHotKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
 						newHotKey &= ~KeyCode.Space;
 					}
@@ -1051,7 +1051,7 @@ namespace Terminal.Gui {
 		TextAlignment _textAlignment;
 		VerticalTextAlignment _textVerticalAlignment;
 		TextDirection _textDirection;
-		Key _hotKey;
+		Key _hotKey = new Key ();
 		int _hotKeyPos = -1;
 		Size _size;
 		private bool _autoSize;

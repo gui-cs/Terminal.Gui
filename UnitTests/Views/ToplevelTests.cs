@@ -652,9 +652,9 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void AlternateForwardKeyChanged_AlternateBackwardKeyChanged_QuitKeyChanged_Events ()
 		{
-			Key alternateForwardKey = default;
-			Key alternateBackwardKey = default;
-			Key quitKey = default;
+			Key alternateForwardKey = KeyCode.Unknown;
+			Key alternateBackwardKey = KeyCode.Unknown;
+			Key quitKey = KeyCode.Unknown;
 
 			var view = new View ();
 			view.Initialized += View_Initialized;
@@ -672,9 +672,9 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (win);
 			Application.Begin (top);
 
-			Assert.Equal (KeyCode.Null, alternateForwardKey);
-			Assert.Equal (KeyCode.Null, alternateBackwardKey);
-			Assert.Equal (KeyCode.Null, quitKey);
+			Assert.Equal (KeyCode.Unknown, alternateForwardKey);
+			Assert.Equal (KeyCode.Unknown, alternateBackwardKey);
+			Assert.Equal (KeyCode.Unknown, quitKey);
 
 			Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
 			Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);

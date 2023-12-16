@@ -165,9 +165,9 @@ public class KeyboardTests {
 		Application.AlternateBackwardKey = KeyCode.PageUp | KeyCode.CtrlMask;
 		Application.QuitKey = KeyCode.Q | KeyCode.CtrlMask;
 
-		Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
+		Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
+		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -188,7 +188,7 @@ public class KeyboardTests {
 		Application.Begin (top);
 		top.Running = true;
 
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.True (isQuiting);
 

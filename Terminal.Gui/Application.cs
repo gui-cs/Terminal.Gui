@@ -1313,7 +1313,7 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyCodeJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
@@ -1337,7 +1337,7 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyCodeJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
@@ -1361,7 +1361,7 @@ public static partial class Application {
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyCodeJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
 	public static Key QuitKey {
 		get => _quitKey;
 		set {
