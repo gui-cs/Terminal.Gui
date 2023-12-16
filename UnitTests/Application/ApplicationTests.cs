@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -18,6 +19,8 @@ public class ApplicationTests {
 	public ApplicationTests (ITestOutputHelper output)
 	{
 		this._output = output;
+		ConsoleDriver.RunningUnitTests = true;
+
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -73,10 +76,10 @@ public class ApplicationTests {
 		// Verify state is back to initial
 		//Pre_Init_State ();
 #if DEBUG_IDISPOSABLE
-			// Validate there are no outstanding Responder-based instances 
-			// after a scenario was selected to run. This proves the main UI Catalog
-			// 'app' closed cleanly.
-			Assert.Empty (Responder.Instances);
+		// Validate there are no outstanding Responder-based instances 
+		// after a scenario was selected to run. This proves the main UI Catalog
+		// 'app' closed cleanly.
+		Assert.Empty (Responder.Instances);
 #endif
 	}
 
@@ -119,6 +122,21 @@ public class ApplicationTests {
 
 		Assert.NotNull (Application.Driver);
 
+		Shutdown ();
+	}
+
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	[InlineData (typeof (NetDriver))]
+	[InlineData (typeof (ANSIDriver))]
+	[InlineData (typeof (WindowsDriver))]
+	[InlineData (typeof (CursesDriver))]
+	public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
+	{
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		Application.Init (driverName: driverType.Name);
+		Assert.NotNull (Application.Driver);
+		Assert.Equal(driverType, Application.Driver.GetType());
 		Shutdown ();
 	}
 
@@ -281,8 +299,8 @@ public class ApplicationTests {
 	[Fact]
 	public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 	{
-		Application.ForceDriver = "FakeConsole";
-		
+		Application.ForceDriver = "FakeDriver";
+
 		Application.Init (null);
 		Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
 
@@ -324,7 +342,7 @@ public class ApplicationTests {
 	[Fact]
 	public void Run_T_NoInit_DoesNotThrow ()
 	{
-		Application.ForceDriver = "FakeConsole";
+		Application.ForceDriver = "FakeDriver";
 
 		Application.Iteration += (s, a) => {
 			Application.RequestStop ();

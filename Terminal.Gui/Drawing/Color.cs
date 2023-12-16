@@ -89,6 +89,29 @@ public enum ColorName {
 	White
 }
 
+
+/// <summary>
+/// The 16 foreground color codes used by ANSI Esc sequences for 256 color terminals. Add 10 to these values for background color.
+/// </summary>
+public enum AnsiColorCode {
+	BLACK = 30,
+	RED = 31,
+	GREEN = 32,
+	YELLOW = 33,
+	BLUE = 34,
+	MAGENTA = 35,
+	CYAN = 36,
+	WHITE = 37,
+	BRIGHT_BLACK = 90,
+	BRIGHT_RED = 91,
+	BRIGHT_GREEN = 92,
+	BRIGHT_YELLOW = 93,
+	BRIGHT_BLUE = 94,
+	BRIGHT_MAGENTA = 95,
+	BRIGHT_CYAN = 96,
+	BRIGHT_WHITE = 97,
+}
+
 /// <summary>
 /// Represents a 24-bit color. Provides automatic mapping between the legacy 4-bit (16 color) system and 24-bit colors (see <see cref="ColorName"/>).
 /// Used with <see cref="Attribute"/>. 
@@ -227,23 +250,23 @@ public class Color : IEquatable<Color> {
 	/// <summary>
 	/// Defines the 16 legacy color names and values that can be used to set the
 	/// </summary>
-	internal static ImmutableDictionary<ColorName, EscSeqUtils.AnsiColorCode> AnsiColorMap = new Dictionary<ColorName, EscSeqUtils.AnsiColorCode> {
-		{ ColorName.Black, EscSeqUtils.AnsiColorCode.BLACK },
-		{ ColorName.Blue, EscSeqUtils.AnsiColorCode.BLUE },
-		{ ColorName.Green, EscSeqUtils.AnsiColorCode.GREEN },
-		{ ColorName.Cyan, EscSeqUtils.AnsiColorCode.CYAN },
-		{ ColorName.Red, EscSeqUtils.AnsiColorCode.RED },
-		{ ColorName.Magenta, EscSeqUtils.AnsiColorCode.MAGENTA },
-		{ ColorName.Yellow, EscSeqUtils.AnsiColorCode.YELLOW },
-		{ ColorName.Gray, EscSeqUtils.AnsiColorCode.WHITE },
-		{ ColorName.DarkGray, EscSeqUtils.AnsiColorCode.BRIGHT_BLACK },
-		{ ColorName.Blue, EscSeqUtils.AnsiColorCode.BRIGHT_BLUE },
-		{ ColorName.Green, EscSeqUtils.AnsiColorCode.BRIGHT_GREEN },
-		{ ColorName.Cyan, EscSeqUtils.AnsiColorCode.BRIGHT_CYAN },
-		{ ColorName.Red, EscSeqUtils.AnsiColorCode.BRIGHT_RED },
-		{ ColorName.Magenta, EscSeqUtils.AnsiColorCode.BRIGHT_MAGENTA },
-		{ ColorName.Yellow, EscSeqUtils.AnsiColorCode.BRIGHT_YELLOW },
-		{ ColorName.White, EscSeqUtils.AnsiColorCode.BRIGHT_WHITE }
+	internal static ImmutableDictionary<ColorName, AnsiColorCode> _colorNameToAnsiColorMap = new Dictionary<ColorName, AnsiColorCode> {
+		{ ColorName.Black, AnsiColorCode.BLACK },
+		{ ColorName.Blue, AnsiColorCode.BLUE },
+		{ ColorName.Green, AnsiColorCode.GREEN },
+		{ ColorName.Cyan, AnsiColorCode.CYAN },
+		{ ColorName.Red, AnsiColorCode.RED },
+		{ ColorName.Magenta, AnsiColorCode.MAGENTA },
+		{ ColorName.Yellow, AnsiColorCode.YELLOW },
+		{ ColorName.Gray, AnsiColorCode.WHITE },
+		{ ColorName.DarkGray, AnsiColorCode.BRIGHT_BLACK },
+		{ ColorName.BrightBlue, AnsiColorCode.BRIGHT_BLUE },
+		{ ColorName.BrightGreen, AnsiColorCode.BRIGHT_GREEN },
+		{ ColorName.BrightCyan, AnsiColorCode.BRIGHT_CYAN },
+		{ ColorName.BrightRed, AnsiColorCode.BRIGHT_RED },
+		{ ColorName.BrightMagenta, AnsiColorCode.BRIGHT_MAGENTA },
+		{ ColorName.BrightYellow, AnsiColorCode.BRIGHT_YELLOW },
+		{ ColorName.White, AnsiColorCode.BRIGHT_WHITE }
 	}.ToImmutableDictionary ();
 
 	/// <summary>
@@ -270,9 +293,9 @@ public class Color : IEquatable<Color> {
 	/// <summary>
 	/// Converts a legacy <see cref="Gui.ColorName"/> to a 24-bit <see cref="Color"/>.
 	/// </summary>
-	/// <param name="consoleColor">The <see cref="Color"/> to convert.</param>
+	/// <param name="colorName">The <see cref="Color"/> to convert.</param>
 	/// <returns></returns>
-	private static Color FromColorName (ColorName consoleColor) => _colorToNameMap.FirstOrDefault (x => x.Value == consoleColor).Key;
+	private static Color FromColorName (ColorName colorName) => _colorToNameMap.FirstOrDefault (x => x.Value == colorName).Key;
 
 	// Iterates through the entries in the _colorNames dictionary, calculates the
 	// Euclidean distance between the input color and each dictionary color in RGB space,
@@ -330,9 +353,10 @@ public class Color : IEquatable<Color> {
 	/// <remarks>
 	/// Get returns the <see cref="ColorName"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
 	/// </remarks>
-	public EscSeqUtils.AnsiColorCode AnsiColorCode {
+	[JsonIgnore]
+	public AnsiColorCode AnsiColorCode {
 		get {
-			return AnsiColorMap [ColorName];
+			return _colorNameToAnsiColorMap [ColorName];
 		}
 	}
 

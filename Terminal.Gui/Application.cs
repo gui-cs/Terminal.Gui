@@ -156,36 +156,24 @@ public static partial class Application {
 			ForceDriver = driverName;
 		}
 
-		if (Driver == null) {
-			var p = Environment.OSVersion.Platform;
-			if (string.IsNullOrEmpty (ForceDriver)) {
-				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-					Driver = new ANSIDriver ();
+			if (Driver == null) {
+				var p = Environment.OSVersion.Platform;
+				if (string.IsNullOrEmpty(ForceDriver)) {
+					if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+						Driver = new ANSIDriver ();
+					} else {
+						Driver = new CursesDriver ();
+					}
 				} else {
-					Driver = new CursesDriver ();
-				}
-			} else {
-				switch (ForceDriver.ToLower ()) {
-				case "curses":
-					Driver = new CursesDriver ();
-					break;
-				case "ansi":
-					Driver = new ANSIDriver ();
-					break;
-				case "windows":
-					Driver = new WindowsDriver ();
-					break;
-				case "fake":
-					Driver = new FakeDriver ();
-					break;
-				case "net":
-					Driver = new NetDriver ();
-					break;
-				default:
-					throw new ArgumentException ($"Invalid driver name '{ForceDriver}'. Valid values are 'curses', 'windows', 'fake', 'ansi', and 'net'.");
+					var drivers = GetDriverTypes ();
+					var driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
+					if (driverType != null) {
+						Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+					} else {
+						throw new ArgumentException ($"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
+					}
 				}
 			}
-		}
 
 		try {
 			MainLoop = Driver.Init ();
@@ -219,6 +207,23 @@ public static partial class Application {
 
 	static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
+		/// <summary>
+		/// Gets of list of <see cref="ConsoleDriver"/> types that are available.
+		/// </summary>
+		/// <returns></returns>
+		public static List<Type> GetDriverTypes ()
+		{
+			// use reflection to get the list of drivers
+			var driverTypes = new List<Type> ();
+			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies ()) {
+				foreach (var type in asm.GetTypes ()) {
+					if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
+						driverTypes.Add (type);
+					}
+				}
+			}
+			return driverTypes;
+		}
 
 	/// <summary>
 	/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>.

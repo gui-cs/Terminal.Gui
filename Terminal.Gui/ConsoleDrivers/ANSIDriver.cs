@@ -38,7 +38,7 @@ internal class WindowsANSIConsole {
 	CursorVisibility? _initialCursorVisibility = null;
 	CursorVisibility? _currentCursorVisibility = null;
 	CursorVisibility? _pendingCursorVisibility = null;
-	
+
 	public WindowsANSIConsole ()
 	{
 		_inputHandle = new SafeFileHandle (PInvoke.GetStdHandle (STD_HANDLE.STD_INPUT_HANDLE), false);
@@ -52,7 +52,7 @@ internal class WindowsANSIConsole {
 		newConsoleMode &= ~CONSOLE_MODE.ENABLE_PROCESSED_INPUT;
 		ConsoleMode = newConsoleMode;
 	}
-	
+
 	public bool Write (string text)
 	{
 		unsafe {
@@ -199,6 +199,13 @@ internal class WindowsANSIConsole {
 	{
 		var csbi = new CONSOLE_SCREEN_BUFFER_INFOEX ();
 		csbi.cbSize = (uint)Marshal.SizeOf (csbi);
+		// https://learn.microsoft.com/en-us/windows/console/getconsolescreenbufferinfoex
+		// This API does not have a virtual terminal equivalent.
+		// Its use may still be required for applications that are attempting to draw columns,
+		// grids, or fill the display to retrieve the window size. This window state is managed
+		// by the TTY/PTY/Pseudoconsole outside of the normal stream flow and is generally
+		// considered a user privilege not adjustable by the client application.
+		// Updates can be received on ReadConsoleInput.
 		if (!PInvoke.GetConsoleScreenBufferInfoEx (_outputHandle, ref csbi)) {
 			throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
 		}
@@ -436,6 +443,7 @@ internal class ANSIDriver : ConsoleDriver {
 				Debug.WriteLine ($"Likely running unit tests. Setting WinConsole to null so we can test it elsewhere. Exception: {e}");
 				WinConsole = null;
 			}
+			WinConsole?.SetInitialCursorVisibility ();
 		}
 
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
@@ -449,8 +457,6 @@ internal class ANSIDriver : ConsoleDriver {
 		};
 
 		ClearContents ();
-
-		WinConsole?.SetInitialCursorVisibility ();
 
 #if HACK_CHECK_WINCHANGED
 		_mainLoopDriver.WinChanged = ChangeWin;
@@ -476,7 +482,7 @@ internal class ANSIDriver : ConsoleDriver {
 		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 #endif
-	
+
 	public override bool IsRuneSupported (Rune rune)
 	{
 		return base.IsRuneSupported (rune) && rune.IsBmp;
@@ -672,7 +678,7 @@ internal class ANSIDriver : ConsoleDriver {
 
 #if !HACK_CHECK_WINCHANGED
 		case (ushort)INPUT_RECORD_EVENT_TYPE.WINDOW_BUFFER_SIZE_EVENT:
-			
+
 			Cols = inputEvent.Event.WindowBufferSizeEvent.dwSize.X;
 			Rows = inputEvent.Event.WindowBufferSizeEvent.dwSize.Y;
 
@@ -1259,7 +1265,7 @@ internal class ANSIDriver : ConsoleDriver {
 
 		if (!RunningUnitTests && _isWindowsTerminal) {
 			// Disable alternative screen buffer.
-			WinConsole.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+			WinConsole?.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
 		}
 		WinConsole?.Cleanup ();
 		WinConsole = null;

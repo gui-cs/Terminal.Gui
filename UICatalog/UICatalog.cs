@@ -52,7 +52,8 @@ namespace UICatalog;
 /// </para>	
 /// </remarks>
 class UICatalogApp {
-	[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)] [JsonPropertyName ("UICatalog.StatusBar")]
+	[SerializableConfigurationProperty (Scope = typeof (AppScope), OmitClassName = true)]
+	[JsonPropertyName ("UICatalog.StatusBar")]
 	public static bool ShowStatusBar { get; set; } = true;
 
 	static readonly FileSystemWatcher _currentDirWatcher = new ();
@@ -75,12 +76,7 @@ class UICatalogApp {
 		var driverOption = new Option<string> (
 			name: "--driver",
 			description: "The ConsoleDriver to force the use of."
-		).FromAmong (
-			"fake",
-			"net",
-			"curses",
-			"windows",
-			"ansi");
+			).FromAmong (Application.GetDriverTypes ().Select (d => d.Name).ToArray ());
 		driverOption.AddAlias ("-d");
 		driverOption.AddAlias ("--d");
 
@@ -240,10 +236,10 @@ class UICatalogApp {
 		Application.Init (driverName: _forceDriver);
 
 		if (_cachedTheme is null) {
-			_cachedTheme = Themes?.Theme;
+			_cachedTheme = CM.Themes?.Theme;
 		} else {
-			Themes!.Theme = _cachedTheme;
-			Apply ();
+			CM.Themes!.Theme = _cachedTheme;
+			CM.Apply ();
 		}
 
 		Application.Run<UICatalogTopLevel> ();
@@ -741,13 +737,13 @@ class UICatalogApp {
 
 		public void ConfigChanged ()
 		{
-			miForce16Colors!.Checked = Application.Force16Colors;
-
 			if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme)) {
 				_topLevelColorScheme = "Base";
 			}
 
-			_themeMenuItems = ((UICatalogTopLevel)Application.Top).CreateThemeMenuItems ();
+			_cachedTheme = CM.Themes?.Theme;
+
+			_themeMenuItems = CreateThemeMenuItems ();
 			_themeMenuBarItem!.Children = _themeMenuItems;
 			foreach (var mi in _themeMenuItems!) {
 				if (mi is { Parent: null }) {
@@ -755,24 +751,7 @@ class UICatalogApp {
 				}
 			}
 
-			var checkedThemeMenu = _themeMenuItems?.Where (m => m?.Checked ?? false).FirstOrDefault ();
-			if (checkedThemeMenu != null) {
-				checkedThemeMenu.Checked = false;
-			}
-			checkedThemeMenu = _themeMenuItems?.Where (m => m != null && m.Title == Themes?.Theme).FirstOrDefault ();
-			if (checkedThemeMenu != null) {
-				Themes!.Theme = checkedThemeMenu.Title!;
-				checkedThemeMenu.Checked = true;
-			}
-
-			var schemeMenuItems = ((MenuBarItem)_themeMenuItems?.Where (i => i is MenuBarItem)!.FirstOrDefault ()!)!.Children;
-			foreach (var schemeMenuItem in schemeMenuItems) {
-				schemeMenuItem.Checked = (string)schemeMenuItem.Data == _topLevelColorScheme;
-			}
-
 			ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
-
-			//ContentPane.LineStyle = FrameView.DefaultBorderStyle;
 
 			MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
 			StatusBar.Items [0].Shortcut = Application.QuitKey;
@@ -781,7 +760,7 @@ class UICatalogApp {
 			miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
 			int height = ShowStatusBar ? 1 : 0; // + (MenuBar.Visible ? 1 : 0);
-			//ContentPane.Height = Dim.Fill (height);
+							    //ContentPane.Height = Dim.Fill (height);
 
 			StatusBar.Visible = ShowStatusBar;
 
