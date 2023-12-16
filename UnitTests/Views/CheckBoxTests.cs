@@ -67,7 +67,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.False (ckb.Checked);
 			Assert.False (toggled);
-			Assert.Equal (KeyCode.Unknown, ckb.HotKey);
+			Assert.Equal (KeyCode.Null, ckb.HotKey);
 			
 			ckb.Text = "Test";
 			Assert.Equal (KeyCode.T, ckb.HotKey);

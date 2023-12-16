@@ -1781,13 +1781,13 @@ namespace Terminal.Gui {
 		private MenuBarItem BuildContextMenuBarItem ()
 		{
 			return new MenuBarItem (new MenuItem [] {
-				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, KeyBindings.GetKeyFromCommands (Command.SelectAll)),
-				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
-				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, KeyBindings.GetKeyFromCommands (Command.Copy)),
-				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, KeyBindings.GetKeyFromCommands (Command.Cut)),
-				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, KeyBindings.GetKeyFromCommands (Command.Paste)),
-				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, KeyBindings.GetKeyFromCommands (Command.Undo)),
-				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, KeyBindings.GetKeyFromCommands (Command.Redo)),
+				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)),
+				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
+				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Copy)),
+				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Cut)),
+				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Paste)),
+				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Undo)),
+				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo)),
 			});
 		}
 

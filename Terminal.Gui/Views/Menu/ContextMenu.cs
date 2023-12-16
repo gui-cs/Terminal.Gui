@@ -27,7 +27,7 @@ public sealed class ContextMenu : IDisposable {
 	/// The default shortcut key for activating the context menu.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-	public static Key DefaultKey { get; set; } = new Key (KeyCode.F10 | KeyCode.ShiftMask);
+	public static Key DefaultKey { get; set; } = Key.F10.WithShift;
 
 	static MenuBar _menuBar;
 	Key _key = DefaultKey;

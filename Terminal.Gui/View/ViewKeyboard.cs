@@ -275,8 +275,8 @@ public partial class View {
 	/// Set to <see langword="false"/> to prevent the view from being a stop-point for keyboard navigation.
 	/// </summary>
 	/// <remarks>
-	/// The default keyboard navigation keys are <see cref="KeyCode.Tab"/> and <see cref="KeyCode.ShiftMask"/>|<see cref="KeyCode.Tab"/>.
-	/// These can be changed by modifying the key bindings (see <see cref="KeyBindings.Add(KeyCode, Command[])"/>) of the SuperView.
+	/// The default keyboard navigation keys are <c>Key.Tab</c> and <c>Key>Tab.WithShift</c>.
+	/// These can be changed by modifying the key bindings (see <see cref="KeyBindings.Add(Key, Command[])"/>) of the SuperView.
 	/// </remarks>
 	public bool TabStop {
 		get => _tabStop;
@@ -352,7 +352,7 @@ public partial class View {
 	/// the keypress was handled and no other view should see it.</returns>
 	/// <remarks>
 	/// <para>
-	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(KeyCode, Command[])"/>instead.
+	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(Key, Command[])"/>instead.
 	/// </para>
 	/// <para>
 	/// Fires the <see cref="KeyDown"/> event. 
@@ -394,7 +394,7 @@ public partial class View {
 	/// Override <see cref="OnKeyPressed"/> to override the behavior of how the base class processes key down events.
 	/// </para>
 	/// <para>
-	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(KeyCode, Command[])"/>instead.
+	/// For processing <see cref="HotKey"/>s and commands, use <see cref="Command"/> and <see cref="KeyBindings.Add(Key, Command[])"/>instead.
 	/// </para>
 	/// <para>
 	/// Fires the <see cref="KeyPressed"/> event. 
