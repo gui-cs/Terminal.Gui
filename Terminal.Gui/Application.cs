@@ -1472,7 +1472,7 @@ public static partial class Application {
 			return true;
 		}
 		foreach (var topLevel in _topLevels.ToList ()) {
-			if (topLevel.OnKeyUp (a)) {
+			if (topLevel.NewKeyUpEvent (a)) {
 				return true;
 			}
 			if (topLevel.Modal) {

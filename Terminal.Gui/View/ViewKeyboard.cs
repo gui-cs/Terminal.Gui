@@ -411,6 +411,7 @@ public partial class View {
 	/// </remarks>
 	public virtual bool OnProcessKeyDown (Key keyEvent)
 	{
+		//ProcessKeyDown?.Invoke (this, keyEvent);
 		return keyEvent.Handled;
 	}
 
@@ -500,8 +501,13 @@ public partial class View {
 	/// </remarks>
 	public virtual bool OnKeyUp (Key keyEvent)
 	{
+		// fire event
 		KeyUp?.Invoke (this, keyEvent);
-		return keyEvent.Handled;
+		if (keyEvent.Handled) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/// <summary>
