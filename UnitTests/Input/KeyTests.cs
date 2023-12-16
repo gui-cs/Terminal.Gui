@@ -8,16 +8,13 @@ namespace Terminal.Gui.InputTests;
 public class KeyTests {
 	readonly ITestOutputHelper _output;
 
-	public KeyTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+	public KeyTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
-	public void Constructor_Default_ShouldSetKeyToUnknown ()
+	public void Constructor_Default_ShouldSetKeyToNull ()
 	{
 		var eventArgs = new Key ();
-		Assert.Equal (KeyCode.Unknown, eventArgs.KeyCode);
+		Assert.Equal (KeyCode.Null, eventArgs.KeyCode);
 	}
 
 	[Theory]
@@ -47,7 +44,7 @@ public class KeyTests {
 	public void Cast_KeyCode_To_Key (KeyCode cdk, Key expected)
 	{
 		// explicit
-		Key key = (Key)cdk;
+		var key = (Key)cdk;
 		Assert.Equal (expected.ToString (), key.ToString ());
 
 		// implicit
@@ -87,7 +84,7 @@ public class KeyTests {
 	[InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '\0')]
 	[InlineData ((KeyCode)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((KeyCode)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
-					//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
+	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (KeyCode.ShiftMask | KeyCode.A, 65)]
 	[InlineData (KeyCode.CtrlMask | KeyCode.A, '\0')]
 	[InlineData (KeyCode.AltMask | KeyCode.A, '\0')]
@@ -129,6 +126,44 @@ public class KeyTests {
 		Assert.Equal (expected, eventArgs.IsAlt);
 	}
 
+	[Fact]
+	public void WithShift_ShouldReturnCorrectValue ()
+	{
+		var a = new Key (KeyCode.A);
+		Assert.Equal (KeyCode.A | KeyCode.ShiftMask, a.WithShift);
+
+		var CAD = Key.Delete.WithCtrl.WithAlt;
+		Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, CAD);
+	}
+
+	[Fact]
+	public void NoShift_ShouldReturnCorrectValue ()
+	{
+		var CAD = Key.Delete.WithCtrl.WithAlt;
+		Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, CAD);
+
+		Assert.Equal (KeyCode.Delete | KeyCode.AltMask, CAD.NoCtrl);
+
+		var a = new Key (KeyCode.A).WithCtrl.WithAlt.WithShift;
+		Assert.Equal (KeyCode.A, a.NoCtrl.NoShift.NoAlt);
+		Assert.Equal (KeyCode.A, a.NoAlt.NoShift.NoCtrl);
+		Assert.Equal (KeyCode.A, a.NoAlt.NoShift.NoCtrl.NoCtrl.NoAlt.NoShift);
+
+		Assert.Equal (Key.Delete, Key.Delete.WithCtrl.NoCtrl);
+
+		Assert.Equal ((KeyCode)Key.Delete | KeyCode.CtrlMask, Key.Delete.NoCtrl.WithCtrl);
+	}
+
+	[Fact]
+	public void Standard_Keys_Should_Equal_KeyCode ()
+	{
+		Assert.Equal (KeyCode.A, Key.A);
+		Assert.Equal (KeyCode.Delete, Key.Delete);
+	}
+
+	// TODO: Create equality operator for KeyCode
+	//Assert.Equal (KeyCode.Delete, Key.Delete);
+
 	// Similar tests for IsShift and IsCtrl
 	[Fact]
 	public void ToString_ShouldReturnReadableString ()
@@ -140,10 +175,7 @@ public class KeyTests {
 	[Theory]
 	[InlineData (KeyCode.CtrlMask | KeyCode.A, '+', "Ctrl+A")]
 	[InlineData (KeyCode.AltMask | KeyCode.B, '-', "Alt-B")]
-	public void ToStringWithSeparator_ShouldReturnFormattedString (KeyCode key, char separator, string expected)
-	{
-		Assert.Equal (expected, Key.ToString (key, (Rune)separator));
-	}
+	public void ToStringWithSeparator_ShouldReturnFormattedString (KeyCode key, char separator, string expected) => Assert.Equal (expected, Key.ToString (key, (Rune)separator));
 
 	[Theory]
 	[InlineData ((KeyCode)'☑', "☑")]
@@ -229,10 +261,7 @@ public class KeyTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, "Ctrl+Alt+Shift")]
 	[InlineData (KeyCode.CharMask, "CharMask")]
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
-	public void ToString_ShouldReturnFormattedString (KeyCode key, string expected)
-	{
-		Assert.Equal (expected, Key.ToString (key));
-	}
+	public void ToString_ShouldReturnFormattedString (KeyCode key, string expected) => Assert.Equal (expected, Key.ToString (key));
 
 	// TryParse
 	[Theory]
@@ -292,8 +321,5 @@ public class KeyTests {
 	[InlineData ("x99")]
 	[InlineData ("0x99")]
 	[InlineData ("Ctrl-Ctrl")]
-	public void TryParse_ShouldReturnFalse_On_InvalidKey (string keyString)
-	{
-		Assert.False (Key.TryParse (keyString, out var _));
-	}
+	public void TryParse_ShouldReturnFalse_On_InvalidKey (string keyString) => Assert.False (Key.TryParse (keyString, out var _));
 }

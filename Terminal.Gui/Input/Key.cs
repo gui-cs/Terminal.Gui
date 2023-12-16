@@ -35,10 +35,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	///   Constructs a new <see cref="Key"/> from the provided Key value
 	/// </summary>
 	/// <param name="k">The key</param>
-	public Key (KeyCode k)
-	{
-		KeyCode = k;
-	}
+	public Key (KeyCode k) => KeyCode = k;
 
 	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
@@ -54,8 +51,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
 	/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </para>
-	[JsonInclude]
-	[JsonConverter (typeof (KeyCodeJsonConverter))]
+	[JsonInclude] [JsonConverter (typeof (KeyCodeJsonConverter))]
 	public KeyCode KeyCode { get; set; }
 
 	/// <summary>
@@ -83,7 +79,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <returns>The key converted to a rune. <see langword="default"/> if conversion is not possible.</returns>
 	public static Rune ToRune (KeyCode key)
 	{
-		if (key is KeyCode.Null or KeyCode.Unknown or KeyCode.SpecialMask || key.HasFlag (KeyCode.CtrlMask) || key.HasFlag (KeyCode.AltMask)) {
+		if (key is KeyCode.Null or KeyCode.SpecialMask || key.HasFlag (KeyCode.CtrlMask) || key.HasFlag (KeyCode.AltMask)) {
 			return default;
 		}
 
@@ -165,261 +161,56 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// </summary>
 	public bool IsValid => !(KeyCode == KeyCode.Null || KeyCode == KeyCode.Unknown);
 
-	#region Standard Key Definitions
 	/// <summary>
-	/// The Shift modifier flag. Combine with a key code property to indicate the shift modifier. E.g. <c>key.Enter | key.Shift</c>.
+	/// Helper for specifying a shifted <see cref="Key"/>.
+	/// <code>
+	/// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
+	/// </code>
 	/// </summary>
-	/// <remarks>
-	/// <see cref="IsShift"/> provides a helper to determine if the <see cref="Key"/> has the Shift modifier applied.
-	/// </remarks>
-	public const uint Shift = (uint)KeyCode.ShiftMask;
+	public Key WithShift => new (KeyCode | KeyCode.ShiftMask);
 
 	/// <summary>
-	/// The Ctrl modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
+	/// Helper for removing a shift modifier from a <see cref="Key"/>.
+	/// <code>
+	/// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
+	/// var AltDelete = ControlAltDelete.NoCtrl;
+	/// </code>
 	/// </summary>
-	/// <remarks>
-	/// <see cref="IsCtrl"/> provides a helper to determine if the <see cref="Key"/> has the Ctrl modifier applied.
-	/// </remarks>
-	public const uint Ctrl = (uint)KeyCode.CtrlMask;
+	public Key NoShift => new (KeyCode & ~KeyCode.ShiftMask);
 
 	/// <summary>
-	/// The Alt modifier flag. Combine with a key code property to indicate the Ctrl modifier. E.g. <c>key.Enter | key.Ctrl</c>.
+	/// Helper for specifying a shifted <see cref="Key"/>.
+	/// <code>
+	/// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
+	/// </code>
 	/// </summary>
-	/// <remarks>
-	/// <see cref="IsAlt"/> provides a helper to determine if the <see cref="Key"/> has the Alt modifier applied.
-	/// </remarks>
-	public const uint Alt = (uint)KeyCode.AltMask;
+	public Key WithCtrl => new (KeyCode | KeyCode.CtrlMask);
 
 	/// <summary>
-	/// The key code for the Backspace key.
+	/// Helper for removing a shift modifier from a <see cref="Key"/>.
+	/// <code>
+	/// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
+	/// var AltDelete = ControlAltDelete.NoCtrl;
+	/// </code>
 	/// </summary>
-	public const uint Backspace = (uint)KeyCode.Backspace;
+	public Key NoCtrl => new (KeyCode & ~KeyCode.CtrlMask);
 
 	/// <summary>
-	/// The key code for the user pressing the tab key (forwards tab key).
+	/// Helper for specifying a shifted <see cref="Key"/>.
+	/// <code>
+	/// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
+	/// </code>
 	/// </summary>
-	public const uint Tab = (uint)KeyCode.Tab;
+	public Key WithAlt => new (KeyCode | KeyCode.AltMask);
 
 	/// <summary>
-	/// The key code for the user pressing the return key.
+	/// Helper for removing a shift modifier from a <see cref="Key"/>.
+	/// <code>
+	/// var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;
+	/// var AltDelete = ControlAltDelete.NoCtrl;
+	/// </code>
 	/// </summary>
-	public const uint Enter = (uint)KeyCode.Enter;
-
-	/// <summary>
-	/// The key code for the user pressing the clear key.
-	/// </summary>
-	public const uint Clear = (uint)KeyCode.Clear;
-
-	/// <summary>
-	/// The key code for the Shift key
-	/// </summary>
-	public const uint ShiftKey = (uint)KeyCode.ShiftKey;
-
-	/// <summary>
-	/// The key code for the Ctrl key
-	/// </summary>
-	public const uint CtrlKey = (uint)KeyCode.CtrlKey;
-
-	/// <summary>
-	/// The key code for the Alt key
-	/// </summary>
-	public const uint AltKey = (uint)KeyCode.AltKey;
-
-	/// <summary>
-	/// The key code for the CapsLock key
-	/// </summary>
-	public const uint CapsLock = (uint)KeyCode.CapsLock;
-
-	/// <summary>
-	/// The key code for the user pressing the escape key
-	/// </summary>
-	public const uint Esc = (uint)KeyCode.Esc;
-
-	/// <summary>
-	/// The key code for the user pressing the space bar
-	/// </summary>
-	public const uint Space = (uint)KeyCode.Space;
-
-	/// <summary>
-	/// The key code for the user pressing DEL
-	/// </summary>
-	public const uint Delete = (uint)KeyCode.Delete;
-
-	/// <summary>
-	/// Cursor up key
-	/// </summary>
-	public const uint CursorUp = (uint)KeyCode.CursorUp;
-
-	/// <summary>
-	/// Cursor down key.
-	/// </summary>
-	public const uint CursorDown = (uint)KeyCode.CursorDown;
-
-	/// <summary>
-	/// Cursor left key.
-	/// </summary>
-	public const uint CursorLeft = (uint)KeyCode.CursorLeft;
-
-	/// <summary>
-	/// Cursor right key.
-	/// </summary>
-	public const uint CursorRight = (uint)KeyCode.CursorRight;
-
-	/// <summary>
-	/// Page Up key.
-	/// </summary>
-	public const uint PageUp = (uint)KeyCode.PageUp;
-
-	/// <summary>
-	/// Page Down key.
-	/// </summary>
-	public const uint PageDown = (uint)KeyCode.PageDown;
-
-	/// <summary>
-	/// Home key.
-	/// </summary>
-	public const uint Home = (uint)KeyCode.Home;
-
-	/// <summary>
-	/// End key.
-	/// </summary>
-	public const uint End = (uint)KeyCode.End;
-
-	/// <summary>
-	/// Insert character key.
-	/// </summary>
-	public const uint InsertChar = (uint)KeyCode.InsertChar;
-
-	/// <summary>
-	/// Delete character key.
-	/// </summary>
-	public const uint DeleteChar = (uint)KeyCode.DeleteChar;
-
-	/// <summary>
-	/// Print screen character key.
-	/// </summary>
-	public const uint PrintScreen = (uint)KeyCode.PrintScreen;
-
-	/// <summary>
-	/// F1 key.
-	/// </summary>
-	public const uint F1 = (uint)KeyCode.F1;
-
-	/// <summary>
-	/// F2 key.
-	/// </summary>
-	public const uint F2 = (uint)KeyCode.F2;
-
-	/// <summary>
-	/// F3 key.
-	/// </summary>
-	public const uint F3 = (uint)KeyCode.F3;
-
-	/// <summary>
-	/// F4 key.
-	/// </summary>
-	public const uint F4 = (uint)KeyCode.F4;
-
-	/// <summary>
-	/// F5 key.
-	/// </summary>
-	public const uint F5 = (uint)KeyCode.F5;
-
-	/// <summary>
-	/// F6 key.
-	/// </summary>
-	public const uint F6 = (uint)KeyCode.F6;
-
-	/// <summary>
-	/// F7 key.
-	/// </summary>
-	public const uint F7 = (uint)KeyCode.F7;
-
-	/// <summary>
-	/// F8 key.
-	/// </summary>
-	public const uint F8 = (uint)KeyCode.F8;
-
-	/// <summary>
-	/// F9 key.
-	/// </summary>
-	public const uint F9 = (uint)KeyCode.F9;
-
-	/// <summary>
-	/// F10 key.
-	/// </summary>
-	public const uint F10 = (uint)KeyCode.F10;
-
-	/// <summary>
-	/// F11 key.
-	/// </summary>
-	public const uint F11 = (uint)KeyCode.F11;
-
-	/// <summary>
-	/// F12 key.
-	/// </summary>
-	public const uint F12 = (uint)KeyCode.F12;
-
-	/// <summary>
-	/// F13 key.
-	/// </summary>
-	public const uint F13 = (uint)KeyCode.F13;
-
-	/// <summary>
-	/// F14 key.
-	/// </summary>
-	public const uint F14 = (uint)KeyCode.F14;
-
-	/// <summary>
-	/// F15 key.
-	/// </summary>
-	public const uint F15 = (uint)KeyCode.F15;
-
-	/// <summary>
-	/// F16 key.
-	/// </summary>
-	public const uint F16 = (uint)KeyCode.F16;
-
-	/// <summary>
-	/// F17 key.
-	/// </summary>
-	public const uint F17 = (uint)KeyCode.F17;
-
-	/// <summary>
-	/// F18 key.
-	/// </summary>
-	public const uint F18 = (uint)KeyCode.F18;
-
-	/// <summary>
-	/// F19 key.
-	/// </summary>
-	public const uint F19 = (uint)KeyCode.F19;
-
-	/// <summary>
-	/// F20 key.
-	/// </summary>
-	public const uint F20 = (uint)KeyCode.F20;
-
-	/// <summary>
-	/// F21 key.
-	/// </summary>
-	public const uint F21 = (uint)KeyCode.F21;
-
-	/// <summary>
-	/// F22 key.
-	/// </summary>
-	public const uint F22 = (uint)KeyCode.F22;
-
-	/// <summary>
-	/// F23 key.
-	/// </summary>
-	public const uint F23 = (uint)KeyCode.F23;
-
-	/// <summary>
-	/// F24 key.
-	/// </summary>
-	public const uint F24 = (uint)KeyCode.F24;
-	#endregion
+	public Key NoAlt => new (KeyCode & ~KeyCode.AltMask);
 
 	#region Operators
 	/// <summary>
@@ -429,74 +220,54 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Uses <see cref="AsRune"/>.
 	/// </remarks>
 	/// <param name="kea"></param>
-	public static explicit operator Rune (Key kea)
-	{
-		return kea.AsRune;
-	}
+	public static explicit operator Rune (Key kea) => kea.AsRune;
 
 	/// <summary>
 	/// Explicitly cast <see cref="Key"/> to a <see langword="char"/>. The conversion is lossy. 
 	/// </summary>
 	/// <param name="kea"></param>
-	public static explicit operator char (Key kea)
-	{
-		return (char)kea.AsRune.Value;
-	}
+	public static explicit operator char (Key kea) => (char)kea.AsRune.Value;
 
 	/// <summary>
 	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy. 
 	/// </summary>
 	/// <param name="key"></param>
-	public static explicit operator KeyCode (Key key)
-	{
-		return key.KeyCode;
-	}
+	public static explicit operator KeyCode (Key key) => key.KeyCode;
 
 	/// <summary>
 	/// Cast <see cref="KeyCode"/> to a <see cref="Key"/>. 
 	/// </summary>
 	/// <param name="keyCode"></param>
-	public static implicit operator Key (KeyCode keyCode)
-	{
-		return new Key (keyCode);
-	}
+	public static implicit operator Key (KeyCode keyCode) => new (keyCode);
+
+
+	/// <summary>
+	/// Cast <see langword="char"/> to a <see cref="Key"/>. 
+	/// </summary>
+	/// <param name="ch"></param>
+	public static implicit operator Key (char ch) => new ((KeyCode)ch);
 
 	/// <inheritdoc/>
-	public override bool Equals (object obj)
-	{
-		return obj is Key k && k.KeyCode == KeyCode;
-	}
+	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;
 
 	/// <inheritdoc/>
-	public override int GetHashCode ()
-	{
-		return (int)KeyCode;
-	}
+	public override int GetHashCode () => (int)KeyCode;
 
 	/// <summary>
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
 	/// <returns></returns>
-	public static bool operator == (Key a, Key b)
-	{
-		return a?.KeyCode == b?.KeyCode;
-	}
+	public static bool operator == (Key a, Key b) => a?.KeyCode == b?.KeyCode;
 
 	/// <summary>
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
 	/// <returns></returns>
-	public static bool operator != (Key a, Key b)
-	{
-		return a?.KeyCode != b?.KeyCode;
-	}
+	public static bool operator != (Key a, Key b) => a?.KeyCode != b?.KeyCode;
 
-	bool IEquatable<Key>.Equals (Key other)
-	{
-		return Equals ((object)other);
-	}
+	bool IEquatable<Key>.Equals (Key other) => Equals ((object)other);
 	#endregion Operators
 
 	#region String conversion
@@ -504,14 +275,11 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Pretty prints the KeyEvent
 	/// </summary>
 	/// <returns></returns>
-	public override string ToString ()
-	{
-		return ToString (KeyCode, (Rune)'+');
-	}
+	public override string ToString () => ToString (KeyCode, (Rune)'+');
 
 	static string GetKeyString (KeyCode key)
 	{
-		if (key is KeyCode.Null or KeyCode.Unknown or KeyCode.SpecialMask) {
+		if (key is KeyCode.Null or KeyCode.SpecialMask) {
 			return string.Empty;
 		}
 		// Extract the base key (removing modifier flags)
@@ -535,10 +303,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// </summary>
 	/// <param name="key">The key to format.</param>
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
-	public static string ToString (KeyCode key)
-	{
-		return ToString (key, (Rune)'+');
-	}
+	public static string ToString (KeyCode key) => ToString (key, (Rune)'+');
 
 	/// <summary>
 	/// Formats a <see cref="KeyCode"/> as a string.
@@ -548,7 +313,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
 	public static string ToString (KeyCode key, Rune separator)
 	{
-		if (key is KeyCode.Null or KeyCode.Unknown) {
+		if (key is KeyCode.Null) {
 			return string.Empty;
 		}
 
@@ -717,5 +482,369 @@ public class Key : EventArgs, IEquatable<Key> {
 
 		return false;
 	}
+	#endregion
+
+
+	#region Standard Key Definitions
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Backspace key.
+	/// </summary>
+	public static readonly Key Backspace = new (KeyCode.Backspace);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the tab key (forwards tab key).
+	/// </summary>
+	public static readonly Key Tab = new (KeyCode.Tab);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the return key.
+	/// </summary>
+	public static readonly Key Enter = new (KeyCode.Enter);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the clear key.
+	/// </summary>
+	public static readonly Key Clear = new (KeyCode.Clear);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Shift key.
+	/// </summary>
+	public static readonly Key Shift = new (KeyCode.ShiftKey);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Ctrl key.
+	/// </summary>
+	public static readonly Key Ctrl = new (KeyCode.CtrlKey);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Alt key.
+	/// </summary>
+	public static readonly Key Alt = new (KeyCode.AltKey);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the CapsLock key.
+	/// </summary>
+	public static readonly Key CapsLock = new (KeyCode.CapsLock);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Escape key.
+	/// </summary>
+	public static readonly Key Esc = new (KeyCode.Esc);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Space bar key.
+	/// </summary>
+	public static readonly Key Space = new (KeyCode.Space);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the A key (un-shifted). Use <c>Key.A.WithShift</c> for uppercase 'A'.
+	/// </summary>
+	public static readonly Key A = new (KeyCode.A);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the B key (un-shifted). Use <c>Key.B.WithShift</c> for uppercase 'B'.
+	/// </summary>
+	public static readonly Key B = new (KeyCode.B);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the C key (un-shifted). Use <c>Key.C.WithShift</c> for uppercase 'C'.
+	/// </summary>
+	public static readonly Key C = new (KeyCode.C);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the D key (un-shifted). Use <c>Key.D.WithShift</c> for uppercase 'D'.
+	/// </summary>
+	public static readonly Key D = new (KeyCode.D);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the E key (un-shifted). Use <c>Key.E.WithShift</c> for uppercase 'E'.
+	/// </summary>
+	public static readonly Key E = new (KeyCode.E);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the F key (un-shifted). Use <c>Key.F.WithShift</c> for uppercase 'F'.
+	/// </summary>
+	public static readonly Key F = new (KeyCode.F);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the G key (un-shifted). Use <c>Key.G.WithShift</c> for uppercase 'G'.
+	/// </summary>
+	public static readonly Key G = new (KeyCode.G);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the H key (un-shifted). Use <c>Key.H.WithShift</c> for uppercase 'H'.
+	/// </summary>
+	public static readonly Key H = new (KeyCode.H);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the I key (un-shifted). Use <c>Key.I.WithShift</c> for uppercase 'I'.
+	/// </summary>
+	public static readonly Key I = new (KeyCode.I);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the J key (un-shifted). Use <c>Key.J.WithShift</c> for uppercase 'J'.
+	/// </summary>
+	public static readonly Key J = new (KeyCode.J);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the K key (un-shifted). Use <c>Key.K.WithShift</c> for uppercase 'K'.
+	/// </summary>
+	public static readonly Key K = new (KeyCode.K);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the L key (un-shifted). Use <c>Key.L.WithShift</c> for uppercase 'L'.
+	/// </summary>
+	public static readonly Key L = new (KeyCode.L);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the M key (un-shifted). Use <c>Key.M.WithShift</c> for uppercase 'M'.
+	/// </summary>
+	public static readonly Key M = new (KeyCode.M);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the N key (un-shifted). Use <c>Key.N.WithShift</c> for uppercase 'N'.
+	/// </summary>
+	public static readonly Key N = new (KeyCode.N);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the O key (un-shifted). Use <c>Key.O.WithShift</c> for uppercase 'O'.
+	/// </summary>
+	public static readonly Key O = new (KeyCode.O);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the P key (un-shifted). Use <c>Key.P.WithShift</c> for uppercase 'P'.
+	/// </summary>
+	public static readonly Key P = new (KeyCode.P);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Q key (un-shifted). Use <c>Key.Q.WithShift</c> for uppercase 'Q'.
+	/// </summary>
+	public static readonly Key Q = new (KeyCode.Q);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the R key (un-shifted). Use <c>Key.R.WithShift</c> for uppercase 'R'.
+	/// </summary>
+	public static readonly Key R = new (KeyCode.R);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the S key (un-shifted). Use <c>Key.S.WithShift</c> for uppercase 'S'.
+	/// </summary>
+	public static readonly Key S = new (KeyCode.S);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the T key (un-shifted). Use <c>Key.T.WithShift</c> for uppercase 'T'.
+	/// </summary>
+	public static readonly Key T = new (KeyCode.T);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the U key (un-shifted). Use <c>Key.U.WithShift</c> for uppercase 'U'.
+	/// </summary>
+	public static readonly Key U = new (KeyCode.U);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the V key (un-shifted). Use <c>Key.V.WithShift</c> for uppercase 'V'.
+	/// </summary>
+	public static readonly Key V = new (KeyCode.V);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the W key (un-shifted). Use <c>Key.W.WithShift</c> for uppercase 'W'.
+	/// </summary>
+	public static readonly Key W = new (KeyCode.W);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the X key (un-shifted). Use <c>Key.X.WithShift</c> for uppercase 'X'.
+	/// </summary>
+	public static readonly Key X = new (KeyCode.X);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Y key (un-shifted). Use <c>Key.Y.WithShift</c> for uppercase 'Y'.
+	/// </summary>
+	public static readonly Key Y = new (KeyCode.Y);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Z key (un-shifted). Use <c>Key.Z.WithShift</c> for uppercase 'Z'.
+	/// </summary>
+	public static readonly Key Z = new (KeyCode.Z);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Delete key.
+	/// </summary>
+	public static readonly Key Delete = new (KeyCode.Delete);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for the Cursor up key.
+	/// </summary>
+	public static readonly Key CursorUp = new (KeyCode.CursorUp);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Cursor down key.
+	/// </summary>
+	public static readonly Key CursorDown = new (KeyCode.CursorDown);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Cursor left key.
+	/// </summary>
+	public static readonly Key CursorLeft = new (KeyCode.CursorLeft);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Cursor right key.
+	/// </summary>
+	public static readonly Key CursorRight = new (KeyCode.CursorRight);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Page Up key.
+	/// </summary>
+	public static readonly Key PageUp = new (KeyCode.PageUp);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Page Down key.
+	/// </summary>
+	public static readonly Key PageDown = new (KeyCode.PageDown);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Home key.
+	/// </summary>
+	public static readonly Key Home = new (KeyCode.Home);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for End key.
+	/// </summary>
+	public static readonly Key End = new (KeyCode.End);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Insert Character key.
+	/// </summary>
+	public static readonly Key InsertChar = new (KeyCode.InsertChar);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Delete Character key.
+	/// </summary>
+	public static readonly Key DeleteChar = new (KeyCode.DeleteChar);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for Print Screen key.
+	/// </summary>
+	public static readonly Key PrintScreen = new (KeyCode.PrintScreen);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F1 key.
+	/// </summary>
+	public static readonly Key F1 = new (KeyCode.F1);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F2 key.
+	/// </summary>
+	public static readonly Key F2 = new (KeyCode.F2);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F3 key.
+	/// </summary>
+	public static readonly Key F3 = new (KeyCode.F3);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F4 key.
+	/// </summary>
+	public static readonly Key F4 = new (KeyCode.F4);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F5 key.
+	/// </summary>
+	public static readonly Key F5 = new (KeyCode.F5);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F6 key.
+	/// </summary>
+	public static readonly Key F6 = new (KeyCode.F6);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F7 key.
+	/// </summary>
+	public static readonly Key F7 = new (KeyCode.F7);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F8 key.
+	/// </summary>
+	public static readonly Key F8 = new (KeyCode.F8);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F9 key.
+	/// </summary>
+	public static readonly Key F9 = new (KeyCode.F9);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F10 key.
+	/// </summary>
+	public static readonly Key F10 = new (KeyCode.F10);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F11 key.
+	/// </summary>
+	public static readonly Key F11 = new (KeyCode.F11);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F12 key.
+	/// </summary>
+	public static readonly Key F12 = new (KeyCode.F12);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F13 key.
+	/// </summary>
+	public static readonly Key F13 = new (KeyCode.F13);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F14 key.
+	/// </summary>
+	public static readonly Key F14 = new (KeyCode.F14);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F15 key.
+	/// </summary>
+	public static readonly Key F15 = new (KeyCode.F15);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F16 key.
+	/// </summary>
+	public static readonly Key F16 = new (KeyCode.F16);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F17 key.
+	/// </summary>
+	public static readonly Key F17 = new (KeyCode.F17);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F18 key.
+	/// </summary>
+	public static readonly Key F18 = new (KeyCode.F18);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F19 key.
+	/// </summary>
+	public static readonly Key F19 = new (KeyCode.F19);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F20 key.
+	/// </summary>
+	public static readonly Key F20 = new (KeyCode.F20);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F21 key.
+	/// </summary>
+	public static readonly Key F21 = new (KeyCode.F21);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F22 key.
+	/// </summary>
+	public static readonly Key F22 = new (KeyCode.F22);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F23 key.
+	/// </summary>
+	public static readonly Key F23 = new (KeyCode.F23);
+
+	/// <summary>
+	/// The <see cref="Key"/> object for F24 key.
+	/// </summary>
+	public static readonly Key F24 = new (KeyCode.F24);
 	#endregion
 }

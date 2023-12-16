@@ -8,6 +8,7 @@ using System.IO;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
+
 /// <summary>
 /// A static, singleton class representing the application. This class is the entry point for the application.
 /// </summary>
@@ -41,7 +42,6 @@ namespace Terminal.Gui;
 ///  </para>
 /// </remarks>
 public static partial class Application {
-
 	/// <summary>
 	/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="UseSystemConsole"/>.
 	/// </summary>
@@ -64,19 +64,19 @@ public static partial class Application {
 	// For Unit testing - ignores UseSystemConsole
 	internal static bool _forceFakeConsole;
 
-	private static List<CultureInfo> _cachedSupportedCultures;
+	static List<CultureInfo> _cachedSupportedCultures;
 
 	/// <summary>
 	/// Gets all cultures supported by the application without the invariant language.
 	/// </summary>
 	public static List<CultureInfo> SupportedCultures => _cachedSupportedCultures;
 
-	private static List<CultureInfo> GetSupportedCultures ()
+	static List<CultureInfo> GetSupportedCultures ()
 	{
-		CultureInfo [] culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
+		var culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
 
 		// Get the assembly
-		Assembly assembly = Assembly.GetExecutingAssembly ();
+		var assembly = Assembly.GetExecutingAssembly ();
 
 		//Find the location of the assembly
 		string assemblyLocation = AppDomain.CurrentDomain.BaseDirectory;
@@ -86,13 +86,12 @@ public static partial class Application {
 
 		// Return all culture for which satellite folder found with culture code.
 		return culture.Where (cultureInfo =>
-		   Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
-		   File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
+			Directory.Exists (Path.Combine (assemblyLocation, cultureInfo.Name)) &&
+			File.Exists (Path.Combine (assemblyLocation, cultureInfo.Name, resourceFilename))
 		).ToList ();
 	}
 
 	#region Initialization (Init/Shutdown)
-
 	/// <summary>
 	/// Initializes a new instance of <see cref="Terminal.Gui"/> Application. 
 	/// </summary>
@@ -155,17 +154,19 @@ public static partial class Application {
 		// multiple times. We need to do this because some settings are only
 		// valid after a Driver is loaded. In this cases we need just 
 		// `Settings` so we can determine which driver to use.
-		ConfigurationManager.Load (true);
-		ConfigurationManager.Apply ();
+		Load (true);
+		Apply ();
 
 		Driver ??= Environment.OSVersion.Platform switch {
 			_ when _forceFakeConsole => new FakeDriver (), // for unit testing only
 			_ when UseSystemConsole => new NetDriver (),
 			PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows => new WindowsDriver (),
-			_ => new CursesDriver (),
+			_ => new CursesDriver ()
 		};
 
-		if (Driver == null) throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+		if (Driver == null) {
+			throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+		}
 
 		try {
 			MainLoop = Driver.Init ();
@@ -191,10 +192,13 @@ public static partial class Application {
 		_initialized = true;
 	}
 
-	private static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) => OnSizeChanging (e);
-	private static void Driver_KeyDown (object sender, Key e) => OnKeyDown (e);
-	private static void Driver_KeyUp (object sender, Key e) => OnKeyUp (e);
-	private static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
+	static void Driver_SizeChanged (object sender, SizeChangedEventArgs e) => OnSizeChanging (e);
+
+	static void Driver_KeyDown (object sender, Key e) => OnKeyDown (e);
+
+	static void Driver_KeyUp (object sender, Key e) => OnKeyUp (e);
+
+	static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
 
 	/// <summary>
@@ -207,7 +211,7 @@ public static partial class Application {
 	public static void Shutdown ()
 	{
 		ResetState ();
-		ConfigurationManager.PrintJsonErrors ();
+		PrintJsonErrors ();
 	}
 
 	// Encapsulate all setting of initial state for Application; Having
@@ -258,11 +262,9 @@ public static partial class Application {
 		// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
 		SynchronizationContext.SetSynchronizationContext (syncContext: null);
 	}
-
 	#endregion Initialization (Init/Shutdown)
 
 	#region Run (Begin, Run, End, Stop)
-
 	/// <summary>
 	/// Notify that a new <see cref="RunState"/> was created (<see cref="Begin(Toplevel)"/> was called). The token is created in 
 	/// <see cref="Begin(Toplevel)"/> and this event will be fired before that function exits.
@@ -326,8 +328,8 @@ public static partial class Application {
 				Top.OnLeave (Toplevel);
 			}
 			if (string.IsNullOrEmpty (Toplevel.Id)) {
-				var count = 1;
-				var id = (_topLevels.Count + count).ToString ();
+				int count = 1;
+				string id = (_topLevels.Count + count).ToString ();
 				while (_topLevels.Count > 0 && _topLevels.FirstOrDefault (x => x.Id == id) != null) {
 					count++;
 					id = (_topLevels.Count + count).ToString ();
@@ -350,9 +352,9 @@ public static partial class Application {
 			Top = Toplevel;
 		}
 
-		var refreshDriver = true;
-		if (OverlappedTop == null || Toplevel.IsOverlappedContainer || (Current?.Modal == false && Toplevel.Modal)
-			|| (Current?.Modal == false && !Toplevel.Modal) || (Current?.Modal == true && Toplevel.Modal)) {
+		bool refreshDriver = true;
+		if (OverlappedTop == null || Toplevel.IsOverlappedContainer || Current?.Modal == false && Toplevel.Modal
+		|| Current?.Modal == false && !Toplevel.Modal || Current?.Modal == true && Toplevel.Modal) {
 
 			if (Toplevel.Visible) {
 				Current = Toplevel;
@@ -360,8 +362,8 @@ public static partial class Application {
 			} else {
 				refreshDriver = false;
 			}
-		} else if ((OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_topLevels.Peek ().Modal)
-			|| (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false)) {
+		} else if (OverlappedTop != null && Toplevel != OverlappedTop && Current?.Modal == true && !_topLevels.Peek ().Modal
+			|| OverlappedTop != null && Toplevel != OverlappedTop && Current?.Running == false) {
 			refreshDriver = false;
 			MoveCurrent (Toplevel);
 		} else {
@@ -415,7 +417,7 @@ public static partial class Application {
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
 	/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver)"/> has already been called. 
 	/// </param>
-	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new()
+	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
 	{
 		if (_initialized) {
 			if (Driver != null) {
@@ -435,7 +437,7 @@ public static partial class Application {
 			}
 		} else {
 			// Init() has NOT been called.
-			InternalInit (() => new T (), driver, calledViaRunT: true);
+			InternalInit (() => new T (), driver, true);
 			Run (Top, errorHandler);
 		}
 	}
@@ -474,7 +476,7 @@ public static partial class Application {
 	/// <param name="errorHandler">RELEASE builds only: Handler for any unhandled exceptions (resumes when returns true, rethrows when null).</param>
 	public static void Run (Toplevel view, Func<Exception, bool> errorHandler = null)
 	{
-		var resume = true;
+		bool resume = true;
 		while (resume) {
 #if !DEBUG
 				try {
@@ -529,13 +531,10 @@ public static partial class Application {
 	///   Runs <paramref name="action"/> on the thread that is processing events
 	/// </summary>
 	/// <param name="action">the action to be invoked on the main processing thread.</param>
-	public static void Invoke (Action action)
-	{
-		MainLoop?.AddIdle (() => {
-			action ();
-			return false;
-		});
-	}
+	public static void Invoke (Action action) => MainLoop?.AddIdle (() => {
+		action ();
+		return false;
+	});
 
 	// TODO: Determine if this is really needed. The only code that calls WakeUp I can find
 	// is ProgressBarStyles and it's not clear it needs to.
@@ -589,26 +588,20 @@ public static partial class Application {
 	// users use async/await on their code
 	//
 	class MainLoopSyncContext : SynchronizationContext {
-		public override SynchronizationContext CreateCopy ()
-		{
-			return new MainLoopSyncContext ();
-		}
+		public override SynchronizationContext CreateCopy () => new MainLoopSyncContext ();
 
-		public override void Post (SendOrPostCallback d, object state)
-		{
-			MainLoop.AddIdle (() => {
-				d (state);
-				return false;
-			});
-			//_mainLoop.Driver.Wakeup ();
-		}
+		public override void Post (SendOrPostCallback d, object state) => MainLoop.AddIdle (() => {
+			d (state);
+			return false;
+		});
 
+		//_mainLoop.Driver.Wakeup ();
 		public override void Send (SendOrPostCallback d, object state)
 		{
 			if (Thread.CurrentThread.ManagedThreadId == _mainThreadId) {
 				d (state);
 			} else {
-				var wasExecuted = false;
+				bool wasExecuted = false;
 				Invoke (() => {
 					d (state);
 					wasExecuted = true;
@@ -633,7 +626,7 @@ public static partial class Application {
 			throw new ObjectDisposedException ("state");
 		}
 
-		var firstIteration = true;
+		bool firstIteration = true;
 		for (state.Toplevel.Running = true; state.Toplevel.Running;) {
 			MainLoop.Running = true;
 			if (EndAfterFirstIteration && !firstIteration) {
@@ -688,16 +681,16 @@ public static partial class Application {
 			}
 		}
 		if (_topLevels.Count == 1 && state.Toplevel == Top
-			&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
-			&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
+					&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
+					&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
 			state.Toplevel.Clear (new Rect (Point.Empty, new Size (Driver.Cols, Driver.Rows)));
 		}
 
 		if (state.Toplevel.NeedsDisplay ||
-			state.Toplevel.SubViewNeedsDisplay ||
-			state.Toplevel.LayoutNeeded ||
-			OverlappedChildNeedsDisplay ()) {
+		state.Toplevel.SubViewNeedsDisplay ||
+		state.Toplevel.LayoutNeeded ||
+		OverlappedChildNeedsDisplay ()) {
 			state.Toplevel.Draw ();
 			state.Toplevel.PositionCursor ();
 			Driver.Refresh ();
@@ -705,8 +698,8 @@ public static partial class Application {
 			Driver.UpdateCursor ();
 		}
 		if (state.Toplevel != Top &&
-			!state.Toplevel.Modal &&
-			(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
+		!state.Toplevel.Modal &&
+		(Top.NeedsDisplay || Top.SubViewNeedsDisplay || Top.LayoutNeeded)) {
 			Top.Draw ();
 		}
 	}
@@ -726,12 +719,12 @@ public static partial class Application {
 	/// </remarks>
 	public static void RequestStop (Toplevel top = null)
 	{
-		if (OverlappedTop == null || top == null || (OverlappedTop == null && top != null)) {
+		if (OverlappedTop == null || top == null || OverlappedTop == null && top != null) {
 			top = Current;
 		}
 
 		if (OverlappedTop != null && top.IsOverlappedContainer && top?.Running == true
-			&& (Current?.Modal == false || (Current?.Modal == true && Current?.Running == false))) {
+		&& (Current?.Modal == false || Current?.Modal == true && Current?.Running == false)) {
 
 			OverlappedTop.RequestStop ();
 		} else if (OverlappedTop != null && top != Current && Current?.Running == true && Current?.Modal == true
@@ -751,10 +744,10 @@ public static partial class Application {
 			OnNotifyStopRunState (Current);
 			top.Running = false;
 			OnNotifyStopRunState (top);
-		} else if ((OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-			&& Current?.Running == true && !top.Running)
-			|| (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
-			&& Current?.Running == false && !top.Running && _topLevels.ToArray () [1].Running)) {
+		} else if (OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
+			&& Current?.Running == true && !top.Running
+			|| OverlappedTop != null && top != OverlappedTop && top != Current && Current?.Modal == false
+			&& Current?.Running == false && !top.Running && _topLevels.ToArray () [1].Running) {
 
 			MoveCurrent (top);
 		} else if (OverlappedTop != null && Current != top && Current?.Running == true && !top.Running
@@ -770,7 +763,7 @@ public static partial class Application {
 			OnNotifyStopRunState (Current);
 		} else {
 			Toplevel currentTop;
-			if (top == Current || (Current?.Modal == true && !top.Modal)) {
+			if (top == Current || Current?.Modal == true && !top.Modal) {
 				currentTop = Current;
 			} else {
 				currentTop = top;
@@ -827,7 +820,7 @@ public static partial class Application {
 
 		// If there is a OverlappedTop that is not the RunState.Toplevel then runstate.TopLevel 
 		// is a child of MidTop and we should notify the OverlappedTop that it is closing
-		if (OverlappedTop != null && !(runState.Toplevel).Modal && runState.Toplevel != OverlappedTop) {
+		if (OverlappedTop != null && !runState.Toplevel.Modal && runState.Toplevel != OverlappedTop) {
 			OverlappedTop.OnChildClosed (runState.Toplevel);
 		}
 
@@ -850,11 +843,10 @@ public static partial class Application {
 		runState.Toplevel = null;
 		runState.Dispose ();
 	}
-
 	#endregion Run (Begin, Run, End)
 
 	#region Toplevel handling
-	static readonly Stack<Toplevel> _topLevels = new Stack<Toplevel> ();
+	static readonly Stack<Toplevel> _topLevels = new ();
 
 	/// <summary>
 	/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -871,7 +863,7 @@ public static partial class Application {
 
 	static void EnsureModalOrVisibleAlwaysOnTop (Toplevel Toplevel)
 	{
-		if (!Toplevel.Running || (Toplevel == Current && Toplevel.Visible) || OverlappedTop == null || _topLevels.Peek ().Modal) {
+		if (!Toplevel.Running || Toplevel == Current && Toplevel.Visible || OverlappedTop == null || _topLevels.Peek ().Modal) {
 			return;
 		}
 
@@ -899,8 +891,8 @@ public static partial class Application {
 		if (_topLevels != null) {
 			int count = _topLevels.Count;
 			if (count > 0) {
-				var rx = x - startFrame.X;
-				var ry = y - startFrame.Y;
+				int rx = x - startFrame.X;
+				int ry = y - startFrame.Y;
 				foreach (var t in _topLevels) {
 					if (t != Current) {
 						if (t != start && t.Visible && t.Frame.Contains (rx, ry)) {
@@ -918,7 +910,7 @@ public static partial class Application {
 
 	static View FindTopFromView (View view)
 	{
-		View top = view?.SuperView != null && view?.SuperView != Top
+		var top = view?.SuperView != null && view?.SuperView != Top
 			? view.SuperView : view;
 
 		while (top?.SuperView != null && top?.SuperView != Top) {
@@ -936,7 +928,7 @@ public static partial class Application {
 			lock (_topLevels) {
 				_topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 			}
-			var index = 0;
+			int index = 0;
 			var savedToplevels = _topLevels.ToArray ();
 			foreach (var t in savedToplevels) {
 				if (!t.Modal && t != Current && t != top && t != savedToplevels [index]) {
@@ -954,7 +946,7 @@ public static partial class Application {
 			lock (_topLevels) {
 				_topLevels.MoveTo (Current, 0, new ToplevelEqualityComparer ());
 			}
-			var index = 0;
+			int index = 0;
 			foreach (var t in _topLevels.ToArray ()) {
 				if (!t.Running && t != Current && index > 0) {
 					lock (_topLevels) {
@@ -965,10 +957,10 @@ public static partial class Application {
 			}
 			return false;
 		}
-		if ((OverlappedTop != null && top?.Modal == true && _topLevels.Peek () != top)
-			|| (OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop)
-			|| (OverlappedTop != null && Current?.Modal == false && top != Current)
-			|| (OverlappedTop != null && Current?.Modal == true && top == OverlappedTop)) {
+		if (OverlappedTop != null && top?.Modal == true && _topLevels.Peek () != top
+		|| OverlappedTop != null && Current != OverlappedTop && Current?.Modal == false && top == OverlappedTop
+		|| OverlappedTop != null && Current?.Modal == false && top != Current
+		|| OverlappedTop != null && Current?.Modal == true && top == OverlappedTop) {
 			lock (_topLevels) {
 				_topLevels.MoveTo (top, 0, new ToplevelEqualityComparer ());
 				Current = top;
@@ -1008,7 +1000,6 @@ public static partial class Application {
 		Refresh ();
 		return true;
 	}
-
 	#endregion Toplevel handling
 
 	#region Mouse handling
@@ -1189,9 +1180,9 @@ public static partial class Application {
 		}
 
 		if ((view == null || view == OverlappedTop) &&
-			Current is { Modal: false } && OverlappedTop != null &&
-			a.MouseEvent.Flags != MouseFlags.ReportMousePosition &&
-			a.MouseEvent.Flags != 0) {
+		Current is { Modal: false } && OverlappedTop != null &&
+		a.MouseEvent.Flags != MouseFlags.ReportMousePosition &&
+		a.MouseEvent.Flags != 0) {
 
 			var top = FindDeepestTop (Top, a.MouseEvent.X, a.MouseEvent.Y, out _, out _);
 			view = View.FindDeepestView (top, a.MouseEvent.X, a.MouseEvent.Y, out screenX, out screenY);
@@ -1307,13 +1298,12 @@ public static partial class Application {
 	#endregion Mouse handling
 
 	#region Keyboard handling
-
-	static Key _alternateForwardKey = new Key (KeyCode.PageDown | KeyCode.CtrlMask);
+	static Key _alternateForwardKey = new (KeyCode.PageDown | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
@@ -1332,12 +1322,12 @@ public static partial class Application {
 		}
 	}
 
-	static Key _alternateBackwardKey = new Key (KeyCode.PageUp | KeyCode.CtrlMask);
+	static Key _alternateBackwardKey = new (KeyCode.PageUp | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
@@ -1356,12 +1346,12 @@ public static partial class Application {
 		}
 	}
 
-	static Key _quitKey = new Key (KeyCode.Q | KeyCode.CtrlMask);
+	static Key _quitKey = new (KeyCode.Q | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope)), JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
 	public static Key QuitKey {
 		get => _quitKey;
 		set {
@@ -1372,6 +1362,7 @@ public static partial class Application {
 			}
 		}
 	}
+
 	static void OnQuitKeyChanged (KeyChangedEventArgs e)
 	{
 		// Duplicate the list so if it changes during enumeration we're safe
@@ -1422,8 +1413,9 @@ public static partial class Application {
 			if (topLevel.ProcessKeyDown (keyEvent)) {
 				return true;
 			}
-			if (topLevel.Modal)
+			if (topLevel.Modal) {
 				break;
+			}
 		}
 
 		// Invoke any Global KeyBindings
@@ -1431,7 +1423,7 @@ public static partial class Application {
 			foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _))) {
 				if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _)) {
 					keyEvent.Scope = KeyBindingScope.Application;
-					var handled = view.OnInvokingKeyBindings (keyEvent);
+					bool? handled = view.OnInvokingKeyBindings (keyEvent);
 					if (handled != null && (bool)handled) {
 						return true;
 					}
@@ -1489,12 +1481,10 @@ public static partial class Application {
 		}
 		return false;
 	}
-
 	#endregion Keyboard handling
 }
 
 /// <summary>
 /// Event arguments for the <see cref="Application.Iteration"/> event.
 /// </summary>
-public class IterationEventArgs {
-}
+public class IterationEventArgs { }

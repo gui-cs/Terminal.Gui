@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text.Encodings.Web;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Unicode;
 
 namespace Terminal.Gui;
 class KeyJsonConverter : JsonConverter<Key> {
@@ -22,7 +18,7 @@ class KeyJsonConverter : JsonConverter<Key> {
 					string propertyName = reader.GetString ();
 					reader.Read ();
 
-					switch (propertyName.ToLowerInvariant ()) {
+					switch (propertyName?.ToLowerInvariant ()) {
 					case "key":
 						if (reader.TokenType == JsonTokenType.String) {
 							string keyValue = reader.GetString ();
@@ -46,7 +42,6 @@ class KeyJsonConverter : JsonConverter<Key> {
 	public override void Write (Utf8JsonWriter writer, Key value, JsonSerializerOptions options)
 	{
 		writer.WriteStartObject ();
-
 		writer.WriteString ("Key", value.ToString ());
 		writer.WriteEndObject ();
 	}
