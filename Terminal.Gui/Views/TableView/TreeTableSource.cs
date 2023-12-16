@@ -106,7 +106,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 		return sb.ToString ();
 	}
 
-	private void Table_KeyPress (object sender, KeyEventArgs e)
+	private void Table_KeyPress (object sender, Key e)
 	{
 		if (!IsInTreeColumn (_tableView.SelectedColumn, true)) {
 			return;

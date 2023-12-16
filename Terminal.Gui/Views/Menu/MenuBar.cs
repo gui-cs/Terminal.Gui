@@ -311,7 +311,7 @@ public class MenuBar : View {
 		KeyBindings.Add (KeyCode.Esc, Command.Cancel);
 		KeyBindings.Add (KeyCode.CursorDown, Command.Accept);
 		KeyBindings.Add (KeyCode.Enter, Command.Accept);
-		KeyBindings.Add (Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+		KeyBindings.Add ((KeyCode)Key, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 		KeyBindings.Add (KeyCode.CtrlMask | KeyCode.Space, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 
 		// TODO: Bindings (esp for hotkey) should be added across and then down. This currently does down then across. 
@@ -351,7 +351,7 @@ public class MenuBar : View {
 	}
 #endif
 	
-	internal void AltKeyUpHandler (KeyEventArgs e)
+	internal void AltKeyUpHandler (Key e)
 	{
 		if (e.KeyCode == KeyCode.AltMask) {
 			e.Handled = true;
@@ -382,7 +382,7 @@ public class MenuBar : View {
 	}
 
 	#region Keyboard handling
-	KeyCode _key = KeyCode.F9;
+	Key _key = KeyCode.F9;
 
 	/// <summary>
 	/// The <see cref="KeyCode"/> used to activate or close the menu bar by keyboard. The default is <see cref="KeyCode.F9"/>.
@@ -401,14 +401,14 @@ public class MenuBar : View {
 	/// <see cref="KeyCode.Esc"/> will close the menu bar and any open sub-menus.
 	/// </para>
 	/// </remarks>
-	public KeyCode Key {
+	public Key Key {
 		get => _key;
 		set {
 			if (_key == value) {
 				return;
 			}
-			KeyBindings.Remove (_key);
-			KeyBindings.Add (value, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
+			KeyBindings.Remove ((KeyCode)_key);
+			KeyBindings.Add ((KeyCode)value, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 			_key = value;
 		}
 	}
@@ -485,7 +485,7 @@ public class MenuBar : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokingKeyBindings (Key keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for menu bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.

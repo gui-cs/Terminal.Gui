@@ -227,7 +227,7 @@ namespace Terminal.Gui.TextTests {
 			Rune hotKeySpecifier = (Rune)'_';
 			bool supportFirstUpperCase = false;
 			int hotPos = 0;
-			KeyCode hotKey = KeyCode.Unknown;
+			KeyCode hotKey = KeyCode.Null;
 			bool result = false;
 
 			result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out hotPos, out hotKey);

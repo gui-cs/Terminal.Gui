@@ -29,7 +29,7 @@ namespace UICatalog.Tests {
 		{
 			FakeConsole.MockKeyPresses.Clear ();
 			// Put a QuitKey in at the end
-			FakeConsole.PushMockKeyPress (Application.QuitKey);
+			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 			foreach (var c in input.Reverse ()) {
 				KeyCode key = KeyCode.Unknown;
 				if (char.IsLetter (c)) {
@@ -66,15 +66,15 @@ namespace UICatalog.Tests {
 				// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 				// by adding this Space it seems to work.
 				//FakeConsole.PushMockKeyPress (Key.Space);
-				FakeConsole.PushMockKeyPress (Application.QuitKey);
+				FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyDown += (object sender, KeyEventArgs args) => {
+				Application.Top.KeyDown += (object sender, Key args) => {
 					output.WriteLine ($"  Keypress: {args.KeyCode}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey, args.KeyCode);
+					Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
 				};
 
 				uint abortTime = 500;
@@ -126,7 +126,7 @@ namespace UICatalog.Tests {
 			// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 			// by adding this Space it seems to work.
 
-			FakeConsole.PushMockKeyPress (Application.QuitKey);
+			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 			var ms = 100;
 			var abortCount = 0;
@@ -153,7 +153,7 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			Application.Top.KeyDown += (object sender, KeyEventArgs args) => {
+			Application.Top.KeyDown += (object sender, Key args) => {
 				// See #2474 for why this is commented out
 				Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
 			};

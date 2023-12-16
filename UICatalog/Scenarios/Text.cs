@@ -119,8 +119,8 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			KeyCode keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
-			KeyCode keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
+			var keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
+			var keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
 			chxCaptureTabs.Toggled += (s, e) => {
 				if (e.NewValue == true) {
 					textView.KeyBindings.Add (keyTab, Command.Tab);

@@ -215,7 +215,7 @@ public class Button : View {
 	///<inheritdoc/>
 	public override void PositionCursor ()
 	{
-		if (HotKey == KeyCode.Unknown && Text != "") {
+		if (HotKey.IsValid && Text != "") {
 			for (int i = 0; i < TextFormatter.Text.GetRuneCount (); i++) {
 				if (TextFormatter.Text [i] == Text [0]) {
 					Move (i, 0);

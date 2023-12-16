@@ -777,7 +777,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private void SuppressIfBadChar (KeyEventArgs k)
+		private void SuppressIfBadChar (Key k)
 		{
 			// don't let user type bad letters
 			var ch = (char)k;
@@ -787,7 +787,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool TreeView_KeyDown (KeyEventArgs keyEvent)
+		private bool TreeView_KeyDown (Key keyEvent)
 		{
 			if (this.treeView.HasFocus && Separators.Contains ((char)keyEvent)) {
 				this.tbPath.FocusFirst ();
@@ -799,7 +799,7 @@ namespace Terminal.Gui {
 			return false;
 		}
 
-		private void AcceptIf (KeyEventArgs keyEvent, KeyCode isKey)
+		private void AcceptIf (Key keyEvent, KeyCode isKey)
 		{
 			if (!keyEvent.Handled && keyEvent.KeyCode == isKey) {
 				keyEvent.Handled = true;
@@ -885,7 +885,7 @@ namespace Terminal.Gui {
 			Application.RequestStop ();
 		}
 
-		private bool NavigateIf (KeyEventArgs keyEvent, KeyCode isKey, View to)
+		private bool NavigateIf (Key keyEvent, KeyCode isKey, View to)
 		{
 			if (keyEvent.KeyCode == isKey) {
 
@@ -951,7 +951,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private bool TableView_KeyUp (KeyEventArgs keyEvent)
+		private bool TableView_KeyUp (Key keyEvent)
 		{
 			if (keyEvent.KeyCode == KeyCode.Backspace) {
 				return this.history.Back ();

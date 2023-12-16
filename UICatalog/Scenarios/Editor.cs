@@ -177,10 +177,9 @@ namespace UICatalog.Scenarios {
 			};
 
 			Win.KeyDown += (s, e) => {
-				if (_winDialog != null && (e.KeyCode == KeyCode.Esc
-								|| e.KeyCode == Application.QuitKey)) {
+				if (_winDialog != null && (e.KeyCode == KeyCode.Esc || e == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.KeyCode == Application.QuitKey) {
+				} else if (e == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
 				} else if (_winDialog != null && e.KeyCode == (KeyCode.Tab | KeyCode.CtrlMask)) {
@@ -232,7 +231,7 @@ namespace UICatalog.Scenarios {
 				// FIXED: BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
 				_textView.Load (_fileName);
 				//_textView.Text = System.IO.File.ReadAllText (_fileName);
-				_originalText = Encoding.Unicode.GetBytes(_textView.Text);
+				_originalText = Encoding.Unicode.GetBytes (_textView.Text);
 				Win.Title = _fileName;
 				_saved = true;
 			}
@@ -428,7 +427,7 @@ namespace UICatalog.Scenarios {
 				Win.Title = title;
 				_fileName = file;
 				System.IO.File.WriteAllText (_fileName, _textView.Text);
-				_originalText = Encoding.Unicode.GetBytes(_textView.Text);
+				_originalText = Encoding.Unicode.GetBytes (_textView.Text);
 				_saved = true;
 				_textView.ClearHistoryChanges ();
 				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
@@ -769,7 +768,7 @@ namespace UICatalog.Scenarios {
 
 		private void SetFindText ()
 		{
-			_textToFind = !string.IsNullOrEmpty(_textView.SelectedText)
+			_textToFind = !string.IsNullOrEmpty (_textView.SelectedText)
 				? _textView.SelectedText
 				: string.IsNullOrEmpty (_textToFind) ? "" : _textToFind;
 
@@ -808,7 +807,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
 				AutoSize = false
@@ -820,7 +819,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
@@ -830,8 +829,8 @@ namespace UICatalog.Scenarios {
 			txtToFind.TextChanged += (s, e) => {
 				_textToFind = txtToFind.Text;
 				_textView.FindTextChanged ();
-				btnFindNext.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
-				btnFindPrevious.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
+				btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
+				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
 			var btnCancel = new Button ("Cancel") {
@@ -900,7 +899,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
 				AutoSize = false
@@ -929,7 +928,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
@@ -940,7 +939,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
@@ -950,9 +949,9 @@ namespace UICatalog.Scenarios {
 			txtToFind.TextChanged += (s, e) => {
 				_textToFind = txtToFind.Text;
 				_textView.FindTextChanged ();
-				btnFindNext.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
-				btnFindPrevious.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
-				btnReplaceAll.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
+				btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
+				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
+				btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
 			var btnCancel = new Button ("Cancel") {

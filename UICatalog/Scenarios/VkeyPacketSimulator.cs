@@ -117,7 +117,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tvOutput);
 
-			KeyEventArgs unknownChar = null;
+			Key unknownChar = null;
 
 			tvInput.KeyUp += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
@@ -214,7 +214,7 @@ namespace UICatalog.Scenarios {
 			Win.LayoutComplete += Win_LayoutComplete;
 		}
 
-		private void AddKeyboardStrokes (KeyEventArgs e)
+		private void AddKeyboardStrokes (Key e)
 		{
 			var keyChar = (int)e.KeyCode;
 			var mK = (int)(e.KeyCode & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask));

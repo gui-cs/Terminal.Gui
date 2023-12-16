@@ -31,8 +31,8 @@ public class Keys : Scenario {
 
 
 		edit.InvokingKeyBindings += (s, a) => {
-			if (edit.KeyBindings.TryGet (a.KeyCode, out var commands)) {
-				invokingKeyBindingsList.Add ($"{a}: {string.Join (",", commands)}");
+			if (edit.KeyBindings.TryGet (a, out var binding)) {
+				invokingKeyBindingsList.Add ($"{a}: {string.Join (",", binding.Commands)}");
 			}
 		};
 
@@ -67,7 +67,7 @@ public class Keys : Scenario {
 		};
 		Win.Add (labelAppKeypress);
 
-		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.KeyCode.ToString();
+		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
 
 		// Key stroke log:
 		var keyLogLabel = new Label ("Application Key Events:") {
@@ -75,7 +75,7 @@ public class Keys : Scenario {
 			Y = Pos.Top (editLabel) + 4,
 		};
 		Win.Add (keyLogLabel);
-		var maxKeyString = KeyEventArgs.ToString (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorRight, MenuBar.ShortcutDelimiter).Length;
+		var maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
 		var yOffset = 1;
 		var keyEventlist = new List<string> ();
 		var keyEventListView = new ListView (keyEventlist) {
@@ -104,7 +104,6 @@ public class Keys : Scenario {
 		onKeyPressedListView.ColorScheme = Colors.TopLevel;
 		Win.Add (onKeyPressedListView);
 
-
 		// OnInvokeKeyBindings
 		var onInvokingKeyBindingsLabel = new Label ("TextView InvokingKeyBindings:") {
 			X = Pos.Right (onKeyPressedListView) + 1,
@@ -114,7 +113,7 @@ public class Keys : Scenario {
 		var onInvokingKeyBindingsListView = new ListView (invokingKeyBindingsList) {
 			X = Pos.Left (onInvokingKeyBindingsLabel),
 			Y = Pos.Top (onInvokingKeyBindingsLabel) + yOffset,
-			Width = Dim.Fill(1),
+			Width = Dim.Fill (1),
 			Height = Dim.Fill (),
 		};
 		onInvokingKeyBindingsListView.ColorScheme = Colors.TopLevel;
@@ -124,7 +123,7 @@ public class Keys : Scenario {
 		Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");
 		Application.KeyUp += (s, a) => KeyDownPressUp (a, "Up");
 
-		void KeyDownPressUp (KeyEventArgs args, string updown)
+		void KeyDownPressUp (Key args, string updown)
 		{
 			// BUGBUG: KeyEvent.ToString is badly broken
 			var msg = $"Key{updown,-7}: {args}";

@@ -109,7 +109,7 @@ namespace UICatalog.Scenarios {
 			Stack<StraightLine> undoHistory = new ();
 
 			//// BUGBUG: Why is this not handled by a key binding???
-			public override bool OnKeyDown (KeyEventArgs e)
+			public override bool OnKeyDown (Key e)
 			{
 				// BUGBUG: These should be implemented with key bindings
 				if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask)) {

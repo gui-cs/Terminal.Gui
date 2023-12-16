@@ -1759,10 +1759,10 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.BackTab);
 
 			KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextView);
-			KeyBindings.Add (Application.AlternateForwardKey, Command.NextView);
+			KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextView);
 
 			KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.PreviousView);
-			KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousView);
+			KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousView);
 
 			KeyBindings.Add (KeyCode.Z | KeyCode.CtrlMask, Command.Undo);
 			KeyBindings.Add (KeyCode.R | KeyCode.CtrlMask, Command.Redo);
@@ -1775,25 +1775,25 @@ namespace Terminal.Gui {
 			ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
-			KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.Accept);
+			KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.Accept);
 		}
 
 		private MenuBarItem BuildContextMenuBarItem ()
 		{
 			return new MenuBarItem (new MenuItem [] {
-				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, KeyBindings.GetKeyFromCommands (Command.SelectAll)),
-				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
-				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, KeyBindings.GetKeyFromCommands (Command.Copy)),
-				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, KeyBindings.GetKeyFromCommands (Command.Cut)),
-				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, KeyBindings.GetKeyFromCommands (Command.Paste)),
-				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, KeyBindings.GetKeyFromCommands (Command.Undo)),
-				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, KeyBindings.GetKeyFromCommands (Command.Redo)),
+				new MenuItem (Strings.ctxSelectAll, "", () => SelectAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)),
+				new MenuItem (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
+				new MenuItem (Strings.ctxCopy, "", () => Copy (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Copy)),
+				new MenuItem (Strings.ctxCut, "", () => Cut (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Cut)),
+				new MenuItem (Strings.ctxPaste, "", () => Paste (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Paste)),
+				new MenuItem (Strings.ctxUndo, "", () => Undo (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Undo)),
+				new MenuItem (Strings.ctxRedo, "", () => Redo (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo)),
 			});
 		}
 
 		private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		}
 
 		private void Model_LinesLoaded (object sender, EventArgs e)
@@ -1867,12 +1867,12 @@ namespace Terminal.Gui {
 
 		void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		}
 
 		void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e)
 		{
-			KeyBindings.Replace (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		}
 
 		/// <summary>
@@ -3068,7 +3068,7 @@ namespace Terminal.Gui {
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new KeyEventArgs () { KeyCode = key });
+				InsertText (new Key () { KeyCode = key });
 			}
 
 			if (NeedsDisplay) {
@@ -3404,7 +3404,7 @@ namespace Terminal.Gui {
 		bool _shiftSelecting;
 
 		///<inheritdoc/>
-		public override bool? OnInvokingKeyBindings (KeyEventArgs a)
+		public override bool? OnInvokingKeyBindings (Key a)
 		{
 			// Give autocomplete first opportunity to respond to key presses
 			if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
@@ -3414,7 +3414,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnProcessKeyDown (Key a)
 		{
 			if (!CanFocus) {
 				return true;
@@ -3425,7 +3425,7 @@ namespace Terminal.Gui {
 			ResetColumnTrack ();
 
 			// Ignore control characters and other special keys
-			if (!a.IsLowerCaseAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask)) {
+			if (!a.IsKeyCodeAtoZ && (a.KeyCode < KeyCode.Space || a.KeyCode > KeyCode.CharMask)) {
 				return false;
 			}
 
@@ -3798,7 +3798,7 @@ namespace Terminal.Gui {
 			if (!AllowsTab || _isReadOnly) {
 				return ProcessMoveNextView ();
 			}
-			InsertText (new KeyEventArgs ((KeyCode)'\t'));
+			InsertText (new Key ((KeyCode)'\t'));
 			DoNeededAction ();
 			return true;
 		}
@@ -4325,7 +4325,7 @@ namespace Terminal.Gui {
 			_continuousFind = false;
 		}
 
-		bool InsertText (KeyEventArgs a, ColorScheme? colorScheme = null)
+		bool InsertText (Key a, ColorScheme? colorScheme = null)
 		{
 			//So that special keys like tab can be processed
 			if (_isReadOnly) {
@@ -4396,7 +4396,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyUp (KeyEventArgs a)
+		public override bool OnKeyUp (Key a)
 		{
 			switch (a.KeyCode) {
 			case KeyCode.Space | KeyCode.CtrlMask:

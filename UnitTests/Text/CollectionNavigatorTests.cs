@@ -389,7 +389,7 @@ public class CollectionNavigatorTests {
 	{
 		// test all Keys
 		foreach (KeyCode key in Enum.GetValues (typeof (KeyCode))) {
-			var ke = new KeyEventArgs (key);
+			var ke = new Key (key);
 			_output.WriteLine ($"Testing {key}");
 			if (key == KeyCode.AltMask || key == KeyCode.CtrlMask || key == KeyCode.SpecialMask) {
 				Assert.False (CollectionNavigator.IsCompatibleKey (ke));

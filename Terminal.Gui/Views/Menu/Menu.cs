@@ -127,7 +127,7 @@ public class MenuItem {
 	/// <summary>
 	/// Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.
 	/// </summary>
-	public string ShortcutTag => KeyEventArgs.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
+	public string ShortcutTag => Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
 	#endregion Keyboard Handling
 
 	/// <summary>
@@ -480,7 +480,7 @@ class Menu : View {
 	}
 
 	/// <inheritdoc/>
-	public override bool? OnInvokingKeyBindings (KeyEventArgs keyEvent)
+	public override bool? OnInvokingKeyBindings (Key keyEvent)
 	{
 		// This is a bit of a hack. We want to handle the key bindings for menu bar but
 		// InvokeKeyBindings doesn't pass any context so we can't tell which item it is for.

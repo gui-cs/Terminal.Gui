@@ -247,7 +247,7 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool OnKeyPressed (KeyEventArgs a)
+		public override bool OnProcessKeyDown (Key a)
 		{
 			// Ignore non-numeric characters.
 			if (a.KeyCode is >= (KeyCode)(int)KeyCode.D0 and <= (KeyCode)(int)KeyCode.D9) {
@@ -259,7 +259,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (a.IsLowerCaseAtoZ) {
+			if (a.IsKeyCodeAtoZ) {
 				return true;
 			}
 			

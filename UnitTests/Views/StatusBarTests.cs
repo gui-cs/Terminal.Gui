@@ -80,7 +80,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Iteration += (s, a) => {
 				if (iteration == 0) {
 					Assert.Equal ("", msg);
-					sb.ProcessKeyDown (new (KeyCode.CtrlMask | KeyCode.Q));
+					sb.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Q));
 				} else if (iteration == 1) {
 					Assert.Equal ("Quiting...", msg);
 					msg = "";
@@ -109,7 +109,7 @@ namespace Terminal.Gui.ViewsTests {
 			sb.OnDrawContent (sb.Bounds);
 
 			string expected = @$"
-^O Open {CM.Glyphs.VLine} Q, CtrlMask to Quit!
+^O Open {CM.Glyphs.VLine} Ctrl+Q to Quit!
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 		}
@@ -192,7 +192,7 @@ CTRL-O Open {CM.Glyphs.VLine} CTRL-Q Quit
 			Assert.True (CanExecuteNew ());
 			Assert.False (CanExecuteClose ());
 
-			Assert.True (top.ProcessKeyDown (new (KeyCode.N | KeyCode.CtrlMask)));
+			Assert.True (top.NewKeyDownEvent (new (KeyCode.N | KeyCode.CtrlMask)));
 			Application.MainLoop.RunIteration ();
 			Assert.NotNull (win);
 			Assert.False (CanExecuteNew ());

@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, KeyCode.CtrlMask | KeyCode.R),
 						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, KeyCode.CtrlMask | KeyCode.C),
 						null,
-						new MenuItem ("_Quit", "", () => Quit(), null, null, Application.QuitKey)
+						new MenuItem ("_Quit", "", () => Quit(), null, null, (KeyCode)Application.QuitKey)
 					}),
 					new MenuBarItem ("_View", new MenuItem [] { }),
 					new MenuBarItem ("_Window", new MenuItem [] { })

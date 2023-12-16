@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="a">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		bool ProcessKey (KeyEventArgs a);
+		bool ProcessKey (Key a);
 
 		/// <summary>
 		/// Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like

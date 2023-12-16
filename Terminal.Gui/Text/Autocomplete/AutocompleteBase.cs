@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 		public abstract bool MouseEvent (MouseEvent me, bool fromHost = false);
 
 		/// <inheritdoc/>
-		public abstract bool ProcessKey (KeyEventArgs a);
+		public abstract bool ProcessKey (Key a);
 		/// <inheritdoc/>
 		public abstract void RenderOverlay (Point renderAt);
 

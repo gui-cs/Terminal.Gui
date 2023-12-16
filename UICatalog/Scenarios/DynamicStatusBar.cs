@@ -405,7 +405,7 @@ public class DynamicStatusBar : Scenario {
 				}
 			};
 
-			bool ProcessKey (KeyEventArgs ev)
+			bool ProcessKey (Key ev)
 			{
 				switch (ev.KeyCode) {
 				case KeyCode.CursorUp:
@@ -433,7 +433,7 @@ public class DynamicStatusBar : Scenario {
 					}
 					return true;
 				}
-				_txtShortcut.Text = KeyEventArgs.ToString (k, StatusBar.ShortcutDelimiter);//ShortcutHelper.GetShortcutTag (k, StatusBar.ShortcutDelimiter);
+				_txtShortcut.Text = Key.ToString (k, StatusBar.ShortcutDelimiter);//ShortcutHelper.GetShortcutTag (k, StatusBar.ShortcutDelimiter);
 
 				return true;
 			}
@@ -515,7 +515,7 @@ public class DynamicStatusBar : Scenario {
 			_statusItem = statusItem;
 			_txtTitle.Text = statusItem?.Title ?? "";
 			_txtAction.Text = statusItem != null && statusItem.Action != null ? GetTargetAction (statusItem.Action) : string.Empty;
-			_txtShortcut.Text = KeyEventArgs.ToString (statusItem.Shortcut, StatusBar.ShortcutDelimiter);//ShortcutHelper.GetShortcutTag (statusItem.Shortcut, StatusBar.ShortcutDelimiter) ?? "";
+			_txtShortcut.Text = Key.ToString ((KeyCode)statusItem.Shortcut, StatusBar.ShortcutDelimiter);//ShortcutHelper.GetShortcutTag (statusItem.Shortcut, StatusBar.ShortcutDelimiter) ?? "";
 		}
 
 		void CleanEditStatusItem ()

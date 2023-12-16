@@ -158,7 +158,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void TreeViewFiles_KeyPress (object sender, KeyEventArgs obj)
+		private void TreeViewFiles_KeyPress (object sender, Key obj)
 		{
 			if (obj.KeyCode == (KeyCode.R | KeyCode.CtrlMask)) {
 
