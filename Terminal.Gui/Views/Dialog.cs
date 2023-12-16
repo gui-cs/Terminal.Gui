@@ -228,15 +228,16 @@ namespace Terminal.Gui {
 			}
 		}
 
+		// BUGBUG: Why is this not handled by a key binding???
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnProcessKeyDown (Key a)
 		{
-			switch (kb.Key) {
-			case Key.Esc:
+			switch (a.KeyCode) {
+			case KeyCode.Esc:
 				Application.RequestStop (this);
 				return true;
 			}
-			return base.ProcessKey (kb);
+			return false;
 		}
 	}
 }

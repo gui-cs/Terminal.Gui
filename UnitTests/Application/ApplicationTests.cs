@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
@@ -12,8 +13,11 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.ApplicationTests;
 
 public class ApplicationTests {
-	public ApplicationTests ()
+	readonly ITestOutputHelper _output;
+
+	public ApplicationTests (ITestOutputHelper output)
 	{
+		this._output = output;
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -416,6 +420,109 @@ public class ApplicationTests {
 		Assert.Equal (3, count);
 	}
 
+	[Fact]
+	public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
+	{
+		Init ();
+		var count = 0;
+		Dialog d = null;
+		var top = Application.Top;
+		top.DrawContent += (s, a) => count++;
+		var iteration = -1;
+		Application.Iteration += (s, a) => {
+			iteration++;
+			if (iteration == 0) {
+				d = new Dialog ();
+				d.DrawContent += (s, a) => count++;
+				Application.Run (d);
+			} else if (iteration < 3) {
+				Application.OnMouseEvent (new (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }));
+				Assert.False (top.NeedsDisplay);
+				Assert.False (top.SubViewNeedsDisplay);
+				Assert.False (top.LayoutNeeded);
+				Assert.False (d.NeedsDisplay);
+				Assert.False (d.SubViewNeedsDisplay);
+				Assert.False (d.LayoutNeeded);
+			} else {
+				Application.RequestStop ();
+			}
+		};
+		Application.Run ();
+		Application.Shutdown ();
+		// 1 - First top load, 1 - Dialog load, 1 - Dialog unload, Total - 3.
+		Assert.Equal (3, count);
+	}
+
+	[Fact]
+	public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
+	{
+		Init ();
+		var d = new Dialog () { Width = 5, Height = 5 };
+		((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+		var rs = Application.Begin (d);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌───┐
+  │   │
+  │   │
+  │   │
+  └───┘", _output);
+
+		var attributes = new Attribute [] {
+			// 0
+			new Attribute (ColorName.White, ColorName.Black),
+			// 1
+			Colors.Dialog.Normal
+		};
+		TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0000000000
+0011111000
+0011111000
+0011111000
+0011111000
+0011111000
+0000000000
+0000000000
+0000000000
+", null, attributes);
+
+		// TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
+		// TODO: Move the mouse grap/drag mode from Toplevel to Border.
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed }));
+		Assert.Equal (d, Application.MouseGrabView);
+
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+ ┌───┐
+ │   │
+ │   │
+ │   │
+ └───┘", _output);
+
+		attributes = new Attribute [] {
+			// 0
+			new Attribute (ColorName.White, ColorName.Black),
+			// 1
+			Colors.Dialog.Normal
+		};
+		TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0111110000
+0111110000
+0111110000
+0111110000
+0111110000
+0000000000
+0000000000
+0000000000
+0000000000
+", null, attributes);
+
+		Application.End (rs);
+		Application.Shutdown ();
+	}
+
 	// TODO: Add tests for Run that test errorHandler
 
 	#endregion
@@ -547,315 +654,10 @@ public class ApplicationTests {
 		Assert.NotNull (Application.Top);
 		var rs = Application.Begin (Application.Top);
 		Assert.Equal (Application.Top, rs.Toplevel);
-		Assert.Null (Application.MouseGrabView);  // public
+		Assert.Null (Application.MouseGrabView); // public
 		Assert.Null (Application.WantContinuousButtonPressedView); // public
 		Assert.False (Application.MoveToOverlappedChild (Application.Top));
 	}
-
-	#region KeyboardTests
-	[Fact]
-	public void KeyUp_Event ()
-	{
-		// Setup Mock driver
-		Init ();
-
-		// Setup some fake keypresses (This)
-		var input = "Tests";
-
-		// Put a control-q in at the end
-		FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('q', ConsoleKey.Q, shift: false, alt: false, control: true));
-		foreach (var c in input.Reverse ()) {
-			if (char.IsLetter (c)) {
-				FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
-			} else {
-				FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
-			}
-		}
-
-		int stackSize = FakeConsole.MockKeyPresses.Count;
-
-		int iterations = 0;
-		Application.Iteration += (s, a) => {
-			iterations++;
-			// Stop if we run out of control...
-			if (iterations > 10) {
-				Application.RequestStop ();
-			}
-		};
-
-		int keyUps = 0;
-		var output = string.Empty;
-		Application.Top.KeyUp += (object sender, KeyEventEventArgs args) => {
-			if (args.KeyEvent.Key != (Key.CtrlMask | Key.Q)) {
-				output += (char)args.KeyEvent.KeyValue;
-			}
-			keyUps++;
-		};
-
-		Application.Run (Application.Top);
-
-		// Input string should match output
-		Assert.Equal (input, output);
-
-		// # of key up events should match stack size
-		//Assert.Equal (stackSize, keyUps);
-		// We can't use numbers variables on the left side of an Assert.Equal/NotEqual,
-		// it must be literal (Linux only).
-		Assert.Equal (6, keyUps);
-
-		// # of key up events should match # of iterations
-		Assert.Equal (stackSize, iterations);
-
-		Application.Shutdown ();
-		Assert.Null (Application.Current);
-		Assert.Null (Application.Top);
-		Assert.Null (Application.MainLoop);
-		Assert.Null (Application.Driver);
-	}
-
-	[Fact]
-	public void AlternateForwardKey_AlternateBackwardKey_Tests ()
-	{
-		Init ();
-
-		var top = Application.Top;
-		var w1 = new Window ();
-		var v1 = new TextField ();
-		var v2 = new TextView ();
-		w1.Add (v1, v2);
-
-		var w2 = new Window ();
-		var v3 = new CheckBox ();
-		var v4 = new Button ();
-		w2.Add (v3, v4);
-
-		top.Add (w1, w2);
-
-		Application.Iteration += (s, a) => {
-			Assert.True (v1.HasFocus);
-			// Using default keys.
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v1.HasFocus);
-
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Shift = true, Ctrl = true }));
-			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Shift = true, Ctrl = true }));
-			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Shift = true, Ctrl = true }));
-			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.ShiftMask | Key.CtrlMask | Key.Tab,
-				new KeyModifiers () { Shift = true, Ctrl = true }));
-			Assert.True (v1.HasFocus);
-
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageDown,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v1.HasFocus);
-
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.PageUp,
-				new KeyModifiers () { Ctrl = true }));
-			Assert.True (v1.HasFocus);
-
-			// Using another's alternate keys.
-			Application.AlternateForwardKey = Key.F7;
-			Application.AlternateBackwardKey = Key.F6;
-
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
-			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
-			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
-			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F7, new KeyModifiers ()));
-			Assert.True (v1.HasFocus);
-
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
-			Assert.True (v4.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
-			Assert.True (v3.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
-			Assert.True (v2.HasFocus);
-			top.ProcessKey (new KeyEvent (Key.F6, new KeyModifiers ()));
-			Assert.True (v1.HasFocus);
-
-			Application.RequestStop ();
-		};
-
-		Application.Run (top);
-
-		// Replacing the defaults keys to avoid errors on others unit tests that are using it.
-		Application.AlternateForwardKey = Key.PageDown | Key.CtrlMask;
-		Application.AlternateBackwardKey = Key.PageUp | Key.CtrlMask;
-		Application.QuitKey = Key.Q | Key.CtrlMask;
-
-		Assert.Equal (Key.PageDown | Key.CtrlMask, Application.AlternateForwardKey);
-		Assert.Equal (Key.PageUp | Key.CtrlMask, Application.AlternateBackwardKey);
-		Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-
-		// Shutdown must be called to safely clean up Application if Init has been called
-		Application.Shutdown ();
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void QuitKey_Getter_Setter ()
-	{
-		var top = Application.Top;
-		var isQuiting = false;
-
-		top.Closing += (s, e) => {
-			isQuiting = true;
-			e.Cancel = true;
-		};
-
-		Application.Begin (top);
-		top.Running = true;
-
-		Assert.Equal (Key.Q | Key.CtrlMask, Application.QuitKey);
-		Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-		Assert.True (isQuiting);
-
-		isQuiting = false;
-		Application.QuitKey = Key.C | Key.CtrlMask;
-
-		Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
-		Assert.False (isQuiting);
-		Application.Driver.SendKeys ('c', ConsoleKey.C, false, false, true);
-		Assert.True (isQuiting);
-
-		// Reset the QuitKey to avoid throws errors on another tests
-		Application.QuitKey = Key.Q | Key.CtrlMask;
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_And_Mouse ()
-	{
-		var top = Application.Top;
-		var win = new Window () { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
-		var tf = new TextField () { Width = 10 };
-		win.Add (tf);
-		var win2 = new Window () { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
-		var tf2 = new TextField () { Width = 10 };
-		win2.Add (tf2);
-		top.Add (win, win2);
-
-		Application.Begin (top);
-
-		Assert.True (win.CanFocus);
-		Assert.True (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.False (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
-		Assert.True (win.CanFocus);
-		Assert.False (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.True (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
-		Assert.True (win.CanFocus);
-		Assert.True (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.False (win2.HasFocus);
-		Assert.Equal ("win", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
-		Assert.True (win.CanFocus);
-		Assert.False (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.True (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-		win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-		Assert.Null (Toplevel._dragPosition);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void EnsuresTopOnFront_CanFocus_False_By_Keyboard_And_Mouse ()
-	{
-		var top = Application.Top;
-		var win = new Window () { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
-		var tf = new TextField () { Width = 10 };
-		win.Add (tf);
-		var win2 = new Window () { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
-		var tf2 = new TextField () { Width = 10 };
-		win2.Add (tf2);
-		top.Add (win, win2);
-
-		Application.Begin (top);
-
-		Assert.True (win.CanFocus);
-		Assert.True (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.False (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		win.CanFocus = false;
-		Assert.False (win.CanFocus);
-		Assert.False (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.True (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
-		Assert.True (win2.CanFocus);
-		Assert.False (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.True (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		top.ProcessKey (new KeyEvent (Key.CtrlMask | Key.Tab, new KeyModifiers ()));
-		Assert.False (win.CanFocus);
-		Assert.False (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.True (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-
-		win.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
-		Assert.False (win.CanFocus);
-		Assert.False (win.HasFocus);
-		Assert.True (win2.CanFocus);
-		Assert.True (win2.HasFocus);
-		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-		win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
-		Assert.Null (Toplevel._dragPosition);
-	}
-
-	#endregion
-
 
 	// Invoke Tests
 	// TODO: Test with threading scenarios
@@ -869,146 +671,9 @@ public class ApplicationTests {
 
 		var actionCalled = 0;
 		Application.Invoke (() => { actionCalled++; });
+		Application.MainLoop.Running = true;
 		Application.RunIteration (ref rs, ref firstIteration);
 		Assert.Equal (1, actionCalled);
 		Application.Shutdown ();
 	}
-
-
-	#region mousegrabtests
-	[Fact, AutoInitShutdown]
-	public void MouseGrabView_WithNullMouseEventView ()
-	{
-		var tf = new TextField () { Width = 10 };
-		var sv = new ScrollView () {
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			ContentSize = new Size (100, 100)
-		};
-
-		sv.Add (tf);
-		Application.Top.Add (sv);
-
-		var iterations = -1;
-
-		Application.Iteration += (s, a) => {
-			iterations++;
-			if (iterations == 0) {
-				Assert.True (tf.HasFocus);
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 5,
-					Y = 5,
-					Flags = MouseFlags.ReportMousePosition
-				}));
-
-				Assert.Equal (sv, Application.MouseGrabView);
-
-				MessageBox.Query ("Title", "Test", "Ok");
-
-				Assert.Null (Application.MouseGrabView);
-			} else if (iterations == 1) {
-				// Application.MouseGrabView is null because
-				// another toplevel (Dialog) was opened
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 5,
-					Y = 5,
-					Flags = MouseFlags.ReportMousePosition
-				}));
-
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 40,
-					Y = 12,
-					Flags = MouseFlags.ReportMousePosition
-				}));
-
-				Assert.Null (Application.MouseGrabView);
-
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 0,
-					Y = 0,
-					Flags = MouseFlags.Button1Pressed
-				}));
-
-				Assert.Null (Application.MouseGrabView);
-
-				Application.RequestStop ();
-			} else if (iterations == 2) {
-				Assert.Null (Application.MouseGrabView);
-
-				Application.RequestStop ();
-			}
-		};
-
-		Application.Run ();
-	}
-
-	[Fact, AutoInitShutdown]
-	public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
-	{
-		View grabView = null;
-		var count = 0;
-
-		var view1 = new View ();
-		var view2 = new View ();
-
-		Application.GrabbedMouse += Application_GrabbedMouse;
-		Application.UnGrabbedMouse += Application_UnGrabbedMouse;
-
-		Application.GrabMouse (view1);
-		Assert.Equal (0, count);
-		Assert.Equal (grabView, view1);
-		Assert.Equal (view1, Application.MouseGrabView);
-
-		Application.UngrabMouse ();
-		Assert.Equal (1, count);
-		Assert.Equal (grabView, view1);
-		Assert.Null (Application.MouseGrabView);
-
-		Application.GrabbedMouse += Application_GrabbedMouse;
-		Application.UnGrabbedMouse += Application_UnGrabbedMouse;
-
-		Application.GrabMouse (view2);
-		Assert.Equal (1, count);
-		Assert.Equal (grabView, view2);
-		Assert.Equal (view2, Application.MouseGrabView);
-
-		Application.UngrabMouse ();
-		Assert.Equal (2, count);
-		Assert.Equal (grabView, view2);
-		Assert.Null (Application.MouseGrabView);
-
-		void Application_GrabbedMouse (object sender, ViewEventArgs e)
-		{
-			if (count == 0) {
-				Assert.Equal (view1, e.View);
-				grabView = view1;
-			} else {
-				Assert.Equal (view2, e.View);
-				grabView = view2;
-			}
-
-			Application.GrabbedMouse -= Application_GrabbedMouse;
-		}
-
-		void Application_UnGrabbedMouse (object sender, ViewEventArgs e)
-		{
-			if (count == 0) {
-				Assert.Equal (view1, e.View);
-				Assert.Equal (grabView, e.View);
-			} else {
-				Assert.Equal (view2, e.View);
-				Assert.Equal (grabView, e.View);
-			}
-			count++;
-
-			Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
-		}
-	}
-	#endregion
 }

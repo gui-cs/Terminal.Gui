@@ -104,23 +104,23 @@ public class ScrollView : View {
 		AddCommand (Command.RightEnd, () => ScrollRight (_contentSize.Width));
 
 		// Default keybindings for this view
-		AddKeyBinding (Key.CursorUp, Command.ScrollUp);
-		AddKeyBinding (Key.CursorDown, Command.ScrollDown);
-		AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
-		AddKeyBinding (Key.CursorRight, Command.ScrollRight);
+		KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
+		KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
+		KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
+		KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
 
-		AddKeyBinding (Key.PageUp, Command.PageUp);
-		AddKeyBinding ((Key)'v' | Key.AltMask, Command.PageUp);
+		KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+		KeyBindings.Add ((KeyCode)'v' | KeyCode.AltMask, Command.PageUp);
 
-		AddKeyBinding (Key.PageDown, Command.PageDown);
-		AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+		KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+		KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
 
-		AddKeyBinding (Key.PageUp | Key.CtrlMask, Command.PageLeft);
-		AddKeyBinding (Key.PageDown | Key.CtrlMask, Command.PageRight);
-		AddKeyBinding (Key.Home, Command.TopHome);
-		AddKeyBinding (Key.End, Command.BottomEnd);
-		AddKeyBinding (Key.Home | Key.CtrlMask, Command.LeftHome);
-		AddKeyBinding (Key.End | Key.CtrlMask, Command.RightEnd);
+		KeyBindings.Add (KeyCode.PageUp | KeyCode.CtrlMask, Command.PageLeft);
+		KeyBindings.Add (KeyCode.PageDown | KeyCode.CtrlMask, Command.PageRight);
+		KeyBindings.Add (KeyCode.Home, Command.TopHome);
+		KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+		KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.LeftHome);
+		KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.RightEnd);
 
 		Initialized += (s, e) => {
 			if (!_vertical.IsInitialized) {
@@ -277,6 +277,37 @@ public class ScrollView : View {
 		SetNeedsLayout ();
 	}
 
+	/// <summary>
+	/// Removes the view from the scrollview.
+	/// </summary>
+	/// <param name="view">The view to remove from the scrollview.</param>
+	public override void Remove (View view)
+	{
+		if (view == null) {
+			return;
+		}
+
+		SetNeedsDisplay ();
+		var container = view?.SuperView;
+		if (container == this) {
+			base.Remove (view);
+		} else {
+			container?.Remove (view);
+		}
+
+		if (_contentView.InternalSubviews.Count < 1) {
+			this.CanFocus = false;
+		}
+	}
+
+	/// <summary>
+	///   Removes all widgets from this container.
+	/// </summary>
+	public override void RemoveAll ()
+	{
+		_contentView.RemoveAll ();
+	}
+
 	void View_MouseLeave (object sender, MouseEventEventArgs e)
 	{
 		if (Application.MouseGrabView != null && Application.MouseGrabView != _vertical && Application.MouseGrabView != _horizontal) {
@@ -316,16 +347,6 @@ public class ScrollView : View {
 			}
 			_vertical.Height = Dim.Fill (_showHorizontalScrollIndicator ? 1 : 0);
 		}
-	}
-
-	/// <summary>
-	///   Removes all widgets from this container.
-	/// </summary>
-	/// <remarks>
-	/// </remarks>
-	public override void RemoveAll ()
-	{
-		_contentView.RemoveAll ();
 	}
 
 	/// <summary>
@@ -542,12 +563,12 @@ public class ScrollView : View {
 	}
 
 	///<inheritdoc/>
-	public override bool ProcessKey (KeyEvent kb)
+	public override bool OnKeyDown (Key a)
 	{
-		if (base.ProcessKey (kb))
+		if (base.OnKeyDown (a))
 			return true;
 
-		var result = InvokeKeybindings (kb);
+		var result = InvokeKeyBindings (a);
 		if (result != null)
 			return (bool)result;
 

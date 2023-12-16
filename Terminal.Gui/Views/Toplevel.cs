@@ -23,7 +23,7 @@ namespace Terminal.Gui {
 	/// </remarks>
 	public partial class Toplevel : View {
 		/// <summary>
-		/// Gets or sets whether the <see cref="MainLoop"/> for this <see cref="Toplevel"/> is running or not. 
+		/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not. 
 		/// </summary>
 		/// <remarks>
 		///    Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead. 
@@ -38,7 +38,7 @@ namespace Terminal.Gui {
 		public event EventHandler Loaded;
 
 		/// <summary>
-		/// Invoked when the <see cref="Toplevel"/> <see cref="MainLoop"/> has started it's first iteration.
+		/// Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration.
 		/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
 		/// changes. 
 		/// <para>A Ready event handler is a good place to finalize initialization after calling 
@@ -138,7 +138,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first time. 
 		/// </summary>
-		virtual public void OnLoaded ()
+		public virtual void OnLoaded ()
 		{
 			IsLoaded = true;
 			foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
@@ -209,31 +209,42 @@ namespace Terminal.Gui {
 			AddCommand (Command.NextViewOrTop, () => { MoveNextViewOrTop (); return true; });
 			AddCommand (Command.PreviousViewOrTop, () => { MovePreviousViewOrTop (); return true; });
 			AddCommand (Command.Refresh, () => { Application.Refresh (); return true; });
+			AddCommand (Command.Accept, () => {
+				// TODO: Perhaps all views should support the concept of being default?
+				// TODO: It's bad that Toplevel is tightly coupled with Button
+				if (Subviews.FirstOrDefault(v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
+					defaultBtn.InvokeCommand (Command.Accept);
+					return true;
+				}
+				return false;
+			});
 
 			// Default keybindings for this view
-			AddKeyBinding (Application.QuitKey, Command.QuitToplevel);
-			AddKeyBinding (Key.Z | Key.CtrlMask, Command.Suspend);
+			KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
 
-			AddKeyBinding (Key.Tab, Command.NextView);
+			KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
+			KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.PreviousView);
+			KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
 
-			AddKeyBinding (Key.CursorRight, Command.NextView);
-			AddKeyBinding (Key.F | Key.CtrlMask, Command.NextView);
+			KeyBindings.Add (KeyCode.Tab, Command.NextView);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.PreviousView);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextViewOrTop);
+			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
-			AddKeyBinding (Key.CursorDown, Command.NextView);
-			AddKeyBinding (Key.I | Key.CtrlMask, Command.NextView); // Unix
+			KeyBindings.Add (KeyCode.F5, Command.Refresh);
+			KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+			KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
-			AddKeyBinding (Key.BackTab | Key.ShiftMask, Command.PreviousView);
-			AddKeyBinding (Key.CursorLeft, Command.PreviousView);
-			AddKeyBinding (Key.CursorUp, Command.PreviousView);
-			AddKeyBinding (Key.B | Key.CtrlMask, Command.PreviousView);
-
-			AddKeyBinding (Key.Tab | Key.CtrlMask, Command.NextViewOrTop);
-			AddKeyBinding (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-
-			AddKeyBinding (Key.Tab | Key.ShiftMask | Key.CtrlMask, Command.PreviousViewOrTop);
-			AddKeyBinding (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
-
-			AddKeyBinding (Key.L | Key.CtrlMask, Command.Refresh);
+#if UNIX_KEY_BINDINGS
+			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
+			KeyBindings.Add (Key.L | Key.CtrlMask, Command.Refresh);// Unix
+			KeyBindings.Add (Key.F | Key.CtrlMask, Command.NextView);// Unix
+			KeyBindings.Add (Key.I | Key.CtrlMask, Command.NextView); // Unix
+			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
+#endif
+			// This enables the default button to be activated by the Enter key.
+			KeyBindings.Add (KeyCode.Enter, Command.Accept);
 		}
 
 		private void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
@@ -261,7 +272,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 			AlternateForwardKeyChanged?.Invoke (this, e);
 		}
 
@@ -276,7 +287,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 			AlternateBackwardKeyChanged?.Invoke (this, e);
 		}
 
@@ -291,7 +302,7 @@ namespace Terminal.Gui {
 		/// <param name="e"></param>
 		public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 		{
-			ReplaceKeyBinding (e.OldKey, e.NewKey);
+			KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 			QuitKeyChanged?.Invoke (this, e);
 		}
 
@@ -318,7 +329,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="ProcessKey(KeyEvent)"/> events will propagate keys upwards.</description>
+		///		<description><see cref="View.OnKeyDown"/> events will propagate keys upwards.</description>
 		///   </item>
 		///   <item>
 		///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
@@ -329,7 +340,7 @@ namespace Terminal.Gui {
 		/// 
 		/// <list type="bullet">
 		///   <item>
-		///		<description><see cref="ProcessKey(KeyEvent)"/> events will NOT propogate keys upwards.</description>
+		///		<description><see cref="View.OnKeyDown"/> events will NOT propagate keys upwards.</description>
 		///	  </item>
 		///   <item>
 		///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
@@ -353,65 +364,6 @@ namespace Terminal.Gui {
 		/// <see langword="false"/>, otherwise.
 		/// </summary>
 		public bool IsLoaded { get; private set; }
-
-		///<inheritdoc/>
-		public override bool OnKeyDown (KeyEvent keyEvent)
-		{
-			if (base.OnKeyDown (keyEvent)) {
-				return true;
-			}
-
-			switch (keyEvent.Key) {
-			case Key.AltMask:
-			case Key.AltMask | Key.Space:
-			case Key.CtrlMask | Key.Space:
-			case Key _ when (keyEvent.Key & Key.AltMask) == Key.AltMask:
-				return MenuBar != null && MenuBar.OnKeyDown (keyEvent);
-			}
-
-			return false;
-		}
-
-		///<inheritdoc/>
-		public override bool OnKeyUp (KeyEvent keyEvent)
-		{
-			if (base.OnKeyUp (keyEvent)) {
-				return true;
-			}
-
-			switch (keyEvent.Key) {
-			case Key.AltMask:
-			case Key.AltMask | Key.Space:
-			case Key.CtrlMask | Key.Space:
-				if (MenuBar != null && MenuBar.OnKeyUp (keyEvent)) {
-					return true;
-				}
-				break;
-			}
-
-			return false;
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
-		{
-			if (base.ProcessKey (keyEvent))
-				return true;
-
-			var result = InvokeKeybindings (new KeyEvent (ShortcutHelper.GetModifiersKey (keyEvent),
-				new KeyModifiers () { Alt = keyEvent.IsAlt, Ctrl = keyEvent.IsCtrl, Shift = keyEvent.IsShift }));
-			if (result != null)
-				return (bool)result;
-
-#if false
-			if (keyEvent.Key == Key.F5) {
-				Application.DebugDrawBounds = !Application.DebugDrawBounds;
-				SetNeedsDisplay ();
-				return true;
-			}
-#endif
-			return false;
-		}
 
 		private void MovePreviousViewOrTop ()
 		{
@@ -476,19 +428,6 @@ namespace Terminal.Gui {
 			} else {
 				Application.RequestStop ();
 			}
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessColdKey (KeyEvent keyEvent)
-		{
-			if (base.ProcessColdKey (keyEvent)) {
-				return true;
-			}
-
-			if (ShortcutHelper.FindAndOpenByShortcut (keyEvent, this)) {
-				return true;
-			}
-			return false;
 		}
 
 		View GetDeepestFocusedSubview (View view)
@@ -812,6 +751,7 @@ namespace Terminal.Gui {
 				Application.BringOverlappedTopToFront ();
 
 				// Only start grabbing if the user clicks on the title bar.
+				// BUGBUG: Assumes Frame == Border and Title is always at Y == 0
 				if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
 					_startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
 					_dragPosition = new Point ();
@@ -836,6 +776,7 @@ namespace Terminal.Gui {
 					} else {
 						SuperView.SetNeedsDisplay ();
 					}
+					// BUGBUG: Assumes Frame == Border?
 					GetLocationThatFits (this, mouseEvent.X + (SuperView == null ? mouseEvent.OfX - _startGrabPoint.X : Frame.X - _startGrabPoint.X),
 						mouseEvent.Y + (SuperView == null ? mouseEvent.OfY - _startGrabPoint.Y : Frame.Y - _startGrabPoint.Y),
 						out nx, out ny, out _, out _);

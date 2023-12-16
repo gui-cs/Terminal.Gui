@@ -17,22 +17,13 @@
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
   "Application.AlternateBackwardKey": {
-    "Key": "PageUp",
-    "Modifiers": [
-      "Ctrl"
-    ]
+    "Key": "Ctrl+PageUp"
   },
   "Application.AlternateForwardKey": {
-    "Key": "PageDown",
-    "Modifiers": [
-      "Ctrl"
-    ]
+    "Key": "Ctrl+PageDown"
   },
   "Application.QuitKey": {
-    "Key": "Q",
-    "Modifiers": [
-      "Ctrl"
-    ]
+    "Key": "Ctrl+Q"
   },
   "Application.IsMouseDisabled": false,
   "Theme": "Default",

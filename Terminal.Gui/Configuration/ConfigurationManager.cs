@@ -406,7 +406,9 @@ public static partial class ConfigurationManager {
 	{
 		Debug.WriteLine ($"ConfigurationManager.Load()");
 
-		if (reset) Reset ();
+		if (reset) {
+			Reset ();
+		}
 
 		// LibraryResources is always loaded by Reset
 		if (Locations == ConfigLocations.All) {

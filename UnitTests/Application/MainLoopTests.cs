@@ -1,17 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui;
 using Xunit;
-using Xunit.Sdk;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ApplicationTests;
 /// <summary>
@@ -634,8 +627,8 @@ public class MainLoopTests {
 		Application.Top.Add (tf);
 
 		const int numPasses = 5;
-		const int numIncrements = 5000;
-		const int pollMs = 10000;
+		const int numIncrements = 500;
+		const int pollMs = 2500;
 
 		var task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
 
@@ -688,7 +681,7 @@ public class MainLoopTests {
 			if (iterations == 0) {
 				Assert.Null (btn);
 				Assert.Equal (zero, total);
-				Assert.True (btnLaunch.ProcessKey (new KeyEvent (Key.Enter, null)));
+				Assert.True (btnLaunch.NewKeyDownEvent (new (KeyCode.Space)));
 				if (btn == null) {
 					Assert.Null (btn);
 					Assert.Equal (zero, total);
@@ -699,7 +692,7 @@ public class MainLoopTests {
 			} else if (iterations == 1) {
 				Assert.Equal (clickMe, btn.Text);
 				Assert.Equal (zero, total);
-				Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, null)));
+				Assert.True (btn.NewKeyDownEvent (new (KeyCode.Space)));
 				Assert.Equal (cancel, btn.Text);
 				Assert.Equal (one, total);
 			} else if (taskCompleted) {

@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override bool OnDrawFrames ()
 		{
-			var screenBounds = ViewToScreen (Bounds);
+			var screenBounds = BoundsToScreen (Bounds);
 			LineCanvas lc;
 
 			lc = SuperView?.LineCanvas;

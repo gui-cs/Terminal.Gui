@@ -57,11 +57,13 @@ namespace Terminal.Gui.DriverTests {
 			Application.Init (driver);
 
 			var top = Application.Top;
-			var view = new View ();
+			var view = new View () {
+				CanFocus = true
+			};
 			var count = 0;
 			var wasKeyPressed = false;
 
-			view.KeyPressed += (s, e) => {
+			view.KeyDown += (s, e) => {
 				wasKeyPressed = true;
 			};
 			top.Add (view);
@@ -96,13 +98,15 @@ namespace Terminal.Gui.DriverTests {
 			Console.MockKeyPresses = mKeys;
 
 			var top = Application.Top;
-			var view = new View ();
+			var view = new View () {
+				CanFocus = true
+			};
 			var rText = "";
 			var idx = 0;
 
-			view.KeyPressed += (s, e) => {
-				Assert.Equal (text [idx], (char)e.KeyEvent.Key);
-				rText += (char)e.KeyEvent.Key;
+			view.KeyDown += (s, e) => {
+				Assert.Equal (text [idx], (char)e.KeyCode);
+				rText += (char)e.KeyCode;
 				Assert.Equal (rText, text.Substring (0, idx + 1));
 				e.Handled = true;
 				idx++;
@@ -155,7 +159,7 @@ namespace Terminal.Gui.DriverTests {
 		//	Key key = Key.Unknown;
 			
 		//	Application.Top.KeyPress += (e) => {
-		//		key = e.KeyEvent.Key;
+		//		key = e.Key;
 		//		output.WriteLine ($"  Application.Top.KeyPress: {key}");
 		//		e.Handled = true;
 				
@@ -239,7 +243,7 @@ namespace Terminal.Gui.DriverTests {
 		//					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		//					Assert.Equal (new Rect (0, 0, 20, 8), pos);
 
-		//					Assert.True (dlg.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+		//					Assert.True (dlg.ProcessKey (new (Key.Tab)));
 		//					dlg.Draw ();
 
 		//					expected = @"

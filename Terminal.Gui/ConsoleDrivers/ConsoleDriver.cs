@@ -3,13 +3,8 @@
 //
 using System.Text;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using static Terminal.Gui.ColorScheme;
 using System.Linq;
-using System.Data;
-using System.Linq;
-using System.Data;
 
 namespace Terminal.Gui;
 
@@ -90,18 +85,9 @@ public abstract class ConsoleDriver {
 	/// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
 	/// is called.
 	/// <remarks>
-	/// The format of the array is rows, columns, and 3 values on the last column: Rune, Attribute and Dirty Flag
+	/// The format of the array is rows, columns. The first index is the row, the second index is the column.
 	/// </remarks>
 	/// </summary>
-	//public int [,,] Contents { get; internal set; }
-
-	///// <summary>
-	///// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
-	///// is called.
-	///// <remarks>
-	///// The format of the array is rows, columns. The first index is the row, the second index is the column.
-	///// </remarks>
-	///// </summary>
 	public Cell [,] Contents { get; internal set; }
 
 	/// <summary>
@@ -483,40 +469,33 @@ public abstract class ConsoleDriver {
 	#endregion
 
 	#region Mouse and Keyboard
-
 	/// <summary>
-	/// Event fired after a key has been pressed and released.
+	/// Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.
 	/// </summary>
-	public event EventHandler<KeyEventEventArgs> KeyPressed;
+	public event EventHandler<Key> KeyDown;
 
 	/// <summary>
-	/// Called after a key has been pressed and released. Fires the <see cref="KeyPressed"/> event.
+	/// Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to <see cref="OnKeyUp"/>.
 	/// </summary>
 	/// <param name="a"></param>
-	public void OnKeyPressed (KeyEventEventArgs a) => KeyPressed?.Invoke (this, a);
+	public void OnKeyDown (Key a) => KeyDown?.Invoke (this, a);
 
 	/// <summary>
-	/// Event fired when a key is released.
+	/// Event fired when a key is released. 
 	/// </summary>
-	public event EventHandler<KeyEventEventArgs> KeyUp;
+	/// <remarks>
+	/// Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is complete.
+	/// </remarks>
+	public event EventHandler<Key> KeyUp;
 
 	/// <summary>
 	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
 	/// </summary>
+	/// <remarks>
+	/// Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is complete.
+	/// </remarks>
 	/// <param name="a"></param>
-	public void OnKeyUp (KeyEventEventArgs a) => KeyUp?.Invoke (this, a);
-
-	/// <summary>
-	/// Event fired when a key is pressed.
-	/// </summary>
-	public event EventHandler<KeyEventEventArgs> KeyDown;
-
-	/// <summary>
-	/// Called when a key is pressed. Fires the <see cref="KeyDown"/> event.
-	/// </summary>
-	/// <param name="a"></param>
-	public void OnKeyDown (KeyEventEventArgs a) => KeyDown?.Invoke (this, a);
-
+	public void OnKeyUp (Key a) => KeyUp?.Invoke (this, a);
 
 	/// <summary>
 	/// Event fired when a mouse event occurs.
@@ -662,3 +641,437 @@ public enum CursorVisibility {
 	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
 	BoxFix = 0x02020164,
 }
+
+
+/// <summary>
+/// The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a consistent
+/// way for application code to specify keys and receive key events. 
+/// <para>
+/// The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for common
+/// operations. For example, <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way
+/// to check whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
+/// </para>
+/// </summary>
+/// <remarks>
+/// <para>
+/// Lowercase alpha keys are encoded as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
+/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
+/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+/// TODO: Strongly consider renaming these from .A to .Z to .A_Lowercase to .Z_Lowercase (or .a to .z).
+/// </para>
+/// <para>
+/// Numeric keys are the values between 48 and 57 corresponding to 0 to 9 (e.g. <see cref="KeyCode.D0"/>, <see cref="KeyCode.D1"/>, etc.).
+/// </para>
+/// <para>
+/// The shift modifiers (<see cref="KeyCode.ShiftMask"/>, <see cref="KeyCode.CtrlMask"/>, and <see cref="KeyCode.AltMask"/>) can be combined (with logical or)
+/// with the other key codes to represent shifted keys. For example, the <see cref="KeyCode.A"/> enum value represents the un-shifted 'a' key, while
+/// <see cref="KeyCode.ShiftMask"/> | <see cref="KeyCode.A"/> represents the 'A' key (shifted 'a' key). Likewise, <see cref="KeyCode.AltMask"/> | <see cref="KeyCode.A"/>
+/// represents the 'Alt+A' key combination.
+/// </para>
+/// <para>
+/// All other keys that produce a printable character are encoded as the Unicode value of the character. For example, the <see cref="KeyCode"/>
+/// for the '!' character is 33, which is the Unicode value for '!'. Likewise, `â` is 226, `Â` is 194, etc.
+/// </para>
+/// <para>
+/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+/// otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>).
+/// </para>
+/// </remarks>
+[Flags]
+public enum KeyCode : uint {
+	/// <summary>
+	/// Mask that indicates that this is a character value, values outside this range
+	/// indicate special characters like Alt-key combinations or special keys on the
+	/// keyboard like function keys, arrows keys and so on.
+	/// </summary>
+	CharMask = 0xfffff,
+
+	/// <summary>
+	/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+	/// otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>).
+	/// </summary>
+	SpecialMask = 0xfff00000,
+
+	/// <summary>
+	/// The key code representing null or empty
+	/// </summary>
+	Null = '\0',
+
+	/// <summary>
+	/// Backspace key.
+	/// </summary>
+	Backspace = 8,
+
+	/// <summary>
+	/// The key code for the tab key (forwards tab key).
+	/// </summary>
+	Tab = 9,
+
+	/// <summary>
+	/// The key code for the return key.
+	/// </summary>
+	Enter = '\n',
+
+	/// <summary>
+	/// The key code for the clear key.
+	/// </summary>
+	Clear = 12,
+
+	/// <summary>
+	/// The key code for the Shift key.
+	/// </summary>
+	ShiftKey = 16,
+
+	/// <summary>
+	/// The key code for the Ctrl key.
+	/// </summary>
+	CtrlKey = 17,
+
+	/// <summary>
+	/// The key code for the Alt key.
+	/// </summary>
+	AltKey = 18,
+
+	/// <summary>
+	/// The key code for the CapsLock key.
+	/// </summary>
+	CapsLock = 20,
+
+	///// <summary>
+	///// The key code for the NumLock key.
+	///// </summary>
+	//NumLock = 144,
+
+	///// <summary>
+	///// The key code for the ScrollLock key.
+	///// </summary>
+	//ScrollLock = 145,
+
+	/// <summary>
+	/// The key code for the escape key.
+	/// </summary>
+	Esc = 27,
+
+	/// <summary>
+	/// The key code for the space bar key.
+	/// </summary>
+	Space = 32,
+
+	/// <summary>
+	/// Digit 0.
+	/// </summary>
+	D0 = 48,
+	/// <summary>
+	/// Digit 1.
+	/// </summary>
+	D1,
+	/// <summary>
+	/// Digit 2.
+	/// </summary>
+	D2,
+	/// <summary>
+	/// Digit 3.
+	/// </summary>
+	D3,
+	/// <summary>
+	/// Digit 4.
+	/// </summary>
+	D4,
+	/// <summary>
+	/// Digit 5.
+	/// </summary>
+	D5,
+	/// <summary>
+	/// Digit 6.
+	/// </summary>
+	D6,
+	/// <summary>
+	/// Digit 7.
+	/// </summary>
+	D7,
+	/// <summary>
+	/// Digit 8.
+	/// </summary>
+	D8,
+	/// <summary>
+	/// Digit 9.
+	/// </summary>
+	D9,
+
+	/// <summary>
+	/// The key code for the user pressing Shift-A
+	/// </summary>
+	A = 65,
+	/// <summary>
+	/// The key code for the user pressing Shift-B
+	/// </summary>
+	B,
+	/// <summary>
+	/// The key code for the user pressing Shift-C
+	/// </summary>
+	C,
+	/// <summary>
+	/// The key code for the user pressing Shift-D
+	/// </summary>
+	D,
+	/// <summary>
+	/// The key code for the user pressing Shift-E
+	/// </summary>
+	E,
+	/// <summary>
+	/// The key code for the user pressing Shift-F
+	/// </summary>
+	F,
+	/// <summary>
+	/// The key code for the user pressing Shift-G
+	/// </summary>
+	G,
+	/// <summary>
+	/// The key code for the user pressing Shift-H
+	/// </summary>
+	H,
+	/// <summary>
+	/// The key code for the user pressing Shift-I
+	/// </summary>
+	I,
+	/// <summary>
+	/// The key code for the user pressing Shift-J
+	/// </summary>
+	J,
+	/// <summary>
+	/// The key code for the user pressing Shift-K
+	/// </summary>
+	K,
+	/// <summary>
+	/// The key code for the user pressing Shift-L
+	/// </summary>
+	L,
+	/// <summary>
+	/// The key code for the user pressing Shift-M
+	/// </summary>
+	M,
+	/// <summary>
+	/// The key code for the user pressing Shift-N
+	/// </summary>
+	N,
+	/// <summary>
+	/// The key code for the user pressing Shift-O
+	/// </summary>
+	O,
+	/// <summary>
+	/// The key code for the user pressing Shift-P
+	/// </summary>
+	P,
+	/// <summary>
+	/// The key code for the user pressing Shift-Q
+	/// </summary>
+	Q,
+	/// <summary>
+	/// The key code for the user pressing Shift-R
+	/// </summary>
+	R,
+	/// <summary>
+	/// The key code for the user pressing Shift-S
+	/// </summary>
+	S,
+	/// <summary>
+	/// The key code for the user pressing Shift-T
+	/// </summary>
+	T,
+	/// <summary>
+	/// The key code for the user pressing Shift-U
+	/// </summary>
+	U,
+	/// <summary>
+	/// The key code for the user pressing Shift-V
+	/// </summary>
+	V,
+	/// <summary>
+	/// The key code for the user pressing Shift-W
+	/// </summary>
+	W,
+	/// <summary>
+	/// The key code for the user pressing Shift-X
+	/// </summary>
+	X,
+	/// <summary>
+	/// The key code for the user pressing Shift-Y
+	/// </summary>
+	Y,
+	/// <summary>
+	/// The key code for the user pressing Shift-Z
+	/// </summary>
+	Z,
+	/// <summary>
+	/// The key code for the user pressing A
+	/// </summary>
+	Delete = 127,
+
+	/// <summary>
+	/// When this value is set, the Key encodes the sequence Shift-KeyValue.
+	/// </summary>
+	ShiftMask = 0x10000000,
+
+	/// <summary>
+	///   When this value is set, the Key encodes the sequence Alt-KeyValue.
+	///   And the actual value must be extracted by removing the AltMask.
+	/// </summary>
+	AltMask = 0x80000000,
+
+	/// <summary>
+	///   When this value is set, the Key encodes the sequence Ctrl-KeyValue.
+	///   And the actual value must be extracted by removing the CtrlMask.
+	/// </summary>
+	CtrlMask = 0x40000000,
+
+	/// <summary>
+	/// Cursor up key
+	/// </summary>
+	CursorUp = 0x100000,
+	/// <summary>
+	/// Cursor down key.
+	/// </summary>
+	CursorDown,
+	/// <summary>
+	/// Cursor left key.
+	/// </summary>
+	CursorLeft,
+	/// <summary>
+	/// Cursor right key.
+	/// </summary>
+	CursorRight,
+	/// <summary>
+	/// Page Up key.
+	/// </summary>
+	PageUp,
+	/// <summary>
+	/// Page Down key.
+	/// </summary>
+	PageDown,
+	/// <summary>
+	/// Home key.
+	/// </summary>
+	Home,
+	/// <summary>
+	/// End key.
+	/// </summary>
+	End,
+
+	/// <summary>
+	/// Insert character key.
+	/// </summary>
+	InsertChar,
+
+	/// <summary>
+	/// Delete character key.
+	/// </summary>
+	DeleteChar,
+
+	/// <summary>
+	/// Print screen character key.
+	/// </summary>
+	PrintScreen,
+
+	/// <summary>
+	/// F1 key.
+	/// </summary>
+	F1,
+	/// <summary>
+	/// F2 key.
+	/// </summary>
+	F2,
+	/// <summary>
+	/// F3 key.
+	/// </summary>
+	F3,
+	/// <summary>
+	/// F4 key.
+	/// </summary>
+	F4,
+	/// <summary>
+	/// F5 key.
+	/// </summary>
+	F5,
+	/// <summary>
+	/// F6 key.
+	/// </summary>
+	F6,
+	/// <summary>
+	/// F7 key.
+	/// </summary>
+	F7,
+	/// <summary>
+	/// F8 key.
+	/// </summary>
+	F8,
+	/// <summary>
+	/// F9 key.
+	/// </summary>
+	F9,
+	/// <summary>
+	/// F10 key.
+	/// </summary>
+	F10,
+	/// <summary>
+	/// F11 key.
+	/// </summary>
+	F11,
+	/// <summary>
+	/// F12 key.
+	/// </summary>
+	F12,
+	/// <summary>
+	/// F13 key.
+	/// </summary>
+	F13,
+	/// <summary>
+	/// F14 key.
+	/// </summary>
+	F14,
+	/// <summary>
+	/// F15 key.
+	/// </summary>
+	F15,
+	/// <summary>
+	/// F16 key.
+	/// </summary>
+	F16,
+	/// <summary>
+	/// F17 key.
+	/// </summary>
+	F17,
+	/// <summary>
+	/// F18 key.
+	/// </summary>
+	F18,
+	/// <summary>
+	/// F19 key.
+	/// </summary>
+	F19,
+	/// <summary>
+	/// F20 key.
+	/// </summary>
+	F20,
+	/// <summary>
+	/// F21 key.
+	/// </summary>
+	F21,
+	/// <summary>
+	/// F22 key.
+	/// </summary>
+	F22,
+	/// <summary>
+	/// F23 key.
+	/// </summary>
+	F23,
+	/// <summary>
+	/// F24 key.
+	/// </summary>
+	F24,
+
+	/// <summary>
+	/// A key with an unknown mapping was raised.
+	/// </summary>
+	Unknown
+}
+

@@ -17,7 +17,7 @@ namespace ReactiveExample {
 	// We mark the view model with the [DataContract] attributes and this
 	// allows you to save the view model class to the disk, and then to read
 	// the view model from the disk, making your app state persistent.
-	// See also: https://www.reactiveui.net/docs/handbook/data-persistence/
+	// See also: https://www.reactiveui.net../docs/handbook/data-persistence/
 	//
 	[DataContract]
 	public class LoginViewModel : ReactiveObject {

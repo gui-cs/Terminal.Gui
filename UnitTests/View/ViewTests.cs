@@ -125,11 +125,9 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var r = new View ();
 
-			Assert.False (r.ProcessKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessHotKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessColdKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyDown (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyUp (new KeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyDown (new Key () { KeyCode = KeyCode.Unknown }));
+			//Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyUp (new Key () { KeyCode = KeyCode.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -498,10 +496,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (view._addingView);
 			view._addingView = true;
 			Assert.True (view._addingView);
-			view.ViewToScreen (0, 0, out int rcol, out int rrow);
+			view.BoundsToScreen (0, 0, out int rcol, out int rrow);
 			Assert.Equal (1, rcol);
 			Assert.Equal (1, rrow);
-			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
+			Assert.Equal (rect, view.BoundsToScreen (view.Bounds));
 			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
 			Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
 
@@ -546,7 +544,7 @@ namespace Terminal.Gui.ViewTests {
 			view.Y = Pos.Center () - 13;
 			view.SetRelativeLayout (top.Bounds);
 			top.LayoutSubviews (); // BUGBUG: v2 - ??
-			view.ViewToScreen (0, 0, out rcol, out rrow);
+			view.BoundsToScreen (0, 0, out rcol, out rrow);
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
 			
@@ -974,19 +972,19 @@ cccccccccccccccccccc", output);
 			public bool IsKeyUp { get; set; }
 			public override string Text { get; set; }
 
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (Key keyEvent)
 			{
 				IsKeyDown = true;
 				return true;
 			}
 
-			public override bool ProcessKey (KeyEvent keyEvent)
+			public override bool OnProcessKeyDown (Key keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
 			}
 
-			public override bool OnKeyUp (KeyEvent keyEvent)
+			public override bool OnKeyUp (Key keyEvent)
 			{
 				IsKeyUp = true;
 				return true;

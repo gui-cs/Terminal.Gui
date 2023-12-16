@@ -38,42 +38,42 @@ namespace Terminal.Gui.ConfigurationTests {
 		public void Apply_ShouldApplyProperties ()
 		{
 			// arrange
-			Assert.Equal (Key.Q | Key.CtrlMask, (Key)ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
-			Assert.Equal (Key.PageDown | Key.CtrlMask, (Key)ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue);
-			Assert.Equal (Key.PageUp | Key.CtrlMask, (Key)ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue);
+			Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, ((Key)ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+			Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, ((Key)ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue).KeyCode);
+			Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, ((Key)ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode);
 			Assert.False ((bool)ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue);
 
 			// act
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = Key.F;
-			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = Key.B;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.Q);
+			ConfigurationManager.Settings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
+			ConfigurationManager.Settings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
 			ConfigurationManager.Settings ["Application.IsMouseDisabled"].PropertyValue = true;
 
 			ConfigurationManager.Settings.Apply ();
 
 			// assert
-			Assert.Equal (Key.Q, Application.QuitKey);
-			Assert.Equal (Key.F, Application.AlternateForwardKey);
-			Assert.Equal (Key.B, Application.AlternateBackwardKey);
+			Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
+			Assert.Equal (KeyCode.F, Application.AlternateForwardKey.KeyCode);
+			Assert.Equal (KeyCode.B, Application.AlternateBackwardKey.KeyCode);
 			Assert.True (Application.IsMouseDisabled);
 		}
 
 		[Fact, AutoInitShutdown]
 		public void CopyUpdatedProperitesFrom_ShouldCopyChangedPropertiesOnly ()
 		{
-			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = Key.End;
+			ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue = new Key (KeyCode.End); ;
 
 			var updatedSettings = new SettingsScope ();
 
 			///Don't set Quitkey
-			updatedSettings["Application.AlternateForwardKey"].PropertyValue = Key.F;
-			updatedSettings["Application.AlternateBackwardKey"].PropertyValue = Key.B;
-			updatedSettings["Application.IsMouseDisabled"].PropertyValue = true;
+			updatedSettings ["Application.AlternateForwardKey"].PropertyValue = new Key (KeyCode.F);
+			updatedSettings ["Application.AlternateBackwardKey"].PropertyValue = new Key (KeyCode.B);
+			updatedSettings ["Application.IsMouseDisabled"].PropertyValue = true;
 
 			ConfigurationManager.Settings.Update (updatedSettings);
-			Assert.Equal (Key.End, ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue);
-			Assert.Equal (Key.F, updatedSettings ["Application.AlternateForwardKey"].PropertyValue);
-			Assert.Equal (Key.B, updatedSettings ["Application.AlternateBackwardKey"].PropertyValue);
+			Assert.Equal (KeyCode.End, ((Key)ConfigurationManager.Settings ["Application.QuitKey"].PropertyValue).KeyCode);
+			Assert.Equal (KeyCode.F,  ((Key)updatedSettings ["Application.AlternateForwardKey"].PropertyValue).KeyCode);
+			Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.AlternateBackwardKey"].PropertyValue).KeyCode);
 			Assert.True ((bool)updatedSettings ["Application.IsMouseDisabled"].PropertyValue);
 		}
 	}

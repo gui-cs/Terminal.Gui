@@ -63,7 +63,7 @@ namespace Terminal.Gui {
 	}
 
 	/// <summary>
-	/// Defines the event arguments for <see cref="View.SetFocus(View)"/>
+	/// Defines the event arguments for <see cref="View.SetFocus()"/>
 	/// </summary>
 	public class FocusEventArgs : EventArgs {
 		/// <summary>

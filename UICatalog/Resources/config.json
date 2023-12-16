@@ -3,6 +3,7 @@
   "Application.QuitKey": {
     "Key": "Esc"
   },
+  "ConfigurationManager.ThrowOnJsonErrors": true,
   "FileDialog.MaxSearchResults": 10000,
   "FileDialogStyle.DefaultUseColors": false,
   "FileDialogStyle.DefaultUseUnicodeCharacters": false,

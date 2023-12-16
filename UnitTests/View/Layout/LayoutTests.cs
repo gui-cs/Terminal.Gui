@@ -357,9 +357,9 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			Application.Top.Add (win);
 
-			// Text is empty so height=0
+			// Text is empty but height=1 by default, see Label view
 			Assert.False (label.AutoSize);
-			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 			label.Text = "New text\nNew line";
 			Application.Top.LayoutSubviews ();
@@ -385,10 +385,11 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.True (label.IsAdded);
 
-			// Text is empty so height=0
+			// Text is empty but height=1 by default, see Label view
 			Assert.True (label.AutoSize);
 			// BUGBUG: LayoutSubviews has not been called, so this test is not really valid (pos/dim are indeterminate, not 0)
-			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			// Not really a bug because View call OnResizeNeeded method on the SetInitialProperties method
+			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 			label.Text = "First line\nSecond line";
 			Application.Top.LayoutSubviews ();
@@ -420,9 +421,9 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			Application.Top.Add (win);
 
-			// Text is empty so height=0
+			// Text is empty but height=1 by default, see Label view
 			Assert.True (label.AutoSize);
-			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 			var rs = Application.Begin (Application.Top);
 

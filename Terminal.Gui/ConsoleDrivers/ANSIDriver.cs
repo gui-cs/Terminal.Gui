@@ -26,6 +26,7 @@ using Windows.Win32;
 using static Terminal.Gui.EscSeqUtils;
 using Windows.Win32.System.Console;
 using Microsoft.Win32.SafeHandles;
+using Terminal.Gui.ConsoleDrivers;
 using static Terminal.Gui.WindowsANSIConsole;
 
 namespace Terminal.Gui;
@@ -606,17 +607,9 @@ internal class ANSIDriver : ConsoleDriver {
 		UpdateScreen ();
 		UpdateCursor ();
 	}
-
-
-	// This is a bit hacky, but it enables users to hold down a key and 
-	// OnKeyDown, OnKeyPressed, OnKeyPressed, OnKeyUp
-	// It might be worth making OnKeyDown and OnKeyUp virtual so this can be tracked from those calls in case
-	// somoene calls them externally??
-	//
-	// It also is broken when modifiers keys are down too
-	//
-	//Key _keyDown = (Key)0xffffffff;
-
+	
+	bool _altDown = false;
+	
 	internal void ProcessInput (INPUT_RECORD inputEvent)
 	{
 		switch (inputEvent.EventType) {
@@ -625,86 +618,40 @@ internal class ANSIDriver : ConsoleDriver {
 			if (fromPacketKey) {
 				inputEvent.Event.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.Event.KeyEvent);
 			}
-			var map = MapKey (ToConsoleKeyInfoEx (inputEvent.Event.KeyEvent));
+			var keyInfo = ToConsoleKeyInfoEx (inputEvent.Event.KeyEvent);
+			Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString ()}");
 
-			if (map == (Key)0xffffffff) {
-				KeyEvent key = new KeyEvent ();
+			var map = MapKey (keyInfo);
 
-				// Shift = VK_SHIFT = 0x10
-				// Ctrl = VK_CONTROL = 0x11
-				// Alt = VK_MENU = 0x12
-
-				if (((CONTROL_KEY_STATE)inputEvent.Event.KeyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.CAPSLOCK_ON)) {
-					inputEvent.Event.KeyEvent.dwControlKeyState &= ~(uint)CONTROL_KEY_STATE.CAPSLOCK_ON;
-				}
-
-				if (((CONTROL_KEY_STATE)inputEvent.Event.KeyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.SCROLLLOCK_ON)) {
-					inputEvent.Event.KeyEvent.dwControlKeyState &= ~(uint)CONTROL_KEY_STATE.SCROLLLOCK_ON;
-				}
-
-				if (((CONTROL_KEY_STATE)inputEvent.Event.KeyEvent.dwControlKeyState).HasFlag (CONTROL_KEY_STATE.NUMLOCK_ON)) {
-					inputEvent.Event.KeyEvent.dwControlKeyState &= ~(uint)CONTROL_KEY_STATE.NUMLOCK_ON;
-				}
-
-				switch (inputEvent.Event.KeyEvent.dwControlKeyState) {
-				case (uint)CONTROL_KEY_STATE.RIGHT_ALT_PRESSED:
-				case (uint)CONTROL_KEY_STATE.RIGHT_ALT_PRESSED |
-					(uint)CONTROL_KEY_STATE.LEFT_CTRL_PRESSED |
-					(uint)CONTROL_KEY_STATE.ENHANCED_KEY:
-				case (uint)CONTROL_KEY_STATE.ENHANCED_KEY:
-					key = new KeyEvent (Key.CtrlMask | Key.AltMask, _keyModifiers);
-					break;
-				case (uint)CONTROL_KEY_STATE.LEFT_ALT_PRESSED:
-					key = new KeyEvent (Key.AltMask, _keyModifiers);
-					break;
-				case (uint)CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED:
-				case (uint)CONTROL_KEY_STATE.LEFT_CTRL_PRESSED:
-					key = new KeyEvent (Key.CtrlMask, _keyModifiers);
-					break;
-				case (uint)CONTROL_KEY_STATE.SHIFT_PRESSED:
-					key = new KeyEvent (Key.ShiftMask, _keyModifiers);
-					break;
-				case (uint)CONTROL_KEY_STATE.NUMLOCK_ON:
-					break;
-				case (uint)CONTROL_KEY_STATE.SCROLLLOCK_ON:
-					break;
-				case (uint)CONTROL_KEY_STATE.CAPSLOCK_ON:
-					break;
-				default:
-					key = inputEvent.Event.KeyEvent.wVirtualKeyCode switch {
-						0x10 => new KeyEvent (Key.ShiftMask, _keyModifiers),
-						0x11 => new KeyEvent (Key.CtrlMask, _keyModifiers),
-						0x12 => new KeyEvent (Key.AltMask, _keyModifiers),
-						_ => new KeyEvent (Key.Unknown, _keyModifiers)
-					};
-					break;
-				}
-
-				if (inputEvent.Event.KeyEvent.bKeyDown) {
-					//_keyDown = key.Key;
-					OnKeyDown (new KeyEventEventArgs (key));
-				} else {
-					//_keyDown = (Key)0xffffffff;
-					OnKeyUp (new KeyEventEventArgs (key));
-				}
+			if (inputEvent.Event.KeyEvent.bKeyDown) {
+				_altDown = keyInfo.ConsoleKeyInfo.Modifiers == ConsoleModifiers.Alt;
+				// Avoid sending repeat keydowns
+				OnKeyDown (new Key (map));
 			} else {
-				if (inputEvent.Event.KeyEvent.bKeyDown) {
-					// May occurs using SendKeys
-					_keyModifiers ??= new KeyModifiers ();
+				var keyPressedEventArgs = new Key (map);
 
-					//if (_keyDown == (Key)0xffffffff) {
-					// Avoid sending repeat keydowns
-					//	_keyDown = map;
-					OnKeyDown (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
-					//}
-					OnKeyPressed (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+				// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
+				// However, if while the 'Alt' key is down, if another key is pressed and
+				// released, there will be a keypressed event for that and the
+				// keypressed event for just `Alt` will be suppressed. 
+				// This allows MenuBar to have `Alt` as a keybinding
+				if (map != KeyCode.AltMask) {
+					if (keyInfo.ConsoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+						if (_altDown) {
+							_altDown = false;
+							OnKeyUp (new Key (map));
+						}
+
+					}
+					_altDown = false;
+					// KeyUp of an Alt-key press. 
+					OnKeyUp (keyPressedEventArgs);
 				} else {
-					//_keyDown = (Key)0xffffffff;
-					OnKeyUp (new KeyEventEventArgs (new KeyEvent (map, _keyModifiers)));
+					OnKeyUp (keyPressedEventArgs);
+					if (_altDown) {
+						_altDown = false;
+					}
 				}
-			}
-			if (!inputEvent.Event.KeyEvent.bKeyDown && inputEvent.Event.KeyEvent.dwControlKeyState == 0) {
-				_keyModifiers = null;
 			}
 			break;
 
@@ -995,8 +942,6 @@ internal class ANSIDriver : ConsoleDriver {
 		return mouseFlag;
 	}
 
-	KeyModifiers _keyModifiers;
-
 	public ConsoleKeyInfoEx ToConsoleKeyInfoEx (KEY_EVENT_RECORD keyEvent)
 	{
 		var state = (CONTROL_KEY_STATE)keyEvent.dwControlKeyState;
@@ -1007,26 +952,6 @@ internal class ANSIDriver : ConsoleDriver {
 		var capsLock = (state & (CONTROL_KEY_STATE.CAPSLOCK_ON)) != 0;
 		var numLock = (state & (CONTROL_KEY_STATE.NUMLOCK_ON)) != 0;
 		var scrollLock = (state & (CONTROL_KEY_STATE.SCROLLLOCK_ON)) != 0;
-
-		_keyModifiers ??= new KeyModifiers ();
-		if (shift) {
-			_keyModifiers.Shift = true;
-		}
-		if (alt) {
-			_keyModifiers.Alt = true;
-		}
-		if (control) {
-			_keyModifiers.Ctrl = true;
-		}
-		if (capsLock) {
-			_keyModifiers.Capslock = true;
-		}
-		if (numLock) {
-			_keyModifiers.Numlock = true;
-		}
-		if (scrollLock) {
-			_keyModifiers.Scrolllock = true;
-		}
 
 		var consoleKeyInfo = new ConsoleKeyInfo (keyEvent.uChar.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode, shift, alt, control);
 
@@ -1039,91 +964,88 @@ internal class ANSIDriver : ConsoleDriver {
 			return keyEvent;
 		}
 
-		var mod = new ConsoleModifiers ();
 		var state = (CONTROL_KEY_STATE)keyEvent.dwControlKeyState;
-		if (state.HasFlag (CONTROL_KEY_STATE.SHIFT_PRESSED)) {
+		var mod = new ConsoleModifiers ();
+		if ((state & CONTROL_KEY_STATE.SHIFT_PRESSED) != 0) {
 			mod |= ConsoleModifiers.Shift;
 		}
-		if (state.HasFlag (CONTROL_KEY_STATE.RIGHT_ALT_PRESSED) ||
-		state.HasFlag (CONTROL_KEY_STATE.LEFT_ALT_PRESSED)) {
+		if ((state & (CONTROL_KEY_STATE.LEFT_ALT_PRESSED | CONTROL_KEY_STATE.RIGHT_ALT_PRESSED)) != 0) {
 			mod |= ConsoleModifiers.Alt;
 		}
-		if (state.HasFlag (CONTROL_KEY_STATE.LEFT_CTRL_PRESSED) ||
-		state.HasFlag (CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED)) {
+		if ((state & (CONTROL_KEY_STATE.LEFT_CTRL_PRESSED | CONTROL_KEY_STATE.RIGHT_CTRL_PRESSED)) != 0) {
 			mod |= ConsoleModifiers.Control;
 		}
-		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (keyEvent.uChar.UnicodeChar, mod, out uint virtualKey, out uint scanCode);
+		var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (keyEvent.uChar.UnicodeChar, mod, out uint scanCode);
 
-		var ret = new KEY_EVENT_RECORD {
+		return new KEY_EVENT_RECORD {
+			uChar = keyEvent.uChar,
 			bKeyDown = keyEvent.bKeyDown,
 			dwControlKeyState = keyEvent.dwControlKeyState,
 			wRepeatCount = keyEvent.wRepeatCount,
-			wVirtualKeyCode = (ushort)virtualKey,
+			wVirtualKeyCode = (ushort)cKeyInfo.Key,
 			wVirtualScanCode = (ushort)scanCode
 		};
-		ret.uChar.UnicodeChar = (char)keyChar;
-		return ret;
 	}
 
-	public Key MapKey (WindowsANSIConsole.ConsoleKeyInfoEx keyInfoEx)
+	KeyCode MapKey (ConsoleKeyInfoEx keyInfoEx)
 	{
 		var keyInfo = keyInfoEx.ConsoleKeyInfo;
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return MapKeyModifiers (keyInfo, Key.Esc);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Esc);
 		case ConsoleKey.Tab:
-			return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Tab);
 		case ConsoleKey.Clear:
-			return MapKeyModifiers (keyInfo, Key.Clear);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Clear);
 		case ConsoleKey.Home:
-			return MapKeyModifiers (keyInfo, Key.Home);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Home);
 		case ConsoleKey.End:
-			return MapKeyModifiers (keyInfo, Key.End);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.End);
 		case ConsoleKey.LeftArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorLeft);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorRight);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorRight);
 		case ConsoleKey.UpArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorUp);
 		case ConsoleKey.DownArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorDown);
 		case ConsoleKey.PageUp:
-			return MapKeyModifiers (keyInfo, Key.PageUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PageUp);
 		case ConsoleKey.PageDown:
-			return MapKeyModifiers (keyInfo, Key.PageDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PageDown);
 		case ConsoleKey.Enter:
-			return MapKeyModifiers (keyInfo, Key.Enter);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Enter);
 		case ConsoleKey.Spacebar:
-			return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? KeyCode.Space : (KeyCode)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return MapKeyModifiers (keyInfo, Key.Backspace);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Backspace);
 		case ConsoleKey.Delete:
-			return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.DeleteChar);
 		case ConsoleKey.Insert:
-			return MapKeyModifiers (keyInfo, Key.InsertChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.InsertChar);
 		case ConsoleKey.PrintScreen:
-			return MapKeyModifiers (keyInfo, Key.PrintScreen);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PrintScreen);
 
-		case ConsoleKey.NumPad0:
-			return keyInfoEx.NumLock ? Key.D0 : Key.InsertChar;
-		case ConsoleKey.NumPad1:
-			return keyInfoEx.NumLock ? Key.D1 : Key.End;
-		case ConsoleKey.NumPad2:
-			return keyInfoEx.NumLock ? Key.D2 : Key.CursorDown;
-		case ConsoleKey.NumPad3:
-			return keyInfoEx.NumLock ? Key.D3 : Key.PageDown;
-		case ConsoleKey.NumPad4:
-			return keyInfoEx.NumLock ? Key.D4 : Key.CursorLeft;
-		case ConsoleKey.NumPad5:
-			return keyInfoEx.NumLock ? Key.D5 : (Key)((uint)keyInfo.KeyChar);
-		case ConsoleKey.NumPad6:
-			return keyInfoEx.NumLock ? Key.D6 : Key.CursorRight;
-		case ConsoleKey.NumPad7:
-			return keyInfoEx.NumLock ? Key.D7 : Key.Home;
-		case ConsoleKey.NumPad8:
-			return keyInfoEx.NumLock ? Key.D8 : Key.CursorUp;
-		case ConsoleKey.NumPad9:
-			return keyInfoEx.NumLock ? Key.D9 : Key.PageUp;
+		//case ConsoleKey.NumPad0:
+		//	return keyInfoEx.NumLock ? Key.D0 : Key.InsertChar;
+		//case ConsoleKey.NumPad1:
+		//	return keyInfoEx.NumLock ? Key.D1 : Key.End;
+		//case ConsoleKey.NumPad2:
+		//	return keyInfoEx.NumLock ? Key.D2 : Key.CursorDown;
+		//case ConsoleKey.NumPad3:
+		//	return keyInfoEx.NumLock ? Key.D3 : Key.PageDown;
+		//case ConsoleKey.NumPad4:
+		//	return keyInfoEx.NumLock ? Key.D4 : Key.CursorLeft;
+		//case ConsoleKey.NumPad5:
+		//	return keyInfoEx.NumLock ? Key.D5 : (Key)((uint)keyInfo.KeyChar);
+		//case ConsoleKey.NumPad6:
+		//	return keyInfoEx.NumLock ? Key.D6 : Key.CursorRight;
+		//case ConsoleKey.NumPad7:
+		//	return keyInfoEx.NumLock ? Key.D7 : Key.Home;
+		//case ConsoleKey.NumPad8:
+		//	return keyInfoEx.NumLock ? Key.D8 : Key.CursorUp;
+		//case ConsoleKey.NumPad9:
+		//	return keyInfoEx.NumLock ? Key.D9 : Key.PageUp;
 
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
@@ -1134,87 +1056,102 @@ internal class ANSIDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
+			var ret = ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)keyInfo.KeyChar));
+			if (ret.HasFlag (KeyCode.ShiftMask)) {
+				ret &= ~KeyCode.ShiftMask;
+			}
+			return ret;
+
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
 		case ConsoleKey.OemMinus:
-			if (keyInfo.KeyChar == 0) {
-				return Key.Unknown;
-			}
-
-			return (Key)((uint)keyInfo.KeyChar);
+			return (KeyCode)((uint)keyInfo.KeyChar);
 		}
 
 		var key = keyInfo.Key;
-		//var alphaBase = ((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock)) ? 'A' : 'a';
 
 		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+				return (KeyCode)(((uint)KeyCode.CtrlMask) | ((uint)KeyCode.A + delta));
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
+				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.A + delta));
 			}
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.A + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.A + delta));
 				}
 			}
-			//return (Key)((uint)alphaBase + delta);
-			return (Key)((uint)keyInfo.KeyChar);
+
+			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
+				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
+					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
+				}
+			}
+
+			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
+				return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
+			}
+
+			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) != 0) {
+				if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) == (KeyCode)keyInfo.Key) {
+					return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
+				}
+				return (KeyCode)((uint)keyInfo.KeyChar);
+			}
+
+			return (KeyCode)(uint)keyInfo.KeyChar;
+
 		}
+
 		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
 			var delta = key - ConsoleKey.D0;
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
+				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.D0 + delta));
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+				return (KeyCode)(((uint)KeyCode.CtrlMask) | ((uint)KeyCode.D0 + delta));
 			}
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.D0 + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)KeyCode.D0 + delta)) {
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.D0 + delta));
 				}
 			}
-			return (Key)((uint)keyInfo.KeyChar);
+			return (KeyCode)((uint)keyInfo.KeyChar);
 		}
+
 		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 			var delta = key - ConsoleKey.F1;
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.F1 + delta));
 			}
 
-			return (Key)((uint)Key.F1 + delta);
-		}
-		if (keyInfo.KeyChar != 0) {
-			return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			return (KeyCode)((uint)KeyCode.F1 + delta);
 		}
 
-		return (Key)(0xffffffff);
+		if (key == (ConsoleKey)16) { // Shift
+			return KeyCode.Null | KeyCode.ShiftMask;
+		}
+
+		if (key == (ConsoleKey)17) { // Ctrl
+			return KeyCode.Null | KeyCode.CtrlMask;
+		}
+
+		if (key == (ConsoleKey)18) { // Alt
+			return KeyCode.Null | KeyCode.AltMask;
+		}
+
+		return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)keyInfo.KeyChar));
 	}
 
-	private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
-	{
-		Key keyMod = new Key ();
-		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
-			keyMod = Key.ShiftMask;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
-			keyMod |= Key.CtrlMask;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
-			keyMod |= Key.AltMask;
-		}
-
-		return keyMod != Key.Null ? keyMod | key : key;
-	}
 	CursorVisibility _cachedCursorVisibility;
 
 	public override void UpdateCursor ()

@@ -6,7 +6,6 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 using System.Text;
-using Terminal.Gui;
 
 namespace Terminal.Gui.ViewsTests {
 	public class WindowTests {
@@ -108,9 +107,9 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null),
-				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.C, "~^C~ Copy", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null),
 			});
 
 			var fv = new FrameView ("Frame View") {
@@ -207,7 +206,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);
 
-			var exception = Record.Exception (() => win.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			var exception = Record.Exception (() => win.NewKeyDownEvent (new (KeyCode.AltMask)));
 			Assert.Null (exception);
 		}
 	}

@@ -30,8 +30,8 @@ namespace UICatalog.Scenarios {
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} Выход", () => Application.RequestStop()),
-				new StatusItem (Key.Unknown, "~F2~ Создать", null),
-				new StatusItem(Key.Unknown, "~F3~ Со_хранить", null),
+				new StatusItem (KeyCode.Unknown, "~F2~ Создать", null),
+				new StatusItem(KeyCode.Unknown, "~F3~ Со_хранить", null),
 			});
 			Application.Top.Add (statusBar);
 
