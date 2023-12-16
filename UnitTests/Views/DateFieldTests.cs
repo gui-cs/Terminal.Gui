@@ -89,7 +89,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (df.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (10, df.CursorPosition);
 			// Non-numerics are ignored
-			Assert.True (df.NewKeyDownEvent (new (KeyCode.A)));
+			Assert.False (df.NewKeyDownEvent (new (KeyCode.A)));
 			df.ReadOnly = true;
 			df.CursorPosition = 1;
 			Assert.True (df.NewKeyDownEvent (new (KeyCode.D1)));

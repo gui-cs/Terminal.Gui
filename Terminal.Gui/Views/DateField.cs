@@ -124,7 +124,7 @@ public class DateField : TextField {
 			}
 			return true;
 		}
-		return true;
+		return false;
 	}
 
 	void DateField_Changed (object sender, TextChangedEventArgs e)
