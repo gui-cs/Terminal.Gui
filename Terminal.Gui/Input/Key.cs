@@ -95,7 +95,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.
 	/// </remarks>
 	[JsonInclude] [JsonConverter (typeof (KeyCodeJsonConverter))]
-	public KeyCode KeyCode { get; set; }
+	public KeyCode KeyCode { get; init; }
 
 	/// <summary>
 	/// Enables passing the key binding scope with the event. Default is <see cref="KeyBindingScope.Focused"/>.
@@ -195,9 +195,10 @@ public class Key : EventArgs, IEquatable<Key> {
 	}
 
 	/// <summary>
-	/// Indicates whether the <see cref="Key"/> is valid or not. 
+	/// Indicates whether the <see cref="Key"/> is valid or not. Invalid keys are <see cref="Key.Empty"/>,
+	/// and keys with only shift modifiers.
 	/// </summary>
-	public bool IsValid => KeyCode is not (KeyCode.Null or KeyCode.Unknown);
+	public bool IsValid => this != Empty && (NoAlt.NoShift.NoCtrl != Empty);
 
 	/// <summary>
 	/// Helper for specifying a shifted <see cref="Key"/>.

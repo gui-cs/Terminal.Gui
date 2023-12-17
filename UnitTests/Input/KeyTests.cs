@@ -27,6 +27,18 @@ public class KeyTests {
 		Assert.Equal (key, eventArgs.KeyCode);
 	}
 
+	// IsValid
+	[Theory]
+	[InlineData (KeyCode.A, true)]
+	[InlineData (KeyCode.B, true)]
+	[InlineData (KeyCode.F1 | KeyCode.ShiftMask, true)]
+	[InlineData (KeyCode.Null, false)]
+	[InlineData (KeyCode.ShiftMask, false)]
+	[InlineData (KeyCode.CtrlMask, false)]
+	[InlineData (KeyCode.AltMask, false)]
+	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask, false)]
+	public void IsValid (Key key, bool expected) => Assert.Equal (expected, key.IsValid);
+
 	[Fact]
 	public void HandledProperty_ShouldBeFalseByDefault ()
 	{
