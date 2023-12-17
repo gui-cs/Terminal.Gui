@@ -51,7 +51,7 @@ jobs:
       if: github.ref_name == 'v2_develop'
       uses: peter-evans/repository-dispatch@v2
       with:
-        token: ${{ secrets.PAT }}
+        token: ${{ secrets.V2DOCS_TOKEN }}
         repository: gui-cs/Terminal.GuiV2Docs
         event-type: v2_develop_push
         client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
