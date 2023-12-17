@@ -1,4 +1,4 @@
-# Keyboard Event Processing
+# Keyboard Events
 
 ## Tenets for Terminal.Gui Key Bindings (Unless you know better ones...)
 
