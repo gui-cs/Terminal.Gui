@@ -17,7 +17,7 @@ public class ShortcutHelper {
 	public virtual KeyCode Shortcut {
 		get => shortcut;
 		set {
-			if (shortcut != value && (PostShortcutValidation (value) || value is KeyCode.Null or KeyCode.Unknown)) {
+			if (shortcut != value && (PostShortcutValidation (value) || value is KeyCode.Null)) {
 				shortcut = value;
 			}
 		}
@@ -142,7 +142,7 @@ public class ShortcutHelper {
 		GetKeyToString (key, out KeyCode knm);
 
 		if (CheckKeysFlagRange (key, KeyCode.F1, KeyCode.F12) ||
-			((key & (KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask)) != 0 && knm != KeyCode.Null && knm != KeyCode.Unknown)) {
+			((key & (KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask)) != 0 && knm != KeyCode.Null)) {
 			return true;
 		}
 		Debug.WriteLine ($"WARNING: {Key.ToString (key)} is not a valid shortcut key.");

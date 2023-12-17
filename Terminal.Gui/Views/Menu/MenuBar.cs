@@ -162,7 +162,7 @@ public class MenuBarItem : MenuItem {
 				menuBar.KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
 				menuBar.KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 			}
-			if (menuItem.Shortcut != KeyCode.Unknown && menuItem.Shortcut != KeyCode.Null) {
+			if (menuItem.Shortcut != KeyCode.Null) {
 				menuBar.KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			SubMenu (menuItem)?.AddKeyBindings (menuBar);
@@ -323,7 +323,7 @@ public class MenuBar : View {
 					KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value, Command.ToggleExpandCollapse);
 					KeyBindings.Add ((KeyCode)menuBarItem.HotKey.Value | KeyCode.AltMask, KeyBindingScope.HotKey, Command.ToggleExpandCollapse);
 				}
-				if (menuBarItem.Shortcut != KeyCode.Unknown && menuBarItem.Shortcut != KeyCode.Null) {
+				if (menuBarItem.Shortcut != KeyCode.Null) {
 					// Technically this will will never run because MenuBarItems don't have shortcuts
 					KeyBindings.Add (menuBarItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 				}

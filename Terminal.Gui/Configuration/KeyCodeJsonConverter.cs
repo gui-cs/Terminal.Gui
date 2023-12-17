@@ -4,18 +4,19 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
+
 class KeyCodeJsonConverter : JsonConverter<KeyCode> {
 	public override KeyCode Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		if (reader.TokenType == JsonTokenType.StartObject) {
-			KeyCode key = KeyCode.Unknown;
-			Dictionary<string, KeyCode> modifierDict = new Dictionary<string, KeyCode> (comparer: StringComparer.InvariantCultureIgnoreCase) {
-					{ "Shift", KeyCode.ShiftMask },
-					{ "Ctrl", KeyCode.CtrlMask },
-					{ "Alt", KeyCode.AltMask }
-				};
+			KeyCode key = KeyCode.Null;
+			var modifierDict = new Dictionary<string, KeyCode> (comparer: StringComparer.InvariantCultureIgnoreCase) {
+				{ "Shift", KeyCode.ShiftMask },
+				{ "Ctrl", KeyCode.CtrlMask },
+				{ "Alt", KeyCode.AltMask }
+			};
 
-			List<KeyCode> modifiers = new List<KeyCode> ();
+			var modifiers = new List<KeyCode> ();
 
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
@@ -38,7 +39,7 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
 								break;
 							}
 
-							if (key == KeyCode.Unknown || key == KeyCode.Null) {
+							if (key == KeyCode.Null) {
 								throw new JsonException ($"The value \"{reader.GetString ()}\" is not a valid Key.");
 							}
 
@@ -60,7 +61,7 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
 								if (reader.TokenType == JsonTokenType.EndArray) {
 									break;
 								}
-								var mod = reader.GetString ();
+								string mod = reader.GetString ();
 								try {
 									modifiers.Add (modifierDict [mod]);
 								} catch (KeyNotFoundException e) {
@@ -91,21 +92,20 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
 	{
 		writer.WriteStartObject ();
 
-		var keyName = (value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask).ToString ();
+		string keyName = (value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask).ToString ();
 		if (keyName != null) {
 			writer.WriteString ("Key", keyName);
 		} else {
 			writer.WriteNumber ("Key", (uint)(value & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask));
 		}
 
-		Dictionary<string, KeyCode> modifierDict = new Dictionary<string, KeyCode>
-		{
-				{ "Shift", KeyCode.ShiftMask },
-				{ "Ctrl", KeyCode.CtrlMask },
-				{ "Alt", KeyCode.AltMask }
-			    };
+		var modifierDict = new Dictionary<string, KeyCode> {
+			{ "Shift", KeyCode.ShiftMask },
+			{ "Ctrl", KeyCode.CtrlMask },
+			{ "Alt", KeyCode.AltMask }
+		};
 
-		List<string> modifiers = new List<string> ();
+		var modifiers = new List<string> ();
 		foreach (var pair in modifierDict) {
 			if ((value & pair.Value) == pair.Value) {
 				modifiers.Add (pair.Key);
@@ -115,7 +115,7 @@ class KeyCodeJsonConverter : JsonConverter<KeyCode> {
 		if (modifiers.Count > 0) {
 			writer.WritePropertyName ("Modifiers");
 			writer.WriteStartArray ();
-			foreach (var modifier in modifiers) {
+			foreach (string modifier in modifiers) {
 				writer.WriteStringValue (modifier);
 			}
 			writer.WriteEndArray ();
