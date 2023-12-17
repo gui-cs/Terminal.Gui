@@ -107,24 +107,23 @@ public class CheckBox : View {
 	public override Key HotKey {
 		get => base.HotKey;
 		set {
-			if (value is null || value.KeyCode is KeyCode.Unknown) {
+			if (value is null) {
 				throw new ArgumentException (nameof (value));
 			}
 
 			var prev = base.HotKey;
 			if (prev != value) {
-				var v = value == KeyCode.Unknown ? Key.Empty: value;
-				base.HotKey = TextFormatter.HotKey = v;
+				base.HotKey = TextFormatter.HotKey = value;
 
 				// Also add Alt+HotKey
-				if (prev != (Key)KeyCode.Null && KeyBindings.TryGet (prev.WithAlt, out _)) {
-					if (v.KeyCode == KeyCode.Null) {
+				if (prev != Key.Empty && KeyBindings.TryGet (prev.WithAlt, out _)) {
+					if (value.KeyCode == KeyCode.Null) {
 						KeyBindings.Remove (prev.WithAlt);
 					} else {
-						KeyBindings.Replace (prev.WithAlt, v.WithAlt);
+						KeyBindings.Replace (prev.WithAlt, value.WithAlt);
 					}
-				} else if (v.KeyCode != KeyCode.Null) {
-					KeyBindings.Add (v.WithAlt, Command.Accept);
+				} else if (value != Key.Empty) {
+					KeyBindings.Add (value.WithAlt, Command.Accept);
 				}
 			}
 		}

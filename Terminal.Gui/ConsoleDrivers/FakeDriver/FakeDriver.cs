@@ -253,7 +253,7 @@ public class FakeDriver : ConsoleDriver {
 		case ConsoleKey.OemPlus:
 		case ConsoleKey.OemMinus:
 			if (keyInfo.KeyChar == 0) {
-				return KeyCode.Unknown;
+				return KeyCode.Null;
 			}
 
 			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)keyInfo.KeyChar));

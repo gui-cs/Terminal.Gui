@@ -8,7 +8,7 @@ class KeyJsonConverter : JsonConverter<Key> {
 	public override Key Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
 		if (reader.TokenType == JsonTokenType.StartObject) {
-			Key key = KeyCode.Unknown;
+			Key key = Key.Empty;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
 					break;

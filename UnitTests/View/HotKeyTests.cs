@@ -200,7 +200,7 @@ public class HotKeyTests {
 	[InlineData (KeyCode.Space)]
 	[InlineData (KeyCode.CursorLeft)]
 	[InlineData (KeyCode.F1)]
-	[InlineData (KeyCode.Unknown)]
+	[InlineData (KeyCode.Null)]
 	public void Set_Throws_With_Invalid_Key (KeyCode key)
 	{
 		var view = new View ();

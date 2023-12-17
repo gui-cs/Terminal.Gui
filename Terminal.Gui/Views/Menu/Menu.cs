@@ -432,7 +432,7 @@ class Menu : View {
 		foreach (var menuItem in menuBarItem.Children.Where (m => m != null)) {
 			KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
 			KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, Command.ToggleExpandCollapse);
-			if (menuItem.Shortcut != KeyCode.Unknown) {
+			if (menuItem.Shortcut != KeyCode.Null) {
 				KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			var subMenu = menuBarItem.SubMenu (menuItem);
