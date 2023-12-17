@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Build and Deploy API docs to github-pages
+    name: Build and Deploy API docs to github-pages ${{ github.ref_name }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -47,7 +47,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: v2_develop Repository Dispatch ${{ github.branch }}
+    - name: v2_develop Repository Dispatch ${{ github.ref_name }}
       if: github.ref_name == 'v2_develop'
       uses: peter-evans/repository-dispatch@v2
       with:
