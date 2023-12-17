@@ -2,15 +2,13 @@ name: Build and publish API docs
 
 on:
   push:
-  # only publish v2 (main or develop); v2 is published via the Terminal.GuiV2Docs repo
-    branches: [main, develop]
+    branches: [main, develop, v2_develop]
 
 permissions:
   id-token: write 
   pages: write
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     name: Build and Deploy API docs to github-pages
     environment:
@@ -19,9 +17,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      if: github.branch == 'main' || github.branch == 'develop' 
+      uses: actions/checkout@v4
 
     - name: DocFX Build
+      if: github.branch == 'main' || github.branch == 'develop' 
       working-directory: docfx
       run: |
         dotnet tool install -g docfx
@@ -31,15 +31,27 @@ jobs:
       continue-on-error: false
 
     - name: Setup Pages
+      if: github.branch == 'main' || github.branch == 'develop' 
       uses: actions/configure-pages@v3
       
     - name: Upload artifact
+      if: github.branch == 'main' || github.branch == 'develop' 
       uses: actions/upload-pages-artifact@v2
       with:
         path: docfx/_site
        
     - name: Deploy to GitHub Pages
+      if: github.branch == 'main' || github.branch == 'develop' 
       id: deployment
       uses: actions/deploy-pages@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: v2_develop Repository Dispatch
+      if: github.branch == 'v2_develop' 
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.PAT }}
+        repository: gui-cs/Terminal.GuiV2Docs
+        event-type: v2_develop_push
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
