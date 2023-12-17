@@ -47,7 +47,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: v2_develop Repository Dispatch
+    - name: v2_develop Repository Dispatch ${{ github.branch }}
       if: github.branch == 'v2_develop' 
       uses: peter-evans/repository-dispatch@v2
       with:
