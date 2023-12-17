@@ -76,7 +76,7 @@ public partial class View {
 	public virtual Key HotKey {
 		get => _hotKey;
 		set {
-			if (value is null || value.KeyCode == KeyCode.Unknown) {
+			if (value is null) {
 				throw new ArgumentException (@"HotKey must not be null. Use Key.Empty to clear the HotKey.", nameof (value));
 			}
 			if (AddKeyBindingsForHotKey (_hotKey, value)) {
@@ -115,7 +115,7 @@ public partial class View {
 			return false;
 		}
 
-		var newKey = hotKey == KeyCode.Unknown ? KeyCode.Null : hotKey;
+		var newKey = hotKey;
 
 		var baseKey = newKey.NoAlt.NoShift.NoCtrl;
 		if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune))) {
@@ -195,7 +195,7 @@ public partial class View {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
 		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
-			if (_hotKey.KeyCode != hk && hk != KeyCode.Unknown) {
+			if (_hotKey.KeyCode != hk) {
 				HotKey = hk;
 			}
 		} else {

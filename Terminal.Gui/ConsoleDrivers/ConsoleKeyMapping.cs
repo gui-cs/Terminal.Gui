@@ -263,9 +263,6 @@ namespace Terminal.Gui.ConsoleDrivers {
 				return ConsoleKey.F24;
 			case KeyCode.Tab | KeyCode.ShiftMask:
 				return ConsoleKey.Tab;
-			case KeyCode.Unknown:
-				isMappable = true;
-				return 0;
 			}
 
 			isMappable = true;

@@ -984,7 +984,7 @@ namespace Terminal.Gui {
 				hotPos = hot_pos;
 
 				var newHotKey = (KeyCode)hot_key.Value;
-				if (newHotKey != KeyCode.Unknown && newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (hot_key))) {
+				if (newHotKey != KeyCode.Null && !(newHotKey == KeyCode.Space || Rune.IsControl (hot_key))) {
 					if ((newHotKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
 						newHotKey &= ~KeyCode.Space;
 					}

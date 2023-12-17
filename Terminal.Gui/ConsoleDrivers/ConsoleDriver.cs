@@ -1060,10 +1060,5 @@ public enum KeyCode : uint {
 	/// F24 key.
 	/// </summary>
 	F24,
-
-	/// <summary>
-	/// A key with an unknown mapping was raised.
-	/// </summary>
-	Unknown
 }
 

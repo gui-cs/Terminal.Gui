@@ -133,7 +133,7 @@ public class MenuItem {
 	/// <summary>
 	/// Gets the text describing the keystroke combination defined by <see cref="Shortcut"/>.
 	/// </summary>
-	public string ShortcutTag => Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
+	public string ShortcutTag => _shortcutHelper.Shortcut == KeyCode.Null ? string.Empty : Key.ToString (_shortcutHelper.Shortcut, MenuBar.ShortcutDelimiter);
 	#endregion Keyboard Handling
 
 	/// <summary>
@@ -264,15 +264,15 @@ public class MenuItem {
 		bool? previousChecked = Checked;
 		if (AllowNullChecked) {
 			switch (previousChecked) {
-				case null:
-					Checked = true;
-					break;
-				case true:
-					Checked = false;
-					break;
-				case false:
-					Checked = null;
-					break;
+			case null:
+				Checked = true;
+				break;
+			case true:
+				Checked = false;
+				break;
+			case false:
+				Checked = null;
+				break;
 			}
 		} else {
 			Checked = !Checked;
@@ -331,8 +331,8 @@ class Menu : View {
 
 		if (barItems == null) {
 			throw new ArgumentNullException (nameof (barItems));
-		} 
-		
+		}
+
 		_host = host;
 		_barItems = barItems;
 
@@ -432,7 +432,7 @@ class Menu : View {
 		foreach (var menuItem in menuBarItem.Children.Where (m => m != null)) {
 			KeyBindings.Add ((KeyCode)menuItem.HotKey.Value, Command.ToggleExpandCollapse);
 			KeyBindings.Add ((KeyCode)menuItem.HotKey.Value | KeyCode.AltMask, Command.ToggleExpandCollapse);
-			if (menuItem.Shortcut != KeyCode.Unknown) {
+			if (menuItem.Shortcut != KeyCode.Null) {
 				KeyBindings.Add (menuItem.Shortcut, KeyBindingScope.HotKey, Command.Select);
 			}
 			var subMenu = menuBarItem.SubMenu (menuItem);
@@ -494,7 +494,7 @@ class Menu : View {
 
 		var key = keyEvent.KeyCode;
 
-		if (KeyBindings.TryGet(key, out _)) {
+		if (KeyBindings.TryGet (key, out _)) {
 			_menuBarItemToActivate = -1;
 			_menuItemToSelect = null;
 
