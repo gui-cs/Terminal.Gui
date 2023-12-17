@@ -17,11 +17,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      if: github.branch == 'main' || github.branch == 'develop' 
+      if: github.ref_name == 'main' ||  github.ref_name == 'develop'
       uses: actions/checkout@v4
 
     - name: DocFX Build
-      if: github.branch == 'main' || github.branch == 'develop' 
+      if: github.ref_name == 'main' ||  github.ref_name == 'develop'
       working-directory: docfx
       run: |
         dotnet tool install -g docfx
@@ -31,24 +31,24 @@ jobs:
       continue-on-error: false
 
     - name: Setup Pages
-      if: github.branch == 'main' || github.branch == 'develop' 
+      if: github.ref_name == 'main' ||  github.ref_name == 'develop'
       uses: actions/configure-pages@v3
       
     - name: Upload artifact
-      if: github.branch == 'main' || github.branch == 'develop' 
+      if: github.ref_name == 'main' ||  github.ref_name == 'develop'
       uses: actions/upload-pages-artifact@v2
       with:
         path: docfx/_site
        
     - name: Deploy to GitHub Pages
-      if: github.branch == 'main' || github.branch == 'develop' 
+      if: github.ref_name == 'main' ||  github.ref_name == 'develop'
       id: deployment
       uses: actions/deploy-pages@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: v2_develop Repository Dispatch ${{ github.branch }}
-      if: github.branch == 'v2_develop' 
+      if: github.ref_name == 'v2_develop'
       uses: peter-evans/repository-dispatch@v2
       with:
         token: ${{ secrets.PAT }}
