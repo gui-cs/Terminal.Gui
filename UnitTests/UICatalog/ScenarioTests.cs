@@ -29,13 +29,13 @@ namespace UICatalog.Tests {
 		{
 			FakeConsole.MockKeyPresses.Clear ();
 			// Put a QuitKey in at the end
-			FakeConsole.PushMockKeyPress (Application.QuitKey);
+			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 			foreach (var c in input.Reverse ()) {
-				Key key = Key.Unknown;
+				KeyCode key = KeyCode.Unknown;
 				if (char.IsLetter (c)) {
-					key = (Key)char.ToUpper (c) | (char.IsUpper (c) ? Key.ShiftMask : (Key)0);
+					key = (KeyCode)char.ToUpper (c) | (char.IsUpper (c) ? KeyCode.ShiftMask : (KeyCode)0);
 				} else {
-					key = (Key)c;
+					key = (KeyCode)c;
 				}
 				FakeConsole.PushMockKeyPress (key);
 			}
@@ -66,15 +66,15 @@ namespace UICatalog.Tests {
 				// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 				// by adding this Space it seems to work.
 				//FakeConsole.PushMockKeyPress (Key.Space);
-				FakeConsole.PushMockKeyPress (Application.QuitKey);
+				FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
-					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
+				Application.Top.KeyDown += (object sender, Key args) => {
+					output.WriteLine ($"  Keypress: {args.KeyCode}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
+					Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
 				};
 
 				uint abortTime = 500;
@@ -126,7 +126,7 @@ namespace UICatalog.Tests {
 			// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 			// by adding this Space it seems to work.
 
-			FakeConsole.PushMockKeyPress (Application.QuitKey);
+			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 			var ms = 100;
 			var abortCount = 0;
@@ -153,9 +153,9 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			Application.Top.KeyPressed += (object sender, KeyEventEventArgs args) => {
+			Application.Top.KeyDown += (object sender, Key args) => {
 				// See #2474 for why this is commented out
-				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
+				Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
 			};
 
 			generic.Init ();

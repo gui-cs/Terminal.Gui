@@ -143,10 +143,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		private void AddKeyBindings ()
 		{
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 		}
 
 		///<inheritdoc/>
@@ -248,16 +248,6 @@ namespace Terminal.Gui {
 		{
 			if (Cursor.Y < _rows - 1) SelectedColor += _cols;
 			return true;
-		}
-
-		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
-		{
-			var result = InvokeKeybindings (kb);
-			if (result != null)
-				return (bool)result;
-
-			return false;
 		}
 
 		///<inheritdoc/>

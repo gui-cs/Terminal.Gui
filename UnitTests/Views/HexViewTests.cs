@@ -54,23 +54,23 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (hv.Edits);
 			hv.AllowEdits = false;
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
-			Assert.False (hv.ProcessKey (new KeyEvent (Key.A, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Home)));
+			Assert.False (hv.NewKeyDownEvent (new (KeyCode.A)));
 			Assert.Empty (hv.Edits);
 			Assert.Equal (126, hv.Source.Length);
 
 			hv.AllowEdits = true;
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D1)));
 			Assert.Single (hv.Edits);
 			Assert.Equal (65, hv.Edits.ToList () [0].Value);
 			Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
 			Assert.Equal (126, hv.Source.Length);
 
 			// Appends byte
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D2)));
 			Assert.Equal (2, hv.Edits.Count);
 			Assert.Equal (66, hv.Edits.ToList () [1].Value);
 			Assert.Equal ('B', (char)hv.Edits.ToList () [1].Value);
@@ -91,11 +91,11 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (0, hv.DisplayStart);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.PageDown)));
 			Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
 			Assert.Equal (hv.Source.Length, hv.Source.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			// already on last page and so the DisplayStart is the same as before
 			Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
 			Assert.Equal (hv.Source.Length, hv.Source.Position);
@@ -108,8 +108,8 @@ namespace Terminal.Gui.ViewsTests {
 			KeyValuePair<long, byte> keyValuePair = default;
 			hv.Edited += (s,e) => keyValuePair = new KeyValuePair<long, byte>(e.Position,e.NewValue);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D6, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D6)));
 
 			Assert.Equal (0, (int)keyValuePair.Key);
 			Assert.Equal (70, (int)keyValuePair.Value);
@@ -120,8 +120,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void DiscardEdits_Method ()
 		{
 			var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D1)));
 			Assert.Single (hv.Edits);
 			Assert.Equal (65, hv.Edits.ToList () [0].Value);
 			Assert.Equal ('A', (char)hv.Edits.ToList () [0].Value);
@@ -140,23 +140,23 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, hv.Position);
 
 			// left side needed to press twice
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (126, hv.Source.Position);
 			Assert.Equal (1, hv.Position);
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (126, hv.Source.Position);
 			Assert.Equal (2, hv.Position);
 
 			// right side only needed to press one time
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.Equal (126, hv.Source.Position);
 			Assert.Equal (2, hv.Position);
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorLeft)));
 			Assert.Equal (126, hv.Source.Position);
 			Assert.Equal (1, hv.Position);
 
 			// last position is equal to the source length
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			Assert.Equal (126, hv.Source.Position);
 			Assert.Equal (127, hv.Position);
 			Assert.Equal (hv.Position - 1, hv.Source.Length);
@@ -171,23 +171,23 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (1, hv.Position);
 
 			// left side needed to press twice
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (63, hv.Source.Position);
 			Assert.Equal (1, hv.Position);
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (63, hv.Source.Position);
 			Assert.Equal (2, hv.Position);
 
 			// right side only needed to press one time
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.Equal (63, hv.Source.Position);
 			Assert.Equal (2, hv.Position);
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorLeft)));
 			Assert.Equal (63, hv.Source.Position);
 			Assert.Equal (1, hv.Position);
 
 			// last position is equal to the source length
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			Assert.Equal (63, hv.Source.Position);
 			Assert.Equal (64, hv.Position);
 			Assert.Equal (hv.Position - 1, hv.Source.Length);
@@ -203,18 +203,18 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (new Point (1, 1), hv.CursorPosition);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask)));
 			Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Home)));
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (new Point (2, 1), hv.CursorPosition);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorDown)));
 			Assert.Equal (new Point (2, 2), hv.CursorPosition);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			var col = hv.CursorPosition.X;
 			var line = hv.CursorPosition.Y;
 			var offset = (line - 1) * (hv.BytesPerLine - col);
@@ -231,18 +231,18 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (new Point (1, 1), hv.CursorPosition);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask)));
 			Assert.Equal (hv.CursorPosition.X, hv.BytesPerLine);
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Home)));
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (new Point (2, 1), hv.CursorPosition);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorDown)));
 			Assert.Equal (new Point (2, 2), hv.CursorPosition);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			var col = hv.CursorPosition.X;
 			var line = hv.CursorPosition.Y;
 			var offset = (line - 1) * (hv.BytesPerLine - col);
@@ -259,9 +259,9 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (hv);
 			Application.Begin (Application.Top);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()))); // left side must press twice
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight))); // left side must press twice
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorDown)));
 
 			Assert.Equal (12, hexViewEventArgs.BytesPerLine);
 			Assert.Equal (new Point (2, 2), hexViewEventArgs.CursorPosition);
@@ -340,7 +340,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (hv);
 			Application.Begin (Application.Top);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			Assert.Equal (62, hv.DisplayStart);
 			Assert.Equal (64, hv.Position);
 
@@ -355,7 +355,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (0, hv.DisplayStart);
 			Assert.Equal (0, hv.Position - 1);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			Assert.Equal (0, hv.DisplayStart);
 			Assert.Equal (64, hv.Position);
 
@@ -381,8 +381,8 @@ namespace Terminal.Gui.ViewsTests {
 			hv.Source.Read (readBuffer);
 			Assert.Equal ("Fest", Encoding.Default.GetString (readBuffer));
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D5, new KeyModifiers ())));
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D5)));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
 			readBuffer [hv.Edits.ToList () [0].Key] = hv.Edits.ToList () [0].Value;
 			Assert.Equal ("Test", Encoding.Default.GetString (readBuffer));
 
@@ -409,48 +409,48 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (4, hv.BytesPerLine);
 
 			// right side only needed to press one time
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Enter)));
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Assert.Equal (2, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorLeft)));
 			Assert.Equal (1, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorDown)));
 			Assert.Equal (5, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorUp)));
 			Assert.Equal (1, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.V | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.V | KeyCode.CtrlMask)));
 			Assert.Equal (41, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent ('v' + Key.AltMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new ('v' + KeyCode.AltMask)));
 			Assert.Equal (1, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.PageDown, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.PageDown)));
 			Assert.Equal (41, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.PageUp, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.PageUp)));
 			Assert.Equal (1, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.End, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.End)));
 			Assert.Equal (64, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.Home)));
 			Assert.Equal (1, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorRight | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask)));
 			Assert.Equal (4, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorLeft | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorLeft | KeyCode.CtrlMask)));
 			Assert.Equal (1, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorDown | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorDown | KeyCode.CtrlMask)));
 			Assert.Equal (37, hv.Position);
 
-			Assert.True (hv.ProcessKey (new KeyEvent (Key.CursorUp | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (hv.NewKeyDownEvent (new (KeyCode.CursorUp | KeyCode.CtrlMask)));
 			Assert.Equal (1, hv.Position);
 		}
 	}

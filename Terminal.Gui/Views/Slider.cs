@@ -1403,46 +1403,32 @@ public class Slider<T> : View {
 	void SetKeyBindings ()
 	{
 		if (_config._sliderOrientation == Orientation.Horizontal) {
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			ClearKeyBinding (Key.CursorDown);
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			ClearKeyBinding (Key.CursorUp);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Remove (KeyCode.CursorDown);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Remove (KeyCode.CursorUp);
 
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.RightExtend);
-			ClearKeyBinding (Key.CursorDown | Key.CtrlMask);
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.LeftExtend);
-			ClearKeyBinding (Key.CursorUp | Key.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (KeyCode.CursorDown | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (KeyCode.CursorUp | KeyCode.CtrlMask);
 		} else {
-			ClearKeyBinding (Key.CursorRight);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			ClearKeyBinding (Key.CursorLeft);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
+			KeyBindings.Remove (KeyCode.CursorRight);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Remove (KeyCode.CursorLeft);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
 
-			ClearKeyBinding (Key.CursorRight | Key.CtrlMask);
-			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.RightExtend);
-			ClearKeyBinding (Key.CursorLeft | Key.CtrlMask);
-			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (KeyCode.CursorRight | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (KeyCode.CursorLeft | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LeftExtend);
 
 		}
-		AddKeyBinding (Key.Home, Command.LeftHome);
-		AddKeyBinding (Key.End, Command.RightEnd);
-		AddKeyBinding (Key.Enter, Command.Accept);
-		AddKeyBinding (Key.Space, Command.Accept);
+		KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+		KeyBindings.Add (KeyCode.End, Command.RightEnd);
+		KeyBindings.Add (KeyCode.Enter, Command.Accept);
+		KeyBindings.Add (KeyCode.Space, Command.Accept);
 
-	}
-
-	/// <inheritdoc/>
-	public override bool ProcessKey (KeyEvent keyEvent)
-	{
-		if (!CanFocus || !HasFocus) {
-			return base.ProcessKey (keyEvent);
-		}
-
-		var result = InvokeKeybindings (keyEvent);
-		if (result != null) {
-			return (bool)result;
-		}
-		return base.ProcessKey (keyEvent);
 	}
 
 	Dictionary<int, SliderOption<T>> GetSetOptionDictionary () => _setOptions.ToDictionary (e => e, e => _options [e]);

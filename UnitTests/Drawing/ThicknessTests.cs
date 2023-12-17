@@ -615,14 +615,12 @@ public class ThicknessTests {
 	[InlineData (0, 0, 10, 10, 9, 9, false)] // On opposite corner, in thickness
 	[InlineData (0, 0, 10, 10, 5, 5, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 10, 10, -1, -1, false)] // Outside the outer rectangle
-	[InlineData (0, 0, 10, 10, 3, 3, false)] // Inside the inner rectangle
 
 	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 0, 0, 0, 0, false)] // On corner, in thickness
 	[InlineData (0, 0, 0, 0, 9, 9, false)] // On opposite corner, in thickness
 	[InlineData (0, 0, 0, 0, 5, 5, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 0, 0, -1, -1, false)] // Outside the outer rectangle
-	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
 
 	[InlineData (1, 1, 10, 10, 1, 1, false)] // On corner, in thickness
 	[InlineData (1, 1, 10, 10, 10, 10, false)] // On opposite corner, in thickness
@@ -647,14 +645,12 @@ public class ThicknessTests {
 	[InlineData (0, 0, 10, 10, 9, 9, true)] // On opposite corner, in thickness
 	[InlineData (0, 0, 10, 10, 5, 5, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 10, 10, -1, -1, false)] // Outside the outer rectangle
-	[InlineData (0, 0, 10, 10, 3, 3, false)] // Inside the inner rectangle
 
 	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 0, 0, 0, 0, false)] // On corner, in thickness
 	[InlineData (0, 0, 0, 0, 9, 9, false)] // On opposite corner, in thickness
 	[InlineData (0, 0, 0, 0, 5, 5, false)] // Inside the inner rectangle
 	[InlineData (0, 0, 0, 0, -1, -1, false)] // Outside the outer rectangle
-	[InlineData (0, 0, 0, 0, 3, 3, false)] // Inside the inner rectangle
 
 	[InlineData (1, 1, 10, 10, 1, 1, true)] // On corner, in thickness
 	[InlineData (1, 1, 10, 10, 10, 10, true)] // On opposite corner, in thickness
