@@ -33,10 +33,10 @@ namespace UICatalog.Scenarios {
 
 				menu = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_Options", new MenuItem [] {
-						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, Key.CtrlMask | Key.R),
-						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, Key.CtrlMask | Key.C),
+						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, KeyCode.CtrlMask | KeyCode.R),
+						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, KeyCode.CtrlMask | KeyCode.C),
 						null,
-						new MenuItem ("_Quit", "", () => Quit(), null, null, Application.QuitKey)
+						new MenuItem ("_Quit", "", () => Quit(), null, null, (KeyCode)Application.QuitKey)
 					}),
 					new MenuBarItem ("_View", new MenuItem [] { }),
 					new MenuBarItem ("_Window", new MenuItem [] { })
@@ -46,8 +46,8 @@ namespace UICatalog.Scenarios {
 
 				var statusBar = new StatusBar (new [] {
 					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-					new StatusItem(Key.CtrlMask | Key.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
-					new StatusItem(Key.CtrlMask | Key.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
+					new StatusItem(KeyCode.CtrlMask | KeyCode.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
+					new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
 				});
 				Add (statusBar);
 
@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 
 				Closed += OverlappedMain_Closed;
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					if (canOpenWorkerApp && !workerApp.Running && Application.OverlappedTop.Running) {
 						Application.Run (workerApp);
 					}
@@ -338,8 +338,8 @@ namespace UICatalog.Scenarios {
 				close.Clicked += OnReportClosed;
 				Add (close);
 
-				KeyPress += (s, e) => {
-					if (e.KeyEvent.Key == Key.Esc) {
+				KeyDown += (s, e) => {
+					if (e.KeyCode == KeyCode.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}
 				};

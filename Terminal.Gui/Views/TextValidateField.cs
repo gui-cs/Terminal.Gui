@@ -400,15 +400,15 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => { CursorRight (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.End, Command.RightEnd);
+			KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+			KeyBindings.Add (KeyCode.End, Command.RightEnd);
 
-			AddKeyBinding (Key.Delete, Command.DeleteCharRight);
-			AddKeyBinding (Key.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
 
-			AddKeyBinding (Key.Backspace, Command.DeleteCharLeft);
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
 		}
 
 		/// <summary>
@@ -612,20 +612,17 @@ namespace Terminal.Gui {
 		}
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnProcessKeyDown (Key a)
 		{
 			if (provider == null) {
 				return false;
 			}
 
-			var result = InvokeKeybindings (kb);
-			if (result != null)
-				return (bool)result;
-
-			if (kb.Key < Key.Space || kb.Key > Key.CharMask)
+			if (a.AsRune == default) {
 				return false;
-
-			var key = new Rune ((uint)kb.KeyValue);
+			}
+			
+			var key = a.AsRune;
 
 			var inserted = provider.InsertAt ((char)key.Value, cursorPosition);
 
@@ -633,7 +630,7 @@ namespace Terminal.Gui {
 				CursorRight ();
 			}
 
-			return true;
+			return false;
 		}
 
 		/// <summary>

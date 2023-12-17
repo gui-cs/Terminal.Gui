@@ -29,13 +29,13 @@ namespace UICatalog.Tests {
 		{
 			FakeConsole.MockKeyPresses.Clear ();
 			// Put a QuitKey in at the end
-			FakeConsole.PushMockKeyPress (Application.QuitKey);
+			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 			foreach (var c in input.Reverse ()) {
-				Key key = Key.Unknown;
+				KeyCode key = KeyCode.Unknown;
 				if (char.IsLetter (c)) {
-					key = (Key)char.ToUpper (c) | (char.IsUpper (c) ? Key.ShiftMask : (Key)0);
+					key = (KeyCode)char.ToUpper (c) | (char.IsUpper (c) ? KeyCode.ShiftMask : (KeyCode)0);
 				} else {
-					key = (Key)c;
+					key = (KeyCode)c;
 				}
 				FakeConsole.PushMockKeyPress (key);
 			}
@@ -66,20 +66,20 @@ namespace UICatalog.Tests {
 				// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 				// by adding this Space it seems to work.
 				//FakeConsole.PushMockKeyPress (Key.Space);
-				FakeConsole.PushMockKeyPress (Application.QuitKey);
+				FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 				// The only key we care about is the QuitKey
-				Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
-					output.WriteLine ($"  Keypress: {args.KeyEvent.Key}");
+				Application.Top.KeyDown += (object sender, Key args) => {
+					output.WriteLine ($"  Keypress: {args.KeyCode}");
 					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 					// by adding this Space it seems to work.
 					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey, args.KeyEvent.Key);
+					Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
 				};
 
 				uint abortTime = 500;
 				// If the scenario doesn't close within 500ms, this will force it to quit
-				Func<MainLoop, bool> forceCloseCallback = (MainLoop loop) => {
+				Func<bool> forceCloseCallback = () => {
 					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();
 						// See #2474 for why this is commented out
@@ -88,9 +88,9 @@ namespace UICatalog.Tests {
 					return false;
 				};
 				//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-				_ = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
+				_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					//output.WriteLine ($"  iteration {++iterations}");
 					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();
@@ -126,11 +126,11 @@ namespace UICatalog.Tests {
 			// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
 			// by adding this Space it seems to work.
 
-			FakeConsole.PushMockKeyPress (Application.QuitKey);
+			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 			var ms = 100;
 			var abortCount = 0;
-			Func<MainLoop, bool> abortCallback = (MainLoop loop) => {
+			Func<bool> abortCallback = () => {
 				abortCount++;
 				output.WriteLine ($"'Generic' abortCount {abortCount}");
 				Application.RequestStop ();
@@ -139,7 +139,7 @@ namespace UICatalog.Tests {
 
 			int iterations = 0;
 			object token = null;
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				if (token == null) {
 					// Timeout only must start at first iteration
 					token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
@@ -153,9 +153,9 @@ namespace UICatalog.Tests {
 				}
 			};
 
-			Application.Top.KeyPress += (object sender, KeyEventEventArgs args) => {
+			Application.Top.KeyDown += (object sender, Key args) => {
 				// See #2474 for why this is commented out
-				Assert.Equal (Key.CtrlMask | Key.Q, args.KeyEvent.Key);
+				Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, args.KeyCode);
 			};
 
 			generic.Init ();
@@ -392,7 +392,7 @@ namespace UICatalog.Tests {
 
 			int iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				if (iterations < _viewClasses.Count) {

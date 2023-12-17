@@ -83,7 +83,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var second = new View () { Id = "second" };
 			root.Add (second);
-			
+
 			second.X = Pos.Right (first) + 1;
 
 			root.LayoutSubviews ();
@@ -357,9 +357,9 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			Application.Top.Add (win);
 
-			// Text is empty so height=0
+			// Text is empty but height=1 by default, see Label view
 			Assert.False (label.AutoSize);
-			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 			label.Text = "New text\nNew line";
 			Application.Top.LayoutSubviews ();
@@ -385,10 +385,11 @@ namespace Terminal.Gui.ViewTests {
 
 			Assert.True (label.IsAdded);
 
-			// Text is empty so height=0
+			// Text is empty but height=1 by default, see Label view
 			Assert.True (label.AutoSize);
 			// BUGBUG: LayoutSubviews has not been called, so this test is not really valid (pos/dim are indeterminate, not 0)
-			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			// Not really a bug because View call OnResizeNeeded method on the SetInitialProperties method
+			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 			label.Text = "First line\nSecond line";
 			Application.Top.LayoutSubviews ();
@@ -420,9 +421,9 @@ namespace Terminal.Gui.ViewTests {
 			win.Add (label);
 			Application.Top.Add (win);
 
-			// Text is empty so height=0
+			// Text is empty but height=1 by default, see Label view
 			Assert.True (label.AutoSize);
-			Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+			Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 			var rs = Application.Begin (Application.Top);
 
@@ -586,7 +587,7 @@ Y
 			{
 				var text = "";
 				for (int i = 0; i < 4; i++) {
-					text += Application.Driver.Contents [0, i].Runes[0];
+					text += Application.Driver.Contents [0, i].Rune;
 				}
 				return text;
 			}
@@ -1396,7 +1397,7 @@ Y
 
 			view1.Frame = new Rect (0, 0, 25, 4);
 			bool firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 
 			Assert.True (view1.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view1.LayoutStyle);
@@ -1407,7 +1408,7 @@ Y
 			Assert.Equal ("Absolute(1)", view1.Height.ToString ());
 
 			view2.Frame = new Rect (0, 0, 1, 25);
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 
 			Assert.True (view2.AutoSize);
 			Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
@@ -1454,7 +1455,7 @@ Y
 			Assert.Equal ("Center", view2.Y.ToString ());
 			Assert.Equal ("Fill(0)", view2.Width.ToString ());
 			Assert.Equal ("Fill(0)", view2.Height.ToString ());
-		
+
 		}
 
 		[Fact, TestRespondersDisposed]
@@ -1598,7 +1599,7 @@ Y
 
 
 			((FakeDriver)Application.Driver).SetBufferSize (20, height);
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (height) {
@@ -1736,7 +1737,7 @@ Y
 
 
 			((FakeDriver)Application.Driver).SetBufferSize (width, 7);
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			var expected = string.Empty;
 
 			switch (width) {
@@ -1861,7 +1862,7 @@ Y
 			var clicked = false;
 			var top = Application.Top;
 			var win1 = new Window () { Id = "win1", Width = 20, Height = 10 };
-			var label= new Label ("[ ok ]");
+			var label = new Label ("[ ok ]");
 			var win2 = new Window () { Id = "win2", Y = Pos.Bottom (label) + 1, Width = 10, Height = 3 };
 			var view1 = new View () { Id = "view1", Width = Dim.Fill (), Height = 1, CanFocus = true };
 			view1.MouseClick += (sender, e) => clicked = true;
@@ -1893,14 +1894,11 @@ Y
 			Assert.Equal (new Rect (0, 0, 7, 1), view2.Frame);
 			var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
 			Assert.Equal (foundView, view1);
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 4,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 4,
+				Flags = MouseFlags.Button1Clicked
+			}));
 			Assert.True (clicked);
 
 			Application.End (rs);
@@ -1920,7 +1918,7 @@ Y
 			};
 			top.Add (view);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.Equal (-2, view.Y);
 
 				Application.RequestStop ();
@@ -1947,7 +1945,7 @@ Y
 			var view = new View ("view") { X = -2 };
 			top.Add (view);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.Equal (-2, view.X);
 
 				Application.RequestStop ();

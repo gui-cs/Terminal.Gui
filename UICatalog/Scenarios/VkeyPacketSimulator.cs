@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
+using Terminal.Gui.ConsoleDrivers;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "VkeyPacketSimulator", Description: "Simulates the Virtual Key Packet")]
@@ -44,6 +45,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (inputVerticalRuler);
 
 			var tvInput = new TextView {
+				Title = "Input",
 				X = 1,
 				Y = Pos.Bottom (inputHorizontalRuler),
 				Width = Dim.Fill (),
@@ -81,6 +83,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (outputVerticalRuler);
 
 			var tvOutput = new TextView {
+				Title = "Output",
 				X = 1,
 				Y = Pos.Bottom (outputHorizontalRuler),
 				Width = Dim.Fill (),
@@ -88,24 +91,24 @@ namespace UICatalog.Scenarios {
 				ReadOnly = true
 			};
 
+			// Detect unknown keys and reject them.
 			tvOutput.KeyDown += (s, e) => {
-				//System.Diagnostics.Debug.WriteLine ($"Output - KeyDown: {e.KeyEvent.Key}");
-				e.Handled = true;
-				if (e.KeyEvent.Key == Key.Unknown) {
+				//System.Diagnostics.Debug.WriteLine ($"Output - KeyDown: {e.Key}");
+				//e.Handled = true;
+				if (e.KeyCode == KeyCode.Unknown) {
 					_wasUnknown = true;
 				}
 			};
 
-			tvOutput.KeyPress += (s, e) => {
+			tvOutput.KeyUp += (s, e) => {
 				//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 				if (_outputStarted && _keyboardStrokes.Count > 0) {
-					var ev = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-					//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress: {ev}");
-					if (!tvOutput.ProcessKey (e.KeyEvent)) {
-						Application.MainLoop.Invoke (() => {
-							MessageBox.Query ("Keys", $"'{ShortcutHelper.GetShortcutTag (ev)}' pressed!", "Ok");
-						});
-					}
+					//// TODO: Tig: I don't understand what this is trying to do
+					//if (!tvOutput.ProcessKeyDown (e)) {
+					//	Application.Invoke (() => {
+					//		MessageBox.Query ("Keys", $"'{KeyEventArgs.ToString (e.ConsoleDriverKey, MenuBar.ShortcutDelimiter)}' pressed!", "Ok");
+					//	});
+					//}
 					e.Handled = true;
 					_stopOutput.Set ();
 				}
@@ -114,49 +117,28 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tvOutput);
 
-			tvInput.KeyDown += (s, e) => {
-				//System.Diagnostics.Debug.WriteLine ($"Input - KeyDown: {e.KeyEvent.Key}");
-				e.Handled = true;
-				if (e.KeyEvent.Key == Key.Unknown) {
-					_wasUnknown = true;
-				}
-			};
+			Key unknownChar = null;
 
-			KeyEventEventArgs unknownChar = null;
+			tvInput.KeyUp += (s, e) => {
+				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.Key}");
+				//var ke = e;
 
-			tvInput.KeyPress += (s, e) => {
-				if (e.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
-					Application.RequestStop ();
-					return;
-				}
-				if (e.KeyEvent.Key == Key.Unknown) {
+				if (e.KeyCode == KeyCode.Unknown) {
 					_wasUnknown = true;
 					e.Handled = true;
 					return;
 				}
 				if (_wasUnknown && _keyboardStrokes.Count == 1) {
 					_wasUnknown = false;
-				} else if (_wasUnknown && char.IsLetter ((char)e.KeyEvent.Key)) {
+				} else if (_wasUnknown && char.IsLetter ((char)e.KeyCode)) {
 					_wasUnknown = false;
-				} else if (!_wasUnknown && _keyboardStrokes.Count > 0) {
-					e.Handled = true;
-					return;
 				}
 				if (_keyboardStrokes.Count == 0) {
 					AddKeyboardStrokes (e);
 				} else {
 					_keyboardStrokes.Insert (0, 0);
 				}
-				var ev = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress: {ev}");
-				//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
-			};
-
-			tvInput.KeyUp += (s, e) => {
-				//System.Diagnostics.Debug.WriteLine ($"Input - KeyUp: {e.KeyEvent.Key}");
-				//var ke = e.KeyEvent;
-				var ke = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				if (_wasUnknown && (int)ke - (int)(ke & (Key.AltMask | Key.CtrlMask | Key.ShiftMask)) != 0) {
+				if (_wasUnknown && (int)e.KeyCode - (int)(e.KeyCode & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask)) != 0) {
 					unknownChar = e;
 				}
 				e.Handled = true;
@@ -170,23 +152,23 @@ namespace UICatalog.Scenarios {
 						while (_outputStarted) {
 							try {
 								ConsoleModifiers mod = new ConsoleModifiers ();
-								if (ke.HasFlag (Key.ShiftMask)) {
+								if (e.KeyCode.HasFlag (KeyCode.ShiftMask)) {
 									mod |= ConsoleModifiers.Shift;
 								}
-								if (ke.HasFlag (Key.AltMask)) {
+								if (e.KeyCode.HasFlag (KeyCode.AltMask)) {
 									mod |= ConsoleModifiers.Alt;
 								}
-								if (ke.HasFlag (Key.CtrlMask)) {
+								if (e.KeyCode.HasFlag (KeyCode.CtrlMask)) {
 									mod |= ConsoleModifiers.Control;
 								}
 								for (int i = 0; i < _keyboardStrokes.Count; i++) {
-									var consoleKey = ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)_keyboardStrokes [i], mod, out _, out _);
-									Application.Driver.SendKeys ((char)consoleKey, ConsoleKey.Packet, mod.HasFlag (ConsoleModifiers.Shift),
+									var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey ((uint)_keyboardStrokes [i], mod, out _);
+									Application.Driver.SendKeys (consoleKeyInfo.KeyChar, ConsoleKey.Packet, mod.HasFlag (ConsoleModifiers.Shift),
 										mod.HasFlag (ConsoleModifiers.Alt), mod.HasFlag (ConsoleModifiers.Control));
 								}
 								//}
 							} catch (Exception) {
-								Application.MainLoop.Invoke (() => {
+								Application.Invoke (() => {
 									MessageBox.ErrorQuery ("Error", "Couldn't send the keystrokes!", "Ok");
 									Application.RequestStop ();
 								});
@@ -196,7 +178,7 @@ namespace UICatalog.Scenarios {
 							_keyboardStrokes.RemoveAt (0);
 							if (_keyboardStrokes.Count == 0) {
 								_outputStarted = false;
-								Application.MainLoop.Invoke (() => {
+								Application.Invoke (() => {
 									tvOutput.ReadOnly = true;
 									tvInput.SetFocus ();
 								});
@@ -207,13 +189,13 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			btnInput.Clicked += (s,e) => {
+			btnInput.Clicked += (s, e) => {
 				if (!tvInput.HasFocus && _keyboardStrokes.Count == 0) {
 					tvInput.SetFocus ();
 				}
 			};
 
-			btnOutput.Clicked += (s,e) => {
+			btnOutput.Clicked += (s, e) => {
 				if (!tvOutput.HasFocus && _keyboardStrokes.Count == 0) {
 					tvOutput.SetFocus ();
 				}
@@ -232,21 +214,10 @@ namespace UICatalog.Scenarios {
 			Win.LayoutComplete += Win_LayoutComplete;
 		}
 
-		private void AddKeyboardStrokes (KeyEventEventArgs e)
+		private void AddKeyboardStrokes (Key e)
 		{
-			var ke = e.KeyEvent;
-			var km = new KeyModifiers ();
-			if (ke.IsShift) {
-				km.Shift = true;
-			}
-			if (ke.IsAlt) {
-				km.Alt = true;
-			}
-			if (ke.IsCtrl) {
-				km.Ctrl = true;
-			}
-			var keyChar = ke.KeyValue;
-			var mK = (int)((Key)ke.KeyValue & (Key.AltMask | Key.CtrlMask | Key.ShiftMask));
+			var keyChar = (int)e.KeyCode;
+			var mK = (int)(e.KeyCode & (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.ShiftMask));
 			keyChar &= ~mK;
 			_keyboardStrokes.Add (keyChar);
 		}

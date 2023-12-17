@@ -58,8 +58,6 @@ public static class Clipboard {
 						Application.Driver.Clipboard.SetClipboardData (value);
 					}
 					_contents = value;
-				} catch (NotSupportedException e) {
-					throw e;
 				} catch (Exception) {
 					_contents = value;
 				}

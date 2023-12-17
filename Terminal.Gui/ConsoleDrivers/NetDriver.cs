@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
@@ -208,11 +209,11 @@ internal class NetEvents : IDisposable {
 					} catch (OperationCanceledException) {
 						return;
 					}
-					if ((consoleKeyInfo.KeyChar == (char)Key.Esc && !_isEscSeq)
-						|| (consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq)) {
+					if ((consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq)
+						|| (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)) {
 
-						if (_cki == null && consoleKeyInfo.KeyChar != (char)Key.Esc && _isEscSeq) {
-							_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)Key.Esc, 0,
+						if (_cki == null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq) {
+							_cki = EscSeqUtils.ResizeArray (new ConsoleKeyInfo ((char)KeyCode.Esc, 0,
 							    false, false, false), _cki);
 						}
 						_isEscSeq = true;
@@ -223,7 +224,7 @@ internal class NetEvents : IDisposable {
 						_cki = null;
 						_isEscSeq = false;
 						break;
-					} else if (consoleKeyInfo.KeyChar == (char)Key.Esc && _isEscSeq && _cki != null) {
+					} else if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki != null) {
 						ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
 						_cki = null;
 						if (Console.KeyAvailable) {
@@ -628,32 +629,14 @@ internal class NetDriver : ConsoleDriver {
 	const int COLOR_BRIGHT_CYAN = 96;
 	const int COLOR_BRIGHT_WHITE = 97;
 
+	NetMainLoop _mainLoopDriver = null;
+
 	public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
 	public NetWinVTConsole NetWinConsole { get; private set; }
 	public bool IsWinPlatform { get; private set; }
 
-	public override void End ()
-	{
-		if (IsWinPlatform) {
-			NetWinConsole?.Cleanup ();
-		}
-
-		StopReportingMouseMoves ();
-
-		if (!RunningUnitTests) {
-			Console.ResetColor ();
-
-			//Disable alternative screen buffer.
-			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndActivateAltBufferWithBackscroll);
-
-			//Set cursor key to cursor.
-			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
-			Console.Out.Close ();
-		}
-	}
-
-	public override void Init (Action terminalResized)
+	internal override MainLoop Init ()
 	{
 		var p = Environment.OSVersion.Platform;
 		if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
@@ -675,9 +658,6 @@ internal class NetDriver : ConsoleDriver {
 				Clipboard = new CursesClipboard ();
 			}
 		}
-
-		TerminalResized = terminalResized;
-
 
 		if (!RunningUnitTests) {
 			Console.TreatControlCAsInput = true;
@@ -703,6 +683,30 @@ internal class NetDriver : ConsoleDriver {
 		CurrentAttribute = new Attribute (Color.White, Color.Black);
 
 		StartReportingMouseMoves ();
+
+		_mainLoopDriver = new NetMainLoop (this);
+		_mainLoopDriver.ProcessInput = ProcessInput;
+		return new MainLoop (_mainLoopDriver);
+	}
+
+	internal override void End ()
+	{
+		if (IsWinPlatform) {
+			NetWinConsole?.Cleanup ();
+		}
+
+		StopReportingMouseMoves ();
+
+		if (!RunningUnitTests) {
+			Console.ResetColor ();
+
+			//Disable alternative screen buffer.
+			Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+			//Set cursor key to cursor.
+			Console.Out.Write (EscSeqUtils.CSI_ShowCursor);
+			Console.Out.Close ();
+		}
 	}
 
 	public virtual void ResizeScreen ()
@@ -756,8 +760,8 @@ internal class NetDriver : ConsoleDriver {
 		Attribute redrawAttr = new Attribute ();
 		var lastCol = -1;
 
-		//GetCursorVisibility (out CursorVisibility savedVisibitity);
-		//SetCursorVisibility (CursorVisibility.Invisible); 
+		var savedVisibitity = _cachedCursorVisibility;
+		SetCursorVisibility (CursorVisibility.Invisible);
 
 		for (var row = top; row < rows; row++) {
 			if (Console.WindowHeight < 1) {
@@ -781,8 +785,9 @@ internal class NetDriver : ConsoleDriver {
 						} else if (lastCol == -1) {
 							lastCol = col;
 						}
-						if (lastCol + 1 < cols)
+						if (lastCol + 1 < cols) {
 							lastCol++;
+						}
 						continue;
 					}
 
@@ -805,11 +810,22 @@ internal class NetDriver : ConsoleDriver {
 
 					}
 					outputWidth++;
-					var rune = (Rune)Contents [row, col].Runes [0];
-					output.Append (rune.ToString ());
-					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
+					var rune = (Rune)Contents [row, col].Rune;
+					output.Append (rune);
+					if (Contents [row, col].CombiningMarks.Count > 0) {
+						// AtlasEngine does not support NON-NORMALIZED combining marks in a way
+						// compatible with the driver architecture. Any CMs (except in the first col)
+						// are correctly combined with the base char, but are ALSO treated as 1 column
+						// width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+						// 
+						// For now, we just ignore the list of CMs.
+						//foreach (var combMark in Contents [row, col].CombiningMarks) {
+						//	output.Append (combMark);
+						//}
+						// WriteToConsole (output, ref lastCol, row, ref outputWidth);
+					} else if ((rune.IsSurrogatePair () && rune.GetColumns () < 2)) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
-						Console.CursorLeft--;
+						SetCursorPosition (col - 1, row);
 					}
 					Contents [row, col].IsDirty = false;
 				}
@@ -821,7 +837,7 @@ internal class NetDriver : ConsoleDriver {
 		}
 		SetCursorPosition (0, 0);
 
-		//SetCursorVisibility (savedVisibitity);
+		_cachedCursorVisibility = savedVisibitity;
 
 		void WriteToConsole (StringBuilder output, ref int lastCol, int row, ref int outputWidth)
 		{
@@ -885,20 +901,20 @@ internal class NetDriver : ConsoleDriver {
 	#region Cursor Handling
 	bool SetCursorPosition (int col, int row)
 	{
-		//if (IsWinPlatform) {
-		// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
-		try {
-			Console.SetCursorPosition (col, row);
+		if (IsWinPlatform) {
+			// Could happens that the windows is still resizing and the col is bigger than Console.WindowWidth.
+			try {
+				Console.SetCursorPosition (col, row);
+				return true;
+			} catch (Exception) {
+				return false;
+			}
+		} else {
+			// + 1 is needed because non-Windows is based on 1 instead of 0 and
+			// Console.CursorTop/CursorLeft isn't reliable.
+			Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
 			return true;
-		} catch (Exception) {
-			return false;
 		}
-		// BUGBUG: This breaks -usc on WSL; not sure why. But commenting out fixes.
-		//} else {
-		//	// TODO: Explain why + 1 is needed (and why we do this for non-Windows).
-		//	Console.Out.Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
-		//	return true;
-		//}
 	}
 
 	CursorVisibility? _cachedCursorVisibility;
@@ -923,7 +939,7 @@ internal class NetDriver : ConsoleDriver {
 	{
 		_cachedCursorVisibility = visibility;
 		var isVisible = RunningUnitTests ? visibility == CursorVisibility.Default : Console.CursorVisible = visibility == CursorVisibility.Default;
-		//Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
+		Console.Out.Write (isVisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
 		return isVisible;
 	}
 
@@ -982,45 +998,44 @@ internal class NetDriver : ConsoleDriver {
 		var alt = (mod & ConsoleModifiers.Alt) != 0;
 		var control = (mod & ConsoleModifiers.Control) != 0;
 
-		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
+		var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out _);
 
-		return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
+		return new ConsoleKeyInfo (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
 	}
 
-	Key MapKey (ConsoleKeyInfo keyInfo)
+	KeyCode MapKey (ConsoleKeyInfo keyInfo)
 	{
-		MapKeyModifiers (keyInfo, (Key)keyInfo.Key);
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return MapKeyModifiers (keyInfo, Key.Esc);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Esc);
 		case ConsoleKey.Tab:
-			return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Tab);
 		case ConsoleKey.Home:
-			return MapKeyModifiers (keyInfo, Key.Home);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Home);
 		case ConsoleKey.End:
-			return MapKeyModifiers (keyInfo, Key.End);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.End);
 		case ConsoleKey.LeftArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorLeft);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorRight);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorRight);
 		case ConsoleKey.UpArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorUp);
 		case ConsoleKey.DownArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorDown);
 		case ConsoleKey.PageUp:
-			return MapKeyModifiers (keyInfo, Key.PageUp);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PageUp);
 		case ConsoleKey.PageDown:
-			return MapKeyModifiers (keyInfo, Key.PageDown);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PageDown);
 		case ConsoleKey.Enter:
-			return MapKeyModifiers (keyInfo, Key.Enter);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Enter);
 		case ConsoleKey.Spacebar:
-			return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? KeyCode.Space : (KeyCode)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return MapKeyModifiers (keyInfo, Key.Backspace);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Backspace);
 		case ConsoleKey.Delete:
-			return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.DeleteChar);
 		case ConsoleKey.Insert:
-			return MapKeyModifiers (keyInfo, Key.InsertChar);
+			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.InsertChar);
 
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
@@ -1031,98 +1046,85 @@ internal class NetDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
+			var ret = ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)keyInfo.KeyChar));
+			if (ret.HasFlag (KeyCode.ShiftMask)) {
+				ret &= ~KeyCode.ShiftMask;
+			}
+			return ret;
+
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
 		case ConsoleKey.OemMinus:
-			return (Key)((uint)keyInfo.KeyChar);
+			return (KeyCode)((uint)keyInfo.KeyChar);
 		}
 
 		var key = keyInfo.Key;
-		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
+		if (key is >= ConsoleKey.A and <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+				return (KeyCode)(((uint)KeyCode.CtrlMask) | ((uint)KeyCode.A + delta));
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
+				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.A + delta));
+			}
+			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.A + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.A + delta));
 				}
 			}
-			return (Key)((uint)keyInfo.KeyChar);
+
+			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) /*^ (keyInfoEx.CapsLock)*/)) {
+				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
+					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
+				}
+			}
+			// This is buggy because is converting a lower case to a upper case and mustn't
+			//if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == KeyCode.Space) {
+			//	return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
+			//}
+			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
-		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
+		if (key is >= ConsoleKey.D0 and <= ConsoleKey.D9) {
 			var delta = key - ConsoleKey.D0;
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
+				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.D0 + delta));
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
+				return (KeyCode)(((uint)KeyCode.CtrlMask) | ((uint)KeyCode.D0 + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)Key.D0 + delta)) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)KeyCode.D0 + delta)) {
+					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.D0 + delta));
 				}
 			}
-			return (Key)((uint)keyInfo.KeyChar);
+			return (KeyCode)((uint)keyInfo.KeyChar);
 		}
 		if (key is >= ConsoleKey.F1 and <= ConsoleKey.F12) {
 			var delta = key - ConsoleKey.F1;
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
+				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.F1 + delta));
 			}
 
-			return (Key)((uint)Key.F1 + delta);
-		}
-		if (keyInfo.KeyChar != 0) {
-			return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			return (KeyCode)((uint)KeyCode.F1 + delta);
 		}
 
-		return (Key)(0xffffffff);
-	}
-
-	KeyModifiers _keyModifiers;
-
-	Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
-	{
-		_keyModifiers ??= new KeyModifiers ();
-		Key keyMod = new Key ();
-		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
-			keyMod = Key.ShiftMask;
-			_keyModifiers.Shift = true;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
-			keyMod |= Key.CtrlMask;
-			_keyModifiers.Ctrl = true;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
-			keyMod |= Key.AltMask;
-			_keyModifiers.Alt = true;
+		// Is it a key between a..z?
+		if ((char)keyInfo.KeyChar is >= 'a' and <= 'z') {
+			// 'a' should be Key.A
+			return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
 		}
 
-		return keyMod != Key.Null ? keyMod | key : key;
-	}
+		// Is it a key between A..Z?
+		if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
+			// It's Key.A...Z.  Make it Key.A | Key.ShiftMask
+			return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space | KeyCode.ShiftMask;
+		}
 
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyUpHandler;
-	Action<MouseEvent> _mouseHandler;
-	NetMainLoop _mainLoop;
-
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
-	{
-		_keyHandler = keyHandler;
-		_keyDownHandler = keyDownHandler;
-		_keyUpHandler = keyUpHandler;
-		_mouseHandler = mouseHandler;
-
-		_mainLoop = mainLoop.MainLoopDriver as NetMainLoop;
-
-		// Note: .Net API doesn't support keydown/up events and thus any passed keyDown/UpHandlers will be simulated to be called.
-		_mainLoop.ProcessInput = ProcessInput;
+		return (KeyCode)(uint)keyInfo.KeyChar;
 	}
 
 	volatile bool _winSizeChanging;
@@ -1135,22 +1137,13 @@ internal class NetDriver : ConsoleDriver {
 			if (consoleKeyInfo.Key == ConsoleKey.Packet) {
 				consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 			}
-			_keyModifiers = new KeyModifiers ();
 			var map = MapKey (consoleKeyInfo);
-			if (map == (Key)0xffffffff) {
-				return;
-			}
-			if (map == Key.Null) {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
-			} else {
-				_keyDownHandler (new KeyEvent (map, _keyModifiers));
-				_keyHandler (new KeyEvent (map, _keyModifiers));
-				_keyUpHandler (new KeyEvent (map, _keyModifiers));
-			}
+
+			OnKeyDown (new Key (map));
+			OnKeyUp (new Key (map));
 			break;
 		case NetEvents.EventType.Mouse:
-			_mouseHandler (ToDriverMouse (inputEvent.MouseEvent));
+			OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
 			break;
 		case NetEvents.EventType.WindowSize:
 			_winSizeChanging = true;
@@ -1161,7 +1154,7 @@ internal class NetDriver : ConsoleDriver {
 			ResizeScreen ();
 			ClearContents ();
 			_winSizeChanging = false;
-			TerminalResized?.Invoke ();
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 		case NetEvents.EventType.RequestResponse:
 			// BUGBUG: What is this for? It does not seem to be used anywhere. 

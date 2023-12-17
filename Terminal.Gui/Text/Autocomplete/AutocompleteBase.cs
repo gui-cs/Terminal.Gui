@@ -39,14 +39,17 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public abstract ColorScheme ColorScheme { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <inheritdoc/>
-		public virtual Key SelectionKey { get; set; } = Key.Enter;
+		public virtual KeyCode SelectionKey { get; set; } = KeyCode.Enter;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <inheritdoc/>
-		public virtual Key CloseKey { get; set; } = Key.Esc;
+		public virtual KeyCode CloseKey { get; set; } = KeyCode.Esc;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <inheritdoc/>
-		public virtual Key Reopen { get; set; } = Key.Space | Key.CtrlMask | Key.AltMask;
+		public virtual KeyCode Reopen { get; set; } = KeyCode.Space | KeyCode.CtrlMask | KeyCode.AltMask;
 
 		/// <inheritdoc/>
 		public virtual AutocompleteContext Context { get; set; }
@@ -55,7 +58,7 @@ namespace Terminal.Gui {
 		public abstract bool MouseEvent (MouseEvent me, bool fromHost = false);
 
 		/// <inheritdoc/>
-		public abstract bool ProcessKey (KeyEvent kb);
+		public abstract bool ProcessKey (Key a);
 		/// <inheritdoc/>
 		public abstract void RenderOverlay (Point renderAt);
 

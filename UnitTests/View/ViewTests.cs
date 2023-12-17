@@ -125,11 +125,9 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var r = new View ();
 
-			Assert.False (r.ProcessKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessHotKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessColdKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyDown (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyUp (new KeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyDown (new Key () { KeyCode = KeyCode.Unknown }));
+			//Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyUp (new Key () { KeyCode = KeyCode.Unknown }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -332,7 +330,7 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (v1, v2);
 			t.Add (w);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				Application.Refresh ();
 				t.Running = false;
 			};
@@ -403,7 +401,7 @@ namespace Terminal.Gui.ViewTests {
 			w.Add (v1, v2);
 			t.Add (w);
 
-			Application.Iteration = () => {
+			Application.Iteration += (s, a) => {
 				var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
 
 				sv1.Initialized += (s, e) => {
@@ -466,11 +464,11 @@ namespace Terminal.Gui.ViewTests {
 				Application.Begin (Application.Top);
 
 				// should have the initial text
-				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Runes [0]);
-				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Runes [0]);
-				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Runes [0]);
-				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Runes [0]);
-				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Runes [0]);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 0].Rune);
+				Assert.Equal ((Rune)'e', driver.Contents [0, 1].Rune);
+				Assert.Equal ((Rune)'s', driver.Contents [0, 2].Rune);
+				Assert.Equal ((Rune)'t', driver.Contents [0, 3].Rune);
+				Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
 			} finally {
 				Application.Shutdown ();
 			}
@@ -498,10 +496,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (view._addingView);
 			view._addingView = true;
 			Assert.True (view._addingView);
-			view.ViewToScreen (0, 0, out int rcol, out int rrow);
+			view.BoundsToScreen (0, 0, out int rcol, out int rrow);
 			Assert.Equal (1, rcol);
 			Assert.Equal (1, rrow);
-			Assert.Equal (rect, view.ViewToScreen (view.Bounds));
+			Assert.Equal (rect, view.BoundsToScreen (view.Bounds));
 			Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
 			Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
 
@@ -546,7 +544,7 @@ namespace Terminal.Gui.ViewTests {
 			view.Y = Pos.Center () - 13;
 			view.SetRelativeLayout (top.Bounds);
 			top.LayoutSubviews (); // BUGBUG: v2 - ??
-			view.ViewToScreen (0, 0, out rcol, out rrow);
+			view.BoundsToScreen (0, 0, out rcol, out rrow);
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
 			
@@ -564,7 +562,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
 				Assert.True (button.Visible);
@@ -612,7 +610,7 @@ namespace Terminal.Gui.ViewTests {
 
 				for (int i = 0; i < Application.Driver.Rows; i++) {
 					for (int j = 0; j < Application.Driver.Cols; j++) {
-						if (contents [i, j].Runes[0] != (Rune)' ') {
+						if (contents [i, j].Rune != (Rune)' ') {
 							runesCount++;
 						}
 					}
@@ -846,7 +844,7 @@ namespace Terminal.Gui.ViewTests {
 			label.Visible = false;
 
 			bool firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
 │                            │
@@ -942,11 +940,11 @@ cccccccccccccccccccc", output);
 			if (label) {
 				TestHelpers.AssertDriverColorsAre (@"
 111111111111111111110
-111111111111111111110", attributes);
+111111111111111111110", driver: Application.Driver, attributes);
 			} else {
 				TestHelpers.AssertDriverColorsAre (@"
 222222222222222222220
-111111111111111111110", attributes);
+111111111111111111110", driver: Application.Driver, attributes);
 			}
 
 			if (label) {
@@ -958,7 +956,7 @@ cccccccccccccccccccc", output);
 				Application.Refresh ();
 				TestHelpers.AssertDriverColorsAre (@"
 222222222222222222220
-111111111111111111110", attributes);
+111111111111111111110", driver: Application.Driver, attributes);
 			}
 			Application.End (runState);
 		}
@@ -974,19 +972,19 @@ cccccccccccccccccccc", output);
 			public bool IsKeyUp { get; set; }
 			public override string Text { get; set; }
 
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (Key keyEvent)
 			{
 				IsKeyDown = true;
 				return true;
 			}
 
-			public override bool ProcessKey (KeyEvent keyEvent)
+			public override bool OnProcessKeyDown (Key keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
 			}
 
-			public override bool OnKeyUp (KeyEvent keyEvent)
+			public override bool OnKeyUp (Key keyEvent)
 			{
 				IsKeyUp = true;
 				return true;

@@ -8,8 +8,8 @@ using Terminal.Gui;
 namespace UICatalog {
 
 	class KeyBindingsDialog : Dialog {
-
-		static Dictionary<Command,Key> CurrentBindings = new Dictionary<Command,Key>();
+		// TODO: Update to use Key instead of KeyCode
+		static Dictionary<Command,KeyCode> CurrentBindings = new Dictionary<Command,KeyCode>();
 		private Command[] commands;
 		private ListView commandsListView;
 		private Label keyLabel;
@@ -28,14 +28,14 @@ namespace UICatalog {
 			Dictionary<View, bool> knownViews = new Dictionary<View, bool> ();
 
 			private object lockKnownViews = new object ();
-			private Dictionary<Command, Key> keybindings;
+			private Dictionary<Command, KeyCode> keybindings;
 
 			public ViewTracker (View top)
 			{
 				RecordView (top);
 
 				// Refresh known windows
-				Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), (m) => {
+				Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 
 					lock (lockKnownViews) {
 						RecordView (Application.Top);
@@ -70,7 +70,7 @@ namespace UICatalog {
 				Instance = new ViewTracker (Application.Top);
 			}
 
-			internal void StartUsingNewKeyMap (Dictionary<Command, Key> currentBindings)
+			internal void StartUsingNewKeyMap (Dictionary<Command, KeyCode> currentBindings)
 			{
 				lock (lockKnownViews) {
 
@@ -109,8 +109,8 @@ namespace UICatalog {
 						if(supported.Contains(kvp.Key))
 						{
 							// if the key was bound to any other commands clear that
-							view.ClearKeyBinding (kvp.Key);
-							view.AddKeyBinding (kvp.Value,kvp.Key);
+							view.KeyBindings.Remove (kvp.Value);
+							view.KeyBindings.Add (kvp.Value,kvp.Key);
 						}
 
 						// mark that we have done this view so don't need to set keybindings again on it
@@ -176,12 +176,12 @@ namespace UICatalog {
 		private void RemapKey (object sender, EventArgs e)
 		{
 			var cmd = commands [commandsListView.SelectedItem];
-			Key? key = null;
+			KeyCode? key = null;
 
 			// prompt user to hit a key
 			var dlg = new Dialog () { Title = "Enter Key" };
-			dlg.KeyPress += (s, k) => {
-				key = k.KeyEvent.Key;
+			dlg.KeyDown += (s, k) => {
+				key = k.KeyCode;
 				Application.RequestStop ();
 			};
 			Application.Run (dlg);

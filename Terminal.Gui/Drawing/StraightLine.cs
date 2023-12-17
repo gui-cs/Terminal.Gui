@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Terminal.Gui {
 #nullable enable
 	// TODO: Add events that notify when StraightLine changes to enable dynamic layout

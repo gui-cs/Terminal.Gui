@@ -53,7 +53,7 @@ namespace UICatalog.Scenarios {
 			Task.Run (() => {
 				while (!isDisposed) {
 					// When updating from a Thread/Task always use Invoke
-					Application.MainLoop.Invoke (() => {
+					Application.Invoke (() => {
 						imageView.NextFrame ();
 						imageView.SetNeedsDisplay ();
 					});

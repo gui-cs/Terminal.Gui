@@ -497,15 +497,15 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.CursorDown));
 
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			Assert.True (called);
 			Assert.Same (f, activated);
@@ -557,7 +557,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			InitFakeDriver ();
 
-			tree.ObjectActivationKey = Key.Delete;
+			tree.ObjectActivationKey = KeyCode.Delete;
 			object activated = null;
 			bool called = false;
 
@@ -570,22 +570,22 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (called);
 
 			// no object is selected yet so no event should happen
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// down to select factory
-			tree.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.CursorDown));
 
-			tree.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Enter));
 
 			// Enter is not the activation key in this unit test
 			Assert.Null (activated);
 			Assert.False (called);
 
 			// Delete is the activation key in this test so should result in activation occurring
-			tree.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers ()));
+			tree.NewKeyDownEvent (new (KeyCode.Delete));
 
 			Assert.True (called);
 			Assert.Same (f, activated);
@@ -836,7 +836,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTreeViewColor ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
-
+			tv.BeginInit ();
+			tv.EndInit ();
 			var n1 = new TreeNode ("normal");
 			var n1_1 = new TreeNode ("pink");
 			var n1_2 = new TreeNode ("normal");
@@ -856,21 +857,20 @@ namespace Terminal.Gui.ViewsTests {
 			var pink = new Attribute (Color.Magenta, Color.Black);
 			var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
-
 			// Normal drawing of the tree view
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
+			TestHelpers.AssertDriverContentsAre (@"
+├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ", output);
 			// Should all be the same color
-			TestHelpers.AssertDriverColorsAre (
-@"00000000
-00000000
+			TestHelpers.AssertDriverColorsAre (@"
 0000000000
-000000
-",
+0000000000
+0000000000
+0000000000
+", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 
 			var pinkScheme = new ColorScheme {
@@ -887,20 +887,20 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			// Same text
-			TestHelpers.AssertDriverContentsAre (
-@"├-normal
+			TestHelpers.AssertDriverContentsAre (@"
+├-normal
 │ ├─pink
 │ └─normal
 └─pink
 ", output);
 			// but now the item (only not lines) appear
 			// in pink when they are the word "pink"
-			TestHelpers.AssertDriverColorsAre (
-@"00000000
+			TestHelpers.AssertDriverColorsAre (@"
+00000000
 00001111
 0000000000
 001111
-",
+", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 		}
 
@@ -1280,7 +1280,7 @@ FFFFFFFFFF
 		{
 			var driver = new FakeDriver ();
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 		}
 	}
 }

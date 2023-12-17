@@ -11,29 +11,30 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TileView : View {
 		TileView parentTileView;
-
+		
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The keyboard key that the user can press to toggle resizing
 		/// of splitter lines.  Mouse drag splitting is always enabled.
 		/// </summary>
-		public Key ToggleResizable { get; set; } = Key.CtrlMask | Key.F10;
+		public KeyCode ToggleResizable { get; set; } = KeyCode.CtrlMask | KeyCode.F10;
 
-		List<Tile> tiles;
-		private List<Pos> splitterDistances;
-		private List<TileViewLineView> splitterLines;
+		List<Tile> _tiles;
+		private List<Pos> _splitterDistances;
+		private List<TileViewLineView> _splitterLines;
 
 		/// <summary>
 		/// The sub sections hosted by the view
 		/// </summary>
-		public IReadOnlyCollection<Tile> Tiles => tiles.AsReadOnly ();
+		public IReadOnlyCollection<Tile> Tiles => _tiles.AsReadOnly ();
 
 		/// <summary>
 		/// The splitter locations. Note that there will be N-1 splitters where
 		/// N is the number of <see cref="Tiles"/>.
 		/// </summary>
-		public IReadOnlyCollection<Pos> SplitterDistances => splitterDistances.AsReadOnly ();
+		public IReadOnlyCollection<Pos> SplitterDistances => _splitterDistances.AsReadOnly ();
 
-		private Orientation orientation = Orientation.Vertical;
+		private Orientation _orientation = Orientation.Vertical;
 
 		/// <summary>
 		/// Creates a new instance of the <see cref="TileView"/> class with 
@@ -63,7 +64,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		protected virtual void OnSplitterMoved (int idx)
 		{
-			SplitterMoved?.Invoke (this, new SplitterEventArgs (this, idx, splitterDistances [idx]));
+			SplitterMoved?.Invoke (this, new SplitterEventArgs (this, idx, _splitterDistances [idx]));
 		}
 
 		/// <summary>
@@ -73,22 +74,22 @@ namespace Terminal.Gui {
 		/// <param name="count"></param>
 		public void RebuildForTileCount (int count)
 		{
-			tiles = new List<Tile> ();
-			splitterDistances = new List<Pos> ();
-			if (splitterLines != null) {
-				foreach (var sl in splitterLines) {
+			_tiles = new List<Tile> ();
+			_splitterDistances = new List<Pos> ();
+			if (_splitterLines != null) {
+				foreach (var sl in _splitterLines) {
 					sl.Dispose ();
 				}
 			}
-			splitterLines = new List<TileViewLineView> ();
+			_splitterLines = new List<TileViewLineView> ();
 
 			RemoveAll ();
-			foreach (var tile in tiles) {
+			foreach (var tile in _tiles) {
 				tile.ContentView.Dispose ();
 				tile.ContentView = null;
 			}
-			tiles.Clear ();
-			splitterDistances.Clear ();
+			_tiles.Clear ();
+			_splitterDistances.Clear ();
 
 			if (count == 0) {
 				return;
@@ -97,14 +98,14 @@ namespace Terminal.Gui {
 			for (int i = 0; i < count; i++) {
 				if (i > 0) {
 					var currentPos = Pos.Percent ((100 / count) * i);
-					splitterDistances.Add (currentPos);
+					_splitterDistances.Add (currentPos);
 					var line = new TileViewLineView (this, i - 1);
 					Add (line);
-					splitterLines.Add (line);
+					_splitterLines.Add (line);
 				}
 
 				var tile = new Tile ();
-				tiles.Add (tile);
+				_tiles.Add (tile);
 				Add (tile.ContentView);
 				tile.TitleChanged += (s, e) => SetNeedsDisplay ();
 			}
@@ -126,21 +127,21 @@ namespace Terminal.Gui {
 
 			Tile toReturn = null;
 
-			for (int i = 0; i < tiles.Count; i++) {
+			for (int i = 0; i < _tiles.Count; i++) {
 
 				if (i != idx) {
 					var oldTile = oldTiles [i > idx ? i - 1 : i];
 
 					// remove the new empty View
-					Remove (tiles [i].ContentView);
-					tiles [i].ContentView.Dispose ();
-					tiles [i].ContentView = null;
+					Remove (_tiles [i].ContentView);
+					_tiles [i].ContentView.Dispose ();
+					_tiles [i].ContentView = null;
 
 					// restore old Tile and View
-					tiles [i] = oldTile;
-					Add (tiles [i].ContentView);
+					_tiles [i] = oldTile;
+					Add (_tiles [i].ContentView);
 				} else {
-					toReturn = tiles [i];
+					toReturn = _tiles [i];
 				}
 			}
 			SetNeedsDisplay ();
@@ -169,19 +170,19 @@ namespace Terminal.Gui {
 
 			RebuildForTileCount (oldTiles.Length - 1);
 
-			for (int i = 0; i < tiles.Count; i++) {
+			for (int i = 0; i < _tiles.Count; i++) {
 
 				int oldIdx = i >= idx ? i + 1 : i;
 				var oldTile = oldTiles [oldIdx];
 
 				// remove the new empty View
-				Remove (tiles [i].ContentView);
-				tiles [i].ContentView.Dispose ();
-				tiles [i].ContentView = null;
+				Remove (_tiles [i].ContentView);
+				_tiles [i].ContentView.Dispose ();
+				_tiles [i].ContentView = null;
 
 				// restore old Tile and View
-				tiles [i] = oldTile;
-				Add (tiles [i].ContentView);
+				_tiles [i] = oldTile;
+				Add (_tiles [i].ContentView);
 
 			}
 			SetNeedsDisplay ();
@@ -196,8 +197,8 @@ namespace Terminal.Gui {
 		///</summary>
 		public int IndexOf (View toFind, bool recursive = false)
 		{
-			for (int i = 0; i < tiles.Count; i++) {
-				var v = tiles [i].ContentView;
+			for (int i = 0; i < _tiles.Count; i++) {
+				var v = _tiles [i].ContentView;
 
 				if (v == toFind) {
 					return i;
@@ -236,9 +237,9 @@ namespace Terminal.Gui {
 		/// Orientation of the dividing line (Horizontal or Vertical).
 		/// </summary>
 		public Orientation Orientation {
-			get { return orientation; }
+			get { return _orientation; }
 			set {
-				orientation = value;
+				_orientation = value;
 				if (IsInitialized) {
 					LayoutSubviews ();
 				}
@@ -266,7 +267,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// <para>Attempts to update the <see cref="splitterDistances"/> of line at <paramref name="idx"/>
+		/// <para>Attempts to update the <see cref="SplitterDistances"/> of line at <paramref name="idx"/>
 		/// to the new <paramref name="value"/>. Returns false if the new position is not allowed because of
 		/// <see cref="Tile.MinSize"/>, location of other splitters etc.
 		/// </para>
@@ -279,13 +280,13 @@ namespace Terminal.Gui {
 				throw new ArgumentException ($"Only Percent and Absolute values are supported. Passed value was {value.GetType ().Name}");
 			}
 
-			var fullSpace = orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
+			var fullSpace = _orientation == Orientation.Vertical ? Bounds.Width : Bounds.Height;
 
 			if (fullSpace != 0 && !IsValidNewSplitterPos (idx, value, fullSpace)) {
 				return false;
 			}
 
-			splitterDistances [idx] = value;
+			_splitterDistances [idx] = value;
 			GetRootTileView ().LayoutSubviews ();
 			OnSplitterMoved (idx);
 			return true;
@@ -329,10 +330,10 @@ namespace Terminal.Gui {
 				}
 
 				foreach (var line in allLines) {
-					bool isRoot = splitterLines.Contains (line);
+					bool isRoot = _splitterLines.Contains (line);
 
-					line.ViewToScreen (0, 0, out var x1, out var y1);
-					var origin = ScreenToView (x1, y1);
+					line.BoundsToScreen (0, 0, out var x1, out var y1);
+					var origin = ScreenToFrame (x1, y1);
 					var length = line.Orientation == Orientation.Horizontal ?
 							line.Frame.Width :
 							line.Frame.Height;
@@ -399,7 +400,7 @@ namespace Terminal.Gui {
 		{
 			// when splitting a view into 2 sub views we will need to migrate
 			// the title too
-			var tile = tiles [idx];
+			var tile = _tiles [idx];
 
 			var title = tile.Title;
 			View toMove = tile.ContentView;
@@ -428,27 +429,28 @@ namespace Terminal.Gui {
 
 			tile.ContentView = newContainer;
 
-			var newTileView1 = newContainer.tiles [0].ContentView;
+			var newTileView1 = newContainer._tiles [0].ContentView;
 			// Add the original content into the first view of the new container
 			foreach (var childView in childViews) {
 				newTileView1.Add (childView);
 			}
 
 			// Move the title across too
-			newContainer.tiles [0].Title = title;
+			newContainer._tiles [0].Title = title;
 			tile.Title = string.Empty;
 
 			result = newContainer;
 			return true;
 		}
 
+		//// BUGBUG: Why is this not handled by a key binding???
 		/// <inheritdoc/>
-		public override bool ProcessHotKey (KeyEvent keyEvent)
+		public override bool OnProcessKeyDown (Key keyEvent)
 		{
 			bool focusMoved = false;
 
-			if (keyEvent.Key == ToggleResizable) {
-				foreach (var l in splitterLines) {
+			if (keyEvent.KeyCode == ToggleResizable) {
+				foreach (var l in _splitterLines) {
 
 					var iniBefore = l.IsInitialized;
 					l.IsInitialized = false;
@@ -463,13 +465,13 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			return base.ProcessHotKey (keyEvent);
+			return false;
 		}
 
 		private bool IsValidNewSplitterPos (int idx, Pos value, int fullSpace)
 		{
 			int newSize = value.Anchor (fullSpace);
-			bool isGettingBigger = newSize > splitterDistances [idx].Anchor (fullSpace);
+			bool isGettingBigger = newSize > _splitterDistances [idx].Anchor (fullSpace);
 			int lastSplitterOrBorder = HasBorder () ? 1 : 0;
 			int nextSplitterOrBorder = HasBorder () ? fullSpace - 1 : fullSpace;
 
@@ -491,7 +493,7 @@ namespace Terminal.Gui {
 
 			// Do not allow splitter to move left of the one before
 			if (idx > 0) {
-				int posLeft = splitterDistances [idx - 1].Anchor (fullSpace);
+				int posLeft = _splitterDistances [idx - 1].Anchor (fullSpace);
 
 				if (newSize <= posLeft) {
 					return false;
@@ -501,8 +503,8 @@ namespace Terminal.Gui {
 			}
 
 			// Do not allow splitter to move right of the one after
-			if (idx + 1 < splitterDistances.Count) {
-				int posRight = splitterDistances [idx + 1].Anchor (fullSpace);
+			if (idx + 1 < _splitterDistances.Count) {
+				int posRight = _splitterDistances [idx + 1].Anchor (fullSpace);
 
 				if (newSize >= posRight) {
 					return false;
@@ -519,7 +521,7 @@ namespace Terminal.Gui {
 				}
 
 				// don't grow if it would take us below min size of right panel
-				if (spaceForNext < tiles [idx + 1].MinSize) {
+				if (spaceForNext < _tiles [idx + 1].MinSize) {
 					return false;
 				}
 			} else {
@@ -531,7 +533,7 @@ namespace Terminal.Gui {
 				}
 
 				// don't shrink if it would take us below min size of left panel
-				if (spaceForLast < tiles [idx].MinSize) {
+				if (spaceForLast < _tiles [idx].MinSize) {
 					return false;
 				}
 			}
@@ -629,22 +631,22 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			for (int i = 0; i < splitterLines.Count; i++) {
-				var line = splitterLines [i];
+			for (int i = 0; i < _splitterLines.Count; i++) {
+				var line = _splitterLines [i];
 
 				line.Orientation = Orientation;
-				line.Width = orientation == Orientation.Vertical
+				line.Width = _orientation == Orientation.Vertical
 					? 1 : Dim.Fill ();
-				line.Height = orientation == Orientation.Vertical
+				line.Height = _orientation == Orientation.Vertical
 					? Dim.Fill () : 1;
-				line.LineRune = orientation == Orientation.Vertical ?
+				line.LineRune = _orientation == Orientation.Vertical ?
 					CM.Glyphs.VLine : CM.Glyphs.HLine;
 
-				if (orientation == Orientation.Vertical) {
-					line.X = splitterDistances [i];
+				if (_orientation == Orientation.Vertical) {
+					line.X = _splitterDistances [i];
 					line.Y = 0;
 				} else {
-					line.Y = splitterDistances [i];
+					line.Y = _splitterDistances [i];
 					line.X = 0;
 				}
 
@@ -652,8 +654,8 @@ namespace Terminal.Gui {
 
 			HideSplittersBasedOnTileVisibility ();
 
-			var visibleTiles = tiles.Where (t => t.ContentView.Visible).ToArray ();
-			var visibleSplitterLines = splitterLines.Where (l => l.Visible).ToArray ();
+			var visibleTiles = _tiles.Where (t => t.ContentView.Visible).ToArray ();
+			var visibleSplitterLines = _splitterLines.Where (l => l.Visible).ToArray ();
 
 			for (int i = 0; i < visibleTiles.Length; i++) {
 				var tile = visibleTiles [i];
@@ -674,20 +676,20 @@ namespace Terminal.Gui {
 
 		private void HideSplittersBasedOnTileVisibility ()
 		{
-			if (splitterLines.Count == 0) {
+			if (_splitterLines.Count == 0) {
 				return;
 			}
 
-			foreach (var line in splitterLines) {
+			foreach (var line in _splitterLines) {
 				line.Visible = true;
 			}
 
-			for (int i = 0; i < tiles.Count; i++) {
-				if (!tiles [i].ContentView.Visible) {
+			for (int i = 0; i < _tiles.Count; i++) {
+				if (!_tiles [i].ContentView.Visible) {
 
 					// when a tile is not visible, prefer hiding
 					// the splitter on it's left
-					var candidate = splitterLines [Math.Max (0, i - 1)];
+					var candidate = _splitterLines [Math.Max (0, i - 1)];
 
 					// unless that splitter is already hidden
 					// e.g. when hiding panels 0 and 1 of a 3 panel 
@@ -695,7 +697,7 @@ namespace Terminal.Gui {
 					if (candidate.Visible) {
 						candidate.Visible = false;
 					} else {
-						splitterLines [Math.Min (i, splitterLines.Count - 1)].Visible = false;
+						_splitterLines [Math.Min (i, _splitterLines.Count - 1)].Visible = false;
 					}
 
 				}
@@ -747,9 +749,9 @@ namespace Terminal.Gui {
 			/// </summary>
 			public Point GetLocalCoordinateForTitle (TileView intoCoordinateSpace)
 			{
-				Tile.ContentView.ViewToScreen (0, 0, out var screenCol, out var screenRow);
+				Tile.ContentView.BoundsToScreen (0, 0, out var screenCol, out var screenRow);
 				screenRow--;
-				return intoCoordinateSpace.ScreenToView (screenCol, screenRow);
+				return intoCoordinateSpace.ScreenToFrame (screenCol, screenRow);
 			}
 
 			internal string GetTrimmedTitle ()
@@ -799,23 +801,10 @@ namespace Terminal.Gui {
 					return MoveSplitter (0, 1);
 				});
 
-				AddKeyBinding (Key.CursorRight, Command.Right);
-				AddKeyBinding (Key.CursorLeft, Command.Left);
-				AddKeyBinding (Key.CursorUp, Command.LineUp);
-				AddKeyBinding (Key.CursorDown, Command.LineDown);
-			}
-
-			public override bool ProcessKey (KeyEvent kb)
-			{
-				if (!CanFocus || !HasFocus) {
-					return base.ProcessKey (kb);
-				}
-
-				var result = InvokeKeybindings (kb);
-				if (result != null)
-					return (bool)result;
-
-				return base.ProcessKey (kb);
+				KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+				KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+				KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+				KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 			}
 
 			public override void PositionCursor ()

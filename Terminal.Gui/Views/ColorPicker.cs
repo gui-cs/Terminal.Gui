@@ -199,10 +199,10 @@ namespace Terminal.Gui {
 		/// </summary>
 		private void AddKeyBindings ()
 		{
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 		}
 
 		///<inheritdoc/>
@@ -416,17 +416,7 @@ namespace Terminal.Gui {
 			}
 			return false;
 		}
-
-		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
-		{
-			var result = InvokeKeybindings (kb);
-			if (result != null)
-				return (bool)result;
-
-			return false;
-		}
-
+		
 		///<inheritdoc/>
 		public override bool MouseEvent (MouseEvent me)
 		{
@@ -435,7 +425,7 @@ namespace Terminal.Gui {
 			}
 
 			SetFocus ();
-			if (me.X < GetFramesThickness ().Left || me.Y < GetFramesThickness ().Top || me.X > Bounds.Width || me.Y > Bounds.Height) {
+			if (me.X > Bounds.Width || me.Y > Bounds.Height) {
 				return true;
 			}
 			//var x = Math.Max (GetFramesThickness().Left, me.X);

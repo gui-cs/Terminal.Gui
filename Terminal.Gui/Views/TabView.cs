@@ -123,10 +123,10 @@ namespace Terminal.Gui {
 			AddCommand (Command.RightEnd, () => { SelectedTab = Tabs.LastOrDefault (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.End, Command.RightEnd);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+			KeyBindings.Add (KeyCode.End, Command.RightEnd);
 		}
 
 		/// <summary>
@@ -227,18 +227,6 @@ namespace Terminal.Gui {
 		{
 
 			SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
-		}
-
-		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
-		{
-			if (HasFocus && CanFocus && Focused == tabsBar) {
-				var result = InvokeKeybindings (keyEvent);
-				if (result != null)
-					return (bool)result;
-			}
-
-			return base.ProcessKey (keyEvent);
 		}
 
 		/// <summary>

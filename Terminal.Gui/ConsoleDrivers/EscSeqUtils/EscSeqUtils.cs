@@ -5,6 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -20,7 +21,7 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// Escape key code (ASCII 27/0x1B).
 	/// </summary>
-	public static readonly char KeyEsc = (char)Key.Esc;
+	public static readonly char KeyEsc = (char)KeyCode.Esc;
 
 	/// <summary>
 	/// ESC [ - The CSI (Control Sequence Introducer).
@@ -72,22 +73,42 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
 	/// </summary>
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Use Alternate Screen Buffer, xterm. 
+	/// </remarks>
 	public static readonly string CSI_ActivateAltBufferNoBackscroll = CSI + "?1047h";
 
 	/// <summary>
 	/// ESC [ ? 1047 l - Restore xterm working buffer (with backscroll)
 	/// </summary>
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Use Normal Screen Buffer, xterm.  Clear the screen first if in the Alternate Screen Buffer.
+	/// </remarks>
 	public static readonly string CSI_RestoreAltBufferWithBackscroll = CSI + "?1047l";
 
 	/// <summary>
 	/// ESC [ ? 1049 h - Save cursor position and activate xterm alternative buffer (no backscroll)
 	/// </summary>
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Save cursor as in DECSC, xterm. After saving the cursor, switch to the Alternate Screen Buffer,
+	/// clearing it first.
+	/// This control combines the effects of the 1047 and 1048 modes.
+	/// Use this with terminfo-based applications rather than the 47 mode.
+	/// </remarks>
 	public static readonly string CSI_SaveCursorAndActivateAltBufferNoBackscroll = CSI + "?1049h";
 
 	/// <summary>
 	/// ESC [ ? 1049 l - Restore cursor position and restore xterm working buffer (with backscroll)
 	/// </summary>
-	public static readonly string CSI_RestoreCursorAndActivateAltBufferWithBackscroll = CSI + "?1049l";
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Use Normal Screen Buffer and restore cursor as in DECRC, xterm.
+	/// resource.This combines the effects of the 1047 and 1048  modes.
+	/// </remarks>
+	public static readonly string CSI_RestoreCursorAndRestoreAltBufferWithBackscroll = CSI + "?1049l";
 
 	/// <summary>
 	/// Options for ANSI ESC "[xJ" - Clears part of the screen.
@@ -152,7 +173,7 @@ public static class EscSeqUtils {
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <returns></returns>
-	public static string CSI_SetCursorPosition (int x, int y) => $"{CSI}{y};{x}H";
+	public static string CSI_SetCursorPosition (int y, int x) => $"{CSI}{y};{x}H";
 
 
 	//ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
@@ -1060,7 +1081,7 @@ public static class EscSeqUtils {
 			if (view == null)
 				break;
 			if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.MainLoop.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
+				Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
 			}
 		}
 	}
