@@ -284,42 +284,41 @@ namespace Terminal.Gui {
 			}
 
 			var messageLabel = new Label () {
-				AutoSize = false,//wrapMessage ? false : true,
+				AutoSize = wrapMessage ? false : true,
 				Text = message,
 				TextAlignment = TextAlignment.Centered,
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
-				ColorScheme = Colors.Base
 			};
 			messageLabel.TextFormatter.WordWrap = wrapMessage;
 			messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
 			d.Add (messageLabel);
 
-			//d.Loaded += (s, e) => {
-			//	if (width != 0 || height != 0) {
-			//		return;
-			//	}
-			//	// TODO: replace with Dim.Fit when implemented
-			//	var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
-			//	if (wrapMessage) {
-			//		messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
-			//	} 
-			//	var msg = messageLabel.TextFormatter.Format ();
-			//	var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
+			d.Loaded += (s, e) => {
+				if (width != 0 || height != 0) {
+					return;
+				}
+				// TODO: replace with Dim.Fit when implemented
+				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
+				if (wrapMessage) {
+					messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
+				}
+				var msg = messageLabel.TextFormatter.Format ();
+				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
-			//	// Ensure the width fits the text + buttons
-			//	var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetFramesThickness ().Horizontal,
-			//					d.GetButtonsWidth () + d.buttons.Count + d.GetFramesThickness ().Horizontal));
-			//	if (newWidth > d.Frame.Width) {
-			//		d.Width = newWidth;
-			//	}
-			//	// Ensure height fits the text + vspace + buttons
-			//	var lastLine = messageLabel.TextFormatter.Lines [^1];
-			//	d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetFramesThickness ().Vertical);
-			//	d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
-			//};
+				// Ensure the width fits the text + buttons
+				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetFramesThickness ().Horizontal,
+								d.GetButtonsWidth () + d.buttons.Count + d.GetFramesThickness ().Horizontal));
+				if (newWidth > d.Frame.Width) {
+					d.Width = newWidth;
+				}
+				// Ensure height fits the text + vspace + buttons
+				var lastLine = messageLabel.TextFormatter.Lines [^1];
+				d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetFramesThickness ().Vertical);
+				d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
+			};
 
 			// Setup actions
 			Clicked = -1;
