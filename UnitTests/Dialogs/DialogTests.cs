@@ -790,7 +790,13 @@ namespace Terminal.Gui.DialogTests {
 				btn2 = new Button ("Show Sub");
 				btn3 = new Button ("Close");
 				btn3.Clicked += (s, e) => Application.RequestStop ();
-				btn2.Clicked += (s, e) => { MessageBox.Query (string.Empty, "ya", "Ok"); };
+				btn2.Clicked += (s, e) => {
+					// Don't test MessageBox in Dialog unit tests!
+					var subBtn = new Button ("Ok") { IsDefault = true };
+					var subDlg = new Dialog (subBtn) { Text = "ya", Width = 20, Height = 5 };
+					subBtn.Clicked += (s, e) => Application.RequestStop (subDlg);
+					Application.Run (subDlg);
+				};
 				var dlg = new Dialog (btn2, btn3);
 
 				Application.Run (dlg);
@@ -818,11 +824,11 @@ namespace Terminal.Gui.DialogTests {
 				} else if (iterations == 2) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
   ┌───────────────────────┐
-  │   ┌────────────────┐  │
-  │   │       ya       │  │
-  │   │                │  │
-  │   │    {btn}    │  │
-  │   └────────────────┘  │
+  │  ┌──────────────────┐ │
+  │  │ya                │ │
+  │  │                  │ │
+  │  │     {btn}     │ │
+  │  └──────────────────┘ │
   │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
   └───────────────────────┘", output);
 
