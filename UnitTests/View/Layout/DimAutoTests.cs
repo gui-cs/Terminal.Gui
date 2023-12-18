@@ -357,5 +357,4 @@ public class DimAutoTests {
 
 	// Test variations of Frame
 
-	// test PosCombine (can DimAuto be combined??!)
 }

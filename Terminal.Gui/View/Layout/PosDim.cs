@@ -601,7 +601,6 @@ public class Dim {
 	/// <summary>
 	/// Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews.
 	/// </summary>
-	/// <returns>The AutoSize <see cref="Dim"/> object.</returns>
 	/// <example>
 	/// This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two SubViews.
 	/// <code>
@@ -611,18 +610,34 @@ public class Dim {
 	/// view.Add (button, textField);
 	/// </code>
 	/// </example>
-	public static Dim Auto ()
+	/// <returns>The AutoSize <see cref="Dim"/> object.</returns>
+	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
+	/// <param name="min">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
+	public static Dim Auto (Dim min = null, Dim max = null)
 	{
-		return new DimAuto ();
+		return new DimAuto (min, max);
 	}
 
 	internal class DimAuto : Dim {
-		public override string ToString () => $"Auto()";
+		internal readonly Dim _min;
+		internal readonly Dim _max;
+
+		public DimAuto (Dim min, Dim max)
+		{
+			_min = min;
+			_max = max;
+		}
+
+		public override string ToString () => $"Auto({_min}, {_max})";
 
 		internal override int Anchor (int width)
 		{
 			return width;
 		}
+
+		public override int GetHashCode () => _min.GetHashCode () * _max.GetHashCode (); // BUGBUG: This isn't right
+
+		public override bool Equals (object other) => other is DimAuto fill && (fill._min == _min && fill._max == _max);
 	}
 
 	/// <summary>

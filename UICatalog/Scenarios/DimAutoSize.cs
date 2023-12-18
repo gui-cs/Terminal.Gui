@@ -58,7 +58,7 @@ public class DimAutoSize : Scenario {
 			X = 3,
 			Y = 3,
 			Width = Dim.Auto (),
-			Height = Dim.Auto ()
+			Height = Dim.Auto (10)
 		};
 		view.ValidatePosDim = true;
 		view.Add (textField, label, button);
