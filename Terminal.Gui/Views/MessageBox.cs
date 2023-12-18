@@ -265,17 +265,17 @@ namespace Terminal.Gui {
 			d = new Dialog (buttonList.ToArray ()) {
 				Title = title,
 				BorderStyle = DefaultBorderStyle,
-				//Width = Dim.AutoSize (),//Percent (60),
-				//Height = Dim.AutoSize () //5 // Border + one line of text + vspace + buttons
+				Width = Dim.Percent (60),
+				Height = 5 // Border + one line of text + vspace + buttons
 			};
 
-			//if (width != 0) {
-			//	d.Width = width;
-			//}
+			if (width != 0) {
+				d.Width = width;
+			}
 
-			//if (height != 0) {
-			//	d.Height = height;
-			//}
+			if (height != 0) {
+				d.Height = height;
+			}
 
 			if (useErrorColors) {
 				d.ColorScheme = Colors.Error;

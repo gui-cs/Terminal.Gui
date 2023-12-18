@@ -57,9 +57,9 @@ public class Dialog : Window {
 
 	void SetInitialProperties (Button [] buttons)
 	{
-		//X = Pos.Center ();
-		//Y = Pos.Center ();
-		ValidatePosDim = true;
+		X = Pos.Center ();
+		Y = Pos.Center ();
+		//ValidatePosDim = true;
 
 		Width = Dim.Percent (85);
 		Height = Dim.Percent (85);
