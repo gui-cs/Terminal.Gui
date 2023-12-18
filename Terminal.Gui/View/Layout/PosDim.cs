@@ -28,8 +28,7 @@ namespace Terminal.Gui;
 ///     of the <see cref="View"/> 3 characters to the left after centering for example.
 ///   </para>
 ///   <para>
-///     It is possible to reference coordinates of another view by using the methods
-///     Left(View), Right(View), Bottom(View), Top(View). The X(View) and Y(View) are
+///     Reference coordinates of another view by using the methods Left(View), Right(View), Bottom(View), Top(View). The X(View) and Y(View) are
 ///     aliases to Left(View) and Top(View) respectively.
 ///   </para>
 /// <para>
@@ -603,7 +602,6 @@ public class Dim {
 	/// Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews.
 	/// </summary>
 	/// <returns>The AutoSize <see cref="Dim"/> object.</returns>
-	/// <param name="margin">Margin to use.</param>
 	/// <example>
 	/// This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two SubViews.
 	/// <code>
@@ -613,28 +611,18 @@ public class Dim {
 	/// view.Add (button, textField);
 	/// </code>
 	/// </example>
-	public static Dim AutoSize (int margin = 0)
+	public static Dim AutoSize ()
 	{
-		return new DimAutoSize (margin);
+		return new DimAutoSize ();
 	}
 
 	internal class DimAutoSize : Dim {
-		readonly int _margin;
-		public DimAutoSize (int margin)
-		{
-			_margin = margin;
-		}
-
-		public override string ToString () => $"AutoSize({_margin})";
+		public override string ToString () => $"AutoSize()";
 
 		internal override int Anchor (int width)
 		{
-			return width - _margin;
+			return width;
 		}
-
-		public override int GetHashCode () => _margin.GetHashCode ();
-
-		public override bool Equals (object other) => other is DimAutoSize autoSize && autoSize._margin == _margin;
 	}
 
 	/// <summary>
