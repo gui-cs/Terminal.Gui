@@ -45,7 +45,7 @@ public class DimAutoSize : Scenario {
 		};
 
 		var button = new Button () { Text = "Press to make button move down.", 
-			X = Pos.Center(), 
+			X = 0, 
 			Y = Pos.Bottom (label), 
 		};
 		button.Clicked += (s, e) => {

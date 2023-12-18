@@ -52,6 +52,8 @@ namespace UICatalog.Scenarios {
 
 			public FrameEditor ()
 			{
+				Height = Dim.AutoSize ();
+				Width = Dim.AutoSize ();
 				Margin.Thickness = new Thickness (0);
 				BorderStyle = LineStyle.Double;
 				Initialized += FrameEditor_Initialized; ;
@@ -144,9 +146,9 @@ namespace UICatalog.Scenarios {
 				_rightEdit.Text = $"{Thickness.Right}";
 				_bottomEdit.Text = $"{Thickness.Bottom}";
 
-				LayoutSubviews ();
-				Height = GetFramesThickness ().Vertical + 4 + 4;
-				Width = GetFramesThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
+				//LayoutSubviews ();
+				//Height = GetFramesThickness ().Vertical + 4 + 4;
+				//Width = GetFramesThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
 			}
 
 			private void Edit_TextChanging (object sender, TextChangingEventArgs e)

@@ -721,13 +721,11 @@ namespace Terminal.Gui {
 				case Dim.DimAutoSize:
 					var thickness = GetFramesThickness ();
 					if (horiz) {
-						var furthestLeft = Subviews.Where (v => v.Frame.X >= 0).Min (v => v.Frame.X);
-						var furthestRight = Subviews.Where (v => v.Frame.X >= 0).Max (v => v.Frame.X + v.Frame.Width);
-						newDimension = furthestLeft + furthestRight + thickness.Left + thickness.Right;
+						var furthestRight = Subviews.Max (v => v.Frame.X + v.Frame.Width);
+						newDimension = furthestRight + thickness.Left + thickness.Right;
 					} else {
-						var furthestTop = Subviews.Where (v => v.Frame.Y >= 0).Min (v => v.Frame.Y);
-						var furthestBottom = Subviews.Where (v => v.Frame.Y >= 0).Max (v => v.Frame.Y + v.Frame.Height);
-						newDimension = furthestTop + furthestBottom + thickness.Top + thickness.Bottom;
+						var furthestBottom = Subviews.Max (v => v.Frame.Y + v.Frame.Height);
+						newDimension = furthestBottom + thickness.Top + thickness.Bottom;
 					}
 					break;
 
@@ -981,7 +979,18 @@ namespace Terminal.Gui {
 			CollectAll (this, ref nodes, ref edges);
 			var ordered = View.TopologicalSort (SuperView, nodes, edges);
 			foreach (var v in ordered) {
-				LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
+				if (v.Width is Dim.DimAutoSize || v.Height is Dim.DimAutoSize) {
+					// If the view is auto-sized...
+					var f = v.Frame;
+					LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
+					if (v.Frame != f) {
+						// The subviews changed; do it again
+						v.LayoutNeeded = true;
+						LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
+					}
+				} else {
+					LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
+				}
 			}
 
 			// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.
