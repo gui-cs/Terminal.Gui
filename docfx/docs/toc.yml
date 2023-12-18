@@ -8,8 +8,8 @@
   href: views.md
 - name: Configuration
   href: config.md
-- name: Color
-  href: color.md
+- name: Drawing (Text and Color)
+  href: drawing.md
 - name: Cross-platform Driver Model
   href: drivers.md
 - name: Keyboard Event Processing

@@ -32,12 +32,12 @@ The `UI Catalog` application provides an example of how to use the [`Configurati
 
 (Note, this list may not be complete; search the source code for `SerializableConfigurationProperty` to find all settings that can be configured.)
 
-    * [Application.QuitKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_QuitKey)
-    * [Application.AlternateForwardKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateForwardKey)
-    * [Application.AlternateBackwardKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateBackwardKey)
-    * [Application.UseSystemConsole](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_UseSystemConsole)
-    * [Application.IsMouseDisabled](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_IsMouseDisabled)
-    * [Application.EnableConsoleScrolling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_EnableConsoleScrolling)
+  * [Application.QuitKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_QuitKey)
+  * [Application.AlternateForwardKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateForwardKey)
+  * [Application.AlternateBackwardKey](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_AlternateBackwardKey)
+  * [Application.UseSystemConsole](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_UseSystemConsole)
+  * [Application.IsMouseDisabled](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_IsMouseDisabled)
+  * [Application.EnableConsoleScrolling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_EnableConsoleScrolling)
 
 ## Glyphs
 

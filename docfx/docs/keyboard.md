@@ -16,21 +16,26 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 *Terminal.Gui* provides the following APIs for handling keyboard input:
 
+### **[Key](~/api/Terminal.Gui.Key.yml)**
+
+The `Key` class provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
+
+See [Key](~/api/Terminal.Gui.Key.yml) for more details.
+
 ### **[Key Bindings](~/api/Terminal.Gui.KeyBindings.yml)**
 
-The default key for activating a button is `Space`. You can change this using the 
-`ClearKeybinding` and `AddKeybinding` methods:
+The default key for activating a button is `Space`. You can change this using  
+`Keybindings.Clear` and `Keybinding.Add` methods:
 
 ```csharp
 var btn = new Button ("Press Me");
-btn.ClearKeybinding (Command.Accept);
-btn.AddKeyBinding (Key.B, Command.Accept);
+btn.Keybinding.Remove (Command.Accept);
+btn.KeyBinding.Add (Key.B, Command.Accept);
 ```
 
 The [Command](~/api/Terminal.Gui.Command.yml) enum lists generic operations that are implemented by views. For example `Command.Accept` in a `Button` results in the `Clicked` event 
 firing while in `TableView` it is bound to `CellActivated`. Not all commands
-are implemented by all views (e.g. you cannot scroll in a `Button`). Use the `GetSupportedCommands()`
-method to determine which commands are implemented by a `View`. 
+are implemented by all views (e.g. you cannot scroll in a `Button`). Use the `GetSupportedCommands()` method to determine which commands are implemented by a `View`. 
 
 ### **[HotKey](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKey)** 
 

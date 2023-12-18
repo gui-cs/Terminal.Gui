@@ -33,14 +33,11 @@ Application.Shutdown ();
 return n;
 ```
 
-This example shows a prompt and returns an integer value depending on
-which value was selected by the user.
+This example shows a prompt and returns an integer value depending on which value was selected by the user.
 
-More interesting user interfaces can be created by composing some of
-the various `View` classes that are included. In the following sections, you
-will see how applications are put together.
+More interesting user interfaces can be created by composing some of the various `View` classes that are included. 
 
-In the example above, you can see that we have initialized the runtime by calling [Applicaton.Init](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_) - this sets up the environment, initializes the color schemes, and clears the screen to start the application.
+In the example above, [Applicaton.Init](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_Init_Terminal_Gui_ConsoleDriver_) sets up the environment, initializes the color schemes, and clears the screen to start the application.
 
 The [Application](~/api/Terminal.Gui.Application.yml) class additionally creates an instance of the [Toplevel](~/api/Terminal.Gui.Toplevel.yml) View available in the `Application.Top` property, and can be used like this:
 
@@ -59,8 +56,7 @@ Application.Run ();
 Application.Shutdown ();
 ```
 
-Typically, you will want your application to have more than a label, you might
-want a menu and a button for example. the following code does this:
+This example includes a menu bar at the top of the screen and a button that shows a message box when clicked:
 
 ```csharp
 using Terminal.Gui;
@@ -97,7 +93,7 @@ All visible elements in a Terminal.Gui application are implemented as
 
 See the full list of [Views provided by the Terminal.Gui library here](views.md).
 
-Every view can contain an arbitrary number of children views, called `SubViews`.Call the
+Every view can contain an arbitrary number of child views, called `SubViews`. Call the
 [View.Add](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_Add_Terminal_Gui_View_) method to add a couple of buttons to a UI:
 
 ```csharp
@@ -139,41 +135,6 @@ See the full [Layout documentation here](layout.md).
 
 Views can either be Modal or Non-modal. Modal views take over all user input until the user closes the View. Examples of Modal Views are Toplevel, Dialog, and Wizard. Non-modal views can be used to create a new experience in your application, one where you would have a new top-level menu for example. Setting the `Modal` property on a View to `true` makes it modal.
 
-### Windows
-
-[Window](~/api/Terminal.Gui.Window.yml) is a view used in Overlapped layouts, providing a frame and a title - and can be moved and sized with the keyboard or mouse.
-
-### Dialogs
-
-[Dialogs](~/api/Terminal.Gui.Dialog.yml) are Modal [Windows](~/api/Terminal.Gui.Window.yml) that are centered in the middle of the screen and are intended to be used modally - that is, they run, and they are expected to return a result before resuming execution of the application.
-
-Dialogs expose the 
-[`AddButton`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.Dialog.yml#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_) API which manages the layout
-of any button passed to it, ensuring that the buttons are at the bottom of the dialog.
-
-Example:
-```csharp
-bool okpressed = false;
-var ok = new Button("Ok");
-var cancel = new Button("Cancel");
-var dialog = new Dialog ("Quit", 60, 7, ok, cancel);
-```
-
-Which will show something like this:
-```
-+- Quit -----------------------------------------------+
-|                                                      |
-|                                                      |
-|                  [ Ok ] [ Cancel ]                   |
-+------------------------------------------------------+
-```
-
-### Wizards
-
-[Wizards](~/api/Terminal.Gui.Wizard.yml) are Dialogs that let users step through a series of steps to complete a task. 
-
-### Running Modally
-
 To run any View (but especially Dialogs, Windows, or Toplevels) modally, invoke the `Application.Run` method on a Toplevel. Use the `Application.RequestStop()` method to terminate the modal execution.
 
 ```csharp
@@ -198,9 +159,55 @@ if (okpressed)
     Console.WriteLine ("The user entered: " + entry.Text);
 ```
 
-There is no return value from running modally, so the modal view must have a mechanism
-of indicating the reason the modal was closed. In the 
-case above, the `okpressed` value is set to true if the user pressed or selected the Ok button.
+There is no return value from running modally, so the modal view must have a mechanism to indicate the reason the modal was closed. In the case above, the `okpressed` value is set to true if the user pressed or selected the `Ok` button.
+
+## Windows
+
+[Window](~/api/Terminal.Gui.Window.yml) is a view used in `Overlapped` layouts, providing a frame and a title - and can be moved and sized with the keyboard or mouse.
+
+## Dialogs
+
+[Dialogs](~/api/Terminal.Gui.Dialog.yml) are Modal [Windows](~/api/Terminal.Gui.Window.yml) that are centered in the middle of the screen and are intended to be used modally - that is, they run, and they are expected to return a result before resuming execution of the application.
+
+Dialogs expose an API for adding buttons and managing the layout such that buttons are at the bottom of the dialog (e.g. [`AddButton`](https://migueldeicaza.github.io/gui.cs/api/Terminal.Gui.Dialog.yml#Terminal_Gui_Dialog_AddButton_Terminal_Gui_Button_)).
+
+Example:
+```csharp
+bool okpressed = false;
+var ok = new Button("Ok");
+var cancel = new Button("Cancel");
+var dialog = new Dialog ("Quit", ok, cancel) { Text = "Are you sure you want to quit?" };
+```
+
+Which will show something like this:
+
+```
++- Quit -----------------------------------------------+
+|            Are you sure you want to quit?            |
+|                                                      |
+|                  [ Ok ] [ Cancel ]                   |
++------------------------------------------------------+
+```
+
+## Wizards
+
+[Wizards](~/api/Terminal.Gui.Wizard.yml) are Dialogs that let users step through a series of steps to complete a task. 
+
+```
+╔╡Gandolf - The last step╞════════════════════════════════════╗
+║                                     The wizard is complete! ║
+║☐ Enable Final Final Step                                    ║
+║                                     Press the Finish        ║
+║                                     button to continue.     ║
+║                                                             ║
+║                                     Pressing ESC will       ║
+║                                     cancel the wizard.      ║
+║                                                             ║
+║                                                             ║
+║─────────────────────────────────────────────────────────────║
+║⟦ Back ⟧                                         ⟦► Finish ◄⟧║
+╚═════════════════════════════════════════════════════════════╝
+```
 
 ## Input Handling
 
@@ -250,7 +257,7 @@ var label = new Label (...);
 label.TextColor = myColor
 ```
 
-Learn more about colors in the [Color](color.md) overview.
+Learn more about colors in the [Drawing](drawing.md) overview.
 
 ## MainLoop, Threads and Input Handling
 

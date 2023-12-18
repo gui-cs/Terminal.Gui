@@ -1,51 +1,31 @@
 # Layout
 
-## Tenets for Terminal.Gui View Layout (Unless you know better ones...)
+Terminal.Gui v2 supports the following View layout systems (controlled by the [View.LayoutStyle](~/api/Terminal.Gui.LayoutStyle.yml)):
 
-Tenets higher in the list have precedence over tenets lower in the list.
-
-* **Users Have Control** - *Terminal.Gui* provides default key bindings consistent with these tenets, but those defaults are configurable by the user. For example, `ConfigurationManager` allows users to redefine key bindings for the system, a user, or an application.
-
-* **More Editor than Command Line** - Once a *Terminal.Gui* app starts, the user is no longer using the command line. Users expect keyboard idioms in TUI apps to be consistent with GUI apps (such as VS Code, Vim, and Emacs). For example, in almost all GUI apps, `Ctrl-V` is `Paste`. But the Linux shells often use `Shift-Insert`. *Terminal.Gui* binds `Ctrl-V` by default.
-
-* **Be Consistent With the User's Platform** - Users get to choose the platform they run *Terminal.Gui* apps on and those apps should respond to keyboard input in a way that is consistent with the platform. For example, on Windows to erase a word to the left, users press `Ctrl-Backspace`. But on Linux, `Ctrl-W` is used.
-
-* **The Source of Truth is Wikipedia** - We use this [Wikipedia article](https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts) as our guide for default key bindings.
-
-
-
-Terminal.Gui supports two different layout systems, absolute and computed \
-(controlled by the [LayoutStyle](~/api/Terminal.Gui.LayoutStyle.yml)
-property on the view.
-
-The absolute system is used when you want the view to be positioned exactly in
-one location and want to manually control where the view is. This is done
-by invoking your View constructor with an argument of type [Rect](~/api/Terminal.Gui.Rect.yml). When you do this, to change the position of the View, you can change the `Frame` property on the View.
-
-The computed layout system offers a few additional capabilities, like automatic
-centering, expanding of dimensions and a handful of other features. To use
-this you construct your object without an initial `Frame`, but set the 
- `X`, `Y`, `Width` and `Height` properties after the object has been created.
+* **Absolute** - Used to have the View positioned exactly in a location, with a fixed size. Absolute layout is accomplished by constructing a View with an argument of type [Rect](~/api/Terminal.Gui.Rect.yml) or directly changing the `Frame` property on the View.
+* **Computed** - The Computed Layout system provides automatic aligning of Views with other Views, automatic centering, and automatic sizing. To use Computed layout set the 
+ `X`, `Y`, `Width` and `Height` properties after the object has been created. Views laid out using the Computed Layout system can be resized with the mouse or keyboard, enabling tiled window managers and dynamic terminal UIs.
+* **Overlapped** - New in V2 (But not yet) - Overlapped layout enables views to be positioned on top of each other. Overlapped Views are movable and sizable with both the keyboard and the mouse.
 
 Examples:
 
 ```csharp
+// Absolute layout using a provided rectangle
+var label1 = new Label (new Rect (1, 1, 20, 1), "Hello")
 
-// Dynamically computed
-var label = new Label ("Hello") {
-    X = 1,
+// Computed Layout
+var label2 = new Label ("Hello") {
+    X = Pos.Right (label2),
     Y = Pos.Center (),
     Width = Dim.Fill (),
     Height = 1
 };
 
-// Absolute position using the provided rectangle
-var label2 = new Label (new Rect (1, 2, 20, 1), "World")
 ```
 
-The computed layout system does not take integers, instead the `X` and `Y` properties are of type [Pos](~/api/Terminal.Gui.Pos.yml) and the `Width` and `Height` properties are of type [Dim](~/api/Terminal.Gui.Dim.yml) both which can be created implicitly from integer values.
+When using *Computed Layout* the `X` and `Y` properties are of type [Pos](~/api/Terminal.Gui.Pos.yml) and the `Width` and `Height` properties are of type [Dim](~/api/Terminal.Gui.Dim.yml) both of which can be created implicitly from integer values.
 
-### The `Pos` Type
+## The `Pos` Type
 
 The `Pos` type on `X` and `Y` offers a few options:
 * Absolute position, by passing an integer
@@ -69,7 +49,7 @@ myView.X = Pos.X (view);
 myView.Y = Pos.Bottom (anotherView);
 ```
 
-### The `Dim` Type
+## The `Dim` Type
 
 The `Dim` type is used for the `Width` and `Height` properties on the View and offers
 the following options:
