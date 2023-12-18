@@ -467,7 +467,7 @@ public class Pos {
 ///	  </description>
 ///	</item>
 ///	<item>
-///	  <term><see cref="Dim.AutoSize(int)"/></term>
+///	  <term><see cref="Auto()"/></term>
 ///	  <description>
 ///	  Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews.
 ///	  </description>
@@ -611,13 +611,13 @@ public class Dim {
 	/// view.Add (button, textField);
 	/// </code>
 	/// </example>
-	public static Dim AutoSize ()
+	public static Dim Auto ()
 	{
-		return new DimAutoSize ();
+		return new DimAuto ();
 	}
 
-	internal class DimAutoSize : Dim {
-		public override string ToString () => $"AutoSize()";
+	internal class DimAuto : Dim {
+		public override string ToString () => $"Auto()";
 
 		internal override int Anchor (int width)
 		{

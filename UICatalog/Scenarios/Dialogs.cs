@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
-				Height = Dim.AutoSize ()
+				Height = Dim.Auto ()
 			};
 
 			var label = new Label ("Width:") {
@@ -204,7 +204,7 @@ namespace UICatalog.Scenarios {
 
 				var add = new Button ("Add a button") {
 					X = Pos.Center (),
-					Y = Pos.Center ()
+					Y = 10//Pos.Center ()
 				};
 				add.Clicked += (s, e) => {
 					var buttonId = buttons.Count;
@@ -231,7 +231,7 @@ namespace UICatalog.Scenarios {
 
 				var addChar = new Button ($"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button") {
 					X = Pos.Center (),
-					Y = Pos.Center () + 1
+					Y = 11//Pos.Center () + 1
 				};
 				addChar.Clicked += (s, e) => {
 					foreach (var button in buttons) {

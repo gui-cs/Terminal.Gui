@@ -56,8 +56,8 @@ public class DimAutoSize : Scenario {
 			Title = "Type in the TextField to make it grow.",
 			X = 3,
 			Y = 3,
-			Width = Dim.AutoSize (),
-			Height = Dim.AutoSize ()
+			Width = Dim.Auto (),
+			Height = Dim.Auto ()
 		};
 
 		view.Add (textField, label, button);

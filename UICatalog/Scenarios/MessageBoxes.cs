@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
-				Height = Dim.AutoSize ()
+				Height = Dim.Auto ()
 			};
 			Win.Add (frame);
 
