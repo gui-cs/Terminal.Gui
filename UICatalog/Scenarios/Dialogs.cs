@@ -15,6 +15,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
+				Height = Dim.AutoSize ()
 			};
 
 			var label = new Label ("Width:") {
@@ -113,20 +114,6 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label),
 			};
 			frame.Add (styleRadioGroup);
-
-			frame.ForceValidatePosDim = true;
-			void Top_Loaded (object sender, EventArgs args)
-			{
-				frame.Height =
-					widthEdit.Frame.Height +
-					heightEdit.Frame.Height +
-					titleEdit.Frame.Height +
-					numButtonsEdit.Frame.Height +
-					glyphsNotWords.Frame.Height +
-					styleRadioGroup.Frame.Height;
-				Application.Top.Loaded -= Top_Loaded;
-			}
-			Application.Top.Loaded += Top_Loaded;
 
 			Win.Add (frame);
 
