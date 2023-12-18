@@ -694,7 +694,7 @@ namespace Terminal.Gui.ViewTests {
 			var v = new View () {
 				X = Pos.Center (),
 				Y = Pos.Percent (10),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			w.Add (v);

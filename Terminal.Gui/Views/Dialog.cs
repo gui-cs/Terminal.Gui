@@ -59,6 +59,7 @@ public class Dialog : Window {
 	{
 		//X = Pos.Center ();
 		//Y = Pos.Center ();
+		ValidatePosDim = true;
 
 		Width = Dim.Auto ();//Percent (85);
 		Height = Dim.Auto ();//Percent (85);

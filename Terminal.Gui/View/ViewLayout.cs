@@ -252,7 +252,7 @@ namespace Terminal.Gui {
 			get {
 #if DEBUG
 				if (LayoutStyle == LayoutStyle.Computed && !IsInitialized) {
-					Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug. View: {this}");
+					Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}");
 					Debug.WriteLine ($"The Frame is set before the View has been initialized. So it isn't a bug.Is by design.");
 				}
 #endif // DEBUG
@@ -280,6 +280,106 @@ namespace Terminal.Gui {
 			var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
 			return new Rect (Point.Empty, new Size (width, height));
 		}
+		
+		Pos _x, _y;
+
+		/// <summary>
+		/// Gets or sets the X position for the view (the column). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// </summary>
+		/// <value>The X Position.</value>
+		/// <remarks>
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// </remarks>
+		public Pos X {
+			get => VerifyIsInitialized (_x);
+			set {
+				if (ValidatePosDim && LayoutStyle == LayoutStyle.Computed) {
+					CheckAbsolute (nameof (X), _x, value);
+				}
+
+				_x = value;
+
+				OnResizeNeeded ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// </summary>
+		/// <value>The y position (line).</value>
+		/// <remarks>
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// </remarks>
+		public Pos Y {
+			get => VerifyIsInitialized (_y);
+			set {
+				if (ValidatePosDim && LayoutStyle == LayoutStyle.Computed) {
+					CheckAbsolute (nameof (Y), _y, value);
+				}
+
+				_y = value;
+
+				OnResizeNeeded ();
+			}
+		}
+		Dim _width, _height;
+
+		/// <summary>
+		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// </summary>
+		/// <value>The width.</value>
+		/// <remarks>
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// </remarks>
+		public Dim Width {
+			get => VerifyIsInitialized (_width);
+			set {
+				if (ValidatePosDim && LayoutStyle == LayoutStyle.Computed) {
+					CheckAbsolute (nameof (Width), _width, value);
+				}
+
+				_width = value;
+
+				if (ValidatePosDim) {
+					var isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (_width);
+
+					if (IsAdded && AutoSize && !isValidNewAutSize) {
+						throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
+					}
+				}
+				OnResizeNeeded ();
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// </summary>
+		/// <value>The height.</value>
+		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		public Dim Height {
+			get => VerifyIsInitialized (_height);
+			set {
+				if (ValidatePosDim) {
+					if (value is Dim.DimAuto) {
+						CheckDimAuto ();
+					}
+					if (LayoutStyle == LayoutStyle.Computed) {
+						CheckAbsolute (nameof (Height), _height, value);
+					}
+				}
+
+				_height = value;
+
+				if (ValidatePosDim) {
+					var isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (_height);
+
+					if (IsAdded && AutoSize && !isValidNewAutSize) {
+						throw new InvalidOperationException ("Must set AutoSize to false before setting the Height.");
+					}
+				}
+				OnResizeNeeded ();
+			}
+		}
 
 		// Diagnostics to highlight when X or Y is read before the view has been initialized
 		Pos VerifyIsInitialized (Pos pos)
@@ -303,118 +403,71 @@ namespace Terminal.Gui {
 			return dim;
 		}
 
-		Pos _x, _y;
 
 		/// <summary>
-		/// Gets or sets the X position for the view (the column). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs. 
 		/// </summary>
-		/// <value>The X Position.</value>
 		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+		/// Setting this to <see langword="true"/> will enable validation of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>
+		/// during set operations and in <see cref="LayoutSubviews"/>.If invalid settings are discovered exceptions will be thrown indicating the error.
+		/// This will impose a performance penalty and thus should only be used for debugging. 
 		/// </remarks>
-		public Pos X {
-			get => VerifyIsInitialized (_x);
-			set {
-				if (ForceValidatePosDim && !ValidatePosDim (_x, value)) {
-					throw new ArgumentException ();
-				}
-
-				_x = value;
-
-				OnResizeNeeded ();
-			}
-		}
+		public bool ValidatePosDim { get; set; }
 
 		/// <summary>
-		/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+		/// Throws an <see cref="InvalidOperationException"/> if any of the SubViews are using Dim objects that depend on this Views dimensions.
 		/// </summary>
-		/// <value>The y position (line).</value>
-		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
-		/// </remarks>
-		public Pos Y {
-			get => VerifyIsInitialized (_y);
-			set {
-				if (ForceValidatePosDim && !ValidatePosDim (_y, value)) {
-					throw new ArgumentException ();
-				}
-
-				_y = value;
-
-				OnResizeNeeded ();
-			}
-		}
-		Dim _width, _height;
-
-		/// <summary>
-		/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
-		/// </summary>
-		/// <value>The width.</value>
-		/// <remarks>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
-		/// </remarks>
-		public Dim Width {
-			get => VerifyIsInitialized (_width);
-			set {
-				if (ForceValidatePosDim && !ValidatePosDim (_width, value)) {
-					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Width));
-				}
-
-				_width = value;
-
-				if (ForceValidatePosDim) {
-					var isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (_width);
-
-					if (IsAdded && AutoSize && !isValidNewAutSize) {
-						throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
-					}
-				}
-				OnResizeNeeded ();
-			}
-		}
-
-		/// <summary>
-		/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
-		/// </summary>
-		/// <value>The height.</value>
-		/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
-		public Dim Height {
-			get => VerifyIsInitialized (_height);
-			set {
-				if (ForceValidatePosDim && !ValidatePosDim (_height, value)) {
-					throw new ArgumentException ("ForceValidatePosDim is enabled", nameof (Height));
-				}
-
-				_height = value;
-
-				if (ForceValidatePosDim) {
-					var isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (_height);
-
-					if (IsAdded && AutoSize && !isValidNewAutSize) {
-						throw new InvalidOperationException ("Must set AutoSize to false before set the Height.");
-					}
-				}
-				OnResizeNeeded ();
-			}
-		}
-
-		/// <summary>
-		/// Forces validation with <see cref="Terminal.Gui.LayoutStyle.Computed"/> layout
-		///  to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
-		/// </summary>
-		public bool ForceValidatePosDim { get; set; }
-
-		bool ValidatePosDim (object oldValue, object newValue)
+		/// <exception cref="InvalidOperationException"></exception>
+		void CheckDimAuto ()
 		{
-			if (!IsInitialized || _layoutStyle == LayoutStyle.Absolute || oldValue == null || oldValue.GetType () == newValue.GetType () || this is Toplevel) {
-				return true;
+			if (!ValidatePosDim) {
+				return;
 			}
-			if (_layoutStyle == LayoutStyle.Computed) {
-				if (oldValue.GetType () != newValue.GetType () && !(newValue is Pos.PosAbsolute || newValue is Dim.DimAbsolute)) {
-					return true;
+			
+			void ThrowInvalid (View view, object checkPosDim, string name)
+			{
+				object bad = null;
+				switch (checkPosDim) {
+				case Pos pos and not Pos.PosAbsolute and not Pos.PosView:
+					bad = pos;
+					break;
+				case Dim dim and not Dim.DimAbsolute and not Dim.DimView:
+					bad = dim;
+					break;
+				}
+				
+				if (bad != null) {
+					throw new InvalidOperationException (@$"{view.GetType().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
 				}
 			}
-			return false;
+
+			// Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
+			foreach (var view in Subviews) {
+				ThrowInvalid (view, view.Width, nameof(view.Width));
+				ThrowInvalid (view, view.Height, nameof(view.Height));
+				ThrowInvalid (view, view.X, nameof (view.X));
+				ThrowInvalid (view, view.Y, nameof (view.Y));
+			}
+		}
+
+		/// <summary>
+		/// Throws an <see cref="ArgumentException"/> if <paramref name="newValue"/> is <see cref="Pos.PosAbsolute"/> or <see cref="Dim.DimAbsolute"/>.
+		/// Used when <see cref="ValidatePosDim"/> is turned on to verify correct <see cref="LayoutStyle.Computed"/> behavior.
+		/// </summary>
+		/// <remarks>
+		/// Does not verify if this view is Toplevel (WHY??!?).
+		/// </remarks>
+		/// <param name="oldValue"></param>
+		/// <param name="newValue"></param>
+		void CheckAbsolute (string prop, object oldValue, object newValue)
+		{
+			if (!IsInitialized || !ValidatePosDim || oldValue == null || oldValue.GetType () == newValue.GetType () || this is Toplevel) {
+				return;
+			}
+
+			if (oldValue.GetType () != newValue.GetType () && newValue is (Pos.PosAbsolute or Dim.DimAbsolute)) {
+				throw new ArgumentException ($@"{prop} must not be Absolute if LayoutStyle is Computed", prop);
+			}
 		}
 
 		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
@@ -712,12 +765,12 @@ namespace Terminal.Gui {
 					}
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFactor factor when !factor.IsFromRemaining ():
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimAuto:
 					var thickness = GetFramesThickness ();
 					if (width) {
@@ -966,6 +1019,8 @@ namespace Terminal.Gui {
 				return;
 			}
 
+			CheckDimAuto ();
+
 			LayoutFrames ();
 
 			var oldBounds = Bounds;
@@ -1027,7 +1082,7 @@ namespace Terminal.Gui {
 		/// if <see cref="Text"/> won't fit the view will be resized as needed.
 		/// </para>
 		/// <para>
-		/// In addition, if <see cref="ForceValidatePosDim"/> is <see langword="true"/> the new values of <see cref="Width"/> and
+		/// In addition, if <see cref="ValidatePosDim"/> is <see langword="true"/> the new values of <see cref="Width"/> and
 		/// <see cref="Height"/> must be of the same types of the existing one to avoid breaking the <see cref="Dim"/> settings.
 		/// </para>
 		/// </summary>
@@ -1054,12 +1109,12 @@ namespace Terminal.Gui {
 			var boundsChanged = true;
 			var newFrameSize = GetAutoSize ();
 			if (IsInitialized && newFrameSize != Frame.Size) {
-				if (ForceValidatePosDim) {
+				if (ValidatePosDim) {
 					// BUGBUG: This ain't right, obviously.  We need to figure out how to handle this.
 					boundsChanged = ResizeBoundsToFit (newFrameSize);
 				} else {
 					Height = newFrameSize.Height;
-					Width = newFrameSize.Width; 
+					Width = newFrameSize.Width;
 				}
 			}
 			// BUGBUG: This call may be redundant
@@ -1103,9 +1158,9 @@ namespace Terminal.Gui {
 			int y = 0;
 			if (IsInitialized) {
 				x = Bounds.X;
-				y = Bounds.Y; 
+				y = Bounds.Y;
 			}
-			var rect = TextFormatter.CalcRect (x, y,TextFormatter.Text, TextFormatter.Direction);
+			var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
 			var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
 			var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
 			return new Size (newWidth, newHeight);
@@ -1116,7 +1171,7 @@ namespace Terminal.Gui {
 			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 			autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
 			    rect.Size.Height - GetHotKeySpecifierLength (false));
-			return !(ForceValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))
+			return !(ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute))
 			    || _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength ()
 			    || _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
 		}
@@ -1125,7 +1180,7 @@ namespace Terminal.Gui {
 		{
 			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = width.Anchor (0);
-			return !(ForceValidatePosDim && (!(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width
+			return !(ValidatePosDim && (!(width is Dim.DimAbsolute)) || dimValue != rect.Size.Width
 			    - GetHotKeySpecifierLength ());
 		}
 
@@ -1133,7 +1188,7 @@ namespace Terminal.Gui {
 		{
 			var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 			var dimValue = height.Anchor (0);
-			return !(ForceValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
+			return !(ValidatePosDim && (!(height is Dim.DimAbsolute)) || dimValue != rect.Size.Height
 			    - GetHotKeySpecifierLength (false));
 		}
 
@@ -1153,7 +1208,7 @@ namespace Terminal.Gui {
 			case Dim.DimFill _:
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's Width anchored.
 				w = Width.Anchor (w);
-				canSetWidth = !ForceValidatePosDim;
+				canSetWidth = !ValidatePosDim;
 				break;
 			case Dim.DimFactor factor:
 				// Tries to get the SuperView Width otherwise the view Width.
@@ -1162,7 +1217,7 @@ namespace Terminal.Gui {
 					sw -= Frame.X;
 				}
 				w = Width.Anchor (sw);
-				canSetWidth = !ForceValidatePosDim;
+				canSetWidth = !ValidatePosDim;
 				break;
 			default:
 				canSetWidth = true;
@@ -1189,7 +1244,7 @@ namespace Terminal.Gui {
 			case Dim.DimFill _:
 				// It's a Dim.DimCombine and so can't be assigned. Let it have it's height anchored.
 				h = Height.Anchor (h);
-				canSetHeight = !ForceValidatePosDim;
+				canSetHeight = !ValidatePosDim;
 				break;
 			case Dim.DimFactor factor:
 				// Tries to get the SuperView height otherwise the view height.
@@ -1198,7 +1253,7 @@ namespace Terminal.Gui {
 					sh -= Frame.Y;
 				}
 				h = Height.Anchor (sh);
-				canSetHeight = !ForceValidatePosDim;
+				canSetHeight = !ValidatePosDim;
 				break;
 			default:
 				canSetHeight = true;
@@ -1227,7 +1282,7 @@ namespace Terminal.Gui {
 			if (start == null || !start.Frame.Contains (x, y)) {
 				return null;
 			}
-			
+
 			var startFrame = start.Frame;
 			if (start.InternalSubviews != null) {
 				int count = start.InternalSubviews.Count;

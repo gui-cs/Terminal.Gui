@@ -122,8 +122,8 @@ namespace Terminal.Gui {
 
 			UpdateTextFormatterText ();
 
-			if ((!ForceValidatePosDim && directionChanged && AutoSize)
-			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
+			if ((!ValidatePosDim && directionChanged && AutoSize)
+			    || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
 				ResizeBoundsToFit (Bounds.Size);

@@ -47,6 +47,7 @@ public class DimAutoSize : Scenario {
 		var button = new Button () { Text = "Press to make button move down.", 
 			X = 0, 
 			Y = Pos.Bottom (label), 
+			Width = Dim.Fill()
 		};
 		button.Clicked += (s, e) => {
 			button.Y = button.Frame.Y + 1;
@@ -59,7 +60,7 @@ public class DimAutoSize : Scenario {
 			Width = Dim.Auto (),
 			Height = Dim.Auto ()
 		};
-
+		view.ValidatePosDim = true;
 		view.Add (textField, label, button);
 
 		Application.Top.Add (view);

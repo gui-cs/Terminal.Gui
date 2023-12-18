@@ -120,7 +120,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var v = new View () {
 				Width = Dim.Fill (),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 			top.Add (v);
 
@@ -159,7 +159,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var v = new View () {
 				Height = Dim.Fill (),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 			top.Add (v);
 

@@ -278,7 +278,7 @@ namespace Terminal.Gui.ViewTests {
 			var v = new View ("v") {
 				Width = Dim.Width (w) - 2,
 				Height = Dim.Percent (10),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			w.Add (v);
@@ -289,7 +289,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (2, w.Height = 2);
 				Assert.Throws<ArgumentException> (() => v.Width = 2);
 				Assert.Throws<ArgumentException> (() => v.Height = 2);
-				v.ForceValidatePosDim = false;
+				v.ValidatePosDim = false;
 				var exception = Record.Exception (() => v.Width = 2);
 				Assert.Null (exception);
 				Assert.Equal (2, v.Width);
@@ -377,7 +377,7 @@ namespace Terminal.Gui.ViewTests {
 				Y = Pos.Bottom (f1) + 2,
 				Width = Dim.Width (f1) - 2,
 				Height = Dim.Fill () - 2,
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			var v2 = new Button ("v2") {
@@ -386,28 +386,28 @@ namespace Terminal.Gui.ViewTests {
 				Y = Pos.Bottom (f2) + 2,
 				Width = Dim.Width (f2) - 2,
 				Height = Dim.Fill () - 2,
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			var v3 = new Button ("v3") {
 				AutoSize = false,
 				Width = Dim.Percent (10),
 				Height = Dim.Percent (10),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			var v4 = new Button ("v4") {
 				AutoSize = false,
 				Width = Dim.Sized (50),
 				Height = Dim.Sized (50),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			var v5 = new Button ("v5") {
 				AutoSize = false,
 				Width = Dim.Width (v1) - Dim.Width (v3),
 				Height = Dim.Height (v1) - Dim.Height (v3),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			var v6 = new Button ("v6") {
@@ -416,7 +416,7 @@ namespace Terminal.Gui.ViewTests {
 				Y = Pos.Bottom (f2) + 2,
 				Width = Dim.Percent (20, true),
 				Height = Dim.Percent (20, true),
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 
 			w.Add (f1, f2, v1, v2, v3, v4, v5, v6);
