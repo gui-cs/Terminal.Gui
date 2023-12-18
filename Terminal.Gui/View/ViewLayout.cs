@@ -280,7 +280,7 @@ namespace Terminal.Gui {
 			var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
 			return new Rect (Point.Empty, new Size (width, height));
 		}
-		
+
 		Pos _x, _y;
 
 		/// <summary>
@@ -334,8 +334,11 @@ namespace Terminal.Gui {
 		public Dim Width {
 			get => VerifyIsInitialized (_width);
 			set {
-				if (ValidatePosDim && LayoutStyle == LayoutStyle.Computed) {
-					CheckAbsolute (nameof (Width), _width, value);
+				if (ValidatePosDim) {
+					CheckDimAuto ();
+					if (LayoutStyle == LayoutStyle.Computed) {
+						CheckAbsolute (nameof (Width), _width, value);
+					}
 				}
 
 				_width = value;
@@ -360,9 +363,7 @@ namespace Terminal.Gui {
 			get => VerifyIsInitialized (_height);
 			set {
 				if (ValidatePosDim) {
-					if (value is Dim.DimAuto) {
-						CheckDimAuto ();
-					}
+					CheckDimAuto ();
 					if (LayoutStyle == LayoutStyle.Computed) {
 						CheckAbsolute (nameof (Height), _height, value);
 					}
@@ -420,10 +421,10 @@ namespace Terminal.Gui {
 		/// <exception cref="InvalidOperationException"></exception>
 		void CheckDimAuto ()
 		{
-			if (!ValidatePosDim) {
+			if (!ValidatePosDim || (Width is not Dim.DimAuto && Height is not Dim.DimAuto)) {
 				return;
 			}
-			
+
 			void ThrowInvalid (View view, object checkPosDim, string name)
 			{
 				object bad = null;
@@ -435,16 +436,16 @@ namespace Terminal.Gui {
 					bad = dim;
 					break;
 				}
-				
+
 				if (bad != null) {
-					throw new InvalidOperationException (@$"{view.GetType().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
+					throw new InvalidOperationException (@$"{view.GetType ().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
 				}
 			}
 
 			// Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
 			foreach (var view in Subviews) {
-				ThrowInvalid (view, view.Width, nameof(view.Width));
-				ThrowInvalid (view, view.Height, nameof(view.Height));
+				ThrowInvalid (view, view.Width, nameof (view.Width));
+				ThrowInvalid (view, view.Height, nameof (view.Height));
 				ThrowInvalid (view, view.X, nameof (view.X));
 				ThrowInvalid (view, view.Y, nameof (view.Y));
 			}
@@ -774,10 +775,10 @@ namespace Terminal.Gui {
 				case Dim.DimAuto:
 					var thickness = GetFramesThickness ();
 					if (width) {
-						var furthestRight = Subviews.Max (v => v.Frame.X + v.Frame.Width);
+						var furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
 						newDimension = furthestRight + thickness.Left + thickness.Right;
 					} else {
-						var furthestBottom = Subviews.Max (v => v.Frame.Y + v.Frame.Height);
+						var furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
 						newDimension = furthestBottom + thickness.Top + thickness.Bottom;
 					}
 					break;
