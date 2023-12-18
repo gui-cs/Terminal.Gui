@@ -790,8 +790,9 @@ namespace Terminal.Gui {
 						newDimension = furthestRight + thickness.Left + thickness.Right;
 					} else {
 						var furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-						// TODO: GethashCode is ah ack. 
-						newDimension = int.Max(furthestBottom + thickness.Top + thickness.Bottom, ((Dim.DimAuto)d)._min.GetHashCode());
+						// TODO: GethashCode is a hack. 
+						//newDimension = int.Max(furthestBottom + thickness.Top + thickness.Bottom, ((Dim.DimAuto)d)._min.GetHashCode());
+						newDimension = furthestBottom + thickness.Top + thickness.Bottom;
 					}
 					break;
 
