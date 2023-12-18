@@ -255,28 +255,28 @@ public class Pos {
 	public static Pos At (int n) => new PosAbsolute (n);
 
 	internal class PosCombine : Pos {
-		internal Pos left, right;
-		internal bool add;
+		internal Pos _left, _right;
+		internal bool _add;
 
 		public PosCombine (bool add, Pos left, Pos right)
 		{
-			this.left = left;
-			this.right = right;
-			this.add = add;
+			_left = left;
+			_right = right;
+			_add = add;
 		}
 
 		internal override int Anchor (int width)
 		{
-			int la = left.Anchor (width);
-			int ra = right.Anchor (width);
-			if (add) {
+			int la = _left.Anchor (width);
+			int ra = _right.Anchor (width);
+			if (_add) {
 				return la + ra;
 			} else {
 				return la - ra;
 			}
 		}
 
-		public override string ToString () => $"Combine({left}{(add ? '+' : '-')}{right})";
+		public override string ToString () => $"Combine({_left}{(_add ? '+' : '-')}{_right})";
 	}
 
 	/// <summary>

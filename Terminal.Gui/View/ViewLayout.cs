@@ -404,7 +404,6 @@ namespace Terminal.Gui {
 			return dim;
 		}
 
-
 		/// <summary>
 		/// Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs. 
 		/// </summary>
@@ -427,13 +426,25 @@ namespace Terminal.Gui {
 
 			void ThrowInvalid (View view, object checkPosDim, string name)
 			{
+				// TODO: Figure out how to make CheckDimAuto deal with PosCombine
 				object bad = null;
 				switch (checkPosDim) {
-				case Pos pos and not Pos.PosAbsolute and not Pos.PosView:
+				case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
 					bad = pos;
 					break;
-				case Dim dim and not Dim.DimAbsolute and not Dim.DimView:
+				case Pos pos and Pos.PosCombine:
+					// Recursively check for not Absolute or not View
+					ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
+					ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
+					break;
+
+				case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
 					bad = dim;
+					break;
+				case Dim dim and Dim.DimCombine:
+					// Recursively check for not Absolute or not View
+					ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
+					ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
 					break;
 				}
 
@@ -723,9 +734,9 @@ namespace Terminal.Gui {
 
 				case Pos.PosCombine combine:
 					int left, right;
-					(left, newDimension) = GetNewLocationAndDimension (width, superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
-					(right, newDimension) = GetNewLocationAndDimension (width, superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
-					if (combine.add) {
+					(left, newDimension) = GetNewLocationAndDimension (width, superviewLocation, superviewDimension, combine._left, dim, autosizeDimension);
+					(right, newDimension) = GetNewLocationAndDimension (width, superviewLocation, superviewDimension, combine._right, dim, autosizeDimension);
+					if (combine._add) {
 						newLocation = left + right;
 					} else {
 						newLocation = left - right;
@@ -861,8 +872,8 @@ namespace Terminal.Gui {
 				}
 				return;
 			case Pos.PosCombine pc:
-				CollectPos (pc.left, from, ref nNodes, ref nEdges);
-				CollectPos (pc.right, from, ref nNodes, ref nEdges);
+				CollectPos (pc._left, from, ref nNodes, ref nEdges);
+				CollectPos (pc._right, from, ref nNodes, ref nEdges);
 				break;
 			}
 		}
