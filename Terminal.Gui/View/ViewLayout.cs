@@ -652,7 +652,7 @@ namespace Terminal.Gui {
 			//   the superview's width or height
 			//   the current Pos (View.X or View.Y)
 			//   the current Dim (View.Width or View.Height)
-			(int newLocation, int newDimension) GetNewLocationAndDimension (int superviewLocation, int superviewDimension, Pos pos, Dim dim, int autosizeDimension)
+			(int newLocation, int newDimension) GetNewLocationAndDimension (bool horiz, int superviewLocation, int superviewDimension, Pos pos, Dim dim, int autosizeDimension)
 			{
 				int newDimension, newLocation;
 
@@ -669,14 +669,14 @@ namespace Terminal.Gui {
 
 				case Pos.PosCombine combine:
 					int left, right;
-					(left, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
-					(right, newDimension) = GetNewLocationAndDimension (superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
+					(left, newDimension) = GetNewLocationAndDimension (horiz, superviewLocation, superviewDimension, combine.left, dim, autosizeDimension);
+					(right, newDimension) = GetNewLocationAndDimension (horiz, superviewLocation, superviewDimension, combine.right, dim, autosizeDimension);
 					if (combine.add) {
 						newLocation = left + right;
 					} else {
 						newLocation = left - right;
 					}
-					newDimension = Math.Max (CalculateNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+					newDimension = Math.Max (CalculateNewDimension (horiz, dim, newLocation, superviewDimension, autosizeDimension), 0);
 					break;
 
 				case Pos.PosAbsolute:
@@ -686,7 +686,7 @@ namespace Terminal.Gui {
 				case Pos.PosView:
 				default:
 					newLocation = pos?.Anchor (superviewDimension) ?? 0;
-					newDimension = Math.Max (CalculateNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+					newDimension = Math.Max (CalculateNewDimension (horiz, dim, newLocation, superviewDimension, autosizeDimension), 0);
 					break;
 				}
 				return (newLocation, newDimension);
@@ -695,7 +695,7 @@ namespace Terminal.Gui {
 			// Recursively calculates the new dimension (width or height) of the given Dim given:
 			//   the current location (x or y)
 			//   the current dimension (width or height)
-			int CalculateNewDimension (Dim d, int location, int dimension, int autosize)
+			int CalculateNewDimension (bool horiz, Dim d, int location, int dimension, int autosize)
 			{
 				int newDimension;
 				switch (d) {
@@ -703,19 +703,32 @@ namespace Terminal.Gui {
 					newDimension = AutoSize ? autosize : dimension;
 					break;
 				case Dim.DimCombine combine:
-					int leftNewDim = CalculateNewDimension (combine.left, location, dimension, autosize);
-					int rightNewDim = CalculateNewDimension (combine.right, location, dimension, autosize);
-					if (combine.add) {
+					int leftNewDim = CalculateNewDimension (horiz, combine._left, location, dimension, autosize);
+					int rightNewDim = CalculateNewDimension (horiz, combine._right, location, dimension, autosize);
+					if (combine._add) {
 						newDimension = leftNewDim + rightNewDim;
 					} else {
 						newDimension = leftNewDim - rightNewDim;
 					}
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-
+					
 				case Dim.DimFactor factor when !factor.IsFromRemaining ():
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+					
+				case Dim.DimAutoSize:
+					var thickness = GetFramesThickness ();
+					if (horiz) {
+						var furthestLeft = Subviews.Where (v => v.Frame.X >= 0).Min (v => v.Frame.X);
+						var furthestRight = Subviews.Where (v => v.Frame.X >= 0).Max (v => v.Frame.X + v.Frame.Width);
+						newDimension = furthestLeft + furthestRight + thickness.Left + thickness.Right;
+					} else {
+						var furthestTop = Subviews.Where (v => v.Frame.Y >= 0).Min (v => v.Frame.Y);
+						var furthestBottom = Subviews.Where (v => v.Frame.Y >= 0).Max (v => v.Frame.Y + v.Frame.Height);
+						newDimension = furthestTop + furthestBottom + thickness.Top + thickness.Bottom;
+					}
 					break;
 
 				case Dim.DimFill:
@@ -729,10 +742,10 @@ namespace Terminal.Gui {
 			}
 
 			// horizontal
-			(newX, newW) = GetNewLocationAndDimension (superviewFrame.X, superviewFrame.Width, _x, _width, autosize.Width);
+			(newX, newW) = GetNewLocationAndDimension (true, superviewFrame.X, superviewFrame.Width, _x, _width, autosize.Width);
 
 			// vertical
-			(newY, newH) = GetNewLocationAndDimension (superviewFrame.Y, superviewFrame.Height, _y, _height, autosize.Height);
+			(newY, newH) = GetNewLocationAndDimension (false, superviewFrame.Y, superviewFrame.Height, _y, _height, autosize.Height);
 
 			var r = new Rect (newX, newY, newW, newH);
 			if (Frame != r) {
@@ -815,8 +828,8 @@ namespace Terminal.Gui {
 				}
 				return;
 			case Dim.DimCombine dc:
-				CollectDim (dc.left, from, ref nNodes, ref nEdges);
-				CollectDim (dc.right, from, ref nNodes, ref nEdges);
+				CollectDim (dc._left, from, ref nNodes, ref nEdges);
+				CollectDim (dc._right, from, ref nNodes, ref nEdges);
 				break;
 			}
 		}

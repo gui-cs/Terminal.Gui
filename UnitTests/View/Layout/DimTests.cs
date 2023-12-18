@@ -1251,8 +1251,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (99, dimFill.Anchor (100));
 
 			var dimCombine = new Dim.DimCombine (true, dimFactor, dimAbsolute);
-			Assert.Equal (dimCombine.left, dimFactor);
-			Assert.Equal (dimCombine.right, dimAbsolute);
+			Assert.Equal (dimCombine._left, dimFactor);
+			Assert.Equal (dimCombine._right, dimAbsolute);
 			Assert.Equal (20, dimCombine.Anchor (100));
 
 			var view = new View (new Rect (20, 10, 20, 1));
