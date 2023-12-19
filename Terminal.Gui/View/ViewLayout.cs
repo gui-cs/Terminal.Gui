@@ -741,6 +741,15 @@ namespace Terminal.Gui {
 						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
 					}
 					newLocation = pos.Anchor (superviewDimension - newDimension);
+#if false
+					if (dim == null) {
+						newDimension = AutoSize ? autosizeDimension : superviewDimension;
+					} else {
+						newDimension = Math.Max (CalculateNewDimension (width, dim, 0, dim.Anchor (superviewDimension), autosizeDimension), 0);
+						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
+					}
+					newLocation = pos.Anchor (superviewDimension - newDimension);
+#endif
 					break;
 
 				case Pos.PosCombine combine:
@@ -755,8 +764,8 @@ namespace Terminal.Gui {
 					newDimension = Math.Max (CalculateNewDimension (width, dim, newLocation, superviewDimension, autosizeDimension), 0);
 					break;
 
-				case Pos.PosAbsolute:
 				case Pos.PosAnchorEnd:
+				case Pos.PosAbsolute:
 				case Pos.PosFactor:
 				case Pos.PosFunc:
 				case Pos.PosView:
@@ -769,8 +778,10 @@ namespace Terminal.Gui {
 			}
 
 			// Recursively calculates the new dimension (width or height) of the given Dim given:
-			//   the current location (x or y)
-			//   the current dimension (width or height)
+			//   width: true for width, false for height
+			//   location: the current location (x or y)
+			//   dimension: the current dimension (width or height)
+			//   autosize: the size to use if autosize = true
 			int CalculateNewDimension (bool width, Dim d, int location, int dimension, int autosize)
 			{
 				int newDimension;
@@ -796,14 +807,13 @@ namespace Terminal.Gui {
 
 				case Dim.DimAuto auto:
 					var thickness = GetFramesThickness ();
+					newDimension = CalculateNewDimension (width, auto._min, location, dimension, autosize);
 					if (width) {
 						var furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
-						//newDimension = furthestRight + thickness.Left + thickness.Right;
 						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (SuperView?.Bounds.Width ?? 0) ?? 0);
 					} else {
 						var furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
 						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (SuperView?.Bounds.Height ?? 0) ?? 0);
-						//newDimension = furthestBottom + thickness.Top + thickness.Bottom;
 					}
 					break;
 

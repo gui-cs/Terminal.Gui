@@ -21,7 +21,8 @@ public class Dialog : Window {
 	/// <remarks>
 	/// This property can be set in a Theme.
 	/// </remarks>
-	[SerializableConfigurationProperty (Scope = typeof (ThemeScope))] [JsonConverter (typeof (JsonStringEnumConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+	[JsonConverter (typeof (JsonStringEnumConverter))]
 	public static ButtonAlignments DefaultButtonAlignment { get; set; } = ButtonAlignments.Center;
 
 	// TODO: Reenable once border/borderframe design is settled
@@ -61,8 +62,8 @@ public class Dialog : Window {
 		Y = Pos.Center ();
 		ValidatePosDim = true;
 
-		Width = Dim.Percent (85);
-		Height = Dim.Percent (85);
+		Width = Dim.Percent (85);// Dim.Auto (min: Dim.Percent (10));
+		Height = Dim.Percent (85);//Dim.Auto (min: Dim.Percent (50));
 
 		ColorScheme = Colors.Dialog;
 
@@ -74,11 +75,18 @@ public class Dialog : Window {
 				AddButton (b);
 			}
 		}
+	}
 
-		LayoutComplete += (s, args) => {
-			LayoutButtons ();
-		};
-
+	bool inLayout = false;
+	public override void LayoutSubviews ()
+	{
+		if (inLayout) {
+			return;
+		}
+		inLayout = true;
+		LayoutButtons ();
+		base.LayoutSubviews ();
+		inLayout = false;
 	}
 
 	/// <summary>
