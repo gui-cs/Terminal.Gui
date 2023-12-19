@@ -1,11 +1,4 @@
-﻿//
-// PosDim.cs: Pos and Dim objects for view dimensions.
-//
-// Authors:
-//   Miguel de Icaza (miguel@gnome.org)
-//
-
-using System;
+﻿using System;
 using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
@@ -348,76 +341,66 @@ public class Pos {
 			}
 		}
 
-		public override string ToString ()
-		{
-			string tside;
-			switch (side) {
-			case 0:
-				tside = "x";
-				break;
-			case 1:
-				tside = "y";
-				break;
-			case 2:
-				tside = "right";
-				break;
-			case 3:
-				tside = "bottom";
-				break;
-			default:
-				tside = "unknown";
-				break;
+			public override string ToString ()
+			{
+				string tside;
+				switch (side) {
+				case 0: tside = "x"; break;
+				case 1: tside = "y"; break;
+				case 2: tside = "right"; break;
+				case 3: tside = "bottom"; break;
+				default: tside = "unknown"; break;
+				}
+				// Note: We do not checkt `Target` for null here to intentionally throw if so
+				return $"View(side={tside},target={Target.ToString ()})";
 			}
-			// Note: We do not checkt `Target` for null here to intentionally throw if so
-			return $"View({tside},{Target.ToString ()})";
-		}
 
 		public override int GetHashCode () => Target.GetHashCode ();
 
 		public override bool Equals (object other) => other is PosView abs && abs.Target == Target;
 	}
 
-	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
-	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-	public static Pos Left (View view) => new PosCombine (true, new PosView (view, 0), new PosAbsolute (0));
+		/// <summary>
+		/// Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
+	    /// </summary>
+		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+		public static Pos Left (View view) => new PosView (view, 0);
 
-	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
-	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-	public static Pos X (View view) => new PosCombine (true, new PosView (view, 0), new PosAbsolute (0));
+		/// <summary>
+		/// Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
+		/// </summary>
+		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+		public static Pos X (View view) => new PosView (view, 0);
 
-	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.
-	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-	public static Pos Top (View view) => new PosCombine (true, new PosView (view, 1), new PosAbsolute (0));
+		/// <summary>
+		/// Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.
+		/// </summary>
+		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+		public static Pos Top (View view) => new PosView (view, 1);
 
-	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.
-	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-	public static Pos Y (View view) => new PosCombine (true, new PosView (view, 1), new PosAbsolute (0));
+		/// <summary>
+		/// Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.
+		/// </summary>
+		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+		public static Pos Y (View view) => new PosView(view, 1);
 
-	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified <see cref="View"/>.
-	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-	public static Pos Right (View view) => new PosCombine (true, new PosView (view, 2), new PosAbsolute (0));
+		/// <summary>
+		/// Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified <see cref="View"/>.
+		/// </summary>
+		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+		public static Pos Right (View view) => new PosView (view, 2);
 
-	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified <see cref="View"/> 
-	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-	public static Pos Bottom (View view) => new PosCombine (true, new PosView (view, 3), new PosAbsolute (0));
+		/// <summary>
+		/// Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified <see cref="View"/> 
+		/// </summary>
+		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
+		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+		public static Pos Bottom (View view) => new PosView (view, 3);
 
 	/// <summary>Serves as the default hash function. </summary>
 	/// <returns>A hash code for the current object.</returns>

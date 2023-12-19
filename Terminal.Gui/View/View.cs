@@ -494,7 +494,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override string ToString ()
 		{
-			return $"{GetType ().Name}({Id})({Frame})";
+			return $"{GetType ().Name}({Id}){Frame}";
 		}
 
 		/// <inheritdoc/>

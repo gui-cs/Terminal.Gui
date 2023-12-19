@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.IO;
-using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ViewTests; 
+namespace Terminal.Gui.ViewTests;
 
 public class PosTests {
 	readonly ITestOutputHelper _output;
@@ -375,7 +370,8 @@ public class PosTests {
 	/// <summary>
 	/// Tests Pos.Left, Pos.X, Pos.Top, Pos.Y, Pos.Right, and Pos.Bottom set operations
 	/// </summary>
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void PosSide_SetsValue ()
 	{
 		string side; // used in format string
@@ -388,140 +384,140 @@ public class PosTests {
 		testInt = 0;
 		testRect = Rect.Empty;
 		pos = Pos.Left (new View ());
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		pos = Pos.Left (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		testRect = new Rect (1, 2, 3, 4);
 		pos = Pos.Left (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		// Pos.Left(win) + 0
 		pos = Pos.Left (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = 1;
 		// Pos.Left(win) +1
 		pos = Pos.Left (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = -1;
 		// Pos.Left(win) -1
 		pos = Pos.Left (new View (testRect)) - testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		// Pos.X
 		side = "x";
 		testInt = 0;
 		testRect = Rect.Empty;
 		pos = Pos.X (new View ());
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		pos = Pos.X (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		testRect = new Rect (1, 2, 3, 4);
 		pos = Pos.X (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		// Pos.X(win) + 0
 		pos = Pos.X (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = 1;
 		// Pos.X(win) +1
 		pos = Pos.X (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = -1;
 		// Pos.X(win) -1
 		pos = Pos.X (new View (testRect)) - testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		// Pos.Top
 		side = "y";
 		testInt = 0;
 		testRect = Rect.Empty;
 		pos = Pos.Top (new View ());
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		pos = Pos.Top (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		testRect = new Rect (1, 2, 3, 4);
 		pos = Pos.Top (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		// Pos.Top(win) + 0
 		pos = Pos.Top (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = 1;
 		// Pos.Top(win) +1
 		pos = Pos.Top (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = -1;
 		// Pos.Top(win) -1
 		pos = Pos.Top (new View (testRect)) - testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		// Pos.Y
 		side = "y";
 		testInt = 0;
 		testRect = Rect.Empty;
 		pos = Pos.Y (new View ());
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		pos = Pos.Y (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		testRect = new Rect (1, 2, 3, 4);
 		pos = Pos.Y (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		// Pos.Y(win) + 0
 		pos = Pos.Y (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = 1;
 		// Pos.Y(win) +1
 		pos = Pos.Y (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = -1;
 		// Pos.Y(win) -1
 		pos = Pos.Y (new View (testRect)) - testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		// Pos.Bottom
 		side = "bottom";
 		testRect = Rect.Empty;
 		testInt = 0;
 		pos = Pos.Bottom (new View ());
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		pos = Pos.Bottom (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		testRect = new Rect (1, 2, 3, 4);
 		pos = Pos.Bottom (new View (testRect));
-		Assert.Equal ($"Combine(View({side},View()({testRect})){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
 		// Pos.Bottom(win) + 0
 		pos = Pos.Bottom (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = 1;
 		// Pos.Bottom(win) +1
 		pos = Pos.Bottom (new View (testRect)) + testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 		testInt = -1;
 		// Pos.Bottom(win) -1
 		pos = Pos.Bottom (new View (testRect)) - testInt;
-		Assert.Equal ($"Combine(Combine(View({side},View()({testRect}))+Absolute(0)){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
+		Assert.Equal ($"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))", pos.ToString ());
 
 #if DEBUG_IDISPOSABLE
 		// HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
@@ -530,7 +526,8 @@ public class PosTests {
 	}
 
 	// See: https://github.com/gui-cs/Terminal.Gui/issues/504
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void LeftTopBottomRight_Win_ShouldNotThrow ()
 	{
 		// Setup Fake driver
@@ -812,7 +809,8 @@ public class PosTests {
 	//	Application.Shutdown ();
 	//}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void PosCombine_Will_Throws ()
 	{
 		Application.Init (new FakeDriver ());
@@ -846,7 +844,8 @@ public class PosTests {
 		v2.Dispose ();
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Pos_Add_Operator ()
 	{
 		Application.Init (new FakeDriver ());
@@ -894,7 +893,8 @@ public class PosTests {
 		Application.Shutdown ();
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Pos_Subtract_Operator ()
 	{
 		Application.Init (new FakeDriver ());
@@ -955,7 +955,8 @@ public class PosTests {
 
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Internal_Tests ()
 	{
 		var posFactor = new Pos.PosFactor (0.10F);
@@ -1022,7 +1023,8 @@ public class PosTests {
 		Assert.NotEqual (pos1, pos2);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void PosPercentPlusOne (bool testHorizontal)
@@ -1084,4 +1086,41 @@ public class PosTests {
 
 		super.Dispose ();
 	}
-}
+
+	[Fact]
+	public void DoNotReturnPosCombine ()
+	{
+		var v = new View () { Id = "V" };
+
+		var pos = Pos.Left (v);
+		Assert.Equal (
+			"View(side=x,target=View(V)(0,0,0,0))",
+			pos.ToString ());
+
+		pos = Pos.X (v);
+		Assert.Equal (
+			"View(side=x,target=View(V)(0,0,0,0))",
+			pos.ToString ());
+
+		pos = Pos.Top (v);
+		Assert.Equal (
+			"View(side=y,target=View(V)(0,0,0,0))",
+			pos.ToString ());
+
+		pos = Pos.Y (v);
+		Assert.Equal (
+			"View(side=y,target=View(V)(0,0,0,0))",
+			pos.ToString ());
+
+		pos = Pos.Right (v);
+		Assert.Equal (
+			"View(side=right,target=View(V)(0,0,0,0))",
+			pos.ToString ());
+
+		pos = Pos.Bottom (v);
+		Assert.Equal (
+			"View(side=bottom,target=View(V)(0,0,0,0))",
+			pos.ToString ());
+	}
+}	
+
