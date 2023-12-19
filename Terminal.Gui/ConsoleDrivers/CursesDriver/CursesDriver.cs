@@ -341,6 +341,7 @@ namespace Terminal.Gui {
 			Key k = Key.Null;
 
 			if (code == Curses.KEY_CODE_YES) {
+				var lastWch = wch;
 				while (code == Curses.KEY_CODE_YES && wch == Curses.KeyResize) {
 					ProcessWinChange ();
 					code = Curses.get_wch (out wch);
@@ -379,6 +380,25 @@ namespace Terminal.Gui {
 				} else if (wch >= 325 && wch <= 327) { // Shift+Alt+(F1 - F3)
 					wch -= 60;
 					k = Key.ShiftMask | Key.AltMask | MapCursesKey (wch);
+				} else {
+					code = Curses.get_wch (out wch);
+					if (code == 0) {
+						switch (wch) {
+						// Shift code.
+						case 16:
+							keyModifiers.Shift = true;
+							break;
+						default:
+							if (lastWch == Curses.KeyResize && wch == 91) {
+								// Returns this keys to the std input which is a CSI (\x1b[).
+								Curses.ungetch (91); // [
+								Curses.ungetch (27); // Esc
+								return;
+							} else {
+								throw new Exception ();
+							}
+						}
+					}
 				}
 				keyDownHandler (new KeyEvent (k, MapKeyModifiers (k)));
 				keyHandler (new KeyEvent (k, MapKeyModifiers (k)));
@@ -388,8 +408,6 @@ namespace Terminal.Gui {
 
 			// Special handling for ESC, we want to try to catch ESC+letter to simulate alt-letter as well as Alt-Fkey
 			if (wch == 27) {
-				Curses.timeout (10);
-
 				code = Curses.get_wch (out int wch2);
 
 				if (code == Curses.KEY_CODE_YES) {
@@ -425,6 +443,56 @@ namespace Terminal.Gui {
 						} else if (wch >= (uint)Key.A && wch <= (uint)Key.Z) {
 							keyModifiers.Shift = true;
 							keyModifiers.Alt = true;
+						} else if (wch2 == Curses.KeySS3) {
+							while (code > -1) {
+								code = Curses.get_wch (out wch2);
+								if (code == 0) {
+									switch (wch2) {
+									case 16:
+										keyModifiers.Shift = true;
+										break;
+									case 108:
+										k = (Key)'+';
+										break;
+									case 109:
+										k = (Key)'-';
+										break;
+									case 112:
+										k = Key.InsertChar;
+										break;
+									case 113:
+										k = Key.End;
+										break;
+									case 114:
+										k = Key.CursorDown;
+										break;
+									case 115:
+										k = Key.PageDown;
+										break;
+									case 116:
+										k = Key.CursorLeft;
+										break;
+									case 117:
+										k = Key.Clear;
+										break;
+									case 118:
+										k = Key.CursorRight;
+										break;
+									case 119:
+										k = Key.Home;
+										break;
+									case 120:
+										k = Key.CursorUp;
+										break;
+									case 121:
+										k = Key.PageUp;
+										break;
+									default:
+										k = (Key)wch2;
+										break;
+									}
+								}
+							}
 						} else if (wch2 < 256) {
 							k = (Key)wch2;
 							keyModifiers.Alt = true;
@@ -559,7 +627,6 @@ namespace Terminal.Gui {
 		public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
 		{
 			// Note: Curses doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-			Curses.timeout (0);
 			this.keyHandler = keyHandler;
 			this.keyDownHandler = keyDownHandler;
 			this.keyUpHandler = keyUpHandler;
@@ -572,9 +639,7 @@ namespace Terminal.Gui {
 				return true;
 			});
 
-			mLoop.WinChanged += () => {
-				ProcessInput ();
-			};
+			mLoop.WinChanged += () => ProcessWinChange ();
 		}
 
 		public override void Init (Action terminalResized)
@@ -585,6 +650,7 @@ namespace Terminal.Gui {
 			try {
 				window = Curses.initscr ();
 				Curses.set_escdelay (10);
+				Curses.nodelay (window.Handle, true);
 			} catch (Exception e) {
 				throw new Exception ($"Curses failed to initialize, the exception is: {e.Message}");
 			}
@@ -673,13 +739,11 @@ namespace Terminal.Gui {
 
 			ResizeScreen ();
 			UpdateOffScreen ();
-
 		}
 
 		public override void ResizeScreen ()
 		{
 			Clip = new Rect (0, 0, Cols, Rows);
-			Curses.refresh ();
 		}
 
 		public override void UpdateOffScreen ()

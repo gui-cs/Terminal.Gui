@@ -41,22 +41,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
+//#define USE_IOCTL
+
 using System;
 using System.Runtime.InteropServices;
 using Terminal.Gui;
 
 namespace Unix.Terminal {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 	public partial class Curses {
-		//[StructLayout (LayoutKind.Sequential)]
-		//public struct winsize {
-		//	public ushort ws_row;
-		//	public ushort ws_col;
-		//	public ushort ws_xpixel;   /* unused */
-		//	public ushort ws_ypixel;   /* unused */
-		//};
+#if USE_IOCTL
 
+		[StructLayout (LayoutKind.Sequential)]
+		public struct winsize {
+			public ushort ws_row;
+			public ushort ws_col;
+			public ushort ws_xpixel;   /* unused */
+			public ushort ws_ypixel;   /* unused */
+		};
+#endif
 		[StructLayout (LayoutKind.Sequential)]
 		public struct MouseEvent {
 			public short ID;
@@ -77,10 +81,11 @@ namespace Unix.Terminal {
 
 		[DllImport ("libc")]
 		public extern static int setlocale (int cate, [MarshalAs (UnmanagedType.LPStr)] string locale);
+#if USE_IOCTL
 
-		//[DllImport ("libc")]
-		//public extern static int ioctl (int fd, int cmd, out winsize argp);
-
+		[DllImport ("libc")]
+		public extern static int ioctl (int fd, int cmd, out winsize argp);
+#endif
 		static void LoadMethods ()
 		{
 			var libs = UnmanagedLibrary.IsMacOSPlatform ? new string [] { "libncurses.dylib" } : new string [] { "libncursesw.so.6", "libncursesw.so.5" };
@@ -227,9 +232,32 @@ namespace Unix.Terminal {
 
 		internal static void console_sharp_get_dims (out int lines, out int cols)
 		{
+#if USE_IOCTL
+
+			if (UnmanagedLibrary.IsMacOSPlatform) {
+				int cmd = TIOCGWINSZ_MAC;
+
+				if (ioctl (1, cmd, out winsize ws) == 0) {
+					lines = ws.ws_row;
+					cols = ws.ws_col;
+
+					if (lines == Lines && cols == Cols) {
+						return;
+					}
+
+					resizeterm (lines, cols);
+				} else {
+					lines = Lines;
+					cols = Cols;
+				}
+			} else {
+				lines = Marshal.ReadInt32 (lines_ptr);
+				cols = Marshal.ReadInt32 (cols_ptr);
+			}
+#else
 			lines = Marshal.ReadInt32 (lines_ptr);
 			cols = Marshal.ReadInt32 (cols_ptr);
-
+#endif
 			//int cmd;
 			//if (UnmanagedLibrary.IsMacOSPlatform) {
 			//	cmd = TIOCGWINSZ_MAC;
@@ -347,6 +375,7 @@ namespace Unix.Terminal {
 		static public int savetty () => methods.savetty ();
 		static public int resetty () => methods.resetty ();
 		static public int set_escdelay (int size) => methods.set_escdelay (size);
+		static public int nodelay (IntPtr win, bool bf) => methods.nodelay (win, bf);
 	}
 
 #pragma warning disable RCS1102 // Make class static.
@@ -424,6 +453,7 @@ namespace Unix.Terminal {
 		public delegate int savetty ();
 		public delegate int resetty ();
 		public delegate int set_escdelay (int size);
+		public delegate int nodelay (IntPtr win, bool bf);
 	}
 
 	internal class NativeMethods {
@@ -498,6 +528,7 @@ namespace Unix.Terminal {
 		public readonly Delegates.savetty savetty;
 		public readonly Delegates.resetty resetty;
 		public readonly Delegates.set_escdelay set_escdelay;
+		public readonly Delegates.nodelay nodelay;
 		public UnmanagedLibrary UnmanagedLibrary;
 
 		public NativeMethods (UnmanagedLibrary lib)
@@ -574,6 +605,7 @@ namespace Unix.Terminal {
 			savetty = lib.GetNativeMethodDelegate<Delegates.savetty> ("savetty");
 			resetty = lib.GetNativeMethodDelegate<Delegates.resetty> ("resetty");
 			set_escdelay = lib.GetNativeMethodDelegate<Delegates.set_escdelay> ("set_escdelay");
+			nodelay = lib.GetNativeMethodDelegate<Delegates.nodelay> ("nodelay");
 		}
 	}
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
