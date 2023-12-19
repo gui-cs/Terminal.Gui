@@ -611,33 +611,58 @@ public class Dim {
 	/// </code>
 	/// </example>
 	/// <returns>The AutoSize <see cref="Dim"/> object.</returns>
+	/// <param name="style">Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Text"/>. NOT CURRENTLY SUPPORTED.</param>
 	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
 	/// <param name="min">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-	public static Dim Auto (Dim min = null, Dim max = null)
+	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Text, Dim min = null, Dim max = null)
 	{
-		return new DimAuto (min, max);
+		return new DimAuto (style, min, max);
+	}
+
+	/// <summary>
+	/// Specifies how <see cref="DimAuto"/> will compute the dimension.
+	/// </summary>
+	public enum DimAutoStyle {
+		/// <summary>
+		/// The dimension will be computed from the view's <see cref="View.Text"/>. NOT CURRENTLY SUPPORTED.
+		/// </summary>
+		Text, 
+
+		/// <summary>
+		/// The dimension will be computed from the view's <see cref="View.Subviews"/>.
+		/// </summary>
+		Subviews,
 	}
 
 	internal class DimAuto : Dim {
 		internal readonly Dim _min;
 		internal readonly Dim _max;
+		internal readonly DimAutoStyle _style;
 
-		public DimAuto (Dim min, Dim max)
+		public DimAuto (DimAutoStyle style, Dim min, Dim max)
 		{
 			_min = min;
 			_max = max;
+			_style = style;
 		}
 
-		public override string ToString () => $"Auto({_min}, {_max})";
+		public override string ToString () => $"Auto({_style},{_min},{_max})";
 
 		internal override int Anchor (int width)
 		{
 			return width;
 		}
 
-		public override int GetHashCode () => _min.GetHashCode () * _max.GetHashCode (); // BUGBUG: This isn't right
+		public override int GetHashCode ()
+		{
+			int hashCode = -1242460230;
+			hashCode = hashCode * -1521134295 + _min.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _max.GetHashCode ();
+			hashCode = hashCode * -1521134295 + _style.GetHashCode ();
+			return hashCode;
+		}
 
-		public override bool Equals (object other) => other is DimAuto fill && (fill._min == _min && fill._max == _max);
+		public override bool Equals (object other) => other is DimAuto auto && (auto._min == _min && auto._max == _max && auto._style == _style);
 	}
 
 	/// <summary>
