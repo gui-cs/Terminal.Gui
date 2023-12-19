@@ -614,7 +614,7 @@ public class Dim {
 	/// <param name="style">Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Text"/>. NOT CURRENTLY SUPPORTED.</param>
 	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
 	/// <param name="min">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Text, Dim min = null, Dim max = null)
+	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Subviews, Dim min = null, Dim max = null)
 	{
 		if (style == DimAutoStyle.Text) {
 			throw new NotImplementedException (@"DimAutoStyle.Text is not implemented.");
@@ -657,10 +657,10 @@ public class Dim {
 
 		public override string ToString () => $"Auto({_style},{_min},{_max})";
 
-		internal override int Anchor (int width)
-		{
-			return width;
-		}
+		//internal override int Anchor (int width)
+		//{
+		//	return width;
+		//}
 
 		public override int GetHashCode ()
 		{
