@@ -657,11 +657,6 @@ public class Dim {
 
 		public override string ToString () => $"Auto({_style},{_min},{_max})";
 
-		//internal override int Anchor (int width)
-		//{
-		//	return width;
-		//}
-
 		public override int GetHashCode ()
 		{
 			int hashCode = -1242460230;
