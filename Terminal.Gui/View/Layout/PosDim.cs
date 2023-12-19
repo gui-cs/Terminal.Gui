@@ -327,7 +327,7 @@ public class Pos {
 	}
 
 	internal class PosView : Pos {
-		public View Target;
+		public readonly View Target;
 		int side;
 
 		public PosView (View view, int side)
@@ -657,14 +657,7 @@ public class Dim {
 
 		public override string ToString () => $"Auto({_style},{_min},{_max})";
 
-		public override int GetHashCode ()
-		{
-			int hashCode = -1242460230;
-			hashCode = hashCode * -1521134295 + _min.GetHashCode ();
-			hashCode = hashCode * -1521134295 + _max.GetHashCode ();
-			hashCode = hashCode * -1521134295 + _style.GetHashCode ();
-			return hashCode;
-		}
+		public override int GetHashCode () => HashCode.Combine (base.GetHashCode (), _min, _max, _style);
 
 		public override bool Equals (object other) => other is DimAuto auto && (auto._min == _min && auto._max == _max && auto._style == _style);
 	}
