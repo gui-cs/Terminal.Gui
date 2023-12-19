@@ -187,6 +187,9 @@ public class DimAutoTests {
 			Height = 10
 		};
 
+		superView.BeginInit ();
+		superView.EndInit ();
+
 		Assert.Throws<InvalidOperationException> (() => superView.Add (subView));
 
 		subView.Width = 10;

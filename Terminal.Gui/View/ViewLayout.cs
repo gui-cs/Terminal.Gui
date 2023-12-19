@@ -420,7 +420,7 @@ namespace Terminal.Gui {
 		/// <exception cref="InvalidOperationException"></exception>
 		void CheckDimAuto ()
 		{
-			if (!ValidatePosDim || (Width is not Dim.DimAuto && Height is not Dim.DimAuto)) {
+			if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto)) {
 				return;
 			}
 
@@ -455,10 +455,14 @@ namespace Terminal.Gui {
 
 			// Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
 			foreach (var view in Subviews) {
-				ThrowInvalid (view, view.Width, nameof (view.Width));
-				ThrowInvalid (view, view.Height, nameof (view.Height));
-				ThrowInvalid (view, view.X, nameof (view.X));
-				ThrowInvalid (view, view.Y, nameof (view.Y));
+				if (Width is Dim.DimAuto { _min: null }) {
+					ThrowInvalid (view, view.Width, nameof (view.Width));
+					ThrowInvalid (view, view.X, nameof (view.X));
+				}
+				if (Height is Dim.DimAuto { _min: null }) {
+					ThrowInvalid (view, view.Height, nameof (view.Height));
+					ThrowInvalid (view, view.Y, nameof (view.Y));
+				}
 			}
 		}
 
@@ -582,7 +586,9 @@ namespace Terminal.Gui {
 				SetNeedsDisplay ();
 			}
 
-			if (LayoutStyle == LayoutStyle.Computed && (SuperView?.Height is Dim.DimAuto || (SuperView?.Width is Dim.DimAuto))) {
+			if (IsInitialized
+			&& SuperView != null
+			&& LayoutStyle == LayoutStyle.Computed && (SuperView?.Height is Dim.DimAuto || (SuperView?.Width is Dim.DimAuto))) {
 				// DimAuto is in play, force a layout.
 				SuperView.LayoutSubviews ();
 			}
@@ -793,10 +799,10 @@ namespace Terminal.Gui {
 					if (width) {
 						var furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
 						//newDimension = furthestRight + thickness.Left + thickness.Right;
-						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (0) ?? 0);
+						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (SuperView?.Bounds.Width ?? 0) ?? 0);
 					} else {
 						var furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (0) ?? 0);
+						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (SuperView?.Bounds.Height ?? 0) ?? 0);
 						//newDimension = furthestBottom + thickness.Top + thickness.Bottom;
 					}
 					break;
@@ -906,7 +912,8 @@ namespace Terminal.Gui {
 
 		internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
 		{
-			foreach (var v in from.InternalSubviews) {
+			// BUGBUG: This should really only work on initialized subviews
+			foreach (var v in from.InternalSubviews/*.Where(v => v.IsInitialized)*/) {
 				nNodes.Add (v);
 				if (v._layoutStyle != LayoutStyle.Computed) {
 					continue;
@@ -1034,6 +1041,10 @@ namespace Terminal.Gui {
 		/// </remarks>
 		public virtual void LayoutSubviews ()
 		{
+			if (!IsInitialized) {
+				Debug.WriteLine ($"WARNING: LayoutSubviews called before view has been initialized. This is likely a bug in {this}");
+			}
+
 			if (!LayoutNeeded) {
 				return;
 			}

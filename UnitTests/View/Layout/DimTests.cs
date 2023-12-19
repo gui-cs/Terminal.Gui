@@ -579,6 +579,8 @@ public class DimTests {
 		f.Add (v1, v2);
 		w.Add (f);
 		t.Add (w);
+		t.BeginInit ();
+		t.EndInit ();
 
 		// BUGBUG: v2 - f references t here; t is f's super-superview. This is supported!
 		// BUGBUG: v2 - f references v2 here; v2 is f's subview. This is not supported!
@@ -622,6 +624,8 @@ public class DimTests {
 		f.Add (v1, v2);
 		w.Add (f);
 		t.Add (w);
+		t.BeginInit ();
+		t.EndInit ();
 
 		f.Width = Dim.Width (t) - Dim.Width (w) + 4; // 80 - 74 = 6
 		f.Height = Dim.Height (t) - Dim.Height (w) + 4; // 25 - 19 = 6
@@ -670,6 +674,9 @@ public class DimTests {
 		sub.Width = Dim.Fill () - Dim.Width (v2);
 		sub.Height = Dim.Fill () - Dim.Height (v2);
 
+		t.BeginInit ();
+		t.EndInit ();
+		
 		Assert.Throws<InvalidOperationException> (() => t.LayoutSubviews ());
 		t.Dispose ();
 		v2.Dispose ();
@@ -1316,6 +1323,8 @@ public class DimTests {
 
 		container.Add (label);
 		Application.Top.Add (container);
+		Application.Top.BeginInit ();
+		Application.Top.EndInit ();
 		Application.Top.LayoutSubviews ();
 
 		Assert.Equal (100, container.Frame.Width);

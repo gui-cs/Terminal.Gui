@@ -2,9 +2,9 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("DimAutoSize", "Demonstrates Dim.AutoSize")]
+[ScenarioMetadata ("DimAuto", "Demonstrates Dim.Auto")]
 [ScenarioCategory ("Layout")]
-public class DimAutoSize : Scenario {
+public class DimAutoDemo : Scenario {
 	public override void Init ()
 	{
 		Application.Init ();
@@ -30,7 +30,7 @@ public class DimAutoSize : Scenario {
 
 		var resetButton = new Button () {
 			Text = "P_ut Button Back",
-			X = 0,
+			X = Pos.Center (),
 			Y = Pos.Bottom(label)
 		};
 
@@ -45,15 +45,13 @@ public class DimAutoSize : Scenario {
 
 		resetButton.Clicked += (s, e) => {
 			movingButton.Y = Pos.Bottom (resetButton);
-			// BUGBUG: Should this be required? I don't thinks so.
-			//movingButton.SuperView.LayoutSubviews ();
 		};
 
 		var view = new FrameView () {
 			Title = "Type in the TextField to make View grow.",
 			X = 3,
 			Y = 3,
-			Width = Dim.Auto (),
+			Width = Dim.Auto (min: Dim.Percent(50)),
 			Height = Dim.Auto (min: 10)
 		};
 		view.ValidatePosDim = true;
