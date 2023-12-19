@@ -333,7 +333,7 @@ namespace Terminal.Gui {
 				default: tside = "unknown"; break;
 				}
 				// Note: We do not checkt `Target` for null here to intentionally throw if so
-				return $"View({tside},{Target.ToString ()})";
+				return $"View(side={tside},target={Target.ToString ()})";
 			}
 
 			public override int GetHashCode () => Target.GetHashCode ();
@@ -346,42 +346,42 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Left (View view) => new PosCombine (true, new PosView (view, 0), new Pos.PosAbsolute (0));
+		public static Pos Left (View view) => new PosView (view, 0);
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Left (X) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos X (View view) => new PosCombine (true, new PosView (view, 0), new Pos.PosAbsolute (0));
+		public static Pos X (View view) => new PosView (view, 0);
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Top (Y) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Top (View view) => new PosCombine (true, new PosView (view, 1), new Pos.PosAbsolute (0));
+		public static Pos Top (View view) => new PosView (view, 1);
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Top (Y) position of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Y (View view) => new PosCombine (true, new PosView (view, 1), new Pos.PosAbsolute (0));
+		public static Pos Y (View view) => new PosView(view, 1);
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Right (X+Width) coordinate of the specified <see cref="View"/>.
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Right (View view) => new PosCombine (true, new PosView (view, 2), new Pos.PosAbsolute (0));
+		public static Pos Right (View view) => new PosView (view, 2);
 
 		/// <summary>
 		/// Returns a <see cref="Pos"/> object tracks the Bottom (Y+Height) coordinate of the specified <see cref="View"/> 
 		/// </summary>
 		/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
 		/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
-		public static Pos Bottom (View view) => new PosCombine (true, new PosView (view, 3), new Pos.PosAbsolute (0));
+		public static Pos Bottom (View view) => new PosView (view, 3);
 
 		/// <summary>Serves as the default hash function. </summary>
 		/// <returns>A hash code for the current object.</returns>

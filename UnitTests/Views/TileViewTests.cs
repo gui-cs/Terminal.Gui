@@ -526,7 +526,7 @@ namespace Terminal.Gui.ViewsTests
             var tileView = Get11By3TileView();
 
             var ex = Assert.Throws<ArgumentException>(() => tileView.SetSplitterPos(0, Pos.Right(tileView)));
-            Assert.Equal("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
+            Assert.Equal("Only Percent and Absolute values are supported. Passed value was PosView", ex.Message);
 
             ex = Assert.Throws<ArgumentException>(() => tileView.SetSplitterPos(0, Pos.Function(() => 1)));
             Assert.Equal("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
