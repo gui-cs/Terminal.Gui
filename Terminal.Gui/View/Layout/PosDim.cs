@@ -619,9 +619,9 @@ public class Dim {
 		if (style == DimAutoStyle.Text) {
 			throw new NotImplementedException (@"DimAutoStyle.Text is not implemented.");
 		}
-		if (min != null) {
-			throw new NotImplementedException (@"min is not implemented");
-		}
+		//if (min != null) {
+		//	throw new NotImplementedException (@"min is not implemented");
+		//}
 		if (max != null) {
 			throw new NotImplementedException (@"max is not implemented");
 		}

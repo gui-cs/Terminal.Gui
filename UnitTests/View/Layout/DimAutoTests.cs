@@ -355,6 +355,117 @@ public class DimAutoTests {
 
 	}
 
+	// Test min - ensure that if min is specified in the DimAuto constructor it is honored
+	[Fact]
+	public void DimAuto_Min ()
+	{
+		var superView = new View () {
+			X = 0,
+			Y = 0,
+			Width = Dim.Auto (min: 10),
+			Height = Dim.Auto (min: 10),
+			ValidatePosDim = true,
+		};
+
+		var subView = new View () {
+			X = 0,
+			Y = 0,
+			Width = 5,
+			Height = 5
+		};
+
+		superView.Add (subView);
+		superView.BeginInit ();
+		superView.EndInit ();
+
+		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+		superView.LayoutSubviews (); // no throw
+
+		Assert.Equal (10, superView.Frame.Width);
+		Assert.Equal (10, superView.Frame.Height);
+	}
+
+	[Fact]
+	public void DimAuto_Min_Resets_If_Subview_Shrinks ()
+	{
+		var superView = new View () {
+			X = 0,
+			Y = 0,
+			Width = Dim.Auto (min: 10),
+			Height = Dim.Auto (min: 10),
+			ValidatePosDim = true,
+		};
+
+		var subView = new View () {
+			X = 0,
+			Y = 0,
+			Width = 5,
+			Height = 5
+		};
+
+		superView.Add (subView);
+		superView.BeginInit ();
+		superView.EndInit ();
+
+		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+		superView.LayoutSubviews (); // no throw
+
+		Assert.Equal (10, superView.Frame.Width);
+		Assert.Equal (10, superView.Frame.Height);
+
+		subView.Width = 3;
+		subView.Height = 3;
+		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+		superView.LayoutSubviews (); // no throw
+
+		Assert.Equal (3, subView.Frame.Width);
+		Assert.Equal (3, subView.Frame.Height);
+
+		Assert.Equal (10, superView.Frame.Width);
+		Assert.Equal (10, superView.Frame.Height);
+	}
+
+	// what happens if DimAuto (min: 10) and the subview moves to a negative coord?
+	[Fact]
+	public void DimAuto_Min_Resets_If_Subview_Moves_Negative ()
+	{
+		var superView = new View () {
+			X = 0,
+			Y = 0,
+			Width = Dim.Auto (min: 10),
+			Height = Dim.Auto (min: 10),
+			ValidatePosDim = true,
+		};
+
+		var subView = new View () {
+			X = 0,
+			Y = 0,
+			Width = 5,
+			Height = 5
+		};
+
+		superView.Add (subView);
+		superView.BeginInit ();
+		superView.EndInit ();
+
+		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+		superView.LayoutSubviews (); // no throw
+
+		Assert.Equal (10, superView.Frame.Width);
+		Assert.Equal (10, superView.Frame.Height);
+
+		subView.X = -1;
+		subView.Y = -1;
+		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
+		superView.LayoutSubviews (); // no throw
+
+		Assert.Equal (5, subView.Frame.Width);
+		Assert.Equal (5, subView.Frame.Height);
+
+		Assert.Equal (10, superView.Frame.Width);
+		Assert.Equal (10, superView.Frame.Height);
+	}
+
 	// Test variations of Frame
 
 }

@@ -581,6 +581,11 @@ namespace Terminal.Gui {
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
+
+			if (LayoutStyle == LayoutStyle.Computed && (SuperView?.Height is Dim.DimAuto || (SuperView?.Width is Dim.DimAuto))) {
+				// DimAuto is in play, force a layout.
+				SuperView.LayoutSubviews ();
+			}
 		}
 
 		internal bool LayoutNeeded { get; private set; } = true;
@@ -783,16 +788,16 @@ namespace Terminal.Gui {
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
 
-				case Dim.DimAuto:
+				case Dim.DimAuto auto:
 					var thickness = GetFramesThickness ();
 					if (width) {
 						var furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
-						newDimension = furthestRight + thickness.Left + thickness.Right;
+						//newDimension = furthestRight + thickness.Left + thickness.Right;
+						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (0) ?? 0);
 					} else {
 						var furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-						// TODO: GethashCode is a hack. 
-						//newDimension = int.Max(furthestBottom + thickness.Top + thickness.Bottom, ((Dim.DimAuto)d)._min.GetHashCode());
-						newDimension = furthestBottom + thickness.Top + thickness.Bottom;
+						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (0) ?? 0);
+						//newDimension = furthestBottom + thickness.Top + thickness.Bottom;
 					}
 					break;
 
