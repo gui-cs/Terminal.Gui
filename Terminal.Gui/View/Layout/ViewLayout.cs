@@ -482,70 +482,6 @@ public partial class View {
 		}
 	}
 
-	// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
-	// BUGBUG: this function does not belong in ViewLayout.cs - it should be in ViewText.cs
-	/// <summary>
-	/// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
-	/// </summary>
-	/// <param name="size">The minimum dimensions required.</param>
-	/// <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
-	/// <remarks>
-	/// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
-	/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
-	/// Does not take into account word wrapping.
-	/// </remarks>
-	bool GetMinimumBoundsForFrame (out Size size)
-	{
-		if (!IsInitialized) {
-			size = new Size (0, 0);
-			return false;
-		}
-		size = Bounds.Size;
-
-		if (!AutoSize && !string.IsNullOrEmpty (TextFormatter.Text)) {
-			switch (TextFormatter.IsVerticalDirection (TextDirection)) {
-			case true:
-				int colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
-				// TODO: v2 - This uses frame.Width; it should only use Bounds
-				if (_frame.Width < colWidth &&
-				(Width == null ||
-				Bounds.Width >= 0 &&
-				Width is Dim.DimAbsolute &&
-				Width.Anchor (0) >= 0 &&
-				Width.Anchor (0) < colWidth)) {
-					size = new Size (colWidth, Bounds.Height);
-					return true;
-				}
-				break;
-			default:
-				if (_frame.Height < 1 &&
-				(Height == null ||
-				Height is Dim.DimAbsolute &&
-				Height.Anchor (0) == 0)) {
-					size = new Size (Bounds.Width, 1);
-					return true;
-				}
-				break;
-			}
-		}
-		return false;
-	}
-
-	// BUGBUG: this function does not belong in ViewLayout.cs - it should be in ViewText.cs
-	/// <summary>
-	/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/> (see <see cref="GetMinimumBoundsForFrame"/>.
-	/// </summary>
-	/// <returns><see langword="true"/> if the size was changed, <see langword="false"/> if <see cref="Text"/>
-	/// will not fit.</returns>
-	bool SetBoundsToFitFrame ()
-	{
-		if (GetMinimumBoundsForFrame (out var size)) {
-			_frame = new Rect (_frame.Location, size);
-			return true;
-		}
-		return false;
-	}
-
 	/// <summary>
 	/// Called whenever the view needs to be resized. Sets <see cref="Frame"/> and
 	/// triggers a <see cref="LayoutSubviews()"/> call.
@@ -575,7 +511,7 @@ public partial class View {
 		}
 		//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 		if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
-			SetBoundsToFitFrame ();
+			SetFrameToFitText ();
 			LayoutFrames ();
 			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			SetNeedsLayout ();
@@ -586,6 +522,8 @@ public partial class View {
 		&& SuperView != null
 		&& LayoutStyle == LayoutStyle.Computed && (SuperView?.Height is Dim.DimAuto || SuperView?.Width is Dim.DimAuto)) {
 			// DimAuto is in play, force a layout.
+			// BUGBUG: This can cause LayoutSubviews to be called recursively resulting in a deadlock. 
+			//         SetNeedsLayout should be sufficient, but it's not.
 			SuperView.LayoutSubviews ();
 		}
 	}
@@ -830,7 +768,7 @@ public partial class View {
 		if (Frame != r) {
 			Frame = r;
 			// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
-			if (!SetBoundsToFitFrame ()) {
+			if (!SetFrameToFitText ()) {
 				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			}
 		}
