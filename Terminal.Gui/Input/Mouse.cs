@@ -180,6 +180,6 @@ public class MouseEvent {
 	/// <returns>A <see cref="T:System.String"/> that represents the current <see cref="MouseEvent"/>.</returns>
 	public override string ToString ()
 	{
-		return $"({X},{Y}:{Flags}";
+		return $"({X},{Y}):{Flags}";
 	}
 }
