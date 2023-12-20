@@ -654,23 +654,80 @@ public partial class View {
 		}
 
 		// Returns the new dimension (width or height) and location (x or y) for the View given
-		//   the superview's Frame.X or Frame.Y
-		//   the superview's width or height
+		//   the superview's Bounds
 		//   the current Pos (View.X or View.Y)
 		//   the current Dim (View.Width or View.Height)
-		(int newLocation, int newDimension) GetNewLocationAndDimension (bool width, int superviewLocation, int superviewDimension, Pos pos, Dim dim, int autosizeDimension)
+		// This method is called recursively if pos is Pos.PosCombine
+		(int newLocation, int newDimension) GetNewLocationAndDimension (bool width, Rect superviewBounds, Pos pos, Dim dim, int autosizeDimension)
 		{
+			// Gets the new dimension (width or height, dependent on `width`) of the given Dim given:
+			//   location: the current location (x or y)
+			//   dimension: the current dimension (width or height)
+			//   autosize: the size to use if autosize = true
+			// This mehod is recursive if d is Dim.DimCombine
+			int GetNewDimension  (Dim d, int location, int dimension, int autosize)
+			{
+				int newDimension;
+				switch (d) {
+				case null:
+					newDimension = AutoSize ? autosize : dimension;
+					break;
+
+				case Dim.DimCombine combine:
+					int leftNewDim = GetNewDimension (combine._left, location, dimension, autosize);
+					int rightNewDim = GetNewDimension (combine._right, location, dimension, autosize);
+					if (combine._add) {
+						newDimension = leftNewDim + rightNewDim;
+					} else {
+						newDimension = leftNewDim - rightNewDim;
+					}
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+
+				case Dim.DimFactor factor when !factor.IsFromRemaining ():
+					newDimension = d.Anchor (dimension);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+
+				case Dim.DimAuto auto:
+					var thickness = GetFramesThickness ();
+					newDimension = GetNewDimension (auto._min, location, dimension, autosize);
+					if (width) {
+						int furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
+						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (SuperView?.Bounds.Width ?? 0) ?? 0);
+					} else {
+						int furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
+						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (SuperView?.Bounds.Height ?? 0) ?? 0);
+					}
+					break;
+
+				case Dim.DimFill:
+				default:
+					newDimension = Math.Max (d.Anchor (dimension - location), 0);
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					break;
+				}
+
+				return newDimension;
+			}
+
 			int newDimension, newLocation;
 
+			int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
+
 			switch (pos) {
-			case Pos.PosCenter:
+			case Pos.PosCenter posCenter:
 				if (dim == null) {
+					throw new ArgumentException ();
 					newDimension = AutoSize ? autosizeDimension : superviewDimension;
+					newLocation = posCenter.Anchor (superviewDimension - newDimension);
 				} else {
+					//newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
+
 					newDimension = dim.Anchor (superviewDimension);
 					newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
+					newLocation = posCenter.Anchor (superviewDimension - newDimension);
 				}
-				newLocation = pos.Anchor (superviewDimension - newDimension);
 #if false
 					if (dim == null) {
 						newDimension = AutoSize ? autosizeDimension : superviewDimension;
@@ -684,14 +741,14 @@ public partial class View {
 
 			case Pos.PosCombine combine:
 				int left, right;
-				(left, newDimension) = GetNewLocationAndDimension (width, superviewLocation, superviewDimension, combine._left, dim, autosizeDimension);
-				(right, newDimension) = GetNewLocationAndDimension (width, superviewLocation, superviewDimension, combine._right, dim, autosizeDimension);
+				(left, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._left, dim, autosizeDimension);
+				(right, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._right, dim, autosizeDimension);
 				if (combine._add) {
 					newLocation = left + right;
 				} else {
 					newLocation = left - right;
 				}
-				newDimension = Math.Max (CalculateNewDimension (width, dim, newLocation, superviewDimension, autosizeDimension), 0);
+				newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
 				break;
 
 			case Pos.PosAnchorEnd:
@@ -701,67 +758,20 @@ public partial class View {
 			case Pos.PosView:
 			default:
 				newLocation = pos?.Anchor (superviewDimension) ?? 0;
-				newDimension = Math.Max (CalculateNewDimension (width, dim, newLocation, superviewDimension, autosizeDimension), 0);
+				newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
 				break;
 			}
+
+
 			return (newLocation, newDimension);
 		}
 
-		// Recursively calculates the new dimension (width or height) of the given Dim given:
-		//   width: true for width, false for height
-		//   location: the current location (x or y)
-		//   dimension: the current dimension (width or height)
-		//   autosize: the size to use if autosize = true
-		int CalculateNewDimension (bool width, Dim d, int location, int dimension, int autosize)
-		{
-			int newDimension;
-			switch (d) {
-			case null:
-				newDimension = AutoSize ? autosize : dimension;
-				break;
-			case Dim.DimCombine combine:
-				int leftNewDim = CalculateNewDimension (width, combine._left, location, dimension, autosize);
-				int rightNewDim = CalculateNewDimension (width, combine._right, location, dimension, autosize);
-				if (combine._add) {
-					newDimension = leftNewDim + rightNewDim;
-				} else {
-					newDimension = leftNewDim - rightNewDim;
-				}
-				newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-				break;
-
-			case Dim.DimFactor factor when !factor.IsFromRemaining ():
-				newDimension = d.Anchor (dimension);
-				newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-				break;
-
-			case Dim.DimAuto auto:
-				var thickness = GetFramesThickness ();
-				newDimension = CalculateNewDimension (width, auto._min, location, dimension, autosize);
-				if (width) {
-					int furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
-					newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (SuperView?.Bounds.Width ?? 0) ?? 0);
-				} else {
-					int furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-					newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (SuperView?.Bounds.Height ?? 0) ?? 0);
-				}
-				break;
-
-			case Dim.DimFill:
-			default:
-				newDimension = Math.Max (d.Anchor (dimension - location), 0);
-				newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
-				break;
-			}
-
-			return newDimension;
-		}
 
 		// horizontal/width
-		(newX, newW) = GetNewLocationAndDimension (true, superviewBounds.X, superviewBounds.Width, _x, _width, autosize.Width);
+		(newX, newW) = GetNewLocationAndDimension (true, superviewBounds, _x, _width, autosize.Width);
 
 		// vertical/height
-		(newY, newH) = GetNewLocationAndDimension (false, superviewBounds.Y, superviewBounds.Height, _y, _height, autosize.Height);
+		(newY, newH) = GetNewLocationAndDimension (false, superviewBounds, _y, _height, autosize.Height);
 
 		var r = new Rect (newX, newY, newW, newH);
 		if (Frame != r) {
