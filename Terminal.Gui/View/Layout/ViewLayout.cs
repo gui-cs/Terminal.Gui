@@ -469,6 +469,7 @@ public partial class View {
 	/// <remarks>
 	/// Does not verify if this view is Toplevel (WHY??!?).
 	/// </remarks>
+	/// <param name="prop">The property name.</param>
 	/// <param name="oldValue"></param>
 	/// <param name="newValue"></param>
 	void CheckAbsolute (string prop, object oldValue, object newValue)
@@ -636,14 +637,12 @@ public partial class View {
 		return ret;
 	}
 
+	// TODO: Come up with a better name for this method. "SetRelativeLayout" lacks clarity and confuses. AdjustSizeAndPosition?
 	/// <summary>
-	/// Sets the View's <see cref="Frame"/> to the frame-relative coordinates if its container. The
-	/// container size and location are specified by <paramref name="superviewFrame"/> and are relative to the
-	/// View's superview.
+	/// Sets the View's position and dimensions (<see cref="Frame"/>) based on <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>.
 	/// </summary>
-	/// <param name="superviewFrame">The SuperView-relative rectangle describing View's container (nominally the 
-	/// same as <c>this.SuperView.Frame</c>).</param>
-	internal void SetRelativeLayout (Rect superviewFrame)
+	/// <param name="superviewBounds">The rectangle describing the SuperView's Bounds (nominally the same as <c>this.SuperView.Bounds</c>).</param>
+	internal void SetRelativeLayout (Rect superviewBounds)
 	{
 		int newX, newW, newY, newH;
 		var autosize = Size.Empty;
@@ -758,11 +757,11 @@ public partial class View {
 			return newDimension;
 		}
 
-		// horizontal width
-		(newX, newW) = GetNewLocationAndDimension (true, superviewFrame.X, superviewFrame.Width, _x, _width, autosize.Width);
+		// horizontal/width
+		(newX, newW) = GetNewLocationAndDimension (true, superviewBounds.X, superviewBounds.Width, _x, _width, autosize.Width);
 
-		// vertical height
-		(newY, newH) = GetNewLocationAndDimension (false, superviewFrame.Y, superviewFrame.Height, _y, _height, autosize.Height);
+		// vertical/height
+		(newY, newH) = GetNewLocationAndDimension (false, superviewBounds.Y, superviewBounds.Height, _y, _height, autosize.Height);
 
 		var r = new Rect (newX, newY, newW, newH);
 		if (Frame != r) {
