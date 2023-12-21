@@ -78,6 +78,8 @@ public class Dialog : Window {
 	}
 
 	bool inLayout = false;
+
+	/// <inheritdoc />
 	public override void LayoutSubviews ()
 	{
 		if (inLayout) {

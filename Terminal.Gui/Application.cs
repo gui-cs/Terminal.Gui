@@ -317,6 +317,8 @@ public static partial class Application {
 			} else if (Top != null && Toplevel != Top && _topLevels.Contains (Top)) {
 				Top.OnLeave (Toplevel);
 			}
+			// BUGBUG: We should not depend on `Id` internally. 
+			// BUGBUG: It is super unclear what this code does anyway.
 			if (string.IsNullOrEmpty (Toplevel.Id)) {
 				int count = 1;
 				string id = (_topLevels.Count + count).ToString ();
@@ -836,6 +838,12 @@ public static partial class Application {
 	#endregion Run (Begin, Run, End)
 
 	#region Toplevel handling
+
+	/// <summary>
+	/// Holds the stack of TopLevel views.
+	/// </summary>
+	// BUGBUG: Techncally, this is not the full lst of TopLevels. THere be dragons hwre. E.g. see how Toplevel.Id is used. What
+	// about TopLevels that are just a SubView of another View?
 	static readonly Stack<Toplevel> _topLevels = new ();
 
 	/// <summary>

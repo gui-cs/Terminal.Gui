@@ -284,11 +284,18 @@ public partial class View {
 	/// </summary>
 	/// <value>The X Position.</value>
 	/// <remarks>
-	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+	/// <para>
+	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate.
+	/// </para>
+	/// <para>
+	/// <see langword="null"/> is the same as <c>Pos.Absolute(0)</c>.
+	/// </para>
 	/// </remarks>
 	public Pos X {
 		get => VerifyIsInitialized (_x);
 		set {
+			// BUGBUG: null is the sames a Pos.Absolute(0). Should we be explicit and set it?
+
 			if (ValidatePosDim && LayoutStyle == LayoutStyle.Computed) {
 				CheckAbsolute (nameof (X), _x, value);
 			}
@@ -299,16 +306,24 @@ public partial class View {
 		}
 	}
 
+
 	/// <summary>
 	/// Gets or sets the Y position for the view (the row). Only used if the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 	/// </summary>
-	/// <value>The y position (line).</value>
+	/// <value>The X Position.</value>
 	/// <remarks>
-	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+	/// <para>
+	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate.
+	/// </para>
+	/// <para>
+	/// <see langword="null"/> is the same as <c>Pos.Absolute(0)</c>.
+	/// </para>
 	/// </remarks>
 	public Pos Y {
 		get => VerifyIsInitialized (_y);
 		set {
+			// BUGBUG: null is the sames a Pos.Absolute(0). Should we be explicit and set it?
+
 			if (ValidatePosDim && LayoutStyle == LayoutStyle.Computed) {
 				CheckAbsolute (nameof (Y), _y, value);
 			}
@@ -321,15 +336,22 @@ public partial class View {
 	Dim _width, _height;
 
 	/// <summary>
-	/// Gets or sets the width of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+	/// Gets or sets the width of the view. Only used when <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 	/// </summary>
 	/// <value>The width.</value>
 	/// <remarks>
-	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+	/// <para>
+	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property
+	/// has no effect and its value is indeterminate. 
+	/// </para>
+	/// <para>
+	/// <see langword="null"/> is the same as <c>Dim.Fill (0)</c>.
+	/// </para>
 	/// </remarks>
 	public Dim Width {
 		get => VerifyIsInitialized (_width);
 		set {
+			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
 			if (ValidatePosDim) {
 				CheckDimAuto ();
 				if (LayoutStyle == LayoutStyle.Computed) {
@@ -351,13 +373,22 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets or sets the height of the view. Only used the <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
+	/// Gets or sets the height of the view. Only used when <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Computed"/>.
 	/// </summary>
-	/// <value>The height.</value>
-	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property has no effect and its value is indeterminate. 
+	/// <value>The width.</value>
+	/// <remarks>
+	/// <para>
+	/// If <see cref="LayoutStyle"/> is <see cref="Terminal.Gui.LayoutStyle.Absolute"/> changing this property
+	/// has no effect and its value is indeterminate. 
+	/// </para>
+	/// <para>
+	/// <see langword="null"/> is the same as <c>Dim.Fill (0)</c>.
+	/// </para>
+	/// </remarks>
 	public Dim Height {
 		get => VerifyIsInitialized (_height);
 		set {
+			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
 			if (ValidatePosDim) {
 				CheckDimAuto ();
 				if (LayoutStyle == LayoutStyle.Computed) {
@@ -639,7 +670,8 @@ public partial class View {
 
 	// TODO: Come up with a better name for this method. "SetRelativeLayout" lacks clarity and confuses. AdjustSizeAndPosition?
 	/// <summary>
-	/// Sets the View's position and dimensions (<see cref="Frame"/>) based on <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>.
+	/// Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and <see cref="Height"/>) to
+	/// <see cref="Frame"/>, given a rectangle describing the SuperView's Bounds (nominally the same as <c>this.SuperView.Bounds</c>).
 	/// </summary>
 	/// <param name="superviewBounds">The rectangle describing the SuperView's Bounds (nominally the same as <c>this.SuperView.Bounds</c>).</param>
 	internal void SetRelativeLayout (Rect superviewBounds)
@@ -670,6 +702,7 @@ public partial class View {
 				int newDimension;
 				switch (d) {
 				case null:
+					// dim == null is the same as dim == Dim.FIll (0)
 					newDimension = AutoSize ? autosize : dimension;
 					break;
 
@@ -694,10 +727,12 @@ public partial class View {
 					newDimension = GetNewDimension (auto._min, location, dimension, autosize);
 					if (width) {
 						int furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
-						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (SuperView?.Bounds.Width ?? 0) ?? 0);
+						//Debug.Assert(superviewBounds.Width == (SuperView?.Bounds.Width ?? 0));
+						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (superviewBounds.Width) ?? 0);
 					} else {
 						int furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (SuperView?.Bounds.Height ?? 0) ?? 0);
+						//Debug.Assert (superviewBounds.Height == (SuperView?.Bounds.Height ?? 0));
+						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (superviewBounds.Height) ?? 0);
 					}
 					break;
 
@@ -718,6 +753,7 @@ public partial class View {
 			switch (pos) {
 			case Pos.PosCenter posCenter:
 				if (dim == null) {
+					// dim == null is the same as dim == Dim.FIll (0)
 					throw new ArgumentException ();
 					newDimension = AutoSize ? autosizeDimension : superviewDimension;
 					newLocation = posCenter.Anchor (superviewDimension - newDimension);
@@ -753,10 +789,11 @@ public partial class View {
 
 			case Pos.PosAnchorEnd:
 			case Pos.PosAbsolute:
+			case null:
 			case Pos.PosFactor:
 			case Pos.PosFunc:
 			case Pos.PosView:
-			default:
+			default: 
 				newLocation = pos?.Anchor (superviewDimension) ?? 0;
 				newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
 				break;
