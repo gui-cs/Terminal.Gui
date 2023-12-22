@@ -747,32 +747,25 @@ public partial class View {
 			}
 
 			int newDimension, newLocation;
-
 			int superviewDimension = width ? superviewBounds.Width : superviewBounds.Height;
 
+			// Determine new location
 			switch (pos) {
 			case Pos.PosCenter posCenter:
 				if (dim == null) {
+					// BUGBUG: In what situation is dim == null here? None that I can find.
 					// dim == null is the same as dim == Dim.FIll (0)
 					throw new ArgumentException ();
 					newDimension = AutoSize ? autosizeDimension : superviewDimension;
 					newLocation = posCenter.Anchor (superviewDimension - newDimension);
 				} else {
+					//newLocation = posCenter?.Anchor (superviewDimension) ?? 0;
 					//newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
 
-					newDimension = dim.Anchor (superviewDimension);
+					newDimension = posCenter.Anchor (superviewDimension);
 					newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
 					newLocation = posCenter.Anchor (superviewDimension - newDimension);
 				}
-#if false
-					if (dim == null) {
-						newDimension = AutoSize ? autosizeDimension : superviewDimension;
-					} else {
-						newDimension = Math.Max (CalculateNewDimension (width, dim, 0, dim.Anchor (superviewDimension), autosizeDimension), 0);
-						newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
-					}
-					newLocation = pos.Anchor (superviewDimension - newDimension);
-#endif
 				break;
 
 			case Pos.PosCombine combine:

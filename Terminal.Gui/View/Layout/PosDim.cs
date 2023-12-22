@@ -171,7 +171,7 @@ public class Pos {
 	/// useful to flush the layout from the right or bottom.
 	/// </summary>
 	/// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
-	/// <param name="margin">Optional margin to place to the right or below.</param>
+	/// <param name="offset">The view will be shifted left or up by the amount specified.</param>
 	/// <example>
 	/// This sample shows how align a <see cref="Button"/> to the bottom-right of a <see cref="View"/>.
 	/// <code>
@@ -180,27 +180,27 @@ public class Pos {
 	/// anchorButton.Y = Pos.AnchorEnd (1);
 	/// </code>
 	/// </example>
-	public static Pos AnchorEnd (int margin = 0)
+	public static Pos AnchorEnd (int offset = 0)
 	{
-		if (margin < 0) {
-			throw new ArgumentException ("Margin must be positive");
+		if (offset < 0) {
+			throw new ArgumentException (@"Must be positive", nameof(offset));
 		}
 
-		return new PosAnchorEnd (margin);
+		return new PosAnchorEnd (offset);
 	}
 
 	internal class PosAnchorEnd : Pos {
-		readonly int _p;
+		readonly int _offset;
 
-		public PosAnchorEnd (int n) => _p = n;
+		public PosAnchorEnd (int offset) => _offset = offset;
 
-		internal override int Anchor (int width) => width - _p;
+		internal override int Anchor (int width) => width - _offset;
 
-		public override string ToString () => $"AnchorEnd({_p})";
+		public override string ToString () => $"AnchorEnd({_offset})";
 
-		public override int GetHashCode () => _p.GetHashCode ();
+		public override int GetHashCode () => _offset.GetHashCode ();
 
-		public override bool Equals (object other) => other is PosAnchorEnd anchorEnd && anchorEnd._p == _p;
+		public override bool Equals (object other) => other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset;
 	}
 
 	/// <summary>

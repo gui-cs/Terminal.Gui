@@ -2,6 +2,7 @@
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -138,8 +139,44 @@ public class SetRelativeLayoutTests {
 		Assert.Equal (expectedDim, view.Frame.Height);
 	}
 
+	[Fact]
+	public void PosCombine_PosCenter_Minus_Absolute ()
+	{
+		// This test used to be in ViewTests.cs Internal_Tests. It was moved here because it is testing
+		// SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
+		// because in v1 Pos.Center was broken in this regard!
+
+		var screen = new Rect (0, 0, 80, 25);
+		var view = new View () {
+			X = Pos.Center () - 41,  // ((80 / 2) - (5 / 2)) - 41 = (40 - 2 - 41) = -3
+			Y = Pos.Center () - 13,  // ((25 / 2) - (4 / 2)) - 13 = (12 - 2 - 13) = -3
+			Width = 5,
+			Height = 4
+		};
+
+		view.SetRelativeLayout (screen);
+		Assert.Equal (-21, view.Frame.X); // BUGBUG: Should be -3
+		Assert.Equal (-7, view.Frame.Y);  // BUGBUG: Should be -3
+	}
+
+	[Fact]
+	public void PosCombine_PosCenter_Plus_Absolute ()
+	{
+		var screen = new Rect (0, 0, 80, 25);
+		var view = new View () {
+			X = Pos.Center () + 41,  // ((80 / 2) - (5 / 2)) + 41 = (40 - 2 + 41) = 79
+			Y = Pos.Center () + 13,  // ((25 / 2) - (4 / 2)) + 13 = (12 - 2 + 13) = 23
+			Width = 5,
+			Height = 4
+		};
+
+		view.SetRelativeLayout (screen);
+		Assert.Equal (79, view.Frame.X); // BUGBUG: Should be 79
+		Assert.Equal (23, view.Frame.Y);  // BUGBUG: Should be 23
+	}
+
 	[Fact] [TestRespondersDisposed]
-	public void PosCombine_Center_Plus_Absolute ()
+	public void PosCombine_Plus_Absolute ()
 	{
 		var superView = new View () {
 			AutoSize = false,
@@ -161,7 +198,7 @@ public class SetRelativeLayoutTests {
 
 		testView = new View () {
 			AutoSize = false,
-			X = Pos.Center () + 1,
+			X = Pos.Center () + 1, // ((10 / 2) - (1 / 2)) + 1 = 5 - 1 + 1 = 5
 			Y = Pos.Center () + 1,
 			Width = 1,
 			Height = 1

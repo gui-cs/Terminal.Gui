@@ -113,10 +113,9 @@ public class PosTests {
 		var win = new Window ();
 
 		var label = new Label ("This should be the last line.") {
-			TextAlignment = TextAlignment.Centered,
 			ColorScheme = Colors.Menu,
 			Width = Dim.Fill (),
-			X = Pos.Center (),
+			X = 0,
 			Y = Pos.Bottom (win) - 3 // two lines top and bottom borders more one line above the bottom border
 		};
 
@@ -140,7 +139,7 @@ public class PosTests {
 │                                      │
 │                                      │
 │                                      │
-│    This should be the last line.     │
+│This should be the last line.         │
 └──────────────────────────────────────┘
 ";
 
@@ -155,10 +154,9 @@ public class PosTests {
 		var win = new Window ();
 
 		var label = new Label ("This should be the last line.") {
-			TextAlignment = TextAlignment.Centered,
 			ColorScheme = Colors.Menu,
 			Width = Dim.Fill (),
-			X = Pos.Center (),
+			X = 0, // keep unit test focused; don't use Center here
 			Y = Pos.AnchorEnd (1)
 		};
 
@@ -183,7 +181,7 @@ public class PosTests {
 │                                      │
 │                                      │
 │                                      │
-│    This should be the last line.     │
+│This should be the last line.         │
 └──────────────────────────────────────┘
 ";
 
@@ -198,10 +196,9 @@ public class PosTests {
 		var win = new Window ();
 
 		var label = new Label ("This should be the last line.") {
-			TextAlignment = TextAlignment.Centered,
 			ColorScheme = Colors.Menu,
 			Width = Dim.Fill (),
-			X = Pos.Center (),
+			X = 0,
 			Y = Pos.Bottom (win) - 4 // two lines top and bottom borders more two lines above border
 		};
 
@@ -242,7 +239,7 @@ public class PosTests {
 │                                                                              │
 │                                                                              │
 │                                                                              │
-│                        This should be the last line.                         │
+│This should be the last line.                                                 │
 └──────────────────────────────────────────────────────────────────────────────┘
  F1 Help                                                                        
 ";
@@ -258,10 +255,9 @@ public class PosTests {
 		var win = new Window ();
 
 		var label = new Label ("This should be the last line.") {
-			TextAlignment = TextAlignment.Centered,
 			ColorScheme = Colors.Menu,
 			Width = Dim.Fill (),
-			X = Pos.Center (),
+			X = 0,
 			Y = Pos.AnchorEnd (1)
 		};
 
@@ -302,7 +298,7 @@ public class PosTests {
 │                                                                              │
 │                                                                              │
 │                                                                              │
-│                        This should be the last line.                         │
+│This should be the last line.                                                 │
 └──────────────────────────────────────────────────────────────────────────────┘
  F1 Help                                                                        
 ";

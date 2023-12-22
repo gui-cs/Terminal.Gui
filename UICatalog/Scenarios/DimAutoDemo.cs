@@ -67,7 +67,7 @@ public class DimAutoDemo : Scenario {
 
 		Application.Top.Add (view, dlgButton);
 	}
-	
+
 	private void DlgButton_Clicked (object sender, System.EventArgs e)
 	{
 		var dlg = new Dialog () {
@@ -82,15 +82,20 @@ public class DimAutoDemo : Scenario {
 		//cancel.Clicked += (s, _) => Application.RequestStop (dlg);
 		//dlg.AddButton (cancel);
 
-		var label = new Label ("This is a label. Press Esc to close.") {
-			X = 0,
-			Y = 2,
+		var label = new Label ("This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close.") {
+			AutoSize = false,
+			X = Pos.Center(),
+			Y = 0,
+			Height = Dim.Auto (min: 3),
+			Width = Dim.Auto (min: 20),
+			ColorScheme = Colors.Menu
 		};
 
-		var btn = new Button ("Button") {
-			X = 0,// Pos.Center (),
+		var btn = new Button ("AnchorEnd") {
 			Y = Pos.AnchorEnd (1)
 		};
+		// TODO: We should really fix AnchorEnd to do this automatically. 
+		btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
 		dlg.Add (btn);
 		dlg.Add (label);
 		Application.Run (dlg);
