@@ -114,6 +114,20 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
+			frame.ValidatePosDim = true;
+			void Top_Loaded (object sender, EventArgs args)
+			{
+				frame.Height =
+					widthEdit.Frame.Height +
+					heightEdit.Frame.Height +
+					titleEdit.Frame.Height +
+					numButtonsEdit.Frame.Height +
+					glyphsNotWords.Frame.Height +
+					styleRadioGroup.Frame.Height;
+				Application.Top.Loaded -= Top_Loaded;
+			}
+			Application.Top.Loaded += Top_Loaded;
+
 			Win.Add (frame);
 
 			label = new Label ("Button Pressed:") {
@@ -203,7 +217,7 @@ namespace UICatalog.Scenarios {
 
 				var add = new Button ("Add a button") {
 					X = Pos.Center (),
-					Y = 10//Pos.Center ()
+					Y = Pos.Center ()
 				};
 				add.Clicked += (s, e) => {
 					var buttonId = buttons.Count;
@@ -230,7 +244,7 @@ namespace UICatalog.Scenarios {
 
 				var addChar = new Button ($"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button") {
 					X = Pos.Center (),
-					Y = 11//Pos.Center () + 1
+					Y = Pos.Center () + 1
 				};
 				addChar.Clicked += (s, e) => {
 					foreach (var button in buttons) {
