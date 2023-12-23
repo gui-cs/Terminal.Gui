@@ -450,12 +450,6 @@ public class Pos {
 ///	  </description>
 ///	</item>
 ///	<item>
-///	  <term><see cref="Dim.Auto"/></term>
-///	  <description>
-///	  Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews.
-///	  </description>
-///	</item>
-///	<item>
 ///	  <term><see cref="Dim.Width(View)"/></term>
 ///	  <description>
 ///	  Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.
@@ -580,70 +574,6 @@ public class Dim {
 	/// <returns>The Fill dimension.</returns>
 	/// <param name="margin">Margin to use.</param>
 	public static Dim Fill (int margin = 0) => new DimFill (margin);
-
-	/// <summary>
-	/// Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews.
-	/// </summary>
-	/// <example>
-	/// This initializes a <see cref="View"/> with two SubViews. The view will be automatically sized to fit the two SubViews.
-	/// <code>
-	/// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
-	/// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
-	/// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.AutoSize (), Height = Dim.AutoSize () };
-	/// view.Add (button, textField);
-	/// </code>
-	/// </example>
-	/// <returns>The AutoSize <see cref="Dim"/> object.</returns>
-	/// <param name="style">Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Text"/>. NOT CURRENTLY SUPPORTED.</param>
-	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-	/// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Subviews, Dim min = null, Dim max = null)
-	{
-		if (style == DimAutoStyle.Text) {
-			throw new NotImplementedException (@"DimAutoStyle.Text is not implemented.");
-		}
-		//if (min != null) {
-		//	throw new NotImplementedException (@"min is not implemented");
-		//}
-		if (max != null) {
-			throw new NotImplementedException (@"max is not implemented");
-		}
-		return new DimAuto (style, min, max);
-	}
-
-	/// <summary>
-	/// Specifies how <see cref="DimAuto"/> will compute the dimension.
-	/// </summary>
-	public enum DimAutoStyle {
-		/// <summary>
-		/// The dimension will be computed from the view's <see cref="View.Text"/>. NOT CURRENTLY SUPPORTED.
-		/// </summary>
-		Text, 
-
-		/// <summary>
-		/// The dimension will be computed from the view's <see cref="View.Subviews"/>.
-		/// </summary>
-		Subviews,
-	}
-
-	internal class DimAuto : Dim {
-		internal readonly Dim _min;
-		internal readonly Dim _max;
-		internal readonly DimAutoStyle _style;
-
-		public DimAuto (DimAutoStyle style, Dim min, Dim max)
-		{
-			_min = min;
-			_max = max;
-			_style = style;
-		}
-
-		public override string ToString () => $"Auto({_style},{_min},{_max})";
-
-		public override int GetHashCode () => HashCode.Combine (base.GetHashCode (), _min, _max, _style);
-
-		public override bool Equals (object other) => other is DimAuto auto && (auto._min == _min && auto._max == _max && auto._style == _style);
-	}
 
 	/// <summary>
 	/// Creates an Absolute <see cref="Dim"/> from the specified integer value.

@@ -13,8 +13,7 @@ namespace UICatalog.Scenarios {
 			var frame = new FrameView ("MessageBox Options") {
 				X = Pos.Center (),
 				Y = 1,
-				Width = Dim.Percent (75),
-				Height = Dim.Auto ()
+				Width = Dim.Percent (75)
 			};
 			Win.Add (frame);
 

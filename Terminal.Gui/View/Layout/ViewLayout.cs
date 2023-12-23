@@ -353,7 +353,6 @@ public partial class View {
 		set {
 			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
 			if (ValidatePosDim) {
-				CheckDimAuto ();
 				if (LayoutStyle == LayoutStyle.Computed) {
 					CheckAbsolute (nameof (Width), _width, value);
 				}
@@ -390,7 +389,6 @@ public partial class View {
 		set {
 			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
 			if (ValidatePosDim) {
-				CheckDimAuto ();
 				if (LayoutStyle == LayoutStyle.Computed) {
 					CheckAbsolute (nameof (Height), _height, value);
 				}
@@ -440,58 +438,6 @@ public partial class View {
 	/// This will impose a performance penalty and thus should only be used for debugging. 
 	/// </remarks>
 	public bool ValidatePosDim { get; set; }
-
-	/// <summary>
-	/// Throws an <see cref="InvalidOperationException"/> if any of the SubViews are using Dim objects that depend on this Views dimensions.
-	/// </summary>
-	/// <exception cref="InvalidOperationException"></exception>
-	void CheckDimAuto ()
-	{
-		if (!ValidatePosDim || !IsInitialized || Width is not Dim.DimAuto && Height is not Dim.DimAuto) {
-			return;
-		}
-
-		void ThrowInvalid (View view, object checkPosDim, string name)
-		{
-			// TODO: Figure out how to make CheckDimAuto deal with PosCombine
-			object bad = null;
-			switch (checkPosDim) {
-			case Pos pos and not Pos.PosAbsolute and not Pos.PosView and not Pos.PosCombine:
-				bad = pos;
-				break;
-			case Pos pos and Pos.PosCombine:
-				// Recursively check for not Absolute or not View
-				ThrowInvalid (view, (pos as Pos.PosCombine)._left, name);
-				ThrowInvalid (view, (pos as Pos.PosCombine)._right, name);
-				break;
-
-			case Dim dim and not Dim.DimAbsolute and not Dim.DimView and not Dim.DimCombine:
-				bad = dim;
-				break;
-			case Dim dim and Dim.DimCombine:
-				// Recursively check for not Absolute or not View
-				ThrowInvalid (view, (dim as Dim.DimCombine)._left, name);
-				ThrowInvalid (view, (dim as Dim.DimCombine)._right, name);
-				break;
-			}
-
-			if (bad != null) {
-				throw new InvalidOperationException (@$"{view.GetType ().Name}.{name} = {bad.GetType ().Name} which depends on the SuperView's dimensions and the SuperView uses Dim.Auto.");
-			}
-		}
-
-		// Verify none of the subviews are using Dim objects that depend on the SuperView's dimensions.
-		foreach (var view in Subviews) {
-			if (Width is Dim.DimAuto { _min: null }) {
-				ThrowInvalid (view, view.Width, nameof (view.Width));
-				ThrowInvalid (view, view.X, nameof (view.X));
-			}
-			if (Height is Dim.DimAuto { _min: null }) {
-				ThrowInvalid (view, view.Height, nameof (view.Height));
-				ThrowInvalid (view, view.Y, nameof (view.Y));
-			}
-		}
-	}
 
 	/// <summary>
 	/// Throws an <see cref="ArgumentException"/> if <paramref name="newValue"/> is <see cref="Pos.PosAbsolute"/> or <see cref="Dim.DimAbsolute"/>.
@@ -548,15 +494,6 @@ public partial class View {
 			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
-		}
-
-		if (IsInitialized
-		&& SuperView != null
-		&& LayoutStyle == LayoutStyle.Computed && (SuperView?.Height is Dim.DimAuto || SuperView?.Width is Dim.DimAuto)) {
-			// DimAuto is in play, force a layout.
-			// BUGBUG: This can cause LayoutSubviews to be called recursively resulting in a deadlock. 
-			//         SetNeedsLayout should be sufficient, but it's not.
-			SuperView.LayoutSubviews ();
 		}
 	}
 
@@ -721,21 +658,7 @@ public partial class View {
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-
-				case Dim.DimAuto auto:
-					var thickness = GetFramesThickness ();
-					//newDimension = GetNewDimension (auto._min, location, dimension, autosize);
-					if (width) {
-						int furthestRight = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.X is not Pos.PosAnchorEnd).Max (v => v.Frame.X + v.Frame.Width);
-						//Debug.Assert(superviewBounds.Width == (SuperView?.Bounds.Width ?? 0));
-						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (superviewBounds.Width) ?? 0);
-					} else {
-						int furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-						//Debug.Assert (superviewBounds.Height == (SuperView?.Bounds.Height ?? 0));
-						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (superviewBounds.Height) ?? 0);
-					}
-					break;
-
+					
 				case Dim.DimFill:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
@@ -1019,8 +942,6 @@ public partial class View {
 			return;
 		}
 
-		CheckDimAuto ();
-
 		LayoutFrames ();
 
 		var oldBounds = Bounds;
@@ -1034,19 +955,7 @@ public partial class View {
 		CollectAll (this, ref nodes, ref edges);
 		var ordered = TopologicalSort (SuperView, nodes, edges);
 		foreach (var v in ordered) {
-			if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto) {
-				// If the view is auto-sized...
-				var f = v.Frame;
-				v._frame = new Rect (v.Frame.X, v.Frame.Y, 0, 0);
-				LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
-				if (v.Frame != f) {
-					// The subviews changed; do it again
-					v.LayoutNeeded = true;
-					LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
-				}
-			} else {
-				LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
-			}
+			LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
 		}
 
 		// If the 'to' is rooted to 'from' and the layoutstyle is Computed it's a special-case.

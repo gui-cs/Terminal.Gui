@@ -52,8 +52,6 @@ namespace UICatalog.Scenarios {
 
 			public FrameEditor ()
 			{
-				Height = Dim.Auto ();
-				Width = Dim.Auto ();
 				Margin.Thickness = new Thickness (0);
 				BorderStyle = LineStyle.Double;
 				Initialized += FrameEditor_Initialized; ;
