@@ -36,6 +36,15 @@ public class MyScenario : Scenario {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 		};
-		Application.Top.Add (button);
+
+		var bar = new Bar () {
+
+		};
+		var barITem = new BarItem () { Text = "Quit", AutoSize = true };
+		barITem.KeyBindings.Add (Key.Q.WithCtrl, KeyBindingScope.Application, Command.QuitToplevel);
+		bar.Add (barITem);
+		bar.Add (new Label () { Text = "Item2" });
+		bar.Add (new Button () { Text = "_Press Me" });
+		Application.Top.Add (button, bar);
 	}
 }
