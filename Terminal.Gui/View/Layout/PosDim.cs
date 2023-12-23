@@ -62,7 +62,7 @@ namespace Terminal.Gui;
 ///	  </description>
 ///	</item>
 ///	<item>
-///	  <term><see cref="Pos.Left(int)"/></term>
+///	  <term><see cref="Pos.Left"/></term>
 ///	  <description>
 ///	  Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
 ///	  </description>
@@ -450,7 +450,7 @@ public class Pos {
 ///	  </description>
 ///	</item>
 ///	<item>
-///	  <term><see cref="Auto()"/></term>
+///	  <term><see cref="Dim.Auto"/></term>
 ///	  <description>
 ///	  Creates a <see cref="Dim"/> object that automatically sizes the view to fit all of the view's SubViews.
 ///	  </description>
@@ -596,7 +596,7 @@ public class Dim {
 	/// <returns>The AutoSize <see cref="Dim"/> object.</returns>
 	/// <param name="style">Specifies how <see cref="DimAuto"/> will compute the dimension. The default is <see cref="DimAutoStyle.Text"/>. NOT CURRENTLY SUPPORTED.</param>
 	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-	/// <param name="min">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
+	/// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
 	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Subviews, Dim min = null, Dim max = null)
 	{
 		if (style == DimAutoStyle.Text) {

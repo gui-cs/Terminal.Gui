@@ -697,7 +697,7 @@ public partial class View {
 			//   dimension: the current dimension (width or height)
 			//   autosize: the size to use if autosize = true
 			// This mehod is recursive if d is Dim.DimCombine
-			int GetNewDimension  (Dim d, int location, int dimension, int autosize)
+			int GetNewDimension (Dim d, int location, int dimension, int autosize)
 			{
 				int newDimension;
 				switch (d) {
@@ -724,9 +724,9 @@ public partial class View {
 
 				case Dim.DimAuto auto:
 					var thickness = GetFramesThickness ();
-					newDimension = GetNewDimension (auto._min, location, dimension, autosize);
+					//newDimension = GetNewDimension (auto._min, location, dimension, autosize);
 					if (width) {
-						int furthestRight = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.X + v.Frame.Width);
+						int furthestRight = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.X is not Pos.PosAnchorEnd).Max (v => v.Frame.X + v.Frame.Width);
 						//Debug.Assert(superviewBounds.Width == (SuperView?.Bounds.Width ?? 0));
 						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (superviewBounds.Width) ?? 0);
 					} else {
@@ -752,20 +752,11 @@ public partial class View {
 			// Determine new location
 			switch (pos) {
 			case Pos.PosCenter posCenter:
-				if (dim == null) {
-					// BUGBUG: In what situation is dim == null here? None that I can find.
-					// dim == null is the same as dim == Dim.FIll (0)
-					throw new ArgumentException ();
-					newDimension = AutoSize ? autosizeDimension : superviewDimension;
-					newLocation = posCenter.Anchor (superviewDimension - newDimension);
-				} else {
-					//newLocation = posCenter?.Anchor (superviewDimension) ?? 0;
-					//newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
-
-					newDimension = posCenter.Anchor (superviewDimension);
-					newDimension = AutoSize && autosizeDimension > newDimension ? autosizeDimension : newDimension;
-					newLocation = posCenter.Anchor (superviewDimension - newDimension);
-				}
+				// For Center, the dimension is dependent on location, but we need to force getting the dimension first
+				// using a location of 0
+				newDimension = Math.Max (GetNewDimension (dim, 0, superviewDimension, autosizeDimension), 0);
+				newLocation = posCenter.Anchor (superviewDimension - newDimension);
+				newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
 				break;
 
 			case Pos.PosCombine combine:
@@ -786,7 +777,7 @@ public partial class View {
 			case Pos.PosFactor:
 			case Pos.PosFunc:
 			case Pos.PosView:
-			default: 
+			default:
 				newLocation = pos?.Anchor (superviewDimension) ?? 0;
 				newDimension = Math.Max (GetNewDimension (dim, newLocation, superviewDimension, autosizeDimension), 0);
 				break;
@@ -1046,6 +1037,7 @@ public partial class View {
 			if (v.Width is Dim.DimAuto || v.Height is Dim.DimAuto) {
 				// If the view is auto-sized...
 				var f = v.Frame;
+				v._frame = new Rect (v.Frame.X, v.Frame.Y, 0, 0);
 				LayoutSubview (v, new Rect (GetBoundsOffset (), Bounds.Size));
 				if (v.Frame != f) {
 					// The subviews changed; do it again

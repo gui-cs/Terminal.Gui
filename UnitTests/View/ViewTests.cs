@@ -547,13 +547,13 @@ namespace Terminal.Gui.ViewTests {
 			// This test has been moved to SetRlativeLayoutTests because it is testing
 			// SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
 			// because in v1 Pos.Center was broken in this regard!
-			//view.X = Pos.Center () - 41;
-			//view.Y = Pos.Center () - 13;
-			//view.SetRelativeLayout (top.Bounds);
-			//top.LayoutSubviews (); // BUGBUG: v2 - ??
-			//view.BoundsToScreen (0, 0, out rcol, out rrow);
-			//Assert.Equal (-41, rcol);
-			//Assert.Equal (-13, rrow);
+			view.X = Pos.Center () - 41;
+			view.Y = Pos.Center () - 13;
+			view.SetRelativeLayout (top.Bounds);
+			top.LayoutSubviews (); // BUGBUG: v2 - ??
+			view.BoundsToScreen (0, 0, out rcol, out rrow);
+			Assert.Equal (-41, rcol);
+			Assert.Equal (-13, rrow);
 
 			Application.End (runState);
 		}

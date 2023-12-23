@@ -30,9 +30,9 @@ public class DimAutoDemo : Scenario {
 
 		var resetButton = new Button () {
 			Text = "P_ut Button Back",
-			X = Pos.Center (),
 			Y = Pos.Bottom (label)
 		};
+		resetButton.X = Pos.AnchorEnd () - 19;
 
 		var movingButton = new Button () {
 			Text = "Press to make button move down.",
@@ -44,9 +44,6 @@ public class DimAutoDemo : Scenario {
 			movingButton.Y = movingButton.Frame.Y + 1;
 		};
 
-		resetButton.Clicked += (s, e) => {
-			movingButton.Y = Pos.Bottom (resetButton);
-		};
 
 		var view = new FrameView () {
 			Title = "Type in the TextField to make View grow.",
@@ -57,6 +54,10 @@ public class DimAutoDemo : Scenario {
 		};
 		view.ValidatePosDim = true;
 		view.Add (textField, label, resetButton, movingButton);
+
+		resetButton.Clicked += (s, e) => {
+			movingButton.Y = Pos.Bottom (resetButton);
+		};
 
 		var dlgButton = new Button () {
 			Text = "Open Test _Dialog",
@@ -82,22 +83,31 @@ public class DimAutoDemo : Scenario {
 		//cancel.Clicked += (s, _) => Application.RequestStop (dlg);
 		//dlg.AddButton (cancel);
 
-		var label = new Label ("This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close.") {
+		var label = new Label ("This is a label (AutoSize = false; Dim.Auto(3/20). Press Esc to close. Even more text.") {
 			AutoSize = false,
-			X = Pos.Center(),
+			X = Pos.Center (),
 			Y = 0,
 			Height = Dim.Auto (min: 3),
 			Width = Dim.Auto (min: 20),
 			ColorScheme = Colors.Menu
 		};
 
+		var text = new TextField () {
+			Text = "TextField... X = 1; Y = Pos.Bottom (label), Width = Dim.Fill (1); Height = Dim.Fill(1)",
+			TextFormatter = new TextFormatter () { WordWrap = true },
+			X = 20,
+			Y = Pos.Bottom (label),
+			Width = Dim.Fill (20),
+			Height = Dim.Fill (10)
+		};
 		var btn = new Button ("AnchorEnd") {
 			Y = Pos.AnchorEnd (1)
 		};
 		// TODO: We should really fix AnchorEnd to do this automatically. 
 		btn.X = Pos.AnchorEnd () - (Pos.Right (btn) - Pos.Left (btn));
-		dlg.Add (btn);
 		dlg.Add (label);
+		dlg.Add (text);
+		dlg.Add (btn);
 		Application.Run (dlg);
 	}
 }
