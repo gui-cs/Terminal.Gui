@@ -102,7 +102,7 @@ public class VkeyPacketSimulator : Scenario {
 			}
 
 			//System.Diagnostics.Debug.WriteLine ($"Output - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
-			if (_outputStarted && _keyboardStrokes.Count > 0) {
+			if (_outputStarted) {
 				// If the key wasn't handled by the TextView will popup a Dialog with the keys pressed.
 				var handled = tvOutput.OnInvokingKeyBindings (e);
 				if (handled == null || handled == false) {
@@ -113,7 +113,6 @@ public class VkeyPacketSimulator : Scenario {
 			}
 			e.Handled = true;
 			_stopOutput.Set ();
-
 		};
 
 		Win.Add (tvOutput);
@@ -130,25 +129,16 @@ public class VkeyPacketSimulator : Scenario {
 
 		tvInput.InvokingKeyBindings += (s, e) => {
 			var ev = e;
-			System.Diagnostics.Debug.WriteLine ($"Input - KeyPress: {ev}");
-			System.Diagnostics.Debug.WriteLine ($"Input - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
+			//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress: {ev}");
+			//System.Diagnostics.Debug.WriteLine ($"Input - KeyPress - _keyboardStrokes: {_keyboardStrokes.Count}");
 
 			if (!e.IsValid) {
 				_wasUnknown = true;
 				e.Handled = true;
 				return;
 			}
-			if (_wasUnknown && _keyboardStrokes.Count == 0) {
-				_wasUnknown = false;
-			} else if (_wasUnknown && char.IsLetter ((char)e.KeyCode)) {
-				_wasUnknown = false;
-			}
 
-			if (_keyboardStrokes.Count == 0) {
-				_keyboardStrokes.Add (e.KeyCode);
-			} else {
-				_keyboardStrokes.Insert (0, 0);
-			}
+			_keyboardStrokes.Add (e.KeyCode);
 		};
 
 		tvInput.KeyUp += (s, e) => {
@@ -163,30 +153,29 @@ public class VkeyPacketSimulator : Scenario {
 				Task.Run (() => {
 					while (_outputStarted) {
 						try {
-							for (int i = 0; i < _keyboardStrokes.Count; i++) {
-								if (_keyboardStrokes [i] == KeyCode.Null) {
+							while (_keyboardStrokes.Count > 0) {
+								if (_keyboardStrokes [0] == KeyCode.Null) {
 									continue;
 								}
-								var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (_keyboardStrokes [i]);
+								var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (_keyboardStrokes [0]);
 								var keyChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
 								Application.Driver.SendKeys (keyChar, ConsoleKey.Packet, consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift),
 									consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt), consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+
+								_stopOutput.Wait ();
+								_stopOutput.Reset ();
+								_keyboardStrokes.RemoveAt (0);
+								Application.Invoke (() => {
+									tvOutput.ReadOnly = true;
+									tvInput.SetFocus ();
+								});
 							}
-							//}
+							_outputStarted = false;
+
 						} catch (Exception) {
 							Application.Invoke (() => {
 								MessageBox.ErrorQuery ("Error", "Couldn't send the keystrokes!", "Ok");
 								Application.RequestStop ();
-							});
-						}
-						_stopOutput.Wait ();
-						_stopOutput.Reset ();
-						_keyboardStrokes.RemoveAt (0);
-						if (_keyboardStrokes.Count == 0) {
-							_outputStarted = false;
-							Application.Invoke (() => {
-								tvOutput.ReadOnly = true;
-								tvInput.SetFocus ();
 							});
 						}
 					}
