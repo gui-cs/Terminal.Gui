@@ -1007,14 +1007,15 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
-				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
-					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
-				}
+				//if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
+				return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
+				//}
 			}
 
-			if (keyInfo.Modifiers == 0 && ((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
-				return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			}
+			// This will get the same KeyChar e.g. Ç (199) will return Ç (199) or if it's Z (90) will return Z (90) anyway
+			//if (keyInfo.Modifiers == 0 && ((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
+			//	return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
+			//}
 
 			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) != 0) {
 				if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) == (KeyCode)keyInfo.Key) {
@@ -1085,7 +1086,6 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
 			Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
-
 
 			var map = MapKey (keyInfo);
 
