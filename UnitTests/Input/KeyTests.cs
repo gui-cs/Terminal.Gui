@@ -37,7 +37,7 @@ public class KeyTests {
 	[InlineData (KeyCode.CtrlMask, false)]
 	[InlineData (KeyCode.AltMask, false)]
 	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask, false)]
-	public void IsValid (Key key, bool expected) => Assert.Equal (expected, key.IsValid);
+	public void IsValid (KeyCode key, bool expected) => Assert.Equal (expected, ((Key)key).IsValid);
 
 	[Fact]
 	public void HandledProperty_ShouldBeFalseByDefault ()
@@ -53,15 +53,15 @@ public class KeyTests {
 	[InlineData (KeyCode.A | KeyCode.ShiftMask, KeyCode.A | KeyCode.ShiftMask)]
 	[InlineData (KeyCode.Z, (KeyCode)'z')]
 	[InlineData (KeyCode.Space, KeyCode.Space)]
-	public void Cast_KeyCode_To_Key (KeyCode cdk, Key expected)
+	public void Cast_KeyCode_To_Key (KeyCode cdk, KeyCode expected)
 	{
 		// explicit
 		var key = (Key)cdk;
-		Assert.Equal (expected.ToString (), key.ToString ());
+		Assert.Equal (((Key)expected).ToString (), key.ToString ());
 
 		// implicit
 		key = cdk;
-		Assert.Equal (expected.ToString (), key.ToString ());
+		Assert.Equal (((Key)expected).ToString (), key.ToString ());
 	}
 
 	[Theory]
@@ -123,10 +123,10 @@ public class KeyTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, '\0')]
 	[InlineData (KeyCode.CharMask, '\0')]
 	[InlineData (KeyCode.SpecialMask, '\0')]
-	public void AsRune_ShouldReturnCorrectIntValue (KeyCode key, Rune expected)
+	public void AsRune_ShouldReturnCorrectIntValue (KeyCode key, uint expected)
 	{
 		var eventArgs = new Key (key);
-		Assert.Equal (expected, eventArgs.AsRune);
+		Assert.Equal ((Rune)expected, eventArgs.AsRune);
 	}
 
 	[Theory]
@@ -191,11 +191,11 @@ public class KeyTests {
 
 	[Theory]
 	[InlineData ((KeyCode)'☑', "☑")]
-	//[InlineData ((ConsoleDriverKey)'英', "英")]
-	//[InlineData ((ConsoleDriverKey)'{', "{")]
+	[InlineData ((KeyCode)'英', "英")]
+	[InlineData ((KeyCode)'{', "{")]
 	[InlineData ((KeyCode)'\'', "\'")]
 	[InlineData ((KeyCode)'ó', "ó")]
-	[InlineData ((KeyCode)'ó' | KeyCode.ShiftMask, "Shift+ó")] // is this right???
+	[InlineData ((KeyCode)'Ó' | KeyCode.ShiftMask, "Ó")]
 	[InlineData ((KeyCode)'Ó', "Ó")]
 	[InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt+Shift+ç")]
 	[InlineData ((KeyCode)'a', "a")] // 97 or Key.Space | Key.A
@@ -263,14 +263,6 @@ public class KeyTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Null, "Null")]
 	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Null, "Null")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.CtrlMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.AltMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, "Null")]
 	[InlineData (KeyCode.AltKey, "AltKey")]
 	[InlineData (KeyCode.CtrlKey, "CtrlKey")]
 	[InlineData (KeyCode.ShiftKey, "ShiftKey")]
@@ -317,11 +309,11 @@ public class KeyTests {
 	[InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
 	[InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
 	[InlineData ("Alt-A-Ctrl", KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask)]
-	public void TryParse_ShouldReturnTrue_WhenValidKey (string keyString, Key expected)
+	public void TryParse_ShouldReturnTrue_WhenValidKey (string keyString, KeyCode expected)
 	{
-		Key key;
-		Assert.True (Key.TryParse (keyString, out key));
-		Assert.Equal (((Key)expected).ToString (), key.ToString ());
+		Assert.True (Key.TryParse (keyString, out Key key));
+		Key expectedKey = (Key)expected;
+		Assert.Equal (expectedKey.ToString (), key.ToString ());
 	}
 
 	[Theory]
@@ -337,4 +329,15 @@ public class KeyTests {
 	[InlineData ("0x99")]
 	[InlineData ("Ctrl-Ctrl")]
 	public void TryParse_ShouldReturnFalse_On_InvalidKey (string keyString) => Assert.False (Key.TryParse (keyString, out var _));
+
+	[Theory]
+	[InlineData (KeyCode.A, KeyCode.A)]
+	[InlineData (KeyCode.F1, KeyCode.F1)]
+	public void Casting_Between_Key_And_KeyCode (KeyCode keyCode, KeyCode key)
+	{
+		Assert.Equal (keyCode, (Key)key);
+		Assert.NotEqual (keyCode, ((Key)key).WithShift);
+		Assert.Equal ((uint)keyCode, (uint)(Key)key);
+		Assert.NotEqual ((uint)keyCode, ((Key)key).WithShift);
+	}
 }

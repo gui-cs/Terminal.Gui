@@ -675,7 +675,7 @@ class UICatalogApp {
 			foreach (var theme in Themes!) {
 				var item = new MenuItem {
 					Title = $"_{theme.Key}",
-					Shortcut = (KeyCode)((Key)((int)KeyCode.D1 + schemeCount++)).WithCtrl
+					Shortcut = (KeyCode)((Key)((uint)KeyCode.D1 + schemeCount++)).WithCtrl
 				};
 				item.CheckType |= MenuItemCheckStyle.Checked;
 				item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;

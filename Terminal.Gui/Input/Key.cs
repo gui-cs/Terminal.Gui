@@ -94,7 +94,8 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <remarks>
 	/// This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.
 	/// </remarks>
-	[JsonInclude] [JsonConverter (typeof (KeyCodeJsonConverter))]
+	[JsonInclude]
+	[JsonConverter (typeof (KeyCodeJsonConverter))]
 	public KeyCode KeyCode { get; init; }
 
 	/// <summary>
@@ -131,18 +132,18 @@ public class Key : EventArgs, IEquatable<Key> {
 
 		switch (baseKey) {
 		case >= KeyCode.A and <= KeyCode.Z when !key.HasFlag (KeyCode.ShiftMask):
-			return new Rune ((char)(baseKey + 32));
+			return new Rune ((uint)(baseKey + 32));
 		case >= KeyCode.A and <= KeyCode.Z:
-			return new Rune ((char)baseKey);
+			return new Rune ((uint)baseKey);
 		case > KeyCode.Null and < KeyCode.A:
-			return new Rune ((char)baseKey);
+			return new Rune ((uint)baseKey);
 		}
 
 		if (Enum.IsDefined (typeof (KeyCode), baseKey)) {
 			return default;
 		}
 
-		return new Rune ((char)baseKey);
+		return new Rune ((uint)baseKey);
 	}
 
 	/// <summary>
@@ -188,6 +189,66 @@ public class Key : EventArgs, IEquatable<Key> {
 		}
 
 		if ((keyCode & ~KeyCode.Space & ~KeyCode.ShiftMask) is >= KeyCode.A and <= KeyCode.Z) {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.Space & ~KeyCode.ShiftMask) is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 13 is KeyCode.D0) {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) + 16 is >= KeyCode.D1 and <= KeyCode.D9 and not KeyCode.D7) {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) + 8 is KeyCode.D7) {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 24 is (KeyCode)'\'') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 16 is (KeyCode)'«') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 32 is (KeyCode)'\\') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) + 1 is (KeyCode)'+') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) + 84 is (KeyCode)'´') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) + 16 is (KeyCode)'º') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) + 32 is (KeyCode)'~') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 2 is (KeyCode)'<') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 15 is (KeyCode)',') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 12 is (KeyCode)'.') {
+			return true;
+		}
+
+		if ((keyCode & ~KeyCode.ShiftMask) - 50 is (KeyCode)'-') {
 			return true;
 		}
 
@@ -262,13 +323,13 @@ public class Key : EventArgs, IEquatable<Key> {
 	public static explicit operator Rune (Key kea) => kea.AsRune;
 
 	/// <summary>
-	/// Explicitly cast <see cref="Key"/> to a <see langword="char"/>. The conversion is lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is never lossy. 
 	/// </summary>
 	/// <param name="kea"></param>
-	public static explicit operator char (Key kea) => (char)kea.AsRune.Value;
+	public static explicit operator uint (Key kea) => (uint)kea.KeyCode;
 
 	/// <summary>
-	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is never lossy. 
 	/// </summary>
 	/// <param name="key"></param>
 	public static explicit operator KeyCode (Key key) => key.KeyCode;
@@ -279,12 +340,11 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <param name="keyCode"></param>
 	public static implicit operator Key (KeyCode keyCode) => new (keyCode);
 
-
 	/// <summary>
-	/// Cast <see langword="char"/> to a <see cref="Key"/>. 
+	/// Cast <see langword="uint"/> to a <see cref="Key"/>. 
 	/// </summary>
-	/// <param name="ch"></param>
-	public static implicit operator Key (char ch) => new ((KeyCode)ch);
+	/// <param name="value"></param>
+	public static implicit operator Key (uint value) => new ((KeyCode)value);
 
 	/// <inheritdoc/>
 	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;
@@ -295,6 +355,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	public override int GetHashCode () => (int)KeyCode;
 
 	/// <summary>
+	/// Compares two <see cref="Key"/>s for equality.
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
@@ -302,6 +363,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	public static bool operator == (Key a, Key b) => a?.KeyCode == b?.KeyCode;
 
 	/// <summary>
+	/// Compares two <see cref="Key"/>s for not equality.
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
@@ -357,15 +419,15 @@ public class Key : EventArgs, IEquatable<Key> {
 		var baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		if (!key.HasFlag (KeyCode.ShiftMask) && baseKey is >= KeyCode.A and <= KeyCode.Z) {
-			return ((char)(key + 32)).ToString ();
+			return ((Rune)(uint)(key + 32)).ToString ();
 		}
 
 		if (key is >= KeyCode.Space and < KeyCode.A) {
-			return ((char)key).ToString ();
+			return ((Rune)(uint)key).ToString ();
 		}
 
 		string keyName = Enum.GetName (typeof (KeyCode), key);
-		return !string.IsNullOrEmpty (keyName) ? keyName : ((char)key).ToString ();
+		return !string.IsNullOrEmpty (keyName) ? keyName : ((Rune)(uint)key).ToString ();
 	}
 
 
