@@ -1,32 +1,40 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Terminal.Gui.ConsoleDrivers;
 public class ConsoleKeyMappingTests {
 	[Theory]
-	[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, ConsoleKey.A, KeyCode.A, 'A')]
-	[InlineData ((KeyCode)'A', ConsoleKey.A, (KeyCode)'a', 'a')]
-	[InlineData ((KeyCode)'à' | KeyCode.ShiftMask, ConsoleKey.A, (KeyCode)'À', 'À')]
-	[InlineData ((KeyCode)'À', ConsoleKey.A, (KeyCode)'à', 'à')]
-	[InlineData ((KeyCode)'ü' | KeyCode.ShiftMask, ConsoleKey.U, (KeyCode)'Ü', 'Ü')]
-	[InlineData ((KeyCode)'Ü', ConsoleKey.U, (KeyCode)'ü', 'ü')]
-	[InlineData ((KeyCode)'ý' | KeyCode.ShiftMask, ConsoleKey.Y, (KeyCode)'Ý', 'Ý')]
-	[InlineData ((KeyCode)'Ý', ConsoleKey.Y, (KeyCode)'ý', 'ý')]
+	[InlineData (KeyCode.A | KeyCode.ShiftMask, ConsoleKey.A, KeyCode.A, 'A')]
+	[InlineData ((KeyCode)'a', ConsoleKey.A, (KeyCode)'a', 'a')]
+	[InlineData ((KeyCode)'À' | KeyCode.ShiftMask, ConsoleKey.A, (KeyCode)'À', 'À')]
+	[InlineData ((KeyCode)'à', ConsoleKey.A, (KeyCode)'à', 'à')]
+	[InlineData ((KeyCode)'Ü' | KeyCode.ShiftMask, ConsoleKey.U, (KeyCode)'Ü', 'Ü')]
+	[InlineData ((KeyCode)'ü', ConsoleKey.U, (KeyCode)'ü', 'ü')]
+	[InlineData ((KeyCode)'Ý' | KeyCode.ShiftMask, ConsoleKey.Y, (KeyCode)'Ý', 'Ý')]
+	[InlineData ((KeyCode)'ý', ConsoleKey.Y, (KeyCode)'ý', 'ý')]
 	[InlineData ((KeyCode)'!' | KeyCode.ShiftMask, ConsoleKey.D1, (KeyCode)'!', '!')]
+	[InlineData (KeyCode.D1 | KeyCode.ShiftMask, ConsoleKey.D1, (KeyCode)'!', '!')]
 	[InlineData (KeyCode.D1, ConsoleKey.D1, KeyCode.D1, '1')]
 	[InlineData ((KeyCode)'/' | KeyCode.ShiftMask, ConsoleKey.D7, (KeyCode)'/', '/')]
+	[InlineData (KeyCode.D7 | KeyCode.ShiftMask, ConsoleKey.D7, (KeyCode)'/', '/')]
 	[InlineData (KeyCode.D7, ConsoleKey.D7, KeyCode.D7, '7')]
+	[InlineData ((KeyCode)'{' | KeyCode.AltMask | KeyCode.CtrlMask, ConsoleKey.D7, (KeyCode)'{', '{')]
+	[InlineData ((KeyCode)'?' | KeyCode.ShiftMask, ConsoleKey.Oem4, (KeyCode)'?', '?')]
+	[InlineData ((KeyCode)'\'', ConsoleKey.Oem4, (KeyCode)'\'', '\'')]
 	[InlineData (KeyCode.PageDown | KeyCode.ShiftMask, ConsoleKey.PageDown, KeyCode.Null, '\0')]
 	[InlineData (KeyCode.PageDown, ConsoleKey.PageDown, KeyCode.Null, '\0')]
-
-	public void TestIfEqual (KeyCode key, ConsoleKey expectedConsoleKey, KeyCode expectedKey, char expectedChar)
+	[InlineData ((KeyCode)'q', ConsoleKey.Q, (KeyCode)'q', 'q')]
+	[InlineData (KeyCode.F2, ConsoleKey.F2, KeyCode.Null, '\0')]
+	[InlineData ((KeyCode)'英', ConsoleKey.None, (KeyCode)'英', '英')]
+	public void GetConsoleKeyInfoFromKeyCode_Tests (KeyCode keyCode, ConsoleKey expectedConsoleKey, KeyCode expectedKeyCode, char expectedKeyChar)
 	{
-		var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (key);
+		var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (keyCode);
 		Assert.Equal (consoleKeyInfo.Key, expectedConsoleKey);
-		Assert.Equal ((char)expectedKey, expectedChar);
-		Assert.Equal (consoleKeyInfo.KeyChar, expectedChar);
+		Assert.Equal ((char)expectedKeyCode, expectedKeyChar);
+		Assert.Equal (consoleKeyInfo.KeyChar, expectedKeyChar);
 	}
 
 	static object packetLock = new object ();
@@ -48,20 +56,17 @@ public class ConsoleKeyMappingTests {
 			Application._forceFakeConsole = true;
 			Application.Init ();
 
-			var modifiers = new ConsoleModifiers ();
-			if (shift) {
-				modifiers |= ConsoleModifiers.Shift;
-			}
-			if (alt) {
-				modifiers |= ConsoleModifiers.Alt;
-			}
-			if (control) {
-				modifiers |= ConsoleModifiers.Control;
-			}
-			ConsoleKeyInfo consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (unicodeCharacter, modifiers, out uint scanCode);
+			ConsoleKeyInfo originalConsoleKeyInfo = new ConsoleKeyInfo ((char)unicodeCharacter, (ConsoleKey)initialVirtualKey, shift, alt, control);
+			var encodedChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (originalConsoleKeyInfo);
+			ConsoleKeyInfo packetConsoleKeyInfo = new ConsoleKeyInfo (encodedChar, ConsoleKey.Packet, shift, alt, control);
+			ConsoleKeyInfo consoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (packetConsoleKeyInfo);
+
+			Assert.Equal (originalConsoleKeyInfo, consoleKeyInfo);
+
+			var modifiers = ConsoleKeyMapping.GetModifiers (shift, alt, control);
+			var scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (consoleKeyInfo);
 
 			Assert.Equal ((uint)consoleKeyInfo.Key, initialVirtualKey);
-
 
 			if (scanCode > 0 && consoleKeyInfo.KeyChar == 0) {
 				Assert.Equal (0, (double)consoleKeyInfo.KeyChar);
@@ -85,7 +90,8 @@ public class ConsoleKeyMappingTests {
 			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
-					Application.Driver.SendKeys (consoleKeyInfo.KeyChar, ConsoleKey.Packet, shift, alt, control);
+					var keyChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
+					Application.Driver.SendKeys (keyChar, ConsoleKey.Packet, shift, alt, control);
 				}
 			};
 			Application.Run ();
@@ -203,10 +209,12 @@ public class ConsoleKeyMappingTests {
 				yield return new object [] { 'ç', true, true, false, 192, 39, (KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask, 192, 39 };
 				yield return new object [] { 'ç', true, true, true, 192, 39, (KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 192, 39 };
 				yield return new object [] { '¨', false, true, true, 187, 26, (KeyCode)'¨' | KeyCode.AltMask | KeyCode.CtrlMask, 187, 26 };
-				yield return new object [] { KeyCode.PageUp, false, false, false, 33, 73, KeyCode.Null, 33, 73 };
-				yield return new object [] { KeyCode.PageUp, true, false, false, 33, 73, KeyCode.Null | KeyCode.ShiftMask, 33, 73 };
-				yield return new object [] { KeyCode.PageUp, true, true, false, 33, 73, KeyCode.Null | KeyCode.ShiftMask | KeyCode.AltMask, 33, 73 };
-				yield return new object [] { KeyCode.PageUp, true, true, true, 33, 73, KeyCode.Null | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 33, 73 };
+				yield return new object [] { '\0', false, false, false, 33, 73, KeyCode.PageUp, 33, 73 };
+				yield return new object [] { '\0', true, false, false, 33, 73, KeyCode.PageUp | KeyCode.ShiftMask, 33, 73 };
+				yield return new object [] { '\0', true, true, false, 33, 73, KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask, 33, 73 };
+				yield return new object [] { '\0', true, true, true, 33, 73, KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 33, 73 };
+				yield return new object [] { '~', false, false, false, 32, 57, (KeyCode)'~', 32, 57 };
+				yield return new object [] { '^', false, false, false, 32, 57, (KeyCode)'^', 32, 57 };
 			}
 		}
 
@@ -214,5 +222,261 @@ public class ConsoleKeyMappingTests {
 		{
 			return GetEnumerator ();
 		}
+	}
+
+	[Theory]
+	[InlineData ('a', ConsoleKey.A, 'a', ConsoleKey.A)]
+	[InlineData ('A', ConsoleKey.A, 'A', ConsoleKey.A)]
+	[InlineData ('á', ConsoleKey.A, 'á', ConsoleKey.A)]
+	[InlineData ('Á', ConsoleKey.A, 'Á', ConsoleKey.A)]
+	[InlineData ('à', ConsoleKey.A, 'à', ConsoleKey.A)]
+	[InlineData ('À', ConsoleKey.A, 'À', ConsoleKey.A)]
+	[InlineData ('5', ConsoleKey.D5, '5', ConsoleKey.D5)]
+	[InlineData ('%', ConsoleKey.D5, '%', ConsoleKey.D5)]
+	[InlineData ('€', ConsoleKey.D5, '€', ConsoleKey.D5)]
+	[InlineData ('?', ConsoleKey.Oem4, '?', ConsoleKey.Oem4)]
+	[InlineData ('\'', ConsoleKey.Oem4, '\'', ConsoleKey.Oem4)]
+	[InlineData ('q', ConsoleKey.Q, 'q', ConsoleKey.Q)]
+	[InlineData ('\0', ConsoleKey.F2, '\0', ConsoleKey.F2)]
+	[InlineData ('英', ConsoleKey.None, '英', ConsoleKey.None)]
+	[InlineData ('´', ConsoleKey.None, '´', ConsoleKey.Oem1)]
+	[InlineData ('`', ConsoleKey.None, '`', ConsoleKey.Oem1)]
+	[InlineData ('~', ConsoleKey.None, '~', ConsoleKey.Oem2)]
+	[InlineData ('^', ConsoleKey.None, '^', ConsoleKey.Oem2)]
+	public void EncodeKeyCharForVKPacket_DecodeVKPacketToKConsoleKeyInfo (char keyChar, ConsoleKey consoleKey, char expectedChar, ConsoleKey expectedConsoleKey)
+	{
+		var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, false, false, false);
+		var encodedKeyChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
+		var encodedConsoleKeyInfo = new ConsoleKeyInfo (encodedKeyChar, ConsoleKey.Packet, false, false, false);
+		var decodedConsoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (encodedConsoleKeyInfo);
+		Assert.Equal (consoleKeyInfo.Key, consoleKey);
+		Assert.Equal (decodedConsoleKeyInfo.Key, expectedConsoleKey);
+		Assert.Equal (decodedConsoleKeyInfo.KeyChar, expectedChar);
+	}
+
+	[Theory]
+	[InlineData ('a', ConsoleKey.A, false, false, false, (KeyCode)'a')]
+	[InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ('á', ConsoleKey.A, false, false, false, (KeyCode)'á')]
+	[InlineData ('Á', ConsoleKey.A, true, false, false, (KeyCode)'Á' | KeyCode.ShiftMask)]
+	[InlineData ('à', ConsoleKey.A, false, false, false, (KeyCode)'à')]
+	[InlineData ('À', ConsoleKey.A, true, false, false, (KeyCode)'À' | KeyCode.ShiftMask)]
+	[InlineData ('5', ConsoleKey.D5, false, false, false, KeyCode.D5)]
+	[InlineData ('%', ConsoleKey.D5, true, false, false, (KeyCode)'%' | KeyCode.ShiftMask)]
+	[InlineData ('€', ConsoleKey.D5, false, true, true, (KeyCode)'€' | KeyCode.AltMask | KeyCode.CtrlMask)]
+	[InlineData ('?', ConsoleKey.Oem4, true, false, false, (KeyCode)'?' | KeyCode.ShiftMask)]
+	[InlineData ('\'', ConsoleKey.Oem4, false, false, false, (KeyCode)'\'')]
+	[InlineData ('q', ConsoleKey.Q, false, false, false, (KeyCode)'q')]
+	[InlineData ('\0', ConsoleKey.F2, false, false, false, KeyCode.F2)]
+	[InlineData ('英', ConsoleKey.None, false, false, false, (KeyCode)'英')]
+	public void MapConsoleKeyInfoToKeyCode_Also_Return_Modifiers (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control, KeyCode expectedKeyCode)
+	{
+		var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
+		var keyCode = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
+
+		Assert.Equal (keyCode, expectedKeyCode);
+	}
+
+	[Theory]
+	[InlineData ('a', false, false, false, (KeyCode)'a')]
+	[InlineData ('A', true, false, false, KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ('á', false, false, false, (KeyCode)'á')]
+	[InlineData ('Á', true, false, false, (KeyCode)'Á' | KeyCode.ShiftMask)]
+	[InlineData ('à', false, false, false, (KeyCode)'à')]
+	[InlineData ('À', true, false, false, (KeyCode)'À' | KeyCode.ShiftMask)]
+	[InlineData ('5', false, false, false, KeyCode.D5)]
+	[InlineData ('%', true, false, false, (KeyCode)'%' | KeyCode.ShiftMask)]
+	[InlineData ('€', false, true, true, (KeyCode)'€' | KeyCode.AltMask | KeyCode.CtrlMask)]
+	[InlineData ('?', true, false, false, (KeyCode)'?' | KeyCode.ShiftMask)]
+	[InlineData ('\'', false, false, false, (KeyCode)'\'')]
+	[InlineData ('q', false, false, false, (KeyCode)'q')]
+	[InlineData ((uint)KeyCode.F2, false, false, false, KeyCode.F2)]
+	[InlineData ('英', false, false, false, (KeyCode)'英')]
+	public void MapToKeyCodeModifiers_Tests (uint keyChar, bool shift, bool alt, bool control, KeyCode excpectedKeyCode)
+	{
+		var modifiers = ConsoleKeyMapping.GetModifiers (shift, alt, control);
+		KeyCode keyCode = (KeyCode)keyChar;
+		keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
+
+		Assert.Equal (keyCode, excpectedKeyCode);
+	}
+
+	[Theory]
+	[InlineData ((KeyCode)'a', false, ConsoleKey.A, 'a')]
+	[InlineData (KeyCode.A | KeyCode.ShiftMask, false, ConsoleKey.A, 'A')]
+	[InlineData ((KeyCode)'á', false, ConsoleKey.A, 'á')]
+	[InlineData ((KeyCode)'Á' | KeyCode.ShiftMask, false, ConsoleKey.A, 'Á')]
+	[InlineData ((KeyCode)'à', false, ConsoleKey.A, 'à')]
+	[InlineData ((KeyCode)'À' | KeyCode.ShiftMask, false, ConsoleKey.A, 'À')]
+	[InlineData (KeyCode.D5, false, ConsoleKey.D5, '5')]
+	[InlineData ((KeyCode)'%' | KeyCode.ShiftMask, false, ConsoleKey.D5, '%')]
+	[InlineData ((KeyCode)'€' | KeyCode.AltMask | KeyCode.CtrlMask, false, ConsoleKey.D5, '€')]
+	[InlineData ((KeyCode)'?' | KeyCode.ShiftMask, false, ConsoleKey.Oem4, '?')]
+	[InlineData ((KeyCode)'\'', false, ConsoleKey.Oem4, '\'')]
+	[InlineData ((KeyCode)'q', false, ConsoleKey.Q, 'q')]
+	[InlineData (KeyCode.F2, true, ConsoleKey.F2, 'q')]
+	[InlineData ((KeyCode)'英', false, ConsoleKey.None, '英')]
+	public void MapKeyCodeToConsoleKey_GetKeyCharFromUnicodeChar (KeyCode keyCode, bool expectedIsConsoleKey, ConsoleKey expectedConsoleKey, char expectedConsoleKeyChar)
+	{
+		var modifiers = ConsoleKeyMapping.MapToConsoleModifiers (keyCode);
+		var consoleKey = ConsoleKeyMapping.MapKeyCodeToConsoleKey (keyCode, out bool isConsoleKey);
+		if (isConsoleKey) {
+			Assert.True (isConsoleKey == expectedIsConsoleKey);
+			Assert.Equal ((ConsoleKey)consoleKey, expectedConsoleKey);
+			Assert.Equal (consoleKey, expectedConsoleKeyChar);
+		} else {
+			var keyChar = ConsoleKeyMapping.GetKeyCharFromUnicodeChar (consoleKey, modifiers, out consoleKey, out _, isConsoleKey);
+			Assert.True (isConsoleKey == expectedIsConsoleKey);
+			Assert.Equal ((ConsoleKey)consoleKey, expectedConsoleKey);
+			Assert.Equal (keyChar, expectedConsoleKeyChar);
+		}
+	}
+
+	[Theory]
+	[InlineData ('a', ConsoleKey.A, false, false, false, 30)]
+	[InlineData ('A', ConsoleKey.A, true, false, false, 30)]
+	[InlineData ('á', ConsoleKey.A, false, false, false, 30)]
+	[InlineData ('Á', ConsoleKey.A, true, false, false, 30)]
+	[InlineData ('à', ConsoleKey.A, false, false, false, 30)]
+	[InlineData ('À', ConsoleKey.A, true, false, false, 30)]
+	[InlineData ('0', ConsoleKey.D0, false, false, false, 11)]
+	[InlineData ('=', ConsoleKey.D0, true, false, false, 11)]
+	[InlineData ('}', ConsoleKey.D0, false, true, true, 11)]
+	[InlineData ('1', ConsoleKey.D1, false, false, false, 2)]
+	[InlineData ('!', ConsoleKey.D1, true, false, false, 2)]
+	[InlineData ('2', ConsoleKey.D2, false, false, false, 3)]
+	[InlineData ('"', ConsoleKey.D2, true, false, false, 3)]
+	[InlineData ('@', ConsoleKey.D2, false, true, true, 3)]
+	[InlineData ('3', ConsoleKey.D3, false, false, false, 4)]
+	[InlineData ('#', ConsoleKey.D3, true, false, false, 4)]
+	[InlineData ('£', ConsoleKey.D3, false, true, true, 4)]
+	[InlineData ('4', ConsoleKey.D4, false, false, false, 5)]
+	[InlineData ('$', ConsoleKey.D4, true, false, false, 5)]
+	[InlineData ('§', ConsoleKey.D4, false, true, true, 5)]
+	[InlineData ('5', ConsoleKey.D5, false, false, false, 6)]
+	[InlineData ('%', ConsoleKey.D5, true, false, false, 6)]
+	[InlineData ('€', ConsoleKey.D5, false, true, true, 6)]
+	[InlineData ('6', ConsoleKey.D6, false, false, false, 7)]
+	[InlineData ('&', ConsoleKey.D6, true, false, false, 7)]
+	[InlineData ('7', ConsoleKey.D7, false, false, false, 8)]
+	[InlineData ('/', ConsoleKey.D7, true, false, false, 8)]
+	[InlineData ('{', ConsoleKey.D7, false, true, true, 8)]
+	[InlineData ('8', ConsoleKey.D8, false, false, false, 9)]
+	[InlineData ('(', ConsoleKey.D8, true, false, false, 9)]
+	[InlineData ('[', ConsoleKey.D8, false, true, true, 9)]
+	[InlineData ('9', ConsoleKey.D9, false, false, false, 10)]
+	[InlineData (')', ConsoleKey.D9, true, false, false, 10)]
+	[InlineData (']', ConsoleKey.D9, false, true, true, 10)]
+	[InlineData ('´', ConsoleKey.Oem1, false, false, false, 27)]
+	[InlineData ('`', ConsoleKey.Oem1, true, false, false, 27)]
+	[InlineData ('~', ConsoleKey.Oem2, false, false, false, 43)]
+	[InlineData ('^', ConsoleKey.Oem2, true, false, false, 43)]
+	[InlineData ('ç', ConsoleKey.Oem3, false, false, false, 39)]
+	[InlineData ('Ç', ConsoleKey.Oem3, true, false, false, 39)]
+	[InlineData ('\'', ConsoleKey.Oem4, false, false, false, 12)]
+	[InlineData ('?', ConsoleKey.Oem4, true, false, false, 12)]
+	[InlineData ('\\', ConsoleKey.Oem5, false, true, true, 41)]
+	[InlineData ('|', ConsoleKey.Oem5, true, false, false, 41)]
+	[InlineData ('«', ConsoleKey.Oem6, false, true, true, 13)]
+	[InlineData ('»', ConsoleKey.Oem6, true, false, false, 13)]
+	[InlineData ('º', ConsoleKey.Oem7, false, true, true, 40)]
+	[InlineData ('ª', ConsoleKey.Oem7, true, false, false, 40)]
+	[InlineData ('+', ConsoleKey.OemPlus, false, true, true, 26)]
+	[InlineData ('*', ConsoleKey.OemPlus, true, false, false, 26)]
+	[InlineData ('¨', ConsoleKey.OemPlus, false, true, true, 26)]
+	[InlineData (',', ConsoleKey.OemComma, false, true, true, 51)]
+	[InlineData (';', ConsoleKey.OemComma, true, false, false, 51)]
+	[InlineData ('.', ConsoleKey.OemPeriod, false, true, true, 52)]
+	[InlineData (':', ConsoleKey.OemPeriod, true, false, false, 52)]
+	[InlineData ('-', ConsoleKey.OemMinus, false, true, true, 53)]
+	[InlineData ('_', ConsoleKey.OemMinus, true, false, false, 53)]
+	[InlineData ('q', ConsoleKey.Q, false, false, false, 16)]
+	[InlineData ('\0', ConsoleKey.F2, false, false, false, 60)]
+	[InlineData ('英', ConsoleKey.None, false, false, false, 0)]
+	[InlineData ('英', ConsoleKey.None, true, false, false, 0)]
+	public void GetScanCodeFromConsoleKeyInfo_Tests (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control, uint expectedScanCode)
+	{
+		var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
+		var scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (consoleKeyInfo);
+
+		Assert.Equal (scanCode, expectedScanCode);
+	}
+
+	[Theory]
+	[InlineData ('a', 'A', KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ('z', 'Z', KeyCode.Z | KeyCode.ShiftMask)]
+	[InlineData ('á', 'Á', (KeyCode)'Á' | KeyCode.ShiftMask)]
+	[InlineData ('à', 'À', (KeyCode)'À' | KeyCode.ShiftMask)]
+	[InlineData ('ý', 'Ý', (KeyCode)'Ý' | KeyCode.ShiftMask)]
+	[InlineData ('1', '!', (KeyCode)'!' | KeyCode.ShiftMask)]
+	[InlineData ('2', '"', (KeyCode)'"' | KeyCode.ShiftMask)]
+	[InlineData ('3', '#', (KeyCode)'#' | KeyCode.ShiftMask)]
+	[InlineData ('4', '$', (KeyCode)'$' | KeyCode.ShiftMask)]
+	[InlineData ('5', '%', (KeyCode)'%' | KeyCode.ShiftMask)]
+	[InlineData ('6', '&', (KeyCode)'&' | KeyCode.ShiftMask)]
+	[InlineData ('7', '/', (KeyCode)'/' | KeyCode.ShiftMask)]
+	[InlineData ('8', '(', (KeyCode)'(' | KeyCode.ShiftMask)]
+	[InlineData ('9', ')', (KeyCode)')' | KeyCode.ShiftMask)]
+	[InlineData ('0', '=', (KeyCode)'=' | KeyCode.ShiftMask)]
+	[InlineData ('\\', '|', (KeyCode)'|' | KeyCode.ShiftMask)]
+	[InlineData ('\'', '?', (KeyCode)'?' | KeyCode.ShiftMask)]
+	[InlineData ('«', '»', (KeyCode)'»' | KeyCode.ShiftMask)]
+	[InlineData ('+', '*', (KeyCode)'*' | KeyCode.ShiftMask)]
+	[InlineData ('´', '`', (KeyCode)'`' | KeyCode.ShiftMask)]
+	[InlineData ('º', 'ª', (KeyCode)'ª' | KeyCode.ShiftMask)]
+	[InlineData ('~', '^', (KeyCode)'^' | KeyCode.ShiftMask)]
+	[InlineData ('<', '>', (KeyCode)'>' | KeyCode.ShiftMask)]
+	[InlineData (',', ';', (KeyCode)';' | KeyCode.ShiftMask)]
+	[InlineData ('.', ':', (KeyCode)':' | KeyCode.ShiftMask)]
+	[InlineData ('-', '_', (KeyCode)'_' | KeyCode.ShiftMask)]
+	public void GetKeyChar_Shifted_Char_From_UnShifted_Char (char unicodeChar, char expectedKeyChar, KeyCode excpectedKeyCode)
+	{
+		var modifiers = ConsoleKeyMapping.GetModifiers (true, false, false);
+		var keyChar = ConsoleKeyMapping.GetKeyChar (unicodeChar, modifiers);
+		Assert.Equal (keyChar, expectedKeyChar);
+
+		KeyCode keyCode = (KeyCode)keyChar;
+		keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
+
+		Assert.Equal (keyCode, excpectedKeyCode);
+	}
+
+	[Theory]
+	[InlineData ('A', 'a', (KeyCode)'a')]
+	[InlineData ('Z', 'z', (KeyCode)'z')]
+	[InlineData ('Á', 'á', (KeyCode)'á')]
+	[InlineData ('À', 'à', (KeyCode)'à')]
+	[InlineData ('Ý', 'ý', (KeyCode)'ý')]
+	[InlineData ('!', '1', KeyCode.D1)]
+	[InlineData ('"', '2', KeyCode.D2)]
+	[InlineData ('#', '3', KeyCode.D3)]
+	[InlineData ('$', '4', KeyCode.D4)]
+	[InlineData ('%', '5', KeyCode.D5)]
+	[InlineData ('&', '6', KeyCode.D6)]
+	[InlineData ('/', '7', KeyCode.D7)]
+	[InlineData ('(', '8', KeyCode.D8)]
+	[InlineData (')', '9', KeyCode.D9)]
+	[InlineData ('=', '0', KeyCode.D0)]
+	[InlineData ('|', '\\', (KeyCode)'\\')]
+	[InlineData ('?', '\'', (KeyCode)'\'')]
+	[InlineData ('»', '«', (KeyCode)'«')]
+	[InlineData ('*', '+', (KeyCode)'+')]
+	[InlineData ('`', '´', (KeyCode)'´')]
+	[InlineData ('ª', 'º', (KeyCode)'º')]
+	[InlineData ('^', '~', (KeyCode)'~')]
+	[InlineData ('>', '<', (KeyCode)'<')]
+	[InlineData (';', ',', (KeyCode)',')]
+	[InlineData (':', '.', (KeyCode)'.')]
+	[InlineData ('_', '-', (KeyCode)'-')]
+	public void GetKeyChar_UnShifted_Char_From_Shifted_Char (char unicodeChar, char expectedKeyChar, KeyCode excpectedKeyCode)
+	{
+		var modifiers = ConsoleKeyMapping.GetModifiers (false, false, false);
+		var keyChar = ConsoleKeyMapping.GetKeyChar (unicodeChar, modifiers);
+		Assert.Equal (keyChar, expectedKeyChar);
+
+		KeyCode keyCode = (KeyCode)keyChar;
+		keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
+
+		Assert.Equal (keyCode, excpectedKeyCode);
 	}
 }
