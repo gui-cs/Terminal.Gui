@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Terminal.Gui;
 
@@ -80,10 +81,31 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// Constructs a new <see cref="Key"/> from a char.
 	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// The key codes for the A..Z keys are encoded as values between 65 and 90 (<see cref="KeyCode.A"/> through <see cref="KeyCode.Z"/>).
+	/// While these are the same as the ASCII values for uppercase characters, they represent *keys*, not characters.
+	/// Therefore, this constructor will store 'A'..'Z' as <see cref="KeyCode.A"/>..<see cref="KeyCode.Z"/> with the
+	/// <see cref="KeyCode.ShiftMask"/> set and will
+	/// store `a`..`z` as <see cref="KeyCode.A"/>..<see cref="KeyCode.Z"/>.
+	/// </para>
+	/// </remarks>
 	/// <param name="ch"></param>
 	public Key (char ch)
 	{
-		KeyCode = (KeyCode)ch;
+		switch (ch) {
+		case >= 'A' and <= 'Z':
+			// Upper case A..Z mean "Shift-char" so we need to add Shift
+			KeyCode = (KeyCode)ch | KeyCode.ShiftMask;
+			break;
+		case >= 'a' and <= 'z':
+			// Lower case a..z mean no shift, so we need to store as Key.A...Key.Z
+			KeyCode = (KeyCode)(ch - 32);
+			return;
+		default:
+			KeyCode = (KeyCode)ch;
+			break;
+		}
 	}
 
 	/// <summary>
@@ -103,7 +125,8 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <remarks>
 	/// This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.
 	/// </remarks>
-	[JsonInclude] [JsonConverter (typeof (KeyCodeJsonConverter))]
+	[JsonInclude]
+	[JsonConverter (typeof (KeyCodeJsonConverter))]
 	public KeyCode KeyCode { get; init; }
 
 	/// <summary>
@@ -115,8 +138,11 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
 	/// </summary>
 	/// <remarks>
-	/// If the key pressed is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
-	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, this will be <see langword="default"/>.
+	/// <para>
+	/// If the key is a letter (a-z or A-Z), the Rune be the upper or lower case letter depending on whether
+	/// the shift key was pressed.
+	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be <see langword="default"/>.
+	/// </para>
 	/// </remarks>
 	public Rune AsRune => ToRune (KeyCode);
 
@@ -124,11 +150,14 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Converts a <see cref="KeyCode"/> to a <see cref="Rune"/>.
 	/// </summary>
 	/// <remarks>
-	/// If the key is a letter (a-z or A-Z), this will be the upper or lower case letter depending on whether the shift key is pressed.
-	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, this will be <see langword="default"/>.
+	/// <para>
+	/// If the key is a letter (a-z or A-Z), the Rune be the upper or lower case letter depending on whether
+	/// the shift key was pressed.
+	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be <see langword="default"/>.
+	/// </para>
 	/// </remarks>
 	/// <param name="key"></param>
-	/// <returns>The key converted to a rune. <see langword="default"/> if conversion is not possible.</returns>
+	/// <returns>The key converted to a Rune. <see langword="default"/> if conversion is not possible.</returns>
 	public static Rune ToRune (KeyCode key)
 	{
 		if (key is KeyCode.Null or KeyCode.SpecialMask || key.HasFlag (KeyCode.CtrlMask) || key.HasFlag (KeyCode.AltMask)) {
@@ -286,14 +315,16 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Cast <see cref="KeyCode"/> to a <see cref="Key"/>. 
 	/// </summary>
 	/// <param name="keyCode"></param>
-	public static implicit operator Key (KeyCode keyCode) => new (keyCode);
+	public static implicit operator Key (KeyCode keyCode) => new Key( keyCode);
 
-
-	///// <summary>
-	///// Cast <see langword="char"/> to a <see cref="Key"/>. 
-	///// </summary>
-	///// <param name="ch"></param>
-	//public static implicit operator Key (char ch) => new ((KeyCode)ch);
+	/// <summary>
+	/// Cast <see langword="char"/> to a <see cref="Key"/>. 
+	/// </summary>
+	/// <remarks>
+	/// See <see cref="Key(char)"/> for more information.
+	/// </remarks>
+	/// <param name="ch"></param>
+	public static implicit operator Key (char ch) => new Key (ch);
 
 	/// <inheritdoc/>
 	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;

@@ -27,6 +27,58 @@ public class KeyTests {
 		Assert.Equal (key, eventArgs.KeyCode);
 	}
 
+	[Theory]
+	[InlineData ('a', KeyCode.A)] 
+	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)] 
+	[InlineData ('z', KeyCode.Z)]
+	[InlineData ('Z', KeyCode.Z | KeyCode.ShiftMask)]
+	[InlineData (' ', KeyCode.Space)]
+	[InlineData ('1', KeyCode.D1)]
+	[InlineData ('!', (KeyCode)'!')]
+	[InlineData ('\n', KeyCode.Enter)]
+	[InlineData ('\t', KeyCode.Tab)]
+	[InlineData ('\r', (KeyCode)13)]
+	[InlineData ('ó', (KeyCode)'ó')]
+	[InlineData ('Ó', (KeyCode)'Ó')]
+	[InlineData ('❿', (KeyCode)'❿')]
+	[InlineData ('☑', (KeyCode)'☑')]
+	[InlineData ('英', (KeyCode)'英')]
+	[InlineData ('{', (KeyCode)'{')]
+	[InlineData ('\'', (KeyCode)'\'')]
+	[InlineData ('\xFFFF', (KeyCode)0xFFFF)]
+	[InlineData ('\x0', (KeyCode)0x0)]
+	public void Constructor_Char (char ch, KeyCode expectedKeyCode)
+	{
+		var key = new Key (ch);
+		Assert.Equal (expectedKeyCode, key.KeyCode);
+	}
+
+	[Theory]
+	[InlineData ('a', KeyCode.A)]
+	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ('z', KeyCode.Z)]
+	[InlineData ('Z', KeyCode.Z | KeyCode.ShiftMask)]
+	[InlineData (' ', KeyCode.Space)]
+	[InlineData ('1', KeyCode.D1)]
+	[InlineData ('!', (KeyCode)'!')]
+	[InlineData ('\n', KeyCode.Enter)]
+	[InlineData ('\t', KeyCode.Tab)]
+	[InlineData ('\r', (KeyCode)13)]
+	[InlineData ('ó', (KeyCode)'ó')]
+	[InlineData ('Ó', (KeyCode)'Ó')]
+	[InlineData ('❿', (KeyCode)'❿')]
+	[InlineData ('☑', (KeyCode)'☑')]
+	[InlineData ('英', (KeyCode)'英')]
+	[InlineData ('{', (KeyCode)'{')]
+	[InlineData ('\'', (KeyCode)'\'')]
+	[InlineData ('\xFFFF', (KeyCode)0xFFFF)]
+	[InlineData ('\x0', (KeyCode)0x0)]
+	public void Cast_Char_To_Key (char ch, KeyCode expectedKeyCode)
+	{
+		var key = (Key)ch;
+		Assert.Equal (expectedKeyCode, key.KeyCode);
+	}
+
 	// IsValid
 	[Theory]
 	[InlineData (KeyCode.A, true)]
@@ -255,14 +307,6 @@ public class KeyTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CursorUp, "Alt+Shift+CursorUp")]
 	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.CursorUp, "Ctrl+Alt+CursorUp")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp, "Ctrl+Alt+Shift+CursorUp")]
-	[InlineData (KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.CtrlMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.AltMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Null, "Null")]
-	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, "Null")]
 	[InlineData (KeyCode.Null, "Null")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.Null, "Null")]
 	[InlineData (KeyCode.CtrlMask | KeyCode.Null, "Null")]
