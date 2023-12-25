@@ -1007,9 +1007,11 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
-				//if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
-				return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
-				//}
+				if (keyInfo.KeyChar >= (uint)KeyCode.A && keyInfo.KeyChar <= (uint)KeyCode.Z) {
+					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
+				} else {
+					return (KeyCode)keyInfo.KeyChar | KeyCode.ShiftMask;
+				}
 			}
 
 			// This will get the same KeyChar e.g. Ç (199) will return Ç (199) or if it's Z (90) will return Z (90) anyway
