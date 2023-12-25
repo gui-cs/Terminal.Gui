@@ -72,10 +72,19 @@ public class Key : EventArgs, IEquatable<Key> {
 	public Key () : this (KeyCode.Null) { }
 
 	/// <summary>
-	///   Constructs a new <see cref="Key"/> from the provided Key value
+	/// Constructs a new <see cref="Key"/> from the provided Key value
 	/// </summary>
 	/// <param name="k">The key</param>
 	public Key (KeyCode k) => KeyCode = k;
+
+	/// <summary>
+	/// Constructs a new <see cref="Key"/> from a char.
+	/// </summary>
+	/// <param name="ch"></param>
+	public Key (char ch)
+	{
+		KeyCode = (KeyCode)ch;
+	}
 
 	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
@@ -280,11 +289,11 @@ public class Key : EventArgs, IEquatable<Key> {
 	public static implicit operator Key (KeyCode keyCode) => new (keyCode);
 
 
-	/// <summary>
-	/// Cast <see langword="char"/> to a <see cref="Key"/>. 
-	/// </summary>
-	/// <param name="ch"></param>
-	public static implicit operator Key (char ch) => new ((KeyCode)ch);
+	///// <summary>
+	///// Cast <see langword="char"/> to a <see cref="Key"/>. 
+	///// </summary>
+	///// <param name="ch"></param>
+	//public static implicit operator Key (char ch) => new ((KeyCode)ch);
 
 	/// <inheritdoc/>
 	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;
