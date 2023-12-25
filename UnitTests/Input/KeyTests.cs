@@ -28,8 +28,8 @@ public class KeyTests {
 	}
 
 	[Theory]
-	[InlineData ('a', KeyCode.A)] 
-	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)] 
+	[InlineData ('a', KeyCode.A)]
+	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)]
 	[InlineData ('z', KeyCode.Z)]
 	[InlineData ('Z', KeyCode.Z | KeyCode.ShiftMask)]
 	[InlineData (' ', KeyCode.Space)]
@@ -116,6 +116,28 @@ public class KeyTests {
 		Assert.Equal (expected.ToString (), key.ToString ());
 	}
 
+	[Fact]
+	public void Standard_Keys_Always_New ()
+	{
+		// Make two local keys, and grab Key.A, which is a reference to a singleton.
+		Key aKey1 = Key.A;
+		Key aKey2 = Key.A;
+
+		// Assert the starting state that is expected
+		Assert.False (aKey1.Handled);
+		Assert.False (aKey2.Handled);
+		Assert.False (Key.A.Handled);
+
+		// Now set Handled true on one of our local keys
+		aKey1.Handled = true;
+
+		// Assert the newly-expected case
+		// The last two assertions will fail, because we have actually modified a singleton
+		Assert.True (aKey1.Handled);
+		Assert.False (aKey2.Handled);
+		Assert.False (Key.A.Handled);
+	}
+
 	[Theory]
 	[InlineData ((KeyCode)'a', true)]
 	[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, true)]
@@ -148,7 +170,7 @@ public class KeyTests {
 	[InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '\0')]
 	[InlineData ((KeyCode)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((KeyCode)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
-	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
+					//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (KeyCode.ShiftMask | KeyCode.A, 65)]
 	[InlineData (KeyCode.CtrlMask | KeyCode.A, '\0')]
 	[InlineData (KeyCode.AltMask | KeyCode.A, '\0')]
