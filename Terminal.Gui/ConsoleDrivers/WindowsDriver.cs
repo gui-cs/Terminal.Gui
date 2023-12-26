@@ -1051,6 +1051,7 @@ internal class WindowsDriver : ConsoleDriver {
 			return (KeyCode)((uint)KeyCode.F1 + delta);
 		}
 
+		// If the key is JUST a modifier, return it as that key
 		if (key == (ConsoleKey)16) { // Shift
 			return KeyCode.ShiftKey;
 		}
