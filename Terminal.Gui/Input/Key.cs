@@ -65,7 +65,6 @@ namespace Terminal.Gui;
 /// </list>
 /// </para>
 /// </remarks>
-[JsonConverter (typeof (KeyJsonConverter))]
 public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// Constructs a new <see cref="Key"/>
@@ -140,8 +139,6 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <remarks>
 	/// This property is the backing data for the <see cref="Key"/>. It is a <see cref="KeyCode"/> enum value.
 	/// </remarks>
-	[JsonInclude]
-	[JsonConverter (typeof (KeyCodeJsonConverter))]
 	public KeyCode KeyCode { get; init; }
 
 	/// <summary>

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static Terminal.Gui.SpinnerStyle;
@@ -70,8 +71,13 @@ public static partial class ConfigurationManager {
 				// We override the standard Rune converter to support specifying Glyphs in
 				// a flexible way
 				new RuneJsonConverter(),
+				// Override Key to support "Ctrl+Q" format.
+				new KeyJsonConverter()
 			},
-	};
+		// Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
+		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+
+};
 
 	/// <summary>
 	/// A dictionary of all properties in the Terminal.Gui project that are decorated with the <see cref="SerializableConfigurationProperty"/> attribute.
