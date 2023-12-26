@@ -36,14 +36,14 @@ jobs:
       
     - name: Upload artifact
       if: github.ref_name == 'main' ||  github.ref_name == 'develop'
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
         path: docfx/_site
        
     - name: Deploy to GitHub Pages
       if: github.ref_name == 'main' ||  github.ref_name == 'develop'
       id: deployment
-      uses: actions/deploy-pages@v3
+      uses: actions/deploy-pages@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
 

@@ -146,7 +146,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (ckbWrapMessage);
 
-			frame.ForceValidatePosDim = true;
+			frame.ValidatePosDim = true;
 			void Top_Loaded (object sender, EventArgs args)
 			{
 				frame.Height =

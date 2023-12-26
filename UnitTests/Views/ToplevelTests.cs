@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class ToplevelTests {
 	readonly ITestOutputHelper output;
@@ -700,126 +700,115 @@ public class ToplevelTests {
 		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Mouse_Drag_On_Top_With_Superview_Null ()
 	{
 		var win = new Window ();
 		var top = Application.Top;
 		top.Add (win);
 		int iterations = -1;
+		Window testWindow;
 
 		Application.Iteration += (s, a) => {
 			iterations++;
 			if (iterations == 0) {
-				((FakeDriver)Application.Driver).SetBufferSize (40, 15);
-				MessageBox.Query ("", "Hello Word", "Ok");
+				((FakeDriver)Application.Driver).SetBufferSize (15, 7);
+				// Don't use MessageBox here; it's too complicated for this unit test; just use Window
+				testWindow = new Window () {
+					Text = "Hello",
+					X = 2,
+					Y = 2,
+					Width = 10,
+					Height = 3
+				};
+				Application.Run (testWindow);
 
 			} else if (iterations == 1) {
 				TestHelpers.AssertDriverContentsWithFrameAre (@$"
-┌──────────────────────────────────────┐
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│       ┌──────────────────────┐       │
-│       │      Hello Word      │       │
-│       │                      │       │
-│       │       {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}       │       │
-│       └──────────────────────┘       │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-└──────────────────────────────────────┘
+┌─────────────┐
+│             │
+│ ┌────────┐  │
+│ │Hello   │  │
+│ └────────┘  │
+│             │
+└─────────────┘
 ", output);
 			} else if (iterations == 2) {
 				Assert.Null (Application.MouseGrabView);
 				// Grab the mouse
 				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 8,
-					Y = 5,
+					X = 3,
+					Y = 2,
 					Flags = MouseFlags.Button1Pressed
 				}));
 
 				Assert.Equal (Application.Current, Application.MouseGrabView);
-				Assert.Equal (new Rect (8, 5, 24, 5), Application.MouseGrabView.Frame);
+				Assert.Equal (new Rect (2, 2, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 3) {
 				Assert.Equal (Application.Current, Application.MouseGrabView);
 				// Drag to left
 				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 7,
-					Y = 5,
+					X = 2,
+					Y = 2,
 					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
 				}));
+				Application.Refresh ();
 
 				Assert.Equal (Application.Current, Application.MouseGrabView);
-				Assert.Equal (new Rect (7, 5, 24, 5), Application.MouseGrabView.Frame);
+				Assert.Equal (new Rect (1, 2, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 4) {
 				Assert.Equal (Application.Current, Application.MouseGrabView);
 
 				TestHelpers.AssertDriverContentsWithFrameAre (@$"
-┌──────────────────────────────────────┐
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│      ┌──────────────────────┐        │
-│      │      Hello Word      │        │
-│      │                      │        │
-│      │       {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}       │        │
-│      └──────────────────────┘        │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-└──────────────────────────────────────┘", output);
+┌─────────────┐
+│             │
+│┌────────┐   │
+││Hello   │   │
+│└────────┘   │
+│             │
+└─────────────┘", output);
 
 				Assert.Equal (Application.Current, Application.MouseGrabView);
 			} else if (iterations == 5) {
 				Assert.Equal (Application.Current, Application.MouseGrabView);
 				// Drag up
 				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 7,
-					Y = 4,
+					X = 2,
+					Y = 1,
 					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
 				}));
+				Application.Refresh ();
 
 				Assert.Equal (Application.Current, Application.MouseGrabView);
-				Assert.Equal (new Rect (7, 4, 24, 5), Application.MouseGrabView.Frame);
+				Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 6) {
 				Assert.Equal (Application.Current, Application.MouseGrabView);
 
 				TestHelpers.AssertDriverContentsWithFrameAre (@$"
-┌──────────────────────────────────────┐
-│                                      │
-│                                      │
-│                                      │
-│      ┌──────────────────────┐        │
-│      │      Hello Word      │        │
-│      │                      │        │
-│      │       {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}       │        │
-│      └──────────────────────┘        │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-└──────────────────────────────────────┘", output);
+┌─────────────┐
+│┌────────┐   │
+││Hello   │   │
+│└────────┘   │
+│             │
+│             │
+└─────────────┘", output);
 
 				Assert.Equal (Application.Current, Application.MouseGrabView);
-				Assert.Equal (new Rect (7, 4, 24, 5), Application.MouseGrabView.Frame);
+				Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 7) {
 				Assert.Equal (Application.Current, Application.MouseGrabView);
 				// Ungrab the mouse
 				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-					X = 7,
-					Y = 4,
+					X = 2,
+					Y = 1,
 					Flags = MouseFlags.Button1Released
 				}));
+				Application.Refresh ();
 
 				Assert.Null (Application.MouseGrabView);
 
@@ -833,7 +822,8 @@ public class ToplevelTests {
 		Application.Run ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Mouse_Drag_On_Top_With_Superview_Not_Null ()
 	{
 		var win = new Window () {
@@ -928,7 +918,8 @@ public class ToplevelTests {
 		Application.Run ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void GetLocationThatFits_With_Border_Null_Not_Throws ()
 	{
 		var top = new Toplevel ();
@@ -941,7 +932,8 @@ public class ToplevelTests {
 		Assert.Null (exception);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void OnEnter_OnLeave_Triggered_On_Application_Begin_End ()
 	{
 		bool isEnter = false;
@@ -979,7 +971,8 @@ public class ToplevelTests {
 		Assert.True (v.HasFocus);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void OnEnter_OnLeave_Triggered_On_Application_Begin_End_With_More_Toplevels ()
 	{
 		int iterations = 0;
@@ -1069,7 +1062,8 @@ public class ToplevelTests {
 		Assert.Equal (5, steps [^1]);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void PositionCursor_SetCursorVisibility_To_Invisible_If_Focused_Is_Null ()
 	{
 		var tf = new TextField ("test") { Width = 5 };
@@ -1089,7 +1083,8 @@ public class ToplevelTests {
 		Assert.Equal (CursorVisibility.Invisible, cursor);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void IsLoaded_Application_Begin ()
 	{
 		var top = Application.Top;
@@ -1099,7 +1094,8 @@ public class ToplevelTests {
 		Assert.True (top.IsLoaded);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void IsLoaded_With_Sub_Toplevel_Application_Begin_NeedDisplay ()
 	{
 		var top = Application.Top;
@@ -1137,7 +1133,8 @@ public class ToplevelTests {
 	}
 
 	// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Toplevel_Inside_ScrollView_MouseGrabView ()
 	{
 		var scrollView = new ScrollView () {
@@ -1254,32 +1251,33 @@ public class ToplevelTests {
 		Assert.Equal (scrollView, Application.MouseGrabView);
 	}
 
-	[Fact] [AutoInitShutdown]
-	public void Dialog_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
+	[Fact]
+	[AutoInitShutdown]
+	public void Window_Bounds_Bigger_Than_Driver_Cols_And_Rows_Allow_Drag_Beyond_Left_Right_And_Bottom ()
 	{
 		var top = Application.Top;
-		var dialog = new Dialog (new Button ("Ok")) { Width = 20, Height = 3 };
+		var window = new Window () { Width = 20, Height = 3 };
 		Application.Begin (top);
 		((FakeDriver)Application.Driver).SetBufferSize (40, 10);
-		Application.Begin (dialog);
+		Application.Begin (window);
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (10, 3, 20, 3), dialog.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@$"
-          ┌──────────────────┐
-          │      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
-          └──────────────────┘
+┌──────────────────┐
+│                  │
+└──────────────────┘
 ", output);
 
 		Assert.Null (Application.MouseGrabView);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-			X = 10,
-			Y = 3,
+			X = 0,
+			Y = 0,
 			Flags = MouseFlags.Button1Pressed
 		}));
 
-		Assert.Equal (dialog, Application.MouseGrabView);
+		Assert.Equal (window, Application.MouseGrabView);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
 			X = -11,
@@ -1289,10 +1287,10 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 20, 3), dialog.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
+│                  │
 └──────────────────┘
 ", output);
 
@@ -1306,10 +1304,10 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 20, 3), top.Frame);
-		Assert.Equal (new Rect (0, 0, 20, 3), dialog.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
+│                  │
 └──────────────────┘
 ", output);
 
@@ -1323,10 +1321,10 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
-		Assert.Equal (new Rect (-1, 0, 20, 3), dialog.Frame);
+		Assert.Equal (new Rect (-1, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ──────────────────┐
-      {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}      │
+                  │
 ", output);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
@@ -1337,7 +1335,7 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
-		Assert.Equal (new Rect (18, 1, 20, 3), dialog.Frame);
+		Assert.Equal (new Rect (18, 1, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
                   ┌", output);
 
@@ -1350,17 +1348,18 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
-		Assert.Equal (new Rect (19, 2, 20, 3), dialog.Frame);
+		Assert.Equal (new Rect (19, 2, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Modal_As_Top_Will_Drag_Cleanly ()
 	{
-		var dialog = new Dialog () { Width = 30, Height = 10 };
-		dialog.Add (new Label (
-			"How should I've to react. Cleaning all chunk trails or setting the 'Cols' and 'Rows' to this dialog length?\n" +
-			"Cleaning is more easy to fix this.") {
+		// Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
+		var window = new Window () { Width = 10, Height = 3};
+		window.Add (new Label (
+			"Test") {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Width = Dim.Fill (),
@@ -1370,73 +1369,53 @@ public class ToplevelTests {
 			AutoSize = false
 		});
 
-		var rs = Application.Begin (dialog);
+		var rs = Application.Begin (window);
 
 		Assert.Null (Application.MouseGrabView);
-		Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
+		Assert.Equal (new Rect (0, 0, 10, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-                         ┌────────────────────────────┐
-                         │ How should I've to react.  │
-                         │Cleaning all chunk trails or│
-                         │   setting the 'Cols' and   │
-                         │   'Rows' to this dialog    │
-                         │          length?           │
-                         │Cleaning is more easy to fix│
-                         │           this.            │
-                         │                            │
-                         └────────────────────────────┘", output);
+┌────────┐
+│  Test  │
+└────────┘", output);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-			X = 25,
-			Y = 7,
+			X = 0,
+			Y = 0,
 			Flags = MouseFlags.Button1Pressed
 		}));
 
 		bool firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
-		Assert.Equal (dialog, Application.MouseGrabView);
+		Assert.Equal (window, Application.MouseGrabView);
 
-		Assert.Equal (new Rect (25, 7, 30, 10), dialog.Frame);
+		Assert.Equal (new Rect (0, 0, 10, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-                         ┌────────────────────────────┐
-                         │ How should I've to react.  │
-                         │Cleaning all chunk trails or│
-                         │   setting the 'Cols' and   │
-                         │   'Rows' to this dialog    │
-                         │          length?           │
-                         │Cleaning is more easy to fix│
-                         │           this.            │
-                         │                            │
-                         └────────────────────────────┘", output);
+┌────────┐
+│  Test  │
+└────────┘", output);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-			X = 20,
-			Y = 10,
+			X = 1,
+			Y = 1,
 			Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
 		}));
 
 		firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
-		Assert.Equal (dialog, Application.MouseGrabView);
-		Assert.Equal (new Rect (20, 10, 30, 10), dialog.Frame);
+		Assert.Equal (window, Application.MouseGrabView);
+		Assert.Equal (new Rect (1, 1, 10,3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-                    ┌────────────────────────────┐
-                    │ How should I've to react.  │
-                    │Cleaning all chunk trails or│
-                    │   setting the 'Cols' and   │
-                    │   'Rows' to this dialog    │
-                    │          length?           │
-                    │Cleaning is more easy to fix│
-                    │           this.            │
-                    │                            │
-                    └────────────────────────────┘", output);
+ ┌────────┐
+ │  Test  │
+ └────────┘", output);
 
 		Application.End (rs);
 	}
 
-	// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
-	[Fact] [AutoInitShutdown]
-	public void Draw_A_Top_Subview_On_A_Dialog ()
+	// Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
+	[Fact]
+	[AutoInitShutdown]
+	public void Draw_A_Top_Subview_On_A_Window ()
 	{
 		var top = Application.Top;
 		var win = new Window ();
@@ -1468,25 +1447,29 @@ public class ToplevelTests {
 └──────────────────┘", output);
 
 		var btnPopup = new Button ("Popup");
+		var testWindow = new Window () { X = 2, Y = 1, Width = 15, Height = 10 };
+		testWindow.Add (btnPopup);
 		btnPopup.Clicked += (s, e) => {
 			var viewToScreen = btnPopup.BoundsToScreen (top.Frame);
-			var view = new View () {
+			var viewAddedToTop = new View () {
+				Text = "viewAddedToTop",
 				X = 1,
 				Y = viewToScreen.Y + 1,
 				Width = 18,
-				Height = 5,
+				Height = 16,
 				BorderStyle = LineStyle.Single
 			};
-			Application.Current.DrawContentComplete += Current_DrawContentComplete;
-			top.Add (view);
+			Assert.Equal (testWindow, Application.Current);
+			Application.Current.DrawContentComplete += testWindow_DrawContentComplete;
+			top.Add (viewAddedToTop);
 
-			void Current_DrawContentComplete (object sender, DrawEventArgs e)
+			void testWindow_DrawContentComplete (object sender, DrawEventArgs e)
 			{
-				Assert.Equal (new Rect (1, 14, 18, 5), view.Frame);
+				Assert.Equal (new Rect (1, 3, 18, 16), viewAddedToTop.Frame);
 
 				var savedClip = Application.Driver.Clip;
 				Application.Driver.Clip = top.Frame;
-				view.Draw ();
+				viewAddedToTop.Draw ();
 				top.Move (2, 15);
 				View.Driver.AddStr ("One");
 				top.Move (2, 16);
@@ -1495,20 +1478,16 @@ public class ToplevelTests {
 				View.Driver.AddStr ("Three");
 				Application.Driver.Clip = savedClip;
 
-				Application.Current.DrawContentComplete -= Current_DrawContentComplete;
+				Application.Current.DrawContentComplete -= testWindow_DrawContentComplete;
 			}
 		};
-		var dialog = new Dialog (btnPopup) { Width = 15, Height = 10 };
-		var rs = Application.Begin (dialog);
+		var rs = Application.Begin (testWindow);
 
-		Assert.Equal (new Rect (2, 5, 15, 10), dialog.Frame);
+		Assert.Equal (new Rect (2, 1, 15, 10), testWindow.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│                  │
-│                  │
-│                  │
-│                  │
 │ ┌─────────────┐  │
+│ │{CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}    │  │
 │ │             │  │
 │ │             │  │
 │ │             │  │
@@ -1516,8 +1495,11 @@ public class ToplevelTests {
 │ │             │  │
 │ │             │  │
 │ │             │  │
-│ │  {CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}  │  │
 │ └─────────────┘  │
+│                  │
+│                  │
+│                  │
+│                  │
 │                  │
 │                  │
 │                  │
@@ -1525,29 +1507,30 @@ public class ToplevelTests {
 └──────────────────┘", output);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-			X = 9,
-			Y = 13,
+			X = 5,
+			Y = 2,
 			Flags = MouseFlags.Button1Clicked
 		}));
+		Application.Top.Draw ();
 
 		bool firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
 		TestHelpers.AssertDriverContentsWithFrameAre (@$"
 ┌──────────────────┐
-│                  │
-│                  │
-│                  │
-│                  │
 │ ┌─────────────┐  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │             │  │
-│ │  {CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}  │  │
+│ │{CM.Glyphs.LeftBracket} Popup {CM.Glyphs.RightBracket}    │  │
 │┌────────────────┐│
+││viewAddedToTop  ││
+││                ││
+││                ││
+││                ││
+││                ││
+││                ││
+││                ││
+││                ││
+││                ││
+││                ││
+││                ││
 ││One             ││
 ││Two             ││
 ││Three           ││
@@ -1557,7 +1540,8 @@ public class ToplevelTests {
 		Application.End (rs);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
@@ -1575,7 +1559,8 @@ public class ToplevelTests {
 	}
 
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Multi_Thread_Toplevels ()
 	{
 		Application.Init (new FakeDriver ());
@@ -1621,12 +1606,12 @@ public class ToplevelTests {
 			return true;
 		});
 
-		t.Ready += FirstDialogToplevel;
+		t.Ready += FirstWindow;
 
-		void FirstDialogToplevel (object sender, EventArgs args)
+		void FirstWindow (object sender, EventArgs args)
 		{
-			var od = new OpenDialog ();
-			od.Ready += SecondDialogToplevel;
+			var firstWindow = new Window ();
+			firstWindow.Ready += SecondWindow;
 
 			Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 				count1++;
@@ -1644,12 +1629,12 @@ public class ToplevelTests {
 				return true;
 			});
 
-			Application.Run (od);
+			Application.Run (firstWindow);
 		}
 
-		void SecondDialogToplevel (object sender, EventArgs args)
+		void SecondWindow (object sender, EventArgs args)
 		{
-			var d = new Dialog ();
+			var testWindow = new Window ();
 
 			Application.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 				count2++;
@@ -1664,7 +1649,7 @@ public class ToplevelTests {
 				return true;
 			});
 
-			Application.Run (d);
+			Application.Run (testWindow);
 		}
 
 		Application.Run ();

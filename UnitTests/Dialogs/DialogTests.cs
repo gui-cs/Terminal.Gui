@@ -780,6 +780,8 @@ namespace Terminal.Gui.DialogTests {
 		[Fact, AutoInitShutdown]
 		public void Dialog_Opened_From_Another_Dialog ()
 		{
+			((FakeDriver)Application.Driver).SetBufferSize (30, 10);
+
 			var btn1 = new Button ("press me 1");
 			Button btn2 = null;
 			Button btn3 = null;
@@ -788,7 +790,13 @@ namespace Terminal.Gui.DialogTests {
 				btn2 = new Button ("Show Sub");
 				btn3 = new Button ("Close");
 				btn3.Clicked += (s, e) => Application.RequestStop ();
-				btn2.Clicked += (s, e) => { MessageBox.Query (string.Empty, "ya", "Ok"); };
+				btn2.Clicked += (s, e) => {
+					// Don't test MessageBox in Dialog unit tests!
+					var subBtn = new Button ("Ok") { IsDefault = true };
+					var subDlg = new Dialog (subBtn) { Text = "ya", Width = 20, Height = 5 };
+					subBtn.Clicked += (s, e) => Application.RequestStop (subDlg);
+					Application.Run (subDlg);
+				};
 				var dlg = new Dialog (btn2, btn3);
 
 				Application.Run (dlg);
@@ -802,53 +810,27 @@ namespace Terminal.Gui.DialogTests {
 					Assert.True (btn1.NewKeyDownEvent (new (KeyCode.Space)));
 				} else if (iterations == 1) {
 					expected = @$"
-      ┌──────────────────────────────────────────────────────────────────┐
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                      {CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket}                      │
-      └──────────────────────────────────────────────────────────────────┘";
+  ┌───────────────────────┐
+  │                       │
+  │                       │
+  │                       │
+  │                       │
+  │                       │
+  │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
+  └───────────────────────┘";
 					TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 					Assert.True (btn2.NewKeyDownEvent (new (KeyCode.Space)));
 				} else if (iterations == 2) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
-      ┌──────────────────────────────────────────────────────────────────┐
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │         ┌──────────────────────────────────────────────┐         │
-      │         │                      ya                      │         │
-      │         │                                              │         │
-      │         │                   {btn}                   │         │
-      │         └──────────────────────────────────────────────┘         │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                                                                  │
-      │                      {CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket}                      │
-      └──────────────────────────────────────────────────────────────────┘", output);
+  ┌───────────────────────┐
+  │  ┌──────────────────┐ │
+  │  │ya                │ │
+  │  │                  │ │
+  │  │     {btn}     │ │
+  │  └──────────────────┘ │
+  │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
+  └───────────────────────┘", output);
 
 					Assert.True (Application.Current.NewKeyDownEvent (new (KeyCode.Enter)));
 				} else if (iterations == 3) {
