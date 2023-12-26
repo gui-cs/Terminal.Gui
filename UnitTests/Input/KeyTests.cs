@@ -101,9 +101,9 @@ public class KeyTests {
 
 	[Theory]
 	[InlineData("Barf")]
-	public void Constructor_String_Invalid_Throws (string kyString)
+	public void Constructor_String_Invalid_Throws (string keyString)
 	{
-
+		Assert.Throws<ArgumentException> (() => new Key (keyString));
 	}
 
 	[Theory]
@@ -130,6 +130,21 @@ public class KeyTests {
 	{
 		var key = (Key)ch;
 		Assert.Equal (expectedKeyCode, key.KeyCode);
+	}
+
+	// string cast operators
+	[Fact]
+	public void Cast_String_To_Key ()
+	{
+		var key = (Key)"Ctrl+Q";
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, key.KeyCode);
+	}
+
+	[Fact]
+	public void Cast_Key_ToString ()
+	{
+		var str = (string)Key.Q.WithCtrl;
+		Assert.Equal ("Ctrl+Q", str);
 	}
 
 	// IsValid

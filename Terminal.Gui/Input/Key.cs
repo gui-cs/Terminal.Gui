@@ -327,7 +327,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// Cast <see cref="KeyCode"/> to a <see cref="Key"/>. 
 	/// </summary>
 	/// <param name="keyCode"></param>
-	public static implicit operator Key (KeyCode keyCode) => new Key( keyCode);
+	public static implicit operator Key (KeyCode keyCode) => new Key (keyCode);
 
 	/// <summary>
 	/// Cast <see langword="char"/> to a <see cref="Key"/>. 
@@ -337,6 +337,24 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// </remarks>
 	/// <param name="ch"></param>
 	public static implicit operator Key (char ch) => new Key (ch);
+
+	/// <summary>
+	/// Cast <see langword="string"/> to a <see cref="Key"/>. 
+	/// </summary>
+	/// <remarks>
+	/// See <see cref="Key(string)"/> for more information.
+	/// </remarks>
+	/// <param name="str"></param>
+	public static implicit operator Key (string str) => new Key (str);
+
+	/// <summary>
+	/// Cast a <see cref="Key"/> to a <see langword="string"/>. 
+	/// </summary>
+	/// <remarks>
+	/// See <see cref="Key(string)"/> for more information.
+	/// </remarks>
+	/// <param name="key"></param>
+	public static implicit operator string (Key key) => key.ToString ();
 
 	/// <inheritdoc/>
 	public override bool Equals (object obj) => obj is Key k && k.KeyCode == KeyCode;
