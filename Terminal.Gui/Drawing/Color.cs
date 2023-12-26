@@ -663,17 +663,22 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// </summary>
 	public Attribute ()
 	{
-		var d = Default;
 		PlatformColor = -1;
-		Foreground = d.Foreground;
-		Background = d.Background;
+		var d = Default;
+		Foreground = new (d.Foreground.ColorName);
+		Background = new (d.Background.ColorName);
 	}
 
 	/// <summary>
 	/// Initializes a new instance with platform specific color value.
 	/// </summary>
 	/// <param name="platformColor">Value.</param>
-	internal Attribute (int platformColor) : this (platformColor, Default.Foreground, Default.Background) { }
+	internal Attribute (int platformColor) {
+		PlatformColor = platformColor;
+		var d = Default;
+		Foreground = new (d.Foreground.ColorName);
+		Background = new (d.Background.ColorName);
+	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Attribute"/> struct.
