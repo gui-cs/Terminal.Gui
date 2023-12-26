@@ -145,7 +145,24 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (label) + 3
 			};
 			frame.Add (ckbWrapMessage);
-		
+
+			frame.ValidatePosDim = true;
+			void Top_Loaded (object sender, EventArgs args)
+			{
+				frame.Height =
+					widthEdit.Frame.Height +
+					heightEdit.Frame.Height +
+					titleEdit.Frame.Height +
+					messageEdit.Frame.Height +
+					numButtonsEdit.Frame.Height +
+					defaultButtonEdit.Frame.Height +
+					styleRadioGroup.Frame.Height +
+					2 +
+					ckbWrapMessage.Frame.Height;
+				Application.Top.Loaded -= Top_Loaded;
+			}
+			//Application.Top.Loaded += Top_Loaded;
+
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 4,

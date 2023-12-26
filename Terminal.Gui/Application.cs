@@ -640,7 +640,7 @@ public static partial class Application {
 	/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
 	public static void RunIteration (ref RunState state, ref bool firstIteration)
 	{
-		if (MainLoop.EventsPending () && MainLoop.Running) {
+		if (MainLoop.Running && MainLoop.EventsPending ()) {
 			// Notify Toplevel it's ready
 			if (firstIteration) {
 				state.Toplevel.OnReady ();

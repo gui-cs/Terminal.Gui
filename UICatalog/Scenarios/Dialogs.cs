@@ -115,6 +115,20 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
+			frame.ValidatePosDim = true;
+			void Top_Loaded (object sender, EventArgs args)
+			{
+				frame.Height =
+					widthEdit.Frame.Height +
+					heightEdit.Frame.Height +
+					titleEdit.Frame.Height +
+					numButtonsEdit.Frame.Height +
+					glyphsNotWords.Frame.Height +
+					styleRadioGroup.Frame.Height;
+				Application.Top.Loaded -= Top_Loaded;
+			}
+			Application.Top.Loaded += Top_Loaded;
+
 			Win.Add (frame);
 
 			label = new Label ("Button Pressed:") {

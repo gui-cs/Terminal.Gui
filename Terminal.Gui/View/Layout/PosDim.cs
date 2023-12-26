@@ -1,5 +1,4 @@
 ﻿using System;
-using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui;
 
