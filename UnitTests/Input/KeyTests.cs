@@ -53,6 +53,59 @@ public class KeyTests {
 		Assert.Equal (expectedKeyCode, key.KeyCode);
 	}
 
+
+	// TryParse
+	[Theory]
+	[InlineData ("a", KeyCode.A)]
+	[InlineData ("Ctrl+A", KeyCode.A | KeyCode.CtrlMask)]
+	[InlineData ("Alt+A", KeyCode.A | KeyCode.AltMask)]
+	[InlineData ("Shift+A", KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ("A", KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ("â", (KeyCode)'â')]
+	[InlineData ("Shift+â", (KeyCode)'â' | KeyCode.ShiftMask)]
+	[InlineData ("Shift+Â", (KeyCode)'Â' | KeyCode.ShiftMask)]
+	[InlineData ("Ctrl+Shift+CursorUp", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp)]
+	[InlineData ("Ctrl+Alt+Shift+CursorUp", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
+	[InlineData ("ctrl+alt+shift+cursorup", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
+	[InlineData ("CTRL+ALT+SHIFT+CURSORUP", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
+	[InlineData ("Ctrl+Alt+Shift+Delete", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete)]
+	[InlineData ("Ctrl+Alt+Shift+Enter", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter)]
+	[InlineData ("Tab", KeyCode.Tab)]
+	[InlineData ("Shift+Tab", KeyCode.Tab | KeyCode.ShiftMask)]
+	[InlineData ("Ctrl+Tab", KeyCode.Tab | KeyCode.CtrlMask)]
+	[InlineData ("Alt+Tab", KeyCode.Tab | KeyCode.AltMask)]
+	[InlineData ("Ctrl+Shift+Tab", KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask)]
+	[InlineData ("Ctrl+Alt+Tab", KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask)]
+	[InlineData ("", KeyCode.Null)]
+	[InlineData (" ", KeyCode.Space)]
+	[InlineData ("Shift+ ", KeyCode.Space | KeyCode.ShiftMask)]
+	[InlineData ("Ctrl+ ", KeyCode.Space | KeyCode.CtrlMask)]
+	[InlineData ("Alt+ ", KeyCode.Space | KeyCode.AltMask)]
+	[InlineData ("F1", KeyCode.F1)]
+	[InlineData ("0", KeyCode.D0)]
+	[InlineData ("9", KeyCode.D9)]
+	[InlineData ("D0", KeyCode.D0)]
+	[InlineData ("65", KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ("97", KeyCode.A)]
+	[InlineData ("Shift", KeyCode.ShiftKey)]
+	[InlineData ("Ctrl", KeyCode.CtrlKey)]
+	[InlineData ("Ctrl-A", KeyCode.A | KeyCode.CtrlMask)]
+	[InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
+	[InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
+	[InlineData ("Alt-A-Ctrl", KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask)]
+	public void Constructor_String_Valid (string keyString, Key expected)
+	{
+		Key key = new Key (keyString);
+		Assert.Equal (((Key)expected).ToString (), key.ToString ());
+	}
+
+	[Theory]
+	[InlineData("Barf")]
+	public void Constructor_String_Invalid_Throws (string kyString)
+	{
+
+	}
+
 	[Theory]
 	[InlineData ('a', KeyCode.A)]
 	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)]

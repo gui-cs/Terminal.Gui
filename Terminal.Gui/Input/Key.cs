@@ -109,6 +109,21 @@ public class Key : EventArgs, IEquatable<Key> {
 	}
 
 	/// <summary>
+	/// Constructs a new Key from a string describing the key.
+	/// See <see cref="TryParse(string, out Terminal.Gui.Key)"/> for information
+	/// on the format of the string.
+	/// </summary>
+	/// <param name="str">The string describing the key.</param>
+	public Key (string str)
+	{
+		var result = Key.TryParse (str, out Key key);
+		if (!result) {
+			throw new ArgumentException (@$"Invalid key string: {str}", nameof (str));
+		}
+		KeyCode = key.KeyCode;
+	}
+
+	/// <summary>
 	/// Indicates if the current Key event has already been processed and the driver should stop notifying any other event subscriber.
 	/// Its important to set this value to true specially when updating any View's layout from inside the subscriber method.
 	/// </summary>
