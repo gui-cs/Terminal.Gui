@@ -163,6 +163,19 @@ namespace UICatalog.Scenarios {
 			};
 			Application.Top.Add (oddballButton);
 
+			oddballButton = new Button ("Center - 1") {
+				X = Pos.Center () - 1,
+				Y = Pos.Bottom (oddballButton)
+			};
+			Application.Top.Add (oddballButton);
+
+			// Won't be visible:
+			//oddballButton = new Button ("1 - Center") {
+			//	X = 1 - Pos.Center (),
+			//	Y = Pos.Bottom (oddballButton)
+			//};
+			//Application.Top.Add (oddballButton);
+
 			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
 			// The `- Pos.Percent(5)` is there so at least something is visible
 			oddballButton = new Button ("Center + Center - Percent(50)") {

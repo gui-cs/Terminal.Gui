@@ -178,7 +178,7 @@ public class RadioGroup : View {
 					AddKeyBindingsForHotKey (KeyCode.Null, hotKey);
 				}
 			}
-			if (prevCount != _radioLabels.Count) {
+			if (IsInitialized && prevCount != _radioLabels.Count) {
 				SetWidthHeight (_radioLabels);
 			}
 			SelectedItem = 0;

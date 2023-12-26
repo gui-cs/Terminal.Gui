@@ -935,7 +935,8 @@ namespace Terminal.Gui.ViewsTests {
 │                  │
 └──────────────────┘", output);
 
-			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			// Don't use Dialog here as it has more layout logic. Use Window instead.
+			var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
 			dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 			var rs = Application.Begin (dialog);
 
@@ -992,8 +993,9 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
 			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
-
-			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			
+			// Don't use Dialog here as it has more layout logic. Use Window instead.
+			var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
 			dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 			var rs = Application.Begin (dialog);
 
