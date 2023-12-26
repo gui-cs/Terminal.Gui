@@ -147,8 +147,18 @@ class UICatalogApp {
 	{
 		// Setup a file system watcher for `./.tui/`
 		_currentDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-		var f = new FileInfo (Assembly.GetExecutingAssembly ().Location);
-		string tuiDir = Path.Combine (f.Directory!.FullName, ".tui");
+
+		var assemblyLocation = Assembly.GetExecutingAssembly ().Location;
+		string tuiDir;
+
+		if (!string.IsNullOrEmpty (assemblyLocation)) {
+			var assemblyFile = new FileInfo (assemblyLocation);
+			tuiDir = Path.Combine (assemblyFile.Directory!.FullName, ".tui");
+		} else {
+			tuiDir = Path.Combine (System.AppContext.BaseDirectory, ".tui");
+		}
+
+
 
 		if (!Directory.Exists (tuiDir)) {
 			Directory.CreateDirectory (tuiDir);
@@ -158,7 +168,7 @@ class UICatalogApp {
 
 		// Setup a file system watcher for `~/.tui/`
 		_homeDirWatcher.NotifyFilter = NotifyFilters.LastWrite;
-		f = new FileInfo (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
+		var f = new FileInfo (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
 		tuiDir = Path.Combine (f.FullName, ".tui");
 
 		if (!Directory.Exists (tuiDir)) {
