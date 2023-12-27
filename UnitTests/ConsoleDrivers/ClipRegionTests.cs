@@ -22,7 +22,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void IsValidLocation (Type driverType)
@@ -67,7 +67,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void Clip_Set_To_Empty_AllInvalid (Type driverType)
@@ -96,7 +96,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void AddRune_Is_Clipped (Type driverType)

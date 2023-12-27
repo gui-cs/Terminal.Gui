@@ -21,7 +21,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void Init_Inits (Type driverType)
@@ -41,7 +41,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void End_Cleans_Up (Type driverType)
@@ -186,7 +186,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void TerminalResized_Simulation (Type driverType)

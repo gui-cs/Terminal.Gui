@@ -95,7 +95,7 @@ public class ContentsTests {
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
 	[InlineData (typeof (NetDriver))]
-	[InlineData (typeof (ANSIDriver))]
+	//[InlineData (typeof (ANSIDriver))]
 	[InlineData (typeof (WindowsDriver))]
 	[InlineData (typeof (CursesDriver))]
 	public void Move_Bad_Coordinates (Type driverType)

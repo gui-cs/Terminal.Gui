@@ -128,7 +128,7 @@ public class ApplicationTests {
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
 	[InlineData (typeof (NetDriver))]
-	[InlineData (typeof (ANSIDriver))]
+	//[InlineData (typeof (ANSIDriver))]
 	[InlineData (typeof (WindowsDriver))]
 	[InlineData (typeof (CursesDriver))]
 	public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)

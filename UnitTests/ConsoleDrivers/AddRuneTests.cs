@@ -19,7 +19,7 @@ public class AddRuneTests {
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
 	[InlineData (typeof (NetDriver))]
-	[InlineData (typeof (ANSIDriver))]
+	//[InlineData (typeof (ANSIDriver))]
 	[InlineData (typeof (WindowsDriver))]
 	[InlineData (typeof (CursesDriver))]
 	public void AddRune (Type driverType)

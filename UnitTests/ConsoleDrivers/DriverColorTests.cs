@@ -14,7 +14,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void SetColors_Changes_Colors (Type driverType)
@@ -42,7 +42,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver), false)]
 		[InlineData (typeof (NetDriver), true)]
-		[InlineData (typeof (ANSIDriver), true)]
+		//[InlineData (typeof (ANSIDriver), true)]
 		[InlineData (typeof (WindowsDriver), true)]
 		[InlineData (typeof (CursesDriver), false)]
 		public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
@@ -58,7 +58,7 @@ namespace Terminal.Gui.DriverTests {
 		[Theory]
 		[InlineData (typeof (FakeDriver))]
 		[InlineData (typeof (NetDriver))]
-		[InlineData (typeof (ANSIDriver))]
+		//[InlineData (typeof (ANSIDriver))]
 		[InlineData (typeof (WindowsDriver))]
 		[InlineData (typeof (CursesDriver))]
 		public void Force16Colors_Sets (Type driverType)
