@@ -16,15 +16,9 @@
   // to throw exceptions. 
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
-  "Application.AlternateBackwardKey": {
-    "Key": "Ctrl+PageUp"
-  },
-  "Application.AlternateForwardKey": {
-    "Key": "Ctrl+PageDown"
-  },
-  "Application.QuitKey": {
-    "Key": "Ctrl+Q"
-  },
+  "Application.AlternateBackwardKey": "Ctrl+PageUp",
+  "Application.AlternateForwardKey": "Ctrl+PageDown",
+  "Application.QuitKey": "Ctrl+Q",
   "Application.IsMouseDisabled": false,
   "Theme": "Default",
   "Themes": [

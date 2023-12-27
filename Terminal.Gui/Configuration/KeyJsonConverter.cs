@@ -3,46 +3,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
-class KeyJsonConverter : JsonConverter<Key> {
-	
-	public override Key Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-	{
-		if (reader.TokenType == JsonTokenType.StartObject) {
-			Key key = Key.Empty;
-			while (reader.Read ()) {
-				if (reader.TokenType == JsonTokenType.EndObject) {
-					break;
-				}
 
-				if (reader.TokenType == JsonTokenType.PropertyName) {
-					string propertyName = reader.GetString ();
-					reader.Read ();
+/// <summary>
+/// Support for <see cref="Key"/> in JSON in the form of "Ctrl-X" or "Alt-Shift-F1".
+/// </summary>
+public class KeyJsonConverter : JsonConverter<Key> {
+	public override Key Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => Key.TryParse (reader.GetString (), out var key) ? key : Key.Empty;
 
-					switch (propertyName?.ToLowerInvariant ()) {
-					case "key":
-						if (reader.TokenType == JsonTokenType.String) {
-							string keyValue = reader.GetString ();
-							if (Key.TryParse (keyValue, out key)) {
-								break;
-							}
-							throw new JsonException ($"Error parsing Key: {keyValue}.");
-
-						}
-						break;
-					default:
-						throw new JsonException ($"Unexpected Key property \"{propertyName}\".");
-					}
-				}
-			}
-			return key;
-		}
-		throw new JsonException ($"Unexpected StartObject token when parsing Key: {reader.TokenType}.");
-	}
-
-	public override void Write (Utf8JsonWriter writer, Key value, JsonSerializerOptions options)
-	{
-		writer.WriteStartObject ();
-		writer.WriteString ("Key", value.ToString ());
-		writer.WriteEndObject ();
-	}
+	public override void Write (Utf8JsonWriter writer, Key value, JsonSerializerOptions options) => writer.WriteStringValue (value.ToString ());
 }
