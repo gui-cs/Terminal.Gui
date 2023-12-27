@@ -160,7 +160,7 @@ public static partial class Application {
 				var p = Environment.OSVersion.Platform;
 				if (string.IsNullOrEmpty(ForceDriver)) {
 					if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-						Driver = new ANSIDriver ();
+						Driver = new WindowsDriver ();
 					} else {
 						Driver = new CursesDriver ();
 					}
@@ -226,10 +226,10 @@ public static partial class Application {
 		}
 
 	/// <summary>
-	/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>.
+	/// Shutdown an application initialized with <see cref="Init"/>.
 	/// </summary>
 	/// <remarks>
-	/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
+	/// Shutdown must be called for every call to <see cref="Init"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
 	/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
 	/// </remarks>
 	public static void Shutdown ()
@@ -428,7 +428,7 @@ public static partial class Application {
 	/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
 	/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 	/// <para>
-	/// Calling <see cref="Init(ConsoleDriver)"/> first is not needed as this function will initialize the application.
+	/// Calling <see cref="Init"/> first is not needed as this function will initialize the application.
 	/// </para>
 	/// <para>
 	/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
@@ -441,7 +441,7 @@ public static partial class Application {
 	/// <param name="errorHandler"></param>
 	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
-	/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver)"/> has already been called. 
+	/// Must be <see langword="null"/> if <see cref="Init"/> has already been called. 
 	/// </param>
 	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
 	{

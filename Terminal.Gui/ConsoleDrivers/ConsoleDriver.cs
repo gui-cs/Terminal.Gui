@@ -671,7 +671,6 @@ public enum CursorVisibility {
 /// Lowercase alpha keys are encoded as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
 /// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
 /// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
-/// TODO: Strongly consider renaming these from .A to .Z to .A_Lowercase to .Z_Lowercase (or .a to .z).
 /// </para>
 /// <para>
 /// Numeric keys are the values between 48 and 57 corresponding to 0 to 9 (e.g. <see cref="KeyCode.D0"/>, <see cref="KeyCode.D1"/>, etc.).
@@ -702,7 +701,7 @@ public enum KeyCode : uint {
 
 	/// <summary>
 	/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
-	/// otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>).
+	/// otherwise, the value is in the the lower bits (as extracted by <see cref="CharMask"/>).
 	/// </summary>
 	SpecialMask = 0xfff00000,
 
@@ -813,111 +812,111 @@ public enum KeyCode : uint {
 	D9,
 
 	/// <summary>
-	/// The key code for the user pressing Shift-A
+	/// The key code for the A key
 	/// </summary>
 	A = 65,
 	/// <summary>
-	/// The key code for the user pressing Shift-B
+	/// The key code for the B key
 	/// </summary>
 	B,
 	/// <summary>
-	/// The key code for the user pressing Shift-C
+	/// The key code for the C key
 	/// </summary>
 	C,
 	/// <summary>
-	/// The key code for the user pressing Shift-D
+	/// The key code for the D key
 	/// </summary>
 	D,
 	/// <summary>
-	/// The key code for the user pressing Shift-E
+	/// The key code for the E key
 	/// </summary>
 	E,
 	/// <summary>
-	/// The key code for the user pressing Shift-F
+	/// The key code for the F key
 	/// </summary>
 	F,
 	/// <summary>
-	/// The key code for the user pressing Shift-G
+	/// The key code for the G key
 	/// </summary>
 	G,
 	/// <summary>
-	/// The key code for the user pressing Shift-H
+	/// The key code for the H key
 	/// </summary>
 	H,
 	/// <summary>
-	/// The key code for the user pressing Shift-I
+	/// The key code for the I key
 	/// </summary>
 	I,
 	/// <summary>
-	/// The key code for the user pressing Shift-J
+	/// The key code for the J key
 	/// </summary>
 	J,
 	/// <summary>
-	/// The key code for the user pressing Shift-K
+	/// The key code for the K key
 	/// </summary>
 	K,
 	/// <summary>
-	/// The key code for the user pressing Shift-L
+	/// The key code for the L key
 	/// </summary>
 	L,
 	/// <summary>
-	/// The key code for the user pressing Shift-M
+	/// The key code for the M key
 	/// </summary>
 	M,
 	/// <summary>
-	/// The key code for the user pressing Shift-N
+	/// The key code for the N key
 	/// </summary>
 	N,
 	/// <summary>
-	/// The key code for the user pressing Shift-O
+	/// The key code for the O key
 	/// </summary>
 	O,
 	/// <summary>
-	/// The key code for the user pressing Shift-P
+	/// The key code for the P key
 	/// </summary>
 	P,
 	/// <summary>
-	/// The key code for the user pressing Shift-Q
+	/// The key code for the Q key
 	/// </summary>
 	Q,
 	/// <summary>
-	/// The key code for the user pressing Shift-R
+	/// The key code for the R key
 	/// </summary>
 	R,
 	/// <summary>
-	/// The key code for the user pressing Shift-S
+	/// The key code for the S key
 	/// </summary>
 	S,
 	/// <summary>
-	/// The key code for the user pressing Shift-T
+	/// The key code for the T key
 	/// </summary>
 	T,
 	/// <summary>
-	/// The key code for the user pressing Shift-U
+	/// The key code for the U key
 	/// </summary>
 	U,
 	/// <summary>
-	/// The key code for the user pressing Shift-V
+	/// The key code for the V key
 	/// </summary>
 	V,
 	/// <summary>
-	/// The key code for the user pressing Shift-W
+	/// The key code for the W key
 	/// </summary>
 	W,
 	/// <summary>
-	/// The key code for the user pressing Shift-X
+	/// The key code for the X key
 	/// </summary>
 	X,
 	/// <summary>
-	/// The key code for the user pressing Shift-Y
+	/// The key code for the Y key
 	/// </summary>
 	Y,
 	/// <summary>
-	/// The key code for the user pressing Shift-Z
+	/// The key code for the Z key
 	/// </summary>
 	Z,
 	/// <summary>
-	/// The key code for the user pressing A
+	/// The key code for the Delete key.
 	/// </summary>
 	Delete = 127,
 

@@ -278,16 +278,16 @@ public class KeyCodeJsonConverterTests {
 
 public class KeyJsonConverterTests {
 	[Theory]
-	[InlineData (KeyCode.A, "{\"Key\":\"a\"}")]
-	[InlineData ((KeyCode)'â', "{\"Key\":\"â\"}")]
-	[InlineData (KeyCode.A | KeyCode.ShiftMask, "{\"Key\":\"A\"}")]
-	[InlineData (KeyCode.A | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+A\"}")]
-	[InlineData (KeyCode.A | KeyCode.AltMask | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+Alt+A\"}")]
-	[InlineData ((KeyCode)'a' | KeyCode.AltMask | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+Alt+A\"}")]
-	[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, "{\"Key\":\"A\"}")]
-	[InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "{\"Key\":\"Ctrl+Alt+Delete\"}")]
-	[InlineData (KeyCode.D4, "{\"Key\":\"4\"}")]
-	[InlineData (KeyCode.Esc, "{\"Key\":\"Esc\"}")]
+	[InlineData (KeyCode.A, "\"a\"")]
+	[InlineData ((KeyCode)'â', "\"â\"")]
+	[InlineData (KeyCode.A | KeyCode.ShiftMask, "\"A\"")]
+	[InlineData (KeyCode.A | KeyCode.CtrlMask, "\"Ctrl+A\"")]
+	[InlineData (KeyCode.A | KeyCode.AltMask | KeyCode.CtrlMask, "\"Ctrl+Alt+A\"")]
+	[InlineData ((KeyCode)'a' | KeyCode.AltMask | KeyCode.CtrlMask, "\"Ctrl+Alt+A\"")]
+	[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, "\"A\"")]
+	[InlineData (KeyCode.Delete | KeyCode.AltMask | KeyCode.CtrlMask, "\"Ctrl+Alt+Delete\"")]
+	[InlineData (KeyCode.D4, "\"4\"")]
+	[InlineData (KeyCode.Esc, "\"Esc\"")]
 	public void TestKey_Serialize (KeyCode key, string expected)
 	{
 		// Arrange
