@@ -148,32 +148,32 @@ public static partial class Application {
 		// multiple times. We need to do this because some settings are only
 		// valid after a Driver is loaded. In this cases we need just 
 		// `Settings` so we can determine which driver to use.
-		ConfigurationManager.Load (true);
-		ConfigurationManager.Apply ();
+		Load (true);
+		Apply ();
 
 		// Ignore Configuration for ForceDriver if driverName is specified
 		if (!string.IsNullOrEmpty (driverName)) {
 			ForceDriver = driverName;
 		}
 
-			if (Driver == null) {
-				var p = Environment.OSVersion.Platform;
-				if (string.IsNullOrEmpty(ForceDriver)) {
-					if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
-						Driver = new WindowsDriver ();
-					} else {
-						Driver = new CursesDriver ();
-					}
+		if (Driver == null) {
+			var p = Environment.OSVersion.Platform;
+			if (string.IsNullOrEmpty (ForceDriver)) {
+				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+					Driver = new WindowsDriver ();
 				} else {
-					var drivers = GetDriverTypes ();
-					var driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
-					if (driverType != null) {
-						Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-					} else {
-						throw new ArgumentException ($"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
-					}
+					Driver = new CursesDriver ();
+				}
+			} else {
+				var drivers = GetDriverTypes ();
+				var driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
+				if (driverType != null) {
+					Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+				} else {
+					throw new ArgumentException ($"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
 				}
 			}
+		}
 
 		try {
 			MainLoop = Driver.Init ();
@@ -207,23 +207,23 @@ public static partial class Application {
 
 	static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
-		/// <summary>
-		/// Gets of list of <see cref="ConsoleDriver"/> types that are available.
-		/// </summary>
-		/// <returns></returns>
-		public static List<Type> GetDriverTypes ()
-		{
-			// use reflection to get the list of drivers
-			var driverTypes = new List<Type> ();
-			foreach (var asm in AppDomain.CurrentDomain.GetAssemblies ()) {
-				foreach (var type in asm.GetTypes ()) {
-					if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
-						driverTypes.Add (type);
-					}
+	/// <summary>
+	/// Gets of list of <see cref="ConsoleDriver"/> types that are available.
+	/// </summary>
+	/// <returns></returns>
+	public static List<Type> GetDriverTypes ()
+	{
+		// use reflection to get the list of drivers
+		var driverTypes = new List<Type> ();
+		foreach (var asm in AppDomain.CurrentDomain.GetAssemblies ()) {
+			foreach (var type in asm.GetTypes ()) {
+				if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
+					driverTypes.Add (type);
 				}
 			}
-			return driverTypes;
 		}
+		return driverTypes;
+	}
 
 	/// <summary>
 	/// Shutdown an application initialized with <see cref="Init"/>.
@@ -872,13 +872,12 @@ public static partial class Application {
 	#endregion Run (Begin, Run, End)
 
 	#region Toplevel handling
-
 	/// <summary>
 	/// Holds the stack of TopLevel views.
 	/// </summary>
 	// BUGBUG: Techncally, this is not the full lst of TopLevels. THere be dragons hwre. E.g. see how Toplevel.Id is used. What
 	// about TopLevels that are just a SubView of another View?
-	static readonly Stack<Toplevel> _topLevels = new ();
+	static readonly Stack<Toplevel> _topLevels = new Stack<Toplevel> ();
 
 	/// <summary>
 	/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -1330,7 +1329,7 @@ public static partial class Application {
 	#endregion Mouse handling
 
 	#region Keyboard handling
-	static Key _alternateForwardKey = new (KeyCode.PageDown | KeyCode.CtrlMask);
+	static Key _alternateForwardKey = new Key (KeyCode.PageDown | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
@@ -1354,7 +1353,7 @@ public static partial class Application {
 		}
 	}
 
-	static Key _alternateBackwardKey = new (KeyCode.PageUp | KeyCode.CtrlMask);
+	static Key _alternateBackwardKey = new Key (KeyCode.PageUp | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
@@ -1378,7 +1377,7 @@ public static partial class Application {
 		}
 	}
 
-	static Key _quitKey = new (KeyCode.Q | KeyCode.CtrlMask);
+	static Key _quitKey = new Key (KeyCode.Q | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Gets or sets the key to quit the application.
@@ -1515,8 +1514,8 @@ public static partial class Application {
 	}
 	#endregion Keyboard handling
 }
-
 /// <summary>
 /// Event arguments for the <see cref="Application.Iteration"/> event.
 /// </summary>
-public class IterationEventArgs { }
+public class IterationEventArgs {
+}
