@@ -438,11 +438,13 @@ public class ApplicationTests {
 		Assert.Equal (3, count);
 	}
 
+	// TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
 	[Fact]
 	public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
 	{
 		Init ();
 		var count = 0;
+		// Don't use Dialog here as it has more layout logic. Use Window instead.
 		Dialog d = null;
 		var top = Application.Top;
 		top.DrawContent += (s, a) => count++;
@@ -450,6 +452,7 @@ public class ApplicationTests {
 		Application.Iteration += (s, a) => {
 			iteration++;
 			if (iteration == 0) {
+				// TODO: Don't use Dialog here as it has more layout logic. Use Window instead.
 				d = new Dialog ();
 				d.DrawContent += (s, a) => count++;
 				Application.Run (d);
@@ -471,44 +474,42 @@ public class ApplicationTests {
 		Assert.Equal (3, count);
 	}
 
+	// TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
 	[Fact]
 	public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
 	{
 		Init ();
-		var d = new Dialog () { Width = 5, Height = 5 };
+		// Don't use Dialog here as it has more layout logic. Use Window instead.
+		var w = new Window () { Width = 5, Height = 5 };
 		((FakeDriver)Application.Driver).SetBufferSize (10, 10);
-		var rs = Application.Begin (d);
+		var rs = Application.Begin (w);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-  ┌───┐
-  │   │
-  │   │
-  │   │
-  └───┘", _output);
+┌───┐
+│   │
+│   │
+│   │
+└───┘", _output);
 
 		var attributes = new Attribute [] {
 			// 0
 			new Attribute (ColorName.White, ColorName.Black),
 			// 1
-			Colors.Dialog.Normal
+			Colors.Base.Normal
 		};
 		TestHelpers.AssertDriverColorsAre (@"
-0000000000
-0000000000
-0011111000
-0011111000
-0011111000
-0011111000
-0011111000
-0000000000
-0000000000
-0000000000
+1111100000
+1111100000
+1111100000
+1111100000
+1111100000
 ", null, attributes);
 
 		// TODO: In PR #2920 this breaks because the mouse is not grabbed anymore.
 		// TODO: Move the mouse grap/drag mode from Toplevel to Border.
-		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed }));
-		Assert.Equal (d, Application.MouseGrabView);
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Pressed }));
+		Assert.Equal (w, Application.MouseGrabView);
 
+		// Move down and to the right.
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -522,7 +523,7 @@ public class ApplicationTests {
 			// 0
 			new Attribute (ColorName.White, ColorName.Black),
 			// 1
-			Colors.Dialog.Normal
+			Colors.Base.Normal
 		};
 		TestHelpers.AssertDriverColorsAre (@"
 0000000000
@@ -531,10 +532,6 @@ public class ApplicationTests {
 0111110000
 0111110000
 0111110000
-0000000000
-0000000000
-0000000000
-0000000000
 ", null, attributes);
 
 		Application.End (rs);
@@ -596,6 +593,7 @@ public class ApplicationTests {
 		var t1 = new Toplevel ();
 		var t2 = new Toplevel ();
 		var t3 = new Toplevel ();
+		// Don't use Dialog here as it has more layout logic. Use Window instead.
 		var d = new Dialog ();
 		var t4 = new Toplevel ();
 

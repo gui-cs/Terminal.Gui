@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
-			frame.ForceValidatePosDim = true;
+			frame.ValidatePosDim = true;
 			void Top_Loaded (object sender, EventArgs args)
 			{
 				frame.Height =

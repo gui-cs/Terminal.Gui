@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace Terminal.Gui {
 
@@ -122,18 +123,86 @@ namespace Terminal.Gui {
 
 			UpdateTextFormatterText ();
 
-			if ((!ForceValidatePosDim && directionChanged && AutoSize)
-			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
+			if ((!ValidatePosDim && directionChanged && AutoSize)
+			    || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
 				ResizeBoundsToFit (Bounds.Size);
 				// BUGBUG: I think this call is redundant.
-				SetBoundsToFitFrame ();
+				SetFrameToFitText ();
 			} else {
-				SetBoundsToFitFrame ();
+				SetFrameToFitText ();
 			}
 			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			SetNeedsDisplay ();
+		}
+
+
+		/// <summary>
+		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>. 
+		/// </summary>
+		/// <returns><see langword="true"/> if the size was changed; <see langword="false"/> if <see cref="AutoSize"/> == <see langword="true"/> or
+		/// <see cref="Text"/> will not fit.</returns>
+		/// <remarks>
+		/// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+		/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+		/// Does not take into account word wrapping.
+		/// </remarks>
+		bool SetFrameToFitText ()
+		{
+			// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
+			// <summary>
+			// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
+			// </summary>
+			// <param name="sizeRequired">The minimum dimensions required.</param>
+			// <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
+			// <remarks>
+			// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+			// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+			// Does not take into account word wrapping.
+			// </remarks>
+			bool GetMinimumSizeOfText (out Size sizeRequired)
+			{
+				if (!IsInitialized) {
+					sizeRequired = new Size (0, 0);
+					return false;
+				}
+				sizeRequired = Bounds.Size;
+
+				if (!AutoSize && !string.IsNullOrEmpty (TextFormatter.Text)) {
+					switch (TextFormatter.IsVerticalDirection (TextDirection)) {
+					case true:
+						int colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
+						// TODO: v2 - This uses frame.Width; it should only use Bounds
+						if (_frame.Width < colWidth &&
+						(Width == null ||
+						Bounds.Width >= 0 &&
+						Width is Dim.DimAbsolute &&
+						Width.Anchor (0) >= 0 &&
+						Width.Anchor (0) < colWidth)) {
+							sizeRequired = new Size (colWidth, Bounds.Height);
+							return true;
+						}
+						break;
+					default:
+						if (_frame.Height < 1 &&
+						(Height == null ||
+						Height is Dim.DimAbsolute &&
+						Height.Anchor (0) == 0)) {
+							sizeRequired = new Size (Bounds.Width, 1);
+							return true;
+						}
+						break;
+					}
+				}
+				return false;
+			}
+
+			if (GetMinimumSizeOfText (out var size)) {
+				_frame = new Rect (_frame.Location, size);
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>

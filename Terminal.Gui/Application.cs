@@ -351,6 +351,8 @@ public static partial class Application {
 			} else if (Top != null && Toplevel != Top && _topLevels.Contains (Top)) {
 				Top.OnLeave (Toplevel);
 			}
+			// BUGBUG: We should not depend on `Id` internally. 
+			// BUGBUG: It is super unclear what this code does anyway.
 			if (string.IsNullOrEmpty (Toplevel.Id)) {
 				int count = 1;
 				string id = (_topLevels.Count + count).ToString ();
@@ -672,7 +674,7 @@ public static partial class Application {
 	/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
 	public static void RunIteration (ref RunState state, ref bool firstIteration)
 	{
-		if (MainLoop.EventsPending () && MainLoop.Running) {
+		if (MainLoop.Running && MainLoop.EventsPending ()) {
 			// Notify Toplevel it's ready
 			if (firstIteration) {
 				state.Toplevel.OnReady ();
@@ -870,6 +872,12 @@ public static partial class Application {
 	#endregion Run (Begin, Run, End)
 
 	#region Toplevel handling
+
+	/// <summary>
+	/// Holds the stack of TopLevel views.
+	/// </summary>
+	// BUGBUG: Techncally, this is not the full lst of TopLevels. THere be dragons hwre. E.g. see how Toplevel.Id is used. What
+	// about TopLevels that are just a SubView of another View?
 	static readonly Stack<Toplevel> _topLevels = new ();
 
 	/// <summary>

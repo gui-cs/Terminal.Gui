@@ -178,7 +178,7 @@ public class RadioGroup : View {
 					AddKeyBindingsForHotKey (KeyCode.Null, hotKey);
 				}
 			}
-			if (prevCount != _radioLabels.Count) {
+			if (IsInitialized && prevCount != _radioLabels.Count) {
 				SetWidthHeight (_radioLabels);
 			}
 			SelectedItem = 0;
@@ -244,7 +244,7 @@ public class RadioGroup : View {
 			Driver.SetAttribute (GetNormalColor ());
 			Driver.AddStr ($"{(i == _selected ? CM.Glyphs.Selected : CM.Glyphs.UnSelected)} ");
 			TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out var hotKey);
-			if (hotPos != -1 && (hotKey != KeyCode.Null || hotKey != KeyCode.Unknown)) {
+			if (hotPos != -1 && (hotKey != KeyCode.Null)) {
 				var rlRunes = rl.ToRunes ();
 				for (int j = 0; j < rlRunes.Length; j++) {
 					Rune rune = rlRunes [j];

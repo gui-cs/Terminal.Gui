@@ -280,6 +280,7 @@ namespace Terminal.Gui {
 				_oldCanFocus = CanFocus;
 				_oldTabIndex = _tabIndex;
 
+				// BUGBUG: These should move to EndInit as they access Bounds causing debug spew.
 				UpdateTextDirection (TextDirection);
 				UpdateTextFormatterText ();
 				SetHotKey ();
@@ -493,7 +494,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override string ToString ()
 		{
-			return $"{GetType ().Name}({Id})({Frame})";
+			return $"{GetType ().Name}({Id}){Frame}";
 		}
 
 		/// <inheritdoc/>

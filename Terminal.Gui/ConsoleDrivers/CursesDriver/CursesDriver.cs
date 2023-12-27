@@ -422,7 +422,7 @@ internal class CursesDriver : ConsoleDriver {
 		case Curses.AltCtrlKeyPPage: return KeyCode.PageUp | KeyCode.AltMask | KeyCode.CtrlMask;
 		case Curses.AltCtrlKeyHome: return KeyCode.Home | KeyCode.AltMask | KeyCode.CtrlMask;
 		case Curses.AltCtrlKeyEnd: return KeyCode.End | KeyCode.AltMask | KeyCode.CtrlMask;
-		default: return KeyCode.Unknown;
+		default: return KeyCode.Null;
 		}
 	}
 

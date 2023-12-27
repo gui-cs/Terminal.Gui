@@ -31,7 +31,7 @@ namespace UICatalog.Tests {
 			// Put a QuitKey in at the end
 			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 			foreach (var c in input.Reverse ()) {
-				KeyCode key = KeyCode.Unknown;
+				KeyCode key = KeyCode.Null;
 				if (char.IsLetter (c)) {
 					key = (KeyCode)char.ToUpper (c) | (char.IsUpper (c) ? KeyCode.ShiftMask : (KeyCode)0);
 				} else {
