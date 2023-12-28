@@ -22,7 +22,7 @@ namespace Terminal.Gui.ViewTests {
 			var r = new View ();
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("View()((0,0,0,0))", r.ToString ());
+			Assert.Equal ("View()(0,0,0,0)", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -47,7 +47,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View (Rect.Empty);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("View()((0,0,0,0))", r.ToString ());
+			Assert.Equal ("View()(0,0,0,0)", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -72,7 +72,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View (new Rect (1, 2, 3, 4));
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("View()((1,2,3,4))", r.ToString ());
+			Assert.Equal ("View()(1,2,3,4)", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 3, 4), r.Bounds);
@@ -97,7 +97,7 @@ namespace Terminal.Gui.ViewTests {
 			r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("View(Vertical View)((0,0,1,13))", r.ToString ());
+			Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 1, 13), r.Bounds);
@@ -117,7 +117,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.TopBottom_LeftRight, r.TextDirection);
 			r.Dispose ();
-		
 		}
 
 		[Fact, TestRespondersDisposed]
@@ -125,11 +124,9 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var r = new View ();
 
-			Assert.False (r.ProcessKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessHotKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.ProcessColdKey (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyDown (new KeyEvent () { Key = Key.Unknown }));
-			Assert.False (r.OnKeyUp (new KeyEvent () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyDown (new Key () { KeyCode = KeyCode.Null }));
+			//Assert.False (r.OnKeyDown (new KeyEventArgs () { Key = Key.Unknown }));
+			Assert.False (r.OnKeyUp (new Key () { KeyCode = KeyCode.Null }));
 			Assert.False (r.MouseEvent (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseEnter (new MouseEvent () { Flags = MouseFlags.AllEvents }));
 			Assert.False (r.OnMouseLeave (new MouseEvent () { Flags = MouseFlags.AllEvents }));
@@ -507,6 +504,7 @@ namespace Terminal.Gui.ViewTests {
 
 			var runState = Application.Begin (top);
 
+			// BUGBUG: This is a SetRelativeLayout test. It should be moved to SetRelativeLayoutTests.cs
 			view.Width = Dim.Fill ();
 			view.Height = Dim.Fill ();
 			Assert.Equal (10, view.Bounds.Width);
@@ -522,6 +520,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (79, view.Bounds.Width);
 			Assert.Equal (24, view.Bounds.Height);
 
+			// BUGBUG: This is a SetRelativeLayout test. It should be moved to SetRelativeLayoutTests.cs
 			view.X = 0;
 			view.Y = 0;
 			Assert.Equal ("Absolute(0)", view.X.ToString ());
@@ -535,6 +534,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (0, view.Bounds.Y);
 			Assert.Equal (80, view.Bounds.Width);
 			Assert.Equal (25, view.Bounds.Height);
+
+			// BUGBUG: This is a layout test. It should be moved to LayoutTests.cs
 			bool layoutStarted = false;
 			view.LayoutStarted += (s, e) => layoutStarted = true;
 			view.OnLayoutStarted (null);
@@ -542,6 +543,10 @@ namespace Terminal.Gui.ViewTests {
 			view.LayoutComplete += (s, e) => layoutStarted = false;
 			view.OnLayoutComplete (null);
 			Assert.False (layoutStarted);
+
+			// This test has been moved to SetRlativeLayoutTests because it is testing
+			// SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
+			// because in v1 Pos.Center was broken in this regard!
 			view.X = Pos.Center () - 41;
 			view.Y = Pos.Center () - 13;
 			view.SetRelativeLayout (top.Bounds);
@@ -549,7 +554,7 @@ namespace Terminal.Gui.ViewTests {
 			view.BoundsToScreen (0, 0, out rcol, out rrow);
 			Assert.Equal (-41, rcol);
 			Assert.Equal (-13, rrow);
-			
+
 			Application.End (runState);
 		}
 
@@ -974,19 +979,19 @@ cccccccccccccccccccc", output);
 			public bool IsKeyUp { get; set; }
 			public override string Text { get; set; }
 
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			public override bool OnKeyDown (Key keyEvent)
 			{
 				IsKeyDown = true;
 				return true;
 			}
 
-			public override bool ProcessKey (KeyEvent keyEvent)
+			public override bool OnProcessKeyDown (Key keyEvent)
 			{
 				IsKeyPress = true;
 				return true;
 			}
 
-			public override bool OnKeyUp (KeyEvent keyEvent)
+			public override bool OnKeyUp (Key keyEvent)
 			{
 				IsKeyUp = true;
 				return true;
@@ -1343,16 +1348,15 @@ At 0,0
 			var frame = new FrameView ();
 
 			var label = new Label ("This should be the first line.") {
-				TextAlignment = Terminal.Gui.TextAlignment.Centered,
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
-				X = Pos.Center (),
-				Y = Pos.Center () - 2  // center minus 2 minus two lines top and bottom borders equal to zero (4-2-2=0)
+				X = 0, // don't overcomplicate unit tests
+				Y = 0 
 			};
 
 			var button = new Button ("Press me!") {
-				X = Pos.Center (),
-				Y = Pos.Center ()
+				X = 0, // don't overcomplicate unit tests
+				Y = 1
 			};
 
 			frame.Add (label, button);
@@ -1391,19 +1395,7 @@ At 0,0
 				frame.Frame.Left, frame.Frame.Top,
 				frame.Frame.Right, frame.Frame.Bottom));
 			Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
-			Assert.Equal (new Rect (12, 2, 13, 1), button.Frame);
-			var expected = @$"
-                    ┌──────────────────────────────────────┐
-                    │    This should be the first line.    │
-                    │                                      │
-                    │            {CM.Glyphs.LeftBracket} Press me! {CM.Glyphs.RightBracket}             │
-                    │                                      │
-                    │                                      │
-                    │                                      │
-                    └──────────────────────────────────────┘
-";
-
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 1, 13, 1), button.Frame); // this proves frame was set
 			Application.End (runState);
 		}
 

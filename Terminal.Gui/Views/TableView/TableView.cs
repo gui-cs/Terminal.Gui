@@ -24,7 +24,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// View for tabular data based on a <see cref="ITableSource"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/tableview.html">See TableView Deep Dive for more information</a>.
+	/// <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 	/// </summary>
 	public class TableView : View {
 
@@ -34,7 +34,8 @@ namespace Terminal.Gui {
 		private int selectedColumn;
 		private ITableSource table;
 		private TableStyle style = new TableStyle ();
-		private Key cellActivationKey = Key.Enter;
+		// TODO: Update to use Key instead of KeyCode
+		private KeyCode cellActivationKey = KeyCode.Enter;
 
 		Point? scrollLeftPoint;
 		Point? scrollRightPoint;
@@ -169,18 +170,19 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<CellToggledEventArgs> CellToggled;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.
 		/// </summary>
-		public Key CellActivationKey {
+		public KeyCode CellActivationKey {
 			get => cellActivationKey;
 			set {
 				if (cellActivationKey != value) {
-					ReplaceKeyBinding (cellActivationKey, value);
+					KeyBindings.Replace (cellActivationKey, value);
 
 					// of API user is mixing and matching old and new methods of keybinding then they may have lost
-					// the old binding (e.g. with ClearKeybindings) so ReplaceKeyBinding alone will fail
-					AddKeyBinding (value, Command.Accept);
+					// the old binding (e.g. with ClearKeybindings) so KeyBindings.Replace alone will fail
+					KeyBindings.Add (value, Command.Accept);
 					cellActivationKey = value;
 				}
 			}
@@ -239,30 +241,30 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => { ToggleCurrentCellSelection (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.CursorLeft, Command.Left);
-			AddKeyBinding (Key.CursorRight, Command.Right);
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.Home, Command.LeftHome);
-			AddKeyBinding (Key.End, Command.RightEnd);
-			AddKeyBinding (Key.Home | Key.CtrlMask, Command.TopHome);
-			AddKeyBinding (Key.End | Key.CtrlMask, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+			KeyBindings.Add (KeyCode.End, Command.RightEnd);
+			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.TopHome);
+			KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask, Command.BottomEnd);
 
-			AddKeyBinding (Key.CursorLeft | Key.ShiftMask, Command.LeftExtend);
-			AddKeyBinding (Key.CursorRight | Key.ShiftMask, Command.RightExtend);
-			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
-			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
-			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
-			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
-			AddKeyBinding (Key.Home | Key.ShiftMask, Command.LeftHomeExtend);
-			AddKeyBinding (Key.End | Key.ShiftMask, Command.RightEndExtend);
-			AddKeyBinding (Key.Home | Key.CtrlMask | Key.ShiftMask, Command.TopHomeExtend);
-			AddKeyBinding (Key.End | Key.CtrlMask | Key.ShiftMask, Command.BottomEndExtend);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.ShiftMask, Command.RightExtend);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.LeftHomeExtend);
+			KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.RightEndExtend);
+			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.TopHomeExtend);
+			KeyBindings.Add (KeyCode.End | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.BottomEndExtend);
 
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
-			AddKeyBinding (CellActivationKey, Command.Accept);
+			KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (CellActivationKey, Command.Accept);
 		}
 
 		///<inheritdoc/>
@@ -758,36 +760,29 @@ namespace Terminal.Gui {
 			return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0).ToArray ());
 		}
 
-
-
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
+		public override bool OnProcessKeyDown (Key keyEvent)
 		{
 			if (TableIsNullOrInvisible ()) {
 				PositionCursor ();
 				return false;
 			}
 
-			var result = InvokeKeybindings (keyEvent);
-			if (result != null) {
-				PositionCursor ();
-				return true;
-			}
-
+		
 			if (CollectionNavigator != null &&
 				this.HasFocus &&
 				Table.Rows != 0 &&
 				Terminal.Gui.CollectionNavigator.IsCompatibleKey (keyEvent) &&
-				!keyEvent.Key.HasFlag (Key.CtrlMask) &&
-				!keyEvent.Key.HasFlag (Key.AltMask) &&
-				char.IsLetterOrDigit ((char)keyEvent.KeyValue)) {
+				!keyEvent.KeyCode.HasFlag (KeyCode.CtrlMask) &&
+				!keyEvent.KeyCode.HasFlag (KeyCode.AltMask) &&
+				Rune.IsLetterOrDigit ((Rune)keyEvent)) {
 				return CycleToNextTableEntryBeginningWith (keyEvent);
 			}
 
 			return false;
 		}
 
-		private bool CycleToNextTableEntryBeginningWith (KeyEvent keyEvent)
+		private bool CycleToNextTableEntryBeginningWith (Key keyEvent)
 		{
 			var row = SelectedRow;
 
@@ -796,7 +791,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent.KeyValue);
+			int match = CollectionNavigator.GetNextMatchingItem (row, (char)keyEvent);
 
 			if (match != -1) {
 				SelectedRow = match;
@@ -1291,7 +1286,12 @@ namespace Terminal.Gui {
 		{
 			return ScreenToCell (clientX, clientY, out _, out _);
 		}
-		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+
+		/// <summary>.
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point 
+		/// on the screen (relative to the control client area).  Returns null if the point is
+		/// in the header, no table is loaded or outside the control bounds.
+		/// </summary>
 		/// <param name="clientX">X offset from the top left of the control.</param>
 		/// <param name="clientY">Y offset from the top left of the control.</param>
 		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
@@ -1300,7 +1300,11 @@ namespace Terminal.Gui {
 			return ScreenToCell (clientX, clientY, out headerIfAny, out _);
 		}
 
-		/// <inheritdoc cref="ScreenToCell(int, int)"/>
+		/// <summary>.
+		/// Returns the column and row of <see cref="Table"/> that corresponds to a given point 
+		/// on the screen (relative to the control client area).  Returns null if the point is
+		/// in the header, no table is loaded or outside the control bounds.
+		/// </summary>
 		/// <param name="clientX">X offset from the top left of the control.</param>
 		/// <param name="clientY">Y offset from the top left of the control.</param>
 		/// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>

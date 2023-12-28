@@ -8,22 +8,24 @@ namespace Terminal.Gui {
 	#region API Docs
 	/// <summary>
 	/// View is the base class for all views on the screen and represents a visible element that can render itself and 
-	/// contains zero or more nested views, called SubViews.
+	/// contains zero or more nested views, called SubViews. View provides basic functionality for layout, positioning,
+	/// and drawing. In addition, View provides keyboard and mouse event handling.
 	/// </summary>
 	/// <remarks>
+	/// <list type="table">
+	///	<listheader>
+	///	<term>Term</term><description>Definition</description>
+	///	</listheader>
+	///	<item>
+	///	<term>SubView</term><description>A View that is contained in another view and will be rendered as part of the containing view's ContentArea. 
+	/// SubViews are added to another view via the <see cref="View.Add(View)"/>` method. A View may only be a SubView of a single View. </description>
+	///	</item>
+	///	<item>
+	///		<term>SuperView</term><description>The View that is a container for SubViews.</description>
+	///	</item>
+	/// </list>
 	/// <para>
-	///    The View defines the base functionality for user interface elements in Terminal.Gui. Views
-	///    can contain one or more subviews, can respond to user input and render themselves on the screen.
-	/// </para>
-	/// <para>
-	/// SubView - A View that is contained in another view and will be rendered as part of the containing view's ContentArea. 
-	/// SubViews are added to another view via the <see cref="View.Add(View)"/>` method. A View may only be a SubView of a single View. 
-	/// </para>
-	/// <para>
-	/// SuperView - The View that is a container for SubViews. 
-	/// </para>
-	/// <para>
-	/// Focus is a concept that is used to describe which Responder is currently receiving user input. Only views that are
+	/// Focus is a concept that is used to describe which View is currently receiving user input. Only Views that are
 	/// <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus.
 	/// </para>
 	/// <para>
@@ -110,7 +112,9 @@ namespace Terminal.Gui {
 	///     to override base class layout code optimally by doing so only on first run,
 	///     instead of on every run.
 	///   </para>
-	/// </remarks>
+	/// <para>
+	///	See <see href="../docs/keyboard.md">for an overview of View keyboard handling.</see>
+	/// </para>	/// </remarks>
 	#endregion API Docs
 	public partial class View : Responder, ISupportInitializeNotification {
 
@@ -220,7 +224,6 @@ namespace Terminal.Gui {
 			TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 			TextDirection = direction;
 
-			_shortcutHelper = new ShortcutHelper ();
 			CanFocus = false;
 			TabIndex = -1;
 			TabStop = false;
@@ -230,6 +233,8 @@ namespace Terminal.Gui {
 			LayoutStyle = layoutStyle;
 			Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 			OnResizeNeeded ();
+
+			AddCommands ();
 
 			CreateFrames ();
 
@@ -275,6 +280,7 @@ namespace Terminal.Gui {
 				_oldCanFocus = CanFocus;
 				_oldTabIndex = _tabIndex;
 
+				// BUGBUG: These should move to EndInit as they access Bounds causing debug spew.
 				UpdateTextDirection (TextDirection);
 				UpdateTextFormatterText ();
 				SetHotKey ();
@@ -488,7 +494,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override string ToString ()
 		{
-			return $"{GetType ().Name}({Id})({Frame})";
+			return $"{GetType ().Name}({Id}){Frame}";
 		}
 
 		/// <inheritdoc/>

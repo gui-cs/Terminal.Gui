@@ -23,7 +23,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (label.AutoSize);
 			Assert.False (label.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
-			Assert.Equal (Key.Null, label.HotKey);
+			Assert.Equal (KeyCode.Null, label.HotKey);
 			var expected = @"";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 			Application.End (rs);
@@ -344,10 +344,10 @@ Test
 
 		//	};
 
-		//	label.HotKey = Key.r;
+		//	label.HotKey = Key.R;
 		//	Assert.Same (label, sender);
 		//	Assert.Equal (Key.Y, args.OldKey);
-		//	Assert.Equal (Key.r, args.NewKey);
+		//	Assert.Equal (Key.R, args.NewKey);
 
 		//}
 
@@ -365,10 +365,10 @@ Test
 
 			};
 
-			label.HotKey = Key.r;
+			label.HotKey = KeyCode.R;
 			Assert.Same (label, sender);
-			Assert.Equal (Key.Null, args.OldKey);
-			Assert.Equal (Key.r, args.NewKey);
+			Assert.Equal (KeyCode.Null, args.OldKey);
+			Assert.Equal (KeyCode.R, args.NewKey);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -662,7 +662,7 @@ e
 				Width = Dim.Fill (),
 				Height = Dim.Percent (50f),
 				TextDirection = TextDirection.TopBottom_LeftRight,
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);

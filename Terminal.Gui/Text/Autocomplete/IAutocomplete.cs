@@ -53,20 +53,23 @@ namespace Terminal.Gui {
 		/// </summary>
 		ColorScheme ColorScheme { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key that the user must press to accept the currently selected autocomplete suggestion
 		/// </summary>
-		Key SelectionKey { get; set; }
+		KeyCode SelectionKey { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key that the user can press to close the currently popped autocomplete menu
 		/// </summary>
-		Key CloseKey { get; set; }
+		KeyCode CloseKey { get; set; }
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The key that the user can press to reopen the currently popped autocomplete menu
 		/// </summary>
-		Key Reopen { get; set; }
+		KeyCode Reopen { get; set; }
 
 		/// <summary>
 		/// The context used by the autocomplete menu.
@@ -85,9 +88,9 @@ namespace Terminal.Gui {
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="kb">The key event.</param>
+		/// <param name="a">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		bool ProcessKey (KeyEvent kb);
+		bool ProcessKey (Key a);
 
 		/// <summary>
 		/// Handle mouse events before <see cref="HostControl"/> e.g. to make mouse events like
