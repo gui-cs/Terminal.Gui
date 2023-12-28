@@ -516,7 +516,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
 	public static string ToString (KeyCode key, Rune separator)
 	{
-		if (key is KeyCode.Null || (key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask) == 0) {
+		if (key is KeyCode.Null) {
 			// Same as Key.IsValid
 			return @"Null";
 		}
