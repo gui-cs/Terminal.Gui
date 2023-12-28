@@ -369,6 +369,8 @@ namespace Terminal.Gui.ConsoleDrivers {
 			keyValue = keyValue & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask;
 
 			switch (keyValue) {
+			case KeyCode.Enter:
+				return (uint)ConsoleKey.Enter;
 			case KeyCode.Delete:
 				return (uint)ConsoleKey.Delete;
 			case KeyCode.CursorUp:
@@ -457,6 +459,9 @@ namespace Terminal.Gui.ConsoleDrivers {
 			KeyCode keyCode;
 
 			switch (consoleKeyInfo.Key) {
+			case ConsoleKey.Enter:
+				keyCode = KeyCode.Enter;
+				break;
 			case ConsoleKey.Delete:
 				keyCode = KeyCode.Delete;
 				break;

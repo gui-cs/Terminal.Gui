@@ -260,6 +260,7 @@ public class ConsoleKeyMappingTests {
 	[InlineData ('q', ConsoleKey.Q, false, false, false, (KeyCode)'q')]
 	[InlineData ('\0', ConsoleKey.F2, false, false, false, KeyCode.F2)]
 	[InlineData ('英', ConsoleKey.None, false, false, false, (KeyCode)'英')]
+	[InlineData ('\r', ConsoleKey.Enter, false, false, false, KeyCode.Enter)]
 	public void MapConsoleKeyInfoToKeyCode_Also_Return_Modifiers (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control, KeyCode expectedKeyCode)
 	{
 		var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
@@ -283,6 +284,7 @@ public class ConsoleKeyMappingTests {
 	[InlineData ('q', false, false, false, (KeyCode)'q')]
 	[InlineData ((uint)KeyCode.F2, false, false, false, KeyCode.F2)]
 	[InlineData ('英', false, false, false, (KeyCode)'英')]
+	[InlineData ('\n', false, false, false, KeyCode.Enter)]
 	public void MapToKeyCodeModifiers_Tests (uint keyChar, bool shift, bool alt, bool control, KeyCode excpectedKeyCode)
 	{
 		var modifiers = ConsoleKeyMapping.GetModifiers (shift, alt, control);
@@ -307,6 +309,7 @@ public class ConsoleKeyMappingTests {
 	[InlineData ((KeyCode)'q', false, ConsoleKey.Q, 'q')]
 	[InlineData (KeyCode.F2, true, ConsoleKey.F2, 'q')]
 	[InlineData ((KeyCode)'英', false, ConsoleKey.None, '英')]
+	[InlineData (KeyCode.Enter, true, ConsoleKey.Enter, '\r')]
 	public void MapKeyCodeToConsoleKey_GetKeyCharFromUnicodeChar (KeyCode keyCode, bool expectedIsConsoleKey, ConsoleKey expectedConsoleKey, char expectedConsoleKeyChar)
 	{
 		var modifiers = ConsoleKeyMapping.MapToConsoleModifiers (keyCode);
