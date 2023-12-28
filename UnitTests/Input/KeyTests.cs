@@ -471,4 +471,52 @@ public class KeyTests {
 	[InlineData ("0x99")]
 	[InlineData ("Ctrl-Ctrl")]
 	public void TryParse_ShouldReturnFalse_On_InvalidKey (string keyString) => Assert.False (Key.TryParse (keyString, out var _));
+
+	[Theory]
+	[InlineData (KeyCode.ShiftKey, KeyCode.ShiftMask, true)]
+	[InlineData (KeyCode.ShiftKey | KeyCode.A, KeyCode.ShiftMask | KeyCode.A, true)]
+	public void IsShift_With_Wrong_And_Right_ShiftMask_NoShift (KeyCode wrongKeyCode, KeyCode rightKeyCode, bool isShift)
+	{
+		Assert.NotEqual (((Key)wrongKeyCode).IsShift, isShift);
+		Assert.NotEqual ((Key)(wrongKeyCode & ~KeyCode.ShiftKey), ((Key)wrongKeyCode).NoShift);
+		Assert.Equal (((Key)rightKeyCode).IsShift, isShift);
+		Assert.Equal ((Key)(rightKeyCode & ~KeyCode.ShiftMask), ((Key)rightKeyCode).NoShift);
+	}
+
+	[Theory]
+	[InlineData (KeyCode.AltKey, KeyCode.AltMask, true)]
+	[InlineData (KeyCode.AltKey | KeyCode.A, KeyCode.AltMask | KeyCode.A, true)]
+	public void IsAlt_With_Wrong_And_Right_AltMask_NoAlt (KeyCode wrongKeyCode, KeyCode rightKeyCode, bool isAlt)
+	{
+		Assert.NotEqual (((Key)wrongKeyCode).IsAlt, isAlt);
+		Assert.NotEqual ((Key)(wrongKeyCode & ~KeyCode.AltKey), ((Key)wrongKeyCode).NoAlt);
+		Assert.Equal (((Key)rightKeyCode).IsAlt, isAlt);
+		Assert.Equal ((Key)(rightKeyCode & ~KeyCode.AltMask), ((Key)rightKeyCode).NoAlt);
+	}
+
+	[Theory]
+	[InlineData (KeyCode.CtrlKey, KeyCode.CtrlMask, true)]
+	[InlineData (KeyCode.CtrlKey | KeyCode.A, KeyCode.CtrlMask | KeyCode.A, true)]
+	public void IsCtrl_With_Wrong_And_Right_CtrlMask_NoCtrl (KeyCode wrongKeyCode, KeyCode rightKeyCode, bool isCtrl)
+	{
+		Assert.NotEqual (((Key)wrongKeyCode).IsCtrl, isCtrl);
+		Assert.NotEqual ((Key)(wrongKeyCode & ~KeyCode.CtrlKey), ((Key)wrongKeyCode).NoCtrl);
+		Assert.Equal (((Key)rightKeyCode).IsCtrl, isCtrl);
+		Assert.Equal ((Key)(rightKeyCode & ~KeyCode.CtrlMask), ((Key)rightKeyCode).NoCtrl);
+	}
+
+	[Theory]
+	[InlineData (KeyCode.ShiftMask, true, false, false)]
+	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask, true, true, false)]
+	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, true, true, true)]
+	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, true, false, true)]
+	[InlineData (KeyCode.AltMask, false, true, false)]
+	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask, false, true, true)]
+	[InlineData (KeyCode.CtrlMask, false, false, true)]
+	public void IsShift_IsAlt_IsCtrl (KeyCode keyCode, bool isShift, bool isAlt, bool isCtrl)
+	{
+		Assert.Equal (((Key)keyCode).IsShift, isShift);
+		Assert.Equal (((Key)keyCode).IsAlt, isAlt);
+		Assert.Equal (((Key)keyCode).IsCtrl, isCtrl);
+	}
 }
