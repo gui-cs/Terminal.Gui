@@ -87,11 +87,10 @@ public class AttributeTests {
 	}
 
 	[Fact]
-	public void Constuctors_Constuct ()
+	public void Constructors_Construct ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		// Test parameterless constructor
 		var attr = new Attribute ();
@@ -127,7 +126,6 @@ public class AttributeTests {
 		Assert.Equal (bg, attr.Background);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
@@ -196,8 +194,7 @@ public class AttributeTests {
 	public void Implicit_Assign ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		var attr = new Attribute ();
 
@@ -216,7 +213,6 @@ public class AttributeTests {
 		Assert.Equal (value, attr.PlatformColor);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
@@ -237,8 +233,7 @@ public class AttributeTests {
 	public void Make_Creates ()
 	{
 		var driver = new FakeDriver ();
-		Application.Init (driver);
-		driver.Init (() => { });
+		driver.Init ();
 
 		var fg = new Color ();
 		fg = new Color (Color.Red);
@@ -252,7 +247,6 @@ public class AttributeTests {
 		Assert.Equal (bg, attr.Background);
 
 		driver.End ();
-		Application.Shutdown ();
 	}
 
 	[Fact]
@@ -375,5 +369,82 @@ public class AttributeTests {
 		Assert.Equal (expectedString, attributeString);
 	}
 
+	[Fact]
+	public void Changing_One_Default_Reference_Also_Change_All_References_But_Not_A_Instance_Reference ()
+	{
+		// Make two local attributes, and grab Attribute.Default, which is a reference to a static.
+		Attribute attr1 = Attribute.Default;
+		Attribute attr2 = Attribute.Default;
+		// Make one local attributes, and grab Attribute(), which is a reference to a singleton.
+		Attribute attr3 = new Attribute (); // instance
 
+		// Assert the starting state that is expected
+		Assert.Equal (ColorName.White, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.White, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.White, Attribute.Default.Foreground.ColorName);
+		Assert.Equal (ColorName.White, attr3.Foreground.ColorName);
+
+		// Now set Foreground.ColorName to ColorName.Blue on one of our local attributes
+		attr1.Foreground.ColorName = ColorName.Blue;
+
+		// Assert the newly-expected case
+		// The last two assertions will fail, because we have actually modified a singleton
+		Assert.Equal (ColorName.Blue, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.Blue, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.Blue, Attribute.Default.Foreground.ColorName);
+		Assert.Equal (ColorName.White, attr3.Foreground.ColorName);
+
+		// Now set Foreground.ColorName to ColorName.Red on the singleton of our local attributes
+		attr3.Foreground.ColorName = ColorName.Red;
+
+		// Assert the newly-expected case
+		// The assertions will not fail, because we have actually modified a singleton
+		Assert.Equal (ColorName.Blue, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.Blue, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.Blue, Attribute.Default.Foreground.ColorName);
+		Assert.Equal (ColorName.Red, attr3.Foreground.ColorName);
+
+		// Now set Foreground.ColorName to ColorName.White on the static of our local attributes
+		// This also avoids errors on others unit test when the default is changed
+		Attribute.Default.Foreground.ColorName = ColorName.White;
+
+		// Assert the newly-expected case
+		// The assertions will not fail, because we have actually modified the static default reference
+		Assert.Equal (ColorName.White, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.White, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.White, Attribute.Default.Foreground.ColorName);
+		Assert.Equal (ColorName.Red, attr3.Foreground.ColorName);
+	}
+
+	[Fact]
+	public void Changing_One_Instance_Reference_Does_Not_Change_All_Instance_References ()
+	{
+		// Make two local attributes, and grab Attribute (), which are a reference to a singleton.
+		Attribute attr1 = new Attribute ();
+		// Make two local attributes, and grab Attribute (Int), which are a reference to a singleton.
+		Attribute attr2 = new Attribute (-1);
+
+		// Assert the starting state that is expected
+		Assert.Equal (ColorName.White, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.White, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.White, Attribute.Default.Foreground.ColorName);
+
+		// Now set Foreground.ColorName to ColorName.Blue on one of our local attributes
+		attr1.Foreground.ColorName = ColorName.Blue;
+
+		// Assert the newly-expected case
+		// The assertions will not fail, because we have actually modified a singleton
+		Assert.Equal (ColorName.Blue, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.White, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.White, Attribute.Default.Foreground.ColorName);
+
+		// Now set Foreground.ColorName to ColorName.Red on the other singleton of our local attributes
+		attr2.Foreground.ColorName = ColorName.Red;
+
+		// Assert the newly-expected case
+		// The assertions will not fail, because we have actually modified a singleton
+		Assert.Equal (ColorName.Blue, attr1.Foreground.ColorName);
+		Assert.Equal (ColorName.Red, attr2.Foreground.ColorName);
+		Assert.Equal (ColorName.White, Attribute.Default.Foreground.ColorName);
+	}
 }

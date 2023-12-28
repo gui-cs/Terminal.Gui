@@ -39,7 +39,15 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lbl2);
 
-			var dir = new DirectoryInfo (Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location));
+			DirectoryInfo dir;
+
+			var assemblyLocation = Assembly.GetExecutingAssembly ().Location;
+
+			if (!string.IsNullOrEmpty (assemblyLocation)) {
+				dir = new DirectoryInfo (Path.GetDirectoryName (assemblyLocation));
+			} else {
+				dir = new DirectoryInfo (System.AppContext.BaseDirectory);
+			}
 
 			var f = new FileInfo (
 				Path.Combine (dir.FullName, "Scenarios", "Spinning_globe_dark_small.gif"));
@@ -53,7 +61,7 @@ namespace UICatalog.Scenarios {
 			Task.Run (() => {
 				while (!isDisposed) {
 					// When updating from a Thread/Task always use Invoke
-					Application.MainLoop.Invoke (() => {
+					Application.Invoke (() => {
 						imageView.NextFrame ();
 						imageView.SetNeedsDisplay ();
 					});

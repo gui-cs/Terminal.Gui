@@ -6,7 +6,6 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 using System.Text;
-using Terminal.Gui;
 
 namespace Terminal.Gui.ViewsTests {
 	public class WindowTests {
@@ -25,7 +24,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (r);
 			Assert.Equal (string.Empty, r.Title);
 			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-			Assert.Equal ("Window()((0,0,0,0))", r.ToString ());
+			Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
 			Assert.True (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -49,7 +48,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.NotNull (r);
 			Assert.Equal ("title", r.Title);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("Window(title)((0,0,0,0))", r.ToString ());
+			Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
 			Assert.True (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -73,7 +72,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("title", r.Title);
 			Assert.NotNull (r);
 			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
-			Assert.Equal ("Window(title)((1,2,3,4))", r.ToString ());
+			Assert.Equal ("Window(title)(1,2,3,4)", r.ToString ());
 			Assert.True (r.CanFocus);
 			Assert.False (r.HasFocus);
 			Assert.Equal (new Rect (0, 0, 1, 2), r.Bounds);
@@ -108,9 +107,9 @@ namespace Terminal.Gui.ViewsTests {
 			});
 
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null),
-				new StatusItem (Key.CtrlMask | Key.O, "~^O~ Open", null),
-				new StatusItem (Key.CtrlMask | Key.C, "~^C~ Copy", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null),
 			});
 
 			var fv = new FrameView ("Frame View") {
@@ -207,7 +206,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (win);
 			Application.Begin (Application.Top);
 
-			var exception = Record.Exception (() => win.ProcessHotKey (new KeyEvent (Key.AltMask, new KeyModifiers { Alt = true })));
+			var exception = Record.Exception (() => win.NewKeyDownEvent (new (KeyCode.AltMask)));
 			Assert.Null (exception);
 		}
 	}

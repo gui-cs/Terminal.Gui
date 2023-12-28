@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using static Terminal.Gui.SpinnerStyle;
@@ -70,8 +71,13 @@ public static partial class ConfigurationManager {
 				// We override the standard Rune converter to support specifying Glyphs in
 				// a flexible way
 				new RuneJsonConverter(),
+				// Override Key to support "Ctrl+Q" format.
+				new KeyJsonConverter()
 			},
-	};
+		// Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
+		Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+
+};
 
 	/// <summary>
 	/// A dictionary of all properties in the Terminal.Gui project that are decorated with the <see cref="SerializableConfigurationProperty"/> attribute.
@@ -251,7 +257,7 @@ public static partial class ConfigurationManager {
 
 	/// <summary>
 	/// Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session
-	/// (e.g. in <see cref="Application.Init(ConsoleDriver, IMainLoopDriver)"/> starts. Called by <see cref="Load"/>
+	/// (e.g. in <see cref="Application.Init(ConsoleDriver)"/> starts. Called by <see cref="Load"/>
 	/// if the <c>reset</c> parameter is <see langword="true"/>.
 	/// </summary>
 	/// <remarks>

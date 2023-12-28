@@ -82,9 +82,9 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lblBlue);
 			
-			Application.RootMouseEvent = (e) => {
-				if (e.View != null) {
-					var normal = e.View.GetNormalColor ();
+			Application.MouseEvent += (s, e) => {
+				if (e.MouseEvent.View != null) {
+					var normal = e.MouseEvent.View.GetNormalColor ();
 					lblRed.Text = normal.Foreground.R.ToString ();
 					lblGreen.Text = normal.Foreground.G.ToString ();
 					lblBlue.Text = normal.Foreground.B.ToString ();

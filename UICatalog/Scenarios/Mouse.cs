@@ -27,9 +27,9 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (rmeList);
 
-			Application.RootMouseEvent += delegate (MouseEvent me) {
-				ml.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count}";
-				rme.Add ($"({me.X},{me.Y}) - {me.Flags} {count++}");
+			Application.MouseEvent += (sender, a) => {
+				ml.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";
+				rme.Add ($"({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}");
 				rmeList.MoveDown ();
 			};
 

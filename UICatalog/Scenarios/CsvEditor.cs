@@ -67,8 +67,8 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.O, "~^O~ Open", () => Open()),
-				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", () => Open()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save()),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -88,7 +88,7 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += OnSelectedCellChanged;
 			tableView.CellActivated += EditCurrentCell;
-			tableView.KeyPress += TableViewKeyPress;
+			tableView.KeyDown += TableViewKeyPress;
 
 			SetupScrollBar ();
 		}
@@ -465,9 +465,9 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, Key e)
 		{
-			if (e.KeyEvent.Key == Key.DeleteChar) {
+			if (e.KeyCode == KeyCode.DeleteChar) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

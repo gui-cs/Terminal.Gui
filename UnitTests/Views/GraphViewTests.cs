@@ -69,7 +69,7 @@ namespace Terminal.Gui.ViewsTests {
 				throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver);
 			}
 
-			driver.Init (() => { });
+			driver.Init ();
 
 			LastInitFakeDriver = Environment.StackTrace;
 			return driver;
@@ -1516,7 +1516,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var driver = new FakeDriver ();
 			Application.Init (driver);
-			driver.Init (() => { });
+			driver.Init ();
 
 			// create a wide window
 			var mount = new View () {

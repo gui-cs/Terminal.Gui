@@ -77,6 +77,15 @@ namespace Terminal.Gui {
 			ConfigurationManager.Applied += ConfigurationManager_Applied;
 		}
 
+		/// <summary>
+		/// Creates a new instance with the given <paramref name="lines"/>.
+		/// </summary>
+		/// <param name="lines">Initial lines for the canvas.</param>
+		public LineCanvas (IEnumerable<StraightLine> lines) : this()
+		{
+			_lines = lines.ToList();
+		}
+
 		private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
 		{
 			foreach (var irr in runeResolvers) {
@@ -85,6 +94,11 @@ namespace Terminal.Gui {
 		}
 
 		private List<StraightLine> _lines = new List<StraightLine> ();
+
+		/// <summary>
+		/// Gets the lines in the canvas.
+		/// </summary>
+		public IReadOnlyCollection<StraightLine> Lines { get { return _lines.AsReadOnly(); } }
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
 			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
@@ -556,7 +570,7 @@ namespace Terminal.Gui {
 			var cell = new Cell ();
 			var rune = GetRuneForIntersects (driver, intersects);
 			if (rune.HasValue) {
-				cell.Runes.Add (rune.Value);
+				cell.Rune = rune.Value;
 			}
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;

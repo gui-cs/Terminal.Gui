@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System;
+using System.Collections.Generic;
 
 namespace Terminal.Gui {
 
@@ -47,11 +48,6 @@ namespace Terminal.Gui {
 		/// Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
 		/// </summary>
 		public TextFormatter TextFormatter { get; set; }
-
-		void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
-		{
-			HotKeyChanged?.Invoke (this, e);
-		}
 
 		/// <summary>
 		/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
@@ -127,17 +123,86 @@ namespace Terminal.Gui {
 
 			UpdateTextFormatterText ();
 
-			if ((!ForceValidatePosDim && directionChanged && AutoSize)
-			    || (ForceValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
+			if ((!ValidatePosDim && directionChanged && AutoSize)
+			    || (ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize)) {
 				OnResizeNeeded ();
 			} else if (directionChanged && IsAdded) {
-				SetWidthHeight (Bounds.Size);
-				SetMinWidthHeight ();
+				ResizeBoundsToFit (Bounds.Size);
+				// BUGBUG: I think this call is redundant.
+				SetFrameToFitText ();
 			} else {
-				SetMinWidthHeight ();
+				SetFrameToFitText ();
 			}
-			TextFormatter.Size = GetSizeNeededForTextAndHotKey ();
+			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 			SetNeedsDisplay ();
+		}
+
+
+		/// <summary>
+		/// Sets the size of the View to the minimum width or height required to fit <see cref="Text"/>. 
+		/// </summary>
+		/// <returns><see langword="true"/> if the size was changed; <see langword="false"/> if <see cref="AutoSize"/> == <see langword="true"/> or
+		/// <see cref="Text"/> will not fit.</returns>
+		/// <remarks>
+		/// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+		/// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+		/// Does not take into account word wrapping.
+		/// </remarks>
+		bool SetFrameToFitText ()
+		{
+			// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
+			// <summary>
+			// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
+			// </summary>
+			// <param name="sizeRequired">The minimum dimensions required.</param>
+			// <returns><see langword="true"/> if the dimensions fit within the View's <see cref="Bounds"/>, <see langword="false"/> otherwise.</returns>
+			// <remarks>
+			// Always returns <see langword="false"/> if <see cref="AutoSize"/> is <see langword="true"/> or
+			// if <see cref="Height"/> (Horizontal) or <see cref="Width"/> (Vertical) are not not set or zero.
+			// Does not take into account word wrapping.
+			// </remarks>
+			bool GetMinimumSizeOfText (out Size sizeRequired)
+			{
+				if (!IsInitialized) {
+					sizeRequired = new Size (0, 0);
+					return false;
+				}
+				sizeRequired = Bounds.Size;
+
+				if (!AutoSize && !string.IsNullOrEmpty (TextFormatter.Text)) {
+					switch (TextFormatter.IsVerticalDirection (TextDirection)) {
+					case true:
+						int colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
+						// TODO: v2 - This uses frame.Width; it should only use Bounds
+						if (_frame.Width < colWidth &&
+						(Width == null ||
+						Bounds.Width >= 0 &&
+						Width is Dim.DimAbsolute &&
+						Width.Anchor (0) >= 0 &&
+						Width.Anchor (0) < colWidth)) {
+							sizeRequired = new Size (colWidth, Bounds.Height);
+							return true;
+						}
+						break;
+					default:
+						if (_frame.Height < 1 &&
+						(Height == null ||
+						Height is Dim.DimAbsolute &&
+						Height.Anchor (0) == 0)) {
+							sizeRequired = new Size (Bounds.Width, 1);
+							return true;
+						}
+						break;
+					}
+				}
+				return false;
+			}
+
+			if (GetMinimumSizeOfText (out var size)) {
+				_frame = new Rect (_frame.Location, size);
+				return true;
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -159,7 +224,7 @@ namespace Terminal.Gui {
 			} else {
 				return TextFormatter.IsVerticalDirection (TextDirection) &&
 				    TextFormatter.Text?.Contains ((char)HotKeySpecifier.Value) == true
-				    ? Math.Max (HotKeySpecifier.GetColumns(), 0) : 0;
+				    ? Math.Max (HotKeySpecifier.GetColumns (), 0) : 0;
 			}
 		}
 
@@ -177,7 +242,7 @@ namespace Terminal.Gui {
 		/// Gets the dimensions required for <see cref="Text"/> accounting for a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
 		/// </summary>
 		/// <returns></returns>
-		public Size GetSizeNeededForTextAndHotKey ()
+		public Size GetTextFormatterSizeNeededForTextAndHotKey ()
 		{
 			if (string.IsNullOrEmpty (TextFormatter.Text)) {
 
@@ -188,9 +253,8 @@ namespace Terminal.Gui {
 
 			// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
 			// BUGBUG: This uses Frame; in v2 it should be Bounds
-			return new Size (_frame.Size.Width + GetHotKeySpecifierLength (),
-					 _frame.Size.Height + GetHotKeySpecifierLength (false));
+			return new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
+					 Bounds.Size.Height + GetHotKeySpecifierLength (false));
 		}
-
 	}
 }

@@ -6,256 +6,254 @@ using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TextTests {
-	public class AppendAutocompleteTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.TextTests; 
 
-		public AppendAutocompleteTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class AppendAutocompleteTests {
+	readonly ITestOutputHelper output;
 
-		[Fact, AutoInitShutdown]
-		public void TestAutoAppend_ShowThenAccept_MatchCase ()
-		{
-			var tf = GetTextFieldsInView ();
+	public AppendAutocompleteTests (ITestOutputHelper output) => this.output = output;
 
-			tf.Autocomplete = new AppendAutocomplete (tf);
-			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-			generator.AllSuggestions = new List<string> { "fish" };
+	[Fact] [AutoInitShutdown]
+	public void TestAutoAppend_ShowThenAccept_MatchCase ()
+	{
+		var tf = GetTextFieldsInView ();
 
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("", output);
+		tf.Autocomplete = new AppendAutocomplete (tf);
+		var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
+		generator.AllSuggestions = new List<string> { "fish" };
 
-			tf.ProcessKey (new KeyEvent (Key.f, new KeyModifiers ()));
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("", output);
 
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
+		tf.NewKeyDownEvent (new ('f'));
 
-			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
 
-			tf.Draw ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("fish", tf.Text);
+		Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
-			// Tab should autcomplete but not move focus
-			Assert.Same (tf, Application.Top.Focused);
+		tf.Draw ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("fish", tf.Text);
 
-			// Second tab should move focus (nothing to autocomplete)
-			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
-			Assert.NotSame (tf, Application.Top.Focused);
-		}
+		// Tab should autcomplete but not move focus
+		Assert.Same (tf, Application.Top.Focused);
 
-		[Fact, AutoInitShutdown]
-		public void TestAutoAppend_ShowThenAccept_CasesDiffer ()
-		{
-			var tf = GetTextFieldsInView ();
+		// Second tab should move focus (nothing to autocomplete)
+		Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+		Assert.NotSame (tf, Application.Top.Focused);
+	}
 
-			tf.Autocomplete = new AppendAutocomplete (tf);
-			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-			generator.AllSuggestions = new List<string> { "FISH" };
+	[Fact] [AutoInitShutdown]
+	public void TestAutoAppend_ShowThenAccept_CasesDiffer ()
+	{
+		var tf = GetTextFieldsInView ();
 
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("", output);
-			tf.ProcessKey (new KeyEvent (Key.m, new KeyModifiers ()));
-			tf.ProcessKey (new KeyEvent (Key.y, new KeyModifiers ()));
-			tf.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ()));
-			tf.ProcessKey (new KeyEvent (Key.f, new KeyModifiers ()));
+		tf.Autocomplete = new AppendAutocomplete (tf);
+		var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
+		generator.AllSuggestions = new List<string> { "FISH" };
 
-			// Even though there is no match on case we should still get the suggestion
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("my fISH", output);
-			Assert.Equal ("my f", tf.Text);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("", output);
+		tf.NewKeyDownEvent (new Key ((KeyCode)'m'));
+		tf.NewKeyDownEvent (new Key ((KeyCode)'y'));
+		tf.NewKeyDownEvent (new Key (KeyCode.Space));
+		tf.NewKeyDownEvent (new Key ((KeyCode)'f'));
+		Assert.Equal ("my f", tf.Text);
 
-			// When tab completing the case of the whole suggestion should be applied
-			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
-			tf.Draw ();
-			TestHelpers.AssertDriverContentsAre ("my FISH", output);
-			Assert.Equal ("my FISH", tf.Text);
-		}
+		// Even though there is no match on case we should still get the suggestion
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("my fISH", output);
+		Assert.Equal ("my f", tf.Text);
 
-		[Fact, AutoInitShutdown]
-		public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
-		{
-			var tf = GetTextFieldsInViewSuggesting ("fish");
+		// When tab completing the case of the whole suggestion should be applied
+		Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+		tf.Draw ();
+		TestHelpers.AssertDriverContentsAre ("my FISH", output);
+		Assert.Equal ("my FISH", tf.Text);
+	}
 
-			// f is typed and suggestion is "fish"
-			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
+	[Fact] [AutoInitShutdown]
+	public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
+	{
+		var tf = GetTextFieldsInViewSuggesting ("fish");
 
-			// When cancelling autocomplete
-			Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
+		// f is typed and suggestion is "fish"
+		Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
 
-			// Suggestion should disapear
-			tf.Draw ();
-			TestHelpers.AssertDriverContentsAre ("f", output);
-			Assert.Equal ("f", tf.Text);
+		// When cancelling autocomplete
+		Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
 
-			// Still has focus though
-			Assert.Same (tf, Application.Top.Focused);
+		// Suggestion should disapear
+		tf.Draw ();
+		TestHelpers.AssertDriverContentsAre ("f", output);
+		Assert.Equal ("f", tf.Text);
 
-			// But can tab away
-			Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
-			Assert.NotSame (tf, Application.Top.Focused);
-		}
+		// Still has focus though
+		Assert.Same (tf, Application.Top.Focused);
 
-		[Fact, AutoInitShutdown]
-		public void TestAutoAppend_AfterCloseKey_ReapearsOnLetter ()
-		{
-			var tf = GetTextFieldsInViewSuggesting ("fish");
+		// But can tab away
+		Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
+		Assert.NotSame (tf, Application.Top.Focused);
+	}
 
-			// f is typed and suggestion is "fish"
-			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
+	[Fact] [AutoInitShutdown]
+	public void TestAutoAppend_AfterCloseKey_ReapearsOnLetter ()
+	{
+		var tf = GetTextFieldsInViewSuggesting ("fish");
 
-			// When cancelling autocomplete
-			Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
+		// f is typed and suggestion is "fish"
+		Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
 
-			// Suggestion should disapear
-			tf.Draw ();
-			TestHelpers.AssertDriverContentsAre ("f", output);
-			Assert.Equal ("f", tf.Text);
+		// When cancelling autocomplete
+		Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
 
-			// Should reapear when you press next letter
-			Application.Driver.SendKeys ('i', ConsoleKey.I, false, false, false);
-			tf.Draw ();
-			// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
-			//TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("fi", tf.Text);
-		}
+		// Suggestion should disapear
+		tf.Draw ();
+		TestHelpers.AssertDriverContentsAre ("f", output);
+		Assert.Equal ("f", tf.Text);
 
-		[Theory, AutoInitShutdown]
-		[InlineData ("ffffffffffffffffffffffffff", "ffffffffff")]
-		[InlineData ("f234567890", "f234567890")]
-		[InlineData ("fisérables", "fisérables")]
-		public void TestAutoAppendRendering_ShouldNotOverspill (string overspillUsing, string expectRender)
-		{
-			var tf = GetTextFieldsInViewSuggesting (overspillUsing);
+		// Should reapear when you press next letter
+		Application.Driver.SendKeys ('i', ConsoleKey.I, false, false, false);
+		tf.Draw ();
+		// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
+		//TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("fi", tf.Text);
+	}
 
-			// f is typed we should only see 'f' up to size of View (10)
-			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre (expectRender, output);
-			Assert.Equal ("f", tf.Text);
-		}
+	[Theory] [AutoInitShutdown]
+	[InlineData ("ffffffffffffffffffffffffff", "ffffffffff")]
+	[InlineData ("f234567890", "f234567890")]
+	[InlineData ("fisérables", "fisérables")]
+	public void TestAutoAppendRendering_ShouldNotOverspill (string overspillUsing, string expectRender)
+	{
+		var tf = GetTextFieldsInViewSuggesting (overspillUsing);
 
-		[Theory, AutoInitShutdown]
-		[InlineData (ConsoleKey.UpArrow)]
-		[InlineData (ConsoleKey.DownArrow)]
-		public void TestAutoAppend_CycleSelections (ConsoleKey cycleKey)
-		{
-			var tf = GetTextFieldsInViewSuggesting ("fish", "friend");
+		// f is typed we should only see 'f' up to size of View (10)
+		Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre (expectRender, output);
+		Assert.Equal ("f", tf.Text);
+	}
 
-			// f is typed and suggestion is "fish"
-			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
+	[Theory] [AutoInitShutdown]
+	[InlineData (ConsoleKey.UpArrow)]
+	[InlineData (ConsoleKey.DownArrow)]
+	public void TestAutoAppend_CycleSelections (ConsoleKey cycleKey)
+	{
+		var tf = GetTextFieldsInViewSuggesting ("fish", "friend");
 
-			// When cycling autocomplete
-			Application.Driver.SendKeys (' ', cycleKey, false, false, false);
+		// f is typed and suggestion is "fish"
+		Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
 
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("friend", output);
-			Assert.Equal ("f", tf.Text);
+		// When cycling autocomplete
+		Application.Driver.SendKeys (' ', cycleKey, false, false, false);
 
-			// Should be able to cycle in circles endlessly
-			Application.Driver.SendKeys (' ', cycleKey, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
-		}
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("friend", output);
+		Assert.Equal ("f", tf.Text);
 
-		[Fact, AutoInitShutdown]
-		public void TestAutoAppend_NoRender_WhenNoMatch ()
-		{
-			var tf = GetTextFieldsInViewSuggesting ("fish");
+		// Should be able to cycle in circles endlessly
+		Application.Driver.SendKeys (' ', cycleKey, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
+	}
 
-			// f is typed and suggestion is "fish"
-			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
+	[Fact] [AutoInitShutdown]
+	public void TestAutoAppend_NoRender_WhenNoMatch ()
+	{
+		var tf = GetTextFieldsInViewSuggesting ("fish");
 
-			// x is typed and suggestion should disapear
-			Application.Driver.SendKeys ('x', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			TestHelpers.AssertDriverContentsAre ("fx", output);
-			Assert.Equal ("fx", tf.Text);
-		}
+		// f is typed and suggestion is "fish"
+		Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
 
-		[Fact, AutoInitShutdown]
-		public void TestAutoAppend_NoRender_WhenCursorNotAtEnd ()
-		{
-			var tf = GetTextFieldsInViewSuggesting ("fish");
+		// x is typed and suggestion should disappear
+		Application.Driver.SendKeys ('x', ConsoleKey.X, false, false, false);
+		tf.Draw ();
+		TestHelpers.AssertDriverContentsAre ("fx", output);
+		Assert.Equal ("fx", tf.Text);
+	}
 
-			// f is typed and suggestion is "fish"
-			Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("fish", output);
-			Assert.Equal ("f", tf.Text);
+	[Fact] [AutoInitShutdown]
+	public void TestAutoAppend_NoRender_WhenCursorNotAtEnd ()
+	{
+		var tf = GetTextFieldsInViewSuggesting ("fish");
 
-			// add a space then go back 1
-			Application.Driver.SendKeys (' ', ConsoleKey.Spacebar, false, false, false);
-			Application.Driver.SendKeys ('<', ConsoleKey.LeftArrow, false, false, false);
+		// f is typed and suggestion is "fish"
+		Application.Driver.SendKeys ('f', ConsoleKey.F, false, false, false);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
+		Assert.Equal ("f", tf.Text);
 
-			tf.Draw ();
-			TestHelpers.AssertDriverContentsAre ("f", output);
-			Assert.Equal ("f ", tf.Text);
-		}
+		// add a space then go back 1
+		Application.Driver.SendKeys (' ', ConsoleKey.Spacebar, false, false, false);
+		Application.Driver.SendKeys ('<', ConsoleKey.LeftArrow, false, false, false);
+
+		tf.Draw ();
+		TestHelpers.AssertDriverContentsAre ("f", output);
+		Assert.Equal ("f ", tf.Text);
+	}
 
 
-		private TextField GetTextFieldsInViewSuggesting (params string [] suggestions)
-		{
-			var tf = GetTextFieldsInView ();
+	TextField GetTextFieldsInViewSuggesting (params string [] suggestions)
+	{
+		var tf = GetTextFieldsInView ();
 
-			tf.Autocomplete = new AppendAutocomplete (tf);
-			var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-			generator.AllSuggestions = suggestions.ToList ();
+		tf.Autocomplete = new AppendAutocomplete (tf);
+		var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
+		generator.AllSuggestions = suggestions.ToList ();
 
-			tf.Draw ();
-			tf.PositionCursor ();
-			TestHelpers.AssertDriverContentsAre ("", output);
+		tf.Draw ();
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("", output);
 
-			return tf;
-		}
+		return tf;
+	}
 
-		private TextField GetTextFieldsInView ()
-		{
-			var tf = new TextField {
-				Width = 10
-			};
-			var tf2 = new TextField {
-				Y = 1,
-				Width = 10
-			};
+	TextField GetTextFieldsInView ()
+	{
+		var tf = new TextField {
+			Width = 10
+		};
+		var tf2 = new TextField {
+			Y = 1,
+			Width = 10
+		};
 
-			var top = Application.Top;
-			top.Add (tf);
-			top.Add (tf2);
+		var top = Application.Top;
+		top.Add (tf);
+		top.Add (tf2);
 
-			Application.Begin (top);
+		Application.Begin (top);
 
-			Assert.Same (tf, top.Focused);
+		Assert.Same (tf, top.Focused);
 
-			return tf;
-		}
+		return tf;
 	}
 }

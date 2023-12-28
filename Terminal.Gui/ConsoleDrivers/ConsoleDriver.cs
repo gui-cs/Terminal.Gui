@@ -3,12 +3,10 @@
 //
 using System.Text;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using static Terminal.Gui.ColorScheme;
+using System.Linq;
 
 namespace Terminal.Gui;
-
 
 /// <summary>
 /// Base class for Terminal.Gui ConsoleDriver implementations.
@@ -32,20 +30,31 @@ public abstract class ConsoleDriver {
 	/// </summary>
 	internal static bool RunningUnitTests { get; set; }
 
-	/// <summary>
-	/// Prepare the driver and set the key and mouse events handlers.
-	/// </summary>
-	/// <param name="mainLoop">The main loop.</param>
-	/// <param name="keyHandler">The handler for ProcessKey</param>
-	/// <param name="keyDownHandler">The handler for key down events</param>
-	/// <param name="keyUpHandler">The handler for key up events</param>
-	/// <param name="mouseHandler">The handler for mouse events</param>
-	public abstract void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler);
+	#region Setup & Teardown
 
 	/// <summary>
-	/// The handler fired when the terminal is resized.
+	/// Initializes the driver
 	/// </summary>
-	protected Action TerminalResized;
+	/// <returns>Returns an instance of <see cref="MainLoop"/> using the <see cref="IMainLoopDriver"/> for the driver.</returns>
+	internal abstract MainLoop Init ();
+
+	/// <summary>
+	/// Ends the execution of the console driver.
+	/// </summary>
+	internal abstract void End ();
+
+	#endregion
+
+	/// <summary>
+	/// The event fired when the terminal is resized.
+	/// </summary>
+	public event EventHandler<SizeChangedEventArgs> SizeChanged;
+
+	/// <summary>
+	/// Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.
+	/// </summary>
+	/// <param name="args"></param>
+	public void OnSizeChanged (SizeChangedEventArgs args) => SizeChanged?.Invoke (this, args);
 
 	/// <summary>
 	/// The number of columns visible in the terminal.
@@ -76,25 +85,10 @@ public abstract class ConsoleDriver {
 	/// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
 	/// is called.
 	/// <remarks>
-	/// The format of the array is rows, columns, and 3 values on the last column: Rune, Attribute and Dirty Flag
+	/// The format of the array is rows, columns. The first index is the row, the second index is the column.
 	/// </remarks>
 	/// </summary>
-	//public int [,,] Contents { get; internal set; }
-
-	///// <summary>
-	///// The contents of the application output. The driver outputs this buffer to the terminal when <see cref="UpdateScreen"/>
-	///// is called.
-	///// <remarks>
-	///// The format of the array is rows, columns. The first index is the row, the second index is the column.
-	///// </remarks>
-	///// </summary>
 	public Cell [,] Contents { get; internal set; }
-
-	/// <summary>
-	/// Initializes the driver
-	/// </summary>
-	/// <param name="terminalResized">Method to invoke when the terminal is resized.</param>
-	public abstract void Init (Action terminalResized);
 
 	/// <summary>
 	/// Gets the column last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/>
@@ -161,40 +155,57 @@ public abstract class ConsoleDriver {
 		if (validLocation) {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
-			if (runeWidth == 0 && rune.IsCombiningMark () && Col > 0) {
-				// This is a combining character, and we are not at the beginning of the line.
-				// TODO: Remove hard-coded [0] once combining pairs is supported
+			if (runeWidth == 0 && rune.IsCombiningMark ()) {
+				if (Col > 0) {
+					if (Contents [Row, Col - 1].CombiningMarks.Count > 0) {
+						// Just add this mark to the list
+						Contents [Row, Col - 1].CombiningMarks.Add (rune);
+						// Don't move to next column (let the driver figure out what to do).
+					} else {
+						// Attempt to normalize the cell to our left combined with this mark
+						string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
 
-				// Convert Runes to string and concatenate
-				string combined = Contents [Row, Col - 1].Runes [0].ToString () + rune.ToString ();
-
-				// Normalize to Form C (Canonical Composition)
-				string normalized = combined.Normalize (NormalizationForm.FormC);
-
-				Contents [Row, Col - 1].Runes = new List<Rune> { (Rune)normalized [0] }; ;
-				Contents [Row, Col - 1].Attribute = CurrentAttribute;
-				Contents [Row, Col - 1].IsDirty = true;
-
-				//Col--;
+						// Normalize to Form C (Canonical Composition)
+						string normalized = combined.Normalize (NormalizationForm.FormC);
+						if (normalized.Length == 1) {
+							// It normalized! We can just set the Cell to the left with the
+							// normalized codepoint 
+							Contents [Row, Col - 1].Rune = (Rune)normalized [0];
+							// Don't move to next column because we're already there
+						} else {
+							// It didn't normalize. Add it to the Cell to left's CM list
+							Contents [Row, Col - 1].CombiningMarks.Add (rune);
+							// Don't move to next column (let the driver figure out what to do).
+						}
+					}
+					Contents [Row, Col - 1].Attribute = CurrentAttribute;
+					Contents [Row, Col - 1].IsDirty = true;
+				} else {
+					// Most drivers will render a combining mark at col 0 as the mark
+					Contents [Row, Col].Rune = rune;
+					Contents [Row, Col].Attribute = CurrentAttribute;
+					Contents [Row, Col].IsDirty = true;
+					Col++;
+				}
 			} else {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 				Contents [Row, Col].IsDirty = true;
 
 				if (Col > 0) {
 					// Check if cell to left has a wide glyph
-					if (Contents [Row, Col - 1].Runes [0].GetColumns () > 1) {
+					if (Contents [Row, Col - 1].Rune.GetColumns () > 1) {
 						// Invalidate cell to left
-						Contents [Row, Col - 1].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col - 1].Rune = Rune.ReplacementChar;
 						Contents [Row, Col - 1].IsDirty = true;
 					}
 				}
 
 
 				if (runeWidth < 1) {
-					Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+					Contents [Row, Col].Rune = Rune.ReplacementChar;
 
 				} else if (runeWidth == 1) {
-					Contents [Row, Col].Runes = new List<Rune> { rune };
+					Contents [Row, Col].Rune = rune;
 					if (Col < Clip.Right - 1) {
 						Contents [Row, Col + 1].IsDirty = true;
 					}
@@ -202,19 +213,19 @@ public abstract class ConsoleDriver {
 					if (Col == Clip.Right - 1) {
 						// We're at the right edge of the clip, so we can't display a wide character.
 						// TODO: Figure out if it is better to show a replacement character or ' '
-						Contents [Row, Col].Runes = new List<Rune> { Rune.ReplacementChar };
+						Contents [Row, Col].Rune = Rune.ReplacementChar;
 					} else {
-						Contents [Row, Col].Runes = new List<Rune> { rune };
+						Contents [Row, Col].Rune = rune;
 						if (Col < Clip.Right - 1) {
 							// Invalidate cell to right so that it doesn't get drawn
 							// TODO: Figure out if it is better to show a replacement character or ' '
-							Contents [Row, Col + 1].Runes = new List<Rune> { Rune.ReplacementChar };
+							Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
 							Contents [Row, Col + 1].IsDirty = true;
 						}
 					}
 				} else {
 					// This is a non-spacing character, so we don't need to do anything
-					Contents [Row, Col].Runes = new List<Rune> { (Rune)' ' };
+					Contents [Row, Col].Rune = (Rune)' ';
 					Contents [Row, Col].IsDirty = false;
 				}
 				_dirtyLines [Row] = true;
@@ -235,7 +246,7 @@ public abstract class ConsoleDriver {
 				Contents [Row, Col].Attribute = CurrentAttribute;
 
 				// TODO: Determine if we should wipe this out (for now now)
-				//Contents [Row, Col].Runes [0] = (Rune)' ';
+				//Contents [Row, Col].Rune = (Rune)' ';
 			}
 			Col++;
 		}
@@ -263,8 +274,19 @@ public abstract class ConsoleDriver {
 	/// <param name="str">String.</param>
 	public void AddStr (string str)
 	{
-		foreach (var rune in str.EnumerateRunes ()) {
-			AddRune (rune);
+		var runes = str.EnumerateRunes ().ToList ();
+		for (var i = 0; i < runes.Count; i++) {
+			//if (runes [i].IsCombiningMark()) {
+
+			//	// Attempt to normalize
+			//	string combined = runes [i-1] + runes [i].ToString();
+
+			//	// Normalize to Form C (Canonical Composition)
+			//	string normalized = combined.Normalize (NormalizationForm.FormC);
+
+			//	runes [i-]
+			//}
+			AddRune (runes [i]);
 		}
 	}
 
@@ -342,7 +364,7 @@ public abstract class ConsoleDriver {
 				for (var row = 0; row < Rows; row++) {
 					for (var c = 0; c < Cols; c++) {
 						Contents [row, c] = new Cell () {
-							Runes = new List<Rune> { (Rune)' ' },
+							Rune = (Rune)' ',
 							Attribute = new Attribute (Color.White, Color.Black),
 							IsDirty = true
 						};
@@ -412,22 +434,13 @@ public abstract class ConsoleDriver {
 	}
 
 	/// <summary>
-	/// Make the attribute for the foreground and background colors.
-	/// </summary>
-	/// <param name="fore">Foreground.</param>
-	/// <param name="back">Background.</param>
-	/// <returns></returns>
-	public virtual Attribute MakeAttribute (Color fore, Color back)
-	{
-		return MakeColor (fore, back);
-	}
-
-	/// <summary>
 	/// Gets the current <see cref="Attribute"/>.
 	/// </summary>
 	/// <returns>The current attribute.</returns>
 	public Attribute GetAttribute () => CurrentAttribute;
-	
+
+	// TODO: This is only overridden by CursesDriver. Once CursesDriver supports 24-bit color, this virtual method can be
+	// removed (and Attribute can lose the platformColor property).
 	/// <summary>
 	/// Makes an <see cref="Attribute"/>.
 	/// </summary>
@@ -444,6 +457,58 @@ public abstract class ConsoleDriver {
 		);
 	}
 
+
+	#endregion
+
+	#region Mouse and Keyboard
+	/// <summary>
+	/// Event fired when a key is pressed down. This is a precursor to <see cref="KeyUp"/>.
+	/// </summary>
+	public event EventHandler<Key> KeyDown;
+
+	/// <summary>
+	/// Called when a key is pressed down. Fires the <see cref="KeyDown"/> event. This is a precursor to <see cref="OnKeyUp"/>.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnKeyDown (Key a) => KeyDown?.Invoke (this, a);
+
+	/// <summary>
+	/// Event fired when a key is released. 
+	/// </summary>
+	/// <remarks>
+	/// Drivers that do not support key release events will fire this event after <see cref="KeyDown"/> processing is complete.
+	/// </remarks>
+	public event EventHandler<Key> KeyUp;
+
+	/// <summary>
+	/// Called when a key is released. Fires the <see cref="KeyUp"/> event.
+	/// </summary>
+	/// <remarks>
+	/// Drivers that do not support key release events will calls this method after <see cref="OnKeyDown"/> processing is complete.
+	/// </remarks>
+	/// <param name="a"></param>
+	public void OnKeyUp (Key a) => KeyUp?.Invoke (this, a);
+
+	/// <summary>
+	/// Event fired when a mouse event occurs.
+	/// </summary>
+	public event EventHandler<MouseEventEventArgs> MouseEvent;
+
+	/// <summary>
+	/// Called when a mouse event occurs. Fires the <see cref="MouseEvent"/> event.
+	/// </summary>
+	/// <param name="a"></param>
+	public void OnMouseEvent (MouseEventEventArgs a) => MouseEvent?.Invoke (this, a);
+
+	/// <summary>
+	/// Simulates a key press.
+	/// </summary>
+	/// <param name="keyChar">The key character.</param>
+	/// <param name="key">The key.</param>
+	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
+	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
+	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
+	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
 	#endregion
 
@@ -479,16 +544,6 @@ public abstract class ConsoleDriver {
 	/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
 	public abstract void Suspend ();
 
-	/// <summary>
-	/// Simulates a key press.
-	/// </summary>
-	/// <param name="keyChar">The key character.</param>
-	/// <param name="key">The key.</param>
-	/// <param name="shift">If <see langword="true"/> simulates the Shift key being pressed.</param>
-	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
-	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
-	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
 	// TODO: Move FillRect to ./Drawing	
 	/// <summary>
 	/// Fills the specified rectangle with the specified rune.
@@ -512,11 +567,6 @@ public abstract class ConsoleDriver {
 	/// <param name="rect"></param>
 	/// <param name="c"></param>
 	public void FillRect (Rect rect, char c) => FillRect (rect, new Rune (c));
-
-	/// <summary>
-	/// Ends the execution of the console driver.
-	/// </summary>
-	public abstract void End ();
 
 	/// <summary>
 	/// Returns the name of the driver and relevant library version information.
@@ -583,3 +633,431 @@ public enum CursorVisibility {
 	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
 	BoxFix = 0x02020164,
 }
+
+
+/// <summary>
+/// The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a consistent
+/// way for application code to specify keys and receive key events. 
+/// <para>
+/// The <see cref="Key"/> class provides a higher-level abstraction, with helper methods and properties for common
+/// operations. For example, <see cref="Key.IsAlt"/> and <see cref="Key.IsCtrl"/> provide a convenient way
+/// to check whether the Alt or Ctrl modifier keys were pressed when a key was pressed.
+/// </para>
+/// </summary>
+/// <remarks>
+/// <para>
+/// Lowercase alpha keys are encoded as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
+/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
+/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
+/// </para>
+/// <para>
+/// Numeric keys are the values between 48 and 57 corresponding to 0 to 9 (e.g. <see cref="KeyCode.D0"/>, <see cref="KeyCode.D1"/>, etc.).
+/// </para>
+/// <para>
+/// The shift modifiers (<see cref="KeyCode.ShiftMask"/>, <see cref="KeyCode.CtrlMask"/>, and <see cref="KeyCode.AltMask"/>) can be combined (with logical or)
+/// with the other key codes to represent shifted keys. For example, the <see cref="KeyCode.A"/> enum value represents the un-shifted 'a' key, while
+/// <see cref="KeyCode.ShiftMask"/> | <see cref="KeyCode.A"/> represents the 'A' key (shifted 'a' key). Likewise, <see cref="KeyCode.AltMask"/> | <see cref="KeyCode.A"/>
+/// represents the 'Alt+A' key combination.
+/// </para>
+/// <para>
+/// All other keys that produce a printable character are encoded as the Unicode value of the character. For example, the <see cref="KeyCode"/>
+/// for the '!' character is 33, which is the Unicode value for '!'. Likewise, `â` is 226, `Â` is 194, etc.
+/// </para>
+/// <para>
+/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+/// otherwise, the value is the one of the lower bits (as extracted by <see cref="CharMask"/>).
+/// </para>
+/// </remarks>
+[Flags]
+public enum KeyCode : uint {
+	/// <summary>
+	/// Mask that indicates that this is a character value, values outside this range
+	/// indicate special characters like Alt-key combinations or special keys on the
+	/// keyboard like function keys, arrows keys and so on.
+	/// </summary>
+	CharMask = 0xfffff,
+
+	/// <summary>
+	/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
+	/// otherwise, the value is in the the lower bits (as extracted by <see cref="CharMask"/>).
+	/// </summary>
+	SpecialMask = 0xfff00000,
+
+	/// <summary>
+	/// The key code representing null or empty
+	/// </summary>
+	Null = '\0',
+
+	/// <summary>
+	/// Backspace key.
+	/// </summary>
+	Backspace = 8,
+
+	/// <summary>
+	/// The key code for the tab key (forwards tab key).
+	/// </summary>
+	Tab = 9,
+
+	/// <summary>
+	/// The key code for the return key.
+	/// </summary>
+	Enter = '\n',
+
+	/// <summary>
+	/// The key code for the clear key.
+	/// </summary>
+	Clear = 12,
+
+	/// <summary>
+	/// The key code for the Shift key.
+	/// </summary>
+	ShiftKey = 16,
+
+	/// <summary>
+	/// The key code for the Ctrl key.
+	/// </summary>
+	CtrlKey = 17,
+
+	/// <summary>
+	/// The key code for the Alt key.
+	/// </summary>
+	AltKey = 18,
+
+	/// <summary>
+	/// The key code for the CapsLock key.
+	/// </summary>
+	CapsLock = 20,
+
+	///// <summary>
+	///// The key code for the NumLock key.
+	///// </summary>
+	//NumLock = 144,
+
+	///// <summary>
+	///// The key code for the ScrollLock key.
+	///// </summary>
+	//ScrollLock = 145,
+
+	/// <summary>
+	/// The key code for the escape key.
+	/// </summary>
+	Esc = 27,
+
+	/// <summary>
+	/// The key code for the space bar key.
+	/// </summary>
+	Space = 32,
+
+	/// <summary>
+	/// Digit 0.
+	/// </summary>
+	D0 = 48,
+	/// <summary>
+	/// Digit 1.
+	/// </summary>
+	D1,
+	/// <summary>
+	/// Digit 2.
+	/// </summary>
+	D2,
+	/// <summary>
+	/// Digit 3.
+	/// </summary>
+	D3,
+	/// <summary>
+	/// Digit 4.
+	/// </summary>
+	D4,
+	/// <summary>
+	/// Digit 5.
+	/// </summary>
+	D5,
+	/// <summary>
+	/// Digit 6.
+	/// </summary>
+	D6,
+	/// <summary>
+	/// Digit 7.
+	/// </summary>
+	D7,
+	/// <summary>
+	/// Digit 8.
+	/// </summary>
+	D8,
+	/// <summary>
+	/// Digit 9.
+	/// </summary>
+	D9,
+
+	/// <summary>
+	/// The key code for the A key
+	/// </summary>
+	A = 65,
+	/// <summary>
+	/// The key code for the B key
+	/// </summary>
+	B,
+	/// <summary>
+	/// The key code for the C key
+	/// </summary>
+	C,
+	/// <summary>
+	/// The key code for the D key
+	/// </summary>
+	D,
+	/// <summary>
+	/// The key code for the E key
+	/// </summary>
+	E,
+	/// <summary>
+	/// The key code for the F key
+	/// </summary>
+	F,
+	/// <summary>
+	/// The key code for the G key
+	/// </summary>
+	G,
+	/// <summary>
+	/// The key code for the H key
+	/// </summary>
+	H,
+	/// <summary>
+	/// The key code for the I key
+	/// </summary>
+	I,
+	/// <summary>
+	/// The key code for the J key
+	/// </summary>
+	J,
+	/// <summary>
+	/// The key code for the K key
+	/// </summary>
+	K,
+	/// <summary>
+	/// The key code for the L key
+	/// </summary>
+	L,
+	/// <summary>
+	/// The key code for the M key
+	/// </summary>
+	M,
+	/// <summary>
+	/// The key code for the N key
+	/// </summary>
+	N,
+	/// <summary>
+	/// The key code for the O key
+	/// </summary>
+	O,
+	/// <summary>
+	/// The key code for the P key
+	/// </summary>
+	P,
+	/// <summary>
+	/// The key code for the Q key
+	/// </summary>
+	Q,
+	/// <summary>
+	/// The key code for the R key
+	/// </summary>
+	R,
+	/// <summary>
+	/// The key code for the S key
+	/// </summary>
+	S,
+	/// <summary>
+	/// The key code for the T key
+	/// </summary>
+	T,
+	/// <summary>
+	/// The key code for the U key
+	/// </summary>
+	U,
+	/// <summary>
+	/// The key code for the V key
+	/// </summary>
+	V,
+	/// <summary>
+	/// The key code for the W key
+	/// </summary>
+	W,
+	/// <summary>
+	/// The key code for the X key
+	/// </summary>
+	X,
+	/// <summary>
+	/// The key code for the Y key
+	/// </summary>
+	Y,
+	/// <summary>
+	/// The key code for the Z key
+	/// </summary>
+	Z,
+	/// <summary>
+	/// The key code for the Delete key.
+	/// </summary>
+	Delete = 127,
+
+	/// <summary>
+	/// When this value is set, the Key encodes the sequence Shift-KeyValue.
+	/// </summary>
+	ShiftMask = 0x10000000,
+
+	/// <summary>
+	///   When this value is set, the Key encodes the sequence Alt-KeyValue.
+	///   And the actual value must be extracted by removing the AltMask.
+	/// </summary>
+	AltMask = 0x80000000,
+
+	/// <summary>
+	///   When this value is set, the Key encodes the sequence Ctrl-KeyValue.
+	///   And the actual value must be extracted by removing the CtrlMask.
+	/// </summary>
+	CtrlMask = 0x40000000,
+
+	/// <summary>
+	/// Cursor up key
+	/// </summary>
+	CursorUp = 0x100000,
+	/// <summary>
+	/// Cursor down key.
+	/// </summary>
+	CursorDown,
+	/// <summary>
+	/// Cursor left key.
+	/// </summary>
+	CursorLeft,
+	/// <summary>
+	/// Cursor right key.
+	/// </summary>
+	CursorRight,
+	/// <summary>
+	/// Page Up key.
+	/// </summary>
+	PageUp,
+	/// <summary>
+	/// Page Down key.
+	/// </summary>
+	PageDown,
+	/// <summary>
+	/// Home key.
+	/// </summary>
+	Home,
+	/// <summary>
+	/// End key.
+	/// </summary>
+	End,
+
+	/// <summary>
+	/// Insert character key.
+	/// </summary>
+	InsertChar,
+
+	/// <summary>
+	/// Delete character key.
+	/// </summary>
+	DeleteChar,
+
+	/// <summary>
+	/// Print screen character key.
+	/// </summary>
+	PrintScreen,
+
+	/// <summary>
+	/// F1 key.
+	/// </summary>
+	F1,
+	/// <summary>
+	/// F2 key.
+	/// </summary>
+	F2,
+	/// <summary>
+	/// F3 key.
+	/// </summary>
+	F3,
+	/// <summary>
+	/// F4 key.
+	/// </summary>
+	F4,
+	/// <summary>
+	/// F5 key.
+	/// </summary>
+	F5,
+	/// <summary>
+	/// F6 key.
+	/// </summary>
+	F6,
+	/// <summary>
+	/// F7 key.
+	/// </summary>
+	F7,
+	/// <summary>
+	/// F8 key.
+	/// </summary>
+	F8,
+	/// <summary>
+	/// F9 key.
+	/// </summary>
+	F9,
+	/// <summary>
+	/// F10 key.
+	/// </summary>
+	F10,
+	/// <summary>
+	/// F11 key.
+	/// </summary>
+	F11,
+	/// <summary>
+	/// F12 key.
+	/// </summary>
+	F12,
+	/// <summary>
+	/// F13 key.
+	/// </summary>
+	F13,
+	/// <summary>
+	/// F14 key.
+	/// </summary>
+	F14,
+	/// <summary>
+	/// F15 key.
+	/// </summary>
+	F15,
+	/// <summary>
+	/// F16 key.
+	/// </summary>
+	F16,
+	/// <summary>
+	/// F17 key.
+	/// </summary>
+	F17,
+	/// <summary>
+	/// F18 key.
+	/// </summary>
+	F18,
+	/// <summary>
+	/// F19 key.
+	/// </summary>
+	F19,
+	/// <summary>
+	/// F20 key.
+	/// </summary>
+	F20,
+	/// <summary>
+	/// F21 key.
+	/// </summary>
+	F21,
+	/// <summary>
+	/// F22 key.
+	/// </summary>
+	F22,
+	/// <summary>
+	/// F23 key.
+	/// </summary>
+	F23,
+	/// <summary>
+	/// F24 key.
+	/// </summary>
+	F24,
+}
+

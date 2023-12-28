@@ -125,7 +125,7 @@ public class Sliders : Scenario {
 					s.AdjustBestHeight ();
 					s.Width = Dim.Percent (50);
 
-					s.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } };
+					s.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.HLine };
 
 					if (prev == null) {
 						s.LayoutStyle = LayoutStyle.Absolute;
@@ -143,7 +143,7 @@ public class Sliders : Scenario {
 					s.AdjustBestWidth ();
 					s.Height = Dim.Fill ();
 
-					s.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.VLine } };
+					s.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.VLine };
 
 
 					if (prev == null) {
@@ -292,15 +292,15 @@ public class Sliders : Scenario {
 
 		single.LayoutStarted += (s, e) => {
 			if (single.Orientation == Orientation.Horizontal) {
-				single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.HLine } };
-				single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.HLine } };
+				single.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.HLine };
+				single.Style.OptionChar = new Cell () { Rune = CM.Glyphs.HLine };
 			} else {
-				single.Style.SpaceChar = new Cell () { Runes = { CM.Glyphs.VLine } };
-				single.Style.OptionChar = new Cell () { Runes = { CM.Glyphs.VLine } };
+				single.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.VLine };
+				single.Style.OptionChar = new Cell () { Rune = CM.Glyphs.VLine };
 			}
 		};
-		single.Style.SetChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
-		single.Style.DragChar = new Cell () { Runes = { CM.Glyphs.ContinuousMeterSegment } };
+		single.Style.SetChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment };
+		single.Style.DragChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment };
 
 		v.Add (single);
 

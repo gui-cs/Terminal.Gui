@@ -1,7 +1,5 @@
-﻿using System.Text;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
@@ -262,7 +260,7 @@ namespace Terminal.Gui {
 				}
 
 			}
-			
+
 			Dialog d;
 			d = new Dialog (buttonList.ToArray ()) {
 				Title = title,
@@ -273,12 +271,12 @@ namespace Terminal.Gui {
 
 			if (width != 0) {
 				d.Width = width;
-			} 
-			
+			}
+
 			if (height != 0) {
 				d.Height = height;
 			}
-		
+
 			if (useErrorColors) {
 				d.ColorScheme = Colors.Error;
 			} else {
@@ -286,24 +284,27 @@ namespace Terminal.Gui {
 			}
 
 			var messageLabel = new Label () {
-				AutoSize = false,
+				AutoSize = wrapMessage ? false : true,
 				Text = message,
 				TextAlignment = TextAlignment.Centered,
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (1)
+				Height = Dim.Fill (1),
 			};
-			messageLabel.TextFormatter.WordWrap = wrapMessage; // BUGBUG: This does nothing as it's not implemented by TextFormatter!
+			messageLabel.TextFormatter.WordWrap = wrapMessage;
+			messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
 			d.Add (messageLabel);
-			
+
 			d.Loaded += (s, e) => {
 				if (width != 0 || height != 0) {
 					return;
 				}
 				// TODO: replace with Dim.Fit when implemented
 				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
-				messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
+				if (wrapMessage) {
+					messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
+				}
 				var msg = messageLabel.TextFormatter.Format ();
 				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
@@ -314,7 +315,8 @@ namespace Terminal.Gui {
 					d.Width = newWidth;
 				}
 				// Ensure height fits the text + vspace + buttons
-				d.Height = Math.Max (height, messageSize.Height + 2 + d.GetFramesThickness ().Vertical);
+				var lastLine = messageLabel.TextFormatter.Lines [^1];
+				d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetFramesThickness ().Vertical);
 				d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
 			};
 

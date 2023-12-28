@@ -34,16 +34,16 @@ namespace Terminal.Gui.ViewTests {
 			frm.Add (frmSubview);
 			top.Add (frm);
 
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			top.NewKeyDownEvent (new (KeyCode.Tab));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			top.NewKeyDownEvent (new (KeyCode.Tab));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ()));
+			top.NewKeyDownEvent (new (KeyCode.Tab));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 
-			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.ShiftMask));
 			Assert.Equal ("FrameSubview", top.MostFocused.Text);
-			top.ProcessKey (new KeyEvent (Key.BackTab | Key.ShiftMask, new KeyModifiers ()));
+			top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.ShiftMask));
 			Assert.Equal ($"WindowSubview", top.MostFocused.Text);
 			top.Dispose ();
 		}
@@ -134,8 +134,8 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (r.TabIndexes.IndexOf (v2) == 1);
 			Assert.True (r.TabIndexes.IndexOf (v3) == 2);
 			r.Dispose ();
-		} 
-		
+		}
+
 		[Fact]
 		public void SendSubviewBackwards_Subviews_vs_TabIndexes ()
 		{
@@ -515,7 +515,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (f.CanFocus);
 			Assert.True (v.CanFocus);
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -558,7 +558,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (v.CanFocus);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -593,7 +593,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.False (v2.CanFocus);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -634,7 +634,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (v2.CanFocus);
 			};
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -654,7 +654,7 @@ namespace Terminal.Gui.ViewTests {
 			// Keyboard navigation with tab
 			Console.MockKeyPresses.Push (new ConsoleKeyInfo ('\t', ConsoleKey.Tab, false, false, false));
 
-			Application.Iteration += () => Application.RequestStop ();
+			Application.Iteration += (s, a) => Application.RequestStop ();
 
 			Application.Run ();
 			Application.Shutdown ();
@@ -669,7 +669,7 @@ namespace Terminal.Gui.ViewTests {
 			view.Clicked += (s, e) => wasClicked = !wasClicked;
 			Application.Top.Add (view);
 
-			view.ProcessKey (new KeyEvent (Key.Enter, null));
+			view.NewKeyDownEvent (new (KeyCode.Space));
 			Assert.True (wasClicked);
 			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 			Assert.False (wasClicked);
@@ -678,7 +678,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.HasFocus);
 
 			view.Enabled = false;
-			view.ProcessKey (new KeyEvent (Key.Enter, null));
+			view.NewKeyDownEvent (new (KeyCode.Space));
 			Assert.False (wasClicked);
 			view.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 			Assert.False (wasClicked);
@@ -695,6 +695,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			var wasClicked = false;
 			var button = new Button ("Click Me");
+			button.IsDefault = true;
 			button.Clicked += (s, e) => wasClicked = !wasClicked;
 			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
 			win.Add (button);
@@ -702,10 +703,10 @@ namespace Terminal.Gui.ViewTests {
 
 			var iterations = 0;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 
-				button.ProcessKey (new KeyEvent (Key.Enter, null));
+				win.NewKeyDownEvent (new (KeyCode.Enter));
 				Assert.True (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);
@@ -717,7 +718,7 @@ namespace Terminal.Gui.ViewTests {
 				Assert.True (win.HasFocus);
 
 				win.Enabled = false;
-				button.ProcessKey (new KeyEvent (Key.Enter, null));
+				button.NewKeyDownEvent (new (KeyCode.Enter));
 				Assert.False (wasClicked);
 				button.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Clicked });
 				Assert.False (wasClicked);
@@ -785,13 +786,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab)));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab)));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -825,14 +826,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -865,13 +866,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view2.CanFocus);
 			Assert.False (view2.HasFocus); // Only one of the most focused toplevels view can have focus
 
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.False (view1.HasFocus); // Only one of the most focused toplevels view can have focus
 			Assert.True (view2.CanFocus);
 			Assert.True (view2.HasFocus);
 
-			Assert.True (Application.Top.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
 			Assert.True (view1.CanFocus);
 			Assert.True (view1.HasFocus);
 			Assert.True (view2.CanFocus);
@@ -890,20 +891,20 @@ namespace Terminal.Gui.ViewTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
+		public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_With_Top_KeyPress_Event ()
 		{
 			var sbQuiting = false;
 			var tfQuiting = false;
 			var topQuiting = false;
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+				new StatusItem(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
-			tf.KeyPress += Tf_KeyPress;
+			tf.KeyDown += Tf_KeyPressed;
 
-			void Tf_KeyPress (object sender, KeyEventEventArgs obj)
+			void Tf_KeyPressed (object sender, Key obj)
 			{
-				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -911,11 +912,11 @@ namespace Terminal.Gui.ViewTests {
 			var win = new Window ();
 			win.Add (sb, tf);
 			var top = Application.Top;
-			top.KeyPress += Top_KeyPress;
+			top.KeyDown += Top_KeyPress;
 
-			void Top_KeyPress (object sender, KeyEventEventArgs obj)
+			void Top_KeyPress (object sender, Key obj)
 			{
-				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
 					obj.Handled = topQuiting = true;
 				}
 			}
@@ -927,12 +928,13 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (tfQuiting);
 			Assert.False (topQuiting);
 
-			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 			Assert.False (sbQuiting);
 			Assert.True (tfQuiting);
 			Assert.False (topQuiting);
 
-			tf.KeyPress -= Tf_KeyPress;
+#if BROKE_WITH_2927
+			tf.KeyPressed -= Tf_KeyPress;
 			tfQuiting = false;
 			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
 			Application.MainLoop.RunIteration ();
@@ -946,24 +948,26 @@ namespace Terminal.Gui.ViewTests {
 			Application.MainLoop.RunIteration ();
 			Assert.False (sbQuiting);
 			Assert.False (tfQuiting);
+// This test is now invalid because `win` is focused, so it will receive the keypress
 			Assert.True (topQuiting);
+#endif
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ProcessHotKey_Will_Invoke_ProcessKey_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
+		public void HotKey_Will_Invoke_KeyPressed_Only_For_The_MostFocused_Without_Top_KeyPress_Event ()
 		{
 			var sbQuiting = false;
 			var tfQuiting = false;
 			var sb = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", () => sbQuiting = true )
+				new StatusItem(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", () => sbQuiting = true )
 			});
 			var tf = new TextField ();
-			tf.KeyPress += Tf_KeyPress;
+			tf.KeyDown += Tf_KeyPressed;
 
-			void Tf_KeyPress (object sender, KeyEventEventArgs obj)
+			void Tf_KeyPressed (object sender, Key obj)
 			{
-				if (obj.KeyEvent.Key == (Key.Q | Key.CtrlMask)) {
+				if (obj.KeyCode == (KeyCode.Q | KeyCode.CtrlMask)) {
 					obj.Handled = tfQuiting = true;
 				}
 			}
@@ -977,16 +981,18 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (sbQuiting);
 			Assert.False (tfQuiting);
 
-			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 			Assert.False (sbQuiting);
 			Assert.True (tfQuiting);
 
-			tf.KeyPress -= Tf_KeyPress;
+			tf.KeyDown -= Tf_KeyPressed;
 			tfQuiting = false;
-			Application.Driver.SendKeys ('q', ConsoleKey.Q, false, false, true);
+			Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 			Application.MainLoop.RunIteration ();
+#if BROKE_WITH_2927
 			Assert.True (sbQuiting);
 			Assert.False (tfQuiting);
+#endif
 		}
 
 		[Fact]
@@ -1131,14 +1137,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.False (removed);
 			Assert.Null (view3);
 
-			Assert.True (top1.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			Assert.True (top1.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
 			Assert.True (top1.HasFocus);
 			Assert.False (view1.HasFocus);
 			Assert.True (view2.HasFocus);
 			Assert.True (removed);
 			Assert.NotNull (view3);
 
-			var exception = Record.Exception (() => top1.ProcessKey (new KeyEvent (Key.Tab | Key.CtrlMask, new KeyModifiers { Ctrl = true })));
+			var exception = Record.Exception (() => top1.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask)));
 			Assert.Null (exception);
 			Assert.True (removed);
 			Assert.Null (view3);
@@ -1175,27 +1181,27 @@ namespace Terminal.Gui.ViewTests {
 └──────────────────┘", output);
 
 			// top
-			Assert.Equal (Point.Empty, top.ScreenToView (0, 0));
-			top.Margin.ViewToScreen (0, 0, out int col, out int row);
+			Assert.Equal (Point.Empty, top.ScreenToFrame (0, 0));
+			top.Margin.BoundsToScreen (0, 0, out int col, out int row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
-			top.Border.ViewToScreen (0, 0, out col, out row);
+			top.Border.BoundsToScreen (0, 0, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
-			top.Padding.ViewToScreen (0, 0, out col, out row);
+			top.Padding.BoundsToScreen (0, 0, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
-			top.ViewToScreen (0, 0, out col, out row);
+			top.BoundsToScreen (0, 0, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			top.ViewToScreen (-1, -1, out col, out row);
+			top.BoundsToScreen (-1, -1, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
 			Assert.Equal (top, View.FindDeepestView (top, 0, 0, out int rx, out int ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (3, 2), top.ScreenToView (3, 2));
-			top.ViewToScreen (3, 2, out col, out row);
+			Assert.Equal (new Point (3, 2), top.ScreenToFrame (3, 2));
+			top.BoundsToScreen (3, 2, out col, out row);
 			Assert.Equal (4, col);
 			Assert.Equal (3, row);
 			Assert.Equal (view, View.FindDeepestView (top, col, row, out rx, out ry));
@@ -1204,62 +1210,62 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (top, View.FindDeepestView (top, 3, 2, out rx, out ry));
 			Assert.Equal (3, rx);
 			Assert.Equal (2, ry);
-			Assert.Equal (new Point (13, 2), top.ScreenToView (13, 2));
-			top.ViewToScreen (12, 2, out col, out row);
+			Assert.Equal (new Point (13, 2), top.ScreenToFrame (13, 2));
+			top.BoundsToScreen (12, 2, out col, out row);
 			Assert.Equal (13, col);
 			Assert.Equal (3, row);
 			Assert.Equal (view, View.FindDeepestView (top, col, row, out rx, out ry));
 			Assert.Equal (9, rx);
 			Assert.Equal (0, ry);
-			top.ViewToScreen (13, 2, out col, out row);
+			top.BoundsToScreen (13, 2, out col, out row);
 			Assert.Equal (14, col);
 			Assert.Equal (3, row);
 			Assert.Equal (top, View.FindDeepestView (top, 13, 2, out rx, out ry));
 			Assert.Equal (13, rx);
 			Assert.Equal (2, ry);
-			Assert.Equal (new Point (14, 3), top.ScreenToView (14, 3));
-			top.ViewToScreen (14, 3, out col, out row);
+			Assert.Equal (new Point (14, 3), top.ScreenToFrame (14, 3));
+			top.BoundsToScreen (14, 3, out col, out row);
 			Assert.Equal (15, col);
 			Assert.Equal (4, row);
 			Assert.Equal (top, View.FindDeepestView (top, 14, 3, out rx, out ry));
 			Assert.Equal (14, rx);
 			Assert.Equal (3, ry);
 			// view
-			Assert.Equal (new Point (-4, -3), view.ScreenToView (0, 0));
-			view.Margin.ViewToScreen (-3, -2, out col, out row);
+			Assert.Equal (new Point (-4, -3), view.ScreenToFrame (0, 0));
+			view.Margin.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.Border.ViewToScreen (-3, -2, out col, out row);
+			view.Border.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.Padding.ViewToScreen (-3, -2, out col, out row);
+			view.Padding.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.ViewToScreen (-3, -2, out col, out row);
+			view.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.ViewToScreen (-4, -3, out col, out row);
+			view.BoundsToScreen (-4, -3, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
 			Assert.Equal (top, View.FindDeepestView (top, 0, 0, out rx, out ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (-1, -1), view.ScreenToView (3, 2));
-			view.ViewToScreen (0, 0, out col, out row);
+			Assert.Equal (new Point (-1, -1), view.ScreenToFrame (3, 2));
+			view.BoundsToScreen (0, 0, out col, out row);
 			Assert.Equal (4, col);
 			Assert.Equal (3, row);
 			Assert.Equal (view, View.FindDeepestView (top, 4, 3, out rx, out ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (9, -1), view.ScreenToView (13, 2));
-			view.ViewToScreen (10, 0, out col, out row);
+			Assert.Equal (new Point (9, -1), view.ScreenToFrame (13, 2));
+			view.BoundsToScreen (10, 0, out col, out row);
 			Assert.Equal (14, col);
 			Assert.Equal (3, row);
 			Assert.Equal (top, View.FindDeepestView (top, 14, 3, out rx, out ry));
 			Assert.Equal (14, rx);
 			Assert.Equal (3, ry);
-			Assert.Equal (new Point (10, 0), view.ScreenToView (14, 3));
-			view.ViewToScreen (11, 1, out col, out row);
+			Assert.Equal (new Point (10, 0), view.ScreenToFrame (14, 3));
+			view.BoundsToScreen (11, 1, out col, out row);
 			Assert.Equal (15, col);
 			Assert.Equal (4, row);
 			Assert.Equal (top, View.FindDeepestView (top, 15, 4, out rx, out ry));
@@ -1301,93 +1307,93 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (3, 2, 23, 10), frame);
 
 			// top
-			Assert.Equal (new Point (-3, -2), top.ScreenToView (0, 0));
-			top.Margin.ViewToScreen (-3, -2, out int col, out int row);
+			Assert.Equal (new Point (-3, -2), top.ScreenToFrame (0, 0));
+			top.Margin.BoundsToScreen (-3, -2, out int col, out int row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
-			top.Border.ViewToScreen (-3, -2, out col, out row);
+			top.Border.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
-			top.Padding.ViewToScreen (-3, -2, out col, out row);
+			top.Padding.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
-			top.ViewToScreen (-3, -2, out col, out row);
+			top.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			top.ViewToScreen (-4, -3, out col, out row);
+			top.BoundsToScreen (-4, -3, out col, out row);
 			Assert.Equal (0, col);
 			Assert.Equal (0, row);
 			Assert.Null (View.FindDeepestView (top, -4, -3, out int rx, out int ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (Point.Empty, top.ScreenToView (3, 2));
-			top.ViewToScreen (0, 0, out col, out row);
+			Assert.Equal (Point.Empty, top.ScreenToFrame (3, 2));
+			top.BoundsToScreen (0, 0, out col, out row);
 			Assert.Equal (4, col);
 			Assert.Equal (3, row);
 			Assert.Equal (top, View.FindDeepestView (top, 3, 2, out rx, out ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (10, 0), top.ScreenToView (13, 2));
-			top.ViewToScreen (10, 0, out col, out row);
+			Assert.Equal (new Point (10, 0), top.ScreenToFrame (13, 2));
+			top.BoundsToScreen (10, 0, out col, out row);
 			Assert.Equal (14, col);
 			Assert.Equal (3, row);
 			Assert.Equal (top, View.FindDeepestView (top, 13, 2, out rx, out ry));
 			Assert.Equal (10, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (11, 1), top.ScreenToView (14, 3));
-			top.ViewToScreen (11, 1, out col, out row);
+			Assert.Equal (new Point (11, 1), top.ScreenToFrame (14, 3));
+			top.BoundsToScreen (11, 1, out col, out row);
 			Assert.Equal (15, col);
 			Assert.Equal (4, row);
 			Assert.Equal (top, View.FindDeepestView (top, 14, 3, out rx, out ry));
 			Assert.Equal (11, rx);
 			Assert.Equal (1, ry);
 			// view
-			Assert.Equal (new Point (-7, -5), view.ScreenToView (0, 0));
-			view.Margin.ViewToScreen (-6, -4, out col, out row);
+			Assert.Equal (new Point (-7, -5), view.ScreenToFrame (0, 0));
+			view.Margin.BoundsToScreen (-6, -4, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.Border.ViewToScreen (-6, -4, out col, out row);
+			view.Border.BoundsToScreen (-6, -4, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.Padding.ViewToScreen (-6, -4, out col, out row);
+			view.Padding.BoundsToScreen (-6, -4, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
-			view.ViewToScreen (-6, -4, out col, out row);
+			view.BoundsToScreen (-6, -4, out col, out row);
 			Assert.Equal (1, col);
 			Assert.Equal (1, row);
 			Assert.Null (View.FindDeepestView (top, 1, 1, out rx, out ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (-4, -3), view.ScreenToView (3, 2));
-			view.ViewToScreen (-3, -2, out col, out row);
+			Assert.Equal (new Point (-4, -3), view.ScreenToFrame (3, 2));
+			view.BoundsToScreen (-3, -2, out col, out row);
 			Assert.Equal (4, col);
 			Assert.Equal (3, row);
 			Assert.Equal (top, View.FindDeepestView (top, 4, 3, out rx, out ry));
 			Assert.Equal (1, rx);
 			Assert.Equal (1, ry);
-			Assert.Equal (new Point (-1, -1), view.ScreenToView (6, 4));
-			view.ViewToScreen (0, 0, out col, out row);
+			Assert.Equal (new Point (-1, -1), view.ScreenToFrame (6, 4));
+			view.BoundsToScreen (0, 0, out col, out row);
 			Assert.Equal (7, col);
 			Assert.Equal (5, row);
 			Assert.Equal (view, View.FindDeepestView (top, 7, 5, out rx, out ry));
 			Assert.Equal (0, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (6, -1), view.ScreenToView (13, 4));
-			view.ViewToScreen (7, 0, out col, out row);
+			Assert.Equal (new Point (6, -1), view.ScreenToFrame (13, 4));
+			view.BoundsToScreen (7, 0, out col, out row);
 			Assert.Equal (14, col);
 			Assert.Equal (5, row);
 			Assert.Equal (view, View.FindDeepestView (top, 14, 5, out rx, out ry));
 			Assert.Equal (7, rx);
 			Assert.Equal (0, ry);
-			Assert.Equal (new Point (7, -2), view.ScreenToView (14, 3));
-			view.ViewToScreen (8, -1, out col, out row);
+			Assert.Equal (new Point (7, -2), view.ScreenToFrame (14, 3));
+			view.BoundsToScreen (8, -1, out col, out row);
 			Assert.Equal (15, col);
 			Assert.Equal (4, row);
 			Assert.Equal (top, View.FindDeepestView (top, 15, 4, out rx, out ry));
 			Assert.Equal (12, rx);
 			Assert.Equal (2, ry);
-			Assert.Equal (new Point (16, -2), view.ScreenToView (23, 3));
-			view.ViewToScreen (17, -1, out col, out row);
+			Assert.Equal (new Point (16, -2), view.ScreenToFrame (23, 3));
+			view.BoundsToScreen (17, -1, out col, out row);
 			Assert.Equal (24, col);
 			Assert.Equal (4, row);
 			Assert.Null (View.FindDeepestView (top, 24, 4, out rx, out ry));

@@ -26,7 +26,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
-			Assert.Equal (Key.Null, btn.HotKey);
+
+			Assert.Equal (string.Empty, btn.Title);
+			Assert.Equal (KeyCode.Null, btn.HotKey);
+
 			var expected = @$"
 {CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
 ";
@@ -45,7 +48,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
-			Assert.Equal (Key.T, btn.HotKey);
+			Assert.Equal (KeyCode.T, btn.HotKey);
 			Application.End (rs);
 
 			btn = new Button (3, 4, "Test", true);
@@ -60,7 +63,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
-			Assert.Equal (Key.T, btn.HotKey);
+			Assert.Equal (KeyCode.T, btn.HotKey);
 
 			Application.End (rs);
 		}
@@ -70,47 +73,49 @@ namespace Terminal.Gui.ViewsTests {
 		public void KeyBindings_Command ()
 		{
 			var clicked = false;
-			Button btn = new Button ("Test");
+			Button btn = new Button ("_Test");
 			btn.Clicked += (s, e) => clicked = true;
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
-			Assert.Equal (Key.T, btn.HotKey);
-			Assert.False (btn.ProcessHotKey (new KeyEvent (Key.T, new KeyModifiers ())));
-			Assert.False (clicked);
-			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.Equal (KeyCode.T, btn.HotKey);
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
+			Assert.True (clicked);
+			clicked = false;
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
 			Assert.True (clicked);
 			clicked = false;
 			Assert.False (btn.IsDefault);
-			Assert.False (btn.ProcessColdKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.False (btn.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.False (clicked);
 			btn.IsDefault = true;
-			Assert.True (btn.ProcessColdKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.False (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessColdKey (new KeyEvent (Key.AltMask | Key.T, new KeyModifiers ())));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.AltMask | KeyCode.T)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new KeyEvent (Key.Enter, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.Space)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new KeyEvent ((Key)'t', new KeyModifiers ())));
+			Assert.True (btn.NewKeyDownEvent (new ((KeyCode)'T')));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.ProcessKey (new KeyEvent (Key.Space | btn.HotKey, new KeyModifiers ())));
+			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
 			Assert.True (clicked);
 			btn.Text = "Te_st";
 			clicked = false;
-			Assert.True (btn.ProcessKey (new KeyEvent (Key.Space | btn.HotKey, new KeyModifiers ())));
+			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
 			Assert.True (clicked);
 		}
 
 		[Fact]
 		[AutoInitShutdown]
-		public void ChangeHotKey ()
+		public void HotKeyChange_Works ()
 		{
 			var clicked = false;
 			Button btn = new Button ("Test");
@@ -118,15 +123,17 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
-			Assert.Equal (Key.T, btn.HotKey);
-			Assert.False (btn.ProcessHotKey (new KeyEvent (Key.T, new KeyModifiers ())));
-			Assert.False (clicked);
-			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.T | Key.AltMask, new KeyModifiers () { Alt = true })));
+			Assert.Equal (KeyCode.T, btn.HotKey);
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
 			Assert.True (clicked);
-			clicked = false;
 
-			btn.HotKey = Key.E;
-			Assert.True (btn.ProcessHotKey (new KeyEvent (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
+			clicked = false;
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
+			Assert.True (clicked);
+
+			clicked = false;
+			btn.HotKey = KeyCode.E;
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.E | KeyCode.AltMask)));
 			Assert.True (clicked);
 		}
 
@@ -140,30 +147,44 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			int pressed = 0;
 			var btn = new Button ("Press Me");
+
 			btn.Clicked += (s, e) => pressed++;
 
-			// The Button class supports the Accept command
+			// The Button class supports the Default and Accept command
+			Assert.Contains (Command.Default, btn.GetSupportedCommands ());
 			Assert.Contains (Command.Accept, btn.GetSupportedCommands ());
 
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
-			// default keybinding is Enter which results in keypress
-			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
+			// default keybinding is Space which results in keypress
+			Application.OnKeyDown (new ((KeyCode)' '));
 			Assert.Equal (1, pressed);
 
-			// remove the default keybinding (Enter)
-			btn.ClearKeyBinding (Command.Accept);
+			// remove the default keybinding (Space)
+			btn.KeyBindings.Clear (Command.Default, Command.Accept);
 
-			// After clearing the default keystroke the Enter button no longer does anything for the Button
-			Application.Driver.SendKeys ('\n', ConsoleKey.Enter, false, false, false);
+			// After clearing the default keystroke the Space button no longer does anything for the Button
+			Application.OnKeyDown (new ((KeyCode)' '));
 			Assert.Equal (1, pressed);
 
 			// Set a new binding of b for the click (Accept) event
-			btn.AddKeyBinding (Key.b, Command.Accept);
+			btn.KeyBindings.Add (KeyCode.B, Command.Default, Command.Accept);
 
 			// now pressing B should call the button click event
-			Application.Driver.SendKeys ('b', ConsoleKey.B, false, false, false);
+			Application.OnKeyDown (new (KeyCode.B));
+			Assert.Equal (2, pressed);
+
+			// now pressing Shift-B should NOT call the button click event
+			Application.OnKeyDown (new (KeyCode.ShiftMask | KeyCode.B));
+			Assert.Equal (2, pressed);
+
+			// now pressing Alt-B should NOT call the button click event
+			Application.OnKeyDown (new (KeyCode.AltMask | KeyCode.B));
+			Assert.Equal (2, pressed);
+
+			// now pressing Shift-Alt-B should NOT call the button click event
+			Application.OnKeyDown (new (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.B));
 			Assert.Equal (2, pressed);
 		}
 
@@ -191,15 +212,15 @@ namespace Terminal.Gui.ViewsTests {
 			super.EndInit ();
 
 			Assert.Equal ("Test", btn.Text);
-			Assert.Equal (Key.T, btn.HotKey);
+			Assert.Equal (KeyCode.T, btn.HotKey);
 
 			btn.Text = string.Empty;
 			Assert.Equal ("", btn.Text);
-			Assert.Equal (Key.Null, btn.HotKey);
+			Assert.Equal (KeyCode.Null, btn.HotKey);
 
 			btn.Text = "Te_st";
 			Assert.Equal ("Te_st", btn.Text);
-			Assert.Equal (Key.S, btn.HotKey);
+			Assert.Equal (KeyCode.S, btn.HotKey);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -601,10 +622,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			};
 
-			btn.HotKey = Key.r;
+			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
-			Assert.Equal (Key.Y, args.OldKey);
-			Assert.Equal (Key.r, args.NewKey);
+			Assert.Equal (KeyCode.Y, args.OldKey);
+			Assert.Equal (KeyCode.R, args.NewKey);
 
 		}
 		[Fact, AutoInitShutdown]
@@ -620,11 +641,11 @@ namespace Terminal.Gui.ViewsTests {
 				args = e;
 
 			};
-
-			btn.HotKey = Key.r;
+			
+			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
-			Assert.Equal (Key.Null, args.OldKey);
-			Assert.Equal (Key.r, args.NewKey);
+			Assert.Equal (KeyCode.Null, args.OldKey);
+			Assert.Equal (KeyCode.R, args.NewKey);
 
 		}
 	}

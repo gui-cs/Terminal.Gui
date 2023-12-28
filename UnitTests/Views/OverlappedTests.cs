@@ -1,21 +1,27 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Xunit;
+using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewsTests {
 	public class OverlappedTests {
-		public OverlappedTests ()
+		readonly ITestOutputHelper output;
+
+		public OverlappedTests (ITestOutputHelper output)
 		{
+			this.output = output;
 #if DEBUG_IDISPOSABLE
 			Responder.Instances.Clear ();
 			RunState.Instances.Clear ();
+			this.output = output;
+
 #endif
 		}
 
@@ -88,7 +94,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			d.Closed += (s, e) => Application.RequestStop (top1);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.Null (Application.OverlappedChildren);
 				if (iterations == 4) Assert.True (Application.Current == d);
 				else if (iterations == 3) Assert.True (Application.Current == top4);
@@ -154,7 +160,7 @@ namespace Terminal.Gui.ViewsTests {
 				overlapped.RequestStop ();
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 4) {
 					// The Dialog was not closed before and will be closed now.
 					Assert.True (Application.Current == d);
@@ -212,7 +218,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d.Closed += (s, e) => Application.RequestStop (overlapped);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 4) {
 					// The Dialog was not closed before and will be closed now.
 					Assert.True (Application.Current == d);
@@ -270,7 +276,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Now this will close the OverlappedContainer propagating through the OverlappedChildren.
 			d.Closed += (s, e) => Application.RequestStop (overlapped);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 4) {
 					// The Dialog still is the current top and we can't request stop to OverlappedContainer
 					// because we are not using parameter calls.
@@ -298,7 +304,7 @@ namespace Terminal.Gui.ViewsTests {
 			var c3 = new Window ();
 			var d = new Dialog ();
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Assert.False (overlapped.IsOverlapped);
 				Assert.True (c1.IsOverlapped);
 				Assert.True (c2.IsOverlapped);
@@ -362,7 +368,7 @@ namespace Terminal.Gui.ViewsTests {
 				overlapped.RequestStop ();
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 5) {
 					// The Dialog2 still is the current top and we can't request stop to OverlappedContainer
 					// because Dialog2 and Dialog1 must be closed first.
@@ -433,7 +439,7 @@ namespace Terminal.Gui.ViewsTests {
 				overlapped.RequestStop ();
 			};
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 5) {
 					// The Dialog2 still is the current top and we can't request stop to OverlappedContainer
 					// because Dialog2 and Dialog1 must be closed first.
@@ -487,7 +493,7 @@ namespace Terminal.Gui.ViewsTests {
 			c1.Closed += (s, e) => {
 				overlapped.RequestStop ();
 			};
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 3) {
 					// The Current still is c3 because Current.Running is false.
 					Assert.True (Application.Current == c3);
@@ -555,7 +561,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			logger.Ready += (s, e) => Assert.Single (Application.OverlappedChildren);
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (stageCompleted && running) {
 					stageCompleted = false;
 					var stage = new Window () { Modal = true };
@@ -635,7 +641,7 @@ namespace Terminal.Gui.ViewsTests {
 			overlapped.AllChildClosed += (s, e) => {
 				overlapped.RequestStop ();
 			};
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				if (iterations == 3) {
 					// The Current still is c3 because Current.Running is false.
 					Assert.True (Application.Current == c3);
@@ -673,6 +679,71 @@ namespace Terminal.Gui.ViewsTests {
 		public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter ()
 		{
 			Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
+		}
+
+
+		[Fact, AutoInitShutdown]
+		public void Visible_False_Does_Not_Clear ()
+		{
+			var overlapped = new Overlapped ();
+			var win1 = new Window () { Width = 5, Height = 5, Visible = false };
+			var win2 = new Window () { X = 1, Y = 1, Width = 5, Height = 5 };
+			((FakeDriver)Application.Driver).SetBufferSize (10, 10);
+			var rs = Application.Begin (overlapped);
+			Application.Begin (win1);
+			Application.Begin (win2);
+			Assert.Equal (win2, Application.Current);
+			var firstIteration = false;
+			Application.RunIteration (ref rs, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+ ┌───┐
+ │   │
+ │   │
+ │   │
+ └───┘", output);
+			var attributes = new Attribute [] {
+				// 0
+				Colors.TopLevel.Normal,
+				// 1
+				Colors.Base.Normal
+			};
+			TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0111110000
+0111110000
+0111110000
+0111110000
+0111110000
+0000000000
+0000000000
+0000000000
+0000000000", null, attributes);
+
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }));
+			Assert.Equal (win2, Application.MouseGrabView);
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
+			// Need to fool MainLoop into thinking it's running
+			Application.MainLoop.Running = true;
+			Application.RunIteration (ref rs, ref firstIteration);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+  ┌───┐
+  │   │
+  │   │
+  │   │
+  └───┘", output);
+			TestHelpers.AssertDriverColorsAre (@"
+0000000000
+0000000000
+0011111000
+0011111000
+0011111000
+0011111000
+0011111000
+0000000000
+0000000000
+0000000000", null, attributes);
+
+			Application.Shutdown ();
 		}
 	}
 }

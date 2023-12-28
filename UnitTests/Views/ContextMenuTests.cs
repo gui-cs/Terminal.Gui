@@ -1,6 +1,5 @@
 ﻿using System.Globalization;
 using System.Threading;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
@@ -180,8 +179,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			var cm = new ContextMenu ();
 
-			lbl.KeyPress += (s, e) => {
-				if (e.KeyEvent.Key == cm.Key) {
+			lbl.KeyDown += (s, e) => {
+				if (e == cm.Key) {
 					lbl.Text = "Replaced";
 					e.Handled = true;
 				}
@@ -191,12 +190,12 @@ namespace Terminal.Gui.ViewsTests {
 			top.Add (lbl);
 			Application.Begin (top);
 
-			Assert.True (lbl.ProcessKey (new KeyEvent (cm.Key, new KeyModifiers ())));
+			Assert.True (lbl.NewKeyDownEvent (cm.Key));
 			Assert.Equal ("Replaced", lbl.Text);
 
 			lbl.Text = "Original";
-			cm.Key = Key.Space | Key.CtrlMask;
-			Assert.True (lbl.ProcessKey (new KeyEvent (cm.Key, new KeyModifiers ())));
+			cm.Key = KeyCode.Space | KeyCode.CtrlMask;
+			Assert.True (lbl.NewKeyDownEvent (cm.Key));
 			Assert.Equal ("Replaced", lbl.Text);
 		}
 
@@ -230,14 +229,14 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void KeyChanged_Event ()
 		{
-			var oldKey = Key.Null;
+			var oldKey = KeyCode.Null;
 			var cm = new ContextMenu ();
 
-			cm.KeyChanged += (s, e) => oldKey = e.OldKey;
+			cm.KeyChanged += (s, e) => oldKey = (KeyCode)e.OldKey;
 
-			cm.Key = Key.Space | Key.CtrlMask;
-			Assert.Equal (Key.Space | Key.CtrlMask, cm.Key);
-			Assert.Equal (Key.F10 | Key.ShiftMask, oldKey);
+			cm.Key = KeyCode.Space | KeyCode.CtrlMask;
+			Assert.Equal (KeyCode.Space | KeyCode.CtrlMask, cm.Key);
+			Assert.Equal (KeyCode.F10 | KeyCode.ShiftMask, oldKey);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -523,6 +522,7 @@ namespace Terminal.Gui.ViewsTests {
 				});
 
 			Application.Top.Add (menu);
+			Application.Begin (Application.Top);
 
 			Assert.Null (Application.MouseGrabView);
 
@@ -530,7 +530,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.True (menu.ProcessHotKey (new KeyEvent (Key.F9, new KeyModifiers ())));
+			Assert.True (menu.NewKeyDownEvent (menu.Key));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
@@ -539,11 +539,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ContextMenu.IsShow);
 			Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 			Assert.False (menu.IsMenuOpen);
-			Assert.False (menu.OnKeyDown (new KeyEvent (Key.Null, new KeyModifiers () { Alt = true })));
-			Assert.True (menu.OnKeyUp (new KeyEvent (Key.Null, new KeyModifiers () { Alt = true })));
+#if SUPPORT_ALT_TO_ACTIVATE_MENU
+			Assert.True (Application.Top.ProcessKeyUp (new (Key.AltMask)));
 			Assert.False (ContextMenu.IsShow);
 			Assert.Equal (menu, Application.MouseGrabView);
 			Assert.True (menu.IsMenuOpen);
+#endif
 
 			cm.Show ();
 			Assert.True (ContextMenu.IsShow);
@@ -581,8 +582,8 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F1, "~F1~ Help", null),
-				new StatusItem(Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem(KeyCode.F1, "~F1~ Help", null),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
 			});
 
 			Application.Top.Add (menu, label, tf, statusBar);
@@ -645,8 +646,8 @@ namespace Terminal.Gui.ViewsTests {
 			win.Add (label, tf);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (Key.F1, "~F1~ Help", null),
-				new StatusItem (Key.CtrlMask | Key.Q, "~^Q~ Quit", null)
+				new StatusItem (KeyCode.F1, "~F1~ Help", null),
+				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
 			});
 
 			Application.Top.Add (menu, win, statusBar);
@@ -898,13 +899,12 @@ namespace Terminal.Gui.ViewsTests {
 		public void Key_Open_And_Close_The_ContextMenu ()
 		{
 			var tf = new TextField ();
-			var top = Application.Top;
-			top.Add (tf);
-			Application.Begin (top);
+			Application.Top.Add (tf);
+			Application.Begin (Application.Top);
 
-			Assert.True (tf.ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.F10 | KeyCode.ShiftMask)));
 			Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-			Assert.True (top.Subviews [1].ProcessKey (new KeyEvent (Key.F10 | Key.ShiftMask, new KeyModifiers ())));
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.F10 | KeyCode.ShiftMask)));
 			Assert.Null (tf.ContextMenu.MenuBar);
 		}
 
@@ -935,7 +935,8 @@ namespace Terminal.Gui.ViewsTests {
 │                  │
 └──────────────────┘", output);
 
-			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			// Don't use Dialog here as it has more layout logic. Use Window instead.
+			var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
 			dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 			var rs = Application.Begin (dialog);
 
@@ -957,17 +958,14 @@ namespace Terminal.Gui.ViewsTests {
 │                  │
 └──────────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 3,
-					Flags = MouseFlags.Button3Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 3,
+				Flags = MouseFlags.Button3Clicked
+			}));
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -995,8 +993,9 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
 			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
-
-			var dialog = new Dialog () { X = 2, Y = 2, Width = 15, Height = 4 };
+			
+			// Don't use Dialog here as it has more layout logic. Use Window instead.
+			var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
 			dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 			var rs = Application.Begin (dialog);
 
@@ -1008,17 +1007,14 @@ namespace Terminal.Gui.ViewsTests {
   │             │
   └─────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 9,
-					Y = 3,
-					Flags = MouseFlags.Button3Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 9,
+				Y = 3,
+				Flags = MouseFlags.Button3Clicked
+			}));
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌─────────────┐   
   │ Test        │   
@@ -1052,17 +1048,14 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
     Test", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 8,
-					Y = 2,
-					Flags = MouseFlags.Button3Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 8,
+				Y = 2,
+				Flags = MouseFlags.Button3Clicked
+			}));
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
     Test            
 ┌───────────────────
@@ -1103,17 +1096,14 @@ namespace Terminal.Gui.ViewsTests {
      │ Three  │
      └────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 5,
-					Y = 13,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 5,
+				Y = 13,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			var firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 			Assert.Equal (new Rect (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -1124,17 +1114,14 @@ namespace Terminal.Gui.ViewsTests {
      │ Sub-Menu 2  │
      └─────────────┘", output);
 
-			ReflectionTools.InvokePrivate (
-				typeof (Application),
-				"ProcessMouseEvent",
-				new MouseEvent () {
-					X = 5,
-					Y = 12,
-					Flags = MouseFlags.Button1Clicked
-				});
+			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				X = 5,
+				Y = 12,
+				Flags = MouseFlags.Button1Clicked
+			}));
 
 			firstIteration = false;
-			Application.RunMainLoopIteration (ref rs, ref firstIteration);
+			Application.RunIteration (ref rs, ref firstIteration);
 			Assert.Equal (new Rect (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
      ┌────────┐
@@ -1154,7 +1141,7 @@ namespace Terminal.Gui.ViewsTests {
 			var isMenuAllClosed = false;
 			MenuBarItem mi = null;
 			var iterations = -1;
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				iterations++;
 				if (iterations == 0) {
 					cm.Show ();

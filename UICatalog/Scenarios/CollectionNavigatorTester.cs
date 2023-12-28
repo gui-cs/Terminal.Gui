@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 					allowMarking,
 					allowMultiSelection,
 					null,
-					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit(), null, null, Application.QuitKey),
+					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit(), null, null, (KeyCode)Application.QuitKey),
 				}),
 				new MenuBarItem("_Quit", $"{Application.QuitKey}", () => Quit()),
 			});

@@ -3,7 +3,7 @@
     "UICatalog": {
       "commandName": "Project",
       "environmentVariables": {
-        "WT_SESSION": "1"
+        "WT_SESSION": "yes"
       }
     },
     "UICatalog -usc": {
@@ -60,6 +60,10 @@
     },
     "Docker": {
       "commandName": "Docker"
+    },
+    "MenuBarScenario": {
+      "commandName": "Project",
+      "commandLineArgs": "MenuBar"
     }
   }
 }

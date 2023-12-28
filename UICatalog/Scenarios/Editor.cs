@@ -75,19 +75,19 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("_Quit", "", () => Quit()),
 				}),
 				new MenuBarItem ("_Edit", new MenuItem [] {
-					new MenuItem ("_Copy", "", () => Copy(),null,null, Key.CtrlMask | Key.C),
-					new MenuItem ("C_ut", "", () => Cut(),null,null, Key.CtrlMask | Key.W),
-					new MenuItem ("_Paste", "", () => Paste(),null,null, Key.CtrlMask | Key.Y),
+					new MenuItem ("_Copy", "", () => Copy(),null,null, KeyCode.CtrlMask | KeyCode.C),
+					new MenuItem ("C_ut", "", () => Cut(),null,null, KeyCode.CtrlMask | KeyCode.W),
+					new MenuItem ("_Paste", "", () => Paste(),null,null, KeyCode.CtrlMask | KeyCode.Y),
 					null,
-					new MenuItem ("_Find", "", () => Find(),null,null, Key.CtrlMask | Key.S),
-					new MenuItem ("Find _Next", "", () => FindNext(),null,null, Key.CtrlMask | Key.ShiftMask | Key.S),
-					new MenuItem ("Find P_revious", "", () => FindPrevious(),null,null, Key.CtrlMask | Key.ShiftMask | Key.AltMask | Key.S),
-					new MenuItem ("_Replace", "", () => Replace(),null,null, Key.CtrlMask | Key.R),
-					new MenuItem ("Replace Ne_xt", "", () => ReplaceNext(),null,null, Key.CtrlMask | Key.ShiftMask | Key.R),
-					new MenuItem ("Replace Pre_vious", "", () => ReplacePrevious(),null,null, Key.CtrlMask | Key.ShiftMask | Key.AltMask | Key.R),
-					new MenuItem ("Replace _All", "", () => ReplaceAll(),null,null, Key.CtrlMask | Key.ShiftMask | Key.AltMask | Key.A),
+					new MenuItem ("_Find", "", () => Find(),null,null, KeyCode.CtrlMask | KeyCode.S),
+					new MenuItem ("Find _Next", "", () => FindNext(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.S),
+					new MenuItem ("Find P_revious", "", () => FindPrevious(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.S),
+					new MenuItem ("_Replace", "", () => Replace(),null,null, KeyCode.CtrlMask | KeyCode.R),
+					new MenuItem ("Replace Ne_xt", "", () => ReplaceNext(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.R),
+					new MenuItem ("Replace Pre_vious", "", () => ReplacePrevious(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.R),
+					new MenuItem ("Replace _All", "", () => ReplaceAll(),null,null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.A),
 					null,
-					new MenuItem ("_Select All", "", () => SelectAll(),null,null, Key.CtrlMask | Key.T)
+					new MenuItem ("_Select All", "", () => SelectAll(),null,null, KeyCode.CtrlMask | KeyCode.T)
 				}),
 				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
 				new MenuBarItem ("_Cursor", CreateCursorRadio ()),
@@ -113,15 +113,15 @@ namespace UICatalog.Scenarios {
 
 			Application.Top.Add (menu);
 
-			var siCursorPosition = new StatusItem (Key.Null, "", null);
+			var siCursorPosition = new StatusItem (KeyCode.Null, "", null);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				siCursorPosition,
-				new StatusItem(Key.F2, "~F2~ Open", () => Open()),
-				new StatusItem(Key.F3, "~F3~ Save", () => Save()),
-				new StatusItem(Key.F4, "~F4~ Save As", () => SaveAs()),
+				new StatusItem(KeyCode.F2, "~F2~ Open", () => Open()),
+				new StatusItem(KeyCode.F3, "~F3~ Save", () => Save()),
+				new StatusItem(KeyCode.F4, "~F4~ Save As", () => SaveAs()),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(Key.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
+				new StatusItem(KeyCode.Null, $"OS Clipboard IsSupported : {Clipboard.IsSupported}", null)
 			});
 
 			_textView.UnwrappedCursorPosition += (s, e) => {
@@ -176,22 +176,20 @@ namespace UICatalog.Scenarios {
 				_scrollBar.Refresh ();
 			};
 
-			Win.KeyPress += (s, e) => {
-				var keys = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-				if (_winDialog != null && (e.KeyEvent.Key == Key.Esc
-					|| e.KeyEvent.Key == Application.QuitKey)) {
+			Win.KeyDown += (s, e) => {
+				if (_winDialog != null && (e.KeyCode == KeyCode.Esc || e == Application.QuitKey)) {
 					DisposeWinDialog ();
-				} else if (e.KeyEvent.Key == Application.QuitKey) {
+				} else if (e == Application.QuitKey) {
 					Quit ();
 					e.Handled = true;
-				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask)) {
+				} else if (_winDialog != null && e.KeyCode == (KeyCode.Tab | KeyCode.CtrlMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (0);
 					} else {
 						_tabView.SwitchTabBy (1);
 					}
 					e.Handled = true;
-				} else if (_winDialog != null && keys == (Key.Tab | Key.CtrlMask | Key.ShiftMask)) {
+				} else if (_winDialog != null && e.KeyCode == (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)) {
 					if (_tabView.SelectedTab == _tabView.Tabs.ElementAt (0)) {
 						_tabView.SelectedTab = _tabView.Tabs.ElementAt (_tabView.Tabs.Count - 1);
 					} else {
@@ -233,7 +231,7 @@ namespace UICatalog.Scenarios {
 				// FIXED: BUGBUG: #452 TextView.LoadFile keeps file open and provides no way of closing it
 				_textView.Load (_fileName);
 				//_textView.Text = System.IO.File.ReadAllText (_fileName);
-				_originalText = Encoding.Unicode.GetBytes(_textView.Text);
+				_originalText = Encoding.Unicode.GetBytes (_textView.Text);
 				Win.Title = _fileName;
 				_saved = true;
 			}
@@ -429,7 +427,7 @@ namespace UICatalog.Scenarios {
 				Win.Title = title;
 				_fileName = file;
 				System.IO.File.WriteAllText (_fileName, _textView.Text);
-				_originalText = Encoding.Unicode.GetBytes(_textView.Text);
+				_originalText = Encoding.Unicode.GetBytes (_textView.Text);
 				_saved = true;
 				_textView.ClearHistoryChanges ();
 				MessageBox.Query ("Save File", "File was successfully saved.", "Ok");
@@ -770,7 +768,7 @@ namespace UICatalog.Scenarios {
 
 		private void SetFindText ()
 		{
-			_textToFind = !string.IsNullOrEmpty(_textView.SelectedText)
+			_textToFind = !string.IsNullOrEmpty (_textView.SelectedText)
 				? _textView.SelectedText
 				: string.IsNullOrEmpty (_textToFind) ? "" : _textToFind;
 
@@ -809,7 +807,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
 				AutoSize = false
@@ -821,7 +819,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
@@ -831,8 +829,8 @@ namespace UICatalog.Scenarios {
 			txtToFind.TextChanged += (s, e) => {
 				_textToFind = txtToFind.Text;
 				_textView.FindTextChanged ();
-				btnFindNext.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
-				btnFindPrevious.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
+				btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
+				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
 			var btnCancel = new Button ("Cancel") {
@@ -901,7 +899,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
 				AutoSize = false
@@ -930,7 +928,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
@@ -941,7 +939,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
-				Enabled = !string.IsNullOrEmpty(txtToFind.Text),
+				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				AutoSize = false
 			};
@@ -951,9 +949,9 @@ namespace UICatalog.Scenarios {
 			txtToFind.TextChanged += (s, e) => {
 				_textToFind = txtToFind.Text;
 				_textView.FindTextChanged ();
-				btnFindNext.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
-				btnFindPrevious.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
-				btnReplaceAll.Enabled = !string.IsNullOrEmpty(txtToFind.Text);
+				btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
+				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
+				btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
 			var btnCancel = new Button ("Cancel") {

@@ -163,7 +163,7 @@ namespace Terminal.Gui.DialogTests {
 			//wizard.LayoutSubviews ();
 			var firstIteration = false;
 			var runstate = Application.Begin (wizard);
-			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
+			Application.RunIteration (ref runstate, ref firstIteration);
 
 			TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
 			Application.End (runstate);
@@ -530,10 +530,10 @@ namespace Terminal.Gui.DialogTests {
 
 			var runstate = Application.Begin (wizard);
 			var firstIteration = true;
-			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
+			Application.RunIteration (ref runstate, ref firstIteration);
 
 			wizard.NextFinishButton.OnClicked ();
-			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
+			Application.RunIteration (ref runstate, ref firstIteration);
 			Application.End (runstate);
 			Assert.True (finishedFired);
 			Assert.True (closedFired);
@@ -559,7 +559,7 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			runstate = Application.Begin (wizard);
-			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
+			Application.RunIteration (ref runstate, ref firstIteration);
 
 			Assert.Equal (step1.Title, wizard.CurrentStep.Title);
 			wizard.NextFinishButton.OnClicked ();
@@ -597,7 +597,7 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			runstate = Application.Begin (wizard);
-			Application.RunMainLoopIteration (ref runstate, ref firstIteration);
+			Application.RunIteration (ref runstate, ref firstIteration);
 
 			Assert.Equal (step2.Title, wizard.CurrentStep.Title);
 			Assert.Equal (wizard.GetLastStep ().Title, wizard.CurrentStep.Title);
