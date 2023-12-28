@@ -480,6 +480,6 @@ public class KeyTests {
 		Assert.Equal (keyCode, (Key)key);
 		Assert.NotEqual (keyCode, ((Key)key).WithShift);
 		Assert.Equal ((uint)keyCode, (uint)(Key)key);
-		Assert.NotEqual ((uint)keyCode, ((Key)key).WithShift);
+		Assert.NotEqual ((uint)keyCode, (uint)((Key)key).WithShift);
 	}
 }
