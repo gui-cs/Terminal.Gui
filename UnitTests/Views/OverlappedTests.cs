@@ -722,6 +722,8 @@ namespace Terminal.Gui.ViewsTests {
 			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 1, Y = 1, Flags = MouseFlags.Button1Pressed }));
 			Assert.Equal (win2, Application.MouseGrabView);
 			Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () { X = 2, Y = 2, Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition }));
+			// Need to fool MainLoop into thinking it's running
+			Application.MainLoop.Running = true;
 			Application.RunIteration (ref rs, ref firstIteration);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
   ┌───┐

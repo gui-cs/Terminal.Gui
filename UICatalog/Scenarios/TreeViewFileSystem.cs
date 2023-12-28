@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (_detailsFrame);
 			treeViewFiles.MouseClick += TreeViewFiles_MouseClick;
-			treeViewFiles.KeyPressed += TreeViewFiles_KeyPress;
+			treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
 			treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
 			SetupFileTree ();
@@ -158,9 +158,9 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		private void TreeViewFiles_KeyPress (object sender, KeyEventEventArgs obj)
+		private void TreeViewFiles_KeyPress (object sender, Key obj)
 		{
-			if (obj.KeyEvent.Key == (Key.R | Key.CtrlMask)) {
+			if (obj.KeyCode == (KeyCode.R | KeyCode.CtrlMask)) {
 
 				var selected = treeViewFiles.SelectedObject;
 

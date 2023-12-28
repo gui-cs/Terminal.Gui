@@ -166,9 +166,9 @@ namespace Terminal.Gui {
 			set {
 				allowsMarking = value;
 				if (allowsMarking) {
-					AddKeyBinding (Key.Space, Command.ToggleChecked);
+					KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 				} else {
-					ClearKeyBinding (Key.Space);
+					KeyBindings.Remove (KeyCode.Space);
 				}
 
 				SetNeedsDisplay ();
@@ -330,22 +330,22 @@ namespace Terminal.Gui {
 			AddCommand (Command.ToggleChecked, () => MarkUnmarkRow ());
 
 			// Default keybindings for all ListViews
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.P | Key.CtrlMask, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.P | KeyCode.CtrlMask, Command.LineUp);
 
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.N | Key.CtrlMask, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.N | KeyCode.CtrlMask, Command.LineDown);
 
-			AddKeyBinding (Key.PageUp, Command.PageUp);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
 
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.V | Key.CtrlMask, Command.PageDown);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.PageDown);
 
-			AddKeyBinding (Key.Home, Command.TopHome);
+			KeyBindings.Add (KeyCode.Home, Command.TopHome);
 
-			AddKeyBinding (Key.End, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.End, Command.BottomEnd);
 
-			AddKeyBinding (Key.Enter, Command.OpenSelectedItem);
+			KeyBindings.Add (KeyCode.Enter, Command.OpenSelectedItem);
 		}
 
 		///<inheritdoc/>
@@ -416,20 +416,11 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		///<inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool OnProcessKeyDown (Key a)
 		{
-			if (source == null) {
-				return base.ProcessKey (kb);
-			}
-
-			var result = InvokeKeybindings (kb);
-			if (result != null) {
-				return (bool)result;
-			}
-
 			// Enable user to find & select an item by typing text
-			if (CollectionNavigator.IsCompatibleKey (kb)) {
-				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)kb.KeyValue);
+			if (CollectionNavigator.IsCompatibleKey (a)) {
+				var newItem = KeystrokeNavigator?.GetNextMatchingItem (SelectedItem, (char)a);
 				if (newItem is int && newItem != -1) {
 					SelectedItem = (int)newItem;
 					EnsureSelectedItemVisible ();
@@ -437,7 +428,6 @@ namespace Terminal.Gui {
 					return true;
 				}
 			}
-
 			return false;
 		}
 

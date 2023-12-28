@@ -1,93 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
+
 //using static Terminal.Gui.ViewTests.MenuTests;
 
-namespace Terminal.Gui.ViewsTests {
-	public class MenuTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.ViewsTests;
 
-		public MenuTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class MenuTests {
+	readonly ITestOutputHelper _output;
 
-		[Fact]
-		public void Constuctors_Defaults ()
-		{
-			var menuBar = new MenuBar ();
-			var menu = new Menu (menuBar, 0, 0, new MenuBarItem (), null, menuBar.MenusBorderStyle);
-			Assert.Equal (Colors.Menu, menu.ColorScheme);
-			Assert.True (menu.CanFocus);
-			Assert.False (menu.WantContinuousButtonPressed);
-			Assert.Equal (LineStyle.Single, menuBar.MenusBorderStyle);
+	public MenuTests (ITestOutputHelper output)
+	{
+		_output = output;
+	}
 
-			menuBar = new MenuBar ();
-			Assert.Equal (0, menuBar.X);
-			Assert.Equal (0, menuBar.Y);
-			Assert.IsType<Dim.DimFill> (menuBar.Width);
-			Assert.Equal (1, menuBar.Height);
-			Assert.Empty (menuBar.Menus);
-			Assert.Equal (Colors.Menu, menuBar.ColorScheme);
-			Assert.True (menuBar.WantMousePositionReports);
-			Assert.False (menuBar.IsMenuOpen);
+	// TODO: Create more low-level unit tests for Menu and MenuItem
+	
+	[Fact]
+	public void Menu_Constuctors_Defaults ()
+	{
+		Assert.Throws<ArgumentNullException> (() => new Menu (null, 0, 0, null));
 
-			menuBar = new MenuBar (new MenuBarItem [] { });
-			Assert.Equal (0, menuBar.X);
-			Assert.Equal (0, menuBar.Y);
-			Assert.IsType<Dim.DimFill> (menuBar.Width);
-			Assert.Equal (1, menuBar.Height);
-			Assert.Empty (menuBar.Menus);
-			Assert.Equal (Colors.Menu, menuBar.ColorScheme);
-			Assert.True (menuBar.WantMousePositionReports);
-			Assert.False (menuBar.IsMenuOpen);
+		var menu = new Menu (new MenuBar (), 0, 0, new MenuBarItem ());
+		Assert.Empty (menu.Title);
+		Assert.Empty (menu.Text);
 
-			var menuBarItem = new MenuBarItem ();
-			Assert.Equal ("", menuBarItem.Title);
-			Assert.Null (menuBarItem.Parent);
-			Assert.Empty (menuBarItem.Children);
+	}
 
-			menuBarItem = new MenuBarItem (new MenuBarItem [] { });
-			Assert.Equal ("", menuBarItem.Title);
-			Assert.Null (menuBarItem.Parent);
-			Assert.Empty (menuBarItem.Children);
+	[Fact]
+	public void MenuItem_Constuctors_Defaults ()
+	{
+		var menuItem = new MenuItem ();
+		Assert.Equal ("", menuItem.Title);
+		Assert.Equal ("", menuItem.Help);
+		Assert.Null (menuItem.Action);
+		Assert.Null (menuItem.CanExecute);
+		Assert.Null (menuItem.Parent);
+		Assert.Equal (KeyCode.Null, menuItem.Shortcut);
 
-			menuBarItem = new MenuBarItem ("Test", new MenuBarItem [] { });
-			Assert.Equal ("Test", menuBarItem.Title);
-			Assert.Null (menuBarItem.Parent);
-			Assert.Empty (menuBarItem.Children);
-
-			menuBarItem = new MenuBarItem ("Test", new List<MenuItem []> ());
-			Assert.Equal ("Test", menuBarItem.Title);
-			Assert.Null (menuBarItem.Parent);
-			Assert.Empty (menuBarItem.Children);
-
-			menuBarItem = new MenuBarItem ("Test", "Help", null);
-			Assert.Equal ("Test", menuBarItem.Title);
-			Assert.Equal ("Help", menuBarItem.Help);
-			Assert.Null (menuBarItem.Action);
-			Assert.Null (menuBarItem.CanExecute);
-			Assert.Null (menuBarItem.Parent);
-			Assert.Equal (Key.Null, menuBarItem.Shortcut);
-
-			var menuItem = new MenuItem ();
-			Assert.Equal ("", menuItem.Title);
-			Assert.Equal ("", menuItem.Help);
-			Assert.Null (menuItem.Action);
-			Assert.Null (menuItem.CanExecute);
-			Assert.Null (menuItem.Parent);
-			Assert.Equal (Key.Null, menuItem.Shortcut);
-
-			menuItem = new MenuItem ("Test", "Help", Run, () => { return true; }, new MenuItem (), Key.F1);
-			Assert.Equal ("Test", menuItem.Title);
-			Assert.Equal ("Help", menuItem.Help);
-			Assert.Equal (Run, menuItem.Action);
-			Assert.NotNull (menuItem.CanExecute);
-			Assert.NotNull (menuItem.Parent);
-			Assert.Equal (Key.F1, menuItem.Shortcut);
+		menuItem = new MenuItem ("Test", "Help", Run, () => { return true; }, new MenuItem (), KeyCode.F1);
+		Assert.Equal ("Test", menuItem.Title);
+		Assert.Equal ("Help", menuItem.Help);
+		Assert.Equal (Run, menuItem.Action);
+		Assert.NotNull (menuItem.CanExecute);
+		Assert.NotNull (menuItem.Parent);
+		Assert.Equal (KeyCode.F1, menuItem.Shortcut);
 
 			void Run () { }
 		}

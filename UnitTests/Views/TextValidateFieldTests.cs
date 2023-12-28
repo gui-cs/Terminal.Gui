@@ -7,6 +7,8 @@ using Xunit;
 
 namespace Terminal.Gui.ViewsTests {
 
+	// TODO: These tests shouild not rely on AutoInitShutdown / Application
+
 	public class TextValidateField_NET_Provider_Tests {
 
 		[Fact]
@@ -20,7 +22,7 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(1___)--", field.Provider.DisplayText);
 			Assert.Equal ("--(1   )--", field.Text);
@@ -37,7 +39,7 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.A, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.A));
 
 			Assert.Equal ("--(    )--", field.Text);
 			Assert.Equal ("--(____)--", field.Provider.DisplayText);
@@ -55,11 +57,11 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.CursorRight));
+			field.NewKeyDownEvent (new (KeyCode.CursorRight));
+			field.NewKeyDownEvent (new (KeyCode.Home));
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(1___)--", field.Provider.DisplayText);
 			Assert.Equal ("--(1   )--", field.Text);
@@ -77,9 +79,9 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.End, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.End));
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(___1)--", field.Provider.DisplayText);
 			Assert.Equal ("--(   1)--", field.Text);
@@ -98,9 +100,9 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			for (int i = 0; i < 10; i++) {
-				field.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers { }));
+				field.NewKeyDownEvent (new (KeyCode.CursorRight));
 			}
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(___1)--", field.Provider.DisplayText);
 			Assert.Equal ("--(   1)--", field.Text);
@@ -119,9 +121,9 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			for (int i = 0; i < 10; i++) {
-				field.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers { }));
+				field.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			}
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(1___)--", field.Provider.DisplayText);
 			Assert.Equal ("--(1   )--", field.Text);
@@ -139,19 +141,19 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 			Assert.Equal ("--(1   )--", field.Text);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D2));
 			Assert.Equal ("--(12  )--", field.Text);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D3, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D3));
 			Assert.Equal ("--(123 )--", field.Text);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D4));
 			Assert.Equal ("--(1234)--", field.Text);
 			Assert.True (field.IsValid);
 		}
@@ -167,19 +169,19 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 			Assert.Equal ("--(1_-__)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D2));
 			Assert.Equal ("--(12-__)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D3, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D3));
 			Assert.Equal ("--(12-3_)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D4));
 			Assert.Equal ("--(12-34)--", field.Provider.DisplayText);
 			Assert.True (field.IsValid);
 		}
@@ -233,7 +235,7 @@ namespace Terminal.Gui.ViewsTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void Delete_Key_Dosent_Move_Cursor ()
+		public void Delete_Key_Doesnt_Move_Cursor ()
 		{
 			//                                                            ****
 			//                                                         0123456789
@@ -245,19 +247,19 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("--(1234)--", field.Provider.DisplayText);
 			Assert.True (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
 
 			Assert.Equal ("--(_234)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.CursorRight));
+			field.NewKeyDownEvent (new (KeyCode.CursorRight));
 
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
 
 			Assert.Equal ("--(_2_4)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
@@ -275,22 +277,22 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			// Go to the end.
-			field.ProcessKey (new KeyEvent (Key.End, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.End));
 
-			field.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Backspace));
 			Assert.Equal ("--(12_4)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Backspace));
 			Assert.Equal ("--(1__4)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Backspace));
 			Assert.Equal ("--(___4)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
 			// One more
-			field.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Backspace));
 			Assert.Equal ("--(___4)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 		}
@@ -344,14 +346,14 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 30
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(1___)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
 
 			field.MouseEvent (new MouseEvent () { X = 25, Flags = MouseFlags.Button1Pressed });
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 
 			Assert.Equal ("--(1__1)--", field.Provider.DisplayText);
 			Assert.False (field.IsValid);
@@ -368,19 +370,19 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 			Assert.Equal ("1", field.Text);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D2, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D2));
 			Assert.Equal ("12", field.Text);
 			Assert.False (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D3, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D3));
 			Assert.Equal ("123", field.Text);
 			Assert.True (field.IsValid);
 
-			field.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D4));
 			Assert.Equal ("1234", field.Text);
 			Assert.False (field.IsValid);
 		}
@@ -394,7 +396,7 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			// Input dosen't validates the pattern.
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
 			Assert.Equal ("", field.Text);
 			Assert.False (field.IsValid);
 
@@ -460,19 +462,19 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20
 			};
 
-			field.ProcessKey (new KeyEvent (Key.D1, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.D0, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.D0, new KeyModifiers { }));
-			field.ProcessKey (new KeyEvent (Key.D0, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D1));
+			field.NewKeyDownEvent (new (KeyCode.D0));
+			field.NewKeyDownEvent (new (KeyCode.D0));
+			field.NewKeyDownEvent (new (KeyCode.D0));
 
 			Assert.Equal ("1000", field.Text);
 			Assert.True (field.IsValid);
 
 			// HOME KEY
-			field.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Home));
 
 			// DELETE
-			field.ProcessKey (new KeyEvent (Key.Delete, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Delete));
 
 			Assert.Equal ("000", field.Text);
 			Assert.True (field.IsValid);
@@ -488,26 +490,26 @@ namespace Terminal.Gui.ViewsTests {
 			};
 
 			for (int i = 0; i < 4; i++) {
-				field.ProcessKey (new KeyEvent (Key.D0, new KeyModifiers { }));
+				field.NewKeyDownEvent (new (KeyCode.D0));
 			}
 
 			Assert.Equal ("0000", field.Text);
 			Assert.False (field.IsValid);
 
 			// HOME KEY
-			field.ProcessKey (new KeyEvent (Key.Home, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.Home));
 
 			// END KEY
-			field.ProcessKey (new KeyEvent (Key.End, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.End));
 
 			// Insert 9
-			field.ProcessKey (new KeyEvent (Key.D9, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D9));
 
 			Assert.Equal ("00009", field.Text);
 			Assert.True (field.IsValid);
 
 			// Insert 9
-			field.ProcessKey (new KeyEvent (Key.D9, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D9));
 
 			Assert.Equal ("000099", field.Text);
 			Assert.False (field.IsValid);
@@ -525,14 +527,14 @@ namespace Terminal.Gui.ViewsTests {
 			field.Text = "123";
 
 			for (int i = 0; i < 10; i++) {
-				field.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers { }));
+				field.NewKeyDownEvent (new (KeyCode.CursorRight));
 			}
 
 			Assert.Equal ("123", field.Text);
 			Assert.True (field.IsValid);
 
 			// Insert 4
-			field.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D4));
 
 			Assert.Equal ("1234", field.Text);
 			Assert.False (field.IsValid);
@@ -550,14 +552,14 @@ namespace Terminal.Gui.ViewsTests {
 			field.Text = "123";
 
 			for (int i = 0; i < 10; i++) {
-				field.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers { }));
+				field.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			}
 
 			Assert.Equal ("123", field.Text);
 			Assert.True (field.IsValid);
 
 			// Insert 4
-			field.ProcessKey (new KeyEvent (Key.D4, new KeyModifiers { }));
+			field.NewKeyDownEvent (new (KeyCode.D4));
 
 			Assert.Equal ("4123", field.Text);
 			Assert.False (field.IsValid);

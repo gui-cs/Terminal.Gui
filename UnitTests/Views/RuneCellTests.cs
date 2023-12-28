@@ -68,6 +68,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("U+0061 'a'; Normal: Red,Red; Focus: White,Black; HotNormal: White,Black; HotFocus: White,Black; Disabled: White,Black", rc2.ToString ());
 		}
 
+
+		// TODO: Move the tests below to View or Color - they test ColorScheme, not RuneCell primitives.
+
 		private TextView CreateTextView ()
 		{
 			return new TextView () { Width = 30, Height = 10 };

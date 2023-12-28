@@ -8,12 +8,16 @@
   href: views.md
 - name: Configuration
   href: config.md
+- name: Drawing (Text and Color)
+  href: drawing.md
 - name: Cross-platform Driver Model
   href: drivers.md
-- name: Event Processing and the Application Main Loop
-  href: mainloop.md
 - name: Keyboard Event Processing
   href: keyboard.md
+- name: Abosolute, Computed, and Overlapped Layout
+  href: layout.md
+- name: Event Processing and the Application Main Loop
+  href: mainloop.md
 - name: TableView Deep Dive
   href: tableview.md
 - name: TreeView Deep Dive

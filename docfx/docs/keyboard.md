@@ -1,86 +1,120 @@
-Keyboard Event Processing
-=========================
+# Keyboard Events
 
-**Terminal.Gui** respects common Linux, Mac, and Windows keyboard idioms. For example, clipboard operations use the familiar `Control/Command-C, X, V` model. `CTRL-Q` is used for exiting views (and apps).
+## Tenets for Terminal.Gui Key Bindings (Unless you know better ones...)
 
-The input handling of **Terminal.Gui** is similar in some ways to Emacs and the Midnight Commander, so you can expect some of the special key combinations to be active.
+Tenets higher in the list have precedence over tenets lower in the list.
 
-The key `ESC` can act as an Alt modifier (or Meta in Emacs parlance), to allow input on terminals that do not have an alt key. So to produce the sequence `Alt-F`, you can press either `Alt-F`, or `ESC` followed by the key `F`.
+* **Users Have Control** - *Terminal.Gui* provides default key bindings consistent with these tenets, but those defaults are configurable by the user. For example, `ConfigurationManager` allows users to redefine key bindings for the system, a user, or an application.
 
-To enter the key `ESC`, you can either press `ESC` and wait 100 milliseconds, or you can press `ESC` twice.
+* **More Editor than Command Line** - Once a *Terminal.Gui* app starts, the user is no longer using the command line. Users expect keyboard idioms in TUI apps to be consistent with GUI apps (such as VS Code, Vim, and Emacs). For example, in almost all GUI apps, `Ctrl-V` is `Paste`. But the Linux shells often use `Shift-Insert`. *Terminal.Gui* binds `Ctrl-V` by default.
 
-`ESC-0`, and `ESC-1` through `ESC-9` have a special meaning, they map to `F10`, and `F1` to `F9` respectively.
+* **Be Consistent With the User's Platform** - Users get to choose the platform they run *Terminal.Gui* apps on and those apps should respond to keyboard input in a way that is consistent with the platform. For example, on Windows to erase a word to the left, users press `Ctrl-Backspace`. But on Linux, `Ctrl-W` is used.
 
-Apps can change key bindings using the `AddKeyBinding` API. 
+* **The Source of Truth is Wikipedia** - We use this [Wikipedia article](https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts) as our guide for default key bindings.
 
-Keyboard events are sent by the [Main Loop](mainloop.md) to the
-Application class for processing. The keyboard events are sent
-exclusively to the current `Toplevel`, this being either the default
-that is created when you call `Application.Init`, or one that you
-created an passed to `Application.Run(Toplevel)`. 
+## Keyboard APIs
 
-Flow
-----
+*Terminal.Gui* provides the following APIs for handling keyboard input:
 
-Keystrokes are first processes as hotkeys, then as regular keys, and
-there is a final cold post-processing event that is invoked if no view
-processed the key.
+### **[Key](~/api/Terminal.Gui.Key.yml)**
 
-HotKey Processing
------------------
+The `Key` class provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
 
-Events are first send to all views as a "HotKey", this means that the
-`View.ProcessHotKey` method is invoked on the current toplevel, which
-in turns propagates this to all the views in the hierarchy. If any
-view decides to process the event, no further processing takes place.
+See [Key](~/api/Terminal.Gui.Key.yml) for more details.
 
-This is how hotkeys for buttons are implemented. For example, the
-keystroke "Alt-A" is handled by Buttons that have a hot-letter "A" to
-activate the button.
+### **[Key Bindings](~/api/Terminal.Gui.KeyBindings.yml)**
 
-Regular Processing
-------------------
-
-Unlike the hotkey processing, the regular processing is only sent to
-the currently focused view in the focus chain.
-
-The regular key processing is only invoked if no hotkey was caught.
-
-Cold-key Processing
--------------------
-
-This stage only is executed if the focused view did not process the
-event, and is broadcast to all the views in the Toplevel.
-
-This method can be overwritten by views that want to provide
-accelerator functionality (Alt-key for example), but without
-interfering with normal ProcessKey behavior.
-
-Key Bindings
--------------------
-**Terminal.Gui** supports rebinding keys. For example the default key
-for activating a button is Enter. You can change this using the 
-`ClearKeybinding` and `AddKeybinding` methods:
+The default key for activating a button is `Space`. You can change this using  
+`Keybindings.Clear` and `Keybinding.Add` methods:
 
 ```csharp
 var btn = new Button ("Press Me");
-btn.ClearKeybinding (Command.Accept);
-btn.AddKeyBinding (Key.b, Command.Accept);
+btn.Keybinding.Remove (Command.Accept);
+btn.KeyBinding.Add (Key.B, Command.Accept);
 ```
 
-The `Command` enum lists generic operations that are implemented by views.
-For example `Command.Accept` in a Button results in the `Clicked` event 
+The [Command](~/api/Terminal.Gui.Command.yml) enum lists generic operations that are implemented by views. For example `Command.Accept` in a `Button` results in the `Clicked` event 
 firing while in `TableView` it is bound to `CellActivated`. Not all commands
-are implemented by all views (e.g. you cannot scroll in a Button). To see
-which commands are implemented by a View you can use the `GetSupportedCommands()`
-method.
+are implemented by all views (e.g. you cannot scroll in a `Button`). Use the `GetSupportedCommands()` method to determine which commands are implemented by a `View`. 
 
-Not all controls have the same key bound for a given command, for example
-`Command.Accept` defaults to `Key.Enter` in a `Button` but defaults to `Key.Space`
-in `RadioGroup`.
+### **[HotKey](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKey)** 
 
-Global Key Handler
---------------------
-Sometimes you may want to define global key handling logic for your entire 
-application that is invoked regardless of what Window/View has focus. This can
-be achieved by using the `Application.RootKeyEvent` event.
+A **HotKey** is a keypress that selects a visible UI item. For selecting items across `View`s (e.g. a `Button` in a `Dialog`) the keypress must have the `Alt` modifier. For selecting items within a `View` that are not `View`s themselves, the keypress can be key without the `Alt` modifier.  For example, in a `Dialog`, a `Button` with the text of "_Text" can be selected with `Alt-T`. Or, in a `Menu` with "_File _Edit", `Alt-F` will select (show) the "_File" menu. If the "_File" menu has a sub-menu of "_New" `Alt-N` or `N` will ONLY select the "_New" sub-menu if the "_File" menu is already opened.
+
+By default, the `Text` of a `View` is used to determine the `HotKey` by looking for the first occurrence of the [HotKeySpecifier](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKeySpecifier) (which is underscore (`_`) by default). The character following the underscore is the `HotKey`. If the `HotKeySpecifier` is not found in `Text`, the first character of `Text` is used as the `HotKey`. The `Text` of a `View` can be changed at runtime, and the `HotKey` will be updated accordingly. [HotKey](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_HotKey) is `virtual` enabling this behavior to be customized.
+
+### **[Shortcut](~/api/Terminal.Gui.MenuItem.yml#Terminal_Gui_MenuItem_Shortcut)** 
+
+A **Shortcut** is a keypress that invokes a [Command](~/api/Terminal.Gui.Command.yml) or `View`-defined action regardless of whether the `View` that defines them is visible (but the `View` must be enabled). Shortcuts can be any keypress; `Key.A`, `Key.A | Key.Ctrl`, `Key.A | Key.Ctrl | Key.Alt`, `Key.Del`, and `Key.F1`, are all valid. 
+
+`Shortcuts` are used to define application-wide actions (e.g. `Quit`), or actions that are not visible (e.g. `Copy`).
+
+Not all `Views` support `Shortcut`s. [MenuBar](~/api/Terminal.Gui.MenuBar.yml), [ContextMenu](~/api/Terminal.Gui.ContextMenu.yml), and [StatusBar](~/api/Terminal.Gui.StatusBar.yml) support `Shortcut`s. However, the `Button` class does not. 
+
+The `Shortcut` is provided by setting the [Shortcut](~/api/Terminal.Gui.MenuItem.yml#Terminal_Gui_MenuItem_Shortcut) property on either a [MenuItem](~/api/Terminal.Gui.MenuItem.yml) or [StatusItem](~/api/Terminal.Gui.StatusItem.yml). 
+
+The [ShortcutDelimiter](~/api/Terminal.Gui.MenuBar.yml#Terminal_Gui_MenuBar_ShortcutDelimiter) (`+` by default) is used to separate the `Shortcut` from the `Text` of the `MenuItem` or `StatusItem`. For example, the `Shortcut` for `Quit` is `Ctrl+Q` and the `Text` is `Quit`. 
+
+### **[Handling Keyboard Events](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyDown)**
+
+Keyboard events are retrieved from [Console Drivers](drivers.md) and passed on 
+to the [Application](~/api/Terminal.Gui.Application.yml) class by the [Main Loop](mainloop.md). 
+
+[Application](~/api/Terminal.Gui.Application.yml) then determines the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view
+(either the default created by calling `Application.Init`, or the one set by calling `Application.Run`). The mouse event, using [Bounds-relative coordinates](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_Bounds) is then passed to the [NewKeyDownEvent](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_NewKeyDownEvent_Terminal_Gui_Key_) method of the current [Toplevel](~/api/Terminal.Gui.Toplevel.yml) view. 
+
+If the view is enabled, the [NewKeyDownEvent](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_NewKeyDownEvent_Terminal_Gui_Key_) method will do the following: 
+
+1) If the view has a subview that has focus, 'ProcessKeyDown' on the focused view will be called. If the focused view handles the keypress, processing stops.
+2) If there is no focused sub-view, or the focused sub-view does not handle the keypress, [OnKeyDown](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyDown_Terminal_Gui_Key_) will be called. If the view handles the keypress, processing stops.
+3) If the view does not handle the keypress, [OnInvokingKeyBindings](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnInvokingKeyBindings_Terminal_Gui_Key_) will be called. This method calls[InvokeKeyBindings](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_InvokeKeyBindings_Terminal_Gui_Key_) to invoke any keys bound to commands. If the key is bound and any of it's command handlers return true, processing stops.
+4) If the key is not bound, or the bound command handlers do not return true, [OnProcessKeyDow](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnProcessKeyDown_Terminal_Gui_Key_) is called. If the view handles the keypress, processing stops.
+
+## **[Global Key Handling](~/api/Terminal.Gui.Application.yml#Terminal_Gui_Application_OnKeyDown_Terminal_Gui_Key_)**
+
+To define global key handling logic for an entire application in cases where the methods listed above are not suitable, use the `Application.OnKeyDown` event. 
+
+## **[Key Down/Up Events](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_KeyDown)**
+
+*Terminal.Gui* supports key up/down events with [OnKeyDown](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyDown_Terminal_Gui_Key_) and [OnKeyUp](~/api/Terminal.Gui.View.yml#Terminal_Gui_View_OnKeyUp_Terminal_Gui_Key_), but not all [Console Drivers](drivers.md) do. To receive these key down and key up events, you must use a driver that supports them (e.g. `WindowsDriver`).
+
+# General input model
+
+- Key Down and Up events are generated by `ConsoleDriver`. 
+- `Application` subscribes to `ConsoleDriver.Down/Up` events and forwards them to the most-focused `TopLevel` view using `View.NewKeyDownEvent` and `View.NewKeyUpEvent`.
+- The base (`View`) implementation of `NewKeyDownEvent` follows a pattern of "Before", "During", and "After" processing:
+  - **Before**
+    - If `Enabled == false` that view should *never* see keyboard (or mouse input).
+    - `NewKeyDownEvent` is called on the most-focused SubView (if any) that has focus. If that call returns true, the method returns.
+    - Calls `OnKeyDown`.
+  - **During**
+    - Assuming `OnKeyDown` call returns false (indicating the key wasn't handled)
+       - `OnInvokingKeyBindings` is called to invoke any bound commands.
+       - `OnInvokingKeyBindings` fires the `InvokingKeyBindings` event
+  - **After**
+    - Assuming `OnInvokingKeyBindings` returns false (indicating the key wasn't handled)
+       - `OnProcessKeyDown` is called to process the key.
+       - `OnProcessKeyDown` fires the `ProcessKeyDown` event
+
+- Subclasses of `View` can (rarely) override `OnKeyDown` to see keys before they are processed by `OnInvokingKeyBindings` and `OnProcessKeyDown
+- Subclasses of `View` can (rarely) override `OnInvokingKeyBindings` to see keys before they are processed by `OnProcessKeyDown`
+- Subclasses of `View` can (often) override `OnProcessKeyDown` to do normal key processing.
+
+## ConsoleDriver
+
+* No concept of `Command` or `KeyBindings`
+* Use the low-level `KeyCode` enum.
+* Exposes non-cancelable `KeyDown/Up` events. The `OnKey/Down/Up` methods are public and can be used to simulate keyboard input (in addition to SendKeys).
+
+## Application
+
+* Implements support for `KeyBindingScope.Application`.
+* Exposes cancelable `KeyDown/Up` events (via `Handled = true`). The `OnKey/Down/Up/` methods are public and can be used to simulate keyboard input.
+
+## View
+
+* Implements support for `KeyBindingScope.View` and `KeyBindingScope.HotKey`.
+* Exposes cancelable non-virtual methods for a new key event: `NewKeyDownEvent` and `NewKeyUpEvent`. These methods are called by `Application` can be called to simulate keyboard input.
+* Exposes cancelable virtual methods for a new key event: `OnKeyDown` and `OnKeyUp`. These methods are called by `NewKeyDownEvent` and `NewKeyUpEvent` and can be overridden to handle keyboard input.
+
+  

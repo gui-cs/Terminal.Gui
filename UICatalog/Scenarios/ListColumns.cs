@@ -80,9 +80,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F2, "~F2~ OpenBigListEx", () => OpenSimpleList (true)),
-				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample ()),
-				new StatusItem(Key.F4, "~F4~ OpenSmListEx", () => OpenSimpleList (false)),
+				new StatusItem(KeyCode.F2, "~F2~ OpenBigListEx", () => OpenSimpleList (true)),
+				new StatusItem(KeyCode.F3, "~F3~ CloseExample", () => CloseExample ()),
+				new StatusItem(KeyCode.F4, "~F4~ OpenSmListEx", () => OpenSimpleList (false)),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -101,7 +101,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (selectedCellLabel);
 
 			listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{listColView.SelectedRow},{listColView.SelectedColumn}"; };
-			listColView.KeyPressed += TableViewKeyPress;
+			listColView.KeyDown += TableViewKeyPress;
 
 			SetupScrollBar ();
 
@@ -119,7 +119,7 @@ namespace UICatalog.Scenarios {
 				listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? clickedCol);
 			};
 
-			listColView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			listColView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 		}
 
 		private void SetupScrollBar ()
@@ -153,9 +153,9 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, Key e)
 		{
-			if (e.KeyEvent.Key == Key.DeleteChar) {
+			if (e.KeyCode == KeyCode.DeleteChar) {
 
 				// set all selected cells to null
 				foreach (var pt in listColView.GetAllSelectedCells ()) {

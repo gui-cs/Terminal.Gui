@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Interface for all non generic members of <see cref="TreeView{T}"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/treeview.html">See TreeView Deep Dive for more information</a>.
+	/// <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public interface ITreeView {
 		/// <summary>
@@ -37,7 +37,7 @@ namespace Terminal.Gui {
 	/// Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes
 	/// implement <see cref="ITreeNode"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/treeview.html">See TreeView Deep Dive for more information</a>.
+	/// <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public class TreeView : TreeView<ITreeNode> {
 
@@ -56,7 +56,7 @@ namespace Terminal.Gui {
 	/// Hierarchical tree view with expandable branches. Branch objects are dynamically determined
 	/// when expanded using a user defined <see cref="ITreeBuilder{T}"/>.
 	/// 
-	/// <a href="https://gui-cs.github.io/Terminal.Gui/docs/treeview.html">See TreeView Deep Dive for more information</a>.
+	/// <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 	/// </summary>
 	public class TreeView<T> : View, ITreeView where T : class {
 		private int scrollOffsetVertical;
@@ -119,15 +119,16 @@ namespace Terminal.Gui {
 		/// </summary>
 		public event EventHandler<ObjectActivatedEventArgs<T>> ObjectActivated;
 
+		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// Key which when pressed triggers <see cref="TreeView{T}.ObjectActivated"/>.
 		/// Defaults to Enter.
 		/// </summary>
-		public Key ObjectActivationKey {
+		public KeyCode ObjectActivationKey {
 			get => objectActivationKey;
 			set {
 				if (objectActivationKey != value) {
-					ReplaceKeyBinding (ObjectActivationKey, value);
+					KeyBindings.Replace (ObjectActivationKey, value);
 					objectActivationKey = value;
 				}
 			}
@@ -162,7 +163,7 @@ namespace Terminal.Gui {
 		/// (nodes added but no tree builder set).
 		/// </summary>
 		public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
-		private Key objectActivationKey = Key.Enter;
+		private KeyCode objectActivationKey = KeyCode.Enter;
 
 		/// <summary>
 		/// Called when the <see cref="SelectedObject"/> changes.
@@ -286,27 +287,27 @@ namespace Terminal.Gui {
 			AddCommand (Command.Accept, () => { ActivateSelectedObjectIfAny (); return true; });
 
 			// Default keybindings for this view
-			AddKeyBinding (Key.PageUp, Command.PageUp);
-			AddKeyBinding (Key.PageDown, Command.PageDown);
-			AddKeyBinding (Key.PageUp | Key.ShiftMask, Command.PageUpExtend);
-			AddKeyBinding (Key.PageDown | Key.ShiftMask, Command.PageDownExtend);
-			AddKeyBinding (Key.CursorRight, Command.Expand);
-			AddKeyBinding (Key.CursorRight | Key.CtrlMask, Command.ExpandAll);
-			AddKeyBinding (Key.CursorLeft, Command.Collapse);
-			AddKeyBinding (Key.CursorLeft | Key.CtrlMask, Command.CollapseAll);
+			KeyBindings.Add (KeyCode.PageUp, Command.PageUp);
+			KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
+			KeyBindings.Add (KeyCode.PageUp | KeyCode.ShiftMask, Command.PageUpExtend);
+			KeyBindings.Add (KeyCode.PageDown | KeyCode.ShiftMask, Command.PageDownExtend);
+			KeyBindings.Add (KeyCode.CursorRight, Command.Expand);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.ExpandAll);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.Collapse);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.CollapseAll);
 
-			AddKeyBinding (Key.CursorUp, Command.LineUp);
-			AddKeyBinding (Key.CursorUp | Key.ShiftMask, Command.LineUpExtend);
-			AddKeyBinding (Key.CursorUp | Key.CtrlMask, Command.LineUpToFirstBranch);
+			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.ShiftMask, Command.LineUpExtend);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LineUpToFirstBranch);
 
-			AddKeyBinding (Key.CursorDown, Command.LineDown);
-			AddKeyBinding (Key.CursorDown | Key.ShiftMask, Command.LineDownExtend);
-			AddKeyBinding (Key.CursorDown | Key.CtrlMask, Command.LineDownToLastBranch);
+			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.ShiftMask, Command.LineDownExtend);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.LineDownToLastBranch);
 
-			AddKeyBinding (Key.Home, Command.TopHome);
-			AddKeyBinding (Key.End, Command.BottomEnd);
-			AddKeyBinding (Key.A | Key.CtrlMask, Command.SelectAll);
-			AddKeyBinding (ObjectActivationKey, Command.Accept);
+			KeyBindings.Add (KeyCode.Home, Command.TopHome);
+			KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+			KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.SelectAll);
+			KeyBindings.Add (ObjectActivationKey, Command.Accept);
 		}
 
 		/// <summary>
@@ -621,19 +622,14 @@ namespace Terminal.Gui {
 		public CollectionNavigator KeystrokeNavigator { get; private set; } = new CollectionNavigator ();
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
+		public override bool OnProcessKeyDown (Key keyEvent)
 		{
 			if (!Enabled) {
 				return false;
 			}
 
 			try {
-				// First of all deal with any registered keybindings
-				var result = InvokeKeybindings (keyEvent);
-				if (result != null) {
-					return (bool)result;
-				}
-
+				// BUGBUG: this should move to OnInvokingKeyBindings
 				// If not a keybinding, is the key a searchable key press?
 				if (CollectionNavigator.IsCompatibleKey (keyEvent) && AllowLetterBasedNavigation) {
 					IReadOnlyCollection<Branch<T>> map;
@@ -644,7 +640,7 @@ namespace Terminal.Gui {
 
 					// Find the current selected object within the tree
 					var current = map.IndexOf (b => b.Model == SelectedObject);
-					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent.KeyValue);
+					var newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)keyEvent);
 
 					if (newIndex is int && newIndex != -1) {
 						SelectedObject = map.ElementAt ((int)newIndex).Model;
@@ -654,10 +650,12 @@ namespace Terminal.Gui {
 					}
 				}
 			} finally {
-				PositionCursor ();
+				if (IsInitialized) {
+					PositionCursor ();
+				}
 			}
 
-			return base.ProcessKey (keyEvent);
+			return false;
 		}
 
 		/// <summary>

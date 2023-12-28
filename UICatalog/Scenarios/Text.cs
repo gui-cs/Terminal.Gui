@@ -119,15 +119,15 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			Key keyTab = textView.GetKeyFromCommand (Command.Tab);
-			Key keyBackTab = textView.GetKeyFromCommand (Command.BackTab);
+			var keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
+			var keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
 			chxCaptureTabs.Toggled += (s, e) => {
 				if (e.NewValue == true) {
-					textView.AddKeyBinding (keyTab, Command.Tab);
-					textView.AddKeyBinding (keyBackTab, Command.BackTab);
+					textView.KeyBindings.Add (keyTab, Command.Tab);
+					textView.KeyBindings.Add (keyBackTab, Command.BackTab);
 				} else {
-					textView.ClearKeyBinding (keyTab);
-					textView.ClearKeyBinding (keyBackTab);
+					textView.KeyBindings.Remove (keyTab);
+					textView.KeyBindings.Remove (keyBackTab);
 				}
 				textView.AllowsTab = (bool)e.NewValue;
 			};

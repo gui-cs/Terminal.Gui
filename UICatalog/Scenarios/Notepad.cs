@@ -6,7 +6,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Notepad", Description: "Multi-tab text editor using the TabView control.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView"), ScenarioCategory("TextView")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("TabView"), ScenarioCategory ("TextView")]
 	public class Notepad : Scenario {
 		TabView tabView;
 
@@ -25,13 +25,14 @@ namespace UICatalog.Scenarios {
 		{
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_New", "", () => New()),
+					new MenuItem ("_New", "", () => New(), null, null, KeyCode.N | KeyCode.CtrlMask | KeyCode.AltMask),
 					new MenuItem ("_Open", "", () => Open()),
 					new MenuItem ("_Save", "", () => Save()),
 					new MenuItem ("Save _As", "", () => SaveAs()),
 					new MenuItem ("_Close", "", () => Close()),
 					new MenuItem ("_Quit", "", () => Quit()),
-				})
+				}),
+				new MenuBarItem ("_About", "", () => MessageBox.Query("Notepad", "About Notepad...", "Ok"))
 				});
 			Application.Top.Add (menu);
 
@@ -41,18 +42,18 @@ namespace UICatalog.Scenarios {
 			tabView.ApplyStyleChanges ();
 
 			// Start with only a single view but support splitting to show side by side
-			var split = new TileView(1) {
+			var split = new TileView (1) {
 				X = 0,
 				Y = 1,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 			};
-			split.Tiles.ElementAt(0).ContentView.Add (tabView);
+			split.Tiles.ElementAt (0).ContentView.Add (tabView);
 			split.LineStyle = LineStyle.None;
 
 			Application.Top.Add (split);
 
-			lenStatusItem = new StatusItem (Key.CharMask, "Len: ", null);
+			lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 
@@ -60,8 +61,8 @@ namespace UICatalog.Scenarios {
 				//new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
 				//new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
 
-				new StatusItem(Key.CtrlMask | Key.S, "~^S~ Save", () => Save()),
-				new StatusItem(Key.CtrlMask | Key.W, "~^W~ Close", () => Close()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.W, "~^W~ Close", () => Close()),
 				lenStatusItem,
 			});
 			focusedTabView = tabView;
@@ -81,7 +82,7 @@ namespace UICatalog.Scenarios {
 		private void TabView_TabClicked (object sender, TabMouseEventArgs e)
 		{
 			// we are only interested in right clicks
-			if(!e.MouseEvent.Flags.HasFlag(MouseFlags.Button3Clicked)) {
+			if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
 				return;
 			}
 
@@ -108,9 +109,9 @@ namespace UICatalog.Scenarios {
 				});
 			}
 
-		((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY,true);
+		((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY, true);
 
-		var contextMenu = new ContextMenu (screenX,screenY, items);
+			var contextMenu = new ContextMenu (screenX, screenY, items);
 
 			contextMenu.Show ();
 			e.MouseEvent.Handled = true;
@@ -118,48 +119,46 @@ namespace UICatalog.Scenarios {
 
 		private void SplitUp (TabView sender, OpenedFile tab)
 		{
-			Split(0, Orientation.Horizontal,sender,tab);			
+			Split (0, Orientation.Horizontal, sender, tab);
 		}
 		private void SplitDown (TabView sender, OpenedFile tab)
 		{
-			Split(1, Orientation.Horizontal,sender,tab);
-			
+			Split (1, Orientation.Horizontal, sender, tab);
+
 		}
 		private void SplitLeft (TabView sender, OpenedFile tab)
 		{
-			Split(0, Orientation.Vertical,sender,tab);
+			Split (0, Orientation.Vertical, sender, tab);
 		}
 		private void SplitRight (TabView sender, OpenedFile tab)
 		{
-			Split(1, Orientation.Vertical,sender,tab);
+			Split (1, Orientation.Vertical, sender, tab);
 		}
 
-		private void Split (int offset, Orientation orientation,TabView sender, OpenedFile tab)
+		private void Split (int offset, Orientation orientation, TabView sender, OpenedFile tab)
 		{
-			
-			var split = (TileView)sender.SuperView.SuperView;
-			var tileIndex = split.IndexOf(sender);
 
-			if(tileIndex == -1)
-			{
+			var split = (TileView)sender.SuperView.SuperView;
+			var tileIndex = split.IndexOf (sender);
+
+			if (tileIndex == -1) {
 				return;
 			}
 
-			if(orientation != split.Orientation)
-			{
-				split.TrySplitTile(tileIndex,1,out split);
+			if (orientation != split.Orientation) {
+				split.TrySplitTile (tileIndex, 1, out split);
 				split.Orientation = orientation;
 				tileIndex = 0;
 			}
 
-			var newTile = split.InsertTile(tileIndex + offset);
+			var newTile = split.InsertTile (tileIndex + offset);
 			var newTabView = CreateNewTabView ();
 			tab.CloneTo (newTabView);
-			newTile.ContentView.Add(newTabView);
+			newTile.ContentView.Add (newTabView);
 
-			newTabView.EnsureFocus();
-			newTabView.FocusFirst();
-			newTabView.FocusNext();
+			newTabView.EnsureFocus ();
+			newTabView.FocusFirst ();
+			newTabView.FocusNext ();
 		}
 
 		private TabView CreateNewTabView ()
@@ -207,7 +206,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				if (result == 0) {
-					if(tab.File == null) {
+					if (tab.File == null) {
 						SaveAs ();
 					} else {
 						tab.Save ();
@@ -220,20 +219,20 @@ namespace UICatalog.Scenarios {
 			tab.View.Dispose ();
 			focusedTabView = tv;
 
-			if(tv.Tabs.Count == 0) {
+			if (tv.Tabs.Count == 0) {
 
 				var split = (TileView)tv.SuperView.SuperView;
 
 				// if it is the last TabView on screen don't drop it or we will
 				// be unable to open new docs!
-				if(split.IsRootTileView() && split.Tiles.Count == 1) {
+				if (split.IsRootTileView () && split.Tiles.Count == 1) {
 					return;
 				}
 
 				var tileIndex = split.IndexOf (tv);
 				split.RemoveTile (tileIndex);
 
-				if(split.Tiles.Count == 0) {
+				if (split.Tiles.Count == 0) {
 					var parent = split.GetParentTileView ();
 
 					if (parent == null) {
@@ -315,8 +314,8 @@ namespace UICatalog.Scenarios {
 			if (string.IsNullOrWhiteSpace (fd.Path)) {
 				return false;
 			}
-			
-			if(fd.Canceled) {
+
+			if (fd.Canceled) {
 				return false;
 			}
 
@@ -338,8 +337,8 @@ namespace UICatalog.Scenarios {
 
 			public bool UnsavedChanges => !string.Equals (SavedText, View.Text);
 
-			public OpenedFile (TabView parent, string name, FileInfo file) 
-				: base (name, CreateTextView(file))
+			public OpenedFile (TabView parent, string name, FileInfo file)
+				: base (name, CreateTextView (file))
 			{
 
 				File = file;
@@ -376,8 +375,8 @@ namespace UICatalog.Scenarios {
 			private static View CreateTextView (FileInfo file)
 			{
 				string initialText = string.Empty;
-				if(file != null && file.Exists) {
-					
+				if (file != null && file.Exists) {
+
 					initialText = System.IO.File.ReadAllText (file.FullName);
 				}
 
@@ -390,7 +389,7 @@ namespace UICatalog.Scenarios {
 					AllowsTab = false,
 				};
 			}
-			public OpenedFile CloneTo(TabView other)
+			public OpenedFile CloneTo (TabView other)
 			{
 				var newTab = new OpenedFile (other, base.DisplayText.ToString(), File);
 				other.AddTab (newTab, true);

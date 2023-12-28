@@ -60,6 +60,10 @@
     },
     "Docker": {
       "commandName": "Docker"
+    },
+    "MenuBarScenario": {
+      "commandName": "Project",
+      "commandLineArgs": "MenuBar"
     }
   }
 }

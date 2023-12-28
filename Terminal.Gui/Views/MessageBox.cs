@@ -290,7 +290,7 @@ namespace Terminal.Gui {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (0),
-				Height = Dim.Fill (1)
+				Height = Dim.Fill (1),
 			};
 			messageLabel.TextFormatter.WordWrap = wrapMessage;
 			messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
@@ -304,7 +304,7 @@ namespace Terminal.Gui {
 				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
 				if (wrapMessage) {
 					messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
-				} 
+				}
 				var msg = messageLabel.TextFormatter.Format ();
 				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
