@@ -27,6 +27,126 @@ public class KeyTests {
 		Assert.Equal (key, eventArgs.KeyCode);
 	}
 
+	[Theory]
+	[InlineData ('a', KeyCode.A)]
+	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ('z', KeyCode.Z)]
+	[InlineData ('Z', KeyCode.Z | KeyCode.ShiftMask)]
+	[InlineData (' ', KeyCode.Space)]
+	[InlineData ('1', KeyCode.D1)]
+	[InlineData ('!', (KeyCode)'!')]
+	[InlineData ('\n', KeyCode.Enter)]
+	[InlineData ('\t', KeyCode.Tab)]
+	[InlineData ('\r', (KeyCode)13)]
+	[InlineData ('ó', (KeyCode)'ó')]
+	[InlineData ('Ó', (KeyCode)'Ó')]
+	[InlineData ('❿', (KeyCode)'❿')]
+	[InlineData ('☑', (KeyCode)'☑')]
+	[InlineData ('英', (KeyCode)'英')]
+	[InlineData ('{', (KeyCode)'{')]
+	[InlineData ('\'', (KeyCode)'\'')]
+	[InlineData ('\xFFFF', (KeyCode)0xFFFF)]
+	[InlineData ('\x0', (KeyCode)0x0)]
+	public void Constructor_Char (char ch, KeyCode expectedKeyCode)
+	{
+		var key = new Key (ch);
+		Assert.Equal (expectedKeyCode, key.KeyCode);
+	}
+
+
+	// TryParse
+	[Theory]
+	[InlineData ("a", KeyCode.A)]
+	[InlineData ("Ctrl+A", KeyCode.A | KeyCode.CtrlMask)]
+	[InlineData ("Alt+A", KeyCode.A | KeyCode.AltMask)]
+	[InlineData ("Shift+A", KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ("A", KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ("â", (KeyCode)'â')]
+	[InlineData ("Shift+â", (KeyCode)'â' | KeyCode.ShiftMask)]
+	[InlineData ("Shift+Â", (KeyCode)'Â' | KeyCode.ShiftMask)]
+	[InlineData ("Ctrl+Shift+CursorUp", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp)]
+	[InlineData ("Ctrl+Alt+Shift+CursorUp", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
+	[InlineData ("ctrl+alt+shift+cursorup", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
+	[InlineData ("CTRL+ALT+SHIFT+CURSORUP", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
+	[InlineData ("Ctrl+Alt+Shift+Delete", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete)]
+	[InlineData ("Ctrl+Alt+Shift+Enter", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter)]
+	[InlineData ("Tab", KeyCode.Tab)]
+	[InlineData ("Shift+Tab", KeyCode.Tab | KeyCode.ShiftMask)]
+	[InlineData ("Ctrl+Tab", KeyCode.Tab | KeyCode.CtrlMask)]
+	[InlineData ("Alt+Tab", KeyCode.Tab | KeyCode.AltMask)]
+	[InlineData ("Ctrl+Shift+Tab", KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask)]
+	[InlineData ("Ctrl+Alt+Tab", KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask)]
+	[InlineData ("", KeyCode.Null)]
+	[InlineData (" ", KeyCode.Space)]
+	[InlineData ("Shift+ ", KeyCode.Space | KeyCode.ShiftMask)]
+	[InlineData ("Ctrl+ ", KeyCode.Space | KeyCode.CtrlMask)]
+	[InlineData ("Alt+ ", KeyCode.Space | KeyCode.AltMask)]
+	[InlineData ("F1", KeyCode.F1)]
+	[InlineData ("0", KeyCode.D0)]
+	[InlineData ("9", KeyCode.D9)]
+	[InlineData ("D0", KeyCode.D0)]
+	[InlineData ("65", KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ("97", KeyCode.A)]
+	[InlineData ("Shift", KeyCode.ShiftKey)]
+	[InlineData ("Ctrl", KeyCode.CtrlKey)]
+	[InlineData ("Ctrl-A", KeyCode.A | KeyCode.CtrlMask)]
+	[InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
+	[InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
+	[InlineData ("Alt-A-Ctrl", KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask)]
+	public void Constructor_String_Valid (string keyString, Key expected)
+	{
+		Key key = new Key (keyString);
+		Assert.Equal (((Key)expected).ToString (), key.ToString ());
+	}
+
+	[Theory]
+	[InlineData("Barf")]
+	public void Constructor_String_Invalid_Throws (string keyString)
+	{
+		Assert.Throws<ArgumentException> (() => new Key (keyString));
+	}
+
+	[Theory]
+	[InlineData ('a', KeyCode.A)]
+	[InlineData ('A', KeyCode.A | KeyCode.ShiftMask)]
+	[InlineData ('z', KeyCode.Z)]
+	[InlineData ('Z', KeyCode.Z | KeyCode.ShiftMask)]
+	[InlineData (' ', KeyCode.Space)]
+	[InlineData ('1', KeyCode.D1)]
+	[InlineData ('!', (KeyCode)'!')]
+	[InlineData ('\n', KeyCode.Enter)]
+	[InlineData ('\t', KeyCode.Tab)]
+	[InlineData ('\r', (KeyCode)13)]
+	[InlineData ('ó', (KeyCode)'ó')]
+	[InlineData ('Ó', (KeyCode)'Ó')]
+	[InlineData ('❿', (KeyCode)'❿')]
+	[InlineData ('☑', (KeyCode)'☑')]
+	[InlineData ('英', (KeyCode)'英')]
+	[InlineData ('{', (KeyCode)'{')]
+	[InlineData ('\'', (KeyCode)'\'')]
+	[InlineData ('\xFFFF', (KeyCode)0xFFFF)]
+	[InlineData ('\x0', (KeyCode)0x0)]
+	public void Cast_Char_To_Key (char ch, KeyCode expectedKeyCode)
+	{
+		var key = (Key)ch;
+		Assert.Equal (expectedKeyCode, key.KeyCode);
+	}
+
+	// string cast operators
+	[Fact]
+	public void Cast_String_To_Key ()
+	{
+		var key = (Key)"Ctrl+Q";
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, key.KeyCode);
+	}
+
+	[Fact]
+	public void Cast_Key_ToString ()
+	{
+		var str = (string)Key.Q.WithCtrl;
+		Assert.Equal ("Ctrl+Q", str);
+	}
+
 	// IsValid
 	[Theory]
 	[InlineData (KeyCode.A, true)]
@@ -64,6 +184,28 @@ public class KeyTests {
 		Assert.Equal (((Key)expected).ToString (), key.ToString ());
 	}
 
+	[Fact]
+	public void Standard_Keys_Always_New ()
+	{
+		// Make two local keys, and grab Key.A, which is a reference to a singleton.
+		Key aKey1 = Key.A;
+		Key aKey2 = Key.A;
+
+		// Assert the starting state that is expected
+		Assert.False (aKey1.Handled);
+		Assert.False (aKey2.Handled);
+		Assert.False (Key.A.Handled);
+
+		// Now set Handled true on one of our local keys
+		aKey1.Handled = true;
+
+		// Assert the newly-expected case
+		// The last two assertions will fail, because we have actually modified a singleton
+		Assert.True (aKey1.Handled);
+		Assert.False (aKey2.Handled);
+		Assert.False (Key.A.Handled);
+	}
+
 	[Theory]
 	[InlineData ((KeyCode)'a', true)]
 	[InlineData ((KeyCode)'a' | KeyCode.ShiftMask, true)]
@@ -96,7 +238,7 @@ public class KeyTests {
 	[InlineData ((KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '\0')]
 	[InlineData ((KeyCode)'a', 97)] // 97 or Key.Space | Key.A
 	[InlineData ((KeyCode)'A', 97)] // 65 or equivalent to Key.A, but A-Z are mapped to lower case by drivers
-	//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
+					//[InlineData (Key.A, 97)] // 65 equivalent to (Key)'A', but A-Z are mapped to lower case by drivers
 	[InlineData (KeyCode.ShiftMask | KeyCode.A, 65)]
 	[InlineData (KeyCode.CtrlMask | KeyCode.A, '\0')]
 	[InlineData (KeyCode.AltMask | KeyCode.A, '\0')]

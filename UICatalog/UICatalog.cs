@@ -516,7 +516,7 @@ class UICatalogApp {
 			miIsMenuBorderDisabled = new MenuItem {
 				Title = "Disable Menu _Border"
 			};
-			miIsMenuBorderDisabled.Shortcut = (KeyCode)((Key)miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0]).WithAlt.WithCtrl;
+			miIsMenuBorderDisabled.Shortcut = (KeyCode)(new Key (miIsMenuBorderDisabled!.Title!.Substring (14, 1) [0])).WithAlt.WithCtrl;
 			miIsMenuBorderDisabled.CheckType |= MenuItemCheckStyle.Checked;
 			miIsMenuBorderDisabled.Action += () => {
 				miIsMenuBorderDisabled.Checked = (bool)!miIsMenuBorderDisabled.Checked!;
@@ -553,7 +553,7 @@ class UICatalogApp {
 			miIsMouseDisabled = new MenuItem {
 				Title = "_Disable Mouse"
 			};
-			miIsMouseDisabled.Shortcut = (KeyCode)((Key)miIsMouseDisabled!.Title!.Substring (1, 1) [0]).WithAlt.WithCtrl;
+			miIsMouseDisabled.Shortcut = (KeyCode)(new Key (miIsMouseDisabled!.Title!.Substring (1, 1) [0])).WithAlt.WithCtrl;
 			miIsMouseDisabled.CheckType |= MenuItemCheckStyle.Checked;
 			miIsMouseDisabled.Action += () => {
 				miIsMouseDisabled.Checked = Application.IsMouseDisabled = (bool)!miIsMouseDisabled.Checked!;
@@ -592,7 +592,7 @@ class UICatalogApp {
 			foreach (Enum diag in Enum.GetValues (_diagnosticFlags.GetType ())) {
 				var item = new MenuItem {
 					Title = GetDiagnosticsTitle (diag),
-					Shortcut = (KeyCode)((Key)index.ToString () [0]).WithAlt
+					Shortcut = (KeyCode)(new Key(index.ToString () [0])).WithAlt
 				};
 				index++;
 				item.CheckType |= MenuItemCheckStyle.Checked;
@@ -685,7 +685,7 @@ class UICatalogApp {
 			foreach (var theme in Themes!) {
 				var item = new MenuItem {
 					Title = $"_{theme.Key}",
-					Shortcut = (KeyCode)((Key)((uint)KeyCode.D1 + schemeCount++)).WithCtrl
+					Shortcut = (KeyCode)(new Key ((KeyCode)((uint)KeyCode.D1 + (schemeCount++))).WithCtrl)
 				};
 				item.CheckType |= MenuItemCheckStyle.Checked;
 				item.Checked = theme.Key == _cachedTheme; // CM.Themes.Theme;

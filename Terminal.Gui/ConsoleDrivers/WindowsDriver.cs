@@ -1061,16 +1061,17 @@ internal class WindowsDriver : ConsoleDriver {
 			return (KeyCode)((uint)KeyCode.F1 + delta);
 		}
 
+		// If the key is JUST a modifier, return it as that key
 		if (key == (ConsoleKey)16) { // Shift
-			return KeyCode.Null | KeyCode.ShiftMask;
+			return KeyCode.ShiftKey;
 		}
 
 		if (key == (ConsoleKey)17) { // Ctrl
-			return KeyCode.Null | KeyCode.CtrlMask;
+			return KeyCode.CtrlKey;
 		}
 
 		if (key == (ConsoleKey)18) { // Alt
-			return KeyCode.Null | KeyCode.AltMask;
+			return KeyCode.AltKey;
 		}
 
 		return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
