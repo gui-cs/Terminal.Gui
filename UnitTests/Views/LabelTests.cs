@@ -345,10 +345,10 @@ Test
 
 			};
 
-			label.HotKey = Key.r;
+			label.HotKey = Key.R;
 			Assert.Same (label, sender);
-			Assert.Equal (Key.Y, args.OldKey);
-			Assert.Equal (Key.r, args.NewKey);
+			Assert.Equal ((Key)(KeyCode.Y | KeyCode.ShiftMask), args.OldKey);
+			Assert.Equal (Key.R, args.NewKey);
 		}
 
 		[Fact, AutoInitShutdown]
