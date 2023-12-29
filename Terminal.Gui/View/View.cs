@@ -238,6 +238,8 @@ namespace Terminal.Gui {
 
 			AddCommands ();
 
+			AddCommands ();
+
 			CreateFrames ();
 
 			LayoutFrames ();
