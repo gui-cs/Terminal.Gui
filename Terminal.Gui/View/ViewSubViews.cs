@@ -118,7 +118,6 @@ namespace Terminal.Gui {
 		{
 			var view = e.Child;
 			view.IsAdded = true;
-			view.UpdateTextDirection (view.TextDirection);
 			view.OnResizeNeeded ();
 			view._x ??= view._frame.X;
 			view._y ??= view._frame.Y;

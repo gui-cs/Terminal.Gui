@@ -347,7 +347,7 @@ Test
 
 			label.HotKey = Key.R;
 			Assert.Same (label, sender);
-			Assert.Equal (KeyCode.Y | KeyCode.ShiftMask, args.OldKey);
+			Assert.Equal ((Key)(KeyCode.Y | KeyCode.ShiftMask), args.OldKey);
 			Assert.Equal (Key.R, args.NewKey);
 		}
 

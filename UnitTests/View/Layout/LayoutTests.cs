@@ -199,7 +199,8 @@ public class LayoutTests {
 		};
 
 		var v = new View () {
-			Width = Dim.Fill ()
+			Width = Dim.Fill (),
+			ValidatePosDim = true
 		};
 		top.Add (v);
 		top.BeginInit ();
@@ -207,19 +208,23 @@ public class LayoutTests {
 		top.LayoutSubviews ();
 
 		Assert.False (v.AutoSize);
-		Assert.True (v.TrySetWidth (0, out _));
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
 		Assert.Equal (80, v.Frame.Width);
 
 		v.Width = Dim.Fill (1);
 		top.LayoutSubviews ();
 
-		Assert.True (v.TrySetWidth (0, out _));
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
 		Assert.Equal (79, v.Frame.Width);
 
 		v.AutoSize = true;
 		top.LayoutSubviews ();
 
-		Assert.True (v.TrySetWidth (0, out _));
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
+		Assert.Equal (79, v.Frame.Width);
 		top.Dispose ();
 	}
 
@@ -233,7 +238,8 @@ public class LayoutTests {
 		};
 
 		var v = new View () {
-			Height = Dim.Fill ()
+			Height = Dim.Fill (),
+			ValidatePosDim = true
 		};
 		top.Add (v);
 		top.BeginInit ();
@@ -241,19 +247,22 @@ public class LayoutTests {
 		top.LayoutSubviews ();
 
 		Assert.False (v.AutoSize);
-		Assert.True (v.TrySetHeight (0, out _));
+		Assert.False (v.TrySetHeight (0, out _));
 		Assert.Equal (20, v.Frame.Height);
 
 		v.Height = Dim.Fill (1);
 		top.LayoutSubviews ();
 
-		Assert.True (v.TrySetHeight (0, out _));
+		Assert.False (v.TrySetHeight (0, out _));
+		Assert.True (v.Height is Dim.DimFill);
 		Assert.Equal (19, v.Frame.Height);
 
 		v.AutoSize = true;
 		top.LayoutSubviews ();
 
-		Assert.True (v.TrySetHeight (0, out _));
+		Assert.False (v.TrySetHeight (0, out _));
+		Assert.True (v.Height is Dim.DimFill);
+		Assert.Equal (19, v.Frame.Height);
 		top.Dispose ();
 	}
 
@@ -359,6 +368,8 @@ public class LayoutTests {
 		win.Add (label);
 		Application.Top.Add (win);
 
+		// Text is empty and Width and Height are Dim.Fill which aren't yet initialized
+		// and thus the LayoutSubViews wasn't called yet.
 		// Text is empty but height=1 by default, see Label view
 		Assert.False (label.AutoSize);
 		Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
@@ -377,32 +388,36 @@ public class LayoutTests {
 		Application.End (rs);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
 	{
 		var win = new Window (new Rect (0, 0, 30, 80));
-		var label = new Label () { Width = Dim.Fill () };
+		var label = new Label () { Width = Dim.Fill (), ValidatePosDim = true };
 		win.Add (label);
 		Application.Top.Add (win);
 
+		Assert.Equal (LayoutStyle.Computed, label.LayoutStyle);
 		Assert.True (label.IsAdded);
 
-		// Text is empty but height=1 by default, see Label view
 		Assert.True (label.AutoSize);
 		// BUGBUG: LayoutSubviews has not been called, so this test is not really valid (pos/dim are indeterminate, not 0)
-		// Not really a bug because View call OnResizeNeeded method on the SetInitialProperties method
+		// Text is empty but height=1 by default, see Label view
 		Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
 		label.Text = "First line\nSecond line";
 		Application.Top.LayoutSubviews ();
 
 		Assert.True (label.AutoSize);
-		// BUGBUG: This test is bogus: label has not been initialized. pos/dim is indeterminate!
+		// LayoutSubviews was called, so width is 28 (30-2)
+		// Height is 2 because text has 2 lines and auto size is true
 		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 		Assert.False (label.IsInitialized);
 
+		Assert.Equal ("Absolute(1)", label.Height.ToString ());
+		Assert.False (label.IsInitialized);
 		var rs = Application.Begin (Application.Top);
+		Assert.True (label.IsInitialized);
+		Assert.Equal ("Absolute(1)", label.Height.ToString ());
 
 		Assert.True (label.AutoSize);
 		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
@@ -412,6 +427,8 @@ public class LayoutTests {
 		Application.Refresh ();
 
 		Assert.False (label.AutoSize);
+		// Height is 1 because Dim Height=1
+		Assert.Equal ("Absolute(1)", label.Height.ToString ());
 		Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
 		Application.End (rs);
 	}
@@ -426,22 +443,23 @@ public class LayoutTests {
 		Application.Top.Add (win);
 
 		// Text is empty but height=1 by default, see Label view
+		// LayoutSubviews has not been called, so width is 0 and height is 0
 		Assert.True (label.AutoSize);
 		Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
 
+		// Set ValidatePosDim to true to maintain the Dim.Fill
+		label.ValidatePosDim = true;
 		var rs = Application.Begin (Application.Top);
 
 		Assert.True (label.AutoSize);
-		// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
-		// and height 0 because wasn't set and the text is empty
-		// BUGBUG: Because of #2450, this test is bogus: pos/dim is indeterminate!
-		//Assert.Equal ("(0,0,28,0)", label.Bounds.ToString ());
+		// Here the AutoSize and Begin ensuring the right size with width 28 (Dim.Fill)
+		// and height 1 because Label set that value by default
+		Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
 
 		label.Text = "First line\nSecond line";
 		Application.Refresh ();
 
-		// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
-		// and height 2 because wasn't set and the text has 2 lines
+		// Height is 2 because text has 2 lines and auto size is true
 		Assert.True (label.AutoSize);
 		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 
@@ -450,12 +468,16 @@ public class LayoutTests {
 
 		// Here the SetMinWidthHeight ensuring the minimum height
 		Assert.False (label.AutoSize);
+		// Height is 1 because Dim Height=1
+		Assert.Equal ("Absolute(1)", label.Height.ToString ());
 		Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
+		Assert.True (label.IsInitialized);
 
+		// Set height to 0 to test the SetMinWidthHeight
+		label.Height = 0;
 		label.Text = "First changed line\nSecond changed line\nNew line";
 		Application.Refresh ();
 
-		// Here the AutoSize is false and the width 28 (Dim.Fill) and
 		// height 1 because wasn't set and SetMinWidthHeight ensuring the minimum height
 		Assert.False (label.AutoSize);
 		Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
@@ -463,19 +485,23 @@ public class LayoutTests {
 		label.AutoSize = true;
 		Application.Refresh ();
 
-		// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
-		// and height 3 because wasn't set and the text has 3 lines
+		// Height 3 because the text has 3 lines
 		Assert.True (label.AutoSize);
+		Assert.True (label.ValidatePosDim);
 		// BUGBUG: v2 - AutoSize is broken - temporarily disabling test See #2432
-		//Assert.Equal ("(0,0,28,3)", label.Bounds.ToString ());
+		// I think this is working again
+		Assert.Equal ("(0,0,28,3)", label.Bounds.ToString ());
+
+		// Set ValidatePosDim to false to ignore the Dim.Fill
+		label.ValidatePosDim = false;
+		Assert.Equal ("(0,0,19,3)", label.Bounds.ToString ());
 		Application.End (rs);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void AutoSize_True_Setting_With_Height_Horizontal ()
 	{
-		var label = new Label ("Hello") { Width = 10, Height = 2 };
+		var label = new Label ("Hello") { Width = 10, Height = 2, ValidatePosDim = true };
 		var viewX = new View ("X") { X = Pos.Right (label) };
 		var viewY = new View ("Y") { Y = Pos.Bottom (label) };
 
@@ -511,11 +537,10 @@ Y
 		Application.End (rs);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void AutoSize_True_Setting_With_Height_Vertical ()
 	{
-		var label = new Label ("Hello") { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight };
+		var label = new Label ("Hello") { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true };
 		var viewX = new View ("X") { X = Pos.Right (label) };
 		var viewY = new View ("Y") { Y = Pos.Bottom (label) };
 
@@ -577,6 +602,7 @@ Y
 
 		Assert.True (lbl.AutoSize);
 		Assert.Equal ("123 ", GetContents ());
+		Assert.Equal (LayoutStyle.Computed, lbl.LayoutStyle);
 
 		lbl.Text = "12";
 		// Here the AutoSize ensuring the right size with width 3 (Dim.Absolute)
@@ -1282,33 +1308,35 @@ Y
 		Application.End (rs);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void AutoSize_True_Equal_Before_And_After_IsInitialized_With_Different_Orders ()
 	{
-		var view1 = new View () { Text = "Say Hello view1 你", AutoSize = true, Width = 10, Height = 5 };
-		var view2 = new View () { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = true };
-		var view3 = new View () { AutoSize = true, Width = 10, Height = 5, Text = "Say Hello view3 你" };
+		var view1 = new View () { Text = "Say Hello view1 你", AutoSize = true, Width = 10, Height = 5, ValidatePosDim = true };
+		var view2 = new View () { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = true, ValidatePosDim = true };
+		var view3 = new View () { AutoSize = true, Width = 10, Height = 5, Text = "Say Hello view3 你", ValidatePosDim = true };
 		var view4 = new View () {
 			Text = "Say Hello view4 你",
 			AutoSize = true,
 			Width = 10,
 			Height = 5,
-			TextDirection = TextDirection.TopBottom_LeftRight
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			ValidatePosDim = true
 		};
 		var view5 = new View () {
 			Text = "Say Hello view5 你",
 			Width = 10,
 			Height = 5,
 			AutoSize = true,
-			TextDirection = TextDirection.TopBottom_LeftRight
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			ValidatePosDim = true
 		};
 		var view6 = new View () {
 			AutoSize = true,
 			Width = 10,
 			Height = 5,
 			TextDirection = TextDirection.TopBottom_LeftRight,
-			Text = "Say Hello view6 你"
+			Text = "Say Hello view6 你",
+			ValidatePosDim = true
 		};
 		Application.Top.Add (view1, view2, view3, view4, view5, view6);
 
@@ -1323,25 +1351,25 @@ Y
 		Assert.Equal ("Absolute(5)", view1.Height.ToString ());
 		Assert.True (view2.AutoSize);
 		// BUGBUG: v2 - Autosize is broken when setting Width/Height AutoSize. Disabling test for now.
-		//Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
-		//Assert.Equal ("Absolute(10)", view2.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view2.Height.ToString ());
-		//Assert.True (view3.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
-		//Assert.Equal ("Absolute(10)", view3.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view3.Height.ToString ());
-		//Assert.True (view4.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
-		//Assert.Equal ("Absolute(10)", view4.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view4.Height.ToString ());
-		//Assert.True (view5.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
-		//Assert.Equal ("Absolute(10)", view5.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view5.Height.ToString ());
-		//Assert.True (view6.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
-		//Assert.Equal ("Absolute(10)", view6.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+		Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
+		Assert.Equal ("Absolute(10)", view2.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+		Assert.True (view3.AutoSize);
+		Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
+		Assert.Equal ("Absolute(10)", view3.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+		Assert.True (view4.AutoSize);
+		Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
+		Assert.Equal ("Absolute(10)", view4.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view4.Height.ToString ());
+		Assert.True (view5.AutoSize);
+		Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
+		Assert.Equal ("Absolute(10)", view5.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view5.Height.ToString ());
+		Assert.True (view6.AutoSize);
+		Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
+		Assert.Equal ("Absolute(10)", view6.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view6.Height.ToString ());
 
 		var rs = Application.Begin (Application.Top);
 
@@ -1356,25 +1384,25 @@ Y
 		Assert.Equal ("Absolute(5)", view1.Height.ToString ());
 		Assert.True (view2.AutoSize);
 		// BUGBUG: v2 - Autosize is broken when setting Width/Height AutoSize. Disabling test for now.
-		//Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
-		//Assert.Equal ("Absolute(10)", view2.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view2.Height.ToString ());
-		//Assert.True (view3.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
-		//Assert.Equal ("Absolute(10)", view3.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view3.Height.ToString ());
-		//Assert.True (view4.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
-		//Assert.Equal ("Absolute(10)", view4.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view4.Height.ToString ());
-		//Assert.True (view5.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
-		//Assert.Equal ("Absolute(10)", view5.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view5.Height.ToString ());
-		//Assert.True (view6.AutoSize);
-		//Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
-		//Assert.Equal ("Absolute(10)", view6.Width.ToString ());
-		//Assert.Equal ("Absolute(5)", view6.Height.ToString ());
+		Assert.Equal (new Rect (0, 0, 18, 5), view2.Frame);
+		Assert.Equal ("Absolute(10)", view2.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view2.Height.ToString ());
+		Assert.True (view3.AutoSize);
+		Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
+		Assert.Equal ("Absolute(10)", view3.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+		Assert.True (view4.AutoSize);
+		Assert.Equal (new Rect (0, 0, 10, 17), view4.Frame);
+		Assert.Equal ("Absolute(10)", view4.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view4.Height.ToString ());
+		Assert.True (view5.AutoSize);
+		Assert.Equal (new Rect (0, 0, 10, 17), view5.Frame);
+		Assert.Equal ("Absolute(10)", view5.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view5.Height.ToString ());
+		Assert.True (view6.AutoSize);
+		Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
+		Assert.Equal ("Absolute(10)", view6.Width.ToString ());
+		Assert.Equal ("Absolute(5)", view6.Height.ToString ());
 		Application.End (rs);
 	}
 
@@ -1401,12 +1429,12 @@ Y
 		Assert.Equal ("Absolute(1)", view1.Height.ToString ());
 		Assert.True (view2.AutoSize);
 		// BUGBUG: v2 - Autosize is broken when setting Width/Height AutoSize. Disabling test for now.
-		//Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
-		//Assert.Equal (new Rect (0, 0, 2, 17), view2.Frame);
-		//Assert.Equal ("Absolute(0)", view2.X.ToString ());
-		//Assert.Equal ("Absolute(0)", view2.Y.ToString ());
-		//Assert.Equal ("Absolute(2)", view2.Width.ToString ());
-		//Assert.Equal ("Absolute(17)", view2.Height.ToString ());
+		Assert.Equal (LayoutStyle.Absolute, view2.LayoutStyle);
+		Assert.Equal (new Rect (0, 0, 2, 17), view2.Frame);
+		Assert.Equal ("Absolute(0)", view2.X.ToString ());
+		Assert.Equal ("Absolute(0)", view2.Y.ToString ());
+		Assert.Equal ("Absolute(2)", view2.Width.ToString ());
+		Assert.Equal ("Absolute(17)", view2.Height.ToString ());
 
 		view1.Frame = new Rect (0, 0, 25, 4);
 		bool firstIteration = false;
@@ -1429,8 +1457,8 @@ Y
 		Assert.Equal ("Absolute(0)", view2.X.ToString ());
 		Assert.Equal ("Absolute(0)", view2.Y.ToString ());
 		// BUGBUG: v2 - Autosize is broken when setting Width/Height AutoSize. Disabling test for now.
-		//Assert.Equal ("Absolute(2)", view2.Width.ToString ());
-		//Assert.Equal ("Absolute(17)", view2.Height.ToString ());
+		Assert.Equal ("Absolute(2)", view2.Width.ToString ());
+		Assert.Equal ("Absolute(17)", view2.Height.ToString ());
 		Application.End (rs);
 	}
 

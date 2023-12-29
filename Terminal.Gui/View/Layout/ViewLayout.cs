@@ -437,7 +437,13 @@ public partial class View {
 	/// during set operations and in <see cref="LayoutSubviews"/>.If invalid settings are discovered exceptions will be thrown indicating the error.
 	/// This will impose a performance penalty and thus should only be used for debugging. 
 	/// </remarks>
-	public bool ValidatePosDim { get; set; }
+	public bool ValidatePosDim {
+		get => _validatePosDim;
+		set {
+			_validatePosDim = value;
+			ResizeView (AutoSize);
+		}
+	}
 
 	/// <summary>
 	/// Throws an <see cref="ArgumentException"/> if <paramref name="newValue"/> is <see cref="Pos.PosAbsolute"/> or <see cref="Dim.DimAbsolute"/>.
@@ -479,15 +485,18 @@ public partial class View {
 			var s = GetAutoSize ();
 			int w = _width is Dim.DimAbsolute && _width.Anchor (0) > s.Width ? _width.Anchor (0) : s.Width;
 			int h = _height is Dim.DimAbsolute && _height.Anchor (0) > s.Height ? _height.Anchor (0) : s.Height;
-			_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
+			_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set _frame, not Frame!
 		} else {
-			int w = _width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width;
-			int h = _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height;
+			int w = _width is Dim.DimAbsolute ? _width.Anchor (0) : IsInitialized ? _frame.Width : string.IsNullOrEmpty (Text) ? _frame.Width : GetAutoSize ().Width;
+			int h = _height is Dim.DimAbsolute ? _height.Anchor (0) : IsInitialized ? _frame.Height : string.IsNullOrEmpty (Text) ? _frame.Height : GetAutoSize ().Height;
 			// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
 			// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
-			_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
+			_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set _frame, not Frame!
 		}
-		//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+		// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
+		// It isn't a bug, this call needs to be called when AutoSize is also false
+		// See the AutoSize_False_Label_Height_Zero_Returns_Minimum_Height unit test on AutoSizeTests.cs
+		// Comment the follow code and the unit test will fail
 		if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 			SetFrameToFitText ();
 			LayoutFrames ();
@@ -658,7 +667,7 @@ public partial class View {
 					newDimension = d.Anchor (dimension);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
-					
+
 				case Dim.DimFill:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
@@ -982,6 +991,7 @@ public partial class View {
 	}
 
 	bool _autoSize;
+	private bool _validatePosDim;
 
 	/// <summary>
 	/// Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/> 
@@ -1071,8 +1081,8 @@ public partial class View {
 			y = Bounds.Y;
 		}
 		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
-		int newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
-		int newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
+		int newWidth = rect.Size.Width - GetHotKeySpecifierLength () + (Margin == null ? 0 : Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal);
+		int newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + (Margin == null ? 0 : Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical);
 		return new Size (newWidth, newHeight);
 	}
 

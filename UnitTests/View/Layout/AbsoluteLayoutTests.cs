@@ -114,6 +114,7 @@ namespace Terminal.Gui.ViewTests {
 			v.Height = newFrame.Height;
 			v.Width = newFrame.Width;
 			Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+			// LayoutStyle.Absolute never runs LayoutSubViews method and thus only the Frame is considered
 			Assert.Equal (newFrame, v.Frame);
 			Assert.Equal (new Rect (0, 0, newFrame.Width, newFrame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
 			Assert.Null (v.X);
@@ -154,6 +155,7 @@ namespace Terminal.Gui.ViewTests {
 			v.Y = newFrame.Y;
 			Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 			Assert.Equal (newFrame, v.Frame);
+			// Bounds location is always Point.Empty so it pass 
 			Assert.Equal (new Rect (0, 0, newFrame.Width, newFrame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
 			Assert.Equal ($"Absolute({newFrame.X})", v.X.ToString ());
 			Assert.Equal ($"Absolute({newFrame.Y})", v.Y.ToString ());

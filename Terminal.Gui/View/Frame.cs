@@ -446,5 +446,7 @@ namespace Terminal.Gui {
 			Driver.Clip = savedClip;
 		}
 
+		///<inheritdoc/>
+		protected override void OnResizeNeeded () { }
 	}
 }
