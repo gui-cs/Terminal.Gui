@@ -157,6 +157,13 @@ public class ResponderTests {
 		Assert.NotEmpty (container2.Subviews);
 		Assert.Equal (views.Count, container2.Subviews.Count);
 
+		// Trying access disposed properties
+		Assert.True (container2.Subviews [0].WasDisposed);
+		Assert.False (container2.Subviews [0].CanFocus);
+		Assert.Null (container2.Subviews [0].Margin);
+		Assert.Null (container2.Subviews [0].Border);
+		Assert.Null (container2.Subviews [0].Padding);
+
 		container2.Dispose ();
 
 		Assert.Empty (Responder.Instances);
