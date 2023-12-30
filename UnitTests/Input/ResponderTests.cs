@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -112,11 +113,11 @@ public class ResponderTests {
 		// MouseEvent is defined on Responder IS overriden on ScrollBarView (but not View)
 		Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides MouseEvent" }, "MouseEvent"));
 
-		//// OnKeyDown is defined on View
-		//Assert.True (Responder.IsOverridden (new View () { Text = "View overrides OnKeyDown" }, "OnKeyDown"));
+		// OnKeyDown is defined on View
+		Assert.False (Responder.IsOverridden (new View () { Text = "View overrides OnKeyDown" }, "OnKeyDown"));
 
-		//// OnKeyDown is defined on DerivedView
-		//Assert.True (Responder.IsOverridden (new DerivedView () { Text = "DerivedView overrides OnKeyDown" }, "OnKeyDown"));
+		// OnKeyDown is defined on DerivedView
+		Assert.True (Responder.IsOverridden (new DerivedView () { Text = "DerivedView overrides OnKeyDown" }, "OnKeyDown"));
 
 		// ScrollBarView overrides both MouseEvent (from Responder) and Redraw (from View)
 		Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides MouseEvent" }, "MouseEvent"));
@@ -128,5 +129,118 @@ public class ResponderTests {
 		Responder.Instances.Clear ();
 		Assert.Empty (Responder.Instances);
 #endif
+	}
+
+	[Fact]
+	public void Responder_Not_Notifying_Dispose ()
+	{
+		List<View> views = new List<View> ();
+		var container1 = new View () { Id = "Container1" };
+
+		for (int i = 0; i < 20; i++) {
+			var view = new View () { Id = $"View{i}" };
+			views.Add (view);
+			container1.Add (view);
+		}
+
+		Assert.Equal (views.Count, container1.Subviews.Count);
+
+		var container2 = new View () { Id = "Container2" };
+
+		foreach (View view in views) {
+			container2.Add (view);
+		}
+		Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+		container1.Dispose ();
+
+		Assert.Empty (container1.Subviews);
+		Assert.NotEmpty (container2.Subviews);
+		Assert.Equal (views.Count, container2.Subviews.Count);
+
+		container2.Dispose ();
+
+		Assert.Empty (Responder.Instances);
+	}
+
+	[Fact]
+	public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
+	{
+		List<View> views = new List<View> ();
+		var container1 = new View () { Id = "Container1" };
+
+		for (int i = 0; i < 20; i++) {
+			var view = new View () { Id = $"View{i}" };
+			views.Add (view);
+			container1.Add(view);
+		}
+
+		Assert.Equal (views.Count, container1.Subviews.Count);
+
+		var container2 = new View () { Id = "Container2" };
+		var count = 0;
+
+		foreach (View view in views) {
+			view.Disposing += View_Disposing;
+			container2.Add (view);
+		}
+
+		void View_Disposing (object sender, System.EventArgs e)
+		{
+			count++;
+			Assert.Equal (views [views.Count - count], sender);
+			container2.Remove ((View)sender);
+		}
+
+		Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+		container1.Dispose ();
+
+		Assert.Empty (container1.Subviews);
+		Assert.Empty (container2.Subviews);
+		Assert.Equal (count, views.Count);
+
+		container2.Dispose ();
+
+		Assert.Empty (Responder.Instances);
+	}
+
+	[Fact]
+	public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
+	{
+		List<View> views = new List<View> ();
+		var container1 = new View () { Id = "Container1" };
+		var count = 0;
+
+		for (int i = 0; i < 20; i++) {
+			var view = new View () { Id = $"View{i}" };
+			view.Disposing += View_Disposing;
+			views.Add (view);
+			container1.Add (view);
+		}
+
+		void View_Disposing (object sender, System.EventArgs e)
+		{
+			count++;
+			Assert.Equal (views [views.Count - count], sender);
+			container1.Remove ((View)sender);
+		}
+
+		Assert.Equal (views.Count, container1.Subviews.Count);
+
+		var container2 = new View () { Id = "Container2" };
+
+		foreach (View view in views) {
+			container2.Add (view);
+		}
+
+		Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
+		container2.Dispose ();
+
+		Assert.Empty (container1.Subviews);
+		Assert.Empty (container2.Subviews);
+		Assert.Equal (count, views.Count);
+
+		container1.Dispose ();
+
+		Assert.Empty (Responder.Instances);
 	}
 }

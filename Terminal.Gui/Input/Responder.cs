@@ -48,6 +48,11 @@ public class Responder : IDisposable {
 #endif
 
 	/// <summary>
+	/// Invokes subscribers that this is disposed.
+	/// </summary>
+	public event EventHandler Disposing;
+
+	/// <summary>
 	/// Gets or sets a value indicating whether this <see cref="Responder"/> can focus.
 	/// </summary>
 	/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
@@ -187,6 +192,7 @@ public class Responder : IDisposable {
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose (disposing: true);
+		Disposing?.Invoke (this, EventArgs.Empty);
 		GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 		WasDisposed = true;
