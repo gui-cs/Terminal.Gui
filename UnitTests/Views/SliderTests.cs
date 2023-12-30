@@ -9,6 +9,26 @@ using System.Threading.Tasks;
 namespace Terminal.Gui.ViewsTests;
 
 public class SliderOptionTests {
+
+
+	[Fact]
+	public void Slider_Option_Default_Constructor ()
+	{
+		var o = new SliderOption<int> ();
+		Assert.Null (o.Legend);
+		Assert.Equal (default, o.LegendAbbr);
+		Assert.Equal (default, o.Data);
+	}
+
+	[Fact]
+	public void Slider_Option_Values_Constructor ()
+	{
+		var o = new SliderOption<int> ("1 thousand", new Rune ('y'), 1000);
+		Assert.Equal ("1 thousand", o.Legend);
+		Assert.Equal (new Rune ('y'), o.LegendAbbr);
+		Assert.Equal (1000, o.Data);
+	}
+
 	[Fact]
 	public void OnSet_Should_Raise_SetEvent ()
 	{
@@ -133,24 +153,6 @@ public class SliderTests {
 		Assert.NotNull (slider);
 		Assert.NotNull (slider.Options);
 		Assert.Equal (options.Count, slider.Options.Count);
-	}
-
-	[Fact]
-	public void Slider_Option_Default_Constructor ()
-	{
-		var o = new SliderOption<int> ();
-		Assert.Null (o.Legend);
-		Assert.Equal (default, o.LegendAbbr);
-		Assert.Equal (default, o.Data);
-	}
-
-	[Fact]
-	public void Slider_Option_Values_Constructor ()
-	{
-		var o = new SliderOption<int> ("1 thousand", new Rune ('y'), 1000);
-		Assert.Equal ("1 thousand", o.Legend);
-		Assert.Equal (new Rune ('y'), o.LegendAbbr);
-		Assert.Equal (1000, o.Data);
 	}
 
 	[Fact]
