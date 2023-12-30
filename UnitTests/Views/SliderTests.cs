@@ -62,7 +62,7 @@ public class SliderOptionTests {
 	}
 
 	[Fact]
-	public void SliderOption_ToString_WhenPopulated ()
+	public void SliderOption_ToString_WhenPopulated_WithInt ()
 	{
 		var sliderOption = new SliderOption<int> {
 			Legend = "Lord flibble",
@@ -71,6 +71,19 @@ public class SliderOptionTests {
 		};
 
 		Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
+	}
+
+
+	[Fact]
+	public void SliderOption_ToString_WhenPopulated_WithSizeF ()
+	{
+		var sliderOption = new SliderOption<SizeF> {
+			Legend = "Lord flibble",
+			LegendAbbr = new Rune ('l'),
+			Data = new SizeF(32,11),
+		};
+
+		Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data={Width=32, Height=11}}", sliderOption.ToString ());
 	}
 }
 
