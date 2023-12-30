@@ -140,16 +140,16 @@ public class SliderTests {
 	{
 		var o = new SliderOption<int> ();
 		Assert.Null (o.Legend);
-		Assert.Equal (default,o.LegendAbbr);
+		Assert.Equal (default, o.LegendAbbr);
 		Assert.Equal (default, o.Data);
 	}
 
 	[Fact]
-	public void Slider_Option_Values_Constructor()
+	public void Slider_Option_Values_Constructor ()
 	{
-		var o = new SliderOption<int> ("1 thousand",new Rune('y'),1000);
+		var o = new SliderOption<int> ("1 thousand", new Rune ('y'), 1000);
 		Assert.Equal ("1 thousand", o.Legend);
-		Assert.Equal (new Rune('y'), o.LegendAbbr);
+		Assert.Equal (new Rune ('y'), o.LegendAbbr);
 		Assert.Equal (1000, o.Data);
 	}
 
@@ -429,7 +429,7 @@ public class SliderTests {
 
 		// Assert
 		Assert.False (result);
-		Assert.NotEmpty (slider.GetSetOptions());
+		Assert.NotEmpty (slider.GetSetOptions ());
 	}
 
 	// Add more tests for different scenarios and edge cases.
