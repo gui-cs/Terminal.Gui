@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Xunit;
+using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui.ConsoleDrivers;
 public class ConsoleKeyMappingTests {
@@ -16,7 +17,7 @@ public class ConsoleKeyMappingTests {
 	[InlineData ((KeyCode)'!' | KeyCode.ShiftMask, ConsoleKey.D1, (KeyCode)'!', '!')]
 	[InlineData (KeyCode.D1 | KeyCode.ShiftMask, ConsoleKey.D1, (KeyCode)'!', '!')]
 	[InlineData (KeyCode.D1, ConsoleKey.D1, KeyCode.D1, '1')]
-	[InlineData ((KeyCode)'/' | KeyCode.ShiftMask, ConsoleKey.D7, (KeyCode)'/', '/')]
+	[InlineData ((KeyCode)'/' | KeyCode.ShiftMask, ConsoleKey.D7, (KeyCode)'/', '/')] // BUGBUG: This is incorrect for ENG keyboards. Shift-7 should be &.
 	[InlineData (KeyCode.D7 | KeyCode.ShiftMask, ConsoleKey.D7, (KeyCode)'/', '/')]
 	[InlineData (KeyCode.D7, ConsoleKey.D7, KeyCode.D7, '7')]
 	[InlineData ((KeyCode)'{' | KeyCode.AltMask | KeyCode.CtrlMask, ConsoleKey.D7, (KeyCode)'{', '{')]
@@ -39,7 +40,7 @@ public class ConsoleKeyMappingTests {
 
 	/// <summary>
 	/// Sometimes when using remote tools EventKeyRecord sends 'virtual keystrokes'.
-	/// These are indicated with the wVirtualKeyCode of 231. When we see this code
+	/// These are indicated with the wVirtualKeyCode of 231 (VK_PACKET). When we see this code
 	/// then we need to look to the unicode character (UnicodeChar) instead of the key
 	/// when telling the rest of the framework what button was pressed. For full details
 	/// see: https://github.com/gui-cs/Terminal.Gui/issues/2008
@@ -113,10 +114,10 @@ public class ConsoleKeyMappingTests {
 			yield return new object [] { '英', true, false, false, '\0', 0, (KeyCode)'英' | KeyCode.ShiftMask, '\0', 0 };
 			yield return new object [] { '英', true, true, false, '\0', 0, (KeyCode)'英' | KeyCode.ShiftMask | KeyCode.AltMask, '\0', 0 };
 			yield return new object [] { '英', true, true, true, '\0', 0, (KeyCode)'英' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '\0', 0 };
-			yield return new object [] { '+', false, false, false, 187, 26, (KeyCode)'+', 187, 26 };
-			yield return new object [] { '*', true, false, false, 187, 26, (KeyCode)'*' | KeyCode.ShiftMask, 187, 26 };
-			yield return new object [] { '+', true, true, false, 187, 26, (KeyCode)'+' | KeyCode.ShiftMask | KeyCode.AltMask, 187, 26 };
-			yield return new object [] { '+', true, true, true, 187, 26, (KeyCode)'+' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 187, 26 };
+			yield return new object [] { '+', false, false, false, VK.OEM_PLUS, 26, (KeyCode)'+', VK.OEM_PLUS, 26 };
+			yield return new object [] { '*', true, false, false, VK.OEM_PLUS, 26, (KeyCode)'*' | KeyCode.ShiftMask, VK.OEM_PLUS, 26 };
+			yield return new object [] { '+', true, true, false, VK.OEM_PLUS, 26, (KeyCode)'+' | KeyCode.ShiftMask | KeyCode.AltMask, VK.OEM_PLUS, 26 };
+			yield return new object [] { '+', true, true, true, VK.OEM_PLUS, 26, (KeyCode)'+' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, VK.OEM_PLUS, 26 };
 			yield return new object [] { '1', false, false, false, '1', 2, KeyCode.D1, '1', 2 };
 			yield return new object [] { '!', true, false, false, '1', 2, (KeyCode)'!' | KeyCode.ShiftMask, '1', 2 };
 			yield return new object [] { '1', true, true, false, '1', 2, KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask, '1', 2 };
@@ -167,14 +168,14 @@ public class ConsoleKeyMappingTests {
 			yield return new object [] { '0', true, true, false, '0', 11, KeyCode.D0 | KeyCode.ShiftMask | KeyCode.AltMask, '0', 11 };
 			yield return new object [] { '0', true, true, true, '0', 11, KeyCode.D0 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '0', 11 };
 			yield return new object [] { '}', false, true, true, '0', 11, (KeyCode)'}' | KeyCode.AltMask | KeyCode.CtrlMask, '0', 11 };
-			yield return new object [] { '\'', false, false, false, 219, 12, (KeyCode)'\'', 219, 12 };
-			yield return new object [] { '?', true, false, false, 219, 12, (KeyCode)'?' | KeyCode.ShiftMask, 219, 12 };
-			yield return new object [] { '\'', true, true, false, 219, 12, (KeyCode)'\'' | KeyCode.ShiftMask | KeyCode.AltMask, 219, 12 };
-			yield return new object [] { '\'', true, true, true, 219, 12, (KeyCode)'\'' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 219, 12 };
-			yield return new object [] { '«', false, false, false, 221, 13, (KeyCode)'«', 221, 13 };
-			yield return new object [] { '»', true, false, false, 221, 13, (KeyCode)'»' | KeyCode.ShiftMask, 221, 13 };
-			yield return new object [] { '«', true, true, false, 221, 13, (KeyCode)'«' | KeyCode.ShiftMask | KeyCode.AltMask, 221, 13 };
-			yield return new object [] { '«', true, true, true, 221, 13, (KeyCode)'«' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 221, 13 };
+			yield return new object [] { '\'', false, false, false, VK.OEM_4, 12, (KeyCode)'\'', VK.OEM_4, 12 };
+			yield return new object [] { '?', true, false, false, VK.OEM_4, 12, (KeyCode)'?' | KeyCode.ShiftMask, VK.OEM_4, 12 };
+			yield return new object [] { '\'', true, true, false, VK.OEM_4, 12, (KeyCode)'\'' | KeyCode.ShiftMask | KeyCode.AltMask, VK.OEM_4, 12 };
+			yield return new object [] { '\'', true, true, true, VK.OEM_4, 12, (KeyCode)'\'' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, VK.OEM_4, 12 };
+			yield return new object [] { '«', false, false, false, VK.OEM_6, 13, (KeyCode)'«', VK.OEM_6, 13 };
+			yield return new object [] { '»', true, false, false, VK.OEM_6, 13, (KeyCode)'»' | KeyCode.ShiftMask, VK.OEM_6, 13 };
+			yield return new object [] { '«', true, true, false, VK.OEM_6, 13, (KeyCode)'«' | KeyCode.ShiftMask | KeyCode.AltMask, VK.OEM_6, 13 };
+			yield return new object [] { '«', true, true, true, VK.OEM_6, 13, (KeyCode)'«' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, VK.OEM_6, 13 };
 			yield return new object [] { 'á', false, false, false, 'A', 30, (KeyCode)'á', 'A', 30 };
 			yield return new object [] { 'Á', true, false, false, 'A', 30, (KeyCode)'Á' | KeyCode.ShiftMask, 'A', 30 };
 			yield return new object [] { 'à', false, false, false, 'A', 30, (KeyCode)'à', 'A', 30 };
@@ -197,21 +198,21 @@ public class ConsoleKeyMappingTests {
 			yield return new object [] { 'Ù', true, false, false, 'U', 22, (KeyCode)'Ù' | KeyCode.ShiftMask, 'U', 22 };
 			yield return new object [] { 'ö', false, false, false, 'O', 24, (KeyCode)'ö', 'O', 24 };
 			yield return new object [] { 'Ö', true, false, false, 'O', 24, (KeyCode)'Ö' | KeyCode.ShiftMask, 'O', 24 };
-			yield return new object [] { '<', false, false, false, 226, 86, (KeyCode)'<', 226, 86 };
-			yield return new object [] { '>', true, false, false, 226, 86, (KeyCode)'>' | KeyCode.ShiftMask, 226, 86 };
-			yield return new object [] { '<', true, true, false, 226, 86, (KeyCode)'<' | KeyCode.ShiftMask | KeyCode.AltMask, 226, 86 };
-			yield return new object [] { '<', true, true, true, 226, 86, (KeyCode)'<' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 226, 86 };
-			yield return new object [] { 'ç', false, false, false, 192, 39, (KeyCode)'ç', 192, 39 };
-			yield return new object [] { 'Ç', true, false, false, 192, 39, (KeyCode)'Ç' | KeyCode.ShiftMask, 192, 39 };
-			yield return new object [] { 'ç', true, true, false, 192, 39, (KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask, 192, 39 };
-			yield return new object [] { 'ç', true, true, true, 192, 39, (KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 192, 39 };
-			yield return new object [] { '¨', false, true, true, 187, 26, (KeyCode)'¨' | KeyCode.AltMask | KeyCode.CtrlMask, 187, 26 };
-			yield return new object [] { '\0', false, false, false, 33, 73, KeyCode.PageUp, 33, 73 };
-			yield return new object [] { '\0', true, false, false, 33, 73, KeyCode.PageUp | KeyCode.ShiftMask, 33, 73 };
-			yield return new object [] { '\0', true, true, false, 33, 73, KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask, 33, 73 };
-			yield return new object [] { '\0', true, true, true, 33, 73, KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, 33, 73 };
-			yield return new object [] { '~', false, false, false, 32, 57, (KeyCode)'~', 32, 57 };
-			yield return new object [] { '^', false, false, false, 32, 57, (KeyCode)'^', 32, 57 };
+			yield return new object [] { '<', false, false, false, VK.OEM_102, 86, (KeyCode)'<', VK.OEM_102, 86 };
+			yield return new object [] { '>', true, false, false, VK.OEM_102, 86, (KeyCode)'>' | KeyCode.ShiftMask, VK.OEM_102, 86 };
+			yield return new object [] { '<', true, true, false, VK.OEM_102, 86, (KeyCode)'<' | KeyCode.ShiftMask | KeyCode.AltMask, VK.OEM_102, 86 };
+			yield return new object [] { '<', true, true, true, VK.OEM_102, 86, (KeyCode)'<' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, VK.OEM_102, 86 };
+			yield return new object [] { 'ç', false, false, false, VK.OEM_3, 39, (KeyCode)'ç', VK.OEM_3, 39 };
+			yield return new object [] { 'Ç', true, false, false, VK.OEM_3, 39, (KeyCode)'Ç' | KeyCode.ShiftMask, VK.OEM_3, 39 };
+			yield return new object [] { 'ç', true, true, false, VK.OEM_3, 39, (KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask, VK.OEM_3, 39 };
+			yield return new object [] { 'ç', true, true, true, VK.OEM_3, 39, (KeyCode)'ç' | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, VK.OEM_3, 39 };
+			yield return new object [] { '¨', false, true, true, VK.OEM_PLUS, 26, (KeyCode)'¨' | KeyCode.AltMask | KeyCode.CtrlMask, VK.OEM_PLUS, 26 };
+			yield return new object [] { '\0', false, false, false, VK.PRIOR, 73, KeyCode.PageUp, VK.PRIOR, 73 };
+			yield return new object [] { '\0', true, false, false, VK.PRIOR, 73, KeyCode.PageUp | KeyCode.ShiftMask, VK.PRIOR, 73 };
+			yield return new object [] { '\0', true, true, false, VK.PRIOR, 73, KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask, VK.PRIOR, 73 };
+			yield return new object [] { '\0', true, true, true, VK.PRIOR, 73, KeyCode.PageUp | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, VK.PRIOR, 73 };
+			yield return new object [] { '~', false, false, false, VK.SPACE, 57, (KeyCode)'~', VK.SPACE, 57 };
+			yield return new object [] { '^', false, false, false, VK.SPACE, 57, (KeyCode)'^', VK.SPACE, 57 };
 		}
 	}
 
