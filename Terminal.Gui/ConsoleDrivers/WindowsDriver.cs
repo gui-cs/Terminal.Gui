@@ -976,11 +976,19 @@ internal class WindowsDriver : ConsoleDriver {
 			//}
 			//return ret;
 
-		case ConsoleKey.OemPeriod:
-		case ConsoleKey.OemComma:
-		case ConsoleKey.OemPlus:
-		case ConsoleKey.OemMinus:
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
+		case ConsoleKey.OemPeriod:
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)'.');
+		case ConsoleKey.OemComma:
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)',');
+		case ConsoleKey.OemPlus:
+			var ret = ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, keyInfo.KeyChar == 0 ? (KeyCode)'+' : (KeyCode)keyInfo.KeyChar);
+			if (ret.HasFlag (KeyCode.ShiftMask)) {
+				ret &= ~KeyCode.ShiftMask;
+			}
+			return ret;
+		case ConsoleKey.OemMinus:
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)'-');
 		}
 
 		var key = keyInfo.Key;
@@ -1088,7 +1096,7 @@ internal class WindowsDriver : ConsoleDriver {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
-			//Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
+			Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
 			var map = MapKey (keyInfo);
 

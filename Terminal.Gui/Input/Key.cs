@@ -241,65 +241,65 @@ public class Key : EventArgs, IEquatable<Key> {
 			return true;
 		}
 
-		if ((keyCode & ~KeyCode.Space & ~KeyCode.ShiftMask) is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.Space & ~KeyCode.ShiftMask) is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 13 is KeyCode.D0) {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 13 is KeyCode.D0) {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) + 16 is >= KeyCode.D1 and <= KeyCode.D9 and not KeyCode.D7) {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) + 16 is >= KeyCode.D1 and <= KeyCode.D9 and not KeyCode.D7) {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) + 8 is KeyCode.D7) {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) + 8 is KeyCode.D7) {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 24 is (KeyCode)'\'') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 24 is (KeyCode)'\'') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 16 is (KeyCode)'«') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 16 is (KeyCode)'«') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 32 is (KeyCode)'\\') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 32 is (KeyCode)'\\') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) + 1 is (KeyCode)'+') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) + 1 is (KeyCode)'+') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) + 84 is (KeyCode)'´') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) + 84 is (KeyCode)'´') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) + 16 is (KeyCode)'º') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) + 16 is (KeyCode)'º') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) + 32 is (KeyCode)'~') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) + 32 is (KeyCode)'~') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 2 is (KeyCode)'<') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 2 is (KeyCode)'<') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 15 is (KeyCode)',') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 15 is (KeyCode)',') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 12 is (KeyCode)'.') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 12 is (KeyCode)'.') {
+		//	return true;
+		//}
 
-		if ((keyCode & ~KeyCode.ShiftMask) - 50 is (KeyCode)'-') {
-			return true;
-		}
+		//if ((keyCode & ~KeyCode.ShiftMask) - 50 is (KeyCode)'-') {
+		//	return true;
+		//}
 
 		return (keyCode & KeyCode.CharMask) is >= KeyCode.A and <= KeyCode.Z;
 	}
@@ -363,7 +363,8 @@ public class Key : EventArgs, IEquatable<Key> {
 
 	#region Operators
 	/// <summary>
-	/// Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy. 
+	/// Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy because properties
+	/// such as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
 	/// </summary>
 	/// <remarks>
 	/// Uses <see cref="AsRune"/>.
@@ -371,14 +372,17 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <param name="kea"></param>
 	public static explicit operator Rune (Key kea) => kea.AsRune;
 
+	// BUGBUG: (Tig) I do not think this cast operator is really needed. 
 	/// <summary>
-	/// Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is never lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is lossy because properties
+	/// such as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
 	/// </summary>
 	/// <param name="kea"></param>
 	public static explicit operator uint (Key kea) => (uint)kea.KeyCode;
 
 	/// <summary>
-	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is never lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy because properties
+	/// such as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
 	/// </summary>
 	/// <param name="key"></param>
 	public static explicit operator KeyCode (Key key) => key.KeyCode;
@@ -552,7 +556,12 @@ public class Key : EventArgs, IEquatable<Key> {
 		}
 
 		string result = sb.ToString ();
-		result = TrimEndRune (result, separator);
+		if (result.Length > 1) {
+			// Only trim the end if there was actually a modifier
+			// This deals with e.g. the OemPlus (+) key where the separator 
+			// is the same as the key char.
+			result = TrimEndRune (result, separator);
+		}
 		return result;
 	}
 
