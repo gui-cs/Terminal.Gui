@@ -86,6 +86,12 @@ public class SliderOption<T> {
 	/// Event fired when the an option has changed.
 	/// </summary>
 	public event EventHandler<SliderOptionEventArgs> Changed;
+
+	/// <summary>
+	/// Creates a human-readable string that represents this <see cref="SliderOption{T}"/>.
+	/// </summary>
+	public override string ToString () => "{Legend=" + Legend + ", LegendAbbr=" + LegendAbbr.ToString () + ", Data=" + Data?.ToString () + "}";
+
 }
 
 /// <summary>
