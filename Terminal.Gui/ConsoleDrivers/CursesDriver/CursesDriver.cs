@@ -172,6 +172,7 @@ internal class CursesDriver : ConsoleDriver {
 			background: CursesColorNumberToColorName (background));
 	}
 
+	/// <inheritdoc/>
 	/// <remarks>
 	/// In the CursesDriver, colors are encoded as an int. 
 	/// The foreground color is stored in the most significant 4 bits, 
@@ -545,9 +546,10 @@ internal class CursesDriver : ConsoleDriver {
 				}
 			} else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z) {
 				k = (KeyCode)wch | KeyCode.ShiftMask;
-			} else if (wch <= 'z') {
-				k = (KeyCode)wch & ~KeyCode.Space;
 			} 
+			//else if (wch <= 'z') {
+			//	k = (KeyCode)wch & ~KeyCode.Space;
+			//} 
 			OnKeyDown (new Key (k));
 			OnKeyUp (new Key (k));
 		}
@@ -572,8 +574,7 @@ internal class CursesDriver : ConsoleDriver {
 							false, false, false), cki);
 					}
 				} else {
-					k = ConsoleKeyMapping.MapConsoleKeyToKey (consoleKeyInfo.Key, out _);
-					k = ConsoleKeyMapping.MapKeyModifiers (consoleKeyInfo, k);
+					k = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
 					keyEventArgs = new (k);
 					OnKeyDown (keyEventArgs);
 				}
@@ -724,11 +725,9 @@ internal class CursesDriver : ConsoleDriver {
 			if (control) {
 				mod |= ConsoleModifiers.Control;
 			}
-			var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (keyChar, mod, out _);
-			key = ConsoleKeyMapping.MapConsoleKeyToKey ((ConsoleKey)cKeyInfo.Key, out bool mappable);
-			if (mappable) {
-				key = (KeyCode)cKeyInfo.KeyChar;
-			}
+			var cKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
+			cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
+			key = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (cKeyInfo);
 		} else {
 			key = (KeyCode)keyChar;
 		}

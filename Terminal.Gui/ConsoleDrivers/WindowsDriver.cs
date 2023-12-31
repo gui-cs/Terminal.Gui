@@ -906,39 +906,39 @@ internal class WindowsDriver : ConsoleDriver {
 		var keyInfo = keyInfoEx.ConsoleKeyInfo;
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Esc);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Esc);
 		case ConsoleKey.Tab:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Tab);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Tab);
 		case ConsoleKey.Clear:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Clear);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Clear);
 		case ConsoleKey.Home:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Home);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Home);
 		case ConsoleKey.End:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.End);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.End);
 		case ConsoleKey.LeftArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorLeft);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorRight);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorRight);
 		case ConsoleKey.UpArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorUp);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorUp);
 		case ConsoleKey.DownArrow:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.CursorDown);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorDown);
 		case ConsoleKey.PageUp:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PageUp);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageUp);
 		case ConsoleKey.PageDown:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PageDown);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageDown);
 		case ConsoleKey.Enter:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Enter);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
 		case ConsoleKey.Spacebar:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? KeyCode.Space : (KeyCode)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, keyInfo.KeyChar == 0 ? KeyCode.Space : (KeyCode)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.Backspace);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
 		case ConsoleKey.Delete:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.DeleteChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.DeleteChar);
 		case ConsoleKey.Insert:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.InsertChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.InsertChar);
 		case ConsoleKey.PrintScreen:
-			return ConsoleKeyMapping.MapKeyModifiers (keyInfo, KeyCode.PrintScreen);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PrintScreen);
 
 		//case ConsoleKey.NumPad0:
 		//	return keyInfoEx.NumLock ? Key.D0 : Key.InsertChar;
@@ -970,17 +970,17 @@ internal class WindowsDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
-			var ret = ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)keyInfo.KeyChar));
-			if (ret.HasFlag (KeyCode.ShiftMask)) {
-				ret &= ~KeyCode.ShiftMask;
-			}
-			return ret;
+			//var ret = ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
+			//if (ret.HasFlag (KeyCode.ShiftMask)) {
+			//	ret &= ~KeyCode.ShiftMask;
+			//}
+			//return ret;
 
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
 		case ConsoleKey.OemMinus:
-			return (KeyCode)((uint)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 		}
 
 		var key = keyInfo.Key;
@@ -994,23 +994,30 @@ internal class WindowsDriver : ConsoleDriver {
 				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.A + delta));
 			}
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.A + delta));
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
 			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+			if (keyInfo.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift)) {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
+			}
+			if (!keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift)
+				&& (keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.A + delta));
+					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
 				}
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
-				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
+				if (keyInfo.KeyChar >= (uint)KeyCode.A && keyInfo.KeyChar <= (uint)KeyCode.Z) {
 					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
+				} else {
+					return (KeyCode)keyInfo.KeyChar | KeyCode.ShiftMask;
 				}
 			}
 
-			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
-				return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			}
+			// This will get the same KeyChar e.g. Ç (199) will return Ç (199) or if it's Z (90) will return Z (90) anyway
+			//if (keyInfo.Modifiers == 0 && ((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
+			//	return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
+			//}
 
 			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) != 0) {
 				if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) == (KeyCode)keyInfo.Key) {
@@ -1019,8 +1026,11 @@ internal class WindowsDriver : ConsoleDriver {
 				return (KeyCode)((uint)keyInfo.KeyChar);
 			}
 
-			return (KeyCode)(uint)keyInfo.KeyChar;
-
+			if (keyInfo.KeyChar != 0) {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.KeyChar);
+			} else {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+			}
 		}
 
 		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
@@ -1032,20 +1042,20 @@ internal class WindowsDriver : ConsoleDriver {
 				return (KeyCode)(((uint)KeyCode.CtrlMask) | ((uint)KeyCode.D0 + delta));
 			}
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.D0 + delta));
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)KeyCode.D0 + delta)) {
-					return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.D0 + delta));
+					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
 				}
 			}
-			return (KeyCode)((uint)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 		}
 
 		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
 			var delta = key - ConsoleKey.F1;
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)KeyCode.F1 + delta));
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.F1 + delta));
 			}
 
 			return (KeyCode)((uint)KeyCode.F1 + delta);
@@ -1053,18 +1063,18 @@ internal class WindowsDriver : ConsoleDriver {
 
 		// If the key is JUST a modifier, return it as that key
 		if (key == (ConsoleKey)16) { // Shift
-			return KeyCode.ShiftKey;
+			return KeyCode.ShiftMask;
 		}
 
 		if (key == (ConsoleKey)17) { // Ctrl
-			return KeyCode.CtrlKey;
+			return KeyCode.CtrlMask;
 		}
 
 		if (key == (ConsoleKey)18) { // Alt
-			return KeyCode.AltKey;
+			return KeyCode.AltMask;
 		}
 
-		return ConsoleKeyMapping.MapKeyModifiers (keyInfo, (KeyCode)((uint)keyInfo.KeyChar));
+		return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 	}
 
 	bool _altDown = false;
@@ -1079,7 +1089,6 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
 			//Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
-
 
 			var map = MapKey (keyInfo);
 
@@ -1438,7 +1447,10 @@ internal class WindowsDriver : ConsoleDriver {
 		    keyEvent.dwControlKeyState.HasFlag (WindowsConsole.ControlKeyState.RightControlPressed)) {
 			mod |= ConsoleModifiers.Control;
 		}
-		var cKeyInfo = ConsoleKeyMapping.GetConsoleKeyFromKey (keyEvent.UnicodeChar, mod, out uint scanCode);
+		var cKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode,
+			mod.HasFlag (ConsoleModifiers.Shift), mod.HasFlag (ConsoleModifiers.Alt), mod.HasFlag (ConsoleModifiers.Control));
+		cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
+		var scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (cKeyInfo);
 
 		return new WindowsConsole.KeyEventRecord {
 			UnicodeChar = cKeyInfo.KeyChar,
@@ -1614,11 +1626,12 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		keyEvent.UnicodeChar = keyChar;
-		if ((uint)key < 255) {
-			keyEvent.wVirtualKeyCode = (ushort)key;
-		} else {
-			keyEvent.wVirtualKeyCode = '\0';
-		}
+		//if ((uint)key < 255) {
+		//	keyEvent.wVirtualKeyCode = (ushort)key;
+		//} else {
+		//	keyEvent.wVirtualKeyCode = '\0';
+		//}
+		keyEvent.wVirtualKeyCode = (ushort)key;
 
 		input.KeyEvent = keyEvent;
 

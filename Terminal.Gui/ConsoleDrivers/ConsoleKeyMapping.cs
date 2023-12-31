@@ -48,15 +48,15 @@ namespace Terminal.Gui.ConsoleDrivers {
 		{
 			switch (propName) {
 			case "UnicodeChar":
-				var sCode = scanCodes.FirstOrDefault ((e) => e.UnicodeChar == keyValue && e.Modifiers == modifiers);
+				var sCode = _scanCodes.FirstOrDefault ((e) => e.UnicodeChar == keyValue && e.Modifiers == modifiers);
 				if (sCode == null && modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control)) {
-					return scanCodes.FirstOrDefault ((e) => e.UnicodeChar == keyValue && e.Modifiers == 0);
+					return _scanCodes.FirstOrDefault ((e) => e.UnicodeChar == keyValue && e.Modifiers == 0);
 				}
 				return sCode;
 			case "VirtualKey":
-				sCode = scanCodes.FirstOrDefault ((e) => e.VirtualKey == keyValue && e.Modifiers == modifiers);
+				sCode = _scanCodes.FirstOrDefault ((e) => e.VirtualKey == keyValue && e.Modifiers == modifiers);
 				if (sCode == null && modifiers == (ConsoleModifiers.Alt | ConsoleModifiers.Control)) {
-					return scanCodes.FirstOrDefault ((e) => e.VirtualKey == keyValue && e.Modifiers == 0);
+					return _scanCodes.FirstOrDefault ((e) => e.VirtualKey == keyValue && e.Modifiers == 0);
 				}
 				return sCode;
 			}
@@ -65,23 +65,91 @@ namespace Terminal.Gui.ConsoleDrivers {
 		}
 
 		/// <summary>
-		/// Gets the <see cref="ConsoleKey"/> from the provided <see cref="KeyCode"/>.
+		/// Get the scan code from a <see cref="ConsoleKeyInfo"/>.
 		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
-		public static ConsoleKeyInfo GetConsoleKeyFromKey (KeyCode key)
+		/// <param name="consoleKeyInfo">The console key info.</param>
+		/// <returns>The value if apply.</returns>
+		public static uint GetScanCodeFromConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 		{
-			var mod = new ConsoleModifiers ();
+			var mod = GetModifiers (consoleKeyInfo.Modifiers);
+			ScanCodeMapping scode = GetScanCode ("VirtualKey", (uint)consoleKeyInfo.Key, mod);
+			if (scode != null) {
+				return scode.ScanCode;
+			}
+
+			return 0;
+		}
+
+		/// <summary>
+		/// Gets the <see cref="ConsoleKeyInfo"/> from the provided <see cref="KeyCode"/>.
+		/// </summary>
+		/// <param name="key">The key code.</param>
+		/// <returns>The console key info.</returns>
+		public static ConsoleKeyInfo GetConsoleKeyInfoFromKeyCode (KeyCode key)
+		{
+			var modifiers = MapToConsoleModifiers (key);
+			var keyValue = MapKeyCodeToConsoleKey (key, out bool isConsoleKey);
+			if (isConsoleKey) {
+				var mod = GetModifiers (modifiers);
+				var scode = GetScanCode ("VirtualKey", (uint)keyValue, mod);
+				if (scode != null) {
+					return new ConsoleKeyInfo ((char)scode.UnicodeChar, (ConsoleKey)scode.VirtualKey, modifiers.HasFlag (ConsoleModifiers.Shift),
+						modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
+				}
+			} else {
+				var keyChar = GetKeyCharFromUnicodeChar ((uint)keyValue, modifiers, out uint consoleKey, out _, isConsoleKey);
+				if (consoleKey != 0) {
+					return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)consoleKey, modifiers.HasFlag (ConsoleModifiers.Shift),
+						modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
+				}
+			}
+
+			return new ConsoleKeyInfo ((char)keyValue, ConsoleKey.None, modifiers.HasFlag (ConsoleModifiers.Shift),
+				modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
+		}
+
+		/// <summary>
+		/// Map existing <see cref="KeyCode"/> modifiers to <see cref="ConsoleModifiers"/>.
+		/// </summary>
+		/// <param name="key">The key code.</param>
+		/// <returns>The console modifiers.</returns>
+		public static ConsoleModifiers MapToConsoleModifiers (KeyCode key)
+		{
+			var modifiers = new ConsoleModifiers ();
 			if (key.HasFlag (KeyCode.ShiftMask)) {
-				mod |= ConsoleModifiers.Shift;
+				modifiers |= ConsoleModifiers.Shift;
 			}
 			if (key.HasFlag (KeyCode.AltMask)) {
-				mod |= ConsoleModifiers.Alt;
+				modifiers |= ConsoleModifiers.Alt;
 			}
 			if (key.HasFlag (KeyCode.CtrlMask)) {
-				mod |= ConsoleModifiers.Control;
+				modifiers |= ConsoleModifiers.Control;
 			}
-			return GetConsoleKeyFromKey ((uint)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask), mod, out _);
+
+			return modifiers;
+		}
+
+		/// <summary>
+		/// Gets <see cref="ConsoleModifiers"/> from <see cref="bool"/> modifiers.
+		/// </summary>
+		/// <param name="shift">The shift key.</param>
+		/// <param name="alt">The alt key.</param>
+		/// <param name="control">The control key.</param>
+		/// <returns>The console modifiers.</returns>
+		public static ConsoleModifiers GetModifiers (bool shift, bool alt, bool control)
+		{
+			var modifiers = new ConsoleModifiers ();
+			if (shift) {
+				modifiers |= ConsoleModifiers.Shift;
+			}
+			if (alt) {
+				modifiers |= ConsoleModifiers.Alt;
+			}
+			if (control) {
+				modifiers |= ConsoleModifiers.Control;
+			}
+
+			return modifiers;
 		}
 
 		/// <summary>
@@ -91,62 +159,163 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// <param name="modifiers">The modifier keys.</param>
 		/// <param name="scanCode">The resulting scan code.</param>
 		/// <returns>The <see cref="ConsoleKeyInfo"/>.</returns>
-		public static ConsoleKeyInfo GetConsoleKeyFromKey (uint keyValue, ConsoleModifiers modifiers, out uint scanCode)
+		static ConsoleKeyInfo GetConsoleKeyInfoFromKeyChar (uint keyValue, ConsoleModifiers modifiers, out uint scanCode)
 		{
 			scanCode = 0;
-			uint outputChar = keyValue;
 			if (keyValue == 0) {
 				return new ConsoleKeyInfo ((char)keyValue, ConsoleKey.None, modifiers.HasFlag (ConsoleModifiers.Shift),
 					modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
 			}
 
-			uint consoleKey = (uint)MapKeyToConsoleKey ((KeyCode)keyValue, modifiers, out bool mappable);
-			if (mappable) {
-				var mod = GetModifiers (modifiers);
-				var scode = GetScanCode ("UnicodeChar", keyValue, mod);
-				if (scode != null) {
-					consoleKey = scode.VirtualKey;
-					scanCode = scode.ScanCode;
-					outputChar = scode.UnicodeChar;
+			uint outputChar = keyValue;
+			uint consoleKey;
+			if (keyValue > byte.MaxValue) {
+				var sCode = _scanCodes.FirstOrDefault ((e) => e.UnicodeChar == keyValue);
+				if (sCode == null) {
+					consoleKey = (byte)(keyValue & byte.MaxValue);
+					sCode = _scanCodes.FirstOrDefault ((e) => e.VirtualKey == consoleKey);
+					if (sCode == null) {
+						consoleKey = 0;
+						outputChar = keyValue;
+					} else {
+						outputChar = (char)(keyValue >> 8);
+					}
 				} else {
-					// If the consoleKey is < 255, retain the lower 8 bits of the key value and set the upper bits to 0xff.
-					// This is a shifted value that will be used by the GetKeyCharFromConsoleKey to do the correct action
-					// because keyValue maybe a UnicodeChar or a ConsoleKey, e.g. for PageUp is passed the ConsoleKey.PageUp
-					consoleKey = consoleKey < 0xff ? consoleKey & 0xff | 0xff << 8 : consoleKey;
-					outputChar = GetKeyCharFromConsoleKey (consoleKey, modifiers, out consoleKey, out scanCode);
+					consoleKey = (byte)sCode.VirtualKey;
+					outputChar = keyValue;
 				}
 			} else {
-				var mod = GetModifiers (modifiers);
-				var scode = GetScanCode ("VirtualKey", consoleKey, mod);
-				if (scode != null) {
-					consoleKey = scode.VirtualKey;
-					scanCode = scode.ScanCode;
-					outputChar = scode.UnicodeChar;
-				}
+				consoleKey = (byte)keyValue;
+				outputChar = '\0';
 			}
 
 			return new ConsoleKeyInfo ((char)outputChar, (ConsoleKey)consoleKey, modifiers.HasFlag (ConsoleModifiers.Shift),
-					modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
+				modifiers.HasFlag (ConsoleModifiers.Alt), modifiers.HasFlag (ConsoleModifiers.Control));
+		}
+
+		internal static uint GetKeyChar (uint keyValue, ConsoleModifiers modifiers)
+		{
+			if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'A' and <= 'Z') {
+				return keyValue - 32;
+			} else if (modifiers == ConsoleModifiers.None && keyValue is >= 'A' and <= 'Z') {
+				return keyValue + 32;
+			}
+
+			if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= 'À' and <= 'Ý') {
+				return keyValue - 32;
+			} else if (modifiers == ConsoleModifiers.None && keyValue is >= 'À' and <= 'Ý') {
+				return keyValue + 32;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '0') {
+				return keyValue + 13;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 13 is '0') {
+				return keyValue - 13;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is >= '1' and <= '9' and not '7') {
+				return keyValue - 16;
+			} else if (modifiers == ConsoleModifiers.None && keyValue + 16 is >= '1' and <= '9' and not '7') {
+				return keyValue + 16;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '7') {
+				return keyValue - 8;
+			} else if (modifiers == ConsoleModifiers.None && keyValue + 8 is '7') {
+				return keyValue + 8;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '\'') {
+				return keyValue + 24;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 24 is '\'') {
+				return keyValue - 24;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '«') {
+				return keyValue + 16;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 16 is '«') {
+				return keyValue - 16;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '\\') {
+				return keyValue + 32;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 32 is '\\') {
+				return keyValue - 32;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '+') {
+				return keyValue - 1;
+			} else if (modifiers == ConsoleModifiers.None && keyValue + 1 is '+') {
+				return keyValue + 1;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '´') {
+				return keyValue - 84;
+			} else if (modifiers == ConsoleModifiers.None && keyValue + 84 is '´') {
+				return keyValue + 84;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is 'º') {
+				return keyValue - 16;
+			} else if (modifiers == ConsoleModifiers.None && keyValue + 16 is 'º') {
+				return keyValue + 16;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '~') {
+				return keyValue - 32;
+			} else if (modifiers == ConsoleModifiers.None && keyValue + 32 is '~') {
+				return keyValue + 32;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '<') {
+				return keyValue + 2;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 2 is '<') {
+				return keyValue - 2;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is ',') {
+				return keyValue + 15;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 15 is ',') {
+				return keyValue - 15;
+			}
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '.') {
+				return keyValue + 12;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 12 is '.') {
+				return keyValue - 12;
+			}
+
+			if (modifiers.HasFlag (ConsoleModifiers.Shift) && keyValue is '-') {
+				return keyValue + 50;
+			} else if (modifiers == ConsoleModifiers.None && keyValue - 50 is '-') {
+				return keyValue - 50;
+			}
+
+			return keyValue;
 		}
 
 		/// <summary>
-		/// Get the output character from the <see cref="ConsoleKey"/>, the correct <see cref="ConsoleKey"/>
+		/// Get the output character from the <see cref="GetConsoleKeyInfoFromKeyCode"/>, with the correct <see cref="ConsoleKey"/>
 		/// and the scan code used on <see cref="WindowsDriver"/>.
 		/// </summary>
 		/// <param name="unicodeChar">The unicode character.</param>
 		/// <param name="modifiers">The modifiers keys.</param>
 		/// <param name="consoleKey">The resulting console key.</param>
 		/// <param name="scanCode">The resulting scan code.</param>
+		/// <param name="isConsoleKey">Indicates if the <paramref name="unicodeChar"/> is a <see cref="ConsoleKey"/>.</param>
 		/// <returns>The output character or the <paramref name="consoleKey"/>.</returns>
-		static uint GetKeyCharFromConsoleKey (uint unicodeChar, ConsoleModifiers modifiers, out uint consoleKey, out uint scanCode)
+		/// <remarks>This is only used by the <see cref="GetConsoleKeyInfoFromKeyCode"/> and by unit tests.</remarks>
+		internal static uint GetKeyCharFromUnicodeChar (uint unicodeChar, ConsoleModifiers modifiers, out uint consoleKey, out uint scanCode, bool isConsoleKey = false)
 		{
 			uint decodedChar = unicodeChar >> 8 == 0xff ? unicodeChar & 0xff : unicodeChar;
 			uint keyChar = decodedChar;
 			consoleKey = 0;
 			var mod = GetModifiers (modifiers);
 			scanCode = 0;
-			var scode = unicodeChar != 0 && unicodeChar >> 8 != 0xff ? GetScanCode ("VirtualKey", decodedChar, mod) : null;
-			if (scode != null) {
+			ScanCodeMapping scode = null;
+			if (unicodeChar != 0 && unicodeChar >> 8 != 0xff && isConsoleKey) {
+				scode = GetScanCode ("VirtualKey", decodedChar, mod);
+			}
+			if (isConsoleKey && scode != null) {
 				consoleKey = scode.VirtualKey;
 				keyChar = scode.UnicodeChar;
 				scanCode = scode.ScanCode;
@@ -172,6 +341,14 @@ namespace Terminal.Gui.ConsoleDrivers {
 					}
 				}
 			}
+			if (keyChar < 255 && consoleKey == 0 && scanCode == 0) {
+				scode = GetScanCode ("VirtualKey", keyChar, mod);
+				if (scode != null) {
+					consoleKey = scode.VirtualKey;
+					keyChar = scode.UnicodeChar;
+					scanCode = scode.ScanCode;
+				}
+			}
 
 			return keyChar;
 		}
@@ -180,221 +357,248 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// Maps a unicode character (e.g. (Key)'a') to a uint representing a <see cref="ConsoleKey"/>.
 		/// </summary>
 		/// <param name="keyValue">The key value.</param>
-		/// <param name="modifiers">The modifiers keys.</param>
-		/// <param name="isMappable">
-		/// <see langword="true"/> means the return value can be mapped to a valid unicode character.
-		/// <see langword="false"/> means the return value is in the ConsoleKey enum.
+		/// <param name="isConsoleKey">Indicates if the <paramref name="keyValue"/> is a <see cref="ConsoleKey"/>.
+		/// <see langword="true"/> means the return value is in the ConsoleKey enum.
+		/// <see langword="false"/> means the return value can be mapped to a valid unicode character.
 		/// </param>
 		/// <returns>The <see cref="ConsoleKey"/> or the <paramref name="keyValue"/>.</returns>
-		public static ConsoleKey MapKeyToConsoleKey (KeyCode keyValue, ConsoleModifiers modifiers, out bool isMappable)
+		/// <remarks>This is only used by the <see cref="GetConsoleKeyInfoFromKeyCode"/> and by unit tests.</remarks>
+		internal static uint MapKeyCodeToConsoleKey (KeyCode keyValue, out bool isConsoleKey)
 		{
-			isMappable = false;
+			isConsoleKey = true;
+			keyValue = keyValue & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask;
 
 			switch (keyValue) {
+			case KeyCode.Enter:
+				return (uint)ConsoleKey.Enter;
 			case KeyCode.Delete:
-				return ConsoleKey.Delete;
+				return (uint)ConsoleKey.Delete;
 			case KeyCode.CursorUp:
-				return ConsoleKey.UpArrow;
+				return (uint)ConsoleKey.UpArrow;
 			case KeyCode.CursorDown:
-				return ConsoleKey.DownArrow;
+				return (uint)ConsoleKey.DownArrow;
 			case KeyCode.CursorLeft:
-				return ConsoleKey.LeftArrow;
+				return (uint)ConsoleKey.LeftArrow;
 			case KeyCode.CursorRight:
-				return ConsoleKey.RightArrow;
+				return (uint)ConsoleKey.RightArrow;
 			case KeyCode.PageUp:
-				return ConsoleKey.PageUp;
+				return (uint)ConsoleKey.PageUp;
 			case KeyCode.PageDown:
-				return ConsoleKey.PageDown;
+				return (uint)ConsoleKey.PageDown;
 			case KeyCode.Home:
-				return ConsoleKey.Home;
+				return (uint)ConsoleKey.Home;
 			case KeyCode.End:
-				return ConsoleKey.End;
+				return (uint)ConsoleKey.End;
 			case KeyCode.InsertChar:
-				return ConsoleKey.Insert;
+				return (uint)ConsoleKey.Insert;
 			case KeyCode.DeleteChar:
-				return ConsoleKey.Delete;
+				return (uint)ConsoleKey.Delete;
 			case KeyCode.F1:
-				return ConsoleKey.F1;
+				return (uint)ConsoleKey.F1;
 			case KeyCode.F2:
-				return ConsoleKey.F2;
+				return (uint)ConsoleKey.F2;
 			case KeyCode.F3:
-				return ConsoleKey.F3;
+				return (uint)ConsoleKey.F3;
 			case KeyCode.F4:
-				return ConsoleKey.F4;
+				return (uint)ConsoleKey.F4;
 			case KeyCode.F5:
-				return ConsoleKey.F5;
+				return (uint)ConsoleKey.F5;
 			case KeyCode.F6:
-				return ConsoleKey.F6;
+				return (uint)ConsoleKey.F6;
 			case KeyCode.F7:
-				return ConsoleKey.F7;
+				return (uint)ConsoleKey.F7;
 			case KeyCode.F8:
-				return ConsoleKey.F8;
+				return (uint)ConsoleKey.F8;
 			case KeyCode.F9:
-				return ConsoleKey.F9;
+				return (uint)ConsoleKey.F9;
 			case KeyCode.F10:
-				return ConsoleKey.F10;
+				return (uint)ConsoleKey.F10;
 			case KeyCode.F11:
-				return ConsoleKey.F11;
+				return (uint)ConsoleKey.F11;
 			case KeyCode.F12:
-				return ConsoleKey.F12;
+				return (uint)ConsoleKey.F12;
 			case KeyCode.F13:
-				return ConsoleKey.F13;
+				return (uint)ConsoleKey.F13;
 			case KeyCode.F14:
-				return ConsoleKey.F14;
+				return (uint)ConsoleKey.F14;
 			case KeyCode.F15:
-				return ConsoleKey.F15;
+				return (uint)ConsoleKey.F15;
 			case KeyCode.F16:
-				return ConsoleKey.F16;
+				return (uint)ConsoleKey.F16;
 			case KeyCode.F17:
-				return ConsoleKey.F17;
+				return (uint)ConsoleKey.F17;
 			case KeyCode.F18:
-				return ConsoleKey.F18;
+				return (uint)ConsoleKey.F18;
 			case KeyCode.F19:
-				return ConsoleKey.F19;
+				return (uint)ConsoleKey.F19;
 			case KeyCode.F20:
-				return ConsoleKey.F20;
+				return (uint)ConsoleKey.F20;
 			case KeyCode.F21:
-				return ConsoleKey.F21;
+				return (uint)ConsoleKey.F21;
 			case KeyCode.F22:
-				return ConsoleKey.F22;
+				return (uint)ConsoleKey.F22;
 			case KeyCode.F23:
-				return ConsoleKey.F23;
+				return (uint)ConsoleKey.F23;
 			case KeyCode.F24:
-				return ConsoleKey.F24;
+				return (uint)ConsoleKey.F24;
 			case KeyCode.Tab | KeyCode.ShiftMask:
-				return ConsoleKey.Tab;
+				return (uint)ConsoleKey.Tab;
 			}
 
-			isMappable = true;
-
-			if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= KeyCode.A and <= KeyCode.Z) {
-				return (ConsoleKey)(keyValue - 32);
-			} else if (modifiers == ConsoleModifiers.None && keyValue is >= KeyCode.A and <= KeyCode.Z) {
-				return (ConsoleKey)(keyValue + 32);
-			}
-			if (modifiers == ConsoleModifiers.Shift && keyValue - 32 is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
-				return (ConsoleKey)(keyValue - 32);
-			} else if (modifiers == ConsoleModifiers.None && keyValue is >= (KeyCode)'À' and <= (KeyCode)'Ý') {
-				return (ConsoleKey)(keyValue + 32);
-			}
-
-			return (ConsoleKey)keyValue;
-		}
-
-		/// <summary>
-		/// Maps a <see cref="ConsoleKey"/> to a <see cref="KeyCode"/>.
-		/// </summary>
-		/// <param name="consoleKey">The console key.</param>
-		/// <param name="isMappable">If <see langword="true"/> is mapped to a valid character, otherwise <see langword="false"/>.</param>
-		/// <returns>The <see cref="KeyCode"/> or the <paramref name="consoleKey"/>.</returns>
-		public static KeyCode MapConsoleKeyToKey (ConsoleKey consoleKey, out bool isMappable)
-		{
-			isMappable = false;
-
-			switch (consoleKey) {
-			case ConsoleKey.Delete:
-				return KeyCode.Delete;
-			case ConsoleKey.UpArrow:
-				return KeyCode.CursorUp;
-			case ConsoleKey.DownArrow:
-				return KeyCode.CursorDown;
-			case ConsoleKey.LeftArrow:
-				return KeyCode.CursorLeft;
-			case ConsoleKey.RightArrow:
-				return KeyCode.CursorRight;
-			case ConsoleKey.PageUp:
-				return KeyCode.PageUp;
-			case ConsoleKey.PageDown:
-				return KeyCode.PageDown;
-			case ConsoleKey.Home:
-				return KeyCode.Home;
-			case ConsoleKey.End:
-				return KeyCode.End;
-			case ConsoleKey.Insert:
-				return KeyCode.InsertChar;
-			case ConsoleKey.F1:
-				return KeyCode.F1;
-			case ConsoleKey.F2:
-				return KeyCode.F2;
-			case ConsoleKey.F3:
-				return KeyCode.F3;
-			case ConsoleKey.F4:
-				return KeyCode.F4;
-			case ConsoleKey.F5:
-				return KeyCode.F5;
-			case ConsoleKey.F6:
-				return KeyCode.F6;
-			case ConsoleKey.F7:
-				return KeyCode.F7;
-			case ConsoleKey.F8:
-				return KeyCode.F8;
-			case ConsoleKey.F9:
-				return KeyCode.F9;
-			case ConsoleKey.F10:
-				return KeyCode.F10;
-			case ConsoleKey.F11:
-				return KeyCode.F11;
-			case ConsoleKey.F12:
-				return KeyCode.F12;
-			case ConsoleKey.F13:
-				return KeyCode.F13;
-			case ConsoleKey.F14:
-				return KeyCode.F14;
-			case ConsoleKey.F15:
-				return KeyCode.F15;
-			case ConsoleKey.F16:
-				return KeyCode.F16;
-			case ConsoleKey.F17:
-				return KeyCode.F17;
-			case ConsoleKey.F18:
-				return KeyCode.F18;
-			case ConsoleKey.F19:
-				return KeyCode.F19;
-			case ConsoleKey.F20:
-				return KeyCode.F20;
-			case ConsoleKey.F21:
-				return KeyCode.F21;
-			case ConsoleKey.F22:
-				return KeyCode.F22;
-			case ConsoleKey.F23:
-				return KeyCode.F23;
-			case ConsoleKey.F24:
-				return KeyCode.F24;
-			case ConsoleKey.Tab:
-				return KeyCode.Tab;
-			}
-			isMappable = true;
-
-			if (consoleKey is >= ConsoleKey.A and <= ConsoleKey.Z) {
-				return (KeyCode)(consoleKey + 32);
-			}
-
-			return (KeyCode)consoleKey;
+			isConsoleKey = false;
+			return (uint)keyValue;
 		}
 
 		/// <summary>
 		/// Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="KeyCode"/>.
 		/// </summary>
-		/// <param name="keyInfo">The console key info.</param>
-		/// <param name="key">The key.</param>
+		/// <param name="consoleKeyInfo">The console key.</param>
+		/// <returns>The <see cref="KeyCode"/> or the <paramref name="consoleKeyInfo"/>.</returns>
+		public static KeyCode MapConsoleKeyInfoToKeyCode (ConsoleKeyInfo consoleKeyInfo)
+		{
+			KeyCode keyCode;
+
+			switch (consoleKeyInfo.Key) {
+			case ConsoleKey.Enter:
+				keyCode = KeyCode.Enter;
+				break;
+			case ConsoleKey.Delete:
+				keyCode = KeyCode.Delete;
+				break;
+			case ConsoleKey.UpArrow:
+				keyCode = KeyCode.CursorUp;
+				break;
+			case ConsoleKey.DownArrow:
+				keyCode = KeyCode.CursorDown;
+				break;
+			case ConsoleKey.LeftArrow:
+				keyCode = KeyCode.CursorLeft;
+				break;
+			case ConsoleKey.RightArrow:
+				keyCode = KeyCode.CursorRight;
+				break;
+			case ConsoleKey.PageUp:
+				keyCode = KeyCode.PageUp;
+				break;
+			case ConsoleKey.PageDown:
+				keyCode = KeyCode.PageDown;
+				break;
+			case ConsoleKey.Home:
+				keyCode = KeyCode.Home;
+				break;
+			case ConsoleKey.End:
+				keyCode = KeyCode.End;
+				break;
+			case ConsoleKey.Insert:
+				keyCode = KeyCode.InsertChar;
+				break;
+			case ConsoleKey.F1:
+				keyCode = KeyCode.F1;
+				break;
+			case ConsoleKey.F2:
+				keyCode = KeyCode.F2;
+				break;
+			case ConsoleKey.F3:
+				keyCode = KeyCode.F3;
+				break;
+			case ConsoleKey.F4:
+				keyCode = KeyCode.F4;
+				break;
+			case ConsoleKey.F5:
+				keyCode = KeyCode.F5;
+				break;
+			case ConsoleKey.F6:
+				keyCode = KeyCode.F6;
+				break;
+			case ConsoleKey.F7:
+				keyCode = KeyCode.F7;
+				break;
+			case ConsoleKey.F8:
+				keyCode = KeyCode.F8;
+				break;
+			case ConsoleKey.F9:
+				keyCode = KeyCode.F9;
+				break;
+			case ConsoleKey.F10:
+				keyCode = KeyCode.F10;
+				break;
+			case ConsoleKey.F11:
+				keyCode = KeyCode.F11;
+				break;
+			case ConsoleKey.F12:
+				keyCode = KeyCode.F12;
+				break;
+			case ConsoleKey.F13:
+				keyCode = KeyCode.F13;
+				break;
+			case ConsoleKey.F14:
+				keyCode = KeyCode.F14;
+				break;
+			case ConsoleKey.F15:
+				keyCode = KeyCode.F15;
+				break;
+			case ConsoleKey.F16:
+				keyCode = KeyCode.F16;
+				break;
+			case ConsoleKey.F17:
+				keyCode = KeyCode.F17;
+				break;
+			case ConsoleKey.F18:
+				keyCode = KeyCode.F18;
+				break;
+			case ConsoleKey.F19:
+				keyCode = KeyCode.F19;
+				break;
+			case ConsoleKey.F20:
+				keyCode = KeyCode.F20;
+				break;
+			case ConsoleKey.F21:
+				keyCode = KeyCode.F21;
+				break;
+			case ConsoleKey.F22:
+				keyCode = KeyCode.F22;
+				break;
+			case ConsoleKey.F23:
+				keyCode = KeyCode.F23;
+				break;
+			case ConsoleKey.F24:
+				keyCode = KeyCode.F24;
+				break;
+			case ConsoleKey.Tab:
+				keyCode = KeyCode.Tab;
+				break;
+			default:
+				keyCode = (KeyCode)consoleKeyInfo.KeyChar;
+				break;
+			}
+			keyCode |= MapToKeyCodeModifiers (consoleKeyInfo.Modifiers, keyCode);
+
+			return keyCode;
+		}
+
+		/// <summary>
+		/// Maps a <see cref="ConsoleKeyInfo"/> to a <see cref="KeyCode"/>.
+		/// </summary>
+		/// <param name="modifiers">The console modifiers.</param>
+		/// <param name="key">The key code.</param>
 		/// <returns>The <see cref="KeyCode"/> with <see cref="ConsoleModifiers"/> or the <paramref name="key"/></returns>
-		public static KeyCode MapKeyModifiers (ConsoleKeyInfo keyInfo, KeyCode key)
+		public static KeyCode MapToKeyCodeModifiers (ConsoleModifiers modifiers, KeyCode key)
 		{
 			var keyMod = new KeyCode ();
-			if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
+			if ((modifiers & ConsoleModifiers.Shift) != 0) {
 				keyMod = KeyCode.ShiftMask;
 			}
-			if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
+			if ((modifiers & ConsoleModifiers.Control) != 0) {
 				keyMod |= KeyCode.CtrlMask;
 			}
-			if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
+			if ((modifiers & ConsoleModifiers.Alt) != 0) {
 				keyMod |= KeyCode.AltMask;
 			}
 
 			return keyMod != KeyCode.Null ? keyMod | key : key;
 		}
 
-		static HashSet<ScanCodeMapping> scanCodes = new HashSet<ScanCodeMapping> {
+		static HashSet<ScanCodeMapping> _scanCodes = new HashSet<ScanCodeMapping> {
 			new ScanCodeMapping (1, 27, 0, 27), // Escape
 			new ScanCodeMapping (1, 27, ConsoleModifiers.Shift, 27),
 			new ScanCodeMapping (2, 49, 0, 49), // D1
@@ -586,13 +790,38 @@ namespace Terminal.Gui.ConsoleDrivers {
 		/// <remarks>If it's a <see cref="ConsoleKey.Packet"/> the <see cref="ConsoleKeyInfo.KeyChar"/> may be
 		/// a <see cref="ConsoleKeyInfo.Key"/> or a <see cref="ConsoleKeyInfo.KeyChar"/> value.
 		/// </remarks>
-		public static ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+		public static ConsoleKeyInfo DecodeVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
 		{
 			if (consoleKeyInfo.Key != ConsoleKey.Packet) {
 				return consoleKeyInfo;
 			}
 
-			return GetConsoleKeyFromKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out _);
+			return GetConsoleKeyInfoFromKeyChar (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out _);
+		}
+
+		/// <summary>
+		/// Encode the <see cref="ConsoleKeyInfo.KeyChar"/> with the <see cref="ConsoleKeyInfo.Key"/>
+		/// if the first a byte length, otherwise only the KeyChar is considered and searched on the database.
+		/// </summary>
+		/// <param name="consoleKeyInfo">The console key info.</param>
+		/// <returns>The encoded KeyChar with the Key if both can be shifted, otherwise only the KeyChar.</returns>
+		/// <remarks>This is useful to use with the <see cref="ConsoleKey.Packet"/>.</remarks>
+		public static char EncodeKeyCharForVKPacket (ConsoleKeyInfo consoleKeyInfo)
+		{
+			char keyChar = consoleKeyInfo.KeyChar;
+			ConsoleKey consoleKey = consoleKeyInfo.Key;
+			if (keyChar != 0 && consoleKeyInfo.KeyChar < byte.MaxValue && consoleKey == ConsoleKey.None) {
+				// try to get the ConsoleKey
+				var scode = _scanCodes.FirstOrDefault ((e) => e.UnicodeChar == keyChar);
+				if (scode != null) {
+					consoleKey = (ConsoleKey)scode.VirtualKey;
+				}
+			}
+			if (keyChar < byte.MaxValue && consoleKey != ConsoleKey.None) {
+				keyChar = (char)(consoleKeyInfo.KeyChar << 8 | (byte)consoleKey);
+			}
+
+			return keyChar;
 		}
 	}
 }
