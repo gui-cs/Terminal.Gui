@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui; 
 
@@ -205,5 +206,9 @@ public abstract class CollectionNavigatorBase {
 	/// </summary>
 	/// <param name="a"></param>
 	/// <returns></returns>
-	public static bool IsCompatibleKey (Key a) => a.AsRune != default;
+	public static bool IsCompatibleKey (Key a)
+	{
+		var rune = a.AsRune;
+		return rune != default && !Rune.IsControl (rune);
+	}
 }
