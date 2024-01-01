@@ -902,8 +902,6 @@ internal class WindowsDriver : ConsoleDriver {
 	}
 #endif
 
-
-
 #if !WT_ISSUE_8871_FIXED // https://github.com/microsoft/terminal/issues/8871
 	/// <summary>
 	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
