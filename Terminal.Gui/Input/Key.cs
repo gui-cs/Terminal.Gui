@@ -944,12 +944,12 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// The <see cref="Key"/> object for Insert Character key.
 	/// </summary>
-	public static Key InsertChar => new (KeyCode.InsertChar);
+	public static Key InsertChar => new (KeyCode.Insert);
 
 	/// <summary>
 	/// The <see cref="Key"/> object for Delete Character key.
 	/// </summary>
-	public static Key DeleteChar => new (KeyCode.DeleteChar);
+	public static Key DeleteChar => new (KeyCode.Delete);
 
 	/// <summary>
 	/// The <see cref="Key"/> object for Print Screen key.

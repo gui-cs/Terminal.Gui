@@ -374,8 +374,6 @@ public static class ConsoleKeyMapping {
 		switch (keyValue) {
 		case KeyCode.Enter:
 			return (uint)ConsoleKey.Enter;
-		case KeyCode.Delete:
-			return (uint)ConsoleKey.Delete;
 		case KeyCode.CursorUp:
 			return (uint)ConsoleKey.UpArrow;
 		case KeyCode.CursorDown:
@@ -392,9 +390,9 @@ public static class ConsoleKeyMapping {
 			return (uint)ConsoleKey.Home;
 		case KeyCode.End:
 			return (uint)ConsoleKey.End;
-		case KeyCode.InsertChar:
+		case KeyCode.Insert:
 			return (uint)ConsoleKey.Insert;
-		case KeyCode.DeleteChar:
+		case KeyCode.Delete:
 			return (uint)ConsoleKey.Delete;
 		case KeyCode.F1:
 			return (uint)ConsoleKey.F1;
@@ -493,7 +491,7 @@ public static class ConsoleKeyMapping {
 			keyCode = KeyCode.End;
 			break;
 		case ConsoleKey.Insert:
-			keyCode = KeyCode.InsertChar;
+			keyCode = KeyCode.Insert;
 			break;
 		case ConsoleKey.F1:
 			keyCode = KeyCode.F1;

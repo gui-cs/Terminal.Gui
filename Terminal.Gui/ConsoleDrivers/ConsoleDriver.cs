@@ -691,9 +691,9 @@ public enum KeyCode : uint {
 	CtrlMask = 0x_4000_0000,
 
 	/// <summary>
-	/// The key code representing null or empty
+	/// The key code representing an invalid or empty key.
 	/// </summary>
-	Null = '\0',
+	Null = 0,
 
 	/// <summary>
 	/// Backspace key.
@@ -935,189 +935,195 @@ public enum KeyCode : uint {
 	/// </summary>
 	Z,
 
-	/// <summary>
-	/// The key code for the Delete key.
-	/// </summary>
-	Delete = 127,
+	///// <summary>
+	///// The key code for the Delete key.
+	///// </summary>
+	//Delete = 127,
 
 	// --- Special keys ---
 	// The values below are common non-alphanum keys. Their values are 
 	// based on the .NET ConsoleKey values, which, in-turn are based on the
 	// VK_ values from the Windows API. 
-	// We add 0x10FFFF to avoid conflicts with the Unicode values.
-	
+	// We add MaxCodePoint to avoid conflicts with the Unicode values.
+
+	/// <summary>
+	/// The maximum Unicode codepoint value. Used to encode the non-alphanumeric control
+	/// keys. 
+	/// </summary>
+	MaxCodePoint = 0x10FFFF,
+
 	/// <summary>
 	/// Cursor up key
 	/// </summary>
-	CursorUp = 0x10FFFF + ConsoleKey.UpArrow,
+	CursorUp = MaxCodePoint + ConsoleKey.UpArrow,
 
 	/// <summary>
 	/// Cursor down key.
 	/// </summary>
-	CursorDown = 0x10FFFF + ConsoleKey.DownArrow,
+	CursorDown = MaxCodePoint + ConsoleKey.DownArrow,
 
 	/// <summary>
 	/// Cursor left key.
 	/// </summary>
-	CursorLeft = 0x10FFFF + ConsoleKey.LeftArrow,
+	CursorLeft = MaxCodePoint + ConsoleKey.LeftArrow,
 
 	/// <summary>
 	/// Cursor right key.
 	/// </summary>
-	CursorRight = 0x10FFFF + ConsoleKey.RightArrow,
+	CursorRight = MaxCodePoint + ConsoleKey.RightArrow,
 
 	/// <summary>
 	/// Page Up key.
 	/// </summary>
-	PageUp = 0x10FFFF + ConsoleKey.PageUp,
+	PageUp = MaxCodePoint + ConsoleKey.PageUp,
 
 	/// <summary>
 	/// Page Down key.
 	/// </summary>
-	PageDown = 0x10FFFF + ConsoleKey.PageDown,
+	PageDown = MaxCodePoint + ConsoleKey.PageDown,
 
 	/// <summary>
 	/// Home key.
 	/// </summary>
-	Home = 0x10FFFF + ConsoleKey.Home,
+	Home = MaxCodePoint + ConsoleKey.Home,
 
 	/// <summary>
 	/// End key.
 	/// </summary>
-	End = 0x10FFFF + ConsoleKey.End,
+	End = MaxCodePoint + ConsoleKey.End,
 
 	/// <summary>
-	/// Insert character key.
+	/// Insert (INS) key.
 	/// </summary>
-	InsertChar = 0x10FFFF + ConsoleKey.Insert,
+	Insert = MaxCodePoint + ConsoleKey.Insert,
 
 	/// <summary>
-	/// Delete character key.
+	/// Delete (DEL) key.
 	/// </summary>
-	DeleteChar = 0x10FFFF + ConsoleKey.Backspace,
+	Delete = MaxCodePoint + ConsoleKey.Delete,
 
 	/// <summary>
 	/// Print screen character key.
 	/// </summary>
-	PrintScreen = 0x10FFFF + ConsoleKey.PrintScreen,
+	PrintScreen = MaxCodePoint + ConsoleKey.PrintScreen,
 
 	/// <summary>
 	/// F1 key.
 	/// </summary>
-	F1 = 0x10FFFF + ConsoleKey.F1,
+	F1 = MaxCodePoint + ConsoleKey.F1,
 
 	/// <summary>
 	/// F2 key.
 	/// </summary>
-	F2 = 0x10FFFF + ConsoleKey.F2,
+	F2 = MaxCodePoint + ConsoleKey.F2,
 
 	/// <summary>
 	/// F3 key.
 	/// </summary>
-	F3 = 0x10FFFF + ConsoleKey.F3,
+	F3 = MaxCodePoint + ConsoleKey.F3,
 
 	/// <summary>
 	/// F4 key.
 	/// </summary>
-	F4 = 0x10FFFF + ConsoleKey.F4,
+	F4 = MaxCodePoint + ConsoleKey.F4,
 
 	/// <summary>
 	/// F5 key.
 	/// </summary>
-	F5 = 0x10FFFF + ConsoleKey.F5,
+	F5 = MaxCodePoint + ConsoleKey.F5,
 
 	/// <summary>
 	/// F6 key.
 	/// </summary>
-	F6 = 0x10FFFF + ConsoleKey.F6,
+	F6 = MaxCodePoint + ConsoleKey.F6,
 
 	/// <summary>
 	/// F7 key.
 	/// </summary>
-	F7 = 0x10FFFF + ConsoleKey.F7,
+	F7 = MaxCodePoint + ConsoleKey.F7,
 
 	/// <summary>
 	/// F8 key.
 	/// </summary>
-	F8 = 0x10FFFF + ConsoleKey.F8,
+	F8 = MaxCodePoint + ConsoleKey.F8,
 
 	/// <summary>
 	/// F9 key.
 	/// </summary>
-	F9 = 0x10FFFF + ConsoleKey.F9,
+	F9 = MaxCodePoint + ConsoleKey.F9,
 
 	/// <summary>
 	/// F10 key.
 	/// </summary>
-	F10 = 0x10FFFF + ConsoleKey.F10,
+	F10 = MaxCodePoint + ConsoleKey.F10,
 
 	/// <summary>
 	/// F11 key.
 	/// </summary>
-	F11 = 0x10FFFF + ConsoleKey.F11,
+	F11 = MaxCodePoint + ConsoleKey.F11,
 
 	/// <summary>
 	/// F12 key.
 	/// </summary>
-	F12 = 0x10FFFF + ConsoleKey.F12,
+	F12 = MaxCodePoint + ConsoleKey.F12,
 
 	/// <summary>
 	/// F13 key.
 	/// </summary>
-	F13 = 0x10FFFF + ConsoleKey.F13,
+	F13 = MaxCodePoint + ConsoleKey.F13,
 
 	/// <summary>
 	/// F14 key.
 	/// </summary>
-	F14 = 0x10FFFF + ConsoleKey.F14,
+	F14 = MaxCodePoint + ConsoleKey.F14,
 
 	/// <summary>
 	/// F15 key.
 	/// </summary>
-	F15 = 0x10FFFF + ConsoleKey.F15,
+	F15 = MaxCodePoint + ConsoleKey.F15,
 
 	/// <summary>
 	/// F16 key.
 	/// </summary>
-	F16 = 0x10FFFF + ConsoleKey.F16,
+	F16 = MaxCodePoint + ConsoleKey.F16,
 
 	/// <summary>
 	/// F17 key.
 	/// </summary>
-	F17 = 0x10FFFF + ConsoleKey.F17,
+	F17 = MaxCodePoint + ConsoleKey.F17,
 
 	/// <summary>
 	/// F18 key.
 	/// </summary>
-	F18 = 0x10FFFF + ConsoleKey.F18,
+	F18 = MaxCodePoint + ConsoleKey.F18,
 
 	/// <summary>
 	/// F19 key.
 	/// </summary>
-	F19 = 0x10FFFF + ConsoleKey.F19,
+	F19 = MaxCodePoint + ConsoleKey.F19,
 
 	/// <summary>
 	/// F20 key.
 	/// </summary>
-	F20 = 0x10FFFF + ConsoleKey.F20,
+	F20 = MaxCodePoint + ConsoleKey.F20,
 
 	/// <summary>
 	/// F21 key.
 	/// </summary>
-	F21 = 0x10FFFF + ConsoleKey.F21,
+	F21 = MaxCodePoint + ConsoleKey.F21,
 
 	/// <summary>
 	/// F22 key.
 	/// </summary>
-	F22 = 0x10FFFF + ConsoleKey.F22,
+	F22 = MaxCodePoint + ConsoleKey.F22,
 
 	/// <summary>
 	/// F23 key.
 	/// </summary>
-	F23 = 0x10FFFF + ConsoleKey.F23,
+	F23 = MaxCodePoint + ConsoleKey.F23,
 
 	/// <summary>
 	/// F24 key.
 	/// </summary>
-	F24 = 0x10FFFF + ConsoleKey.F24,
+	F24 = MaxCodePoint + ConsoleKey.F24,
 }

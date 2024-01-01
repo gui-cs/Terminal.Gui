@@ -1703,7 +1703,6 @@ namespace Terminal.Gui {
 
 			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.ShiftMask, Command.LeftExtend);
 
-			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharLeft);
 			KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
 
 			KeyBindings.Add (KeyCode.Home, Command.StartOfLine);
@@ -1711,7 +1710,7 @@ namespace Terminal.Gui {
 
 			KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.StartOfLineExtend);
 
-			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
 			KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
 
 			KeyBindings.Add (KeyCode.End, Command.EndOfLine);
@@ -1720,7 +1719,7 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.EndOfLineExtend);
 
 			KeyBindings.Add (KeyCode.K | KeyCode.CtrlMask, Command.CutToEndLine); // kill-to-end
-			KeyBindings.Add (KeyCode.DeleteChar | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToEndLine); // kill-to-end
+			KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToEndLine); // kill-to-end
 
 			KeyBindings.Add (KeyCode.K | KeyCode.AltMask, Command.CutToStartLine); // kill-to-start
 			KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToStartLine); // kill-to-start
@@ -1744,7 +1743,7 @@ namespace Terminal.Gui {
 			KeyBindings.Add ((KeyCode)((int)'F' + KeyCode.AltMask), Command.WordRight);
 
 			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.WordRightExtend);
-			KeyBindings.Add (KeyCode.DeleteChar | KeyCode.CtrlMask, Command.KillWordForwards); // kill-word-forwards
+			KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards); // kill-word-forwards
 			KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
 
 			// BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
@@ -1754,7 +1753,7 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask, Command.TopHome);
 			KeyBindings.Add (KeyCode.Home | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.TopHomeExtend);
 			KeyBindings.Add (KeyCode.T | KeyCode.CtrlMask, Command.SelectAll);
-			KeyBindings.Add (KeyCode.InsertChar, Command.ToggleOverwrite);
+			KeyBindings.Add (KeyCode.Insert, Command.ToggleOverwrite);
 			KeyBindings.Add (KeyCode.Tab, Command.Tab);
 			KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.BackTab);
 

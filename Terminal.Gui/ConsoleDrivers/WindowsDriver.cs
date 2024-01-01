@@ -963,44 +963,8 @@ internal class WindowsDriver : ConsoleDriver {
 
 	KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 	{
-		KeyCode retval = KeyCode.Null;
 		var keyInfo = keyInfoEx.ConsoleKeyInfo;
 		switch (keyInfo.Key) {
-		case ConsoleKey.Escape:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Esc);
-		case ConsoleKey.Tab:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Tab);
-		case ConsoleKey.Clear:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Clear);
-		case ConsoleKey.Home:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Home);
-		case ConsoleKey.End:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.End);
-		case ConsoleKey.LeftArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorLeft);
-		case ConsoleKey.RightArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorRight);
-		case ConsoleKey.UpArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorUp);
-		case ConsoleKey.DownArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorDown);
-		case ConsoleKey.PageUp:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageUp);
-		case ConsoleKey.PageDown:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageDown);
-		case ConsoleKey.Enter:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
-		case ConsoleKey.Spacebar:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Space);
-		case ConsoleKey.Backspace:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
-		case ConsoleKey.Delete:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.DeleteChar);
-		case ConsoleKey.Insert:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.InsertChar);
-		case ConsoleKey.PrintScreen:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PrintScreen);
-
 		case ConsoleKey.NumPad0:
 		case ConsoleKey.NumPad1:
 		case ConsoleKey.NumPad2:
@@ -1069,7 +1033,7 @@ internal class WindowsDriver : ConsoleDriver {
 				// would be redundant.
 				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar );
 			}
-			return retval;
+			break;
 		}
 
 		var key = keyInfo.Key;
@@ -1123,34 +1087,44 @@ internal class WindowsDriver : ConsoleDriver {
 				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
 			}
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == ((uint)KeyCode.D0 + delta)) {
+				// TODO: figure out why VK.ACCEPT (IME ACCEPT) is special cased below. 
+				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == (uint)VK.ACCEPT || keyInfo.KeyChar == ((uint)KeyCode.D0 + delta)) {
 					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
 				}
 			}
 			return (KeyCode)((uint)keyInfo.KeyChar);
 		}
 
-		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
-			var delta = key - ConsoleKey.F1;
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.F1 + delta));
+		// Handle all other control keys 
+		if (Enum.IsDefined (typeof (KeyCode), ((uint)key))) {
+			// If the key is JUST a modifier, return it as just that key
+			if ((KeyCode)key == KeyCode.ShiftKey) { // Shift 16
+				return KeyCode.ShiftMask;
 			}
 
-			return (KeyCode)((uint)KeyCode.F1 + delta);
+			if ((KeyCode)key == KeyCode.CtrlKey) { // Ctrl 17
+				return KeyCode.CtrlMask;
+			}
+
+			if ((KeyCode)key == KeyCode.AltKey) { // Alt 18
+				return KeyCode.AltMask;
+			}
+
+			if (0 == keyInfo.KeyChar) {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
+			} else {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)((uint)keyInfo.KeyChar));
+			}
 		}
 
-		// If the key is JUST a modifier, return it as that key
-		if (key == (ConsoleKey)16) { // Shift
-			return KeyCode.ShiftMask;
+		// Handle all other control keys (e.g. CursorUp)
+		if (Enum.IsDefined(typeof(KeyCode), ((uint)key + (uint)KeyCode.MaxCodePoint)))
+		{
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key + (uint)KeyCode.MaxCodePoint));
 		}
 
-		if (key == (ConsoleKey)17) { // Ctrl
-			return KeyCode.CtrlMask;
-		}
 
-		if (key == (ConsoleKey)18) { // Alt
-			return KeyCode.AltMask;
-		}
+
 
 		return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 	}

@@ -960,7 +960,7 @@ namespace Terminal.Gui {
 				return this.history.Forward ();
 			}
 
-			if (keyEvent.KeyCode == KeyCode.DeleteChar) {
+			if (keyEvent.KeyCode == KeyCode.Delete) {
 
 				Delete ();
 				return true;

@@ -61,7 +61,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			TimeField tf = new TimeField (TimeSpan.Parse ("12:12:19"));
 			tf.ReadOnly = true;
-			Assert.True (tf.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+			Assert.True (tf.NewKeyDownEvent (new (KeyCode.Delete)));
 			Assert.Equal (" 12:12:19", tf.Text);
 			tf.ReadOnly = false;
 			Assert.True (tf.NewKeyDownEvent (new (KeyCode.D | KeyCode.CtrlMask)));

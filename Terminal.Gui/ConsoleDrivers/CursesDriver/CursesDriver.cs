@@ -368,8 +368,8 @@ internal class CursesDriver : ConsoleDriver {
 		case Curses.KeyEnd: return KeyCode.End;
 		case Curses.KeyNPage: return KeyCode.PageDown;
 		case Curses.KeyPPage: return KeyCode.PageUp;
-		case Curses.KeyDeleteChar: return KeyCode.DeleteChar;
-		case Curses.KeyInsertChar: return KeyCode.InsertChar;
+		case Curses.KeyDeleteChar: return KeyCode.Delete;
+		case Curses.KeyInsertChar: return KeyCode.Insert;
 		case Curses.KeyTab: return KeyCode.Tab;
 		case Curses.KeyBackTab: return KeyCode.Tab | KeyCode.ShiftMask;
 		case Curses.KeyBackspace: return KeyCode.Backspace;

@@ -320,7 +320,7 @@ public class KeyTests {
 	}
 
 	// TODO: Create equality operator for KeyCode
-	//Assert.Equal (KeyCode.Delete, Key.Delete);
+	//Assert.Equal (KeyCode.DeleteChar, Key.Delete);
 
 	// Similar tests for IsShift and IsCtrl
 	[Fact]
