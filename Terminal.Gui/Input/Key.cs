@@ -496,7 +496,7 @@ public class Key : EventArgs, IEquatable<Key> {
 			return ((Rune)(uint)(key + 32)).ToString ();
 		}
 
-		if (key is >= KeyCode.Space and < KeyCode.A) {
+		if (key is > KeyCode.Space and < KeyCode.A) {
 			return ((Rune)(uint)key).ToString ();
 		}
 

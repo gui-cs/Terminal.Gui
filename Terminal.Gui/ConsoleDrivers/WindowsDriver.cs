@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Terminal.Gui.ConsoleDrivers;
 using static Unix.Terminal.Delegates;
+using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui;
 
@@ -371,7 +372,7 @@ internal class WindowsConsole {
 		[FieldOffset (4), MarshalAs (UnmanagedType.U2)]
 		public ushort wRepeatCount;
 		[FieldOffset (6), MarshalAs (UnmanagedType.U2)]
-		public ushort wVirtualKeyCode;
+		public ConsoleKeyMapping.VK wVirtualKeyCode;
 		[FieldOffset (8), MarshalAs (UnmanagedType.U2)]
 		public ushort wVirtualScanCode;
 		[FieldOffset (10)]
@@ -901,8 +902,70 @@ internal class WindowsDriver : ConsoleDriver {
 	}
 #endif
 
+
+
+#if !WT_ISSUE_8871_FIXED // https://github.com/microsoft/terminal/issues/8871
+	/// <summary>
+	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
+	/// </summary>
+	/// <param name="vk"></param>
+	/// <param name="uMapType">
+	/// If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an unshifted
+	/// character value in the low order word of the return value. 
+	/// </param>
+	/// <returns>An unshifted character value in the low order word of the return value. Dead keys (diacritics)
+	/// are indicated by setting the top bit of the return value. If there is no translation,
+	/// the function returns 0. See Remarks.</returns>
+	[DllImport ("user32.dll", EntryPoint = "MapVirtualKeyExW", CharSet = CharSet.Unicode)]
+	extern static uint MapVirtualKeyEx (VK vk, uint uMapType, IntPtr dwhkl);
+
+	/// <summary>
+	/// Retrieves the active input locale identifier (formerly called the keyboard layout).
+	/// </summary>
+	/// <param name="idThread">0 for current thread</param>
+	/// <returns>The return value is the input locale identifier for the thread.
+	/// The low word contains a Language Identifier for the input language
+	/// and the high word contains a device handle to the physical layout of the keyboard.
+	/// </returns>
+	[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayout", CharSet = CharSet.Unicode)]
+	extern static IntPtr GetKeyboardLayout (IntPtr idThread);
+
+	//[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayoutNameW", CharSet = CharSet.Unicode)]
+	//extern static uint GetKeyboardLayoutName (uint idThread);
+
+	[DllImport ("user32.dll")]
+	extern static IntPtr GetForegroundWindow ();
+
+	[DllImport ("user32.dll")]
+	extern static IntPtr GetWindowThreadProcessId (IntPtr hWnd, IntPtr ProcessId);
+
+	uint MapVKtoChar (VK vk)
+	{
+		var tid = GetWindowThreadProcessId (GetForegroundWindow (), 0);
+		var hkl = GetKeyboardLayout (tid);
+		return MapVirtualKeyEx (vk, 2, hkl);
+	}
+#else
+	/// <summary>
+	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
+	/// </summary>
+	/// <param name="vk"></param>
+	/// <param name="uMapType">
+	/// If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an unshifted
+	/// character value in the low order word of the return value. 
+	/// </param>
+	/// <returns>An unshifted character value in the low order word of the return value. Dead keys (diacritics)
+	/// are indicated by setting the top bit of the return value. If there is no translation,
+	/// the function returns 0. See Remarks.</returns>
+	[DllImport ("user32.dll", EntryPoint = "MapVirtualKeyW", CharSet = CharSet.Unicode)]
+	extern static uint MapVirtualKey (VK vk, uint uMapType = 2);
+
+	uint MapVKtoChar (VK vk) => MapVirtualKeyToCharEx (vk);
+#endif
+
 	KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 	{
+		KeyCode retval = KeyCode.Null;
 		var keyInfo = keyInfoEx.ConsoleKeyInfo;
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
@@ -930,7 +993,7 @@ internal class WindowsDriver : ConsoleDriver {
 		case ConsoleKey.Enter:
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
 		case ConsoleKey.Spacebar:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, keyInfo.KeyChar == 0 ? KeyCode.Space : (KeyCode)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Space);
 		case ConsoleKey.Backspace:
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
 		case ConsoleKey.Delete:
@@ -940,27 +1003,22 @@ internal class WindowsDriver : ConsoleDriver {
 		case ConsoleKey.PrintScreen:
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PrintScreen);
 
-		//case ConsoleKey.NumPad0:
-		//	return keyInfoEx.NumLock ? Key.D0 : Key.InsertChar;
-		//case ConsoleKey.NumPad1:
-		//	return keyInfoEx.NumLock ? Key.D1 : Key.End;
-		//case ConsoleKey.NumPad2:
-		//	return keyInfoEx.NumLock ? Key.D2 : Key.CursorDown;
-		//case ConsoleKey.NumPad3:
-		//	return keyInfoEx.NumLock ? Key.D3 : Key.PageDown;
-		//case ConsoleKey.NumPad4:
-		//	return keyInfoEx.NumLock ? Key.D4 : Key.CursorLeft;
-		//case ConsoleKey.NumPad5:
-		//	return keyInfoEx.NumLock ? Key.D5 : (Key)((uint)keyInfo.KeyChar);
-		//case ConsoleKey.NumPad6:
-		//	return keyInfoEx.NumLock ? Key.D6 : Key.CursorRight;
-		//case ConsoleKey.NumPad7:
-		//	return keyInfoEx.NumLock ? Key.D7 : Key.Home;
-		//case ConsoleKey.NumPad8:
-		//	return keyInfoEx.NumLock ? Key.D8 : Key.CursorUp;
-		//case ConsoleKey.NumPad9:
-		//	return keyInfoEx.NumLock ? Key.D9 : Key.PageUp;
-
+		case ConsoleKey.NumPad0:
+		case ConsoleKey.NumPad1:
+		case ConsoleKey.NumPad2:
+		case ConsoleKey.NumPad3:
+		case ConsoleKey.NumPad4:
+		case ConsoleKey.NumPad5:
+		case ConsoleKey.NumPad6:
+		case ConsoleKey.NumPad7:
+		case ConsoleKey.NumPad8:
+		case ConsoleKey.NumPad9:
+		case ConsoleKey.Multiply:
+		case ConsoleKey.Add:
+		case ConsoleKey.Separator:
+		case ConsoleKey.Subtract:
+		case ConsoleKey.Decimal:
+		case ConsoleKey.Divide:
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
 		case ConsoleKey.Oem3:
@@ -970,25 +1028,50 @@ internal class WindowsDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
-			//var ret = ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
-			//if (ret.HasFlag (KeyCode.ShiftMask)) {
-			//	ret &= ~KeyCode.ShiftMask;
-			//}
-			//return ret;
-
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 		case ConsoleKey.OemPeriod:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)'.');
 		case ConsoleKey.OemComma:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)',');
 		case ConsoleKey.OemPlus:
-			var ret = ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, keyInfo.KeyChar == 0 ? (KeyCode)'+' : (KeyCode)keyInfo.KeyChar);
-			if (ret.HasFlag (KeyCode.ShiftMask)) {
-				ret &= ~KeyCode.ShiftMask;
-			}
-			return ret;
 		case ConsoleKey.OemMinus:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)'-');
+			if (keyInfo.KeyChar == 0) {
+				var mappedChar = MapVKtoChar ((VK)keyInfo.Key);
+				if (mappedChar != 0) {
+					var charVal = (char)(mappedChar & 0x0000FFFF);
+					// An un-shifted character value in the low order word of the return value.
+					// Dead keys (diacritics) are indicated by setting the top bit of the return value. 
+					if ((mappedChar & 0x80000000) != 0) {
+						// Dead key (e.g. Oem2 '~'/'^' on POR keyboard)
+						// Option 1: Throw it out. 
+						//    - Apps will never see the dead keys
+						//    - If user presses a key that can be combined with the dead key ('a'), the right thing happens (app will see 'ã').
+						//      - NOTE: With Dead Keys, KeyDown != KeyUp. The KeyUp event will have just the base char ('a').
+						//    - If user presses dead key again, the right thing happens (app will see `~~`)
+						//    - This is what Notepad etc... appear to do
+						// Option 2: Expand the API to indicate the KeyCode is a dead key
+						//    - Enables apps to do their own dead key processing
+						//    - Adds complexity; no dev has asked for this (yet).
+						// We choose Option 1 for now.
+						return KeyCode.Null;
+					}
+
+					if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
+						// We get here if Windows detected a Ctrl-Deadkey (like Oem3 '`'/'~` on ENG).
+						// Sadly, the charVal is just the deadkey and subsequent key events do not contain
+						// any info that the previous event was a deadkey.
+						// TODO: We *could* set a global with charVal and then, on the next KeyDown combine them,
+						// but that's super-complex, and WT does not support this either. 
+						// This means Ctrl-DeadKey input is not supported in Terminal.Gui apps
+						return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)charVal);
+					}
+					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)charVal);
+				} else {
+					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
+				}
+			} else {
+				// Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç") and passing on Shift
+				// would be redundant.
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar );
+			}
+			return retval;
 		}
 
 		var key = keyInfo.Key;
@@ -1004,28 +1087,21 @@ internal class WindowsDriver : ConsoleDriver {
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
 				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
 			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Control | ConsoleModifiers.Shift)) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-			}
-			if (!keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift)
-				&& (keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
 				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
 					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
 				}
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
-				if (keyInfo.KeyChar >= (uint)KeyCode.A && keyInfo.KeyChar <= (uint)KeyCode.Z) {
+				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
 					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
-				} else {
-					return (KeyCode)keyInfo.KeyChar | KeyCode.ShiftMask;
 				}
 			}
 
-			// This will get the same KeyChar e.g. Ç (199) will return Ç (199) or if it's Z (90) will return Z (90) anyway
-			//if (keyInfo.Modifiers == 0 && ((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
-			//	return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			//}
+			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
+				return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
+			}
 
 			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) != 0) {
 				if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) == (KeyCode)keyInfo.Key) {
@@ -1034,11 +1110,7 @@ internal class WindowsDriver : ConsoleDriver {
 				return (KeyCode)((uint)keyInfo.KeyChar);
 			}
 
-			if (keyInfo.KeyChar != 0) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.KeyChar);
-			} else {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
-			}
+			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
 
 		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
@@ -1057,7 +1129,7 @@ internal class WindowsDriver : ConsoleDriver {
 					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
 				}
 			}
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
+			return (KeyCode)((uint)keyInfo.KeyChar);
 		}
 
 		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
@@ -1091,7 +1163,7 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		switch (inputEvent.EventType) {
 		case WindowsConsole.EventType.Key:
-			var fromPacketKey = inputEvent.KeyEvent.wVirtualKeyCode == (uint)ConsoleKey.Packet;
+			var fromPacketKey = inputEvent.KeyEvent.wVirtualKeyCode == (VK)ConsoleKey.Packet;
 			if (fromPacketKey) {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
@@ -1100,6 +1172,10 @@ internal class WindowsDriver : ConsoleDriver {
 
 			var map = MapKey (keyInfo);
 
+			if (map == KeyCode.Null) {
+				break;
+			}
+
 			if (inputEvent.KeyEvent.bKeyDown) {
 				_altDown = keyInfo.ConsoleKeyInfo.Modifiers == ConsoleModifiers.Alt;
 				// Avoid sending repeat keydowns
@@ -1107,11 +1183,6 @@ internal class WindowsDriver : ConsoleDriver {
 			} else {
 				var keyPressedEventArgs = new Key (map);
 
-				// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
-				// However, if while the 'Alt' key is down, if another key is pressed and
-				// released, there will be a keypressed event for that and the
-				// keypressed event for just `Alt` will be suppressed. 
-				// This allows MenuBar to have `Alt` as a keybinding
 				if (map != KeyCode.AltMask) {
 					if (keyInfo.ConsoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
 						if (_altDown) {
@@ -1121,9 +1192,13 @@ internal class WindowsDriver : ConsoleDriver {
 
 					}
 					_altDown = false;
-					// KeyUp of an Alt-key press. 
-					OnKeyUp (keyPressedEventArgs);
+					OnKeyUp (new Key (map));
 				} else {
+					// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
+					// However, if while the 'Alt' key is down, if another key is pressed and
+					// released, there will be a keypressed event for that and the
+					// keypressed event for just `Alt` will be suppressed. 
+					// This allows MenuBar to have `Alt` as a keybinding
 					OnKeyUp (keyPressedEventArgs);
 					if (_altDown) {
 						_altDown = false;
@@ -1439,7 +1514,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 	public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
 	{
-		if (keyEvent.wVirtualKeyCode != (uint)ConsoleKey.Packet) {
+		if (keyEvent.wVirtualKeyCode != (VK)ConsoleKey.Packet) {
 			return keyEvent;
 		}
 
@@ -1465,7 +1540,7 @@ internal class WindowsDriver : ConsoleDriver {
 			bKeyDown = keyEvent.bKeyDown,
 			dwControlKeyState = keyEvent.dwControlKeyState,
 			wRepeatCount = keyEvent.wRepeatCount,
-			wVirtualKeyCode = (ushort)cKeyInfo.Key,
+			wVirtualKeyCode = (VK)cKeyInfo.Key,
 			wVirtualScanCode = (ushort)scanCode
 		};
 	}
@@ -1611,19 +1686,19 @@ internal class WindowsDriver : ConsoleDriver {
 		if (shift) {
 			controlKey |= WindowsConsole.ControlKeyState.ShiftPressed;
 			keyEvent.UnicodeChar = '\0';
-			keyEvent.wVirtualKeyCode = 16;
+			keyEvent.wVirtualKeyCode = VK.SHIFT;
 		}
 		if (alt) {
 			controlKey |= WindowsConsole.ControlKeyState.LeftAltPressed;
 			controlKey |= WindowsConsole.ControlKeyState.RightAltPressed;
 			keyEvent.UnicodeChar = '\0';
-			keyEvent.wVirtualKeyCode = 18;
+			keyEvent.wVirtualKeyCode = VK.MENU;
 		}
 		if (control) {
 			controlKey |= WindowsConsole.ControlKeyState.LeftControlPressed;
 			controlKey |= WindowsConsole.ControlKeyState.RightControlPressed;
 			keyEvent.UnicodeChar = '\0';
-			keyEvent.wVirtualKeyCode = 17;
+			keyEvent.wVirtualKeyCode = VK.CONTROL;
 		}
 		keyEvent.dwControlKeyState = controlKey;
 
@@ -1639,7 +1714,7 @@ internal class WindowsDriver : ConsoleDriver {
 		//} else {
 		//	keyEvent.wVirtualKeyCode = '\0';
 		//}
-		keyEvent.wVirtualKeyCode = (ushort)key;
+		keyEvent.wVirtualKeyCode = (VK)key;
 
 		input.KeyEvent = keyEvent;
 

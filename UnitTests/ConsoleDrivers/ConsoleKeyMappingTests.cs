@@ -149,7 +149,7 @@ public class ConsoleKeyMappingTests {
 			yield return new object [] { '6', true, true, true, '6', 7, KeyCode.D6 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '6', 7 };
 			yield return new object [] { '6', false, true, true, '6', 7, KeyCode.D6 | KeyCode.AltMask | KeyCode.CtrlMask, '6', 7 };
 			yield return new object [] { '7', false, false, false, '7', 8, KeyCode.D7, '7', 8 };
-			yield return new object [] { '/', true, false, false, '7', 8, (KeyCode)'/' | KeyCode.ShiftMask, '7', 8 };
+			yield return new object [] { '/', true, false, false, '7', 8, (KeyCode)'/' | KeyCode.ShiftMask, '7', 8 }; // BUGBUG: This is not true for ENG keyboards. Shift-7 is &.
 			yield return new object [] { '7', true, true, false, '7', 8, KeyCode.D7 | KeyCode.ShiftMask | KeyCode.AltMask, '7', 8 };
 			yield return new object [] { '7', true, true, true, '7', 8, KeyCode.D7 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask, '7', 8 };
 			yield return new object [] { '{', false, true, true, '7', 8, (KeyCode)'{' | KeyCode.AltMask | KeyCode.CtrlMask, '7', 8 };
@@ -233,8 +233,9 @@ public class ConsoleKeyMappingTests {
 	[InlineData ('英', ConsoleKey.None, '英', ConsoleKey.None)]
 	[InlineData ('´', ConsoleKey.None, '´', ConsoleKey.Oem1)]
 	[InlineData ('`', ConsoleKey.None, '`', ConsoleKey.Oem1)]
-	[InlineData ('~', ConsoleKey.None, '~', ConsoleKey.Oem2)]
-	[InlineData ('^', ConsoleKey.None, '^', ConsoleKey.Oem2)]
+	//[InlineData ('~', ConsoleKey.None, '~', ConsoleKey.Oem2)]
+	//[InlineData ('^', ConsoleKey.None, '^', ConsoleKey.Oem2)] // BUGBUG: '^' is Shift-6 on ENG keyboard,not Oem2.
+                                                                  // For the US standard keyboard, Oem2 is the /? key
 	public void EncodeKeyCharForVKPacket_DecodeVKPacketToKConsoleKeyInfo (char keyChar, ConsoleKey consoleKey, char expectedChar, ConsoleKey expectedConsoleKey)
 	{
 		var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, false, false, false);
@@ -242,8 +243,8 @@ public class ConsoleKeyMappingTests {
 		var encodedConsoleKeyInfo = new ConsoleKeyInfo (encodedKeyChar, ConsoleKey.Packet, false, false, false);
 		var decodedConsoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (encodedConsoleKeyInfo);
 		Assert.Equal (consoleKeyInfo.Key, consoleKey);
-		Assert.Equal (decodedConsoleKeyInfo.Key, expectedConsoleKey);
-		Assert.Equal (decodedConsoleKeyInfo.KeyChar, expectedChar);
+		Assert.Equal (expectedConsoleKey, decodedConsoleKeyInfo.Key);
+		Assert.Equal (expectedChar, decodedConsoleKeyInfo.KeyChar);
 	}
 
 	[Theory]
