@@ -64,6 +64,7 @@ public static class ConsoleKeyMapping {
 		return null;
 	}
 
+	// BUGBUG: This API is not correct. It is only used by WindowsDriver in VKPacket scenarios
 	/// <summary>
 	/// Get the scan code from a <see cref="ConsoleKeyInfo"/>.
 	/// </summary>
@@ -80,6 +81,7 @@ public static class ConsoleKeyMapping {
 		return 0;
 	}
 
+	// BUGBUG: This API is not correct. It is only used by FakeDriver and VkeyPacketSimulator
 	/// <summary>
 	/// Gets the <see cref="ConsoleKeyInfo"/> from the provided <see cref="KeyCode"/>.
 	/// </summary>

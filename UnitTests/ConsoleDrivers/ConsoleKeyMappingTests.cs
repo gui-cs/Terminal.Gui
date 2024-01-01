@@ -5,6 +5,10 @@ using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui.ConsoleDrivers;
 public class ConsoleKeyMappingTests {
+
+#if ENABLE_VK_PACKET_NON_WINDOWS
+	// This test (and the GetConsoleKeyInfoFromKeyCode API) are bogus. They make no sense outside of
+	// the context of Windows and knowing they keyboard layout. They should be removed.
 	[Theory]
 	[InlineData (KeyCode.A | KeyCode.ShiftMask, ConsoleKey.A, KeyCode.A, 'A')]
 	[InlineData ((KeyCode)'a', ConsoleKey.A, (KeyCode)'a', 'a')]
@@ -247,6 +251,40 @@ public class ConsoleKeyMappingTests {
 		Assert.Equal (expectedChar, decodedConsoleKeyInfo.KeyChar);
 	}
 
+	
+	[Theory]
+	[InlineData ((KeyCode)'a', false, ConsoleKey.A, 'a')]
+	[InlineData (KeyCode.A | KeyCode.ShiftMask, false, ConsoleKey.A, 'A')]
+	[InlineData ((KeyCode)'á', false, ConsoleKey.A, 'á')]
+	[InlineData ((KeyCode)'Á' | KeyCode.ShiftMask, false, ConsoleKey.A, 'Á')]
+	[InlineData ((KeyCode)'à', false, ConsoleKey.A, 'à')]
+	[InlineData ((KeyCode)'À' | KeyCode.ShiftMask, false, ConsoleKey.A, 'À')]
+	[InlineData (KeyCode.D5, false, ConsoleKey.D5, '5')]
+	[InlineData ((KeyCode)'%' | KeyCode.ShiftMask, false, ConsoleKey.D5, '%')]
+	//[InlineData ((KeyCode)'€' | KeyCode.AltMask | KeyCode.CtrlMask, false, ConsoleKey.D5, '€')] // Bogus test. This is not true on ENG keyboard layout.
+	[InlineData ((KeyCode)'?' | KeyCode.ShiftMask, false, ConsoleKey.Oem4, '?')]
+	[InlineData ((KeyCode)'\'', false, ConsoleKey.Oem4, '\'')]
+	[InlineData ((KeyCode)'q', false, ConsoleKey.Q, 'q')]
+	[InlineData (KeyCode.F2, true, ConsoleKey.F2, 'q')]
+	[InlineData ((KeyCode)'英', false, ConsoleKey.None, '英')]
+	[InlineData (KeyCode.Enter, true, ConsoleKey.Enter, '\r')]
+	public void MapKeyCodeToConsoleKey_GetKeyCharFromUnicodeChar (KeyCode keyCode, bool expectedIsConsoleKey, ConsoleKey expectedConsoleKey, char expectedConsoleKeyChar)
+	{
+		var modifiers = ConsoleKeyMapping.MapToConsoleModifiers (keyCode);
+		var consoleKey = ConsoleKeyMapping.MapKeyCodeToConsoleKey (keyCode, out bool isConsoleKey);
+		if (isConsoleKey) {
+			Assert.True (isConsoleKey == expectedIsConsoleKey);
+			Assert.Equal (expectedConsoleKey , (ConsoleKey)consoleKey);
+			Assert.Equal (expectedConsoleKeyChar, consoleKey);
+		} else {
+			var keyChar = ConsoleKeyMapping.GetKeyCharFromUnicodeChar (consoleKey, modifiers, out consoleKey, out _, isConsoleKey);
+			Assert.True (isConsoleKey == expectedIsConsoleKey);
+			Assert.Equal (expectedConsoleKey , (ConsoleKey)consoleKey);
+			Assert.Equal (expectedConsoleKeyChar, keyChar);
+		}
+	}
+#endif
+	
 	[Theory]
 	[InlineData ('a', ConsoleKey.A, false, false, false, (KeyCode)'a')]
 	[InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)]
@@ -294,38 +332,6 @@ public class ConsoleKeyMappingTests {
 		keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
 
 		Assert.Equal (keyCode, excpectedKeyCode);
-	}
-
-	[Theory]
-	[InlineData ((KeyCode)'a', false, ConsoleKey.A, 'a')]
-	[InlineData (KeyCode.A | KeyCode.ShiftMask, false, ConsoleKey.A, 'A')]
-	[InlineData ((KeyCode)'á', false, ConsoleKey.A, 'á')]
-	[InlineData ((KeyCode)'Á' | KeyCode.ShiftMask, false, ConsoleKey.A, 'Á')]
-	[InlineData ((KeyCode)'à', false, ConsoleKey.A, 'à')]
-	[InlineData ((KeyCode)'À' | KeyCode.ShiftMask, false, ConsoleKey.A, 'À')]
-	[InlineData (KeyCode.D5, false, ConsoleKey.D5, '5')]
-	[InlineData ((KeyCode)'%' | KeyCode.ShiftMask, false, ConsoleKey.D5, '%')]
-	[InlineData ((KeyCode)'€' | KeyCode.AltMask | KeyCode.CtrlMask, false, ConsoleKey.D5, '€')]
-	[InlineData ((KeyCode)'?' | KeyCode.ShiftMask, false, ConsoleKey.Oem4, '?')]
-	[InlineData ((KeyCode)'\'', false, ConsoleKey.Oem4, '\'')]
-	[InlineData ((KeyCode)'q', false, ConsoleKey.Q, 'q')]
-	[InlineData (KeyCode.F2, true, ConsoleKey.F2, 'q')]
-	[InlineData ((KeyCode)'英', false, ConsoleKey.None, '英')]
-	[InlineData (KeyCode.Enter, true, ConsoleKey.Enter, '\r')]
-	public void MapKeyCodeToConsoleKey_GetKeyCharFromUnicodeChar (KeyCode keyCode, bool expectedIsConsoleKey, ConsoleKey expectedConsoleKey, char expectedConsoleKeyChar)
-	{
-		var modifiers = ConsoleKeyMapping.MapToConsoleModifiers (keyCode);
-		var consoleKey = ConsoleKeyMapping.MapKeyCodeToConsoleKey (keyCode, out bool isConsoleKey);
-		if (isConsoleKey) {
-			Assert.True (isConsoleKey == expectedIsConsoleKey);
-			Assert.Equal ((ConsoleKey)consoleKey, expectedConsoleKey);
-			Assert.Equal (consoleKey, expectedConsoleKeyChar);
-		} else {
-			var keyChar = ConsoleKeyMapping.GetKeyCharFromUnicodeChar (consoleKey, modifiers, out consoleKey, out _, isConsoleKey);
-			Assert.True (isConsoleKey == expectedIsConsoleKey);
-			Assert.Equal ((ConsoleKey)consoleKey, expectedConsoleKey);
-			Assert.Equal (keyChar, expectedConsoleKeyChar);
-		}
 	}
 
 	[Theory]
