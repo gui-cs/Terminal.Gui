@@ -960,6 +960,13 @@ internal class WindowsDriver : ConsoleDriver {
 
 	uint MapVKtoChar (VK vk) => MapVirtualKeyToCharEx (vk);
 #endif
+	/// <summary>
+	/// Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling thread.
+	/// </summary>
+	/// <param name="pwszKLID"></param>
+	/// <returns></returns>
+	[DllImport ("user32.dll")] 
+	extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
 
 	KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 	{
@@ -1133,7 +1140,9 @@ internal class WindowsDriver : ConsoleDriver {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
-			Debug.WriteLine ($"event: {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
+			StringBuilder klidSB = new StringBuilder();
+			GetKeyboardLayoutName (klidSB);
+			Debug.WriteLine ($"event: KBD: {klidSB} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
 			var map = MapKey (keyInfo);
 
