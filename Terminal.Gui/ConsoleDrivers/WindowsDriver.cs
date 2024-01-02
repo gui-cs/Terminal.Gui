@@ -965,7 +965,7 @@ internal class WindowsDriver : ConsoleDriver {
 	/// </summary>
 	/// <param name="pwszKLID"></param>
 	/// <returns></returns>
-	[DllImport ("user32.dll")] 
+	[DllImport ("user32.dll")]
 	extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
 
 	KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
@@ -1036,9 +1036,13 @@ internal class WindowsDriver : ConsoleDriver {
 					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.Key);
 				}
 			} else {
+				// AltGr support - AltGr is equivalent to Ctrl+Alt
+				if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+					return (KeyCode)keyInfo.KeyChar;
+				}
 				// Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç") and passing on Shift
 				// would be redundant.
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar );
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
 			}
 			break;
 		}
@@ -1061,12 +1065,11 @@ internal class WindowsDriver : ConsoleDriver {
 				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key));
 			}
 
+			// AltGr support - AltGr is equivalent to Ctrl+Alt
 			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				// BDISP: What does this test do? What is KeyChar >= 1 and KeyChar <= 26???
-				//        With this commented out I can't find anything that doesn't work.
-				//if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
+				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
 					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key));
-				//}
+				}
 			}
 
 			// If (ShiftMask is on and CapsLock is off) or (ShiftMask is off and CapsLock is on) add the ShiftMask
@@ -1121,8 +1124,7 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 
 		// Handle all other control keys (e.g. CursorUp)
-		if (Enum.IsDefined(typeof(KeyCode), ((uint)key + (uint)KeyCode.MaxCodePoint)))
-		{
+		if (Enum.IsDefined (typeof (KeyCode), ((uint)key + (uint)KeyCode.MaxCodePoint))) {
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key + (uint)KeyCode.MaxCodePoint));
 		}
 
@@ -1140,7 +1142,7 @@ internal class WindowsDriver : ConsoleDriver {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
-			StringBuilder klidSB = new StringBuilder();
+			StringBuilder klidSB = new StringBuilder ();
 			GetKeyboardLayoutName (klidSB);
 			Debug.WriteLine ($"event: KBD: {klidSB} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
@@ -1151,33 +1153,34 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 
 			if (inputEvent.KeyEvent.bKeyDown) {
-				_altDown = keyInfo.ConsoleKeyInfo.Modifiers == ConsoleModifiers.Alt;
+				//_altDown = keyInfo.ConsoleKeyInfo.Modifiers == ConsoleModifiers.Alt;
 				// Avoid sending repeat keydowns
 				OnKeyDown (new Key (map));
 			} else {
-				var keyPressedEventArgs = new Key (map);
+				OnKeyUp (new Key (map));
+				//var keyPressedEventArgs = new Key (map);
 
-				if (map != KeyCode.AltMask) {
-					if (keyInfo.ConsoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
-						if (_altDown) {
-							_altDown = false;
-							OnKeyUp (new Key (map));
-						}
+				//if (map != KeyCode.AltMask) {
+				//	if (keyInfo.ConsoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
+				//		if (_altDown) {
+				//			_altDown = false;
+				//			OnKeyUp (new Key (map));
+				//		}
 
-					}
-					_altDown = false;
-					OnKeyUp (new Key (map));
-				} else {
-					// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
-					// However, if while the 'Alt' key is down, if another key is pressed and
-					// released, there will be a keypressed event for that and the
-					// keypressed event for just `Alt` will be suppressed. 
-					// This allows MenuBar to have `Alt` as a keybinding
-					OnKeyUp (keyPressedEventArgs);
-					if (_altDown) {
-						_altDown = false;
-					}
-				}
+				//	}
+				//	_altDown = false;
+				//	OnKeyUp (new Key (map));
+				//} else {
+				//	// PROTOTYPE: This logic enables `Alt` key presses (down, up, pressed).
+				//	// However, if while the 'Alt' key is down, if another key is pressed and
+				//	// released, there will be a keypressed event for that and the
+				//	// keypressed event for just `Alt` will be suppressed. 
+				//	// This allows MenuBar to have `Alt` as a keybinding
+				//	OnKeyUp (keyPressedEventArgs);
+				//	if (_altDown) {
+				//		_altDown = false;
+				//	}
+				//}
 			}
 
 			break;
