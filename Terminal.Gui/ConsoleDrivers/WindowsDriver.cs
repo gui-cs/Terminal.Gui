@@ -1038,44 +1038,40 @@ internal class WindowsDriver : ConsoleDriver {
 
 		var key = keyInfo.Key;
 
-		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
-			var delta = key - ConsoleKey.A;
+		// A..Z are special cased:
+		// - Alone, they represent lowercase a...z
+		// - With ShiftMask they are A..Z
+		// - If CapsLock is on the above is reversed.
+		// - If Alt and/or Ctrl are present, treat as upper case
+		if (key is >= ConsoleKey.A and <= ConsoleKey.Z) {
 			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (KeyCode)(((uint)KeyCode.CtrlMask) | ((uint)KeyCode.A + delta));
+				return (KeyCode)(((uint)KeyCode.CtrlMask) | (uint)key);
 			}
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.A + delta));
+				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)key));
 			}
 			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
-					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-				}
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key));
 			}
 
+			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
+				// BDISP: What does this test do? What is KeyChar >= 1 and KeyChar <= 26???
+				//        With this commented out I can't find anything that doesn't work.
+				//if (keyInfo.KeyChar == 0 || (keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26)) {
+					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key));
+				//}
+			}
+
+			// If (ShiftMask is on and CapsLock is off) or (ShiftMask is off and CapsLock is on) add the ShiftMask
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
 				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
-					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
+					return (KeyCode)((uint)key) | KeyCode.ShiftMask;
 				}
 			}
-
-			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == 0) {
-				return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			}
-
-			if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) != 0) {
-				if (((KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space) == (KeyCode)keyInfo.Key) {
-					return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-				}
-				return (KeyCode)((uint)keyInfo.KeyChar);
-			}
-
 			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
 
-		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
+		if (key is >= ConsoleKey.D0 and <= ConsoleKey.D9) {
 			var delta = key - ConsoleKey.D0;
 			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
 				return (KeyCode)(((uint)KeyCode.AltMask) | ((uint)KeyCode.D0 + delta));

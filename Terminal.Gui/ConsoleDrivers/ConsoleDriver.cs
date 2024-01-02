@@ -708,7 +708,7 @@ public enum KeyCode : uint {
 	/// <summary>
 	/// The key code for the return key.
 	/// </summary>
-	Enter = '\n',
+	Enter = ConsoleKey.Enter,
 
 	/// <summary>
 	/// The key code for the clear key.

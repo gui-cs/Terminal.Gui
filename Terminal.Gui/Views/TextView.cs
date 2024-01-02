@@ -3057,17 +3057,14 @@ namespace Terminal.Gui {
 		public void InsertText (string toAdd)
 		{
 			foreach (var ch in toAdd) {
-
 				KeyCode key;
-
 				try {
 					key = (KeyCode)ch;
 				} catch (Exception) {
-
 					throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 				}
 
-				InsertText (new Key () { KeyCode = key });
+				InsertText (new Key (key));
 			}
 
 			if (NeedsDisplay) {
@@ -4342,7 +4339,7 @@ namespace Terminal.Gui {
 				_model.AddLine (_currentRow + 1, new List<RuneCell> ());
 				_currentRow++;
 				_currentColumn = 0;
-			} else if ((uint)a.KeyCode == '\r') {
+			} else if ((uint)a.KeyCode == '\n') {
 				_currentColumn = 0;
 			} else {
 				if (Used) {

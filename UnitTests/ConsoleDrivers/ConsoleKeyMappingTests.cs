@@ -324,7 +324,8 @@ public class ConsoleKeyMappingTests {
 	[InlineData ('q', false, false, false, (KeyCode)'q')]
 	[InlineData ((uint)KeyCode.F2, false, false, false, KeyCode.F2)]
 	[InlineData ('英', false, false, false, (KeyCode)'英')]
-	[InlineData ('\n', false, false, false, KeyCode.Enter)]
+	[InlineData ('\r', false, false, false, KeyCode.Enter)]
+	[InlineData ('\n', false, false, false, (KeyCode)'\n')]
 	public void MapToKeyCodeModifiers_Tests (uint keyChar, bool shift, bool alt, bool control, KeyCode excpectedKeyCode)
 	{
 		var modifiers = ConsoleKeyMapping.GetModifiers (shift, alt, control);
