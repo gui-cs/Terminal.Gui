@@ -1119,9 +1119,6 @@ internal class WindowsDriver : ConsoleDriver {
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)key + (uint)KeyCode.MaxCodePoint));
 		}
 
-
-
-
 		return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 	}
 
