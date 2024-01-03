@@ -281,7 +281,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void EnsureSelectedTabIsVisible ()
 		{
-			if (SelectedTab == null) {
+			if (!IsInitialized || SelectedTab == null) {
 				return;
 			}
 
