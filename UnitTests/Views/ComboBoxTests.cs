@@ -256,7 +256,7 @@ Three
 			Assert.Equal ("One", cb.Text);
 			cb.Text = "T";
 			Assert.True (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("T", cb.Text);
 			Assert.True (cb.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.False (cb.IsShow);
