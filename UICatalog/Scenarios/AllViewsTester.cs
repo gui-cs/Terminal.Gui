@@ -89,7 +89,7 @@ namespace UICatalog.Scenarios {
 			_classListView.OpenSelectedItem += (s, a) => {
 				_settingsPane.SetFocus ();
 			};
-			_classListView.SelectedItemChanged += (s,args) => {
+			_classListView.SelectedItemChanged += (s, args) => {
 				// Remove existing class, if any
 				if (_curView != null) {
 					_curView.LayoutComplete -= LayoutCompleteHandler;
@@ -111,7 +111,7 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.TopLevel,
 			};
 			_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
-			_computedCheckBox.Toggled += (s,e) => {
+			_computedCheckBox.Toggled += (s, e) => {
 				if (_curView != null) {
 					_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
@@ -152,7 +152,7 @@ namespace UICatalog.Scenarios {
 			label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 			_locationFrame.Add (label);
 			_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_yText.TextChanged += (s,args) => {
+			_yText.TextChanged += (s, args) => {
 				try {
 					_yVal = int.Parse (_yText.Text);
 					DimPosChanged (_curView);
@@ -184,7 +184,7 @@ namespace UICatalog.Scenarios {
 			};
 			_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 			_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
-			_wText.TextChanged += (s,args) => {
+			_wText.TextChanged += (s, args) => {
 				try {
 					switch (_wRadioGroup.SelectedItem) {
 					case 0:
@@ -354,7 +354,7 @@ namespace UICatalog.Scenarios {
 			types.Add (typeof (View));
 			return types;
 		}
-		
+
 
 		View CreateClass (Type type)
 		{
@@ -374,11 +374,6 @@ namespace UICatalog.Scenarios {
 			}
 			// Instantiate view
 			var view = (View)Activator.CreateInstance (type);
-
-			//_curView.X = Pos.Center ();
-			//_curView.Y = Pos.Center ();
-			view.Width = Dim.Percent (75);
-			view.Height = Dim.Percent (75);
 
 			// Set the colorscheme to make it stand out if is null by default
 			if (view.ColorScheme == null) {
@@ -413,13 +408,29 @@ namespace UICatalog.Scenarios {
 			// Set Settings
 			_computedCheckBox.Checked = view.LayoutStyle == LayoutStyle.Computed;
 
+			view.Initialized += View_Initialized;
+
 			// Add
 			_hostPane.Add (view);
 			_hostPane.SetNeedsDisplay ();
 
-			view.LayoutComplete += LayoutCompleteHandler;
-
 			return view;
+		}
+
+		private void View_Initialized (object sender, EventArgs e)
+		{
+			var view = sender as View;
+
+			//view.X = Pos.Center ();
+			//view.Y = Pos.Center ();
+			if (view.Width == null) {
+				view.Width = Dim.Percent (75);
+			}
+			if (view.Height == null) {
+				view.Height = Dim.Percent (75);
+			}
+			UpdateSettings (view);
+			UpdateTitle (view);
 		}
 
 		void LayoutCompleteHandler (object sender, LayoutEventArgs args)
