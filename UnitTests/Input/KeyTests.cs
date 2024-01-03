@@ -426,6 +426,10 @@ public class KeyTests {
 	[InlineData (KeyCode.ShiftKey, "ShiftKey")]
 	[InlineData (KeyCode.CharMask, "CharMask")]
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
+	[InlineData ((KeyCode)'+', "+")]
+	[InlineData ((KeyCode)'+' | KeyCode.ShiftMask, "Shift++")]
+	[InlineData ((KeyCode)'+' | KeyCode.CtrlMask, "Ctrl++")] 
+	[InlineData ((KeyCode)'+' | KeyCode.ShiftMask | KeyCode.CtrlMask, "Ctrl+Shift++")]
 	public void ToString_ShouldReturnFormattedString (KeyCode key, string expected) => Assert.Equal (expected, Key.ToString (key));
 
 	// TryParse

@@ -515,26 +515,19 @@ public class Key : EventArgs, IEquatable<Key> {
 			}
 		}
 
-		string result = sb.ToString ();
-		if (result.Length > 1) {
-			// Only trim the end if there was actually a modifier
-			// This deals with e.g. the OemPlus (+) key where the separator 
-			// is the same as the key char.
-			result = TrimEndRune (result, separator);
-		}
-		return result;
+		return TrimEndSeparator (sb.ToString (), separator);
 	}
 
-	static string TrimEndRune (string input, Rune runeToTrim)
+	static string TrimEndSeparator (string input, Rune separator)
 	{
-		// Convert the Rune to a string (which may be one or two chars)
-		string runeString = runeToTrim.ToString ();
+		// Trim the trailing separator (+). Unless there are two separators at the end.
+		// "+" (don't trim)
+		// "Ctrl+" (trim)
+		// "Ctrl++" (trim)
 
-		if (input.EndsWith (runeString)) {
-			// Remove the rune from the end of the string
-			return input [..^runeString.Length];
+		if (input.Length > 1 && new Rune(input [^1]) == separator && new Rune(input [^2]) != separator) {
+			return input [..^1];
 		}
-
 		return input;
 	}
 
