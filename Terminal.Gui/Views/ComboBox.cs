@@ -759,13 +759,13 @@ namespace Terminal.Gui {
 			isShow = false;
 		}
 
-		private int GetSelectedItemFromSource (string value)
+		private int GetSelectedItemFromSource (string searchText)
 		{
-			if (source == null) {
+			if (source is null) {
 				return -1;
 			}
 			for (int i = 0; i < searchset.Count; i++) {
-				if (searchset [i].ToString () == value) {
+				if (searchset [i].ToString () == searchText) {
 					return i;
 				}
 			}
