@@ -228,8 +228,6 @@ public partial class View : Responder, ISupportInitializeNotification {
 		AddCommands ();
 
 		CreateFrames ();
-
-		//LayoutFrames ();
 	}
 
 	/// <summary>
@@ -271,10 +269,6 @@ public partial class View : Responder, ISupportInitializeNotification {
 			_oldCanFocus = CanFocus;
 			_oldTabIndex = _tabIndex;
 
-			// BUGBUG: These should move to EndInit as they access Bounds causing debug spew.
-			UpdateTextDirection (TextDirection);
-			UpdateTextFormatterText ();
-			SetHotKey ();
 
 			// TODO: Figure out why ScrollView and other tests fail if this call is put here 
 			// instead of the constructor.
@@ -300,6 +294,11 @@ public partial class View : Responder, ISupportInitializeNotification {
 	public void EndInit ()
 	{
 		IsInitialized = true;
+		// These calls were moved from BeginInit as they access Bounds which is indeterminate until EndInit is called.
+		UpdateTextDirection (TextDirection);
+		UpdateTextFormatterText ();
+		SetHotKey ();
+
 		OnResizeNeeded ();
 		if (_subviews != null) {
 			foreach (var view in _subviews) {

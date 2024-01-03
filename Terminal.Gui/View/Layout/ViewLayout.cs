@@ -293,7 +293,6 @@ public partial class View {
 #if DEBUG
 			if (LayoutStyle == LayoutStyle.Computed && !IsInitialized) {
 				Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}");
-				Debug.WriteLine ($"The Frame is set before the View has been initialized. So it isn't a bug.Is by design.");
 			}
 #endif // DEBUG
 			//var frameRelativeBounds = Padding?.Thickness.GetInside (Padding.Frame) ?? new Rect (default, Frame.Size);
@@ -1102,8 +1101,6 @@ public partial class View {
 				Width = newFrameSize.Width;
 			}
 		}
-		// BUGBUG: This call may be redundant
-		TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 		return boundsChanged;
 	}
 
