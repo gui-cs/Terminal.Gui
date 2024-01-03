@@ -1143,8 +1143,10 @@ internal class WindowsDriver : ConsoleDriver {
 	{
 		switch (inputEvent.EventType) {
 		case WindowsConsole.EventType.Key:
-			var fromPacketKey = inputEvent.KeyEvent.wVirtualKeyCode == (VK)ConsoleKey.Packet;
-			if (fromPacketKey) {
+			if (inputEvent.KeyEvent.wVirtualKeyCode == (VK)ConsoleKey.Packet) {
+				// Used to pass Unicode characters as if they were keystrokes.
+				// The VK_PACKET key is the low word of a 32-bit
+				// Virtual Key value used for non-keyboard input methods.
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);

@@ -1399,7 +1399,8 @@ public static class ConsoleKeyMapping {
 		OEM_CLEAR = 0xFE
 	}
 
-
+	// BUGBUG: This database makes no sense. It is not possible to map a VK code to a character without knowing the keyboard layout
+	//         It should be deleted.
 	static HashSet<ScanCodeMapping> _scanCodes = new HashSet<ScanCodeMapping> {
 		new (1, VK.ESCAPE, 0, '\u001B'), // Escape
 		new (1, VK.ESCAPE, ConsoleModifiers.Shift, '\u001B'),
