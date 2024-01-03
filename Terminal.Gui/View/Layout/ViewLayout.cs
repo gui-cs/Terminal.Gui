@@ -344,7 +344,7 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	public Pos X {
-		get => VerifyIsInitialized (_x);
+		get => VerifyIsInitialized (_x, nameof(X));
 		set {
 			// BUGBUG: null is the sames a Pos.Absolute(0). Should we be explicit and set it?
 
@@ -380,7 +380,7 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	public Pos Y {
-		get => VerifyIsInitialized (_y);
+		get => VerifyIsInitialized (_y, nameof(Y));
 		set {
 			// BUGBUG: null is the sames a Pos.Absolute(0). Should we be explicit and set it?
 
@@ -415,7 +415,7 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	public Dim Width {
-		get => VerifyIsInitialized (_width);
+		get => VerifyIsInitialized (_width, nameof (Width));
 		set {
 			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
 			if (ValidatePosDim) {
@@ -456,7 +456,7 @@ public partial class View {
 	/// </para>
 	/// </remarks>
 	public Dim Height {
-		get => VerifyIsInitialized (_height);
+		get => VerifyIsInitialized (_height, nameof (Height));
 		set {
 			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
 			if (ValidatePosDim) {
@@ -479,22 +479,22 @@ public partial class View {
 	}
 
 	// Diagnostics to highlight when X or Y is read before the view has been initialized
-	Pos VerifyIsInitialized (Pos pos)
+	Pos VerifyIsInitialized (Pos pos, string member)
 	{
 #if DEBUG
 		if (LayoutStyle == LayoutStyle.Computed && !IsInitialized) {
-			Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; position is indeterminate {pos}. This is likely a bug.");
+			Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate {pos}. This is potentially a bug.");
 		}
 #endif // DEBUG
 		return pos;
 	}
 
 	// Diagnostics to highlight when Width or Height is read before the view has been initialized
-	Dim VerifyIsInitialized (Dim dim)
+	Dim VerifyIsInitialized (Dim dim, string member)
 	{
 #if DEBUG
 		if (LayoutStyle == LayoutStyle.Computed && !IsInitialized) {
-			Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; dimension is indeterminate: {dim}. This is likely a bug.");
+			Debug.WriteLine ($"WARNING: \"{this}\" has not been initialized; {member} is indeterminate: {dim}. This is potentially a bug.");
 		}
 #endif // DEBUG		
 		return dim;
