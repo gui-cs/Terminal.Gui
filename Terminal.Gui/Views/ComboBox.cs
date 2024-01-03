@@ -764,8 +764,8 @@ namespace Terminal.Gui {
 			if (source == null) {
 				return -1;
 			}
-			for (int i = 0; i < source.Count; i++) {
-				if (source.ToList () [i].ToString () == value) {
+			for (int i = 0; i < searchset.Count; i++) {
+				if (searchset [i].ToString () == value) {
 					return i;
 				}
 			}
