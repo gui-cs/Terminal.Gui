@@ -50,7 +50,7 @@ public class Responder : IDisposable {
 	/// <summary>
 	/// Event raised when <see cref="Dispose()"/> is called to signal that this object has been disposed.
 	/// </summary>
-	public event EventHandler Disposing;
+	public event EventHandler Disposed;
 
 	/// <summary>
 	/// Gets or sets a value indicating whether this <see cref="Responder"/> can focus.
@@ -192,10 +192,10 @@ public class Responder : IDisposable {
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose (disposing: true);
-		Disposing?.Invoke (this, EventArgs.Empty);
 		GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 		WasDisposed = true;
+		Disposed?.Invoke (this, EventArgs.Empty);
 
 		foreach (var instance in Instances.Where (x => x.WasDisposed).ToList ()) {
 			Instances.Remove (instance);
