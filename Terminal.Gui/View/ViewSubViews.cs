@@ -82,14 +82,15 @@ namespace Terminal.Gui {
 				view._oldEnabled = true;
 				view.Enabled = false;
 			}
-			SetNeedsLayout ();
-			SetNeedsDisplay ();
 
 			OnAdded (new SuperViewChangedEventArgs (this, view));
 			if (IsInitialized && !view.IsInitialized) {
 				view.BeginInit ();
 				view.EndInit ();
 			}
+
+			SetNeedsLayout ();
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>

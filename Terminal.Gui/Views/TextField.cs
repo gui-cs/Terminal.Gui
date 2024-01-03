@@ -391,6 +391,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public override void PositionCursor ()
 		{
+			if (!IsInitialized) {
+				return;
+			}
 			ProcessAutocomplete ();
 
 			var col = 0;

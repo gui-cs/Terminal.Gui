@@ -415,7 +415,6 @@ namespace UICatalog.Scenarios {
 
 			// Add
 			_hostPane.Add (view);
-			_hostPane.Clear ();
 			_hostPane.SetNeedsDisplay ();
 			UpdateSettings (view);
 			UpdateTitle (view);
