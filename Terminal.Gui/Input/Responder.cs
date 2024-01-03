@@ -48,7 +48,7 @@ public class Responder : IDisposable {
 #endif
 
 	/// <summary>
-	/// Invokes subscribers that this is disposed.
+	/// Event raised when <see cref="Dispose()"/> is called to signal that this object has been disposed.
 	/// </summary>
 	public event EventHandler Disposing;
 
