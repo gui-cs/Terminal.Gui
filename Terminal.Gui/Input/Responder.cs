@@ -192,10 +192,10 @@ public class Responder : IDisposable {
 	{
 		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		Dispose (disposing: true);
+		Disposed?.Invoke (this, EventArgs.Empty);
 		GC.SuppressFinalize (this);
 #if DEBUG_IDISPOSABLE
 		WasDisposed = true;
-		Disposed?.Invoke (this, EventArgs.Empty);
 
 		foreach (var instance in Instances.Where (x => x.WasDisposed).ToList ()) {
 			Instances.Remove (instance);
