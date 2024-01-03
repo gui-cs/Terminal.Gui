@@ -716,36 +716,6 @@ public enum KeyCode : uint {
 	Clear = 12,
 
 	/// <summary>
-	/// The key code for the Shift key.
-	/// </summary>
-	ShiftKey = 16,
-
-	/// <summary>
-	/// The key code for the Ctrl key.
-	/// </summary>
-	CtrlKey = 17,
-
-	/// <summary>
-	/// The key code for the Alt key.
-	/// </summary>
-	AltKey = 18,
-
-	/// <summary>
-	/// The key code for the CapsLock key.
-	/// </summary>
-	CapsLock = 20,
-
-	///// <summary>
-	///// The key code for the NumLock key.
-	///// </summary>
-	//NumLock = 144,
-
-	///// <summary>
-	///// The key code for the ScrollLock key.
-	///// </summary>
-	//ScrollLock = 145,
-
-	/// <summary>
 	/// The key code for the escape key.
 	/// </summary>
 	Esc = 27,

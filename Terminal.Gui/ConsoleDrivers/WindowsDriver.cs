@@ -1109,18 +1109,18 @@ internal class WindowsDriver : ConsoleDriver {
 			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
 
-		// Handle misc control keys 
+		// Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
 		if (Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key)) {
 			// If the key is JUST a modifier, return it as just that key
-			if ((KeyCode)keyInfo.Key == KeyCode.ShiftKey) { // Shift 16
+			if (keyInfo.Key == (ConsoleKey)VK.SHIFT) { // Shift 16
 				return KeyCode.ShiftMask;
 			}
 
-			if ((KeyCode)keyInfo.Key == KeyCode.CtrlKey) { // Ctrl 17
+			if (keyInfo.Key == (ConsoleKey)VK.CONTROL) { // Ctrl 17
 				return KeyCode.CtrlMask;
 			}
 
-			if ((KeyCode)keyInfo.Key == KeyCode.AltKey) { // Alt 18
+			if (keyInfo.Key == (ConsoleKey)VK.MENU) { // Alt 18
 				return KeyCode.AltMask;
 			}
 
@@ -1131,7 +1131,7 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 		}
 
-		// Handle all control keys (e.g. CursorUp)
+		// Handle control keys (e.g. CursorUp)
 		if (Enum.IsDefined (typeof (KeyCode), ((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))) {
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
 		}

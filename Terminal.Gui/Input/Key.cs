@@ -567,13 +567,13 @@ public class Key : EventArgs, IEquatable<Key> {
 		if (parts.Length == 1) {
 			switch (parts [0]) {
 			case "Ctrl":
-				key = new Key (KeyCode.CtrlKey);
+				key = new Key (KeyCode.CtrlMask);
 				return true;
 			case "Alt":
-				key = new Key (KeyCode.AltKey);
+				key = new Key (KeyCode.AltMask);
 				return true;
 			case "Shift":
-				key = new Key (KeyCode.ShiftKey);
+				key = new Key (KeyCode.ShiftMask);
 				return true;
 			}
 		}
@@ -678,26 +678,6 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// The <see cref="Key"/> object for the clear key.
 	/// </summary>
 	public static Key Clear => new (KeyCode.Clear);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the Shift key.
-	/// </summary>
-	public static Key Shift => new (KeyCode.ShiftKey);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the Ctrl key.
-	/// </summary>
-	public static Key Ctrl => new (KeyCode.CtrlKey);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the Alt key.
-	/// </summary>
-	public static Key Alt => new (KeyCode.AltKey);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the CapsLock key.
-	/// </summary>
-	public static Key CapsLock => new (KeyCode.CapsLock);
 
 	/// <summary>
 	/// The <see cref="Key"/> object for the Escape key.

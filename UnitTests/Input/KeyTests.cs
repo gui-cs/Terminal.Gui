@@ -92,8 +92,8 @@ public class KeyTests {
 	[InlineData ("D0", KeyCode.D0)]
 	[InlineData ("65", KeyCode.A | KeyCode.ShiftMask)]
 	[InlineData ("97", KeyCode.A)]
-	[InlineData ("Shift", KeyCode.ShiftKey)]
-	[InlineData ("Ctrl", KeyCode.CtrlKey)]
+	[InlineData ("Shift", KeyCode.ShiftMask)]
+	[InlineData ("Ctrl", KeyCode.CtrlMask)]
 	[InlineData ("Ctrl-A", KeyCode.A | KeyCode.CtrlMask)]
 	[InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
 	[InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
@@ -421,9 +421,9 @@ public class KeyTests {
 	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask, "Ctrl+Alt+Shift")]
 #pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
-	[InlineData (KeyCode.AltKey, "AltKey")]
-	[InlineData (KeyCode.CtrlKey, "CtrlKey")]
-	[InlineData (KeyCode.ShiftKey, "ShiftKey")]
+	[InlineData (KeyCode.AltMask, "Alt")]
+	[InlineData (KeyCode.CtrlMask, "Ctrl")]
+	[InlineData (KeyCode.ShiftMask, "Shift")]
 	[InlineData (KeyCode.CharMask, "CharMask")]
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
 	[InlineData ((KeyCode)'+', "+")]
@@ -469,8 +469,8 @@ public class KeyTests {
 	[InlineData ("D0", KeyCode.D0)]
 	[InlineData ("65", KeyCode.A | KeyCode.ShiftMask)]
 	[InlineData ("97", KeyCode.A)]
-	[InlineData ("Shift", KeyCode.ShiftKey)]
-	[InlineData ("Ctrl", KeyCode.CtrlKey)]
+	[InlineData ("Shift", KeyCode.ShiftMask)]
+	[InlineData ("Ctrl", KeyCode.CtrlMask)]
 	[InlineData ("Ctrl-A", KeyCode.A | KeyCode.CtrlMask)]
 	[InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
 	[InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
@@ -495,40 +495,7 @@ public class KeyTests {
 	[InlineData ("0x99")]
 	[InlineData ("Ctrl-Ctrl")]
 	public void TryParse_ShouldReturnFalse_On_InvalidKey (string keyString) => Assert.False (Key.TryParse (keyString, out var _));
-
-	[Theory]
-	[InlineData (KeyCode.ShiftKey, KeyCode.ShiftMask, true)]
-	[InlineData (KeyCode.ShiftKey | KeyCode.A, KeyCode.ShiftMask | KeyCode.A, true)]
-	public void IsShift_With_Wrong_And_Right_ShiftMask_NoShift (KeyCode wrongKeyCode, KeyCode rightKeyCode, bool isShift)
-	{
-		Assert.NotEqual (((Key)wrongKeyCode).IsShift, isShift);
-		Assert.NotEqual ((Key)(wrongKeyCode & ~KeyCode.ShiftKey), ((Key)wrongKeyCode).NoShift);
-		Assert.Equal (((Key)rightKeyCode).IsShift, isShift);
-		Assert.Equal ((Key)(rightKeyCode & ~KeyCode.ShiftMask), ((Key)rightKeyCode).NoShift);
-	}
-
-	[Theory]
-	[InlineData (KeyCode.AltKey, KeyCode.AltMask, true)]
-	[InlineData (KeyCode.AltKey | KeyCode.A, KeyCode.AltMask | KeyCode.A, true)]
-	public void IsAlt_With_Wrong_And_Right_AltMask_NoAlt (KeyCode wrongKeyCode, KeyCode rightKeyCode, bool isAlt)
-	{
-		Assert.NotEqual (((Key)wrongKeyCode).IsAlt, isAlt);
-		Assert.NotEqual ((Key)(wrongKeyCode & ~KeyCode.AltKey), ((Key)wrongKeyCode).NoAlt);
-		Assert.Equal (((Key)rightKeyCode).IsAlt, isAlt);
-		Assert.Equal ((Key)(rightKeyCode & ~KeyCode.AltMask), ((Key)rightKeyCode).NoAlt);
-	}
-
-	[Theory]
-	[InlineData (KeyCode.CtrlKey, KeyCode.CtrlMask, true)]
-	[InlineData (KeyCode.CtrlKey | KeyCode.A, KeyCode.CtrlMask | KeyCode.A, true)]
-	public void IsCtrl_With_Wrong_And_Right_CtrlMask_NoCtrl (KeyCode wrongKeyCode, KeyCode rightKeyCode, bool isCtrl)
-	{
-		Assert.NotEqual (((Key)wrongKeyCode).IsCtrl, isCtrl);
-		Assert.NotEqual ((Key)(wrongKeyCode & ~KeyCode.CtrlKey), ((Key)wrongKeyCode).NoCtrl);
-		Assert.Equal (((Key)rightKeyCode).IsCtrl, isCtrl);
-		Assert.Equal ((Key)(rightKeyCode & ~KeyCode.CtrlMask), ((Key)rightKeyCode).NoCtrl);
-	}
-
+	
 	[Theory]
 	[InlineData (KeyCode.ShiftMask, true, false, false)]
 	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask, true, true, false)]
