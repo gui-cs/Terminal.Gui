@@ -201,9 +201,9 @@ namespace Terminal.Gui {
 			
 			Initialized += (s, e) => {
 				this.splitContainer.SetSplitterPos (0, 30);
+				this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 			};
 			//			this.splitContainer.Border.BorderStyle = BorderStyle.None;
-			this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 
 			this.tableView = new TableView {
 				Width = Dim.Fill (),

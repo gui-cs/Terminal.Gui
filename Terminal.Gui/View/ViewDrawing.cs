@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 public partial class View {
 	ColorScheme _colorScheme;
@@ -190,7 +190,13 @@ public partial class View {
 	///     This clears the Bounds used by this view.
 	///   </para>
 	/// </remarks>
-	public void Clear () => Clear (BoundsToScreen (Bounds));
+	public void Clear ()
+	{
+		if (IsInitialized) {
+			Clear (BoundsToScreen (Bounds));
+		}
+
+	}
 
 	// BUGBUG: This version of the Clear API should be removed. We should have a tenet that says 
 	// "View APIs only deal with View-relative coords". This is only used by ComboBox which can
