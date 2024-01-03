@@ -815,13 +815,16 @@ namespace Terminal.Gui {
 
 		private void Search_Changed (object sender, TextChangedEventArgs e)
 		{
-			if (source == null) { // Object initialization		
+			if (source is null) { // Object initialization		
 				return;
 			}
 
 			if (string.IsNullOrEmpty (search.Text) && string.IsNullOrEmpty (e.OldValue)) {
 				ResetSearchSet ();
 			} else if (search.Text != e.OldValue) {
+				if (search.Text.Length < e.OldValue.Length) {
+					selectedItem = -1;
+				}
 				isShow = true;
 				ResetSearchSet (noCopy: true);
 
