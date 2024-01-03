@@ -238,7 +238,7 @@ namespace Terminal.Gui {
 
 			CreateFrames ();
 
-			LayoutFrames ();
+			//LayoutFrames ();
 		}
 
 		/// <summary>
