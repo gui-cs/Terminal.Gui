@@ -2,12 +2,91 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Terminal.Gui.ConsoleDrivers;
+
 /// <summary>
 /// Helper class to handle the scan code and virtual key from a <see cref="ConsoleKey"/>.
 /// </summary>
 public static class ConsoleKeyMapping {
+
+#if !WT_ISSUE_8871_FIXED // https://github.com/microsoft/terminal/issues/8871
+	/// <summary>
+	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
+	/// </summary>
+	/// <param name="vk"></param>
+	/// <param name="uMapType">
+	/// If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an un-shifted
+	/// character value in the low order word of the return value. 
+	/// </param>
+	/// <param name="dwhkl"></param>
+	/// <returns>An un-shifted character value in the low order word of the return value. Dead keys (diacritics)
+	/// are indicated by setting the top bit of the return value. If there is no translation,
+	/// the function returns 0. See Remarks.</returns>
+	[DllImport ("user32.dll", EntryPoint = "MapVirtualKeyExW", CharSet = CharSet.Unicode)]
+	extern static uint MapVirtualKeyEx (VK vk, uint uMapType, IntPtr dwhkl);
+
+	/// <summary>
+	/// Retrieves the active input locale identifier (formerly called the keyboard layout).
+	/// </summary>
+	/// <param name="idThread">0 for current thread</param>
+	/// <returns>The return value is the input locale identifier for the thread.
+	/// The low word contains a Language Identifier for the input language
+	/// and the high word contains a device handle to the physical layout of the keyboard.
+	/// </returns>
+	[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayout", CharSet = CharSet.Unicode)]
+	extern static IntPtr GetKeyboardLayout (IntPtr idThread);
+
+	//[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayoutNameW", CharSet = CharSet.Unicode)]
+	//extern static uint GetKeyboardLayoutName (uint idThread);
+
+	[DllImport ("user32.dll")]
+	extern static IntPtr GetForegroundWindow ();
+
+	[DllImport ("user32.dll")]
+	extern static IntPtr GetWindowThreadProcessId (IntPtr hWnd, IntPtr ProcessId);
+
+	/// <summary>
+	/// Translates the specified virtual-key code and keyboard state to the corresponding Unicode character or characters using
+	/// the Win32 API MapVirtualKey.
+	/// </summary>
+	/// <param name="vk"></param>
+	/// <returns>An un-shifted character value in the low order word of the return value. Dead keys (diacritics)
+	/// are indicated by setting the top bit of the return value. If there is no translation,
+	/// the function returns 0.</returns>
+	public static uint MapVKtoChar (VK vk)
+	{
+		var tid = GetWindowThreadProcessId (GetForegroundWindow (), 0);
+		var hkl = GetKeyboardLayout (tid);
+		return MapVirtualKeyEx (vk, 2, hkl);
+	}
+#else
+	/// <summary>
+	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
+	/// </summary>
+	/// <param name="vk"></param>
+	/// <param name="uMapType">
+	/// If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an unshifted
+	/// character value in the low order word of the return value. 
+	/// </param>
+	/// <returns>An unshifted character value in the low order word of the return value. Dead keys (diacritics)
+	/// are indicated by setting the top bit of the return value. If there is no translation,
+	/// the function returns 0. See Remarks.</returns>
+	[DllImport ("user32.dll", EntryPoint = "MapVirtualKeyW", CharSet = CharSet.Unicode)]
+	extern static uint MapVirtualKey (VK vk, uint uMapType = 2);
+
+	uint MapVKtoChar (VK vk) => MapVirtualKeyToCharEx (vk);
+#endif
+	/// <summary>
+	/// Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling thread.
+	/// </summary>
+	/// <param name="pwszKLID"></param>
+	/// <returns></returns>
+	[DllImport ("user32.dll")]
+	public extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
+
 	class ScanCodeMapping : IEquatable<ScanCodeMapping> {
 		public uint ScanCode;
 		public VK VirtualKey;
@@ -602,7 +681,7 @@ public static class ConsoleKeyMapping {
 	/// <summary>
 	/// Generated from winuser.h. See https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
 	/// </summary>
-	internal enum VK : ushort {
+	public enum VK : ushort {
 		/// <summary>
 		/// Left mouse button.
 		/// </summary>

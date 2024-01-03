@@ -674,19 +674,19 @@ public enum KeyCode : uint {
 
 	/// <summary>
 	/// When this value is set, the Key encodes the sequence Shift-KeyValue.
-	/// The actual value must be extracted by removing the ShiftMask (<c>& ~KeyCode.ShiftMask</c>).
+	/// The actual value must be extracted by removing the ShiftMask.
 	/// </summary>
 	ShiftMask = 0x_1000_0000,
 
 	/// <summary>
 	/// When this value is set, the Key encodes the sequence Alt-KeyValue.
-	/// The actual value must be extracted by removing the AltMask (<c>& ~KeyCode.AltMask</c>).
+	/// The actual value must be extracted by removing the AltMask.
 	/// </summary>
 	AltMask = 0x_8000_0000,
 
 	/// <summary>
 	/// When this value is set, the Key encodes the sequence Ctrl-KeyValue.
-	/// The actual value must be extracted by removing the CtrlMask (<c>& ~KeyCode.CtrlMask</c>).
+	/// The actual value must be extracted by removing the CtrlMask.
 	/// </summary>
 	CtrlMask = 0x_4000_0000,
 

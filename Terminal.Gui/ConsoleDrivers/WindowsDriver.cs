@@ -372,7 +372,7 @@ internal class WindowsConsole {
 		[FieldOffset (4), MarshalAs (UnmanagedType.U2)]
 		public ushort wRepeatCount;
 		[FieldOffset (6), MarshalAs (UnmanagedType.U2)]
-		public ConsoleKeyMapping.VK wVirtualKeyCode;
+		public VK wVirtualKeyCode;
 		[FieldOffset (8), MarshalAs (UnmanagedType.U2)]
 		public ushort wVirtualScanCode;
 		[FieldOffset (10)]
@@ -902,71 +902,6 @@ internal class WindowsDriver : ConsoleDriver {
 	}
 #endif
 
-#if !WT_ISSUE_8871_FIXED // https://github.com/microsoft/terminal/issues/8871
-	/// <summary>
-	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
-	/// </summary>
-	/// <param name="vk"></param>
-	/// <param name="uMapType">
-	/// If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an unshifted
-	/// character value in the low order word of the return value. 
-	/// </param>
-	/// <returns>An unshifted character value in the low order word of the return value. Dead keys (diacritics)
-	/// are indicated by setting the top bit of the return value. If there is no translation,
-	/// the function returns 0. See Remarks.</returns>
-	[DllImport ("user32.dll", EntryPoint = "MapVirtualKeyExW", CharSet = CharSet.Unicode)]
-	extern static uint MapVirtualKeyEx (VK vk, uint uMapType, IntPtr dwhkl);
-
-	/// <summary>
-	/// Retrieves the active input locale identifier (formerly called the keyboard layout).
-	/// </summary>
-	/// <param name="idThread">0 for current thread</param>
-	/// <returns>The return value is the input locale identifier for the thread.
-	/// The low word contains a Language Identifier for the input language
-	/// and the high word contains a device handle to the physical layout of the keyboard.
-	/// </returns>
-	[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayout", CharSet = CharSet.Unicode)]
-	extern static IntPtr GetKeyboardLayout (IntPtr idThread);
-
-	//[DllImport ("user32.dll", EntryPoint = "GetKeyboardLayoutNameW", CharSet = CharSet.Unicode)]
-	//extern static uint GetKeyboardLayoutName (uint idThread);
-
-	[DllImport ("user32.dll")]
-	extern static IntPtr GetForegroundWindow ();
-
-	[DllImport ("user32.dll")]
-	extern static IntPtr GetWindowThreadProcessId (IntPtr hWnd, IntPtr ProcessId);
-
-	uint MapVKtoChar (VK vk)
-	{
-		var tid = GetWindowThreadProcessId (GetForegroundWindow (), 0);
-		var hkl = GetKeyboardLayout (tid);
-		return MapVirtualKeyEx (vk, 2, hkl);
-	}
-#else
-	/// <summary>
-	/// Translates (maps) a virtual-key code into a scan code or character value, or translates a scan code into a virtual-key code.
-	/// </summary>
-	/// <param name="vk"></param>
-	/// <param name="uMapType">
-	/// If MAPVK_VK_TO_CHAR (2) - The uCode parameter is a virtual-key code and is translated into an unshifted
-	/// character value in the low order word of the return value. 
-	/// </param>
-	/// <returns>An unshifted character value in the low order word of the return value. Dead keys (diacritics)
-	/// are indicated by setting the top bit of the return value. If there is no translation,
-	/// the function returns 0. See Remarks.</returns>
-	[DllImport ("user32.dll", EntryPoint = "MapVirtualKeyW", CharSet = CharSet.Unicode)]
-	extern static uint MapVirtualKey (VK vk, uint uMapType = 2);
-
-	uint MapVKtoChar (VK vk) => MapVirtualKeyToCharEx (vk);
-#endif
-	/// <summary>
-	/// Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling thread.
-	/// </summary>
-	/// <param name="pwszKLID"></param>
-	/// <returns></returns>
-	[DllImport ("user32.dll")]
-	extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
 
 	KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
 	{
@@ -1063,7 +998,7 @@ internal class WindowsDriver : ConsoleDriver {
 
 				// Return the mappedChar with they modifiers. Because mappedChar is un-shifted, if Shift was down
 				// we should keep it
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
+				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
 			} else {
 				// KeyChar is printable
 				if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
@@ -1073,12 +1008,12 @@ internal class WindowsDriver : ConsoleDriver {
 
 				if (keyInfo.Modifiers != ConsoleModifiers.Shift) {
 					// If Shift wasn't down we don't need to do anything but return the mappedChar
-					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(mappedChar));
+					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(mappedChar));
 				}
 
 				// Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç")
 				// and passing on Shift would be redundant.
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
+				return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
 			}
 		}
 
@@ -1092,12 +1027,12 @@ internal class WindowsDriver : ConsoleDriver {
 				// KeyChar is not printable - possibly an AltGr key?
 				// AltGr support - AltGr is equivalent to Ctrl+Alt
 				if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) && keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
-					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
 				}
 			}
 
 			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
+				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
 			}
 
 			if (((keyInfo.Modifiers == ConsoleModifiers.Shift) ^ (keyInfoEx.CapsLock))) {
@@ -1125,18 +1060,18 @@ internal class WindowsDriver : ConsoleDriver {
 			}
 
 			if (keyInfo.KeyChar == 0) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
+				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
 			} else {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)(keyInfo.KeyChar));
+				return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)(keyInfo.KeyChar));
 			}
 		}
 
 		// Handle control keys (e.g. CursorUp)
 		if (Enum.IsDefined (typeof (KeyCode), ((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))) {
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
+			return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
 		}
 
-		return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
+		return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
 	}
 
 	internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
@@ -1493,8 +1428,8 @@ internal class WindowsDriver : ConsoleDriver {
 		}
 		var cKeyInfo = new ConsoleKeyInfo (keyEvent.UnicodeChar, (ConsoleKey)keyEvent.wVirtualKeyCode,
 			mod.HasFlag (ConsoleModifiers.Shift), mod.HasFlag (ConsoleModifiers.Alt), mod.HasFlag (ConsoleModifiers.Control));
-		cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
-		var scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (cKeyInfo);
+		cKeyInfo = DecodeVKPacketToKConsoleKeyInfo (cKeyInfo);
+		var scanCode = GetScanCodeFromConsoleKeyInfo (cKeyInfo);
 
 		return new WindowsConsole.KeyEventRecord {
 			UnicodeChar = cKeyInfo.KeyChar,
