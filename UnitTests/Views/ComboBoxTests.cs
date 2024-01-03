@@ -215,17 +215,17 @@ Three
 			Assert.True (cb.NewKeyDownEvent (new (KeyCode.CursorDown))); // losing focus
 			Assert.False (cb.HasFocus);
 			Assert.False (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 			Application.Top.FocusFirst (); // Gets focus again
 			Assert.True (cb.HasFocus);
 			Assert.False (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.NewKeyDownEvent (new (KeyCode.U | KeyCode.CtrlMask)));
 			Assert.True (cb.HasFocus);
 			Assert.True (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			Assert.Equal (3, cb.Source.Count);
 		}
