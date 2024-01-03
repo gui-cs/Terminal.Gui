@@ -79,7 +79,9 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (margin),
 				Height = 7
 			};
-			subWin.Title = $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+			subWin.Initialized += (s, a) => {
+				subWin.Title = $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+			};
 			Application.Top.Add (subWin);
 
 			int i = 1;
@@ -98,7 +100,10 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				Height = 7
 			};
-			frameView.Title = $"{frameView.GetType ().Name} {{X={frameView.X},Y={frameView.Y},Width={frameView.Width},Height={frameView.Height}}}";
+			frameView.Initialized += (sender, args) => {
+				var fv = sender as FrameView;
+				fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+			};
 			i = 1;
 			labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
@@ -115,7 +120,10 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = 7,
 			};
-			frameView.Title = $"{frameView.GetType ().Name} {{X={frameView.X},Y={frameView.Y},Width={frameView.Width},Height={frameView.Height}}}";
+			frameView.Initialized += (sender, args) => {
+				var fv = sender as FrameView;
+				fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+			};
 			Application.Top.Add (frameView);
 
 			// Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
