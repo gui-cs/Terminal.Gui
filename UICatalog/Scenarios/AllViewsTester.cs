@@ -416,8 +416,6 @@ namespace UICatalog.Scenarios {
 			// Add
 			_hostPane.Add (view);
 			_hostPane.SetNeedsDisplay ();
-			UpdateSettings (view);
-			UpdateTitle (view);
 
 			view.LayoutComplete += LayoutCompleteHandler;
 
@@ -426,6 +424,7 @@ namespace UICatalog.Scenarios {
 
 		void LayoutCompleteHandler (object sender, LayoutEventArgs args)
 		{
+			UpdateSettings (_curView);
 			UpdateTitle (_curView);
 		}
 
