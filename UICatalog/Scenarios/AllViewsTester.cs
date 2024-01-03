@@ -388,10 +388,10 @@ public class AllViewsTester : Scenario {
 		//view.X = Pos.Center ();
 		//view.Y = Pos.Center ();
 		if (view.Width == null || view.Frame.Width == 0) {
-			view.Width = Dim.Percent (75);
+			view.Width = Dim.Fill();
 		}
 		if (view.Height == null || view.Frame.Height == 0) {
-			view.Height = Dim.Percent (75);
+			view.Height = Dim.Fill();
 		}
 		UpdateSettings (view);
 		UpdateTitle (view);
