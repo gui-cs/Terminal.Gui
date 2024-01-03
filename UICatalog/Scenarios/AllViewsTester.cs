@@ -319,7 +319,7 @@ public class AllViewsTester : Scenario {
 		return types;
 	}
 
-
+	// TODO: Add Command.Default handler (pop a message box?)
 	View CreateClass (Type type)
 	{
 		// If we are to create a generic Type
