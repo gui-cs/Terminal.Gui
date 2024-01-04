@@ -72,7 +72,9 @@ public class Sliders : Scenario {
 				else
 					s.ShowSpacing = false;
 			}
-			Win.LayoutSubviews ();
+			if (Win.IsInitialized) {
+				Win.LayoutSubviews ();
+			}
 		};
 		slider.SetOption (0);
 		slider.SetOption (1);

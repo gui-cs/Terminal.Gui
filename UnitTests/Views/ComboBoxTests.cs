@@ -19,6 +19,7 @@ namespace Terminal.Gui.ViewsTests {
 			var cb = new ComboBox ();
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.Null (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -28,6 +29,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb = new ComboBox ("Test");
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal ("Test", cb.Text);
 			Assert.Null (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -37,6 +39,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb = new ComboBox (new Rect (1, 2, 10, 20), new List<string> () { "One", "Two", "Three" });
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.NotNull (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -46,6 +49,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb = new ComboBox (new List<string> () { "One", "Two", "Three" });
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.NotNull (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -60,6 +64,9 @@ namespace Terminal.Gui.ViewsTests {
 			var cb = new ComboBox (new List<string> () { "One", "Two", "Three" }) {
 				SelectedItem = 1
 			};
+			cb.BeginInit ();
+			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal ("Two", cb.Text);
 			Assert.NotNull (cb.Source);
 			Assert.False (cb.AutoSize);

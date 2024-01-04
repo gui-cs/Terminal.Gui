@@ -198,9 +198,12 @@ namespace Terminal.Gui {
 				Width = Dim.Fill (0),
 				Height = Dim.Fill (1),
 			};
-			this.splitContainer.SetSplitterPos (0, 30);
+			
+			Initialized += (s, e) => {
+				this.splitContainer.SetSplitterPos (0, 30);
+				this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
+			};
 			//			this.splitContainer.Border.BorderStyle = BorderStyle.None;
-			this.splitContainer.Tiles.ElementAt (0).ContentView.Visible = false;
 
 			this.tableView = new TableView {
 				Width = Dim.Fill (),
