@@ -1244,9 +1244,6 @@ class NetDriver : ConsoleDriver {
 			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 		case NetEvents.EventType.RequestResponse:
-			// BUGBUG: What is this for? It does not seem to be used anywhere. 
-			// It is also not clear what it does. View.Data is documented as "This property is not used internally"
-			Application.Top.Data = inputEvent.RequestResponseEvent.ResultTuple;
 			break;
 		case NetEvents.EventType.WindowPosition:
 			break;
