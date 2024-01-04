@@ -143,18 +143,21 @@ public class ResponderTests {
 
 		var view = new View () { Id = "View" };
 		container1.Add (view);
+		Assert.Equal (container1, view.SuperView);
 
 		Assert.Single (container1.Subviews);
 
 		var container2 = new View () { Id = "Container2" };
 
 		container2.Add (view);
+		Assert.Equal (container2, view.SuperView);
 		Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
 		container1.Dispose ();
 
 		Assert.Empty (container1.Subviews);
 		Assert.NotEmpty (container2.Subviews);
 		Assert.Single (container2.Subviews);
+		Assert.Null (view.SuperView);
 
 		// Trying access disposed properties
 		Assert.True (container2.Subviews [0].WasDisposed);
@@ -162,6 +165,7 @@ public class ResponderTests {
 		Assert.Null (container2.Subviews [0].Margin);
 		Assert.Null (container2.Subviews [0].Border);
 		Assert.Null (container2.Subviews [0].Padding);
+		Assert.Null (view.SuperView);
 
 		container2.Dispose ();
 
@@ -169,22 +173,23 @@ public class ResponderTests {
 	}
 
 	[Fact]
-	public void Disposed_Event_Notify_All_Subscribers_On_The_Second_Container ()
+	public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
 	{
 		var container1 = new View () { Id = "Container1" };
 
 		var view = new View () { Id = "View" };
 		container1.Add (view);
-
+		Assert.Equal (container1, view.SuperView);
 		Assert.Single (container1.Subviews);
 
 		var container2 = new View () { Id = "Container2" };
 		var count = 0;
 
-		view.Disposed += View_Disposed;
+		view.Disposing += View_Disposing;
 		container2.Add (view);
+		Assert.Equal (container2, view.SuperView);
 
-		void View_Disposed (object sender, System.EventArgs e)
+		void View_Disposing (object sender, System.EventArgs e)
 		{
 			count++;
 			Assert.Equal (view, sender);
@@ -197,6 +202,7 @@ public class ResponderTests {
 		Assert.Empty (container1.Subviews);
 		Assert.Empty (container2.Subviews);
 		Assert.Equal (1, count);
+		Assert.Null (view.SuperView);
 
 		container2.Dispose ();
 
@@ -204,16 +210,17 @@ public class ResponderTests {
 	}
 
 	[Fact]
-	public void Disposed_Event_Notify_All_Subscribers_On_The_First_Container ()
+	public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
 	{
 		var container1 = new View () { Id = "Container1" };
 		var count = 0;
 
 		var view = new View () { Id = "View" };
-		view.Disposed += View_Disposed;
+		view.Disposing += View_Disposing;
 		container1.Add (view);
+		Assert.Equal (container1, view.SuperView);
 
-		void View_Disposed (object sender, System.EventArgs e)
+		void View_Disposing (object sender, System.EventArgs e)
 		{
 			count++;
 			Assert.Equal (view, sender);
@@ -225,13 +232,14 @@ public class ResponderTests {
 		var container2 = new View () { Id = "Container2" };
 
 		container2.Add (view);
-
+		Assert.Equal (container2, view.SuperView);
 		Assert.Equal (container1.Subviews.Count, container2.Subviews.Count);
 		container2.Dispose ();
 
 		Assert.Empty (container1.Subviews);
 		Assert.Empty (container2.Subviews);
 		Assert.Equal (1, count);
+		Assert.Null (view.SuperView);
 
 		container1.Dispose ();
 
