@@ -3,14 +3,16 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Terminal.Gui.ConsoleDrivers;
+using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
+using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 
@@ -585,6 +587,35 @@ class NetEvents : IDisposable {
 		public WindowSizeEvent WindowSizeEvent;
 		public WindowPositionEvent WindowPositionEvent;
 		public RequestResponseEvent RequestResponseEvent;
+
+		public override readonly string ToString ()
+		{
+			return EventType switch {
+				EventType.Key => ToString (ConsoleKeyInfo),
+				EventType.Mouse => MouseEvent.ToString (),
+				//EventType.WindowSize => WindowSize.ToString (),
+				//EventType.RequestResponse => RequestResponse.ToString (),
+				_ => "Unknown event type: " + EventType
+			};
+		}
+
+		/// <summary>
+		/// Prints a ConsoleKeyInfoEx structure
+		/// </summary>
+		/// <param name="cki"></param>
+		/// <returns></returns>
+		public readonly string ToString (ConsoleKeyInfo cki)
+		{
+			var ke = new Key ((KeyCode)cki.KeyChar);
+			var sb = new StringBuilder ();
+			sb.Append ($"Key: {(KeyCode)cki.Key} ({cki.Key})");
+			sb.Append ((cki.Modifiers & ConsoleModifiers.Shift) != 0 ? " | Shift" : string.Empty);
+			sb.Append ((cki.Modifiers & ConsoleModifiers.Control) != 0 ? " | Control" : string.Empty);
+			sb.Append ((cki.Modifiers & ConsoleModifiers.Alt) != 0 ? " | Alt" : string.Empty);
+			sb.Append ($", KeyChar: {ke.AsRune.MakePrintable ()} ({(uint)cki.KeyChar}) ");
+			var s = sb.ToString ().TrimEnd (',').TrimEnd (' ');
+			return $"[ConsoleKeyInfo({s})]";
+		}
 	}
 
 	void HandleKeyboardEvent (ConsoleKeyInfo cki)
@@ -877,7 +908,7 @@ class NetDriver : ConsoleDriver {
 	);
 
 	// Dictionary for mapping ConsoleColor values to the values used by System.Net.Console.
-	static Dictionary<ConsoleColor, int> colorMap = new() {
+	static Dictionary<ConsoleColor, int> colorMap = new () {
 		{ ConsoleColor.Black, COLOR_BLACK },
 		{ ConsoleColor.DarkBlue, COLOR_BLUE },
 		{ ConsoleColor.DarkGreen, COLOR_GREEN },
@@ -1100,7 +1131,7 @@ class NetDriver : ConsoleDriver {
 		bool alt = (mod & ConsoleModifiers.Alt) != 0;
 		bool control = (mod & ConsoleModifiers.Control) != 0;
 
-		var cKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
+		var cKeyInfo = DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 
 		return new ConsoleKeyInfo (cKeyInfo.KeyChar, cKeyInfo.Key, shift, alt, control);
 	}
@@ -1108,37 +1139,11 @@ class NetDriver : ConsoleDriver {
 	KeyCode MapKey (ConsoleKeyInfo keyInfo)
 	{
 		switch (keyInfo.Key) {
-		case ConsoleKey.Escape:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Esc);
-		case ConsoleKey.Tab:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Tab);
-		case ConsoleKey.Home:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Home);
-		case ConsoleKey.End:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.End);
-		case ConsoleKey.LeftArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorLeft);
-		case ConsoleKey.RightArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorRight);
-		case ConsoleKey.UpArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorUp);
-		case ConsoleKey.DownArrow:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorDown);
-		case ConsoleKey.PageUp:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageUp);
-		case ConsoleKey.PageDown:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageDown);
-		case ConsoleKey.Enter:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
-		case ConsoleKey.Spacebar:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Space);
-		case ConsoleKey.Backspace:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
-		case ConsoleKey.Delete:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Delete);
-		case ConsoleKey.Insert:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Insert);
-
+		case ConsoleKey.OemPeriod:
+		case ConsoleKey.OemComma:
+		case ConsoleKey.OemPlus:
+		case ConsoleKey.OemMinus:
+		case ConsoleKey.Packet:
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
 		case ConsoleKey.Oem3:
@@ -1148,107 +1153,85 @@ class NetDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
-			var ret = ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.KeyChar);
-			if (ret.HasFlag (KeyCode.ShiftMask)) {
-				ret &= ~KeyCode.ShiftMask;
-			}
-			return ret;
+			if (keyInfo.KeyChar == 0) {
+				// If the keyChar is 0, keyInfo.Key value is not a printable character. 
 
-		case ConsoleKey.OemPeriod:
-		case ConsoleKey.OemComma:
-		case ConsoleKey.OemPlus:
-		case ConsoleKey.OemMinus:
+				return KeyCode.Null;// MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode)keyInfo.Key);
+			} else {
+				if (keyInfo.Modifiers != ConsoleModifiers.Shift) {
+					// If Shift wasn't down we don't need to do anything but return the keyInfo.KeyChar
+					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
+				}
+
+				// Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç")
+				// and passing on Shift would be redundant.
+				return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
+			}
+			break;
+
+
 			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
 
 		var key = keyInfo.Key;
-		if (key is >= ConsoleKey.A and <= ConsoleKey.Z) {
-			int delta = key - ConsoleKey.A;
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (KeyCode)((uint)KeyCode.CtrlMask | (uint)KeyCode.A + delta);
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (KeyCode)((uint)KeyCode.AltMask | (uint)KeyCode.A + delta);
-			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26) {
-					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-				} else if (keyInfo.KeyChar != 0) {
-					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
-				}
+		// A..Z are special cased:
+		// - Alone, they represent lowercase a...z
+		// - With ShiftMask they are A..Z
+		// - If CapsLock is on the above is reversed.
+		// - If Alt and/or Ctrl are present, treat as upper case
+		if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z) {
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
+				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
 			}
 
-			if (keyInfo.Modifiers == ConsoleModifiers.Shift /*^ (keyInfoEx.CapsLock)*/) {
-				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
-					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
-				}
-			}
-			// This is buggy because is converting a lower case to a upper case and mustn't
-			//if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == KeyCode.Space) {
-			//	return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			//}
-			return (KeyCode)(uint)keyInfo.KeyChar;
-		}
-		if (key is >= ConsoleKey.D0 and <= ConsoleKey.D9) {
-			int delta = key - ConsoleKey.D0;
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (KeyCode)((uint)KeyCode.AltMask | (uint)KeyCode.D0 + delta);
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (KeyCode)((uint)KeyCode.CtrlMask | (uint)KeyCode.D0 + delta);
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == (uint)KeyCode.D0 + delta) {
-					return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
+			if (keyInfo.Modifiers == ConsoleModifiers.Shift) {
+				// If ShiftMask is on  add the ShiftMask
+				if (char.IsUpper (keyInfo.KeyChar)) {
+					return (KeyCode)((uint)keyInfo.Key) | KeyCode.ShiftMask;
 				}
 			}
 			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
-		if (key is >= ConsoleKey.F1 and <= ConsoleKey.F12) {
-			int delta = key - ConsoleKey.F1;
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.F1 + delta));
-			}
 
-			return (KeyCode)((uint)KeyCode.F1 + delta);
+		// Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
+		if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key)) {
+			return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.Key));
 		}
 
-		// Is it a key between a..z?
-		if ((char)keyInfo.KeyChar is >= 'a' and <= 'z') {
-			// 'a' should be Key.A
-			return (KeyCode)(uint)keyInfo.KeyChar & ~KeyCode.Space;
+		// Handle control keys (e.g. CursorUp)
+		if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), ((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))) {
+			return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
 		}
 
-		// Is it a key between A..Z?
-		if (((KeyCode)(uint)keyInfo.KeyChar & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
-			// It's Key.A...Z.  Make it Key.A | Key.ShiftMask
-			return (KeyCode)(uint)keyInfo.KeyChar & ~KeyCode.Space | KeyCode.ShiftMask;
-		}
 
 		return (KeyCode)(uint)keyInfo.KeyChar;
 	}
 	#endregion Keyboard Handling
-	
+
 	void ProcessInput (InputResult inputEvent)
 	{
 		switch (inputEvent.EventType) {
-		case EventType.Key:
+		case NetEvents.EventType.Key:
 			var consoleKeyInfo = inputEvent.ConsoleKeyInfo;
-			if (consoleKeyInfo.Key == ConsoleKey.Packet) {
-				consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
-			}
+			//if (consoleKeyInfo.Key == ConsoleKey.Packet) {
+			//	consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
+			//}
+
+			//Debug.WriteLine ($"event: {inputEvent}");
+
 			var map = MapKey (consoleKeyInfo);
+
+			if (map == KeyCode.Null) {
+				break;
+			}
 
 			OnKeyDown (new Key (map));
 			OnKeyUp (new Key (map));
 			break;
-		case EventType.Mouse:
+		case NetEvents.EventType.Mouse:
 			OnMouseEvent (new MouseEventEventArgs (ToDriverMouse (inputEvent.MouseEvent)));
 			break;
-		case EventType.WindowSize:
+		case NetEvents.EventType.WindowSize:
 			_winSizeChanging = true;
 			Top = 0;
 			Left = 0;
@@ -1260,12 +1243,9 @@ class NetDriver : ConsoleDriver {
 			_winSizeChanging = false;
 			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
-		case EventType.RequestResponse:
-			// BUGBUG: What is this for? It does not seem to be used anywhere. 
-			// It is also not clear what it does. View.Data is documented as "This property is not used internally"
-			Application.Top.Data = inputEvent.RequestResponseEvent.ResultTuple;
+		case NetEvents.EventType.RequestResponse:
 			break;
-		case EventType.WindowPosition:
+		case NetEvents.EventType.WindowPosition:
 			break;
 		default:
 			throw new ArgumentOutOfRangeException ();
@@ -1275,7 +1255,7 @@ class NetDriver : ConsoleDriver {
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 	{
 		var input = new InputResult {
-			EventType = EventType.Key,
+			EventType = NetEvents.EventType.Key,
 			ConsoleKeyInfo = new ConsoleKeyInfo (keyChar, key, shift, alt, control)
 		};
 

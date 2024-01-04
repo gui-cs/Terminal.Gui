@@ -1085,9 +1085,7 @@ internal class WindowsDriver : ConsoleDriver {
 				inputEvent.KeyEvent = FromVKPacketToKeyEventRecord (inputEvent.KeyEvent);
 			}
 			var keyInfo = ToConsoleKeyInfoEx (inputEvent.KeyEvent);
-			StringBuilder klidSB = new StringBuilder ();
-			GetKeyboardLayoutName (klidSB);
-			Debug.WriteLine ($"event: KBD: {klidSB} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
+			//Debug.WriteLine ($"event: KBD: {GetKeyboardLayoutName()} {inputEvent.ToString ()} {keyInfo.ToString (keyInfo)}");
 
 			var map = MapKey (keyInfo);
 

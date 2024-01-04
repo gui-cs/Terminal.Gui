@@ -1609,175 +1609,58 @@ public class TextView : View {
 
 		Initialized += TextView_Initialized!;
 
-		// Things this view knows how to do
-		AddCommand (Command.PageDown, () => {
-			ProcessPageDown ();
-			return true;
-		});
-		AddCommand (Command.PageDownExtend, () => {
-			ProcessPageDownExtend ();
-			return true;
-		});
-		AddCommand (Command.PageUp, () => {
-			ProcessPageUp ();
-			return true;
-		});
-		AddCommand (Command.PageUpExtend, () => {
-			ProcessPageUpExtend ();
-			return true;
-		});
-		AddCommand (Command.LineDown, () => {
-			ProcessMoveDown ();
-			return true;
-		});
-		AddCommand (Command.LineDownExtend, () => {
-			ProcessMoveDownExtend ();
-			return true;
-		});
-		AddCommand (Command.LineUp, () => {
-			ProcessMoveUp ();
-			return true;
-		});
-		AddCommand (Command.LineUpExtend, () => {
-			ProcessMoveUpExtend ();
-			return true;
-		});
-		AddCommand (Command.Right, () => ProcessMoveRight ());
-		AddCommand (Command.RightExtend, () => {
-			ProcessMoveRightExtend ();
-			return true;
-		});
-		AddCommand (Command.Left, () => ProcessMoveLeft ());
-		AddCommand (Command.LeftExtend, () => {
-			ProcessMoveLeftExtend ();
-			return true;
-		});
-		AddCommand (Command.DeleteCharLeft, () => {
-			ProcessDeleteCharLeft ();
-			return true;
-		});
-		AddCommand (Command.StartOfLine, () => {
-			ProcessMoveStartOfLine ();
-			return true;
-		});
-		AddCommand (Command.StartOfLineExtend, () => {
-			ProcessMoveStartOfLineExtend ();
-			return true;
-		});
-		AddCommand (Command.DeleteCharRight, () => {
-			ProcessDeleteCharRight ();
-			return true;
-		});
-		AddCommand (Command.EndOfLine, () => {
-			ProcessMoveEndOfLine ();
-			return true;
-		});
-		AddCommand (Command.EndOfLineExtend, () => {
-			ProcessMoveEndOfLineExtend ();
-			return true;
-		});
-		AddCommand (Command.CutToEndLine, () => {
-			KillToEndOfLine ();
-			return true;
-		});
-		AddCommand (Command.CutToStartLine, () => {
-			KillToStartOfLine ();
-			return true;
-		});
-		AddCommand (Command.Paste, () => {
-			ProcessPaste ();
-			return true;
-		});
-		AddCommand (Command.ToggleExtend, () => {
-			ToggleSelecting ();
-			return true;
-		});
-		AddCommand (Command.Copy, () => {
-			ProcessCopy ();
-			return true;
-		});
-		AddCommand (Command.Cut, () => {
-			ProcessCut ();
-			return true;
-		});
-		AddCommand (Command.WordLeft, () => {
-			ProcessMoveWordBackward ();
-			return true;
-		});
-		AddCommand (Command.WordLeftExtend, () => {
-			ProcessMoveWordBackwardExtend ();
-			return true;
-		});
-		AddCommand (Command.WordRight, () => {
-			ProcessMoveWordForward ();
-			return true;
-		});
-		AddCommand (Command.WordRightExtend, () => {
-			ProcessMoveWordForwardExtend ();
-			return true;
-		});
-		AddCommand (Command.KillWordForwards, () => {
-			ProcessKillWordForward ();
-			return true;
-		});
-		AddCommand (Command.KillWordBackwards, () => {
-			ProcessKillWordBackward ();
-			return true;
-		});
-		AddCommand (Command.NewLine, () => ProcessReturn ());
-		AddCommand (Command.BottomEnd, () => {
-			MoveBottomEnd ();
-			return true;
-		});
-		AddCommand (Command.BottomEndExtend, () => {
-			MoveBottomEndExtend ();
-			return true;
-		});
-		AddCommand (Command.TopHome, () => {
-			MoveTopHome ();
-			return true;
-		});
-		AddCommand (Command.TopHomeExtend, () => {
-			MoveTopHomeExtend ();
-			return true;
-		});
-		AddCommand (Command.SelectAll, () => {
-			ProcessSelectAll ();
-			return true;
-		});
-		AddCommand (Command.ToggleOverwrite, () => {
-			ProcessSetOverwrite ();
-			return true;
-		});
-		AddCommand (Command.EnableOverwrite, () => {
-			SetOverwrite (true);
-			return true;
-		});
-		AddCommand (Command.DisableOverwrite, () => {
-			SetOverwrite (false);
-			return true;
-		});
-		AddCommand (Command.Tab, () => ProcessTab ());
-		AddCommand (Command.BackTab, () => ProcessBackTab ());
-		AddCommand (Command.NextView, () => ProcessMoveNextView ());
-		AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
-		AddCommand (Command.Undo, () => {
-			Undo ();
-			return true;
-		});
-		AddCommand (Command.Redo, () => {
-			Redo ();
-			return true;
-		});
-		AddCommand (Command.DeleteAll, () => {
-			DeleteAll ();
-			return true;
-		});
-		AddCommand (Command.Accept, () => {
-			ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
-			ShowContextMenu ();
-			return true;
-		});
+			// Things this view knows how to do
+			AddCommand (Command.PageDown, () => { ProcessPageDown (); return true; });
+			AddCommand (Command.PageDownExtend, () => { ProcessPageDownExtend (); return true; });
+			AddCommand (Command.PageUp, () => { ProcessPageUp (); return true; });
+			AddCommand (Command.PageUpExtend, () => { ProcessPageUpExtend (); return true; });
+			AddCommand (Command.LineDown, () => { ProcessMoveDown (); return true; });
+			AddCommand (Command.LineDownExtend, () => { ProcessMoveDownExtend (); return true; });
+			AddCommand (Command.LineUp, () => { ProcessMoveUp (); return true; });
+			AddCommand (Command.LineUpExtend, () => { ProcessMoveUpExtend (); return true; });
+			AddCommand (Command.Right, () => ProcessMoveRight ());
+			AddCommand (Command.RightExtend, () => { ProcessMoveRightExtend (); return true; });
+			AddCommand (Command.Left, () => ProcessMoveLeft ());
+			AddCommand (Command.LeftExtend, () => { ProcessMoveLeftExtend (); return true; });
+			AddCommand (Command.DeleteCharLeft, () => { ProcessDeleteCharLeft (); return true; });
+			AddCommand (Command.StartOfLine, () => { ProcessMoveStartOfLine (); return true; });
+			AddCommand (Command.StartOfLineExtend, () => { ProcessMoveStartOfLineExtend (); return true; });
+			AddCommand (Command.DeleteCharRight, () => { ProcessDeleteCharRight (); return true; });
+			AddCommand (Command.EndOfLine, () => { ProcessMoveEndOfLine (); return true; });
+			AddCommand (Command.EndOfLineExtend, () => { ProcessMoveEndOfLineExtend (); return true; });
+			AddCommand (Command.CutToEndLine, () => { KillToEndOfLine (); return true; });
+			AddCommand (Command.CutToStartLine, () => { KillToStartOfLine (); return true; });
+			AddCommand (Command.Paste, () => { ProcessPaste (); return true; });
+			AddCommand (Command.ToggleExtend, () => { ToggleSelecting (); return true; });
+			AddCommand (Command.Copy, () => { ProcessCopy (); return true; });
+			AddCommand (Command.Cut, () => { ProcessCut (); return true; });
+			AddCommand (Command.WordLeft, () => { ProcessMoveWordBackward (); return true; });
+			AddCommand (Command.WordLeftExtend, () => { ProcessMoveWordBackwardExtend (); return true; });
+			AddCommand (Command.WordRight, () => { ProcessMoveWordForward (); return true; });
+			AddCommand (Command.WordRightExtend, () => { ProcessMoveWordForwardExtend (); return true; });
+			AddCommand (Command.KillWordForwards, () => { ProcessKillWordForward (); return true; });
+			AddCommand (Command.KillWordBackwards, () => { ProcessKillWordBackward (); return true; });
+			AddCommand (Command.NewLine, () => ProcessReturn ());
+			AddCommand (Command.BottomEnd, () => { MoveBottomEnd (); return true; });
+			AddCommand (Command.BottomEndExtend, () => { MoveBottomEndExtend (); return true; });
+			AddCommand (Command.TopHome, () => { MoveTopHome (); return true; });
+			AddCommand (Command.TopHomeExtend, () => { MoveTopHomeExtend (); return true; });
+			AddCommand (Command.SelectAll, () => { ProcessSelectAll (); return true; });
+			AddCommand (Command.ToggleOverwrite, () => { ProcessSetOverwrite (); return true; });
+			AddCommand (Command.EnableOverwrite, () => { SetOverwrite (true); return true; });
+			AddCommand (Command.DisableOverwrite, () => { SetOverwrite (false); return true; });
+			AddCommand (Command.Tab, () => ProcessTab ());
+			AddCommand (Command.BackTab, () => ProcessBackTab ());
+			AddCommand (Command.NextView, () => ProcessMoveNextView ());
+			AddCommand (Command.PreviousView, () => ProcessMovePreviousView ());
+			AddCommand (Command.Undo, () => { Undo (); return true; });
+			AddCommand (Command.Redo, () => { Redo (); return true; });
+			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
+			AddCommand (Command.ShowContextMenu, () => {
+				ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
+				ShowContextMenu ();
+				return true;
+			});
 
 		// Default keybindings for this view
 		KeyBindings.Add (KeyCode.PageDown, Command.PageDown);
@@ -1881,8 +1764,8 @@ public class TextView : View {
 		ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
 		ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
-		KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.Accept);
-	}
+			KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
+		}
 
 	MenuBarItem BuildContextMenuBarItem () => new (new MenuItem [] {
 		new (Strings.ctxSelectAll, "", () => SelectAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)),
