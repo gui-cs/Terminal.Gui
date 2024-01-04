@@ -70,8 +70,7 @@ namespace UICatalog.Scenarios {
 			tabView.Enter += (s, e) => focusedTabView = tabView;
 
 			Application.Top.Add (statusBar);
-
-			New ();
+			Application.Top.Ready += (s, e) => New ();
 		}
 
 		private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
