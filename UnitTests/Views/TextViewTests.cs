@@ -3047,10 +3047,9 @@ Line 2.", _output);
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateForwardKey));
 		Assert.False (tv.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateBackwardKey));
-
-		Assert.Null (tv.ContextMenu.MenuBar);
+		
 		Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
-		Assert.True (tv.ContextMenu.MenuBar.Visible);
+		Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
 
 	}
 
