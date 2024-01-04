@@ -1139,37 +1139,6 @@ class NetDriver : ConsoleDriver {
 	KeyCode MapKey (ConsoleKeyInfo keyInfo)
 	{
 		switch (keyInfo.Key) {
-		case ConsoleKey.Escape:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Esc);
-		case ConsoleKey.Tab:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Tab);
-		case ConsoleKey.Home:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Home);
-		case ConsoleKey.End:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.End);
-		case ConsoleKey.LeftArrow:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorLeft);
-		case ConsoleKey.RightArrow:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorRight);
-		case ConsoleKey.UpArrow:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorUp);
-		case ConsoleKey.DownArrow:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorDown);
-		case ConsoleKey.PageUp:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageUp);
-		case ConsoleKey.PageDown:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageDown);
-		case ConsoleKey.Enter:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
-		case ConsoleKey.Spacebar:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Space);
-		case ConsoleKey.Backspace:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
-		case ConsoleKey.Delete:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Delete);
-		case ConsoleKey.Insert:
-			return MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Insert);
-
 		case ConsoleKey.OemPeriod:
 		case ConsoleKey.OemComma:
 		case ConsoleKey.OemPlus:
@@ -1184,69 +1153,14 @@ class NetDriver : ConsoleDriver {
 		case ConsoleKey.Oem7:
 		case ConsoleKey.Oem8:
 		case ConsoleKey.Oem102:
-			// These virtual key codes are mapped differently depending on the keyboard layout in use.
-			// We use the Win32 API to map them to the correct character.
-			var mapResult = 0;//MapVKtoChar ((VK)keyInfo.Key);
-			//if (mapResult == 0) {
-			//	// There is no mapping - this should not happen
-			//	//Debug.Assert (mapResult != 0, $@"Unable to map the virtual key code {keyInfo.Key}.");
-			//	//return KeyCode.Null;
-			//}
-
-			// An un-shifted character value is in the low order word of the return value.
-			var mappedChar = (char)(mapResult & 0x0000FFFF);
-
 			if (keyInfo.KeyChar == 0) {
 				// If the keyChar is 0, keyInfo.Key value is not a printable character. 
 
-				// Dead keys (diacritics) are indicated by setting the top bit of the return value. 
-				if ((mapResult & 0x80000000) != 0) {
-					// Dead key (e.g. Oem2 '~'/'^' on POR keyboard)
-					// Option 1: Throw it out. 
-					//    - Apps will never see the dead keys
-					//    - If user presses a key that can be combined with the dead key ('a'), the right thing happens (app will see 'ã').
-					//      - NOTE: With Dead Keys, KeyDown != KeyUp. The KeyUp event will have just the base char ('a').
-					//    - If user presses dead key again, the right thing happens (app will see `~~`)
-					//    - This is what Notepad etc... appear to do
-					// Option 2: Expand the API to indicate the KeyCode is a dead key
-					//    - Enables apps to do their own dead key processing
-					//    - Adds complexity; no dev has asked for this (yet).
-					// We choose Option 1 for now.
-					return KeyCode.Null;
-
-					// Note: Ctrl-Deadkey (like Oem3 '`'/'~` on ENG) can't be supported.
-					// Sadly, the charVal is just the deadkey and subsequent key events do not contain
-					// any info that the previous event was a deadkey.
-					// Note WT does not support Ctrl-Deadkey either.
-				}
-
-				if (keyInfo.Modifiers != 0) {
-					// These Oem keys have well defined chars. We ensure the representative char is used.
-					// If we don't do this, then on some keyboard layouts the wrong char is 
-					// returned (e.g. on ENG OemPlus un-shifted is =, not +). This is important
-					// for key persistence ("Ctrl++" vs. "Ctrl+=").
-					mappedChar = keyInfo.Key switch {
-						ConsoleKey.OemPeriod => '.',
-						ConsoleKey.OemComma => ',',
-						ConsoleKey.OemPlus => '+',
-						ConsoleKey.OemMinus => '-',
-						_ => mappedChar
-					};
-				}
-
-				// Return the mappedChar with they modifiers. Because mappedChar is un-shifted, if Shift was down
-				// we should keep it
-				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)mappedChar);
+				return KeyCode.Null;// MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode)keyInfo.Key);
 			} else {
-				// KeyChar is printable
-				if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
-					// AltGr support - AltGr is equivalent to Alt on NetDriver - the correct char is in KeyChar
-					return (KeyCode)keyInfo.KeyChar;
-				}
-
 				if (keyInfo.Modifiers != ConsoleModifiers.Shift) {
-					// If Shift wasn't down we don't need to do anything but return the mappedChar
-					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(mappedChar));
+					// If Shift wasn't down we don't need to do anything but return the keyInfo.KeyChar
+					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
 				}
 
 				// Strip off Shift - We got here because they KeyChar from Windows is the shifted char (e.g. "Ç")
@@ -1260,71 +1174,35 @@ class NetDriver : ConsoleDriver {
 		}
 
 		var key = keyInfo.Key;
-		if (key is >= ConsoleKey.A and <= ConsoleKey.Z) {
-			int delta = key - ConsoleKey.A;
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (KeyCode)((uint)KeyCode.CtrlMask | (uint)KeyCode.A + delta);
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (KeyCode)((uint)KeyCode.AltMask | (uint)KeyCode.A + delta);
-			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar != 0 && keyInfo.KeyChar >= 1 && keyInfo.KeyChar <= 26) {
-					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
-				} else if (keyInfo.KeyChar != 0) {
-					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
-				}
+		// A..Z are special cased:
+		// - Alone, they represent lowercase a...z
+		// - With ShiftMask they are A..Z
+		// - If CapsLock is on the above is reversed.
+		// - If Alt and/or Ctrl are present, treat as upper case
+		if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z) {
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)) {
+				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(uint)keyInfo.Key);
 			}
 
-			if (keyInfo.Modifiers == ConsoleModifiers.Shift /*^ (keyInfoEx.CapsLock)*/) {
-				if (keyInfo.KeyChar <= (uint)KeyCode.Z) {
-					return (KeyCode)((uint)KeyCode.A + delta) | KeyCode.ShiftMask;
-				}
-			}
-			// This is buggy because is converting a lower case to a upper case and mustn't
-			//if (((KeyCode)((uint)keyInfo.KeyChar) & KeyCode.Space) == KeyCode.Space) {
-			//	return (KeyCode)((uint)keyInfo.KeyChar) & ~KeyCode.Space;
-			//}
-			return (KeyCode)(uint)keyInfo.KeyChar;
-		}
-		if (key is >= ConsoleKey.D0 and <= ConsoleKey.D9) {
-			int delta = key - ConsoleKey.D0;
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (KeyCode)((uint)KeyCode.AltMask | (uint)KeyCode.D0 + delta);
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (KeyCode)((uint)KeyCode.CtrlMask | (uint)KeyCode.D0 + delta);
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30 || keyInfo.KeyChar == (uint)KeyCode.D0 + delta) {
-					return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.D0 + delta));
+			if (keyInfo.Modifiers == ConsoleModifiers.Shift) {
+				// If ShiftMask is on  add the ShiftMask
+				if (char.IsUpper (keyInfo.KeyChar)) {
+					return (KeyCode)((uint)keyInfo.Key) | KeyCode.ShiftMask;
 				}
 			}
 			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
-		if (key is >= ConsoleKey.F1 and <= ConsoleKey.F12) {
-			int delta = key - ConsoleKey.F1;
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.F1 + delta));
-			}
 
-			return (KeyCode)((uint)KeyCode.F1 + delta);
+		// Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC
+		if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), (uint)keyInfo.Key)) {
+			return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.Key));
 		}
 
-		// Is it a key between a..z?
-		if ((char)keyInfo.KeyChar is >= 'a' and <= 'z') {
-			// 'a' should be Key.A
-			return (KeyCode)(uint)keyInfo.KeyChar & ~KeyCode.Space;
+		// Handle control keys (e.g. CursorUp)
+		if (keyInfo.Key != ConsoleKey.None && Enum.IsDefined (typeof (KeyCode), ((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint))) {
+			return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.Key + (uint)KeyCode.MaxCodePoint));
 		}
 
-		// Is it a key between A..Z?
-		if (((KeyCode)(uint)keyInfo.KeyChar & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z) {
-			// It's Key.A...Z.  Make it Key.A | Key.ShiftMask
-			return (KeyCode)(uint)keyInfo.KeyChar & ~KeyCode.Space | KeyCode.ShiftMask;
-		}
 
 		return (KeyCode)(uint)keyInfo.KeyChar;
 	}
