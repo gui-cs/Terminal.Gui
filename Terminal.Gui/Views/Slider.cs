@@ -756,7 +756,7 @@ public class Slider<T> : View {
 
 		int max_legend;
 		if (_config._sliderOrientation == _config._legendsOrientation) {
-			max_legend = _options.Max (e => e.Legend == null ? 0 : e.Legend.ToString ().Length);
+			max_legend = int.Max (_options.Max (e => e.Legend == null ? 0 : e.Legend.ToString ().Length), 1);
 		} else {
 			max_legend = 1;
 		}
