@@ -731,18 +731,18 @@ public class ComboBox : View {
 		_isShow = false;
 	}
 
-	int GetSelectedItemFromSource (string value)
-	{
-		if (_source == null) {
+		private int GetSelectedItemFromSource (string searchText)
+		{
+			if (_source is null) {
+				return -1;
+			}
+			for (int i = 0; i < _searchset.Count; i++) {
+				if (_searchset [i].ToString () == searchText) {
+					return i;
+				}
+			}
 			return -1;
 		}
-		for (int i = 0; i < _source.Count; i++) {
-			if (_source.ToList () [i].ToString () == value) {
-				return i;
-			}
-		}
-		return -1;
-	}
 
 	/// <summary>
 	/// Reset to full original list
@@ -784,18 +784,20 @@ public class ComboBox : View {
 		}
 	}
 
-	void Search_Changed (object sender, TextChangedEventArgs e)
-	{
-		if (_source == null) {
-			// Object initialization		
-			return;
-		}
+		private void Search_Changed (object sender, TextChangedEventArgs e)
+		{
+			if (_source is null) { // Object initialization		
+				return;
+			}
 
-		if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue)) {
-			ResetSearchSet ();
-		} else if (_search.Text != e.OldValue) {
-			_isShow = true;
-			ResetSearchSet (noCopy: true);
+			if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue)) {
+				ResetSearchSet ();
+			} else if (_search.Text != e.OldValue) {
+				if (_search.Text.Length < e.OldValue.Length) {
+					_selectedItem = -1;
+				}
+				_isShow = true;
+				ResetSearchSet (noCopy: true);
 
 			foreach (object item in _source.ToList ()) {
 				// Iterate to preserver object type and force deep copy
