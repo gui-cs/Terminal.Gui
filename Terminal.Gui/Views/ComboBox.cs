@@ -759,13 +759,13 @@ namespace Terminal.Gui {
 			isShow = false;
 		}
 
-		private int GetSelectedItemFromSource (string value)
+		private int GetSelectedItemFromSource (string searchText)
 		{
-			if (source == null) {
+			if (source is null) {
 				return -1;
 			}
-			for (int i = 0; i < source.Count; i++) {
-				if (source.ToList () [i].ToString () == value) {
+			for (int i = 0; i < searchset.Count; i++) {
+				if (searchset [i].ToString () == searchText) {
 					return i;
 				}
 			}
@@ -815,13 +815,16 @@ namespace Terminal.Gui {
 
 		private void Search_Changed (object sender, TextChangedEventArgs e)
 		{
-			if (source == null) { // Object initialization		
+			if (source is null) { // Object initialization		
 				return;
 			}
 
 			if (string.IsNullOrEmpty (search.Text) && string.IsNullOrEmpty (e.OldValue)) {
 				ResetSearchSet ();
 			} else if (search.Text != e.OldValue) {
+				if (search.Text.Length < e.OldValue.Length) {
+					selectedItem = -1;
+				}
 				isShow = true;
 				ResetSearchSet (noCopy: true);
 
