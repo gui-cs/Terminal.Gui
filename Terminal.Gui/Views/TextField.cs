@@ -143,10 +143,9 @@ namespace Terminal.Gui {
 
 			// Default keybindings for this view
 			// We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
 			KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
 
-			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharLeft);
 			KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
 
 			KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.LeftHomeExtend);
@@ -201,9 +200,9 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.WordRight);
 			KeyBindings.Add ((KeyCode)((int)'F' + KeyCode.AltMask), Command.WordRight);
 
-			KeyBindings.Add (KeyCode.DeleteChar | KeyCode.CtrlMask, Command.KillWordForwards);
+			KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards);
 			KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask, Command.KillWordBackwards);
-			KeyBindings.Add (KeyCode.InsertChar, Command.ToggleOverwrite);
+			KeyBindings.Add (KeyCode.Insert, Command.ToggleOverwrite);
 			KeyBindings.Add (KeyCode.C | KeyCode.CtrlMask, Command.Copy);
 			KeyBindings.Add (KeyCode.X | KeyCode.CtrlMask, Command.Cut);
 			KeyBindings.Add (KeyCode.V | KeyCode.CtrlMask, Command.Paste);
