@@ -58,6 +58,9 @@ public static class ConsoleKeyMapping {
 	/// the function returns 0.</returns>
 	public static uint MapVKtoChar (VK vk)
 	{
+		if (Environment.OSVersion.Platform != PlatformID.Win32NT) {
+			return 0;
+		}
 		var tid = GetWindowThreadProcessId (GetForegroundWindow (), 0);
 		var hkl = GetKeyboardLayout (tid);
 		return MapVirtualKeyEx (vk, 2, hkl);
@@ -85,7 +88,18 @@ public static class ConsoleKeyMapping {
 	/// <param name="pwszKLID"></param>
 	/// <returns></returns>
 	[DllImport ("user32.dll")]
-	public extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
+	extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
+
+	public static string GetKeyboardLayoutName ()
+	{
+		if (Environment.OSVersion.Platform != PlatformID.Win32NT) {
+			return "none";
+		}
+
+		StringBuilder klidSB = new StringBuilder ();
+		GetKeyboardLayoutName (klidSB);
+		return klidSB.ToString ();
+	}
 
 	class ScanCodeMapping : IEquatable<ScanCodeMapping> {
 		public uint ScanCode;
