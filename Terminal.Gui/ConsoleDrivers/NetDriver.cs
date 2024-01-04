@@ -1217,7 +1217,7 @@ class NetDriver : ConsoleDriver {
 			//	consoleKeyInfo = FromVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 			//}
 
-			Debug.WriteLine ($"event: {inputEvent}");
+			//Debug.WriteLine ($"event: {inputEvent}");
 
 			var map = MapKey (consoleKeyInfo);
 
