@@ -12,9 +12,6 @@ public class Sliders : Scenario {
 	public override void Setup ()
 	{
 		MakeSliders (Win, new List<object> { 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000 });
-
-		#region configView
-
 		var configView = new FrameView {
 			Title = "Configuration",
 			X = Pos.Percent (50),
@@ -27,7 +24,6 @@ public class Sliders : Scenario {
 		Win.Add (configView);
 
 		#region Config Slider
-
 		var slider = new Slider<string> () {
 			Title = "Options",
 			X = Pos.Center (),
@@ -78,8 +74,6 @@ public class Sliders : Scenario {
 		};
 		slider.SetOption (0);
 		slider.SetOption (1);
-
-		#endregion
 
 		#region InnerSpacing Input
 		// var innerspacing_slider = new Slider<string> ("Innerspacing", new List<string> { "Auto", "0", "1", "2", "3", "4", "5" }) {
@@ -247,7 +241,7 @@ public class Sliders : Scenario {
 
 		#endregion
 
-		#endregion
+		#endregion Config Slider
 
 		Win.FocusFirst ();
 
@@ -285,7 +279,7 @@ public class Sliders : Scenario {
 			Y = prev == null ? 0 : Pos.Bottom (prev),
 			//Y = Pos.Center (),
 			Type = SliderType.Single,
-			//BorderStyle = LineStyle.Single,
+			BorderStyle = LineStyle.Single,
 			LegendsOrientation = Orientation.Horizontal,
 			Width = Dim.Percent (50),
 			AllowEmpty = false,
@@ -306,17 +300,25 @@ public class Sliders : Scenario {
 
 		v.Add (single);
 
-		var label = new Label () {
-			X = 0,
-			Y = Pos.Bottom (single),
-			Height = 1,
-			Width = Dim.Width (single),
-			Text = $"{single.GetSetOptions ().FirstOrDefault ()}"
-		};
 		single.OptionsChanged += (s, e) => {
-			label.Text = $"{e.Options.FirstOrDefault ().Key}";
+			single.Title = $"Actual slider {e.Options.FirstOrDefault ().Key}";
 		};
 
-		v.Add (label);
+		var oneOption = new List<object> { "The Only Option" };
+		var one = new Slider (oneOption, Orientation.Horizontal) {
+			Title = "One Option Slider",
+			X = 0,
+			//X = Pos.Right (view) + 1,
+			Y = prev == null ? 0 : Pos.Bottom (single),
+			//Y = Pos.Center (),
+			Type = SliderType.Single,
+			BorderStyle = LineStyle.Single,
+			LegendsOrientation = Orientation.Horizontal,
+			Width = Dim.Percent (50),
+			AllowEmpty = false,
+			//ShowSpacing = true
+		};
+		v.Add (one);
+
 	}
 }

@@ -416,7 +416,7 @@ public class Slider<T> : View {
 	{
 		CanFocus = true;
 
-		this._options = options ?? new List<SliderOption<T>> ();
+		_options = options ?? new List<SliderOption<T>> ();
 
 		_config._sliderOrientation = orientation;
 
@@ -577,9 +577,10 @@ public class Slider<T> : View {
 			return _options;
 		}
 		set {
-			_options = value;
+			// _options should never be null
+			_options = value ?? throw new ArgumentNullException (nameof (value));
 
-			if (_options == null || _options.Count == 0) {
+			if (_options.Count == 0) {
 				return;
 			}
 
@@ -755,12 +756,12 @@ public class Slider<T> : View {
 
 		int max_legend;
 		if (_config._sliderOrientation == _config._legendsOrientation) {
-			max_legend = _options.Max (e => e.Legend.ToString ().Length);
+			max_legend = _options.Max (e => e.Legend == null ? 0 : e.Legend.ToString ().Length);
 		} else {
 			max_legend = 1;
 		}
 
-		var min = (size - max_legend) / (_options.Count - 1);
+		var min = _options.Count == 1 ? (size) : (size - max_legend) / (_options.Count - 1);
 
 		string first;
 		string last;
@@ -792,7 +793,11 @@ public class Slider<T> : View {
 		var width = size - first_left - last_right - 1;
 
 		_config._startSpacing = first_left;
-		_config._innerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
+		if (_options.Count == 1) {
+			_config._innerSpacing = Math.Max (0, width - 1);
+		} else {
+			_config._innerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
+		}
 		_config._endSpacing = last_right;
 
 	}
@@ -972,17 +977,15 @@ public class Slider<T> : View {
 	{
 		// TODO: make this more surgical to reduce repaint
 
-		var normalScheme = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
-
-		if (this._options == null && this._options.Count > 0) {
+		if (_options == null && _options.Count > 0) {
 			return;
 		}
 
 		// Debug
 #if (DEBUG)
-		Driver.SetAttribute (new Attribute (Color.White, Color.Red));
-		for (var y = 0; y < Bounds.Height; y++) {
-			for (var x = 0; x < Bounds.Width; x++) {
+		Driver?.SetAttribute (new Attribute (Color.White, Color.Red));
+		for (var y = 0; y < contentArea.Height; y++) {
+			for (var x = 0; x < contentArea.Width; x++) {
 				// MoveAndAdd (x, y, '·');
 			}
 		}
@@ -1041,9 +1044,13 @@ public class Slider<T> : View {
 		Clear ();
 
 		// Attributes
-		var normalScheme = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
-		//var normalScheme = style.LegendStyle.NormalAttribute ?? ColorScheme.Disabled;
-		var setScheme = _style.SetChar.Attribute ?? ColorScheme.HotNormal;//  ColorScheme?.Focus ?? Application.Current.ColorScheme.Focus;
+
+		var normalAttr = new Attribute (Color.White, Color.Black);
+		var setAtrr = new Attribute (Color.Black, Color.White);
+		if (IsInitialized) {
+			normalAttr = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
+			setAtrr = _style.SetChar.Attribute ?? ColorScheme.HotNormal;//  ColorScheme?.Focus ?? Application.Current.ColorScheme.Focus;
+		}
 
 		var isVertical = _config._sliderOrientation == Orientation.Vertical;
 		var isLegendsVertical = _config._legendsOrientation == Orientation.Vertical;
@@ -1057,7 +1064,7 @@ public class Slider<T> : View {
 		// Left Spacing
 		if (_config._showSpacing && _config._startSpacing > 0) {
 
-			Driver.SetAttribute (isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
+			Driver?.SetAttribute (isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Attribute ?? normalAttr : _style.SpaceChar.Attribute ?? normalAttr);
 			var rune = isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
 
 			for (var i = 0; i < this._config._startSpacing; i++) {
@@ -1065,7 +1072,7 @@ public class Slider<T> : View {
 				if (isVertical) y++; else x++;
 			}
 		} else {
-			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
+			Driver?.SetAttribute (_style.EmptyChar.Attribute ?? normalAttr);
 			// for (int i = 0; i < this.config.StartSpacing + ((this.config.StartSpacing + this.config.EndSpacing) % 2 == 0 ? 1 : 2); i++) {
 			for (var i = 0; i < this._config._startSpacing; i++) {
 				MoveAndAdd (x, y, _style.EmptyChar.Rune);
@@ -1103,7 +1110,7 @@ public class Slider<T> : View {
 				}
 
 				// Draw Option
-				Driver.SetAttribute (isSet && _setOptions.Contains (i) ? _style.SetChar.Attribute ?? setScheme : drawRange ? _style.RangeChar.Attribute ?? setScheme : _style.OptionChar.Attribute ?? normalScheme);
+				Driver?.SetAttribute (isSet && _setOptions.Contains (i) ? _style.SetChar.Attribute ?? setAtrr : drawRange ? _style.RangeChar.Attribute ?? setAtrr : _style.OptionChar.Attribute ?? normalAttr);
 
 				// Note(jmperricone): Maybe only for curses, windows inverts actual colors, while curses inverts bg with fg.
 				//if (Application.Driver is CursesDriver) {
@@ -1126,7 +1133,7 @@ public class Slider<T> : View {
 
 				// Draw Spacing
 				if (_config._showSpacing || i < _options.Count - 1) { // Skip if is the Last Spacing.
-					Driver.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setScheme : _style.SpaceChar.Attribute ?? normalScheme);
+					Driver?.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setAtrr : _style.SpaceChar.Attribute ?? normalAttr);
 					for (var s = 0; s < _config._innerSpacing; s++) {
 						MoveAndAdd (x, y, drawRange && isSet ? _style.RangeChar.Rune : _style.SpaceChar.Rune);
 						if (isVertical) y++; else x++;
@@ -1138,14 +1145,14 @@ public class Slider<T> : View {
 		var remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
 		// Right Spacing
 		if (_config._showSpacing) {
-			Driver.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalScheme : _style.SpaceChar.Attribute ?? normalScheme);
+			Driver?.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalAttr : _style.SpaceChar.Attribute ?? normalAttr);
 			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
 			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) y++; else x++;
 			}
 		} else {
-			Driver.SetAttribute (_style.EmptyChar.Attribute ?? normalScheme);
+			Driver?.SetAttribute (_style.EmptyChar.Attribute ?? normalAttr);
 			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, _style.EmptyChar.Rune);
 				if (isVertical) y++; else x++;
@@ -1156,9 +1163,14 @@ public class Slider<T> : View {
 	void DrawLegends ()
 	{
 		// Attributes
-		var normalScheme = _style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
-		var setScheme = _style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
-		var spaceScheme = normalScheme;// style.LegendStyle.EmptyAttribute ?? normalScheme;
+		var normalAttr = new Attribute (Color.White, Color.Black);
+		var setAttr = new Attribute (Color.Black, Color.White);
+		if (IsInitialized) {
+			normalAttr = _style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
+			setAttr = _style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
+		}
+		var spaceScheme = normalAttr;// style.LegendStyle.EmptyAttribute ?? normalScheme;
+
 
 		var isTextVertical = _config._legendsOrientation == Orientation.Vertical;
 		var isSet = _setOptions.Count > 0;
@@ -1272,7 +1284,7 @@ public class Slider<T> : View {
 			}
 
 			// Legend
-			Driver.SetAttribute (isOptionSet ? setScheme : normalScheme);
+			Driver?.SetAttribute (isOptionSet ? setAttr : normalAttr);
 			foreach (var c in text.EnumerateRunes ()) {
 				MoveAndAdd (x, y, c);
 				//Driver.AddRune (c);
@@ -1288,7 +1300,7 @@ public class Slider<T> : View {
 			}
 
 			// Option Right Spacing of Option
-			Driver.SetAttribute (spaceScheme);
+			Driver?.SetAttribute (spaceScheme);
 			if (isTextVertical) y += legend_right_spaces_count;
 			else x += legend_right_spaces_count;
 

@@ -291,12 +291,12 @@ public partial class View {
 	/// <param name="row">the row to move to, in view-relative coordinates.</param>
 	public void Move (int col, int row)
 	{
-		if (Driver.Rows == 0) {
+		if (Driver == null || Driver?.Rows == 0) {
 			return;
 		}
 
 		BoundsToScreen (col, row, out int rCol, out int rRow, false);
-		Driver.Move (rCol, rRow);
+		Driver?.Move (rCol, rRow);
 	}
 
 	/// <summary>

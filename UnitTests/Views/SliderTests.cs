@@ -1,16 +1,11 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Xunit;
 
 namespace Terminal.Gui.ViewsTests;
 
 public class SliderOptionTests {
-
-
 	[Fact]
 	public void Slider_Option_Default_Constructor ()
 	{
@@ -464,6 +459,41 @@ public class SliderTests {
 		// Assert
 		Assert.False (result);
 		Assert.NotEmpty (slider.GetSetOptions ());
+	}
+
+	[Fact]
+	void Set_Options_Throws_If_Null ()
+	{
+		// Arrange
+		var slider = new Slider<int> ();
+
+		// Act/Assert
+		Assert.Throws<ArgumentNullException> (() => slider.Options = null);
+		
+	}
+
+	[Fact]
+	void Set_Options_No_Legend_Throws ()
+	{
+		// Arrange
+		var slider = new Slider<int> ();
+
+		// Act/Assert
+		Assert.Throws<ArgumentNullException> (() => slider.Options = null);
+
+	}
+
+	// https://github.com/gui-cs/Terminal.Gui/issues/3099
+	[Fact]
+	void One_Option_Does_Not_Throw ()
+	{
+		// Arrange
+		var slider = new Slider<int> ();
+		slider.BeginInit ();
+		slider.EndInit ();
+		// Act/Assert
+		slider.Options = new List<SliderOption<int>> { new SliderOption<int> () };
+
 	}
 
 	// Add more tests for different scenarios and edge cases.
