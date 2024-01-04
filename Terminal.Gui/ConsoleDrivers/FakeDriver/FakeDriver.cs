@@ -233,9 +233,9 @@ public class FakeDriver : ConsoleDriver {
 		case ConsoleKey.Backspace:
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
 		case ConsoleKey.Delete:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.DeleteChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Delete);
 		case ConsoleKey.Insert:
-			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.InsertChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Insert);
 		case ConsoleKey.PrintScreen:
 			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PrintScreen);
 
