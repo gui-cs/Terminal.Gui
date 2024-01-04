@@ -1666,7 +1666,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.Undo, () => { Undo (); return true; });
 			AddCommand (Command.Redo, () => { Redo (); return true; });
 			AddCommand (Command.DeleteAll, () => { DeleteAll (); return true; });
-			AddCommand (Command.Accept, () => {
+			AddCommand (Command.ShowContextMenu, () => {
 				ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
 				ShowContextMenu ();
 				return true;
@@ -1775,7 +1775,7 @@ namespace Terminal.Gui {
 			ContextMenu = new ContextMenu () { MenuItems = BuildContextMenuBarItem () };
 			ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
-			KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.Accept);
+			KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
 		}
 
 		private MenuBarItem BuildContextMenuBarItem ()
