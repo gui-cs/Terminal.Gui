@@ -91,6 +91,7 @@ namespace UICatalog.Scenarios {
 			// Set default colors.
 			foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.ColorName;
 			backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.ColorName;
+			Win.Initialized += (s, e) => Win.LayoutSubviews ();
 		}
 
 		/// <summary>

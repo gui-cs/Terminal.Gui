@@ -87,7 +87,7 @@ namespace Terminal.Gui {
 			AddCommand (Command.Right, () => MoveRight ());
 
 			// Default keybindings for this view
-			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
 			KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
 
 			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharLeft);

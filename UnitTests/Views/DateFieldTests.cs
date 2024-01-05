@@ -64,7 +64,7 @@ namespace Terminal.Gui.ViewsTests {
 			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 			DateField df = new DateField (DateTime.Parse ("12/12/1971"));
 			df.ReadOnly = true;
-			Assert.True (df.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.Delete)));
 			Assert.Equal (" 12/12/1971", df.Text);
 			df.ReadOnly = false;
 			Assert.True (df.NewKeyDownEvent (new (KeyCode.D | KeyCode.CtrlMask)));

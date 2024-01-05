@@ -49,8 +49,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
-
+			
 			this.tableView = new TableView () {
 				X = 0,
 				Y = 0,
@@ -392,7 +391,7 @@ namespace UICatalog.Scenarios {
 				return;
 			}
 
-			if (e.KeyCode == KeyCode.DeleteChar) {
+			if (e.KeyCode == KeyCode.Delete) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode
