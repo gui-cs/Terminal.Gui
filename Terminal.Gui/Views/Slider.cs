@@ -222,7 +222,7 @@ class SliderConfiguration {
 	internal int _endSpacing;
 	internal int _innerSpacing;
 
-	internal bool _showSpacing;
+	internal bool _showEndSpacing;
 	internal bool _showLegends;
 	internal bool _showLegendsAbbr;
 
@@ -423,8 +423,7 @@ public class Slider<T> : View {
 
 		LayoutComplete += (s, e) => {
 			CalcSpacingConfig ();
-			AdjustBestHeight ();
-			AdjustBestWidth ();
+			SetBoundsBestFit ();
 		};
 	}
 	#endregion
@@ -455,7 +454,9 @@ public class Slider<T> : View {
 		set {
 			_config._autoSize = value;
 			if (IsInitialized) {
-				SuperView?.LayoutSubviews ();
+				CalcSpacingConfig ();
+				SetBoundsBestFit ();
+				SetRelativeLayout (SuperView.Bounds);
 			}
 		}
 	}
@@ -467,10 +468,11 @@ public class Slider<T> : View {
 		get => _config._innerSpacing;
 		set {
 			_config._innerSpacing = value;
-			CalcSpacingConfig ();
-			Adjust ();
-			SetNeedsDisplay ();
-			SuperView?.SetNeedsLayout ();
+			if (IsInitialized) {
+				CalcSpacingConfig ();
+				SetBoundsBestFit ();
+				SetRelativeLayout (SuperView.Bounds);
+			}
 		}
 	}
 
@@ -484,7 +486,6 @@ public class Slider<T> : View {
 
 			// Todo: Custom logic to preserve options.
 			_setOptions.Clear ();
-
 			SetNeedsDisplay ();
 		}
 	}
@@ -516,9 +517,8 @@ public class Slider<T> : View {
 			SetKeyBindings ();
 			if (IsInitialized) {
 				CalcSpacingConfig ();
-				Adjust ();
-				SetNeedsDisplay ();
-				SuperView?.SetNeedsLayout ();
+				SetBoundsBestFit ();
+				SetRelativeLayout (SuperView.Bounds);
 			}
 		}
 		return args.Cancel;
@@ -531,10 +531,11 @@ public class Slider<T> : View {
 		get => _config._legendsOrientation;
 		set {
 			_config._legendsOrientation = value;
-			CalcSpacingConfig ();
-			Adjust ();
-			SetNeedsDisplay ();
-			SuperView?.SetNeedsLayout ();
+			if (IsInitialized) {
+				CalcSpacingConfig ();
+				SetBoundsBestFit ();
+				SetRelativeLayout (SuperView.Bounds);
+			}
 		}
 	}
 
@@ -564,14 +565,13 @@ public class Slider<T> : View {
 			// _options should never be null
 			_options = value ?? throw new ArgumentNullException (nameof (value));
 
-			if (_options.Count == 0) {
+			if (!IsInitialized || _options.Count == 0) {
 				return;
 			}
 
 			CalcSpacingConfig ();
-			Adjust ();
-			SetNeedsDisplay ();
-			SuperView?.SetNeedsLayout ();
+			SetBoundsBestFit ();
+			SetRelativeLayout (SuperView.Bounds);
 		}
 	}
 
@@ -586,10 +586,10 @@ public class Slider<T> : View {
 	/// <summary>
 	/// Show/Hide spacing before and after the first and last option.
 	/// </summary>
-	public bool ShowSpacing {
-		get => _config._showSpacing;
+	public bool ShowEndSpacing {
+		get => _config._showEndSpacing;
 		set {
-			_config._showSpacing = value;
+			_config._showEndSpacing = value;
 			SetNeedsDisplay ();
 		}
 	}
@@ -601,7 +601,8 @@ public class Slider<T> : View {
 		get => _config._showLegends;
 		set {
 			_config._showLegends = value;
-			Adjust ();
+			SetBoundsBestFit ();
+			SetRelativeLayout (SuperView.Bounds);
 		}
 	}
 
@@ -709,6 +710,9 @@ public class Slider<T> : View {
 	internal void CalcSpacingConfig ()
 	{
 		int size = 0;
+		_config._innerSpacing = 0;
+		_config._startSpacing = 0;
+		_config._endSpacing = 0;
 
 		if (_options.Count == 0 || !IsInitialized) {
 			return;
@@ -782,7 +786,7 @@ public class Slider<T> : View {
 
 		_config._startSpacing = first_left;
 		if (_options.Count == 1) {
-			_config._innerSpacing = Math.Max (0, width - 1);
+			_config._innerSpacing = max_legend;
 		} else {
 			_config._innerSpacing = Math.Max (0, (int)Math.Floor ((double)width / (_options.Count - 1)) - 1);
 		}
@@ -791,16 +795,17 @@ public class Slider<T> : View {
 	}
 
 	/// <summary>
-	/// Adjust the height of the Slider to the best value.
+	/// Adjust the dimensions of the Slider to the best value if <see cref="AutoSize"/> is true.
 	///</summary>
-	public void AdjustBestHeight ()
+	public void SetBoundsBestFit ()
 	{
 		if (!IsInitialized || AutoSize == false) {
 			return;
 		}
 		// Hack???  Otherwise we can't go back to Dim.Absolute.
 		LayoutStyle = LayoutStyle.Absolute;
-
+		Width = 0;
+		Height = 0;
 		if (_config._sliderOrientation == Orientation.Horizontal) {
 			Bounds = new Rect (Bounds.Location,
 				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcBestLength ()),
@@ -810,42 +815,7 @@ public class Slider<T> : View {
 				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcThickness ()),
 					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical, CalcBestLength ())));
 		}
-
 		LayoutStyle = LayoutStyle.Computed;
-	}
-
-	/// <summary>
-	/// Adjust the height of the Slider to the best value. (Only works if height is DimAbsolute).
-	///</summary>
-	public void AdjustBestWidth ()
-	{
-		if (!IsInitialized || AutoSize == false) {
-			return;
-		}
-		LayoutStyle = LayoutStyle.Absolute;
-
-		if (_config._sliderOrientation == Orientation.Horizontal) {
-			Bounds = new Rect (Bounds.Location,
-				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness().Horizontal, CalcBestLength ()),
-					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical, CalcThickness ())));
-		} else {
-			Bounds = new Rect (Bounds.Location,
-				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcThickness ()),
-					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical, CalcBestLength ())));
-		}
-
-		LayoutStyle = LayoutStyle.Computed;
-	}
-
-	void Adjust ()
-	{
-		if (Width is Dim.DimAbsolute) {
-			AdjustBestWidth ();
-		}
-
-		if (Height is Dim.DimAbsolute) {
-			AdjustBestHeight ();
-		}
 	}
 
 	/// <summary>
@@ -880,7 +850,7 @@ public class Slider<T> : View {
 		if (_config._showLegends) {
 			int max_legend = 1;
 			if (_config._legendsOrientation == _config._sliderOrientation && _options.Count > 0) {
-				max_legend = int.Max (_options.Max (s => s.Legend?.Length ?? 1), 1);
+				max_legend = int.Max (_options.Max (s => s.Legend?.Length + 1 ?? 1), 1);
 				length += max_legend * (_options.Count);
 				//length += (max_legend / 2);
 			} else {
@@ -1095,7 +1065,7 @@ public class Slider<T> : View {
 		bool isSet = _setOptions.Count > 0;
 
 		// Left Spacing
-		if (_config._showSpacing && _config._startSpacing > 0) {
+		if (_config._showEndSpacing && _config._startSpacing > 0) {
 
 			Driver?.SetAttribute (isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Attribute ?? normalAttr : _style.SpaceChar.Attribute ?? normalAttr);
 			var rune = isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
@@ -1177,7 +1147,7 @@ public class Slider<T> : View {
 				}
 
 				// Draw Spacing
-				if (_config._showSpacing || i < _options.Count - 1) {
+				if (_config._showEndSpacing || i < _options.Count - 1) {
 					// Skip if is the Last Spacing.
 					Driver?.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setAtrr : _style.SpaceChar.Attribute ?? normalAttr);
 					for (int s = 0; s < _config._innerSpacing; s++) {
@@ -1194,7 +1164,7 @@ public class Slider<T> : View {
 
 		int remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
 		// Right Spacing
-		if (_config._showSpacing) {
+		if (_config._showEndSpacing) {
 			Driver?.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalAttr : _style.SpaceChar.Attribute ?? normalAttr);
 			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
 			for (int i = 0; i < remaining; i++) {
@@ -1223,12 +1193,12 @@ public class Slider<T> : View {
 		// Attributes
 		var normalAttr = new Attribute (Color.White, Color.Black);
 		var setAttr = new Attribute (Color.Black, Color.White);
+		var spaceAttr = normalAttr; 
 		if (IsInitialized) {
 			normalAttr = _style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
 			setAttr = _style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
+			spaceAttr = _style.LegendAttributes.EmptyAttribute ?? normalAttr;
 		}
-		var spaceScheme = normalAttr; // style.LegendStyle.EmptyAttribute ?? normalScheme;
-
 
 		bool isTextVertical = _config._legendsOrientation == Orientation.Vertical;
 		bool isSet = _setOptions.Count > 0;
@@ -1369,7 +1339,7 @@ public class Slider<T> : View {
 			}
 
 			// Option Right Spacing of Option
-			Driver?.SetAttribute (spaceScheme);
+			Driver?.SetAttribute (spaceAttr);
 			if (isTextVertical) {
 				y += legend_right_spaces_count;
 			} else {

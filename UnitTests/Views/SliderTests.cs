@@ -160,7 +160,7 @@ public class SliderTests {
 		Assert.Equal (Orientation.Horizontal, slider.Orientation);
 		Assert.False (slider.AllowEmpty);
 		Assert.True (slider.ShowLegends);
-		Assert.False (slider.ShowSpacing);
+		Assert.False (slider.ShowEndSpacing);
 		Assert.Equal (SliderType.Single, slider.Type);
 		Assert.Equal (0, slider.InnerSpacing);
 		Assert.False (slider.AutoSize);
