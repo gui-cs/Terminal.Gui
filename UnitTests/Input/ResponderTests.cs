@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -6,7 +7,8 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.InputTests;
 
 public class ResponderTests {
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void New_Initializes ()
 	{
 		var r = new Responder ();
@@ -19,7 +21,8 @@ public class ResponderTests {
 		r.Dispose ();
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void New_Methods_Return_False ()
 	{
 		var r = new View ();
@@ -59,7 +62,8 @@ public class ResponderTests {
 	}
 
 	// Generic lifetime (IDisposable) tests
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Dispose_Works ()
 	{
 
@@ -83,7 +87,8 @@ public class ResponderTests {
 		}
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void IsOverridden_False_IfNotOverridden ()
 	{
 		// MouseEvent IS defined on Responder but NOT overridden
@@ -106,17 +111,18 @@ public class ResponderTests {
 #endif
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void IsOverridden_True_IfOverridden ()
 	{
 		// MouseEvent is defined on Responder IS overriden on ScrollBarView (but not View)
 		Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides MouseEvent" }, "MouseEvent"));
 
-		//// OnKeyDown is defined on View
-		//Assert.True (Responder.IsOverridden (new View () { Text = "View overrides OnKeyDown" }, "OnKeyDown"));
+		// OnKeyDown is defined on View
+		Assert.False (Responder.IsOverridden (new View () { Text = "View overrides OnKeyDown" }, "OnKeyDown"));
 
-		//// OnKeyDown is defined on DerivedView
-		//Assert.True (Responder.IsOverridden (new DerivedView () { Text = "DerivedView overrides OnKeyDown" }, "OnKeyDown"));
+		// OnKeyDown is defined on DerivedView
+		Assert.True (Responder.IsOverridden (new DerivedView () { Text = "DerivedView overrides OnKeyDown" }, "OnKeyDown"));
 
 		// ScrollBarView overrides both MouseEvent (from Responder) and Redraw (from View)
 		Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides MouseEvent" }, "MouseEvent"));
@@ -133,9 +139,6 @@ public class ResponderTests {
 	[Fact]
 	public void Responder_Not_Notifying_Dispose ()
 	{
-		// Only clear before because need to test after assert
-		Responder.Instances.Clear ();
-
 		var container1 = new View () { Id = "Container1" };
 
 		var view = new View () { Id = "View" };
@@ -172,9 +175,6 @@ public class ResponderTests {
 	[Fact]
 	public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
 	{
-		// Only clear before because need to test after assert
-		Responder.Instances.Clear ();
-
 		var container1 = new View () { Id = "Container1" };
 
 		var view = new View () { Id = "View" };
@@ -212,9 +212,6 @@ public class ResponderTests {
 	[Fact]
 	public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
 	{
-		// Only clear before because need to test after assert
-		Responder.Instances.Clear ();
-
 		var container1 = new View () { Id = "Container1" };
 		var count = 0;
 

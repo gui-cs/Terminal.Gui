@@ -194,7 +194,9 @@ namespace Terminal.Gui {
 
 				// Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using the absolute value 0
 			}
-			LayoutSubviews ();
+			if (IsInitialized) {
+				LayoutSubviews ();
+			}
 			SetNeedsDisplay ();
 		}
 
@@ -297,7 +299,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public void EnsureSelectedTabIsVisible ()
 		{
-			if (SelectedTab == null) {
+			if (!IsInitialized || SelectedTab == null) {
 				return;
 			}
 
