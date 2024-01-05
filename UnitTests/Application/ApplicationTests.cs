@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -17,7 +18,9 @@ public class ApplicationTests {
 
 	public ApplicationTests (ITestOutputHelper output)
 	{
-		this._output = output;
+		_output = output;
+		ConsoleDriver.RunningUnitTests = true;
+
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -52,10 +55,7 @@ public class ApplicationTests {
 		Assert.NotNull (SynchronizationContext.Current);
 	}
 
-	void Shutdown ()
-	{
-		Application.Shutdown ();
-	}
+	void Shutdown () => Application.Shutdown ();
 
 	[Fact]
 	public void Init_Shutdown_Cleans_Up ()
@@ -73,10 +73,10 @@ public class ApplicationTests {
 		// Verify state is back to initial
 		//Pre_Init_State ();
 #if DEBUG_IDISPOSABLE
-			// Validate there are no outstanding Responder-based instances 
-			// after a scenario was selected to run. This proves the main UI Catalog
-			// 'app' closed cleanly.
-			Assert.Empty (Responder.Instances);
+		// Validate there are no outstanding Responder-based instances 
+		// after a scenario was selected to run. This proves the main UI Catalog
+		// 'app' closed cleanly.
+		Assert.Empty (Responder.Instances);
 #endif
 	}
 
@@ -106,10 +106,7 @@ public class ApplicationTests {
 	}
 
 	class TestToplevel : Toplevel {
-		public TestToplevel ()
-		{
-			IsOverlappedContainer = false;
-		}
+		public TestToplevel () => IsOverlappedContainer = false;
 	}
 
 	[Fact]
@@ -119,6 +116,21 @@ public class ApplicationTests {
 
 		Assert.NotNull (Application.Driver);
 
+		Shutdown ();
+	}
+
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	[InlineData (typeof (NetDriver))]
+	//[InlineData (typeof (ANSIDriver))]
+	[InlineData (typeof (WindowsDriver))]
+	[InlineData (typeof (CursesDriver))]
+	public void Init_DriverName_Should_Pick_Correct_Driver (Type driverType)
+	{
+		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+		Application.Init (driverName: driverType.Name);
+		Assert.NotNull (Application.Driver);
+		Assert.Equal (driverType, Application.Driver.GetType ());
 		Shutdown ();
 	}
 
@@ -140,7 +152,7 @@ public class ApplicationTests {
 		};
 		Application.NotifyNewRunState += NewRunStateFn;
 
-		Toplevel topLevel = new Toplevel ();
+		var topLevel = new Toplevel ();
 		var rs = Application.Begin (topLevel);
 		Assert.NotNull (rs);
 		Assert.NotNull (runstate);
@@ -225,7 +237,6 @@ public class ApplicationTests {
 	}
 
 	#region RunTests
-
 	[Fact]
 	public void Run_T_After_InitWithDriver_with_TopLevel_Throws ()
 	{
@@ -249,7 +260,7 @@ public class ApplicationTests {
 		Init ();
 
 		// Run<Toplevel> when already initialized with a Driver will throw (because Toplevel is not dervied from TopLevel)
-		Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (errorHandler: null, new FakeDriver ()));
+		Assert.Throws<ArgumentException> (() => Application.Run<Toplevel> (null, new FakeDriver ()));
 
 		Shutdown ();
 
@@ -281,7 +292,7 @@ public class ApplicationTests {
 	[Fact]
 	public void Run_T_After_InitNullDriver_with_TestTopLevel_Throws ()
 	{
-		Application._forceFakeConsole = true;
+		Application.ForceDriver = "FakeDriver";
 
 		Application.Init (null);
 		Assert.Equal (typeof (FakeDriver), Application.Driver.GetType ());
@@ -324,7 +335,7 @@ public class ApplicationTests {
 	[Fact]
 	public void Run_T_NoInit_DoesNotThrow ()
 	{
-		Application._forceFakeConsole = true;
+		Application.ForceDriver = "FakeDriver";
 
 		Application.Iteration += (s, a) => {
 			Application.RequestStop ();
@@ -348,7 +359,7 @@ public class ApplicationTests {
 		};
 
 		// Init has NOT been called and we're passing a valid driver to Run<TestTopLevel>. This is ok.
-		Application.Run<TestToplevel> (errorHandler: null, new FakeDriver ());
+		Application.Run<TestToplevel> (null, new FakeDriver ());
 
 		Shutdown ();
 
@@ -410,7 +421,7 @@ public class ApplicationTests {
 	{
 		Init ();
 		var top = Application.Top;
-		var count = 0;
+		int count = 0;
 		top.Loaded += (s, e) => count++;
 		top.Ready += (s, e) => count++;
 		top.Unloaded += (s, e) => count++;
@@ -425,12 +436,12 @@ public class ApplicationTests {
 	public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
 	{
 		Init ();
-		var count = 0;
+		int count = 0;
 		// Don't use Dialog here as it has more layout logic. Use Window instead.
 		Dialog d = null;
 		var top = Application.Top;
 		top.DrawContent += (s, a) => count++;
-		var iteration = -1;
+		int iteration = -1;
 		Application.Iteration += (s, a) => {
 			iteration++;
 			if (iteration == 0) {
@@ -439,7 +450,7 @@ public class ApplicationTests {
 				d.DrawContent += (s, a) => count++;
 				Application.Run (d);
 			} else if (iteration < 3) {
-				Application.OnMouseEvent (new (new () { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }));
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent { X = 0, Y = 0, Flags = MouseFlags.ReportMousePosition }));
 				Assert.False (top.NeedsDisplay);
 				Assert.False (top.SubViewNeedsDisplay);
 				Assert.False (top.LayoutNeeded);
@@ -521,7 +532,6 @@ public class ApplicationTests {
 	}
 
 	// TODO: Add tests for Run that test errorHandler
-
 	#endregion
 
 	#region ShutdownTests
@@ -556,7 +566,7 @@ public class ApplicationTests {
 	}
 	#endregion
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Begin_Sets_Application_Top_To_Console_Size ()
 	{
 		Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
@@ -580,7 +590,7 @@ public class ApplicationTests {
 		var t4 = new Toplevel ();
 
 		// t1, t2, t3, d, t4
-		var iterations = 5;
+		int iterations = 5;
 
 		t1.Ready += (s, e) => {
 			Assert.Equal (t1, Application.Top);
@@ -667,7 +677,7 @@ public class ApplicationTests {
 		var rs = Application.Begin (top);
 		bool firstIteration = false;
 
-		var actionCalled = 0;
+		int actionCalled = 0;
 		Application.Invoke (() => { actionCalled++; });
 		Application.MainLoop.Running = true;
 		Application.RunIteration (ref rs, ref firstIteration);

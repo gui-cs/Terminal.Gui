@@ -257,7 +257,7 @@ public static partial class ConfigurationManager {
 
 	/// <summary>
 	/// Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session
-	/// (e.g. in <see cref="Application.Init(ConsoleDriver)"/> starts. Called by <see cref="Load"/>
+	/// (e.g. in <see cref="Application.Init"/> starts. Called by <see cref="Load"/>
 	/// if the <c>reset</c> parameter is <see langword="true"/>.
 	/// </summary>
 	/// <remarks>
@@ -412,7 +412,9 @@ public static partial class ConfigurationManager {
 	{
 		Debug.WriteLine ($"ConfigurationManager.Load()");
 
-		if (reset) Reset ();
+		if (reset) {
+			Reset ();
+		}
 
 		// LibraryResources is always loaded by Reset
 		if (Locations == ConfigLocations.All) {
