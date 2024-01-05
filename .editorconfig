@@ -83,6 +83,15 @@ csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
 csharp_style_var_for_built_in_types = false:silent
+resharper_xmldoc_indent_size = 2
+resharper_xmldoc_indent_style = space
+resharper_xmldoc_indent_text = DoNotTouch
+resharper_xmldoc_linebreaks_inside_tags_for_elements_longer_than = 120
+resharper_xmldoc_max_blank_lines_between_tags = 1
+resharper_xmldoc_max_line_length = 100
+resharper_xmldoc_space_before_self_closing = false
+resharper_xmldoc_tab_width = 2
+resharper_xmldoc_use_indent_from_vs = true
 
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line

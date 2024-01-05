@@ -361,9 +361,6 @@ public class SliderTests {
 		// 7 |
 		// 8 |
 		// 9 4
-		slider.CalcSpacingConfig ();
-
-		// Arrange
 
 		// Act
 		bool result = slider.TryGetOptionByPosition (x, y, threshold, out int option);
