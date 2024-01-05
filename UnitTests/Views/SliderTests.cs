@@ -19,9 +19,9 @@ public class SliderOptionTests {
 	public void Slider_Option_Values_Constructor ()
 	{
 		var o = new SliderOption<int> ("1 thousand", new Rune ('y'), 1000);
-		Assert.Equal ("1 thousand", o.Legend);
+		Assert.Equal ("1 thousand",   o.Legend);
 		Assert.Equal (new Rune ('y'), o.LegendAbbr);
-		Assert.Equal (1000, o.Data);
+		Assert.Equal (1000,           o.Data);
 	}
 
 	[Fact]
@@ -161,7 +161,7 @@ public class SliderTests {
 		Assert.True (slider.ShowLegends);
 		Assert.False (slider.ShowEndSpacing);
 		Assert.Equal (SliderType.Single, slider.Type);
-		Assert.Equal (0, slider.InnerSpacing);
+		Assert.Equal (0,                 slider.InnerSpacing);
 		Assert.False (slider.AutoSize);
 		Assert.Equal (0, slider.FocusedOption);
 	}
@@ -234,7 +234,7 @@ public class SliderTests {
 		slider.OnOptionFocused (newFocusedOption, args);
 
 		// Assert
-		Assert.True (eventRaised); // Event should be raised
+		Assert.True (eventRaised);                             // Event should be raised
 		Assert.Equal (newFocusedOption, slider.FocusedOption); // Focused option should change
 
 		// Create args with cancel set to true
@@ -247,7 +247,7 @@ public class SliderTests {
 		slider.OnOptionFocused (2, args);
 
 		// Assert
-		Assert.True (eventRaised); // Event should be raised
+		Assert.True (eventRaised);                             // Event should be raised
 		Assert.Equal (newFocusedOption, slider.FocusedOption); // Focused option should not change
 	}
 
