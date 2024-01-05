@@ -1061,6 +1061,8 @@ internal class WindowsDriver : ConsoleDriver {
 
 			if (keyInfo.KeyChar == 0) {
 				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
+			} else if (keyInfo.Key != ConsoleKey.None) {
+				return MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)(keyInfo.KeyChar));
 			} else {
 				return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)(keyInfo.KeyChar));
 			}
