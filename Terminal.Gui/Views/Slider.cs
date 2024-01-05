@@ -776,7 +776,7 @@ public class Slider<T> : View {
 		// Left = He
 		// Right = lo
 		var first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
-		var last_right = last.Length        / 2; // Chars count of the last option to the right.
+		var last_right = last.Length / 2;        // Chars count of the last option to the right.
 
 		if (_config._sliderOrientation != _config._legendsOrientation) {
 			first_left = 0;
@@ -811,11 +811,11 @@ public class Slider<T> : View {
 		if (_config._sliderOrientation == Orientation.Horizontal) {
 			Bounds = new Rect (Bounds.Location,
 				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcBestLength ()),
-					int.Min (SuperView.Bounds.Height  - GetFramesThickness ().Vertical,   CalcThickness ())));
+					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical,    CalcThickness ())));
 		} else {
 			Bounds = new Rect (Bounds.Location,
 				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcThickness ()),
-					int.Min (SuperView.Bounds.Height  - GetFramesThickness ().Vertical,   CalcBestLength ())));
+					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical,    CalcBestLength ())));
 		}
 		LayoutStyle = LayoutStyle.Computed;
 	}
@@ -1052,13 +1052,13 @@ public class Slider<T> : View {
 		var normalAttr = new Attribute (Color.White, Color.Black);
 		var setAtrr = new Attribute (Color.Black,    Color.White);
 		if (IsInitialized) {
-			normalAttr = ColorScheme?.Normal  ?? Application.Current.ColorScheme.Normal;
+			normalAttr = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
 			setAtrr = Style.SetChar.Attribute ?? ColorScheme.HotNormal;
 		}
 
-		var isVertical = _config._sliderOrientation         == Orientation.Vertical;
+		var isVertical = _config._sliderOrientation == Orientation.Vertical;
 		var isLegendsVertical = _config._legendsOrientation == Orientation.Vertical;
-		var isReverse = _config._sliderOrientation          != _config._legendsOrientation;
+		var isReverse = _config._sliderOrientation != _config._legendsOrientation;
 
 		var x = 0;
 		var y = 0;
@@ -1069,7 +1069,7 @@ public class Slider<T> : View {
 		if (_config._showEndSpacing && _config._startSpacing > 0) {
 
 			Driver?.SetAttribute (isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Attribute ?? normalAttr : Style.SpaceChar.Attribute ?? normalAttr);
-			var rune = isSet            && _config._type == SliderType.LeftRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
+			var rune = isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
 
 			for (var i = 0; i < _config._startSpacing; i++) {
 				MoveAndAdd (x, y, rune);
@@ -1100,10 +1100,10 @@ public class Slider<T> : View {
 				if (isSet) {
 					switch (_config._type) {
 					case SliderType.LeftRange when i <= _setOptions [0]:
-						drawRange = i            < _setOptions [0];
+						drawRange = i < _setOptions [0];
 						break;
 					case SliderType.RightRange when i >= _setOptions [0]:
-						drawRange = i             >= _setOptions [0];
+						drawRange = i >= _setOptions [0];
 						break;
 					case SliderType.Range when _setOptions.Count == 1:
 						drawRange = false;
@@ -1119,7 +1119,7 @@ public class Slider<T> : View {
 
 				// Draw Option
 				Driver?.SetAttribute (isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAtrr : drawRange
-					? Style.RangeChar.Attribute                                               ?? setAtrr : Style.OptionChar.Attribute ?? normalAttr);
+					? Style.RangeChar.Attribute ?? setAtrr : Style.OptionChar.Attribute ?? normalAttr);
 
 				// Note(jmperricone): Maybe only for curses, windows inverts actual colors, while curses inverts bg with fg.
 				//if (Application.Driver is CursesDriver) {
@@ -1164,7 +1164,7 @@ public class Slider<T> : View {
 		// Right Spacing
 		if (_config._showEndSpacing) {
 			Driver?.SetAttribute (isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Attribute ?? normalAttr : Style.SpaceChar.Attribute ?? normalAttr);
-			var rune = isSet            && _config._type == SliderType.RightRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
+			var rune = isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
 			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) {
@@ -1193,13 +1193,13 @@ public class Slider<T> : View {
 		var setAttr = new Attribute (Color.Black,    Color.White);
 		var spaceAttr = normalAttr;
 		if (IsInitialized) {
-			normalAttr = Style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal    ?? ColorScheme.Disabled;
-			setAttr = Style.LegendAttributes.SetAttribute       ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
-			spaceAttr = Style.LegendAttributes.EmptyAttribute   ?? normalAttr;
+			normalAttr = Style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
+			setAttr = Style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
+			spaceAttr = Style.LegendAttributes.EmptyAttribute ?? normalAttr;
 		}
 
 		var isTextVertical = _config._legendsOrientation == Orientation.Vertical;
-		var isSet = _setOptions.Count                    > 0;
+		var isSet = _setOptions.Count > 0;
 
 		var x = 0;
 		var y = 0;
@@ -1286,7 +1286,7 @@ public class Slider<T> : View {
 			}
 
 			// Text
-			var legend_left_spaces_count = text.TakeWhile (e => e             == ' ').Count ();
+			var legend_left_spaces_count = text.TakeWhile (e => e == ' ').Count ();
 			var legend_right_spaces_count = text.Reverse ().TakeWhile (e => e == ' ').Count ();
 			text = text.Trim ();
 
@@ -1369,8 +1369,8 @@ public class Slider<T> : View {
 		//       adss to much friction to UI.
 		// TODO(jmperricone): Make Range Type work with mouse.
 
-		if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)      ||
-		      mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)      ||
+		if (!(mouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked) ||
+		      mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) ||
 		      mouseEvent.Flags.HasFlag (MouseFlags.ReportMousePosition) ||
 		      mouseEvent.Flags.HasFlag (MouseFlags.Button1Released))) {
 			return false;
@@ -1383,13 +1383,13 @@ public class Slider<T> : View {
 			if (Orientation == Orientation.Horizontal) {
 				var left = _config._startSpacing;
 				var width = _options.Count + (_options.Count - 1) * _config._innerSpacing;
-				var right = left + width   - 1;
+				var right = left + width - 1;
 				var clampedX = Clamp (position.X, left, right);
 				position = new Point (clampedX, 0);
 			} else {
 				var top = _config._startSpacing;
 				var height = _options.Count + (_options.Count - 1) * _config._innerSpacing;
-				var bottom = top + height   - 1;
+				var bottom = top + height - 1;
 				var clampedY = Clamp (position.Y, top, bottom);
 				position = new Point (0, clampedY);
 			}
@@ -1484,10 +1484,10 @@ public class Slider<T> : View {
 			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
 			KeyBindings.Remove (KeyCode.CursorUp);
 
-			KeyBindings.Add (KeyCode.CursorRight   | KeyCode.CtrlMask, Command.RightExtend);
+			KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.RightExtend);
 			KeyBindings.Remove (KeyCode.CursorDown | KeyCode.CtrlMask);
-			KeyBindings.Add (KeyCode.CursorLeft    | KeyCode.CtrlMask, Command.LeftExtend);
-			KeyBindings.Remove (KeyCode.CursorUp   | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorLeft | KeyCode.CtrlMask, Command.LeftExtend);
+			KeyBindings.Remove (KeyCode.CursorUp | KeyCode.CtrlMask);
 		} else {
 			KeyBindings.Remove (KeyCode.CursorRight);
 			KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
@@ -1495,9 +1495,9 @@ public class Slider<T> : View {
 			KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
 
 			KeyBindings.Remove (KeyCode.CursorRight | KeyCode.CtrlMask);
-			KeyBindings.Add (KeyCode.CursorDown     | KeyCode.CtrlMask, Command.RightExtend);
-			KeyBindings.Remove (KeyCode.CursorLeft  | KeyCode.CtrlMask);
-			KeyBindings.Add (KeyCode.CursorUp       | KeyCode.CtrlMask, Command.LeftExtend);
+			KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.RightExtend);
+			KeyBindings.Remove (KeyCode.CursorLeft | KeyCode.CtrlMask);
+			KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LeftExtend);
 
 		}
 		KeyBindings.Add (KeyCode.Home,  Command.LeftHome);
