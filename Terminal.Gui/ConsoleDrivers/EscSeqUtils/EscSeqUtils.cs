@@ -170,10 +170,10 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column of the y line
 	/// </summary>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
+	/// <param name="row">Origin is (1,1).</param>
+	/// <param name="col">Origin is (1,1).</param>
 	/// <returns></returns>
-	public static string CSI_SetCursorPosition (int y, int x) => $"{CSI}{y};{x}H";
+	public static string CSI_SetCursorPosition (int row, int col) => $"{CSI}{row};{col}H";
 
 
 	//ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
@@ -249,14 +249,28 @@ public static class EscSeqUtils {
 	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
 
 	/// <summary>
+	/// ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])" /> to set the foreground color.
+	/// </summary>
+	/// <param name="code">One of the 16 color codes.</param>
+	/// <returns></returns>
+	public static string CSI_SetForegroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code);
+
+	/// <summary>
+	/// ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])" /> to set the background color.
+	/// </summary>
+	/// <param name="code">One of the 16 color codes.</param>
+	/// <returns></returns>
+	public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code+10);
+
+	/// <summary>
 	/// ESC[38;5;{id}m - Set foreground color (256 colors)
 	/// </summary>
-	public static string CSI_SetForegroundColor (int id) => $"{CSI}38;5;{id}m";
+	public static string CSI_SetForegroundColor256 (int color) => $"{CSI}38;5;{color}m";
 
 	/// <summary>
 	/// ESC[48;5;{id}m - Set background color (256 colors)
 	/// </summary>
-	public static string CSI_SetBackgroundColor (int id) => $"{CSI}48;5;{id}m";
+	public static string CSI_SetBackgroundColor256 (int color) => $"{CSI}48;5;{color}m";
 
 	/// <summary>
 	/// ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.

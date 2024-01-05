@@ -837,9 +837,8 @@ class NetDriver : ConsoleDriver {
 						} else if (lastCol == -1) {
 							lastCol = col;
 						}
-						if (lastCol + 1 < cols) {
+						if (lastCol + 1 < cols)
 							lastCol++;
-						}
 						continue;
 					}
 
@@ -1167,10 +1166,6 @@ class NetDriver : ConsoleDriver {
 				// and passing on Shift would be redundant.
 				return MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.KeyChar);
 			}
-			break;
-
-
-			return (KeyCode)(uint)keyInfo.KeyChar;
 		}
 
 		var key = keyInfo.Key;
