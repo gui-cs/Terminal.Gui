@@ -12,17 +12,14 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.DriverTests;
 
 public class MainLoopDriverTests {
-
-	public MainLoopDriverTests (ITestOutputHelper output)
-	{
-		ConsoleDriver.RunningUnitTests = true;
-	}
+	public MainLoopDriverTests (ITestOutputHelper output) => ConsoleDriver.RunningUnitTests = true;
 
 	[Theory]
 	[InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_Constructs_Disposes (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -45,20 +42,21 @@ public class MainLoopDriverTests {
 		Assert.Empty (mainLoop.Timeouts);
 		Assert.False (mainLoop.Running);
 	}
-	
+
 	[Theory]
 	[InlineData (typeof (FakeDriver), typeof (FakeMainLoop))]
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_AddTimeout_ValidParameters_ReturnsToken (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
-		var callbackInvoked = false;
+		bool callbackInvoked = false;
 
-		var token = mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
+		object token = mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), () => {
 			callbackInvoked = true;
 			return false;
 		});
@@ -77,14 +75,15 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_RemoveTimeout_ValidToken_ReturnsTrue (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
 
-		var token = mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
-		var result = mainLoop.RemoveTimeout (token);
+		object token = mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
+		bool result = mainLoop.RemoveTimeout (token);
 
 		Assert.True (result);
 		mainLoop.Dispose ();
@@ -95,13 +94,14 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_RemoveTimeout_InvalidToken_ReturnsFalse (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
 
-		var result = mainLoop.RemoveTimeout (new object ());
+		bool result = mainLoop.RemoveTimeout (new object ());
 
 		Assert.False (result);
 	}
@@ -111,12 +111,13 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_AddIdle_ValidIdleHandler_ReturnsToken (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
-		var idleHandlerInvoked = false;
+		bool idleHandlerInvoked = false;
 
 		bool IdleHandler ()
 		{
@@ -124,7 +125,7 @@ public class MainLoopDriverTests {
 			return false;
 		}
 
-		Func<bool> token = mainLoop.AddIdle (IdleHandler);
+		var token = mainLoop.AddIdle (IdleHandler);
 
 		Assert.NotNull (token);
 		Assert.False (idleHandlerInvoked); // Idle handler should not be invoked immediately
@@ -138,6 +139,7 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_RemoveIdle_ValidToken_ReturnsTrue (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -145,8 +147,8 @@ public class MainLoopDriverTests {
 		var mainLoop = new MainLoop (mainLoopDriver);
 
 		bool IdleHandler () => false;
-		Func<bool> token = mainLoop.AddIdle (IdleHandler);
-		var result = mainLoop.RemoveIdle (token);
+		var token = mainLoop.AddIdle (IdleHandler);
+		bool result = mainLoop.RemoveIdle (token);
 
 		Assert.True (result);
 		mainLoop.Dispose ();
@@ -157,13 +159,14 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_RemoveIdle_InvalidToken_ReturnsFalse (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
 
-		var result = mainLoop.RemoveIdle (() => false);
+		bool result = mainLoop.RemoveIdle (() => false);
 
 		Assert.False (result);
 		mainLoop.Dispose ();
@@ -174,14 +177,15 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_RunIteration_ValidIdleHandler_CallsIdleHandler (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
-		var idleHandlerInvoked = false;
+		bool idleHandlerInvoked = false;
 
-		Func<bool> idleHandler = () => {
+		var idleHandler = () => {
 			idleHandlerInvoked = true;
 			return false;
 		};
@@ -198,13 +202,14 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_CheckTimersAndIdleHandlers_NoTimersOrIdleHandlers_ReturnsFalse (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
 		var mainLoop = new MainLoop (mainLoopDriver);
 
-		var result = mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout);
+		bool result = mainLoop.CheckTimersAndIdleHandlers (out int waitTimeout);
 
 		Assert.False (result);
 		Assert.Equal (-1, waitTimeout);
@@ -216,6 +221,7 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_CheckTimersAndIdleHandlers_TimersActive_ReturnsTrue (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -223,7 +229,7 @@ public class MainLoopDriverTests {
 		var mainLoop = new MainLoop (mainLoopDriver);
 
 		mainLoop.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
-		var result = mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout);
+		bool result = mainLoop.CheckTimersAndIdleHandlers (out int waitTimeout);
 
 		Assert.True (result);
 		Assert.True (waitTimeout >= 0);
@@ -235,6 +241,7 @@ public class MainLoopDriverTests {
 	[InlineData (typeof (NetDriver), typeof (NetMainLoop))]
 	[InlineData (typeof (CursesDriver), typeof (UnixMainLoop))]
 	[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
+	//[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
 	public void MainLoop_CheckTimersAndIdleHandlers_IdleHandlersActive_ReturnsTrue (Type driverType, Type mainLoopDriverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -242,7 +249,7 @@ public class MainLoopDriverTests {
 		var mainLoop = new MainLoop (mainLoopDriver);
 
 		mainLoop.AddIdle (() => false);
-		var result = mainLoop.CheckTimersAndIdleHandlers (out var waitTimeout);
+		bool result = mainLoop.CheckTimersAndIdleHandlers (out int waitTimeout);
 
 		Assert.True (result);
 		Assert.Equal (-1, waitTimeout);

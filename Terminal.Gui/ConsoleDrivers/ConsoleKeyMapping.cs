@@ -90,6 +90,10 @@ public static class ConsoleKeyMapping {
 	[DllImport ("user32.dll")]
 	extern static bool GetKeyboardLayoutName ([Out] StringBuilder pwszKLID);
 
+	/// <summary>
+	/// Retrieves the name of the active input locale identifier (formerly called the keyboard layout) for the calling thread.
+	/// </summary>
+	/// <returns></returns>
 	public static string GetKeyboardLayoutName ()
 	{
 		if (Environment.OSVersion.Platform != PlatformID.Win32NT) {
