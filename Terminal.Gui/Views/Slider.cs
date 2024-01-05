@@ -49,6 +49,25 @@ public class SliderOption<T> {
 	public T Data { get; set; }
 
 	/// <summary>
+	/// Creates a new empty instance of the <see cref="SliderOption{T}"/> class.
+	/// </summary>
+	public SliderOption ()
+	{
+
+	}
+
+	/// <summary>
+	/// Creates a new instance of the <see cref="SliderOption{T}"/> class with values for
+	/// each property.
+	/// </summary>
+	public SliderOption (string legend, Rune legendAbbr, T data)
+	{
+		Legend = legend;
+		LegendAbbr = legendAbbr;
+		Data = data;
+	}
+
+	/// <summary>
 	/// To Raise the <see cref="Set"/> event from the Slider.
 	/// </summary>
 	internal void OnSet ()
@@ -86,6 +105,12 @@ public class SliderOption<T> {
 	/// Event fired when the an option has changed.
 	/// </summary>
 	public event EventHandler<SliderOptionEventArgs> Changed;
+
+	/// <summary>
+	/// Creates a human-readable string that represents this <see cref="SliderOption{T}"/>.
+	/// </summary>
+	public override string ToString () => "{Legend=" + Legend + ", LegendAbbr=" + LegendAbbr.ToString () + ", Data=" + Data?.ToString () + "}";
+
 }
 
 /// <summary>

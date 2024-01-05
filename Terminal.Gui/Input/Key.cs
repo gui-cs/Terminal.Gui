@@ -132,7 +132,8 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// The encoded key value. 
 	/// </summary>
 	/// <para>
-	/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
+	/// IMPORTANT: Lowercase alpha keys are encoded (in <see cref="Gui.KeyCode"/>) as values between 65 and
+	/// 90 corresponding to the un-shifted A to Z keys on a keyboard. Enum values
 	/// are provided for these (e.g. <see cref="KeyCode.A"/>, <see cref="KeyCode.B"/>, etc.). Even though the values are the same as the ASCII
 	/// values for uppercase characters, these enum values represent *lowercase*, un-shifted characters.
 	/// </para>
@@ -147,24 +148,36 @@ public class Key : EventArgs, IEquatable<Key> {
 	public KeyBindingScope Scope { get; set; } = KeyBindingScope.Focused;
 
 	/// <summary>
-	/// The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
+	/// The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers. Useful
+	/// for determining if a key represents is a printable character.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// If the key is a letter (a-z or A-Z), the Rune be the upper or lower case letter depending on whether
-	/// the shift key was pressed.
+	/// Keys with Ctrl or Alt modifiers will return <see langword="default"/>. 
+	/// </para>
+	/// <para>
+	/// If the key is a letter key (A-Z), the Rune will be the upper or lower case letter depending on whether
+	/// <see cref="KeyCode.ShiftMask"/> is set.
+	/// </para>
+	/// <para>
 	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be <see langword="default"/>.
 	/// </para>
 	/// </remarks>
 	public Rune AsRune => ToRune (KeyCode);
 
 	/// <summary>
-	/// Converts a <see cref="KeyCode"/> to a <see cref="Rune"/>.
+	/// Converts a <see cref="KeyCode"/> to a <see cref="Rune"/>. Useful
+	/// for determining if a key represents is a printable character.
 	/// </summary>
 	/// <remarks>
 	/// <para>
-	/// If the key is a letter (a-z or A-Z), the Rune be the upper or lower case letter depending on whether
-	/// the shift key was pressed.
+	/// Keys with Ctrl or Alt modifiers will return <see langword="default"/>. 
+	/// </para>
+	/// <para>
+	/// If the key is a letter key (A-Z), the Rune will be the upper or lower case letter depending on whether
+	/// <see cref="KeyCode.ShiftMask"/> is set.
+	/// </para>
+	/// <para>
 	/// If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be <see langword="default"/>.
 	/// </para>
 	/// </remarks>
@@ -176,23 +189,26 @@ public class Key : EventArgs, IEquatable<Key> {
 			return default;
 		}
 
-		// Extract the base key (removing modifier flags)
-		var baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
+		// Extract the base key code
+		var baseKey = key;
+		if (baseKey.HasFlag(KeyCode.ShiftMask)) {
+			baseKey &= ~KeyCode.ShiftMask;
+		}
 
 		switch (baseKey) {
 		case >= KeyCode.A and <= KeyCode.Z when !key.HasFlag (KeyCode.ShiftMask):
-			return new Rune ((char)(baseKey + 32));
-		case >= KeyCode.A and <= KeyCode.Z:
-			return new Rune ((char)baseKey);
+			return new Rune ((uint)(baseKey + 32));
+		case >= KeyCode.A and <= KeyCode.Z when key.HasFlag (KeyCode.ShiftMask):
+			return new Rune ((uint)baseKey);
 		case > KeyCode.Null and < KeyCode.A:
-			return new Rune ((char)baseKey);
+			return new Rune ((uint)baseKey);
 		}
 
 		if (Enum.IsDefined (typeof (KeyCode), baseKey)) {
 			return default;
 		}
 
-		return new Rune ((char)baseKey);
+		return new Rune ((uint)baseKey);
 	}
 
 	/// <summary>
@@ -214,7 +230,9 @@ public class Key : EventArgs, IEquatable<Key> {
 	public bool IsCtrl => (KeyCode & KeyCode.CtrlMask) != 0;
 
 	/// <summary>
-	/// Gets a value indicating whether the KeyCode is composed of a lower case letter from 'a' to 'z', independent of the shift key.
+	/// Gets a value indicating whether the key represents a key in the range of <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/>,
+	/// regardless of the <see cref="KeyCode.ShiftMask"/>. This is useful for testing if a key is based on these keys which are
+	/// special cased.
 	/// </summary>
 	/// <remarks>
 	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to
@@ -224,7 +242,9 @@ public class Key : EventArgs, IEquatable<Key> {
 	public bool IsKeyCodeAtoZ => GetIsKeyCodeAtoZ (KeyCode);
 
 	/// <summary>
-	/// Tests if a KeyCode is composed of a lower case letter from 'a' to 'z', independent of the shift key.
+	/// Tests if a KeyCode represents a key in the range of <see cref="KeyCode.A"/> to <see cref="KeyCode.Z"/>,
+	/// regardless of the <see cref="KeyCode.ShiftMask"/>. This is useful for testing if a key is based on these keys which are
+	/// special cased.
 	/// </summary>
 	/// <remarks>
 	/// IMPORTANT: Lowercase alpha keys are encoded in <see cref="Key.KeyCode"/> as values between 65 and 90 corresponding to
@@ -303,7 +323,8 @@ public class Key : EventArgs, IEquatable<Key> {
 
 	#region Operators
 	/// <summary>
-	/// Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy. 
+	/// Explicitly cast a <see cref="Key"/> to a <see cref="Rune"/>. The conversion is lossy because properties
+	/// such as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
 	/// </summary>
 	/// <remarks>
 	/// Uses <see cref="AsRune"/>.
@@ -311,14 +332,17 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <param name="kea"></param>
 	public static explicit operator Rune (Key kea) => kea.AsRune;
 
+	// BUGBUG: (Tig) I do not think this cast operator is really needed. 
 	/// <summary>
-	/// Explicitly cast <see cref="Key"/> to a <see langword="char"/>. The conversion is lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is lossy because properties
+	/// such as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
 	/// </summary>
 	/// <param name="kea"></param>
-	public static explicit operator char (Key kea) => (char)kea.AsRune.Value;
+	public static explicit operator uint (Key kea) => (uint)kea.KeyCode;
 
 	/// <summary>
-	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy. 
+	/// Explicitly cast <see cref="Key"/> to a <see cref="KeyCode"/>. The conversion is lossy because properties
+	/// such as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
 	/// </summary>
 	/// <param name="key"></param>
 	public static explicit operator KeyCode (Key key) => key.KeyCode;
@@ -365,6 +389,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	public override int GetHashCode () => (int)KeyCode;
 
 	/// <summary>
+	/// Compares two <see cref="Key"/>s for equality.
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
@@ -372,6 +397,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	public static bool operator == (Key a, Key b) => a?.KeyCode == b?.KeyCode;
 
 	/// <summary>
+	/// Compares two <see cref="Key"/>s for not equality.
 	/// </summary>
 	/// <param name="a"></param>
 	/// <param name="b"></param>
@@ -427,15 +453,15 @@ public class Key : EventArgs, IEquatable<Key> {
 		var baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
 		if (!key.HasFlag (KeyCode.ShiftMask) && baseKey is >= KeyCode.A and <= KeyCode.Z) {
-			return ((char)(key + 32)).ToString ();
+			return ((Rune)(uint)(key + 32)).ToString ();
 		}
 
-		if (key is >= KeyCode.Space and < KeyCode.A) {
-			return ((char)key).ToString ();
+		if (key is > KeyCode.Space and < KeyCode.A) {
+			return ((Rune)(uint)key).ToString ();
 		}
 
 		string keyName = Enum.GetName (typeof (KeyCode), key);
-		return !string.IsNullOrEmpty (keyName) ? keyName : ((char)key).ToString ();
+		return !string.IsNullOrEmpty (keyName) ? keyName : ((Rune)(uint)key).ToString ();
 	}
 
 
@@ -454,7 +480,7 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <returns>The formatted string. If the key is a printable character, it will be returned as a string. Otherwise, the key name will be returned.</returns>
 	public static string ToString (KeyCode key, Rune separator)
 	{
-		if (key is KeyCode.Null || (key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask) == 0) {
+		if (key is KeyCode.Null) {
 			// Same as Key.IsValid
 			return @"Null";
 		}
@@ -489,21 +515,19 @@ public class Key : EventArgs, IEquatable<Key> {
 			}
 		}
 
-		string result = sb.ToString ();
-		result = TrimEndRune (result, separator);
-		return result;
+		return TrimEndSeparator (sb.ToString (), separator);
 	}
 
-	static string TrimEndRune (string input, Rune runeToTrim)
+	static string TrimEndSeparator (string input, Rune separator)
 	{
-		// Convert the Rune to a string (which may be one or two chars)
-		string runeString = runeToTrim.ToString ();
+		// Trim the trailing separator (+). Unless there are two separators at the end.
+		// "+" (don't trim)
+		// "Ctrl+" (trim)
+		// "Ctrl++" (trim)
 
-		if (input.EndsWith (runeString)) {
-			// Remove the rune from the end of the string
-			return input.Substring (0, input.Length - runeString.Length);
+		if (input.Length > 1 && new Rune(input [^1]) == separator && new Rune(input [^2]) != separator) {
+			return input [..^1];
 		}
-
 		return input;
 	}
 
@@ -543,13 +567,13 @@ public class Key : EventArgs, IEquatable<Key> {
 		if (parts.Length == 1) {
 			switch (parts [0]) {
 			case "Ctrl":
-				key = new Key (KeyCode.CtrlKey);
+				key = new Key (KeyCode.CtrlMask);
 				return true;
 			case "Alt":
-				key = new Key (KeyCode.AltKey);
+				key = new Key (KeyCode.AltMask);
 				return true;
 			case "Shift":
-				key = new Key (KeyCode.ShiftKey);
+				key = new Key (KeyCode.ShiftMask);
 				return true;
 			}
 		}
@@ -654,26 +678,6 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// The <see cref="Key"/> object for the clear key.
 	/// </summary>
 	public static Key Clear => new (KeyCode.Clear);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the Shift key.
-	/// </summary>
-	public static Key Shift => new (KeyCode.ShiftKey);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the Ctrl key.
-	/// </summary>
-	public static Key Ctrl => new (KeyCode.CtrlKey);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the Alt key.
-	/// </summary>
-	public static Key Alt => new (KeyCode.AltKey);
-
-	/// <summary>
-	/// The <see cref="Key"/> object for the CapsLock key.
-	/// </summary>
-	public static Key CapsLock => new (KeyCode.CapsLock);
 
 	/// <summary>
 	/// The <see cref="Key"/> object for the Escape key.
@@ -913,12 +917,12 @@ public class Key : EventArgs, IEquatable<Key> {
 	/// <summary>
 	/// The <see cref="Key"/> object for Insert Character key.
 	/// </summary>
-	public static Key InsertChar => new (KeyCode.InsertChar);
+	public static Key InsertChar => new (KeyCode.Insert);
 
 	/// <summary>
 	/// The <see cref="Key"/> object for Delete Character key.
 	/// </summary>
-	public static Key DeleteChar => new (KeyCode.DeleteChar);
+	public static Key DeleteChar => new (KeyCode.Delete);
 
 	/// <summary>
 	/// The <see cref="Key"/> object for Print Screen key.
