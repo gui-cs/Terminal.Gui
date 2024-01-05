@@ -139,9 +139,9 @@ public class LayoutTests {
 
 		Assert.True (v.IsInitialized);
 		v.Width = Dim.Fill (1);
-		Assert.Throws<ArgumentException> (() => v.Width = 75);
-		v.LayoutStyle = LayoutStyle.Absolute;
+		v.LayoutStyle = LayoutStyle.Computed;
 		v.Width = 75;
+		v.LayoutStyle = LayoutStyle.Absolute;
 		Assert.True (v.TrySetWidth (60, out rWidth));
 		Assert.Equal (60, rWidth);
 	}
@@ -179,7 +179,8 @@ public class LayoutTests {
 		Assert.True (v.IsInitialized);
 
 		v.Height = Dim.Fill (1);
-		Assert.Throws<ArgumentException> (() => v.Height = 15);
+		v.LayoutStyle = LayoutStyle.Computed;
+		v.Height = 15;
 		v.LayoutStyle = LayoutStyle.Absolute;
 		v.Height = 15;
 		Assert.True (v.TrySetHeight (5, out rHeight));
