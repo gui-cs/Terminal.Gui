@@ -1541,6 +1541,9 @@ public class TextViewTests {
 	[TextViewTestsAutoInitShutdown]
 	public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
 	{
+		Application.Top.Add (_textView);
+		Application.Begin (Application.Top);
+
 		Assert.Equal (4, _textView.TabWidth);
 		Assert.True (_textView.AllowsTab);
 		Assert.True (_textView.AllowsReturn);
@@ -1552,8 +1555,21 @@ public class TextViewTests {
 		Assert.True (_textView.Multiline);
 		_textView.NewKeyDownEvent (new (KeyCode.Tab));
 		Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+TAB to jump between text field", _output);
+
+		_textView.TabWidth = 4;
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+    TAB to jump between text f", _output);
+
 		_textView.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.ShiftMask));
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+		Assert.True (_textView.NeedsDisplay);
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+TAB to jump between text field", _output);
 	}
 
 	[Fact]
