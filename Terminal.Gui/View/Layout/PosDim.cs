@@ -446,7 +446,9 @@ public class Pos {
 				tside = "unknown";
 				break;
 			}
-			// Note: We do not checkt `Target` for null here to intentionally throw if so
+			if (Target == null) {
+				throw new NullReferenceException (nameof (Target));
+			}
 			return $"View(side={tside},target={Target})";
 		}
 
