@@ -221,9 +221,10 @@ public partial class View : Responder, ISupportInitializeNotification {
 		LayoutStyle = layoutStyle;
 
 		Text = text == null ? string.Empty : text;
-		LayoutStyle = layoutStyle;
 		Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
-		OnResizeNeeded ();
+		if (LayoutStyle == LayoutStyle.Computed) {
+			OnResizeNeeded ();
+		}
 
 		AddCommands ();
 
