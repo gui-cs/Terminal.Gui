@@ -38,7 +38,9 @@ public class KeyTests {
 	[InlineData ('!', (KeyCode)'!')]
 	[InlineData ('\r', KeyCode.Enter)]
 	[InlineData ('\t', KeyCode.Tab)]
+#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\r', (KeyCode)13)]
+#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\n', (KeyCode)10)]
 	[InlineData ('ó', (KeyCode)'ó')]
 	[InlineData ('Ó', (KeyCode)'Ó')]
@@ -126,7 +128,9 @@ public class KeyTests {
 	[InlineData ('!', (KeyCode)'!')]
 	[InlineData ('\r', KeyCode.Enter)]
 	[InlineData ('\t', KeyCode.Tab)]
+#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\r', (KeyCode)13)]
+#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\n', (KeyCode)10)]
 	[InlineData ('ó', (KeyCode)'ó')]
 	[InlineData ('Ó', (KeyCode)'Ó')]
@@ -267,7 +271,9 @@ public class KeyTests {
 	[InlineData (KeyCode.F1, '\0')]
 	[InlineData (KeyCode.ShiftMask | KeyCode.F1, '\0')]
 	[InlineData (KeyCode.CtrlMask | KeyCode.F1, '\0')]
+#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData (KeyCode.Enter, '\r')]
+#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData (KeyCode.Tab, '\t')]
 	[InlineData (KeyCode.Esc, 0x1b)]
 	[InlineData (KeyCode.Space, ' ')]
