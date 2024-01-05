@@ -49,7 +49,7 @@ public class DateField : TextField {
 	/// <param name="y">The y coordinate.</param>
 	/// <param name="date">Initial date contents.</param>
 	/// <param name="isShort">If true, shows only two digits for the year.</param>
-	public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "") => Initialize (date, isShort);
+	public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "") => SetInitialProperties (date, isShort);
 
 	/// <summary>
 	///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -63,10 +63,10 @@ public class DateField : TextField {
 	public DateField (DateTime date) : base ("")
 	{
 		Width = _fieldLen + 2;
-		Initialize (date);
+		SetInitialProperties (date);
 	}
 
-	void Initialize (DateTime date, bool isShort = false)
+	void SetInitialProperties (DateTime date, bool isShort = false)
 	{
 		var cultureInfo = CultureInfo.CurrentCulture;
 		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
