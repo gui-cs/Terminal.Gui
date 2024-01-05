@@ -82,7 +82,7 @@ public class SliderOptionTests {
 		var sliderOption = new SliderOption<int> {
 			Legend = "Lord flibble",
 			LegendAbbr = new Rune ('l'),
-			Data = 1,
+			Data = 1
 		};
 
 		Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data=1}", sliderOption.ToString ());
@@ -95,7 +95,7 @@ public class SliderOptionTests {
 		var sliderOption = new SliderOption<SizeF> {
 			Legend = "Lord flibble",
 			LegendAbbr = new Rune ('l'),
-			Data = new SizeF(32,11),
+			Data = new SizeF (32, 11)
 		};
 
 		Assert.Equal ("{Legend=Lord flibble, LegendAbbr=l, Data={Width=32, Height=11}}", sliderOption.ToString ());
@@ -145,7 +145,6 @@ public class SliderEventArgsTests {
 	}
 }
 
-
 public class SliderTests {
 	[Fact]
 	public void Constructor_Default ()
@@ -187,7 +186,7 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> ();
-		bool eventRaised = false;
+		var eventRaised = false;
 		slider.OptionsChanged += (sender, args) => eventRaised = true;
 
 		// Act
@@ -202,9 +201,9 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> (new List<int> { 1, 2, 3 });
-		bool eventRaised = false;
+		var eventRaised = false;
 		slider.OptionFocused += (sender, args) => eventRaised = true;
-		int newFocusedOption = 1;
+		var newFocusedOption = 1;
 		var args = new SliderEventArgs<int> (new Dictionary<int, SliderOption<int>> (), newFocusedOption);
 
 		// Act
@@ -219,10 +218,10 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> (new List<int> { 1, 2, 3 });
-		bool eventRaised = false;
-		bool cancel = false;
+		var eventRaised = false;
+		var cancel = false;
 		slider.OptionFocused += (sender, args) => eventRaised = true;
-		int newFocusedOption = 1;
+		var newFocusedOption = 1;
 
 		// Create args with cancel set to false
 		cancel = false;
@@ -266,7 +265,7 @@ public class SliderTests {
 		// 1--2--3--4
 
 		// Act
-		bool result = slider.TryGetPositionByOption (option, out var position);
+		var result = slider.TryGetPositionByOption (option, out var position);
 
 		// Assert
 		Assert.True (result);
@@ -287,7 +286,7 @@ public class SliderTests {
 		slider.InnerSpacing = 2;
 
 		// Act
-		bool result = slider.TryGetPositionByOption (option, out var position);
+		var result = slider.TryGetPositionByOption (option, out var position);
 
 		// Assert
 		Assert.True (result);
@@ -300,11 +299,11 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> (new List<int> { 1, 2, 3 });
-		int option = -1;
+		var option = -1;
 		var expectedPosition = (-1, -1);
 
 		// Act
-		bool result = slider.TryGetPositionByOption (option, out var position);
+		var result = slider.TryGetPositionByOption (option, out var position);
 
 		// Assert
 		Assert.False (result);
@@ -330,7 +329,7 @@ public class SliderTests {
 		// Arrange
 
 		// Act
-		bool result = slider.TryGetOptionByPosition (x, y, threshold, out int option);
+		var result = slider.TryGetOptionByPosition (x, y, threshold, out var option);
 
 		// Assert
 		Assert.True (result);
@@ -363,7 +362,7 @@ public class SliderTests {
 		// 9 4
 
 		// Act
-		bool result = slider.TryGetOptionByPosition (x, y, threshold, out int option);
+		var result = slider.TryGetOptionByPosition (x, y, threshold, out var option);
 
 		// Assert
 		Assert.True (result);
@@ -376,13 +375,13 @@ public class SliderTests {
 	{
 		// Arrange
 		var slider = new Slider<int> (new List<int> { 1, 2, 3 });
-		int x = 10;
-		int y = 10;
-		int threshold = 2;
-		int expectedOption = -1;
+		var x = 10;
+		var y = 10;
+		var threshold = 2;
+		var expectedOption = -1;
 
 		// Act
-		bool result = slider.TryGetOptionByPosition (x, y, threshold, out int option);
+		var result = slider.TryGetOptionByPosition (x, y, threshold, out var option);
 
 		// Assert
 		Assert.False (result);
@@ -397,7 +396,7 @@ public class SliderTests {
 		slider.AutoSize = true;
 
 		// Act
-		bool result = slider.MovePlus ();
+		var result = slider.MovePlus ();
 
 		// Assert
 		Assert.True (result);
@@ -413,7 +412,7 @@ public class SliderTests {
 		slider.FocusedOption = 3;
 
 		// Act
-		bool result = slider.MovePlus ();
+		var result = slider.MovePlus ();
 
 		// Assert
 		Assert.False (result);
@@ -431,7 +430,7 @@ public class SliderTests {
 
 		// Act
 		slider.FocusedOption = 2;
-		bool result = slider.Set ();
+		var result = slider.Set ();
 
 		// Assert
 		Assert.True (result);
@@ -451,7 +450,7 @@ public class SliderTests {
 		Assert.NotEmpty (slider.GetSetOptions ());
 
 		// Act
-		bool result = slider.UnSetOption (slider.FocusedOption);
+		var result = slider.UnSetOption (slider.FocusedOption);
 
 		// Assert
 		Assert.False (result);
@@ -466,7 +465,7 @@ public class SliderTests {
 
 		// Act/Assert
 		Assert.Throws<ArgumentNullException> (() => slider.Options = null);
-		
+
 	}
 
 	[Fact]
@@ -489,11 +488,9 @@ public class SliderTests {
 		slider.BeginInit ();
 		slider.EndInit ();
 		// Act/Assert
-		slider.Options = new List<SliderOption<int>> { new SliderOption<int> () };
+		slider.Options = new List<SliderOption<int>> { new () };
 
 	}
 
 	// Add more tests for different scenarios and edge cases.
 }
-
-

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace UICatalog.Scenarios;
 
@@ -25,7 +24,7 @@ public class Sliders : Scenario {
 		Win.Add (configView);
 
 		#region Config Slider
-		var slider = new Slider<string> () {
+		var slider = new Slider<string> {
 			Title = "Options",
 			X = 0,
 			Y = 0,
@@ -33,23 +32,23 @@ public class Sliders : Scenario {
 			Width = Dim.Fill (),
 			Height = 4,
 			AllowEmpty = true,
-			BorderStyle = LineStyle.Single,
+			BorderStyle = LineStyle.Single
 		};
 
 		slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		slider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
 		slider.Options = new List<SliderOption<string>> {
-			new() {
+			new () {
 				Legend = "Legends"
 			},
-			new() {
+			new () {
 				Legend = "RangeAllowSingle"
 			},
-			new() {
+			new () {
 				Legend = "EndSpacing"
 			},
-			new() {
+			new () {
 				Legend = "AutoSize"
 			}
 		};
@@ -89,7 +88,7 @@ public class Sliders : Scenario {
 			Y = Pos.Bottom (slider) + 1,
 			Width = Dim.Fill (),
 			Height = 4,
-			BorderStyle = LineStyle.Single,
+			BorderStyle = LineStyle.Single
 		};
 
 		slider_orientation_slider.SetOption (0);
@@ -102,7 +101,7 @@ public class Sliders : Scenario {
 				if (e.Options.ContainsKey (0)) {
 					s.Orientation = Orientation.Horizontal;
 
-					s.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.HLine };
+					s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
 
 					if (prev == null) {
 						s.LayoutStyle = LayoutStyle.Absolute;
@@ -117,7 +116,7 @@ public class Sliders : Scenario {
 				} else if (e.Options.ContainsKey (1)) {
 					s.Orientation = Orientation.Vertical;
 
-					s.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.VLine };
+					s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
 
 					if (prev == null) {
 						s.LayoutStyle = LayoutStyle.Absolute;
@@ -152,7 +151,7 @@ public class Sliders : Scenario {
 			Y = Pos.Bottom (slider_orientation_slider) + 1,
 			Width = Dim.Fill (),
 			Height = 4,
-			BorderStyle = LineStyle.Single,
+			BorderStyle = LineStyle.Single
 		};
 
 		legends_orientation_slider.SetOption (0);
@@ -178,8 +177,8 @@ public class Sliders : Scenario {
 			}
 			Win.LayoutSubviews ();
 		};
-
 		#endregion Legends Orientation Slider
+
 		#region Color Slider
 		foreach (var s in Win.Subviews.OfType<Slider> ()) {
 			s.Style.OptionChar.Attribute = Win.GetNormalColor ();
@@ -188,7 +187,7 @@ public class Sliders : Scenario {
 			s.Style.RangeChar.Attribute = Win.GetNormalColor ();
 		}
 
-		var sliderFGColor = new Slider<(Color, Color)> () {
+		var sliderFGColor = new Slider<(Color, Color)> {
 			Title = "FG Color",
 			X = 0,
 			Y = Pos.Bottom (legends_orientation_slider) + 1,
@@ -205,9 +204,9 @@ public class Sliders : Scenario {
 
 		var colorOptions = new List<SliderOption<(Color, Color)>> ();
 		foreach (var colorIndex in Enum.GetValues<ColorName> ()) {
-			string colorName = colorIndex.ToString ();
+			var colorName = colorIndex.ToString ();
 			colorOptions.Add (new SliderOption<(Color, Color)> {
-				Data = (new Color ((ColorName)colorIndex), new Color ((ColorName)colorIndex)),
+				Data = (new Color (colorIndex), new Color (colorIndex)),
 				Legend = colorName,
 				LegendAbbr = (Rune)colorName [0]
 			});
@@ -230,10 +229,10 @@ public class Sliders : Scenario {
 					s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 					s.Style.LegendAttributes.NormalAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 				}
-			} 
+			}
 		};
 
-		var sliderBGColor = new Slider<(Color, Color)> () {
+		var sliderBGColor = new Slider<(Color, Color)> {
 			Title = "BG Color",
 			X = Pos.Right (sliderFGColor),
 			Y = Pos.Top (sliderFGColor),
@@ -258,13 +257,11 @@ public class Sliders : Scenario {
 
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
 					s.ColorScheme = new ColorScheme (s.ColorScheme);
-					s.ColorScheme.Normal = new Attribute(s.ColorScheme.Normal.Foreground, data.Item2);
+					s.ColorScheme.Normal = new Attribute (s.ColorScheme.Normal.Foreground, data.Item2);
 				}
-			} 
+			}
 		};
-
 		#endregion Color Slider
-
 		#endregion Config Slider
 
 		Win.FocusFirst ();
@@ -277,20 +274,20 @@ public class Sliders : Scenario {
 		Slider prev = null;
 
 		foreach (var type in types) {
-			var view = new Slider (options, Orientation.Horizontal) {
+			var view = new Slider (options) {
 				Title = type.ToString (),
 				X = 0,
 				Y = prev == null ? 0 : Pos.Bottom (prev),
 				BorderStyle = LineStyle.Single,
 				Type = type,
-				AllowEmpty = true,
+				AllowEmpty = true
 			};
 			v.Add (view);
 			prev = view;
 		}
 
 		var singleOptions = new List<object> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39 };
-		var single = new Slider (singleOptions, Orientation.Horizontal) {
+		var single = new Slider (singleOptions) {
 			Title = "Continuous",
 			X = 0,
 			Y = prev == null ? 0 : Pos.Bottom (prev),
@@ -301,15 +298,15 @@ public class Sliders : Scenario {
 
 		single.LayoutStarted += (s, e) => {
 			if (single.Orientation == Orientation.Horizontal) {
-				single.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.HLine };
-				single.Style.OptionChar = new Cell () { Rune = CM.Glyphs.HLine };
+				single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
+				single.Style.OptionChar = new Cell { Rune = CM.Glyphs.HLine };
 			} else {
-				single.Style.SpaceChar = new Cell () { Rune = CM.Glyphs.VLine };
-				single.Style.OptionChar = new Cell () { Rune = CM.Glyphs.VLine };
+				single.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
+				single.Style.OptionChar = new Cell { Rune = CM.Glyphs.VLine };
 			}
 		};
-		single.Style.SetChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment };
-		single.Style.DragChar = new Cell () { Rune = CM.Glyphs.ContinuousMeterSegment };
+		single.Style.SetChar = new Cell { Rune = CM.Glyphs.ContinuousMeterSegment };
+		single.Style.DragChar = new Cell { Rune = CM.Glyphs.ContinuousMeterSegment };
 
 		v.Add (single);
 
@@ -318,13 +315,13 @@ public class Sliders : Scenario {
 		};
 
 		var oneOption = new List<object> { "The Only Option" };
-		var one = new Slider (oneOption, Orientation.Horizontal) {
+		var one = new Slider (oneOption) {
 			Title = "One Option",
 			X = 0,
 			Y = prev == null ? 0 : Pos.Bottom (single),
 			Type = SliderType.Single,
 			BorderStyle = LineStyle.Single,
-			AllowEmpty = false,
+			AllowEmpty = false
 		};
 		v.Add (one);
 

@@ -99,35 +99,35 @@ public class SliderOption<T> {
 /// </summary>
 public enum SliderType {
 	/// <summary>
-	/// <code>
+	///         <code>
 	/// ├─┼─┼─┼─┼─█─┼─┼─┼─┼─┼─┼─┤
 	/// </code>
 	/// </summary>
 	Single,
 
 	/// <summary>
-	/// <code>
+	///         <code>
 	/// ├─┼─█─┼─┼─█─┼─┼─┼─┼─█─┼─┤
 	/// </code>
 	/// </summary>
 	Multiple,
 
 	/// <summary>
-	/// <code>
+	///         <code>
 	/// ├▒▒▒▒▒▒▒▒▒█─┼─┼─┼─┼─┼─┼─┤
 	/// </code>
 	/// </summary>
 	LeftRange,
 
 	/// <summary>
-	/// <code>
+	///         <code>
 	/// ├─┼─┼─┼─┼─█▒▒▒▒▒▒▒▒▒▒▒▒▒┤
 	/// </code>
 	/// </summary>
 	RightRange,
 
 	/// <summary>
-	/// <code>
+	///         <code>
 	/// ├─┼─┼─┼─┼─█▒▒▒▒▒▒▒█─┼─┼─┤
 	/// </code>
 	/// </summary>
@@ -318,7 +318,6 @@ public class Slider<T> : View {
 
 	// Options
 	List<SliderOption<T>> _options;
-	SliderStyle _style = new ();
 
 	/// <summary>
 	/// The focused option (has the cursor).
@@ -419,7 +418,7 @@ public class Slider<T> : View {
 			SetInitialProperties (null, orientation);
 		} else {
 			SetInitialProperties (options.Select (e => {
-				string legend = e.ToString ();
+				var legend = e.ToString ();
 				return new SliderOption<T> {
 					Data = e,
 					Legend = legend,
@@ -550,11 +549,9 @@ public class Slider<T> : View {
 	public SliderStyle Style {
 		// Note(jmperricone): Maybe SliderStyle should be a struct so we return a copy ???
 		// Or SetStyle() and ( GetStyle() || Style getter copy )
-		get => _style;
-		set =>
-			// Note(jmperricone): If the user change a style, he/she must call SetNeedsDisplay(). OK ???
-			_style = value;
-	}
+		get;
+		set;
+	} = new ();
 
 	/// <summary>
 	/// Set the slider options.
@@ -665,12 +662,12 @@ public class Slider<T> : View {
 	{
 		switch (_config._sliderOrientation) {
 		case Orientation.Horizontal:
-			_style.SpaceChar = new Cell { Rune = Glyphs.HLine }; // '─'
-			_style.OptionChar = new Cell { Rune = Glyphs.BlackCircle }; // '┼●🗹□⏹'
+			Style.SpaceChar = new Cell { Rune = Glyphs.HLine }; // '─'
+			Style.OptionChar = new Cell { Rune = Glyphs.BlackCircle }; // '┼●🗹□⏹'
 			break;
 		case Orientation.Vertical:
-			_style.SpaceChar = new Cell { Rune = Glyphs.VLine };
-			_style.OptionChar = new Cell { Rune = Glyphs.BlackCircle };
+			Style.SpaceChar = new Cell { Rune = Glyphs.VLine };
+			Style.OptionChar = new Cell { Rune = Glyphs.BlackCircle };
 			break;
 		}
 
@@ -694,12 +691,12 @@ public class Slider<T> : View {
 		*/
 
 		_config._legendsOrientation = _config._sliderOrientation;
-		_style.EmptyChar = new Cell { Rune = new Rune (' ') };
-		_style.SetChar = new Cell { Rune = Glyphs.ContinuousMeterSegment }; // ■
-		_style.RangeChar = new Cell { Rune = Glyphs.Stipple }; // ░ ▒ ▓   // Medium shade not blinking on curses.
-		_style.StartRangeChar = new Cell { Rune = Glyphs.ContinuousMeterSegment };
-		_style.EndRangeChar = new Cell { Rune = Glyphs.ContinuousMeterSegment };
-		_style.DragChar = new Cell { Rune = Glyphs.Diamond };
+		Style.EmptyChar = new Cell { Rune = new Rune (' ') };
+		Style.SetChar = new Cell { Rune = Glyphs.ContinuousMeterSegment }; // ■
+		Style.RangeChar = new Cell { Rune = Glyphs.Stipple }; // ░ ▒ ▓   // Medium shade not blinking on curses.
+		Style.StartRangeChar = new Cell { Rune = Glyphs.ContinuousMeterSegment };
+		Style.EndRangeChar = new Cell { Rune = Glyphs.ContinuousMeterSegment };
+		Style.DragChar = new Cell { Rune = Glyphs.Diamond };
 
 		// TODO: Support left & right (top/bottom)
 		// First = '├',
@@ -713,7 +710,7 @@ public class Slider<T> : View {
 	/// </summary>
 	internal void CalcSpacingConfig ()
 	{
-		int size = 0;
+		var size = 0;
 
 		if (_options.Count == 0 || !IsInitialized) {
 			return;
@@ -754,7 +751,7 @@ public class Slider<T> : View {
 			max_legend = 1;
 		}
 
-		int min_size_that_fits_legends = _options.Count == 1 ? max_legend : max_legend / (_options.Count - 1);
+		var min_size_that_fits_legends = _options.Count == 1 ? max_legend : max_legend / (_options.Count - 1);
 
 		string first;
 		string last;
@@ -778,8 +775,8 @@ public class Slider<T> : View {
 		// Hello
 		// Left = He
 		// Right = lo
-		int first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
-		int last_right = last.Length / 2; // Chars count of the last option to the right.
+		var first_left = (first.Length - 1) / 2; // Chars count of the first option to the left.
+		var last_right = last.Length / 2; // Chars count of the last option to the right.
 
 		if (_config._sliderOrientation != _config._legendsOrientation) {
 			first_left = 0;
@@ -787,7 +784,7 @@ public class Slider<T> : View {
 		}
 
 		// -1 because it's better to have an extra space at right than to clip
-		int width = size - first_left - last_right - 1;
+		var width = size - first_left - last_right - 1;
 
 		_config._startSpacing = first_left;
 		if (_options.Count == 1) {
@@ -833,7 +830,7 @@ public class Slider<T> : View {
 			return 0;
 		}
 
-		int length = 0;
+		var length = 0;
 		length += _config._startSpacing + _config._endSpacing;
 		length += _options.Count;
 		length += (_options.Count - 1) * _config._innerSpacing;
@@ -851,10 +848,10 @@ public class Slider<T> : View {
 			return 0;
 		}
 
-		int length = 0;
+		var length = 0;
 
 		if (_config._showLegends) {
-			int max_legend = 1;
+			var max_legend = 1;
 			if (_config._legendsOrientation == _config._sliderOrientation && _options.Count > 0) {
 				max_legend = int.Max (_options.Max (s => s.Legend?.Length + 1 ?? 1), 1);
 				length += max_legend * _options.Count;
@@ -872,7 +869,7 @@ public class Slider<T> : View {
 	/// <returns></returns>
 	int CalcThickness ()
 	{
-		int thickness = 1; // Always show the slider.
+		var thickness = 1; // Always show the slider.
 
 		if (_config._showLegends) {
 			if (_config._legendsOrientation != _config._sliderOrientation && _options.Count > 0) {
@@ -893,7 +890,7 @@ public class Slider<T> : View {
 			return false;
 		}
 
-		int offset = 0;
+		var offset = 0;
 		offset += _config._startSpacing;
 		offset += option * (_config._innerSpacing + 1);
 
@@ -923,12 +920,12 @@ public class Slider<T> : View {
 				return false;
 			}
 
-			for (int xx = x - threshold; xx < x + threshold + 1; xx++) {
-				int cx = xx;
+			for (var xx = x - threshold; xx < x + threshold + 1; xx++) {
+				var cx = xx;
 				cx -= _config._startSpacing;
 
-				int option = cx / (_config._innerSpacing + 1);
-				bool valid = cx % (_config._innerSpacing + 1) == 0;
+				var option = cx / (_config._innerSpacing + 1);
+				var valid = cx % (_config._innerSpacing + 1) == 0;
 
 				if (!valid || option < 0 || option > _options.Count - 1) {
 					continue;
@@ -943,12 +940,12 @@ public class Slider<T> : View {
 				return false;
 			}
 
-			for (int yy = y - threshold; yy < y + threshold + 1; yy++) {
-				int cy = yy;
+			for (var yy = y - threshold; yy < y + threshold + 1; yy++) {
+				var cy = yy;
 				cy -= _config._startSpacing;
 
-				int option = cy / (_config._innerSpacing + 1);
-				bool valid = cy % (_config._innerSpacing + 1) == 0;
+				var option = cy / (_config._innerSpacing + 1);
+				var valid = cy % (_config._innerSpacing + 1) == 0;
 
 				if (!valid || option < 0 || option > _options.Count - 1) {
 					continue;
@@ -993,8 +990,8 @@ public class Slider<T> : View {
 		// Debug
 #if (DEBUG)
 		Driver?.SetAttribute (new Attribute (Color.White, Color.Red));
-		for (int y = 0; y < contentArea.Height; y++) {
-			for (int x = 0; x < contentArea.Width; x++) {
+		for (var y = 0; y < contentArea.Height; y++) {
+			for (var x = 0; x < contentArea.Width; x++) {
 				// MoveAndAdd (x, y, '·');
 			}
 		}
@@ -1009,7 +1006,7 @@ public class Slider<T> : View {
 		}
 
 		if (_dragPosition.HasValue && _moveRenderPosition.HasValue) {
-			AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, _style.DragChar.Rune);
+			AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, Style.DragChar.Rune);
 		}
 	}
 
@@ -1023,7 +1020,7 @@ public class Slider<T> : View {
 			text = text [..width];
 		}
 
-		int w = width - text.Length;
+		var w = width - text.Length;
 		string s1 = new (' ', w / 2);
 		string s2 = new (' ', w % 2);
 
@@ -1057,25 +1054,25 @@ public class Slider<T> : View {
 		var setAtrr = new Attribute (Color.Black, Color.White);
 		if (IsInitialized) {
 			normalAttr = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
-			setAtrr = _style.SetChar.Attribute ?? ColorScheme.HotNormal; //  ColorScheme?.Focus ?? Application.Current.ColorScheme.Focus;
+			setAtrr = Style.SetChar.Attribute ?? ColorScheme.HotNormal; //  ColorScheme?.Focus ?? Application.Current.ColorScheme.Focus;
 		}
 
-		bool isVertical = _config._sliderOrientation == Orientation.Vertical;
-		bool isLegendsVertical = _config._legendsOrientation == Orientation.Vertical;
-		bool isReverse = _config._sliderOrientation != _config._legendsOrientation;
+		var isVertical = _config._sliderOrientation == Orientation.Vertical;
+		var isLegendsVertical = _config._legendsOrientation == Orientation.Vertical;
+		var isReverse = _config._sliderOrientation != _config._legendsOrientation;
 
-		int x = 0;
-		int y = 0;
+		var x = 0;
+		var y = 0;
 
-		bool isSet = _setOptions.Count > 0;
+		var isSet = _setOptions.Count > 0;
 
 		// Left Spacing
 		if (_config._showEndSpacing && _config._startSpacing > 0) {
 
-			Driver?.SetAttribute (isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Attribute ?? normalAttr : _style.SpaceChar.Attribute ?? normalAttr);
-			var rune = isSet && _config._type == SliderType.LeftRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
+			Driver?.SetAttribute (isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Attribute ?? normalAttr : Style.SpaceChar.Attribute ?? normalAttr);
+			var rune = isSet && _config._type == SliderType.LeftRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
 
-			for (int i = 0; i < _config._startSpacing; i++) {
+			for (var i = 0; i < _config._startSpacing; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) {
 					y++;
@@ -1084,10 +1081,10 @@ public class Slider<T> : View {
 				}
 			}
 		} else {
-			Driver?.SetAttribute (_style.EmptyChar.Attribute ?? normalAttr);
+			Driver?.SetAttribute (Style.EmptyChar.Attribute ?? normalAttr);
 			// for (int i = 0; i < this.config.StartSpacing + ((this.config.StartSpacing + this.config.EndSpacing) % 2 == 0 ? 1 : 2); i++) {
-			for (int i = 0; i < _config._startSpacing; i++) {
-				MoveAndAdd (x, y, _style.EmptyChar.Rune);
+			for (var i = 0; i < _config._startSpacing; i++) {
+				MoveAndAdd (x, y, Style.EmptyChar.Rune);
 				if (isVertical) {
 					y++;
 				} else {
@@ -1098,9 +1095,9 @@ public class Slider<T> : View {
 
 		// Slider
 		if (_options.Count > 0) {
-			for (int i = 0; i < _options.Count; i++) {
+			for (var i = 0; i < _options.Count; i++) {
 
-				bool drawRange = false;
+				var drawRange = false;
 
 				if (isSet) {
 					switch (_config._type) {
@@ -1123,7 +1120,7 @@ public class Slider<T> : View {
 				}
 
 				// Draw Option
-				Driver?.SetAttribute (isSet && _setOptions.Contains (i) ? _style.SetChar.Attribute ?? setAtrr : drawRange ? _style.RangeChar.Attribute ?? setAtrr : _style.OptionChar.Attribute ?? normalAttr);
+				Driver?.SetAttribute (isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAtrr : drawRange ? Style.RangeChar.Attribute ?? setAtrr : Style.OptionChar.Attribute ?? normalAttr);
 
 				// Note(jmperricone): Maybe only for curses, windows inverts actual colors, while curses inverts bg with fg.
 				//if (Application.Driver is CursesDriver) {
@@ -1131,14 +1128,14 @@ public class Slider<T> : View {
 				//		Driver.SetAttribute (ColorScheme.Focus);
 				//	}
 				//}
-				var rune = drawRange ? _style.RangeChar.Rune : _style.OptionChar.Rune;
+				var rune = drawRange ? Style.RangeChar.Rune : Style.OptionChar.Rune;
 				if (isSet) {
 					if (_setOptions [0] == i) {
-						rune = _style.StartRangeChar.Rune;
+						rune = Style.StartRangeChar.Rune;
 					} else if (_setOptions.Count > 1 && _setOptions [1] == i) {
-						rune = _style.EndRangeChar.Rune;
+						rune = Style.EndRangeChar.Rune;
 					} else if (_setOptions.Contains (i)) {
-						rune = _style.SetChar.Rune;
+						rune = Style.SetChar.Rune;
 					}
 				}
 				MoveAndAdd (x, y, rune);
@@ -1151,9 +1148,9 @@ public class Slider<T> : View {
 				// Draw Spacing
 				if (_config._showEndSpacing || i < _options.Count - 1) {
 					// Skip if is the Last Spacing.
-					Driver?.SetAttribute (drawRange && isSet ? _style.RangeChar.Attribute ?? setAtrr : _style.SpaceChar.Attribute ?? normalAttr);
-					for (int s = 0; s < _config._innerSpacing; s++) {
-						MoveAndAdd (x, y, drawRange && isSet ? _style.RangeChar.Rune : _style.SpaceChar.Rune);
+					Driver?.SetAttribute (drawRange && isSet ? Style.RangeChar.Attribute ?? setAtrr : Style.SpaceChar.Attribute ?? normalAttr);
+					for (var s = 0; s < _config._innerSpacing; s++) {
+						MoveAndAdd (x, y, drawRange && isSet ? Style.RangeChar.Rune : Style.SpaceChar.Rune);
 						if (isVertical) {
 							y++;
 						} else {
@@ -1164,12 +1161,12 @@ public class Slider<T> : View {
 			}
 		}
 
-		int remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
+		var remaining = isVertical ? Bounds.Height - y : Bounds.Width - x;
 		// Right Spacing
 		if (_config._showEndSpacing) {
-			Driver?.SetAttribute (isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Attribute ?? normalAttr : _style.SpaceChar.Attribute ?? normalAttr);
-			var rune = isSet && _config._type == SliderType.RightRange ? _style.RangeChar.Rune : _style.SpaceChar.Rune;
-			for (int i = 0; i < remaining; i++) {
+			Driver?.SetAttribute (isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Attribute ?? normalAttr : Style.SpaceChar.Attribute ?? normalAttr);
+			var rune = isSet && _config._type == SliderType.RightRange ? Style.RangeChar.Rune : Style.SpaceChar.Rune;
+			for (var i = 0; i < remaining; i++) {
 				MoveAndAdd (x, y, rune);
 				if (isVertical) {
 					y++;
@@ -1178,9 +1175,9 @@ public class Slider<T> : View {
 				}
 			}
 		} else {
-			Driver?.SetAttribute (_style.EmptyChar.Attribute ?? normalAttr);
-			for (int i = 0; i < remaining; i++) {
-				MoveAndAdd (x, y, _style.EmptyChar.Rune);
+			Driver?.SetAttribute (Style.EmptyChar.Attribute ?? normalAttr);
+			for (var i = 0; i < remaining; i++) {
+				MoveAndAdd (x, y, Style.EmptyChar.Rune);
 				if (isVertical) {
 					y++;
 				} else {
@@ -1197,16 +1194,16 @@ public class Slider<T> : View {
 		var setAttr = new Attribute (Color.Black, Color.White);
 		var spaceAttr = normalAttr;
 		if (IsInitialized) {
-			normalAttr = _style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
-			setAttr = _style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
-			spaceAttr = _style.LegendAttributes.EmptyAttribute ?? normalAttr;
+			normalAttr = Style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
+			setAttr = Style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
+			spaceAttr = Style.LegendAttributes.EmptyAttribute ?? normalAttr;
 		}
 
-		bool isTextVertical = _config._legendsOrientation == Orientation.Vertical;
-		bool isSet = _setOptions.Count > 0;
+		var isTextVertical = _config._legendsOrientation == Orientation.Vertical;
+		var isSet = _setOptions.Count > 0;
 
-		int x = 0;
-		int y = 0;
+		var x = 0;
+		var y = 0;
 
 		Move (x, y);
 
@@ -1224,9 +1221,9 @@ public class Slider<T> : View {
 			x += 1;
 		}
 
-		for (int i = 0; i < _options.Count; i++) {
+		for (var i = 0; i < _options.Count; i++) {
 
-			bool isOptionSet = false;
+			var isOptionSet = false;
 
 			// Check if the Option is Set.
 			switch (_config._type) {
@@ -1259,7 +1256,7 @@ public class Slider<T> : View {
 			}
 
 			// Text || Abbreviation
-			string text = string.Empty;
+			var text = string.Empty;
 			if (_config._showLegendsAbbr) {
 				text = _options [i].LegendAbbr.ToString () ?? new Rune (_options [i].Legend.First ()).ToString ();
 			} else {
@@ -1290,8 +1287,8 @@ public class Slider<T> : View {
 			}
 
 			// Text
-			int legend_left_spaces_count = text.TakeWhile (e => e == ' ').Count ();
-			int legend_right_spaces_count = text.Reverse ().TakeWhile (e => e == ' ').Count ();
+			var legend_left_spaces_count = text.TakeWhile (e => e == ' ').Count ();
+			var legend_right_spaces_count = text.Reverse ().TakeWhile (e => e == ' ').Count ();
 			text = text.Trim ();
 
 			// TODO(jmperricone): Improve the Orientation check.
@@ -1308,7 +1305,7 @@ public class Slider<T> : View {
 					//
 					// then the spacing is 2 for the slider but 0 for the legends.
 
-					int chars_left = (text.Length - 1) / 2;
+					var chars_left = (text.Length - 1) / 2;
 					legend_left_spaces_count = _config._startSpacing - chars_left;
 				}
 
@@ -1336,7 +1333,7 @@ public class Slider<T> : View {
 			// Calculate End Spacing
 			if (i == _options.Count () - 1) {
 				// See Start Spacing explanation.
-				int chars_right = text.Length / 2;
+				var chars_right = text.Length / 2;
 				legend_right_spaces_count = _config._endSpacing - chars_right;
 			}
 
@@ -1385,16 +1382,16 @@ public class Slider<T> : View {
 			int Clamp (int value, int min, int max) => Math.Max (min, Math.Min (max, value));
 
 			if (Orientation == Orientation.Horizontal) {
-				int left = _config._startSpacing;
-				int width = _options.Count + (_options.Count - 1) * _config._innerSpacing;
-				int right = left + width - 1;
-				int clampedX = Clamp (position.X, left, right);
+				var left = _config._startSpacing;
+				var width = _options.Count + (_options.Count - 1) * _config._innerSpacing;
+				var right = left + width - 1;
+				var clampedX = Clamp (position.X, left, right);
 				position = new Point (clampedX, 0);
 			} else {
-				int top = _config._startSpacing;
-				int height = _options.Count + (_options.Count - 1) * _config._innerSpacing;
-				int bottom = top + height - 1;
-				int clampedY = Clamp (position.Y, top, bottom);
+				var top = _config._startSpacing;
+				var height = _options.Count + (_options.Count - 1) * _config._innerSpacing;
+				var bottom = top + height - 1;
+				var clampedY = Clamp (position.Y, top, bottom);
 				position = new Point (0, clampedY);
 			}
 			return position;
@@ -1419,8 +1416,8 @@ public class Slider<T> : View {
 			_dragPosition = new Point (mouseEvent.X, mouseEvent.Y);
 			_moveRenderPosition = ClampMovePosition ((Point)_dragPosition);
 
-			bool success = false;
-			int option = 0;
+			var success = false;
+			var option = 0;
 			// how far has user dragged from original location?						
 			if (Orientation == Orientation.Horizontal) {
 				success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
@@ -1445,8 +1442,8 @@ public class Slider<T> : View {
 			_moveRenderPosition = null;
 
 			// TODO: Add func to calc distance between options to use as the MouseClickXOptionThreshold
-			bool success = false;
-			int option = 0;
+			var success = false;
+			var option = 0;
 			if (Orientation == Orientation.Horizontal) {
 				success = TryGetOptionByPosition (mouseEvent.X, 0, Math.Max (0, _config._innerSpacing / 2), out option);
 			} else {
@@ -1521,7 +1518,7 @@ public class Slider<T> : View {
 		case SliderType.RightRange:
 
 			if (_setOptions.Count == 1) {
-				int prev = _setOptions [0];
+				var prev = _setOptions [0];
 
 				if (!_config._allowEmpty && prev == FocusedOption) {
 					break;
@@ -1560,7 +1557,7 @@ public class Slider<T> : View {
 		case SliderType.Range:
 			if (_config._rangeAllowSingle) {
 				if (_setOptions.Count == 1) {
-					int prev = _setOptions [0];
+					var prev = _setOptions [0];
 
 					if (!_config._allowEmpty && prev == FocusedOption) {
 						break;
@@ -1607,7 +1604,7 @@ public class Slider<T> : View {
 				}
 			} else {
 				if (_setOptions.Count == 1) {
-					int prev = _setOptions [0];
+					var prev = _setOptions [0];
 
 					if (!_config._allowEmpty && prev == FocusedOption) {
 						break;
@@ -1619,7 +1616,7 @@ public class Slider<T> : View {
 				} else if (_setOptions.Count == 0) {
 					_setOptions.Add (FocusedOption);
 					_options [FocusedOption].OnSet ();
-					int next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption - 1;
+					var next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption - 1;
 					_setOptions.Add (next);
 					_options [next].OnSet ();
 				} else {
@@ -1661,7 +1658,7 @@ public class Slider<T> : View {
 
 	internal bool ExtendPlus ()
 	{
-		int next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
+		var next = FocusedOption < _options.Count - 1 ? FocusedOption + 1 : FocusedOption;
 		if (next != FocusedOption && !OnOptionFocused (next, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption))) {
 			SetFocusedOption ();
 		}
@@ -1713,7 +1710,7 @@ public class Slider<T> : View {
 
 	internal bool ExtendMinus ()
 	{
-		int prev = FocusedOption > 0 ? FocusedOption - 1 : FocusedOption;
+		var prev = FocusedOption > 0 ? FocusedOption - 1 : FocusedOption;
 		if (prev != FocusedOption && !OnOptionFocused (prev, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption))) {
 			SetFocusedOption ();
 		}
@@ -1728,7 +1725,7 @@ public class Slider<T> : View {
 
 	internal bool MovePlus ()
 	{
-		bool cancelled = OnOptionFocused (FocusedOption + 1, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
+		var cancelled = OnOptionFocused (FocusedOption + 1, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
 		if (cancelled) {
 			return false;
 		}
@@ -1741,7 +1738,7 @@ public class Slider<T> : View {
 
 	internal bool MoveMinus ()
 	{
-		bool cancelled = OnOptionFocused (FocusedOption - 1, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
+		var cancelled = OnOptionFocused (FocusedOption - 1, new SliderEventArgs<T> (GetSetOptionDictionary (), FocusedOption));
 		if (cancelled) {
 			return false;
 		}
