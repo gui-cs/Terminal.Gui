@@ -432,9 +432,6 @@ public class KeyTests {
 	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask, "Ctrl+Alt+Shift")]
 #pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
-	[InlineData (KeyCode.AltMask, "Alt")]
-	[InlineData (KeyCode.CtrlMask, "Ctrl")]
-	[InlineData (KeyCode.ShiftMask, "Shift")]
 	[InlineData (KeyCode.CharMask, "CharMask")]
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
 	[InlineData ((KeyCode)'+', "+")]
