@@ -27,14 +27,24 @@ csharp_style_var_elsewhere = true:none
 
 # ReSharper properties
 resharper_align_linq_query = true
+resharper_align_multiline_binary_patterns = true
 resharper_align_multiline_calls_chain = true
 resharper_align_multiline_extends_list = true
 resharper_align_multiline_parameter = true
 resharper_blank_lines_around_region = 1
 resharper_braces_redundant = true
+resharper_csharp_alignment_tab_fill_style = optimal_fill
+resharper_csharp_max_line_length = 200
 resharper_csharp_stick_comment = false
+resharper_csharp_wrap_parameters_style = chop_if_long
 resharper_force_attribute_style = separate
 resharper_indent_type_constraints = true
+#resharper_int_align_binary_expressions = true
+resharper_int_align_comments = true
+resharper_int_align_invocations = true
+resharper_int_align_nested_ternary = true
+resharper_int_align_switch_expressions = true
+resharper_int_align_switch_sections = true
 resharper_local_function_body = expression_body
 resharper_remove_blank_lines_near_braces_in_declarations = true
 resharper_use_roslyn_logic_for_evident_types = true
@@ -82,7 +92,19 @@ csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
-csharp_style_var_for_built_in_types = false:silent
+csharp_style_var_for_built_in_types = true:none
+resharper_wrap_before_linq_expression = true
+resharper_wrap_chained_binary_expressions = chop_if_long
+resharper_wrap_chained_binary_patterns = chop_if_long
+resharper_xmldoc_indent_size = 2
+resharper_xmldoc_indent_style = space
+resharper_xmldoc_indent_text = DoNotTouch
+resharper_xmldoc_linebreaks_inside_tags_for_elements_longer_than = 120
+resharper_xmldoc_max_blank_lines_between_tags = 1
+resharper_xmldoc_max_line_length = 100
+resharper_xmldoc_space_before_self_closing = false
+resharper_xmldoc_tab_width = 2
+resharper_xmldoc_use_indent_from_vs = true
 
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line

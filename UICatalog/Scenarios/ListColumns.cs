@@ -34,7 +34,6 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
 
 			this.listColView = new TableView () {
 				X = 0,
@@ -155,7 +154,7 @@ namespace UICatalog.Scenarios {
 
 		private void TableViewKeyPress (object sender, Key e)
 		{
-			if (e.KeyCode == KeyCode.DeleteChar) {
+			if (e.KeyCode == KeyCode.Delete) {
 
 				// set all selected cells to null
 				foreach (var pt in listColView.GetAllSelectedCells ()) {
