@@ -3373,6 +3373,9 @@ public class TextView : View {
 	///<inheritdoc/>
 	public override bool? OnInvokingKeyBindings (Key a)
 	{
+		if (!a.IsValid) {
+			return false;
+		}
 		// Give autocomplete first opportunity to respond to key presses
 		if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
 			return true;
@@ -3752,6 +3755,8 @@ public class TextView : View {
 				_historyText.Add (new List<List<RuneCell>> () { new List<RuneCell> (GetCurrentLine ()) }, CursorPosition,
 					HistoryText.LineStatus.Replaced);
 			}
+
+			SetNeedsDisplay ();
 
 			UpdateWrapModel ();
 		}
