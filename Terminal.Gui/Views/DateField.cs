@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///   Simple Date editing <see cref="View"/>
@@ -95,8 +95,8 @@ public class DateField : TextField {
 		KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
 		KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-		KeyBindings.Add (Key.Delete, Command.DeleteCharLeft);
 		KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+		KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
 		KeyBindings.Add (Key.Home, Command.LeftHome);
 		KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
