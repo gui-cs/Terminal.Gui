@@ -240,7 +240,7 @@ public class ComboBox : View {
 	public ComboBox (string text) : base ()
 	{
 		_search = new TextField ("");
-		_listview = new ComboListView (this, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, CanFocus = true, TabStop = false };
+		_listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = false };
 
 		SetInitialProperties ();
 		Text = text;
@@ -254,7 +254,7 @@ public class ComboBox : View {
 	public ComboBox (Rect rect, IList source) : base (rect)
 	{
 		_search = new TextField ("") { Width = rect.Width };
-		_listview = new ComboListView (this, rect, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+		_listview = new ComboListView (this, rect, source, HideDropdownListOnClick) { ColorScheme = Colors.Base };
 
 		SetInitialProperties ();
 		SetSource (source);
@@ -267,7 +267,7 @@ public class ComboBox : View {
 	public ComboBox (IList source) : this (string.Empty)
 	{
 		_search = new TextField ("");
-		_listview = new ComboListView (this, source, HideDropdownListOnClick) { LayoutStyle = LayoutStyle.Computed, ColorScheme = Colors.Base };
+		_listview = new ComboListView (this, source, HideDropdownListOnClick) { ColorScheme = Colors.Base };
 
 		SetInitialProperties ();
 		SetSource (source);

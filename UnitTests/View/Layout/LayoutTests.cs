@@ -359,431 +359,6 @@ public class LayoutTests {
 		Application.End (rs);
 	}
 
-	[Fact] [AutoInitShutdown]
-	public void TextDirection_Toggle ()
-	{
-		var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
-		var view = new View ();
-		win.Add (view);
-		Application.Top.Add (win);
-
-		var rs = Application.Begin (Application.Top);
-		((FakeDriver)Application.Driver).SetBufferSize (22, 22);
-
-		Assert.Equal (new Rect (0, 0, 22, 22), win.Frame);
-		Assert.Equal (new Rect (0, 0, 22, 22), win.Margin.Frame);
-		Assert.Equal (new Rect (0, 0, 22, 22), win.Border.Frame);
-		Assert.Equal (new Rect (1, 1, 20, 20), win.Padding.Frame);
-		Assert.False (view.AutoSize);
-		Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
-		Assert.Equal (Rect.Empty, view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(0)", view.Width.ToString ());
-		Assert.Equal ("Absolute(0)", view.Height.ToString ());
-		string expected = @"
-┌────────────────────┐
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.Text = "Hello World";
-		view.Width = 11;
-		view.Height = 1;
-		win.LayoutSubviews ();
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(11)", view.Width.ToString ());
-		Assert.Equal ("Absolute(1)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│Hello World         │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.AutoSize = true;
-		view.Text = "Hello Worlds";
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 12, 1), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(11)", view.Width.ToString ());
-		Assert.Equal ("Absolute(1)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│Hello Worlds        │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.TextDirection = TextDirection.TopBottom_LeftRight;
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 11, 12), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(11)", view.Width.ToString ());
-		Assert.Equal ("Absolute(1)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│H                   │
-│e                   │
-│l                   │
-│l                   │
-│o                   │
-│                    │
-│W                   │
-│o                   │
-│r                   │
-│l                   │
-│d                   │
-│s                   │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.AutoSize = false;
-		view.Height = 1;
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(11)", view.Width.ToString ());
-		Assert.Equal ("Absolute(1)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│HelloWorlds         │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.PreserveTrailingSpaces = true;
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 11, 1), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(11)", view.Width.ToString ());
-		Assert.Equal ("Absolute(1)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│Hello World         │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.PreserveTrailingSpaces = false;
-		var f = view.Frame;
-		view.Width = f.Height;
-		view.Height = f.Width;
-		view.TextDirection = TextDirection.TopBottom_LeftRight;
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 1, 11), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(1)", view.Width.ToString ());
-		Assert.Equal ("Absolute(11)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│H                   │
-│e                   │
-│l                   │
-│l                   │
-│o                   │
-│                    │
-│W                   │
-│o                   │
-│r                   │
-│l                   │
-│d                   │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		view.AutoSize = true;
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 1, 12), view.Frame);
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Absolute(0)", view.Y.ToString ());
-		Assert.Equal ("Absolute(1)", view.Width.ToString ());
-		Assert.Equal ("Absolute(12)", view.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│H                   │
-│e                   │
-│l                   │
-│l                   │
-│o                   │
-│                    │
-│W                   │
-│o                   │
-│r                   │
-│l                   │
-│d                   │
-│s                   │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-		Application.End (rs);
-	}
-
-	[Fact] [AutoInitShutdown]
-	public void Width_Height_AutoSize_True_Stay_True_If_TextFormatter_Size_Fit ()
-	{
-		string text = $"Fi_nish 終";
-		var horizontalView = new View () {
-			Id = "horizontalView",
-			AutoSize = true,
-			HotKeySpecifier = (Rune)'_',
-			Text = text
-		};
-		var verticalView = new View () {
-			Id = "verticalView",
-			Y = 3,
-			AutoSize = true,
-			HotKeySpecifier = (Rune)'_',
-			Text = text,
-			TextDirection = TextDirection.TopBottom_LeftRight
-		};
-		var win = new Window () {
-			Id = "win",
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			Text = "Window"
-		};
-		win.Add (horizontalView, verticalView);
-		Application.Top.Add (win);
-		var rs = Application.Begin (Application.Top);
-		((FakeDriver)Application.Driver).SetBufferSize (22, 22);
-
-		Assert.True (horizontalView.AutoSize);
-		Assert.True (verticalView.AutoSize);
-		Assert.Equal (new Size (10, 1), horizontalView.TextFormatter.Size);
-		Assert.Equal (new Size (2, 9), verticalView.TextFormatter.Size);
-		Assert.Equal (new Rect (0, 0, 9, 1), horizontalView.Frame);
-		Assert.Equal ("Absolute(0)", horizontalView.X.ToString ());
-		Assert.Equal ("Absolute(0)", horizontalView.Y.ToString ());
-		// BUGBUG - v2 - With v1 AutoSize = true Width/Height should always grow or keep initial value, 
-		// but in v2, autosize will be replaced by Dim.Fit. Disabling test for now.
-		Assert.Equal ("Absolute(9)", horizontalView.Width.ToString ());
-		Assert.Equal ("Absolute(1)", horizontalView.Height.ToString ());
-		Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
-		Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
-		Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-		Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
-		Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
-		string expected = @"
-┌────────────────────┐
-│Finish 終           │
-│                    │
-│                    │
-│F                   │
-│i                   │
-│n                   │
-│i                   │
-│s                   │
-│h                   │
-│                    │
-│終                  │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-
-		verticalView.Text = $"最初_の行二行目";
-		Application.Top.Draw ();
-		Assert.True (horizontalView.AutoSize);
-		Assert.True (verticalView.AutoSize);
-		// height was initialized with 8 and can only grow or keep initial value
-		Assert.Equal (new Rect (0, 3, 2, 8), verticalView.Frame);
-		Assert.Equal ("Absolute(0)", verticalView.X.ToString ());
-		Assert.Equal ("Absolute(3)", verticalView.Y.ToString ());
-		Assert.Equal ("Absolute(2)", verticalView.Width.ToString ());
-		Assert.Equal ("Absolute(8)", verticalView.Height.ToString ());
-		expected = @"
-┌────────────────────┐
-│Finish 終           │
-│                    │
-│                    │
-│最                  │
-│初                  │
-│の                  │
-│行                  │
-│二                  │
-│行                  │
-│目                  │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-│                    │
-└────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 22, 22), pos);
-		Application.End (rs);
-	}
 
 	// Tested in AbsoluteLayoutTests.cs
 	// public void Pos_Dim_Are_Null_If_Not_Initialized_On_Constructor_IsAdded_False ()
@@ -1083,22 +658,22 @@ public class LayoutTests {
 		bool clicked = false;
 		var top = Application.Top;
 		var win1 = new Window () { Id = "win1", Width = 20, Height = 10 };
-		var label = new Label ("[ ok ]");
-		var win2 = new Window () { Id = "win2", Y = Pos.Bottom (label) + 1, Width = 10, Height = 3 };
-		var view1 = new View () { Id = "view1", Width = Dim.Fill (), Height = 1, CanFocus = true };
-		view1.MouseClick += (sender, e) => clicked = true;
-		var view2 = new View () { Id = "view2", Width = Dim.Fill (1), Height = 1, CanFocus = true };
+		var view1 = new View ("view1");
+		var win2 = new Window () { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
+		var view2 = new View () { Id = "view2", Width = Dim.Fill (), Height = 1, CanFocus = true };
+		view2.MouseClick += (sender, e) => clicked = true;
+		var view3 = new View () { Id = "view3", Width = Dim.Fill (1), Height = 1, CanFocus = true };
 
-		view1.Add (view2);
-		win2.Add (view1);
-		win1.Add (label, win2);
+		view2.Add (view3);
+		win2.Add (view2);
+		win1.Add (view1, win2);
 		top.Add (win1);
 
 		var rs = Application.Begin (top);
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
-│[ ok ]            │
+│view1             │
 │                  │
 │┌────────┐        │
 ││        │        │
@@ -1108,13 +683,13 @@ public class LayoutTests {
 │                  │
 └──────────────────┘", _output);
 		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 6, 1), label.Frame);
+		Assert.Equal (new Rect (0, 0, 5, 1), view1.Frame);
 		Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
 		Assert.Equal (new Rect (0, 2, 10, 3), win2.Frame);
-		Assert.Equal (new Rect (0, 0, 8, 1), view1.Frame);
-		Assert.Equal (new Rect (0, 0, 7, 1), view2.Frame);
+		Assert.Equal (new Rect (0, 0, 8, 1), view2.Frame);
+		Assert.Equal (new Rect (0, 0, 7, 1), view3.Frame);
 		var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
-		Assert.Equal (foundView, view1);
+		Assert.Equal (foundView, view2);
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
 			X = 9,
 			Y = 4,
@@ -1182,4 +757,39 @@ public class LayoutTests {
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
 	}
+
+	// Was named AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+	// but doesn't actually have anything to do with AutoSize.
+	[Fact]
+	public void AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+	{
+		Application.Init (new FakeDriver ());
+
+		var t = Application.Top;
+
+		var w = new Window () {
+			X = Pos.Left (t) + 2,
+			Y = Pos.At (2)
+		};
+
+		var v = new View () {
+			X = Pos.Center (),
+			Y = Pos.Percent (10)
+		};
+
+		w.Add (v);
+		t.Add (w);
+
+		t.Ready += (s, e) => {
+			v.LayoutStyle = LayoutStyle.Absolute;
+			Assert.Equal (2, v.X = 2);
+			Assert.Equal (2, v.Y = 2);
+		};
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+
+		Application.Run ();
+		Application.Shutdown ();
+	}
+
 }
