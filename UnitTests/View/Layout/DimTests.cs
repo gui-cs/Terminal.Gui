@@ -1010,8 +1010,6 @@ public class DimTests {
 	{
 		var top = Application.Top;
 
-		// BUGBUG: v2 - If a View's height is zero, it should not be drawn.
-		//// Although view height is zero the text it's draw due the SetMinWidthHeight method
 		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
 		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
 		var count = 0;

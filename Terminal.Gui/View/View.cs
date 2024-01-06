@@ -218,10 +218,8 @@ public partial class View : Responder, ISupportInitializeNotification {
 		CanFocus = false;
 		TabIndex = -1;
 		TabStop = false;
-		LayoutStyle = layoutStyle;
 
 		Text = text == null ? string.Empty : text;
-		LayoutStyle = layoutStyle;
 		Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 		OnResizeNeeded ();
 
@@ -497,10 +495,10 @@ public partial class View : Responder, ISupportInitializeNotification {
 		Padding?.Dispose ();
 		Padding = null;
 
-		_height = null;
-		_width = null;
-		_x = null;
-		_y = null;
+		//_height = null;
+		//_width = null;
+		//_x = null;
+		//_y = null;
 
 		for (int i = InternalSubviews.Count - 1; i >= 0; i--) {
 			var subview = InternalSubviews [i];

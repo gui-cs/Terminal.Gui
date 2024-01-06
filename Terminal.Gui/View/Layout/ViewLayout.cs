@@ -29,14 +29,10 @@ public enum LayoutStyle {
 public partial class View {
 	bool _autoSize;
 
-	// The frame for the object. Relative to the SuperView's Bounds.
+	/// <summary>
+	/// Backing property for Frame - The frame for the object. Relative to the SuperView's Bounds.
+	/// </summary>
 	Rect _frame;
-
-	LayoutStyle _layoutStyle;
-
-	Dim _width, _height;
-
-	Pos _x, _y;
 
 	/// <summary>
 	/// Gets or sets location and size of the view. The frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>
@@ -65,10 +61,10 @@ public partial class View {
 		get => _frame;
 		set {
 			_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-			//X = _frame.X;
-			//Y = _frame.Y;
-			//Width = _frame.Width;
-			//Height = _frame.Height;
+			_x = _frame.X;
+			_y = _frame.Y;
+			_width = _frame.Width;
+			_height = _frame.Height;
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 				LayoutFrames ();
 				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
@@ -201,31 +197,16 @@ public partial class View {
 	/// </remarks>
 	/// <value>The layout style.</value>
 	public LayoutStyle LayoutStyle {
-		get => _layoutStyle;
-		//if ((X == null || X is Pos.PosAbsolute) && (Y == null || Y is Pos.PosAbsolute) &&
-		//(Width == null || Width is Dim.DimAbsolute) && (Height == null || Height is Dim.DimAbsolute)) {
-		//	return LayoutStyle.Absolute;
-		//} else {
-		//	return LayoutStyle.Computed;
-		//}
+		get {
+			if (_x is Pos.PosAbsolute && _y is Pos.PosAbsolute && _width is Dim.DimAbsolute && _height is Dim.DimAbsolute) {
+				return LayoutStyle.Absolute;
+			} else {
+				return LayoutStyle.Computed;
+			}
+		}
 		set {
-			_layoutStyle = value;
-			//switch (_layoutStyle) {
-			//case LayoutStyle.Absolute:
-			//	X = Frame.X;
-			//	Y = Frame.Y;
-			//	Width = Frame.Width;
-			//	Height = Frame.Height;
-			//	break;
-
-			//case LayoutStyle.Computed:
-			//	X ??= Frame.X;
-			//	Y ??= Frame.Y;
-			//	Width ??= Frame.Width;
-			//	Height ??= Frame.Height;
-			//	break;
-			//}
-			SetNeedsLayout ();
+			// TODO: Remove this setter and make LayoutStyle read-only for real.
+			throw new InvalidOperationException ("LayoutStyle is read-only.");
 		}
 	}
 
@@ -278,6 +259,8 @@ public partial class View {
 		}
 	}
 
+	Pos _x = Pos.At (0);
+
 	/// <summary>
 	/// Gets or sets the X position for the view (the column).
 	/// </summary>
@@ -306,12 +289,12 @@ public partial class View {
 	public Pos X {
 		get => VerifyIsInitialized (_x, nameof (X));
 		set {
-			// BUGBUG: null is the sames a Pos.Absolute(0). Should we be explicit and set it?
-			_x = value;
-
+			_x = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (X)} cannot be null");
 			OnResizeNeeded ();
 		}
 	}
+
+	Pos _y = Pos.At (0);
 
 	/// <summary>
 	/// Gets or sets the Y position for the view (the row).
@@ -341,12 +324,12 @@ public partial class View {
 	public Pos Y {
 		get => VerifyIsInitialized (_y, nameof (Y));
 		set {
-			// BUGBUG: null is the sames a Pos.Absolute(0). Should we be explicit and set it?
-			_y = value;
-
+			_y = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Y)} cannot be null");
 			OnResizeNeeded ();
 		}
 	}
+
+	Dim _width = Dim.Sized (0);
 
 	/// <summary>
 	/// Gets or sets the width of the view.
@@ -373,8 +356,7 @@ public partial class View {
 	public Dim Width {
 		get => VerifyIsInitialized (_width, nameof (Width));
 		set {
-			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
-			_width = value;
+			_width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
 			if (ValidatePosDim) {
 				var isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (_width);
@@ -386,6 +368,8 @@ public partial class View {
 			OnResizeNeeded ();
 		}
 	}
+
+	Dim _height = Dim.Sized (0);
 
 	/// <summary>
 	/// Gets or sets the height of the view.
@@ -412,8 +396,7 @@ public partial class View {
 	public Dim Height {
 		get => VerifyIsInitialized (_height, nameof (Height));
 		set {
-			// BUGBUG: null is the sames a Dim.Fill(0). Should we be explicit and set it?
-			_height = value;
+			_height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
 			if (ValidatePosDim) {
 				var isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (_height);
@@ -542,7 +525,7 @@ public partial class View {
 		if (Margin == null || Border == null || Padding == null) {
 			return new Rect (default, Frame.Size);
 		}
-		var width = Math.Max (0,  Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+		var width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
 		var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
 		return new Rect (Point.Empty, new Size (width, height));
 	}
@@ -614,8 +597,8 @@ public partial class View {
 		} else {
 			var w = _width is Dim.DimAbsolute ? _width.Anchor (0) : _frame.Width;
 			var h = _height is Dim.DimAbsolute ? _height.Anchor (0) : _frame.Height;
-			// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
-			// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
+			//// BUGBUG: v2 - ? - If layoutstyle is absolute, this overwrites the current frame h/w with 0. Hmmm...
+			//// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
 			_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 		}
 		//// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
@@ -750,6 +733,11 @@ public partial class View {
 	/// </param>
 	internal void SetRelativeLayout (Rect superviewBounds)
 	{
+		Debug.Assert (_x != null);
+		Debug.Assert (_y != null);
+		Debug.Assert (_width != null);
+		Debug.Assert (_height != null);
+
 		int newX, newW, newY, newH;
 		var autosize = Size.Empty;
 
@@ -775,13 +763,9 @@ public partial class View {
 			{
 				int newDimension;
 				switch (d) {
-				case null:
-					// dim == null is the same as dim == Dim.FIll (0)
-					newDimension = AutoSize ? autosize : dimension;
-					break;
 
 				case Dim.DimCombine combine:
-					var leftNewDim = GetNewDimension (combine._left,   location, dimension, autosize);
+					var leftNewDim = GetNewDimension (combine._left, location, dimension, autosize);
 					var rightNewDim = GetNewDimension (combine._right, location, dimension, autosize);
 					if (combine._add) {
 						newDimension = leftNewDim + rightNewDim;
@@ -797,6 +781,7 @@ public partial class View {
 					break;
 
 				case Dim.DimFill:
+				case Dim.DimAbsolute:
 				default:
 					newDimension = Math.Max (d.Anchor (dimension - location), 0);
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
@@ -821,7 +806,7 @@ public partial class View {
 
 			case Pos.PosCombine combine:
 				int left, right;
-				(left, newDimension) = GetNewLocationAndDimension (width,  superviewBounds, combine._left,  dim, autosizeDimension);
+				(left, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._left, dim, autosizeDimension);
 				(right, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._right, dim, autosizeDimension);
 				if (combine._add) {
 					newLocation = left + right;
@@ -833,7 +818,6 @@ public partial class View {
 
 			case Pos.PosAnchorEnd:
 			case Pos.PosAbsolute:
-			case null:
 			case Pos.PosFactor:
 			case Pos.PosFunc:
 			case Pos.PosView:
@@ -907,7 +891,7 @@ public partial class View {
 			}
 			return;
 		case Pos.PosCombine pc:
-			CollectPos (pc._left,  from, ref nNodes, ref nEdges);
+			CollectPos (pc._left, from, ref nNodes, ref nEdges);
 			CollectPos (pc._right, from, ref nNodes, ref nEdges);
 			break;
 		}
@@ -926,7 +910,7 @@ public partial class View {
 			}
 			return;
 		case Dim.DimCombine dc:
-			CollectDim (dc._left,  from, ref nNodes, ref nEdges);
+			CollectDim (dc._left, from, ref nNodes, ref nEdges);
 			CollectDim (dc._right, from, ref nNodes, ref nEdges);
 			break;
 		}
@@ -942,7 +926,7 @@ public partial class View {
 			}
 			CollectPos (v.X, v, ref nNodes, ref nEdges);
 			CollectPos (v.Y, v, ref nNodes, ref nEdges);
-			CollectDim (v.Width,  v, ref nNodes, ref nEdges);
+			CollectDim (v.Width, v, ref nNodes, ref nEdges);
 			CollectDim (v.Height, v, ref nNodes, ref nEdges);
 		}
 	}
