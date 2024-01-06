@@ -127,6 +127,25 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (" 10/02/1971", df.Text);
 			CultureInfo.CurrentCulture = cultureBackup;
 		}
+
+		[Fact]
+		public void Typing_With_Selection_Normalize_Format ()
+		{
+			CultureInfo cultureBackup = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+			DateField df = new DateField (DateTime.Parse ("12/12/1971"));
+			// Start selection at before the first separator /
+			df.CursorPosition = 2;
+			// Now select the separator /
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.ShiftMask)));
+			Assert.Equal (2, df.SelectedStart);
+			Assert.Equal (1, df.SelectedLength);
+			Assert.Equal (3, df.CursorPosition);
+			// Type 3 over the separator
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.D3)));
+			// The format was normalized and replaced again with /
+			Assert.Equal (" 12/12/1971", df.Text);
+			Assert.Equal (4, df.CursorPosition);
 			CultureInfo.CurrentCulture = cultureBackup;
 		}
 	}

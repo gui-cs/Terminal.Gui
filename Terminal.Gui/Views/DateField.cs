@@ -211,6 +211,14 @@ public class DateField : TextField {
 
 	bool SetText (Rune key)
 	{
+		if (CursorPosition > _fieldLen) {
+			CursorPosition = _fieldLen;
+			return false;
+		} else if (CursorPosition < 1) {
+			CursorPosition = 1;
+			return false;
+		}
+
 		var text = Text.EnumerateRunes ().ToList ();
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
@@ -226,20 +234,24 @@ public class DateField : TextField {
 			return false;
 		}
 
+		text = NormalizeFormat (text);
 		string [] vals = text.Split (_sepChar);
 		string [] frm = _format.Split (_sepChar);
-		bool isValidDate = true;
-		int idx = GetFormatIndex (frm, "y");
-		int year = Int32.Parse (vals [idx]);
+		int year;
 		int month;
 		int day;
+		int idx = GetFormatIndex (frm, "y");
+		if (Int32.Parse (vals [idx]) < 1) {
+			year = 1;
+			vals [idx] = "1";
+		} else {
+			year = Int32.Parse (vals [idx]);
+		}
 		idx = GetFormatIndex (frm, "M");
 		if (Int32.Parse (vals [idx]) < 1) {
-			isValidDate = false;
 			month = 1;
 			vals [idx] = "1";
 		} else if (Int32.Parse (vals [idx]) > 12) {
-			isValidDate = false;
 			month = 12;
 			vals [idx] = "12";
 		} else {
@@ -247,11 +259,9 @@ public class DateField : TextField {
 		}
 		idx = GetFormatIndex (frm, "d");
 		if (Int32.Parse (vals [idx]) < 1) {
-			isValidDate = false;
 			day = 1;
 			vals [idx] = "1";
 		} else if (Int32.Parse (vals [idx]) > 31) {
-			isValidDate = false;
 			day = DateTime.DaysInMonth (year, month);
 			vals [idx] = day.ToString ();
 		} else {
@@ -259,12 +269,34 @@ public class DateField : TextField {
 		}
 		string d = GetDate (month, day, year, frm);
 
-		if (!DateTime.TryParseExact (d, _format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result) ||
-		!isValidDate) {
+		if (!DateTime.TryParseExact (d, _format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
 			return false;
 		}
 		Date = result;
 		return true;
+	}
+
+	string NormalizeFormat (string text, string fmt = null, string sepChar = null)
+	{
+		if (string.IsNullOrEmpty (fmt)) {
+			fmt = _format;
+		}
+		if (string.IsNullOrEmpty (sepChar)) {
+			sepChar = _sepChar;
+		}
+		if (fmt.Length != text.Length) {
+			return text;
+		}
+
+		var fmtText = text.ToCharArray ();
+		for (int i = 0; i < text.Length; i++) {
+			var c = fmt [i];
+			if (c.ToString () == sepChar && text [i].ToString () != sepChar) {
+				fmtText [i] = c;
+			}
+		}
+
+		return new string (fmtText);
 	}
 
 	string GetDate (int month, int day, int year, string [] fm)
@@ -276,13 +308,12 @@ public class DateField : TextField {
 			} else if (fm [i].Contains ("d")) {
 				date += $"{day,2:00}";
 			} else {
-				if (!_isShort && year.ToString ().Length == 2) {
-					string y = DateTime.Now.Year.ToString ();
-					date += y.Substring (0, 2) + year.ToString ();
-				} else if (_isShort && year.ToString ().Length == 4) {
+				if (_isShort && year.ToString ().Length == 4) {
 					date += $"{year.ToString ().Substring (2, 2)}";
-				} else {
+				} else if (_isShort) {
 					date += $"{year,2:00}";
+				} else {
+					date += $"{year,4:0000}";
 				}
 			}
 			if (i < 2) {
