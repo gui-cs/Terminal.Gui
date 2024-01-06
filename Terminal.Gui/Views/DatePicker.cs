@@ -3,8 +3,6 @@
 //
 // Author: Maciej Winnik
 //
-// Licensed under the MIT license
-//
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -19,9 +17,11 @@ namespace Terminal.Gui.Views;
 ///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
 /// </remarks>
 public class DatePicker : TextField {
-	//DateTime Date { get; set; }
-	//char SeparationChar { get; set; } = '/';
-	//public string Format { get; set; }
+
+	/// <summary>
+	/// Format of date.
+	/// </summary>
+	public string Format { get; set; } = "dd/MM/yyyy";
 
 	private DataTable table;
 	private TableView calendar;
@@ -37,15 +37,13 @@ public class DatePicker : TextField {
 		Initialize ();
 	}
 
-
-
 	private void Initialize ()
 	{
 		months = Enum.GetValues (typeof (Month)).Cast<Month> ().Select (x => x.ToString ()).ToList ();
 		years = Enumerable.Range (1900, 200).Select (x => x.ToString ()).ToList ();
 	}
 
-	public void ShowDatePickerDialog ()
+	private void ShowDatePickerDialog ()
 	{
 		var dialog = new Dialog () {
 			Height = 14,
@@ -99,7 +97,17 @@ public class DatePicker : TextField {
 
 		dialog.Add (calendar, yearsLabel, comboBoxYear, monthsLabel, comboBoxMonth);
 		CreateCalendar ();
-		calendar.CellActivated += SelectDate;
+		calendar.CellActivated += (sender, e) => {
+			var dayValue = table.Rows [e.Row] [e.Col];
+			int day = int.Parse (dayValue.ToString ());
+			ChangeDayDate (day);
+			try {
+				Text = date.ToString (Format);
+			} catch (Exception) {
+				MessageBox.ErrorQuery ("Error", "Invalid date format", "Ok");
+			}
+			Application.RequestStop ();
+		};
 		Application.Run (dialog);
 	}
 
@@ -127,14 +135,6 @@ public class DatePicker : TextField {
 	{
 		date = new DateTime (date.Year, date.Month, day);
 		CreateCalendar ();
-	}
-
-	private void SelectDate (object sender, CellActivatedEventArgs e)
-	{
-		var dayValue = table.Rows [e.Row] [e.Col];
-		int day = int.Parse (dayValue.ToString ());
-		ChangeDayDate (day);
-		MessageBox.Query ("Selected date", date.ToString (), "Ok");
 	}
 
 	private DataTable CreateDataTable (int month, int year)

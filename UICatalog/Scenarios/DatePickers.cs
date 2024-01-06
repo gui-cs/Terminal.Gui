@@ -14,6 +14,7 @@ public class DatePickers : Scenario {
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
+			Format = "MM.dd.yy",
 		};
 		Win.Add (datePicker);
 	}
