@@ -122,6 +122,11 @@ namespace Terminal.Gui.ViewsTests {
 			df.ReadOnly = false;
 			Assert.True (df.NewKeyDownEvent (new (KeyCode.D1)));
 			Assert.Equal (" 12/02/1971", df.Text);
+			Assert.Equal (2, df.CursorPosition);
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.D | KeyCode.AltMask)));
+			Assert.Equal (" 10/02/1971", df.Text);
+			CultureInfo.CurrentCulture = cultureBackup;
+		}
 			CultureInfo.CurrentCulture = cultureBackup;
 		}
 	}
