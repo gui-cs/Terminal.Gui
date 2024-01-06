@@ -11,17 +11,9 @@ using System.Linq;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///   Simple Date editing <see cref="View"/>
+/// The <see cref="DatePicker"/> <see cref="View"/> Date Picker.
 /// </summary>
-/// <remarks>
-///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
-/// </remarks>
 public class DatePicker : TextField {
-
-	/// <summary>
-	/// Format of date.
-	/// </summary>
-	public string Format { get; set; } = "dd/MM/yyyy";
 
 	private DataTable table;
 	private TableView calendar;
@@ -30,7 +22,23 @@ public class DatePicker : TextField {
 	private List<string> years = new ();
 
 	/// <summary>
-	/// Initializes a new instance of <see cref="ColorPicker"/>.
+	/// Format of date.
+	/// </summary>
+	public string Format { get; set; } = "dd/MM/yyyy";
+
+	/// <summary>
+	/// Get or set the date.
+	/// </summary>
+	public DateTime Date {
+		get => date;
+		set {
+			date = value;
+			Text = date.ToString (Format);
+		}
+	}
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="DatePicker"/>.
 	/// </summary>
 	public DatePicker ()
 	{

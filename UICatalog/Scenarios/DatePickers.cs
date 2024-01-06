@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System;
+using Terminal.Gui;
 using Terminal.Gui.Views;
 
 namespace UICatalog.Scenarios;
@@ -14,6 +15,7 @@ public class DatePickers : Scenario {
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
+			Date = DateTime.Now.AddDays (10),
 			Format = "MM.dd.yy",
 		};
 		Win.Add (datePicker);
