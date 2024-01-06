@@ -40,7 +40,7 @@ public class DatePicker : TextField {
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/>.
 	/// </summary>
-	public DatePicker () => Initialize ();
+	public DatePicker () : base () => Initialize ();
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date.
@@ -48,6 +48,7 @@ public class DatePicker : TextField {
 	public DatePicker (DateTime date) : base ()
 	{
 		this.date = date;
+		Initialize ();
 	}
 
 	/// <summary>
@@ -57,6 +58,7 @@ public class DatePicker : TextField {
 	{
 		this.date = date;
 		Format = format;
+		Initialize ();
 	}
 
 	private void Initialize ()
