@@ -16,64 +16,76 @@ public class DatePickers : Scenario {
 	{
 		List<string> months = Enum.GetValues (typeof (Month)).Cast<Month> ().Select (x => x.ToString ()).ToList ();
 		List<string> years = Enumerable.Range (1900, 200).Select (x => x.ToString ()).ToList ();
-		var comboBoxYear = new ComboBox (years) {
-			X = Pos.Center (),
-			Y = 1,
-			Width = Dim.Percent (25),
-		};
-
-		comboBoxYear.SelectedItem = years.IndexOf (date.Year.ToString ());
-		comboBoxYear.SelectedItemChanged += ChangeYearDate;
-		Win.Add (comboBoxYear);
-
-		var comboBoxMonth = new ComboBox (months) {
-			X = Pos.Right (comboBoxYear),
-			Y = 1,
-			Width = Dim.Percent (25),
-		};
-
-		comboBoxMonth.SelectedItem = date.Month;
-		comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
-
-		Win.Add (comboBoxMonth);
 
 		var button = new Button ("Open date picker") {
 			X = Pos.Center (),
-			Y = Pos.Bottom (comboBoxMonth),
+			Y = 0,
 		};
 
 		button.Clicked += (s, e) => {
-			var dialog = new Dialog ();
+			var dialog = new Dialog () {
+				Height = 14,
+				Width = 40,
+				Title = "Date Picker",
+			};
+
+			calendar = new TableView () {
+				X = 0,
+				Y = Pos.Center () + 1,
+				Width = 22,
+				Height = Dim.Fill (1),
+				Style = new TableStyle {
+					ShowHeaders = true,
+					ShowHorizontalHeaderOverline = true,
+					ShowHorizontalHeaderUnderline = true,
+					ShowHorizontalBottomline = true,
+					ShowVerticalCellLines = true,
+					ExpandLastColumn = false,
+				}
+			};
+
+			var yearsLabel = new Label ("Year:") {
+				X = Pos.Right (calendar) + 1,
+				Y = 1,
+				Height = 1,
+			};
+			var comboBoxYear = new ComboBox (years) {
+				X = Pos.Right (calendar) + 1,
+				Y = 2,
+				Width = 12,
+				Height = 4,
+				SelectedItem = years.IndexOf (date.Year.ToString ())
+			};
+			comboBoxYear.SelectedItemChanged += ChangeYearDate;
+
+			var monthsLabel = new Label ("Month:") {
+				X = Pos.Right (calendar) + 1,
+				Y = 6,
+				Height = 1,
+			};
+
+			var comboBoxMonth = new ComboBox (months) {
+				X = Pos.Right (calendar) + 1,
+				Y = 7,
+				Width = 12,
+				Height = 4,
+				SelectedItem = date.Month - 1
+			};
+			comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
+
+			dialog.Add (calendar, yearsLabel, comboBoxYear, monthsLabel, comboBoxMonth);
+			CreateCalendar ();
+			calendar.CellActivated += SelectDate;
 			Application.Run (dialog);
 		};
 
-		calendar = new TableView () {
-			X = 0,
-			Y = Pos.Bottom (button),
-			Width = Dim.Fill (),
-			Height = Dim.Fill (1),
-			Style = new TableStyle {
-				ShowHeaders = true,
-				ShowHorizontalHeaderOverline = false,
-				ShowHorizontalHeaderUnderline = false,
-				ShowHorizontalBottomline = false,
-				ExpandLastColumn = false,
-			}
-		};
 
-		var days = Enumerable.Range (1, 31).ToArray ();
-		calendar.Table = new ListTableSource (days, calendar);
-
-		CreateCalendar ();
-		calendar.CellActivated += SelectDate;
-
-		Win.Add (calendar);
 		Win.Add (button);
 	}
 
 	public void CreateCalendar ()
 	{
-		calendar.Table = new DataTableSource (this.table = CreateDataTable (date.Month, date.Year));
+		calendar.Table = new DataTableSource (table = CreateDataTable (date.Month, date.Year));
 	}
 
 	private void ChangeYearDate (object sender, ListViewItemEventArgs e)
@@ -90,18 +102,23 @@ public class DatePickers : Scenario {
 		CreateCalendar ();
 	}
 
+
+	private void ChangeDayDate (int day)
+	{
+		date = new DateTime (date.Year, date.Month, day);
+		CreateCalendar ();
+	}
+
 	private void SelectDate (object sender, CellActivatedEventArgs e)
 	{
-		var o = table.Rows [e.Row] [e.Col];
+		var dayValue = table.Rows [e.Row] [e.Col];
+		int day = int.Parse (dayValue.ToString ());
+		ChangeDayDate (day);
 		MessageBox.Query ("Selected date", date.ToString (), "Ok");
 	}
 
-
-
 	public DataTable CreateDataTable (int month, int year)
 	{
-		// calculate amount of days in month
-		int days = GetAmountOfDaysInMonth (month, year);
 		table = new DataTable ();
 		table.Columns.Add ("Su");
 		table.Columns.Add ("Mo");
@@ -114,10 +131,10 @@ public class DatePickers : Scenario {
 		DateTime dateValue = new DateTime (year, month, 1);
 		var dayOfWeek = dateValue.DayOfWeek;
 
-		table.Rows.Add (new object [7]);
+		table.Rows.Add (new object [6]);
 		for (int i = 1; i <= amountOfDaysInMonth; i++) {
 			table.Rows [^1] [(int)dayOfWeek] = i;
-			if (dayOfWeek == DayOfWeek.Saturday) {
+			if (dayOfWeek == DayOfWeek.Saturday && i != amountOfDaysInMonth) {
 				table.Rows.Add (new object [7]);
 			}
 			dayOfWeek = dayOfWeek == DayOfWeek.Saturday ? DayOfWeek.Sunday : dayOfWeek + 1;
@@ -164,4 +181,3 @@ public class DatePickers : Scenario {
 	}
 }
 
-// Repopulate on choice
