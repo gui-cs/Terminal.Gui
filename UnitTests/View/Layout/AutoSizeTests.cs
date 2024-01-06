@@ -1474,4 +1474,709 @@ Y
 		Application.End (rs);
 	}
 
+
+	readonly string [] expecteds = new string [21] {
+		@"
+┌────────────────────┐
+│View with long text │
+│                    │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 0             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 1             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 2             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 3             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 4             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 5             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 6             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 7             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 8             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 9             │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 10            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 11            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 12            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 13            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 14            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 15            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 16            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 17            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 18            │
+│Label 18            │
+└────────────────────┘",
+		@"
+┌────────────────────┐
+│View with long text │
+│Label 0             │
+│Label 1             │
+│Label 2             │
+│Label 3             │
+│Label 4             │
+│Label 5             │
+│Label 6             │
+│Label 7             │
+│Label 8             │
+│Label 9             │
+│Label 10            │
+│Label 11            │
+│Label 12            │
+│Label 13            │
+│Label 14            │
+│Label 15            │
+│Label 16            │
+│Label 17            │
+│Label 18            │
+│Label 19            │
+│Label 19            │
+└────────────────────┘"
+	};
+
+
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_Dim_Add_Operator_With_Text ()
+	{
+		var top = Application.Top;
+
+		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
+		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
+		var count = 0;
+		var listLabels = new List<Label> ();
+
+		field.KeyDown += (s, k) => {
+			if (k.KeyCode == KeyCode.Enter) {
+				((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+				var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
+				Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
+
+				if (count < 20) {
+					field.Text = $"Label {count}";
+					// Label is AutoSize = true
+					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 10 };
+					view.Add (label);
+					Assert.Equal ($"Label {count}",         label.Text);
+					Assert.Equal ($"Absolute({count + 1})", label.Y.ToString ());
+					listLabels.Add (label);
+					//if (count == 0) {
+					//	Assert.Equal ($"Absolute({count})", view.Height.ToString ());
+					//	view.Height += 2;
+					//} else {
+					Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+					view.Height += 1;
+					//}
+					count++;
+				}
+				Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+			}
+		};
+
+		Application.Iteration += (s, a) => {
+			while (count < 21) {
+				field.NewKeyDownEvent (new Key (KeyCode.Enter));
+				if (count == 20) {
+					field.NewKeyDownEvent (new Key (KeyCode.Enter));
+					break;
+				}
+			}
+
+			Application.RequestStop ();
+		};
+
+		var win = new Window ();
+		win.Add (view);
+		win.Add (field);
+
+		top.Add (win);
+
+		Application.Run (top);
+
+		Assert.Equal (20,    count);
+		Assert.Equal (count, listLabels.Count);
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_Dim_Subtract_Operator_With_Text ()
+	{
+		var top = Application.Top;
+
+		// BUGBUG: v2 - If a View's height is zero, it should not be drawn.
+		//// Although view height is zero the text it's draw due the SetMinWidthHeight method
+		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
+		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
+		var count = 20;
+		// Label is AutoSize = true
+		var listLabels = new List<Label> ();
+
+		for (var i = 0; i < count; i++) {
+			field.Text = $"Label {i}";
+			// BUGBUG: v2 - view has not been initialied yet; view.Bounds is indeterminate
+			var label = new Label (field.Text) { X = 0, Y = i + 1, Width = 10 };
+			view.Add (label);
+			Assert.Equal ($"Label {i}", label.Text);
+			// BUGBUG: Bogus test; views have not been initialized yet
+			//Assert.Equal ($"Absolute({i + 1})", label.Y.ToString ());
+			listLabels.Add (label);
+
+			//if (i == 0) {
+			// BUGBUG: Bogus test; views have not been initialized yet
+			//Assert.Equal ($"Absolute({i})", view.Height.ToString ());
+			//view.Height += 2;
+			// BUGBUG: Bogus test; views have not been initialized yet
+			//Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
+			//} else {
+			// BUGBUG: Bogus test; views have not been initialized yet
+			//Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
+			view.Height += 1;
+			// BUGBUG: Bogus test; views have not been initialized yet
+			//Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
+			//}
+		}
+
+		field.KeyDown += (s, k) => {
+			if (k.KeyCode == KeyCode.Enter) {
+				((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
+				var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
+				Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
+
+				if (count > 0) {
+					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
+					view.Remove (listLabels [count - 1]);
+					listLabels [count - 1].Dispose ();
+					listLabels.RemoveAt (count - 1);
+					Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+					view.Height -= 1;
+					count--;
+					if (listLabels.Count > 0) {
+						field.Text = listLabels [count - 1].Text;
+					} else {
+						field.Text = string.Empty;
+					}
+				}
+				Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
+			}
+		};
+
+		Application.Iteration += (s, a) => {
+			while (count > -1) {
+				field.NewKeyDownEvent (new Key (KeyCode.Enter));
+				if (count == 0) {
+					field.NewKeyDownEvent (new Key (KeyCode.Enter));
+					break;
+				}
+			}
+
+			Application.RequestStop ();
+		};
+
+		var win = new Window ();
+		win.Add (view);
+		win.Add (field);
+
+		top.Add (win);
+
+		Application.Run (top);
+
+		Assert.Equal (0, count);
+		Assert.Equal (count, listLabels.Count);
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_AnchorEnd_Better_Than_Bottom_Equal_Inside_Window ()
+	{
+		var win = new Window ();
+
+		var label = new Label ("This should be the last line.") {
+			ColorScheme = Colors.Menu,
+			Width = Dim.Fill (),
+			X = 0, // keep unit test focused; don't use Center here
+			Y = Pos.AnchorEnd (1)
+		};
+
+		win.Add (label);
+
+		var top = Application.Top;
+		top.Add (win);
+		var rs = Application.Begin (top);
+		((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+
+		Assert.True (label.AutoSize);
+		Assert.Equal (29,                      label.Text.Length);
+		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
+		Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
+		Assert.Equal (new Rect (0, 7, 38, 1),  label.Frame);
+		string expected = @"
+┌──────────────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│This should be the last line.         │
+└──────────────────────────────────────┘
+";
+
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+		Application.End (rs);
+	}
+
+
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_Bottom_Equal_Inside_Window ()
+	{
+		var win = new Window ();
+
+		var label = new Label ("This should be the last line.") {
+			ColorScheme = Colors.Menu,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (win) - 3 // two lines top and bottom borders more one line above the bottom border
+		};
+
+		win.Add (label);
+
+		var top = Application.Top;
+		top.Add (win);
+		var rs = Application.Begin (top);
+		((FakeDriver)Application.Driver).SetBufferSize (40, 10);
+
+		Assert.True (label.AutoSize);
+		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
+		Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
+		Assert.Equal (new Rect (0, 7, 38, 1), label.Frame);
+		string expected = @"
+┌──────────────────────────────────────┐
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│This should be the last line.         │
+└──────────────────────────────────────┘
+";
+
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+		Application.End (rs);
+	}
+
+
+
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
+	{
+		var win = new Window ();
+
+		var label = new Label ("This should be the last line.") {
+			ColorScheme = Colors.Menu,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (win) - 4 // two lines top and bottom borders more two lines above border
+		};
+
+		win.Add (label);
+
+		var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
+		var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
+		var top = Application.Top;
+		top.Add (win, menu, status);
+		var rs = Application.Begin (top);
+
+		Assert.True (label.AutoSize);
+		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+		Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
+		Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
+		Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
+		Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
+		string expected = @"
+ Menu                                                                           
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│This should be the last line.                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+ F1 Help                                                                        
+";
+
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+		Application.End (rs);
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_AnchorEnd_Better_Than_Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
+	{
+		var win = new Window ();
+
+		var label = new Label ("This should be the last line.") {
+			ColorScheme = Colors.Menu,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.AnchorEnd (1)
+		};
+
+		win.Add (label);
+
+		var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
+		var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
+		var top = Application.Top;
+		top.Add (win, menu, status);
+		var rs = Application.Begin (top);
+
+		Assert.True (label.AutoSize);
+		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+		Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
+		Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
+		Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
+		Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
+		string expected = @"
+ Menu                                                                           
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│This should be the last line.                                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+ F1 Help                                                                        
+";
+
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+		Application.End (rs);
+	}
+
+	[Fact]
+	public void AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+	{
+		Application.Init (new FakeDriver ());
+
+		var t = Application.Top;
+
+		var w = new Window () {
+			X = Pos.Left (t) + 2,
+			Y = Pos.At (2)
+		};
+
+		// View is AutoSize = true
+		var v = new View () {
+			X = Pos.Center (),
+			Y = Pos.Percent (10)
+		};
+
+		w.Add (v);
+		t.Add (w);
+
+		t.Ready += (s, e) => {
+			v.LayoutStyle = LayoutStyle.Absolute;
+			Assert.Equal (2, v.X = 2);
+			Assert.Equal (2, v.Y = 2);
+		};
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+
+		Application.Run ();
+		Application.Shutdown ();
+	}
 }

@@ -61,10 +61,12 @@ public partial class View {
 		get => _frame;
 		set {
 			_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
-			_x = _frame.X;
-			_y = _frame.Y;
-			_width = _frame.Width;
-			_height = _frame.Height;
+			if (LayoutStyle == LayoutStyle.Absolute) {
+				_x = _frame.X;
+				_y = _frame.Y;
+				_width = _frame.Width;
+				_height = _frame.Height;
+			}
 			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
 				LayoutFrames ();
 				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
