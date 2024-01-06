@@ -58,6 +58,31 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact]
+		public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
+		{
+			var df = new DateField ();
+			// Start selection
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.CursorLeft | KeyCode.ShiftMask)));
+			Assert.Equal (1, df.SelectedStart);
+			Assert.Equal (1, df.SelectedLength);
+			Assert.Equal (0, df.CursorPosition);
+			// Without selection
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.CursorLeft)));
+			Assert.Equal (-1, df.SelectedStart);
+			Assert.Equal (0, df.SelectedLength);
+			Assert.Equal (1, df.CursorPosition);
+			df.CursorPosition = 10;
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.ShiftMask)));
+			Assert.Equal (10, df.SelectedStart);
+			Assert.Equal (1, df.SelectedLength);
+			Assert.Equal (11, df.CursorPosition);
+			Assert.True (df.NewKeyDownEvent (new (KeyCode.CursorRight)));
+			Assert.Equal (-1, df.SelectedStart);
+			Assert.Equal (0, df.SelectedLength);
+			Assert.Equal (10, df.CursorPosition);
+		}
+
+		[Fact]
 		public void KeyBindings_Command ()
 		{
 			CultureInfo cultureBackup = CultureInfo.CurrentCulture;

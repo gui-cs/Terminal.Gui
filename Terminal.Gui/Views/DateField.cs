@@ -330,7 +330,8 @@ public class DateField : TextField {
 
 	void IncCursorPosition ()
 	{
-		if (CursorPosition == _fieldLen) {
+		if (CursorPosition >= _fieldLen) {
+			CursorPosition = _fieldLen;
 			return;
 		}
 		if (Text [++CursorPosition] == _sepChar.ToCharArray () [0]) {
@@ -340,7 +341,8 @@ public class DateField : TextField {
 
 	void DecCursorPosition ()
 	{
-		if (CursorPosition == 1) {
+		if (CursorPosition <= 1) {
+			CursorPosition = 1;
 			return;
 		}
 		if (Text [--CursorPosition] == _sepChar.ToCharArray () [0]) {
@@ -357,18 +359,21 @@ public class DateField : TextField {
 
 	bool MoveRight ()
 	{
+		ClearAllSelection ();
 		IncCursorPosition ();
 		return true;
 	}
 
 	new bool MoveEnd ()
 	{
+		ClearAllSelection ();
 		CursorPosition = _fieldLen;
 		return true;
 	}
 
 	bool MoveLeft ()
 	{
+		ClearAllSelection ();
 		DecCursorPosition ();
 		return true;
 	}
@@ -376,6 +381,7 @@ public class DateField : TextField {
 	bool MoveHome ()
 	{
 		// Home, C-A
+		ClearAllSelection ();
 		CursorPosition = 1;
 		return true;
 	}
@@ -387,6 +393,7 @@ public class DateField : TextField {
 			return;
 		}
 
+		ClearAllSelection ();
 		SetText ((Rune)'0');
 		DecCursorPosition ();
 		return;
@@ -399,6 +406,7 @@ public class DateField : TextField {
 			return;
 		}
 
+		ClearAllSelection ();
 		SetText ((Rune)'0');
 		return;
 	}
