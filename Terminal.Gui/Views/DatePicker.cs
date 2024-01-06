@@ -1,5 +1,5 @@
 ﻿//
-// DatePicker.cs: text entry for date
+// DatePicker.cs: DatePicker control
 //
 // Author: Maciej Winnik
 //
@@ -40,9 +40,23 @@ public class DatePicker : TextField {
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/>.
 	/// </summary>
-	public DatePicker ()
+	public DatePicker () => Initialize ();
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date.
+	/// </summary>
+	public DatePicker (DateTime date) : base ()
 	{
-		Initialize ();
+		this.date = date;
+	}
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date and format.
+	/// </summary>
+	public DatePicker (DateTime date, string format) : base ()
+	{
+		this.date = date;
+		Format = format;
 	}
 
 	private void Initialize ()

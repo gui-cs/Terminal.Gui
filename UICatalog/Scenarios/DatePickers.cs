@@ -10,13 +10,11 @@ public class DatePickers : Scenario {
 
 	public override void Setup ()
 	{
-		var datePicker = new DatePicker () {
+		var datePicker = new DatePicker (DateTime.Now, "MM.dd.yy") {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			Date = DateTime.Now.AddDays (10),
-			Format = "MM.dd.yy",
 		};
 		Win.Add (datePicker);
 	}
