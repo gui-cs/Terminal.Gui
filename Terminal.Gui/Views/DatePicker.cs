@@ -104,11 +104,17 @@ public class DatePicker : TextField {
 		comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
 
 		dialog.Add (calendar, yearsLabel, comboBoxYear, monthsLabel, comboBoxMonth);
+
 		CreateCalendar ();
+		SelectDayOnCalendar (date.Day);
+
 		calendar.CellActivated += (sender, e) => {
 			var dayValue = table.Rows [e.Row] [e.Col];
 			int day = int.Parse (dayValue.ToString ());
 			ChangeDayDate (day);
+
+			SelectDayOnCalendar (day);
+			//calendar.SetSelection (e.Row, e.Col, false);
 			try {
 				Text = date.ToString (Format);
 			} catch (Exception) {
@@ -171,6 +177,18 @@ public class DatePicker : TextField {
 		return table;
 	}
 
+	private void SelectDayOnCalendar (int day)
+	{
+		for (int i = 0; i < table.Rows.Count; i++) {
+			for (int j = 0; j < table.Columns.Count; j++) {
+				if (table.Rows [i] [j].ToString () == day.ToString ()) {
+					calendar.SetSelection (j, i, false);
+					return;
+				}
+			}
+		}
+	}
+
 	int GetAmountOfDaysInMonth (int month, int year)
 	{
 		return DateTime.DaysInMonth (year, month);
@@ -182,7 +200,7 @@ public class DatePicker : TextField {
 		base.OnDrawContent (contentArea);
 		Driver.SetAttribute (ColorScheme.Focus);
 		Move (Bounds.Right - 1, 0);
-		Driver.AddRune (Glyphs.Cross);
+		Driver.AddRune (Glyphs.BlackCircle);
 	}
 
 	///<inheritdoc/>
