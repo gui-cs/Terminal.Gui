@@ -169,5 +169,17 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (11, df1.CursorPosition);
 			CultureInfo.CurrentCulture = cultureBackup;
 		}
+
+		[Fact]
+		public void Date_Start_From_01_01_0001_And_End_At_12_31_9999 ()
+		{
+			CultureInfo cultureBackup = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+			DateField df = new DateField (DateTime.Parse ("01/01/0001"));
+			Assert.Equal (" 01/01/0001", df.Text);
+			df.Date = DateTime.Parse ("12/31/9999");
+			Assert.Equal (" 12/31/9999", df.Text);
+			CultureInfo.CurrentCulture = cultureBackup;
+		}
 	}
 }
