@@ -1,12 +1,4 @@
-## Fixes:
-
-(Include a list of issues that this PR fixes. If this PR is a work in progress, include a list of issues that this PR is related to. Use the format `Fixes #issue` to automatically close the issue when this PR is merged.)
-
-- Fixes #____ 
-
-## Todos:
-
-- [ ] - Include a list of tasks that need to be completed for this PR to be considered complete.
+Fixes #_____ - Include a terse summary of the change or which issue is fixed.
 
 ## Pull Request checklist:
 
