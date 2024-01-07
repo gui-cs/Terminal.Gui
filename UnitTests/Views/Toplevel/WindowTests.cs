@@ -1,7 +1,8 @@
-﻿using Xunit;
+﻿using Terminal.Gui;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace TerminalGui.ViewsTests;
 
 public class WindowTests {
 	readonly ITestOutputHelper _output;
@@ -14,9 +15,9 @@ public class WindowTests {
 		// Parameterless
 		var r = new Window ();
 		Assert.NotNull (r);
-		Assert.Equal (string.Empty,         r.Title);
+		Assert.Equal (string.Empty, r.Title);
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-		Assert.Equal ("Window()(0,0,0,0)",  r.ToString ());
+		Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
 		Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
@@ -38,8 +39,8 @@ public class WindowTests {
 		// Empty Rect
 		r = new Window (Rect.Empty) { Title = "title" };
 		Assert.NotNull (r);
-		Assert.Equal ("title",                  r.Title);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
+		Assert.Equal ("title", r.Title);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -63,7 +64,7 @@ public class WindowTests {
 		r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(1,2,3,4)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -85,7 +86,8 @@ public class WindowTests {
 		r.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MenuBar_And_StatusBar_Inside_Window ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
@@ -167,7 +169,8 @@ public class WindowTests {
 └──────────────────┘", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True ()
 	{
 		var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
@@ -185,7 +188,8 @@ public class WindowTests {
 		Assert.False (view2.HasFocus);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {

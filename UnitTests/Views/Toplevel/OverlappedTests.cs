@@ -1,8 +1,9 @@
 ﻿using System;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace TerminalGui.ViewsTests;
 
 public class OverlappedTests {
 	readonly ITestOutputHelper _output;
@@ -16,7 +17,8 @@ public class OverlappedTests {
 #endif
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Dispose_Toplevel_IsOverlappedContainer_False_With_Begin_End ()
 	{
 		Application.Init (new FakeDriver ());
@@ -35,7 +37,8 @@ public class OverlappedTests {
 #endif
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Dispose_Toplevel_IsOverlappedContainer_True_With_Begin ()
 	{
 		Application.Init (new FakeDriver ());
@@ -47,7 +50,8 @@ public class OverlappedTests {
 		Application.Shutdown ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Application_RequestStop_With_Params_On_A_Not_OverlappedContainer_Always_Use_Application_Current ()
 	{
 		var top1 = new Toplevel ();
@@ -683,7 +687,8 @@ public class OverlappedTests {
 	[Fact]
 	public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter () => Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Visible_False_Does_Not_Clear ()
 	{
 		var overlapped = new Overlapped ();
