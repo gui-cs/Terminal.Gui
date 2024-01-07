@@ -53,16 +53,6 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Convenience factory method that creates a new Toplevel.
-	/// </summary>
-	/// <remarks>
-	/// The <see cref="View.Width"/> and <see cref="View.Height"/> properties
-	/// will be set to the dimensions of the terminal using <see cref="Dim.Fill"/>.
-	/// </remarks>
-	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new (); // BUGBUG: Should be ComputedLayout
-
-	/// <summary>
 	/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.
 	/// </summary>
 	/// <remarks>

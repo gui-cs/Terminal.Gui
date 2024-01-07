@@ -36,7 +36,7 @@ public class ToplevelTests {
 	[AutoInitShutdown]
 	public void Create_Toplevel ()
 	{
-		var top = Toplevel.Create ();
+		var top = new Toplevel ();
 
 		Assert.Equal (Colors.TopLevel, top.ColorScheme);
 		Assert.Equal ("Fill(0)",       top.Width.ToString ());

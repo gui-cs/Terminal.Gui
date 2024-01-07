@@ -109,7 +109,7 @@ public static partial class Application {
 	/// </para>
 	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
 	/// <param name="driverName">The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
-	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (Toplevel.Create, driver, driverName);
+	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (() => new Toplevel(), driver, driverName);
 
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
@@ -194,6 +194,10 @@ public static partial class Application {
 
 		Top = topLevelFactory ();
 		Current = Top;
+
+		// Ensure Top's layout is up to date.
+		Current.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows)); 
+		
 		_cachedSupportedCultures = GetSupportedCultures ();
 		_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 		_initialized = true;
