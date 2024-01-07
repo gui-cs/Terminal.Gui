@@ -8,16 +8,61 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("DateTime")]
 public class DatePickers : Scenario {
 
+	DatePicker datePicker;
+	Label currentlySelectedDateLabel;
+
 	public override void Setup ()
 	{
-		var datePicker = new DatePicker (DateTime.Now.AddYears (6), "MM/dd/yyyy") {
-			X = 0,
-			Y = 0,
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			YearsRange = 2000..2030,
+		var frameView = new FrameView ("Date Picker") {
+			X = Pos.Center (),
+			Y = Pos.Center (),
+			Width = Dim.Percent (75),
+			Height = Dim.Percent (50),
 		};
-		Win.Add (datePicker);
+		var label = new Label ("Click the dot to open the date picker.") {
+			X = Pos.Center (),
+			Y = Pos.Center () - 3,
+			Width = Dim.Percent (50),
+			Height = 1,
+		};
+
+		datePicker = new DatePicker () {
+			X = Pos.Center (),
+			Y = Pos.Bottom (label) + 1,
+			Width = Dim.Percent (50),
+			Height = 1,
+		};
+
+		currentlySelectedDateLabel = new Label ($"Currently selected date: {datePicker.Date.ToString (datePicker.Format)}") {
+			X = Pos.Center (),
+			Y = Pos.Bottom (datePicker) + 1,
+			Width = Dim.Percent (50),
+			Height = 1,
+		};
+
+		datePicker.TextChanged += DateChanged;
+
+		var formatLabel = new Label ($"Format: {datePicker.Format}") {
+			X = Pos.Center (),
+			Y = Pos.Bottom (currentlySelectedDateLabel) + 1,
+			Width = Dim.Percent (50),
+			Height = 1,
+		};
+
+		frameView.Add (label, datePicker, currentlySelectedDateLabel, formatLabel);
+		Win.Add (frameView);
+	}
+
+	private void DateChanged (object sender, TextChangedEventArgs e)
+	{
+		try {
+			string parsedNewDate = datePicker.Date.ToString (datePicker.Format);
+			currentlySelectedDateLabel.Text = $"Currently selected date: {parsedNewDate}";
+		} catch (FormatException) {
+			MessageBox.ErrorQuery ("Error", "Unable to parse date", "Ok");
+		}
+
+
 	}
 }
 
