@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class OverlappedTests {
 	readonly ITestOutputHelper _output;
@@ -682,7 +682,6 @@ public class OverlappedTests {
 
 	[Fact]
 	public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter () => Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
-
 
 	[Fact] [AutoInitShutdown]
 	public void Visible_False_Does_Not_Clear ()

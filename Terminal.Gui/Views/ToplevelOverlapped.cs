@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 public partial class Toplevel {
 	/// <summary>

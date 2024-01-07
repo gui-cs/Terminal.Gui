@@ -39,6 +39,9 @@ resharper_csharp_stick_comment = false
 resharper_csharp_wrap_parameters_style = chop_if_long
 resharper_force_attribute_style = separate
 resharper_indent_type_constraints = true
+resharper_xmldoc_indent_size = 2
+resharper_xmldoc_indent_style = space
+resharper_xmldoc_tab_width = 2
 #resharper_int_align_binary_expressions = true
 resharper_int_align_comments = true
 resharper_int_align_invocations = true
@@ -96,15 +99,7 @@ csharp_style_var_for_built_in_types = true:none
 resharper_wrap_before_linq_expression = true
 resharper_wrap_chained_binary_expressions = chop_if_long
 resharper_wrap_chained_binary_patterns = chop_if_long
-resharper_xmldoc_indent_size = 2
-resharper_xmldoc_indent_style = space
-resharper_xmldoc_indent_text = DoNotTouch
-resharper_xmldoc_linebreaks_inside_tags_for_elements_longer_than = 120
-resharper_xmldoc_max_blank_lines_between_tags = 1
-resharper_xmldoc_max_line_length = 100
-resharper_xmldoc_space_before_self_closing = false
-resharper_xmldoc_tab_width = 2
-resharper_xmldoc_use_indent_from_vs = true
+
 
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
