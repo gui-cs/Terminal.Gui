@@ -148,5 +148,26 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (4, df.CursorPosition);
 			CultureInfo.CurrentCulture = cultureBackup;
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Copy_Paste ()
+		{
+			CultureInfo cultureBackup = CultureInfo.CurrentCulture;
+			CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+			DateField df1 = new DateField (DateTime.Parse ("12/12/1971"));
+			DateField df2 = new DateField (DateTime.Parse ("12/31/2023"));
+			// Select all text
+			Assert.True (df2.NewKeyDownEvent (new (KeyCode.End | KeyCode.ShiftMask)));
+			Assert.Equal (1, df2.SelectedStart);
+			Assert.Equal (10, df2.SelectedLength);
+			Assert.Equal (11, df2.CursorPosition);
+			// Copy from df2
+			Assert.True (df2.NewKeyDownEvent (new (KeyCode.C | KeyCode.CtrlMask)));
+			// Paste into df1
+			Assert.True (df1.NewKeyDownEvent (new (KeyCode.V | KeyCode.CtrlMask)));
+			Assert.Equal (" 12/31/2023", df1.Text);
+			Assert.Equal (11, df1.CursorPosition);
+			CultureInfo.CurrentCulture = cultureBackup;
+		}
 	}
 }

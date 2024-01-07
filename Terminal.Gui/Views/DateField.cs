@@ -130,7 +130,14 @@ public class DateField : TextField {
 	void DateField_Changed (object sender, TextChangedEventArgs e)
 	{
 		try {
-			if (!DateTime.TryParseExact (GetDate (Text), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
+			var date = GetInvarianteDate (Text, _isShort);
+			if ($" {date}" != Text) {
+				Text = $" {date}";
+			}
+			if (_isShort) {
+				date = GetInvarianteDate (Text, false);
+			}
+			if (!DateTime.TryParseExact (date, GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
 				Text = e.OldValue;
 			}
 		} catch (Exception) {
@@ -323,10 +330,10 @@ public class DateField : TextField {
 		return date;
 	}
 
-	string GetDate (string text)
+	string GetInvarianteDate (string text, bool isShort)
 	{
 		string [] vals = text.Split (_sepChar);
-		string [] frm = _format.Split (_sepChar);
+		string [] frm = (isShort ? $"MM{_sepChar}dd{_sepChar}yy" : GetInvarianteFormat ()).Split (_sepChar);
 		string [] date = { null, null, null };
 
 		for (int i = 0; i < frm.Length; i++) {
@@ -335,16 +342,25 @@ public class DateField : TextField {
 			} else if (frm [i].Contains ("d")) {
 				date [1] = vals [i].Trim ();
 			} else {
-				string year = vals [i].Trim ();
-				if (year.GetRuneCount () == 2) {
-					string y = DateTime.Now.Year.ToString ();
-					date [2] = y.Substring (0, 2) + year.ToString ();
+				string yearString;
+				if (isShort && vals [i].Length > 2) {
+					yearString = vals [i].Substring (0, 2);
+				} else if (!isShort && vals [i].Length > 4) {
+					yearString = vals [i].Substring (0, 4);
 				} else {
-					date [2] = vals [i].Trim ();
+					yearString = vals [i].Trim ();
+				}
+				var year = int.Parse (yearString);
+				if (isShort && year.ToString ().Length == 4) {
+					date [2] = year.ToString ().Substring (2, 2);
+				} else if (isShort) {
+					date [2] = year.ToString ();
+				} else {
+					date [2] = $"{year,4:0000}";
 				}
 			}
 		}
-		return date [0] + _sepChar + date [1] + _sepChar + date [2];
+		return $"{date [0]}{_sepChar}{date [1]}{_sepChar}{date [2]}";
 	}
 
 	int GetFormatIndex (string [] fm, string t)
