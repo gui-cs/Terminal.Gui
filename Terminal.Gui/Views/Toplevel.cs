@@ -60,7 +60,7 @@ public partial class Toplevel : View {
 	/// will be set to the dimensions of the terminal using <see cref="Dim.Fill"/>.
 	/// </remarks>
 	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new (new Rect (0, 0, Driver.Cols, Driver.Rows)); // BUGBUG: Should be ComputedLayout
+	public static Toplevel Create () => new (); // BUGBUG: Should be ComputedLayout
 
 	/// <summary>
 	/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.
