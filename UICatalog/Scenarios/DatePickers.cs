@@ -10,7 +10,7 @@ public class DatePickers : Scenario {
 
 	public override void Setup ()
 	{
-		var datePicker = new DatePicker (DateTime.Now.AddYears (50), "MM/dd/yyyy") {
+		var datePicker = new DatePicker (DateTime.Now.AddYears (6), "MM/dd/yyyy") {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),

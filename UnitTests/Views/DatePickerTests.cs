@@ -9,14 +9,14 @@ public class DatePickerTests {
 	public void DatePicker_DefaultFormat_ShouldBe_dd_MM_yyyy ()
 	{
 		var datePicker = new DatePicker ();
-		Assert.Equal ("dd/MM/yyyy", datePicker.Format);
+		Assert.Equal ("MM/dd/yyyy", datePicker.Format);
 	}
 
 	[Fact]
 	public void DatePicker_Initialize_ShouldSetCurrentDate ()
 	{
 		var datePicker = new DatePicker ();
-		Assert.Equal (DateTime.Now.ToString ("dd/MM/yyyy"), datePicker.Text);
+		Assert.Equal (DateTime.Now.ToString ("MM/dd/yyyy"), datePicker.Text);
 	}
 
 	[Fact]
@@ -25,7 +25,7 @@ public class DatePickerTests {
 		var datePicker = new DatePicker ();
 		var newDate = new DateTime (2024, 1, 15);
 		datePicker.Date = newDate;
-		Assert.Equal (newDate.ToString ("dd/MM/yyyy"), datePicker.Text);
+		Assert.Equal (newDate.ToString ("MM/dd/yyyy"), datePicker.Text);
 	}
 
 	[Fact]
@@ -39,7 +39,7 @@ public class DatePickerTests {
 		var newDate = new DateTime (2024, 2, 20);
 		datePicker.Date = newDate;
 
-		Assert.Equal (newDate.ToString ("dd/MM/yyyy"), datePicker.Text);
+		Assert.Equal (newDate.ToString ("MM/dd/yyyy"), datePicker.Text);
 
 		datePicker.Date = originalDate;
 	}
