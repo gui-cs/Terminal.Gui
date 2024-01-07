@@ -68,10 +68,6 @@ public static partial class Application {
 	static bool SetCurrentOverlappedAsTop ()
 	{
 		if (OverlappedTop == null && Current != Top && Current?.SuperView == null && Current?.Modal == false) {
-			if (Current.Frame != new Rect (0, 0, Driver.Cols, Driver.Rows)) {
-				// BUGBUG: Use Dim.Fill
-				Current.Frame = new Rect (0, 0, Driver.Cols, Driver.Rows);
-			}
 			Top = Current;
 			return true;
 		}
