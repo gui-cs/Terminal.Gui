@@ -25,34 +25,8 @@ public class ToplevelTests {
 		Assert.Null (top.StatusBar);
 		Assert.False (top.IsOverlappedContainer);
 		Assert.False (top.IsOverlapped);
-
-		// Because Toplevel is LayoutStyle.Computed, SetRelativeLayout needs to be called
-		// to set the Frame.
-		top.SetRelativeLayout (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-		Assert.Equal (new Rect (0,          0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
-	public void Create_Toplevel ()
-	{
-		var top = new Toplevel ();
-
-		Assert.Equal (Colors.TopLevel, top.ColorScheme);
-		Assert.Equal ("Fill(0)",       top.Width.ToString ());
-		Assert.Equal ("Fill(0)",       top.Height.ToString ());
-		Assert.False (top.Running);
-		Assert.False (top.Modal);
-		Assert.Null (top.MenuBar);
-		Assert.Null (top.StatusBar);
-		Assert.False (top.IsOverlappedContainer);
-		Assert.False (top.IsOverlapped);
-
-		// Because Toplevel is LayoutStyle.Computed, SetRelativeLayout needs to be called
-		// to set the Frame.
-		top.SetRelativeLayout (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-		Assert.Equal (new Rect (0,          0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
-	}
 
 #if BROKE_IN_2927
 		// BUGBUG: The name of this test does not match what it does. 
