@@ -1,88 +1,173 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
-/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
-/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
+/// Toplevel views are used for both an application's main view (filling the entire screen and
+/// for modal (pop-up) views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and
+/// <see cref="Wizard"/>).
 /// </summary>
 /// <remarks>
-///   <para>
-///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. 
-///     They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has 
-///     been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>). 
-///   </para>
-///   <para>
-///     A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
-///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
-///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
-///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
-///   </para>
+///         <para>
+///         Toplevels can run as modal (popup) views, started by calling
+///         <see cref="Application.Run(Toplevel, System.Func{System.Exception,bool}(System.Exception))"/>.
+///         They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has
+///         been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>).
+///         </para>
+///         <para>
+///         A Toplevel is created when an application initializes Terminal.Gui by calling
+///         <see cref="Application.Init"/>.
+///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional
+///         Toplevels can be created
+///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and
+///         call <see cref="Application.Run(Toplevel, System.Func{System.Exception,bool}(System.Exception))"/>.
+///         </para>
 /// </remarks>
 public partial class Toplevel : View {
+	internal static Point? _dragPosition;
+	Point _startGrabPoint;
+
+	// BUGBUG: Remove; Toplevel should be ComputedLayout
 	/// <summary>
-	/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not. 
+	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
+	/// <see cref="LayoutStyle.Absolute"/> layout.
+	/// </summary>
+	/// <param name="frame">
+	/// A Superview-relative rectangle specifying the location and size for the new
+	/// Toplevel
+	/// </param>
+	public Toplevel (Rect frame) : base (frame) => SetInitialProperties ();
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Toplevel"/> class with
+	/// <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties
+	/// will be set to the dimensions of the terminal using <see cref="Dim.Fill"/>.
+	/// </summary>
+	public Toplevel ()
+	{
+		SetInitialProperties ();
+		Width = Dim.Fill ();
+		Height = Dim.Fill ();
+	}
+
+	/// <summary>
+	/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.
 	/// </summary>
 	/// <remarks>
-	///    Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead. 
+	/// Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/>
+	/// instead.
 	/// </remarks>
 	public bool Running { get; set; }
 
 	/// <summary>
+	/// Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.
+	/// </summary>
+	/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
+	public override bool CanFocus => SuperView == null ? true : base.CanFocus;
+
+	/// <summary>
+	/// Determines whether the <see cref="Toplevel"/> is modal or not.
+	/// If set to <c>false</c> (the default):
+	/// <list type="bullet">
+	///         <item>
+	///                 <description><see cref="View.OnKeyDown"/> events will propagate keys upwards.</description>
+	///         </item>
+	///         <item>
+	///                 <description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
+	///         </item>
+	/// </list>
+	/// If set to <c>true</c>:
+	/// <list type="bullet">
+	///         <item>
+	///                 <description><see cref="View.OnKeyDown"/> events will NOT propagate keys upwards.</description>
+	///         </item>
+	///         <item>
+	///                 <description>
+	///                 The Toplevel will and look like a modal (pop-up) (e.g. see
+	///                 <see cref="Dialog"/>.
+	///                 </description>
+	///         </item>
+	/// </list>
+	/// </summary>
+	public bool Modal { get; set; }
+
+	/// <summary>
+	/// Gets or sets the menu for this Toplevel.
+	/// </summary>
+	public virtual MenuBar MenuBar { get; set; }
+
+	/// <summary>
+	/// Gets or sets the status bar for this Toplevel.
+	/// </summary>
+	public virtual StatusBar StatusBar { get; set; }
+
+	/// <summary>
+	/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
+	/// <see langword="false"/>, otherwise.
+	/// </summary>
+	public bool IsLoaded { get; private set; }
+
+	/// <summary>
 	/// Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded.
-	/// A Loaded event handler is a good place to finalize initialization before calling 
+	/// A Loaded event handler is a good place to finalize initialization before calling
 	/// <see cref="Application.RunLoop(RunState)"/>.
 	/// </summary>
 	public event EventHandler Loaded;
 
 	/// <summary>
 	/// Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration.
-	/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
-	/// changes. 
-	/// <para>A Ready event handler is a good place to finalize initialization after calling 
-	/// <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.</para>
+	/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and
+	/// focus has been set.
+	/// changes.
+	/// <para>
+	/// A Ready event handler is a good place to finalize initialization after calling
+	/// <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
+	/// </para>
 	/// </summary>
 	public event EventHandler Ready;
 
 	/// <summary>
 	/// Invoked when the Toplevel <see cref="RunState"/> has been unloaded.
-	/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(RunState)"/>.
+	/// A Unloaded event handler is a good place to dispose objects after calling
+	/// <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler Unloaded;
 
 	/// <summary>
-	/// Invoked when the Toplevel <see cref="RunState"/> becomes the <see cref="Application.Current"/> Toplevel.
+	/// Invoked when the Toplevel <see cref="RunState"/> becomes the <see cref="Application.Current"/>
+	/// Toplevel.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> Activate;
 
 	/// <summary>
-	/// Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
+	/// Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/>
+	/// Toplevel.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> Deactivate;
 
 	/// <summary>
-	/// Invoked when a child of the Toplevel <see cref="RunState"/> is closed by  
+	/// Invoked when a child of the Toplevel <see cref="RunState"/> is closed by
 	/// <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> ChildClosed;
 
 	/// <summary>
-	/// Invoked when the last child of the Toplevel <see cref="RunState"/> is closed from 
+	/// Invoked when the last child of the Toplevel <see cref="RunState"/> is closed from
 	/// by <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler AllChildClosed;
 
 	/// <summary>
-	/// Invoked when the Toplevel's <see cref="RunState"/> is being closed by  
+	/// Invoked when the Toplevel's <see cref="RunState"/> is being closed by
 	/// <see cref="Application.RequestStop(Toplevel)"/>.
 	/// </summary>
 	public event EventHandler<ToplevelClosingEventArgs> Closing;
 
 	/// <summary>
-	/// Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.
+	/// Invoked when the Toplevel's <see cref="RunState"/> is closed by
+	/// <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> Closed;
 
@@ -131,7 +216,8 @@ public partial class Toplevel : View {
 	internal virtual void OnActivate (Toplevel deactivated) => Activate?.Invoke (this, new ToplevelEventArgs (deactivated));
 
 	/// <summary>
-	/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first time. 
+	/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for
+	/// the first time.
 	/// </summary>
 	public virtual void OnLoaded ()
 	{
@@ -143,7 +229,7 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the 
+	/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the
 	/// first iteration of the loop.
 	/// </summary>
 	internal virtual void OnReady ()
@@ -163,23 +249,6 @@ public partial class Toplevel : View {
 			tl.OnUnloaded ();
 		}
 		Unloaded?.Invoke (this, EventArgs.Empty);
-	}
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <param name="frame">A Superview-relative rectangle specifying the location and size for the new Toplevel</param>
-	public Toplevel (Rect frame) : base (frame) => SetInitialProperties ();
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout, 
-	/// defaulting to full screen.
-	/// </summary>
-	public Toplevel () : base ()
-	{
-		SetInitialProperties ();
-		Width = Dim.Fill ();
-		Height = Dim.Fill ();
 	}
 
 	void SetInitialProperties ()
@@ -247,7 +316,7 @@ public partial class Toplevel : View {
 		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
 		KeyBindings.Add (KeyCode.F5, Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop);     // Needed on Unix
 		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
@@ -319,60 +388,6 @@ public partial class Toplevel : View {
 		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
-
-	/// <summary>
-	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
-	/// </summary>
-	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
-
-	/// <summary>
-	/// Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.
-	/// </summary>
-	/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
-	public override bool CanFocus => SuperView == null ? true : base.CanFocus;
-
-	/// <summary>
-	/// Determines whether the <see cref="Toplevel"/> is modal or not. 
-	/// If set to <c>false</c> (the default):
-	/// 
-	/// <list type="bullet">
-	///   <item>
-	///		<description><see cref="View.OnKeyDown"/> events will propagate keys upwards.</description>
-	///   </item>
-	///   <item>
-	///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
-	///   </item>
-	/// </list>
-	///
-	/// If set to <c>true</c>:
-	/// 
-	/// <list type="bullet">
-	///   <item>
-	///		<description><see cref="View.OnKeyDown"/> events will NOT propagate keys upwards.</description>
-	///	  </item>
-	///   <item>
-	///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
-	///   </item>
-	/// </list>
-	/// </summary>
-	public bool Modal { get; set; }
-
-	/// <summary>
-	/// Gets or sets the menu for this Toplevel.
-	/// </summary>
-	public virtual MenuBar MenuBar { get; set; }
-
-	/// <summary>
-	/// Gets or sets the status bar for this Toplevel.
-	/// </summary>
-	public virtual StatusBar StatusBar { get; set; }
-
-	/// <summary>
-	/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
-	/// <see langword="false"/>, otherwise.
-	/// </summary>
-	public bool IsLoaded { get; private set; }
 
 	void MovePreviousViewOrTop ()
 	{
@@ -461,9 +476,9 @@ public partial class Toplevel : View {
 			return;
 		}
 
-		bool found = false;
-		bool focusProcessed = false;
-		int idx = 0;
+		var found = false;
+		var focusProcessed = false;
+		var idx = 0;
 
 		foreach (var v in views) {
 			if (v == this) {
@@ -538,13 +553,16 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	///  Gets a new location of the <see cref="Toplevel"/> that is within the Bounds of the <paramref name="top"/>'s 
-	///  <see cref="View.SuperView"/> (e.g. for dragging a Window).
-	///  The `out` parameters are the new X and Y coordinates.
+	/// Gets a new location of the <see cref="Toplevel"/> that is within the Bounds of the
+	/// <paramref name="top"/>'s
+	/// <see cref="View.SuperView"/> (e.g. for dragging a Window).
+	/// The `out` parameters are the new X and Y coordinates.
 	/// </summary>
 	/// <remarks>
-	/// If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not <see cref="Application.Top"/>
-	/// the position will be bound by the <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>.
+	/// If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
+	/// <see cref="Application.Top"/>
+	/// the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
+	/// <see cref="ConsoleDriver.Rows"/>.
 	/// </remarks>
 	/// <param name="top">The Toplevel that is to be moved.</param>
 	/// <param name="targetX">The target x location.</param>
@@ -554,11 +572,17 @@ public partial class Toplevel : View {
 	/// <param name="menuBar">The new top most menuBar</param>
 	/// <param name="statusBar">The new top most statusBar</param>
 	/// <returns>
-	///  Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
-	///  <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
-	///  </returns>
-	internal View GetLocationThatFits (Toplevel top, int targetX, int targetY,
-					out int nx, out int ny, out MenuBar menuBar, out StatusBar statusBar)
+	/// Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
+	/// <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the
+	/// correct View.
+	/// </returns>
+	internal View GetLocationThatFits (Toplevel top,
+					   int targetX,
+					   int targetY,
+					   out int nx,
+					   out int ny,
+					   out MenuBar menuBar,
+					   out StatusBar statusBar)
 	{
 		int maxWidth;
 		View superView;
@@ -645,21 +669,22 @@ public partial class Toplevel : View {
 
 	/// <summary>
 	/// Adjusts the location and size of <paramref name="top"/> within this Toplevel.
-	/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/> views.
+	/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/>
+	/// views.
 	/// </summary>
 	/// <param name="top">The Toplevel to adjust.</param>
 	public virtual void PositionToplevel (Toplevel top)
 	{
 		var superView = GetLocationThatFits (top, top.Frame.X, top.Frame.Y,
-			out int nx, out int ny, out _, out var sb);
-		bool layoutSubviews = false;
-		int maxWidth = 0;
+			out var nx, out var ny, out _, out var sb);
+		var layoutSubviews = false;
+		var maxWidth = 0;
 		if (superView.Margin != null && superView == top.SuperView) {
 			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
 		}
-		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal
-			|| top?.SuperView == null && top.IsOverlapped)
-		&& (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal || top?.SuperView == null && top.IsOverlapped) &&
+		    (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) &&
+		    top.LayoutStyle == LayoutStyle.Computed) {
 
 			if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 				top.X = nx;
@@ -672,8 +697,7 @@ public partial class Toplevel : View {
 		}
 
 		// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
-		if (sb != null && !top.Subviews.Contains (sb) && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-		&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
+		if (sb != null && !top.Subviews.Contains (sb) && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0) && top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
 			top.Height = Dim.Fill (sb.Visible ? 1 : 0);
 			layoutSubviews = true;
@@ -741,9 +765,6 @@ public partial class Toplevel : View {
 		return false;
 	}
 
-	internal static Point? _dragPosition;
-	Point _startGrabPoint;
-
 	///<inheritdoc/>
 	public override bool MouseEvent (MouseEvent mouseEvent)
 	{
@@ -754,9 +775,7 @@ public partial class Toplevel : View {
 		//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
 
 		int nx, ny;
-		if (!_dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
-						|| mouseEvent.Flags == MouseFlags.Button2Pressed
-						|| mouseEvent.Flags == MouseFlags.Button3Pressed)) {
+		if (!_dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed || mouseEvent.Flags == MouseFlags.Button2Pressed || mouseEvent.Flags == MouseFlags.Button3Pressed)) {
 
 			SetFocus ();
 			Application.BringOverlappedTopToFront ();
@@ -774,8 +793,9 @@ public partial class Toplevel : View {
 
 			//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
 			return true;
-		} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
-			mouseEvent.Flags == MouseFlags.Button3Pressed) {
+		}
+		if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
+		    mouseEvent.Flags == MouseFlags.Button3Pressed) {
 			if (_dragPosition.HasValue) {
 				if (SuperView == null) {
 					// Redraw the entire app window using just our Frame. Since we are 
@@ -813,15 +833,14 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel, 
+	/// Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel,
 	/// <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
 	/// </summary>
 	public virtual void RequestStop ()
 	{
-		if (IsOverlappedContainer && Running
-					&& (Application.Current == this
-					|| Application.Current?.Modal == false
-					|| Application.Current?.Modal == true && Application.Current?.Running == false)) {
+		if (IsOverlappedContainer &&
+		    Running &&
+		    (Application.Current == this || Application.Current?.Modal == false || Application.Current?.Modal == true && Application.Current?.Running == false)) {
 
 			foreach (var child in Application.OverlappedChildren) {
 				var ev = new ToplevelClosingEventArgs (this);
@@ -852,7 +871,8 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is the top-most Toplevel, 
+	/// Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If
+	/// <paramref name="top"/> is the top-most Toplevel,
 	/// <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
 	/// </summary>
 	/// <param name="top">The Toplevel to request stop.</param>
@@ -902,69 +922,82 @@ public partial class Toplevel : View {
 		base.Dispose (disposing);
 	}
 }
+
 /// <summary>
 /// Implements the <see cref="IEqualityComparer{T}"/> for comparing two <see cref="Toplevel"/>s
 /// used by <see cref="StackExtensions"/>.
 /// </summary>
 public class ToplevelEqualityComparer : IEqualityComparer<Toplevel> {
 	/// <summary>Determines whether the specified objects are equal.</summary>
-	/// <param name="x">The first object of type <see cref="Toplevel" /> to compare.</param>
-	/// <param name="y">The second object of type <see cref="Toplevel" /> to compare.</param>
+	/// <param name="x">The first object of type <see cref="Toplevel"/> to compare.</param>
+	/// <param name="y">The second object of type <see cref="Toplevel"/> to compare.</param>
 	/// <returns>
-	///     <see langword="true" /> if the specified objects are equal; otherwise, <see langword="false" />.</returns>
+	/// <see langword="true"/> if the specified objects are equal; otherwise, <see langword="false"/>.
+	/// </returns>
 	public bool Equals (Toplevel x, Toplevel y)
 	{
 		if (y == null && x == null) {
 			return true;
-		} else if (x == null || y == null) {
-			return false;
-		} else if (x.Id == y.Id) {
-			return true;
-		} else {
+		}
+		if (x == null || y == null) {
 			return false;
 		}
+		if (x.Id == y.Id) {
+			return true;
+		}
+		return false;
 	}
 
 	/// <summary>Returns a hash code for the specified object.</summary>
-	/// <param name="obj">The <see cref="Toplevel" /> for which a hash code is to be returned.</param>
+	/// <param name="obj">The <see cref="Toplevel"/> for which a hash code is to be returned.</param>
 	/// <returns>A hash code for the specified object.</returns>
-	/// <exception cref="ArgumentNullException">The type of <paramref name="obj" /> 
-	/// is a reference type and <paramref name="obj" /> is <see langword="null" />.</exception>
+	/// <exception cref="ArgumentNullException">
+	/// The type of <paramref name="obj"/>
+	/// is a reference type and <paramref name="obj"/> is <see langword="null"/>.
+	/// </exception>
 	public int GetHashCode (Toplevel obj)
 	{
 		if (obj == null) {
 			throw new ArgumentNullException ();
 		}
 
-		int hCode = 0;
-		if (int.TryParse (obj.Id, out int result)) {
+		var hCode = 0;
+		if (int.TryParse (obj.Id, out var result)) {
 			hCode = result;
 		}
 		return hCode.GetHashCode ();
 	}
 }
+
 /// <summary>
-/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> 
+/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/>
 /// from the <see cref="Application.OverlappedChildren"/> if needed.
 /// </summary>
 public sealed class ToplevelComparer : IComparer<Toplevel> {
-	/// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>
+	/// <summary>
+	/// Compares two objects and returns a value indicating whether one is less than, equal to, or
+	/// greater than the other.
+	/// </summary>
 	/// <param name="x">The first object to compare.</param>
 	/// <param name="y">The second object to compare.</param>
-	/// <returns>A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />, as shown in the following table.Value Meaning Less than zero
-	///             <paramref name="x" /> is less than <paramref name="y" />.Zero
-	///             <paramref name="x" /> equals <paramref name="y" />.Greater than zero
-	///             <paramref name="x" /> is greater than <paramref name="y" />.</returns>
+	/// <returns>
+	/// A signed integer that indicates the relative values of <paramref name="x"/> and
+	/// <paramref name="y"/>, as shown in the following table.Value Meaning Less than zero
+	/// <paramref name="x"/> is less than <paramref name="y"/>.Zero
+	/// <paramref name="x"/> equals <paramref name="y"/>.Greater than zero
+	/// <paramref name="x"/> is greater than <paramref name="y"/>.
+	/// </returns>
 	public int Compare (Toplevel x, Toplevel y)
 	{
 		if (ReferenceEquals (x, y)) {
 			return 0;
-		} else if (x == null) {
-			return -1;
-		} else if (y == null) {
-			return 1;
-		} else {
-			return string.Compare (x.Id, y.Id);
 		}
+		if (x == null) {
+			return -1;
+		}
+		if (y == null) {
+			return 1;
+		}
+		return string.Compare (x.Id, y.Id);
 	}
 }
