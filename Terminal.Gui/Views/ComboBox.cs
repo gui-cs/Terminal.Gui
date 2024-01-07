@@ -612,6 +612,8 @@ public class ComboBox : View {
 				_listview.SetFocus ();
 				if (_listview.SelectedItem > -1) {
 					SetValue (_searchset [_listview.SelectedItem]);
+				} else {
+					_listview.SelectedItem = 0;
 				}
 			} else {
 				_listview.TabStop = false;
