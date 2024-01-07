@@ -397,9 +397,9 @@ public static partial class Application {
 			MoveCurrent (Current);
 		}
 
-		if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
+		//if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
 			Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
-		}
+		//}
 		Toplevel.LayoutSubviews ();
 		Toplevel.PositionToplevels ();
 		Toplevel.FocusFirst ();

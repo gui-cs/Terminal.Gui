@@ -16,8 +16,12 @@ public class AbsoluteLayoutTests {
 	[TestRespondersDisposed]
 	public void AbsoluteLayout_Constructor ()
 	{
+		var v = new View ();
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+		v.Dispose ();
+
 		var frame = Rect.Empty;
-		var v = new View (frame);
+		v = new View (frame);
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (frame,                                      v.Frame);
 		Assert.Equal (new Rect (0, 0, frame.Width, frame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
@@ -83,7 +87,6 @@ public class AbsoluteLayoutTests {
 		Assert.Equal (Dim.Sized (3),                     v.Width);
 		Assert.Equal (Dim.Sized (4),                     v.Height);
 		v.Dispose ();
-
 	}
 
 	[Fact]
@@ -93,7 +96,13 @@ public class AbsoluteLayoutTests {
 		var frame = new Rect (1,    2, 3,  4);
 		var newFrame = new Rect (1, 2, 30, 40);
 
-		var v = new View (frame);
+		var v = new View ();
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+		v.Dispose ();
+
+		v = new View (frame);
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+		
 		v.Frame = newFrame;
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (newFrame,                                         v.Frame);
@@ -106,6 +115,7 @@ public class AbsoluteLayoutTests {
 
 		v = new View (frame.X, frame.Y, "v");
 		v.Frame = newFrame;
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (newFrame,                                         v.Frame);
 		Assert.Equal (new Rect (0, 0, newFrame.Width, newFrame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
 		Assert.Equal (Pos.At (1),                                       v.X);
@@ -117,6 +127,7 @@ public class AbsoluteLayoutTests {
 		newFrame = new Rect (10, 20, 30, 40);
 		v = new View (frame);
 		v.Frame = newFrame;
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (newFrame,                                         v.Frame);
 		Assert.Equal (new Rect (0, 0, newFrame.Width, newFrame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
 		Assert.Equal (Pos.At (10),                                       v.X);
@@ -127,6 +138,7 @@ public class AbsoluteLayoutTests {
 
 		v = new View (frame.X, frame.Y, "v");
 		v.Frame = newFrame;
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (newFrame,                                         v.Frame);
 		Assert.Equal (new Rect (0, 0, newFrame.Width, newFrame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
 		Assert.Equal (Pos.At (10),                                       v.X);

@@ -262,6 +262,8 @@ public class DimTests {
 		Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
 	{
@@ -276,6 +278,8 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	{
@@ -311,6 +315,8 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [AutoInitShutdown]
 	public void Only_DimAbsolute_And_DimFactor_As_A_Different_Procedure_For_Assigning_Value_To_Width_Or_Height ()
 	{
@@ -522,6 +528,9 @@ public class DimTests {
 	//	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
 	//}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
+
 	/// <summary>
 	/// This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461
 	/// </summary>
@@ -570,6 +579,8 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
 	{
@@ -614,6 +625,8 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void PosCombine_View_Not_Added_Throws ()
 	{
@@ -650,6 +663,8 @@ public class DimTests {
 		v2.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// A new test that does not depend on Application is needed.
 	[Fact] [AutoInitShutdown]
 	public void Dim_Add_Operator ()
 	{
@@ -693,8 +708,8 @@ public class DimTests {
 		Assert.Equal (20, count);
 	}
 
-	
-
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [AutoInitShutdown]
 	public void Dim_Subtract_Operator ()
 	{
@@ -807,6 +822,8 @@ public class DimTests {
 		Assert.NotEqual (dim1, dim2);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Theory] [AutoInitShutdown]
 	[InlineData (0,  true)]
 	[InlineData (0,  false)]
@@ -844,6 +861,8 @@ public class DimTests {
 		}
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_Referencing_SuperView_Does_Not_Throw ()
 	{
@@ -865,6 +884,8 @@ public class DimTests {
 		super.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_SyperView_Referencing_SubView_Throws ()
 	{

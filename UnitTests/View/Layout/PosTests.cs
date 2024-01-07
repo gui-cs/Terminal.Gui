@@ -22,7 +22,7 @@ public class PosTests {
 	[Fact]
 	public void AnchorEnd_SetsValue ()
 	{
-		int n = 0;
+		var n = 0;
 		var pos = Pos.AnchorEnd ();
 		Assert.Equal ($"AnchorEnd({n})", pos.ToString ());
 
@@ -34,8 +34,8 @@ public class PosTests {
 	[Fact]
 	public void AnchorEnd_Equal ()
 	{
-		int n1 = 0;
-		int n2 = 0;
+		var n1 = 0;
+		var n2 = 0;
 
 		var pos1 = Pos.AnchorEnd (n1);
 		var pos2 = Pos.AnchorEnd (n2);
@@ -47,13 +47,15 @@ public class PosTests {
 		Assert.NotEqual (pos1, pos2);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[AutoInitShutdown]
 	public void AnchorEnd_Equal_Inside_Window ()
 	{
-		int viewWidth = 10;
-		int viewHeight = 1;
-		var tv = new TextView () {
+		var viewWidth = 10;
+		var viewHeight = 1;
+		var tv = new TextView {
 			X = Pos.AnchorEnd (viewWidth),
 			Y = Pos.AnchorEnd (viewHeight),
 			Width = viewWidth,
@@ -68,19 +70,21 @@ public class PosTests {
 		top.Add (win);
 		var rs = Application.Begin (top);
 
-		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
-		Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
+		Assert.Equal (new Rect (0,  0,  80, 25), top.Frame);
+		Assert.Equal (new Rect (0,  0,  80, 25), win.Frame);
+		Assert.Equal (new Rect (68, 22, 10, 1),  tv.Frame);
 		Application.End (rs);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[AutoInitShutdown]
 	public void AnchorEnd_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
 	{
-		int viewWidth = 10;
-		int viewHeight = 1;
-		var tv = new TextView () {
+		var viewWidth = 10;
+		var viewHeight = 1;
+		var tv = new TextView {
 			X = Pos.AnchorEnd (viewWidth),
 			Y = Pos.AnchorEnd (viewHeight),
 			Width = viewWidth,
@@ -97,11 +101,11 @@ public class PosTests {
 		top.Add (win, menu, status);
 		var rs = Application.Begin (top);
 
-		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
-		Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
-		Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
-		Assert.Equal (new Rect (68, 20, 10, 1), tv.Frame);
+		Assert.Equal (new Rect (0,  0,  80, 25), top.Frame);
+		Assert.Equal (new Rect (0,  0,  80, 1),  menu.Frame);
+		Assert.Equal (new Rect (0,  24, 80, 1),  status.Frame);
+		Assert.Equal (new Rect (0,  1,  80, 23), win.Frame);
+		Assert.Equal (new Rect (68, 20, 10, 1),  tv.Frame);
 
 		Application.End (rs);
 	}
@@ -110,7 +114,7 @@ public class PosTests {
 	public void AnchorEnd_Negative_Throws ()
 	{
 		Pos pos;
-		int n = -1;
+		var n = -1;
 		Assert.Throws<ArgumentException> (() => pos = Pos.AnchorEnd (n));
 	}
 
@@ -130,8 +134,8 @@ public class PosTests {
 	[Fact]
 	public void At_Equal ()
 	{
-		int n1 = 0;
-		int n2 = 0;
+		var n1 = 0;
+		var n2 = 0;
 
 		var pos1 = Pos.At (n1);
 		var pos2 = Pos.At (n2);
@@ -171,7 +175,7 @@ public class PosTests {
 	{
 		string side; // used in format string
 		var testRect = Rect.Empty;
-		int testInt = 0;
+		var testInt = 0;
 		Pos pos;
 
 		// Pos.Left
@@ -320,6 +324,8 @@ public class PosTests {
 #endif
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	// See: https://github.com/gui-cs/Terminal.Gui/issues/504
 	[Fact]
 	[TestRespondersDisposed]
@@ -332,7 +338,7 @@ public class PosTests {
 			Application.Iteration += (s, a) => {
 				Application.RequestStop ();
 			};
-			var win = new Window () {
+			var win = new Window {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -470,6 +476,8 @@ public class PosTests {
 		Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
 	{
@@ -492,6 +500,8 @@ public class PosTests {
 
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[TestRespondersDisposed]
 	public void PosCombine_Will_Throws ()
@@ -500,16 +510,16 @@ public class PosTests {
 
 		var t = Application.Top;
 
-		var w = new Window () {
+		var w = new Window {
 			X = Pos.Left (t) + 2,
 			Y = Pos.Top (t) + 2
 		};
 		var f = new FrameView ();
-		var v1 = new View () {
+		var v1 = new View {
 			X = Pos.Left (w) + 2,
 			Y = Pos.Top (w) + 2
 		};
-		var v2 = new View () {
+		var v2 = new View {
 			X = Pos.Left (v1) + 2,
 			Y = Pos.Top (v1) + 2
 		};
@@ -527,6 +537,8 @@ public class PosTests {
 		v2.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[TestRespondersDisposed]
 	public void Pos_Add_Operator ()
@@ -535,16 +547,16 @@ public class PosTests {
 
 		var top = Application.Top;
 
-		var view = new View () { X = 0, Y = 0, Width = 20, Height = 20 };
-		var field = new TextField () { X = 0, Y = 0, Width = 20 };
-		int count = 0;
+		var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
+		var field = new TextField { X = 0, Y = 0, Width = 20 };
+		var count = 0;
 
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
 				field.Text = $"Label {count}";
 				var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 				view.Add (label);
-				Assert.Equal ($"Label {count}", label.Text);
+				Assert.Equal ($"Label {count}",     label.Text);
 				Assert.Equal ($"Absolute({count})", label.Y.ToString ());
 
 				Assert.Equal ($"Absolute({count})", field.Y.ToString ());
@@ -576,6 +588,8 @@ public class PosTests {
 		Application.Shutdown ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[TestRespondersDisposed]
 	public void Pos_Subtract_Operator ()
@@ -584,16 +598,16 @@ public class PosTests {
 
 		var top = Application.Top;
 
-		var view = new View () { X = 0, Y = 0, Width = 20, Height = 20 };
-		var field = new TextField () { X = 0, Y = 0, Width = 20 };
-		int count = 20;
+		var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
+		var field = new TextField { X = 0, Y = 0, Width = 20 };
+		var count = 20;
 		var listLabels = new List<Label> ();
 
-		for (int i = 0; i < count; i++) {
+		for (var i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
 			var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 			view.Add (label);
-			Assert.Equal ($"Label {i}", label.Text);
+			Assert.Equal ($"Label {i}",     label.Text);
 			Assert.Equal ($"Absolute({i})", field.Y.ToString ());
 			listLabels.Add (label);
 
@@ -655,14 +669,14 @@ public class PosTests {
 		Assert.Equal (10, posAbsolute.Anchor (0));
 
 		var posCombine = new Pos.PosCombine (true, posFactor, posAbsolute);
-		Assert.Equal (posCombine._left, posFactor);
+		Assert.Equal (posCombine._left,  posFactor);
 		Assert.Equal (posCombine._right, posAbsolute);
-		Assert.Equal (20, posCombine.Anchor (100));
+		Assert.Equal (20,                posCombine.Anchor (100));
 
 		posCombine = new Pos.PosCombine (true, posAbsolute, posFactor);
-		Assert.Equal (posCombine._left, posAbsolute);
+		Assert.Equal (posCombine._left,  posAbsolute);
 		Assert.Equal (posCombine._right, posFactor);
-		Assert.Equal (20, posCombine.Anchor (100));
+		Assert.Equal (20,                posCombine.Anchor (100));
 
 		var view = new View (new Rect (20, 10, 20, 1));
 		var posViewX = new Pos.PosView (view, 0);
@@ -680,7 +694,7 @@ public class PosTests {
 	[Fact]
 	public void Function_SetsValue ()
 	{
-		string text = "Test";
+		var text = "Test";
 		var pos = Pos.Function (() => text.Length);
 		Assert.Equal ("PosFunc(4)", pos.ToString ());
 
@@ -706,6 +720,8 @@ public class PosTests {
 		Assert.NotEqual (pos1, pos2);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Theory]
 	[AutoInitShutdown]
 	[InlineData (true)]
@@ -733,13 +749,15 @@ public class PosTests {
 
 		if (testHorizontal) {
 			Assert.Equal (61, label.Frame.X);
-			Assert.Equal (1, label.Frame.Y);
+			Assert.Equal (1,  label.Frame.Y);
 		} else {
-			Assert.Equal (1, label.Frame.X);
+			Assert.Equal (1,  label.Frame.X);
 			Assert.Equal (61, label.Frame.Y);
 		}
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	public void PosCombine_Referencing_Same_View ()
 	{
@@ -764,8 +782,8 @@ public class PosTests {
 		var exception = Record.Exception (super.LayoutSubviews);
 		Assert.Null (exception);
 		Assert.Equal (new Rect (0, 0, 10, 10), super.Frame);
-		Assert.Equal (new Rect (0, 0, 2, 2), view1.Frame);
-		Assert.Equal (new Rect (8, 0, 2, 2), view2.Frame);
+		Assert.Equal (new Rect (0, 0, 2,  2),  view1.Frame);
+		Assert.Equal (new Rect (8, 0, 2,  2),  view2.Frame);
 
 		super.Dispose ();
 	}
@@ -773,7 +791,7 @@ public class PosTests {
 	[Fact]
 	public void DoNotReturnPosCombine ()
 	{
-		var v = new View () { Id = "V" };
+		var v = new View { Id = "V" };
 
 		var pos = Pos.Left (v);
 		Assert.Equal (
@@ -805,5 +823,4 @@ public class PosTests {
 			"View(side=bottom,target=View(V)(0,0,0,0))",
 			pos.ToString ());
 	}
-}	
-
+}

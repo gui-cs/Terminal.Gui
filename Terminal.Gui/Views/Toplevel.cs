@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
@@ -182,6 +182,15 @@ public partial class Toplevel : View {
 		Height = Dim.Fill ();
 	}
 
+	/// <summary>
+	/// Convenience factory method that creates a new Toplevel that will fill the terminal dimensions.
+	/// </summary>
+	/// <remarks>
+	/// The new Toplevel will be created at position 0,0 and will have dimensions set to <see cref="Dim.Fill"/> for both.
+	/// </remarks>
+	/// <returns>The created Toplevel.</returns>
+	public static Toplevel Create () => new Toplevel ();
+
 	void SetInitialProperties ()
 	{
 		ColorScheme = Colors.TopLevel;
@@ -319,12 +328,6 @@ public partial class Toplevel : View {
 		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
-
-	/// <summary>
-	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
-	/// </summary>
-	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 	/// <summary>
 	/// Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.
@@ -659,7 +662,8 @@ public partial class Toplevel : View {
 		}
 		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal
 			|| top?.SuperView == null && top.IsOverlapped)
-		&& (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+		    // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
+		&& (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/) {
 
 			if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 				top.X = nx;

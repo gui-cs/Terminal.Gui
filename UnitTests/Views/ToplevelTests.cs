@@ -1412,6 +1412,21 @@ public class ToplevelTests {
 		Application.End (rs);
 	}
 
+	[Fact]
+	[AutoInitShutdown]
+	public void Begin_With_Window_Sets_Size_Correctly ()
+	{
+		var top = Application.Top;
+		Application.Begin (top);
+		((FakeDriver)Application.Driver).SetBufferSize (20, 20);
+
+		var testWindow = new Window () { X = 2, Y = 1, Width = 15, Height = 10 };
+		Assert.Equal (new Rect (2, 1, 15, 10), testWindow.Frame);
+
+		var rs = Application.Begin (testWindow);
+		Assert.Equal (new Rect (2, 1, 15, 10), testWindow.Frame);
+	}
+
 	// Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
 	[Fact]
 	[AutoInitShutdown]
