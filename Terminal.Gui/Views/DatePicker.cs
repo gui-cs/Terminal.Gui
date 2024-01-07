@@ -22,9 +22,14 @@ public class DatePicker : TextField {
 	private List<string> years = new ();
 
 	/// <summary>
-	/// Format of date.
+	/// Format of date. The default is MM/dd/yyyy.
 	/// </summary>
 	public string Format { get; set; } = "MM/dd/yyyy";
+
+	/// <summary>
+	/// Range of years in the calendar. The default is 1900..2100.
+	/// </summary>
+	public Range YearsRange { get; set; } = 1900..2100;
 
 	/// <summary>
 	/// Get or set the date.
@@ -63,11 +68,19 @@ public class DatePicker : TextField {
 	{
 		Date = date;
 		months = Enum.GetValues (typeof (Month)).Cast<Month> ().Select (x => x.ToString ()).ToList ();
-		years = Enumerable.Range (1900, 200).Select (x => x.ToString ()).ToList ();
 	}
 
 	private void ShowDatePickerDialog ()
 	{
+		years = Enumerable.Range (YearsRange.Start.Value, YearsRange.End.Value - YearsRange.Start.Value + 1)
+			.Select (x => x.ToString ())
+			.ToList ();
+
+		if (date.Year < YearsRange.Start.Value || date.Year > YearsRange.End.Value) {
+			MessageBox.ErrorQuery ("Error", "Date year is out of range", "Ok");
+			return;
+		}
+
 		var dialog = new Dialog () {
 			Height = 14,
 			Width = 40,
