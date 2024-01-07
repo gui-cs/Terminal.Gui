@@ -61,8 +61,6 @@ public class DatePickers : Scenario {
 		} catch (FormatException) {
 			MessageBox.ErrorQuery ("Error", "Unable to parse date", "Ok");
 		}
-
-
 	}
 }
 

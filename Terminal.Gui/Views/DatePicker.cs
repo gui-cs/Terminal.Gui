@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 
 namespace Terminal.Gui.Views;
@@ -24,7 +25,7 @@ public class DatePicker : TextField {
 	/// <summary>
 	/// Format of date. The default is MM/dd/yyyy.
 	/// </summary>
-	public string Format { get; set; } = "MM/dd/yyyy";
+	public string Format { get; set; } = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 
 	/// <summary>
 	/// Range of years in the calendar. The default is 1900..2100.
