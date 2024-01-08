@@ -614,7 +614,7 @@ public partial class View {
 		//	_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 		//}
 
-		// First try SuperView.Bounds, then Application.Current.Bounds, then Application.Top, then Driver
+		// First try SuperView.Bounds, then Application.Top, then Driver
 		// Finally, if none of those are valid, use int.MaxValue (for Unit tests).
 		SetRelativeLayout (SuperView?.Bounds ?? Application.Top?.Bounds ?? Application.Driver?.Bounds ?? new Rect (0, 0, int.MaxValue, int.MaxValue));
 
