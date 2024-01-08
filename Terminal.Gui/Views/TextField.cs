@@ -110,6 +110,8 @@ namespace Terminal.Gui {
 
 			Initialized += TextField_Initialized;
 
+			LayoutComplete += TextField_LayoutComplete;
+
 			// Things this view knows how to do
 			AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
 			AddCommand (Command.DeleteCharLeft, () => { DeleteCharLeft (false); return true; });
@@ -219,6 +221,16 @@ namespace Terminal.Gui {
 			KeyBindings.Add (ContextMenu.Key.KeyCode, KeyBindingScope.HotKey, Command.ShowContextMenu);
 		}
 
+		private void TextField_LayoutComplete (object sender, LayoutEventArgs e)
+		{
+			// Don't let height > 1
+			if (Frame.Height > 1) {
+				Height = 1;
+			} 
+			Adjust ();
+		}
+
+
 		private MenuBarItem BuildContextMenuBarItem ()
 		{
 			return new MenuBarItem (new MenuItem [] {
@@ -279,20 +291,6 @@ namespace Terminal.Gui {
 		/// position. Configure <see cref="ISuggestionGenerator"/> to enable this feature.
 		/// </summary>
 		public IAutocomplete Autocomplete { get; set; } = new TextFieldAutocomplete ();
-
-		///<inheritdoc/>
-		public override Rect Frame {
-			get => base.Frame;
-			set {
-				if (value.Height > 1) {
-					base.Frame = new Rect (value.X, value.Y, value.Width, 1);
-					Height = 1;
-				} else {
-					base.Frame = value;
-				}
-				Adjust ();
-			}
-		}
 
 		/// <summary>
 		///   Sets or gets the text held by the view.

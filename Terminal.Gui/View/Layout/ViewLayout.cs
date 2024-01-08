@@ -52,8 +52,7 @@ public partial class View {
 	///         </para>
 	///         <para>
 	///         Altering the Frame will eventually (when the view is next drawn) cause the
-	///         <see cref="LayoutSubview(View, Rect)"/>
-	///         and <see cref="OnDrawContent(Rect)"/> methods to be called.
+	///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
 	///         </para>
 	/// </remarks>
 	public virtual Rect Frame {
