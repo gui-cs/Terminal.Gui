@@ -20,8 +20,12 @@ public class DatePicker : TextField {
 	private DataTable _table;
 	private TableView _calendar;
 	private DateTime _date = DateTime.Now;
+
+	private ComboBox _comboBoxYear;
+	private ComboBox _comboBoxMonth;
+
 	private List<string> _months = new ();
-	private List<string> years = new ();
+	private List<string> _years = new ();
 
 	private readonly int comboBoxHeight = 4;
 	private readonly int comboBoxWidth = 12;
@@ -81,7 +85,7 @@ public class DatePicker : TextField {
 
 	private void ShowDatePickerDialog ()
 	{
-		years = Enumerable.Range (YearsRange.Start.Value, YearsRange.End.Value - YearsRange.Start.Value + 1)
+		_years = Enumerable.Range (YearsRange.Start.Value, YearsRange.End.Value - YearsRange.Start.Value + 1)
 			.Select (x => x.ToString ())
 			.ToList ();
 
@@ -118,29 +122,29 @@ public class DatePicker : TextField {
 			Y = 1,
 			Height = 1,
 		};
-		var comboBoxYear = new ComboBox (years) {
+		_comboBoxYear = new ComboBox (_years) {
 			X = Pos.Right (_calendar) + 1,
 			Y = Pos.Bottom (yearsLabel),
 			Width = comboBoxWidth,
 			Height = comboBoxHeight,
-			SelectedItem = years.IndexOf (_date.Year.ToString ())
+			SelectedItem = _years.IndexOf (_date.Year.ToString ())
 		};
-		comboBoxYear.SelectedItemChanged += ChangeYearDate;
+		_comboBoxYear.SelectedItemChanged += ChangeYearDate;
 
 		var monthsLabel = new Label ("Month:") {
 			X = Pos.Right (_calendar) + 1,
-			Y = Pos.Bottom (comboBoxYear),
+			Y = Pos.Bottom (_comboBoxYear),
 			Height = 1,
 		};
 
-		var comboBoxMonth = new ComboBox (_months) {
+		_comboBoxMonth = new ComboBox (_months) {
 			X = Pos.Right (_calendar) + 1,
 			Y = Pos.Bottom (monthsLabel),
 			Width = comboBoxWidth,
 			Height = comboBoxHeight,
 			SelectedItem = _date.Month - 1
 		};
-		comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
+		_comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
 
 		var previousMonthButton = new Button ("Previous") {
 			X = 0,
@@ -152,11 +156,11 @@ public class DatePicker : TextField {
 		previousMonthButton.Clicked += (sender, e) => {
 			Date = _date.AddMonths (-1);
 			CreateCalendar ();
-			if (comboBoxMonth.SelectedItem == 0) {
-				comboBoxYear.SelectedItem--;
-				comboBoxMonth.SelectedItem = 11;
+			if (_comboBoxMonth.SelectedItem == 0) {
+				_comboBoxYear.SelectedItem--;
+				_comboBoxMonth.SelectedItem = 11;
 			} else {
-				comboBoxMonth.SelectedItem = _date.Month - 1;
+				_comboBoxMonth.SelectedItem = _date.Month - 1;
 			}
 		};
 
@@ -170,17 +174,17 @@ public class DatePicker : TextField {
 		nextMonthButton.Clicked += (sender, e) => {
 			Date = _date.AddMonths (1);
 			CreateCalendar ();
-			if (comboBoxMonth.SelectedItem == 11) {
-				comboBoxYear.SelectedItem++;
-				comboBoxMonth.SelectedItem = 0;
+			if (_comboBoxMonth.SelectedItem == 11) {
+				_comboBoxYear.SelectedItem++;
+				_comboBoxMonth.SelectedItem = 0;
 			} else {
-				comboBoxMonth.SelectedItem = _date.Month - 1;
+				_comboBoxMonth.SelectedItem = _date.Month - 1;
 			}
 		};
 
 		dialog.Add (_calendar,
-			yearsLabel, comboBoxYear,
-			monthsLabel, comboBoxMonth,
+			yearsLabel, _comboBoxYear,
+			monthsLabel, _comboBoxMonth,
 			previousMonthButton, nextMonthButton);
 
 		CreateCalendar ();
@@ -210,16 +214,23 @@ public class DatePicker : TextField {
 
 	private void ChangeYearDate (object sender, ListViewItemEventArgs e)
 	{
-		int year = int.Parse (e.Value.ToString ());
-		_date = new DateTime (year, _date.Month, _date.Day);
-		CreateCalendar ();
+		if (e.Value is not null && int.TryParse (e.Value.ToString (), out int year)) {
+			_date = new DateTime (year, _date.Month, _date.Day);
+			CreateCalendar ();
+		} else {
+			_comboBoxYear.SelectedItem = _years.IndexOf (_date.Year.ToString ());
+		}
 	}
 
 	private void ChangeMonthDate (object sender, ListViewItemEventArgs e)
 	{
-		int monthNumber = (int)Enum.Parse (typeof (Month), e.Value.ToString ());
-		_date = new DateTime (_date.Year, monthNumber, _date.Day);
-		CreateCalendar ();
+		if (e.Value is not null && Enum.TryParse (e.Value.ToString (), out Month month)) {
+			int monthNumber = (int)month;
+			_date = new DateTime (_date.Year, monthNumber, _date.Day);
+			CreateCalendar ();
+		} else {
+			_comboBoxMonth.SelectedItem = _date.Month - 1;
+		}
 	}
 
 	private void ChangeDayDate (int day)
@@ -284,7 +295,12 @@ public class DatePicker : TextField {
 	public override bool MouseEvent (MouseEvent me)
 	{
 		if (me.X == Bounds.Right - 1 && me.Y == Bounds.Top && me.Flags == MouseFlags.Button1Pressed) {
-			ShowDatePickerDialog ();
+
+			try {
+				ShowDatePickerDialog ();
+			} catch (Exception e) {
+				MessageBox.ErrorQuery ("Error", $"Uppsss: {e}", "Ok");
+			}
 			return true;
 		}
 
