@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -57,6 +58,58 @@ public class KeyTests {
 		Assert.Equal (expectedKeyCode, key.KeyCode);
 	}
 
+
+
+	public static IEnumerable<object []> ConstructorStrings2 ()
+	{
+		object [,] KeyMappings = {
+		{ "a", new Key (KeyCode.A) },
+		{ "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) },
+		{ "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) },
+		{ "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) },
+		{ "A", new Key (KeyCode.A | KeyCode.ShiftMask) },
+		{ "â", new Key ((KeyCode)'â') },
+		{ "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) },
+		{ "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) },
+		{ "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) },
+		{ "Ctrl+Alt+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) },
+		{ "ctrl+alt+shift+cursorup", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) },
+		{ "CTRL+ALT+SHIFT+CURSORUP", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) },
+		{ "Ctrl+Alt+Shift+Delete", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete) },
+		{ "Ctrl+Alt+Shift+Enter", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter) },
+		{ "Tab", new Key (KeyCode.Tab) },
+		{ "Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask) },
+		{ "Ctrl+Tab", new Key (KeyCode.Tab | KeyCode.CtrlMask) },
+		{ "Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask) },
+		{ "Ctrl+Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask) },
+		{ "Ctrl+Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask) },
+		{ "", new Key (KeyCode.Null) },
+		{ " ", new Key (KeyCode.Space) },
+		{ "Space", new Key (KeyCode.Space) },
+		{ "Shift+Space", new Key (KeyCode.Space | KeyCode.ShiftMask) },
+		{ "Ctrl+Space", new Key (KeyCode.Space | KeyCode.CtrlMask) },
+		{ "Alt+Space", new Key (KeyCode.Space | KeyCode.AltMask) },
+		{ "Shift+ ", new Key (KeyCode.Space | KeyCode.ShiftMask) },
+		{ "Ctrl+ ", new Key (KeyCode.Space | KeyCode.CtrlMask) },
+		{ "Alt+ ", new Key (KeyCode.Space | KeyCode.AltMask) },
+		{ "F1", new Key (KeyCode.F1) },
+		{ "0", new Key (KeyCode.D0) },
+		{ "9", new Key (KeyCode.D9) },
+		{ "D0", new Key (KeyCode.D0) },
+		{ "65", new Key (KeyCode.A | KeyCode.ShiftMask) },
+		{ "97", new Key (KeyCode.A) },
+		{ "Shift", new Key (KeyCode.ShiftMask) },
+		{ "Ctrl", new Key (KeyCode.CtrlMask) },
+		{ "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) },
+		{ "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) },
+		{ "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) },
+		{ "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) }
+	};
+		for (int i = 0; i < KeyMappings.GetLength (0); i++) {
+			yield return new object [] { KeyMappings [i, 0], KeyMappings [i, 1] };
+		}
+	}
+
 	public static IEnumerable<object []> ConstructorStrings ()
 	{
 		yield return new object [] { "a", new Key (KeyCode.A) };
@@ -64,7 +117,7 @@ public class KeyTests {
 		yield return new object [] { "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) };
 		yield return new object [] { "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) };
 		yield return new object [] { "A", new Key (KeyCode.A | KeyCode.ShiftMask) };
-		yield return new object [] { "â", new Key ((KeyCode)'â')};
+		yield return new object [] { "â", new Key ((KeyCode)'â') };
 		yield return new object [] { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) };
 		yield return new object [] { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) };
 		yield return new object [] { "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) };
@@ -93,7 +146,7 @@ public class KeyTests {
 		yield return new object [] { "9", new Key (KeyCode.D9) };
 		yield return new object [] { "D0", new Key (KeyCode.D0) };
 		yield return new object [] { "65", new Key (KeyCode.A | KeyCode.ShiftMask) };
-		yield return new object [] { "97", new Key (KeyCode.A)};
+		yield return new object [] { "97", new Key (KeyCode.A) };
 		yield return new object [] { "Shift", new Key (KeyCode.ShiftMask) };
 		yield return new object [] { "Ctrl", new Key (KeyCode.CtrlMask) };
 		yield return new object [] { "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) };
@@ -104,7 +157,7 @@ public class KeyTests {
 
 	// TryParse
 	[Theory]
-	[MemberData (nameof (ConstructorStrings))]
+	[MemberData (nameof (ConstructorStrings2))]
 	public void Constructor_String_Valid (string keyString, Key expected)
 	{
 		Key key = new Key (keyString);
@@ -112,7 +165,7 @@ public class KeyTests {
 	}
 
 	[Theory]
-	[InlineData("Barf")]
+	[InlineData ("Barf")]
 	public void Constructor_String_Invalid_Throws (string keyString)
 	{
 		Assert.Throws<ArgumentException> (() => new Key (keyString));
@@ -436,7 +489,7 @@ public class KeyTests {
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
 	[InlineData ((KeyCode)'+', "+")]
 	[InlineData ((KeyCode)'+' | KeyCode.ShiftMask, "Shift++")]
-	[InlineData ((KeyCode)'+' | KeyCode.CtrlMask, "Ctrl++")] 
+	[InlineData ((KeyCode)'+' | KeyCode.CtrlMask, "Ctrl++")]
 	[InlineData ((KeyCode)'+' | KeyCode.ShiftMask | KeyCode.CtrlMask, "Ctrl+Shift++")]
 	public void ToString_ShouldReturnFormattedString (KeyCode key, string expected) => Assert.Equal (expected, Key.ToString (key));
 
@@ -503,7 +556,7 @@ public class KeyTests {
 	[InlineData ("0x99")]
 	[InlineData ("Ctrl-Ctrl")]
 	public void TryParse_ShouldReturnFalse_On_InvalidKey (string keyString) => Assert.False (Key.TryParse (keyString, out var _));
-	
+
 	[Theory]
 	[InlineData (KeyCode.ShiftMask, true, false, false)]
 	[InlineData (KeyCode.ShiftMask | KeyCode.AltMask, true, true, false)]
