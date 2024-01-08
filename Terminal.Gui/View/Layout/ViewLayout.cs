@@ -55,7 +55,7 @@ public partial class View {
 	///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
 	///         </para>
 	/// </remarks>
-	public virtual Rect Frame {
+	public Rect Frame {
 		get => _frame;
 		set {
 			_frame = new Rect (value.X, value.Y, Math.Max (value.Width, 0), Math.Max (value.Height, 0));
