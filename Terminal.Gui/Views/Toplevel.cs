@@ -29,7 +29,6 @@ public partial class Toplevel : View {
 	internal static Point? _dragPosition;
 	Point _startGrabPoint;
 
-	// BUGBUG: Remove; Toplevel should be ComputedLayout
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
 	/// <see cref="LayoutStyle.Absolute"/> layout.
@@ -310,12 +309,20 @@ public partial class Toplevel : View {
 		KeyBindings.Add (KeyCode.CursorDown,  Command.NextView);
 		KeyBindings.Add (KeyCode.CursorLeft,  Command.PreviousView);
 		KeyBindings.Add (KeyCode.CursorUp,    Command.PreviousView);
+		KeyBindings.Add (KeyCode.CursorDown,  Command.NextView);
+		KeyBindings.Add (KeyCode.CursorLeft,  Command.PreviousView);
+		KeyBindings.Add (KeyCode.CursorUp,    Command.PreviousView);
 
+		KeyBindings.Add (KeyCode.Tab,                                        Command.NextView);
+		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask,                    Command.PreviousView);
+		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask,                     Command.NextViewOrTop);
 		KeyBindings.Add (KeyCode.Tab,                                        Command.NextView);
 		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask,                    Command.PreviousView);
 		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask,                     Command.NextViewOrTop);
 		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
+		KeyBindings.Add (KeyCode.F5,                                Command.Refresh);
+		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey,  Command.NextViewOrTop);     // Needed on Unix
 		KeyBindings.Add (KeyCode.F5,                                Command.Refresh);
 		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey,  Command.NextViewOrTop);     // Needed on Unix
 		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
@@ -389,6 +396,12 @@ public partial class Toplevel : View {
 		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
+
+	/// <summary>
+	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
+	/// </summary>
+	/// <returns>The created Toplevel.</returns>
+	public static Toplevel Create () => new (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 	void MovePreviousViewOrTop ()
 	{
