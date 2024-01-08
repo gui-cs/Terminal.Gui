@@ -943,6 +943,12 @@ namespace Terminal.Gui.DialogTests {
 				btn = new Button ("Ok") {
 					X = Pos.AnchorEnd () - Pos.Function (Btn_Width)
 				};
+				btn.SetRelativeLayout (dlg.Bounds);
+				Assert.Equal (6, btn.Bounds.Width);
+				Assert.Equal (10, btn.Frame.X); // 14 - 6 = 10
+				Assert.Equal (0,  btn.Frame.Y);
+				Assert.Equal (6, btn.Frame.Width);
+				Assert.Equal (1,  btn.Frame.Height);
 				int Btn_Width ()
 				{
 					return (btn?.Bounds.Width) ?? 0;
@@ -950,6 +956,11 @@ namespace Terminal.Gui.DialogTests {
 				var tf = new TextField ("01234567890123456789") {
 					Width = Dim.Fill (1) - Dim.Function (Btn_Width)
 				};
+				Assert.Equal (11, tf.Bounds.Width); // 20 - 2 (for Dim.Fill (1)) - 6 (for Dim.Function (Btn_Width)) = 8
+				Assert.Equal (0,  tf.Frame.X);
+				Assert.Equal (0,  tf.Frame.Y);
+				Assert.Equal (11, tf.Frame.Width);
+				Assert.Equal (1,  tf.Frame.Height);
 
 				dlg.Loaded += (s, a) => {
 					Application.Refresh ();

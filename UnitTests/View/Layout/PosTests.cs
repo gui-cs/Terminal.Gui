@@ -70,9 +70,9 @@ public class PosTests {
 		top.Add (win);
 		var rs = Application.Begin (top);
 
-		Assert.Equal (new Rect (0,  0,  80, 25), top.Frame);
-		Assert.Equal (new Rect (0,  0,  80, 25), win.Frame);
-		Assert.Equal (new Rect (68, 22, 10, 1),  tv.Frame);
+		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+		Assert.Equal (new Rect (0, 0, 80, 25), win.Frame);
+		Assert.Equal (new Rect (68, 22, 10, 1), tv.Frame);
 		Application.End (rs);
 	}
 
@@ -101,11 +101,11 @@ public class PosTests {
 		top.Add (win, menu, status);
 		var rs = Application.Begin (top);
 
-		Assert.Equal (new Rect (0,  0,  80, 25), top.Frame);
-		Assert.Equal (new Rect (0,  0,  80, 1),  menu.Frame);
-		Assert.Equal (new Rect (0,  24, 80, 1),  status.Frame);
-		Assert.Equal (new Rect (0,  1,  80, 23), win.Frame);
-		Assert.Equal (new Rect (68, 20, 10, 1),  tv.Frame);
+		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
+		Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
+		Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
+		Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
+		Assert.Equal (new Rect (68, 20, 10, 1), tv.Frame);
 
 		Application.End (rs);
 	}
@@ -556,7 +556,7 @@ public class PosTests {
 				field.Text = $"Label {count}";
 				var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 				view.Add (label);
-				Assert.Equal ($"Label {count}",     label.Text);
+				Assert.Equal ($"Label {count}", label.Text);
 				Assert.Equal ($"Absolute({count})", label.Y.ToString ());
 
 				Assert.Equal ($"Absolute({count})", field.Y.ToString ());
@@ -607,7 +607,7 @@ public class PosTests {
 			field.Text = $"Label {i}";
 			var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 			view.Add (label);
-			Assert.Equal ($"Label {i}",     label.Text);
+			Assert.Equal ($"Label {i}", label.Text);
 			Assert.Equal ($"Absolute({i})", field.Y.ToString ());
 			listLabels.Add (label);
 
@@ -669,14 +669,14 @@ public class PosTests {
 		Assert.Equal (10, posAbsolute.Anchor (0));
 
 		var posCombine = new Pos.PosCombine (true, posFactor, posAbsolute);
-		Assert.Equal (posCombine._left,  posFactor);
+		Assert.Equal (posCombine._left, posFactor);
 		Assert.Equal (posCombine._right, posAbsolute);
-		Assert.Equal (20,                posCombine.Anchor (100));
+		Assert.Equal (20, posCombine.Anchor (100));
 
 		posCombine = new Pos.PosCombine (true, posAbsolute, posFactor);
-		Assert.Equal (posCombine._left,  posAbsolute);
+		Assert.Equal (posCombine._left, posAbsolute);
 		Assert.Equal (posCombine._right, posFactor);
-		Assert.Equal (20,                posCombine.Anchor (100));
+		Assert.Equal (20, posCombine.Anchor (100));
 
 		var view = new View (new Rect (20, 10, 20, 1));
 		var posViewX = new Pos.PosView (view, 0);
@@ -749,9 +749,9 @@ public class PosTests {
 
 		if (testHorizontal) {
 			Assert.Equal (61, label.Frame.X);
-			Assert.Equal (1,  label.Frame.Y);
+			Assert.Equal (1, label.Frame.Y);
 		} else {
-			Assert.Equal (1,  label.Frame.X);
+			Assert.Equal (1, label.Frame.X);
 			Assert.Equal (61, label.Frame.Y);
 		}
 	}
@@ -782,8 +782,8 @@ public class PosTests {
 		var exception = Record.Exception (super.LayoutSubviews);
 		Assert.Null (exception);
 		Assert.Equal (new Rect (0, 0, 10, 10), super.Frame);
-		Assert.Equal (new Rect (0, 0, 2,  2),  view1.Frame);
-		Assert.Equal (new Rect (8, 0, 2,  2),  view2.Frame);
+		Assert.Equal (new Rect (0, 0, 2, 2), view1.Frame);
+		Assert.Equal (new Rect (8, 0, 2, 2), view2.Frame);
 
 		super.Dispose ();
 	}
@@ -823,4 +823,5 @@ public class PosTests {
 			"View(side=bottom,target=View(V)(0,0,0,0))",
 			pos.ToString ());
 	}
+
 }
