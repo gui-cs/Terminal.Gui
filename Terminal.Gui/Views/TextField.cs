@@ -227,7 +227,6 @@ namespace Terminal.Gui {
 			if (Frame.Height > 1) {
 				Height = 1;
 			} 
-			Adjust ();
 		}
 
 

@@ -181,18 +181,33 @@ namespace Terminal.Gui.DialogTests {
 
 					// This is because of PostionTopLevels and EnsureVisibleBounds
 					Assert.Equal (new Point (3, 2), d.Frame.Location);
-					Assert.Equal (new Size (17, 8), d.Frame.Size);
+					// #3127: Before					
+					//					Assert.Equal (new Size (17, 8), d.Frame.Size);
+					//					TestHelpers.AssertDriverContentsWithFrameAre (@"
+					//╔══════════════════╗
+					//║                  ║
+					//║  ┌───────────────┐
+					//║  │               │
+					//║  │               │
+					//║  │               │
+					//║  │               │
+					//║  │               │
+					//║  │               │
+					//╚══└───────────────┘", output);
+
+					// #3127: After: Because Toplevel is now Width/Height = Dim.Filll
+					Assert.Equal (new Size (15, 6), d.Frame.Size);
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╔══════════════════╗
 ║                  ║
-║  ┌───────────────┐
-║  │               │
-║  │               │
-║  │               │
-║  │               │
-║  │               │
-║  │               │
-╚══└───────────────┘", output);
+║  ┌─────────────┐ ║
+║  │             │ ║
+║  │             │ ║
+║  │             │ ║
+║  │             │ ║
+║  └─────────────┘ ║
+║                  ║
+╚══════════════════╝", output);
 
 				} else if (iterations > 0) {
 					Application.RequestStop ();
@@ -971,20 +986,11 @@ namespace Terminal.Gui.DialogTests {
 					Application.Refresh ();
 					Assert.Equal (new Rect (10, 0, 6, 1), btn.Frame);
 					Assert.Equal (new Rect (0, 0, 6, 1), btn.Bounds);
-					// #3127: Before: This test was clearly wrong before. The math above is correct, but the result is wrong.
-					// var expected = @$"
-					//┌──────────────────┐
-					//│┌────────────────┐│
-					//││23456789  {b}││
-					//│└────────────────┘│
-					//└──────────────────┘";
 
-					// #3127: After: This test was clearly wrong before. The math above is correct, but the result is wrong.
-					// See also `PosDimFunction` in SetRelativeLayoutTests.cs
 					var expected = @$"
 ┌──────────────────┐
 │┌────────────────┐│
-││012345678 {b}││
+││23456789  {b}││
 │└────────────────┘│
 └──────────────────┘";
 
@@ -998,7 +1004,7 @@ namespace Terminal.Gui.DialogTests {
 					expected = @$"
 ┌──────────────────┐
 │┌────────────────┐│
-││012345678 {b}││
+││23456789  {b}││
 │└────────────────┘│
 └──────────────────┘";
 					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);

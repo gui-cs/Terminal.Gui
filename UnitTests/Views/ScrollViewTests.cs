@@ -188,6 +188,8 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (sv);
 			Application.Begin (Application.Top);
 
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+
 			Assert.False (sv.AutoHideScrollBars);
 			Assert.True (sv.ShowHorizontalScrollIndicator);
 			Assert.True (sv.ShowVerticalScrollIndicator);
@@ -206,7 +208,9 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 
 			sv.ShowHorizontalScrollIndicator = false;
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
 			sv.ShowVerticalScrollIndicator = true;
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
 
 			Assert.False (sv.AutoHideScrollBars);
 			Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -215,6 +219,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (@"
          ▲
          ┬
+         │
          │
          │
          │
@@ -241,7 +246,7 @@ namespace Terminal.Gui.ViewsTests {
          
          
          
-◄├─────┤► 
+◄├──────┤► 
 ", output);
 
 			sv.ShowHorizontalScrollIndicator = false;

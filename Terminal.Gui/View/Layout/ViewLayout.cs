@@ -66,7 +66,7 @@ public partial class View {
 			_y = _frame.Y;
 			_width = _frame.Width;
 			_height = _frame.Height;
-			
+
 			// TODO: Figure out if the below can be optimized.
 			if (IsInitialized /*|| LayoutStyle == LayoutStyle.Absolute*/) {
 				LayoutFrames ();
@@ -615,10 +615,14 @@ public partial class View {
 
 		// First try SuperView.Bounds, then Application.Top, then Driver
 		// Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-		SetRelativeLayout (SuperView?.Bounds ?? Application.Top?.Bounds ?? Application.Driver?.Bounds ?? new Rect (0, 0, int.MaxValue, int.MaxValue));
+		var relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
+					((Application.Top != null && Application.Top.IsInitialized) ? Application.Top.Bounds : 
+					Application.Driver?.Bounds ?? 
+					new Rect (0, 0, int.MaxValue, int.MaxValue));
+		SetRelativeLayout (relativeBounds);
 
 		// TODO: Determine what, if any of the below is actually needed here.
-		if (IsInitialized/* || LayoutStyle == LayoutStyle.Absolute*/) {
+		if (IsInitialized) {
 			SetFrameToFitText ();
 			LayoutFrames ();
 			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
@@ -874,16 +878,16 @@ public partial class View {
 			// Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
 			// the view LayoutStyle.Absolute.
 			_frame = r;
-			if (X is Pos.PosAbsolute) {
+			if (_x is Pos.PosAbsolute) {
 				_x = Frame.X;
 			}
-			if (Y is Pos.PosAbsolute) {
+			if (_y is Pos.PosAbsolute) {
 				_y = Frame.Y;
 			}
-			if (Width is Dim.DimAbsolute) {
+			if (_width is Dim.DimAbsolute) {
 				_width = Frame.Width;
 			}
-			if (Height is Dim.DimAbsolute) {
+			if (_height is Dim.DimAbsolute) {
 				_height = Frame.Height;
 			}
 
@@ -894,7 +898,7 @@ public partial class View {
 				SetNeedsLayout ();
 				//SetNeedsDisplay ();
 			}
-			
+
 			// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
 			if (!SetFrameToFitText ()) {
 				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
@@ -1148,7 +1152,7 @@ public partial class View {
 	void LayoutSubview (View v, Rect contentArea)
 	{
 		//if (v.LayoutStyle == LayoutStyle.Computed) {
-			v.SetRelativeLayout (contentArea);
+		v.SetRelativeLayout (contentArea);
 		//}
 
 		v.LayoutSubviews ();

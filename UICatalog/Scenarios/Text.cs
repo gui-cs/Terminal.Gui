@@ -233,7 +233,7 @@ namespace UICatalog.Scenarios {
 			};
 			var appendAutocompleteTextField = new TextField () {
 				X = Pos.Right (labelAppendAutocomplete),
-				Y = labelAppendAutocomplete.Y,
+				Y = Pos.Bottom (labelAppendAutocomplete),
 				Width = Dim.Fill ()
 			};
 			appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);

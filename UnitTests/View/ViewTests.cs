@@ -265,20 +265,20 @@ namespace Terminal.Gui.ViewTests {
 			int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
 			winAddedToTop.Added += (s, e) => {
-				Assert.Equal (e.Parent.Bounds.Width, winAddedToTop.Frame.Width);
-				Assert.Equal (e.Parent.Bounds.Height, winAddedToTop.Frame.Height);
+				Assert.Equal (e.Parent.Frame.Width,  winAddedToTop.Frame.Width);
+				Assert.Equal (e.Parent.Frame.Height, winAddedToTop.Frame.Height);
 			};
 			v1AddedToWin.Added += (s, e) => {
-				Assert.Equal (e.Parent.Bounds.Width, v1AddedToWin.Frame.Width);
-				Assert.Equal (e.Parent.Bounds.Height, v1AddedToWin.Frame.Height);
+				Assert.Equal (e.Parent.Frame.Width,  v1AddedToWin.Frame.Width);
+				Assert.Equal (e.Parent.Frame.Height, v1AddedToWin.Frame.Height);
 			};
 			v2AddedToWin.Added += (s, e) => {
-				Assert.Equal (e.Parent.Bounds.Width, v2AddedToWin.Frame.Width);
-				Assert.Equal (e.Parent.Bounds.Height, v2AddedToWin.Frame.Height);
+				Assert.Equal (e.Parent.Frame.Width,  v2AddedToWin.Frame.Width);
+				Assert.Equal (e.Parent.Frame.Height, v2AddedToWin.Frame.Height);
 			};
 			svAddedTov1.Added += (s, e) => {
-				Assert.Equal (e.Parent.Bounds.Width, svAddedTov1.Frame.Width);
-				Assert.Equal (e.Parent.Bounds.Height, svAddedTov1.Frame.Height);
+				Assert.Equal (e.Parent.Frame.Width,  svAddedTov1.Frame.Width);
+				Assert.Equal (e.Parent.Frame.Height, svAddedTov1.Frame.Height);
 			};
 
 			top.Initialized += (s, e) => {
