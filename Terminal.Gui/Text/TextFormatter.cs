@@ -1102,7 +1102,7 @@ namespace Terminal.Gui {
 				_text = EnableNeedsFormat (value);
 
 				if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty)) {
-					Size = CalcRect (0, 0, _text, _textDirection, TabWidth).Size;
+					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
 
 				//if (_text != null && _text.GetRuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.GetColumns ())) {
@@ -1129,7 +1129,7 @@ namespace Terminal.Gui {
 			set {
 				_autoSize = EnableNeedsFormat (value);
 				if (_autoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
-					Size = CalcRect (0, 0, Text, _textDirection, TabWidth).Size;
+					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
 			}
 		}
@@ -1169,7 +1169,12 @@ namespace Terminal.Gui {
 		/// <value>The text vertical alignment.</value>
 		public TextDirection Direction {
 			get => _textDirection;
-			set => _textDirection = EnableNeedsFormat (value);
+			set {
+				_textDirection = EnableNeedsFormat (value);
+				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
+					Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+				}
+			}
 		}
 
 		/// <summary>
@@ -1250,7 +1255,7 @@ namespace Terminal.Gui {
 			get => _size;
 			set {
 				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
-					_size = EnableNeedsFormat (CalcRect (0, 0, Text, _textDirection, TabWidth).Size);
+					_size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
 				} else {
 					_size = EnableNeedsFormat (value);
 				}
@@ -1329,7 +1334,7 @@ namespace Terminal.Gui {
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
 					}
 
-					if (IsVerticalDirection (_textDirection)) {
+					if (IsVerticalDirection (Direction)) {
 						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1, TabWidth);
 						_lines = Format (shown_text, Size.Height, VerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth && WordWrap,
 							PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
@@ -1434,7 +1439,7 @@ namespace Terminal.Gui {
 			// Use "Lines" to ensure a Format (don't use "lines"))
 
 			var linesFormated = Lines;
-			switch (_textDirection) {
+			switch (Direction) {
 			case TextDirection.TopBottom_RightLeft:
 			case TextDirection.LeftRight_BottomTop:
 			case TextDirection.RightLeft_BottomTop:
@@ -1443,7 +1448,7 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			var isVertical = IsVerticalDirection (_textDirection);
+			var isVertical = IsVerticalDirection (Direction);
 			var maxBounds = bounds;
 			if (driver != null) {
 				maxBounds = containerBounds == default
@@ -1475,7 +1480,7 @@ namespace Terminal.Gui {
 
 				var runes = _lines [line].ToRunes ();
 
-				switch (_textDirection) {
+				switch (Direction) {
 				case TextDirection.RightLeft_BottomTop:
 				case TextDirection.RightLeft_TopBottom:
 				case TextDirection.BottomTop_LeftRight:
@@ -1488,7 +1493,7 @@ namespace Terminal.Gui {
 
 				int x, y;
 				// Horizontal Alignment
-				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (_textDirection))) {
+				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (Direction))) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line, TabWidth);
 						x = bounds.Right - runesWidth;
@@ -1521,7 +1526,7 @@ namespace Terminal.Gui {
 				}
 
 				// Vertical Alignment
-				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (_textDirection))) {
+				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction))) {
 					if (isVertical) {
 						y = bounds.Bottom - runes.Length;
 					} else {

@@ -190,37 +190,43 @@ public partial class View {
 			}
 			sizeRequired = Bounds.Size;
 
-			if (!AutoSize && !string.IsNullOrEmpty (TextFormatter.Text)) {
-				switch (TextFormatter.IsVerticalDirection (TextDirection)) {
-				case true:
-					var colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
-					// TODO: v2 - This uses frame.Width; it should only use Bounds
-					if (_frame.Width < colWidth &&
-					    (Width == null ||
-					     Bounds.Width >= 0 &&
-					     Width is Dim.DimAbsolute &&
-					     Width.Anchor (0) >= 0 &&
-					     Width.Anchor (0) < colWidth)) {
-						sizeRequired = new Size (colWidth, Bounds.Height);
-						return true;
-					}
-					break;
-				default:
-					if (_frame.Height < 1 &&
-					    (Height == null ||
-					     Height is Dim.DimAbsolute &&
-					     Height.Anchor (0) == 0)) {
-						sizeRequired = new Size (Bounds.Width, 1);
-						return true;
-					}
-					break;
+			if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text)) {
+				return false;
+			}
+			
+			switch (TextFormatter.IsVerticalDirection (TextDirection)) {
+			case true:
+				var colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
+				// TODO: v2 - This uses frame.Width; it should only use Bounds
+				if (_frame.Width < colWidth &&
+				    (Width == null ||
+				     Bounds.Width >= 0 &&
+				     Width is Dim.DimAbsolute &&
+				     Width.Anchor (0) >= 0 &&
+				     Width.Anchor (0) < colWidth)) {
+					sizeRequired = new Size (colWidth, Bounds.Height);
+					return true;
 				}
+				break;
+			default:
+				if (_frame.Height < 1 &&
+				    (Height == null ||
+				     Height is Dim.DimAbsolute &&
+				     Height.Anchor (0) == 0)) {
+					sizeRequired = new Size (Bounds.Width, 1);
+					return true;
+				}
+				break;
 			}
 			return false;
 		}
 
 		if (GetMinimumSizeOfText (out var size)) {
+			// TODO: This is a hack.
+			//_width  = size.Width;
+			//_height = size.Height;
 			_frame = new Rect (_frame.Location, size);
+			//throw new InvalidOperationException ("This is a hack.");
 			return true;
 		}
 		return false;
@@ -275,10 +281,12 @@ public partial class View {
 	{
 		if (!IsInitialized) {
 			TextFormatter.Size = Size.Empty;
+			return;
 		}
 
 		if (string.IsNullOrEmpty (TextFormatter.Text)) {
 			TextFormatter.Size = Bounds.Size;
+			return;
 		}
 
 		TextFormatter.Size = new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
@@ -299,9 +307,9 @@ public partial class View {
 			x = Bounds.X;
 			y = Bounds.Y;
 		}
-		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
-		var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
-		var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
+		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction); 
+		int newWidth = rect.Size.Width - GetHotKeySpecifierLength () + (Margin == null ? 0 : Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal);
+		int newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + (Margin == null ? 0 : Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical);
 		return new Size (newWidth, newHeight);
 	}
 

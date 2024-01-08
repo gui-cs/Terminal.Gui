@@ -190,7 +190,8 @@ public class LayoutTests {
 				      };
 
 		var v = new View () {
-					    Width = Dim.Fill ()
+					    Width          = Dim.Fill (),
+					    ValidatePosDim = true
 				    };
 		top.Add (v);
 		top.BeginInit ();
@@ -198,19 +199,23 @@ public class LayoutTests {
 		top.LayoutSubviews ();
 
 		Assert.False (v.AutoSize);
-		Assert.True (v.TrySetWidth (0, out _));
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
 		Assert.Equal (80, v.Frame.Width);
 
 		v.Width = Dim.Fill (1);
 		top.LayoutSubviews ();
 
-		Assert.True (v.TrySetWidth (0, out _));
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
 		Assert.Equal (79, v.Frame.Width);
 
 		v.AutoSize = true;
 		top.LayoutSubviews ();
 
 		Assert.True (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimAbsolute);
+		Assert.Equal (79, v.Frame.Width);
 		top.Dispose ();
 	}
 
@@ -224,7 +229,8 @@ public class LayoutTests {
 				      };
 
 		var v = new View () {
-					    Height = Dim.Fill ()
+					    Height         = Dim.Fill (),
+					    ValidatePosDim = true
 				    };
 		top.Add (v);
 		top.BeginInit ();
@@ -232,19 +238,22 @@ public class LayoutTests {
 		top.LayoutSubviews ();
 
 		Assert.False (v.AutoSize);
-		Assert.True (v.TrySetHeight (0, out _));
+		Assert.False (v.TrySetHeight (0, out _));
 		Assert.Equal (20, v.Frame.Height);
 
 		v.Height = Dim.Fill (1);
 		top.LayoutSubviews ();
 
-		Assert.True (v.TrySetHeight (0, out _));
+		Assert.False (v.TrySetHeight (0, out _));
+		Assert.True (v.Height is Dim.DimFill);
 		Assert.Equal (19, v.Frame.Height);
 
 		v.AutoSize = true;
 		top.LayoutSubviews ();
 
 		Assert.True (v.TrySetHeight (0, out _));
+		Assert.True (v.Height is Dim.DimAbsolute);
+		Assert.Equal (19, v.Frame.Height);
 		top.Dispose ();
 	}
 
@@ -265,117 +274,6 @@ public class LayoutTests {
 		//view.SetRelativeLayout (new Rect (0, 0, 32, 5));
 		Assert.Equal (32, view.Frame.Width);
 		Assert.Equal (5,  view.Frame.Height);
-	}
-
-	[Fact] [AutoInitShutdown]
-	public void Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
-	{
-		string text = $"First line{Environment.NewLine}Second line";
-		var horizontalView = new View () {
-							 Width  = 20,
-							 Height = 1,
-							 Text   = text
-						 };
-		var verticalView = new View () {
-						       Y             = 3,
-						       Height        = 20,
-						       Width         = 1,
-						       Text          = text,
-						       TextDirection = TextDirection.TopBottom_LeftRight
-					       };
-		var win = new Window () {
-						Width  = Dim.Fill (),
-						Height = Dim.Fill (),
-						Text   = "Window"
-					};
-		win.Add (horizontalView, verticalView);
-		Application.Top.Add (win);
-		var rs = Application.Begin (Application.Top);
-		((FakeDriver)Application.Driver).SetBufferSize (32, 32);
-
-		Assert.False (horizontalView.AutoSize);
-		Assert.False (verticalView.AutoSize);
-		Assert.Equal (new Rect (0, 0, 20, 1),  horizontalView.Frame);
-		Assert.Equal (new Rect (0, 3, 1,  20), verticalView.Frame);
-		string expected = @"
-┌──────────────────────────────┐
-│First line Second li          │
-│                              │
-│                              │
-│F                             │
-│i                             │
-│r                             │
-│s                             │
-│t                             │
-│                              │
-│l                             │
-│i                             │
-│n                             │
-│e                             │
-│                              │
-│S                             │
-│e                             │
-│c                             │
-│o                             │
-│n                             │
-│d                             │
-│                              │
-│l                             │
-│i                             │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-└──────────────────────────────┘
-";
-
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 32, 32), pos);
-
-		verticalView.Text = $"最初の行{Environment.NewLine}二行目";
-		Application.Top.Draw ();
-		Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
-		expected = @"
-┌──────────────────────────────┐
-│First line Second li          │
-│                              │
-│                              │
-│最                            │
-│初                            │
-│の                            │
-│行                            │
-│                              │
-│二                            │
-│行                            │
-│目                            │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-│                              │
-└──────────────────────────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 32, 32), pos);
-		Application.End (rs);
 	}
 
 
@@ -777,6 +675,51 @@ public class LayoutTests {
 		Application.Shutdown ();
 	}
 
+	[Fact]
+	public void PosCombine_Refs_SuperView_Throws ()
+	{
+		Application.Init (new FakeDriver ());
+
+		var w = new Window () {
+					      X = Pos.Left (Application.Top) + 2,
+					      Y = Pos.Top (Application.Top) + 2
+				      };
+		var f = new FrameView ();
+		var v1 = new View () {
+					     X = Pos.Left (w) + 2,
+					     Y = Pos.Top (w) + 2
+				     };
+		var v2 = new View () {
+					     X = Pos.Left (v1) + 2,
+					     Y = Pos.Top (v1) + 2
+				     };
+
+		f.Add (v1, v2);
+		w.Add (f);
+		Application.Top.Add (w);
+
+		f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
+		f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
+
+		Application.Top.LayoutComplete += (s, e) => {
+			Assert.Equal (0, Application.Top.Frame.X);
+			Assert.Equal (0, Application.Top.Frame.Y);
+			Assert.Equal (2, w.Frame.X);
+			Assert.Equal (2, w.Frame.Y);
+			Assert.Equal (2, f.Frame.X);
+			Assert.Equal (2, f.Frame.Y);
+			Assert.Equal (4, v1.Frame.X);
+			Assert.Equal (4, v1.Frame.Y);
+			Assert.Equal (6, v2.Frame.X);
+			Assert.Equal (6, v2.Frame.Y);
+		};
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+
+		Assert.Throws<InvalidOperationException> (() => Application.Run ());
+		Application.Shutdown ();
+	}
+	
 	// Was named AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	// but doesn't actually have anything to do with AutoSize.
 	[Fact]

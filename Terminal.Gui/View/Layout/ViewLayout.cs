@@ -569,14 +569,14 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	///         <para>
-	///         Sets the <see cref="Frame"/>.
-	///         </para>
-	///         <para>
-	///         Can be overridden if the view resize behavior is different than the default.
+	///         Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls
+	///         <see cref="SetRelativeLayout(Rect)"/> to update the view. 
 	///         </para>
 	/// </remarks>
-	protected virtual void OnResizeNeeded ()
+	internal void OnResizeNeeded ()
 	{
+		// TODO: Identify a real-world use-case where this API should be virtual. 
+		// TODO: Until then leave it `internal` and non-virtual
 		// First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
 		// Finally, if none of those are valid, use int.MaxValue (for Unit tests).
 		var relativeBounds = SuperView is { IsInitialized: true }        ? SuperView.Bounds :

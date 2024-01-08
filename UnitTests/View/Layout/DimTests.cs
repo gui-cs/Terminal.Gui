@@ -559,8 +559,6 @@ public class DimTests {
 		t.BeginInit ();
 		t.EndInit ();
 
-		// BUGBUG: v2 - f references t here; t is f's super-superview. This is supported!
-		// BUGBUG: v2 - f references v2 here; v2 is f's subview. This is not supported!
 		f.Width = Dim.Width (t) - Dim.Width (v2);    // 80 - 74 = 6
 		f.Height = Dim.Height (t) - Dim.Height (v2); // 25 - 19 = 6
 
@@ -569,13 +567,12 @@ public class DimTests {
 		Assert.Equal (25, t.Frame.Height);
 		Assert.Equal (78, w.Frame.Width);
 		Assert.Equal (23, w.Frame.Height);
-		// BUGBUG: v2 - this no longer works - see above
-		//Assert.Equal (6, f.Frame.Width);
-		//Assert.Equal (6, f.Frame.Height);
-		//Assert.Equal (76, v1.Frame.Width);
-		//Assert.Equal (21, v1.Frame.Height);
-		//Assert.Equal (74, v2.Frame.Width);
-		//Assert.Equal (19, v2.Frame.Height);
+		Assert.Equal (6, f.Frame.Width);
+		Assert.Equal (6, f.Frame.Height);
+		Assert.Equal (76, v1.Frame.Width);
+		Assert.Equal (21, v1.Frame.Height);
+		Assert.Equal (74, v2.Frame.Width);
+		Assert.Equal (19, v2.Frame.Height);
 		t.Dispose ();
 	}
 
@@ -632,7 +629,6 @@ public class DimTests {
 	{
 		var t = new View { Width = 80, Height = 50 };
 
-		// BUGBUG: v2 - super should not reference it's superview (t)
 		var super = new View {
 			Width = Dim.Width (t) - 2,
 			Height = Dim.Height (t) - 2
@@ -720,19 +716,17 @@ public class DimTests {
 		var count = 20;
 		var listLabels = new List<Label> ();
 
-		for (var i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
 			var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 			view.Add (label);
 			Assert.Equal ($"Label {i}", label.Text);
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i})", label.Y.ToString ());
+			Assert.Equal ($"Absolute({i})", label.Y.ToString ());
 			listLabels.Add (label);
 
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i})", view.Height.ToString ());
+			Assert.Equal ($"Absolute({i})", view.Height.ToString ());
 			view.Height += 1;
-			//Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
+			Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 		}
 
 		field.KeyDown += (s, k) => {

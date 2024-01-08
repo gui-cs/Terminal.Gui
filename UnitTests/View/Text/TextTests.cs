@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -538,4 +539,114 @@ public class TextTests {
 		Application.End (rs);
 	}
 
+	[Fact]
+	[AutoInitShutdown]
+	public void AutoSize_False_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
+	{
+		string text = $"First line{Environment.NewLine}Second line";
+		var horizontalView = new View () {
+			Width = 20,
+			Height = 1,
+			Text = text
+		};
+		var verticalView = new View () {
+			Y = 3,
+			Height = 20,
+			Width = 1,
+			Text = text,
+			TextDirection = TextDirection.TopBottom_LeftRight
+		};
+		var win = new Window () {
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+			Text = "Window"
+		};
+		win.Add (horizontalView, verticalView);
+		Application.Top.Add (win);
+		var rs = Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (32, 32);
+
+		Assert.False (horizontalView.AutoSize);
+		Assert.False (verticalView.AutoSize);
+		Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
+		Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
+		string expected = @"
+┌──────────────────────────────┐
+│First line Second li          │
+│                              │
+│                              │
+│F                             │
+│i                             │
+│r                             │
+│s                             │
+│t                             │
+│                              │
+│l                             │
+│i                             │
+│n                             │
+│e                             │
+│                              │
+│S                             │
+│e                             │
+│c                             │
+│o                             │
+│n                             │
+│d                             │
+│                              │
+│l                             │
+│i                             │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+└──────────────────────────────┘
+";
+
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
+		verticalView.Text = $"最初の行{Environment.NewLine}二行目";
+		Application.Top.Draw ();
+		// BUGBUG: #3127 - If AutoSize == false, setting text should NOT change the size of the view.
+		Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
+		expected = @"
+┌──────────────────────────────┐
+│First line Second li          │
+│                              │
+│                              │
+│最                            │
+│初                            │
+│の                            │
+│行                            │
+│                              │
+│二                            │
+│行                            │
+│目                            │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+│                              │
+└──────────────────────────────┘
+";
+
+		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+		Application.End (rs);
+	}
 }
