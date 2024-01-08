@@ -248,6 +248,25 @@ public class LayoutTests {
 		top.Dispose ();
 	}
 
+	[Fact]
+	[AutoInitShutdown]
+	public void DimFill_SizedCorrectly ()
+	{
+		var view = new View () {
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+			BorderStyle = LineStyle.Single,
+		};
+		Application.Top.Add (view);
+		var rs = Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (32, 5);
+		//view.SetNeedsLayout ();
+		Application.Top.LayoutSubviews ();
+		//view.SetRelativeLayout (new Rect (0, 0, 32, 5));
+		Assert.Equal (32, view.Frame.Width);
+		Assert.Equal (5, view.Frame.Height);
+	}
+
 	[Fact] [AutoInitShutdown]
 	public void Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
 	{
@@ -761,7 +780,7 @@ public class LayoutTests {
 	// Was named AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	// but doesn't actually have anything to do with AutoSize.
 	[Fact]
-	public void AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
+	public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	{
 		Application.Init (new FakeDriver ());
 
@@ -781,7 +800,7 @@ public class LayoutTests {
 		t.Add (w);
 
 		t.Ready += (s, e) => {
-			v.LayoutStyle = LayoutStyle.Absolute;
+			v.Frame = new Rect (2, 2, 10, 10);
 			Assert.Equal (2, v.X = 2);
 			Assert.Equal (2, v.Y = 2);
 		};

@@ -15,19 +15,19 @@ public class WindowTests {
 		// Parameterless
 		var r = new Window ();
 		Assert.NotNull (r);
-		Assert.Equal (string.Empty, r.Title);
+		Assert.Equal (string.Empty,         r.Title);
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-		Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
+		Assert.Equal ("Window()(0,0,0,0)",  r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
 		Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
 		Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
+		Assert.Equal (0,           r.X);
+		Assert.Equal (0,           r.Y);
 		Assert.Equal (Dim.Fill (), r.Width);
 		Assert.Equal (Dim.Fill (), r.Height);
-		Assert.Null (r.X);
-		Assert.Null (r.Y);
 		Assert.False (r.IsCurrentTop);
 		Assert.Empty (r.Id);
 		Assert.False (r.WantContinuousButtonPressed);
@@ -39,8 +39,8 @@ public class WindowTests {
 		// Empty Rect
 		r = new Window (Rect.Empty) { Title = "title" };
 		Assert.NotNull (r);
-		Assert.Equal ("title", r.Title);
-		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		Assert.Equal ("title",                  r.Title);
+		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
 		Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -48,10 +48,10 @@ public class WindowTests {
 		Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
-		Assert.Null (r.Width);  // All view Dim are initialized now in the IsAdded setter,
-		Assert.Null (r.Height); // avoiding Dim errors.
-		Assert.Null (r.X);      // All view Pos are initialized now in the IsAdded setter,
-		Assert.Null (r.Y);      // avoiding Pos errors.
+		Assert.Equal (0, r.X);
+		Assert.Equal (0, r.Y);
+		Assert.Equal (0, r.Width);
+		Assert.Equal (0, r.Height);
 		Assert.False (r.IsCurrentTop);
 		Assert.Equal (r.Title, r.Id);
 		Assert.False (r.WantContinuousButtonPressed);
@@ -64,7 +64,7 @@ public class WindowTests {
 		r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
-		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
 		Assert.Equal ("Window(title)(1,2,3,4)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -72,10 +72,10 @@ public class WindowTests {
 		Assert.Equal (new Rect (1, 2, 3, 4), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
-		Assert.Null (r.Width);
-		Assert.Null (r.Height);
-		Assert.Null (r.X);
-		Assert.Null (r.Y);
+		Assert.Equal (1, r.X);
+		Assert.Equal (2, r.Y);
+		Assert.Equal (3, r.Width);
+		Assert.Equal (4, r.Height);
 		Assert.False (r.IsCurrentTop);
 		Assert.Equal (r.Title, r.Id);
 		Assert.False (r.WantContinuousButtonPressed);

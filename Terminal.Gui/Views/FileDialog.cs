@@ -368,7 +368,10 @@ namespace Terminal.Gui {
 
 		private int CalculateOkButtonPosX ()
 		{
-			return this.Bounds.Width
+			if (!IsInitialized) {
+				return 0;
+			}
+			return Bounds.Width
 				- btnOk.Bounds.Width
 				- btnCancel.Bounds.Width
 				- 1

@@ -553,6 +553,11 @@ public abstract class ConsoleDriver {
 	public static DiagnosticFlags Diagnostics { get; set; }
 
 	/// <summary>
+	/// Gets the dimensions of the terminal.
+	/// </summary>
+	public Rect Bounds => new Rect (0, 0, Cols, Rows);
+
+	/// <summary>
 	/// Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.
 	/// </summary>
 	/// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>

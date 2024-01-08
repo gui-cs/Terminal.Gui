@@ -246,7 +246,7 @@ public class AllViewsTester : Scenario {
 		var layout = view.LayoutStyle;
 
 		try {
-			view.LayoutStyle = LayoutStyle.Absolute;
+			//view.LayoutStyle = LayoutStyle.Absolute;
 
 			view.X = _xRadioGroup.SelectedItem switch {
 				0 => Pos.Percent (_xVal),
@@ -280,7 +280,7 @@ public class AllViewsTester : Scenario {
 		} catch (Exception e) {
 			MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
 		} finally {
-			view.LayoutStyle = layout;
+			//view.LayoutStyle = layout;
 		}
 		UpdateTitle (view);
 	}

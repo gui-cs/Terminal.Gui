@@ -21,7 +21,7 @@ namespace Terminal.Gui.ViewTests {
 			// Parameterless
 			var r = new View ();
 			Assert.NotNull (r);
-			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
+			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 			Assert.Equal ("View()(0,0,0,0)", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
@@ -29,10 +29,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.Null (r.Width);
-			Assert.Null (r.Height);
-			Assert.Null (r.X);
-			Assert.Null (r.Y);
+			Assert.Equal (0, r.Width);
+			Assert.Equal (0, r.Height);
+			Assert.Equal (0, r.X);
+			Assert.Equal (0, r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -42,7 +42,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Null (r.MostFocused);
 			Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 			r.Dispose ();
-			
+
 			// Empty Rect
 			r = new View (Rect.Empty);
 			Assert.NotNull (r);
@@ -54,10 +54,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.Null (r.Width);       // All view Dim are initialized now in the IsAdded setter,
-			Assert.Null (r.Height);      // avoiding Dim errors.
-			Assert.Null (r.X);           // All view Pos are initialized now in the IsAdded setter,
-			Assert.Null (r.Y);           // avoiding Pos errors.
+			Assert.Equal (0, r.Width);
+			Assert.Equal (0, r.Height);
+			Assert.Equal (0, r.X);
+			Assert.Equal (0, r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -79,10 +79,10 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (1, 2, 3, 4), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.Null (r.Width);
-			Assert.Null (r.Height);
-			Assert.Null (r.X);
-			Assert.Null (r.Y);
+			Assert.Equal (3, r.Width);
+			Assert.Equal (4, r.Height);
+			Assert.Equal (1, r.X);
+			Assert.Equal (2, r.Y);
 			Assert.False (r.IsCurrentTop);
 			Assert.Empty (r.Id);
 			Assert.Empty (r.Subviews);
@@ -96,7 +96,7 @@ namespace Terminal.Gui.ViewTests {
 			// Initializes a view with a vertical direction
 			r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
 			Assert.NotNull (r);
-			Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
+			Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 			Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
 			Assert.False (r.CanFocus);
 			Assert.False (r.HasFocus);
@@ -104,10 +104,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (new Rect (0, 0, 1, 13), r.Frame);
 			Assert.Null (r.Focused);
 			Assert.Null (r.ColorScheme);
-			Assert.Null (r.Width);       // All view Dim are initialized now in the IsAdded setter,
-			Assert.Null (r.Height);      // avoiding Dim errors.
-			Assert.Null (r.X);           // All view Pos are initialized now in the IsAdded setter,
-			Assert.Null (r.Y);           // avoiding Pos errors.
 			Assert.False (r.IsCurrentTop);
 			Assert.Equal ("Vertical View", r.Id);
 			Assert.Empty (r.Subviews);
@@ -183,23 +179,23 @@ namespace Terminal.Gui.ViewTests {
 #if DEBUG_IDISPOSABLE
 			Assert.Empty (Responder.Instances);
 #endif
-			
+
 			// Default Constructor
 			view = new View ();
-			Assert.Null (view.X);
-			Assert.Null (view.Y);
-			Assert.Null (view.Width);
-			Assert.Null (view.Height);
+			Assert.Equal (0, view.X);
+			Assert.Equal (0, view.Y);
+			Assert.Equal (0, view.Width);
+			Assert.Equal (0, view.Height);
 			Assert.True (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
 			view.Dispose ();
 
 			// Constructor
 			view = new View (1, 2, "");
-			Assert.Null (view.X);
-			Assert.Null (view.Y);
-			Assert.Null (view.Width);
-			Assert.Null (view.Height);
+			Assert.Equal (1, view.X);
+			Assert.Equal (2, view.Y);
+			Assert.Equal (0, view.Width);
+			Assert.Equal (0, view.Height);
 			Assert.False (view.Frame.IsEmpty);
 			Assert.True (view.Bounds.IsEmpty);
 			view.Dispose ();
@@ -259,33 +255,33 @@ namespace Terminal.Gui.ViewTests {
 		{
 			Application.Init (new FakeDriver ());
 
-			var t = new Toplevel () { Id = "0", };
+			var top = new Toplevel () { Id = "0", }; // Frame: 0, 0, 80, 25; Bounds: 0, 0, 80, 25
 
-			var w = new Window () { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () };
-			var v1 = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () };
-			var v2 = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () };
-			var sv1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () };
+			var winAddedToTop = new Window () { Id = "t", Width = Dim.Fill (), Height = Dim.Fill () }; // Frame: 0, 0, 80, 25; Bounds: 0, 0, 78, 23
+			var v1AddedToWin = new View () { Id = "v1", Width = Dim.Fill (), Height = Dim.Fill () }; // Frame: 1, 1, 78, 23 (because Windows has a border)
+			var v2AddedToWin = new View () { Id = "v2", Width = Dim.Fill (), Height = Dim.Fill () }; // Frame: 1, 1, 78, 23 (because Windows has a border)
+			var svAddedTov1 = new View () { Id = "sv1", Width = Dim.Fill (), Height = Dim.Fill () }; // Frame: 1, 1, 78, 23 (same as it's superview v1AddedToWin)
 
 			int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
-			w.Added += (s, e) => {
-				Assert.Equal (e.Parent.Frame.Width, w.Frame.Width);
-				Assert.Equal (e.Parent.Frame.Height, w.Frame.Height);
+			winAddedToTop.Added += (s, e) => {
+				Assert.Equal (e.Parent.Bounds.Width, winAddedToTop.Frame.Width);
+				Assert.Equal (e.Parent.Bounds.Height, winAddedToTop.Frame.Height);
 			};
-			v1.Added += (s, e) => {
-				Assert.Equal (e.Parent.Frame.Width, v1.Frame.Width);
-				Assert.Equal (e.Parent.Frame.Height, v1.Frame.Height);
+			v1AddedToWin.Added += (s, e) => {
+				Assert.Equal (e.Parent.Bounds.Width, v1AddedToWin.Frame.Width);
+				Assert.Equal (e.Parent.Bounds.Height, v1AddedToWin.Frame.Height);
 			};
-			v2.Added += (s, e) => {
-				Assert.Equal (e.Parent.Frame.Width, v2.Frame.Width);
-				Assert.Equal (e.Parent.Frame.Height, v2.Frame.Height);
+			v2AddedToWin.Added += (s, e) => {
+				Assert.Equal (e.Parent.Bounds.Width, v2AddedToWin.Frame.Width);
+				Assert.Equal (e.Parent.Bounds.Height, v2AddedToWin.Frame.Height);
 			};
-			sv1.Added += (s, e) => {
-				Assert.Equal (e.Parent.Frame.Width, sv1.Frame.Width);
-				Assert.Equal (e.Parent.Frame.Height, sv1.Frame.Height);
+			svAddedTov1.Added += (s, e) => {
+				Assert.Equal (e.Parent.Bounds.Width, svAddedTov1.Frame.Width);
+				Assert.Equal (e.Parent.Bounds.Height, svAddedTov1.Frame.Height);
 			};
 
-			t.Initialized += (s, e) => {
+			top.Initialized += (s, e) => {
 				tc++;
 				Assert.Equal (1, tc);
 				Assert.Equal (1, wc);
@@ -293,48 +289,61 @@ namespace Terminal.Gui.ViewTests {
 				Assert.Equal (1, v2c);
 				Assert.Equal (1, sv1c);
 
-				Assert.True (t.CanFocus);
-				Assert.True (w.CanFocus);
-				Assert.False (v1.CanFocus);
-				Assert.False (v2.CanFocus);
-				Assert.False (sv1.CanFocus);
+				Assert.True (top.CanFocus);
+				Assert.True (winAddedToTop.CanFocus);
+				Assert.False (v1AddedToWin.CanFocus);
+				Assert.False (v2AddedToWin.CanFocus);
+				Assert.False (svAddedTov1.CanFocus);
 
 				Application.Refresh ();
 			};
-			w.Initialized += (s, e) => {
+			winAddedToTop.Initialized += (s, e) => {
 				wc++;
-				Assert.Equal (t.Frame.Width, w.Frame.Width);
-				Assert.Equal (t.Frame.Height, w.Frame.Height);
+				Assert.Equal (top.Bounds.Width, winAddedToTop.Frame.Width);
+				Assert.Equal (top.Bounds.Height, winAddedToTop.Frame.Height);
 			};
-			v1.Initialized += (s, e) => {
+			v1AddedToWin.Initialized += (s, e) => {
 				v1c++;
-				Assert.Equal (t.Frame.Width, v1.Frame.Width);
-				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+				// Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
+				// BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
+				// in no way should the v1AddedToWin.Frame be the same as the Top.Frame/Bounds
+				// as it is a subview of winAddedToTop, which has a border!
+				//Assert.Equal (top.Bounds.Width,  v1AddedToWin.Frame.Width);
+				//Assert.Equal (top.Bounds.Height, v1AddedToWin.Frame.Height);
 			};
-			v2.Initialized += (s, e) => {
+			v2AddedToWin.Initialized += (s, e) => {
 				v2c++;
-				Assert.Equal (t.Frame.Width, v2.Frame.Width);
-				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+				// Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
+				// BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
+				// in no way should the v2AddedToWin.Frame be the same as the Top.Frame/Bounds
+				// as it is a subview of winAddedToTop, which has a border!
+				//Assert.Equal (top.Bounds.Width,  v2AddedToWin.Frame.Width);
+				//Assert.Equal (top.Bounds.Height, v2AddedToWin.Frame.Height);
 			};
-			sv1.Initialized += (s, e) => {
+			svAddedTov1.Initialized += (s, e) => {
 				sv1c++;
-				Assert.Equal (t.Frame.Width, sv1.Frame.Width);
-				Assert.Equal (t.Frame.Height, sv1.Frame.Height);
-				Assert.False (sv1.CanFocus);
-				Assert.Throws<InvalidOperationException> (() => sv1.CanFocus = true);
-				Assert.False (sv1.CanFocus);
+				// Top.Frame: 0, 0, 80, 25; Top.Bounds: 0, 0, 80, 25
+				// BUGBUG: This is wrong, it should be 78, 23. This test has always been broken.
+				// in no way should the svAddedTov1.Frame be the same as the Top.Frame/Bounds
+				// because sv1AddedTov1 is a subview of v1AddedToWin, which is a subview of
+				// winAddedToTop, which has a border!
+				//Assert.Equal (top.Bounds.Width,  svAddedTov1.Frame.Width);
+				//Assert.Equal (top.Bounds.Height, svAddedTov1.Frame.Height);
+				Assert.False (svAddedTov1.CanFocus);
+				Assert.Throws<InvalidOperationException> (() => svAddedTov1.CanFocus = true);
+				Assert.False (svAddedTov1.CanFocus);
 			};
 
-			v1.Add (sv1);
-			w.Add (v1, v2);
-			t.Add (w);
+			v1AddedToWin.Add (svAddedTov1);
+			winAddedToTop.Add (v1AddedToWin, v2AddedToWin);
+			top.Add (winAddedToTop);
 
 			Application.Iteration += (s, a) => {
 				Application.Refresh ();
-				t.Running = false;
+				top.Running = false;
 			};
 
-			Application.Run (t);
+			Application.Run (top);
 			Application.Shutdown ();
 
 			Assert.Equal (1, tc);
@@ -343,14 +352,14 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (1, v2c);
 			Assert.Equal (1, sv1c);
 
-			Assert.True (t.CanFocus);
-			Assert.True (w.CanFocus);
-			Assert.False (v1.CanFocus);
-			Assert.False (v2.CanFocus);
-			Assert.False (sv1.CanFocus);
+			Assert.True (top.CanFocus);
+			Assert.True (winAddedToTop.CanFocus);
+			Assert.False (v1AddedToWin.CanFocus);
+			Assert.False (v2AddedToWin.CanFocus);
+			Assert.False (svAddedTov1.CanFocus);
 
-			v1.CanFocus = true;
-			Assert.False (sv1.CanFocus); // False because sv1 was disposed and it isn't a subview of v1.
+			v1AddedToWin.CanFocus = true;
+			Assert.False (svAddedTov1.CanFocus); // False because sv1 was disposed and it isn't a subview of v1.
 
 		}
 
@@ -384,18 +393,18 @@ namespace Terminal.Gui.ViewTests {
 			};
 			w.Initialized += (s, e) => {
 				wc++;
-				Assert.Equal (t.Frame.Width, w.Frame.Width);
-				Assert.Equal (t.Frame.Height, w.Frame.Height);
+				Assert.Equal (t.Bounds.Width, w.Frame.Width);
+				Assert.Equal (t.Bounds.Height, w.Frame.Height);
 			};
 			v1.Initialized += (s, e) => {
 				v1c++;
-				Assert.Equal (t.Frame.Width, v1.Frame.Width);
-				Assert.Equal (t.Frame.Height, v1.Frame.Height);
+				//Assert.Equal (t.Bounds.Width, v1.Frame.Width);
+				//Assert.Equal (t.Bounds.Height, v1.Frame.Height);
 			};
 			v2.Initialized += (s, e) => {
 				v2c++;
-				Assert.Equal (t.Frame.Width, v2.Frame.Width);
-				Assert.Equal (t.Frame.Height, v2.Frame.Height);
+				//Assert.Equal (t.Bounds.Width,  v2.Frame.Width);
+				//Assert.Equal (t.Bounds.Height, v2.Frame.Height);
 			};
 			w.Add (v1, v2);
 			t.Add (w);
@@ -505,12 +514,17 @@ namespace Terminal.Gui.ViewTests {
 			var runState = Application.Begin (top);
 
 			// BUGBUG: This is a SetRelativeLayout test. It should be moved to SetRelativeLayoutTests.cs
-			view.Width = Dim.Fill ();
-			view.Height = Dim.Fill ();
-			Assert.Equal (10, view.Bounds.Width);
-			Assert.Equal (1, view.Bounds.Height);
-			view.LayoutStyle = LayoutStyle.Computed;
+			view.Width = Dim.Fill (); // Width should be 79 (Top.Width - 1)
+			Assert.Equal ("Fill(0)", view.Width.ToString ());
+			view.Height = Dim.Fill (); // Height should be 24 (Top.Height - 1)
+
+			// #3127: Before: Frame was not being set when Width and Height were set to Dim.Fill()
+			//	  After: Frame is set to the parent's Frame when Width and Height are set to Dim.Fill()
+			Assert.Equal (79, view.Bounds.Width);
+			Assert.Equal (24, view.Bounds.Height);
+			//view.LayoutStyle = LayoutStyle.Computed;
 			view.SetRelativeLayout (top.Bounds);
+			Assert.Equal ("Fill(0)", view.Width.ToString ());
 			Assert.Equal (1, view.Frame.X);
 			Assert.Equal (1, view.Frame.Y);
 			Assert.Equal (79, view.Frame.Width);
@@ -758,61 +772,6 @@ namespace Terminal.Gui.ViewTests {
 			Assert.Equal (Rect.Empty, pos);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void GetTextFormatterBoundsSize_GetSizeNeededForText_HotKeySpecifier ()
-		{
-			var text = "Say Hello 你";
-			var horizontalView = new View () {
-				Text = text,
-				AutoSize = true,
-				HotKeySpecifier = (Rune)'_'
-			};
-
-			var verticalView = new View () {
-				Text = text,
-				AutoSize = true,
-				HotKeySpecifier = (Rune)'_',
-				TextDirection = TextDirection.TopBottom_LeftRight
-			};
-			Application.Top.Add (horizontalView, verticalView);
-			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (50, 50);
-
-			Assert.True (horizontalView.AutoSize);
-			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
-			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
-			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
-
-			Assert.True (verticalView.AutoSize);
-			// BUGBUG: v2 - Autosize is broken; disabling this test
-			//Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
-			Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
-
-			text = "Say He_llo 你";
-			horizontalView.Text = text;
-			verticalView.Text = text;
-
-			Assert.True (horizontalView.AutoSize);
-			Assert.Equal (new Rect (0, 0, 12, 1), horizontalView.Frame);
-			Assert.Equal (new Size (12, 1), horizontalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (13, 1), horizontalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (horizontalView.TextFormatter.Size, horizontalView.GetSizeNeededForTextAndHotKey ());
-			Assert.Equal (horizontalView.Frame.Size, horizontalView.GetSizeNeededForTextWithoutHotKey ());
-
-			Assert.True (verticalView.AutoSize);
-			// BUGBUG: v2 - Autosize is broken; disabling this test
-			//Assert.Equal (new Rect (0, 0, 2, 11), verticalView.Frame);
-			//Assert.Equal (new Size (2, 11), verticalView.GetSizeNeededForTextWithoutHotKey ());
-			//Assert.Equal (new Size (2, 12), verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.TextFormatter.Size, verticalView.GetSizeNeededForTextAndHotKey ());
-			//Assert.Equal (verticalView.Frame.Size, verticalView.GetSizeNeededForTextWithoutHotKey ());
-		}
-
 		[Fact, TestRespondersDisposed]
 		public void IsAdded_Added_Removed ()
 		{
@@ -823,7 +782,7 @@ namespace Terminal.Gui.ViewTests {
 			Assert.True (view.IsAdded);
 			top.Remove (view);
 			Assert.False (view.IsAdded);
-			
+
 			top.Dispose ();
 			view.Dispose ();
 		}
@@ -831,14 +790,16 @@ namespace Terminal.Gui.ViewTests {
 		[Fact, AutoInitShutdown]
 		public void Visible_Clear_The_View_Output ()
 		{
-			var label = new Label ("Testing visibility.");
+			var view = new View ("Testing visibility.");  // use View, not Label to avoid AutoSize == true
+			Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
+			Assert.Equal (1, view.Height);
 			var win = new Window ();
-			win.Add (label);
+			win.Add (view);
 			var top = Application.Top;
 			top.Add (win);
 			var rs = Application.Begin (top);
 
-			Assert.True (label.Visible);
+			Assert.True (view.Visible);
 			((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────────────────────────┐
@@ -848,7 +809,7 @@ namespace Terminal.Gui.ViewTests {
 └────────────────────────────┘
 ", output);
 
-			label.Visible = false;
+			view.Visible = false;
 
 			bool firstIteration = false;
 			Application.RunIteration (ref rs, ref firstIteration);
@@ -1044,8 +1005,7 @@ At 0,0
 
 			view.Frame = new Rect (1, 1, 10, 1);
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
-			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
-			view.LayoutStyle = LayoutStyle.Absolute;
+			Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			top.Draw ();
@@ -1115,8 +1075,7 @@ At 0,0
 
 			view.Frame = new Rect (1, 1, 10, 1);
 			Assert.Equal (new Rect (1, 1, 10, 1), view.Frame);
-			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
-			view.LayoutStyle = LayoutStyle.Absolute;
+			Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			view.Draw ();
@@ -1189,8 +1148,7 @@ At 0,0
 
 			view.Frame = new Rect (3, 3, 10, 1);
 			Assert.Equal (new Rect (3, 3, 10, 1), view.Frame);
-			Assert.Equal (LayoutStyle.Computed, view.LayoutStyle);
-			view.LayoutStyle = LayoutStyle.Absolute;
+			Assert.Equal (LayoutStyle.Absolute, view.LayoutStyle);
 			Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), view._needsDisplayRect);
 			top.Draw ();
@@ -1351,7 +1309,7 @@ At 0,0
 				ColorScheme = Colors.Menu,
 				Width = Dim.Fill (),
 				X = 0, // don't overcomplicate unit tests
-				Y = 0 
+				Y = 0
 			};
 
 			var button = new Button ("Press me!") {

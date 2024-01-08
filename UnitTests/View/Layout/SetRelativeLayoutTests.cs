@@ -10,7 +10,46 @@ public class SetRelativeLayoutTests {
 	readonly ITestOutputHelper _output;
 
 	public SetRelativeLayoutTests (ITestOutputHelper output) => _output = output;
-	
+
+	[Fact]
+	public void ComputedPosDim_StayComputed ()
+	{
+		var screen = new Rect (0, 0, 10, 15);
+		var view = new View () {
+			X = 1,
+			Y = 2,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+
+		Assert.Equal ("Absolute(1)", view.X.ToString ());
+		Assert.Equal ("Absolute(2)", view.Y.ToString ());
+		Assert.Equal ("Fill(0)", view.Width.ToString ());
+		Assert.Equal ("Fill(0)", view.Height.ToString ());
+		view.SetRelativeLayout (screen);
+		Assert.Equal ("Fill(0)", view.Width.ToString ());
+		Assert.Equal ("Fill(0)", view.Height.ToString ());
+	}
+
+	[Fact]
+	public void AbsolutePosDim_DontChange ()
+	{
+		var screen = new Rect (0, 0, 10, 15);
+		var view = new View () {
+			X = 1,  // outside of screen +10
+			Y = 2, // outside of screen -10
+			Width = 3,
+			Height = 4
+		};
+
+		// Layout is Absolute. So the X and Y are not changed.
+		view.SetRelativeLayout (screen);
+		Assert.Equal (1, view.Frame.X);
+		Assert.Equal (2, view.Frame.Y);
+		Assert.Equal (3, view.Frame.Width);
+		Assert.Equal (4, view.Frame.Height);
+	}
+
 	[Fact]
 	public void Fill_Pos_Within_Bounds ()
 	{
@@ -64,7 +103,7 @@ public class SetRelativeLayoutTests {
 	}
 
 	[Fact]
-	public void FIll_Pos_Outside_Bounds ()
+	public void Fill_Pos_Outside_Bounds ()
 	{
 		var screen = new Rect (0, 0, 80, 25);
 		var view = new View () {
@@ -74,6 +113,7 @@ public class SetRelativeLayoutTests {
 			Height = 15
 		};
 
+		// Layout is Absolute. So the X and Y are not changed.
 		view.SetRelativeLayout (screen);
 		Assert.Equal (90, view.Frame.X);
 		Assert.Equal (-10, view.Frame.Y);
@@ -125,10 +165,10 @@ public class SetRelativeLayoutTests {
 		Assert.Equal (80, view.Frame.Width);
 		Assert.Equal (25, view.Frame.Height);
 
-		view.Width = Dim.Fill (); 
+		view.Width = Dim.Fill ();
 		view.Height = Dim.Fill ();
 		view.SetRelativeLayout (screen);
-		Assert.Equal (-41, view.Frame.X); 
+		Assert.Equal (-41, view.Frame.X);
 		Assert.Equal (-13, view.Frame.Y);
 		Assert.Equal (121, view.Frame.Width);  // 121 = screen.Width - (-Center - 41)
 		Assert.Equal (38, view.Frame.Height);
@@ -141,12 +181,12 @@ public class SetRelativeLayoutTests {
 		var view = new View () {
 			X = Pos.Center (),
 			Y = Pos.Center (),
-			Width = Dim.Fill(),
-			Height = Dim.Fill()
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 
 		view.SetRelativeLayout (screen);
-		Assert.Equal (0, view.Frame.X); 
+		Assert.Equal (0, view.Frame.X);
 		Assert.Equal (0, view.Frame.Y);
 		Assert.Equal (80, view.Frame.Width);
 		Assert.Equal (25, view.Frame.Height);
@@ -176,14 +216,14 @@ public class SetRelativeLayoutTests {
 		view.SetRelativeLayout (screen);
 		Assert.Equal (-1, view.Frame.X);
 		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (81, view.Frame.Width); 
+		Assert.Equal (81, view.Frame.Width);
 		Assert.Equal (25, view.Frame.Height);
 
 		view.X = Pos.Center () - 2; // Fill means all the way to right. So width will be 82. (dim gets calc'd before pos).
 		view.SetRelativeLayout (screen);
 		Assert.Equal (-2, view.Frame.X);
 		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (82, view.Frame.Width); 
+		Assert.Equal (82, view.Frame.Width);
 		Assert.Equal (25, view.Frame.Height);
 
 		view.X = Pos.Center () - 3; // Fill means all the way to right. So width will be 83. (dim gets calc'd before pos).
@@ -217,7 +257,8 @@ public class SetRelativeLayoutTests {
 		Assert.Equal (23, view.Frame.Y);
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void PosCombine_Plus_Absolute ()
 	{
 		var superView = new View () {

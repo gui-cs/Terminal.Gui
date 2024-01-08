@@ -196,7 +196,7 @@ public static partial class Application {
 		Current = Top;
 
 		// Ensure Top's layout is up to date.
-		Current.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows)); 
+		Current.SetRelativeLayout (Driver.Bounds); 
 		
 		_cachedSupportedCultures = GetSupportedCultures ();
 		_mainThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -402,7 +402,7 @@ public static partial class Application {
 		}
 
 		//if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-			Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+			Toplevel.SetRelativeLayout (Driver.Bounds);
 		//}
 		Toplevel.LayoutSubviews ();
 		Toplevel.PositionToplevels ();
@@ -714,7 +714,7 @@ public static partial class Application {
 					&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 					&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
-			state.Toplevel.Clear (new Rect (Point.Empty, new Size (Driver.Cols, Driver.Rows)));
+			state.Toplevel.Clear (Driver.Bounds);
 		}
 
 		if (state.Toplevel.NeedsDisplay ||
