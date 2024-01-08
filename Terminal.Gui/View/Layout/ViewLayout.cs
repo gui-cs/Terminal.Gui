@@ -438,7 +438,7 @@ public partial class View {
 	/// <exception cref="InvalidOperationException"></exception>
 	void CheckDimAuto ()
 	{
-		if (!ValidatePosDim && Width is not Dim.DimAuto && Height is not Dim.DimAuto) {
+		if (!ValidatePosDim || !IsInitialized || (Width is not Dim.DimAuto && Height is not Dim.DimAuto)) {
 			return;
 		}
 
