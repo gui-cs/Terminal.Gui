@@ -990,7 +990,7 @@ namespace Terminal.Gui.DialogTests {
 					var expected = @$"
 ┌──────────────────┐
 │┌────────────────┐│
-││23456789  {b}││
+││012345678 ⟦ Ok ⟧││
 │└────────────────┘│
 └──────────────────┘";
 
@@ -1004,7 +1004,7 @@ namespace Terminal.Gui.DialogTests {
 					expected = @$"
 ┌──────────────────┐
 │┌────────────────┐│
-││23456789  {b}││
+││012345678 ⟦ Ok ⟧││
 │└────────────────┘│
 └──────────────────┘";
 					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);

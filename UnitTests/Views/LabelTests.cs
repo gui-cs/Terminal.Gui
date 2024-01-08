@@ -870,10 +870,10 @@ e
 			Assert.True (lblCenter.AutoSize);
 			Assert.True (lblRight.AutoSize);
 			Assert.True (lblJust.AutoSize);
-			Assert.Equal (new Rect (0, 0, 2, height), lblLeft.Frame);
-			Assert.Equal (new Rect (3, 0, 2, height), lblCenter.Frame);
-			Assert.Equal (new Rect (6, 0, 2, height), lblRight.Frame);
-			Assert.Equal (new Rect (9, 0, 2, height), lblJust.Frame);
+			Assert.Equal (new Rect (0, 0, 15, height), lblLeft.Frame);
+			Assert.Equal (new Rect (3, 0, 15, height), lblCenter.Frame);
+			Assert.Equal (new Rect (6, 0, 15, height), lblRight.Frame);
+			Assert.Equal (new Rect (9, 0, 15, height), lblJust.Frame);
 			Assert.Equal (new Rect (0, 0, 13, height + 2), frame.Frame);
 
 			var expected = @"
