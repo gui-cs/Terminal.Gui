@@ -889,6 +889,7 @@ public partial class View {
 			}
 
 			if (IsInitialized) {
+				// TODO: Figure out what really is needed here. All unit tests (except AutoSize) pass as-is
 				//LayoutFrames ();
 				//TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
