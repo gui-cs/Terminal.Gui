@@ -10,7 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Provides a drop-down list of items the user can select from.
@@ -32,6 +32,7 @@ public class ComboBox : View {
 		{
 			_container = container ?? throw new ArgumentNullException (nameof (container), "ComboBox container cannot be null.");
 			HideDropdownListOnClick = hideDropdownListOnClick;
+			AddCommand (Command.LineUp, () => _container.MoveUpList ());
 		}
 
 		public bool HideDropdownListOnClick {
@@ -589,6 +590,14 @@ public class ComboBox : View {
 
 	bool? MoveUp ()
 	{
+		if (HasItems ()) {
+			_listview.MoveUp ();
+		}
+		return true;
+	}
+
+	bool? MoveUpList ()
+	{
 		if (_search.HasFocus) {
 			// stop odd behavior on KeyUp when search has focus
 			return true;
@@ -733,18 +742,18 @@ public class ComboBox : View {
 		_isShow = false;
 	}
 
-		private int GetSelectedItemFromSource (string searchText)
-		{
-			if (_source is null) {
-				return -1;
-			}
-			for (int i = 0; i < _searchset.Count; i++) {
-				if (_searchset [i].ToString () == searchText) {
-					return i;
-				}
-			}
+	private int GetSelectedItemFromSource (string searchText)
+	{
+		if (_source is null) {
 			return -1;
 		}
+		for (int i = 0; i < _searchset.Count; i++) {
+			if (_searchset [i].ToString () == searchText) {
+				return i;
+			}
+		}
+		return -1;
+	}
 
 	/// <summary>
 	/// Reset to full original list
@@ -786,20 +795,20 @@ public class ComboBox : View {
 		}
 	}
 
-		private void Search_Changed (object sender, TextChangedEventArgs e)
-		{
-			if (_source is null) { // Object initialization		
-				return;
-			}
+	private void Search_Changed (object sender, TextChangedEventArgs e)
+	{
+		if (_source is null) { // Object initialization		
+			return;
+		}
 
-			if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue)) {
-				ResetSearchSet ();
-			} else if (_search.Text != e.OldValue) {
-				if (_search.Text.Length < e.OldValue.Length) {
-					_selectedItem = -1;
-				}
-				_isShow = true;
-				ResetSearchSet (noCopy: true);
+		if (string.IsNullOrEmpty (_search.Text) && string.IsNullOrEmpty (e.OldValue)) {
+			ResetSearchSet ();
+		} else if (_search.Text != e.OldValue) {
+			if (_search.Text.Length < e.OldValue.Length) {
+				_selectedItem = -1;
+			}
+			_isShow = true;
+			ResetSearchSet (noCopy: true);
 
 			foreach (object item in _source.ToList ()) {
 				// Iterate to preserver object type and force deep copy
