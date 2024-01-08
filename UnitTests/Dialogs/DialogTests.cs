@@ -939,39 +939,55 @@ namespace Terminal.Gui.DialogTests {
 
 			win.Loaded += (s, a) => {
 				var dlg = new Dialog () { Width = 18, Height = 3 };
+				Assert.Equal (16, dlg.Bounds.Width);
+
 				Button btn = null;
 				btn = new Button ("Ok") {
 					X = Pos.AnchorEnd () - Pos.Function (Btn_Width)
 				};
 				btn.SetRelativeLayout (dlg.Bounds);
 				Assert.Equal (6, btn.Bounds.Width);
-				Assert.Equal (10, btn.Frame.X); // 14 - 6 = 10
-				Assert.Equal (0,  btn.Frame.Y);
+				Assert.Equal (10, btn.Frame.X); // dlg.Bounds.Width (16) - btn.Frame.Width (6) = 10
+				Assert.Equal (0, btn.Frame.Y);
 				Assert.Equal (6, btn.Frame.Width);
-				Assert.Equal (1,  btn.Frame.Height);
+				Assert.Equal (1, btn.Frame.Height);
 				int Btn_Width ()
 				{
 					return (btn?.Bounds.Width) ?? 0;
 				}
 				var tf = new TextField ("01234567890123456789") {
+					// Dim.Fill (1) fills remaining space minus 1
+					// Dim.Function (Btn_Width) is 6
 					Width = Dim.Fill (1) - Dim.Function (Btn_Width)
 				};
-				Assert.Equal (11, tf.Bounds.Width); // 20 - 2 (for Dim.Fill (1)) - 6 (for Dim.Function (Btn_Width)) = 8
-				Assert.Equal (0,  tf.Frame.X);
-				Assert.Equal (0,  tf.Frame.Y);
-				Assert.Equal (11, tf.Frame.Width);
-				Assert.Equal (1,  tf.Frame.Height);
+				tf.SetRelativeLayout (dlg.Bounds);
+				Assert.Equal (9, tf.Bounds.Width); // dlg.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
+				Assert.Equal (0, tf.Frame.X);
+				Assert.Equal (0, tf.Frame.Y);
+				Assert.Equal (9, tf.Frame.Width);
+				Assert.Equal (1, tf.Frame.Height);
 
 				dlg.Loaded += (s, a) => {
 					Application.Refresh ();
 					Assert.Equal (new Rect (10, 0, 6, 1), btn.Frame);
 					Assert.Equal (new Rect (0, 0, 6, 1), btn.Bounds);
+					// #3127: Before: This test was clearly wrong before. The math above is correct, but the result is wrong.
+					// var expected = @$"
+					//┌──────────────────┐
+					//│┌────────────────┐│
+					//││23456789  {b}││
+					//│└────────────────┘│
+					//└──────────────────┘";
+
+					// #3127: After: This test was clearly wrong before. The math above is correct, but the result is wrong.
+					// See also `PosDimFunction` in SetRelativeLayoutTests.cs
 					var expected = @$"
 ┌──────────────────┐
 │┌────────────────┐│
-││23456789  {b}││
+││012345678 {b}││
 │└────────────────┘│
 └──────────────────┘";
+
 					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
 					dlg.SetNeedsLayout ();
@@ -982,7 +998,7 @@ namespace Terminal.Gui.DialogTests {
 					expected = @$"
 ┌──────────────────┐
 │┌────────────────┐│
-││23456789  {b}││
+││012345678 {b}││
 │└────────────────┘│
 └──────────────────┘";
 					_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
