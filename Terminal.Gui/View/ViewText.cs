@@ -26,6 +26,9 @@ public partial class View {
 	///         <see cref="HotKeySpecifier"/> to
 	///         <c>(Rune)0xffff</c>.
 	///         </para>
+	///         <para>
+	///         If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.
+	///         </para>
 	/// </remarks>
 	public virtual string Text {
 		get => _text;
@@ -69,6 +72,11 @@ public partial class View {
 	/// Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
 	/// redisplay the <see cref="View"/>.
 	/// </summary>
+	/// <remarks>
+	///         <para>
+	///         If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.
+	///         </para>
+	/// </remarks>
 	/// <value>The text alignment.</value>
 	public virtual TextAlignment TextAlignment {
 		get => TextFormatter.Alignment;
@@ -83,6 +91,11 @@ public partial class View {
 	/// Gets or sets how the View's <see cref="Text"/> is aligned vertically when drawn. Changing this property will redisplay
 	/// the <see cref="View"/>.
 	/// </summary>
+	/// <remarks>
+	///         <para>
+	///         If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.
+	///         </para>
+	/// </remarks>
 	/// <value>The text alignment.</value>
 	public virtual VerticalTextAlignment VerticalTextAlignment {
 		get => TextFormatter.VerticalAlignment;
@@ -96,6 +109,11 @@ public partial class View {
 	/// Gets or sets the direction of the View's <see cref="Text"/>. Changing this property will redisplay the
 	/// <see cref="View"/>.
 	/// </summary>
+	/// <remarks>
+	///         <para>
+	///         If <see cref="AutoSize"/> is <c>true</c>, the <see cref="Bounds"/> will be adjusted to fit the text.
+	///         </para>
+	/// </remarks>
 	/// <value>The text alignment.</value>
 	public virtual TextDirection TextDirection {
 		get => TextFormatter.Direction;
@@ -134,7 +152,7 @@ public partial class View {
 		} else {
 			SetFrameToFitText ();
 		}
-		TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
+		SetTextFormatterSize ();
 		SetNeedsDisplay ();
 	}
 
@@ -210,18 +228,18 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets the width or height of the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> characters
+	/// Gets the width or height of the <see cref="TextFormatter.HotKeySpecifier"/> characters
 	/// in the <see cref="Text"/> property.
 	/// </summary>
 	/// <remarks>
-	/// Only the first hotkey specifier found in <see cref="Text"/> is supported.
+	/// Only the first HotKey specifier found in <see cref="Text"/> is supported.
 	/// </remarks>
 	/// <param name="isWidth">
-	/// If <see langword="true"/> (the default) the width required for the hotkey specifier is returned. Otherwise the height
+	/// If <see langword="true"/> (the default) the width required for the HotKey specifier is returned. Otherwise the height
 	/// is returned.
 	/// </param>
 	/// <returns>
-	/// The number of characters required for the <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>. If the text
+	/// The number of characters required for the <see cref="TextFormatter.HotKeySpecifier"/>. If the text
 	/// direction specified
 	/// by <see cref="TextDirection"/> does not match the <paramref name="isWidth"/> parameter, <c>0</c> is returned.
 	/// </returns>
@@ -238,31 +256,77 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/>
-	/// .
+	/// Gets the dimensions required for <see cref="Text"/> ignoring a <see cref="TextFormatter.HotKeySpecifier"/>.
 	/// </summary>
 	/// <returns></returns>
-	public Size GetSizeNeededForTextWithoutHotKey () => new (TextFormatter.Size.Width - GetHotKeySpecifierLength (),
+	internal Size GetSizeNeededForTextWithoutHotKey () => new (TextFormatter.Size.Width - GetHotKeySpecifierLength (),
 		TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
 
 	/// <summary>
-	/// Gets the dimensions required for <see cref="Text"/> accounting for a
-	/// <see cref="Terminal.Gui.TextFormatter.HotKeySpecifier"/> .
+	/// Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
+	/// <see cref="TextFormatter.HotKeySpecifier"/>.
 	/// </summary>
+	/// <remarks>
+	/// Use this API to set <see cref="TextFormatter.Size"/> when the view has changed such that the
+	/// size required to fit the text has changed.
+	/// changes.
+	/// </remarks>
 	/// <returns></returns>
-	public Size GetTextFormatterSizeNeededForTextAndHotKey ()
+	internal void SetTextFormatterSize ()
 	{
 		if (!IsInitialized) {
-			return Size.Empty;
+			TextFormatter.Size = Size.Empty;
 		}
 
 		if (string.IsNullOrEmpty (TextFormatter.Text)) {
-			return Bounds.Size;
+			TextFormatter.Size = Bounds.Size;
 		}
 
-		// BUGBUG: This IGNORES what Text is set to, using on only the current View size. This doesn't seem to make sense.
-		// BUGBUG: This uses Frame; in v2 it should be Bounds
-		return new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
+		TextFormatter.Size = new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
 			Bounds.Size.Height + GetHotKeySpecifierLength (false));
+	}
+
+	/// <summary>
+	/// Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
+	/// <see cref="Direction"/> specified by the
+	/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
+	/// </summary>
+	/// <returns>The <see cref="Size"/> the <see cref="Frame"/> needs to be set to fit the text.</returns>
+	public Size GetAutoSize ()
+	{
+		var x = 0;
+		var y = 0;
+		if (IsInitialized) {
+			x = Bounds.X;
+			y = Bounds.Y;
+		}
+		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
+		var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
+		var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
+		return new Size (newWidth, newHeight);
+	}
+
+	bool IsValidAutoSize (out Size autoSize)
+	{
+		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+		autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
+			rect.Size.Height - GetHotKeySpecifierLength (false));
+		return !(ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)) ||
+			 _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength () ||
+			 _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+	}
+
+	bool IsValidAutoSizeWidth (Dim width)
+	{
+		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+		var dimValue = width.Anchor (0);
+		return !(ValidatePosDim && !(width is Dim.DimAbsolute) || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
+	}
+
+	bool IsValidAutoSizeHeight (Dim height)
+	{
+		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
+		var dimValue = height.Anchor (0);
+		return !(ValidatePosDim && !(height is Dim.DimAbsolute) || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
 	}
 }

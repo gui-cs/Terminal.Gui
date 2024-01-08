@@ -87,7 +87,7 @@ public partial class View {
 			// TODO: Figure out if the below can be optimized.
 			if (IsInitialized /*|| LayoutStyle == LayoutStyle.Absolute*/) {
 				LayoutFrames ();
-				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
+				SetTextFormatterSize ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
 			}
@@ -195,7 +195,7 @@ public partial class View {
 
 	/// <summary>
 	///         <para>
-	///         Indicates the LayoutStyle for the <see cref="View"/>.
+	///         Gets the LayoutStyle for the <see cref="View"/>.
 	///         </para>
 	///         <para>
 	///         If Absolute, the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and
@@ -227,7 +227,7 @@ public partial class View {
 	/// <remarks>
 	///         <para>
 	///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Bounds is indeterminate until
-	///         the view has been initialized (<see creft="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
+	///         the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
 	///         called.
 	///         </para>
 	///         <para>
@@ -279,12 +279,12 @@ public partial class View {
 	/// <remarks>
 	///         <para>
 	///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the
-	///         view has been initialized (<see creft="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+	///         view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
 	///         called.
 	///         </para>
 	///         <para>
 	///         Changing this property will eventually (when the view is next drawn) cause the
-	///         <see cref="LayoutSubview(View, Rect)"/> and
+	///          <see cref="LayoutSubview(View, Rect)"/> and
 	///         <see cref="OnDrawContent(Rect)"/> methods to be called.
 	///         </para>
 	///         <para>
@@ -311,7 +311,7 @@ public partial class View {
 	/// <remarks>
 	///         <para>
 	///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the
-	///         view has been initialized (<see creft="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+	///         view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
 	///         called.
 	///         </para>
 	///         <para>
@@ -337,13 +337,13 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets or sets the width of the view.
+	/// Gets or sets the width dimension of the view.
 	/// </summary>
 	/// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
 	/// <remarks>
 	///         <para>
 	///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the
-	///         view has been initialized (<see creft="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+	///         view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
 	///         called.
 	///         </para>
 	///         <para>
@@ -377,13 +377,13 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets or sets the height of the view.
+	/// Gets or sets the height dimension of the view.
 	/// </summary>
 	/// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
 	/// <remarks>
 	///         <para>
 	///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the
-	///         view has been initialized (<see creft="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+	///         view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
 	///         called.
 	///         </para>
 	///         <para>
@@ -422,7 +422,7 @@ public partial class View {
 	/// <remarks>
 	/// Setting this to <see langword="true"/> will enable validation of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>,
 	/// and <see cref="Height"/>
-	/// during set operations and in <see cref="LayoutSubviews"/>.If invalid settings are discovered exceptions will be thrown
+	/// during set operations and in <see cref="LayoutSubviews"/>. If invalid settings are discovered exceptions will be thrown
 	/// indicating the error.
 	/// This will impose a performance penalty and thus should only be used for debugging.
 	/// </remarks>
@@ -440,8 +440,12 @@ public partial class View {
 	/// if <see cref="Text"/> won't fit the view will be resized as needed.
 	/// </para>
 	/// <para>
-	/// In addition, if <see cref="ValidatePosDim"/> is <see langword="true"/> the new values of <see cref="Width"/> and
-	/// <see cref="Height"/> must be of the same types of the existing one to avoid breaking the <see cref="Dim"/> settings.
+	/// If <see cref="AutoSize"/> is set to <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/>
+	/// will be changed to <see cref="Dim.DimAbsolute"/> if they are not already.
+	/// </para>
+	/// <para>
+	/// If <see cref="AutoSize"/> is set to <see langword="false"/> then <see cref="Width"/> and <see cref="Height"/>
+	/// will left unchanged.
 	/// </para>
 	/// </summary>
 	public virtual bool AutoSize {
@@ -585,7 +589,7 @@ public partial class View {
 		if (IsInitialized) {
 			SetFrameToFitText ();
 			LayoutFrames ();
-			TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
+			SetTextFormatterSize ();
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 		}
@@ -853,14 +857,14 @@ public partial class View {
 			if (IsInitialized) {
 				// TODO: Figure out what really is needed here. All unit tests (except AutoSize) pass as-is
 				//LayoutFrames ();
-				//TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
+				SetTextFormatterSize ();
 				SetNeedsLayout ();
 				//SetNeedsDisplay ();
 			}
 
 			// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
 			if (!SetFrameToFitText ()) {
-				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
+				SetTextFormatterSize ();
 			}
 		}
 	}
@@ -1084,7 +1088,7 @@ public partial class View {
 		var oldBounds = Bounds;
 		OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });
 
-		TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
+		SetTextFormatterSize ();
 
 		// Sort out the dependencies of the X, Y, Width, Height properties
 		var nodes = new HashSet<View> ();
@@ -1163,49 +1167,6 @@ public partial class View {
 		return boundsChanged;
 	}
 
-	/// <summary>
-	/// Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
-	/// <see cref="Direction"/> specified by the
-	/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
-	/// </summary>
-	/// <returns>The <see cref="Size"/> of the view required to fit the text.</returns>
-	public Size GetAutoSize ()
-	{
-		var x = 0;
-		var y = 0;
-		if (IsInitialized) {
-			x = Bounds.X;
-			y = Bounds.Y;
-		}
-		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
-		var newWidth = rect.Size.Width - GetHotKeySpecifierLength () + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal;
-		var newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical;
-		return new Size (newWidth, newHeight);
-	}
-
-	bool IsValidAutoSize (out Size autoSize)
-	{
-		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-		autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
-			rect.Size.Height - GetHotKeySpecifierLength (false));
-		return !(ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)) ||
-			 _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength () ||
-			 _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
-	}
-
-	bool IsValidAutoSizeWidth (Dim width)
-	{
-		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-		var dimValue = width.Anchor (0);
-		return !(ValidatePosDim && !(width is Dim.DimAbsolute) || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
-	}
-
-	bool IsValidAutoSizeHeight (Dim height)
-	{
-		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
-		var dimValue = height.Anchor (0);
-		return !(ValidatePosDim && !(height is Dim.DimAbsolute) || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
-	}
 
 	/// <summary>
 	/// Determines if the View's <see cref="Width"/> can be set to a new value.
