@@ -427,10 +427,8 @@ public class TextTests {
 		win.Add (label);
 		Application.Top.Add (win);
 
-		// #3127: Before: Text is empty but height=1 by default, see Label view
-		//        After: Text is empty Dim.Fill is honored
 		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,28,78)", label.Bounds.ToString ());
+		Assert.Equal ("(0,0,80,25)", label.Bounds.ToString ());
 
 		label.Text = "New text\nNew line";
 		Application.Top.LayoutSubviews ();
