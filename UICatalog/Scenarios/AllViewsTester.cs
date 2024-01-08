@@ -111,7 +111,6 @@ public class AllViewsTester : Scenario {
 		_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
 		_computedCheckBox.Toggled += (s, e) => {
 			if (_curView != null) {
-				_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 				_hostPane.LayoutSubviews ();
 			}
 		};

@@ -104,9 +104,7 @@ public class Sliders : Scenario {
 					s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
 
 					if (prev == null) {
-						s.LayoutStyle = LayoutStyle.Absolute;
 						s.Y = 0;
-						s.LayoutStyle = LayoutStyle.Computed;
 					} else {
 						s.Y = Pos.Bottom (prev) + 1;
 					}
@@ -119,9 +117,7 @@ public class Sliders : Scenario {
 					s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
 
 					if (prev == null) {
-						s.LayoutStyle = LayoutStyle.Absolute;
 						s.X = 0;
-						s.LayoutStyle = LayoutStyle.Computed;
 					} else {
 						s.X = Pos.Right (prev) + 2;
 					}
