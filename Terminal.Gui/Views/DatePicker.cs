@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using Terminal.Gui.Resources;
 
 namespace Terminal.Gui.Views;
 
@@ -16,11 +17,19 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class DatePicker : TextField {
 
-	private DataTable table;
-	private TableView calendar;
-	private DateTime date = DateTime.Now;
-	private List<string> months = new ();
+	private DataTable _table;
+	private TableView _calendar;
+	private DateTime _date = DateTime.Now;
+	private List<string> _months = new ();
 	private List<string> years = new ();
+
+
+	private readonly int comboBoxHeight = 4;
+	private readonly int comboBoxWidth = 12;
+	private readonly int buttonWidth = 12;
+	private readonly int calendarWidth = 22;
+	private readonly int dialogHeight = 10;
+	private readonly int dialogWidth = 10;
 
 	/// <summary>
 	/// Format of date. The default is MM/dd/yyyy.
@@ -36,24 +45,24 @@ public class DatePicker : TextField {
 	/// Get or set the date.
 	/// </summary>
 	public DateTime Date {
-		get => date;
+		get => _date;
 		set {
-			date = value;
-			Text = date.ToString (Format);
+			_date = value;
+			Text = _date.ToString (Format);
 		}
 	}
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/>.
 	/// </summary>
-	public DatePicker () : base () => Initialize (date);
+	public DatePicker () : base () => SetInitialProperties (_date);
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date.
 	/// </summary>
 	public DatePicker (DateTime date) : base ()
 	{
-		Initialize (date);
+		SetInitialProperties (date);
 	}
 
 	/// <summary>
@@ -62,13 +71,13 @@ public class DatePicker : TextField {
 	public DatePicker (DateTime date, string format) : base ()
 	{
 		Format = format;
-		Initialize (date);
+		SetInitialProperties (date);
 	}
 
-	private void Initialize (DateTime date)
+	void SetInitialProperties (DateTime date)
 	{
 		Date = date;
-		months = Enum.GetValues (typeof (Month)).Cast<Month> ().Select (x => x.ToString ()).ToList ();
+		_months = Enum.GetValues (typeof (Month)).Cast<Month> ().Select (x => x.ToString ()).ToList ();
 	}
 
 	private void ShowDatePickerDialog ()
@@ -77,21 +86,23 @@ public class DatePicker : TextField {
 			.Select (x => x.ToString ())
 			.ToList ();
 
-		if (date.Year < YearsRange.Start.Value || date.Year > YearsRange.End.Value) {
+		if (_date.Year < YearsRange.Start.Value || _date.Year > YearsRange.End.Value) {
 			MessageBox.ErrorQuery ("Error", "Date year is out of range", "Ok");
 			return;
 		}
 
 		var dialog = new Dialog () {
-			Height = 14,
-			Width = 40,
-			Title = "Date Picker",
+			Title = Strings.dpTitle,
+			X = Pos.Center (),
+			Y = Pos.Center (),
+			Height = dialogHeight,
+			Width = dialogWidth,
 		};
 
-		calendar = new TableView () {
+		_calendar = new TableView () {
 			X = 0,
 			Y = Pos.Center () + 1,
-			Width = 22,
+			Width = calendarWidth,
 			Height = Dim.Fill (1),
 			Style = new TableStyle {
 				ShowHeaders = true,
@@ -104,151 +115,152 @@ public class DatePicker : TextField {
 		};
 
 		var yearsLabel = new Label ("Year:") {
-			X = Pos.Right (calendar) + 1,
+			X = Pos.Right (_calendar) + 1,
 			Y = 1,
 			Height = 1,
 		};
 		var comboBoxYear = new ComboBox (years) {
-			X = Pos.Right (calendar) + 1,
-			Y = 2,
-			Width = 12,
-			Height = 4,
-			SelectedItem = years.IndexOf (date.Year.ToString ())
+			X = Pos.Right (_calendar) + 1,
+			Y = Pos.Bottom (yearsLabel),
+			Width = comboBoxWidth,
+			Height = comboBoxHeight,
+			SelectedItem = years.IndexOf (_date.Year.ToString ())
 		};
 		comboBoxYear.SelectedItemChanged += ChangeYearDate;
 
 		var monthsLabel = new Label ("Month:") {
-			X = Pos.Right (calendar) + 1,
-			Y = 6,
+			X = Pos.Right (_calendar) + 1,
+			Y = Pos.Bottom (comboBoxYear),
 			Height = 1,
 		};
 
-		var comboBoxMonth = new ComboBox (months) {
-			X = Pos.Right (calendar) + 1,
-			Y = 7,
-			Width = 12,
-			Height = 4,
-			SelectedItem = date.Month - 1
+		var comboBoxMonth = new ComboBox (_months) {
+			X = Pos.Right (_calendar) + 1,
+			Y = Pos.Bottom (monthsLabel),
+			Width = comboBoxWidth,
+			Height = comboBoxHeight,
+			SelectedItem = _date.Month - 1
 		};
 		comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
 
 		var previousMonthButton = new Button ("Previous") {
 			X = 0,
-			Y = Pos.Bottom (calendar),
-			Width = 12,
+			Y = Pos.Bottom (_calendar),
+			Width = buttonWidth,
 			Height = 1,
 		};
 
 		previousMonthButton.Clicked += (sender, e) => {
-			Date = date.AddMonths (-1);
+			Date = _date.AddMonths (-1);
 			CreateCalendar ();
 			if (comboBoxMonth.SelectedItem == 0) {
 				comboBoxYear.SelectedItem--;
 				comboBoxMonth.SelectedItem = 11;
 			} else {
-				comboBoxMonth.SelectedItem = date.Month - 1;
+				comboBoxMonth.SelectedItem = _date.Month - 1;
 			}
 		};
 
 		var nextMonthButton = new Button ("Next") {
 			X = Pos.Right (previousMonthButton),
-			Y = Pos.Bottom (calendar),
-			Width = 12,
+			Y = Pos.Bottom (_calendar),
+			Width = buttonWidth,
 			Height = 1,
 		};
 
 		nextMonthButton.Clicked += (sender, e) => {
-			Date = date.AddMonths (1);
+			Date = _date.AddMonths (1);
 			CreateCalendar ();
 			if (comboBoxMonth.SelectedItem == 11) {
 				comboBoxYear.SelectedItem++;
 				comboBoxMonth.SelectedItem = 0;
 			} else {
-				comboBoxMonth.SelectedItem = date.Month - 1;
+				comboBoxMonth.SelectedItem = _date.Month - 1;
 			}
 		};
 
-		dialog.Add (calendar,
+		dialog.Add (_calendar,
 			yearsLabel, comboBoxYear,
 			monthsLabel, comboBoxMonth,
 			previousMonthButton, nextMonthButton);
 
 		CreateCalendar ();
-		SelectDayOnCalendar (date.Day);
+		SelectDayOnCalendar (_date.Day);
 
-		calendar.CellActivated += (sender, e) => {
-			var dayValue = table.Rows [e.Row] [e.Col];
+		_calendar.CellActivated += (sender, e) => {
+			var dayValue = _table.Rows [e.Row] [e.Col];
 			int day = int.Parse (dayValue.ToString ());
 			ChangeDayDate (day);
 
 			SelectDayOnCalendar (day);
 			try {
-				Text = date.ToString (Format);
+				Text = _date.ToString (Format);
 			} catch (Exception) {
 				MessageBox.ErrorQuery ("Error", "Invalid date format", "Ok");
 			}
 			Application.RequestStop ();
 		};
+
 		Application.Run (dialog);
 	}
 
 	private void CreateCalendar ()
 	{
-		calendar.Table = new DataTableSource (table = CreateDataTable (date.Month, date.Year));
+		_calendar.Table = new DataTableSource (_table = CreateDataTable (_date.Month, _date.Year));
 	}
 
 	private void ChangeYearDate (object sender, ListViewItemEventArgs e)
 	{
 		int year = int.Parse (e.Value.ToString ());
-		date = new DateTime (year, date.Month, date.Day);
+		_date = new DateTime (year, _date.Month, _date.Day);
 		CreateCalendar ();
 	}
 
 	private void ChangeMonthDate (object sender, ListViewItemEventArgs e)
 	{
 		int monthNumber = (int)Enum.Parse (typeof (Month), e.Value.ToString ());
-		date = new DateTime (date.Year, monthNumber, date.Day);
+		_date = new DateTime (_date.Year, monthNumber, _date.Day);
 		CreateCalendar ();
 	}
 
 	private void ChangeDayDate (int day)
 	{
-		date = new DateTime (date.Year, date.Month, day);
+		_date = new DateTime (_date.Year, _date.Month, day);
 		CreateCalendar ();
 	}
 
 	private DataTable CreateDataTable (int month, int year)
 	{
-		table = new DataTable ();
-		table.Columns.Add ("Su");
-		table.Columns.Add ("Mo");
-		table.Columns.Add ("Tu");
-		table.Columns.Add ("We");
-		table.Columns.Add ("Th");
-		table.Columns.Add ("Fr");
-		table.Columns.Add ("Sa");
+		_table = new DataTable ();
+		_table.Columns.Add ("Su");
+		_table.Columns.Add ("Mo");
+		_table.Columns.Add ("Tu");
+		_table.Columns.Add ("We");
+		_table.Columns.Add ("Th");
+		_table.Columns.Add ("Fr");
+		_table.Columns.Add ("Sa");
 		int amountOfDaysInMonth = GetAmountOfDaysInMonth (month, year);
 		DateTime dateValue = new DateTime (year, month, 1);
 		var dayOfWeek = dateValue.DayOfWeek;
 
-		table.Rows.Add (new object [6]);
+		_table.Rows.Add (new object [6]);
 		for (int i = 1; i <= amountOfDaysInMonth; i++) {
-			table.Rows [^1] [(int)dayOfWeek] = i;
+			_table.Rows [^1] [(int)dayOfWeek] = i;
 			if (dayOfWeek == DayOfWeek.Saturday && i != amountOfDaysInMonth) {
-				table.Rows.Add (new object [7]);
+				_table.Rows.Add (new object [7]);
 			}
 			dayOfWeek = dayOfWeek == DayOfWeek.Saturday ? DayOfWeek.Sunday : dayOfWeek + 1;
 		}
 
-		return table;
+		return _table;
 	}
 
 	private void SelectDayOnCalendar (int day)
 	{
-		for (int i = 0; i < table.Rows.Count; i++) {
-			for (int j = 0; j < table.Columns.Count; j++) {
-				if (table.Rows [i] [j].ToString () == day.ToString ()) {
-					calendar.SetSelection (j, i, false);
+		for (int i = 0; i < _table.Rows.Count; i++) {
+			for (int j = 0; j < _table.Columns.Count; j++) {
+				if (_table.Rows [i] [j].ToString () == day.ToString ()) {
+					_calendar.SetSelection (j, i, false);
 					return;
 				}
 			}
