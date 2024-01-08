@@ -3180,15 +3180,15 @@ public class TextView : View {
 	/// <param name="toAdd">Text to add</param>
 	public void InsertText (string toAdd)
 	{
-		foreach (var ch in toAdd) {
-			KeyCode key;
+		foreach (char ch in toAdd) {
+			Key key;
 			try {
-				key = (KeyCode)ch;
+				key = new Key(ch);
 			} catch (Exception) {
 				throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 			}
 
-			InsertText (new Key (key));
+			InsertText (key);
 
 			if (NeedsDisplay) {
 				Adjust ();
