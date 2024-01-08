@@ -35,8 +35,7 @@ public partial class View {
 	Rect _frame;
 
 	/// <summary>
-	/// Gets or sets location and size of the view. The frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>
-	/// .
+	/// Gets or sets location and size of the view. The frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.
 	/// </summary>
 	/// <value>
 	/// The rectangle describing the location and size of the view, in coordinates relative to the
@@ -68,7 +67,9 @@ public partial class View {
 			_y = _frame.Y;
 			_width = _frame.Width;
 			_height = _frame.Height;
-			if (IsInitialized || LayoutStyle == LayoutStyle.Absolute) {
+			
+			// TODO: Figure out if the below can be optimized.
+			if (IsInitialized /*|| LayoutStyle == LayoutStyle.Absolute*/) {
 				LayoutFrames ();
 				TextFormatter.Size = GetTextFormatterSizeNeededForTextAndHotKey ();
 				SetNeedsLayout ();
@@ -591,12 +592,11 @@ public partial class View {
 	/// </remarks>
 	protected virtual void OnResizeNeeded ()
 	{
-		//var actX = _x is Pos.PosAbsolute ? _x.Anchor (0) : _frame.X;
-		//var actY = _y is Pos.PosAbsolute ? _y.Anchor (0) : _frame.Y;
-
 		//// TODO: Determine if this API should change Frame as it does.
 		//// TODO: Is it correct behavior? Shouldn't the Frame be changed when SetRelativeLayout
 		//// TODO: is eventually called because SetNeedsLayout get set?
+		//var actX = _x is Pos.PosAbsolute ? _x.Anchor (0) : _frame.X;
+		//var actY = _y is Pos.PosAbsolute ? _y.Anchor (0) : _frame.Y;
 		//if (AutoSize) {
 		//	//if (TextAlignment == TextAlignment.Justified) {
 		//	//	throw new InvalidOperationException ("TextAlignment.Justified cannot be used with AutoSize");
@@ -613,9 +613,12 @@ public partial class View {
 		//	//// This is needed for DimAbsolute values by setting the frame before LayoutSubViews.
 		//	_frame = new Rect (new Point (actX, actY), new Size (w, h)); // Set frame, not Frame!
 		//}
-		// BUGBUG: I think these calls are redundant or should be moved into just the AutoSize case
 
-		SetRelativeLayout (SuperView?.Bounds ?? Application.Top?.Bounds ?? Application.Driver?.Bounds ?? new Rect (0, 0, int.MaxValue, int.MaxValue));
+		// First try SuperView.Bounds, then Application.Current.Bounds, then Application.Top, then Driver
+		// Finally, if none of those are valid, use int.MaxValue (for Unit tests).
+		SetRelativeLayout (SuperView?.Bounds ?? Application.Current?.Bounds ?? Application.Top?.Bounds ?? Application.Driver?.Bounds ?? new Rect (0, 0, int.MaxValue, int.MaxValue));
+
+		// TODO: Determine what, if any of the below is actually needed here.
 		if (IsInitialized/* || LayoutStyle == LayoutStyle.Absolute*/) {
 			SetFrameToFitText ();
 			LayoutFrames ();

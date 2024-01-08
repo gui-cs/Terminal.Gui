@@ -2058,7 +2058,7 @@ Y
 		Assert.Equal (2,             label.Frame.Height);
 
 		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
+		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 		Application.End (rs);
 	}
 

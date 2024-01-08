@@ -185,21 +185,6 @@ public partial class HexView : View {
 		}
 	}
 
-	//// BUGBUG: This should be Bounds. Or, even better use View.LayoutComplete event
-	///// <inheritdoc/>
-	//public override Rect Frame {
-	//	get => base.Frame;
-	//	set {
-	//		base.Frame = value;
-
-	//		// Small buffers will just show the position, with the bsize field value (4 bytes)
-	//		bytesPerLine = bsize;
-	//		if (value.Width - displayWidth > 17) {
-	//			bytesPerLine = bsize * ((value.Width - displayWidth) / 18);
-	//		}
-	//	}
-	//}
-
 	//
 	// This is used to support editing of the buffer on a peer List<>, 
 	// the offset corresponds to an offset relative to DisplayStart, and
@@ -614,6 +599,9 @@ public partial class HexView : View {
 	/// </summary>
 	public Point CursorPosition {
 		get {
+			if (!IsInitialized) {
+				return new Point (0, 0);
+			}
 			int delta = (int)position;
 			int line = delta / bytesPerLine + 1;
 			int item = delta % bytesPerLine + 1;

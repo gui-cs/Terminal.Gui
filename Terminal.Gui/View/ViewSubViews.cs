@@ -120,11 +120,6 @@ namespace Terminal.Gui {
 			var view = e.Child;
 			view.IsAdded = true;
 			view.OnResizeNeeded ();
-			//view._x ??= view._frame.X;
-			//view._y ??= view._frame.Y;
-			//view._width ??= view._frame.Width;
-			//view._height ??= view._frame.Height;
-
 			view.Added?.Invoke (this, e);
 		}
 

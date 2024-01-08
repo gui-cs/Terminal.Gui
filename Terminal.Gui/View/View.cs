@@ -495,11 +495,6 @@ public partial class View : Responder, ISupportInitializeNotification {
 		Padding?.Dispose ();
 		Padding = null;
 
-		//_height = null;
-		//_width = null;
-		//_x = null;
-		//_y = null;
-
 		for (int i = InternalSubviews.Count - 1; i >= 0; i--) {
 			var subview = InternalSubviews [i];
 			Remove (subview);

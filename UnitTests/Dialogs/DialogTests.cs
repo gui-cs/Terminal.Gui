@@ -920,8 +920,10 @@ namespace Terminal.Gui.DialogTests {
 		//			Application.Shutdown ();
 		//		}
 
+		// TODO: This is not really a Dialog test, but a ViewLayout test (Width = Dim.Fill (1) - Dim.Function (Btn_Width))
+		// TODO: Move (and simplify)
 		[Fact, AutoInitShutdown]
-		public void Dialog_In_Window_With_TexxtField_And_Button_AnchorEnd ()
+		public void Dialog_In_Window_With_TextField_And_Button_AnchorEnd ()
 		{
 			((FakeDriver)Application.Driver).SetBufferSize (20, 5);
 
