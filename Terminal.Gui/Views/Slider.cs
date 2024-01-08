@@ -804,8 +804,6 @@ public class Slider<T> : View {
 		if (!IsInitialized || AutoSize == false) {
 			return;
 		}
-		// Hack???  Otherwise we can't go back to Dim.Absolute.
-		LayoutStyle = LayoutStyle.Absolute;
 		Width = 0;
 		Height = 0;
 		if (_config._sliderOrientation == Orientation.Horizontal) {
@@ -817,7 +815,6 @@ public class Slider<T> : View {
 				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcThickness ()),
 					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical,    CalcBestLength ())));
 		}
-		LayoutStyle = LayoutStyle.Computed;
 	}
 
 	/// <summary>

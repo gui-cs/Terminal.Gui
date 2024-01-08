@@ -58,7 +58,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (_foregroundColorLabel);
 
 			// Background ColorPicker.
-			backgroundColorPicker = new ColorPicker () { 
+			backgroundColorPicker = new ColorPicker () {
 				Title = "Background Color",
 				Y = 0,
 				X = 0,

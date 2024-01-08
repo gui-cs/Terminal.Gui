@@ -580,43 +580,8 @@ public class DimTests {
 		Assert.Throws<ArgumentException> (() => dim = Dim.Percent (1000001));
 	}
 
-	[Fact] [AutoInitShutdown]
-	public void ForceValidatePosDim_True_Dim_Validation_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_Throws ()
-	{
-		var t = Application.Top;
-
-		var w = new Window {
-			Width = Dim.Fill (),
-			Height = Dim.Sized (10)
-		};
-		var v = new View ("v") {
-			Width = Dim.Width (w) - 2,
-			Height = Dim.Percent (10),
-			ValidatePosDim = true
-		};
-
-		w.Add (v);
-		t.Add (w);
-
-		t.Ready += (s, e) => {
-			Assert.Equal (2, w.Width = 2);
-			Assert.Equal (2, w.Height = 2);
-			Assert.Throws<ArgumentException> (() => v.Width = 2);
-			Assert.Throws<ArgumentException> (() => v.Height = 2);
-			v.ValidatePosDim = false;
-			var exception = Record.Exception (() => v.Width = 2);
-			Assert.Null (exception);
-			Assert.Equal (2, v.Width);
-			exception = Record.Exception (() => v.Height = 2);
-			Assert.Null (exception);
-			Assert.Equal (2, v.Height);
-		};
-
-		Application.Iteration += (s, a) => Application.RequestStop ();
-
-		Application.Run ();
-	}
-
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
 	{
@@ -631,6 +596,8 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	{
@@ -644,15 +611,21 @@ public class DimTests {
 			Width = Dim.Width (w) - 2,
 			Height = Dim.Percent (10)
 		};
-
+		
 		w.Add (v);
 		t.Add (w);
+
+		Assert.Equal (LayoutStyle.Absolute, t.LayoutStyle);
+		Assert.Equal (LayoutStyle.Computed, w.LayoutStyle);
+		Assert.Equal (LayoutStyle.Computed, v.LayoutStyle);
 
 		t.LayoutSubviews ();
 		Assert.Equal (2, v.Width = 2);
 		Assert.Equal (2, v.Height = 2);
 
-		v.LayoutStyle = LayoutStyle.Absolute;
+		// Force v to be LayoutStyle.Absolute;
+		v.Frame = new Rect (0, 1, 3, 4);
+		Assert.Equal (LayoutStyle.Absolute, v.LayoutStyle);
 		t.LayoutSubviews ();
 
 		Assert.Equal (2, v.Width = 2);
@@ -660,6 +633,8 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [AutoInitShutdown]
 	public void Only_DimAbsolute_And_DimFactor_As_A_Different_Procedure_For_Assigning_Value_To_Width_Or_Height ()
 	{
@@ -871,6 +846,9 @@ public class DimTests {
 	//	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
 	//}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
+
 	/// <summary>
 	/// This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461
 	/// </summary>
@@ -899,8 +877,6 @@ public class DimTests {
 		t.BeginInit ();
 		t.EndInit ();
 
-		// BUGBUG: v2 - f references t here; t is f's super-superview. This is supported!
-		// BUGBUG: v2 - f references v2 here; v2 is f's subview. This is not supported!
 		f.Width = Dim.Width (t) - Dim.Width (v2);    // 80 - 74 = 6
 		f.Height = Dim.Height (t) - Dim.Height (v2); // 25 - 19 = 6
 
@@ -909,16 +885,17 @@ public class DimTests {
 		Assert.Equal (25, t.Frame.Height);
 		Assert.Equal (78, w.Frame.Width);
 		Assert.Equal (23, w.Frame.Height);
-		// BUGBUG: v2 - this no longer works - see above
-		//Assert.Equal (6, f.Frame.Width);
-		//Assert.Equal (6, f.Frame.Height);
-		//Assert.Equal (76, v1.Frame.Width);
-		//Assert.Equal (21, v1.Frame.Height);
-		//Assert.Equal (74, v2.Frame.Width);
-		//Assert.Equal (19, v2.Frame.Height);
+		Assert.Equal (6, f.Frame.Width);
+		Assert.Equal (6, f.Frame.Height);
+		Assert.Equal (76, v1.Frame.Width);
+		Assert.Equal (21, v1.Frame.Height);
+		Assert.Equal (74, v2.Frame.Width);
+		Assert.Equal (19, v2.Frame.Height);
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
 	{
@@ -963,12 +940,13 @@ public class DimTests {
 		t.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void PosCombine_View_Not_Added_Throws ()
 	{
 		var t = new View { Width = 80, Height = 50 };
 
-		// BUGBUG: v2 - super should not reference it's superview (t)
 		var super = new View {
 			Width = Dim.Width (t) - 2,
 			Height = Dim.Height (t) - 2
@@ -999,6 +977,8 @@ public class DimTests {
 		v2.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// A new test that does not depend on Application is needed.
 	[Fact] [AutoInitShutdown]
 	public void Dim_Add_Operator ()
 	{
@@ -1042,68 +1022,8 @@ public class DimTests {
 		Assert.Equal (20, count);
 	}
 
-	[Fact] [AutoInitShutdown]
-	public void Dim_Add_Operator_With_Text ()
-	{
-		var top = Application.Top;
-
-		// BUGBUG: v2 - If a View's height is zero, it should not be drawn.
-		//// Although view height is zero the text it's draw due the SetMinWidthHeight method
-		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
-		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
-		var count = 0;
-		var listLabels = new List<Label> ();
-
-		field.KeyDown += (s, k) => {
-			if (k.KeyCode == KeyCode.Enter) {
-				((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-				var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
-				Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
-
-				if (count < 20) {
-					field.Text = $"Label {count}";
-					var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 10 };
-					view.Add (label);
-					Assert.Equal ($"Label {count}",         label.Text);
-					Assert.Equal ($"Absolute({count + 1})", label.Y.ToString ());
-					listLabels.Add (label);
-					//if (count == 0) {
-					//	Assert.Equal ($"Absolute({count})", view.Height.ToString ());
-					//	view.Height += 2;
-					//} else {
-					Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-					view.Height += 1;
-					//}
-					count++;
-				}
-				Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-			}
-		};
-
-		Application.Iteration += (s, a) => {
-			while (count < 21) {
-				field.NewKeyDownEvent (new Key (KeyCode.Enter));
-				if (count == 20) {
-					field.NewKeyDownEvent (new Key (KeyCode.Enter));
-					break;
-				}
-			}
-
-			Application.RequestStop ();
-		};
-
-		var win = new Window ();
-		win.Add (view);
-		win.Add (field);
-
-		top.Add (win);
-
-		Application.Run (top);
-
-		Assert.Equal (20,    count);
-		Assert.Equal (count, listLabels.Count);
-	}
-
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [AutoInitShutdown]
 	public void Dim_Subtract_Operator ()
 	{
@@ -1119,14 +1039,12 @@ public class DimTests {
 			var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 			view.Add (label);
 			Assert.Equal ($"Label {i}", label.Text);
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i})", label.Y.ToString ());
+			Assert.Equal ($"Absolute({i})", label.Y.ToString ());
 			listLabels.Add (label);
 
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i})", view.Height.ToString ());
+			Assert.Equal ($"Absolute({i})", view.Height.ToString ());
 			view.Height += 1;
-			//Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
+			Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
 		}
 
 		field.KeyDown += (s, k) => {
@@ -1159,91 +1077,6 @@ public class DimTests {
 		Application.Run (top);
 
 		Assert.Equal (0, count);
-	}
-
-	[Fact] [AutoInitShutdown]
-	public void Dim_Subtract_Operator_With_Text ()
-	{
-		var top = Application.Top;
-
-		// BUGBUG: v2 - If a View's height is zero, it should not be drawn.
-		//// Although view height is zero the text it's draw due the SetMinWidthHeight method
-		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
-		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
-		var count = 20;
-		var listLabels = new List<Label> ();
-
-		for (var i = 0; i < count; i++) {
-			field.Text = $"Label {i}";
-			// BUGBUG: v2 - view has not been initialied yet; view.Bounds is indeterminate
-			var label = new Label (field.Text) { X = 0, Y = i + 1, Width = 10 };
-			view.Add (label);
-			Assert.Equal ($"Label {i}", label.Text);
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i + 1})", label.Y.ToString ());
-			listLabels.Add (label);
-
-			//if (i == 0) {
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i})", view.Height.ToString ());
-			//view.Height += 2;
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
-			//} else {
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i + 1})", view.Height.ToString ());
-			view.Height += 1;
-			// BUGBUG: Bogus test; views have not been initialized yet
-			//Assert.Equal ($"Absolute({i + 2})", view.Height.ToString ());
-			//}
-		}
-
-		field.KeyDown += (s, k) => {
-			if (k.KeyCode == KeyCode.Enter) {
-				((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-				var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
-				Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
-
-				if (count > 0) {
-					Assert.Equal ($"Label {count - 1}", listLabels [count - 1].Text);
-					view.Remove (listLabels [count - 1]);
-					listLabels [count - 1].Dispose ();
-					listLabels.RemoveAt (count - 1);
-					Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-					view.Height -= 1;
-					count--;
-					if (listLabels.Count > 0) {
-						field.Text = listLabels [count - 1].Text;
-					} else {
-						field.Text = string.Empty;
-					}
-				}
-				Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
-			}
-		};
-
-		Application.Iteration += (s, a) => {
-			while (count > -1) {
-				field.NewKeyDownEvent (new Key (KeyCode.Enter));
-				if (count == 0) {
-					field.NewKeyDownEvent (new Key (KeyCode.Enter));
-					break;
-				}
-			}
-
-			Application.RequestStop ();
-		};
-
-		var win = new Window ();
-		win.Add (view);
-		win.Add (field);
-
-		top.Add (win);
-
-		Application.Run (top);
-
-		Assert.Equal (0,     count);
-		Assert.Equal (count, listLabels.Count);
 	}
 
 	[Fact] [TestRespondersDisposed]
@@ -1301,9 +1134,11 @@ public class DimTests {
 		Assert.NotEqual (dim1, dim2);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Theory] [AutoInitShutdown]
-	[InlineData (0,  true)]
-	[InlineData (0,  false)]
+	[InlineData (0,   true)]
+	[InlineData (0,   false)]
 	[InlineData (50, true)]
 	[InlineData (50, false)]
 	public void DimPercentPlusOne (int startingDistance, bool testHorizontal)
@@ -1338,6 +1173,8 @@ public class DimTests {
 		}
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_Referencing_SuperView_Does_Not_Throw ()
 	{
@@ -1359,6 +1196,8 @@ public class DimTests {
 		super.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact] [TestRespondersDisposed]
 	public void Dim_SyperView_Referencing_SubView_Throws ()
 	{

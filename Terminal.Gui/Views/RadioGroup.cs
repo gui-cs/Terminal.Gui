@@ -26,7 +26,7 @@ public class RadioGroup : View {
 	/// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
 	public RadioGroup (string [] radioLabels, int selected = 0) : base ()
 	{
-		SetInitialProperties (Rect.Empty, radioLabels, selected);
+		SetInitialProperties (radioLabels, selected);
 	}
 
 	/// <summary>
@@ -37,7 +37,7 @@ public class RadioGroup : View {
 	/// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
 	public RadioGroup (Rect rect, string [] radioLabels, int selected = 0) : base (rect)
 	{
-		SetInitialProperties (rect, radioLabels, selected);
+		SetInitialProperties (radioLabels, selected);
 	}
 
 	/// <summary>
@@ -52,7 +52,7 @@ public class RadioGroup : View {
 		this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
 	{ }
 
-	void SetInitialProperties (Rect rect, string [] radioLabels, int selected)
+	void SetInitialProperties (string [] radioLabels, int selected)
 	{
 		HotKeySpecifier = new Rune ('_');
 
@@ -61,7 +61,6 @@ public class RadioGroup : View {
 		}
 
 		_selected = selected;
-		Frame = rect;
 		CanFocus = true;
 
 		// Things this view knows how to do
@@ -130,7 +129,7 @@ public class RadioGroup : View {
 				length += item.length;
 			}
 			var hr = new Rect (0, 0, length, 1);
-			if (IsAdded && LayoutStyle == LayoutStyle.Computed) {
+			if (IsAdded) {
 				Width = hr.Width;
 				Height = 1;
 			} else {

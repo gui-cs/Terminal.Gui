@@ -118,8 +118,6 @@ public class Button : View {
 		_isDefault = is_default;
 		Text = text ?? string.Empty;
 
-		OnResizeNeeded ();
-
 		// Override default behavior of View
 		// Command.Default sets focus
 		AddCommand (Command.Accept, () => { OnClicked (); return true; });

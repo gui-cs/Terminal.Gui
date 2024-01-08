@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///         <para>
 ///         Toplevels can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, System.Func{System.Exception,bool}(System.Exception))"/>.
+///         <see cref="Application.Run(Toplevel, System.Func{System.Exception,bool})"/>.
 ///         They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has
 ///         been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>).
 ///         </para>
@@ -22,14 +22,13 @@ namespace Terminal.Gui;
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional
 ///         Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and
-///         call <see cref="Application.Run(Toplevel, System.Func{System.Exception,bool}(System.Exception))"/>.
+///         call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
 ///         </para>
 /// </remarks>
 public partial class Toplevel : View {
 	internal static Point? _dragPosition;
 	Point _startGrabPoint;
 
-	// BUGBUG: Remove; Toplevel should be ComputedLayout
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
 	/// <see cref="LayoutStyle.Absolute"/> layout.
@@ -42,7 +41,8 @@ public partial class Toplevel : View {
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Toplevel"/> class with
-	/// <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen. The <see cref="View.Width"/> and <see cref="View.Height"/> properties
+	/// <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen. The <see cref="View.Width"/> and
+	/// <see cref="View.Height"/> properties
 	/// will be set to the dimensions of the terminal using <see cref="Dim.Fill"/>.
 	/// </summary>
 	public Toplevel ()
@@ -306,17 +306,25 @@ public partial class Toplevel : View {
 		KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
 
 		KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorLeft, Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
+		KeyBindings.Add (KeyCode.CursorDown,  Command.NextView);
+		KeyBindings.Add (KeyCode.CursorLeft,  Command.PreviousView);
+		KeyBindings.Add (KeyCode.CursorUp,    Command.PreviousView);
+		KeyBindings.Add (KeyCode.CursorDown,  Command.NextView);
+		KeyBindings.Add (KeyCode.CursorLeft,  Command.PreviousView);
+		KeyBindings.Add (KeyCode.CursorUp,    Command.PreviousView);
 
-		KeyBindings.Add (KeyCode.Tab, Command.NextView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.PreviousView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextViewOrTop);
+		KeyBindings.Add (KeyCode.Tab,                                        Command.NextView);
+		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask,                    Command.PreviousView);
+		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask,                     Command.NextViewOrTop);
+		KeyBindings.Add (KeyCode.Tab,                                        Command.NextView);
+		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask,                    Command.PreviousView);
+		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask,                     Command.NextViewOrTop);
 		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
-		KeyBindings.Add (KeyCode.F5, Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop);     // Needed on Unix
+		KeyBindings.Add (KeyCode.F5,                                Command.Refresh);
+		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey,  Command.NextViewOrTop);     // Needed on Unix
+		KeyBindings.Add (KeyCode.F5,                                Command.Refresh);
+		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey,  Command.NextViewOrTop);     // Needed on Unix
 		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
@@ -388,6 +396,12 @@ public partial class Toplevel : View {
 		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
+
+	/// <summary>
+	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
+	/// </summary>
+	/// <returns>The created Toplevel.</returns>
+	public static Toplevel Create () => new (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 	void MovePreviousViewOrTop ()
 	{
@@ -676,15 +690,16 @@ public partial class Toplevel : View {
 	public virtual void PositionToplevel (Toplevel top)
 	{
 		var superView = GetLocationThatFits (top, top.Frame.X, top.Frame.Y,
-			out var nx, out var ny, out _, out var sb);
+			out var nx,                       out var ny,  out _, out var sb);
 		var layoutSubviews = false;
 		var maxWidth = 0;
 		if (superView.Margin != null && superView == top.SuperView) {
 			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
 		}
-		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal || top?.SuperView == null && top.IsOverlapped) &&
-		    (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) &&
-		    top.LayoutStyle == LayoutStyle.Computed) {
+		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal || top?.SuperView == null && top.IsOverlapped)
+		    // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
+		    &&
+		    (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/) {
 
 			if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 				top.X = nx;

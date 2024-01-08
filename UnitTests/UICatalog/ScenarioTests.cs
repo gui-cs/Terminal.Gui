@@ -335,7 +335,7 @@ namespace UICatalog.Tests {
 
 			_computedCheckBox.Toggled += (s, e) => {
 				if (_curView != null) {
-					_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
+					//_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 					_hostPane.LayoutSubviews ();
 				}
 			};
@@ -419,7 +419,7 @@ namespace UICatalog.Tests {
 				var layout = view.LayoutStyle;
 
 				try {
-					view.LayoutStyle = LayoutStyle.Absolute;
+					//view.LayoutStyle = LayoutStyle.Absolute;
 
 					switch (_xRadioGroup.SelectedItem) {
 					case 0:
@@ -477,7 +477,7 @@ namespace UICatalog.Tests {
 				} catch (Exception e) {
 					MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
 				} finally {
-					view.LayoutStyle = layout;
+					//view.LayoutStyle = layout;
 				}
 				UpdateTitle (view);
 			}

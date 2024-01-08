@@ -1,9 +1,8 @@
 ﻿using System;
-using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TerminalGui.ViewsTests;
+namespace Terminal.Gui.ViewsTests;
 
 public class ToplevelTests {
 	readonly ITestOutputHelper _output;
@@ -17,28 +16,6 @@ public class ToplevelTests {
 		var top = new Toplevel ();
 
 		Assert.Equal (Colors.TopLevel, top.ColorScheme);
-		Assert.Equal ("Fill(0)", top.Width.ToString ());
-		Assert.Equal ("Fill(0)", top.Height.ToString ());
-		Assert.False (top.Running);
-		Assert.False (top.Modal);
-		Assert.Null (top.MenuBar);
-		Assert.Null (top.StatusBar);
-		Assert.False (top.IsOverlappedContainer);
-		Assert.False (top.IsOverlapped);
-
-		// Because Toplevel is LayoutStyle.Computed, SetRelativeLayout needs to be called
-		// to set the Frame.
-		top.SetRelativeLayout (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-		Assert.Equal (new Rect (0,          0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void Create_Toplevel ()
-	{
-		var top = new Toplevel ();
-
-		Assert.Equal (Colors.TopLevel, top.ColorScheme);
 		Assert.Equal ("Fill(0)",       top.Width.ToString ());
 		Assert.Equal ("Fill(0)",       top.Height.ToString ());
 		Assert.False (top.Running);
@@ -47,12 +24,8 @@ public class ToplevelTests {
 		Assert.Null (top.StatusBar);
 		Assert.False (top.IsOverlappedContainer);
 		Assert.False (top.IsOverlapped);
-
-		// Because Toplevel is LayoutStyle.Computed, SetRelativeLayout needs to be called
-		// to set the Frame.
-		top.SetRelativeLayout (new Rect (0, 0, Application.Driver.Cols, Application.Driver.Rows));
-		Assert.Equal (new Rect (0,          0, Application.Driver.Cols, Application.Driver.Rows), top.Frame);
 	}
+
 
 #if BROKE_IN_2927
 		// BUGBUG: The name of this test does not match what it does. 
@@ -226,8 +199,8 @@ public class ToplevelTests {
 		// Application.Top without menu and status bar.
 		var supView = top.GetLocationThatFits (top, 2, 2, out var nx, out var ny, out var mb, out var sb);
 		Assert.Equal (Application.Top, supView);
-		Assert.Equal (0, nx);
-		Assert.Equal (0, ny);
+		Assert.Equal (0,               nx);
+		Assert.Equal (0,               ny);
 		Assert.Null (mb);
 		Assert.Null (sb);
 
@@ -341,7 +314,7 @@ public class ToplevelTests {
 		// Application.Top with a menu and status bar.
 		top.GetLocationThatFits (win, 30, 20, out nx, out ny, out mb, out sb);
 		Assert.Equal (20, nx); // 20+60=80
-		Assert.Equal (9, ny); // 9+15+1(mb)=25
+		Assert.Equal (9,  ny); // 9+15+1(mb)=25
 		Assert.NotNull (mb);
 		Assert.NotNull (sb);
 
@@ -389,10 +362,10 @@ public class ToplevelTests {
 		Application.Begin (top);
 		top.Running = true;
 
-		Assert.Equal (new Rect (0, 0, 40, 25), win1.Frame);
+		Assert.Equal (new Rect (0,  0, 40, 25), win1.Frame);
 		Assert.Equal (new Rect (41, 0, 40, 25), win2.Frame);
-		Assert.Equal (win1, top.Focused);
-		Assert.Equal (tf1W1, top.MostFocused);
+		Assert.Equal (win1,                     top.Focused);
+		Assert.Equal (tf1W1,                    top.MostFocused);
 
 		Assert.True (isRunning);
 		Assert.True (Application.OnKeyDown (Application.QuitKey));
@@ -409,13 +382,13 @@ public class ToplevelTests {
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
 		Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf2W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab)));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf1W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorRight)));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf1W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorDown)));
 		Assert.Equal (win1, top.Focused);
@@ -429,22 +402,22 @@ public class ToplevelTests {
 		Assert.Equal (win1, top.Focused);
 		Assert.Equal (tvW1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorLeft)));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf1W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorUp)));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf2W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
-		Assert.Equal (win2, top.Focused);
+		Assert.Equal (win2,  top.Focused);
 		Assert.Equal (tf1W2, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf2W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (Application.AlternateForwardKey));
-		Assert.Equal (win2, top.Focused);
+		Assert.Equal (win2,  top.Focused);
 		Assert.Equal (tf1W2, top.MostFocused);
 		Assert.True (Application.OnKeyDown (Application.AlternateBackwardKey));
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf2W1, top.MostFocused);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorUp)));
 		Assert.Equal (win1, top.Focused);
@@ -454,23 +427,23 @@ public class ToplevelTests {
 #else
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorLeft)));
 #endif
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf1W1, top.MostFocused);
 
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorDown)));
-		Assert.Equal (win1, top.Focused);
-		Assert.Equal (tvW1, top.MostFocused);
+		Assert.Equal (win1,             top.Focused);
+		Assert.Equal (tvW1,             top.MostFocused);
 		Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.End | KeyCode.CtrlMask)));
-		Assert.Equal (win1, top.Focused);
-		Assert.Equal (tvW1, top.MostFocused);
+		Assert.Equal (win1,              top.Focused);
+		Assert.Equal (tvW1,              top.MostFocused);
 		Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
 			Assert.True (Application.OnKeyDown (new (Key.F | Key.CtrlMask)));
 #else
 		Assert.True (Application.OnKeyDown (new Key (KeyCode.CursorRight)));
 #endif
-		Assert.Equal (win1, top.Focused);
+		Assert.Equal (win1,  top.Focused);
 		Assert.Equal (tf2W1, top.MostFocused);
 
 #if UNIX_KEY_BINDINGS
@@ -537,7 +510,7 @@ public class ToplevelTests {
 		Assert.Null (top.Focused);
 		Assert.Null (top.MostFocused);
 		Assert.Equal (tf1W2, win2.MostFocused);
-		Assert.Equal (2, Application.OverlappedChildren.Count);
+		Assert.Equal (2,     Application.OverlappedChildren.Count);
 
 		Application.MoveToOverlappedChild (win1);
 		Assert.Equal (win1, Application.Current);
@@ -559,13 +532,13 @@ public class ToplevelTests {
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.ShiftMask)));
 		Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf2W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorRight)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
 		Assert.Equal (win1, Application.OverlappedChildren [0]);
@@ -579,27 +552,27 @@ public class ToplevelTests {
 		Assert.Equal (win1, Application.OverlappedChildren [0]);
 		Assert.Equal (tvW1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorUp)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf2W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
-		Assert.Equal (win2, Application.OverlappedChildren [0]);
+		Assert.Equal (win2,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W2, win2.MostFocused);
 		tf2W2.SetFocus ();
 		Assert.True (tf2W2.HasFocus);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Application.AlternateForwardKey));
-		Assert.Equal (win2, Application.OverlappedChildren [0]);
+		Assert.Equal (win2,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf2W2, win2.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (Application.AlternateBackwardKey));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
 		Assert.Equal (win1, Application.OverlappedChildren [0]);
@@ -609,22 +582,22 @@ public class ToplevelTests {
 #else
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
 #endif
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf1W1, win1.MostFocused);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorDown)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
-		Assert.Equal (tvW1, win1.MostFocused);
+		Assert.Equal (win1,             Application.OverlappedChildren [0]);
+		Assert.Equal (tvW1,             win1.MostFocused);
 		Assert.Equal (new Point (0, 0), tvW1.CursorPosition);
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.End | KeyCode.CtrlMask)));
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
-		Assert.Equal (tvW1, win1.MostFocused);
+		Assert.Equal (win1,              Application.OverlappedChildren [0]);
+		Assert.Equal (tvW1,              win1.MostFocused);
 		Assert.Equal (new Point (16, 1), tvW1.CursorPosition);
 #if UNIX_KEY_BINDINGS
 			Assert.True (Application.OverlappedChildren [0].ProcessKeyDown (new (Key.F | Key.CtrlMask)));
 #else
 		Assert.True (Application.OverlappedChildren [0].NewKeyDownEvent (new Key (KeyCode.CursorRight)));
 #endif
-		Assert.Equal (win1, Application.OverlappedChildren [0]);
+		Assert.Equal (win1,  Application.OverlappedChildren [0]);
 		Assert.Equal (tf2W1, win1.MostFocused);
 
 #if UNIX_KEY_BINDINGS
@@ -693,16 +666,16 @@ public class ToplevelTests {
 		Assert.Equal (KeyCode.Null, quitKey);
 
 		Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
+		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask,   Application.AlternateBackwardKey);
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask,        Application.QuitKey);
 
 		Application.AlternateForwardKey = KeyCode.A;
 		Application.AlternateBackwardKey = KeyCode.B;
 		Application.QuitKey = KeyCode.C;
 
 		Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, alternateForwardKey);
-		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, alternateBackwardKey);
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, quitKey);
+		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask,   alternateBackwardKey);
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask,        quitKey);
 
 		Assert.Equal (KeyCode.A, Application.AlternateForwardKey);
 		Assert.Equal (KeyCode.B, Application.AlternateBackwardKey);
@@ -714,8 +687,8 @@ public class ToplevelTests {
 		Application.QuitKey = KeyCode.Q | KeyCode.CtrlMask;
 
 		Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey);
-		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey);
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey);
+		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask,   Application.AlternateBackwardKey);
+		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask,        Application.QuitKey);
 	}
 
 	[Fact]
@@ -761,7 +734,7 @@ public class ToplevelTests {
 					Flags = MouseFlags.Button1Pressed
 				}));
 
-				Assert.Equal (Application.Current, Application.MouseGrabView);
+				Assert.Equal (Application.Current,    Application.MouseGrabView);
 				Assert.Equal (new Rect (2, 2, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 3) {
@@ -774,7 +747,7 @@ public class ToplevelTests {
 				}));
 				Application.Refresh ();
 
-				Assert.Equal (Application.Current, Application.MouseGrabView);
+				Assert.Equal (Application.Current,    Application.MouseGrabView);
 				Assert.Equal (new Rect (1, 2, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 4) {
@@ -800,7 +773,7 @@ public class ToplevelTests {
 				}));
 				Application.Refresh ();
 
-				Assert.Equal (Application.Current, Application.MouseGrabView);
+				Assert.Equal (Application.Current,    Application.MouseGrabView);
 				Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 6) {
@@ -815,7 +788,7 @@ public class ToplevelTests {
 │             │
 └─────────────┘", _output);
 
-				Assert.Equal (Application.Current, Application.MouseGrabView);
+				Assert.Equal (Application.Current,    Application.MouseGrabView);
 				Assert.Equal (new Rect (1, 1, 10, 3), Application.MouseGrabView.Frame);
 
 			} else if (iterations == 7) {
@@ -875,7 +848,7 @@ public class ToplevelTests {
 					Flags = MouseFlags.Button1Pressed
 				}));
 
-				Assert.Equal (win, Application.MouseGrabView);
+				Assert.Equal (win,      Application.MouseGrabView);
 				Assert.Equal (location, Application.MouseGrabView.Frame);
 			} else if (iterations == 2) {
 				Assert.Equal (win, Application.MouseGrabView);
@@ -1168,10 +1141,10 @@ public class ToplevelTests {
 		top.Add (scrollView);
 		Application.Begin (top);
 
-		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (3, 3, 40, 16), scrollView.Frame);
+		Assert.Equal (new Rect (0, 0, 80,  25),  top.Frame);
+		Assert.Equal (new Rect (3, 3, 40,  16),  scrollView.Frame);
 		Assert.Equal (new Rect (0, 0, 200, 100), scrollView.Subviews [0].Frame);
-		Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
+		Assert.Equal (new Rect (3, 3, 194, 94),  win.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
                                           ▲
                                           ┬
@@ -1195,7 +1168,7 @@ public class ToplevelTests {
 			Y = 6,
 			Flags = MouseFlags.Button1Pressed
 		}));
-		Assert.Equal (win, Application.MouseGrabView);
+		Assert.Equal (win,                      Application.MouseGrabView);
 		Assert.Equal (new Rect (3, 3, 194, 94), win.Frame);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
@@ -1280,7 +1253,7 @@ public class ToplevelTests {
 		Application.Begin (window);
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3),  window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -1305,7 +1278,7 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3),  window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -1338,7 +1311,7 @@ public class ToplevelTests {
 		}));
 
 		Application.Refresh ();
-		Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
+		Assert.Equal (new Rect (0,  0, 19, 2), top.Frame);
 		Assert.Equal (new Rect (-1, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ──────────────────┐
@@ -1352,7 +1325,7 @@ public class ToplevelTests {
 		}));
 
 		Application.Refresh ();
-		Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
+		Assert.Equal (new Rect (0,  0, 19, 2), top.Frame);
 		Assert.Equal (new Rect (18, 1, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
                   ┌", _output);
@@ -1365,7 +1338,7 @@ public class ToplevelTests {
 		}));
 
 		Application.Refresh ();
-		Assert.Equal (new Rect (0, 0, 19, 2), top.Frame);
+		Assert.Equal (new Rect (0,  0, 19, 2), top.Frame);
 		Assert.Equal (new Rect (19, 2, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 	}
@@ -1420,7 +1393,7 @@ public class ToplevelTests {
 
 		firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
-		Assert.Equal (window, Application.MouseGrabView);
+		Assert.Equal (window,                 Application.MouseGrabView);
 		Assert.Equal (new Rect (1, 1, 10, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
  ┌────────┐
