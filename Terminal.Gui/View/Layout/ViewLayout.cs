@@ -432,13 +432,13 @@ public partial class View {
 	public bool ValidatePosDim { get; set; }
 
 	/// <summary>
-	/// Throws an <see cref="InvalidOperationException"/> if any of the SubViews are using Dim objects that depend on this
+	/// Throws an <see cref="InvalidOperationException"/> if any SubViews are using Dim objects that depend on this
 	/// Views dimensions.
 	/// </summary>
 	/// <exception cref="InvalidOperationException"></exception>
 	void CheckDimAuto ()
 	{
-		if (!ValidatePosDim || !IsInitialized || Width is not Dim.DimAuto && Height is not Dim.DimAuto) {
+		if (!ValidatePosDim && Width is not Dim.DimAuto && Height is not Dim.DimAuto) {
 			return;
 		}
 
@@ -632,6 +632,8 @@ public partial class View {
 	/// </remarks>
 	internal void OnResizeNeeded ()
 	{
+		SuperView?.CheckDimAuto ();
+		
 		// TODO: Identify a real-world use-case where this API should be virtual. 
 		// TODO: Until then leave it `internal` and non-virtual
 		// First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
@@ -641,7 +643,7 @@ public partial class View {
 										   Application.Driver?.Bounds ??
 										   new Rect (0, 0, int.MaxValue, int.MaxValue);
 		SetRelativeLayout (relativeBounds);
-
+		
 		// TODO: Determine what, if any of the below is actually needed here.
 		if (IsInitialized) {
 			SetFrameToFitText ();

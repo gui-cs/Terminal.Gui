@@ -184,7 +184,8 @@ public class DimAutoTests {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = 10
+			Height = 10,
+			ValidatePosDim = true,
 		};
 
 		superView.BeginInit ();

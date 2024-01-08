@@ -89,6 +89,7 @@ public partial class View {
 			view.EndInit ();
 		}
 
+		CheckDimAuto ();
 		SetNeedsLayout ();
 		SetNeedsDisplay ();
 	}
