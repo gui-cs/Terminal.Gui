@@ -598,18 +598,15 @@ public class ComboBox : View {
 
 	bool? MoveUpList ()
 	{
-		if (_search.HasFocus) {
-			// stop odd behavior on KeyUp when search has focus
-			return true;
-		}
-
 		if (_listview.HasFocus && _listview.SelectedItem == 0 && _searchset?.Count > 0) // jump back to search
 		{
 			_search.CursorPosition = _search.Text.GetRuneCount ();
 			_search.SetFocus ();
-			return true;
+		} else {
+			MoveUp ();
 		}
-		return null;
+
+		return true;
 	}
 
 	bool? MoveDown ()
