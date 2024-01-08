@@ -564,8 +564,8 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Called whenever the view needs to be resized. Sets <see cref="Frame"/> and triggers a <see cref="LayoutSubviews()"/>
-	/// call.
+	/// Called whenever the view needs to be resized. This is called whenever <see cref="Frame"/>,
+	/// <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> changes.
 	/// </summary>
 	/// <remarks>
 	///         <para>

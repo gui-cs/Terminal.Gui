@@ -36,7 +36,6 @@ public partial class View {
 			_text = value;
 			SetHotKey ();
 			UpdateTextFormatterText ();
-			//TextFormatter.Format ();
 			OnResizeNeeded ();
 
 #if DEBUG
