@@ -2156,23 +2156,23 @@ public class TextView : View {
 				_currentColumn = 0;
 				_currentRow = 0;
 				savedHeight = Height;
-				var prevLayoutStyle = LayoutStyle;
-				if (LayoutStyle == LayoutStyle.Computed) {
-					LayoutStyle = LayoutStyle.Absolute;
-				}
+				//var prevLayoutStyle = LayoutStyle;
+				//if (LayoutStyle == LayoutStyle.Computed) {
+				//	LayoutStyle = LayoutStyle.Absolute;
+				//}
 				Height = 1;
-				LayoutStyle = prevLayoutStyle;
+				//LayoutStyle = prevLayoutStyle;
 				if (!IsInitialized) {
 					_model.LoadString (Text);
 				}
 				SetNeedsDisplay ();
 			} else if (_multiline && savedHeight != null) {
-				var lyout = LayoutStyle;
-				if (LayoutStyle == LayoutStyle.Computed) {
-					LayoutStyle = LayoutStyle.Absolute;
-				}
+				//var lyout = LayoutStyle;
+				//if (LayoutStyle == LayoutStyle.Computed) {
+				//	LayoutStyle = LayoutStyle.Absolute;
+				//}
 				Height = savedHeight;
-				LayoutStyle = lyout;
+				//LayoutStyle = lyout;
 				SetNeedsDisplay ();
 			}
 		}

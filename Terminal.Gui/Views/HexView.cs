@@ -95,6 +95,17 @@ public partial class HexView : View {
 		KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask, Command.EndOfLine);
 		KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.StartOfPage);
 		KeyBindings.Add (KeyCode.CursorDown | KeyCode.CtrlMask, Command.EndOfPage);
+
+		LayoutComplete += HexView_LayoutComplete;
+	}
+
+	private void HexView_LayoutComplete (object sender, LayoutEventArgs e)
+	{
+		// Small buffers will just show the position, with the bsize field value (4 bytes)
+		bytesPerLine = bsize;
+		if (Bounds.Width - displayWidth > 17) {
+			bytesPerLine = bsize * ((Bounds.Width - displayWidth) / 18);
+		}
 	}
 
 	/// <summary>
@@ -174,19 +185,20 @@ public partial class HexView : View {
 		}
 	}
 
-	/// <inheritdoc/>
-	public override Rect Frame {
-		get => base.Frame;
-		set {
-			base.Frame = value;
+	//// BUGBUG: This should be Bounds. Or, even better use View.LayoutComplete event
+	///// <inheritdoc/>
+	//public override Rect Frame {
+	//	get => base.Frame;
+	//	set {
+	//		base.Frame = value;
 
-			// Small buffers will just show the position, with the bsize field value (4 bytes)
-			bytesPerLine = bsize;
-			if (value.Width - displayWidth > 17) {
-				bytesPerLine = bsize * ((value.Width - displayWidth) / 18);
-			}
-		}
-	}
+	//		// Small buffers will just show the position, with the bsize field value (4 bytes)
+	//		bytesPerLine = bsize;
+	//		if (value.Width - displayWidth > 17) {
+	//			bytesPerLine = bsize * ((value.Width - displayWidth) / 18);
+	//		}
+	//	}
+	//}
 
 	//
 	// This is used to support editing of the buffer on a peer List<>, 
@@ -214,6 +226,7 @@ public partial class HexView : View {
 		Driver.SetAttribute (current);
 		Move (0, 0);
 
+		// BUGBUG: Bounds!!!!
 		var frame = Frame;
 
 		int nblocks = bytesPerLine / bsize;
@@ -309,6 +322,7 @@ public partial class HexView : View {
 		int delta = (int)(pos - DisplayStart);
 		int line = delta / bytesPerLine;
 
+		// BUGBUG: Bounds!
 		SetNeedsDisplay (new Rect (0, line, Frame.Width, 1));
 	}
 
@@ -331,6 +345,7 @@ public partial class HexView : View {
 	bool MoveEnd ()
 	{
 		position = source.Length;
+		// BUGBUG: Bounds!
 		if (position >= DisplayStart + bytesPerLine * Frame.Height) {
 			SetDisplayStart (position);
 			SetNeedsDisplay ();
@@ -396,6 +411,7 @@ public partial class HexView : View {
 		if (position < source.Length) {
 			position++;
 		}
+		// BUGBUG: Bounds!
 		if (position >= DisplayStart + bytesPerLine * Frame.Height) {
 			SetDisplayStart (DisplayStart + bytesPerLine);
 			SetNeedsDisplay ();
@@ -424,6 +440,7 @@ public partial class HexView : View {
 
 	bool MoveDown (int bytes)
 	{
+		// BUGBUG: Bounds!
 		RedisplayLine (position);
 		if (position + bytes < source.Length) {
 			position += bytes;
@@ -513,6 +530,8 @@ public partial class HexView : View {
 	/// <inheritdoc/>
 	public override bool MouseEvent (MouseEvent me)
 	{
+		// BUGBUG: Test this with a border! Assumes Frame == Bounds!
+
 		if (!me.Flags.HasFlag (MouseFlags.Button1Clicked) && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
 								&& !me.Flags.HasFlag (MouseFlags.WheeledDown) && !me.Flags.HasFlag (MouseFlags.WheeledUp)) {
 			return false;

@@ -15,13 +15,15 @@ public class WindowTests {
 		// Parameterless
 		var r = new Window ();
 		Assert.NotNull (r);
-		Assert.Equal (string.Empty,         r.Title);
+		Assert.Equal (string.Empty, r.Title);
+		// Toplevels have Width/Height set to Dim.Fill
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-		Assert.Equal ("Window()(0,0,0,0)",  r.ToString ());
+		// If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
+		Assert.Equal ("Window()(0,0,2147483647,2147483647)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
-		Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
-		Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
+		Assert.Equal (new Rect (0, 0, 2147483645, 2147483645), r.Bounds);
+		Assert.Equal (new Rect (0, 0, 2147483647, 2147483647), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
 		Assert.Equal (0,           r.X);

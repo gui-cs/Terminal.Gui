@@ -16,14 +16,10 @@ namespace Terminal.Gui.ViewsTests {
 		public void Constructors_Defaults ()
 		{
 			var sv = new ScrollView ();
-			Assert.Equal (LayoutStyle.Computed, sv.LayoutStyle);
+			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
 			Assert.Equal (Rect.Empty, sv.Frame);
-			Assert.Null (sv.X);
-			Assert.Null (sv.Y);
-			Assert.Null (sv.Width);
-			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
@@ -33,10 +29,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
-			Assert.Null (sv.X);
-			Assert.Null (sv.Y);
-			Assert.Null (sv.Width);
-			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);

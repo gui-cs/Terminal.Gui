@@ -16,20 +16,12 @@ public class RadioGroupTests {
 		var rg = new RadioGroup ();
 		Assert.True (rg.CanFocus);
 		Assert.Empty (rg.RadioLabels);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (Rect.Empty, rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
 		rg = new RadioGroup (new string [] { "Test" });
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
@@ -37,10 +29,6 @@ public class RadioGroupTests {
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
 		Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
@@ -48,10 +36,6 @@ public class RadioGroupTests {
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
 		Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 	}
