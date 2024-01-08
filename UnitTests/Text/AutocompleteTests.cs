@@ -153,7 +153,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (3, g.AllSuggestions.Count);
 			Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.SelectionKey)));
 			tv.PositionCursor ();
-			Assert.Equal ($"fortunately Fortunately super feature.", tv.Text);
+			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.Equal (3, g.AllSuggestions.Count);
