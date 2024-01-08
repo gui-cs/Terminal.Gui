@@ -23,13 +23,12 @@ public class DatePicker : TextField {
 	private List<string> _months = new ();
 	private List<string> years = new ();
 
-
 	private readonly int comboBoxHeight = 4;
 	private readonly int comboBoxWidth = 12;
 	private readonly int buttonWidth = 12;
 	private readonly int calendarWidth = 22;
-	private readonly int dialogHeight = 10;
-	private readonly int dialogWidth = 10;
+	private readonly int dialogHeight = 14;
+	private readonly int dialogWidth = 40;
 
 	/// <summary>
 	/// Format of date. The default is MM/dd/yyyy.
