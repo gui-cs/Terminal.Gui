@@ -321,4 +321,69 @@ public class AbsoluteLayoutTests {
 		Assert.Equal (new Rect (10, 10, 10, 10), v2.Frame);
 		super.Dispose ();
 	}
+
+	[Fact]
+	public void AbsoluteLayout_Setting_Bounds_Location_NotEmpty ()
+	{
+		// TODO: Should we enforce Bounds.X/Y == 0? The code currently ignores value.X/Y which is
+		// TODO: correct behavior, but is silent. Perhaps an exception?
+		var frame = new Rect (1,     2, 3,  4);
+		var newBounds = new Rect (10, 20, 30, 40);
+		var view = new View (frame);
+		view.Bounds = newBounds;
+		Assert.Equal (new Rect (0, 0, 30, 40), view.Bounds);
+		Assert.Equal (new Rect (1, 2, 30, 40), view.Frame);
+	}
+
+	[Fact]
+	public void AbsoluteLayout_Setting_Bounds_Sets_Frame ()
+	{
+		var frame = new Rect (1, 2, 3, 4);
+		var newBounds = new Rect (0, 0, 30, 40);
+
+		var v = new View (frame);
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+
+		v.Bounds = newBounds;
+		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
+		Assert.Equal (newBounds,                                          v.Bounds);
+		Assert.Equal (new Rect (1, 2, newBounds.Width, newBounds.Height), v.Frame);
+		Assert.Equal (new Rect (0, 0, newBounds.Width, newBounds.Height), v.Bounds); 
+		Assert.Equal (Pos.At (1),                                         v.X);
+		Assert.Equal (Pos.At (2),                                         v.Y);
+		Assert.Equal (Dim.Sized (30),                                     v.Width);
+		Assert.Equal (Dim.Sized (40),                                     v.Height);
+
+		newBounds = new Rect (0, 0, 3, 4);
+		v.Bounds  = newBounds;
+		Assert.Equal (newBounds,                                          v.Bounds);
+		Assert.Equal (new Rect (1, 2, newBounds.Width, newBounds.Height), v.Frame);
+		Assert.Equal (new Rect (0, 0, newBounds.Width, newBounds.Height), v.Bounds);
+		Assert.Equal (Pos.At (1),                                        v.X);
+		Assert.Equal (Pos.At (2),                                        v.Y);
+		Assert.Equal (Dim.Sized (3),                                     v.Width);
+		Assert.Equal (Dim.Sized (4),                                     v.Height);
+
+		v.BorderStyle = LineStyle.Single;
+		// Bounds should shrink
+		Assert.Equal (new Rect (0, 0, 1,               2),                v.Bounds);
+		// Frame should not change
+		Assert.Equal (new Rect (1, 2, 3,               4),                v.Frame);
+		Assert.Equal (Pos.At (1),                                         v.X);
+		Assert.Equal (Pos.At (2),                                         v.Y);
+		Assert.Equal (Dim.Sized (3),                                      v.Width);
+		Assert.Equal (Dim.Sized (4),                                      v.Height);
+
+		// Now set bounds bigger as before
+		newBounds = new Rect (0, 0, 3, 4);
+		v.Bounds  = newBounds;
+		Assert.Equal (newBounds,                                          v.Bounds);
+		// Frame grows because there's now a border
+		Assert.Equal (new Rect (1, 2, 5, 6), v.Frame);
+		Assert.Equal (new Rect (0, 0, newBounds.Width, newBounds.Height), v.Bounds);
+		Assert.Equal (Pos.At (1),                                         v.X);
+		Assert.Equal (Pos.At (2),                                         v.Y);
+		Assert.Equal (Dim.Sized (5),                                      v.Width);
+		Assert.Equal (Dim.Sized (6),                                      v.Height);
+	}
 }

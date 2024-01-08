@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ViewTests; 
+namespace Terminal.Gui.ViewTests;
 
 public class LayoutTests {
 	readonly ITestOutputHelper _output;
@@ -111,15 +111,15 @@ public class LayoutTests {
 	public void TrySetWidth_ForceValidatePosDim ()
 	{
 		var top = new View () {
-			X = 0,
-			Y = 0,
-			Width = 80
-		};
+					      X     = 0,
+					      Y     = 0,
+					      Width = 80
+				      };
 
 		var v = new View () {
-			Width = Dim.Fill (),
-			ValidatePosDim = true
-		};
+					    Width          = Dim.Fill (),
+					    ValidatePosDim = true
+				    };
 		top.Add (v);
 
 		Assert.False (v.TrySetWidth (70, out int rWidth));
@@ -147,15 +147,15 @@ public class LayoutTests {
 	public void TrySetHeight_ForceValidatePosDim ()
 	{
 		var top = new View () {
-			X = 0,
-			Y = 0,
-			Height = 20
-		};
+					      X      = 0,
+					      Y      = 0,
+					      Height = 20
+				      };
 
 		var v = new View () {
-			Height = Dim.Fill (),
-			ValidatePosDim = true
-		};
+					    Height         = Dim.Fill (),
+					    ValidatePosDim = true
+				    };
 		top.Add (v);
 
 		Assert.False (v.TrySetHeight (10, out int rHeight));
@@ -184,14 +184,14 @@ public class LayoutTests {
 	public void GetCurrentWidth_TrySetWidth ()
 	{
 		var top = new View () {
-			X = 0,
-			Y = 0,
-			Width = 80
-		};
+					      X     = 0,
+					      Y     = 0,
+					      Width = 80
+				      };
 
 		var v = new View () {
-			Width = Dim.Fill ()
-		};
+					    Width = Dim.Fill ()
+				    };
 		top.Add (v);
 		top.BeginInit ();
 		top.EndInit ();
@@ -218,14 +218,14 @@ public class LayoutTests {
 	public void GetCurrentHeight_TrySetHeight ()
 	{
 		var top = new View () {
-			X = 0,
-			Y = 0,
-			Height = 20
-		};
+					      X      = 0,
+					      Y      = 0,
+					      Height = 20
+				      };
 
 		var v = new View () {
-			Height = Dim.Fill ()
-		};
+					    Height = Dim.Fill ()
+				    };
 		top.Add (v);
 		top.BeginInit ();
 		top.EndInit ();
@@ -253,10 +253,10 @@ public class LayoutTests {
 	public void DimFill_SizedCorrectly ()
 	{
 		var view = new View () {
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			BorderStyle = LineStyle.Single,
-		};
+					       Width       = Dim.Fill (),
+					       Height      = Dim.Fill (),
+					       BorderStyle = LineStyle.Single,
+				       };
 		Application.Top.Add (view);
 		var rs = Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (32, 5);
@@ -264,7 +264,7 @@ public class LayoutTests {
 		Application.Top.LayoutSubviews ();
 		//view.SetRelativeLayout (new Rect (0, 0, 32, 5));
 		Assert.Equal (32, view.Frame.Width);
-		Assert.Equal (5, view.Frame.Height);
+		Assert.Equal (5,  view.Frame.Height);
 	}
 
 	[Fact] [AutoInitShutdown]
@@ -272,22 +272,22 @@ public class LayoutTests {
 	{
 		string text = $"First line{Environment.NewLine}Second line";
 		var horizontalView = new View () {
-			Width = 20,
-			Height = 1,
-			Text = text
-		};
+							 Width  = 20,
+							 Height = 1,
+							 Text   = text
+						 };
 		var verticalView = new View () {
-			Y = 3,
-			Height = 20,
-			Width = 1,
-			Text = text,
-			TextDirection = TextDirection.TopBottom_LeftRight
-		};
+						       Y             = 3,
+						       Height        = 20,
+						       Width         = 1,
+						       Text          = text,
+						       TextDirection = TextDirection.TopBottom_LeftRight
+					       };
 		var win = new Window () {
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			Text = "Window"
-		};
+						Width  = Dim.Fill (),
+						Height = Dim.Fill (),
+						Text   = "Window"
+					};
 		win.Add (horizontalView, verticalView);
 		Application.Top.Add (win);
 		var rs = Application.Begin (Application.Top);
@@ -295,8 +295,8 @@ public class LayoutTests {
 
 		Assert.False (horizontalView.AutoSize);
 		Assert.False (verticalView.AutoSize);
-		Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
-		Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 1),  horizontalView.Frame);
+		Assert.Equal (new Rect (0, 3, 1,  20), verticalView.Frame);
 		string expected = @"
 ┌──────────────────────────────┐
 │First line Second li          │
@@ -396,16 +396,16 @@ public class LayoutTests {
 	public void Dim_CenteredSubView_85_Percent_Height (int height)
 	{
 		var win = new Window () {
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+						Width  = Dim.Fill (),
+						Height = Dim.Fill ()
+					};
 
 		var subview = new Window () {
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			Width = Dim.Percent (85),
-			Height = Dim.Percent (85)
-		};
+						    X      = Pos.Center (),
+						    Y      = Pos.Center (),
+						    Width  = Dim.Percent (85),
+						    Height = Dim.Percent (85)
+					    };
 
 		win.Add (subview);
 
@@ -534,16 +534,16 @@ public class LayoutTests {
 	public void Dim_CenteredSubView_85_Percent_Width (int width)
 	{
 		var win = new Window () {
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+						Width  = Dim.Fill (),
+						Height = Dim.Fill ()
+					};
 
 		var subview = new Window () {
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			Width = Dim.Percent (85),
-			Height = Dim.Percent (85)
-		};
+						    X      = Pos.Center (),
+						    Y      = Pos.Center (),
+						    Width  = Dim.Percent (85),
+						    Height = Dim.Percent (85)
+					    };
 
 		win.Add (subview);
 
@@ -678,8 +678,8 @@ public class LayoutTests {
 		var top = Application.Top;
 		var win1 = new Window () { Id = "win1", Width = 20, Height = 10 };
 		var view1 = new View ("view1");
-		var win2 = new Window () { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
-		var view2 = new View () { Id = "view2", Width = Dim.Fill (), Height = 1, CanFocus = true };
+		var win2 = new Window () { Id = "win2", Y      = Pos.Bottom (view1) + 1, Width = 10, Height  = 3 };
+		var view2 = new View () { Id  = "view2", Width = Dim.Fill (), Height           = 1, CanFocus = true };
 		view2.MouseClick += (sender, e) => clicked = true;
 		var view3 = new View () { Id = "view3", Width = Dim.Fill (1), Height = 1, CanFocus = true };
 
@@ -702,18 +702,18 @@ public class LayoutTests {
 │                  │
 └──────────────────┘", _output);
 		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 5, 1), view1.Frame);
+		Assert.Equal (new Rect (0, 0, 5,  1),  view1.Frame);
 		Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
-		Assert.Equal (new Rect (0, 2, 10, 3), win2.Frame);
-		Assert.Equal (new Rect (0, 0, 8, 1), view2.Frame);
-		Assert.Equal (new Rect (0, 0, 7, 1), view3.Frame);
+		Assert.Equal (new Rect (0, 2, 10, 3),  win2.Frame);
+		Assert.Equal (new Rect (0, 0, 8,  1),  view2.Frame);
+		Assert.Equal (new Rect (0, 0, 7,  1),  view3.Frame);
 		var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
 		Assert.Equal (foundView, view2);
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
-			X = 9,
-			Y = 4,
-			Flags = MouseFlags.Button1Clicked
-		}));
+											     X     = 9,
+											     Y     = 4,
+											     Flags = MouseFlags.Button1Clicked
+										     }));
 		Assert.True (clicked);
 
 		Application.End (rs);
@@ -727,10 +727,10 @@ public class LayoutTests {
 		var top = Application.Top;
 
 		var view = new View ("view") {
-			Y = -2,
-			Height = 10,
-			TextDirection = TextDirection.TopBottom_LeftRight
-		};
+						     Y             = -2,
+						     Height        = 10,
+						     TextDirection = TextDirection.TopBottom_LeftRight
+					     };
 		top.Add (view);
 
 		Application.Iteration += (s, a) => {
@@ -787,14 +787,14 @@ public class LayoutTests {
 		var t = Application.Top;
 
 		var w = new Window () {
-			X = Pos.Left (t) + 2,
-			Y = Pos.At (2)
-		};
+					      X = Pos.Left (t) + 2,
+					      Y = Pos.At (2)
+				      };
 
 		var v = new View () {
-			X = Pos.Center (),
-			Y = Pos.Percent (10)
-		};
+					    X = Pos.Center (),
+					    Y = Pos.Percent (10)
+				    };
 
 		w.Add (v);
 		t.Add (w);
@@ -810,5 +810,4 @@ public class LayoutTests {
 		Application.Run ();
 		Application.Shutdown ();
 	}
-
 }

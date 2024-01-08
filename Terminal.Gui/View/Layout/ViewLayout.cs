@@ -256,6 +256,13 @@ public partial class View {
 			return new Rect (default, frameRelativeBounds.Size);
 		}
 		set {
+			// TODO: Should we enforce Bounds.X/Y == 0? The code currently ignores value.X/Y which is
+			// TODO: correct behavior, but is silent. Perhaps an exception?
+#if DEBUG
+			if (value.Location != Point.Empty) {
+				Debug.WriteLine ($"WARNING: Bounds.Location must always be 0,0. Location ({value.Location}) is ignored. {this}");
+			}
+#endif // DEBUG
 			Frame = new Rect (Frame.Location,
 				new Size (
 					value.Size.Width + Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal,
