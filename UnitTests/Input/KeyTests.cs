@@ -58,11 +58,9 @@ public class KeyTests {
 		Assert.Equal (expectedKeyCode, key.KeyCode);
 	}
 
-
-
-	public static IEnumerable<object []> ConstructorStrings2 ()
-	{
-		object [,] KeyMappings = {
+	// Via https://andrewlock.net/creating-parameterised-tests-in-xunit-with-inlinedata-classdata-and-memberdata/
+	public static TheoryData<string, Key> ValidStrings =>
+		new TheoryData<string, Key> {
 		{ "a", new Key (KeyCode.A) },
 		{ "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) },
 		{ "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) },
@@ -104,65 +102,16 @@ public class KeyTests {
 		{ "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) },
 		{ "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) },
 		{ "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) }
-	};
-		for (int i = 0; i < KeyMappings.GetLength (0); i++) {
-			yield return new object [] { KeyMappings [i, 0], KeyMappings [i, 1] };
-		}
-	}
+		};
 
-	public static IEnumerable<object []> ConstructorStrings ()
-	{
-		yield return new object [] { "a", new Key (KeyCode.A) };
-		yield return new object [] { "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) };
-		yield return new object [] { "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) };
-		yield return new object [] { "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) };
-		yield return new object [] { "A", new Key (KeyCode.A | KeyCode.ShiftMask) };
-		yield return new object [] { "â", new Key ((KeyCode)'â') };
-		yield return new object [] { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) };
-		yield return new object [] { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) };
-		yield return new object [] { "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) };
-		yield return new object [] { "Ctrl+Alt+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) };
-		yield return new object [] { "ctrl+alt+shift+cursorup", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) };
-		yield return new object [] { "CTRL+ALT+SHIFT+CURSORUP", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) };
-		yield return new object [] { "Ctrl+Alt+Shift+Delete", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete) };
-		yield return new object [] { "Ctrl+Alt+Shift+Enter", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter) };
-		yield return new object [] { "Tab", new Key (KeyCode.Tab) };
-		yield return new object [] { "Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask) };
-		yield return new object [] { "Ctrl+Tab", new Key (KeyCode.Tab | KeyCode.CtrlMask) };
-		yield return new object [] { "Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask) };
-		yield return new object [] { "Ctrl+Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask) };
-		yield return new object [] { "Ctrl+Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask) };
-		yield return new object [] { "", new Key (KeyCode.Null) };
-		yield return new object [] { " ", new Key (KeyCode.Space) };
-		yield return new object [] { "Space", new Key (KeyCode.Space) };
-		yield return new object [] { "Shift+Space", new Key (KeyCode.Space | KeyCode.ShiftMask) };
-		yield return new object [] { "Ctrl+Space", new Key (KeyCode.Space | KeyCode.CtrlMask) };
-		yield return new object [] { "Alt+Space", new Key (KeyCode.Space | KeyCode.AltMask) };
-		yield return new object [] { "Shift+ ", new Key (KeyCode.Space | KeyCode.ShiftMask) };
-		yield return new object [] { "Ctrl+ ", new Key (KeyCode.Space | KeyCode.CtrlMask) };
-		yield return new object [] { "Alt+ ", new Key (KeyCode.Space | KeyCode.AltMask) };
-		yield return new object [] { "F1", new Key (KeyCode.F1) };
-		yield return new object [] { "0", new Key (KeyCode.D0) };
-		yield return new object [] { "9", new Key (KeyCode.D9) };
-		yield return new object [] { "D0", new Key (KeyCode.D0) };
-		yield return new object [] { "65", new Key (KeyCode.A | KeyCode.ShiftMask) };
-		yield return new object [] { "97", new Key (KeyCode.A) };
-		yield return new object [] { "Shift", new Key (KeyCode.ShiftMask) };
-		yield return new object [] { "Ctrl", new Key (KeyCode.CtrlMask) };
-		yield return new object [] { "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) };
-		yield return new object [] { "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) };
-		yield return new object [] { "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) };
-		yield return new object [] { "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) };
-	}
-
-	// TryParse
 	[Theory]
-	[MemberData (nameof (ConstructorStrings2))]
+	[MemberData (nameof (ValidStrings))]
 	public void Constructor_String_Valid (string keyString, Key expected)
 	{
 		Key key = new Key (keyString);
 		Assert.Equal (((Key)expected).ToString (), key.ToString ());
 	}
+
 
 	[Theory]
 	[InlineData ("Barf")]
