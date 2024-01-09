@@ -226,7 +226,7 @@ public partial class Toplevel : View {
 
 
 		// Default keybindings for this view
-		KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
+		KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
 		KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
 		KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
@@ -239,8 +239,8 @@ public partial class Toplevel : View {
 		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
 
 		KeyBindings.Add (KeyCode.F5, Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+		KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+		KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
 			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
