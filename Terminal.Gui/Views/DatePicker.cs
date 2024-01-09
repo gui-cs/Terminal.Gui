@@ -192,6 +192,9 @@ public class DatePicker : TextField {
 
 		_calendar.CellActivated += (sender, e) => {
 			var dayValue = _table.Rows [e.Row] [e.Col];
+			if (dayValue is { }) {
+				return;
+			}
 			int day = int.Parse (dayValue.ToString ());
 			ChangeDayDate (day);
 
