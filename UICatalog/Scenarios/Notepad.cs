@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Terminal.Gui;
 
@@ -339,7 +338,6 @@ namespace UICatalog.Scenarios {
 			public OpenedFile (TabView parent, string name, FileInfo file)
 				: base (name, CreateTextView (file))
 			{
-
 				File = file;
 				SavedText = View.Text;
 				RegisterTextViewEvents (parent);
@@ -355,9 +353,9 @@ namespace UICatalog.Scenarios {
 					var areDiff = this.UnsavedChanges;
 
 					if (areDiff) {
-						if (!this.Text.EndsWith ('*')) {
+						if (!Text.EndsWith ('*')) {
 
-							this.Text = this.Text + '*';
+							Text = Text + '*';
 							parent.SetNeedsDisplay ();
 						}
 					} else {
@@ -388,15 +386,21 @@ namespace UICatalog.Scenarios {
 					AllowsTab = false,
 				};
 			}
+
 			public OpenedFile CloneTo (TabView other)
 			{
 				var newTab = new OpenedFile (other, base.Text.ToString (), File);
 				other.AddTab (newTab, true);
 				return newTab;
 			}
+
 			internal void Save ()
 			{
 				var newText = View.Text;
+
+				if (File is null || string.IsNullOrWhiteSpace (File.FullName)) {
+					return;
+				}
 
 				System.IO.File.WriteAllText (File.FullName, newText);
 				SavedText = newText;
