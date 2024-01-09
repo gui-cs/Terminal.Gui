@@ -983,17 +983,39 @@ namespace Terminal.Gui.DialogTests {
 
 		[Fact]
 		[AutoInitShutdown]
-		public void KeyBindings_Esc_Cancels ()
+		public void KeyBindings_Esc_Closes ()
 		{
 			// test that Esc is bound to the Cancel command
+			var dlg = new Dialog ();
+			var dlgClosed = false;
+			dlg.Closed += (s, e) => {
+				dlgClosed = true;
+			};
+			
+			int iterations = 0;
+			Application.Iteration += (s, a) => {
+				dlg.NewKeyDownEvent (Key.Esc);
+
+				if (++iterations > 1) {
+					Assert.Fail ();
+				}
+			};
+			Application.Run (dlg);
+		}
+
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindings_Enter_No_Default_Button_NoOp ()
+		{
+			// test that Enter does nothing if there's no default button
 			var dlg = new Dialog ();
 			int iterations = 0;
 			Application.Iteration += (s, a) => {
 				if (++iterations > 1) {
-					Assert.Fail ();
 					Application.RequestStop ();
 				}
-				dlg.NewKeyDownEvent (Key.Esc);
+				dlg.NewKeyDownEvent (Key.Enter);
 			};
 			Application.Run (dlg);
 		}

@@ -79,6 +79,8 @@ public class Dialog : Window {
 			return false;
 		});
 
+
+		KeyBindings.Add (KeyCode.Esc, Command.QuitToplevel);
 		// This enables the default button to be activated by the Enter key.
 		KeyBindings.Add (KeyCode.Enter, Command.Accept);
 
@@ -240,17 +242,5 @@ public class Dialog : Window {
 			}
 			break;
 		}
-	}
-
-	// BUGBUG: Why is this not handled by a key binding???
-	///<inheritdoc/>
-	public override bool OnProcessKeyDown (Key a)
-	{
-		switch (a.KeyCode) {
-		case KeyCode.Esc:
-			Application.RequestStop (this);
-			return true;
-		}
-		return false;
 	}
 }
