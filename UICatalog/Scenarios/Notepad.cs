@@ -75,6 +75,7 @@ namespace UICatalog.Scenarios {
 		private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
 		{
 			lenStatusItem.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
+			e.NewTab?.View?.SetFocus ();
 		}
 
 		private void TabView_TabClicked (object sender, TabMouseEventArgs e)
