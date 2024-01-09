@@ -70,6 +70,18 @@ public class Dialog : Window {
 		Modal = true;
 		ButtonAlignment = DefaultButtonAlignment;
 
+		AddCommand (Command.Accept, () => {
+			// TODO: Perhaps all views should support the concept of being default?
+			if (Subviews.FirstOrDefault (v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
+				defaultBtn.InvokeCommand (Command.Accept);
+				return true;
+			}
+			return false;
+		});
+
+		// This enables the default button to be activated by the Enter key.
+		KeyBindings.Add (KeyCode.Enter, Command.Accept);
+
 		if (buttons != null) {
 			foreach (var b in buttons) {
 				AddButton (b);
@@ -104,6 +116,7 @@ public class Dialog : Window {
 		//button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
 		buttons.Add (button);
 		Add (button);
+
 		SetNeedsDisplay ();
 		if (IsInitialized) {
 			LayoutSubviews ();

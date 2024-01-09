@@ -921,7 +921,7 @@ namespace Terminal.Gui.DialogTests {
 		//		}
 
 		[Fact, AutoInitShutdown]
-		public void Dialog_In_Window_With_TexxtField_And_Button_AnchorEnd ()
+		public void Dialog_In_Window_With_TextField_And_Button_AnchorEnd ()
 		{
 			((FakeDriver)Application.Driver).SetBufferSize (20, 5);
 
@@ -979,6 +979,88 @@ namespace Terminal.Gui.DialogTests {
 				Application.Run (dlg);
 			};
 			Application.Run (win);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindings_Esc_Cancels ()
+		{
+			// test that Esc is bound to the Cancel command
+			var dlg = new Dialog ();
+			int iterations = 0;
+			Application.Iteration += (s, a) => {
+				if (++iterations > 1) {
+					Assert.Fail ();
+					Application.RequestStop ();
+				}
+				dlg.NewKeyDownEvent (Key.Esc);
+			};
+			Application.Run (dlg);
+		}
+
+		[Fact]
+		[AutoInitShutdown]
+		public void KeyBindings_Enter_Invokes_Default_Button ()
+		{
+			var dlg = new Dialog ();
+			var ok = new Button () {
+				Text = "Ok",
+				IsDefault = true
+			};
+
+			ok.Clicked += (s, e) => {
+				Application.RequestStop ();
+			};
+
+			dlg.AddButton (ok);
+			
+			int iterations = 0;
+			void JustButtonIteration (object sender, IterationEventArgs e)
+			{
+				if (++iterations > 1) {
+					Assert.Fail ();
+					Application.RequestStop ();
+				}
+				dlg.NewKeyDownEvent (Key.Enter);
+			}
+			
+			Application.Iteration += JustButtonIteration;
+			Application.Run (dlg);
+			Application.Iteration -= JustButtonIteration;
+
+			// Now try it without a default button being focused
+			dlg = new Dialog ();
+			ok = new Button () {
+				Text = "Ok",
+				IsDefault = true
+			};
+
+			ok.Clicked += (s, e) => {
+				Application.RequestStop ();
+			};
+			
+			dlg.AddButton (ok);
+
+			var tf = new TextField () {
+				Text = "text",
+			};
+
+			dlg.Add (tf);
+
+			iterations = 0;
+			void ButtonAndTextFieldIteration (object sender, IterationEventArgs e)
+			{
+				if (++iterations > 1) {
+					Assert.Fail ();
+					Application.RequestStop ();
+				}
+				tf.SetFocus ();
+				dlg.NewKeyDownEvent (Key.Enter);
+			}
+
+			Application.Iteration += ButtonAndTextFieldIteration;
+			Application.Run (dlg);
+			Application.Iteration -= JustButtonIteration;
 		}
 	}
 }

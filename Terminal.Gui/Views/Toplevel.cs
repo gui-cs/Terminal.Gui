@@ -223,15 +223,7 @@ public partial class Toplevel : View {
 			Application.Refresh ();
 			return true;
 		});
-		AddCommand (Command.Accept, () => {
-			// TODO: Perhaps all views should support the concept of being default?
-			// TODO: It's bad that Toplevel is tightly coupled with Button
-			if (Subviews.FirstOrDefault (v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
-				defaultBtn.InvokeCommand (Command.Accept);
-				return true;
-			}
-			return false;
-		});
+
 
 		// Default keybindings for this view
 		KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
@@ -257,8 +249,6 @@ public partial class Toplevel : View {
 			KeyBindings.Add (Key.I | Key.CtrlMask, Command.NextView); // Unix
 			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
 #endif
-		// This enables the default button to be activated by the Enter key.
-		KeyBindings.Add (KeyCode.Enter, Command.Accept);
 	}
 
 	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)

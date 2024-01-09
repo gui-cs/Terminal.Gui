@@ -122,8 +122,15 @@ public class Button : View {
 
 		// Override default behavior of View
 		// Command.Default sets focus
-		AddCommand (Command.Accept, () => { OnClicked (); return true; });
+		AddCommand (Command.Accept, () => AcceptKey ());
 		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
+		KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
+	}
+
+	bool AcceptKey ()
+	{
+		OnClicked ();
+		return true;
 	}
 
 	/// <summary>
@@ -166,14 +173,6 @@ public class Button : View {
 		}
 	}
 
-	bool AcceptKey ()
-	{
-		//if (!HasFocus) {
-		//	SetFocus ();
-		//}
-		OnClicked ();
-		return true;
-	}
 
 	/// <summary>
 	/// Virtual method to invoke the <see cref="Clicked"/> event.
