@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
@@ -37,7 +38,9 @@ public class KeyTests {
 	[InlineData ('!', (KeyCode)'!')]
 	[InlineData ('\r', KeyCode.Enter)]
 	[InlineData ('\t', KeyCode.Tab)]
+#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\r', (KeyCode)13)]
+#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\n', (KeyCode)10)]
 	[InlineData ('ó', (KeyCode)'ó')]
 	[InlineData ('Ó', (KeyCode)'Ó')]
@@ -54,50 +57,54 @@ public class KeyTests {
 		Assert.Equal (expectedKeyCode, key.KeyCode);
 	}
 
+	public static IEnumerable<object []> ConstructorStrings ()
+	{
+		yield return new object [] { "a", new Key (KeyCode.A) };
+		yield return new object [] { "Ctrl+A", new Key (KeyCode.A | KeyCode.CtrlMask) };
+		yield return new object [] { "Alt+A", new Key (KeyCode.A | KeyCode.AltMask) };
+		yield return new object [] { "Shift+A", new Key (KeyCode.A | KeyCode.ShiftMask) };
+		yield return new object [] { "A", new Key (KeyCode.A | KeyCode.ShiftMask) };
+		yield return new object [] { "â", new Key ((KeyCode)'â')};
+		yield return new object [] { "Shift+â", new Key ((KeyCode)'â' | KeyCode.ShiftMask) };
+		yield return new object [] { "Shift+Â", new Key ((KeyCode)'Â' | KeyCode.ShiftMask) };
+		yield return new object [] { "Ctrl+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp) };
+		yield return new object [] { "Ctrl+Alt+Shift+CursorUp", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) };
+		yield return new object [] { "ctrl+alt+shift+cursorup", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) };
+		yield return new object [] { "CTRL+ALT+SHIFT+CURSORUP", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp) };
+		yield return new object [] { "Ctrl+Alt+Shift+Delete", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete) };
+		yield return new object [] { "Ctrl+Alt+Shift+Enter", new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter) };
+		yield return new object [] { "Tab", new Key (KeyCode.Tab) };
+		yield return new object [] { "Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask) };
+		yield return new object [] { "Ctrl+Tab", new Key (KeyCode.Tab | KeyCode.CtrlMask) };
+		yield return new object [] { "Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask) };
+		yield return new object [] { "Ctrl+Shift+Tab", new Key (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask) };
+		yield return new object [] { "Ctrl+Alt+Tab", new Key (KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask) };
+		yield return new object [] { "", new Key (KeyCode.Null) };
+		yield return new object [] { " ", new Key (KeyCode.Space) };
+		yield return new object [] { "Space", new Key (KeyCode.Space) };
+		yield return new object [] { "Shift+Space", new Key (KeyCode.Space | KeyCode.ShiftMask) };
+		yield return new object [] { "Ctrl+Space", new Key (KeyCode.Space | KeyCode.CtrlMask) };
+		yield return new object [] { "Alt+Space", new Key (KeyCode.Space | KeyCode.AltMask) };
+		yield return new object [] { "Shift+ ", new Key (KeyCode.Space | KeyCode.ShiftMask) };
+		yield return new object [] { "Ctrl+ ", new Key (KeyCode.Space | KeyCode.CtrlMask) };
+		yield return new object [] { "Alt+ ", new Key (KeyCode.Space | KeyCode.AltMask) };
+		yield return new object [] { "F1", new Key (KeyCode.F1) };
+		yield return new object [] { "0", new Key (KeyCode.D0) };
+		yield return new object [] { "9", new Key (KeyCode.D9) };
+		yield return new object [] { "D0", new Key (KeyCode.D0) };
+		yield return new object [] { "65", new Key (KeyCode.A | KeyCode.ShiftMask) };
+		yield return new object [] { "97", new Key (KeyCode.A)};
+		yield return new object [] { "Shift", new Key (KeyCode.ShiftMask) };
+		yield return new object [] { "Ctrl", new Key (KeyCode.CtrlMask) };
+		yield return new object [] { "Ctrl-A", new Key (KeyCode.A | KeyCode.CtrlMask) };
+		yield return new object [] { "Alt-A", new Key (KeyCode.A | KeyCode.AltMask) };
+		yield return new object [] { "A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask) };
+		yield return new object [] { "Alt-A-Ctrl", new Key (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask) };
+	}
 
 	// TryParse
 	[Theory]
-	[InlineData ("a", KeyCode.A)]
-	[InlineData ("Ctrl+A", KeyCode.A | KeyCode.CtrlMask)]
-	[InlineData ("Alt+A", KeyCode.A | KeyCode.AltMask)]
-	[InlineData ("Shift+A", KeyCode.A | KeyCode.ShiftMask)]
-	[InlineData ("A", KeyCode.A | KeyCode.ShiftMask)]
-	[InlineData ("â", (KeyCode)'â')]
-	[InlineData ("Shift+â", (KeyCode)'â' | KeyCode.ShiftMask)]
-	[InlineData ("Shift+Â", (KeyCode)'Â' | KeyCode.ShiftMask)]
-	[InlineData ("Ctrl+Shift+CursorUp", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.CursorUp)]
-	[InlineData ("Ctrl+Alt+Shift+CursorUp", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
-	[InlineData ("ctrl+alt+shift+cursorup", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
-	[InlineData ("CTRL+ALT+SHIFT+CURSORUP", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.CursorUp)]
-	[InlineData ("Ctrl+Alt+Shift+Delete", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Delete)]
-	[InlineData ("Ctrl+Alt+Shift+Enter", KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Enter)]
-	[InlineData ("Tab", KeyCode.Tab)]
-	[InlineData ("Shift+Tab", KeyCode.Tab | KeyCode.ShiftMask)]
-	[InlineData ("Ctrl+Tab", KeyCode.Tab | KeyCode.CtrlMask)]
-	[InlineData ("Alt+Tab", KeyCode.Tab | KeyCode.AltMask)]
-	[InlineData ("Ctrl+Shift+Tab", KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask)]
-	[InlineData ("Ctrl+Alt+Tab", KeyCode.Tab | KeyCode.AltMask | KeyCode.CtrlMask)]
-	[InlineData ("", KeyCode.Null)]
-	[InlineData (" ", KeyCode.Space)]
-	[InlineData ("Space", KeyCode.Space)]
-	[InlineData ("Shift+Space", KeyCode.Space | KeyCode.ShiftMask)]
-	[InlineData ("Ctrl+Space", KeyCode.Space | KeyCode.CtrlMask)]
-	[InlineData ("Alt+Space", KeyCode.Space | KeyCode.AltMask)]
-	[InlineData ("Shift+ ", KeyCode.Space | KeyCode.ShiftMask)]
-	[InlineData ("Ctrl+ ", KeyCode.Space | KeyCode.CtrlMask)]
-	[InlineData ("Alt+ ", KeyCode.Space | KeyCode.AltMask)]
-	[InlineData ("F1", KeyCode.F1)]
-	[InlineData ("0", KeyCode.D0)]
-	[InlineData ("9", KeyCode.D9)]
-	[InlineData ("D0", KeyCode.D0)]
-	[InlineData ("65", KeyCode.A | KeyCode.ShiftMask)]
-	[InlineData ("97", KeyCode.A)]
-	[InlineData ("Shift", KeyCode.ShiftMask)]
-	[InlineData ("Ctrl", KeyCode.CtrlMask)]
-	[InlineData ("Ctrl-A", KeyCode.A | KeyCode.CtrlMask)]
-	[InlineData ("Alt-A", KeyCode.A | KeyCode.AltMask)]
-	[InlineData ("A-Ctrl", KeyCode.A | KeyCode.CtrlMask)]
-	[InlineData ("Alt-A-Ctrl", KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask)]
+	[MemberData (nameof (ConstructorStrings))]
 	public void Constructor_String_Valid (string keyString, Key expected)
 	{
 		Key key = new Key (keyString);
@@ -121,7 +128,9 @@ public class KeyTests {
 	[InlineData ('!', (KeyCode)'!')]
 	[InlineData ('\r', KeyCode.Enter)]
 	[InlineData ('\t', KeyCode.Tab)]
+#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\r', (KeyCode)13)]
+#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData ('\n', (KeyCode)10)]
 	[InlineData ('ó', (KeyCode)'ó')]
 	[InlineData ('Ó', (KeyCode)'Ó')]
@@ -262,7 +271,9 @@ public class KeyTests {
 	[InlineData (KeyCode.F1, '\0')]
 	[InlineData (KeyCode.ShiftMask | KeyCode.F1, '\0')]
 	[InlineData (KeyCode.CtrlMask | KeyCode.F1, '\0')]
+#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData (KeyCode.Enter, '\r')]
+#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
 	[InlineData (KeyCode.Tab, '\t')]
 	[InlineData (KeyCode.Esc, 0x1b)]
 	[InlineData (KeyCode.Space, ' ')]
@@ -421,9 +432,6 @@ public class KeyTests {
 	[InlineData (KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt")]
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask, "Ctrl+Alt+Shift")]
 #pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
-	[InlineData (KeyCode.AltMask, "Alt")]
-	[InlineData (KeyCode.CtrlMask, "Ctrl")]
-	[InlineData (KeyCode.ShiftMask, "Shift")]
 	[InlineData (KeyCode.CharMask, "CharMask")]
 	[InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
 	[InlineData ((KeyCode)'+', "+")]
