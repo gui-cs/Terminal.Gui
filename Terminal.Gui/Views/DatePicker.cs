@@ -79,8 +79,6 @@ public class DatePicker : TextField {
 
 	void SetInitialProperties (DateTime date)
 	{
-		// Set culture to polish
-		CultureInfo.CurrentCulture = new CultureInfo ("pl-PL");
 		Date = date;
 		_months = GetMonthNames ();
 	}
