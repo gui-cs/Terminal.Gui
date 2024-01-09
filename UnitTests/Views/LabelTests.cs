@@ -662,7 +662,7 @@ e
 				Width = Dim.Fill (),
 				Height = Dim.Percent (50f),
 				TextDirection = TextDirection.TopBottom_LeftRight,
-				ForceValidatePosDim = true
+				ValidatePosDim = true
 			};
 			Application.Top.Add (label);
 			Application.Begin (Application.Top);

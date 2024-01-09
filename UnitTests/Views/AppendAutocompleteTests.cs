@@ -26,7 +26,7 @@ public class AppendAutocompleteTests {
 		tf.PositionCursor ();
 		TestHelpers.AssertDriverContentsAre ("", output);
 
-		tf.NewKeyDownEvent ('f');
+		tf.NewKeyDownEvent (new ('f'));
 
 		tf.Draw ();
 		tf.PositionCursor ();

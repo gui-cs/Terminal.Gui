@@ -51,7 +51,9 @@ namespace Terminal.Gui {
 			set {
 				if (_boxWidth != value) {
 					_boxWidth = value;
-					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+					if (IsInitialized) {
+						Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+					}
 				}
 			}
 		}
@@ -65,7 +67,9 @@ namespace Terminal.Gui {
 			set {
 				if (_boxHeight != value) {
 					_boxHeight = value;
-					Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+					if (IsInitialized) {
+						Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+					}
 				}
 			}
 		}

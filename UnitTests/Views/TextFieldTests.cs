@@ -950,10 +950,10 @@ public class TextFieldTests {
 		Assert.Equal (15, tf.CursorPosition);
 		Assert.False (tf.ReadOnly);
 
-		Assert.True (tf.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.Delete)));
 		Assert.Equal ("This is a test.", tf.Text);
 		tf.CursorPosition = 0;
-		Assert.True (tf.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.Delete)));
 		Assert.Equal ("his is a test.", tf.Text);
 		tf.ReadOnly = true;
 		Assert.True (tf.NewKeyDownEvent (new (KeyCode.D | KeyCode.CtrlMask)));
@@ -1114,7 +1114,7 @@ public class TextFieldTests {
 		Assert.Equal ("is is a t", tf.Text);
 		Assert.Equal (9, tf.CursorPosition);
 		Assert.True (tf.Used);
-		Assert.True (tf.NewKeyDownEvent (new (KeyCode.InsertChar)));
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.Insert)));
 		Assert.Equal ("is is a t", tf.Text);
 		Assert.Equal (9, tf.CursorPosition);
 		Assert.False (tf.Used);
@@ -1137,7 +1137,7 @@ public class TextFieldTests {
 		Assert.Equal ("is is a", Clipboard.Contents);
 		tf.Text = "TAB to jump between text fields.";
 		Assert.Equal (0, tf.CursorPosition);
-		Assert.True (tf.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ("to jump between text fields.", tf.Text);
 		tf.CursorPosition = tf.Text.Length;
 		Assert.True (tf.NewKeyDownEvent (new (KeyCode.Backspace | KeyCode.CtrlMask)));
@@ -1212,7 +1212,7 @@ public class TextFieldTests {
 		tf.CursorPosition = 2;
 		Assert.Equal (1, tf.SelectedLength);
 		Assert.Equal ("1", tf.SelectedText);
-		Assert.True (tf.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.Delete)));
 		Assert.Equal ("-", newText);
 		Assert.Equal ("-1", oldText);
 		Assert.Equal ("-", tf.Text);

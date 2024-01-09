@@ -33,15 +33,20 @@ namespace Terminal.Gui;
 /// </remarks>
 public static partial class Application {
 	/// <summary>
-	/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="UseSystemConsole"/>.
+	/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.
 	/// </summary>
 	public static ConsoleDriver Driver { get; internal set; }
 
 	/// <summary>
-	/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
+	/// Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If
+	/// not specified, the driver is selected based on the platform.
 	/// </summary>
+	/// <remarks>
+	/// Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if
+	/// called with either `driver` or `driverName` specified.
+	/// </remarks>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-	public static bool UseSystemConsole { get; set; } = false;
+	public static string ForceDriver { get; set; } = string.Empty;
 
 	/// <summary>
 	/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorName"/>.
@@ -98,14 +103,13 @@ public static partial class Application {
 	/// </para>
 	/// <para>
 	/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function 
-	/// combines <see cref="Init(ConsoleDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+	/// combines <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
 	/// into a single call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> 
-	/// without explicitly calling <see cref="Init(ConsoleDriver)"/>.
+	/// without explicitly calling <see cref="Init(ConsoleDriver, string)"/>.
 	/// </para>
-	/// <param name="driver">
-	/// The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
-	/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
-	public static void Init (ConsoleDriver driver = null) => InternalInit (() => Toplevel.Create (), driver);
+	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+	/// <param name="driverName">The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (Toplevel.Create, driver, driverName);
 
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
@@ -119,7 +123,7 @@ public static partial class Application {
 	// Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
 	// 
 	// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
-	internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, bool calledViaRunT = false)
+	internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, string driverName = null, bool calledViaRunT = false)
 	{
 		if (_initialized && driver == null) {
 			return;
@@ -147,15 +151,28 @@ public static partial class Application {
 		Load (true);
 		Apply ();
 
-		Driver ??= Environment.OSVersion.Platform switch {
-			_ when _forceFakeConsole => new FakeDriver (), // for unit testing only
-			_ when UseSystemConsole => new NetDriver (),
-			PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows => new WindowsDriver (),
-			_ => new CursesDriver ()
-		};
+		// Ignore Configuration for ForceDriver if driverName is specified
+		if (!string.IsNullOrEmpty (driverName)) {
+			ForceDriver = driverName;
+		}
 
 		if (Driver == null) {
-			throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+			var p = Environment.OSVersion.Platform;
+			if (string.IsNullOrEmpty (ForceDriver)) {
+				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+					Driver = new WindowsDriver ();
+				} else {
+					Driver = new CursesDriver ();
+				}
+			} else {
+				var drivers = GetDriverTypes ();
+				var driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
+				if (driverType != null) {
+					Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+				} else {
+					throw new ArgumentException ($"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
+				}
+			}
 		}
 
 		try {
@@ -168,10 +185,10 @@ public static partial class Application {
 			throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 		}
 
-		Driver.SizeChanged += Driver_SizeChanged;
-		Driver.KeyDown += Driver_KeyDown;
-		Driver.KeyUp += Driver_KeyUp;
-		Driver.MouseEvent += Driver_MouseEvent;
+		Driver.SizeChanged += (s, args) => OnSizeChanging (args);
+		Driver.KeyDown += (s, args) => OnKeyDown (args);
+		Driver.KeyUp += (s, args) => OnKeyUp (args);
+		Driver.MouseEvent += (s, args) => OnMouseEvent (args);
 
 		SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
@@ -190,12 +207,29 @@ public static partial class Application {
 
 	static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
+	/// <summary>
+	/// Gets of list of <see cref="ConsoleDriver"/> types that are available.
+	/// </summary>
+	/// <returns></returns>
+	public static List<Type> GetDriverTypes ()
+	{
+		// use reflection to get the list of drivers
+		var driverTypes = new List<Type> ();
+		foreach (var asm in AppDomain.CurrentDomain.GetAssemblies ()) {
+			foreach (var type in asm.GetTypes ()) {
+				if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
+					driverTypes.Add (type);
+				}
+			}
+		}
+		return driverTypes;
+	}
 
 	/// <summary>
-	/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>.
+	/// Shutdown an application initialized with <see cref="Init"/>.
 	/// </summary>
 	/// <remarks>
-	/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
+	/// Shutdown must be called for every call to <see cref="Init"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
 	/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
 	/// </remarks>
 	public static void Shutdown ()
@@ -317,6 +351,8 @@ public static partial class Application {
 			} else if (Top != null && Toplevel != Top && _topLevels.Contains (Top)) {
 				Top.OnLeave (Toplevel);
 			}
+			// BUGBUG: We should not depend on `Id` internally. 
+			// BUGBUG: It is super unclear what this code does anyway.
 			if (string.IsNullOrEmpty (Toplevel.Id)) {
 				int count = 1;
 				string id = (_topLevels.Count + count).ToString ();
@@ -392,7 +428,7 @@ public static partial class Application {
 	/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
 	/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 	/// <para>
-	/// Calling <see cref="Init(ConsoleDriver)"/> first is not needed as this function will initialize the application.
+	/// Calling <see cref="Init"/> first is not needed as this function will initialize the application.
 	/// </para>
 	/// <para>
 	/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
@@ -405,7 +441,7 @@ public static partial class Application {
 	/// <param name="errorHandler"></param>
 	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
-	/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver)"/> has already been called. 
+	/// Must be <see langword="null"/> if <see cref="Init"/> has already been called. 
 	/// </param>
 	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
 	{
@@ -427,7 +463,7 @@ public static partial class Application {
 			}
 		} else {
 			// Init() has NOT been called.
-			InternalInit (() => new T (), driver, true);
+			InternalInit (() => new T (), driver, null, true);
 			Run (Top, errorHandler);
 		}
 	}
@@ -638,7 +674,7 @@ public static partial class Application {
 	/// it will be set to <see langword="false"/> if at least one iteration happened.</param>
 	public static void RunIteration (ref RunState state, ref bool firstIteration)
 	{
-		if (MainLoop.EventsPending () && MainLoop.Running) {
+		if (MainLoop.Running && MainLoop.EventsPending ()) {
 			// Notify Toplevel it's ready
 			if (firstIteration) {
 				state.Toplevel.OnReady ();
@@ -836,7 +872,12 @@ public static partial class Application {
 	#endregion Run (Begin, Run, End)
 
 	#region Toplevel handling
-	static readonly Stack<Toplevel> _topLevels = new ();
+	/// <summary>
+	/// Holds the stack of TopLevel views.
+	/// </summary>
+	// BUGBUG: Techncally, this is not the full lst of TopLevels. THere be dragons hwre. E.g. see how Toplevel.Id is used. What
+	// about TopLevels that are just a SubView of another View?
+	static readonly Stack<Toplevel> _topLevels = new Stack<Toplevel> ();
 
 	/// <summary>
 	/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -1288,7 +1329,7 @@ public static partial class Application {
 	#endregion Mouse handling
 
 	#region Keyboard handling
-	static Key _alternateForwardKey = new (KeyCode.PageDown | KeyCode.CtrlMask);
+	static Key _alternateForwardKey = new Key (KeyCode.PageDown | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
@@ -1312,7 +1353,7 @@ public static partial class Application {
 		}
 	}
 
-	static Key _alternateBackwardKey = new (KeyCode.PageUp | KeyCode.CtrlMask);
+	static Key _alternateBackwardKey = new Key (KeyCode.PageUp | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
@@ -1336,7 +1377,7 @@ public static partial class Application {
 		}
 	}
 
-	static Key _quitKey = new (KeyCode.Q | KeyCode.CtrlMask);
+	static Key _quitKey = new Key (KeyCode.Q | KeyCode.CtrlMask);
 
 	/// <summary>
 	/// Gets or sets the key to quit the application.
@@ -1473,8 +1514,8 @@ public static partial class Application {
 	}
 	#endregion Keyboard handling
 }
-
 /// <summary>
 /// Event arguments for the <see cref="Application.Iteration"/> event.
 /// </summary>
-public class IterationEventArgs { }
+public class IterationEventArgs {
+}
