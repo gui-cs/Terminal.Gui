@@ -242,13 +242,7 @@ public class DatePicker : TextField {
 	private DataTable CreateDataTable (int month, int year)
 	{
 		_table = new DataTable ();
-		_table.Columns.Add ("Su");
-		_table.Columns.Add ("Mo");
-		_table.Columns.Add ("Tu");
-		_table.Columns.Add ("We");
-		_table.Columns.Add ("Th");
-		_table.Columns.Add ("Fr");
-		_table.Columns.Add ("Sa");
+		GenerateCalendarLabels ();
 		int amountOfDaysInMonth = GetAmountOfDaysInMonth (month, year);
 		DateTime dateValue = new DateTime (year, month, 1);
 		var dayOfWeek = dateValue.DayOfWeek;
@@ -263,6 +257,13 @@ public class DatePicker : TextField {
 		}
 
 		return _table;
+	}
+
+	private void GenerateCalendarLabels ()
+	{
+		for (int i = 0; i < 7; i++) {
+			_table.Columns.Add (CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i));
+		}
 	}
 
 	private void SelectDayOnCalendar (int day)
