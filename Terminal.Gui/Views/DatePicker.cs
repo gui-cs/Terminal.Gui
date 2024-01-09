@@ -79,8 +79,10 @@ public class DatePicker : TextField {
 
 	void SetInitialProperties (DateTime date)
 	{
+		// Set culture to polish
+		CultureInfo.CurrentCulture = new CultureInfo ("pl-PL");
 		Date = date;
-		_months = Enum.GetValues (typeof (Month)).Cast<Month> ().Select (x => x.ToString ()).ToList ();
+		_months = GetMonthNames ();
 	}
 
 	private void ShowDatePickerDialog ()
@@ -224,9 +226,17 @@ public class DatePicker : TextField {
 
 	private void ChangeMonthDate (object sender, ListViewItemEventArgs e)
 	{
-		if (e.Value is not null && Enum.TryParse (e.Value.ToString (), out Month month)) {
-			int monthNumber = (int)month;
-			_date = new DateTime (_date.Year, monthNumber, _date.Day);
+		bool isValueNotNull = e.Value is not null;
+		bool isParsingSuccessful = DateTime.TryParseExact (
+		    e.Value.ToString (),
+		    "MMMM",
+		    CultureInfo.CurrentCulture,
+		    DateTimeStyles.None,
+		    out DateTime parsedMonth
+		);
+
+		if (isValueNotNull && isParsingSuccessful) {
+			_date = new DateTime (_date.Year, parsedMonth.Month, _date.Day);
 			CreateCalendar ();
 		} else {
 			_comboBoxMonth.SelectedItem = _date.Month - 1;
@@ -308,19 +318,13 @@ public class DatePicker : TextField {
 		return false;
 	}
 
-	enum Month {
-		January = 1,
-		February = 2,
-		March = 3,
-		April = 4,
-		May = 5,
-		June = 6,
-		July = 7,
-		August = 8,
-		September = 9,
-		October = 10,
-		November = 11,
-		December = 12
-	}
+	static List<string> GetMonthNames ()
+	{
+		CultureInfo culture = CultureInfo.CurrentCulture;
+		var monthNames = Enumerable.Range (1, 12)
+					   .Select (month => new DateTime (1, month, 1).ToString ("MMMM", culture))
+					   .ToList ();
 
+		return monthNames;
+	}
 }
