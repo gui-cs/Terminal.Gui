@@ -139,6 +139,9 @@ public class ResponderTests {
 	[Fact]
 	public void Responder_Not_Notifying_Dispose ()
 	{
+		// Only clear before because need to test after assert
+		Responder.Instances.Clear ();
+
 		var container1 = new View () { Id = "Container1" };
 
 		var view = new View () { Id = "View" };
@@ -175,6 +178,9 @@ public class ResponderTests {
 	[Fact]
 	public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
 	{
+		// Only clear before because need to test after assert
+		Responder.Instances.Clear ();
+
 		var container1 = new View () { Id = "Container1" };
 
 		var view = new View () { Id = "View" };
@@ -212,6 +218,9 @@ public class ResponderTests {
 	[Fact]
 	public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
 	{
+		// Only clear before because need to test after assert
+		Responder.Instances.Clear ();
+
 		var container1 = new View () { Id = "Container1" };
 		var count = 0;
 

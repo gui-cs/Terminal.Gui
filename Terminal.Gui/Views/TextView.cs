@@ -3026,14 +3026,14 @@ public class TextView : View {
 	public void InsertText (string toAdd)
 	{
 		foreach (char ch in toAdd) {
-			KeyCode key;
+			Key key;
 			try {
-				key = (KeyCode)ch;
+				key = new Key(ch);
 			} catch (Exception) {
 				throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
 			}
 
-			InsertText (new Key (key));
+			InsertText (key);
 
 			if (NeedsDisplay) {
 				Adjust ();
