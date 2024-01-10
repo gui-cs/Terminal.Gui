@@ -120,12 +120,12 @@ public class Button : View {
 
 		OnResizeNeeded ();
 
-		// Override default behavior of View
-		// Command.Default sets focus
+		// Override default behavior of View - Command.Default sets focus
 		AddCommand (Command.Accept, () => { OnClicked (); return true; });
 		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
+		KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
 	}
-
+	
 	/// <summary>
 	/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
 	/// </summary>
@@ -166,14 +166,6 @@ public class Button : View {
 		}
 	}
 
-	bool AcceptKey ()
-	{
-		//if (!HasFocus) {
-		//	SetFocus ();
-		//}
-		OnClicked ();
-		return true;
-	}
 
 	/// <summary>
 	/// Virtual method to invoke the <see cref="Clicked"/> event.

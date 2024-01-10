@@ -223,42 +223,32 @@ public partial class Toplevel : View {
 			Application.Refresh ();
 			return true;
 		});
-		AddCommand (Command.Accept, () => {
-			// TODO: Perhaps all views should support the concept of being default?
-			// TODO: It's bad that Toplevel is tightly coupled with Button
-			if (Subviews.FirstOrDefault (v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
-				defaultBtn.InvokeCommand (Command.Accept);
-				return true;
-			}
-			return false;
-		});
+
 
 		// Default keybindings for this view
-		KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
+		KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
-		KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorLeft, Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
+		KeyBindings.Add (Key.CursorRight, Command.NextView);
+		KeyBindings.Add (Key.CursorDown, Command.NextView);
+		KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
+		KeyBindings.Add (Key.CursorUp, Command.PreviousView);
 
-		KeyBindings.Add (KeyCode.Tab, Command.NextView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.PreviousView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextViewOrTop);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
+		KeyBindings.Add (Key.Tab, Command.NextView);
+		KeyBindings.Add (Key.Tab.WithShift, Command.PreviousView);
+		KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
+		KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
 
-		KeyBindings.Add (KeyCode.F5, Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+		KeyBindings.Add (Key.F5, Command.Refresh);
+		KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+		KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
-			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
-			KeyBindings.Add (Key.L | Key.CtrlMask, Command.Refresh);// Unix
-			KeyBindings.Add (Key.F | Key.CtrlMask, Command.NextView);// Unix
-			KeyBindings.Add (Key.I | Key.CtrlMask, Command.NextView); // Unix
-			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
+			KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+			KeyBindings.Add (Key.L.WithCtrl, Command.Refresh);// Unix
+			KeyBindings.Add (Key.F.WithCtrl, Command.NextView);// Unix
+			KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
+			KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView);// Unix
 #endif
-		// This enables the default button to be activated by the Enter key.
-		KeyBindings.Add (KeyCode.Enter, Command.Accept);
 	}
 
 	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
@@ -286,7 +276,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		AlternateForwardKeyChanged?.Invoke (this, e);
 	}
 
@@ -301,7 +291,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		AlternateBackwardKeyChanged?.Invoke (this, e);
 	}
 
@@ -316,7 +306,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
 
