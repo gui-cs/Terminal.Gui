@@ -107,12 +107,21 @@ public class KeyBindings {
 	/// rebound <paramref name="commands"/>.</para>
 	/// </summary>
 	/// <remarks>
-	/// Commands are only ever applied to the current <see cref="View"/> (i.e. this feature
-	/// cannot be used to switch focus to another view and perform multiple commands there).
+	/// <para>
+	/// If <paramref name="scope"/> is <see cref="KeyBindingScope.Focused"/> the command is only applied to the current <see cref="View"/>, and
+	/// only if it is focused.
+	/// </para>
+	/// <para>
+	/// If <paramref name="scope"/> is <see cref="KeyBindingScope.HotKey"/> the command is applied to the <see cref="View.SuperView"/>, and
+	/// only if it is focused.
+	/// The key bindings defined by <see cref="View.SuperView"/> are used; the <paramref name="key"/> parameter is ignored for this scope.
+	/// </para>
+	/// <para>
+	/// If <paramref name="scope"/> is <see cref="KeyBindingScope.Application"/> the command is applied to <see cref="Application.Top"/>.
+	/// The key bindings defined by <see cref="Application.Top"/> are used; the <paramref name="key"/> parameter is ignored for this scope.
+	/// </para>
 	/// </remarks>
-	/// <param name="key">
-	/// The key to check.
-	/// </param>
+	/// <param name="key">The key to add a binding for.</param>
 	/// <param name="scope">The scope for the command.</param>
 	/// <param name="commands">The command to invoked on the <see cref="View"/> when <paramref name="key"/> is pressed.
 	/// When multiple commands are provided,they will be applied in sequence. The bound <paramref name="key"/> strike
@@ -195,7 +204,11 @@ public class KeyBindings {
 	public bool TryGet (Key key, out KeyBinding binding)
 	{
 		if (key.IsValid) {
-			return Bindings.TryGetValue (key, out binding);
+			// Use linq to search Bindings for key, ignoring Key.Scope
+			binding = Bindings.FirstOrDefault (x => x.Key.KeyCode == key.KeyCode).Value;
+			if (binding != null) {
+				return true;
+			}
 		}
 		binding = new KeyBinding (Array.Empty<Command> (), KeyBindingScope.Focused);
 		return false;

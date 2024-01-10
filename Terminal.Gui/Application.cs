@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Reflection;
 using System.IO;
 using System.Text.Json.Serialization;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Terminal.Gui;
 
@@ -443,7 +444,7 @@ public static partial class Application {
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
 	/// Must be <see langword="null"/> if <see cref="Init"/> has already been called. 
 	/// </param>
-	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
+	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new()
 	{
 		if (_initialized) {
 			if (Driver != null) {
@@ -1334,7 +1335,8 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
@@ -1358,7 +1360,8 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
@@ -1382,7 +1385,8 @@ public static partial class Application {
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key QuitKey {
 		get => _quitKey;
 		set {
@@ -1450,19 +1454,50 @@ public static partial class Application {
 		}
 
 		// Invoke any Global KeyBindings
-		foreach (var topLevel in _topLevels.ToList ()) {
-			foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _))) {
-				if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _)) {
-					keyEvent.Scope = KeyBindingScope.Application;
+		// In the most efficient way possible, recursively search the subviews of the views in _topLevels
+		// for KeyBindings that match the keyEvent (with KeyBindingScope.Application).
+		// If a matching KeyBinding is found, invoke it and return true.
+		bool InvokeApplicationKeyBindings (List<View> views, Key key)
+		{
+			foreach (var view in views) {
+				if (view.KeyBindings.TryGet (key.KeyCode, KeyBindingScope.Application, out var binding)) {
+					// Give the view that bound the key a chance
 					bool? handled = view.OnInvokingKeyBindings (keyEvent);
 					if (handled != null && (bool)handled) {
 						return true;
 					}
+					// If the view that bound the key didn't handle it, invoke the command
+					// on Application.Top
+					handled = Application.Top.InvokeCommands (binding.Commands);
+					if (handled != null && (bool)handled) {
+						return true;
+					}
+				}
+
+				if (InvokeApplicationKeyBindings (view.Subviews.ToList (), key)) {
+					return true;
 				}
 			}
+
+			return false;
 		}
 
-		return false;
+		return InvokeApplicationKeyBindings (_topLevels.Cast<View> ().ToList (), keyEvent);
+
+
+		//foreach (var topLevel in _topLevels.ToList ()) {
+		//	foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _))) {
+		//		if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _)) {
+		//			keyEvent.Scope = KeyBindingScope.Application;
+		//			bool? handled = view.OnInvokingKeyBindings (keyEvent);
+		//			if (handled != null && (bool)handled) {
+		//				return true;
+		//			}
+		//		}
+		//	}
+		//}
+
+		//return false;
 	}
 
 	/// <summary>

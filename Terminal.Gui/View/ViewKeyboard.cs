@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -557,7 +558,11 @@ public partial class View {
 	{
 		// fire event
 		// BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
-		if (keyEvent.Scope == KeyBindingScope.Application || keyEvent.Scope == KeyBindingScope.HotKey) {
+		if (keyEvent.Scope == KeyBindingScope.Application) {
+			Application.Top.InvokeKeyBindings (keyEvent);
+		} 
+		
+		if (keyEvent.Scope == KeyBindingScope.HotKey) {
 			InvokingKeyBindings?.Invoke (this, keyEvent);
 			if (keyEvent.Handled) {
 				return true;
@@ -600,28 +605,31 @@ public partial class View {
 
 	/// <summary>
 	/// Invokes any binding that is registered on this <see cref="View"/>
-	/// and matches the <paramref name="keyEvent"/>
+	/// and matches the <paramref name="key"/>
 	/// <para>
 	/// See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see>
 	/// </para>
 	/// </summary>
-	/// <param name="keyEvent">The key event passed.</param>
+	/// <param name="key">The key event passed.</param>
 	/// <returns>
-	/// <see langword="null"/> if no command was bound the <paramref name="keyEvent"/>.
+	/// <see langword="null"/> if no command was bound the <paramref name="key"/>.
 	/// <see langword="true"/> if commands were invoked and at least one handled the command.
 	/// <see langword="false"/> if commands were invoked and at none handled the command.
-	/// </returns>	
-	protected bool? InvokeKeyBindings (Key keyEvent)
+	/// </returns>
+	/// <exception cref="NotSupportedException">Thrown if no command is bound to <paramref name="key"/></exception>
+	protected bool? InvokeKeyBindings (Key key)
 	{
 		bool? toReturn = null;
-		var key = keyEvent.KeyCode;
-		if (!KeyBindings.TryGet (key, out var binding)) {
+		var keyCode = key.KeyCode; // strip off scope
+		if (!KeyBindings.TryGet (keyCode, out var binding)) {
+			//throw new NotSupportedException (@$"{GetType ().Name} has no command bound to {key}");
+			//Debug.WriteLine (@$"WARNING: {GetType ().Name} has no command bound to {key}.");
 			return null;
 		}
 		foreach (var command in binding.Commands) {
 
-			if (!CommandImplementations.ContainsKey (command)) {
-				throw new NotSupportedException (@$"A KeyBinding was set up for the command {command} ({keyEvent.KeyCode}) but that command is not supported by this View ({GetType ().Name})");
+			if (key.Scope == KeyBindingScope.Focused && !CommandImplementations.ContainsKey (command)) {
+				throw new NotSupportedException (@$"{key.KeyCode} is bound to {command}, but that command is not supported by ({GetType ().Name}).");
 			}
 
 			// each command has its own return value
@@ -640,6 +648,37 @@ public partial class View {
 	}
 
 	/// <summary>
+	/// Invokes the specified commands.
+	/// </summary>
+	/// <param name="commands"></param>
+	/// <returns>
+	/// <see langword="null"/> if no command was found.
+	/// <see langword="true"/> if the command was invoked and it handled the command.
+	/// <see langword="false"/> if the command was invoked and it did not handle the command.
+	/// </returns>		
+	public bool? InvokeCommands (Command[] commands)
+	{
+		bool? toReturn = null;
+		foreach (var command in commands) {
+			if (!CommandImplementations.ContainsKey (command)) {
+				throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
+			}
+
+			// each command has its own return value
+			var thisReturn = InvokeCommand (command);
+
+			// if we haven't got anything yet, the current command result should be used
+			toReturn ??= thisReturn;
+
+			// if ever see a true then that's what we will return
+			if (thisReturn ?? false) {
+				toReturn = true;
+			}
+		}
+		return toReturn;
+	}
+	
+	/// <summary>
 	/// Invokes the specified command.
 	/// </summary>
 	/// <param name="command"></param>
@@ -651,6 +690,7 @@ public partial class View {
 	public bool? InvokeCommand (Command command)
 	{
 		if (!CommandImplementations.ContainsKey (command)) {
+			throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
 			return null;
 		}
 		return CommandImplementations [command] ();

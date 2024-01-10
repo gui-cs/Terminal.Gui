@@ -63,6 +63,8 @@ class UICatalogApp {
 		/* etc. */
 	}
 
+	static Options _options;
+
 	static int Main (string [] args)
 	{
 		Console.OutputEncoding = Encoding.Default;
@@ -101,21 +103,13 @@ class UICatalogApp {
 				Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
 				/* etc. */
 			};
-			context.ExitCode = CommandWrapper (options);
+			// See https://github.com/dotnet/command-line-api/issues/796 for the rationale behind this hackery
+			_options = options; ;
 		});
 
-		return rootCommand.Invoke (args);
-	}
+		rootCommand.Invoke (args);
 
-	// See https://github.com/dotnet/command-line-api/issues/796 for the rationale behind this hackery
-	static int CommandWrapper (Options options)
-	{
-		try {
-			UICatalogMain (options);
-		} catch (Exception e) {
-			Console.WriteLine (e.ToString());
-			return 1;
-		}
+		UICatalogMain (_options);
 		return 0;
 	}
 
@@ -834,6 +828,7 @@ class UICatalogApp {
 		// 'app' closed cleanly.
 		foreach (var inst in Responder.Instances) {
 
+			
 			Debug.Assert (inst.WasDisposed);
 		}
 		Responder.Instances.Clear ();
