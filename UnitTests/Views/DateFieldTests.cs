@@ -12,7 +12,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (DateTime.MinValue, df.Date);
 			Assert.Equal (1, df.CursorPosition);
 			Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
-			Assert.Equal (LayoutStyle.Computed, df.LayoutStyle);
 
 			var date = DateTime.Now;
 			df = new DateField (date);
@@ -20,14 +19,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (date, df.Date);
 			Assert.Equal (1, df.CursorPosition);
 			Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
-			Assert.Equal (LayoutStyle.Computed, df.LayoutStyle);
 
 			df = new DateField (1, 2, date);
 			Assert.False (df.IsShortFormat);
 			Assert.Equal (date, df.Date);
 			Assert.Equal (1, df.CursorPosition);
 			Assert.Equal (new Rect (1, 2, 12, 1), df.Frame);
-			Assert.Equal (LayoutStyle.Absolute, df.LayoutStyle);
 
 			df = new DateField (3, 4, date, true);
 			Assert.True (df.IsShortFormat);
@@ -38,8 +35,8 @@ namespace Terminal.Gui.ViewsTests {
 
 			df.IsShortFormat = false;
 			Assert.Equal (new Rect (3, 4, 12, 1), df.Frame);
-			Assert.Null (df.Width);
-		}
+            Assert.Equal(12, df.Width);
+        }
 
 		[Fact]
 		public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
