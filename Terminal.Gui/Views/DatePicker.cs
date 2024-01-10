@@ -28,11 +28,6 @@ public class DatePicker : TextField {
 	private List<string> _years = new ();
 
 	private readonly int comboBoxHeight = 4;
-	private readonly int comboBoxWidth = 12;
-	private readonly int buttonWidth = 12;
-	private readonly int calendarWidth = 22;
-	private readonly int dialogHeight = 14;
-	private readonly int dialogWidth = 40;
 
 	/// <summary>
 	/// Format of date. The default is MM/dd/yyyy.
@@ -98,22 +93,20 @@ public class DatePicker : TextField {
 			Title = Strings.dpTitle,
 			X = Pos.Center (),
 			Y = Pos.Center (),
-			Height = dialogHeight,
-			Width = dialogWidth,
+			Width = Dim.Percent (50),
+			Height = Dim.Percent (50),
 		};
 
 		_calendar = new TableView () {
 			X = 0,
-			Y = Pos.Center () + 1,
-			Width = calendarWidth,
+			Y = 0,
+			Width = Dim.Fill (1),
 			Height = Dim.Fill (1),
 			Style = new TableStyle {
 				ShowHeaders = true,
-				ShowHorizontalHeaderOverline = true,
-				ShowHorizontalHeaderUnderline = true,
 				ShowHorizontalBottomline = true,
 				ShowVerticalCellLines = true,
-				ExpandLastColumn = false,
+				ExpandLastColumn = true,
 			}
 		};
 
@@ -122,13 +115,15 @@ public class DatePicker : TextField {
 			Y = 1,
 			Height = 1,
 		};
+
 		_comboBoxYear = new ComboBox (_years) {
 			X = Pos.Right (_calendar) + 1,
 			Y = Pos.Bottom (yearsLabel),
-			Width = comboBoxWidth,
+			Width = Dim.Fill (),
 			Height = comboBoxHeight,
 			SelectedItem = _years.IndexOf (_date.Year.ToString ())
 		};
+
 		_comboBoxYear.SelectedItemChanged += ChangeYearDate;
 
 		var monthsLabel = new Label ("Month:") {
@@ -140,7 +135,7 @@ public class DatePicker : TextField {
 		_comboBoxMonth = new ComboBox (_months) {
 			X = Pos.Right (_calendar) + 1,
 			Y = Pos.Bottom (monthsLabel),
-			Width = comboBoxWidth,
+			Width = Dim.Fill (),
 			Height = comboBoxHeight,
 			SelectedItem = _date.Month - 1
 		};
@@ -149,7 +144,7 @@ public class DatePicker : TextField {
 		var previousMonthButton = new Button ("Previous") {
 			X = 0,
 			Y = Pos.Bottom (_calendar),
-			Width = buttonWidth,
+			Width = (int)(CalculateCalendarWidth () * 0.8),
 			Height = 1,
 		};
 
@@ -167,7 +162,7 @@ public class DatePicker : TextField {
 		var nextMonthButton = new Button ("Next") {
 			X = Pos.Right (previousMonthButton),
 			Y = Pos.Bottom (_calendar),
-			Width = buttonWidth,
+			Width = (int)(CalculateCalendarWidth () * 0.8),
 			Height = 1,
 		};
 
@@ -182,17 +177,20 @@ public class DatePicker : TextField {
 			}
 		};
 
+
 		dialog.Add (_calendar,
 			yearsLabel, _comboBoxYear,
-			monthsLabel, _comboBoxMonth,
-			previousMonthButton, nextMonthButton);
+			monthsLabel, _comboBoxMonth);
+
+		dialog.AddButton (previousMonthButton);
+		dialog.AddButton (nextMonthButton);
 
 		CreateCalendar ();
 		SelectDayOnCalendar (_date.Day);
 
 		_calendar.CellActivated += (sender, e) => {
 			var dayValue = _table.Rows [e.Row] [e.Col];
-			if (dayValue is { }) {
+			if (dayValue is null) {
 				return;
 			}
 			int day = int.Parse (dayValue.ToString ());
@@ -272,10 +270,24 @@ public class DatePicker : TextField {
 
 	private void GenerateCalendarLabels ()
 	{
+		_calendar.Style.ColumnStyles.Clear ();
 		for (int i = 0; i < 7; i++) {
-			_table.Columns.Add (CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i));
+			var abbreviatedDayName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i);
+			_calendar.Style.ColumnStyles.Add (i, new ColumnStyle () {
+				MaxWidth = abbreviatedDayName.Length,
+				MinWidth = abbreviatedDayName.Length,
+				MinAcceptableWidth = abbreviatedDayName.Length
+			});
+			_table.Columns.Add (abbreviatedDayName);
 		}
+		_calendar.Width = CalculateCalendarWidth ();
 	}
+
+	private int CalculateCalendarWidth ()
+	{
+		return _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7;
+	}
+
 
 	private void SelectDayOnCalendar (int day)
 	{
@@ -308,11 +320,7 @@ public class DatePicker : TextField {
 	{
 		if (me.X == Bounds.Right - 1 && me.Y == Bounds.Top && me.Flags == MouseFlags.Button1Pressed) {
 
-			try {
-				ShowDatePickerDialog ();
-			} catch (Exception e) {
-				MessageBox.ErrorQuery ("Error", $"Uppsss: {e}", "Ok");
-			}
+			ShowDatePickerDialog ();
 			return true;
 		}
 
