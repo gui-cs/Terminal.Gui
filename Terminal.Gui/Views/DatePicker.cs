@@ -84,11 +84,6 @@ public class DatePicker : TextField {
 			.Select (x => x.ToString ())
 			.ToList ();
 
-		if (_date.Year < YearsRange.Start.Value || _date.Year > YearsRange.End.Value) {
-			MessageBox.ErrorQuery ("Error", "Date year is out of range", "Ok");
-			return;
-		}
-
 		var dialog = new Dialog () {
 			Title = Strings.dpTitle,
 			X = Pos.Center (),
@@ -124,6 +119,10 @@ public class DatePicker : TextField {
 			SelectedItem = _years.IndexOf (_date.Year.ToString ())
 		};
 
+		if (_comboBoxYear.SelectedItem == -1) {
+			_comboBoxYear.SearchText = Date.Year.ToString ();
+		}
+
 		_comboBoxYear.SelectedItemChanged += ChangeYearDate;
 
 		var monthsLabel = new Label ("Month:") {
@@ -144,7 +143,6 @@ public class DatePicker : TextField {
 		var previousMonthButton = new Button ("Previous") {
 			X = 0,
 			Y = Pos.Bottom (_calendar),
-			Width = (int)(CalculateCalendarWidth () * 0.8),
 			Height = 1,
 		};
 
@@ -152,7 +150,11 @@ public class DatePicker : TextField {
 			Date = _date.AddMonths (-1);
 			CreateCalendar ();
 			if (_comboBoxMonth.SelectedItem == 0) {
-				_comboBoxYear.SelectedItem--;
+				if (_comboBoxYear.SelectedItem == 0) {
+					_comboBoxYear.SearchText = Date.Year.ToString ();
+				} else {
+					_comboBoxYear.SelectedItem--;
+				}
 				_comboBoxMonth.SelectedItem = 11;
 			} else {
 				_comboBoxMonth.SelectedItem = _date.Month - 1;
@@ -162,7 +164,6 @@ public class DatePicker : TextField {
 		var nextMonthButton = new Button ("Next") {
 			X = Pos.Right (previousMonthButton),
 			Y = Pos.Bottom (_calendar),
-			Width = (int)(CalculateCalendarWidth () * 0.8),
 			Height = 1,
 		};
 
@@ -170,7 +171,11 @@ public class DatePicker : TextField {
 			Date = _date.AddMonths (1);
 			CreateCalendar ();
 			if (_comboBoxMonth.SelectedItem == 11) {
-				_comboBoxYear.SelectedItem++;
+				if (_comboBoxYear.SelectedItem == _years.Count - 1) {
+					_comboBoxYear.SearchText = Date.Year.ToString ();
+				} else {
+					_comboBoxYear.SelectedItem++;
+				}
 				_comboBoxMonth.SelectedItem = 0;
 			} else {
 				_comboBoxMonth.SelectedItem = _date.Month - 1;
@@ -197,11 +202,7 @@ public class DatePicker : TextField {
 			ChangeDayDate (day);
 
 			SelectDayOnCalendar (day);
-			try {
-				Text = _date.ToString (Format);
-			} catch (Exception) {
-				MessageBox.ErrorQuery ("Error", "Invalid date format", "Ok");
-			}
+			Text = _date.ToString (Format);
 			Application.RequestStop ();
 		};
 
@@ -287,7 +288,6 @@ public class DatePicker : TextField {
 	{
 		return _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7;
 	}
-
 
 	private void SelectDayOnCalendar (int day)
 	{
