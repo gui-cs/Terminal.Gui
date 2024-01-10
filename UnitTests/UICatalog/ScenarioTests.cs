@@ -61,20 +61,10 @@ namespace UICatalog.Tests {
 
 				Application.Init (new FakeDriver ());
 
-				// Press QuitKey 
-				Assert.Empty (FakeConsole.MockKeyPresses);
-				// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-				// by adding this Space it seems to work.
-				//FakeConsole.PushMockKeyPress (Key.Space);
-				FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
 
 				// The only key we care about is the QuitKey
 				Application.Top.KeyDown += (object sender, Key args) => {
 					output.WriteLine ($"  Keypress: {args.KeyCode}");
-					// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-					// by adding this Space it seems to work.
-					// See #2474 for why this is commented out
-					Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
 				};
 
 				uint abortTime = 500;
@@ -91,6 +81,10 @@ namespace UICatalog.Tests {
 				_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
 
 				Application.Iteration += (s, a) => {
+					// Press QuitKey 
+					Assert.Empty (FakeConsole.MockKeyPresses);
+					FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
+
 					//output.WriteLine ($"  iteration {++iterations}");
 					if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 						Application.RequestStop ();

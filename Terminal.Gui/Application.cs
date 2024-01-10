@@ -1453,7 +1453,6 @@ public static partial class Application {
 			}
 		}
 
-		// Invoke any Global KeyBindings
 		// In the most efficient way possible, recursively search the subviews of the views in _topLevels
 		// for KeyBindings that match the keyEvent (with KeyBindingScope.Application).
 		// If a matching KeyBinding is found, invoke it and return true.

@@ -49,7 +49,7 @@ public class KeyboardTests {
 		int keyUps = 0;
 		var output = string.Empty;
 		Application.Top.KeyUp += (object sender, Key args) => {
-			if (args.KeyCode != (KeyCode.CtrlMask | KeyCode.Q)) {
+			if (args.KeyCode != (Key.Q.WithCtrl)) {
 				output += args.AsRune;
 			}
 			keyUps++;
@@ -97,62 +97,62 @@ public class KeyboardTests {
 		Application.Iteration += (s, a) => {
 			Assert.True (v1.HasFocus);
 			// Using default keys.
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithCtrl);
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithCtrl);
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithCtrl);
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithCtrl);
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (Key.Tab.WithShift.WithCtrl);
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (Key.PageDown.WithCtrl);
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (Key.PageDown.WithCtrl);
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (Key.PageDown.WithCtrl);
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (Key.PageDown.WithCtrl);
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (Key.PageUp.WithCtrl);
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (Key.PageUp.WithCtrl);
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (Key.PageUp.WithCtrl);
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (Key.PageUp.WithCtrl);
 			Assert.True (v1.HasFocus);
 
 			// Using another's alternate keys.
-			Application.AlternateForwardKey = KeyCode.F7;
-			Application.AlternateBackwardKey = KeyCode.F6;
+			Application.AlternateForwardKey = Key.F7;
+			Application.AlternateBackwardKey = Key.F6;
 
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (Key.F7);
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (Key.F7);
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (Key.F7);
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (Key.F7);
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (Key.F6);
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (Key.F6);
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (Key.F6);
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (Key.F6);
 			Assert.True (v1.HasFocus);
 
 			Application.RequestStop ();
@@ -161,13 +161,13 @@ public class KeyboardTests {
 		Application.Run (top);
 
 		// Replacing the defaults keys to avoid errors on others unit tests that are using it.
-		Application.AlternateForwardKey = KeyCode.PageDown | KeyCode.CtrlMask;
-		Application.AlternateBackwardKey = KeyCode.PageUp | KeyCode.CtrlMask;
-		Application.QuitKey = KeyCode.Q | KeyCode.CtrlMask;
+		Application.AlternateForwardKey = Key.PageDown.WithCtrl;
+		Application.AlternateBackwardKey = Key.PageUp.WithCtrl;
+		Application.QuitKey = Key.Q.WithCtrl;
 
-		Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, Application.AlternateForwardKey.KeyCode);
-		Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, Application.AlternateBackwardKey.KeyCode);
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+		Assert.Equal (Key.PageDown.WithCtrl, Application.AlternateForwardKey.KeyCode);
+		Assert.Equal (Key.PageUp.WithCtrl, Application.AlternateBackwardKey.KeyCode);
+		Assert.Equal (Key.Q.WithCtrl, Application.QuitKey.KeyCode);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -188,26 +188,26 @@ public class KeyboardTests {
 		Application.Begin (top);
 		top.Running = true;
 
-		Assert.Equal (KeyCode.Q | KeyCode.CtrlMask, Application.QuitKey.KeyCode);
+		Assert.Equal (Key.Q.WithCtrl, Application.QuitKey.KeyCode);
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.OnKeyDown(new Key ( KeyCode.Q | KeyCode.CtrlMask));
+		Application.OnKeyDown(new Key ( Key.Q.WithCtrl));
 		Assert.True (isQuiting);
 
 		isQuiting = false;
-		Application.QuitKey = KeyCode.C | KeyCode.CtrlMask;
+		Application.QuitKey = Key.C.WithCtrl;
 		Application.Driver.SendKeys ('Q', ConsoleKey.Q, false, false, true);
 		Assert.False (isQuiting);
-		Application.OnKeyDown (new Key (KeyCode.Q | KeyCode.CtrlMask));
+		Application.OnKeyDown (new Key (Key.Q.WithCtrl));
 		Assert.False (isQuiting);
 
 		Application.OnKeyDown (Application.QuitKey);
 		Assert.True (isQuiting);
 
 		// Reset the QuitKey to avoid throws errors on another tests
-		Application.QuitKey = KeyCode.Q | KeyCode.CtrlMask;
+		Application.QuitKey = Key.Q.WithCtrl;
 	}
 
 	[Fact]
@@ -231,14 +231,14 @@ public class KeyboardTests {
 		Assert.False (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (Key.Tab.WithCtrl);
 		Assert.True (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (Key.Tab.WithCtrl);
 		Assert.True (win.CanFocus);
 		Assert.True (win.HasFocus);
 		Assert.True (win2.CanFocus);
@@ -283,14 +283,14 @@ public class KeyboardTests {
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (Key.Tab.WithCtrl);
 		Assert.True (win2.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (Key.Tab.WithCtrl);
 		Assert.False (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
@@ -315,19 +315,57 @@ public class KeyboardTests {
 
 		public ScopedKeyBindingView ()
 		{
-			AddCommand (Command.Save, () => ApplicationCommand = true);
+			AddCommand (Command.Refresh, () => ApplicationCommand = true);
 			AddCommand (Command.Default, () => HotKeyCommand = true);
-			AddCommand (Command.Left, () => FocusedCommand = true);
+			AddCommand (Command.Left,    () => FocusedCommand = true);
 
-			KeyBindings.Add (KeyCode.A, KeyBindingScope.Application, Command.Save);
-			HotKey = KeyCode.H;
-			KeyBindings.Add (KeyCode.F, KeyBindingScope.Focused, Command.Left);
+			KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Refresh);
+			HotKey = Key.H;
+			KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
+		
 		}
 	}
 
 	[Fact]
 	[AutoInitShutdown]
-	public void OnKeyDown_Application_KeyBinding ()
+	public void Application_Scope_ScopedKeyBindings ()
+	{
+		var top = Application.Top;
+		var view = new ScopedKeyBindingView ();
+		top.Add (view);
+		Application.Begin (top);
+
+		Assert.False (view.ApplicationCommand);
+		Assert.False (view.HotKeyCommand);
+		Assert.False (view.FocusedCommand);
+
+		Application.OnKeyDown (Key.A);
+		Assert.True (view.ApplicationCommand);
+		Assert.False (view.HotKeyCommand);
+		Assert.False (view.FocusedCommand);
+		view.ApplicationCommand = false;
+		view.HotKeyCommand = false;
+		view.FocusedCommand = false; 
+
+		Application.OnKeyDown (Key.H);
+		Assert.False (view.ApplicationCommand);
+		Assert.True (view.HotKeyCommand);
+		Assert.False (view.FocusedCommand);
+		view.ApplicationCommand = false;
+		view.HotKeyCommand = false;
+		view.FocusedCommand = false;
+
+		view.CanFocus = true;
+		view.SetFocus ();
+		Application.OnKeyDown (Key.F);
+		Assert.False (view.ApplicationCommand);
+		Assert.False (view.HotKeyCommand);
+		Assert.True (view.FocusedCommand);
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void Application_Scope_KeyBinding ()
 	{
 		var view = new ScopedKeyBindingView ();
 		var invoked = false;
@@ -336,31 +374,31 @@ public class KeyboardTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (KeyCode.A));
+		Application.OnKeyDown (Key.A);
 		Assert.True (invoked);
 		Assert.True (view.ApplicationCommand);
 
 		invoked = false;
 		view.ApplicationCommand = false;
-		view.KeyBindings.Remove (KeyCode.A);
-		Application.OnKeyDown (new (KeyCode.A)); // old
+		view.KeyBindings.Remove (Key.A);
+		Application.OnKeyDown (Key.A); // old
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
-		view.KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, KeyBindingScope.Application, Command.Save);
-		Application.OnKeyDown (new (KeyCode.A)); // old
+		view.KeyBindings.Add (Key.A.WithCtrl, KeyBindingScope.Application, Command.Refresh);
+		Application.OnKeyDown (Key.A); // old
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
-		Application.OnKeyDown (new (KeyCode.A | KeyCode.CtrlMask)); // new
+		Application.OnKeyDown (Key.A.WithCtrl); // new
 		Assert.True (invoked);
 		Assert.True (view.ApplicationCommand);
 
 		invoked = false;
-		Application.OnKeyDown (new (KeyCode.H));
+		Application.OnKeyDown (Key.H);
 		Assert.True (invoked);
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (KeyCode.F));
+		Application.OnKeyDown (Key.F);
 		Assert.False (invoked);
 
 		Assert.True (view.ApplicationCommand);
@@ -368,9 +406,63 @@ public class KeyboardTests {
 		Assert.False (view.FocusedCommand);
 	}
 
+	// Same as Application_Scope_KeyBinding, but tests KeyBindingScope.Application with nested views
 	[Fact]
 	[AutoInitShutdown]
-	public void OnKeyDown_Application_KeyBinding_Negative ()
+	public void Application_Scope_KeyBinding_Nested ()
+	{
+		var viewWithAppScopeBinding = new ScopedKeyBindingView ();
+		var invoked = false;
+		viewWithAppScopeBinding.InvokingKeyBindings += (s, e) => invoked = true;
+
+		var view2 = new View ();
+		view2.Add (viewWithAppScopeBinding);
+		Application.Top.Add (view2);
+		Application.Begin (Application.Top);
+
+		Application.OnKeyDown (Key.A);
+		Assert.True (invoked);
+		Assert.True (viewWithAppScopeBinding.ApplicationCommand);
+
+		invoked = false;
+		viewWithAppScopeBinding.ApplicationCommand = false;
+		viewWithAppScopeBinding.KeyBindings.Remove (Key.A);
+		Application.OnKeyDown (Key.A); // old
+		Assert.False (invoked);
+		Assert.False (viewWithAppScopeBinding.ApplicationCommand);
+		viewWithAppScopeBinding.KeyBindings.Add (Key.A.WithCtrl, KeyBindingScope.Application, Command.Refresh);
+		Application.OnKeyDown (Key.A); // old
+		Assert.False (invoked);
+		Assert.False (viewWithAppScopeBinding.ApplicationCommand);
+		Application.OnKeyDown (Key.A.WithCtrl); // new
+		Assert.True (invoked);
+		Assert.True (viewWithAppScopeBinding.ApplicationCommand);
+
+		invoked = false;
+		Assert.False (view2.HasFocus);
+		Assert.False (viewWithAppScopeBinding.HasFocus);
+		Application.OnKeyDown (Key.H);
+		Assert.False (invoked); // neither viewWithAppScopeBinding nor view2 have a Focus
+		
+		view2.CanFocus = true;
+		view2.SetFocus ();
+		Application.OnKeyDown (Key.H);
+		Assert.True (invoked); // neither viewWithAppScopeBinding nor view2 have a Focus
+
+		invoked = false;
+		Assert.False (viewWithAppScopeBinding.HasFocus);
+		Application.OnKeyDown (Key.F);
+		Assert.False (invoked);
+
+		Assert.True (viewWithAppScopeBinding.ApplicationCommand);
+		Assert.True (viewWithAppScopeBinding.HotKeyCommand);
+		Assert.False (viewWithAppScopeBinding.FocusedCommand);
+	}
+
+
+	[Fact]
+	[AutoInitShutdown]
+	public void Application_Scope_KeyBinding_Negative ()
 	{
 		var view = new ScopedKeyBindingView ();
 		var invoked = false;
@@ -379,7 +471,7 @@ public class KeyboardTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (KeyCode.A | KeyCode.CtrlMask));
+		Application.OnKeyDown (Key.A.WithCtrl);
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		Assert.False (view.HotKeyCommand);
@@ -387,10 +479,62 @@ public class KeyboardTests {
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (KeyCode.Z));
+		Application.OnKeyDown (Key.Z);
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		Assert.False (view.HotKeyCommand);
 		Assert.False (view.FocusedCommand);
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void Application_Scope_View_Command_Invoked_If_Application_Has_No_Binding ()
+	{
+		var view = new ScopedKeyBindingView ();
+
+		Application.Top.Add (view);
+		Application.Begin (Application.Top);
+
+		var drawContentInvoked = false;
+		Application.Top.DrawContent += (s, e) => drawContentInvoked = true;
+
+		Application.OnKeyDown (Key.F5);
+		Assert.True (drawContentInvoked);
+		drawContentInvoked = false;
+
+		// Remove the key binding for Refresh from the top level
+		Application.Top.KeyBindings.Remove (Key.F5);
+		Application.OnKeyDown (Key.F5);
+		Assert.False (drawContentInvoked);
+		drawContentInvoked = false;
+		
+		// The Command is still valid, even if the binding is gone
+		// So this should work.
+		Application.OnKeyDown (Key.A);
+		Assert.True (view.ApplicationCommand);
+		Assert.False (drawContentInvoked); // not invoked because the view ate it
+		drawContentInvoked = false;
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void Application_Scope_View_Command_Invoked_If_Application_Has_Binding ()
+	{
+		var view = new ScopedKeyBindingView ();
+
+		Application.Top.Add (view);
+		Application.Begin (Application.Top);
+
+		var drawContentInvoked = false;
+		Application.Top.DrawContent += (s, e) => drawContentInvoked = true;
+		
+		Application.OnKeyDown (Key.F5);
+		Assert.True (drawContentInvoked);
+		drawContentInvoked = false;
+
+		Application.OnKeyDown (Key.A);
+		Assert.True (view.ApplicationCommand);
+		Assert.False (drawContentInvoked); // not invoked because the view ate it
+		drawContentInvoked = false;
 	}
 }

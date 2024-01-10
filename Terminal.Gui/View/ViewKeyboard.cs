@@ -557,12 +557,9 @@ public partial class View {
 	public virtual bool? OnInvokingKeyBindings (Key keyEvent)
 	{
 		// fire event
-		// BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
 		if (keyEvent.Scope == KeyBindingScope.Application) {
 			Application.Top.InvokeKeyBindings (keyEvent);
-		} 
-		
-		if (keyEvent.Scope == KeyBindingScope.HotKey) {
+		} else {
 			InvokingKeyBindings?.Invoke (this, keyEvent);
 			if (keyEvent.Handled) {
 				return true;
