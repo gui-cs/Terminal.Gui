@@ -8,13 +8,14 @@ public class BarItem : View {
 	public BarItem ()
 	{
 		Height = 1;
+		AddCommand (Command.ToggleExpandCollapse, () => { Visible = !Visible; return true; });
 	}
 	public override string Text {
 		set {
-			base.Text = $"{KeyBindings.Bindings.FirstOrDefault (b => b.Value.Scope != KeyBindingScope.Focused).Key} `{value}`";
+			base.Text = $"{KeyBindings.Bindings.FirstOrDefault (b => b.Value.Scope != KeyBindingScope.Focused).Key} {value}";
 		}
 		get {
-			return $"{KeyBindings.Bindings.FirstOrDefault(b => b.Value.Scope != KeyBindingScope.Focused).Key} `{base.Text}`";
+			return $"{KeyBindings.Bindings.FirstOrDefault(b => b.Value.Scope != KeyBindingScope.Focused).Key} {base.Text}";
 		}
 	}
 }
@@ -36,6 +37,7 @@ public class Bar : View {
 		Height = 1;
 		AutoSize = false;
 		ColorScheme = Colors.Menu;
+		CanFocus = true;
 	}
 
 	public override void Add (View view)
