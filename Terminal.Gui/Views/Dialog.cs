@@ -70,18 +70,7 @@ public class Dialog : Window {
 		Modal = true;
 		ButtonAlignment = DefaultButtonAlignment;
 
-		// This enables the default button to be activated by the Enter key.
-		AddCommand (Command.Accept, () => {
-			// TODO: Perhaps all views should support the concept of being default?
-			if (Subviews.FirstOrDefault (v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
-				defaultBtn.InvokeCommand (Command.Accept);
-				return true;
-			}
-			return false;
-		});
-
-		KeyBindings.Add (KeyCode.Esc, Command.QuitToplevel);
-		KeyBindings.Add (KeyCode.Enter, Command.Accept);
+		KeyBindings.Add (Key.Esc, Command.QuitToplevel);
 
 		if (buttons != null) {
 			foreach (var b in buttons) {

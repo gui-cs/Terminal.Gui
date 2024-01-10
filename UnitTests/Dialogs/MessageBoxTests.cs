@@ -1,15 +1,13 @@
-﻿using Microsoft.VisualBasic;
-using System.Text;
+﻿using System.Text;
 using Xunit;
 using Xunit.Abstractions;
-using static Terminal.Gui.Application;
 
 namespace Terminal.Gui.DialogTests;
 
 public class MessageBoxTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public MessageBoxTests (ITestOutputHelper output) => this.output = output;
+	public MessageBoxTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	[AutoInitShutdown]
@@ -192,7 +190,7 @@ public class MessageBoxTests {
                 │                                              │
                 │                                              │
                 └──────────────────────────────────────────────┘
-", output);
+", _output);
 
 				Application.RequestStop ();
 			}
@@ -236,7 +234,7 @@ public class MessageBoxTests {
 ║│                {btn}                │║
 ║└────────────────────────────────────────┘║
 ╚══════════════════════════════════════════╝
-", output);
+", _output);
 
 				Application.RequestStop ();
 			}
@@ -270,7 +268,7 @@ public class MessageBoxTests {
                                     │ ge  │
                                     │ Ok {CM.Glyphs.RightDefaultIndicator}│
                                     └─────┘
-", output);
+", _output);
 
 				Application.RequestStop ();
 			}
@@ -302,7 +300,7 @@ public class MessageBoxTests {
                                   │         │
                                   │{btn} │
                                   └─────────┘
-", output);
+", _output);
 
 				Application.RequestStop ();
 			}
@@ -342,7 +340,7 @@ public class MessageBoxTests {
 ║│                │║
 ║│    {btn}   │║
 ║└────────────────┘║
-╚══════════════════╝", output);
+╚══════════════════╝", _output);
 				Assert.Equal (new Size (20 - 2, 10 - 2), Application.Current.Frame.Size);
 				Application.RequestStop ();
 
@@ -360,7 +358,7 @@ public class MessageBoxTests {
 ║│ffffffffffffffff│║
 ║│ffffffffffffffff│║
 ║│    {btn}   │║
-╚└────────────────┘╝", output);
+╚└────────────────┘╝", _output);
 				Application.RequestStop ();
 			}
 		};
@@ -403,7 +401,7 @@ public class MessageBoxTests {
 ║ │              │ ║
 ║ │   {btn}  │ ║
 ║ └──────────────┘ ║
-╚══════════════════╝", output);
+╚══════════════════╝", _output);
 				Application.RequestStop ();
 
 				// Really long text
@@ -420,7 +418,7 @@ public class MessageBoxTests {
 ║│ffffffffffffffff│║
 ║│ffffffffffffffff│║
 ║│    {btn}   │║
-╚└────────────────┘╝", output);
+╚└────────────────┘╝", _output);
 				Application.RequestStop ();
 			}
 		};
@@ -458,7 +456,7 @@ ffffffffffffffffffff
 ────────────────────
 ║                  ║
 ║                  ║
-╚══════════════════╝", output);
+╚══════════════════╝", _output);
 
 				Application.RequestStop ();
 
@@ -476,7 +474,7 @@ ffffffffffffffffffff
 ────────────────────
 ║                  ║
 ║                  ║
-╚══════════════════╝", output);
+╚══════════════════╝", _output);
 
 				Application.RequestStop ();
 			}
@@ -519,7 +517,7 @@ ff ff ff ff ff ff ff
 ────────────────────
 ║                  ║
 ║                  ║
-╚══════════════════╝", output);
+╚══════════════════╝", _output);
 				Application.RequestStop ();
 
 				// Really long text
@@ -536,7 +534,7 @@ ffffffffffffffffffff
 ────────────────────
 ║                  ║
 ║                  ║
-╚══════════════════╝", output);
+╚══════════════════╝", _output);
 				Application.RequestStop ();
 			}
 		};
@@ -574,7 +572,7 @@ ffffffffffffffffffff
                 │                                              │
                 │                                              │
                 │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
-                └──────────────────────────────────────────────┘", output);
+                └──────────────────────────────────────────────┘", _output);
 				} else {
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
                 ┌──────────────────────────────────────────────┐
@@ -582,7 +580,7 @@ ffffffffffffffffffff
                 │                                              │
                 │                                              │
                 │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
-                └──────────────────────────────────────────────┘", output);
+                └──────────────────────────────────────────────┘", _output);
 				}
 				Application.RequestStop ();
 			}
