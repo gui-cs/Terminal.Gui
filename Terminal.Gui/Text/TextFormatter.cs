@@ -1325,7 +1325,7 @@ namespace Terminal.Gui {
 					NeedsFormat = false;
 					return _lines;
 				}
-				
+
 				if (NeedsFormat) {
 					var shown_text = _text;
 					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out var newHotKey)) {
