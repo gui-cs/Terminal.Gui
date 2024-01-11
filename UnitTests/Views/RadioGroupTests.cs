@@ -25,17 +25,33 @@ public class RadioGroupTests {
 		Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (new Rect (1, 2, 20, 5), new string [] { "Test" });
+		rg = new RadioGroup (new string [] { "Test" }) {
+			X = 1,
+			Y = 2,
+			Width = 20,
+			Height = 5,
+		};
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
-		Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
 		Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (1, 2, new string [] { "Test" });
+		rg = new RadioGroup (new string [] { "Test" }) {
+			X = 1,
+			Y = 2,
+		};
+
+		var view = new View () {
+			Width = 30,
+			Height = 40,
+		};
+		view.Add (rg);
+		view.BeginInit ();
+		view.EndInit ();
+		view.LayoutSubviews ();
+		
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
-		Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
 		Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 	}
@@ -50,7 +66,7 @@ public class RadioGroupTests {
 	}
 
 	[Fact, AutoInitShutdown]
-	public void DisplayMode_Width_Height_Vertical_Horizontal_Space ()
+	public void Orientation_Width_Height_Vertical_Horizontal_Space ()
 	{
 		var rg = new RadioGroup (new string [] { "Test", "New Test 你" });
 		var win = new Window () {
@@ -63,7 +79,7 @@ public class RadioGroupTests {
 		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-		Assert.Equal (DisplayModeLayout.Vertical, rg.DisplayMode);
+		Assert.Equal (Orientation.Vertical, rg.Orientation);
 		Assert.Equal (2, rg.RadioLabels.Length);
 		Assert.Equal (0, rg.X);
 		Assert.Equal (0, rg.Y);
@@ -80,10 +96,10 @@ public class RadioGroupTests {
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-		rg.DisplayMode = DisplayModeLayout.Horizontal;
+		rg.Orientation = Orientation.Horizontal;
 		Application.Refresh ();
 
-		Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
+		Assert.Equal (Orientation.Horizontal, rg.Orientation);
 		Assert.Equal (2, rg.HorizontalSpace);
 		Assert.Equal (0, rg.X);
 		Assert.Equal (0, rg.Y);
@@ -104,7 +120,7 @@ public class RadioGroupTests {
 		rg.HorizontalSpace = 4;
 		Application.Refresh ();
 
-		Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
+		Assert.Equal (Orientation.Horizontal, rg.Orientation);
 		Assert.Equal (4, rg.HorizontalSpace);
 		Assert.Equal (0, rg.X);
 		Assert.Equal (0, rg.Y);

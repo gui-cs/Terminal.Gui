@@ -42,10 +42,6 @@ namespace UICatalog.Scenarios {
 			// Foreground ColorPicker.
 			foregroundColorPicker = new ColorPicker () {
 				Title = "Foreground Color",
-				X = 0,
-				Y = 0,
-				BoxHeight = 3,
-				BoxWidth = 6,
 				BorderStyle = LineStyle.Single
 			};
 			foregroundColorPicker.ColorChanged += ForegroundColor_ColorChanged;
@@ -60,13 +56,13 @@ namespace UICatalog.Scenarios {
 			// Background ColorPicker.
 			backgroundColorPicker = new ColorPicker () {
 				Title = "Background Color",
-				Y = 0,
-				X = 0,
+				Y = Pos.Center (),
+				X = Pos.Center (),
 				BoxHeight = 1,
 				BoxWidth = 4,
 				BorderStyle = LineStyle.Single
 			};
-			backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
+			//backgroundColorPicker.X = Pos.AnchorEnd () - (Pos.Right (backgroundColorPicker) - Pos.Left (backgroundColorPicker));
 			backgroundColorPicker.ColorChanged += BackgroundColor_ColorChanged;
 			Win.Add (backgroundColorPicker);
 			_backgroundColorLabel = new Label ();

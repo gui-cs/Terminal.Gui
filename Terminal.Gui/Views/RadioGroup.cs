@@ -10,7 +10,7 @@ namespace Terminal.Gui;
 public class RadioGroup : View {
 	int _selected = -1;
 	int _cursor;
-	DisplayModeLayout _displayMode;
+	Orientation _orientation = Orientation.Vertical;
 	int _horizontalSpace = 2;
 	List<(int pos, int length)> _horizontal;
 
@@ -39,18 +39,6 @@ public class RadioGroup : View {
 	{
 		SetInitialProperties (radioLabels, selected);
 	}
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Absolute"/> layout.
-	/// The <see cref="View"/> frame is computed from the provided radio labels.
-	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	/// <param name="radioLabels">The radio labels; an array of strings that can contain hotkeys using an underscore before the letter.</param>
-	/// <param name="selected">The item to be selected, the value is clamped to the number of items.</param>
-	public RadioGroup (int x, int y, string [] radioLabels, int selected = 0) :
-		this (MakeRect (x, y, radioLabels != null ? radioLabels.ToList () : null), radioLabels, selected)
-	{ }
 
 	void SetInitialProperties (string [] radioLabels, int selected)
 	{
@@ -86,26 +74,42 @@ public class RadioGroup : View {
 	}
 
 	/// <summary>
-	/// Gets or sets the <see cref="DisplayModeLayout"/> for this <see cref="RadioGroup"/>.
+	/// Gets or sets the <see cref="Orientation"/> for this <see cref="RadioGroup"/>. The default is <see cref="Orientation.Vertical"/>.
 	/// </summary>
-	public DisplayModeLayout DisplayMode {
-		get { return _displayMode; }
-		set {
-			if (_displayMode != value) {
-				_displayMode = value;
-				SetWidthHeight (_radioLabels);
-				SetNeedsDisplay ();
-			}
-		}
+	public Orientation Orientation {
+		get => _orientation;
+		set => OnOrientationChanged (value);
 	}
 
 	/// <summary>
-	/// Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="DisplayMode"/> is <see cref="DisplayModeLayout.Horizontal"/>
+	/// Fired when the view orientation has changed. Can be cancelled by setting
+	/// <see cref="OrientationEventArgs.Cancel"/> to true.
+	/// </summary>
+	public event EventHandler<OrientationEventArgs> OrientationChanged;
+
+	/// <summary>
+	/// Called when the view orientation has changed. Invokes the <see cref="OrientationChanged"/> event.
+	/// </summary>
+	/// <param name="newOrientation"></param>
+	/// <returns>True of the event was cancelled.</returns>
+	public virtual bool OnOrientationChanged (Orientation newOrientation)
+	{
+		var args = new OrientationEventArgs (newOrientation);
+		OrientationChanged?.Invoke (this, args);
+		if (!args.Cancel) {
+			_orientation = newOrientation;
+			SetNeedsLayout ();
+		}
+		return args.Cancel;
+	}
+
+	/// <summary>
+	/// Gets or sets the horizontal space for this <see cref="RadioGroup"/> if the <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>
 	/// </summary>
 	public int HorizontalSpace {
 		get { return _horizontalSpace; }
 		set {
-			if (_horizontalSpace != value && _displayMode == DisplayModeLayout.Horizontal) {
+			if (_horizontalSpace != value && _orientation == Orientation.Horizontal) {
 				_horizontalSpace = value;
 				SetWidthHeight (_radioLabels);
 				UpdateTextFormatterText ();
@@ -116,24 +120,24 @@ public class RadioGroup : View {
 
 	void SetWidthHeight (List<string> radioLabels)
 	{
-		switch (_displayMode) {
-		case DisplayModeLayout.Vertical:
+		switch (_orientation) {
+		case Orientation.Vertical:
 			var r = MakeRect (0, 0, radioLabels);
-			Bounds = new Rect (Bounds.Location, new Size (r.Width, radioLabels.Count));
+			if (IsInitialized) {
+				Width = r.Width + GetFramesThickness ().Horizontal;
+				Height = radioLabels.Count + GetFramesThickness ().Vertical;
+			}
 			break;
 
-		case DisplayModeLayout.Horizontal:
+		case Orientation.Horizontal:
 			CalculateHorizontalPositions ();
 			var length = 0;
 			foreach (var item in _horizontal) {
 				length += item.length;
 			}
-			var hr = new Rect (0, 0, length, 1);
-			if (IsAdded) {
-				Width = hr.Width;
-				Height = 1;
-			} else {
-				Bounds = new Rect (Bounds.Location, new Size (hr.Width, radioLabels.Count));
+			if (IsInitialized) {
+				Width = length + GetFramesThickness ().Vertical;
+				Height = 1 + GetFramesThickness ().Horizontal;
 			}
 			break;
 		}
@@ -212,7 +216,7 @@ public class RadioGroup : View {
 
 	void CalculateHorizontalPositions ()
 	{
-		if (_displayMode == DisplayModeLayout.Horizontal) {
+		if (_orientation == Orientation.Horizontal) {
 			_horizontal = new List<(int pos, int length)> ();
 			int start = 0;
 			int length = 0;
@@ -231,11 +235,11 @@ public class RadioGroup : View {
 
 		Driver.SetAttribute (GetNormalColor ());
 		for (int i = 0; i < _radioLabels.Count; i++) {
-			switch (DisplayMode) {
-			case DisplayModeLayout.Vertical:
+			switch (Orientation) {
+			case Orientation.Vertical:
 				Move (0, i);
 				break;
-			case DisplayModeLayout.Horizontal:
+			case Orientation.Horizontal:
 				Move (_horizontal [i].pos, 0);
 				break;
 			}
@@ -275,11 +279,11 @@ public class RadioGroup : View {
 	///<inheritdoc/>
 	public override void PositionCursor ()
 	{
-		switch (DisplayMode) {
-		case DisplayModeLayout.Vertical:
+		switch (Orientation) {
+		case Orientation.Vertical:
 			Move (0, _cursor);
 			break;
-		case DisplayModeLayout.Horizontal:
+		case Orientation.Horizontal:
 			Move (_horizontal [_cursor].pos, 0);
 			break;
 		}
@@ -373,11 +377,11 @@ public class RadioGroup : View {
 		int boundsX = me.X;
 		int boundsY = me.Y;
 
-		var pos = _displayMode == DisplayModeLayout.Horizontal ? boundsX : boundsY;
-		var rCount = _displayMode == DisplayModeLayout.Horizontal ? _horizontal.Last ().pos + _horizontal.Last ().length : _radioLabels.Count;
+		var pos = _orientation == Orientation.Horizontal ? boundsX : boundsY;
+		var rCount = _orientation == Orientation.Horizontal ? _horizontal.Last ().pos + _horizontal.Last ().length : _radioLabels.Count;
 
 		if (pos < rCount) {
-			var c = _displayMode == DisplayModeLayout.Horizontal ? _horizontal.FindIndex ((x) => x.pos <= boundsX && x.pos + x.length - 2 >= boundsX) : boundsY;
+			var c = _orientation == Orientation.Horizontal ? _horizontal.FindIndex ((x) => x.pos <= boundsX && x.pos + x.length - 2 >= boundsX) : boundsY;
 			if (c > -1) {
 				_cursor = SelectedItem = c;
 				SetNeedsDisplay ();
@@ -395,16 +399,3 @@ public class RadioGroup : View {
 	}
 }
 
-/// <summary>
-/// Used for choose the display mode of this <see cref="RadioGroup"/>
-/// </summary>
-public enum DisplayModeLayout {
-	/// <summary>
-	/// Vertical mode display. It's the default.
-	/// </summary>
-	Vertical,
-	/// <summary>
-	/// Horizontal mode display.
-	/// </summary>
-	Horizontal
-}
