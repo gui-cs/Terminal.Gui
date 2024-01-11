@@ -4,10 +4,16 @@ using System.Linq;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the
-/// <see cref="View.Bounds"/>
-/// enabling borders, menus, etc...
+/// Implements Border for <see cref="View"/>. 
 /// </summary>
+/// <remarks>
+/// <para>
+/// Provides a border around the view including the <see cref="Title"/>.
+/// </para>
+/// <para>
+/// See the <see cref="Frame"/> class. 
+/// </para>
+/// </remarks>
 public class Border : Frame {
 	/// <summary>
 	/// 
