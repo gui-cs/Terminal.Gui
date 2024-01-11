@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class WindowTests {
 	readonly ITestOutputHelper _output;
@@ -25,8 +25,8 @@ public class WindowTests {
 		Assert.Equal (new Rect (0, 0, 2147483647, 2147483647), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
-		Assert.Equal (0,           r.X);
-		Assert.Equal (0,           r.Y);
+		Assert.Equal (0, r.X);
+		Assert.Equal (0, r.Y);
 		Assert.Equal (Dim.Fill (), r.Width);
 		Assert.Equal (Dim.Fill (), r.Height);
 		Assert.False (r.IsCurrentTop);
@@ -40,10 +40,10 @@ public class WindowTests {
 		// Empty Rect
 		r = new Window (Rect.Empty) { Title = "title" };
 		Assert.NotNull (r);
-		Assert.Equal ("title",                  r.Title);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
-		Assert.Equal ("title",                  r.Title);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
+		Assert.Equal ("title", r.Title);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		Assert.Equal ("title", r.Title);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -67,8 +67,8 @@ public class WindowTests {
 		r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(1,2,3,4)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
