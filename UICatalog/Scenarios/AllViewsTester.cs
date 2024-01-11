@@ -285,8 +285,8 @@ public class AllViewsTester : Scenario {
 	}
 
 	// TODO: This is missing some
-	List<string> _posNames = new() { "Factor", "AnchorEnd", "Center", "Absolute" };
-	List<string> _dimNames = new() { "Factor", "Fill", "Absolute" };
+	List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
+	List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
 
 	void UpdateSettings (View view)
 	{
@@ -387,10 +387,10 @@ public class AllViewsTester : Scenario {
 		//view.X = Pos.Center ();
 		//view.Y = Pos.Center ();
 		if (view.Width == null || view.Frame.Width == 0) {
-			view.Width = Dim.Fill();
+			view.Width = Dim.Fill ();
 		}
 		if (view.Height == null || view.Frame.Height == 0) {
-			view.Height = Dim.Fill();
+			view.Height = Dim.Fill ();
 		}
 		UpdateSettings (view);
 		UpdateTitle (view);
