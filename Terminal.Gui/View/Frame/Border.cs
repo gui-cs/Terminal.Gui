@@ -8,7 +8,8 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Provides a border around the view including the <see cref="Title"/>.
+/// Renders a border around the view including the <see cref="View.Title"/>. If <see cref="Thickness"/> is non-zero the border
+/// will be drawn. 
 /// </para>
 /// <para>
 /// See the <see cref="Frame"/> class. 
@@ -16,13 +17,13 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Border : Frame {
 	/// <summary>
-	/// 
+	/// Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for
+	/// setting the <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the
+	/// views that comprise the border. If set to <see cref="LineStyle.None"/> no border will be drawn.
 	/// </summary>
 	public new LineStyle BorderStyle { get; set; } = LineStyle.None;
 
-	/// <summary>
-	/// Redraws the Frames that comprise the <see cref="Frame"/>.
-	/// </summary>
+	/// </inheritdoc>
 	public override void OnDrawContent (Rect contentArea)
 	{
 		base.OnDrawContent (contentArea);
