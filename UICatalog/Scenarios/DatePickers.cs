@@ -13,44 +13,11 @@ public class DatePickers : Scenario {
 
 	public override void Setup ()
 	{
-		var frameView = new FrameView ("Date Picker") {
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			Width = Dim.Percent (75),
-			Height = Dim.Percent (50),
-		};
-		var label = new Label ("Click the dot to open the date picker.") {
-			X = Pos.Center (),
-			Y = Pos.Center () - 3,
-			Width = Dim.Percent (50),
-			Height = 1,
+		var dp = new DatePicker () {
+			Format = "dd/MM/yyyy",
 		};
 
-		_datePicker = new DatePicker () {
-			X = Pos.Center (),
-			Y = Pos.Bottom (label) + 1,
-			Width = Dim.Percent (50),
-			Height = 1,
-		};
-
-		_currentlySelectedDateLabel = new Label ($"Currently selected date: {_datePicker.Date.ToString (_datePicker.Format)}") {
-			X = Pos.Center (),
-			Y = Pos.Bottom (_datePicker) + 1,
-			Width = Dim.Percent (50),
-			Height = 1,
-		};
-
-		_datePicker.TextChanged += DateChanged;
-
-		var formatLabel = new Label ($"Format: {_datePicker.Format}") {
-			X = Pos.Center (),
-			Y = Pos.Bottom (_currentlySelectedDateLabel) + 1,
-			Width = Dim.Percent (50),
-			Height = 1,
-		};
-
-		frameView.Add (label, _datePicker, _currentlySelectedDateLabel, formatLabel);
-		Win.Add (frameView);
+		Win.Add (dp);
 	}
 
 	private void DateChanged (object sender, TextChangedEventArgs e)

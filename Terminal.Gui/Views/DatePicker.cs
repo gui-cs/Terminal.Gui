@@ -4,40 +4,27 @@
 // Author: Maciej Winnik
 //
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using Terminal.Gui.Resources;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>
 /// The <see cref="DatePicker"/> <see cref="View"/> Date Picker.
 /// </summary>
-public class DatePicker : TextField {
+public class DatePicker : View {
 
 	private DataTable _table;
 	private TableView _calendar;
 	private DateTime _date = DateTime.Now;
 
-	private ComboBox _comboBoxYear;
-	private ComboBox _comboBoxMonth;
-
-	private List<string> _months = new ();
-	private List<string> _years = new ();
-
-	private readonly int comboBoxHeight = 4;
+	private DateField _dateField;
 
 	/// <summary>
 	/// Format of date. The default is MM/dd/yyyy.
 	/// </summary>
 	public string Format { get; set; } = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-
-	/// <summary>
-	/// Range of years in the calendar. The default is 1900..2100.
-	/// </summary>
-	public Range YearsRange { get; set; } = 1900..2100;
 
 	/// <summary>
 	/// Get or set the date.
@@ -53,12 +40,12 @@ public class DatePicker : TextField {
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/>.
 	/// </summary>
-	public DatePicker () : base () => SetInitialProperties (_date);
+	public DatePicker () => SetInitialProperties (_date);
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date.
 	/// </summary>
-	public DatePicker (DateTime date) : base ()
+	public DatePicker (DateTime date)
 	{
 		SetInitialProperties (date);
 	}
@@ -66,37 +53,35 @@ public class DatePicker : TextField {
 	/// <summary>
 	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date and format.
 	/// </summary>
-	public DatePicker (DateTime date, string format) : base ()
+	public DatePicker (DateTime date, string format)
 	{
 		Format = format;
 		SetInitialProperties (date);
 	}
 
-	void SetInitialProperties (DateTime date)
+	private void SetInitialProperties (DateTime date)
 	{
+		Title = "Date Picker";
+		BorderStyle = LineStyle.Single;
 		Date = date;
-		_months = GetMonthNames ();
-	}
+		var dateLabel = new Label ("Date: ") {
+			X = 0,
+			Y = 0,
+			Height = 1,
+		};
 
-	private void ShowDatePickerDialog ()
-	{
-		_years = Enumerable.Range (YearsRange.Start.Value, YearsRange.End.Value - YearsRange.Start.Value + 1)
-			.Select (x => x.ToString ())
-			.ToList ();
-
-		var dialog = new Dialog () {
-			Title = Strings.dpTitle,
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			Width = Dim.Percent (50),
-			Height = Dim.Percent (50),
+		_dateField = new DateField (DateTime.Now) {
+			X = Pos.Right (dateLabel),
+			Y = 0,
+			Width = Dim.Fill (1),
+			Height = 1,
+			IsShortFormat = false
 		};
 
 		_calendar = new TableView () {
 			X = 0,
-			Y = 0,
-			Width = Dim.Fill (1),
-			Height = Dim.Fill (1),
+			Y = Pos.Bottom (dateLabel),
+			Height = 11,
 			Style = new TableStyle {
 				ShowHeaders = true,
 				ShowHorizontalBottomline = true,
@@ -111,84 +96,31 @@ public class DatePicker : TextField {
 			Height = 1,
 		};
 
-		_comboBoxYear = new ComboBox (_years) {
-			X = Pos.Right (_calendar) + 1,
-			Y = Pos.Bottom (yearsLabel),
-			Width = Dim.Fill (),
-			Height = comboBoxHeight,
-			SelectedItem = _years.IndexOf (_date.Year.ToString ())
-		};
-
-		if (_comboBoxYear.SelectedItem == -1) {
-			_comboBoxYear.SearchText = Date.Year.ToString ();
-		}
-
-		_comboBoxYear.SelectedItemChanged += ChangeYearDate;
-
-		var monthsLabel = new Label ("Month:") {
-			X = Pos.Right (_calendar) + 1,
-			Y = Pos.Bottom (_comboBoxYear),
+		var previousMonthButton = new Button (GetBackButtonText ()) {
+			X = Pos.Center () - 4,
+			Y = Pos.Bottom (_calendar) - 1,
 			Height = 1,
-		};
-
-		_comboBoxMonth = new ComboBox (_months) {
-			X = Pos.Right (_calendar) + 1,
-			Y = Pos.Bottom (monthsLabel),
-			Width = Dim.Fill (),
-			Height = comboBoxHeight,
-			SelectedItem = _date.Month - 1
-		};
-		_comboBoxMonth.SelectedItemChanged += ChangeMonthDate;
-
-		var previousMonthButton = new Button ("Previous") {
-			X = 0,
-			Y = Pos.Bottom (_calendar),
-			Height = 1,
+			Width = CalculateCalendarWidth () / 2
 		};
 
 		previousMonthButton.Clicked += (sender, e) => {
 			Date = _date.AddMonths (-1);
 			CreateCalendar ();
-			if (_comboBoxMonth.SelectedItem == 0) {
-				if (_comboBoxYear.SelectedItem == 0) {
-					_comboBoxYear.SearchText = Date.Year.ToString ();
-				} else {
-					_comboBoxYear.SelectedItem--;
-				}
-				_comboBoxMonth.SelectedItem = 11;
-			} else {
-				_comboBoxMonth.SelectedItem = _date.Month - 1;
-			}
+			_dateField.Date = Date;
 		};
 
-		var nextMonthButton = new Button ("Next") {
-			X = Pos.Right (previousMonthButton),
-			Y = Pos.Bottom (_calendar),
+		var nextMonthButton = new Button (GetForwardButtonText ()) {
+			X = Pos.Right (previousMonthButton) + 2,
+			Y = Pos.Bottom (_calendar) - 1,
 			Height = 1,
+			Width = CalculateCalendarWidth () / 2
 		};
 
 		nextMonthButton.Clicked += (sender, e) => {
 			Date = _date.AddMonths (1);
 			CreateCalendar ();
-			if (_comboBoxMonth.SelectedItem == 11) {
-				if (_comboBoxYear.SelectedItem == _years.Count - 1) {
-					_comboBoxYear.SearchText = Date.Year.ToString ();
-				} else {
-					_comboBoxYear.SelectedItem++;
-				}
-				_comboBoxMonth.SelectedItem = 0;
-			} else {
-				_comboBoxMonth.SelectedItem = _date.Month - 1;
-			}
+			_dateField.Date = Date;
 		};
-
-
-		dialog.Add (_calendar,
-			yearsLabel, _comboBoxYear,
-			monthsLabel, _comboBoxMonth);
-
-		dialog.AddButton (previousMonthButton);
-		dialog.AddButton (nextMonthButton);
 
 		CreateCalendar ();
 		SelectDayOnCalendar (_date.Day);
@@ -200,13 +132,28 @@ public class DatePicker : TextField {
 			}
 			int day = int.Parse (dayValue.ToString ());
 			ChangeDayDate (day);
-
 			SelectDayOnCalendar (day);
 			Text = _date.ToString (Format);
-			Application.RequestStop ();
+
 		};
 
-		Application.Run (dialog);
+		Width = CalculateCalendarWidth () + 2;
+		Height = _calendar.Height + 3;
+
+		_dateField.DateChanged += DateField_DateChanged;
+
+		Add (dateLabel, _dateField, _calendar, previousMonthButton, nextMonthButton);
+
+	}
+
+	private void DateField_DateChanged (object sender, DateTimeEventArgs<DateTime> e)
+	{
+		if (e.NewValue.Date.Day != _date.Day) {
+			SelectDayOnCalendar (e.NewValue.Day);
+		}
+		Date = e.NewValue;
+		CreateCalendar ();
+		SelectDayOnCalendar (_date.Day);
 	}
 
 	private void CreateCalendar ()
@@ -214,38 +161,10 @@ public class DatePicker : TextField {
 		_calendar.Table = new DataTableSource (_table = CreateDataTable (_date.Month, _date.Year));
 	}
 
-	private void ChangeYearDate (object sender, ListViewItemEventArgs e)
-	{
-		if (e.Value is not null && int.TryParse (e.Value.ToString (), out int year)) {
-			_date = new DateTime (year, _date.Month, _date.Day);
-			CreateCalendar ();
-		} else {
-			_comboBoxYear.SelectedItem = _years.IndexOf (_date.Year.ToString ());
-		}
-	}
-
-	private void ChangeMonthDate (object sender, ListViewItemEventArgs e)
-	{
-		bool isValueNotNull = e.Value is not null;
-		bool isParsingSuccessful = DateTime.TryParseExact (
-		    e.Value.ToString (),
-		    "MMMM",
-		    CultureInfo.CurrentCulture,
-		    DateTimeStyles.None,
-		    out DateTime parsedMonth
-		);
-
-		if (isValueNotNull && isParsingSuccessful) {
-			_date = new DateTime (_date.Year, parsedMonth.Month, _date.Day);
-			CreateCalendar ();
-		} else {
-			_comboBoxMonth.SelectedItem = _date.Month - 1;
-		}
-	}
-
 	private void ChangeDayDate (int day)
 	{
 		_date = new DateTime (_date.Year, _date.Month, day);
+		_dateField.Date = _date;
 		CreateCalendar ();
 	}
 
@@ -253,7 +172,7 @@ public class DatePicker : TextField {
 	{
 		_table = new DataTable ();
 		GenerateCalendarLabels ();
-		int amountOfDaysInMonth = GetAmountOfDaysInMonth (month, year);
+		int amountOfDaysInMonth = DateTime.DaysInMonth (year, month);
 		DateTime dateValue = new DateTime (year, month, 1);
 		var dayOfWeek = dateValue.DayOfWeek;
 
@@ -301,39 +220,7 @@ public class DatePicker : TextField {
 		}
 	}
 
-	int GetAmountOfDaysInMonth (int month, int year)
-	{
-		return DateTime.DaysInMonth (year, month);
-	}
+	private string GetForwardButtonText () => Glyphs.RightArrow.ToString () + Glyphs.RightArrow.ToString ();
 
-	///<inheritdoc/>
-	public override void OnDrawContent (Rect contentArea)
-	{
-		base.OnDrawContent (contentArea);
-		Driver.SetAttribute (ColorScheme.Focus);
-		Move (Bounds.Right - 1, 0);
-		Driver.AddRune (Glyphs.BlackCircle);
-	}
-
-	///<inheritdoc/>
-	public override bool MouseEvent (MouseEvent me)
-	{
-		if (me.X == Bounds.Right - 1 && me.Y == Bounds.Top && me.Flags == MouseFlags.Button1Pressed) {
-
-			ShowDatePickerDialog ();
-			return true;
-		}
-
-		return false;
-	}
-
-	static List<string> GetMonthNames ()
-	{
-		CultureInfo culture = CultureInfo.CurrentCulture;
-		var monthNames = Enumerable.Range (1, 12)
-					   .Select (month => new DateTime (1, month, 1).ToString ("MMMM", culture))
-					   .ToList ();
-
-		return monthNames;
-	}
+	private string GetBackButtonText () => Glyphs.LeftArrow.ToString () + Glyphs.LeftArrow.ToString ();
 }

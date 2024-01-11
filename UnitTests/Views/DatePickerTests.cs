@@ -16,15 +16,6 @@ public class DatePickerTests {
 	}
 
 	[Fact]
-	public void DatePicker_SetYearsRange_ShouldChangeYearsRange ()
-	{
-		var datePicker = new DatePicker {
-			YearsRange = 2000..2030
-		};
-		Assert.Equal (2000..2030, datePicker.YearsRange);
-	}
-
-	[Fact]
 	public void DatePicker_Initialize_ShouldSetCurrentDate ()
 	{
 		var datePicker = new DatePicker ();
