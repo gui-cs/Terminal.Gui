@@ -20,16 +20,13 @@ namespace Terminal.Gui;
 /// </remarks>
 public class DateField : TextField {
 	DateTime _date;
-	bool _isShort;
 	int _longFieldLen = 10;
-	int _shortFieldLen = 8;
 	string _sepChar;
 	string _longFormat;
-	string _shortFormat;
 
-	int _fieldLen => _isShort ? _shortFieldLen : _longFieldLen;
+	int _fieldLen => _longFieldLen;
 
-	string _format => _isShort ? _shortFormat : _longFormat;
+	string _format => _longFormat;
 
 	/// <summary>
 	///   DateChanged event, raised when the <see cref="Date"/> property has changed.
@@ -48,8 +45,7 @@ public class DateField : TextField {
 	/// <param name="x">The x coordinate.</param>
 	/// <param name="y">The y coordinate.</param>
 	/// <param name="date">Initial date contents.</param>
-	/// <param name="isShort">If true, shows only two digits for the year.</param>
-	public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "") => SetInitialProperties (date, isShort);
+	public DateField (int x, int y, DateTime date) : base (x, y, 12, "") => SetInitialProperties (date);
 
 	/// <summary>
 	///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
@@ -66,13 +62,11 @@ public class DateField : TextField {
 		SetInitialProperties (date);
 	}
 
-	void SetInitialProperties (DateTime date, bool isShort = false)
+	void SetInitialProperties (DateTime date)
 	{
 		var cultureInfo = CultureInfo.CurrentCulture;
 		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
 		_longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
-		_shortFormat = GetShortFormat (_longFormat);
-		this._isShort = isShort;
 		Date = date;
 		CursorPosition = 1;
 		TextChanged += DateField_Changed;
@@ -109,7 +103,6 @@ public class DateField : TextField {
 
 		KeyBindings.Add (Key.CursorRight, Command.Right);
 		KeyBindings.Add (Key.F.WithCtrl, Command.Right);
-
 	}
 
 	/// <inheritdoc />
@@ -130,41 +123,34 @@ public class DateField : TextField {
 	void DateField_Changed (object sender, TextChangedEventArgs e)
 	{
 		try {
-			var date = GetInvarianteDate (Text, _isShort);
+			var cultureInfo = CultureInfo.CurrentCulture;
+			DateTimeFormatInfo ccFmt = cultureInfo.DateTimeFormat;
+			string trimedText = Text[..11];
+			var date = Convert.ToDateTime (trimedText, ccFmt).ToString (ccFmt.ShortDatePattern);
 			if ($" {date}" != Text) {
 				Text = $" {date}";
-			}
-			if (_isShort) {
-				date = GetInvarianteDate (Text, false);
-			}
-			if (!DateTime.TryParseExact (date, GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
-				Text = e.OldValue;
 			}
 		} catch (Exception) {
 			Text = e.OldValue;
 		}
 	}
 
-	string GetInvarianteFormat () => $"MM{_sepChar}dd{_sepChar}yyyy";
-
 	string GetLongFormat (string lf)
 	{
 		string [] frm = lf.Split (_sepChar);
 		for (int i = 0; i < frm.Length; i++) {
-			if (frm [i].Contains ("M") && frm [i].GetRuneCount () < 2) {
+			if (frm [i].Contains ('M') && frm [i].GetRuneCount () < 2) {
 				lf = lf.Replace ("M", "MM");
 			}
-			if (frm [i].Contains ("d") && frm [i].GetRuneCount () < 2) {
+			if (frm [i].Contains ('d') && frm [i].GetRuneCount () < 2) {
 				lf = lf.Replace ("d", "dd");
 			}
-			if (frm [i].Contains ("y") && frm [i].GetRuneCount () < 4) {
+			if (frm [i].Contains ('y') && frm [i].GetRuneCount () < 4) {
 				lf = lf.Replace ("yy", "yyyy");
 			}
 		}
 		return $" {lf}";
 	}
-
-	string GetShortFormat (string lf) => lf.Replace ("yyyy", "yy");
 
 	/// <summary>
 	///   Gets or sets the date of the <see cref="DateField"/>.
@@ -188,28 +174,6 @@ public class DateField : TextField {
 		}
 	}
 
-	/// <summary>
-	/// Get or set the date format for the widget.
-	/// </summary>
-	public bool IsShortFormat {
-		get => _isShort;
-		set {
-			_isShort = value;
-			if (_isShort) {
-				Width = 10;
-			} else {
-				Width = 12;
-			}
-			bool ro = ReadOnly;
-			if (ro) {
-				ReadOnly = false;
-			}
-			SetText (Text);
-			ReadOnly = ro;
-			SetNeedsDisplay ();
-		}
-	}
-
 	/// <inheritdoc/>
 	public override int CursorPosition {
 		get => base.CursorPosition;
@@ -230,7 +194,7 @@ public class DateField : TextField {
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
 		if (CursorPosition < _fieldLen) {
-			newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
+			newText = [.. newText, .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))];
 		}
 		return SetText (StringExtensions.ToString (newText));
 	}
@@ -310,18 +274,12 @@ public class DateField : TextField {
 	{
 		string date = " ";
 		for (int i = 0; i < fm.Length; i++) {
-			if (fm [i].Contains ("M")) {
+			if (fm [i].Contains ('M')) {
 				date += $"{month,2:00}";
-			} else if (fm [i].Contains ("d")) {
+			} else if (fm [i].Contains ('d')) {
 				date += $"{day,2:00}";
 			} else {
-				if (_isShort && year.ToString ().Length == 4) {
-					date += $"{year.ToString ().Substring (2, 2)}";
-				} else if (_isShort) {
-					date += $"{year,2:00}";
-				} else {
-					date += $"{year,4:0000}";
-				}
+				date += $"{year,4:0000}";
 			}
 			if (i < 2) {
 				date += $"{_sepChar}";
@@ -330,40 +288,7 @@ public class DateField : TextField {
 		return date;
 	}
 
-	string GetInvarianteDate (string text, bool isShort)
-	{
-		string [] vals = text.Split (_sepChar);
-		string [] frm = (isShort ? $"MM{_sepChar}dd{_sepChar}yy" : GetInvarianteFormat ()).Split (_sepChar);
-		string [] date = { null, null, null };
-
-		for (int i = 0; i < frm.Length; i++) {
-			if (frm [i].Contains ("M")) {
-				date [0] = vals [i].Trim ();
-			} else if (frm [i].Contains ("d")) {
-				date [1] = vals [i].Trim ();
-			} else {
-				string yearString;
-				if (isShort && vals [i].Length > 2) {
-					yearString = vals [i].Substring (0, 2);
-				} else if (!isShort && vals [i].Length > 4) {
-					yearString = vals [i].Substring (0, 4);
-				} else {
-					yearString = vals [i].Trim ();
-				}
-				var year = int.Parse (yearString);
-				if (isShort && year.ToString ().Length == 4) {
-					date [2] = year.ToString ().Substring (2, 2);
-				} else if (isShort) {
-					date [2] = year.ToString ();
-				} else {
-					date [2] = $"{year,4:0000}";
-				}
-			}
-		}
-		return $"{date [0]}{_sepChar}{date [1]}{_sepChar}{date [2]}";
-	}
-
-	int GetFormatIndex (string [] fm, string t)
+	static int GetFormatIndex (string [] fm, string t)
 	{
 		int idx = -1;
 		for (int i = 0; i < fm.Length; i++) {
@@ -381,7 +306,7 @@ public class DateField : TextField {
 			CursorPosition = _fieldLen;
 			return;
 		}
-		if (Text [++CursorPosition] == _sepChar.ToCharArray () [0]) {
+		if (Text [++CursorPosition] == _sepChar [0]) {
 			CursorPosition++;
 		}
 	}
@@ -392,14 +317,14 @@ public class DateField : TextField {
 			CursorPosition = 1;
 			return;
 		}
-		if (Text [--CursorPosition] == _sepChar.ToCharArray () [0]) {
+		if (Text [--CursorPosition] == _sepChar [0]) {
 			CursorPosition--;
 		}
 	}
 
 	void AdjCursorPosition ()
 	{
-		if (Text [CursorPosition] == _sepChar.ToCharArray () [0]) {
+		if (Text [CursorPosition] == _sepChar [0]) {
 			CursorPosition++;
 		}
 	}

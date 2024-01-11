@@ -159,8 +159,7 @@ namespace UICatalog.Scenarios {
 			var dateField = new DateField (System.DateTime.Now) {
 				X = 1,
 				Y = Pos.Bottom (hexEditor) + 1,
-				Width = 20,
-				IsShortFormat = false
+				Width = 20
 			};
 			Win.Add (dateField);
 
