@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 public partial class View {
 	static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
@@ -71,16 +71,16 @@ public partial class View {
 			_addingView = true;
 			if (SuperView?.CanFocus == false) {
 				SuperView._addingView = true;
-				SuperView.CanFocus    = true;
+				SuperView.CanFocus = true;
 				SuperView._addingView = false;
 			}
-			CanFocus       = true;
+			CanFocus = true;
 			view._tabIndex = _tabIndexes.IndexOf (view);
-			_addingView    = false;
+			_addingView = false;
 		}
 		if (view.Enabled && !Enabled) {
 			view._oldEnabled = true;
-			view.Enabled     = false;
+			view.Enabled = false;
 		}
 
 		OnAdded (new SuperViewChangedEventArgs (this, view));
@@ -157,7 +157,7 @@ public partial class View {
 		_subviews.Remove (view);
 		_tabIndexes.Remove (view);
 		view._superView = null;
-		view._tabIndex  = -1;
+		view._tabIndex = -1;
 		SetNeedsLayout ();
 		SetNeedsDisplay ();
 
@@ -378,14 +378,14 @@ public partial class View {
 							if (!value) {
 								view._oldCanFocus = view.CanFocus;
 								view._oldTabIndex = view._tabIndex;
-								view.CanFocus     = false;
-								view._tabIndex    = -1;
+								view.CanFocus = false;
+								view._tabIndex = -1;
 							} else {
 								if (_addingView) {
 									view._addingView = true;
 								}
-								view.CanFocus    = view._oldCanFocus;
-								view._tabIndex   = view._oldTabIndex;
+								view.CanFocus = view._oldCanFocus;
+								view._tabIndex = view._oldTabIndex;
 								view._addingView = false;
 							}
 						}

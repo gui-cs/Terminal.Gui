@@ -122,7 +122,7 @@ public partial class View {
 	/// </summary>
 	protected void ClearNeedsDisplay ()
 	{
-		_needsDisplayRect   = Rect.Empty;
+		_needsDisplayRect = Rect.Empty;
 		SubViewNeedsDisplay = false;
 	}
 
@@ -159,7 +159,7 @@ public partial class View {
 		} else {
 			var x = Math.Min (_needsDisplayRect.X, region.X);
 			var y = Math.Min (_needsDisplayRect.Y, region.Y);
-			var w = Math.Max (_needsDisplayRect.Width,  region.Width);
+			var w = Math.Max (_needsDisplayRect.Width, region.Width);
 			var h = Math.Max (_needsDisplayRect.Height, region.Height);
 			_needsDisplayRect = new Rect (x, y, w, h);
 		}
