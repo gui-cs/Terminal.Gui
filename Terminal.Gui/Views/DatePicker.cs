@@ -130,7 +130,10 @@ public class DatePicker : View {
 			if (dayValue is null) {
 				return;
 			}
-			int day = int.Parse (dayValue.ToString ());
+			bool isDay = int.TryParse (dayValue.ToString (), out int day);
+			if (!isDay) {
+				return;
+			}
 			ChangeDayDate (day);
 			SelectDayOnCalendar (day);
 			Text = _date.ToString (Format);
