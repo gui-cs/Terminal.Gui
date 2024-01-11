@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,8 +26,6 @@ namespace Terminal.Gui;
 ///         </para>
 /// </remarks>
 public partial class Toplevel : View {
-	internal static Point? _dragPosition;
-	Point _startGrabPoint;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
@@ -292,64 +290,32 @@ public partial class Toplevel : View {
 			Application.Refresh ();
 			return true;
 		});
-		AddCommand (Command.Accept, () => {
-			// TODO: Perhaps all views should support the concept of being default?
-			// TODO: It's bad that Toplevel is tightly coupled with Button
-			if (Subviews.FirstOrDefault (v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
-				defaultBtn.InvokeCommand (Command.Accept);
-				return true;
-			}
-			return false;
-		});
+
 
 		// Default keybindings for this view
-		KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
+		KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
-		KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorLeft, Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorDown, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorLeft, Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorUp, Command.PreviousView);
+		KeyBindings.Add (Key.CursorRight, Command.NextView);
+		KeyBindings.Add (Key.CursorDown, Command.NextView);
+		KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
+		KeyBindings.Add (Key.CursorUp, Command.PreviousView);
 
-		KeyBindings.Add (KeyCode.Tab, Command.NextView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.PreviousView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextViewOrTop);
-		KeyBindings.Add (KeyCode.Tab, Command.NextView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask, Command.PreviousView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask, Command.NextViewOrTop);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
+		KeyBindings.Add (Key.Tab, Command.NextView);
+		KeyBindings.Add (Key.Tab.WithShift, Command.PreviousView);
+		KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
+		KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
 
-		KeyBindings.Add (KeyCode.F5, Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-		KeyBindings.Add (KeyCode.F5, Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+		KeyBindings.Add (Key.F5, Command.Refresh);
+		KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+		KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
-			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
-			KeyBindings.Add (Key.L | Key.CtrlMask, Command.Refresh);// Unix
-			KeyBindings.Add (Key.F | Key.CtrlMask, Command.NextView);// Unix
-			KeyBindings.Add (Key.I | Key.CtrlMask, Command.NextView); // Unix
-			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
+			KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+			KeyBindings.Add (Key.L.WithCtrl, Command.Refresh);// Unix
+			KeyBindings.Add (Key.F.WithCtrl, Command.NextView);// Unix
+			KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
+			KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView);// Unix
 #endif
-		// This enables the default button to be activated by the Enter key.
-		KeyBindings.Add (KeyCode.Enter, Command.Accept);
-	}
-
-	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
-	{
-		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
-			e.Cancel = true;
-		}
-	}
-
-	void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
-	{
-		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
-			e.Cancel = true;
-		}
 	}
 
 	/// <summary>
@@ -363,7 +329,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		AlternateForwardKeyChanged?.Invoke (this, e);
 	}
 
@@ -378,7 +344,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		AlternateBackwardKeyChanged?.Invoke (this, e);
 	}
 
@@ -393,15 +359,9 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
-
-	/// <summary>
-	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
-	/// </summary>
-	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 	void MovePreviousViewOrTop ()
 	{
@@ -490,9 +450,9 @@ public partial class Toplevel : View {
 			return;
 		}
 
-		var found = false;
-		var focusProcessed = false;
-		var idx = 0;
+		bool found = false;
+		bool focusProcessed = false;
+		int idx = 0;
 
 		foreach (var v in views) {
 			if (v == this) {
@@ -567,16 +527,13 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Gets a new location of the <see cref="Toplevel"/> that is within the Bounds of the
-	/// <paramref name="top"/>'s
-	/// <see cref="View.SuperView"/> (e.g. for dragging a Window).
-	/// The `out` parameters are the new X and Y coordinates.
+	///  Gets a new location of the <see cref="Toplevel"/> that is within the Bounds of the <paramref name="top"/>'s 
+	///  <see cref="View.SuperView"/> (e.g. for dragging a Window).
+	///  The `out` parameters are the new X and Y coordinates.
 	/// </summary>
 	/// <remarks>
-	/// If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not
-	/// <see cref="Application.Top"/>
-	/// the position will be bound by the <see cref="ConsoleDriver.Cols"/> and
-	/// <see cref="ConsoleDriver.Rows"/>.
+	/// If <paramref name="top"/> does not have a <see cref="View.SuperView"/> or it's SuperView is not <see cref="Application.Top"/>
+	/// the position will be bound by the <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>.
 	/// </remarks>
 	/// <param name="top">The Toplevel that is to be moved.</param>
 	/// <param name="targetX">The target x location.</param>
@@ -586,17 +543,11 @@ public partial class Toplevel : View {
 	/// <param name="menuBar">The new top most menuBar</param>
 	/// <param name="statusBar">The new top most statusBar</param>
 	/// <returns>
-	/// Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
-	/// <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the
-	/// correct View.
-	/// </returns>
-	internal View GetLocationThatFits (Toplevel top,
-		int targetX,
-		int targetY,
-		out int nx,
-		out int ny,
-		out MenuBar menuBar,
-		out StatusBar statusBar)
+	///  Either <see cref="Application.Top"/> (if <paramref name="top"/> does not have a Super View) or
+	///  <paramref name="top"/>'s SuperView. This can be used to ensure LayoutSubviews is called on the correct View.
+	///  </returns>
+	internal View GetLocationThatFits (Toplevel top, int targetX, int targetY,
+					out int nx, out int ny, out MenuBar menuBar, out StatusBar statusBar)
 	{
 		int maxWidth;
 		View superView;
@@ -683,16 +634,15 @@ public partial class Toplevel : View {
 
 	/// <summary>
 	/// Adjusts the location and size of <paramref name="top"/> within this Toplevel.
-	/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/>
-	/// views.
+	/// Virtual method enabling implementation of specific positions for inherited <see cref="Toplevel"/> views.
 	/// </summary>
 	/// <param name="top">The Toplevel to adjust.</param>
 	public virtual void PositionToplevel (Toplevel top)
 	{
 		var superView = GetLocationThatFits (top, top.Frame.X, top.Frame.Y,
-			out var nx, out var ny, out _, out var sb);
-		var layoutSubviews = false;
-		var maxWidth = 0;
+			out int nx, out int ny, out _, out var sb);
+		bool layoutSubviews = false;
+		int maxWidth = 0;
 		if (superView.Margin != null && superView == top.SuperView) {
 			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
 		}
@@ -780,6 +730,23 @@ public partial class Toplevel : View {
 		return false;
 	}
 
+	internal static Point? _dragPosition;
+	Point _startGrabPoint;
+
+	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+	{
+		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
+			e.Cancel = true;
+		}
+	}
+
+	void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+	{
+		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
+			e.Cancel = true;
+		}
+	}
+
 	///<inheritdoc/>
 	public override bool MouseEvent (MouseEvent mouseEvent)
 	{
@@ -790,7 +757,9 @@ public partial class Toplevel : View {
 		//System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
 
 		int nx, ny;
-		if (!_dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed || mouseEvent.Flags == MouseFlags.Button2Pressed || mouseEvent.Flags == MouseFlags.Button3Pressed)) {
+		if (!_dragPosition.HasValue && (mouseEvent.Flags == MouseFlags.Button1Pressed
+						|| mouseEvent.Flags == MouseFlags.Button2Pressed
+						|| mouseEvent.Flags == MouseFlags.Button3Pressed)) {
 
 			SetFocus ();
 			Application.BringOverlappedTopToFront ();
@@ -808,9 +777,8 @@ public partial class Toplevel : View {
 
 			//System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
 			return true;
-		}
-		if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
-		    mouseEvent.Flags == MouseFlags.Button3Pressed) {
+		} else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) ||
+			mouseEvent.Flags == MouseFlags.Button3Pressed) {
 			if (_dragPosition.HasValue) {
 				if (SuperView == null) {
 					// Redraw the entire app window using just our Frame. Since we are 
@@ -848,14 +816,15 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel,
+	/// Stops and closes this <see cref="Toplevel"/>. If this Toplevel is the top-most Toplevel, 
 	/// <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
 	/// </summary>
 	public virtual void RequestStop ()
 	{
-		if (IsOverlappedContainer &&
-		    Running &&
-		    (Application.Current == this || Application.Current?.Modal == false || Application.Current?.Modal == true && Application.Current?.Running == false)) {
+		if (IsOverlappedContainer && Running
+					&& (Application.Current == this
+					|| Application.Current?.Modal == false
+					|| Application.Current?.Modal == true && Application.Current?.Running == false)) {
 
 			foreach (var child in Application.OverlappedChildren) {
 				var ev = new ToplevelClosingEventArgs (this);
@@ -886,8 +855,7 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If
-	/// <paramref name="top"/> is the top-most Toplevel,
+	/// Stops and closes the <see cref="Toplevel"/> specified by <paramref name="top"/>. If <paramref name="top"/> is the top-most Toplevel, 
 	/// <see cref="Application.RequestStop(Toplevel)"/> will be called, causing the application to exit.
 	/// </summary>
 	/// <param name="top">The Toplevel to request stop.</param>
@@ -937,71 +905,58 @@ public partial class Toplevel : View {
 		base.Dispose (disposing);
 	}
 }
-
 /// <summary>
 /// Implements the <see cref="IEqualityComparer{T}"/> for comparing two <see cref="Toplevel"/>s
 /// used by <see cref="StackExtensions"/>.
 /// </summary>
 public class ToplevelEqualityComparer : IEqualityComparer<Toplevel> {
 	/// <summary>Determines whether the specified objects are equal.</summary>
-	/// <param name="x">The first object of type <see cref="Toplevel"/> to compare.</param>
-	/// <param name="y">The second object of type <see cref="Toplevel"/> to compare.</param>
+	/// <param name="x">The first object of type <see cref="Toplevel" /> to compare.</param>
+	/// <param name="y">The second object of type <see cref="Toplevel" /> to compare.</param>
 	/// <returns>
-	/// <see langword="true"/> if the specified objects are equal; otherwise, <see langword="false"/>.
-	/// </returns>
+	///     <see langword="true" /> if the specified objects are equal; otherwise, <see langword="false" />.</returns>
 	public bool Equals (Toplevel x, Toplevel y)
 	{
 		if (y == null && x == null) {
 			return true;
-		}
-		if (x == null || y == null) {
+		} else if (x == null || y == null) {
 			return false;
-		}
-		if (x.Id == y.Id) {
+		} else if (x.Id == y.Id) {
 			return true;
 		}
 		return false;
 	}
 
 	/// <summary>Returns a hash code for the specified object.</summary>
-	/// <param name="obj">The <see cref="Toplevel"/> for which a hash code is to be returned.</param>
+	/// <param name="obj">The <see cref="Toplevel" /> for which a hash code is to be returned.</param>
 	/// <returns>A hash code for the specified object.</returns>
-	/// <exception cref="ArgumentNullException">
-	/// The type of <paramref name="obj"/>
-	/// is a reference type and <paramref name="obj"/> is <see langword="null"/>.
-	/// </exception>
+	/// <exception cref="ArgumentNullException">The type of <paramref name="obj" /> 
+	/// is a reference type and <paramref name="obj" /> is <see langword="null" />.</exception>
 	public int GetHashCode (Toplevel obj)
 	{
 		if (obj == null) {
 			throw new ArgumentNullException ();
 		}
 
-		var hCode = 0;
-		if (int.TryParse (obj.Id, out var result)) {
+		int hCode = 0;
+		if (int.TryParse (obj.Id, out int result)) {
 			hCode = result;
 		}
 		return hCode.GetHashCode ();
 	}
 }
-
 /// <summary>
-/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/>
+/// Implements the <see cref="IComparer{T}"/> to sort the <see cref="Toplevel"/> 
 /// from the <see cref="Application.OverlappedChildren"/> if needed.
 /// </summary>
 public sealed class ToplevelComparer : IComparer<Toplevel> {
-	/// <summary>
-	/// Compares two objects and returns a value indicating whether one is less than, equal to, or
-	/// greater than the other.
-	/// </summary>
+	/// <summary>Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.</summary>
 	/// <param name="x">The first object to compare.</param>
 	/// <param name="y">The second object to compare.</param>
-	/// <returns>
-	/// A signed integer that indicates the relative values of <paramref name="x"/> and
-	/// <paramref name="y"/>, as shown in the following table.Value Meaning Less than zero
-	/// <paramref name="x"/> is less than <paramref name="y"/>.Zero
-	/// <paramref name="x"/> equals <paramref name="y"/>.Greater than zero
-	/// <paramref name="x"/> is greater than <paramref name="y"/>.
-	/// </returns>
+	/// <returns>A signed integer that indicates the relative values of <paramref name="x" /> and <paramref name="y" />, as shown in the following table.Value Meaning Less than zero
+	///             <paramref name="x" /> is less than <paramref name="y" />.Zero
+	///             <paramref name="x" /> equals <paramref name="y" />.Greater than zero
+	///             <paramref name="x" /> is greater than <paramref name="y" />.</returns>
 	public int Compare (Toplevel x, Toplevel y)
 	{
 		if (ReferenceEquals (x, y)) {

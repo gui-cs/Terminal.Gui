@@ -1,4 +1,4 @@
-﻿//
+//
 // Button.cs: Button control
 //
 // Authors:
@@ -9,7 +9,6 @@ using System;
 using System.Text;
 
 namespace Terminal.Gui;
-
 /// <summary>
 /// Button is a <see cref="View"/> that provides an item that invokes raises the <see cref="Clicked"/> event.
 /// </summary>
@@ -146,6 +145,7 @@ public class Button : View {
 			return true;
 		});
 		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
+		KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
 	}
 
 	/// <inheritdoc/>
@@ -164,14 +164,6 @@ public class Button : View {
 		}
 	}
 
-	bool AcceptKey ()
-	{
-		//if (!HasFocus) {
-		//	SetFocus ();
-		//}
-		OnClicked ();
-		return true;
-	}
 
 	/// <summary>
 	/// Virtual method to invoke the <see cref="Clicked"/> event.
