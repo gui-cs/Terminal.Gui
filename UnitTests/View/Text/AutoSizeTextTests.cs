@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
@@ -13,27 +12,26 @@ namespace Terminal.Gui.ViewTests;
 public class AutoSizeTextTests {
 	readonly ITestOutputHelper _output;
 
-
 	readonly string [] expecteds = new string [21] {
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │                    │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
 │Label 0             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
 │Label 1             │
 │Label 1             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -41,7 +39,7 @@ public class AutoSizeTextTests {
 │Label 2             │
 │Label 2             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -50,7 +48,7 @@ public class AutoSizeTextTests {
 │Label 3             │
 │Label 3             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -60,7 +58,7 @@ public class AutoSizeTextTests {
 │Label 4             │
 │Label 4             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -71,7 +69,7 @@ public class AutoSizeTextTests {
 │Label 5             │
 │Label 5             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -83,7 +81,7 @@ public class AutoSizeTextTests {
 │Label 6             │
 │Label 6             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -96,7 +94,7 @@ public class AutoSizeTextTests {
 │Label 7             │
 │Label 7             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -110,7 +108,7 @@ public class AutoSizeTextTests {
 │Label 8             │
 │Label 8             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -125,7 +123,7 @@ public class AutoSizeTextTests {
 │Label 9             │
 │Label 9             │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -141,7 +139,7 @@ public class AutoSizeTextTests {
 │Label 10            │
 │Label 10            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -158,7 +156,7 @@ public class AutoSizeTextTests {
 │Label 11            │
 │Label 11            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -176,7 +174,7 @@ public class AutoSizeTextTests {
 │Label 12            │
 │Label 12            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -195,7 +193,7 @@ public class AutoSizeTextTests {
 │Label 13            │
 │Label 13            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -215,7 +213,7 @@ public class AutoSizeTextTests {
 │Label 14            │
 │Label 14            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -236,7 +234,7 @@ public class AutoSizeTextTests {
 │Label 15            │
 │Label 15            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -258,7 +256,7 @@ public class AutoSizeTextTests {
 │Label 16            │
 │Label 16            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -281,7 +279,7 @@ public class AutoSizeTextTests {
 │Label 17            │
 │Label 17            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -305,7 +303,7 @@ public class AutoSizeTextTests {
 │Label 18            │
 │Label 18            │
 └────────────────────┘",
-							       @"
+		@"
 ┌────────────────────┐
 │View with long text │
 │Label 0             │
@@ -330,7 +328,7 @@ public class AutoSizeTextTests {
 │Label 19            │
 │Label 19            │
 └────────────────────┘"
-						       };
+	};
 
 	public AutoSizeTextTests (ITestOutputHelper output) => _output = output;
 
@@ -1305,7 +1303,7 @@ Y
 		// Label is AutoSize == true
 		var listLabels = new List<Label> ();
 
-		for (int i = 0; i < count; i++) {
+		for (var i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
 			var label = new Label (field.Text) { X = 0, Y = i + 1, Width = 10 };
 			view.Add (label);
@@ -2515,7 +2513,7 @@ Y
 		Application.End (rs);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory] [AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
@@ -2526,7 +2524,7 @@ Y
 		var lblCenter = new View (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize };
 		var lblRight = new View (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize };
 		var lblJust = new View (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize };
-		var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
 		Application.Top.Add (frame);
 		Application.Begin (Application.Top);
@@ -2564,13 +2562,13 @@ Y
 │Hello          World│
 └────────────────────┘
 "
-		;
+			;
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory] [AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void View_Draw_Vertical_Simple_TextAlignments (bool autoSize)
@@ -2581,7 +2579,7 @@ Y
 		var lblCenter = new View (text) { X = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Middle };
 		var lblRight = new View (text) { X = 4, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Bottom };
 		var lblJust = new View (text) { X = 6, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Justified };
-		var frame = new FrameView () { Width = Dim.Fill (), Height = Dim.Fill () };
+		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
 		Application.Top.Add (frame);
@@ -2636,7 +2634,7 @@ Y
 │    d d│
 └───────┘
 "
-		;
+			;
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
