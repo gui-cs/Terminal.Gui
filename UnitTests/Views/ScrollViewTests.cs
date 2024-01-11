@@ -598,7 +598,7 @@ namespace Terminal.Gui.ViewsTests {
 00000000000000000000000
 00000000000000000000000", null, attributes);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void DrawTextFormatter_Respects_The_Clip_Bounds ()
 		{

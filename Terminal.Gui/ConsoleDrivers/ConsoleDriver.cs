@@ -62,7 +62,7 @@ public abstract class ConsoleDriver {
 		get => _cols;
 		internal set {
 			_cols = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -73,7 +73,7 @@ public abstract class ConsoleDriver {
 		get => _rows;
 		internal set {
 			_rows = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
