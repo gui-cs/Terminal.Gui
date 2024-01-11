@@ -454,7 +454,7 @@ public partial class View {
 	{
 		if (NeedsDisplay) {
 			if (SuperView != null) {
-				Clear (BoundsToScreen (Bounds));
+				Clear (BoundsToScreen (contentArea));
 			}
 
 			if (!string.IsNullOrEmpty (TextFormatter.Text)) {
@@ -463,7 +463,7 @@ public partial class View {
 				}
 			}
 			// This should NOT clear 
-			TextFormatter?.Draw (BoundsToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+			TextFormatter?.Draw (BoundsToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
 				HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 				Rect.Empty, false);
 			SetSubViewNeedsDisplay ();

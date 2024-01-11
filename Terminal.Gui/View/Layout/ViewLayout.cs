@@ -101,7 +101,7 @@ public partial class View {
 	/// <see cref="SuperView"/> and its <see cref="Subviews"/>.
 	/// </para>
 	/// </remarks>
-	public Frame Border { get; private set; }
+	public Border Border { get; private set; }
 
 	/// <summary>
 	/// Gets or sets whether the view has a one row/col thick border.
@@ -191,7 +191,7 @@ public partial class View {
 			Margin.ThicknessChanged -= ThicknessChangedHandler;
 			Margin.Dispose ();
 		}
-		Margin = new Frame () { Id = "Margin", Thickness = new Thickness (0) };
+		Margin = new Frame () { Thickness = new Thickness (0) };
 		Margin.ThicknessChanged += ThicknessChangedHandler;
 		Margin.Parent = this;
 
@@ -199,7 +199,7 @@ public partial class View {
 			Border.ThicknessChanged -= ThicknessChangedHandler;
 			Border.Dispose ();
 		}
-		Border = new Frame () { Id = "Border", Thickness = new Thickness (0) };
+		Border = new Border () { Thickness = new Thickness (0) };
 		Border.ThicknessChanged += ThicknessChangedHandler;
 		Border.Parent = this;
 
@@ -209,7 +209,7 @@ public partial class View {
 			Padding.ThicknessChanged -= ThicknessChangedHandler;
 			Padding.Dispose ();
 		}
-		Padding = new Frame () { Id = "Padding", Thickness = new Thickness (0) };
+		Padding = new Frame () { Thickness = new Thickness (0) };
 		Padding.ThicknessChanged += ThicknessChangedHandler;
 		Padding.Parent = this;
 	}

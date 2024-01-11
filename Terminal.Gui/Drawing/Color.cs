@@ -736,6 +736,17 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	}
 
 	/// <summary>
+	///  Initializes a new instance from an existing instance.
+	/// </summary>
+	public Attribute (Attribute attr)
+	{
+		PlatformColor = -1;
+		var d = Default;
+		Foreground = new Color (attr.Foreground.ColorName);
+		Background = new Color (attr.Background.ColorName);
+	}
+
+	/// <summary>
 	/// Initializes a new instance with platform specific color value.
 	/// </summary>
 	/// <param name="platformColor">Value.</param>
