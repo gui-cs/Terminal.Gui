@@ -6,6 +6,7 @@ using Xunit;
 namespace Terminal.Gui.ViewsTests;
 
 public class DatePickerTests {
+
 	[Fact]
 	public void DatePicker_SetFormat_ShouldChangeFormat ()
 	{

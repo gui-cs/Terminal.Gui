@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using Terminal.Gui.Views;
 using Xunit;
-using System.IO;
-using System.Text;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -16,7 +15,7 @@ public class AllViewsTests {
 	{
 		this._output = output;
 	}
-	
+
 	[Fact]
 	public void AllViews_Tests_All_Constructors ()
 	{
@@ -76,6 +75,10 @@ public class AllViewsTests {
 
 			if (vType is TextView) {
 				top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+			} else if (vType is DatePicker) {
+				for (int i = 0; i < 4; i++) {
+					top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+				}
 			} else {
 				top.NewKeyDownEvent (new (KeyCode.Tab));
 			}
@@ -102,7 +105,7 @@ public class AllViewsTests {
 	//	}
 	//}
 
-	public bool Constructors_FullTest (Type type)	
+	public bool Constructors_FullTest (Type type)
 	{
 		foreach (var ctor in type.GetConstructors ()) {
 			var view = GetTypeInitializer (type, ctor);
