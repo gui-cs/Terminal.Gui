@@ -113,7 +113,7 @@ namespace Terminal.Gui.ViewsTests {
 			hv.LayoutSubviews ();
 
 			KeyValuePair<long, byte> keyValuePair = default;
-			hv.Edited += (s,e) => keyValuePair = new KeyValuePair<long, byte>(e.Position,e.NewValue);
+			hv.Edited += (s, e) => keyValuePair = new KeyValuePair<long, byte> (e.Position, e.NewValue);
 
 			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
 			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D6)));
