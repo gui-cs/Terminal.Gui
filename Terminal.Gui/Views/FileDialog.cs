@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Modal dialog for selecting files/directories. Has auto-complete and expandable
@@ -91,7 +91,7 @@ public class FileDialog : Dialog {
 		btnOk.Clicked += (s, e) => Accept (true);
 		btnOk.KeyDown += (s, k) => {
 			NavigateIf (k, KeyCode.CursorLeft, btnCancel);
-			NavigateIf (k, KeyCode.CursorUp,   tableView);
+			NavigateIf (k, KeyCode.CursorUp, tableView);
 		};
 
 		btnCancel = new Button (Strings.btnCancel) {
@@ -99,8 +99,8 @@ public class FileDialog : Dialog {
 			X = Pos.Right (btnOk) + 1
 		};
 		btnCancel.KeyDown += (s, k) => {
-			NavigateIf (k, KeyCode.CursorLeft,  btnToggleSplitterCollapse);
-			NavigateIf (k, KeyCode.CursorUp,    tableView);
+			NavigateIf (k, KeyCode.CursorLeft, btnToggleSplitterCollapse);
+			NavigateIf (k, KeyCode.CursorUp, tableView);
 			NavigateIf (k, KeyCode.CursorRight, btnOk);
 		};
 		btnCancel.Clicked += (s, e) => {
@@ -265,10 +265,10 @@ public class FileDialog : Dialog {
 		tableView.KeyUp += (s, k) => k.Handled = TableView_KeyUp (k);
 		tableView.SelectedCellChanged += TableView_SelectedCellChanged;
 
-		tableView.KeyBindings.Add (KeyCode.Home,                     Command.TopHome);
-		tableView.KeyBindings.Add (KeyCode.End,                      Command.BottomEnd);
+		tableView.KeyBindings.Add (KeyCode.Home, Command.TopHome);
+		tableView.KeyBindings.Add (KeyCode.End, Command.BottomEnd);
 		tableView.KeyBindings.Add (KeyCode.Home | KeyCode.ShiftMask, Command.TopHomeExtend);
-		tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask,  Command.BottomEndExtend);
+		tableView.KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.BottomEndExtend);
 
 		treeView.KeyDown += (s, k) => {
 
@@ -475,7 +475,7 @@ public class FileDialog : Dialog {
 	string GetUpButtonText () => Style.UseUnicodeCharacters ? "◭" : "▲";
 
 	string GetToggleSplitterText (bool isExpanded) => isExpanded ?
-		new string ((char)Glyphs.LeftArrow.Value,  2) :
+		new string ((char)Glyphs.LeftArrow.Value, 2) :
 		new string ((char)Glyphs.RightArrow.Value, 2);
 
 	void Delete ()
@@ -1183,10 +1183,10 @@ public class FileDialog : Dialog {
 
 		// TODO: Add some kind of cache for this
 		return new ColorScheme {
-			Normal = new Attribute (color,    black),
+			Normal = new Attribute (color, black),
 			HotNormal = new Attribute (color, black),
-			Focus = new Attribute (black,     color),
-			HotFocus = new Attribute (black,  color)
+			Focus = new Attribute (black, color),
+			HotFocus = new Attribute (black, color)
 		};
 	}
 
@@ -1273,7 +1273,7 @@ public class FileDialog : Dialog {
 		// This portion is flexible based on the column clicked (e.g. alphabetical)
 		var ordered =
 			currentSortIsAsc ?
-				forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn,           f)) :
+				forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn, f)) :
 				forcedOrder.ThenByDescending (f => FileDialogTableSource.GetRawColumnValue (currentSortColumn, f));
 
 		State.Children = ordered.ToArray ();
