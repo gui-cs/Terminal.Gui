@@ -109,7 +109,7 @@ public static partial class Application {
 	/// </para>
 	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
 	/// <param name="driverName">The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
-	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (() => new Toplevel(), driver, driverName);
+	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (() => new Toplevel (), driver, driverName);
 
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
@@ -196,8 +196,8 @@ public static partial class Application {
 		Current = Top;
 
 		// Ensure Top's layout is up to date.
-		Current.SetRelativeLayout (Driver.Bounds); 
-		
+		Current.SetRelativeLayout (Driver.Bounds);
+
 		_cachedSupportedCultures = GetSupportedCultures ();
 		_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 		_initialized = true;
@@ -402,7 +402,7 @@ public static partial class Application {
 		}
 
 		//if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-			Toplevel.SetRelativeLayout (Driver.Bounds);
+		Toplevel.SetRelativeLayout (Driver.Bounds);
 		//}
 		Toplevel.LayoutSubviews ();
 		Toplevel.PositionToplevels ();
@@ -447,7 +447,7 @@ public static partial class Application {
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
 	/// Must be <see langword="null"/> if <see cref="Init"/> has already been called. 
 	/// </param>
-	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
+	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new()
 	{
 		if (_initialized) {
 			if (Driver != null) {
@@ -1338,7 +1338,8 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
@@ -1362,7 +1363,8 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
@@ -1386,7 +1388,8 @@ public static partial class Application {
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key QuitKey {
 		get => _quitKey;
 		set {

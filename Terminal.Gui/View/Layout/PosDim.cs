@@ -405,8 +405,8 @@ public class Pos {
 	}
 
 	internal class PosView : Pos {
-		public readonly View Target;
 		readonly int side;
+		public readonly View Target;
 
 		public PosView (View view, int side)
 		{

@@ -202,7 +202,7 @@ public class RadioGroup : View {
 		if (KeyBindings.TryGet (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {
-				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out var hotKey) 
+				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out var hotKey)
 					&& (key.NoAlt.NoCtrl.NoShift) == hotKey) {
 					SelectedItem = i;
 					keyEvent.Scope = KeyBindingScope.HotKey;

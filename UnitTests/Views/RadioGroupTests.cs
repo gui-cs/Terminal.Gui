@@ -49,7 +49,7 @@ public class RadioGroupTests {
 		view.BeginInit ();
 		view.EndInit ();
 		view.LayoutSubviews ();
-		
+
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
 		Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);

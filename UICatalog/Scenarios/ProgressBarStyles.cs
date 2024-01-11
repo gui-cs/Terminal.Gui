@@ -4,7 +4,7 @@ using System.Threading;
 using Terminal.Gui;
 using static UICatalog.Scenarios.Frames;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ProgressBar Styles", "Shows the ProgressBar Styles.")]
 [ScenarioCategory ("Controls")]

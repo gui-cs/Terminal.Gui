@@ -536,7 +536,7 @@ public partial class View {
 		if (Margin == null || Border == null || Padding == null) {
 			return new Rect (default, Frame.Size);
 		}
-		var width = Math.Max (0,  Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+		var width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
 		var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
 		return new Rect (Point.Empty, new Size (width, height));
 	}
@@ -579,7 +579,7 @@ public partial class View {
 		// TODO: Until then leave it `internal` and non-virtual
 		// First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
 		// Finally, if none of those are valid, use int.MaxValue (for Unit tests).
-		var relativeBounds = SuperView is { IsInitialized: true }        ? SuperView.Bounds :
+		var relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
 			Application.Top != null && Application.Top.IsInitialized ? Application.Top.Bounds :
 										   Application.Driver?.Bounds ??
 										   new Rect (0, 0, int.MaxValue, int.MaxValue);
@@ -758,7 +758,7 @@ public partial class View {
 
 				case Dim.DimCombine combine:
 					// TODO: Move combine logic into DimCombine?
-					var leftNewDim = GetNewDimension (combine._left,   location, dimension, autosize);
+					var leftNewDim = GetNewDimension (combine._left, location, dimension, autosize);
 					var rightNewDim = GetNewDimension (combine._right, location, dimension, autosize);
 					if (combine._add) {
 						newDimension = leftNewDim + rightNewDim;
@@ -805,7 +805,7 @@ public partial class View {
 			case Pos.PosCombine combine:
 				// TODO: Move combine logic into PosCombine?
 				int left, right;
-				(left, newDimension) = GetNewLocationAndDimension (width,  superviewBounds, combine._left,  dim, autosizeDimension);
+				(left, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._left, dim, autosizeDimension);
 				(right, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._right, dim, autosizeDimension);
 				if (combine._add) {
 					newLocation = left + right;
@@ -912,7 +912,7 @@ public partial class View {
 			}
 			return;
 		case Pos.PosCombine pc:
-			CollectPos (pc._left,  from, ref nNodes, ref nEdges);
+			CollectPos (pc._left, from, ref nNodes, ref nEdges);
 			CollectPos (pc._right, from, ref nNodes, ref nEdges);
 			break;
 		}
@@ -931,7 +931,7 @@ public partial class View {
 			}
 			return;
 		case Dim.DimCombine dc:
-			CollectDim (dc._left,  from, ref nNodes, ref nEdges);
+			CollectDim (dc._left, from, ref nNodes, ref nEdges);
 			CollectDim (dc._right, from, ref nNodes, ref nEdges);
 			break;
 		}
@@ -947,7 +947,7 @@ public partial class View {
 			}
 			CollectPos (v.X, v, ref nNodes, ref nEdges);
 			CollectPos (v.Y, v, ref nNodes, ref nEdges);
-			CollectDim (v.Width,  v, ref nNodes, ref nEdges);
+			CollectDim (v.Width, v, ref nNodes, ref nEdges);
 			CollectDim (v.Height, v, ref nNodes, ref nEdges);
 		}
 	}

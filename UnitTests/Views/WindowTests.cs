@@ -91,7 +91,8 @@ public class WindowTests {
 		r.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MenuBar_And_StatusBar_Inside_Window ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
@@ -173,7 +174,8 @@ public class WindowTests {
 └──────────────────┘", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True ()
 	{
 		var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
@@ -191,7 +193,8 @@ public class WindowTests {
 		Assert.False (view2.HasFocus);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {

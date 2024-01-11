@@ -761,7 +761,8 @@ public class DialogTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Dialog_Opened_From_Another_Dialog ()
 	{
 		((FakeDriver)Driver).SetBufferSize (30, 10);
@@ -834,7 +835,8 @@ public class DialogTests {
 		Assert.Equal (4, iterations);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Dialog_In_Window_With_Size_One_Button_Aligns ()
 	{
 		((FakeDriver)Driver).SetBufferSize (20, 5);
@@ -868,7 +870,8 @@ public class DialogTests {
 		Run (win);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (5, @"
 ┌┌───────────────┐─┐
 ││               │ │
@@ -933,7 +936,8 @@ public class DialogTests {
 
 	// TODO: This is not really a Dialog test, but a ViewLayout test (Width = Dim.Fill (1) - Dim.Function (Btn_Width))
 	// TODO: Move (and simplify)
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Dialog_In_Window_With_TextField_And_Button_AnchorEnd ()
 	{
 		((FakeDriver)Driver).SetBufferSize (20, 5);

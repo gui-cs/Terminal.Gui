@@ -51,7 +51,7 @@ public class AllViewsTests {
 			var expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
 
 			Assert.True (view.Frame.Left == expectedX, $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
-			Assert.True (view.Frame.Top == expectedY,  $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
+			Assert.True (view.Frame.Top == expectedY, $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
 			Application.Shutdown ();
 		}
 	}
@@ -67,7 +67,7 @@ public class AllViewsTests {
 
 		Application.Shutdown ();
 	}
-	
+
 	[Fact]
 	public void AllViews_Enter_Leave_Events ()
 	{
@@ -141,7 +141,7 @@ public class AllViewsTests {
 	//	}
 	//}
 
-	public bool Test_All_Constructors_Of_Type (Type type)	
+	public bool Test_All_Constructors_Of_Type (Type type)
 	{
 		foreach (var ctor in type.GetConstructors ()) {
 			var view = CreateViewFromType (type, ctor);
