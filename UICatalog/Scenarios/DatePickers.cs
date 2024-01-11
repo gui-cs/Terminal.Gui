@@ -1,5 +1,4 @@
-﻿using System;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 using Terminal.Gui.Views;
 
 namespace UICatalog.Scenarios;
@@ -8,26 +7,16 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("DateTime")]
 public class DatePickers : Scenario {
 
-	DatePicker _datePicker;
-	Label _currentlySelectedDateLabel;
 
 	public override void Setup ()
 	{
-		var dp = new DatePicker () {
-			Format = "dd/MM/yyyy",
+		var datePicker = new DatePicker () {
+			Y = Pos.Center (),
+			X = Pos.Center ()
 		};
 
-		Win.Add (dp);
-	}
 
-	private void DateChanged (object sender, TextChangedEventArgs e)
-	{
-		try {
-			string parsedNewDate = _datePicker.Date.ToString (_datePicker.Format);
-			_currentlySelectedDateLabel.Text = $"Currently selected date: {parsedNewDate}";
-		} catch (FormatException) {
-			MessageBox.ErrorQuery ("Error", "Unable to parse date", "Ok");
-		}
+		Win.Add (datePicker);
 	}
 }
 
