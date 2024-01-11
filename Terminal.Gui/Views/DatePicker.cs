@@ -187,6 +187,10 @@ public class DatePicker : View {
 			}
 			dayOfWeek = dayOfWeek == DayOfWeek.Saturday ? DayOfWeek.Sunday : dayOfWeek + 1;
 		}
+		int missingRows = 6 - _table.Rows.Count;
+		for (int i = 0; i < missingRows; i++) {
+			_table.Rows.Add (new object [7]);
+		}
 
 		return _table;
 	}
