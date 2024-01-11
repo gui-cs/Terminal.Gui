@@ -15,11 +15,14 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class DatePicker : View {
 
-	private DataTable _table;
-	private TableView _calendar;
-	private DateTime _date = DateTime.Now;
-
 	private DateField _dateField;
+	private Label _dateLabel;
+	private TableView _calendar;
+	private DataTable _table;
+	private Button _nextMonthButton;
+	private Button _previousMonthButton;
+
+	private DateTime _date = DateTime.Now;
 
 	/// <summary>
 	/// Format of date. The default is MM/dd/yyyy.
@@ -64,14 +67,14 @@ public class DatePicker : View {
 		Title = "Date Picker";
 		BorderStyle = LineStyle.Single;
 		Date = date;
-		var dateLabel = new Label ("Date: ") {
+		_dateLabel = new Label ("Date: ") {
 			X = 0,
 			Y = 0,
 			Height = 1,
 		};
 
 		_dateField = new DateField (DateTime.Now) {
-			X = Pos.Right (dateLabel),
+			X = Pos.Right (_dateLabel),
 			Y = 0,
 			Width = Dim.Fill (1),
 			Height = 1,
@@ -80,7 +83,7 @@ public class DatePicker : View {
 
 		_calendar = new TableView () {
 			X = 0,
-			Y = Pos.Bottom (dateLabel),
+			Y = Pos.Bottom (_dateLabel),
 			Height = 11,
 			Style = new TableStyle {
 				ShowHeaders = true,
@@ -90,33 +93,27 @@ public class DatePicker : View {
 			}
 		};
 
-		var yearsLabel = new Label ("Year:") {
-			X = Pos.Right (_calendar) + 1,
-			Y = 1,
-			Height = 1,
-		};
-
-		var previousMonthButton = new Button (GetBackButtonText ()) {
+		_previousMonthButton = new Button (GetBackButtonText ()) {
 			X = Pos.Center () - 4,
 			Y = Pos.Bottom (_calendar) - 1,
 			Height = 1,
 			Width = CalculateCalendarWidth () / 2
 		};
 
-		previousMonthButton.Clicked += (sender, e) => {
+		_previousMonthButton.Clicked += (sender, e) => {
 			Date = _date.AddMonths (-1);
 			CreateCalendar ();
 			_dateField.Date = Date;
 		};
 
-		var nextMonthButton = new Button (GetForwardButtonText ()) {
-			X = Pos.Right (previousMonthButton) + 2,
+		_nextMonthButton = new Button (GetForwardButtonText ()) {
+			X = Pos.Right (_previousMonthButton) + 2,
 			Y = Pos.Bottom (_calendar) - 1,
 			Height = 1,
 			Width = CalculateCalendarWidth () / 2
 		};
 
-		nextMonthButton.Clicked += (sender, e) => {
+		_nextMonthButton.Clicked += (sender, e) => {
 			Date = _date.AddMonths (1);
 			CreateCalendar ();
 			_dateField.Date = Date;
@@ -145,8 +142,7 @@ public class DatePicker : View {
 
 		_dateField.DateChanged += DateField_DateChanged;
 
-		Add (dateLabel, _dateField, _calendar, previousMonthButton, nextMonthButton);
-
+		Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
 	}
 
 	private void DateField_DateChanged (object sender, DateTimeEventArgs<DateTime> e)
@@ -230,4 +226,16 @@ public class DatePicker : View {
 	private string GetForwardButtonText () => Glyphs.RightArrow.ToString () + Glyphs.RightArrow.ToString ();
 
 	private string GetBackButtonText () => Glyphs.LeftArrow.ToString () + Glyphs.LeftArrow.ToString ();
+
+	///<inheritdoc/>
+	protected override void Dispose (bool disposing)
+	{
+		_dateLabel.Dispose ();
+		_calendar.Dispose ();
+		_dateField.Dispose ();
+		_table.Dispose ();
+		_previousMonthButton.Dispose ();
+		_nextMonthButton.Dispose ();
+		base.Dispose (disposing);
+	}
 }
