@@ -1265,7 +1265,7 @@ namespace Terminal.Gui {
 				cbTxt +
 				StringExtensions.ToString (_text.GetRange (selStart + _length, _text.Count - (selStart + _length)));
 
-			_cursorPosition = selStart + cbTxt.GetRuneCount ();
+			_cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
 			ClearAllSelection ();
 			SetNeedsDisplay ();
 			Adjust ();
