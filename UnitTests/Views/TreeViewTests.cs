@@ -837,8 +837,9 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTreeViewColor ()
 		{
 			var tv = new TreeView { Width = 20, Height = 10 };
-			tv.BeginInit ();
-			tv.EndInit ();
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
 			var n1 = new TreeNode ("normal");
 			var n1_1 = new TreeNode ("pink");
 			var n1_2 = new TreeNode ("normal");
@@ -852,11 +853,6 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
-
-			// Subscribe to return only the current color scheme
-			// Maybe some other test wasn't totally disposed some tree view
-			tv.ColorGetter = (_) => tv.ColorScheme;
-
 			tv.Draw ();
 
 			// create a new color scheme
