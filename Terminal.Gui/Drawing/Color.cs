@@ -184,7 +184,13 @@ public class Color : IEquatable<Color> {
 	/// Initializes a new instance of the <see cref="Color"/> class with an encoded 24-bit color value.
 	/// </summary>
 	/// <param name="rgba">The encoded 24-bit color value (see <see cref="Rgba"/>).</param>
-	public Color (int rgba) => Rgba = rgba;
+	public Color (int rgba)
+	{
+		A = (byte)(rgba >> 24 & 0xFF);
+		R = (byte)(rgba >> 16 & 0xFF);
+		G = (byte)(rgba >> 8 & 0xFF);
+		B = (byte)(rgba & 0xFF);
+	}
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color value.
@@ -229,15 +235,15 @@ public class Color : IEquatable<Color> {
 	/// <summary>
 	/// Red color component.
 	/// </summary>
-	public int R { get; set; }
+	public int R { get; private init; }
 	/// <summary>
 	/// Green color component.
 	/// </summary>
-	public int G { get; set; }
+	public int G { get; private init; }
 	/// <summary>
 	/// Blue color component.
 	/// </summary>
-	public int B { get; set; }
+	public int B { get; private init; }
 
 	/// <summary>
 	/// Alpha color component.
@@ -245,7 +251,7 @@ public class Color : IEquatable<Color> {
 	/// <remarks>
 	/// The Alpha channel is not supported by Terminal.Gui.
 	/// </remarks>
-	public int A { get; set; } = 0xFF; // Not currently supported; here for completeness.
+	public int A { get; private init; } = 0xFF; // Not currently supported; here for completeness.
 
 	/// <summary>
 	/// Gets or sets the color value encoded as ARGB32.
@@ -253,15 +259,7 @@ public class Color : IEquatable<Color> {
 	/// (&lt;see cref="A"/&gt; &lt;&lt; 24) | (&lt;see cref="R"/&gt; &lt;&lt; 16) | (&lt;see cref="G"/&gt; &lt;&lt; 8) | &lt;see cref="B"/&gt;
 	/// </code>
 	/// </summary>
-	public int Rgba {
-		get => A << 24 | R << 16 | G << 8 | B;
-		set {
-			A = (byte)(value >> 24 & 0xFF);
-			R = (byte)(value >> 16 & 0xFF);
-			G = (byte)(value >> 8 & 0xFF);
-			B = (byte)(value & 0xFF);
-		}
-	}
+	public int Rgba => A << 24 | R << 16 | G << 8 | B;
 
 	// TODO: Make this map configurable via ConfigurationManager
 	// TODO: This does not need to be a Dictionary, but can be an 16 element array.
@@ -370,26 +368,16 @@ public class Color : IEquatable<Color> {
 	}
 
 	/// <summary>
-	/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value.
+	/// Gets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value.
 	/// <see langword="get"/> will return the closest 16 color match to the true color when no exact value is found.
 	/// </summary>
 	/// <remarks>
 	/// Get returns the <see cref="ColorName"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded map.
 	/// </remarks>
-	public ColorName ColorName {
-		get => FindClosestColor (this);
-		set {
-
-			var c = FromColorName (value);
-			R = c.R;
-			G = c.G;
-			B = c.B;
-			A = c.A;
-		}
-	}
+	public ColorName ColorName => FindClosestColor (this);
 
 	/// <summary>
-	/// Gets or sets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value.
+	/// Gets the <see cref="Color"/> using a legacy 16-color <see cref="Gui.ColorName"/> value.
 	/// <see langword="get"/> will return the closest 16 color match to the true color when no exact value is found.
 	/// </summary>
 	/// <remarks>
@@ -480,7 +468,7 @@ public class Color : IEquatable<Color> {
 	public static bool TryParse (string text, [NotNullWhen (true)] out Color color)
 	{
 		// empty color
-		if (text == null || text.Length == 0) {
+		if (string.IsNullOrEmpty (text)) {
 			color = null;
 			return false;
 		}
@@ -558,6 +546,7 @@ public class Color : IEquatable<Color> {
 		return false;
 	}
 
+	// TODO: Verify implict/explicit are correct for below
 	#region Operators
 	/// <summary>
 	/// Cast from int.
@@ -691,6 +680,7 @@ public class Color : IEquatable<Color> {
 		return $"#{R:X2}{G:X2}{B:X2}";
 	}
 }
+
 /// <summary>
 /// Attributes represent how text is styled when displayed in the terminal. 
 /// </summary>
@@ -708,7 +698,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// This is a dynamic property that returns a new Attribute instance each time it's
 	/// accessed and has not setter.
 	/// </remarks>
-	public static readonly Attribute Default = new Attribute (Color.White, Color.Black);
+	public static Attribute Default => new Attribute (Color.White, Color.Black);
 
 	/// <summary>
 	/// The <see cref="ConsoleDriver"/>-specific color value.
@@ -720,13 +710,13 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// The foreground color.
 	/// </summary>
 	[JsonConverter (typeof (ColorJsonConverter))]
-	public Color Foreground { get; private init; }
+	public Color Foreground { get; }
 
 	/// <summary>
 	/// The background color.
 	/// </summary>
 	[JsonConverter (typeof (ColorJsonConverter))]
-	public Color Background { get; private init; }
+	public Color Background { get; }
 
 	/// <summary>
 	///  Initializes a new instance with default values.
@@ -734,9 +724,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	public Attribute ()
 	{
 		PlatformColor = -1;
-		var d = Default;
-		Foreground = new Color (d.Foreground.ColorName);
-		Background = new Color (d.Background.ColorName);
+		Foreground = new Color (Default.Foreground.ColorName);
+		Background = new Color (Default.Background.ColorName);
 	}
 
 	/// <summary>
@@ -745,7 +734,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	public Attribute (Attribute attr)
 	{
 		PlatformColor = -1;
-		var d = Default;
 		Foreground = new Color (attr.Foreground.ColorName);
 		Background = new Color (attr.Background.ColorName);
 	}
@@ -872,6 +860,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 		// Note, Unit tests are dependent on this format
 		$"{Foreground},{Background}";
 }
+
 /// <summary>
 /// Defines the <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>. 
 /// Containers such as <see cref="Window"/> and <see cref="FrameView"/> use <see cref="ColorScheme"/> to determine
@@ -1017,6 +1006,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <returns><c>true</c> if the two objects are not equivalent</returns>
 	public static bool operator != (ColorScheme left, ColorScheme right) => !(left == right);
 }
+
 /// <summary>
 /// The default <see cref="ColorScheme"/>s for the application.
 /// </summary>
