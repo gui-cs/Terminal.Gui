@@ -853,7 +853,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
 
-			// Subscribe to return on the current color scheme
+			// Subscribe to return only the current color scheme
 			// Maybe some other test wasn't totally disposed some tree view
 			tv.ColorGetter = (_) => tv.ColorScheme;
 
