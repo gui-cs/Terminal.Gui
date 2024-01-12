@@ -704,6 +704,10 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// <summary>
 	/// Default empty attribute.
 	/// </summary>
+	/// <remarks>
+	/// This is a dynamic property that returns a new Attribute instance each time it's
+	/// accessed and has not setter.
+	/// </remarks>
 	public static readonly Attribute Default = new Attribute (Color.White, Color.Black);
 
 	/// <summary>

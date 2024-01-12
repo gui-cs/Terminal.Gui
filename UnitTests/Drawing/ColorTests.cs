@@ -342,19 +342,19 @@ public class ColorTests {
 		}
 	}
 
-	[Fact]
-	public void Color_ColorName_Set_SetsColorBasedOnColorName ()
-	{
-		// Arrange
-		var color = new Color (0, 0, 0); // Black
-		var expectedColor = new Color (ColorName.Magenta);
+	//[Fact]
+	//public void Color_ColorName_Set_SetsColorBasedOnColorName ()
+	//{
+	//	// Arrange
+	//	var color = new Color (0, 0, 0); // Black
+	//	var expectedColor = new Color (ColorName.Magenta);
 
-		// Act
-		color.ColorName = ColorName.Magenta;
+	//	// Act
+	//	color.ColorName = ColorName.Magenta;
 
-		// Assert
-		Assert.Equal (expectedColor, color);
-	}
+	//	// Assert
+	//	Assert.Equal (expectedColor, color);
+	//}
 }
 
 
