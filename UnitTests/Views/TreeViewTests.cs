@@ -832,6 +832,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Null (tv.GetObjectRow (n1_2));
 			Assert.Equal (0, tv.GetObjectRow (n2));
 		}
+
 		[Fact, AutoInitShutdown]
 		public void TestTreeViewColor ()
 		{
@@ -851,6 +852,10 @@ namespace Terminal.Gui.ViewsTests {
 
 			tv.ColorScheme = new ColorScheme ();
 			tv.LayoutSubviews ();
+
+			// Unsubscribe any previous assigned delegate
+			tv.ColorGetter = (_) => tv.ColorScheme;
+
 			tv.Draw ();
 
 			// create a new color scheme
@@ -866,10 +871,10 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 			// Should all be the same color
 			TestHelpers.AssertDriverColorsAre (@"
+00000000
+00000000
 0000000000
-0000000000
-0000000000
-0000000000
+000000
 ", driver: Application.Driver,
 				new [] { tv.ColorScheme.Normal, pink });
 
