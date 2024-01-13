@@ -221,6 +221,11 @@ public partial class View {
 	/// </summary>
 	public Point GetBoundsOffset () => new (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
 
+	internal virtual void AddAdornment (Adornment adornment)
+	{
+
+	}
+	
 	/// <summary>
 	/// Creates the view's <see cref="Adornment"/> objects. This internal method is overridden by Adornment to do nothing
 	/// to prevent recursion during View construction.
