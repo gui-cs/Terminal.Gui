@@ -112,6 +112,7 @@ public class TimeField : TextField {
 			if (!TimeSpan.TryParseExact (e.NewText.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result)) {
 				e.Cancel = true;
 			}
+			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
 			e.Cancel = true;
 		}
@@ -253,24 +254,44 @@ public class TimeField : TextField {
 
 	void IncCursorPosition ()
 	{
-		if (CursorPosition == _fieldLen)
+		if (CursorPosition >= _fieldLen) {
+			CursorPosition = _fieldLen;
 			return;
-		if (Text [++CursorPosition] == _sepChar [0])
-			CursorPosition++;
+		}
+		CursorPosition++;
+		AdjCursorPosition (CursorPosition);
 	}
 
 	void DecCursorPosition ()
 	{
-		if (CursorPosition == 1)
+		if (CursorPosition <= 1) {
+			CursorPosition = 1;
 			return;
-		if (Text [--CursorPosition] == _sepChar [0])
-			CursorPosition--;
+		}
+		CursorPosition--;
+		AdjCursorPosition (CursorPosition, false);
 	}
 
-	void AdjCursorPosition ()
+	void AdjCursorPosition (int point, bool increment = true)
 	{
-		if (Text [CursorPosition] == _sepChar [0])
-			CursorPosition++;
+		var newPoint = point;
+		if (point > _fieldLen) {
+			newPoint = _fieldLen;
+		}
+		if (point < 1) {
+			newPoint = 1;
+		}
+		if (newPoint != point) {
+			CursorPosition = newPoint;
+		}
+
+		while (Text [CursorPosition] == _sepChar [0]) {
+			if (increment) {
+				CursorPosition++;
+			} else {
+				CursorPosition--;
+			}
+		}
 	}
 
 	///<inheritdoc/>
@@ -338,19 +359,13 @@ public class TimeField : TextField {
 	///<inheritdoc/>
 	public override bool MouseEvent (MouseEvent ev)
 	{
-		if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked))
-			return false;
-		if (!HasFocus)
-			SetFocus ();
+		var result = base.MouseEvent (ev);
 
-		var point = ev.X;
-		if (point > _fieldLen)
-			point = _fieldLen;
-		if (point < 1)
-			point = 1;
-		CursorPosition = point;
-		AdjCursorPosition ();
-		return true;
+		if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+			int point = ev.X;
+			AdjCursorPosition (point, true);
+		}
+		return result;
 	}
 
 	/// <summary>
