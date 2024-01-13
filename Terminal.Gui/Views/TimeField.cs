@@ -312,18 +312,21 @@ public class TimeField : TextField {
 
 	bool MoveRight ()
 	{
+		ClearAllSelection ();
 		IncCursorPosition ();
 		return true;
 	}
 
 	new bool MoveEnd ()
 	{
+		ClearAllSelection ();
 		CursorPosition = _fieldLen;
 		return true;
 	}
 
 	bool MoveLeft ()
 	{
+		ClearAllSelection ();
 		DecCursorPosition ();
 		return true;
 	}
@@ -331,6 +334,7 @@ public class TimeField : TextField {
 	bool MoveHome ()
 	{
 		// Home, C-A
+		ClearAllSelection ();
 		CursorPosition = 1;
 		return true;
 	}
@@ -338,9 +342,11 @@ public class TimeField : TextField {
 	/// <inheritdoc/>
 	public override void DeleteCharLeft (bool useOldCursorPos = true)
 	{
-		if (ReadOnly)
+		if (ReadOnly) {
 			return;
+		}
 
+		ClearAllSelection ();
 		SetText ((Rune)'0');
 		DecCursorPosition ();
 		return;
@@ -349,9 +355,11 @@ public class TimeField : TextField {
 	/// <inheritdoc/>
 	public override void DeleteCharRight ()
 	{
-		if (ReadOnly)
+		if (ReadOnly) {
 			return;
+		}
 
+		ClearAllSelection ();
 		SetText ((Rune)'0');
 		return;
 	}
