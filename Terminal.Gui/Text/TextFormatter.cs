@@ -50,23 +50,50 @@ namespace Terminal.Gui {
 		Justified
 	}
 
-	/// TextDirection  [H] = Horizontal  [V] = Vertical
-	/// =============
-	/// LeftRight_TopBottom [H] Normal
-	/// TopBottom_LeftRight [V] Normal
-	/// 
-	/// RightLeft_TopBottom [H] Invert Text
-	/// TopBottom_RightLeft [V] Invert Lines
-	/// 
-	/// LeftRight_BottomTop [H] Invert Lines
-	/// BottomTop_LeftRight [V] Invert Text
-	/// 
-	/// RightLeft_BottomTop [H] Invert Text + Invert Lines
-	/// BottomTop_RightLeft [V] Invert Text + Invert Lines
-	///
 	/// <summary>
 	/// Text direction enumeration, controls how text is displayed.
 	/// </summary>
+	/// <remarks>
+	/// <para>TextDirection  [H] = Horizontal  [V] = Vertical</para>
+	/// <table>
+	///   <tr>
+	///     <th>TextDirection</th>
+	///     <th>Description</th>
+	///   </tr>
+	///   <tr>
+	///     <td>LeftRight_TopBottom [H]</td>
+	///     <td>Normal</td>
+	///   </tr>
+	///   <tr>
+	///     <td>TopBottom_LeftRight [V]</td>
+	///     <td>Normal</td>
+	///   </tr>
+	///   <tr>
+	///     <td>RightLeft_TopBottom [H]</td>
+	///     <td>Invert Text</td>
+	///   </tr>
+	///   <tr>
+	///     <td>TopBottom_RightLeft [V]</td>
+	///     <td>Invert Lines</td>
+	///   </tr>
+	///   <tr>
+	///     <td>LeftRight_BottomTop [H]</td>
+	///     <td>Invert Lines</td>
+	///   </tr>
+	///   <tr>
+	///     <td>BottomTop_LeftRight [V]</td>
+	///     <td>Invert Text</td>
+	///   </tr>
+	///   <tr>
+	///     <td>RightLeft_BottomTop [H]</td>
+	///     <td>Invert Text + Invert Lines</td>
+	///   </tr>
+	///   <tr>
+	///     <td>BottomTop_RightLeft [V]</td>
+	///     <td>Invert Text + Invert Lines</td>
+	///   </tr>
+	/// </table>
+	/// </remarks>
 	public enum TextDirection {
 		/// <summary>
 		/// Normal horizontal direction.
@@ -1075,7 +1102,7 @@ namespace Terminal.Gui {
 				_text = EnableNeedsFormat (value);
 
 				if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty)) {
-					Size = CalcRect (0, 0, _text, _textDirection, TabWidth).Size;
+					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
 
 				//if (_text != null && _text.GetRuneCount () > 0 && (Size.Width == 0 || Size.Height == 0 || Size.Width != _text.GetColumns ())) {
@@ -1087,20 +1114,22 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Used by <see cref="Text"/> to resize the view's <see cref="View.Bounds"/> with the <see cref="Size"/>.
-		/// Setting <see cref="AutoSize"/> to true only work if the <see cref="View.Width"/> and <see cref="View.Height"/> are null or
-		///   <see cref="LayoutStyle.Absolute"/> values and doesn't work with <see cref="LayoutStyle.Computed"/> layout,
-		///   to avoid breaking the <see cref="Pos"/> and <see cref="Dim"/> settings.
+		/// Gets or sets whether the <see cref="Size"/> should be automatically changed to fit the <see cref="Text"/>.
 		/// </summary>
 		/// <remarks>
-		///   Auto size is ignored if the <see cref="TextAlignment.Justified"/> and <see cref="VerticalTextAlignment.Justified"/> are used.
+		/// <para>
+		/// Used by <see cref="View.AutoSize"/> to resize the view's <see cref="View.Bounds"/> to fit <see cref="Size"/>.
+		/// </para>
+		/// <para>
+		/// AutoSize is ignored if <see cref="TextAlignment.Justified"/> and <see cref="VerticalTextAlignment.Justified"/> are used.
+		/// </para>
 		/// </remarks>
 		public bool AutoSize {
 			get => _autoSize;
 			set {
 				_autoSize = EnableNeedsFormat (value);
 				if (_autoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
-					Size = CalcRect (0, 0, Text, _textDirection, TabWidth).Size;
+					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
 			}
 		}
@@ -1140,7 +1169,12 @@ namespace Terminal.Gui {
 		/// <value>The text vertical alignment.</value>
 		public TextDirection Direction {
 			get => _textDirection;
-			set => _textDirection = EnableNeedsFormat (value);
+			set {
+				_textDirection = EnableNeedsFormat (value);
+				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
+					Size = CalcRect (0, 0, Text, Direction, TabWidth).Size;
+				}
+			}
 		}
 
 		/// <summary>
@@ -1204,7 +1238,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Allows word wrap the to fit the available container width.
+		/// Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="Size"/>.
 		/// </summary>
 		public bool WordWrap {
 			get => _wordWrap;
@@ -1212,16 +1246,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets the size of the area the text will be constrained to when formatted.
+		/// Gets or sets the size <see cref="Text"/> will be constrained to when formatted.
 		/// </summary>
 		/// <remarks>
-		/// Does not return the size the formatted text; just the value that was set.
+		/// Does not return the size of the formatted text but the size that will be used to constrain the text when formatted.
 		/// </remarks>
 		public Size Size {
 			get => _size;
 			set {
 				if (AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) {
-					_size = EnableNeedsFormat (CalcRect (0, 0, Text, _textDirection, TabWidth).Size);
+					_size = EnableNeedsFormat (CalcRect (0, 0, Text, Direction, TabWidth).Size);
 				} else {
 					_size = EnableNeedsFormat (value);
 				}
@@ -1291,7 +1325,7 @@ namespace Terminal.Gui {
 					NeedsFormat = false;
 					return _lines;
 				}
-				
+
 				if (NeedsFormat) {
 					var shown_text = _text;
 					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out var newHotKey)) {
@@ -1300,7 +1334,7 @@ namespace Terminal.Gui {
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
 					}
 
-					if (IsVerticalDirection (_textDirection)) {
+					if (IsVerticalDirection (Direction)) {
 						var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1, TabWidth);
 						_lines = Format (shown_text, Size.Height, VerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth && WordWrap,
 							PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
@@ -1325,10 +1359,15 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text when <see cref="Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)"/> is called.
-		/// If it is <c>false</c> when Draw is called, the Draw call will be faster.
+		/// Gets or sets whether the <see cref="TextFormatter"/> needs to format the text. 
 		/// </summary>
 		/// <remarks>
+		/// <para>
+		/// If <c>false</c> when Draw is called, the Draw call will be faster.
+		/// </para>
+		/// <para>
+		/// Used by <see cref="Draw(Rect, Attribute, Attribute, Rect, bool, ConsoleDriver)"/>
+		/// </para>
 		/// <para>
 		/// This is set to true when the properties of <see cref="TextFormatter"/> are set.
 		/// </para>
@@ -1400,7 +1439,7 @@ namespace Terminal.Gui {
 			// Use "Lines" to ensure a Format (don't use "lines"))
 
 			var linesFormated = Lines;
-			switch (_textDirection) {
+			switch (Direction) {
 			case TextDirection.TopBottom_RightLeft:
 			case TextDirection.LeftRight_BottomTop:
 			case TextDirection.RightLeft_BottomTop:
@@ -1409,7 +1448,7 @@ namespace Terminal.Gui {
 				break;
 			}
 
-			var isVertical = IsVerticalDirection (_textDirection);
+			var isVertical = IsVerticalDirection (Direction);
 			var maxBounds = bounds;
 			if (driver != null) {
 				maxBounds = containerBounds == default
@@ -1441,7 +1480,7 @@ namespace Terminal.Gui {
 
 				var runes = _lines [line].ToRunes ();
 
-				switch (_textDirection) {
+				switch (Direction) {
 				case TextDirection.RightLeft_BottomTop:
 				case TextDirection.RightLeft_TopBottom:
 				case TextDirection.BottomTop_LeftRight:
@@ -1454,7 +1493,7 @@ namespace Terminal.Gui {
 
 				int x, y;
 				// Horizontal Alignment
-				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (_textDirection))) {
+				if (_textAlignment == TextAlignment.Right || (_textAlignment == TextAlignment.Justified && !IsLeftToRight (Direction))) {
 					if (isVertical) {
 						var runesWidth = GetSumMaxCharWidth (Lines, line, TabWidth);
 						x = bounds.Right - runesWidth;
@@ -1487,7 +1526,7 @@ namespace Terminal.Gui {
 				}
 
 				// Vertical Alignment
-				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (_textDirection))) {
+				if (_textVerticalAlignment == VerticalTextAlignment.Bottom || (_textVerticalAlignment == VerticalTextAlignment.Justified && !IsTopToBottom (Direction))) {
 					if (isVertical) {
 						y = bounds.Bottom - runes.Length;
 					} else {
