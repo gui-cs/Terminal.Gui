@@ -659,7 +659,7 @@ namespace Terminal.Gui.ViewsTests {
 				args = e;
 
 			};
-			
+
 			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
 			Assert.Equal (KeyCode.Null, args.OldKey);
