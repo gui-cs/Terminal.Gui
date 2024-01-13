@@ -20,13 +20,9 @@ namespace Terminal.Gui;
 /// </remarks>
 public class DateField : TextField {
 	DateTime _date;
-	int _longFieldLen = 10;
+	int _fieldLen = 10;
 	string _sepChar;
-	string _longFormat;
-
-	int _fieldLen => _longFieldLen;
-
-	string _format => _longFormat;
+	string _format;
 
 	/// <summary>
 	///   DateChanged event, raised when the <see cref="Date"/> property has changed.
@@ -66,7 +62,7 @@ public class DateField : TextField {
 	{
 		var cultureInfo = CultureInfo.CurrentCulture;
 		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-		_longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
+		_format = GetShortDatePattern (cultureInfo.DateTimeFormat.ShortDatePattern);
 		Date = date;
 		CursorPosition = 1;
 		TextChanging += DateField_Changing;
@@ -147,7 +143,7 @@ public class DateField : TextField {
 		}
 	}
 
-	string GetLongFormat (string lf)
+	string GetShortDatePattern (string lf)
 	{
 		string [] frm = lf.Split (_sepChar);
 		for (int i = 0; i < frm.Length; i++) {
