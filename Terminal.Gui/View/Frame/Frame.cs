@@ -153,12 +153,6 @@ public class Frame : View {
 			return;
 		}
 
-
-		if (Text == "Border") {
-
-
-		}
-
 		var screenBounds = BoundsToScreen (Frame);
 
 		Attribute normalAttr = Parent.GetNormalColor ();
