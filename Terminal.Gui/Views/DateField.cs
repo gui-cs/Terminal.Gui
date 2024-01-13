@@ -308,10 +308,10 @@ public class DateField : TextField {
 			return;
 		}
 		CursorPosition--;
-		AdjCursorPosition (CursorPosition);
+		AdjCursorPosition (CursorPosition, false);
 	}
 
-	void AdjCursorPosition (int point, bool? increment = null)
+	void AdjCursorPosition (int point, bool increment = true)
 	{
 		var newPoint = point;
 		if (point > _fieldLen) {
@@ -324,10 +324,10 @@ public class DateField : TextField {
 			CursorPosition = newPoint;
 		}
 
-		if (Text [CursorPosition] == _sepChar [0]) {
-			if (increment == true) {
+		while (Text [CursorPosition] == _sepChar [0]) {
+			if (increment) {
 				CursorPosition++;
-			} else if (increment == false) {
+			} else {
 				CursorPosition--;
 			}
 		}
