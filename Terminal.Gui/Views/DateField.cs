@@ -69,7 +69,7 @@ public class DateField : TextField {
 		_longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
 		Date = date;
 		CursorPosition = 1;
-		TextChanged += DateField_Changed;
+		TextChanging += DateField_Changing;
 
 		// Things this view knows how to do
 		AddCommand (Command.DeleteCharRight, () => {
@@ -120,18 +120,30 @@ public class DateField : TextField {
 		return false;
 	}
 
-	void DateField_Changed (object sender, TextChangedEventArgs e)
+	void DateField_Changing (object sender, TextChangingEventArgs e)
 	{
 		try {
 			var cultureInfo = CultureInfo.CurrentCulture;
 			DateTimeFormatInfo ccFmt = cultureInfo.DateTimeFormat;
-			string trimedText = Text[..11];
-			var date = Convert.ToDateTime (trimedText, ccFmt).ToString (ccFmt.ShortDatePattern);
-			if ($" {date}" != Text) {
-				Text = $" {date}";
+			int spaces = 0;
+			for (int i = 0; i < e.NewText.Length; i++) {
+				if (e.NewText [i] == ' ') {
+					spaces++;
+				} else {
+					break;
+				}
 			}
+			spaces += _fieldLen;
+			string trimedText = e.NewText [..spaces];
+			spaces -= _fieldLen;
+			trimedText = trimedText.Replace (new string (' ', spaces), " ");
+			var date = Convert.ToDateTime (trimedText, ccFmt).ToString (ccFmt.ShortDatePattern);
+			if ($" {date}" != e.NewText) {
+				e.NewText = $" {date}";
+			}
+			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
-			Text = e.OldValue;
+			e.Cancel = true;
 		}
 	}
 
@@ -306,9 +318,8 @@ public class DateField : TextField {
 			CursorPosition = _fieldLen;
 			return;
 		}
-		if (Text [++CursorPosition] == _sepChar [0]) {
-			CursorPosition++;
-		}
+		CursorPosition++;
+		AdjCursorPosition (CursorPosition);
 	}
 
 	void DecCursorPosition ()
@@ -317,15 +328,29 @@ public class DateField : TextField {
 			CursorPosition = 1;
 			return;
 		}
-		if (Text [--CursorPosition] == _sepChar [0]) {
-			CursorPosition--;
-		}
+		CursorPosition--;
+		AdjCursorPosition (CursorPosition);
 	}
 
-	void AdjCursorPosition ()
+	void AdjCursorPosition (int point, bool? increment = null)
 	{
+		var newPoint = point;
+		if (point > _fieldLen) {
+			newPoint = _fieldLen;
+		}
+		if (point < 1) {
+			newPoint = 1;
+		}
+		if (newPoint != point) {
+			CursorPosition = newPoint;
+		}
+
 		if (Text [CursorPosition] == _sepChar [0]) {
-			CursorPosition++;
+			if (increment == true) {
+				CursorPosition++;
+			} else if (increment == false) {
+				CursorPosition--;
+			}
 		}
 	}
 
@@ -386,23 +411,13 @@ public class DateField : TextField {
 	/// <inheritdoc/>
 	public override bool MouseEvent (MouseEvent ev)
 	{
-		if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-			return false;
-		}
-		if (!HasFocus) {
-			SetFocus ();
-		}
+		var result = base.MouseEvent (ev);
 
-		int point = ev.X;
-		if (point > _fieldLen) {
-			point = _fieldLen;
+		if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+			int point = ev.X;
+			AdjCursorPosition (point, true);
 		}
-		if (point < 1) {
-			point = 1;
-		}
-		CursorPosition = point;
-		AdjCursorPosition ();
-		return true;
+		return result;
 	}
 
 	/// <summary>
