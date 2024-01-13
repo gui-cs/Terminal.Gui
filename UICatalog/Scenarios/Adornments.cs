@@ -302,7 +302,7 @@ public class Adornments : Scenario {
 
 					X = Pos.Right (_borderEditor) - 1,
 					Y = Pos.Top (_borderEditor),
-					SelectedItem = (int)_viewToEdit.Border.BorderStyle,
+					SelectedItem = (int)_viewToEdit.Border.LineStyle,
 					BorderStyle = LineStyle.Double,
 					Title = "Border Style",
 					SuperViewRendersLineCanvas = true
@@ -311,10 +311,10 @@ public class Adornments : Scenario {
 
 				rbBorderStyle.SelectedItemChanged += (s, e) => {
 					var prevBorderStyle = _viewToEdit.BorderStyle;
-					_viewToEdit.Border.BorderStyle = (LineStyle)e.SelectedItem;
-					if (_viewToEdit.Border.BorderStyle == LineStyle.None) {
+					_viewToEdit.Border.LineStyle = (LineStyle)e.SelectedItem;
+					if (_viewToEdit.Border.LineStyle == LineStyle.None) {
 						_viewToEdit.Border.Thickness = new Thickness (0);
-					} else if (prevBorderStyle == LineStyle.None && _viewToEdit.Border.BorderStyle != LineStyle.None) {
+					} else if (prevBorderStyle == LineStyle.None && _viewToEdit.Border.LineStyle != LineStyle.None) {
 						_viewToEdit.Border.Thickness = new Thickness (1);
 					}
 					_borderEditor.Thickness = new Thickness (_viewToEdit.Border.Thickness.Left, _viewToEdit.Border.Thickness.Top,

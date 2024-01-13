@@ -445,7 +445,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			public override bool OnEnter (View view)
 			{
-				Border.BorderStyle = LineStyle.None;
+				Border.LineStyle = LineStyle.None;
 				Border.Thickness = new Thickness (0);
 				labelFill.Visible = true;
 				view = this;
@@ -454,7 +454,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			public override bool OnLeave (View view)
 			{
-				Border.BorderStyle = LineStyle.Single;
+				Border.LineStyle = LineStyle.Single;
 				Border.Thickness = new Thickness (1);
 				labelFill.Visible = false;
 				if (view == null)

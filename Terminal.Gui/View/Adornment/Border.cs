@@ -8,9 +8,40 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Renders a border around the view including the <see cref="View.Title"/>. If <see cref="Thickness"/> is non-zero the border
-/// will be drawn. 
+/// Renders a border around the view including the <see cref="View.Title"/>. A border using <see cref="LineStyle"/>
+/// will be drawn on the sides of <see cref="Thickness"/> that are greater than zero. 
 /// </para>
+/// <para>
+/// The <see cref="View.Title"/> of <see cref="Adornment.Parent"/> will be drawn based on the value of <see cref="Thickness.Top"/>:
+/// </para>
+/// <para>
+/// If <c>1</c>:
+/// <code>
+/// ┌┤1234├──┐
+/// │        │
+/// └────────┘
+/// </code>
+/// </para>
+/// <para>
+/// If <c>2</c>:
+/// <code>
+///  ┌────┐
+/// ┌┤1234├──┐
+/// │        │
+/// └────────┘
+/// </code>
+/// </para>
+/// <para>
+/// If <c>3</c>:
+/// <code>
+///  ┌────┐
+/// ┌┤1234├──┐
+/// │└────┘  │
+/// │        │
+/// └────────┘
+/// </code>
+/// </para>
+/// <para/>
 /// <para>
 /// See the <see cref="Adornment"/> class. 
 /// </para>
@@ -21,7 +52,7 @@ public class Border : Adornment {
 	/// setting the <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the
 	/// views that comprise the border. If set to <see cref="LineStyle.None"/> no border will be drawn.
 	/// </summary>
-	public new LineStyle BorderStyle { get; set; } = LineStyle.None;
+	public new LineStyle LineStyle { get; set; } = LineStyle.None;
 
 	/// <inheritdoc />
 	public override void OnDrawContent (Rect contentArea)
@@ -95,7 +126,7 @@ public class Border : Adornment {
 			Driver.SetAttribute (prevAttr);
 		}
 
-		if (canDrawBorder && BorderStyle != LineStyle.None) {
+		if (canDrawBorder && LineStyle != LineStyle.None) {
 			var lc = Parent?.LineCanvas;
 
 			var drawTop = Thickness.Top > 0 && Frame.Width > 1 && Frame.Height > 1;
@@ -115,42 +146,42 @@ public class Border : Adornment {
 				// ╔╡╞═════╗
 				if (borderBounds.Width < 4 || string.IsNullOrEmpty (Parent?.Title)) {
 					// ╔╡╞╗ should be ╔══╗
-					lc.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+					lc.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
 				} else {
 
 					// ┌────┐
 					//┌┘View└
 					//│
 					if (Thickness.Top == 2) {
-						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
 					}
 					// ┌────┐
 					//┌┘View└
 					//│
 					if (borderBounds.Width >= 4 && Thickness.Top > 2) {
-						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
-						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
+						lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2), Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
 					}
 
 					// ╔╡Title╞═════╗
 					// Add a short horiz line for ╔╡
-					lc.AddLine (new Point (borderBounds.Location.X, titleY), 2, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+					lc.AddLine (new Point (borderBounds.Location.X, titleY), 2, Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
 					// Add a vert line for ╔╡
 					lc.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, Driver.GetAttribute ());
 					// Add a vert line for ╞
 					lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, Driver.GetAttribute ());
 					// Add the right hand line for ╞═════╗
-					lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY), borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+					lc.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY), borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2), Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
 				}
 			}
 			if (drawLeft) {
-				lc.AddLine (new Point (borderBounds.Location.X, titleY), sideLineLength, Orientation.Vertical, BorderStyle, Driver.GetAttribute ());
+				lc.AddLine (new Point (borderBounds.Location.X, titleY), sideLineLength, Orientation.Vertical, LineStyle, Driver.GetAttribute ());
 			}
 			if (drawBottom) {
-				lc.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1), borderBounds.Width, Orientation.Horizontal, BorderStyle, Driver.GetAttribute ());
+				lc.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1), borderBounds.Width, Orientation.Horizontal, LineStyle, Driver.GetAttribute ());
 			}
 			if (drawRight) {
-				lc.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, BorderStyle, Driver.GetAttribute ());
+				lc.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, LineStyle, Driver.GetAttribute ());
 			}
 			Driver.SetAttribute (prevAttr);
 
@@ -235,16 +266,16 @@ public class Border : Adornment {
 		var drawRight = region.Width > 1 && region.Height > 1;
 
 		if (drawTop) {
-			lc.AddLine (screenBounds.Location, screenBounds.Width, Orientation.Horizontal, BorderStyle);
+			lc.AddLine (screenBounds.Location, screenBounds.Width, Orientation.Horizontal, LineStyle);
 		}
 		if (drawLeft) {
-			lc.AddLine (screenBounds.Location, screenBounds.Height, Orientation.Vertical, BorderStyle);
+			lc.AddLine (screenBounds.Location, screenBounds.Height, Orientation.Vertical, LineStyle);
 		}
 		if (drawBottom) {
-			lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, BorderStyle);
+			lc.AddLine (new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1), screenBounds.Width, Orientation.Horizontal, LineStyle);
 		}
 		if (drawRight) {
-			lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, BorderStyle);
+			lc.AddLine (new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y), screenBounds.Height, Orientation.Vertical, LineStyle);
 		}
 		foreach (var p in lc.GetMap ()) {
 			Driver.Move (p.Key.X, p.Key.Y);
