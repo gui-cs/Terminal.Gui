@@ -62,7 +62,7 @@ public class DateField : TextField {
 	{
 		var cultureInfo = CultureInfo.CurrentCulture;
 		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-		_format = GetShortDatePattern (cultureInfo.DateTimeFormat.ShortDatePattern);
+		_format = $" {cultureInfo.DateTimeFormat.ShortDatePattern}";
 		Date = date;
 		CursorPosition = 1;
 		TextChanging += DateField_Changing;
@@ -141,23 +141,6 @@ public class DateField : TextField {
 		} catch (Exception) {
 			e.Cancel = true;
 		}
-	}
-
-	string GetShortDatePattern (string lf)
-	{
-		string [] frm = lf.Split (_sepChar);
-		for (int i = 0; i < frm.Length; i++) {
-			if (frm [i].Contains ('M') && frm [i].GetRuneCount () < 2) {
-				lf = lf.Replace ("M", "MM");
-			}
-			if (frm [i].Contains ('d') && frm [i].GetRuneCount () < 2) {
-				lf = lf.Replace ("d", "dd");
-			}
-			if (frm [i].Contains ('y') && frm [i].GetRuneCount () < 4) {
-				lf = lf.Replace ("yy", "yyyy");
-			}
-		}
-		return $" {lf}";
 	}
 
 	/// <summary>
