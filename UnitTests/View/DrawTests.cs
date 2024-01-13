@@ -100,7 +100,7 @@ public class DrawTests {
 		};
 
 		TestHelpers.AssertDriverAttributesAre (@"
-0020000000
+0010000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
@@ -149,7 +149,7 @@ public class DrawTests {
 		};
 
 		TestHelpers.AssertDriverAttributesAre (@"
-0022000000
+0011000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);

@@ -965,7 +965,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	}
 
 	/// <summary>
-	/// The foreground and background color for text when the view is highlighted (hot).
+	/// The foreground and background color for text in a non-focused view that indicates a <see cref="View.HotKey"/>.
 	/// </summary>
 	public Attribute HotNormal {
 		get => _hotNormal;
@@ -973,7 +973,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	}
 
 	/// <summary>
-	/// The foreground and background color for text when the view is highlighted (hot) and has focus.
+	/// The foreground and background color for for text in a focused view that indicates a <see cref="View.HotKey"/>.
 	/// </summary>
 	public Attribute HotFocus {
 		get => _hotFocus;
@@ -981,7 +981,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	}
 
 	/// <summary>
-	/// The default foreground and background color for text, when the view is disabled.
+	/// The default foreground and background color for text when the view is disabled.
 	/// </summary>
 	public Attribute Disabled {
 		get => _disabled;
