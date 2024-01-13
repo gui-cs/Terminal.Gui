@@ -82,7 +82,7 @@ public class TimeFieldTests {
 		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorRight)));
 		Assert.Equal (8, tf.CursorPosition);
 		// Non-numerics are ignored
-		Assert.True (tf.NewKeyDownEvent (new (KeyCode.A)));
+		Assert.False (tf.NewKeyDownEvent (new (KeyCode.A)));
 		tf.ReadOnly = true;
 		tf.CursorPosition = 1;
 		Assert.True (tf.NewKeyDownEvent (new (KeyCode.D1)));

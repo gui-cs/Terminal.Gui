@@ -261,7 +261,7 @@ public class TimeField : TextField {
 			return true;
 		}
 
-		return a.IsKeyCodeAtoZ;
+		return false;
 	}
 
 	bool MoveRight ()
