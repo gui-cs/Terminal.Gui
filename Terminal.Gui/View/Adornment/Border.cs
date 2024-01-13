@@ -4,7 +4,7 @@ using System.Linq;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Implements Border for <see cref="View"/>. 
+/// The Border for a <see cref="View"/>. 
 /// </summary>
 /// <remarks>
 /// <para>
