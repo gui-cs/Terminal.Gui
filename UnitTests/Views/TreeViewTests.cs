@@ -4,7 +4,7 @@ using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class TreeViewTests {
 

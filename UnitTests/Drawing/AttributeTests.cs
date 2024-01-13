@@ -7,11 +7,9 @@ namespace Terminal.Gui.DrawingTests;
 public class AttributeTests {
 
 	[Fact]
-	public void Attribute_Is_Value_Type ()
-	{
+	public void Attribute_Is_Value_Type () =>
 		// prove that Color is a value type
 		Assert.True (typeof (Attribute).IsValueType);
-	}
 
 
 	[Fact]

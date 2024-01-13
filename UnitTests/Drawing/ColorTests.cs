@@ -7,11 +7,9 @@ namespace Terminal.Gui.DrawingTests;
 public class ColorTests {
 
 	[Fact]
-	public void Color_Is_Value_Type ()
-	{
+	public void Color_Is_Value_Type () =>
 		// prove that Color is a value type
 		Assert.True (typeof (Color).IsValueType);
-	}
 
 	[Fact]
 	public void Colors_ColorSchemes_Property_Has_Private_Setter ()
@@ -23,7 +21,7 @@ public class ColorTests {
 		Assert.NotNull (property);
 		Assert.NotNull (property.SetMethod);
 		Assert.True (property.GetSetMethod (true).IsPrivate);
-		
+
 	}
 
 	[Fact] [AutoInitShutdown]
