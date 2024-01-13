@@ -8,8 +8,14 @@ namespace Terminal.Gui;
 
 /// <summary>
 /// Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>
-/// enabling borders, menus, etc...See <see cref="Border"/>.
+/// enabling borders, menus, etc...See <see cref="Border"/>. They are defined using the <see cref="Thickness"/>
+/// class, which specifies the thickness of the sides of a rectangle. 
 /// </summary>
+/// <remarsk>
+/// <code>
+/// 
+/// </code>
+/// </remarsk>
 public class Adornment : View {
 	Thickness _thickness = Thickness.Empty;
 
