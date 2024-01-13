@@ -404,10 +404,10 @@ public readonly struct Color : IEquatable<Color> {
 	internal static ColorName FindClosestColor (Color inputColor)
 	{
 		var closestColor = ColorName.Black; // Default to Black
-		double closestDistance = double.MaxValue;
+		var closestDistance = double.MaxValue;
 
 		foreach (var colorEntry in _colorToNameMap) {
-			double distance = CalculateColorDistance (inputColor, colorEntry.Key);
+			var distance = CalculateColorDistance (inputColor, colorEntry.Key);
 			if (distance < closestDistance) {
 				closestDistance = distance;
 				closestColor = colorEntry.Value;
@@ -707,9 +707,9 @@ public readonly struct Color : IEquatable<Color> {
 
 	/// <inheritdoc/>
 	public bool Equals (Color other) => R == other.R &&
-					    G == other.G &&
-					    B == other.B &&
-					    A == other.A;
+	                                    G == other.G &&
+	                                    B == other.B &&
+	                                    A == other.A;
 
 	/// <inheritdoc/>
 	public override int GetHashCode () => HashCode.Combine (R, G, B, A);
@@ -765,7 +765,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	}
 
 	/// <summary>
-<<<<<<< HEAD
 	/// Initializes a new instance from an existing instance.
 	/// </summary>
 	public Attribute (Attribute attr)
@@ -776,8 +775,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	}
 
 	/// <summary>
-=======
->>>>>>> parent of 79b35dc5 (Initial work in progress)
 	/// Initializes a new instance with platform specific color value.
 	/// </summary>
 	/// <param name="platformColor">Value.</param>
@@ -887,8 +884,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 
 	/// <inheritdoc/>
 	public bool Equals (Attribute other) => PlatformColor == other.PlatformColor &&
-						Foreground == other.Foreground &&
-						Background == other.Background;
+	                                        Foreground == other.Foreground &&
+	                                        Background == other.Background;
 
 	/// <inheritdoc/>
 	public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);
@@ -931,7 +928,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// Creates a new instance, initialized with the values from <paramref name="scheme"/>.
 	/// </summary>
 	/// <param name="scheme">The scheme to initialize the new instance with.</param>
-	public ColorScheme (ColorScheme scheme) : base ()
+	public ColorScheme (ColorScheme scheme)
 	{
 		if (scheme != null) {
 			_normal = scheme.Normal;
@@ -1001,11 +998,11 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="other"></param>
 	/// <returns>true if the two objects are equal</returns>
 	public bool Equals (ColorScheme other) => other != null &&
-						  EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-						  EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-						  EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-						  EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-						  EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+	                                          EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+	                                          EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+	                                          EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+	                                          EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+	                                          EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 
 	/// <summary>
 	/// Compares two <see cref="ColorScheme"/> objects for equality.

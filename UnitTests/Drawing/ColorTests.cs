@@ -5,6 +5,27 @@ using Xunit;
 namespace Terminal.Gui.DrawingTests;
 
 public class ColorTests {
+
+	[Fact]
+	public void Color_Is_Value_Type ()
+	{
+		// prove that Color is a value type
+		Assert.True (typeof (Color).IsValueType);
+	}
+
+	[Fact]
+	public void Colors_ColorSchemes_Property_Has_Private_Setter ()
+	{
+		// Resharper Code Cleanup likes to remove the `private set; `
+		// from the ColorSchemes property.  This test will fail if
+		// that happens.
+		var property = typeof (Colors).GetProperty ("ColorSchemes");
+		Assert.NotNull (property);
+		Assert.NotNull (property.SetMethod);
+		Assert.True (property.GetSetMethod (true).IsPrivate);
+		
+	}
+
 	[Fact] [AutoInitShutdown]
 	public void ColorScheme_New ()
 	{
