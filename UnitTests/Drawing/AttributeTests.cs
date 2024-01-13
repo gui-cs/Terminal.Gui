@@ -5,6 +5,22 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.DrawingTests;
 
 public class AttributeTests {
+
+	[Fact]
+	public void Attribute_Is_Value_Type ()
+	{
+		// prove that Color is a value type
+		Assert.True (typeof (Attribute).IsValueType);
+	}
+
+	
+	[Fact]
+	public void Color_Is_Value_Type ()
+	{
+		// prove that Color is a value type
+		Assert.True (typeof (Color).IsValueType);
+	}
+
 	[Fact]
 	public void DefaultConstructor ()
 	{

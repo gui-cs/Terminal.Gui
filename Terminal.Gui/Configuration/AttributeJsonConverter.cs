@@ -30,14 +30,14 @@ namespace Terminal.Gui {
 			}
 
 			Attribute attribute = new Attribute ();
-			Color foreground = null;
-			Color background = null;
+			Color? foreground = null;
+			Color? background = null;
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
 					if (foreground == null || background == null) {
 						throw new JsonException ($"Both Foreground and Background colors must be provided.");
 					} 
-					return new Attribute (foreground, background);
+					return new Attribute (foreground.Value, background.Value);
 				}
 
 				if (reader.TokenType != JsonTokenType.PropertyName) {
@@ -48,7 +48,7 @@ namespace Terminal.Gui {
 				reader.Read ();
 				string color = $"\"{reader.GetString ()}\"";
 
-				switch (propertyName.ToLower ()) {
+				switch (propertyName?.ToLower ()) {
 				case "foreground":
 					foreground = JsonSerializer.Deserialize<Color> (color, options);
 					break;

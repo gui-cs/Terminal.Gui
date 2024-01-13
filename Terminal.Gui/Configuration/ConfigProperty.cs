@@ -64,7 +64,7 @@ public class ConfigProperty {
 		if (source.GetType () != PropertyInfo!.PropertyType && (ut != null && source.GetType () != ut)) {
 			throw new ArgumentException ($"The source object ({PropertyInfo!.DeclaringType}.{PropertyInfo!.Name}) is not of type {PropertyInfo!.PropertyType}.");
 		}
-		if (PropertyValue != null && source != null) {
+		if (PropertyValue != null) {
 			PropertyValue = ConfigurationManager.DeepMemberwiseCopy (source, PropertyValue);
 		} else {
 			PropertyValue = source;
@@ -104,6 +104,8 @@ public class ConfigProperty {
 
 				// Handle the outer exception or rethrow it if needed
 				throw new JsonException ($"Error Applying Configuration Change: {tie.Message}", tie);
+			} catch (ArgumentException ae) {
+				throw new JsonException ($"Error Applying Configuration Change ({PropertyInfo?.Name}): {ae.Message}", ae);
 			}
 		}
 		return PropertyValue != null;

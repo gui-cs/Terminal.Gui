@@ -513,11 +513,15 @@ public static partial class ConfigurationManager {
 			var sourceVal = sourceProp.GetValue (source);
 			var destVal = destProp.GetValue (destination);
 			if (sourceVal != null) {
-				if (destVal != null) {
-					// Recurse
-					destProp.SetValue (destination, DeepMemberwiseCopy (sourceVal, destVal));
-				} else {
-					destProp.SetValue (destination, sourceVal);
+				try {
+					if (destVal != null) {
+						// Recurse
+						destProp.SetValue (destination, DeepMemberwiseCopy (sourceVal, destVal));
+					} else {
+						destProp.SetValue (destination, sourceVal);
+					}
+				} catch (ArgumentException e) {
+					throw new JsonException ($"Error Applying Configuration Change: {e.Message}", e);
 				}
 			}
 		}
