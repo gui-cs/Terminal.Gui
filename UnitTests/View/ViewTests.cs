@@ -479,7 +479,7 @@ public class ViewTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Internal_Tests ()
 	{
 		Assert.Equal (new [] { View.Direction.Forward, View.Direction.Backward },
@@ -569,7 +569,7 @@ public class ViewTests {
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Visible_Sets_Also_Sets_Subviews ()
 	{
 		var button = new Button ("Click Me");
@@ -637,7 +637,7 @@ public class ViewTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void GetTopSuperView_Test ()
 	{
 		var v1 = new View ();
@@ -673,7 +673,7 @@ public class ViewTests {
 		top2.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
 	{
 		var view = new FrameView {
@@ -721,7 +721,7 @@ public class ViewTests {
 		Assert.Equal (Rect.Empty, pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Clear_Bounds_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
 	{
 		var view = new FrameView {
@@ -784,7 +784,7 @@ public class ViewTests {
 		view.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Visible_Clear_The_View_Output ()
 	{
 		var view = new View ("Testing visibility."); // use View, not Label to avoid AutoSize == true
@@ -820,7 +820,7 @@ public class ViewTests {
 		Application.End (rs);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void DrawContentComplete_Event_Is_Always_Called ()
 	{
 		var viewCalled = false;
@@ -838,7 +838,7 @@ public class ViewTests {
 		Assert.True (tvCalled);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void GetNormalColor_ColorScheme ()
 	{
 		var view = new View { ColorScheme = Colors.Base };
@@ -850,7 +850,7 @@ public class ViewTests {
 		view.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void GetHotNormalColor_ColorScheme ()
 	{
 		var view = new View { ColorScheme = Colors.Base };
@@ -926,7 +926,7 @@ cccccccccccccccccccc", output);
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
 	{
 		var label = new Label ("At 0,0");
@@ -960,7 +960,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
 	{
 		var label = new Label ("At 0,0");
@@ -996,7 +996,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
 	{
 		var label = new Label ("At 0,0");
@@ -1032,7 +1032,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
 	{
 		var label = new Label ("At 0,0");
@@ -1070,7 +1070,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
 	{
 		var label = new Label ("At 0,0");
@@ -1105,7 +1105,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
 	{
 		var label = new Label ("At 0,0");
@@ -1143,7 +1143,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
 	{
 		var label = new Label ("At 0,0");
@@ -1177,7 +1177,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
 	{
 		var label = new Label ("At 0,0");
@@ -1215,7 +1215,7 @@ At 0,0
 		Application.End (runState);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Test_Nested_Views_With_Height_Equal_To_One ()
 	{
 		var v = new View { Width = 11, Height = 3, ColorScheme = new ColorScheme () };
@@ -1245,7 +1245,7 @@ At 0,0
 		bottom.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Frame_Set_After_Initialize_Update_NeededDisplay ()
 	{
 		var frame = new FrameView ();
