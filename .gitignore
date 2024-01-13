@@ -27,8 +27,3 @@ demo.*
 *.deb
 
 *.tui/
-/Terminal.Gui/View/Layout/ViewLayout.cs
-/Terminal.Gui/View/Frame.cs
-/Terminal.Gui/View/ViewDrawing.cs
-/UICatalog/Properties/launchSettings.json
-/UICatalog/Scenarios/Frames.cs
