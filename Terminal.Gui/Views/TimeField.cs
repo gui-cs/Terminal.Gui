@@ -109,6 +109,21 @@ public class TimeField : TextField {
 	void TextField_TextChanging (object sender, TextChangingEventArgs e)
 	{
 		try {
+			int spaces = 0;
+			for (int i = 0; i < e.NewText.Length; i++) {
+				if (e.NewText [i] == ' ') {
+					spaces++;
+				} else {
+					break;
+				}
+			}
+			spaces += _fieldLen;
+			string trimedText = e.NewText [..spaces];
+			spaces -= _fieldLen;
+			trimedText = trimedText.Replace (new string (' ', spaces), " ");
+			if (trimedText != e.NewText) {
+				e.NewText = trimedText;
+			}
 			if (!TimeSpan.TryParseExact (e.NewText.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result)) {
 				e.Cancel = true;
 			}
