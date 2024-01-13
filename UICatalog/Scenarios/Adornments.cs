@@ -4,10 +4,10 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios; 
 
-[ScenarioMetadata ("Frames Demo", "Demonstrates Margin, Border, and Padding on Views.")]
+[ScenarioMetadata ("Adornments Demo", "Demonstrates Margin, Border, and Padding on Views.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Borders")]
-public class Frames : Scenario {
+public class Adornments : Scenario {
 
 	public override void Init ()
 	{
@@ -51,7 +51,7 @@ public class Frames : Scenario {
 
 		view.Add (tf1, button, label, tf2, tv);
 
-		var editor = new FramesEditor {
+		var editor = new AdornmentsEditor {
 			Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
 			ViewToEdit = view
 		};
@@ -66,7 +66,7 @@ public class Frames : Scenario {
 
 	public override void Run () { }
 
-	public class FrameEditor : View {
+	public class AdornmentEditor : View {
 		readonly ColorPicker _backgroundColorPicker = new() {
 			Title = "BG",
 			BoxWidth = 1,
@@ -90,11 +90,11 @@ public class Frames : Scenario {
 		Thickness _thickness;
 		TextField _topEdit;
 
-		public FrameEditor ()
+		public AdornmentEditor ()
 		{
 			Margin.Thickness = new Thickness (0);
 			BorderStyle = LineStyle.Double;
-			Initialized += FrameEditor_Initialized;
+			Initialized += AdornmentEditor_Initialized;
 			;
 		}
 
@@ -137,7 +137,7 @@ public class Frames : Scenario {
 
 		public event EventHandler<Attribute> AttributeChanged;
 
-		void FrameEditor_Initialized (object sender, EventArgs e)
+		void AdornmentEditor_Initialized (object sender, EventArgs e)
 		{
 			var editWidth = 3;
 
@@ -212,8 +212,8 @@ public class Frames : Scenario {
 			_bottomEdit.Text = $"{Thickness.Bottom}";
 
 			LayoutSubviews ();
-			Height = GetFramesThickness ().Vertical + 4 + 4;
-			Width = GetFramesThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
+			Height = GetAdornmentsThickness ().Vertical + 4 + 4;
+			Width = GetAdornmentsThickness ().Horizontal + _foregroundColorPicker.Frame.Width * 2 - 3;
 		}
 
 		void Edit_TextChanging (object sender, TextChangingEventArgs e)
@@ -254,12 +254,12 @@ public class Frames : Scenario {
 		}
 	}
 
-	public class FramesEditor : Window {
-		FrameEditor _borderEditor;
+	public class AdornmentsEditor : Window {
+		AdornmentEditor _borderEditor;
 		CheckBox _diagCheckBox;
-		FrameEditor _marginEditor;
+		AdornmentEditor _marginEditor;
 		String _origTitle = string.Empty;
-		FrameEditor _paddingEditor;
+		AdornmentEditor _paddingEditor;
 		View _viewToEdit;
 
 		public View ViewToEdit {
@@ -269,7 +269,7 @@ public class Frames : Scenario {
 				_viewToEdit = value;
 
 				_viewToEdit.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Toplevel"]);
-				_marginEditor = new FrameEditor {
+				_marginEditor = new AdornmentEditor {
 					X = 0,
 					Y = 0,
 					Title = "Margin",
@@ -282,7 +282,7 @@ public class Frames : Scenario {
 				Add (_marginEditor);
 
 				_viewToEdit.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Base"]);
-				_borderEditor = new FrameEditor {
+				_borderEditor = new AdornmentEditor {
 					X = Pos.Left (_marginEditor),
 					Y = Pos.Bottom (_marginEditor),
 					Title = "Border",
@@ -340,7 +340,7 @@ public class Frames : Scenario {
 				};
 				Add (ckbTitle);
 
-				_paddingEditor = new FrameEditor {
+				_paddingEditor = new AdornmentEditor {
 					X = Pos.Left (_borderEditor),
 					Y = Pos.Bottom (rbBorderStyle),
 					Title = "Padding",

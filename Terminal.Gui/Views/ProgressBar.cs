@@ -83,7 +83,7 @@ public class ProgressBar : View {
 	void ProgressBar_LayoutStarted (object sender, EventArgs e)
 	{
 		// TODO: use Dim.Auto
-		Height = 1 + GetFramesThickness ().Vertical;
+		Height = 1 + GetAdornmentsThickness ().Vertical;
 	}
 
 	float _fraction;

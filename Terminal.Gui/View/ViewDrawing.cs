@@ -58,7 +58,7 @@ public partial class View {
 	/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for
 	/// rendering any border lines. If <see langword="true"/> the rendering of any borders drawn
 	/// by this Frame will be done by it's parent's SuperView. If <see langword="false"/> (the default)
-	/// this View's <see cref="OnDrawFrames()"/> method will be called to render the borders.
+	/// this View's <see cref="OnDrawAdornments"/> method will be called to render the borders.
 	/// </summary>
 	public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
@@ -334,7 +334,7 @@ public partial class View {
 	/// method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
 	/// </summary>
 	/// <returns></returns>
-	public virtual bool OnDrawFrames ()
+	public virtual bool OnDrawAdornments ()
 	{
 		if (!IsInitialized) {
 			return false;
@@ -372,7 +372,7 @@ public partial class View {
 		if (!CanBeVisible (this)) {
 			return;
 		}
-		OnDrawFrames ();
+		OnDrawAdornments ();
 
 		var prevClip = ClipToBounds ();
 

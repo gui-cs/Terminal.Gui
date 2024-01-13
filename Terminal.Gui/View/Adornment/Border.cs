@@ -39,7 +39,7 @@ public class Border : Adornment {
 
 		// TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
-		// The border frame (and title) are drawn at the outermost edge of border; 
+		// The border adornment (and title) are drawn at the outermost edge of border; 
 		// For Border
 		// ...thickness extends outward (border/title is always as far in as possible)
 		var borderBounds = new Rect (

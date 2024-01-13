@@ -86,7 +86,7 @@ public partial class View {
 
 			// TODO: Figure out if the below can be optimized.
 			if (IsInitialized /*|| LayoutStyle == LayoutStyle.Absolute*/) {
-				LayoutFrames ();
+				LayoutAdornments ();
 				SetTextFormatterSize ();
 				SetNeedsLayout ();
 				SetNeedsDisplay ();
@@ -100,21 +100,19 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	///         <para>
-	///         The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's
-	///         content
-	///         and are not clipped by the View's Clip Area.
+	///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's
+	///         content and are not clipped by the View's Clip Area.
 	///         </para>
 	///         <para>
-	///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
-	///         will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout
-	///         of the
-	///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+	///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
+	///         will change the size of <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout
+	///         of the <see cref="SuperView"/> and its <see cref="Subviews"/>.
 	///         </para>
 	/// </remarks>
 	public Adornment Margin { get; private set; }
 
 	/// <summary>
-	/// The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the
+	/// The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the
 	/// <see cref="Margin"/>.
 	/// The Border provides the space for a visual border (drawn using line-drawing glyphs) and the Title.
 	/// The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and
@@ -125,9 +123,8 @@ public partial class View {
 	///         <see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.
 	///         </para>
 	///         <para>
-	///         The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's
-	///         content
-	///         and are not clipped by the View's Clip Area.
+	///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's
+	///         content and are not clipped by the View's Clip Area.
 	///         </para>
 	///         <para>
 	///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
@@ -169,7 +166,7 @@ public partial class View {
 				Border.Thickness = new Thickness (0);
 			}
 			Border.BorderStyle = value;
-			LayoutFrames ();
+			LayoutAdornments ();
 			SetNeedsLayout ();
 		}
 	}
@@ -180,9 +177,8 @@ public partial class View {
 	/// </summary>
 	/// <remarks>
 	///         <para>
-	///         The frames (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's
-	///         content
-	///         and are not clipped by the View's Clip Area.
+	///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's
+	///         content and are not clipped by the View's Clip Area.
 	///         </para>
 	///         <para>
 	///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>)
@@ -209,8 +205,8 @@ public partial class View {
 	///         objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.
 	///         </para>
 	/// </summary>
-	/// <returns>A thickness that describes the sum of the Frames' thicknesses.</returns>
-	public Thickness GetFramesThickness ()
+	/// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
+	public Thickness GetAdornmentsThickness ()
 	{
 		int left = Margin.Thickness.Left + Border.Thickness.Left + Padding.Thickness.Left;
 		int top = Margin.Thickness.Top + Border.Thickness.Top + Padding.Thickness.Top;
@@ -226,15 +222,15 @@ public partial class View {
 	public Point GetBoundsOffset () => new (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
 
 	/// <summary>
-	/// Creates the view's <see cref="Frame"/> objects. This internal method is overridden by Frame to do nothing
+	/// Creates the view's <see cref="Adornment"/> objects. This internal method is overridden by Adornment to do nothing
 	/// to prevent recursion during View construction.
 	/// </summary>
-	internal virtual void CreateFrames ()
+	internal virtual void CreateAdornments ()
 	{
 		void ThicknessChangedHandler (object sender, EventArgs e)
 		{
 			if (IsInitialized) {
-				LayoutFrames ();
+				LayoutAdornments ();
 			}
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
@@ -256,8 +252,6 @@ public partial class View {
 		Border.ThicknessChanged += ThicknessChangedHandler;
 		Border.Parent = this;
 
-		// TODO: Create View.AddAdornment
-
 		if (Padding != null) {
 			Padding.ThicknessChanged -= ThicknessChangedHandler;
 			Padding.Dispose ();
@@ -266,8 +260,6 @@ public partial class View {
 		Padding.ThicknessChanged += ThicknessChangedHandler;
 		Padding.Parent = this;
 	}
-
-	LayoutStyle _layoutStyle;
 
 	/// <summary>
 	/// Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is set to
@@ -330,8 +322,13 @@ public partial class View {
 				Debug.WriteLine ($"WARNING: Bounds is being accessed before the View has been initialized. This is likely a bug in {this}");
 			}
 #endif // DEBUG
-			var frameRelativeBounds = FrameGetInsideBounds ();
-			return new Rect (default, frameRelativeBounds.Size);
+			// BUGBUG: I think there's a bug here. This should be && not ||
+			if (Margin == null || Border == null || Padding == null) {
+				return new Rect (default, Frame.Size);
+			}
+			var width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
+			var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
+			return new Rect (Point.Empty, new Size (width, height));
 		}
 		set {
 			// TODO: Should we enforce Bounds.X/Y == 0? The code currently ignores value.X/Y which is
@@ -547,16 +544,8 @@ public partial class View {
 	/// initialized.
 	/// </summary>
 	public event EventHandler Initialized;
-	
-	Rect FrameGetInsideBounds ()
-	{
-		if (Margin == null || Border == null || Padding == null) {
-			return new Rect (default, Frame.Size);
-		}
-		var width = Math.Max (0, Frame.Size.Width - Margin.Thickness.Horizontal - Border.Thickness.Horizontal - Padding.Thickness.Horizontal);
-		var height = Math.Max (0, Frame.Size.Height - Margin.Thickness.Vertical - Border.Thickness.Vertical - Padding.Thickness.Vertical);
-		return new Rect (Point.Empty, new Size (width, height));
-	}
+
+
 
 	// Diagnostics to highlight when X or Y is read before the view has been initialized
 	Pos VerifyIsInitialized (Pos pos, string member)
@@ -605,7 +594,7 @@ public partial class View {
 		// TODO: Determine what, if any of the below is actually needed here.
 		if (IsInitialized) {
 			SetFrameToFitText ();
-			LayoutFrames ();
+			LayoutAdornments ();
 			SetTextFormatterSize ();
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
@@ -873,10 +862,8 @@ public partial class View {
 
 			if (IsInitialized) {
 				// TODO: Figure out what really is needed here. All unit tests (except AutoSize) pass as-is
-				//LayoutFrames ();
 				SetTextFormatterSize ();
 				SetNeedsLayout ();
-				//SetNeedsDisplay ();
 			}
 
 			// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
@@ -1036,12 +1023,12 @@ public partial class View {
 	} // TopologicalSort
 
 	/// <summary>
-	/// Overriden by <see cref="Frame"/> to do nothing, as the <see cref="Frame"/> does not have frames.
+	/// Overriden by <see cref="Adornment"/> to do nothing, as the <see cref="Adornment"/> does not have adornments.
 	/// </summary>
-	internal virtual void LayoutFrames ()
+	internal virtual void LayoutAdornments ()
 	{
 		if (Margin == null) {
-			return; // CreateFrames() has not been called yet
+			return; // CreateAdornments () has not been called yet
 		}
 
 		if (Margin.Frame.Size != Frame.Size) {
@@ -1100,7 +1087,7 @@ public partial class View {
 			return;
 		}
 
-		LayoutFrames ();
+		LayoutAdornments ();
 
 		var oldBounds = Bounds;
 		OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });

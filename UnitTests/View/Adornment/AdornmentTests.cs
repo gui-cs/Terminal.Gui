@@ -12,28 +12,28 @@ public class AdornmentTests {
 
 
 	[Fact]
-	public void GetFramesThickness ()
+	public void GetAdornmentsThickness ()
 	{
 		var view = new View ();
-		Assert.Equal (Thickness.Empty, view.GetFramesThickness ());
+		Assert.Equal (Thickness.Empty, view.GetAdornmentsThickness ());
 
 		view.Margin.Thickness = new Thickness (1);
-		Assert.Equal (new Thickness (1), view.GetFramesThickness ());
+		Assert.Equal (new Thickness (1), view.GetAdornmentsThickness ());
 
 		view.Border.Thickness = new Thickness (1);
-		Assert.Equal (new Thickness (2), view.GetFramesThickness ());
+		Assert.Equal (new Thickness (2), view.GetAdornmentsThickness ());
 
 		view.Padding.Thickness = new Thickness (1);
-		Assert.Equal (new Thickness (3), view.GetFramesThickness ());
+		Assert.Equal (new Thickness (3), view.GetAdornmentsThickness ());
 
 		view.Padding.Thickness = new Thickness (2);
-		Assert.Equal (new Thickness (4), view.GetFramesThickness ());
+		Assert.Equal (new Thickness (4), view.GetAdornmentsThickness ());
 
 		view.Padding.Thickness = new Thickness (1, 2, 3, 4);
-		Assert.Equal (new Thickness (3, 4, 5, 6), view.GetFramesThickness ());
+		Assert.Equal (new Thickness (3, 4, 5, 6), view.GetAdornmentsThickness ());
 
 		view.Margin.Thickness = new Thickness (1, 2, 3, 4);
-		Assert.Equal (new Thickness (3, 5, 7, 9), view.GetFramesThickness ());
+		Assert.Equal (new Thickness (3, 5, 7, 9), view.GetAdornmentsThickness ());
 		view.Dispose ();
 	}
 }

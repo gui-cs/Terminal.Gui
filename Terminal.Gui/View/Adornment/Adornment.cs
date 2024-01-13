@@ -1,27 +1,25 @@
 ﻿using System;
-using System.Linq;
 
 namespace Terminal.Gui;
 
-// TODO: v2 - Missing 3D effect - 3D effects will be drawn by a mechanism separate from Frames
-// TODO: v2 - If a Frame has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Frame
-// QUESTION: How does a user navigate out of a Frame to another Frame, or back into the Parent's SubViews?
+// TODO: v2 - Missing 3D effect - 3D effects will be drawn by a mechanism separate from Adornments
+// TODO: v2 - If a Adornment has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Adornments
+// QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
-/// Frames are a special form of <see cref="View"/> that act as adornments; they appear outside of the
-/// <see cref="View.Bounds"/>
-/// enabling borders, menus, etc...
+/// Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>
+/// enabling borders, menus, etc...See <see cref="Border"/>.
 /// </summary>
 public class Adornment : View {
 	Thickness _thickness = Thickness.Empty;
 
 	/// <summary>
-	/// The Parent of this Frame (the View this Frame surrounds).
+	/// The Parent of this Adornment (the View this Adornment surrounds).
 	/// </summary>
 	public View Parent { get; set; }
 
 	/// <summary>
-	/// Frames cannot be used as sub-views, so this method always throws an <see cref="InvalidOperationException"/>.
+	/// Adornments cannot be used as sub-views, so this method always throws an <see cref="InvalidOperationException"/>.
 	/// TODO: Are we sure?
 	/// </summary>
 	public override View SuperView {
@@ -30,7 +28,7 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Frames only render to their Parent or Parent's SuperView's LineCanvas,
+	/// Adornments only render to their Parent or Parent's SuperView's LineCanvas,
 	/// so this always throws an <see cref="InvalidOperationException"/>.
 	/// </summary>
 	public override bool SuperViewRendersLineCanvas {
@@ -48,7 +46,7 @@ public class Adornment : View {
 			_thickness = value;
 			if (prev != _thickness) {
 
-				Parent?.LayoutFrames ();
+				Parent?.LayoutAdornments ();
 				OnThicknessChanged (prev);
 			}
 
@@ -56,28 +54,28 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Gets the rectangle that describes the inner area of the frame. The Location is always (0,0).
+	/// Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
 	/// </summary>
 	public override Rect Bounds {
 		get => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
 		set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
 	}
 
-	internal override void CreateFrames ()
+	internal override void CreateAdornments ()
 	{
-		/* Do nothing - Frames do not have Frames */
+		/* Do nothing - Adornments do not have Adornments */
 	}
 
-	internal override void LayoutFrames ()
+	internal override void LayoutAdornments ()
 	{
-		/* Do nothing - Frames do not have Frames */
+		/* Do nothing - Adornments do not have Adornments */
 	}
 
 	/// <inheritdoc/>
 	public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 	{
-		// Frames are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
-		// To get the screen-relative coordinates of a Frame, we need to know who
+		// Adornments are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
+		// To get the screen-relative coordinates of a Adornment, we need to know who
 		// the Parent is
 		var parentFrame = Parent?.Frame ?? Frame;
 		rrow = row + parentFrame.Y;
@@ -91,8 +89,8 @@ public class Adornment : View {
 	/// <inheritdoc/>
 	public override Rect FrameToScreen ()
 	{
-		// Frames are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
-		// To get the screen-relative coordinates of a Frame, we need to know who
+		// Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
+		// To get the screen-relative coordinates of a Adornment, we need to know who
 		// the Parent is
 		var ret = Parent?.Frame ?? Frame;
 		ret.Size = Frame.Size;
@@ -105,13 +103,13 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Does nothing for Frame
+	/// Does nothing for Adornment
 	/// </summary>
 	/// <returns></returns>
-	public override bool OnDrawFrames () => false;
+	public override bool OnDrawAdornments () => false;
 
 	/// <summary>
-	/// Does nothing for Frame
+	/// Does nothing for Adornment
 	/// </summary>
 	/// <returns></returns>
 	public override bool OnRenderLineCanvas () => false;
@@ -122,7 +120,7 @@ public class Adornment : View {
 	/// <param name="clipRect"></param>
 	public virtual void OnDrawSubViews (Rect clipRect)
 	{
-		// TODO: Enable subviews of Frames (adornments).
+		// TODO: Enable subviews of Adornments (adornments).
 		//	if (Subviews == null) {
 		//		return;
 		//	}
@@ -145,7 +143,7 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Redraws the Frames that comprise the <see cref="Adornment"/>.
+	/// Redraws the Adornments that comprise the <see cref="Adornment"/>.
 	/// </summary>
 	public override void OnDrawContent (Rect contentArea)
 	{
