@@ -7,14 +7,17 @@ namespace Terminal.Gui;
 // QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
-/// Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>
-/// enabling borders, menus, etc...See <see cref="Border"/>. They are defined using the <see cref="Thickness"/>
+/// Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>:
+/// <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the <see cref="Thickness"/>
 /// class, which specifies the thickness of the sides of a rectangle. 
 /// </summary>
 /// <remarsk>
-/// <code>
-/// 
-/// </code>
+/// <para>
+/// There is no prevision for creating additional subclasses of Adornment. It is not abstract to enable unit testing.
+/// </para>
+/// <para>
+/// Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> can be customized.
+/// </para>
 /// </remarsk>
 public class Adornment : View {
 	Thickness _thickness = Thickness.Empty;
@@ -22,10 +25,14 @@ public class Adornment : View {
 	/// <summary>
 	/// The Parent of this Adornment (the View this Adornment surrounds).
 	/// </summary>
+	/// <remarks>
+	/// Adornments are distinguished from typical View classes in that they are not sub-views,
+	/// but have a parent/child relationship with their containing View.
+	/// </remarks>
 	public View Parent { get; set; }
 
 	/// <summary>
-	/// Adornments cannot be used as sub-views, so this method always throws an <see cref="InvalidOperationException"/>.
+	/// Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an <see cref="InvalidOperationException"/>.
 	/// TODO: Are we sure?
 	/// </summary>
 	public override View SuperView {
@@ -34,8 +41,8 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Adornments only render to their Parent or Parent's SuperView's LineCanvas,
-	/// so this always throws an <see cref="InvalidOperationException"/>.
+	/// Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas,
+	/// so setting this property throws an <see cref="InvalidOperationException"/>.
 	/// </summary>
 	public override bool SuperViewRendersLineCanvas {
 		get => false; // throw new NotImplementedException ();

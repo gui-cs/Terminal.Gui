@@ -245,7 +245,7 @@ public partial class View {
 			Margin.ThicknessChanged -= ThicknessChangedHandler;
 			Margin.Dispose ();
 		}
-		Margin = new Adornment () { Thickness = new Thickness (0) };
+		Margin = new Margin () { Thickness = new Thickness (0) };
 		Margin.ThicknessChanged += ThicknessChangedHandler;
 		Margin.Parent = this;
 
@@ -261,7 +261,7 @@ public partial class View {
 			Padding.ThicknessChanged -= ThicknessChangedHandler;
 			Padding.Dispose ();
 		}
-		Padding = new Adornment () { Thickness = new Thickness (0) };
+		Padding = new Padding () { Thickness = new Thickness (0) };
 		Padding.ThicknessChanged += ThicknessChangedHandler;
 		Padding.Parent = this;
 	}
