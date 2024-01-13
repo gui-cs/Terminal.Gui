@@ -566,7 +566,7 @@ public class ApplicationTests {
 	}
 	#endregion
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Begin_Sets_Application_Top_To_Console_Size ()
 	{
 		Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
