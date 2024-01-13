@@ -53,6 +53,43 @@ public class TimeFieldTests {
 	}
 
 	[Fact]
+	public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format_After_Selection ()
+	{
+		var tf = new TimeField ();
+		// Start selection
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorLeft | KeyCode.ShiftMask)));
+		Assert.Equal (1, tf.SelectedStart);
+		Assert.Equal (1, tf.SelectedLength);
+		Assert.Equal (0, tf.CursorPosition);
+		// Without selection
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorLeft)));
+		Assert.Equal (-1, tf.SelectedStart);
+		Assert.Equal (0, tf.SelectedLength);
+		Assert.Equal (1, tf.CursorPosition);
+		tf.CursorPosition = 8;
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.ShiftMask)));
+		Assert.Equal (8, tf.SelectedStart);
+		Assert.Equal (1, tf.SelectedLength);
+		Assert.Equal (9, tf.CursorPosition);
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorRight)));
+		Assert.Equal (-1, tf.SelectedStart);
+		Assert.Equal (0, tf.SelectedLength);
+		Assert.Equal (8, tf.CursorPosition);
+		Assert.False (tf.IsShortFormat);
+		tf.IsShortFormat = true;
+		Assert.Equal (5, tf.CursorPosition);
+		// Start selection
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.ShiftMask)));
+		Assert.Equal (5, tf.SelectedStart);
+		Assert.Equal (1, tf.SelectedLength);
+		Assert.Equal (6, tf.CursorPosition);
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorRight)));
+		Assert.Equal (-1, tf.SelectedStart);
+		Assert.Equal (0, tf.SelectedLength);
+		Assert.Equal (5, tf.CursorPosition);
+	}
+
+	[Fact]
 	public void KeyBindings_Command ()
 	{
 		TimeField tf = new TimeField (TimeSpan.Parse ("12:12:19"));
