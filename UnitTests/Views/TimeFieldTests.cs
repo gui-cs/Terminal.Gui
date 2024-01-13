@@ -90,5 +90,44 @@ public class TimeFieldTests {
 		tf.ReadOnly = false;
 		Assert.True (tf.NewKeyDownEvent (new (KeyCode.D1)));
 		Assert.Equal (" 12:02:19", tf.Text);
+		Assert.Equal (2, tf.CursorPosition);
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.D | KeyCode.AltMask)));
+		Assert.Equal (" 10:02:19", tf.Text);
+	}
+
+	[Fact]
+	public void Typing_With_Selection_Normalize_Format ()
+	{
+		TimeField tf = new TimeField (TimeSpan.Parse ("12:12:19"));
+		// Start selection at before the first separator :
+		tf.CursorPosition = 2;
+		// Now select the separator :
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.ShiftMask)));
+		Assert.Equal (2, tf.SelectedStart);
+		Assert.Equal (1, tf.SelectedLength);
+		Assert.Equal (3, tf.CursorPosition);
+		// Type 3 over the separator
+		Assert.True (tf.NewKeyDownEvent (new (KeyCode.D3)));
+		// The format was normalized and replaced again with :
+		Assert.Equal (" 12:12:19", tf.Text);
+		Assert.Equal (4, tf.CursorPosition);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void Copy_Paste ()
+	{
+		TimeField tf1 = new TimeField (TimeSpan.Parse ("12:12:19"));
+		TimeField tf2 = new TimeField (TimeSpan.Parse ("12:59:01"));
+		// Select all text
+		Assert.True (tf2.NewKeyDownEvent (new (KeyCode.End | KeyCode.ShiftMask)));
+		Assert.Equal (1, tf2.SelectedStart);
+		Assert.Equal (8, tf2.SelectedLength);
+		Assert.Equal (9, tf2.CursorPosition);
+		// Copy from tf2
+		Assert.True (tf2.NewKeyDownEvent (new (KeyCode.C | KeyCode.CtrlMask)));
+		// Paste into tf1
+		Assert.True (tf1.NewKeyDownEvent (new (KeyCode.V | KeyCode.CtrlMask)));
+		Assert.Equal (" 12:59:01", tf1.Text);
+		Assert.Equal (9, tf1.CursorPosition);
 	}
 }

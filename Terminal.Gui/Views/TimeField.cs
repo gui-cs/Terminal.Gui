@@ -88,22 +88,22 @@ public class TimeField : TextField {
 
 		// Default keybindings for this view
 		KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-		KeyBindings.Add (KeyCode.D | KeyCode.CtrlMask, Command.DeleteCharRight);
+		KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-		KeyBindings.Add (KeyCode.Delete, Command.DeleteCharLeft);
-		KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
+		KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+		KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
-		KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-		KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, Command.LeftHome);
+		KeyBindings.Add (Key.Home, Command.LeftHome);
+		KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
 
-		KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-		KeyBindings.Add (KeyCode.B | KeyCode.CtrlMask, Command.Left);
+		KeyBindings.Add (Key.CursorLeft, Command.Left);
+		KeyBindings.Add (Key.B.WithCtrl, Command.Left);
 
-		KeyBindings.Add (KeyCode.End, Command.RightEnd);
-		KeyBindings.Add (KeyCode.E | KeyCode.CtrlMask, Command.RightEnd);
+		KeyBindings.Add (Key.End, Command.RightEnd);
+		KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
 
-		KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-		KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
+		KeyBindings.Add (Key.CursorRight, Command.Right);
+		KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 	}
 
 	void TextField_TextChanging (object sender, TextChangingEventArgs e)
