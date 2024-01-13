@@ -76,7 +76,7 @@ public class TimeField : TextField {
 		this._isShort = isShort;
 		Time = time;
 		CursorPosition = 1;
-		TextChanged += TextField_TextChanged;
+		TextChanging += TextField_TextChanging;
 
 		// Things this view knows how to do
 		AddCommand (Command.DeleteCharRight, () => { DeleteCharRight (); return true; });
@@ -106,13 +106,14 @@ public class TimeField : TextField {
 		KeyBindings.Add (KeyCode.F | KeyCode.CtrlMask, Command.Right);
 	}
 
-	void TextField_TextChanged (object sender, TextChangedEventArgs e)
+	void TextField_TextChanging (object sender, TextChangingEventArgs e)
 	{
 		try {
-			if (!TimeSpan.TryParseExact (Text.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
-				Text = e.OldValue;
+			if (!TimeSpan.TryParseExact (e.NewText.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result)) {
+				e.Cancel = true;
+			}
 		} catch (Exception) {
-			Text = e.OldValue;
+			e.Cancel = true;
 		}
 	}
 
