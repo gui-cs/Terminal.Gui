@@ -2755,4 +2755,58 @@ wo
 		var exception = Record.Exception (() => Assert.True (menu.NewKeyDownEvent (new Key (KeyCode.AltMask | KeyCode.Q))));
 		Assert.Null (exception);
 	}
+
+	[Fact]
+	public void RemoveAndThenAddMenuBar_ShouldNotChangeWidth ()
+	{
+		MenuBar menuBar;
+		MenuBar menuBar2;
+
+		// TODO: When https: //github.com/gui-cs/Terminal.Gui/issues/3136 is fixed, 
+		// TODO: Change this to Window
+		var w = new View ();
+		menuBar2 = new Terminal.Gui.MenuBar ();
+		menuBar = new Terminal.Gui.MenuBar ();
+		w.Width = Dim.Fill (0);
+		w.Height = Dim.Fill (0);
+		w.X = 0;
+		w.Y = 0;
+
+		w.Visible = true;
+		// TODO: When https: //github.com/gui-cs/Terminal.Gui/issues/3136 is fixed, 
+		// TODO: uncomment this.
+		//w.Modal = false;
+		w.Title = "";
+		menuBar.Width = Dim.Fill (0);
+		menuBar.Height = 1;
+		menuBar.X = 0;
+		menuBar.Y = 0;
+		menuBar.Visible = true;
+		w.Add (menuBar);
+
+		menuBar2.Width = Dim.Fill (0);
+		menuBar2.Height = 1;
+		menuBar2.X = 0;
+		menuBar2.Y = 4;
+		menuBar2.Visible = true;
+		w.Add (menuBar2);
+
+
+		var menuBars = w.Subviews.OfType<MenuBar> ().ToArray ();
+		Assert.Equal (2, menuBars.Length);
+
+		Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+		Assert.Equal (Dim.Fill (0), menuBars [1].Width);
+
+		// Goes wrong here
+		w.Remove (menuBar);
+		w.Remove (menuBar2);
+
+		w.Add (menuBar);
+		w.Add (menuBar2);
+
+		// These assertions fail
+		Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+		Assert.Equal (Dim.Fill (0), menuBars [1].Width);
+	}
 }
