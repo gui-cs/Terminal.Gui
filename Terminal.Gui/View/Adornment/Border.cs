@@ -47,6 +47,8 @@ namespace Terminal.Gui;
 /// </para>
 /// </remarks>
 public class Border : Adornment {
+	LineStyle? _lineStyle = null;
+
 	/// <inheritdoc />
 	public Border () { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */ }
 
@@ -54,11 +56,39 @@ public class Border : Adornment {
 	public Border (View parent) : base (parent) { /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */ }
 
 	/// <summary>
+	/// The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/> scheme.
+	/// color scheme.
+	/// </summary>
+	public override ColorScheme ColorScheme {
+		get {
+			if (base.ColorScheme != null) {
+				return base.ColorScheme;
+			}
+			return Parent?.ColorScheme;
+		}
+		set {
+			base.ColorScheme = value;
+			Parent?.SetNeedsDisplay ();
+		}
+	}
+
+	/// <summary>
 	/// Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for
 	/// setting the <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the
 	/// views that comprise the border. If set to <see cref="LineStyle.None"/> no border will be drawn.
 	/// </summary>
-	public new LineStyle LineStyle { get; set; } = LineStyle.None;
+	public new LineStyle LineStyle {
+		get {
+			if (_lineStyle.HasValue) {
+				return _lineStyle.Value;
+			}
+			// TODO: Make Border.LineStyle inherit from the SuperView hierarchy
+			// TODO: Right now, Window and FrameView use CM to set BorderStyle, which negates
+			// TODO: all this.
+			return Parent.SuperView?.BorderStyle ?? LineStyle.None;
+		}
+		set => _lineStyle = value;
+	}
 
 	/// <inheritdoc />
 	public override void OnDrawContent (Rect contentArea)
@@ -123,11 +153,7 @@ public class Border : Adornment {
 
 		if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && !string.IsNullOrEmpty (Parent?.Title)) {
 			var prevAttr = Driver.GetAttribute ();
-			if (ColorScheme != null) {
-				Driver.SetAttribute (HasFocus ? GetHotNormalColor () : GetNormalColor ());
-			} else {
-				Driver.SetAttribute (Parent.HasFocus ? Parent.GetHotNormalColor () : Parent.GetNormalColor ());
-			}
+			Driver.SetAttribute (Parent.HasFocus ? Parent.GetFocusColor () : Parent.GetNormalColor ());
 			DrawTitle (new Rect (borderBounds.X, titleY, maxTitleWidth, 1), Parent?.Title);
 			Driver.SetAttribute (prevAttr);
 		}

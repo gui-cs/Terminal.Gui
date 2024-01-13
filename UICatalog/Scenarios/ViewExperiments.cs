@@ -169,23 +169,18 @@ namespace UICatalog.Scenarios {
 			};
 			view.Add (edit);
 
-			edit = new TextField () {
+			var label50 = new View () {
+				Title = "Border Inherit Demo",
 				Text = "Center();50%",
 				X = Pos.Center (),
 				Y = Pos.Percent (50),
 				Width = 30,
-				Height = 1
+				TextAlignment = TextAlignment.Centered,
+				//Height = 1
 			};
-			view.Add (edit);
-
-			edit = new TextField () {
-				Text = "Center() - 1;60%",
-				X = Pos.Center () - 1,
-				Y = Pos.Percent (60),
-				Width = 30,
-				Height = 1
-			};
-			view.Add (edit);
+			label50.Border.Thickness = new Thickness (1, 3, 1, 1);
+			label50.Height = 5;
+			view.Add (label50);
 
 			edit = new TextField () {
 				Text = "0 + Percent(50);70%",

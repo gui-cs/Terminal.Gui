@@ -1,45 +1,56 @@
-﻿using System;
+﻿using CsvHelper.Configuration.Attributes;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Xunit.Abstractions;
-using Xunit;
-using System.Text.RegularExpressions;
-using System.Reflection;
 using System.Diagnostics;
-
-using Attribute = Terminal.Gui.Attribute;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using Xunit.Sdk;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Terminal.Gui;
+
 // This class enables test functions annotated with the [AutoInitShutdown] attribute to 
 // automatically call Application.Init at start of the test and Application.Shutdown after the
 // test exits. 
 // 
 // This is necessary because a) Application is a singleton and Init/Shutdown must be called
 // as a pair, and b) all unit test functions should be atomic..
-[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
+public class AutoInitShutdownAttribute : BeforeAfterTestAttribute {
+	readonly Type _driverType;
+
 	/// <summary>
 	/// Initializes a [AutoInitShutdown] attribute, which determines if/how Application.Init and
 	/// Application.Shutdown are automatically called Before/After a test runs.
 	/// </summary>
 	/// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
 	/// <param name="autoShutdown">If true, Application.Shutdown will be called After the test runs.</param>
-	/// <param name="consoleDriverType">Determines which ConsoleDriver (FakeDriver, WindowsDriver, 
+	/// <param name="consoleDriverType">
+	/// Determines which ConsoleDriver (FakeDriver, WindowsDriver,
 	/// CursesDriver, NetDriver) will be used when Application.Init is called. If null FakeDriver will be used.
-	/// Only valid if <paramref name="autoInit"/> is true.</param>
-	/// <param name="useFakeClipboard">If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. 
-	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
-	/// <param name="fakeClipboardAlwaysThrowsNotSupportedException">Only valid if <paramref name="autoInit"/> is true.
-	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
-	/// <param name="fakeClipboardIsSupportedAlwaysTrue">Only valid if <paramref name="autoInit"/> is true.
-	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.</param>
-	/// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will 
-	/// load from.</param>
+	/// Only valid if <paramref name="autoInit"/> is true.
+	/// </param>
+	/// <param name="useFakeClipboard">
+	/// If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>.
+	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+	/// </param>
+	/// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
+	/// Only valid if <paramref name="autoInit"/> is true.
+	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+	/// </param>
+	/// <param name="fakeClipboardIsSupportedAlwaysTrue">
+	/// Only valid if <paramref name="autoInit"/> is true.
+	/// Only valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+	/// </param>
+	/// <param name="configLocation">
+	/// Determines what config file locations <see cref="ConfigurationManager"/> will
+	/// load from.
+	/// </param>
 	public AutoInitShutdownAttribute (bool autoInit = true,
 		Type consoleDriverType = null,
 		bool useFakeClipboard = true,
@@ -57,7 +68,6 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	}
 
 	bool AutoInit { get; }
-	Type _driverType;
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
@@ -91,12 +101,9 @@ public class AutoInitShutdownAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 	}
 }
 
-[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
-	public TestRespondersDisposed ()
-	{
-		CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
-	}
+[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
+public class TestRespondersDisposed : BeforeAfterTestAttribute {
+	public TestRespondersDisposed () => CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
@@ -117,21 +124,20 @@ public class TestRespondersDisposed : Xunit.Sdk.BeforeAfterTestAttribute {
 	}
 }
 
-[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public class SetupFakeDriverAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
+public class SetupFakeDriverAttribute : BeforeAfterTestAttribute {
 	/// <summary>
-	/// Enables test functions annotated with the [SetupFakeDriver] attribute to 
-	/// set Application.Driver to new FakeDriver(). 
+	/// Enables test functions annotated with the [SetupFakeDriver] attribute to
+	/// set Application.Driver to new FakeDriver(). The driver is setup with
+	/// 10 rows and columns.
 	/// </summary>
-	public SetupFakeDriverAttribute ()
-	{
-	}
+	public SetupFakeDriverAttribute () { }
 
 	public override void Before (MethodInfo methodUnderTest)
 	{
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		Assert.Null (Application.Driver);
-		Application.Driver = new FakeDriver ();
+		Application.Driver = new FakeDriver () { Rows = 10, Cols = 10 };
 	}
 
 	public override void After (MethodInfo methodUnderTest)
@@ -144,31 +150,22 @@ public class SetupFakeDriverAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
 partial class TestHelpers {
 	[GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
 	private static partial Regex TrailingWhiteSpaceRegEx ();
+
 	[GeneratedRegex ("^\\s+", RegexOptions.Multiline)]
 	private static partial Regex LeadingWhitespaceRegEx ();
 
-#pragma warning disable xUnit1013 // Public method should be marked as test
-	/// <summary>
-	/// Asserts that the driver contents match the expected contents, optionally ignoring any trailing whitespace.
-	/// </summary>
-	/// <param name="expectedLook"></param>
-	/// <param name="output"></param>
-	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
-	/// <param name="ignoreLeadingWhitespace"></param>
-	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, ConsoleDriver driver = null, bool ignoreLeadingWhitespace = false)
+	public static string DriverContentsToString (ConsoleDriver driver = null)
 	{
-#pragma warning restore xUnit1013 // Public method should be marked as test
-
 		var sb = new StringBuilder ();
 		driver ??= Application.Driver;
 
 		var contents = driver.Contents;
 
-		for (int r = 0; r < driver.Rows; r++) {
-			for (int c = 0; c < driver.Cols; c++) {
-				Rune rune = contents [r, c].Rune;
-				if (rune.DecodeSurrogatePair (out char [] spair)) {
-					sb.Append (spair);
+		for (var r = 0; r < driver.Rows; r++) {
+			for (var c = 0; c < driver.Cols; c++) {
+				var rune = contents [r, c].Rune;
+				if (rune.DecodeSurrogatePair (out var sp)) {
+					sb.Append (sp);
 				} else {
 					sb.Append ((char)rune.Value);
 				}
@@ -183,9 +180,25 @@ partial class TestHelpers {
 			sb.AppendLine ();
 		}
 
-		var actualLook = sb.ToString ();
+		return sb.ToString ();
+	}
 
-		if (string.Equals (expectedLook, actualLook)) return;
+#pragma warning disable xUnit1013 // Public method should be marked as test
+	/// <summary>
+	/// Asserts that the driver contents match the expected contents, optionally ignoring any trailing whitespace.
+	/// </summary>
+	/// <param name="expectedLook"></param>
+	/// <param name="output"></param>
+	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+	/// <param name="ignoreLeadingWhitespace"></param>
+	public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, ConsoleDriver driver = null, bool ignoreLeadingWhitespace = false)
+	{
+#pragma warning restore xUnit1013 // Public method should be marked as test
+		var actualLook = DriverContentsToString (driver);
+
+		if (string.Equals (expectedLook, actualLook)) {
+			return;
+		}
 
 		// get rid of trailing whitespace on each line (and leading/trailing whitespace of start/end of full string)
 		expectedLook = TrailingWhiteSpaceRegEx ().Replace (expectedLook, "").Trim ();
@@ -231,13 +244,13 @@ partial class TestHelpers {
 		for (var r = 0; r < driver.Rows; r++) {
 			var runes = new List<Rune> ();
 			for (var c = 0; c < driver.Cols; c++) {
-				Rune rune = contents [r, c].Rune;
+				var rune = contents [r, c].Rune;
 				if (rune != (Rune)' ') {
 					if (x == -1) {
 						x = c;
 						y = r;
-						for (int i = 0; i < c; i++) {
-							runes.InsertRange (i, new List<Rune> () { (Rune)' ' });
+						for (var i = 0; i < c; i++) {
+							runes.InsertRange (i, new List<Rune> { (Rune)' ' });
 						}
 					}
 					if (rune.GetColumns () > 1) {
@@ -248,25 +261,31 @@ partial class TestHelpers {
 					}
 					h = r - y + 1;
 				}
-				if (x > -1) runes.Add (rune);
+				if (x > -1) {
+					runes.Add (rune);
+				}
 				// See Issue #2616
 				//foreach (var combMark in contents [r, c].CombiningMarks) {
 				//	runes.Add (combMark);
 				//}
 			}
-			if (runes.Count > 0) lines.Add (runes);
+			if (runes.Count > 0) {
+				lines.Add (runes);
+			}
 		}
 
 		// Remove unnecessary empty lines
 		if (lines.Count > 0) {
-			for (var r = lines.Count - 1; r > h - 1; r--) lines.RemoveAt (r);
+			for (var r = lines.Count - 1; r > h - 1; r--) {
+				lines.RemoveAt (r);
+			}
 		}
 
 		// Remove trailing whitespace on each line
 		foreach (var row in lines) {
 			for (var c = row.Count - 1; c >= 0; c--) {
 				var rune = row [c];
-				if (rune != (Rune)' ' || (row.Sum (x => x.GetColumns ()) == w)) {
+				if (rune != (Rune)' ' || row.Sum (x => x.GetColumns ()) == w) {
 					break;
 				}
 				row.RemoveAt (c);
@@ -274,8 +293,8 @@ partial class TestHelpers {
 		}
 
 		// Convert Rune list to string
-		for (int r = 0; r < lines.Count; r++) {
-			var line = Terminal.Gui.StringExtensions.ToString (lines [r]).ToString ();
+		for (var r = 0; r < lines.Count; r++) {
+			var line = StringExtensions.ToString (lines [r]);
 			if (r == lines.Count - 1) {
 				sb.Append (line);
 			} else {
@@ -294,8 +313,12 @@ partial class TestHelpers {
 		actualLook = actualLook.Replace ("\r\n", "\n");
 
 		// Remove the first and the last line ending from the expectedLook
-		if (expectedLook.StartsWith ("\n")) expectedLook = expectedLook [1..];
-		if (expectedLook.EndsWith ("\n")) expectedLook = expectedLook [..^1];
+		if (expectedLook.StartsWith ("\n")) {
+			expectedLook = expectedLook [1..];
+		}
+		if (expectedLook.EndsWith ("\n")) {
+			expectedLook = expectedLook [..^1];
+		}
 
 		output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
 		output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
@@ -306,48 +329,62 @@ partial class TestHelpers {
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
 	/// <summary>
-	/// Verifies the console was rendered using the given <paramref name="expectedColors"/> at the given locations.
-	/// Pass a bitmap of indexes into <paramref name="expectedColors"/> as <paramref name="expectedLook"/> and the
+	/// Verifies the console was rendered using the given <paramref name="expectedAttribute"/> at the given locations.
+	/// Pass a bitmap of indexes into <paramref name="expectedAttribute"/> as <paramref name="expectedLook"/> and the
 	/// test method will verify those colors were used in the row/col of the console during rendering
 	/// </summary>
-	/// <param name="expectedLook">Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes of <paramref name="expectedColors"/></param>
+	/// <param name="expectedLook">
+	/// Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes of
+	/// <paramref name="expectedAttribute"/>
+	/// </param>
 	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
-	/// <param name="expectedColors"></param>
-	public static void AssertDriverColorsAre (string expectedLook, ConsoleDriver driver = null, params Attribute [] expectedColors)
+	/// <param name="expectedAttribute"></param>
+	public static void AssertDriverAttributesAre (string expectedLook, ConsoleDriver driver = null, params Attribute [] expectedAttribute)
 	{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
-		if (expectedColors.Length > 10) throw new ArgumentException ("This method only works for UIs that use at most 10 colors");
+		if (expectedAttribute.Length > 10) {
+			throw new ArgumentException ("This method only works for UIs that use at most 10 colors");
+		}
 
 		expectedLook = expectedLook.Trim ();
 		driver ??= Application.Driver;
 
 		var contents = driver.Contents;
 
-		var r = 0;
-		foreach (var line in expectedLook.Split ('\n').Select (l => l.Trim ())) {
+		var line = 0;
+		foreach (var lineString in expectedLook.Split ('\n').Select (l => l.Trim ())) {
 
-			for (var c = 0; c < line.Length; c++) {
+			for (var c = 0; c < lineString.Length; c++) {
 
-				var val = contents [r, c].Attribute;
+				var val = contents [line, c].Attribute;
 
-				var match = expectedColors.Where (e => e == val).ToList ();
+				var match = expectedAttribute.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
-					throw new Exception ($"Unexpected color {val} was used at row {r} and col {c} (indexes start at 0).  Color value was {val} (expected colors were {string.Join (",", expectedColors.Select (c => c.PlatformColor.ToString ()))})");
+					throw new Exception ($"{DriverContentsToString (driver)}\n" + 
+					                     $"Unexpected Attribute {val} was used at row {line} and col {c} (indexes start at 0).  " +
+							     $"Color value was {val} (expected colors were " +
+							     $"{string.Join (",", expectedAttribute.Select (c => c.PlatformColor.ToString ()))})");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
 
-				var colorUsed = Array.IndexOf (expectedColors, match [0]).ToString () [0];
-				var userExpected = line [c];
+				var colorUsed = Array.IndexOf (expectedAttribute, match [0]).ToString () [0];
+				var userExpected = lineString [c];
 
-				if (colorUsed != userExpected) throw new Exception ($"Colors used did not match expected at row {r} and col {c} (indexes start at 0).  Color index used was {colorUsed} ({val}) but test expected {userExpected} ({expectedColors [int.Parse (userExpected.ToString ())].PlatformColor}) (these are indexes into the expectedColors array)");
+				if (colorUsed != userExpected) {
+					throw new Exception ($"{DriverContentsToString (driver)}\n" +
+						$"Attribute did not match at Contents[{line},{c}] {contents [line, c]}'\n" +
+						$"  Expected: {userExpected} ({expectedAttribute [int.Parse (userExpected.ToString ())]})\n" +
+						$"  Actual:   {colorUsed} ({val})\n");
+				}
 			}
 
-			r++;
+			line++;
 		}
 	}
+
 	/// <summary>
 	/// Verifies the console used all the <paramref name="expectedColors"/> when rendering.
 	/// If one or more of the expected colors are not used then the failure will output both
@@ -392,12 +429,14 @@ partial class TestHelpers {
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
 	/// <summary>
-	/// Verifies two strings are equivalent. If the assert fails, output will be generated to standard 
+	/// Verifies two strings are equivalent. If the assert fails, output will be generated to standard
 	/// output showing the expected and actual look.
 	/// </summary>
 	/// <param name="output"></param>
-	/// <param name="expectedLook">A string containing the expected look. Newlines should be specified as "\r\n" as
-	/// they will be converted to <see cref="Environment.NewLine"/> to make tests platform independent.</param>
+	/// <param name="expectedLook">
+	/// A string containing the expected look. Newlines should be specified as "\r\n" as
+	/// they will be converted to <see cref="Environment.NewLine"/> to make tests platform independent.
+	/// </param>
 	/// <param name="actualLook"></param>
 	public static void AssertEqual (ITestOutputHelper output, string expectedLook, string actualLook)
 	{
@@ -414,7 +453,7 @@ partial class TestHelpers {
 	}
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
-	private static string ReplaceNewLinesToPlatformSpecific (string toReplace)
+	static string ReplaceNewLinesToPlatformSpecific (string toReplace)
 	{
 		var replaced = toReplace;
 
@@ -431,19 +470,16 @@ partial class TestHelpers {
 	/// Gets a list of instances of all classes derived from View.
 	/// </summary>
 	/// <returns>List of View objects</returns>
-	public static List<View> GetAllViews ()
-	{
-		return typeof (View).Assembly.GetTypes ()
-			.Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
-			.Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()))).ToList ();
-	}
+	public static List<View> GetAllViews () => typeof (View).Assembly.GetTypes ()
+		.Where (type => type.IsClass && !type.IsAbstract && type.IsPublic && type.IsSubclassOf (typeof (View)))
+		.Select (type => GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()))).ToList ();
 
-	private static View GetTypeInitializer (Type type, ConstructorInfo ctor)
+	static View GetTypeInitializer (Type type, ConstructorInfo ctor)
 	{
 		View viewType = null;
 
 		if (type.IsGenericType && type.IsTypeDefinition) {
-			List<Type> gTypes = new List<Type> ();
+			var gTypes = new List<Type> ();
 
 			foreach (var args in type.GetGenericArguments ()) {
 				gTypes.Add (typeof (object));
@@ -453,9 +489,9 @@ partial class TestHelpers {
 			Assert.IsType (type, (View)Activator.CreateInstance (type));
 
 		} else {
-			ParameterInfo [] paramsInfo = ctor.GetParameters ();
+			var paramsInfo = ctor.GetParameters ();
 			Type paramType;
-			List<object> pTypes = new List<object> ();
+			var pTypes = new List<object> ();
 
 			if (type.IsGenericType) {
 				foreach (var args in type.GetGenericArguments ()) {
@@ -491,7 +527,7 @@ partial class TestHelpers {
 		return viewType;
 	}
 
-	private static void AddArguments (Type paramType, List<object> pTypes)
+	static void AddArguments (Type paramType, List<object> pTypes)
 	{
 		if (paramType == typeof (Rect)) {
 			pTypes.Add (Rect.Empty);

@@ -176,11 +176,7 @@ public class Adornment : View {
 
 		var screenBounds = BoundsToScreen (Frame);
 
-		Attribute normalAttr = Parent.GetNormalColor ();
-		if (ColorScheme != null) {
-			// If a color scheme was set, use it instead
-			normalAttr = GetNormalColor ();
-		} 
+		Attribute normalAttr = GetNormalColor ();
 
 		// This just draws/clears the thickness, not the insides.
 		Driver.SetAttribute (normalAttr);

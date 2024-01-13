@@ -155,11 +155,8 @@ public partial class View {
 	///         </para>
 	/// </remarks>
 	public LineStyle BorderStyle {
-		get => Border?.LineStyle ?? LineStyle.None;
+		get => Border.LineStyle;
 		set {
-			if (Border == null) {
-				throw new InvalidOperationException ("Border is null; this is likely a bug.");
-			}
 			if (value != LineStyle.None) {
 				Border.Thickness = new Thickness (1);
 			} else {

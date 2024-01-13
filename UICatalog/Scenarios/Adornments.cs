@@ -2,7 +2,7 @@
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Adornments Demo", "Demonstrates Margin, Border, and Padding on Views.")]
 [ScenarioCategory ("Layout")]
@@ -53,12 +53,19 @@ public class Adornments : Scenario {
 
 		var editor = new AdornmentsEditor {
 			Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
-			ViewToEdit = view
+			ColorScheme = Colors.ColorSchemes [TopLevelColorScheme],
 		};
 		view.X = 36;
 		view.Y = 0;
 		view.Width = Dim.Fill ();
 		view.Height = Dim.Fill ();
+
+		editor.Initialized += (s, e) => {
+			editor.ViewToEdit = view;
+		};
+		//view.Margin.ColorScheme = new ColorScheme (Colors.Dialog);
+		//view.Border.ColorScheme = new ColorScheme (Colors.Error);
+		//view.Padding.ColorScheme = new ColorScheme (Colors.Menu);
 
 		Application.Run (editor);
 		Application.Shutdown ();
@@ -67,7 +74,7 @@ public class Adornments : Scenario {
 	public override void Run () { }
 
 	public class AdornmentEditor : View {
-		readonly ColorPicker _backgroundColorPicker = new() {
+		readonly ColorPicker _backgroundColorPicker = new () {
 			Title = "BG",
 			BoxWidth = 1,
 			BoxHeight = 1,
@@ -75,7 +82,7 @@ public class Adornments : Scenario {
 			SuperViewRendersLineCanvas = true
 		};
 
-		readonly ColorPicker _foregroundColorPicker = new() {
+		readonly ColorPicker _foregroundColorPicker = new () {
 			Title = "FG",
 			BoxWidth = 1,
 			BoxHeight = 1,
@@ -95,7 +102,6 @@ public class Adornments : Scenario {
 			Margin.Thickness = new Thickness (0);
 			BorderStyle = LineStyle.Double;
 			Initialized += AdornmentEditor_Initialized;
-			;
 		}
 
 		public Attribute Color {
@@ -268,7 +274,6 @@ public class Adornments : Scenario {
 				_origTitle = value.Title;
 				_viewToEdit = value;
 
-				_viewToEdit.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Toplevel"]);
 				_marginEditor = new AdornmentEditor {
 					X = 0,
 					Y = 0,
@@ -281,7 +286,6 @@ public class Adornments : Scenario {
 				_marginEditor.AttributeChanged += Editor_AttributeChanged;
 				Add (_marginEditor);
 
-				_viewToEdit.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Base"]);
 				_borderEditor = new AdornmentEditor {
 					X = Pos.Left (_marginEditor),
 					Y = Pos.Bottom (_marginEditor),
@@ -294,7 +298,6 @@ public class Adornments : Scenario {
 				_borderEditor.AttributeChanged += Editor_AttributeChanged;
 				Add (_borderEditor);
 
-				_viewToEdit.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
 
 				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (

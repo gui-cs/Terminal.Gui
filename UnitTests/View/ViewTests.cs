@@ -903,11 +903,11 @@ cccccccccccccccccccc", output);
 						Colors.Base.Focus
 					};
 		if (label) {
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 111111111111111111110
 111111111111111111110", Application.Driver, attributes);
 		} else {
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 222222222222222222220
 111111111111111111110", Application.Driver, attributes);
 		}
@@ -919,7 +919,7 @@ cccccccccccccccccccc", output);
 			v.SetFocus ();
 			Assert.True (v.HasFocus);
 			Application.Refresh ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 222222222222222222220
 111111111111111111110", Application.Driver, attributes);
 		}

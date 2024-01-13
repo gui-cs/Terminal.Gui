@@ -17,6 +17,21 @@ public class Padding : Adornment {
 
 	/// <inheritdoc />
 	public Padding (View parent) : base (parent) { /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */ }
-
-	// TODO: Implement specific override behavior: ColorScheme should match the Parent
+	
+	/// <summary>
+	/// The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/> scheme.
+	/// color scheme.
+	/// </summary>
+	public override ColorScheme ColorScheme {
+		get {
+			if (base.ColorScheme != null) {
+				return base.ColorScheme;
+			}
+			return Parent?.ColorScheme;
+		}
+		set {
+			base.ColorScheme = value;
+			Parent?.SetNeedsDisplay ();
+		}
+	}
 }

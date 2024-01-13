@@ -503,7 +503,7 @@ namespace Terminal.Gui.ViewsTests {
 						Colors.Base.Normal
 					};
 
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -542,7 +542,7 @@ namespace Terminal.Gui.ViewsTests {
                        
                At 15,15", output);
 
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -580,7 +580,7 @@ namespace Terminal.Gui.ViewsTests {
                        
                At 15,15", output);
 
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
