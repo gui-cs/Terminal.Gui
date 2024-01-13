@@ -17,17 +17,17 @@ namespace Terminal.Gui;
 ///   The <see cref="TimeField"/> <see cref="View"/> provides time editing functionality with mouse support.
 /// </remarks>
 public class TimeField : TextField {
-	TimeSpan time;
-	bool isShort;
+	TimeSpan _time;
+	bool _isShort;
 
-	int longFieldLen = 8;
-	int shortFieldLen = 5;
-	string sepChar;
-	string longFormat;
-	string shortFormat;
+	int _longFieldLen = 8;
+	int _shortFieldLen = 5;
+	string _sepChar;
+	string _longFormat;
+	string _shortFormat;
 
-	int fieldLen => isShort ? shortFieldLen : longFieldLen;
-	string format => isShort ? shortFormat : longFormat;
+	int _fieldLen => _isShort ? _shortFieldLen : _longFieldLen;
+	string _format => _isShort ? _shortFormat : _longFormat;
 
 	/// <summary>
 	///   TimeChanged event, raised when the Date has changed.
@@ -58,7 +58,7 @@ public class TimeField : TextField {
 	/// <param name="time">Initial time</param>
 	public TimeField (TimeSpan time) : base (string.Empty)
 	{
-		Width = fieldLen + 2;
+		Width = _fieldLen + 2;
 		Initialize (time);
 	}
 
@@ -70,10 +70,10 @@ public class TimeField : TextField {
 	void Initialize (TimeSpan time, bool isShort = false)
 	{
 		CultureInfo cultureInfo = CultureInfo.CurrentCulture;
-		sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
-		longFormat = $" hh\\{sepChar}mm\\{sepChar}ss";
-		shortFormat = $" hh\\{sepChar}mm";
-		this.isShort = isShort;
+		_sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
+		_longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
+		_shortFormat = $" hh\\{_sepChar}mm";
+		this._isShort = isShort;
 		Time = time;
 		CursorPosition = 1;
 		TextChanged += TextField_TextChanged;
@@ -109,7 +109,7 @@ public class TimeField : TextField {
 	void TextField_TextChanged (object sender, TextChangedEventArgs e)
 	{
 		try {
-			if (!TimeSpan.TryParseExact (Text.Trim (), format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
+			if (!TimeSpan.TryParseExact (Text.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result))
 				Text = e.OldValue;
 		} catch (Exception) {
 			Text = e.OldValue;
@@ -123,16 +123,16 @@ public class TimeField : TextField {
 	/// </remarks>
 	public TimeSpan Time {
 		get {
-			return time;
+			return _time;
 		}
 		set {
 			if (ReadOnly)
 				return;
 
-			var oldTime = time;
-			time = value;
-			this.Text = " " + value.ToString (format.Trim ());
-			var args = new DateTimeEventArgs<TimeSpan> (oldTime, value, format);
+			var oldTime = _time;
+			_time = value;
+			this.Text = " " + value.ToString (_format.Trim ());
+			var args = new DateTimeEventArgs<TimeSpan> (oldTime, value, _format);
 			if (oldTime != value) {
 				OnTimeChanged (args);
 			}
@@ -143,10 +143,10 @@ public class TimeField : TextField {
 	/// Get or sets whether <see cref="TimeField"/> uses the short or long time format.
 	/// </summary>
 	public bool IsShortFormat {
-		get => isShort;
+		get => _isShort;
 		set {
-			isShort = value;
-			if (isShort)
+			_isShort = value;
+			if (_isShort)
 				Width = 7;
 			else
 				Width = 10;
@@ -163,7 +163,7 @@ public class TimeField : TextField {
 	public override int CursorPosition {
 		get => base.CursorPosition;
 		set {
-			base.CursorPosition = Math.Max (Math.Min (value, fieldLen), 1);
+			base.CursorPosition = Math.Max (Math.Min (value, _fieldLen), 1);
 		}
 	}
 
@@ -172,7 +172,7 @@ public class TimeField : TextField {
 		var text = Text.EnumerateRunes ().ToList ();
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
-		if (CursorPosition < fieldLen)
+		if (CursorPosition < _fieldLen)
 			newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
 		return SetText (StringExtensions.ToString (newText));
 	}
@@ -183,11 +183,11 @@ public class TimeField : TextField {
 			return false;
 		}
 
-		string [] vals = text.Split (sepChar);
+		string [] vals = text.Split (_sepChar);
 		bool isValidTime = true;
 		int hour = Int32.Parse (vals [0]);
 		int minute = Int32.Parse (vals [1]);
-		int second = isShort ? 0 : vals.Length > 2 ? Int32.Parse (vals [2].ToString ()) : 0;
+		int second = _isShort ? 0 : vals.Length > 2 ? Int32.Parse (vals [2].ToString ()) : 0;
 		if (hour < 0) {
 			isValidTime = false;
 			hour = 0;
@@ -215,9 +215,9 @@ public class TimeField : TextField {
 			second = 59;
 			vals [2] = "59";
 		}
-		string t = isShort ? $" {hour,2:00}{sepChar}{minute,2:00}" : $" {hour,2:00}{sepChar}{minute,2:00}{sepChar}{second,2:00}";
+		string t = _isShort ? $" {hour,2:00}{_sepChar}{minute,2:00}" : $" {hour,2:00}{_sepChar}{minute,2:00}{_sepChar}{second,2:00}";
 
-		if (!TimeSpan.TryParseExact (t.Trim (), format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result) ||
+		if (!TimeSpan.TryParseExact (t.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result) ||
 			!isValidTime)
 			return false;
 		Time = result;
@@ -226,9 +226,9 @@ public class TimeField : TextField {
 
 	void IncCursorPosition ()
 	{
-		if (CursorPosition == fieldLen)
+		if (CursorPosition == _fieldLen)
 			return;
-		if (Text [++CursorPosition] == sepChar.ToCharArray () [0])
+		if (Text [++CursorPosition] == _sepChar.ToCharArray () [0])
 			CursorPosition++;
 	}
 
@@ -236,13 +236,13 @@ public class TimeField : TextField {
 	{
 		if (CursorPosition == 1)
 			return;
-		if (Text [--CursorPosition] == sepChar.ToCharArray () [0])
+		if (Text [--CursorPosition] == _sepChar.ToCharArray () [0])
 			CursorPosition--;
 	}
 
 	void AdjCursorPosition ()
 	{
-		if (Text [CursorPosition] == sepChar.ToCharArray () [0])
+		if (Text [CursorPosition] == _sepChar.ToCharArray () [0])
 			CursorPosition++;
 	}
 
@@ -274,7 +274,7 @@ public class TimeField : TextField {
 
 	new bool MoveEnd ()
 	{
-		CursorPosition = fieldLen;
+		CursorPosition = _fieldLen;
 		return true;
 	}
 
@@ -321,8 +321,8 @@ public class TimeField : TextField {
 			SetFocus ();
 
 		var point = ev.X;
-		if (point > fieldLen)
-			point = fieldLen;
+		if (point > _fieldLen)
+			point = _fieldLen;
 		if (point < 1)
 			point = 1;
 		CursorPosition = point;
