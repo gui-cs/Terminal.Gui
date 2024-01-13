@@ -87,7 +87,14 @@ public partial class View {
 	/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 	/// If it's overridden can return other values.
 	/// </returns>
-	public virtual Attribute GetFocusColor () => Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
+	public virtual Attribute GetFocusColor ()
+	{
+		var cs = ColorScheme;
+		if (ColorScheme == null) {
+			cs = new ColorScheme ();
+		}
+		return Enabled ? cs.Focus : cs.Disabled;
+	}
 
 	/// <summary>
 	/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
@@ -97,7 +104,14 @@ public partial class View {
 	/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 	/// If it's overridden can return other values.
 	/// </returns>
-	public virtual Attribute GetHotNormalColor () => Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled;
+	public virtual Attribute GetHotNormalColor ()
+	{
+		var cs = ColorScheme;
+		if (ColorScheme == null) {
+			cs = new ColorScheme ();
+		}
+		return Enabled ? cs.HotNormal : cs.Disabled;
+	}
 
 	/// <summary>
 	/// Displays the specified character in the specified column and row of the View.

@@ -672,4 +672,14 @@ public class BorderTests {
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
+
+	[Fact]
+	public void Border_Uses_Parent_ColorScheme ()
+	{
+		var view = new View ();
+		view.ColorScheme = Colors.Error;
+		Assert.Equal (Colors.Error.Normal.Foreground, view.ColorScheme.Normal.Foreground);
+		Assert.Equal (view.GetNormalColor(), view.Border.GetNormalColor ());
+		Assert.Equal (view.GetHotNormalColor (), view.Border.GetHotNormalColor ());
+	}
 }
