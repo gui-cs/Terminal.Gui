@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Provides a border around the view including the <see cref="Title"/>.
+/// Provides a border around the view including the <see cref="View.Title"/>.
 /// </para>
 /// <para>
 /// See the <see cref="Frame"/> class. 

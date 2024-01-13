@@ -644,7 +644,7 @@ ffffffffffffffffffff
 				Application.OnKeyDown (Key.Tab);
 				Application.OnKeyDown (Key.Enter);
 				break;
-			
+
 			default:
 				Assert.Fail ();
 				break;
@@ -672,7 +672,7 @@ ffffffffffffffffffff
 				result = MessageBox.Query (title: string.Empty, message: string.Empty, defaultButton: 0, wrapMessage: false, "btn0", "btn1");
 				Application.RequestStop ();
 				break;
-				
+
 			case 2:
 				// Tab to btn2
 				Application.OnKeyDown (Key.Tab);

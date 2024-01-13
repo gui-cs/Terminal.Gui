@@ -62,7 +62,7 @@ public abstract class ConsoleDriver {
 		get => _cols;
 		internal set {
 			_cols = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -73,7 +73,7 @@ public abstract class ConsoleDriver {
 		get => _rows;
 		internal set {
 			_rows = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -551,6 +551,11 @@ public abstract class ConsoleDriver {
 	/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
 	/// </summary>
 	public static DiagnosticFlags Diagnostics { get; set; }
+
+	/// <summary>
+	/// Gets the dimensions of the terminal.
+	/// </summary>
+	public Rect Bounds => new Rect (0, 0, Cols, Rows);
 
 	/// <summary>
 	/// Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.
