@@ -50,19 +50,19 @@ namespace Terminal.Gui.TextTests {
 
 			// allocate a new custom scheme
 			tv.Autocomplete.ColorScheme = new ColorScheme () {
-				Normal = Application.Driver.MakeAttribute (Color.Black, Color.Blue),
-				Focus = Application.Driver.MakeAttribute (Color.Black, Color.Cyan),
+				Normal = new Attribute (Color.Black, Color.Blue),
+				Focus = new Attribute (Color.Black, Color.Cyan),
 			};
 
 			// should be separate instance
 			Assert.NotSame (Colors.Menu, tv.Autocomplete.ColorScheme);
 
 			// with the values we set on it
-			Assert.Equal (Color.Black, tv.Autocomplete.ColorScheme.Normal.Foreground);
-			Assert.Equal (Color.Blue, tv.Autocomplete.ColorScheme.Normal.Background);
+			Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Normal.Foreground);
+			Assert.Equal (new Color (Color.Blue), tv.Autocomplete.ColorScheme.Normal.Background);
 
-			Assert.Equal (Color.Black, tv.Autocomplete.ColorScheme.Focus.Foreground);
-			Assert.Equal (Color.Cyan, tv.Autocomplete.ColorScheme.Focus.Background);
+			Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Focus.Foreground);
+			Assert.Equal (new Color (Color.Cyan), tv.Autocomplete.ColorScheme.Focus.Background);
 		}
 
 		[Fact]
@@ -92,7 +92,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("feature", g.AllSuggestions [^1]);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
 			Assert.Empty (tv.Autocomplete.Suggestions);
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.F, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.F | KeyCode.ShiftMask)));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -101,7 +101,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
 			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorDown)));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -110,7 +110,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (1, tv.Autocomplete.SelectedIdx);
 			Assert.Equal ("feature", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorDown)));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -119,7 +119,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (0, tv.Autocomplete.SelectedIdx);
 			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorUp)));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -128,7 +128,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("feature", tv.Autocomplete.Suggestions [^1].Replacement);
 			Assert.Equal (1, tv.Autocomplete.SelectedIdx);
 			Assert.Equal ("feature", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorUp)));
 			top.Draw ();
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
@@ -139,19 +139,19 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal ("Fortunately", tv.Autocomplete.Suggestions [tv.Autocomplete.SelectedIdx].Replacement);
 			Assert.True (tv.Autocomplete.Visible);
 			top.Draw ();
-			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.CloseKey, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.CloseKey)));
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.Equal (3, g.AllSuggestions.Count);
 			Assert.False (tv.Autocomplete.Visible);
 			tv.PositionCursor ();
-			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.Reopen, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.Reopen)));
 			Assert.Equal ($"F Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (1, 0), tv.CursorPosition);
 			Assert.Equal (2, tv.Autocomplete.Suggestions.Count);
 			Assert.Equal (3, g.AllSuggestions.Count);
-			Assert.True (tv.ProcessKey (new KeyEvent (tv.Autocomplete.SelectionKey, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.SelectionKey)));
 			tv.PositionCursor ();
 			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
@@ -178,7 +178,7 @@ namespace Terminal.Gui.TextTests {
 			Application.Begin (top);
 
 			for (int i = 0; i < 7; i++) {
-				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 				Application.Refresh ();
 				if (i < 4 || i > 5) {
 					TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -202,51 +202,51 @@ This a long line and against TextView.
      and                              
      against                          ", output);
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.g, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.G)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
      against                           ", output);
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorLeft)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
      against                           ", output);
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorLeft)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
      against                           ", output);
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorLeft)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.", output);
 
 			for (int i = 0; i < 3; i++) {
-				Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+				Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 				Application.Refresh ();
 				TestHelpers.AssertDriverContentsWithFrameAre (@"
 This ag long line and against TextView.
      against                           ", output);
 			}
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.Backspace, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.Backspace)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This a long line and against TextView.
      and                              
      against                          ", output);
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.n, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.N)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This an long line and against TextView.
      and                               ", output);
 
-			Assert.True (tv.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ())));
+			Assert.True (tv.NewKeyDownEvent (new (KeyCode.CursorRight)));
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 This an long line and against TextView.", output);

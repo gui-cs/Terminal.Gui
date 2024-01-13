@@ -1,5 +1,7 @@
 ﻿using System;
+
 namespace Terminal.Gui {
+#nullable enable
 	// TODO: Add events that notify when StraightLine changes to enable dynamic layout
 	/// <summary>
 	/// A line between two points on a horizontal or vertical <see cref="Orientation"/>
@@ -49,7 +51,7 @@ namespace Terminal.Gui {
 			this.Attribute = attribute;
 		}
 
-		internal IntersectionDefinition Intersects (int x, int y)
+		internal IntersectionDefinition? Intersects (int x, int y)
 		{
 			switch (Orientation) {
 			case Orientation.Horizontal: return IntersectsHorizontally (x, y);
@@ -59,7 +61,7 @@ namespace Terminal.Gui {
 
 		}
 
-		private IntersectionDefinition IntersectsHorizontally (int x, int y)
+		private IntersectionDefinition? IntersectsHorizontally (int x, int y)
 		{
 			if (Start.Y != y) {
 				return null;
@@ -99,7 +101,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private IntersectionDefinition IntersectsVertically (int x, int y)
+		private IntersectionDefinition? IntersectsVertically (int x, int y)
 		{
 			if (Start.X != x) {
 				return null;

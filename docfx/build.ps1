@@ -5,13 +5,14 @@ $prevPwd = $PWD; Set-Location -ErrorAction Stop -LiteralPath $PSScriptRoot
 try {
     $PWD  # output the current location 
 
-    dotnet build --configuration Release ../Terminal.sln
+    dotnet tool update -g docfx
 
-    rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
+    # Force delete metadata
+    rm ./api  -Recurse -Force -ErrorAction SilentlyContinue
 
     $env:DOCFX_SOURCE_BRANCH_NAME="v2_develop"
 
-    docfx --metadata --serve --force
+    docfx --serve
 }
 finally {
   # Restore the previous location.

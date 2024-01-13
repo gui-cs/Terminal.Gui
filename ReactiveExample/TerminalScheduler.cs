@@ -15,7 +15,7 @@ namespace ReactiveExample {
 			IDisposable PostOnMainLoop() {
 				var composite = new CompositeDisposable(2);
 				var cancellation = new CancellationDisposable();
-				Application.MainLoop.Invoke (() => {
+				Application.Invoke (() => {
 					if (!cancellation.Token.IsCancellationRequested)
 						composite.Add(action(this, state));
 				});
@@ -25,11 +25,11 @@ namespace ReactiveExample {
 
 			IDisposable PostOnMainLoopAsTimeout () {
 				var composite = new CompositeDisposable (2);
-				var timeout = Application.MainLoop.AddTimeout (dueTime, args => {
+				var timeout = Application.AddTimeout (dueTime, () => {
 					composite.Add(action (this, state));
 					return false;
 				});
-				composite.Add (Disposable.Create (() => Application.MainLoop.RemoveTimeout (timeout)));
+				composite.Add (Disposable.Create (() => Application.RemoveTimeout (timeout)));
 				return composite;
 			}
 

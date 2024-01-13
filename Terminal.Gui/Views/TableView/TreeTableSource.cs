@@ -38,7 +38,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	{
 		_tableView = table;
 		_tree = tree;
-		_tableView.KeyPress += Table_KeyPress;
+		_tableView.KeyDown += Table_KeyPress;
 		_tableView.MouseClick += Table_MouseClick;
 
 		var colList = subsequentColumns.Keys.ToList ();
@@ -68,7 +68,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 	/// <inheritdoc/>
 	public void Dispose ()
 	{
-		_tableView.KeyPress -= Table_KeyPress;
+		_tableView.KeyDown -= Table_KeyPress;
 		_tableView.MouseClick -= Table_MouseClick;
 		_tree.Dispose ();
 	}
@@ -106,7 +106,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 		return sb.ToString ();
 	}
 
-	private void Table_KeyPress (object sender, KeyEventEventArgs e)
+	private void Table_KeyPress (object sender, Key e)
 	{
 		if (!IsInTreeColumn (_tableView.SelectedColumn, true)) {
 			return;
@@ -118,13 +118,13 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 			return;
 		}
 
-		if (e.KeyEvent.Key == Key.CursorLeft) {
+		if (e.KeyCode == KeyCode.CursorLeft) {
 			if (_tree.IsExpanded (obj)) {
 				_tree.Collapse (obj);
 				e.Handled = true;
 			}
 		}
-		if (e.KeyEvent.Key == Key.CursorRight) {
+		if (e.KeyCode == KeyCode.CursorRight) {
 			if (_tree.CanExpand (obj) && !_tree.IsExpanded (obj)) {
 				_tree.Expand (obj);
 				e.Handled = true;

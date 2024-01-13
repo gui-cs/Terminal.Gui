@@ -4,7 +4,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "View Experiments", Description: "v2 View Experiments")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("Borders"), ScenarioCategory ("Layout"), ScenarioCategory ("Proof of Concept")]
 	public class ViewExperiments : Scenario {
 
 		public override void Init ()
@@ -220,13 +220,20 @@ namespace UICatalog.Scenarios {
 
 			view.X = Pos.Center ();
 
-			var editor = new Frames.FramesEditor ($"Frames Editor", view) {
+			var editor = new Frames.FramesEditor () {
+				Title = $"Frames Editor",
 				X = 0,
 				Y = Pos.Bottom (containerLabel),
 				Width = Dim.Fill (),
+				ViewToEdit = view,
 			};
 
 			Application.Top.Add (editor);
+			view.X = 36;
+			view.Y = 4;
+			view.Width = Dim.Fill ();
+			view.Height = Dim.Fill ();
+			Application.Top.Add (view);
 		}
 	}
 }

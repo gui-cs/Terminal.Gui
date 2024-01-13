@@ -14,7 +14,7 @@ namespace Terminal.Gui.DrawingTests {
 	public class RulerTests {
 
 		readonly ITestOutputHelper output;
-
+		
 		public RulerTests (ITestOutputHelper output)
 		{
 			this.output = output;
@@ -26,7 +26,6 @@ namespace Terminal.Gui.DrawingTests {
 			var r = new Ruler ();
 			Assert.Equal (0, r.Length);
 			Assert.Equal (Orientation.Horizontal, r.Orientation);
-			Assert.Equal (default, r.Attribute);
 		}
 
 		[Fact ()]
@@ -53,7 +52,6 @@ namespace Terminal.Gui.DrawingTests {
 			var newAttribute = new Attribute (Color.Red, Color.Green);
 
 			var r = new Ruler ();
-			Assert.Equal (default, r.Attribute);
 			r.Attribute = newAttribute;
 			Assert.Equal (newAttribute, r.Attribute);
 		}

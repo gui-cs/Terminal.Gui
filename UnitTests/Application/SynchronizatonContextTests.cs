@@ -31,7 +31,7 @@ namespace Terminal.Gui.ApplicationTests {
 						success = true;
 
 						// then tell the application to quit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
+						Application.Invoke (() => Application.RequestStop ());
 					}, null);
 				Assert.False (success);
 			});
@@ -56,7 +56,7 @@ namespace Terminal.Gui.ApplicationTests {
 						success = true;
 
 						// then tell the application to quit
-						Application.MainLoop.Invoke (() => Application.RequestStop ());
+						Application.Invoke (() => Application.RequestStop ());
 					}, null);
 				Assert.True (success);
 			});

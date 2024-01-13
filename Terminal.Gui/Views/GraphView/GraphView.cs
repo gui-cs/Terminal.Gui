@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
 namespace Terminal.Gui {
-
 	/// <summary>
 	/// Control for rendering graphs (bar, scatter etc)
 	/// </summary>
@@ -81,14 +81,14 @@ namespace Terminal.Gui {
 			AddCommand (Command.PageUp, () => { PageUp (); return true; });
 			AddCommand (Command.PageDown, () => { PageDown (); return true; });
 
-			AddKeyBinding (Key.CursorRight, Command.ScrollRight);
-			AddKeyBinding (Key.CursorLeft, Command.ScrollLeft);
-			AddKeyBinding (Key.CursorUp, Command.ScrollUp);
-			AddKeyBinding (Key.CursorDown, Command.ScrollDown);
+			KeyBindings.Add (KeyCode.CursorRight, Command.ScrollRight);
+			KeyBindings.Add (KeyCode.CursorLeft, Command.ScrollLeft);
+			KeyBindings.Add (KeyCode.CursorUp, Command.ScrollUp);
+			KeyBindings.Add (KeyCode.CursorDown, Command.ScrollDown);
 
 			// Not bound by default (preserves backwards compatibility)
-			//AddKeyBinding (Key.PageUp, Command.PageUp);
-			//AddKeyBinding (Key.PageDown, Command.PageDown);
+			//KeyBindings.Add (Key.PageUp, Command.PageUp);
+			//KeyBindings.Add (Key.PageDown, Command.PageDown);
 		}
 
 		/// <summary>
@@ -241,18 +241,6 @@ namespace Terminal.Gui {
 		{
 			Driver.SetCursorVisibility (CursorVisibility.Invisible);
 			return base.OnEnter (view);
-		}
-
-		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent keyEvent)
-		{
-			if (HasFocus && CanFocus) {
-				var result = InvokeKeybindings (keyEvent);
-				if (result != null)
-					return (bool)result;
-			}
-
-			return base.ProcessKey (keyEvent);
 		}
 
 		/// <summary>

@@ -29,14 +29,14 @@ namespace Terminal.Gui {
 		public AppendAutocomplete (TextField textField)
 		{
 			this.textField = textField;
-			SelectionKey = Key.Tab;
+			SelectionKey = KeyCode.Tab;
 
 			ColorScheme = new ColorScheme {
-				Normal = new Attribute (Color.DarkGray, 0),
-				Focus = new Attribute (Color.DarkGray, 0),
-				HotNormal = new Attribute (Color.DarkGray, 0),
-				HotFocus = new Attribute (Color.DarkGray, 0),
-				Disabled = new Attribute (Color.DarkGray, 0),
+				Normal = new Attribute (Color.DarkGray, Color.Black),
+				Focus = new Attribute (Color.DarkGray, Color.Black),
+				HotNormal = new Attribute (Color.DarkGray, Color.Black),
+				HotFocus = new Attribute (Color.DarkGray, Color.Black),
+				Disabled = new Attribute (Color.DarkGray, Color.Black),
 			};
 		}
 
@@ -54,16 +54,16 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (Key a)
 		{
-			var key = kb.Key;
+			var key = a.KeyCode;
 			if (key == SelectionKey) {
 				return this.AcceptSelectionIfAny ();
 			} else
-			if (key == Key.CursorUp) {
+			if (key == KeyCode.CursorUp) {
 				return this.CycleSuggestion (1);
 			} else
-			if (key == Key.CursorDown) {
+			if (key == KeyCode.CursorDown) {
 				return this.CycleSuggestion (-1);
 			} else if (key == CloseKey && Suggestions.Any ()) {
 				ClearSuggestions ();
@@ -71,7 +71,7 @@ namespace Terminal.Gui {
 				return true;
 			}
 
-			if (char.IsLetterOrDigit ((char)kb.KeyValue)) {
+			if (char.IsLetterOrDigit ((char)a)) {
 				_suspendSuggestions = false;
 			}
 
@@ -83,6 +83,7 @@ namespace Terminal.Gui {
 		public override void GenerateSuggestions (AutocompleteContext context)
 		{
 			if (_suspendSuggestions) {
+				_suspendSuggestions = false;
 				return;
 			}
 			base.GenerateSuggestions (context);

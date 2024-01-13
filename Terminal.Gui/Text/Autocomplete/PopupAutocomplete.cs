@@ -23,17 +23,6 @@ namespace Terminal.Gui {
 				WantMousePositionReports = true;
 			}
 
-			public override Rect Frame {
-				get => base.Frame;
-				set {
-					base.Frame = value;
-					X = value.X;
-					Y = value.Y;
-					Width = value.Width;
-					Height = value.Height;
-				}
-			}
-
 			public override void OnDrawContent (Rect contentArea)
 			{
 				if (autocomplete.LastPopupPos == null) {
@@ -152,7 +141,7 @@ namespace Terminal.Gui {
 		public override void RenderOverlay (Point renderAt)
 		{
 			if (!Context.Canceled && Suggestions.Count > 0 && !Visible && HostControl?.HasFocus == true) {
-				ProcessKey (new KeyEvent ((Key)(Suggestions [0].Title [0]), new KeyModifiers ()));
+				ProcessKey (new ((KeyCode)(Suggestions [0].Title [0])));
 			} else if (!Visible || HostControl?.HasFocus == false || Suggestions.Count == 0) {
 				LastPopupPos = null;
 				Visible = false;
@@ -276,18 +265,18 @@ namespace Terminal.Gui {
 		/// up/down apply to the autocomplete control instead of changing the cursor position in
 		/// the underlying text view.
 		/// </summary>
-		/// <param name="kb">The key event.</param>
+		/// <param name="a">The key event.</param>
 		/// <returns><c>true</c>if the key can be handled <c>false</c>otherwise.</returns>
-		public override bool ProcessKey (KeyEvent kb)
+		public override bool ProcessKey (Key a)
 		{
-			if (SuggestionGenerator.IsWordChar ((Rune)(char)kb.Key)) {
+			if (SuggestionGenerator.IsWordChar ((Rune)a)) {
 				Visible = true;
 				ManipulatePopup ();
 				closed = false;
 				return false;
 			}
 
-			if (kb.Key == Reopen) {
+			if (a.KeyCode == Reopen) {
 				Context.Canceled = false;
 				return ReopenSuggestions ();
 			}
@@ -300,19 +289,19 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-			if (kb.Key == Key.CursorDown) {
+			if (a.KeyCode == KeyCode.CursorDown) {
 				MoveDown ();
 				return true;
 			}
 
-			if (kb.Key == Key.CursorUp) {
+			if (a.KeyCode == KeyCode.CursorUp) {
 				MoveUp ();
 				return true;
 			}
 
 			// TODO : Revisit this
-			/*if (kb.Key == Key.CursorLeft || kb.Key == Key.CursorRight) {
-				GenerateSuggestions (kb.Key == Key.CursorLeft ? -1 : 1);
+			/*if (a.ConsoleDriverKey == Key.CursorLeft || a.ConsoleDriverKey == Key.CursorRight) {
+				GenerateSuggestions (a.ConsoleDriverKey == Key.CursorLeft ? -1 : 1);
 				if (Suggestions.Count == 0) {
 					Visible = false;
 					if (!closed) {
@@ -322,11 +311,11 @@ namespace Terminal.Gui {
 				return false;
 			}*/
 
-			if (kb.Key == SelectionKey) {
+			if (a.KeyCode == SelectionKey) {
 				return Select ();
 			}
 
-			if (kb.Key == CloseKey) {
+			if (a.KeyCode == CloseKey) {
 				Close ();
 				Context.Canceled = true;
 				return true;

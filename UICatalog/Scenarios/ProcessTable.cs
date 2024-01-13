@@ -18,7 +18,6 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
 
 			this.tableView = new TableView () {
 				X = 0,
@@ -31,8 +30,8 @@ namespace UICatalog.Scenarios {
 			CreateProcessTable ();
 
 			// Then every second
-			Application.MainLoop.AddTimeout (TimeSpan.FromSeconds (1),
-				(s) => {
+			Application.AddTimeout (TimeSpan.FromSeconds (1),
+				() => {
 					CreateProcessTable ();
 					return true;
 				});

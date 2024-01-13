@@ -21,7 +21,7 @@ namespace UICatalog.Scenarios {
 						CheckType = MenuItemCheckStyle.Checked
 					},
 					null,
-					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, Application.QuitKey)
+					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, (KeyCode)Application.QuitKey)
 				})
 			});
 			Application.Top.Add (menu, _scrollViewTestWindow);
@@ -77,6 +77,7 @@ namespace UICatalog.Scenarios {
 				};
 
 				AutoSize = false;
+				//LayoutStyle = LayoutStyle.Absolute;
 
 				var fillText = new System.Text.StringBuilder ();
 				for (int i = 0; i < Bounds.Height; i++) {
@@ -193,7 +194,7 @@ namespace UICatalog.Scenarios {
 					};
 				}
 
-				scrollView.ClearKeyBindings ();
+				scrollView.KeyBindings.Clear ();
 
 				buttons = new List<Button> ();
 				Button prevButton = null;
@@ -205,7 +206,7 @@ namespace UICatalog.Scenarios {
 					button.Clicked += Button_Clicked;
 					button.PointerEnter += Button_PointerEnter;
 					button.MouseClick += Button_MouseClick;
-					button.KeyPress += Button_KeyPress;
+					button.KeyDown += Button_KeyPress;
 					scrollView.Add (button);
 					buttons.Add (button);
 					prevButton = button;
@@ -215,7 +216,7 @@ namespace UICatalog.Scenarios {
 				closeButton.Clicked += Button_Clicked;
 				closeButton.PointerEnter += Button_PointerEnter;
 				closeButton.MouseClick += Button_MouseClick;
-				closeButton.KeyPress += Button_KeyPress;
+				closeButton.KeyDown += Button_KeyPress;
 				scrollView.Add (closeButton);
 				buttons.Add (closeButton);
 
@@ -231,27 +232,27 @@ namespace UICatalog.Scenarios {
 				}
 			}
 
-			private void Button_KeyPress (object sender, KeyEventEventArgs obj)
+			private void Button_KeyPress (object sender, Key obj)
 			{
-				switch (obj.KeyEvent.Key) {
-				case Key.End:
+				switch (obj.KeyCode) {
+				case KeyCode.End:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 -(scrollView.ContentSize.Height - scrollView.Frame.Height
 						 + (scrollView.ShowHorizontalScrollIndicator ? 1 : 0)));
 					obj.Handled = true;
 					return;
-				case Key.Home:
+				case KeyCode.Home:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X, 0);
 					obj.Handled = true;
 					return;
-				case Key.PageDown:
+				case KeyCode.PageDown:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 Math.Max (scrollView.ContentOffset.Y - scrollView.Frame.Height,
 						 -(scrollView.ContentSize.Height - scrollView.Frame.Height
 						 + (scrollView.ShowHorizontalScrollIndicator ? 1 : 0))));
 					obj.Handled = true;
 					return;
-				case Key.PageUp:
+				case KeyCode.PageUp:
 					scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
 						 Math.Min (scrollView.ContentOffset.Y + scrollView.Frame.Height, 0));
 					obj.Handled = true;

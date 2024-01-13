@@ -10,11 +10,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Animation", Description: "Demonstration of how to render animated images with threading.")]
-	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Threading")]
+	[ScenarioCategory ("Drawing")]
 	public class Animation : Scenario {
 		private bool isDisposed;
 
@@ -39,7 +39,15 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lbl2);
 
-			var dir = new DirectoryInfo (Path.GetDirectoryName (Assembly.GetExecutingAssembly ().Location));
+			DirectoryInfo dir;
+
+			var assemblyLocation = Assembly.GetExecutingAssembly ().Location;
+
+			if (!string.IsNullOrEmpty (assemblyLocation)) {
+				dir = new DirectoryInfo (Path.GetDirectoryName (assemblyLocation));
+			} else {
+				dir = new DirectoryInfo (System.AppContext.BaseDirectory);
+			}
 
 			var f = new FileInfo (
 				Path.Combine (dir.FullName, "Scenarios", "Spinning_globe_dark_small.gif"));
@@ -53,7 +61,7 @@ namespace UICatalog.Scenarios {
 			Task.Run (() => {
 				while (!isDisposed) {
 					// When updating from a Thread/Task always use Invoke
-					Application.MainLoop.Invoke (() => {
+					Application.Invoke (() => {
 						imageView.NextFrame ();
 						imageView.SetNeedsDisplay ();
 					});

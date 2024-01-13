@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 /// <summary>
 /// Defines rendering options that affect how the table is displayed.
 /// 
-/// <a href="https://gui-cs.github.io/Terminal.Gui/articles/tableview.html">See TableView Deep Dive for more information</a>.
+/// <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class TableStyle {
 

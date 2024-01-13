@@ -17,7 +17,7 @@ namespace Terminal.Gui {
 	public interface IAnnotation {
 		/// <summary>
 		/// True if annotation should be drawn before <see cref="ISeries"/>.  This
-		/// allowes Series and later annotations to potentially draw over the top
+		/// allows Series and later annotations to potentially draw over the top
 		/// of this annotation.
 		/// </summary>
 		bool BeforeSeries { get; }

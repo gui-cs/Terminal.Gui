@@ -5,6 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -20,7 +21,7 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// Escape key code (ASCII 27/0x1B).
 	/// </summary>
-	public static readonly char KeyEsc = (char)Key.Esc;
+	public static readonly char KeyEsc = (char)KeyCode.Esc;
 
 	/// <summary>
 	/// ESC [ - The CSI (Control Sequence Introducer).
@@ -72,22 +73,42 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// ESC [ ? 1047 h - Activate xterm alternative buffer (no backscroll)
 	/// </summary>
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Use Alternate Screen Buffer, xterm. 
+	/// </remarks>
 	public static readonly string CSI_ActivateAltBufferNoBackscroll = CSI + "?1047h";
 
 	/// <summary>
 	/// ESC [ ? 1047 l - Restore xterm working buffer (with backscroll)
 	/// </summary>
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Use Normal Screen Buffer, xterm.  Clear the screen first if in the Alternate Screen Buffer.
+	/// </remarks>
 	public static readonly string CSI_RestoreAltBufferWithBackscroll = CSI + "?1047l";
 
 	/// <summary>
 	/// ESC [ ? 1049 h - Save cursor position and activate xterm alternative buffer (no backscroll)
 	/// </summary>
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Save cursor as in DECSC, xterm. After saving the cursor, switch to the Alternate Screen Buffer,
+	/// clearing it first.
+	/// This control combines the effects of the 1047 and 1048 modes.
+	/// Use this with terminfo-based applications rather than the 47 mode.
+	/// </remarks>
 	public static readonly string CSI_SaveCursorAndActivateAltBufferNoBackscroll = CSI + "?1049h";
 
 	/// <summary>
 	/// ESC [ ? 1049 l - Restore cursor position and restore xterm working buffer (with backscroll)
 	/// </summary>
-	public static readonly string CSI_RestoreCursorAndActivateAltBufferWithBackscroll = CSI + "?1049l";
+	/// <remarks>
+	/// From https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+	/// Use Normal Screen Buffer and restore cursor as in DECRC, xterm.
+	/// resource.This combines the effects of the 1047 and 1048  modes.
+	/// </remarks>
+	public static readonly string CSI_RestoreCursorAndRestoreAltBufferWithBackscroll = CSI + "?1049l";
 
 	/// <summary>
 	/// Options for ANSI ESC "[xJ" - Clears part of the screen.
@@ -149,10 +170,10 @@ public static class EscSeqUtils {
 	/// <summary>
 	/// ESC [ y ; x H - CUP Cursor Position - Cursor moves to x ; y coordinate within the viewport, where x is the column of the y line
 	/// </summary>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
+	/// <param name="row">Origin is (1,1).</param>
+	/// <param name="col">Origin is (1,1).</param>
 	/// <returns></returns>
-	public static string CSI_SetCursorPosition (int x, int y) => $"{CSI}{y};{x}H";
+	public static string CSI_SetCursorPosition (int row, int col) => $"{CSI}{row};{col}H";
 
 
 	//ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
@@ -228,14 +249,28 @@ public static class EscSeqUtils {
 	public static string CSI_SetGraphicsRendition (params int [] parameters) => $"{CSI}{string.Join (";", parameters)}m";
 
 	/// <summary>
+	/// ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])" /> to set the foreground color.
+	/// </summary>
+	/// <param name="code">One of the 16 color codes.</param>
+	/// <returns></returns>
+	public static string CSI_SetForegroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code);
+
+	/// <summary>
+	/// ESC [ (n) m - Uses <see cref="CSI_SetGraphicsRendition(int[])" /> to set the background color.
+	/// </summary>
+	/// <param name="code">One of the 16 color codes.</param>
+	/// <returns></returns>
+	public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code+10);
+
+	/// <summary>
 	/// ESC[38;5;{id}m - Set foreground color (256 colors)
 	/// </summary>
-	public static string CSI_SetForegroundColor (int id) => $"{CSI}38;5;{id}m";
+	public static string CSI_SetForegroundColor256 (int color) => $"{CSI}38;5;{color}m";
 
 	/// <summary>
 	/// ESC[48;5;{id}m - Set background color (256 colors)
 	/// </summary>
-	public static string CSI_SetBackgroundColor (int id) => $"{CSI}48;5;{id}m";
+	public static string CSI_SetBackgroundColor256 (int color) => $"{CSI}48;5;{color}m";
 
 	/// <summary>
 	/// ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
@@ -1060,7 +1095,7 @@ public static class EscSeqUtils {
 			if (view == null)
 				break;
 			if (isButtonPressed && lastMouseButtonPressed != null && (mouseFlag & MouseFlags.ReportMousePosition) == 0) {
-				Application.MainLoop.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
+				Application.Invoke (() => continuousButtonPressedHandler (mouseFlag, point));
 			}
 		}
 	}

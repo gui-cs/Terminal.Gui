@@ -21,14 +21,14 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 11111│22222
 11111│22222
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -42,14 +42,14 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌────┬────┐
 │1111│2222│
 └────┴────┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -59,35 +59,35 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_Focused ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 11111│22222
 11111◊22222
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 111111│2222
 111111◊2222
       │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// and 2 to the left
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 1111│222222
 1111◊222222
     │     ";
@@ -98,35 +98,35 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_Focused_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌────┬────┐
 │1111◊2222│
 └────┴────┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌─────┬───┐
 │11111◊222│
 └─────┴───┘";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// and 2 to the left
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌───┬─────┐
 │111◊22222│
 └───┴─────┘";
@@ -139,23 +139,23 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView (out var line);
 			tileView.SetSplitterPos (0, Pos.Percent (50));
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 11111│22222
 11111◊22222
      │     ";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now while focused move the splitter 1 unit right
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 111111│2222
 111111◊2222
       │     ";
@@ -165,12 +165,12 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
 
 			// and 2 to the left
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 1111│222222
 1111◊222222
     │     ";
@@ -187,14 +187,15 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"    
+	    @"    
 11111111111
 ───────────
 22222222222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Keyboard movement on splitter should have no effect if it is not focused
-			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			var handled = tileView.NewKeyDownEvent (new (KeyCode.CursorDown));
+			Assert.False (handled);
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
@@ -204,7 +205,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 			tileView.Tiles.ElementAt (0).MinSize = 6;
 
 			// distance is too small (below 6)
@@ -217,7 +218,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
-@"
+	    @"
 11111│22222
 11111◊22222
      │     ";
@@ -225,18 +226,18 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 111111│2222
 111111◊2222
       │     ";
@@ -248,7 +249,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 			tileView.Tiles.ElementAt (0).MinSize = 5;
 
 			// distance is too small (below 5)
@@ -261,7 +262,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 5
 			string looksLike =
-@"
+	    @"
 ┌────┬────┐
 │1111◊2222│
 └────┴────┘";
@@ -269,18 +270,18 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter right if we want
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌─────┬───┐
 │11111◊222│
 └─────┴───┘";
@@ -292,7 +293,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 			tileView.Tiles.ElementAt (1).MinSize = 6;
 
 			// distance leaves too little space for view2 (less than 6 would remain)
@@ -305,7 +306,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
-@"
+	    @"
 11111│22222
 11111◊22222
      │     ";
@@ -313,18 +314,18 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 1111│222222
 1111◊222222
     │    ";
@@ -336,7 +337,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 		{
 			var tileView = Get11By3TileView (out var line, true);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 			tileView.Tiles.ElementAt (1).MinSize = 5;
 
 			// distance leaves too little space for view2 (less than 5 would remain)
@@ -349,7 +350,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
-@"
+	    @"
 ┌────┬────┐
 │1111◊2222│
 └────┴────┘";
@@ -357,18 +358,18 @@ namespace Terminal.Gui.ViewsTests {
 
 			// Keyboard movement on splitter should have no effect because it
 			// would take us below the minimum splitter size
-			line.ProcessKey (new KeyEvent (Key.CursorRight, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorRight));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// but we can continue to move the splitter left if we want
-			line.ProcessKey (new KeyEvent (Key.CursorLeft, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorLeft));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌───┬─────┐
 │111◊22222│
 └───┴─────┘";
@@ -386,7 +387,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
-@"
+	    @"
 ┌──┬───┬──┐
 │  │111│22│
 └──┴───┴──┘";
@@ -403,7 +404,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
-@"
+	    @"
 ┌──┬───┬──┐
 │11│   │22│
 └──┴───┴──┘";
@@ -420,7 +421,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			// so should ignore the 2 distance and stick to 6
 			string looksLike =
-@"
+	    @"
 ┌──┬───┬──┐
 │11│222│  │
 └──┴───┴──┘";
@@ -433,37 +434,37 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView (out var line);
 
 			tileView.Orientation = Orientation.Horizontal;
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
 			Assert.True (line.HasFocus);
 
 			tileView.Draw ();
 
 			string looksLike =
-@"    
+	    @"    
 11111111111
 ─────◊─────
 22222222222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now move splitter line down
-			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (KeyCode.CursorDown));
 
 			tileView.Draw ();
 			looksLike =
-@"    
+	    @"    
 11111111111
 11111111111
 ─────◊─────";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// And 2 up
-			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
-			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorUp));
+			line.NewKeyDownEvent (new (KeyCode.CursorUp));
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			looksLike =
-@"    
+	    @"    
 ─────◊─────
 22222222222
 22222222222";
@@ -474,7 +475,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void TestTileView_Horizontal_View1MinSize_Absolute ()
 		{
 			var tileView = Get11By3TileView (out var line);
-			tileView.ProcessHotKey (new KeyEvent (tileView.ToggleResizable, new KeyModifiers ()));
+			tileView.NewKeyDownEvent (new (tileView.ToggleResizable));
 
 			tileView.Orientation = Orientation.Horizontal;
 			tileView.Tiles.ElementAt (0).MinSize = 1;
@@ -487,30 +488,30 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"    
+	    @"    
 11111111111
 ─────◊─────
 22222222222";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// Now move splitter line down (allowed
-			line.ProcessKey (new KeyEvent (Key.CursorDown, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorDown));
 			tileView.Draw ();
 			looksLike =
-@"    
+	    @"    
 11111111111
 11111111111
 ─────◊─────";
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			// And up 2 (only 1 is allowed because of minimum size of 1 on view1)
-			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
-			line.ProcessKey (new KeyEvent (Key.CursorUp, new KeyModifiers ()));
+			line.NewKeyDownEvent (new (KeyCode.CursorUp));
+			line.NewKeyDownEvent (new (KeyCode.CursorUp));
 
 			tileView.SetNeedsDisplay ();
 			tileView.Draw ();
 			looksLike =
-@"    
+	    @"    
 11111111111
 ─────◊─────
 22222222222";
@@ -523,7 +524,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tileView = Get11By3TileView ();
 
 			var ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Right (tileView)));
-			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
+			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosView", ex.Message);
 
 			ex = Assert.Throws<ArgumentException> (() => tileView.SetSplitterPos (0, Pos.Function (() => 1)));
 			Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosFunc", ex.Message);
@@ -561,7 +562,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"    
+	    @"    
 1111111111│222222222
 1111111111│222222222
           │
@@ -584,7 +585,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 111111│222222│333333
 111111│222222│333333
 111111│222222│333333
@@ -647,7 +648,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌─────┬──────┬─────┐
 │11111│222222│33333│
 │11111│222222│33333│
@@ -709,7 +710,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌ T1 ─┬ T2 ──┬ T3 ─┐
 │11111│222222│33333│
 │11111│222222│33333│
@@ -731,7 +732,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌─────┬──────┬─────┐
 │11111│222222│33333│
 │11111│222222│33333│
@@ -752,7 +753,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌─────────┬────────┐
 │111111111│33333333│
 │111111111│33333333│
@@ -773,7 +774,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌──────────────────┐
 │333333333333333333│
 │333333333333333333│
@@ -791,7 +792,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌──────────────────┐
 │                  │
 │                  │
@@ -883,7 +884,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬───┐
 │    │┌─┐│
 │    │├─┤│
@@ -903,7 +904,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬────┬────┬────┬───┐
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
@@ -933,7 +934,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────────┬┬────┬────┬───┐
 │11111111││3333│4444│555│
 │        ││    │    │   │
@@ -952,7 +953,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 11111│2222│3333│4444│5555
      │    │    │    │
      │    │    │    │
@@ -982,7 +983,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 111111111││3333│4444│5555
          ││    │    │
          ││    │    │
@@ -1000,7 +1001,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬────┬────┬────┬───┐
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
@@ -1018,7 +1019,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌┬────────┬────┬────┬───┐
 ││22222222│3333│4444│555│
 ││        │    │    │   │
@@ -1040,7 +1041,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────────┬┬────┬────┬───┐
 │11111111││3333│4444│555│
 │        ││    │    │   │
@@ -1056,7 +1057,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 11111│2222│3333│4444│5555
      │    │    │    │
      │    │    │    │
@@ -1072,7 +1073,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 │222222222│3333│4444│5555
 │         │    │    │
 │         │    │    │
@@ -1094,7 +1095,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 111111111││3333│4444│5555
          ││    │    │
          ││    │    │
@@ -1112,7 +1113,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬────┬────┬────┬───┐
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
@@ -1132,7 +1133,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬┬────────┬────┬───┐
 │1111││33333333│4444│555│
 │    ││        │    │   │
@@ -1152,7 +1153,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬────────┬┬────┬───┐
 │1111│22222222││4444│555│
 │    │        ││    │   │
@@ -1170,7 +1171,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 11111│2222│3333│4444│5555
      │    │    │    │
      │    │    │    │
@@ -1190,7 +1191,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 11111││33333333│4444│5555
      ││        │    │
      ││        │    │
@@ -1211,7 +1212,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 11111│22222222││4444│5555
      │        ││    │
      │        ││    │
@@ -1231,7 +1232,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬────┬────┬────┬───┐
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
@@ -1251,7 +1252,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬──┬──────┬────┬───┐
 │1111│22│333333│4444│555│
 │    │  │      │    │   │
@@ -1271,7 +1272,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬─────┬───┬────┬───┐
 │1111│22222│333│4444│555│
 │    │     │   │    │   │
@@ -1292,7 +1293,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 11111│2222│3333│4444│5555
      │    │    │    │
      │    │    │    │
@@ -1312,7 +1313,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 
 11111│22│333333│4444│5555
      │  │      │    │
@@ -1334,7 +1335,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"  
+	    @"  
 11111│22222│333│4444│5555
      │     │   │    │
      │     │   │    │
@@ -1353,7 +1354,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬────┬────┬────┬───┐
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
@@ -1373,7 +1374,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬────┬────┬┬───────┐
 │1111│2222│3333││5555555│
 │    │    │    ││       │
@@ -1393,7 +1394,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬────┬────┬───────┬┐
 │1111│2222│3333│4444444││
 │    │    │    │       ││
@@ -1411,7 +1412,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"   
+	    @"   
 11111│2222│3333│4444│5555
      │    │    │    │
      │    │    │    │
@@ -1431,7 +1432,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"  
+	    @"  
 11111│2222│3333││55555555
      │    │    ││
      │    │    ││
@@ -1452,7 +1453,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 11111│2222│3333│44444444│
      │    │    │        │
      │    │    │        │
@@ -1473,7 +1474,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬────┬────┬────┬───┐
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
@@ -1493,7 +1494,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬────┬────┬──┬─────┐
 │1111│2222│3333│44│55555│
 │    │    │    │  │     │
@@ -1514,7 +1515,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────┬────┬────┬──────┬─┐
 │1111│2222│3333│444444│5│
 │    │    │    │      │ │
@@ -1534,7 +1535,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 11111│2222│3333│4444│5555
      │    │    │    │
      │    │    │    │
@@ -1554,7 +1555,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"   
+	    @"   
 11111│2222│3333│44│555555
      │    │    │  │
      │    │    │  │
@@ -1574,7 +1575,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			looksLike =
-@"
+	    @"
 11111│2222│3333│4444444│5
      │    │    │       │
      │    │    │       │
@@ -1618,7 +1619,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Draw ();
 
 			var looksLike =
-@"
+	    @"
 ┌────┬───┐
 │    │   │
 │    ├───┤
@@ -1650,7 +1651,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌─────┬──────┬─────┐
 │11111│222222│33333│
 │11111│222222│33333│
@@ -1672,7 +1673,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌────────────┬─────┐
 │222222222222│33333│
 │222222222222│33333│
@@ -1686,94 +1687,93 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			// BUGBUG: v2 - Something broke and I can't figure it out. Disabling for now.
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//┌────────────┬─────┐
-			//│111111111111│33333│
-			//│111111111111│33333│
-			//│111111111111│33333│
-			//│111111111111│33333│
-			//│111111111111├─────┤
-			//│111111111111│44444│
-			//│111111111111│44444│
-			//│111111111111│44444│
-			//└────────────┴─────┘";
+			looksLike =
+@"
+┌────────────┬─────┐
+│111111111111│33333│
+│111111111111│33333│
+│111111111111│33333│
+│111111111111│33333│
+│111111111111├─────┤
+│111111111111│44444│
+│111111111111│44444│
+│111111111111│44444│
+└────────────┴─────┘";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//┌─────┬────────────┐
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//│11111│222222222222│
-			//└─────┴────────────┘";
+			looksLike =
+@"
+┌─────┬────────────┐
+│11111│222222222222│
+│11111│222222222222│
+│11111│222222222222│
+│11111│222222222222│
+│11111│222222222222│
+│11111│222222222222│
+│11111│222222222222│
+│11111│222222222222│
+└─────┴────────────┘";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//┌──────────────────┐
-			//│111111111111111111│
-			//│111111111111111111│
-			//│111111111111111111│
-			//│111111111111111111│
-			//│111111111111111111│
-			//│111111111111111111│
-			//│111111111111111111│
-			//│111111111111111111│
-			//└──────────────────┘";
+			looksLike =
+@"
+┌──────────────────┐
+│111111111111111111│
+│111111111111111111│
+│111111111111111111│
+│111111111111111111│
+│111111111111111111│
+│111111111111111111│
+│111111111111111111│
+│111111111111111111│
+└──────────────────┘";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//┌──────────────────┐
-			//│222222222222222222│
-			//│222222222222222222│
-			//│222222222222222222│
-			//│222222222222222222│
-			//│222222222222222222│
-			//│222222222222222222│
-			//│222222222222222222│
-			//│222222222222222222│
-			//└──────────────────┘";
+			looksLike =
+@"
+┌──────────────────┐
+│222222222222222222│
+│222222222222222222│
+│222222222222222222│
+│222222222222222222│
+│222222222222222222│
+│222222222222222222│
+│222222222222222222│
+│222222222222222222│
+└──────────────────┘";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
 			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
@@ -1783,7 +1783,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌──────────────────┐
 │333333333333333333│
 │333333333333333333│
@@ -1808,7 +1808,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 ┌──────────────────┐
 │                  │
 │                  │
@@ -1832,7 +1832,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 111111│222222│333333
 111111│222222│333333
 111111│222222│333333
@@ -1854,7 +1854,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			looksLike =
-@"
+	    @"
 2222222222222│333333
 2222222222222│333333
 2222222222222│333333
@@ -1868,132 +1868,132 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			// BUGBUG: v2 - Something broke and I can't figure it out. Disabling for now.
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//1111111111111│333333
-			//1111111111111│333333
-			//1111111111111│333333
-			//1111111111111│333333
-			//1111111111111│333333
-			//1111111111111├──────
-			//1111111111111│444444
-			//1111111111111│444444
-			//1111111111111│444444
-			//1111111111111│444444";
+			looksLike =
+@"
+1111111111111│333333
+1111111111111│333333
+1111111111111│333333
+1111111111111│333333
+1111111111111│333333
+1111111111111├──────
+1111111111111│444444
+1111111111111│444444
+1111111111111│444444
+1111111111111│444444";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222
-			//111111│2222222222222";
+			looksLike =
+@"
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222
+111111│2222222222222";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111
-			//11111111111111111111";
+			looksLike =
+@"
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111
+11111111111111111111";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222
-			//22222222222222222222";
+			looksLike =
+@"
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222
+22222222222222222222";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			//33333333333333333333
-			//33333333333333333333
-			//33333333333333333333
-			//33333333333333333333
-			//33333333333333333333
-			//────────────────────
-			//44444444444444444444
-			//44444444444444444444
-			//44444444444444444444
-			//44444444444444444444";
+			looksLike =
+@"
+33333333333333333333
+33333333333333333333
+33333333333333333333
+33333333333333333333
+33333333333333333333
+────────────────────
+44444444444444444444
+44444444444444444444
+44444444444444444444
+44444444444444444444";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
-			//			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-			//			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-			//			tileView.LayoutSubviews ();
+			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+			tileView.LayoutSubviews ();
 
-			//			tileView.Draw ();
+			tileView.Draw ();
 
-			//			looksLike =
-			//@"
-			// ";
+			looksLike =
+@"
+			 ";
 
-			//			TestHelpers.AssertDriverContentsAre (looksLike, output);
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
 
 		}
 
@@ -2026,7 +2026,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌─────────┬────────┐
 │bleh     │blah    │
 │         │        │
@@ -2049,7 +2049,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌ T1 ─┬ T3 ──┬ T2 ─┐
 │11111│333333│22222│
 │11111│333333│22222│
@@ -2072,12 +2072,12 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
 
 			((TileView)tileView.Tiles.ElementAt (1).ContentView)
-				.Tiles.ElementAt (1).Title = new string ('y', 100);
+			    .Tiles.ElementAt (1).Title = new string ('y', 100);
 
 			tileView.Draw ();
 
 			string looksLike =
-@"
+	    @"
 ┌ xxxx┬ T3 ──┬ T2 ─┐
 │11111│333333│22222│
 │11111│333333│22222│
@@ -2108,11 +2108,11 @@ namespace Terminal.Gui.ViewsTests {
 			// but I still want my view in the first tile
 			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Multiple (
-				() => Assert.Equal (0, myReusableView.DisposalCount)
-				, () => {
-					tv.Dispose ();
-					Assert.Equal (1, myReusableView.DisposalCount);
-				});
+			    () => Assert.Equal (0, myReusableView.DisposalCount)
+			    , () => {
+				    tv.Dispose ();
+				    Assert.Equal (1, myReusableView.DisposalCount);
+			    });
 		}
 		[Fact, AutoInitShutdown]
 		public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
@@ -2132,11 +2132,11 @@ namespace Terminal.Gui.ViewsTests {
 			// but I still want my view in the first tile
 			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Multiple (
-				() => Assert.Equal (0, myReusableView.DisposalCount)
-				, () => {
-					tv.Dispose ();
-					Assert.True (myReusableView.DisposalCount >= 1);
-				});
+			    () => Assert.Equal (0, myReusableView.DisposalCount)
+			    , () => {
+				    tv.Dispose ();
+				    Assert.True (myReusableView.DisposalCount >= 1);
+			    });
 		}
 		[Theory, AutoInitShutdown]
 		[InlineData (0)]
@@ -2156,11 +2156,11 @@ namespace Terminal.Gui.ViewsTests {
 			// but I still want my view in the first tile
 			tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
 			Assert.Multiple (
-				() => Assert.Equal (0, myReusableView.DisposalCount)
-				, () => {
-					tv.Dispose ();
-					Assert.True (myReusableView.DisposalCount >= 1);
-				});
+			    () => Assert.Equal (0, myReusableView.DisposalCount)
+			    , () => {
+				    tv.Dispose ();
+				    Assert.True (myReusableView.DisposalCount >= 1);
+			    });
 		}
 		private class DisposeCounter : View {
 			public int DisposalCount;
@@ -2225,10 +2225,10 @@ namespace Terminal.Gui.ViewsTests {
 					Width = Dim.Fill (),
 					Height = Dim.Fill (),
 					Text =
-						string.Join ('\n',
-						Enumerable.Repeat (
-							new string (i.ToString () [0], 100)
-							, 10).ToArray ()),
+					string.Join ('\n',
+					Enumerable.Repeat (
+					    new string (i.ToString () [0], 100)
+					    , 10).ToArray ()),
 					WordWrap = false
 				});
 			}

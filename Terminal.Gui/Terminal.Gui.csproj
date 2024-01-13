@@ -19,8 +19,8 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>net7.0</TargetFrameworks>
-    <LangVersion>10.0</LangVersion>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <!--<LangVersion>11.0</LangVersion>-->
     <RootNamespace>Terminal.Gui</RootNamespace>
     <AssemblyName>Terminal.Gui</AssemblyName>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
@@ -38,14 +38,13 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="System.IO.Abstractions" Version="19.2.51" />
-    <PackageReference Include="System.Text.Json" Version="7.0.3" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
-    <PackageReference Include="Wcwidth" Version="1.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="20.0.4" />
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="Wcwidth" Version="2.0.0" />
     <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <InternalsVisibleTo Include="UnitTests" />
   </ItemGroup>
   <PropertyGroup>
@@ -114,5 +113,6 @@
     <EnableSourceLink>true</EnableSourceLink>
     <!--<DebugType>Embedded</DebugType>-->
     <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 </Project>

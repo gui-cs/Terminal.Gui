@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Snake", Description: "The game of apple eating.")]
 	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Drawing")]
 	public class Snake : Scenario {
 		private bool isDisposed;
 
@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 					if (state.AdvanceState ()) {
 
 						// When updating from a Thread/Task always use Invoke
-						Application.MainLoop?.Invoke (() => {
+						Application.Invoke (() => {
 							snakeView.SetNeedsDisplay ();
 						});
 					}
@@ -124,21 +124,23 @@ namespace UICatalog.Scenarios {
 				AddRune (State.Apple.X, State.Apple.Y, _appleRune);
 				Driver.SetAttribute (white);
 			}
-			public override bool OnKeyDown (KeyEvent keyEvent)
+			
+			// BUGBUG: Should (can) this use key bindings instead.
+			public override bool OnKeyDown (Key keyEvent)
 			{
-				if (keyEvent.Key == Key.CursorUp) {
+				if (keyEvent.KeyCode == KeyCode.CursorUp) {
 					State.PlannedDirection = Direction.Up;
 					return true;
 				}
-				if (keyEvent.Key == Key.CursorDown) {
+				if (keyEvent.KeyCode == KeyCode.CursorDown) {
 					State.PlannedDirection = Direction.Down;
 					return true;
 				}
-				if (keyEvent.Key == Key.CursorLeft) {
+				if (keyEvent.KeyCode == KeyCode.CursorLeft) {
 					State.PlannedDirection = Direction.Left;
 					return true;
 				}
-				if (keyEvent.Key == Key.CursorRight) {
+				if (keyEvent.KeyCode == KeyCode.CursorRight) {
 					State.PlannedDirection = Direction.Right;
 					return true;
 				}

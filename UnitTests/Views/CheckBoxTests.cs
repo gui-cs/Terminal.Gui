@@ -59,27 +59,44 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void KeyBindings_Command ()
 		{
-			var isChecked = false;
+			var toggled = false;
 			CheckBox ckb = new CheckBox ();
-			ckb.Toggled += (s, e) => isChecked = true;
+			ckb.Toggled += (s, e) => toggled = true;
 			Application.Top.Add (ckb);
 			Application.Begin (Application.Top);
 
-			Assert.Equal (Key.Null, ckb.HotKey);
+			Assert.False (ckb.Checked);
+			Assert.False (toggled);
+			Assert.Equal (KeyCode.Null, ckb.HotKey);
+
 			ckb.Text = "Test";
-			Assert.Equal (Key.T, ckb.HotKey);
-			Assert.False (ckb.ProcessHotKey (new KeyEvent (Key.T, new KeyModifiers ())));
-			Assert.False (isChecked);
+			Assert.Equal (KeyCode.T, ckb.HotKey);
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.T)));
+			Assert.True (ckb.Checked);
+			Assert.True (toggled);
+
 			ckb.Text = "T_est";
-			Assert.Equal (Key.E, ckb.HotKey);
-			Assert.True (ckb.ProcessHotKey (new KeyEvent (Key.E | Key.AltMask, new KeyModifiers () { Alt = true })));
-			Assert.True (isChecked);
-			isChecked = false;
-			Assert.True (ckb.ProcessKey (new KeyEvent ((Key)' ', new KeyModifiers ())));
-			Assert.True (isChecked);
-			isChecked = false;
-			Assert.True (ckb.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
-			Assert.True (isChecked);
+			toggled = false;
+			Assert.Equal (KeyCode.E, ckb.HotKey);
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.E | KeyCode.AltMask)));
+			Assert.True (toggled);
+			Assert.False (ckb.Checked);
+
+			toggled = false;
+			Assert.Equal (KeyCode.E, ckb.HotKey);
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.E)));
+			Assert.True (toggled);
+			Assert.True (ckb.Checked);
+
+			toggled = false;
+			Assert.True (Application.Top.NewKeyDownEvent (new ((KeyCode)' ')));
+			Assert.True (toggled);
+			Assert.False (ckb.Checked);
+
+			toggled = false;
+			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Space)));
+			Assert.True (toggled);
+			Assert.True (ckb.Checked);
 			Assert.True (ckb.AutoSize);
 
 			Application.Refresh ();
@@ -122,53 +139,52 @@ namespace Terminal.Gui.ViewsTests {
 			checkBox.Checked = true;
 			Assert.Equal ($"{CM.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
 
-			//checkBox.AutoSize = false;
+			checkBox.AutoSize = false;
+			checkBox.AutoSize = false;
 			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
-			//checkBox.Text = "Check this out 你 changed";
-			//Application.RunMainLoopIteration (ref runstate, ref first);
+			checkBox.Text = "Check this out 你 changed";
+			var firstIteration = false;
+			Application.RunIteration (ref runstate, ref firstIteration);
 			// BUGBUG - v2 - Autosize is busted; disabling tests for now
-//			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-//			expected = @"
-//┌┤Test Demo 你├──────────────┐
-//│                            │
-//│ √ Check this out 你        │
-//│                            │
-//└────────────────────────────┘
-//";
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
+			var expected = @"
+┌┤Test Demo 你├──────────────┐
+│                            │
+│ ☑ Check this out 你        │
+│                            │
+└────────────────────────────┘";
 
-//			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+			var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-//			checkBox.Width = 19;
-//			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
-//			checkBox.Text = "Check this out 你 changed";
-//			Application.RunMainLoopIteration (ref runstate, ref first);
-//			Assert.False (checkBox.AutoSize);
-//			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
-//			expected = @"
-//┌┤Test Demo 你├──────────────┐
-//│                            │
-//│ √ Check this out 你        │
-//│                            │
-//└────────────────────────────┘
-//";
+			checkBox.Width = 19;
+			// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
+			checkBox.Text = "Check this out 你 changed";
+			Application.RunIteration (ref runstate, ref firstIteration);
+			Assert.False (checkBox.AutoSize);
+			Assert.Equal (new Rect (1, 1, 19, 1), checkBox.Frame);
+			expected = @"
+┌┤Test Demo 你├──────────────┐
+│                            │
+│ ☑ Check this out 你        │
+│                            │
+└────────────────────────────┘";
 
-//			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-//			checkBox.AutoSize = true;
-//			Application.RunMainLoopIteration (ref runstate, ref first);
-//			Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
-//			expected = @"
-//┌┤Test Demo 你├──────────────┐
-//│                            │
-//│ √ Check this out 你 changed│
-//│                            │
-//└────────────────────────────┘
-//";
+			checkBox.AutoSize = true;
+			Application.RunIteration (ref runstate, ref firstIteration);
+			Assert.Equal (new Rect (1, 1, 27, 1), checkBox.Frame);
+			expected = @"
+┌┤Test Demo 你├──────────────┐
+│                            │
+│ ☑ Check this out 你 changed│
+│                            │
+└────────────────────────────┘";
 
-//			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-//			Assert.Equal (new Rect (0, 0, 30, 5), pos);
+			pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+			Assert.Equal (new Rect (0, 0, 30, 5), pos);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -495,20 +511,20 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Begin (top);
 
 			Assert.False (checkBox.Checked);
-			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.NewKeyDownEvent (new (KeyCode.Space)));
 			Assert.True (checkBox.Checked);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.False (checkBox.Checked);
 
 			checkBox.AllowNullChecked = true;
-			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.NewKeyDownEvent (new (KeyCode.Space)));
 			Assert.Null (checkBox.Checked);
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (@$"
 {CM.Glyphs.NullChecked} Check this out 你", output);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.True (checkBox.Checked);
-			Assert.True (checkBox.ProcessKey (new KeyEvent (Key.Space, new KeyModifiers ())));
+			Assert.True (checkBox.NewKeyDownEvent (new (KeyCode.Space)));
 			Assert.False (checkBox.Checked);
 			Assert.True (checkBox.MouseEvent (new MouseEvent () { X = 0, Y = 0, Flags = MouseFlags.Button1Clicked }));
 			Assert.Null (checkBox.Checked);

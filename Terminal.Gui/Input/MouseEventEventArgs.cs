@@ -12,6 +12,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="me">The mouse event.</param>
 		public MouseEventEventArgs (MouseEvent me) => MouseEvent = me;
+
+		// TODO: Merge MouseEvent and MouseEventEventArgs into a single class.
 		/// <summary>
 		/// The <see cref="Terminal.Gui.MouseEvent"/> for the event.
 		/// </summary>

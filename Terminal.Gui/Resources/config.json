@@ -16,24 +16,9 @@
   // to throw exceptions. 
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
-  "Application.AlternateBackwardKey": {
-    "Key": "PageUp",
-    "Modifiers": [
-      "Ctrl"
-    ]
-  },
-  "Application.AlternateForwardKey": {
-    "Key": "PageDown",
-    "Modifiers": [
-      "Ctrl"
-    ]
-  },
-  "Application.QuitKey": {
-    "Key": "Q",
-    "Modifiers": [
-      "Ctrl"
-    ]
-  },
+  "Application.AlternateBackwardKey": "Ctrl+PageUp",
+  "Application.AlternateForwardKey": "Ctrl+PageDown",
+  "Application.QuitKey": "Ctrl+Q",
   "Application.IsMouseDisabled": false,
   "Theme": "Default",
   "Themes": [
@@ -54,7 +39,7 @@
                 "Background": "Cyan"
               },
               "HotNormal": {
-                "Foreground": "Brown",
+                "Foreground": "Yellow",
                 "Background": "Black"
               },
               "HotFocus": {
@@ -200,7 +185,7 @@
                 "Background": "Black"
               },
               "Focus": {
-                "Foreground": "White",
+                "Foreground": "BrightYellow",
                 "Background": "DarkGray"
               },
               "HotNormal": {

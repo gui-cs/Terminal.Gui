@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 using Rune = System.Text.Rune;
 
 namespace Terminal.Gui;
@@ -461,28 +462,6 @@ public static class FakeConsole {
 	public static bool KeyAvailable { get; }
 	//
 	// Summary:
-	//	Gets a value indicating whether the NUM LOCK keyboard toggle is turned on or
-	//	turned off.
-	//
-	// Returns:
-	//	true if NUM LOCK is turned on; false if NUM LOCK is turned off.
-	/// <summary>
-	/// 
-	/// </summary>
-	public static bool NumberLock { get; }
-	//
-	// Summary:
-	//	Gets a value indicating whether the CAPS LOCK keyboard toggle is turned on or
-	//	turned off.
-	//
-	// Returns:
-	//	true if CAPS LOCK is turned on; false if CAPS LOCK is turned off.
-	/// <summary>
-	/// 
-	/// </summary>
-	public static bool CapsLock { get; }
-	//
-	// Summary:
 	//	Gets a value that indicates whether input has been redirected from the standard
 	//	input stream.
 	//
@@ -814,17 +793,17 @@ public static class FakeConsole {
 	public static Stack<ConsoleKeyInfo> MockKeyPresses = new Stack<ConsoleKeyInfo> ();
 
 	/// <summary>
-	///  Helper to push a <see cref="Key"/> onto <see cref="MockKeyPresses"/>.
+	///  Helper to push a <see cref="KeyCode"/> onto <see cref="MockKeyPresses"/>.
 	/// </summary>
 	/// <param name="key"></param>
-	public static void PushMockKeyPress (Key key)
+	public static void PushMockKeyPress (KeyCode key)
 	{
 		MockKeyPresses.Push (new ConsoleKeyInfo (
-			(char)(key & ~Key.CtrlMask & ~Key.ShiftMask & ~Key.AltMask),
-			ConsoleKeyMapping.GetConsoleKeyFromKey (key),
-			key.HasFlag (Key.ShiftMask),
-			key.HasFlag (Key.AltMask),
-			key.HasFlag (Key.CtrlMask)));
+			(char)(key & ~KeyCode.CtrlMask & ~KeyCode.ShiftMask & ~KeyCode.AltMask),
+			ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (key).Key,
+			key.HasFlag (KeyCode.ShiftMask),
+			key.HasFlag (KeyCode.AltMask),
+			key.HasFlag (KeyCode.CtrlMask)));
 	}
 
 	//
