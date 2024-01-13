@@ -734,7 +734,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// This is a dynamic property that returns a new Attribute instance each time it's
 	/// accessed and has not setter.
 	/// </remarks>
-	public static Attribute Default => new (Color.White, Color.Black);
+	public static readonly Attribute Default = new (Color.White, Color.Black);
 
 	/// <summary>
 	/// The <see cref="ConsoleDriver"/>-specific color value.
