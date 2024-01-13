@@ -47,6 +47,12 @@ namespace Terminal.Gui;
 /// </para>
 /// </remarks>
 public class Border : Adornment {
+	/// <inheritdoc />
+	public Border () { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */ }
+
+	/// <inheritdoc />
+	public Border (View parent) : base (parent) { /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */ }
+
 	/// <summary>
 	/// Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for
 	/// setting the <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the

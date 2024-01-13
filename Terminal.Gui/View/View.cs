@@ -493,7 +493,9 @@ public partial class View : Responder, ISupportInitializeNotification {
 
 		AddCommands ();
 
-		CreateAdornments ();
+		Margin = CreateAdornment (typeof (Margin)) as Margin;
+		Border = CreateAdornment (typeof (Border)) as Border;
+		Padding = CreateAdornment (typeof (Padding)) as Padding;
 	}
 
 	/// <summary>

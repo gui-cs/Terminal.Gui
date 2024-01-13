@@ -20,6 +20,15 @@ namespace Terminal.Gui;
 /// </para>
 /// </remarsk>
 public class Adornment : View {
+	/// <inheritdoc />
+	public Adornment () { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */ }
+
+	/// <summary>
+	/// Constructs a new adornment for the view specified by <paramref name="parent"/>.
+	/// </summary>
+	/// <param name="parent"></param>
+	public Adornment (View parent) => Parent = parent;
+
 	Thickness _thickness = Thickness.Empty;
 
 	/// <summary>
@@ -74,9 +83,10 @@ public class Adornment : View {
 		set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
 	}
 
-	internal override void CreateAdornments ()
+	internal override Adornment CreateAdornment (Type adornmentType)
 	{
 		/* Do nothing - Adornments do not have Adornments */
+		return null;
 	}
 
 	internal override void LayoutAdornments ()

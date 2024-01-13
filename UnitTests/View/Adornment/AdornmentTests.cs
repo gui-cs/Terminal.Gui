@@ -15,16 +15,14 @@ public class AdornmentTests {
 	[Fact]
 	public void Setting_SuperView_Throws ()
 	{
-		var adornment = new Adornment ();
-		var super = new View ();
+		var adornment = new Adornment (null);
 		Assert.Throws<NotImplementedException> (() => adornment.SuperView = new View ());
 	}
 
 	[Fact]
 	public void Setting_SuperViewRendersLineCanvas_Throws ()
 	{
-		var adornment = new Adornment ();
-		var super = new View ();
+		var adornment = new Adornment (null);
 		Assert.Throws<NotImplementedException> (() => adornment.SuperViewRendersLineCanvas = true);
 	}
 
@@ -49,7 +47,7 @@ public class AdornmentTests {
 	[Fact]
 	public void Setting_Thickness_Raises_ThicknessChanged ()
 	{
-		var adornment = new Adornment ();
+		var adornment = new Adornment (null);
 		var super = new View ();
 		var raised = false;
 		adornment.ThicknessChanged += (s, e) => {
@@ -65,7 +63,7 @@ public class AdornmentTests {
 	[Fact]
 	public void Setting_Bounds_Throws ()
 	{
-		var adornment = new Adornment ();
+		var adornment = new Adornment (null);
 		Assert.Throws<InvalidOperationException> (() => adornment.Bounds = new Rect (1, 2, 3, 4));
 	}
 

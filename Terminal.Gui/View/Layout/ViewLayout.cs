@@ -109,7 +109,7 @@ public partial class View {
 	///         of the <see cref="SuperView"/> and its <see cref="Subviews"/>.
 	///         </para>
 	/// </remarks>
-	public Adornment Margin { get; private set; }
+	public Margin Margin { get; private set; }
 
 	/// <summary>
 	/// The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the
@@ -187,22 +187,11 @@ public partial class View {
 	///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
 	///         </para>
 	/// </remarks>
-	public Adornment Padding { get; private set; }
+	public Padding Padding { get; private set; }
 
 	/// <summary>
 	///         <para>
-	///         Gets the LayoutStyle for the <see cref="View"/>.
-	///         </para>
-	///         <para>
-	///         If Absolute, the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and
-	///         <see cref="View.Height"/>
-	///         objects are all absolute values and are not relative. The position and size of the view is described by
-	///         <see cref="View.Frame"/>.
-	///         </para>
-	///         <para>
-	///         If Computed, one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
-	///         <see cref="View.Height"/>
-	///         objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.
+	///         Gets the thickness describing the sum of the Adornments' thicknesses.
 	///         </para>
 	/// </summary>
 	/// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
@@ -221,16 +210,14 @@ public partial class View {
 	/// </summary>
 	public Point GetBoundsOffset () => new (Padding?.Thickness.GetInside (Padding.Frame).X ?? 0, Padding?.Thickness.GetInside (Padding.Frame).Y ?? 0);
 
-	internal virtual void AddAdornment (Adornment adornment)
-	{
-
-	}
-	
 	/// <summary>
-	/// Creates the view's <see cref="Adornment"/> objects. This internal method is overridden by Adornment to do nothing
-	/// to prevent recursion during View construction.
+	/// This internal method is overridden by Adornment to do nothing to prevent recursion during View construction.
+	/// And, because Adornments don't have Adornments. It's internal to support unit tests.
 	/// </summary>
-	internal virtual void CreateAdornments ()
+	/// <param name="adornment"></param>
+	/// <exception cref="ArgumentNullException"></exception>
+	/// <exception cref="ArgumentException"></exception>
+	internal virtual Adornment CreateAdornment (Type adornmentType)
 	{
 		void ThicknessChangedHandler (object sender, EventArgs e)
 		{
@@ -241,29 +228,12 @@ public partial class View {
 			SetNeedsDisplay ();
 		}
 
-		if (Margin != null) {
-			Margin.ThicknessChanged -= ThicknessChangedHandler;
-			Margin.Dispose ();
-		}
-		Margin = new Margin () { Thickness = new Thickness (0) };
-		Margin.ThicknessChanged += ThicknessChangedHandler;
-		Margin.Parent = this;
+		Adornment adornment;
 
-		if (Border != null) {
-			Border.ThicknessChanged -= ThicknessChangedHandler;
-			Border.Dispose ();
-		}
-		Border = new Border () { Thickness = new Thickness (0) };
-		Border.ThicknessChanged += ThicknessChangedHandler;
-		Border.Parent = this;
+		adornment = Activator.CreateInstance (adornmentType, this) as Adornment;
+		adornment.ThicknessChanged += ThicknessChangedHandler;
 
-		if (Padding != null) {
-			Padding.ThicknessChanged -= ThicknessChangedHandler;
-			Padding.Dispose ();
-		}
-		Padding = new Padding () { Thickness = new Thickness (0) };
-		Padding.ThicknessChanged += ThicknessChangedHandler;
-		Padding.Parent = this;
+		return adornment;
 	}
 
 	/// <summary>

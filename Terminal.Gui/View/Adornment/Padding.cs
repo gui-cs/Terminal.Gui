@@ -12,6 +12,11 @@ namespace Terminal.Gui;
 /// </para>
 /// </remarks>
 public class Padding : Adornment {
+	/// <inheritdoc />
+	public Padding () { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */ }
+
+	/// <inheritdoc />
+	public Padding (View parent) : base (parent) { /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */ }
 
 	// TODO: Implement specific override behavior: ColorScheme should match the Parent
 }
