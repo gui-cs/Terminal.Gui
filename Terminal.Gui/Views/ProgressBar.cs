@@ -183,9 +183,14 @@ public class ProgressBar : View {
 	/// </remarks>
 	public void Pulse ()
 	{
-		if (_activityPos == null) {
+		if (_activityPos == null || _activityPos.Length == 0) {
 			PopulateActivityPos ();
 		}
+
+		if (_activityPos!.Length == 0) {
+			return;
+		}
+
 		if (!_isActivity) {
 			_isActivity = true;
 			_delta = 1;
@@ -193,6 +198,7 @@ public class ProgressBar : View {
 			for (var i = 0; i < _activityPos.Length; i++) {
 				_activityPos [i] += _delta;
 			}
+
 			if (_activityPos [^1] < 0) {
 				for (var i = 0; i < _activityPos.Length; i++) {
 					_activityPos [i] = i - _activityPos.Length + 2;
