@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Terminal.Gui.Views;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -115,6 +116,10 @@ public class AllViewsTests {
 
 			if (vType is TextView) {
 				top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+			} else if (vType is DatePicker) {
+				for (int i = 0; i < 4; i++) {
+					top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+				}
 			} else {
 				top.NewKeyDownEvent (new (KeyCode.Tab));
 			}
