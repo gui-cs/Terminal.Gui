@@ -44,7 +44,8 @@ public class Window : Toplevel {
 	/// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all
 	/// <see cref="Window"/>s.
 	/// </remarks>
-	[SerializableConfigurationProperty (Scope = typeof (ThemeScope))] [JsonConverter (typeof (JsonStringEnumConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
+	[JsonConverter (typeof (JsonStringEnumConverter))]
 	public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
 
 	void SetInitialProperties ()

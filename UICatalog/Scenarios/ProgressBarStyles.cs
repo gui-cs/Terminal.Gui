@@ -65,8 +65,6 @@ public class ProgressBarStyles : Scenario {
 				dialog.X = pbList.Frame.X;
 				dialog.Y = pbList.Frame.Height;
 
-				// Once #3127 is merged:
-				dialog.LayoutStyle = LayoutStyle.Absolute;
 				dialog.Bounds = new Rect (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
 
 				Application.Top.LayoutSubviews ();
@@ -118,7 +116,7 @@ public class ProgressBarStyles : Scenario {
 			BorderStyle = LineStyle.Single,
 			Title = "ProgressBarFormat",
 			X = Pos.Left (pbList),
-			Y = Pos.Bottom(bgColorPickerBtn) + 1,
+			Y = Pos.Bottom (bgColorPickerBtn) + 1,
 		};
 		editor.Add (rbPBFormat);
 
@@ -132,7 +130,7 @@ public class ProgressBarStyles : Scenario {
 			Title = "Blocks",
 			X = Pos.Center (),
 			Y = Pos.Bottom (button) + 1,
-			Width = Dim.Width(pbList),
+			Width = Dim.Width (pbList),
 			BorderStyle = LineStyle.Single,
 			CanFocus = true
 		};
@@ -217,6 +215,7 @@ public class ProgressBarStyles : Scenario {
 			marqueesContinuousPB.Pulse ();
 			Application.Wakeup ();
 		}, null, 0, 300);
+
 
 		Application.Top.Unloaded += Top_Unloaded;
 
