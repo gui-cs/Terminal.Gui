@@ -35,7 +35,7 @@ public class Sliders : Scenario {
 			BorderStyle = LineStyle.Single
 		};
 
-		slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen,       Color.Black);
+		slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		slider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
 		slider.Options = new List<SliderOption<string>> {
@@ -79,7 +79,7 @@ public class Sliders : Scenario {
 		};
 		slider.SetOption (0); // Legends
 		slider.SetOption (1); // RangeAllowSingle
-		//slider.SetOption (3); // AutoSize
+				      //slider.SetOption (3); // AutoSize
 
 		#region Slider Orientation Slider
 		var slider_orientation_slider = new Slider<string> (new List<string> { "Horizontal", "Vertical" }) {
@@ -104,9 +104,7 @@ public class Sliders : Scenario {
 					s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.HLine };
 
 					if (prev == null) {
-						s.LayoutStyle = LayoutStyle.Absolute;
 						s.Y = 0;
-						s.LayoutStyle = LayoutStyle.Computed;
 					} else {
 						s.Y = Pos.Bottom (prev) + 1;
 					}
@@ -119,9 +117,7 @@ public class Sliders : Scenario {
 					s.Style.SpaceChar = new Cell { Rune = CM.Glyphs.VLine };
 
 					if (prev == null) {
-						s.LayoutStyle = LayoutStyle.Absolute;
 						s.X = 0;
-						s.LayoutStyle = LayoutStyle.Computed;
 					} else {
 						s.X = Pos.Right (prev) + 2;
 					}
@@ -199,7 +195,7 @@ public class Sliders : Scenario {
 			AutoSize = true
 		};
 
-		sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen,       Color.Black);
+		sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		sliderFGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
 		var colorOptions = new List<SliderOption<(Color, Color)>> ();
@@ -222,11 +218,11 @@ public class Sliders : Scenario {
 					s.ColorScheme = new ColorScheme (s.ColorScheme);
 					s.ColorScheme.Normal = new Attribute (data.Item2, s.ColorScheme.Normal.Background);
 
-					s.Style.OptionChar.Attribute = new Attribute (data.Item1,             s.ColorScheme.Normal.Background);
-					s.Style.SetChar.Attribute = new Attribute (data.Item1,                s.Style.SetChar.Attribute?.Background ?? s.ColorScheme.Normal.Background);
-					s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1,    s.ColorScheme.Normal.Background);
-					s.Style.RangeChar.Attribute = new Attribute (data.Item1,              s.ColorScheme.Normal.Background);
-					s.Style.SpaceChar.Attribute = new Attribute (data.Item1,              s.ColorScheme.Normal.Background);
+					s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+					s.Style.SetChar.Attribute = new Attribute (data.Item1, s.Style.SetChar.Attribute?.Background ?? s.ColorScheme.Normal.Background);
+					s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+					s.Style.RangeChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+					s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 					s.Style.LegendAttributes.NormalAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 				}
 			}
@@ -244,7 +240,7 @@ public class Sliders : Scenario {
 			AutoSize = true
 		};
 
-		sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen,       Color.Black);
+		sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		sliderBGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
 		sliderBGColor.Options = colorOptions;

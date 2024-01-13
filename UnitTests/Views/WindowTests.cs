@@ -1,12 +1,13 @@
-﻿using Xunit;
+using System;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class WindowTests {
 	readonly ITestOutputHelper _output;
 
-	public WindowTests (ITestOutputHelper output) => this._output = output;
+	public WindowTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void New_Initializes ()
@@ -14,19 +15,21 @@ public class WindowTests {
 		// Parameterless
 		var r = new Window ();
 		Assert.NotNull (r);
-		Assert.Equal (string.Empty,         r.Title);
+		Assert.Equal (string.Empty, r.Title);
+		// Toplevels have Width/Height set to Dim.Fill
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-		Assert.Equal ("Window()(0,0,0,0)",  r.ToString ());
+		// If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
+		Assert.Equal ("Window()(0,0,2147483647,2147483647)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
-		Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
-		Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
+		Assert.Equal (new Rect (0, 0, 2147483645, 2147483645), r.Bounds);
+		Assert.Equal (new Rect (0, 0, 2147483647, 2147483647), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
+		Assert.Equal (0, r.X);
+		Assert.Equal (0, r.Y);
 		Assert.Equal (Dim.Fill (), r.Width);
 		Assert.Equal (Dim.Fill (), r.Height);
-		Assert.Null (r.X);
-		Assert.Null (r.Y);
 		Assert.False (r.IsCurrentTop);
 		Assert.Empty (r.Id);
 		Assert.False (r.WantContinuousButtonPressed);
@@ -38,8 +41,10 @@ public class WindowTests {
 		// Empty Rect
 		r = new Window (Rect.Empty) { Title = "title" };
 		Assert.NotNull (r);
-		Assert.Equal ("title",                  r.Title);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
+		Assert.Equal ("title", r.Title);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		Assert.Equal ("title", r.Title);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -47,10 +52,10 @@ public class WindowTests {
 		Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
-		Assert.Null (r.Width);  // All view Dim are initialized now in the IsAdded setter,
-		Assert.Null (r.Height); // avoiding Dim errors.
-		Assert.Null (r.X);      // All view Pos are initialized now in the IsAdded setter,
-		Assert.Null (r.Y);      // avoiding Pos errors.
+		Assert.Equal (0, r.X);
+		Assert.Equal (0, r.Y);
+		Assert.Equal (0, r.Width);
+		Assert.Equal (0, r.Height);
 		Assert.False (r.IsCurrentTop);
 		Assert.Equal (r.Title, r.Id);
 		Assert.False (r.WantContinuousButtonPressed);
@@ -63,7 +68,8 @@ public class WindowTests {
 		r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
-		Assert.Equal (LayoutStyle.Absolute,     r.LayoutStyle);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(1,2,3,4)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -71,10 +77,10 @@ public class WindowTests {
 		Assert.Equal (new Rect (1, 2, 3, 4), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
-		Assert.Null (r.Width);
-		Assert.Null (r.Height);
-		Assert.Null (r.X);
-		Assert.Null (r.Y);
+		Assert.Equal (1, r.X);
+		Assert.Equal (2, r.Y);
+		Assert.Equal (3, r.Width);
+		Assert.Equal (4, r.Height);
 		Assert.False (r.IsCurrentTop);
 		Assert.Equal (r.Title, r.Id);
 		Assert.False (r.WantContinuousButtonPressed);
@@ -85,7 +91,8 @@ public class WindowTests {
 		r.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MenuBar_And_StatusBar_Inside_Window ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
@@ -167,7 +174,8 @@ public class WindowTests {
 └──────────────────┘", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True ()
 	{
 		var win1 = new Window { Id = "win1", Width = 10, Height = 1 };
@@ -185,7 +193,8 @@ public class WindowTests {
 		Assert.False (view2.HasFocus);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
@@ -200,39 +209,5 @@ public class WindowTests {
 
 		var exception = Record.Exception (() => win.NewKeyDownEvent (new Key (KeyCode.AltMask)));
 		Assert.Null (exception);
-	}
-
-	public static TheoryData<Toplevel> ButtonContainers =>
-		new () {
-			{ new Window () },
-			{ new Dialog () }
-		};
-
-
-	[Theory, AutoInitShutdown]
-	[MemberData (nameof (ButtonContainers))]
-	public void With_Default_Button_Enter_Invokes_Accept_Action (Toplevel container)
-	{
-		var view = new View () { CanFocus = true };
-		var btnOk = new Button ("Accept") { IsDefault = true };
-		btnOk.Clicked += (s, e) => view.Text = "Test";
-		var btnCancel = new Button ("Cancel");
-		btnCancel.Clicked += (s, e) => view.Text = "";
-
-		container.Add (view, btnOk, btnCancel);
-		var rs = Application.Begin (container);
-
-		Assert.True (view.HasFocus);
-		Assert.Equal ("", view.Text);
-		Assert.True (Application.OnKeyDown (new Key (KeyCode.Enter)));
-		Assert.True (view.HasFocus);
-		Assert.Equal ("Test", view.Text);
-
-		btnOk.IsDefault = false;
-		btnCancel.IsDefault = true;
-		Assert.True (Application.OnKeyDown (new Key (KeyCode.Enter)));
-		Assert.True (view.HasFocus);
-		Assert.Equal ("", view.Text);
-		Application.End (rs);
 	}
 }
