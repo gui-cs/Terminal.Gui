@@ -765,6 +765,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	}
 
 	/// <summary>
+<<<<<<< HEAD
 	/// Initializes a new instance from an existing instance.
 	/// </summary>
 	public Attribute (Attribute attr)
@@ -775,6 +776,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	}
 
 	/// <summary>
+=======
+>>>>>>> parent of 79b35dc5 (Initial work in progress)
 	/// Initializes a new instance with platform specific color value.
 	/// </summary>
 	/// <param name="platformColor">Value.</param>
