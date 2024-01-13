@@ -364,20 +364,21 @@ public class TreeViewFileSystem : Scenario {
 
 	void SetCustomColors ()
 	{
-		var hidden = new ColorScheme {
-			Focus = new Attribute (Color.BrightRed, _treeViewFiles.ColorScheme.Focus.Background),
-			Normal = new Attribute (Color.BrightYellow, _treeViewFiles.ColorScheme.Normal.Background)
-		};
-
 		_miCustomColors.Checked = !_miCustomColors.Checked;
 
 		if (_miCustomColors.Checked == true) {
 			_treeViewFiles.ColorGetter = (m) => {
 				if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) {
-					return hidden;
+					return new ColorScheme {
+						Focus = new Attribute (Color.BrightRed, _treeViewFiles.ColorScheme.Focus.Background),
+						Normal = new Attribute (Color.BrightYellow, _treeViewFiles.ColorScheme.Normal.Background)
+					}; ;
 				}
 				if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) {
-					return hidden;
+					return new ColorScheme {
+						Focus = new Attribute (Color.BrightRed, _treeViewFiles.ColorScheme.Focus.Background),
+						Normal = new Attribute (Color.BrightYellow, _treeViewFiles.ColorScheme.Normal.Background)
+					}; ;
 				}
 				return null;
 			};
