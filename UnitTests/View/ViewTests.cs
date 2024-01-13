@@ -862,7 +862,7 @@ public class ViewTests {
 		view.Dispose ();
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory, AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void Clear_Does_Not_Spillover_Its_Parent (bool label)

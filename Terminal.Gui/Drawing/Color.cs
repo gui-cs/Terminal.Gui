@@ -730,7 +730,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// <summary>
 	/// Default empty attribute.
 	/// </summary>
-	/// </remarks>
 	public static readonly Attribute Default = new (Color.White, Color.Black);
 
 	/// <summary>
@@ -767,17 +766,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	public Attribute (Attribute attr)
 	{
 		PlatformColor = -1;
-		Foreground = new Color (attr.Foreground.ColorName);
-		Background = new Color (attr.Background.ColorName);
-	}
-
-	/// <summary>
-	///  Initializes a new instance from an existing instance.
-	/// </summary>
-	public Attribute (Attribute attr)
-	{
-		PlatformColor = -1;
-		var d = Default;
 		Foreground = new Color (attr.Foreground.ColorName);
 		Background = new Color (attr.Background.ColorName);
 	}

@@ -111,7 +111,7 @@ public partial class View {
 	///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
 	///         </para>
 	/// </remarks>
-	public Frame Margin { get; private set; }
+	public Adornment Margin { get; private set; }
 
 	/// <summary>
 	/// The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the
@@ -145,12 +145,12 @@ public partial class View {
 	///         <para>
 	///         This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
 	///         than
-	///         <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Frame.Thickness"/>
+	///         <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Adornment.Thickness"/>
 	///         to `1` and <see cref="BorderStyle"/> to the value.
 	///         </para>
 	///         <para>
 	///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-	///         <see cref="Frame.Thickness"/>
+	///         <see cref="Adornment.Thickness"/>
 	///         to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
 	///         </para>
 	///         <para>
@@ -191,7 +191,7 @@ public partial class View {
 	///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
 	///         </para>
 	/// </remarks>
-	public Frame Padding { get; private set; }
+	public Adornment Padding { get; private set; }
 
 	/// <summary>
 	///         <para>
@@ -244,7 +244,7 @@ public partial class View {
 			Margin.ThicknessChanged -= ThicknessChangedHandler;
 			Margin.Dispose ();
 		}
-		Margin = new Frame () { Thickness = new Thickness (0) };
+		Margin = new Adornment () { Thickness = new Thickness (0) };
 		Margin.ThicknessChanged += ThicknessChangedHandler;
 		Margin.Parent = this;
 
@@ -262,7 +262,7 @@ public partial class View {
 			Padding.ThicknessChanged -= ThicknessChangedHandler;
 			Padding.Dispose ();
 		}
-		Padding = new Frame () { Thickness = new Thickness (0) };
+		Padding = new Adornment () { Thickness = new Thickness (0) };
 		Padding.ThicknessChanged += ThicknessChangedHandler;
 		Padding.Parent = this;
 	}

@@ -430,7 +430,7 @@ public partial class View : Responder, ISupportInitializeNotification {
 	///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
 	///         </para>
 	/// </remarks>
-	/// <param name="rect">Location.</param>
+	/// <param name="frame">Location.</param>
 	/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
 	public View (Rect frame, string text) => SetInitialProperties (text, frame, LayoutStyle.Absolute);
 

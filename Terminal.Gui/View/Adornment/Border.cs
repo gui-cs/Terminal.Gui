@@ -12,10 +12,10 @@ namespace Terminal.Gui;
 /// will be drawn. 
 /// </para>
 /// <para>
-/// See the <see cref="Frame"/> class. 
+/// See the <see cref="Adornment"/> class. 
 /// </para>
 /// </remarks>
-public class Border : Frame {
+public class Border : Adornment {
 	/// <summary>
 	/// Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for
 	/// setting the <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the
@@ -23,7 +23,7 @@ public class Border : Frame {
 	/// </summary>
 	public new LineStyle BorderStyle { get; set; } = LineStyle.None;
 
-	/// </inheritdoc>
+	/// <inheritdoc />
 	public override void OnDrawContent (Rect contentArea)
 	{
 		base.OnDrawContent (contentArea);

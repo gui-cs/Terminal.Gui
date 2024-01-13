@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 /// <see cref="View.Bounds"/>
 /// enabling borders, menus, etc...
 /// </summary>
-public class Frame : View {
+public class Adornment : View {
 	Thickness _thickness = Thickness.Empty;
 
 	/// <summary>
@@ -39,7 +39,7 @@ public class Frame : View {
 	}
 
 	/// <summary>
-	/// Defines the rectangle that the <see cref="Frame"/> will use to draw its content.
+	/// Defines the rectangle that the <see cref="Adornment"/> will use to draw its content.
 	/// </summary>
 	public Thickness Thickness {
 		get => _thickness;
@@ -145,7 +145,7 @@ public class Frame : View {
 	}
 
 	/// <summary>
-	/// Redraws the Frames that comprise the <see cref="Frame"/>.
+	/// Redraws the Frames that comprise the <see cref="Adornment"/>.
 	/// </summary>
 	public override void OnDrawContent (Rect contentArea)
 	{

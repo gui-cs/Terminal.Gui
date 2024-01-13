@@ -2,156 +2,38 @@
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
-public class FrameTests {
+public class BorderTests {
 	readonly ITestOutputHelper _output;
 
-	public FrameTests (ITestOutputHelper output)
+	public BorderTests (ITestOutputHelper output)
 	{
 		_output = output;
 	}
 
-	// Test FrameToScreen
-	[Theory]
-	[InlineData (0, 0, 0, 0)]
-	[InlineData (1, 0, 1, 0)]
-	[InlineData (0, 1, 0, 1)]
-	[InlineData (1, 1, 1, 1)]
-	[InlineData (10, 10, 10, 10)]
-	public void FrameToScreen_NoSuperView (int frameX, int frameY, int expectedScreenX, int expectedScreenY)
-	{
-		var view = new View () {
-			X = frameX,
-			Y = frameY,
-			Width = 10,
-			Height = 10
-		};
-		var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-		var actual = view.FrameToScreen ();
-		Assert.Equal (expected, actual);
-	}
-
-	[Theory]
-	[InlineData (0, 0, 0, 0, 0)]
-	[InlineData (1, 0, 0, 1, 1)]
-	[InlineData (2, 0, 0, 2, 2)]
-	[InlineData (1, 1, 0, 2, 1)]
-	[InlineData (1, 0, 1, 1, 2)]
-	[InlineData (1, 1, 1, 2, 2)]
-	[InlineData (1, 10, 10, 11, 11)]
-	public void FrameToScreen_SuperView (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
-	{
-		var super = new View() {
-			X = superOffset,
-			Y = superOffset,
-			Width = 20,
-			Height = 20
-		};
-		
-		var view = new View () {
-			X = frameX,
-			Y = frameY,
-			Width = 10,
-			Height = 10
-		};
-		super.Add (view);
-		var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-		var actual = view.FrameToScreen ();
-		Assert.Equal (expected, actual);
-	}
-
-	[Theory]
-	[InlineData (0, 0, 0, 1, 1)]
-	[InlineData (1, 0, 0, 2, 2)]
-	[InlineData (2, 0, 0, 3, 3)]
-	[InlineData (1, 1, 0, 3, 2)]
-	[InlineData (1, 0, 1, 2, 3)]
-	[InlineData (1, 1, 1, 3, 3)]
-	[InlineData (1, 10, 10, 12, 12)]
-	public void FrameToScreen_SuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
-	{
-		var super = new View () {
-			X = superOffset,
-			Y = superOffset,
-			Width = 20,
-			Height = 20,
-			BorderStyle = LineStyle.Single
-		};
-
-		var view = new View () {
-			X = frameX,
-			Y = frameY,
-			Width = 10,
-			Height = 10
-		};
-		super.Add (view);
-		var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-		var actual = view.FrameToScreen ();
-		Assert.Equal (expected, actual);
-	}
-
-	[Theory]
-	[InlineData (0, 0, 0, 2, 2)]
-	[InlineData (1, 0, 0, 4, 4)]
-	[InlineData (2, 0, 0, 6, 6)]
-	[InlineData (1, 1, 0, 5, 4)]
-	[InlineData (1, 0, 1, 4, 5)]
-	[InlineData (1, 1, 1, 5, 5)]
-	[InlineData (1, 10, 10, 14, 14)]
-	public void FrameToScreen_NestedSuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
-	{
-		var superSuper = new View () {
-			X = superOffset,
-			Y = superOffset,
-			Width = 30,
-			Height = 30,
-			BorderStyle = LineStyle.Single
-		};
-
-		var super = new View () {
-			X = superOffset,
-			Y = superOffset,
-			Width = 20,
-			Height = 20,
-			BorderStyle = LineStyle.Single
-		};
-		superSuper.Add (super);
-
-		var view = new View () {
-			X = frameX,
-			Y = frameY,
-			Width = 10,
-			Height = 10
-		};
-		super.Add (view);
-		var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
-		var actual = view.FrameToScreen ();
-		Assert.Equal (expected, actual);
-	}
-
-
 	[Fact]
-	public void GetFramesThickness ()
+	public void View_BorderStyle_Defaults ()
 	{
 		var view = new View ();
-		Assert.Equal (Thickness.Empty, view.GetFramesThickness ());
+		Assert.Equal (LineStyle.None, view.BorderStyle);
+		Assert.Equal (Thickness.Empty, view.Border.Thickness);
+		view.Dispose ();
+	}
 
-		view.Margin.Thickness = new Thickness (1);
-		Assert.Equal (new Thickness (1), view.GetFramesThickness ());
+	[Fact]
+	public void View_SetBorderStyle ()
+	{
+		var view = new View ();
+		view.BorderStyle = LineStyle.Single;
+		Assert.Equal (LineStyle.Single, view.BorderStyle);
+		Assert.Equal (new Thickness (1), view.Border.Thickness);
 
-		view.Border.Thickness = new Thickness (1);
-		Assert.Equal (new Thickness (2), view.GetFramesThickness ());
+		view.BorderStyle = LineStyle.Double;
+		Assert.Equal (LineStyle.Double, view.BorderStyle);
+		Assert.Equal (new Thickness (1), view.Border.Thickness);
 
-		view.Padding.Thickness = new Thickness (1);
-		Assert.Equal (new Thickness (3), view.GetFramesThickness ());
-
-		view.Padding.Thickness = new Thickness (2);
-		Assert.Equal (new Thickness (4), view.GetFramesThickness ());
-
-		view.Padding.Thickness = new Thickness (1, 2, 3, 4);
-		Assert.Equal (new Thickness (3, 4, 5, 6), view.GetFramesThickness ());
-
-		view.Margin.Thickness = new Thickness (1, 2, 3, 4);
-		Assert.Equal (new Thickness (3, 5, 7, 9), view.GetFramesThickness ());
+		view.BorderStyle = LineStyle.None;
+		Assert.Equal (LineStyle.None, view.BorderStyle);
+		Assert.Equal (Thickness.Empty, view.Border.Thickness);
 		view.Dispose ();
 	}
 
@@ -383,6 +265,77 @@ public class FrameTests {
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
+
+
+	[Theory]
+	[InlineData (0, 0, 0, 1, 1)]
+	[InlineData (1, 0, 0, 2, 2)]
+	[InlineData (2, 0, 0, 3, 3)]
+	[InlineData (1, 1, 0, 3, 2)]
+	[InlineData (1, 0, 1, 2, 3)]
+	[InlineData (1, 1, 1, 3, 3)]
+	[InlineData (1, 10, 10, 12, 12)]
+	public void FrameToScreen_SuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
+	{
+		var super = new View () {
+			X = superOffset,
+			Y = superOffset,
+			Width = 20,
+			Height = 20,
+			BorderStyle = LineStyle.Single
+		};
+
+		var view = new View () {
+			X = frameX,
+			Y = frameY,
+			Width = 10,
+			Height = 10
+		};
+		super.Add (view);
+		var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
+		var actual = view.FrameToScreen ();
+		Assert.Equal (expected, actual);
+	}
+
+	[Theory]
+	[InlineData (0, 0, 0, 2, 2)]
+	[InlineData (1, 0, 0, 4, 4)]
+	[InlineData (2, 0, 0, 6, 6)]
+	[InlineData (1, 1, 0, 5, 4)]
+	[InlineData (1, 0, 1, 4, 5)]
+	[InlineData (1, 1, 1, 5, 5)]
+	[InlineData (1, 10, 10, 14, 14)]
+	public void FrameToScreen_NestedSuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
+	{
+		var superSuper = new View () {
+			X = superOffset,
+			Y = superOffset,
+			Width = 30,
+			Height = 30,
+			BorderStyle = LineStyle.Single
+		};
+
+		var super = new View () {
+			X = superOffset,
+			Y = superOffset,
+			Width = 20,
+			Height = 20,
+			BorderStyle = LineStyle.Single
+		};
+		superSuper.Add (super);
+
+		var view = new View () {
+			X = frameX,
+			Y = frameY,
+			Width = 10,
+			Height = 10
+		};
+		super.Add (view);
+		var expected = new Rect (expectedScreenX, expectedScreenY, 10, 10);
+		var actual = view.FrameToScreen ();
+		Assert.Equal (expected, actual);
+	}
+
 
 	[Theory, AutoInitShutdown]
 	[InlineData (0)]
