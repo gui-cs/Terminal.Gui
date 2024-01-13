@@ -32,15 +32,91 @@ public class ProgressBarStyles : Scenario {
 		editor.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
 		const float fractionStep = 0.01F;
-		const int pbWidth = 25;
+
+		var pbList = new ListView () {
+			Title = "Focused ProgressBar",
+			Y = 0,
+			X = Pos.Center (),
+			Width = 30,
+			Height = 7,
+			BorderStyle = LineStyle.Single
+		};
+		pbList.SelectedItemChanged += (sender, e) => {
+			editor.ViewToEdit = editor.Subviews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == (string)e.Value);
+		};
+		editor.Add (pbList);
+		pbList.SelectedItem = 0;
+
+		#region ColorPicker
+		ColorName ChooseColor (string text, ColorName colorName)
+		{
+
+			var colorPicker = new ColorPicker {
+				Title = text,
+				SelectedColor = colorName
+			};
+
+			var dialog = new Dialog {
+				Title = text
+			};
+
+			dialog.LayoutComplete += (sender, args) => {
+				// TODO: Replace with Dim.Auto
+				dialog.X = pbList.Frame.X;
+				dialog.Y = pbList.Frame.Height;
+
+				dialog.Bounds = new Rect (0, 0, colorPicker.Frame.Width, colorPicker.Frame.Height);
+
+				Application.Top.LayoutSubviews ();
+			};
+
+			dialog.Add (colorPicker);
+			colorPicker.ColorChanged += (s, e) => {
+				dialog.RequestStop ();
+			};
+			Application.Run (dialog);
+
+			var retColor = colorPicker.SelectedColor;
+			colorPicker.Dispose ();
+
+			return retColor;
+		}
+
+		var fgColorPickerBtn = new Button {
+			Text = "Foreground HotNormal Color",
+			X = Pos.Center (),
+			Y = Pos.Bottom (pbList),
+		};
+		editor.Add (fgColorPickerBtn);
+		fgColorPickerBtn.Clicked += (s, e) => {
+			var newColor = ChooseColor (fgColorPickerBtn.Text, editor.ViewToEdit.ColorScheme.HotNormal.Foreground.ColorName);
+			var cs = new ColorScheme (editor.ViewToEdit.ColorScheme) {
+				HotNormal = new Attribute (newColor, editor.ViewToEdit.ColorScheme.HotNormal.Background)
+			};
+			editor.ViewToEdit.ColorScheme = cs;
+		};
+
+		var bgColorPickerBtn = new Button {
+			X = Pos.Center (),
+			Y = Pos.Bottom (fgColorPickerBtn),
+			Text = "Background HotNormal Color"
+		};
+		editor.Add (bgColorPickerBtn);
+		bgColorPickerBtn.Clicked += (s, e) => {
+			var newColor = ChooseColor (fgColorPickerBtn.Text, editor.ViewToEdit.ColorScheme.HotNormal.Background.ColorName);
+			var cs = new ColorScheme (editor.ViewToEdit.ColorScheme) {
+				HotNormal = new Attribute (editor.ViewToEdit.ColorScheme.HotNormal.Foreground, newColor)
+			};
+			editor.ViewToEdit.ColorScheme = cs;
+		};
+		#endregion
 
 		var pbFormatEnum = Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
-
 		var rbPBFormat = new RadioGroup (pbFormatEnum.Select (e => e.ToString ()).ToArray ()) {
-			X = Pos.Center (),
-			Y = 10,
-			Orientation = Orientation.Horizontal,
-			BorderStyle = LineStyle.Single
+			BorderStyle = LineStyle.Single,
+			Title = "ProgressBarFormat",
+			X = Pos.Left (pbList),
+			Y = Pos.Bottom (bgColorPickerBtn) + 1,
 		};
 		editor.Add (rbPBFormat);
 
@@ -54,8 +130,9 @@ public class ProgressBarStyles : Scenario {
 			Title = "Blocks",
 			X = Pos.Center (),
 			Y = Pos.Bottom (button) + 1,
-			Width = pbWidth,
-			BorderStyle = LineStyle.Single
+			Width = Dim.Width (pbList),
+			BorderStyle = LineStyle.Single,
+			CanFocus = true
 		};
 		editor.Add (blocksPB);
 
@@ -63,9 +140,10 @@ public class ProgressBarStyles : Scenario {
 			Title = "Continuous",
 			X = Pos.Center (),
 			Y = Pos.Bottom (blocksPB) + 1,
-			Width = pbWidth,
+			Width = Dim.Width (pbList),
 			ProgressBarStyle = ProgressBarStyle.Continuous,
-			BorderStyle = LineStyle.Single
+			BorderStyle = LineStyle.Single,
+			CanFocus = true
 		};
 		editor.Add (continuousPB);
 
@@ -99,9 +177,10 @@ public class ProgressBarStyles : Scenario {
 			Title = "Marquee Blocks",
 			X = Pos.Center (),
 			Y = Pos.Bottom (ckbBidirectional) + 1,
-			Width = pbWidth,
+			Width = Dim.Width (pbList),
 			ProgressBarStyle = ProgressBarStyle.MarqueeBlocks,
-			BorderStyle = LineStyle.Single
+			BorderStyle = LineStyle.Single,
+			CanFocus = true
 		};
 		editor.Add (marqueesBlocksPB);
 
@@ -109,11 +188,15 @@ public class ProgressBarStyles : Scenario {
 			Title = "Marquee Continuous",
 			X = Pos.Center (),
 			Y = Pos.Bottom (marqueesBlocksPB) + 1,
-			Width = pbWidth,
+			Width = Dim.Width (pbList),
 			ProgressBarStyle = ProgressBarStyle.MarqueeContinuous,
-			BorderStyle = LineStyle.Single
+			BorderStyle = LineStyle.Single,
+			CanFocus = true
 		};
 		editor.Add (marqueesContinuousPB);
+
+		pbList.SetSource (editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar)).Select (v => v.Title).ToList ());
+		pbList.SelectedItem = 0;
 
 		rbPBFormat.SelectedItemChanged += (s, e) => {
 			blocksPB.ProgressBarFormat = (ProgressBarFormat)e.SelectedItem;
@@ -133,6 +216,7 @@ public class ProgressBarStyles : Scenario {
 			Application.Wakeup ();
 		}, null, 0, 300);
 
+
 		Application.Top.Unloaded += Top_Unloaded;
 
 		void Top_Unloaded (object sender, EventArgs args)
@@ -148,24 +232,11 @@ public class ProgressBarStyles : Scenario {
 			Application.Top.Unloaded -= Top_Unloaded;
 		}
 
-		var pbs = editor.Subviews.Where (v => v.GetType () == typeof (ProgressBar)).Select (v => v.Title).ToList ();
-		var pbList = new ListView (pbs) {
-			Title = "Focused ProgressBar",
-			Y = 0,
-			X = Pos.Center (),
-			Width = 30,
-			Height = 7,
-			BorderStyle = LineStyle.Single
-		};
-		pbList.SelectedItemChanged += (sender, e) => {
-			editor.ViewToEdit = editor.Subviews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == (string)e.Value);
-		};
-		editor.Add (pbList);
-		pbList.SelectedItem = 0;
-
 		Application.Run (editor);
 		Application.Shutdown ();
 	}
 
-	public override void Run () { }
+	public override void Run ()
+	{
+	}
 }
