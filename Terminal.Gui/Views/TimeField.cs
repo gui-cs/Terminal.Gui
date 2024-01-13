@@ -174,7 +174,7 @@ public class TimeField : TextField {
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
 		if (CursorPosition < _fieldLen)
-			newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
+			newText = [.. newText, .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))];
 		return SetText (StringExtensions.ToString (newText));
 	}
 
@@ -188,7 +188,7 @@ public class TimeField : TextField {
 		bool isValidTime = true;
 		int hour = Int32.Parse (vals [0]);
 		int minute = Int32.Parse (vals [1]);
-		int second = _isShort ? 0 : vals.Length > 2 ? Int32.Parse (vals [2].ToString ()) : 0;
+		int second = _isShort ? 0 : vals.Length > 2 ? Int32.Parse (vals [2]) : 0;
 		if (hour < 0) {
 			isValidTime = false;
 			hour = 0;
@@ -219,8 +219,9 @@ public class TimeField : TextField {
 		string t = _isShort ? $" {hour,2:00}{_sepChar}{minute,2:00}" : $" {hour,2:00}{_sepChar}{minute,2:00}{_sepChar}{second,2:00}";
 
 		if (!TimeSpan.TryParseExact (t.Trim (), _format.Trim (), CultureInfo.CurrentCulture, TimeSpanStyles.None, out TimeSpan result) ||
-			!isValidTime)
+			!isValidTime) {
 			return false;
+		}
 		Time = result;
 		return true;
 	}
@@ -229,7 +230,7 @@ public class TimeField : TextField {
 	{
 		if (CursorPosition == _fieldLen)
 			return;
-		if (Text [++CursorPosition] == _sepChar.ToCharArray () [0])
+		if (Text [++CursorPosition] == _sepChar [0])
 			CursorPosition++;
 	}
 
@@ -237,13 +238,13 @@ public class TimeField : TextField {
 	{
 		if (CursorPosition == 1)
 			return;
-		if (Text [--CursorPosition] == _sepChar.ToCharArray () [0])
+		if (Text [--CursorPosition] == _sepChar [0])
 			CursorPosition--;
 	}
 
 	void AdjCursorPosition ()
 	{
-		if (Text [CursorPosition] == _sepChar.ToCharArray () [0])
+		if (Text [CursorPosition] == _sepChar [0])
 			CursorPosition++;
 	}
 
@@ -260,11 +261,7 @@ public class TimeField : TextField {
 			return true;
 		}
 
-		if (a.IsKeyCodeAtoZ) {
-			return true;
-		}
-
-		return false;
+		return a.IsKeyCodeAtoZ;
 	}
 
 	bool MoveRight ()
