@@ -1,4 +1,4 @@
-﻿//
+//
 // TimeField.cs: text entry for time
 //
 // Author: Jörg Preiß
@@ -359,7 +359,6 @@ public class TimeField : TextField {
 	{
 		if (ReadOnly) {
 			return;
-		}
 
 		ClearAllSelection ();
 		SetText ((Rune)'0');
@@ -372,7 +371,6 @@ public class TimeField : TextField {
 	{
 		if (ReadOnly) {
 			return;
-		}
 
 		ClearAllSelection ();
 		SetText ((Rune)'0');
