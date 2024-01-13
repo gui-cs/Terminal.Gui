@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Renders a border around the view including the <see cref="View.Title"/>. A border using <see cref="LineStyle"/>
+/// Renders a border around the view with the <see cref="View.Title"/>. A border using <see cref="LineStyle"/>
 /// will be drawn on the sides of <see cref="Thickness"/> that are greater than zero. 
 /// </para>
 /// <para>
