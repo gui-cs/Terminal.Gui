@@ -49,7 +49,7 @@ public class TimeField : TextField {
 	/// <param name="isShort">If true, the seconds are hidden. Sets the <see cref="IsShortFormat"/> property.</param>
 	public TimeField (int x, int y, TimeSpan time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
 	{
-		Initialize (time, isShort);
+		SetInitialProperties (time, isShort);
 	}
 
 	/// <summary>
@@ -59,7 +59,7 @@ public class TimeField : TextField {
 	public TimeField (TimeSpan time) : base (string.Empty)
 	{
 		Width = _fieldLen + 2;
-		Initialize (time);
+		SetInitialProperties (time);
 	}
 
 	/// <summary>
@@ -67,7 +67,7 @@ public class TimeField : TextField {
 	/// </summary>
 	public TimeField () : this (time: TimeSpan.MinValue) { }
 
-	void Initialize (TimeSpan time, bool isShort = false)
+	void SetInitialProperties (TimeSpan time, bool isShort = false)
 	{
 		CultureInfo cultureInfo = CultureInfo.CurrentCulture;
 		_sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
