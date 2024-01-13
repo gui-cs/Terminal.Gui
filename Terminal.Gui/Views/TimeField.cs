@@ -184,6 +184,7 @@ public class TimeField : TextField {
 			return false;
 		}
 
+		text = NormalizeFormat (text);
 		string [] vals = text.Split (_sepChar);
 		bool isValidTime = true;
 		int hour = Int32.Parse (vals [0]);
@@ -224,6 +225,30 @@ public class TimeField : TextField {
 		}
 		Time = result;
 		return true;
+	}
+
+	string NormalizeFormat (string text, string fmt = null, string sepChar = null)
+	{
+		if (string.IsNullOrEmpty (fmt)) {
+			fmt = _format;
+		}
+		fmt = fmt.Replace ("\\", "");
+		if (string.IsNullOrEmpty (sepChar)) {
+			sepChar = _sepChar;
+		}
+		if (fmt.Length != text.Length) {
+			return text;
+		}
+
+		var fmtText = text.ToCharArray ();
+		for (int i = 0; i < text.Length; i++) {
+			var c = fmt [i];
+			if (c.ToString () == sepChar && text [i].ToString () != sepChar) {
+				fmtText [i] = c;
+			}
+		}
+
+		return new string (fmtText);
 	}
 
 	void IncCursorPosition ()
