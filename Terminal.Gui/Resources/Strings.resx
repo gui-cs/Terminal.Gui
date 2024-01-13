@@ -277,4 +277,7 @@
   <data name="fdCtxSortDesc" xml:space="preserve">
     <value>_Sort {0} DESC</value>
   </data>
+  <data name="dpTitle" xml:space="preserve">
+    <value>Date Picker</value>
+  </data>
 </root>
