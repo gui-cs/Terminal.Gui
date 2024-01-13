@@ -5,7 +5,6 @@ using Xunit;
 namespace Terminal.Gui.DrawingTests;
 
 public class ColorTests {
-
 	[Fact]
 	public void Color_Is_Value_Type () =>
 		// prove that Color is a value type
@@ -24,7 +23,7 @@ public class ColorTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void ColorScheme_New ()
 	{
 		var scheme = new ColorScheme ();

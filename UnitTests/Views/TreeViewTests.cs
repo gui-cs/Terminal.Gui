@@ -696,7 +696,7 @@ public class TreeViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestGetObjectOnRow ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -746,7 +746,7 @@ public class TreeViewTests {
 		Assert.Null (tv.GetObjectOnRow (4));
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestGetObjectRow ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -807,7 +807,7 @@ public class TreeViewTests {
 		Assert.Equal (0, tv.GetObjectRow (n2));
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestTreeViewColor ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -877,7 +877,7 @@ public class TreeViewTests {
 ", Application.Driver, tv.ColorScheme.Normal, pink);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestBottomlessTreeView_MaxDepth_5 ()
 	{
 		var tv = new TreeView<string> { Width = 20, Height = 10 };
@@ -937,7 +937,7 @@ public class TreeViewTests {
 ", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestBottomlessTreeView_MaxDepth_3 ()
 	{
 		var tv = new TreeView<string> { Width = 20, Height = 10 };
@@ -970,7 +970,7 @@ public class TreeViewTests {
 ", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestTreeView_DrawLineEvent ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -1036,7 +1036,7 @@ public class TreeViewTests {
 		Assert.Equal ("root two", eventArgs [3].Model.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestTreeView_DrawLineEvent_WithScrolling ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -1098,7 +1098,7 @@ oot two
 		Assert.Equal ("root two", eventArgs [2].Model.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestTreeView_DrawLineEvent_Handled ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -1139,7 +1139,7 @@ FFFFFFFFFF
 ", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestTreeView_Filter ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };
@@ -1208,7 +1208,7 @@ FFFFFFFFFF
 ", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void DesiredCursorVisibility_MultiSelect ()
 	{
 		var tv = new TreeView { Width = 20, Height = 10 };

@@ -50,7 +50,8 @@ public class AttributeTests {
 		Assert.Equal (new Color (Color.Blue), attribute.Background);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ColorConstructor ()
 	{
 		// Arrange & Act
@@ -63,7 +64,8 @@ public class AttributeTests {
 		Assert.Equal (backgroundColor, attribute.Background);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ColorAndColorNamesConstructor ()
 	{
 		// Arrange & Act
@@ -288,7 +290,7 @@ public class AttributeTests {
 		Assert.False (attr2.Equals (attr1));
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Equals_Initialized ()
 	{
 		Assert.NotNull (Application.Driver);
@@ -300,7 +302,7 @@ public class AttributeTests {
 		Assert.True (attr2.Equals (attr1));
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void NotEquals_Initialized ()
 	{
 		var attr1 = new Attribute (Color.Red, Color.Green);
