@@ -47,7 +47,7 @@ public class OverlappedTests {
 		Application.Shutdown ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Application_RequestStop_With_Params_On_A_Not_OverlappedContainer_Always_Use_Application_Current ()
 	{
 		var top1 = new Toplevel ();
@@ -683,7 +683,7 @@ public class OverlappedTests {
 	[Fact]
 	public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter () => Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Visible_False_Does_Not_Clear ()
 	{
 		var overlapped = new Overlapped ();
