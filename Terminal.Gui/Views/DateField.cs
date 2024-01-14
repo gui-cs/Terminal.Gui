@@ -36,14 +36,6 @@ public class DateField : TextField {
 	public event EventHandler<DateTimeEventArgs<DateTime>> DateChanged;
 
 	/// <summary>
-	///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	/// <param name="date">Initial date contents.</param>
-	public DateField (int x, int y, DateTime date) : base (x, y, 12, "") => SetInitialProperties (date);
-
-	/// <summary>
 	///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
 	/// </summary>
 	public DateField () : this (DateTime.MinValue) { }
