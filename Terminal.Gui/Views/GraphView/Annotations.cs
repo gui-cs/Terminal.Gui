@@ -116,7 +116,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class LegendAnnotation : View, IAnnotation {
 		/// <summary>
-		/// Returns false i.e. Lengends render after series
+		/// Returns false i.e. Legends render after series
 		/// </summary>
 		public bool BeforeSeries => false;
 
@@ -192,7 +192,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Adds an entry into the legend.  Duplicate entries are permissable
+		/// Adds an entry into the legend.  Duplicate entries are permissible
 		/// </summary>
 		/// <param name="graphCellToRender">The symbol appearing on the graph that should appear in the legend</param>
 		/// <param name="text">Text to render on this line of the legend.  Will be truncated
