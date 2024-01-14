@@ -156,7 +156,7 @@ namespace Terminal.Gui {
 			}
 
 			if (BorderStyle != LineStyle.None) {
-				OnDrawFrames ();
+				OnDrawAdornments ();
 				OnRenderLineCanvas ();
 			}
 
