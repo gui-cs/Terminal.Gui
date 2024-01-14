@@ -216,7 +216,7 @@ partial class TestHelpers {
 		// If test is about to fail show user what things looked like
 		if (!string.Equals (expectedLook, actualLook)) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+			output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
 		}
 
 		Assert.Equal (expectedLook, actualLook);
@@ -321,7 +321,7 @@ partial class TestHelpers {
 		}
 
 		output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-		output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+		output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
 
 		Assert.Equal (expectedLook, actualLook);
 		return new Rect (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
@@ -362,10 +362,10 @@ partial class TestHelpers {
 				var match = expectedAttribute.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
-					throw new Exception ($"{DriverContentsToString (driver)}\n" + 
-					                     $"Unexpected Attribute {val} was used at row {line} and col {c} (indexes start at 0).  " +
-							     $"Color value was {val} (expected colors were " +
-							     $"{string.Join (",", expectedAttribute.Select (c => c.PlatformColor.ToString ()))})");
+					throw new Exception ($"{DriverContentsToString (driver)}\n" +
+					                     $"Attribute at Contents[{line},{c}] {contents [line, c]}'\n" +
+					                     $"  Expected: {string.Join (",", expectedAttribute.Select (c => c.PlatformColor.ToString ()))})" +
+					                     $"  But Was: {val}");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -375,9 +375,9 @@ partial class TestHelpers {
 
 				if (colorUsed != userExpected) {
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-						$"Attribute did not match at Contents[{line},{c}] {contents [line, c]}'\n" +
+						$"Attribute at Contents[{line},{c}] {contents [line, c]}'\n" +
 						$"  Expected: {userExpected} ({expectedAttribute [int.Parse (userExpected.ToString ())]})\n" +
-						$"  Actual:   {colorUsed} ({val})\n");
+						$"  But Was:   {colorUsed} ({val})\n");
 				}
 			}
 
@@ -446,7 +446,7 @@ partial class TestHelpers {
 		// If test is about to fail show user what things looked like
 		if (!string.Equals (expectedLook, actualLook)) {
 			output?.WriteLine ("Expected:" + Environment.NewLine + expectedLook);
-			output?.WriteLine ("But Was:" + Environment.NewLine + actualLook);
+			output?.WriteLine (" But Was:" + Environment.NewLine + actualLook);
 		}
 
 		Assert.Equal (expectedLook, actualLook);
