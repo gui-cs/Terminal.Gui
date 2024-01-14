@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			tabView.AddTab (new Tab ("Tab1", new Label ("hodor!")), false);
-			tabView.AddTab (new Tab ("Tab2", new Label ("durdur")), false);
+			tabView.AddTab (new Tab ("Tab2", new TextField ("durdur")), false);
 			tabView.AddTab (new Tab ("Interactive Tab", GetInteractiveTab ()), false);
 			tabView.AddTab (new Tab ("Big Text", GetBigTextFileTab ()), false);
 			tabView.AddTab (new Tab (

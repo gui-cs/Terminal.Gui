@@ -11,6 +11,7 @@ public class DrawTests {
 
 	public DrawTests (ITestOutputHelper output) => _output = output;
 
+	// TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
 	[Fact]
 	[AutoInitShutdown]
 	public void Clipping_AddRune_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
@@ -30,7 +31,8 @@ public class DrawTests {
 		var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
 		win.Add (tv);
 		Application.Top.Add (win);
-		var lbl = new Label ("ワイドルーン。");
+		// Don't use Label. It sets AutoSize = true which is not what we're testing here.
+		var lbl = new View ("ワイドルーン。");
 		// Don't have unit tests use things that aren't absolutely critical for the test, like Dialog
 		var dg = new Window () { X = 2, Y = 2, Width = 14, Height = 3 };
 		dg.Add (lbl);

@@ -68,13 +68,13 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (ckb.Checked);
 			Assert.False (toggled);
 			Assert.Equal (KeyCode.Null, ckb.HotKey);
-			
+
 			ckb.Text = "Test";
 			Assert.Equal (KeyCode.T, ckb.HotKey);
 			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.T)));
 			Assert.True (ckb.Checked);
 			Assert.True (toggled);
-			
+
 			ckb.Text = "T_est";
 			toggled = false;
 			Assert.Equal (KeyCode.E, ckb.HotKey);

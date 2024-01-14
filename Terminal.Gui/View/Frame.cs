@@ -58,7 +58,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override Rect FrameToScreen ()
 		{
-			// Frames are *Children* of a View, not SubViews. Thus View.FramToScreen will not work.
+			// Frames are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
 			// To get the screen-relative coordinates of a Frame, we need to know who
 			// the Parent is
 			var ret = Parent?.Frame ?? Frame;

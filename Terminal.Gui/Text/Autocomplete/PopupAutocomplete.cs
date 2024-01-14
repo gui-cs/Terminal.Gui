@@ -23,17 +23,6 @@ namespace Terminal.Gui {
 				WantMousePositionReports = true;
 			}
 
-			public override Rect Frame {
-				get => base.Frame;
-				set {
-					base.Frame = value;
-					X = value.X;
-					Y = value.Y;
-					Width = value.Width;
-					Height = value.Height;
-				}
-			}
-
 			public override void OnDrawContent (Rect contentArea)
 			{
 				if (autocomplete.LastPopupPos == null) {

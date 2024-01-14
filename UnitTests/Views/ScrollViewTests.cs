@@ -16,14 +16,10 @@ namespace Terminal.Gui.ViewsTests {
 		public void Constructors_Defaults ()
 		{
 			var sv = new ScrollView ();
-			Assert.Equal (LayoutStyle.Computed, sv.LayoutStyle);
+			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
 			Assert.Equal (Rect.Empty, sv.Frame);
-			Assert.Null (sv.X);
-			Assert.Null (sv.Y);
-			Assert.Null (sv.Width);
-			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
@@ -33,10 +29,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
-			Assert.Null (sv.X);
-			Assert.Null (sv.Y);
-			Assert.Null (sv.Width);
-			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
@@ -196,6 +188,8 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (sv);
 			Application.Begin (Application.Top);
 
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+
 			Assert.False (sv.AutoHideScrollBars);
 			Assert.True (sv.ShowHorizontalScrollIndicator);
 			Assert.True (sv.ShowVerticalScrollIndicator);
@@ -214,7 +208,9 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 
 			sv.ShowHorizontalScrollIndicator = false;
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
 			sv.ShowVerticalScrollIndicator = true;
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
 
 			Assert.False (sv.AutoHideScrollBars);
 			Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -223,6 +219,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (@"
          ▲
          ┬
+         │
          │
          │
          │
@@ -249,7 +246,7 @@ namespace Terminal.Gui.ViewsTests {
          
          
          
-◄├─────┤► 
+◄├──────┤► 
 ", output);
 
 			sv.ShowHorizontalScrollIndicator = false;
@@ -373,8 +370,6 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 		}
 
-		// BUGBUG: v2 - I can't figure out what this test is trying to test and it fails in weird ways
-		// Disabling for now
 		// There still have an issue with lower right corner of the scroll view
 		[Fact, AutoInitShutdown]
 		public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
@@ -467,8 +462,6 @@ namespace Terminal.Gui.ViewsTests {
 				return base.OnLeave (view);
 			}
 		}
-
-		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
 		// There are still issue with the lower right corner of the scroll view
 		[Fact, AutoInitShutdown]
 		public void Clear_Window_Inside_ScrollView ()

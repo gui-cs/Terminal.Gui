@@ -111,7 +111,6 @@ public class AllViewsTester : Scenario {
 		_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
 		_computedCheckBox.Toggled += (s, e) => {
 			if (_curView != null) {
-				_curView.LayoutStyle = e.OldValue == true ? LayoutStyle.Absolute : LayoutStyle.Computed;
 				_hostPane.LayoutSubviews ();
 			}
 		};
@@ -246,7 +245,7 @@ public class AllViewsTester : Scenario {
 		var layout = view.LayoutStyle;
 
 		try {
-			view.LayoutStyle = LayoutStyle.Absolute;
+			//view.LayoutStyle = LayoutStyle.Absolute;
 
 			view.X = _xRadioGroup.SelectedItem switch {
 				0 => Pos.Percent (_xVal),
@@ -280,14 +279,14 @@ public class AllViewsTester : Scenario {
 		} catch (Exception e) {
 			MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
 		} finally {
-			view.LayoutStyle = layout;
+			//view.LayoutStyle = layout;
 		}
 		UpdateTitle (view);
 	}
 
 	// TODO: This is missing some
-	List<string> _posNames = new() { "Factor", "AnchorEnd", "Center", "Absolute" };
-	List<string> _dimNames = new() { "Factor", "Fill", "Absolute" };
+	List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
+	List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
 
 	void UpdateSettings (View view)
 	{
@@ -388,10 +387,10 @@ public class AllViewsTester : Scenario {
 		//view.X = Pos.Center ();
 		//view.Y = Pos.Center ();
 		if (view.Width == null || view.Frame.Width == 0) {
-			view.Width = Dim.Fill();
+			view.Width = Dim.Fill ();
 		}
 		if (view.Height == null || view.Frame.Height == 0) {
-			view.Height = Dim.Fill();
+			view.Height = Dim.Fill ();
 		}
 		UpdateSettings (view);
 		UpdateTitle (view);

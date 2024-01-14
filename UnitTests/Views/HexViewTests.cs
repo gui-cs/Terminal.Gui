@@ -51,6 +51,8 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20,
 				Height = 20
 			};
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
 
 			Assert.Empty (hv.Edits);
 			hv.AllowEdits = false;
@@ -88,6 +90,8 @@ namespace Terminal.Gui.ViewsTests {
 				Width = 20,
 				Height = 20
 			};
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
 
 			Assert.Equal (0, hv.DisplayStart);
 
@@ -105,8 +109,11 @@ namespace Terminal.Gui.ViewsTests {
 		public void Edited_Event ()
 		{
 			var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
+
 			KeyValuePair<long, byte> keyValuePair = default;
-			hv.Edited += (s,e) => keyValuePair = new KeyValuePair<long, byte>(e.Position,e.NewValue);
+			hv.Edited += (s, e) => keyValuePair = new KeyValuePair<long, byte> (e.Position, e.NewValue);
 
 			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
 			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D6)));
@@ -120,6 +127,9 @@ namespace Terminal.Gui.ViewsTests {
 		public void DiscardEdits_Method ()
 		{
 			var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
+
 			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D4)));
 			Assert.True (hv.NewKeyDownEvent (new (KeyCode.D1)));
 			Assert.Single (hv.Edits);
@@ -135,6 +145,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void Position_Using_Encoding_Unicode ()
 		{
 			var hv = new HexView (LoadStream (true)) { Width = 20, Height = 20 };
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
 			Assert.Equal (126, hv.Source.Length);
 			Assert.Equal (126, hv.Source.Position);
 			Assert.Equal (1, hv.Position);
@@ -166,6 +178,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void Position_Using_Encoding_Default ()
 		{
 			var hv = new HexView (LoadStream ()) { Width = 20, Height = 20 };
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
 			Assert.Equal (63, hv.Source.Length);
 			Assert.Equal (63, hv.Source.Position);
 			Assert.Equal (1, hv.Position);
@@ -376,6 +390,9 @@ namespace Terminal.Gui.ViewsTests {
 			original.CopyTo (copy);
 			copy.Flush ();
 			var hv = new HexView (copy) { Width = Dim.Fill (), Height = Dim.Fill () };
+			// Needed because HexView relies on LayoutComplete to calc sizes
+			hv.LayoutSubviews ();
+
 			byte [] readBuffer = new byte [hv.Source.Length];
 			hv.Source.Position = 0;
 			hv.Source.Read (readBuffer);

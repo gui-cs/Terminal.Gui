@@ -1,264 +1,254 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Terminal.Gui;
-using Xunit;
 using System.Globalization;
+using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests {
+namespace Terminal.Gui.ViewsTests;
 
-	public class TabViewTests {
-		readonly ITestOutputHelper output;
+public class TabViewTests {
+	readonly ITestOutputHelper output;
 
-		public TabViewTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+	public TabViewTests (ITestOutputHelper output) => this.output = output;
 
-		private TabView GetTabView ()
-		{
-			return GetTabView (out _, out _);
-		}
+	TabView GetTabView () => GetTabView (out _, out _);
 
-		private TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true)
-		{
-			if (initFakeDriver) {
-				InitFakeDriver ();
-			}
-
-			var tv = new TabView ();
-			tv.BeginInit ();
-			tv.EndInit ();
-			tv.ColorScheme = new ColorScheme ();
-			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
-			tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);
-			return tv;
-		}
-
-		[Fact]
-		public void AddTwoTabs_SecondIsSelected ()
-		{
+	TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true)
+	{
+		if (initFakeDriver) {
 			InitFakeDriver ();
-
-			var tv = new TabView ();
-			Tab tab1;
-			Tab tab2;
-			tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
-			tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")), true);
-
-			Assert.Equal (2, tv.Tabs.Count);
-			Assert.Equal (tab2, tv.SelectedTab);
-
-			Application.Shutdown ();
 		}
 
-		[Fact]
-		public void EnsureSelectedTabVisible_NullSelect ()
-		{
-			var tv = GetTabView ();
+		var tv = new TabView ();
+		tv.BeginInit ();
+		tv.EndInit ();
+		tv.ColorScheme = new ColorScheme ();
+		tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi") { Width = 2 }), false);
+		tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);
+		return tv;
+	}
 
-			tv.SelectedTab = null;
+	[Fact]
+	public void AddTwoTabs_SecondIsSelected ()
+	{
+		InitFakeDriver ();
 
-			Assert.Null (tv.SelectedTab);
-			Assert.Equal (0, tv.TabScrollOffset);
+		var tv = new TabView ();
+		Tab tab1;
+		Tab tab2;
+		tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
+		tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")), true);
 
-			tv.EnsureSelectedTabIsVisible ();
+		Assert.Equal (2, tv.Tabs.Count);
+		Assert.Equal (tab2, tv.SelectedTab);
 
-			Assert.Null (tv.SelectedTab);
-			Assert.Equal (0, tv.TabScrollOffset);
+		Application.Shutdown ();
+	}
 
-			Application.Shutdown ();
-		}
+	[Fact]
+	public void EnsureSelectedTabVisible_NullSelect ()
+	{
+		var tv = GetTabView ();
 
-		[Fact]
-		public void EnsureSelectedTabVisible_MustScroll ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+		tv.SelectedTab = null;
 
-			// Make tab width small to force only one tab visible at once
-			tv.Width = 4;
+		Assert.Null (tv.SelectedTab);
+		Assert.Equal (0, tv.TabScrollOffset);
 
-			tv.SelectedTab = tab1;
-			Assert.Equal (0, tv.TabScrollOffset);
-			tv.EnsureSelectedTabIsVisible ();
-			Assert.Equal (0, tv.TabScrollOffset);
+		tv.EnsureSelectedTabIsVisible ();
 
-			// Asking to show tab2 should automatically move scroll offset accordingly
-			tv.SelectedTab = tab2;
-			Assert.Equal (1, tv.TabScrollOffset);
+		Assert.Null (tv.SelectedTab);
+		Assert.Equal (0, tv.TabScrollOffset);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		Application.Shutdown ();
+	}
 
-		[Fact]
-		public void SelectedTabChanged_Called ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+	[Fact]
+	public void EnsureSelectedTabVisible_MustScroll ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			tv.SelectedTab = tab1;
+		// Make tab width small to force only one tab visible at once
+		tv.Width = 4;
 
-			Tab oldTab = null;
-			Tab newTab = null;
-			int called = 0;
+		tv.SelectedTab = tab1;
+		Assert.Equal (0, tv.TabScrollOffset);
+		tv.EnsureSelectedTabIsVisible ();
+		Assert.Equal (0, tv.TabScrollOffset);
 
-			tv.SelectedTabChanged += (s, e) => {
-				oldTab = e.OldTab;
-				newTab = e.NewTab;
-				called++;
-			};
+		// Asking to show tab2 should automatically move scroll offset accordingly
+		tv.SelectedTab = tab2;
+		Assert.Equal (1, tv.TabScrollOffset);
 
-			tv.SelectedTab = tab2;
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-			Assert.Equal (1, called);
-			Assert.Equal (tab1, oldTab);
-			Assert.Equal (tab2, newTab);
+	[Fact]
+	public void SelectedTabChanged_Called ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		tv.SelectedTab = tab1;
 
-		[Fact]
-		public void RemoveTab_ChangesSelection ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+		Tab oldTab = null;
+		Tab newTab = null;
+		var called = 0;
 
-			tv.SelectedTab = tab1;
-			tv.RemoveTab (tab1);
+		tv.SelectedTabChanged += (s, e) => {
+			oldTab = e.OldTab;
+			newTab = e.NewTab;
+			called++;
+		};
 
-			Assert.Equal (tab2, tv.SelectedTab);
+		tv.SelectedTab = tab2;
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		Assert.Equal (1, called);
+		Assert.Equal (tab1, oldTab);
+		Assert.Equal (tab2, newTab);
 
-		[Fact]
-		public void RemoveTab_MultipleCalls_NotAnError ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-			tv.SelectedTab = tab1;
+	[Fact]
+	public void RemoveTab_ChangesSelection ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			// Repeated calls to remove a tab that is not part of
-			// the collection should be ignored
-			tv.RemoveTab (tab1);
-			tv.RemoveTab (tab1);
-			tv.RemoveTab (tab1);
-			tv.RemoveTab (tab1);
+		tv.SelectedTab = tab1;
+		tv.RemoveTab (tab1);
 
-			Assert.Equal (tab2, tv.SelectedTab);
+		Assert.Equal (tab2, tv.SelectedTab);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-		[Fact]
-		public void RemoveAllTabs_ClearsSelection ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+	[Fact]
+	public void RemoveTab_MultipleCalls_NotAnError ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			tv.SelectedTab = tab1;
-			tv.RemoveTab (tab1);
-			tv.RemoveTab (tab2);
+		tv.SelectedTab = tab1;
 
-			Assert.Null (tv.SelectedTab);
+		// Repeated calls to remove a tab that is not part of
+		// the collection should be ignored
+		tv.RemoveTab (tab1);
+		tv.RemoveTab (tab1);
+		tv.RemoveTab (tab1);
+		tv.RemoveTab (tab1);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		Assert.Equal (tab2, tv.SelectedTab);
 
-		[Fact]
-		public void SwitchTabBy_NormalUsage ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-			Tab tab3;
-			Tab tab4;
-			Tab tab5;
+	[Fact]
+	public void RemoveAllTabs_ClearsSelection ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			tv.AddTab (tab3 = new Tab (), false);
-			tv.AddTab (tab4 = new Tab (), false);
-			tv.AddTab (tab5 = new Tab (), false);
+		tv.SelectedTab = tab1;
+		tv.RemoveTab (tab1);
+		tv.RemoveTab (tab2);
 
-			tv.SelectedTab = tab1;
+		Assert.Null (tv.SelectedTab);
 
-			int called = 0;
-			tv.SelectedTabChanged += (s, e) => { called++; };
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-			tv.SwitchTabBy (1);
+	[Fact]
+	public void SwitchTabBy_NormalUsage ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			Assert.Equal (1, called);
-			Assert.Equal (tab2, tv.SelectedTab);
+		Tab tab3;
+		Tab tab4;
+		Tab tab5;
 
-			//reset called counter
-			called = 0;
+		tv.AddTab (tab3 = new Tab (), false);
+		tv.AddTab (tab4 = new Tab (), false);
+		tv.AddTab (tab5 = new Tab (), false);
 
-			// go right 2
-			tv.SwitchTabBy (2);
+		tv.SelectedTab = tab1;
 
-			// even though we go right 2 indexes the event should only be called once
-			Assert.Equal (1, called);
-			Assert.Equal (tab4, tv.SelectedTab);
+		var called = 0;
+		tv.SelectedTabChanged += (s, e) => { called++; };
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		tv.SwitchTabBy (1);
 
-		[Fact]
-		public void AddTab_SameTabMoreThanOnce ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+		Assert.Equal (1, called);
+		Assert.Equal (tab2, tv.SelectedTab);
 
-			Assert.Equal (2, tv.Tabs.Count);
+		//reset called counter
+		called = 0;
 
-			// Tab is already part of the control so shouldn't result in duplication
-			tv.AddTab (tab1, false);
-			tv.AddTab (tab1, false);
-			tv.AddTab (tab1, false);
-			tv.AddTab (tab1, false);
+		// go right 2
+		tv.SwitchTabBy (2);
 
-			Assert.Equal (2, tv.Tabs.Count);
+		// even though we go right 2 indexes the event should only be called once
+		Assert.Equal (1, called);
+		Assert.Equal (tab4, tv.SelectedTab);
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-		[Fact]
-		public void SwitchTabBy_OutOfTabsRange ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2);
+	[Fact]
+	public void AddTab_SameTabMoreThanOnce ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-			tv.SelectedTab = tab1;
-			tv.SwitchTabBy (500);
+		Assert.Equal (2, tv.Tabs.Count);
 
-			Assert.Equal (tab2, tv.SelectedTab);
+		// Tab is already part of the control so shouldn't result in duplication
+		tv.AddTab (tab1, false);
+		tv.AddTab (tab1, false);
+		tv.AddTab (tab1, false);
+		tv.AddTab (tab1, false);
 
-			tv.SwitchTabBy (-500);
+		Assert.Equal (2, tv.Tabs.Count);
 
-			Assert.Equal (tab1, tv.SelectedTab);
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
 
-			// Shutdown must be called to safely clean up Application if Init has been called
-			Application.Shutdown ();
-		}
+	[Fact]
+	public void SwitchTabBy_OutOfTabsRange ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2);
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
-			tv.Width = 10;
-			tv.Height = 5;
+		tv.SelectedTab = tab1;
+		tv.SwitchTabBy (500);
 
-			// Ensures that the tab bar subview gets the bounds of the parent TabView
-			tv.LayoutSubviews ();
+		Assert.Equal (tab2, tv.SelectedTab);
+
+		tv.SwitchTabBy (-500);
+
+		Assert.Equal (tab1, tv.SelectedTab);
+
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
+		tv.Width = 10;
+		tv.Height = 5;
+
+		// Ensures that the tab bar subview gets the bounds of the parent TabView
+		tv.LayoutSubviews ();
 
 			// Test two tab names that fit 
 			tab1.DisplayText = "12";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭──┬──╮   
@@ -267,9 +257,9 @@ namespace Terminal.Gui.ViewsTests {
 │hi      │
 └────────┘", output);
 
-			tv.SelectedTab = tab2;
+		tv.SelectedTab = tab2;
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭──┬──╮   
@@ -283,7 +273,7 @@ namespace Terminal.Gui.ViewsTests {
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭───────╮ 
@@ -292,9 +282,9 @@ namespace Terminal.Gui.ViewsTests {
 │hi      │
 └────────┘", output);
 
-			//switch to tab2
-			tv.SelectedTab = tab2;
-			tv.Draw ();
+		//switch to tab2
+		tv.SelectedTab = tab2;
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭──╮      
@@ -307,7 +297,7 @@ namespace Terminal.Gui.ViewsTests {
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "abcdefghijklmnopq";
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭───────╮ 
@@ -315,25 +305,26 @@ namespace Terminal.Gui.ViewsTests {
 ◄       ╰╮
 │hi2     │
 └────────┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
-			tv.Width = 10;
-			tv.Height = 5;
-			tv.Style = new TabStyle { ShowTopLine = false };
-			tv.ApplyStyleChanges ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
+		tv.Width = 10;
+		tv.Height = 5;
+		tv.Style = new TabStyle { ShowTopLine = false };
+		tv.ApplyStyleChanges ();
 
-			// Ensures that the tab bar subview gets the bounds of the parent TabView
-			tv.LayoutSubviews ();
+		// Ensures that the tab bar subview gets the bounds of the parent TabView
+		tv.LayoutSubviews ();
 
 			// Test two tab names that fit 
 			tab1.DisplayText = "12";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │12│13│   
@@ -342,9 +333,9 @@ namespace Terminal.Gui.ViewsTests {
 │        │
 └────────┘", output);
 
-			tv.SelectedTab = tab2;
+		tv.SelectedTab = tab2;
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 │12│13│   
@@ -353,26 +344,26 @@ namespace Terminal.Gui.ViewsTests {
 │        │
 └────────┘", output);
 
-			tv.SelectedTab = tab1;
+		tv.SelectedTab = tab1;
 
 			// Test first tab name too long
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │1234567│ 
 │       ╰►
 │hi      │
 │        │
 └────────┘", output);
 
-			//switch to tab2
-			tv.SelectedTab = tab2;
-			tv.Draw ();
+		//switch to tab2
+		tv.SelectedTab = tab2;
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │13│      
 ◄  ╰─────╮
 │hi2     │
@@ -383,25 +374,26 @@ namespace Terminal.Gui.ViewsTests {
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "abcdefghijklmnopq";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │abcdefg│ 
 ◄       ╰╮
 │hi2     │
 │        │
 └────────┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 4;
-			tv.Height = 5;
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 4;
+		tv.Height = 5;
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭─╮ 
@@ -409,37 +401,39 @@ namespace Terminal.Gui.ViewsTests {
 │ ╰►
 │hi│
 └──┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 4;
-			tv.Height = 5;
-			tv.Style = new TabStyle { ShowTopLine = false };
-			tv.ApplyStyleChanges ();
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 4;
+		tv.Height = 5;
+		tv.Style = new TabStyle { ShowTopLine = false };
+		tv.ApplyStyleChanges ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │T│ 
 │ ╰►
 │hi│
 │  │
 └──┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 3;
-			tv.Height = 5;
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 3;
+		tv.Height = 5;
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭╮ 
@@ -447,47 +441,49 @@ namespace Terminal.Gui.ViewsTests {
 │╰►
 │h│
 └─┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 3;
-			tv.Height = 5;
-			tv.Style = new TabStyle { ShowTopLine = false };
-			tv.ApplyStyleChanges ();
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 3;
+		tv.Height = 5;
+		tv.Style = new TabStyle { ShowTopLine = false };
+		tv.ApplyStyleChanges ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ││ 
 │╰►
 │h│
 │ │
 └─┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
-			tv.Width = 10;
-			tv.Height = 5;
-			tv.Style = new TabStyle { TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
+		tv.Width = 10;
+		tv.Height = 5;
+		tv.Style = new TabStyle { TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
 
-			// Ensures that the tab bar subview gets the bounds of the parent TabView
-			tv.LayoutSubviews ();
+		// Ensures that the tab bar subview gets the bounds of the parent TabView
+		tv.LayoutSubviews ();
 
 			// Test two tab names that fit 
 			tab1.DisplayText = "12";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │  ╭──┬──╯
@@ -498,20 +494,20 @@ namespace Terminal.Gui.ViewsTests {
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │       ╭►
 │1234567│ 
 ╰───────╯ ", output);
 
-			//switch to tab2
-			tv.SelectedTab = tab2;
-			tv.Draw ();
+		//switch to tab2
+		tv.SelectedTab = tab2;
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 ◄  ╭─────╯
@@ -522,9 +518,9 @@ namespace Terminal.Gui.ViewsTests {
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "abcdefghijklmnopq";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 ◄       ╭╯
@@ -532,62 +528,63 @@ namespace Terminal.Gui.ViewsTests {
 ╰───────╯ ", output);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
-			tv.Width = 10;
-			tv.Height = 5;
-			tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
+		tv.Width = 10;
+		tv.Height = 5;
+		tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
 
-			// Ensures that the tab bar subview gets the bounds of the parent TabView
-			tv.LayoutSubviews ();
+		// Ensures that the tab bar subview gets the bounds of the parent TabView
+		tv.LayoutSubviews ();
 
 			// Test two tab names that fit 
 			tab1.DisplayText = "12";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │        │
 │  ╭──┬──╯
 │12│13│   ", output);
 
-			tv.SelectedTab = tab2;
+		tv.SelectedTab = tab2;
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 │        │
 ├──╮  ╭──╯
 │12│13│   ", output);
 
-			tv.SelectedTab = tab1;
+		tv.SelectedTab = tab1;
 
 			// Test first tab name too long
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "13";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
 │        │
 │       ╭►
 │1234567│ ", output);
 
-			//switch to tab2
-			tv.SelectedTab = tab2;
-			tv.Draw ();
+		//switch to tab2
+		tv.SelectedTab = tab2;
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 │        │
@@ -598,29 +595,30 @@ namespace Terminal.Gui.ViewsTests {
 			tab1.DisplayText = "12345678910";
 			tab2.DisplayText = "abcdefghijklmnopq";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
 │        │
 ◄       ╭╯
 │abcdefg│ ", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 4;
-			tv.Height = 5;
-			tv.Style = new TabStyle { TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 4;
+		tv.Height = 5;
+		tv.Style = new TabStyle { TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐
 │hi│
 │ ╭►
@@ -628,39 +626,41 @@ namespace Terminal.Gui.ViewsTests {
 ╰─╯ ", output);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 4;
-			tv.Height = 5;
-			tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 4;
+		tv.Height = 5;
+		tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐
 │hi│
 │  │
 │ ╭►
 │T│ ", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 3;
-			tv.Height = 5;
-			tv.Style = new TabStyle { TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 3;
+		tv.Height = 5;
+		tv.Style = new TabStyle { TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌─┐
 │h│
 │╭►
@@ -668,39 +668,41 @@ namespace Terminal.Gui.ViewsTests {
 ╰╯ ", output);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
-		{
-			var tv = GetTabView (out _, out _, false);
-			tv.Width = 3;
-			tv.Height = 5;
-			tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
-			tv.LayoutSubviews ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
+	{
+		var tv = GetTabView (out _, out _, false);
+		tv.Width = 3;
+		tv.Height = 5;
+		tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌─┐
 │h│
 │ │
 │╭►
 ││ ", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
-			tv.Width = 20;
-			tv.Height = 5;
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
+		tv.Width = 20;
+		tv.Height = 5;
 
-			tv.LayoutSubviews ();
+		tv.LayoutSubviews ();
 
 			tab1.DisplayText = "Tab0";
 			tab2.DisplayText = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭────╮              
@@ -709,9 +711,9 @@ namespace Terminal.Gui.ViewsTests {
 │hi                │
 └──────────────────┘", output);
 
-			tv.SelectedTab = tab2;
+		tv.SelectedTab = tab2;
 
-			tv.Draw ();
+		tv.Draw ();
 
 			TestHelpers.AssertDriverContentsWithFrameAre (@"
 ╭──────────────╮    
@@ -719,36 +721,37 @@ namespace Terminal.Gui.ViewsTests {
 ◄              ╰───╮
 │hi2               │
 └──────────────────┘", output);
-		}
+	}
 
-		[Fact, AutoInitShutdown]
-		public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
-			tv.Width = 20;
-			tv.Height = 5;
-			tv.Style = new TabStyle { TabsOnBottom = true };
-			tv.ApplyStyleChanges ();
+	[Fact]
+	[AutoInitShutdown]
+	public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
+		tv.Width = 20;
+		tv.Height = 5;
+		tv.Style = new TabStyle { TabsOnBottom = true };
+		tv.ApplyStyleChanges ();
 
-			tv.LayoutSubviews ();
+		tv.LayoutSubviews ();
 
 			tab1.DisplayText = "Tab0";
 			tab2.DisplayText = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │hi                │
 │    ╭─────────────►
 │Tab0│              
 ╰────╯              ", output);
 
-			tv.SelectedTab = tab2;
+		tv.SelectedTab = tab2;
 
-			tv.Draw ();
+		tv.Draw ();
 
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │hi2               │
 ◄              ╭───╯
@@ -756,17 +759,18 @@ namespace Terminal.Gui.ViewsTests {
 ╰──────────────╯    ", output);
 		}
 
-		[Fact, AutoInitShutdown]
-		public void MouseClick_ChangesTab ()
-		{
-			var tv = GetTabView (out var tab1, out var tab2, false);
+	[Fact]
+	[AutoInitShutdown]
+	public void MouseClick_ChangesTab ()
+	{
+		var tv = GetTabView (out var tab1, out var tab2, false);
 
-			tv.Width = 20;
-			tv.Height = 5;
+		tv.Width = 20;
+		tv.Height = 5;
 
-			tv.LayoutSubviews ();
+		tv.LayoutSubviews ();
 
-			tv.Draw ();
+		tv.Draw ();
 
 			var tabRow = tv.Subviews [0];
 			Assert.Equal ("TabRowView", tabRow.GetType ().Name);
@@ -1165,11 +1169,10 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 		}
 
-		private void InitFakeDriver ()
-		{
-			var driver = new FakeDriver ();
-			Application.Init (driver);
-			driver.Init ();
-		}
+	void InitFakeDriver ()
+	{
+		var driver = new FakeDriver ();
+		Application.Init (driver);
+		driver.Init ();
 	}
 }
