@@ -18,16 +18,30 @@ public class Adornments : Scenario {
 
 		var view = new Window { Title = "The Window" };
 		var tf1 = new TextField ("TextField") { Width = 10 };
+		var color = new ColorPicker () { Title = "BG", BoxHeight = 1, BoxWidth =1, X = Pos.AnchorEnd(11) };
+		color.BorderStyle = LineStyle.RoundedDotted;
+		color.ColorChanged += (s, e) => {
+			color.SuperView.ColorScheme = new ColorScheme (color.SuperView.ColorScheme) {
+				Normal = new Attribute(color.SuperView.ColorScheme.Normal.Foreground, e.Color)
+			};
+		};
 
 		var button = new Button ("Press me!") {
 			X = Pos.Center (),
 			Y = Pos.Center ()
 		};
 		button.Clicked += (s, e) => MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
-		var label = new Label ($"I'm a {view.GetType ().Name}") {
+
+		var label = new TextView () {
 			X = Pos.Center (),
-			Y = Pos.Center () - 1
+			Y = Pos.Bottom (button),
+			Title = "Title",
+			Text = "I have a 3 row top border.\nMy border inherits from the SuperView.",
+			Width = 40,
+			Height = 6 // TODO: Use Dim.Auto
 		};
+		label.Border.Thickness = new Thickness (1, 3, 1, 1);
+
 		var tf2 = new Button ("Button") {
 			X = Pos.AnchorEnd (10),
 			Y = Pos.AnchorEnd (1),
@@ -49,7 +63,7 @@ public class Adornments : Scenario {
 		view.Padding.Data = "Padding";
 		view.Padding.Thickness = new Thickness (3);
 
-		view.Add (tf1, button, label, tf2, tv);
+		view.Add (tf1, color, button, label, tf2, tv);
 
 		var editor = new AdornmentsEditor {
 			Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
