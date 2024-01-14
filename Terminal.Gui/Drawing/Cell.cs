@@ -40,4 +40,7 @@ public class Cell {
 	/// been modified since the last time it was drawn.
 	/// </summary>
 	public bool IsDirty { get; set; }
+
+	/// <inheritdoc />
+	public override string ToString () => $"[{Rune}, {Attribute}]";
 }

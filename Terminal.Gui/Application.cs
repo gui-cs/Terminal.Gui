@@ -109,7 +109,7 @@ public static partial class Application {
 	/// </para>
 	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
 	/// <param name="driverName">The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
-	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (Toplevel.Create, driver, driverName);
+	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (() => new Toplevel (), driver, driverName);
 
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
@@ -194,6 +194,10 @@ public static partial class Application {
 
 		Top = topLevelFactory ();
 		Current = Top;
+
+		// Ensure Top's layout is up to date.
+		Current.SetRelativeLayout (Driver.Bounds);
+
 		_cachedSupportedCultures = GetSupportedCultures ();
 		_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 		_initialized = true;
@@ -397,9 +401,9 @@ public static partial class Application {
 			MoveCurrent (Current);
 		}
 
-		if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-			Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
-		}
+		//if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
+		Toplevel.SetRelativeLayout (Driver.Bounds);
+		//}
 		Toplevel.LayoutSubviews ();
 		Toplevel.PositionToplevels ();
 		Toplevel.FocusFirst ();
@@ -443,7 +447,7 @@ public static partial class Application {
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
 	/// Must be <see langword="null"/> if <see cref="Init"/> has already been called. 
 	/// </param>
-	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
+	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new()
 	{
 		if (_initialized) {
 			if (Driver != null) {
@@ -710,7 +714,7 @@ public static partial class Application {
 					&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 					&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
-			state.Toplevel.Clear (new Rect (Point.Empty, new Size (Driver.Cols, Driver.Rows)));
+			state.Toplevel.Clear (Driver.Bounds);
 		}
 
 		if (state.Toplevel.NeedsDisplay ||
@@ -1223,7 +1227,7 @@ public static partial class Application {
 			}
 		}
 
-		bool FrameHandledMouseEvent (Frame frame)
+		bool FrameHandledMouseEvent (Adornment frame)
 		{
 			if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
 				var boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
@@ -1334,7 +1338,8 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
@@ -1358,7 +1363,8 @@ public static partial class Application {
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
@@ -1382,7 +1388,8 @@ public static partial class Application {
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key QuitKey {
 		get => _quitKey;
 		set {

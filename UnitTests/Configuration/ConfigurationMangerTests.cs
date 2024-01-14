@@ -297,7 +297,7 @@ public class ConfigurationManagerTests {
 		Assert.Equal (pi, Themes ["Default"] ["ColorSchemes"].PropertyInfo);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestConfigurationManagerToJson ()
 	{
 		Reset ();
@@ -307,14 +307,14 @@ public class ConfigurationManagerTests {
 		Settings.Update (stream, "TestConfigurationManagerToJson");
 	}
 
-	[Fact] [AutoInitShutdown (configLocation: ConfigLocations.None)]
+	[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
 	public void TestConfigurationManagerInitDriver_NoLocations ()
 	{
 
 
 	}
 
-	[Fact] [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
+	[Fact, AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
 	public void TestConfigurationManagerInitDriver ()
 	{
 		Assert.Equal ("Default", Themes.Theme);
@@ -518,7 +518,7 @@ public class ConfigurationManagerTests {
 		Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestConfigurationManagerInvalidJsonThrows ()
 	{
 		ThrowOnJsonErrors = true;
@@ -690,7 +690,7 @@ public class ConfigurationManagerTests {
 		ThrowOnJsonErrors = false;
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
 	{
 		//var _configFilename = "config.json";

@@ -70,6 +70,8 @@ public class Dialog : Window {
 		Modal = true;
 		ButtonAlignment = DefaultButtonAlignment;
 
+		KeyBindings.Add (Key.Esc, Command.QuitToplevel);
+
 		if (buttons != null) {
 			foreach (var b in buttons) {
 				AddButton (b);
@@ -104,6 +106,7 @@ public class Dialog : Window {
 		//button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
 		buttons.Add (button);
 		Add (button);
+
 		SetNeedsDisplay ();
 		if (IsInitialized) {
 			LayoutSubviews ();
@@ -227,17 +230,5 @@ public class Dialog : Window {
 			}
 			break;
 		}
-	}
-
-	// BUGBUG: Why is this not handled by a key binding???
-	///<inheritdoc/>
-	public override bool OnProcessKeyDown (Key a)
-	{
-		switch (a.KeyCode) {
-		case KeyCode.Esc:
-			Application.RequestStop (this);
-			return true;
-		}
-		return false;
 	}
 }

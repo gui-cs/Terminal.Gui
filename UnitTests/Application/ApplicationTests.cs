@@ -489,7 +489,7 @@ public class ApplicationTests {
 			// 1
 			Colors.Base.Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 1111100000
 1111100000
 1111100000
@@ -518,7 +518,7 @@ public class ApplicationTests {
 			// 1
 			Colors.Base.Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
 0111110000
 0111110000
@@ -566,12 +566,10 @@ public class ApplicationTests {
 	}
 	#endregion
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Begin_Sets_Application_Top_To_Console_Size ()
 	{
 		Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
-
-		((FakeDriver)Application.Driver).SetBufferSize (5, 5);
 		Application.Begin (Application.Top);
 		Assert.Equal (new Rect (0, 0, 80, 25), Application.Top.Frame);
 		((FakeDriver)Application.Driver).SetBufferSize (5, 5);
