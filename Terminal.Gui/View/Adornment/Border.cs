@@ -77,7 +77,7 @@ public class Border : Adornment {
 	/// setting the <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the
 	/// views that comprise the border. If set to <see cref="LineStyle.None"/> no border will be drawn.
 	/// </summary>
-	public new LineStyle LineStyle {
+	public LineStyle LineStyle {
 		get {
 			if (_lineStyle.HasValue) {
 				return _lineStyle.Value;

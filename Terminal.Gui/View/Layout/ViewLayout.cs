@@ -211,7 +211,7 @@ public partial class View {
 	/// This internal method is overridden by Adornment to do nothing to prevent recursion during View construction.
 	/// And, because Adornments don't have Adornments. It's internal to support unit tests.
 	/// </summary>
-	/// <param name="adornment"></param>
+	/// <param name="adornmentType"></param>
 	/// <exception cref="ArgumentNullException"></exception>
 	/// <exception cref="ArgumentException"></exception>
 	internal virtual Adornment CreateAdornment (Type adornmentType)
