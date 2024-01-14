@@ -147,6 +147,28 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute {
 	}
 }
 
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+public class TestDateAttribute : Xunit.Sdk.BeforeAfterTestAttribute
+{
+    CultureInfo _currentCulture = CultureInfo.CurrentCulture;
+
+    public TestDateAttribute()
+    {
+        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+    }
+
+    public override void Before(MethodInfo methodUnderTest)
+    {
+		Assert.Equal(CultureInfo.CurrentCulture, CultureInfo.InvariantCulture);
+    }
+
+    public override void After(MethodInfo methodUnderTest)
+    {
+        CultureInfo.CurrentCulture = _currentCulture;
+        Assert.Equal(CultureInfo.CurrentCulture, _currentCulture);
+    }
+}
+
 partial class TestHelpers {
 	[GeneratedRegex ("\\s+$", RegexOptions.Multiline)]
 	private static partial Regex TrailingWhiteSpaceRegEx ();
