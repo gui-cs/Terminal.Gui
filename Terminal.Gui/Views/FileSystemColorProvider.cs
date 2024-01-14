@@ -443,10 +443,16 @@ namespace Terminal.Gui {
 
 		private static Color StringToColor (string str)
 		{
-			if (!Color.TryParse (str, out var c)) {
-				throw new System.Exception ("Failed to parse Color from " + str);
+			if ( !Color.TryParse ( str, out var c ) ) {
+				ThrowFormatException ( str );
 			}
-			return c;
+			return c.Value;
+
+			[DoesNotReturn]
+			static void ThrowFormatException ( string s )
+			{
+				throw new FormatException ( $"Failed to parse Color from {s}" );
+			}
 		}
 	}
 }

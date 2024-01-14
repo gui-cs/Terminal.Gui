@@ -1,4 +1,3 @@
-﻿global using Attribute = Terminal.Gui.Attribute;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -288,7 +287,7 @@ public readonly struct Color : IEquatable<Color> {
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Color"/> color from string. See <see cref="TryParse(string, out Color)"/>
+	/// Initializes a new instance of the <see cref="Color"/> color from string. See <see cref="TryParse(string, out Color?)"/>
 	/// for details.
 	/// </summary>
 	/// <param name="colorString"></param>
@@ -298,10 +297,10 @@ public readonly struct Color : IEquatable<Color> {
 		if (!TryParse (colorString, out var c)) {
 			throw new ArgumentOutOfRangeException (nameof (colorString));
 		}
-		R = c.R;
-		G = c.G;
-		B = c.B;
-		A = c.A;
+		R = c.Value.R;
+		G = c.Value.G;
+		B = c.Value.B;
+		A = c.Value.A;
 	}
 
 	/// <summary>
@@ -425,6 +424,7 @@ public readonly struct Color : IEquatable<Color> {
 
 		return Math.Sqrt (deltaR * deltaR + deltaG * deltaG + deltaB * deltaB);
 	}
+#nullable enable
 
 	/// <summary>
 	/// Converts the provided string to a new <see cref="Color"/> instance.
@@ -439,11 +439,11 @@ public readonly struct Color : IEquatable<Color> {
 	/// <remarks>
 	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
 	/// </remarks>
-	public static bool TryParse (string text, [NotNullWhen (true)] out Color color)
+	public static bool TryParse (string? text, [NotNullWhen (true)] out Color? color)
 	{
 		// empty color
 		if (string.IsNullOrEmpty (text)) {
-			color = new Color ();
+			color = null;
 			return false;
 		}
 
@@ -519,6 +519,7 @@ public readonly struct Color : IEquatable<Color> {
 		color = new Color ();
 		return false;
 	}
+    #nullable restore
 
 	/// <summary>
 	/// Converts the color to a string representation.
