@@ -112,7 +112,7 @@ public class ColorPicker : View {
 		AddCommands ();
 		AddKeyBindings ();
 		LayoutStarted += (o, a) => {
-			var thickness = GetFramesThickness ();
+			var thickness = GetAdornmentsThickness ();
 			Width = _cols * BoxWidth + thickness.Vertical;
 			Height = _rows * BoxHeight + thickness.Horizontal;
 		};

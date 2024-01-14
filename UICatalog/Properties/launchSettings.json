@@ -69,6 +69,10 @@
     "ListView & ComboBox": {
       "commandName": "Project",
       "commandLineArgs": "\"ListView & ComboBox\""
+    },
+    "Frames Demo": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Frames Demo\""
     }
   }
 }

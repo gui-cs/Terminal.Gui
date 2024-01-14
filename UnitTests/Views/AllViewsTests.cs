@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Terminal.Gui.Views;
 using Xunit;
 using Xunit.Abstractions;
 

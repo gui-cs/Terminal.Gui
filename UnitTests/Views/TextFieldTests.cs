@@ -59,14 +59,14 @@ public class TextFieldTests {
 			};
 
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("0000000", driver: Application.Driver, attributes);
 		_textField.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
 		bool first = true;
 		Application.RunIteration (ref rs, ref first);
 		Assert.Equal (4, _textField.CursorPosition);
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("1111000", driver: Application.Driver, attributes);
 	}
 
 	[Fact]

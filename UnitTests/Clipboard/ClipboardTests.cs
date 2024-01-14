@@ -13,21 +13,21 @@ public class ClipboardTests {
 		this.output = output;
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
+	[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
 	public void IClipboard_GetClipBoardData_Throws_NotSupportedException ()
 	{
 		var iclip = Application.Driver.Clipboard;
 		Assert.Throws<NotSupportedException> (() => iclip.GetClipboardData ());
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
+	[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
 	public void IClipboard_SetClipBoardData_Throws_NotSupportedException ()
 	{
 		var iclip = Application.Driver.Clipboard;
 		Assert.Throws<NotSupportedException> (() => iclip.SetClipboardData ("foo"));
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: true)]
+	[Fact, AutoInitShutdown (useFakeClipboard: true)]
 	public void Contents_Fake_Gets_Sets ()
 	{
 		if (!Clipboard.IsSupported) {
@@ -44,7 +44,7 @@ public class ClipboardTests {
 		Assert.Equal (clipText, Clipboard.Contents);
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: false)]
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
 	public void Contents_Gets_Sets ()
 	{
 		if (!Clipboard.IsSupported) {
@@ -61,7 +61,7 @@ public class ClipboardTests {
 		Assert.Equal (clipText, Clipboard.Contents);
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: false)]
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
 	public void Contents_Gets_Sets_When_IsSupportedFalse ()
 	{
 
@@ -79,7 +79,7 @@ public class ClipboardTests {
 		Assert.Equal (clipText, Clipboard.Contents);
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: true)]
+	[Fact, AutoInitShutdown (useFakeClipboard: true)]
 	public void Contents_Fake_Gets_Sets_When_IsSupportedFalse ()
 	{
 
@@ -97,7 +97,7 @@ public class ClipboardTests {
 		Assert.Equal (clipText, Clipboard.Contents);
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: false)]
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
 	public void IsSupported_Get ()
 	{
 		if (Clipboard.IsSupported) {
@@ -107,7 +107,7 @@ public class ClipboardTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: false)]
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
 	public void TryGetClipboardData_Gets_From_OS_Clipboard ()
 	{
 		string clipText = "The TryGetClipboardData_Gets_From_OS_Clipboard unit test pasted this to the OS clipboard.";
@@ -126,7 +126,7 @@ public class ClipboardTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown (useFakeClipboard: false)]
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
 	public void TrySetClipboardData_Sets_The_OS_Clipboard ()
 	{
 		string clipText = "The TrySetClipboardData_Sets_The_OS_Clipboard unit test pasted this to the OS clipboard.";
