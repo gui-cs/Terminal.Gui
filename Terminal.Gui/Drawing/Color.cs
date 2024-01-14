@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -442,7 +442,7 @@ public readonly struct Color : IEquatable<Color> {
 	public static bool TryParse (string? text, [NotNullWhen (true)] out Color? color)
 	{
 		// empty color
-		if (string.IsNullOrEmpty (text)) {
+		if (string.IsNullOrWhiteSpace(text)) {
 			color = null;
 			return false;
 		}
