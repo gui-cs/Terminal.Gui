@@ -34,7 +34,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			df.IsShortFormat = false;
 			Assert.Equal (new Rect (3, 4, 12, 1), df.Frame);
-			Assert.Equal(12, df.Width);
+			Assert.Equal (12, df.Width);
 		}
 
 		[Fact]
