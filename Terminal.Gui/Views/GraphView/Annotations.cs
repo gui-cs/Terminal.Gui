@@ -145,7 +145,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		/// Draws the Legend and all entries into the area within <see cref="Bounds"/>
+		/// Draws the Legend and all entries into the area within <see cref="View.Bounds"/>
 		/// </summary>
 		/// <param name="graph"></param>
 		public void Render (GraphView graph)
@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 				Application.Driver.AddStr (str);
 
 				linesDrawn++;
-
+				
 				// Legend has run out of space
 				if (linesDrawn >= Bounds.Height) {
 					break;
@@ -196,7 +196,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="graphCellToRender">The symbol appearing on the graph that should appear in the legend</param>
 		/// <param name="text">Text to render on this line of the legend.  Will be truncated
-		/// if outside of Legend <see cref="Bounds"/></param>
+		/// if outside of Legend <see cref="View.Bounds"/></param>
 		public void AddEntry (GraphCellToRender graphCellToRender, string text)
 		{
 			_entries.Add (Tuple.Create (graphCellToRender, text));
