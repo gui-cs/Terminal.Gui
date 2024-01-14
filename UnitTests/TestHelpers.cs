@@ -363,9 +363,9 @@ partial class TestHelpers {
 				switch (match.Count) {
 				case 0:
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-					                     $"Attribute at Contents[{line},{c}] {contents [line, c]}'\n" +
-					                     $"  Expected: {string.Join (",", expectedAttribute.Select (c => c.PlatformColor.ToString ()))})" +
-					                     $"  But Was: {val}");
+					                     $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]}' was not found.\n" +
+							     $"  Expected: {string.Join (",", expectedAttribute.Select (c => c))}\n" +
+					                     $"  But Was: <not found>");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
@@ -375,7 +375,7 @@ partial class TestHelpers {
 
 				if (colorUsed != userExpected) {
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-						$"Attribute at Contents[{line},{c}] {contents [line, c]}'\n" +
+						$"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.'\n" +
 						$"  Expected: {userExpected} ({expectedAttribute [int.Parse (userExpected.ToString ())]})\n" +
 						$"  But Was:   {colorUsed} ({val})\n");
 				}

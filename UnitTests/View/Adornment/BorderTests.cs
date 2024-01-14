@@ -673,14 +673,33 @@ public class BorderTests {
 		Application.End (rs);
 	}
 
-	[Fact]
+	[Fact, SetupFakeDriver]
 	public void Border_Uses_Parent_ColorScheme ()
 	{
-		var view = new View ();
-		view.ColorScheme = Colors.Error;
+		var view = new View () {
+			Title = "A",
+			Height = 2,
+			Width = 5
+		};
+		view.Border.Thickness = new Thickness (0, 1, 0, 0);
+		view.Border.LineStyle = LineStyle.Single;
+		view.ColorScheme = new ColorScheme () {
+			Normal = new Attribute (Color.Red, Color.Green),
+			Focus = new Attribute (Color.Green, Color.Red),
+		};
 		Assert.Equal (Colors.Error.Normal.Foreground, view.ColorScheme.Normal.Foreground);
+		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.ColorName);
+		Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.ColorName);
 		Assert.Equal (view.GetNormalColor(), view.Border.GetNormalColor ());
-		Assert.Equal (view.GetHotNormalColor (), view.Border.GetHotNormalColor ());
+		Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
+
+		view.BeginInit ();
+		view.EndInit ();
+		view.Draw ();
+
+		var expected = @"─┤A├─";
+		TestHelpers.AssertDriverContentsAre (expected, _output);
+		TestHelpers.AssertDriverAttributesAre ("00000", null, view.ColorScheme.Normal);
 	}
 
 	[Fact, SetupFakeDriver]
@@ -694,12 +713,12 @@ public class BorderTests {
 		view.Border.Thickness = new Thickness (0, 1, 0, 0);
 		view.Border.LineStyle = LineStyle.Single;
 		view.ColorScheme = new ColorScheme () {
-			Normal = new Attribute (Color.White, Color.Black),
-			Focus = new Attribute (Color.Black, Color.White),
+			Normal = new Attribute (Color.Red, Color.Green),
+			Focus = new Attribute (Color.Green, Color.Red),
 		};
 		Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
-		Assert.Equal (view.ColorScheme.Focus.Foreground, view.Border.GetFocusColor ().Foreground);
-		Assert.Equal (view.ColorScheme.Normal.Foreground, view.Border.GetNormalColor ().Foreground);
+		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.ColorName);
+		Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.ColorName);
 		Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 
 		view.BeginInit ();
