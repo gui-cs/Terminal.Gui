@@ -890,5 +890,3 @@ public readonly struct Attribute : IEquatable<Attribute> {
 		// Note, Unit tests are dependent on this format
 		$"[{Foreground},{Background}]";
 }
-
-}
