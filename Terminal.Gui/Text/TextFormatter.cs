@@ -1100,6 +1100,7 @@ namespace Terminal.Gui {
 			set {
 				var textWasNull = _text == null && value != null;
 				_text = EnableNeedsFormat (value);
+
 				if ((AutoSize && Alignment != TextAlignment.Justified && VerticalAlignment != VerticalTextAlignment.Justified) || (textWasNull && Size.IsEmpty)) {
 					Size = CalcRect (0, 0, _text, Direction, TabWidth).Size;
 				}
