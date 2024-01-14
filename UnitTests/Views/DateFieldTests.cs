@@ -20,7 +20,7 @@ public class DateFieldTests {
 		Assert.Equal (new Rect (0, 0, 12, 1), df.Frame);
 		Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
-		df = new DateField (1, 2, date);
+		df = new DateField (date) { X = 1, Y = 2 };
 		Assert.Equal (date, df.Date);
 		Assert.Equal (1, df.CursorPosition);
 		Assert.Equal (new Rect (1, 2, 12, 1), df.Frame);
