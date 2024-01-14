@@ -262,7 +262,7 @@ namespace Terminal.Gui {
 			if (a.IsKeyCodeAtoZ) {
 				return true;
 			}
-
+			
 			return false;
 		}
 

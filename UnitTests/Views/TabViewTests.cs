@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class TabViewTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public TabViewTests (ITestOutputHelper output) => this.output = output;
+	public TabViewTests (ITestOutputHelper output) => this._output = output;
 
 	TabView GetTabView () => GetTabView (out _, out _);
 
@@ -255,7 +255,7 @@ public class TabViewTests {
 │12│13│   
 │  ╰──┴──╮
 │hi      │
-└────────┘", output);
+└────────┘", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -266,7 +266,7 @@ public class TabViewTests {
 │12│13│   
 ├──╯  ╰──╮
 │hi2     │
-└────────┘", output);
+└────────┘", _output);
 
 			tv.SelectedTab = tab1;
 			// Test first tab name too long
@@ -280,7 +280,7 @@ public class TabViewTests {
 │1234567│ 
 │       ╰►
 │hi      │
-└────────┘", output);
+└────────┘", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -291,7 +291,7 @@ public class TabViewTests {
 │13│      
 ◄  ╰─────╮
 │hi2     │
-└────────┘", output);
+└────────┘", _output);
 
 			// now make both tabs too long
 			tab1.DisplayText = "12345678910";
@@ -304,7 +304,7 @@ public class TabViewTests {
 │abcdefg│ 
 ◄       ╰╮
 │hi2     │
-└────────┘", output);
+└────────┘", _output);
 	}
 
 	[Fact]
@@ -331,7 +331,7 @@ public class TabViewTests {
 │  ╰──┴──╮
 │hi      │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -342,7 +342,7 @@ public class TabViewTests {
 ├──╯  ╰──╮
 │hi2     │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 		tv.SelectedTab = tab1;
 
@@ -357,7 +357,7 @@ public class TabViewTests {
 │       ╰►
 │hi      │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -368,7 +368,7 @@ public class TabViewTests {
 ◄  ╰─────╮
 │hi2     │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 			// now make both tabs too long
 			tab1.DisplayText = "12345678910";
@@ -381,7 +381,7 @@ public class TabViewTests {
 ◄       ╰╮
 │hi2     │
 │        │
-└────────┘", output);
+└────────┘", _output);
 	}
 
 	[Fact]
@@ -400,7 +400,7 @@ public class TabViewTests {
 │T│ 
 │ ╰►
 │hi│
-└──┘", output);
+└──┘", _output);
 	}
 
 	[Fact]
@@ -421,7 +421,7 @@ public class TabViewTests {
 │ ╰►
 │hi│
 │  │
-└──┘", output);
+└──┘", _output);
 	}
 
 	[Fact]
@@ -440,7 +440,7 @@ public class TabViewTests {
 ││ 
 │╰►
 │h│
-└─┘", output);
+└─┘", _output);
 	}
 
 	[Fact]
@@ -461,7 +461,7 @@ public class TabViewTests {
 │╰►
 │h│
 │ │
-└─┘", output);
+└─┘", _output);
 	}
 
 	[Fact]
@@ -488,7 +488,7 @@ public class TabViewTests {
 │hi      │
 │  ╭──┬──╯
 │12│13│   
-╰──┴──╯   ", output);
+╰──┴──╯   ", _output);
 
 			// Test first tab name too long
 			tab1.DisplayText = "12345678910";
@@ -501,7 +501,7 @@ public class TabViewTests {
 │hi      │
 │       ╭►
 │1234567│ 
-╰───────╯ ", output);
+╰───────╯ ", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -512,7 +512,7 @@ public class TabViewTests {
 │hi2     │
 ◄  ╭─────╯
 │13│      
-╰──╯      ", output);
+╰──╯      ", _output);
 
 			// now make both tabs too long
 			tab1.DisplayText = "12345678910";
@@ -525,7 +525,7 @@ public class TabViewTests {
 │hi2     │
 ◄       ╭╯
 │abcdefg│ 
-╰───────╯ ", output);
+╰───────╯ ", _output);
 		}
 
 	[Fact]
@@ -552,7 +552,7 @@ public class TabViewTests {
 │hi      │
 │        │
 │  ╭──┬──╯
-│12│13│   ", output);
+│12│13│   ", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -563,7 +563,7 @@ public class TabViewTests {
 │hi2     │
 │        │
 ├──╮  ╭──╯
-│12│13│   ", output);
+│12│13│   ", _output);
 
 		tv.SelectedTab = tab1;
 
@@ -578,7 +578,7 @@ public class TabViewTests {
 │hi      │
 │        │
 │       ╭►
-│1234567│ ", output);
+│1234567│ ", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -589,7 +589,7 @@ public class TabViewTests {
 │hi2     │
 │        │
 ◄  ╭─────╯
-│13│      ", output);
+│13│      ", _output);
 
 			// now make both tabs too long
 			tab1.DisplayText = "12345678910";
@@ -602,7 +602,7 @@ public class TabViewTests {
 │hi2     │
 │        │
 ◄       ╭╯
-│abcdefg│ ", output);
+│abcdefg│ ", _output);
 	}
 
 	[Fact]
@@ -623,7 +623,7 @@ public class TabViewTests {
 │hi│
 │ ╭►
 │T│ 
-╰─╯ ", output);
+╰─╯ ", _output);
 		}
 
 	[Fact]
@@ -644,7 +644,7 @@ public class TabViewTests {
 │hi│
 │  │
 │ ╭►
-│T│ ", output);
+│T│ ", _output);
 	}
 
 	[Fact]
@@ -665,7 +665,7 @@ public class TabViewTests {
 │h│
 │╭►
 ││ 
-╰╯ ", output);
+╰╯ ", _output);
 		}
 
 	[Fact]
@@ -686,7 +686,7 @@ public class TabViewTests {
 │h│
 │ │
 │╭►
-││ ", output);
+││ ", _output);
 	}
 
 	[Fact]
@@ -709,7 +709,7 @@ public class TabViewTests {
 │Tab0│              
 │    ╰─────────────►
 │hi                │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -720,7 +720,7 @@ public class TabViewTests {
 │Les Misérables│    
 ◄              ╰───╮
 │hi2               │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 	}
 
 	[Fact]
@@ -745,7 +745,7 @@ public class TabViewTests {
 │hi                │
 │    ╭─────────────►
 │Tab0│              
-╰────╯              ", output);
+╰────╯              ", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -756,7 +756,7 @@ public class TabViewTests {
 │hi2               │
 ◄              ╭───╯
 │Les Misérables│    
-╰──────────────╯    ", output);
+╰──────────────╯    ", _output);
 		}
 
 	[Fact]
@@ -781,7 +781,7 @@ public class TabViewTests {
 │    ╰────┴────────╮
 │hi                │
 └──────────────────┘
-", output);
+", _output);
 
 			Tab clicked = null;
 
@@ -878,7 +878,7 @@ public class TabViewTests {
 │    ╰►
 │hi   │
 └─────┘
-", output);
+", _output);
 
 			Tab clicked = null;
 
@@ -915,7 +915,7 @@ public class TabViewTests {
 ◄    ╰╮
 │hi2  │
 └─────┘
-", output);
+", _output);
 
 			// Click the left arrow
 			args = new MouseEventEventArgs (new MouseEvent {
@@ -935,7 +935,7 @@ public class TabViewTests {
 │    ╰►
 │hi   │
 └─────┘
-", output);
+", _output);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -964,7 +964,7 @@ public class TabViewTests {
 ││hi   ││
 │└─────┘│
 └───────┘
-", output);
+", _output);
 
 			Tab clicked = null;
 
@@ -1003,7 +1003,7 @@ public class TabViewTests {
 ││hi2  ││
 │└─────┘│
 └───────┘
-", output);
+", _output);
 
 			// Click the left arrow
 			args = new MouseEventEventArgs (new MouseEvent {
@@ -1025,7 +1025,7 @@ public class TabViewTests {
 ││hi   ││
 │└─────┘│
 └───────┘
-", output);
+", _output);
 		}
 
 		[Fact]
