@@ -840,7 +840,7 @@ public class TreeViewTests {
 └─pink
 ", _output);
 		// Should all be the same color
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
 0000000000
 0000000000
@@ -869,7 +869,7 @@ public class TreeViewTests {
 ", _output);
 		// but now the item (only not lines) appear
 		// in pink when they are the word "pink"
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 00000000
 00001111
 0000000000

@@ -489,7 +489,7 @@ public class ApplicationTests {
 			// 1
 			Colors.Base.Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 1111100000
 1111100000
 1111100000
@@ -518,7 +518,7 @@ public class ApplicationTests {
 			// 1
 			Colors.Base.Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
 0111110000
 0111110000

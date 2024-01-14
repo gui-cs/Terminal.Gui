@@ -43,6 +43,8 @@ public class FakeDriver : ConsoleDriver {
 
 	public FakeDriver ()
 	{
+		Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 		if (FakeBehaviors.UseFakeClipboard) {
 			Clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 		} else {

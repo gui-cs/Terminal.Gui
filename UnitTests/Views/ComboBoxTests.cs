@@ -839,7 +839,7 @@ Three ", output);
 				cb.Subviews [1].GetNormalColor ()
 			};
 
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 222222
@@ -851,7 +851,7 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 000002
@@ -863,7 +863,7 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 222222
@@ -881,7 +881,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 222222
@@ -893,7 +893,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 000002
@@ -905,7 +905,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 000002
 222222

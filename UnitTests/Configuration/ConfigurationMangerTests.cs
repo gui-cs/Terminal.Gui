@@ -307,14 +307,14 @@ public class ConfigurationManagerTests {
 		Settings.Update (stream, "TestConfigurationManagerToJson");
 	}
 
-	[Fact] [AutoInitShutdown (configLocation: ConfigLocations.None)]
+	[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
 	public void TestConfigurationManagerInitDriver_NoLocations ()
 	{
 
 
 	}
 
-	[Fact] [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
+	[Fact, AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
 	public void TestConfigurationManagerInitDriver ()
 	{
 		Assert.Equal ("Default", Themes.Theme);
