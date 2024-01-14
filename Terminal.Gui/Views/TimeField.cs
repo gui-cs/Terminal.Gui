@@ -146,19 +146,10 @@ namespace Terminal.Gui {
 			get => isShort;
 			set {
 				isShort = value;
-				if (isShort) {
-					if (LayoutStyle == LayoutStyle.Absolute) {
-						Frame = new Rect (Frame.Location, new Size (7, Frame.Height));
-					} else {
-						Width = 7;
-					}
-				} else {
-					if (LayoutStyle == LayoutStyle.Absolute) {
-						Frame = new Rect (Frame.Location, new Size (10, Frame.Height));
-					} else {
-						Width = 10;
-					}
-				}
+				if (isShort)
+					Width = 7;
+				else
+					Width = 10;
 				var ro = ReadOnly;
 				if (ro)
 					ReadOnly = false;
@@ -271,7 +262,7 @@ namespace Terminal.Gui {
 			if (a.IsKeyCodeAtoZ) {
 				return true;
 			}
-			
+
 			return false;
 		}
 
