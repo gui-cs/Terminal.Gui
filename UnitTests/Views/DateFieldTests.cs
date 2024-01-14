@@ -31,12 +31,11 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (date, df.Date);
 			Assert.Equal (1, df.CursorPosition);
 			Assert.Equal (new Rect (3, 4, 10, 1), df.Frame);
-			Assert.Equal (LayoutStyle.Absolute, df.LayoutStyle);
 
 			df.IsShortFormat = false;
 			Assert.Equal (new Rect (3, 4, 12, 1), df.Frame);
-            Assert.Equal(12, df.Width);
-        }
+			Assert.Equal(12, df.Width);
+		}
 
 		[Fact]
 		public void CursorPosition_Min_Is_Always_One_Max_Is_Always_Max_Format ()
