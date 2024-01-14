@@ -779,7 +779,7 @@ namespace Terminal.Gui {
 
 					LayoutSubviews ();
 
-					tab.OnDrawFrames ();
+					tab.OnDrawAdornments ();
 
 					var prevAttr = Driver.GetAttribute ();
 
