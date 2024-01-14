@@ -68,7 +68,7 @@ namespace Terminal.Gui;
 /// points. The Width and Height properties are of type
 /// <see cref="Dim"/> and can use absolute position,
 /// percentages, and anchors. These are useful as they will take
-/// care of repositioning views when view's frames are resized or
+/// care of repositioning views when view's adornments are resized or
 /// if the terminal size changes.
 /// </para>
 /// <para>
@@ -88,7 +88,7 @@ namespace Terminal.Gui;
 /// The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has
 /// changed. The default processing system will keep the size and dimensions
 /// for views that use the <see cref="LayoutStyle.Absolute"/>, and will recompute the
-/// frames for the vies that use <see cref="LayoutStyle.Computed"/>.
+/// Adornments for the views that use <see cref="LayoutStyle.Computed"/>.
 /// </para>
 /// <para>
 /// Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews
@@ -430,9 +430,9 @@ public partial class View : Responder, ISupportInitializeNotification {
 	///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
 	///         </para>
 	/// </remarks>
-	/// <param name="rect">Location.</param>
+	/// <param name="frame">Location.</param>
 	/// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-	public View (Rect rect, string text) => SetInitialProperties (text, rect, LayoutStyle.Absolute);
+	public View (Rect frame, string text) => SetInitialProperties (text, frame, LayoutStyle.Absolute);
 
 
 	/// <summary>
@@ -493,7 +493,9 @@ public partial class View : Responder, ISupportInitializeNotification {
 
 		AddCommands ();
 
-		CreateFrames ();
+		Margin = CreateAdornment (typeof (Margin)) as Margin;
+		Border = CreateAdornment (typeof (Border)) as Border;
+		Padding = CreateAdornment (typeof (Padding)) as Padding;
 	}
 
 	/// <summary>
@@ -534,12 +536,6 @@ public partial class View : Responder, ISupportInitializeNotification {
 		if (!IsInitialized) {
 			_oldCanFocus = CanFocus;
 			_oldTabIndex = _tabIndex;
-
-
-			// TODO: Figure out why ScrollView and other tests fail if this call is put here 
-			// instead of the constructor.
-			//InitializeFrames ();
-
 		}
 
 		//throw new InvalidOperationException ("The view is already initialized.");

@@ -836,7 +836,7 @@ namespace Terminal.Gui.ViewsTests {
 01000
 ";
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -883,7 +883,7 @@ namespace Terminal.Gui.ViewsTests {
 			var invertFocus = new Attribute (tv.ColorScheme.Focus.Background, tv.ColorScheme.Focus.Foreground);
 			var invertHotNormal = new Attribute (tv.ColorScheme.HotNormal.Background, tv.ColorScheme.HotNormal.Foreground);
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -938,7 +938,7 @@ namespace Terminal.Gui.ViewsTests {
 21222
 ";
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -971,7 +971,7 @@ namespace Terminal.Gui.ViewsTests {
 			// now we only see 2 colors used (the selected cell color and Normal
 			// rowHighlight should no longer be used because the delegate returned null
 			// (now that the cell value is 5 - which does not match the conditional)
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,
 				// 1
@@ -1030,7 +1030,7 @@ namespace Terminal.Gui.ViewsTests {
 01020
 ";
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -1063,7 +1063,7 @@ namespace Terminal.Gui.ViewsTests {
 			// now we only see 2 colors used (the selected cell color and Normal
 			// cellHighlight should no longer be used because the delegate returned null
 			// (now that the cell value is 5 - which does not match the conditional)
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -2112,7 +2112,7 @@ namespace Terminal.Gui.ViewsTests {
 00000000000000000000
 01111101101111111110
 ";
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, new Attribute [] { tv.ColorScheme.Normal, color });
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, new Attribute [] { tv.ColorScheme.Normal, color });
 
 		}
 
@@ -2232,7 +2232,7 @@ namespace Terminal.Gui.ViewsTests {
 0111110
 0000000";
 
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, normal, focus);
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2289,7 +2289,7 @@ namespace Terminal.Gui.ViewsTests {
 0101010
 0000000";
 
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, normal, focus);
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2784,7 +2784,7 @@ A B C
 000000
 111111";
 
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, normal, focus);
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);
 		}
 
 		public static DataTableSource BuildTable (int cols, int rows)

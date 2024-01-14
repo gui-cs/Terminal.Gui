@@ -58,7 +58,7 @@ public partial class View {
 	/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for
 	/// rendering any border lines. If <see langword="true"/> the rendering of any borders drawn
 	/// by this Frame will be done by it's parent's SuperView. If <see langword="false"/> (the default)
-	/// this View's <see cref="OnDrawFrames()"/> method will be called to render the borders.
+	/// this View's <see cref="OnDrawAdornments"/> method will be called to render the borders.
 	/// </summary>
 	public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
@@ -87,7 +87,14 @@ public partial class View {
 	/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 	/// If it's overridden can return other values.
 	/// </returns>
-	public virtual Attribute GetFocusColor () => Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
+	public virtual Attribute GetFocusColor ()
+	{
+		var cs = ColorScheme;
+		if (ColorScheme == null) {
+			cs = new ColorScheme ();
+		}
+		return Enabled ? cs.Focus : cs.Disabled;
+	}
 
 	/// <summary>
 	/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
@@ -97,7 +104,14 @@ public partial class View {
 	/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 	/// If it's overridden can return other values.
 	/// </returns>
-	public virtual Attribute GetHotNormalColor () => Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled;
+	public virtual Attribute GetHotNormalColor ()
+	{
+		var cs = ColorScheme;
+		if (ColorScheme == null) {
+			cs = new ColorScheme ();
+		}
+		return Enabled ? cs.HotNormal : cs.Disabled;
+	}
 
 	/// <summary>
 	/// Displays the specified character in the specified column and row of the View.
@@ -334,7 +348,7 @@ public partial class View {
 	/// method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
 	/// </summary>
 	/// <returns></returns>
-	public virtual bool OnDrawFrames ()
+	public virtual bool OnDrawAdornments ()
 	{
 		if (!IsInitialized) {
 			return false;
@@ -372,7 +386,7 @@ public partial class View {
 		if (!CanBeVisible (this)) {
 			return;
 		}
-		OnDrawFrames ();
+		OnDrawAdornments ();
 
 		var prevClip = ClipToBounds ();
 
@@ -474,7 +488,7 @@ public partial class View {
 	{
 		if (NeedsDisplay) {
 			if (SuperView != null) {
-				Clear (BoundsToScreen (Bounds));
+				Clear (BoundsToScreen (contentArea));
 			}
 
 			if (!string.IsNullOrEmpty (TextFormatter.Text)) {
@@ -483,7 +497,7 @@ public partial class View {
 				}
 			}
 			// This should NOT clear 
-			TextFormatter?.Draw (BoundsToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+			TextFormatter?.Draw (BoundsToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
 				HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 				Rect.Empty, false);
 			SetSubViewNeedsDisplay ();
