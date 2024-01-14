@@ -1,5 +1,4 @@
 ﻿using Terminal.Gui;
-using Terminal.Gui.Views;
 
 namespace UICatalog.Scenarios;
 [ScenarioMetadata (Name: "Date Picker", Description: "Demonstrates how to use DatePicker class")]

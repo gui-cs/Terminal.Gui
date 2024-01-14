@@ -2513,7 +2513,7 @@ Y
 		Application.End (rs);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory, AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
@@ -2568,7 +2568,7 @@ Y
 		Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory, AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void View_Draw_Vertical_Simple_TextAlignments (bool autoSize)

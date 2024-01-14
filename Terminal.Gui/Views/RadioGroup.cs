@@ -124,8 +124,8 @@ public class RadioGroup : View {
 		case Orientation.Vertical:
 			var r = MakeRect (0, 0, radioLabels);
 			if (IsInitialized) {
-				Width = r.Width + GetFramesThickness ().Horizontal;
-				Height = radioLabels.Count + GetFramesThickness ().Vertical;
+				Width = r.Width + GetAdornmentsThickness ().Horizontal;
+				Height = radioLabels.Count + GetAdornmentsThickness ().Vertical;
 			}
 			break;
 
@@ -136,8 +136,8 @@ public class RadioGroup : View {
 				length += item.length;
 			}
 			if (IsInitialized) {
-				Width = length + GetFramesThickness ().Vertical;
-				Height = 1 + GetFramesThickness ().Horizontal;
+				Width = length + GetAdornmentsThickness ().Vertical;
+				Height = 1 + GetAdornmentsThickness ().Horizontal;
 			}
 			break;
 		}

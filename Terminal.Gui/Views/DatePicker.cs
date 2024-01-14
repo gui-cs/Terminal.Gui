@@ -8,7 +8,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 
-namespace Terminal.Gui.Views;
+namespace Terminal.Gui;
 
 /// <summary>
 /// The <see cref="DatePicker"/> <see cref="View"/> Date Picker.

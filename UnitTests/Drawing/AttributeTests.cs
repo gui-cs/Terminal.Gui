@@ -364,7 +364,7 @@ public class AttributeTests {
 		// Arrange
 		var foregroundColor = new Color (0, 0, 255);
 		var backgroundColor = new Color (255, 255, 255);
-		var expectedString = $"{foregroundColor},{backgroundColor}";
+		var expectedString = $"[{foregroundColor},{backgroundColor}]";
 
 		// Act
 		var attribute = new Attribute (foregroundColor, backgroundColor);

@@ -99,8 +99,8 @@ public class DrawTests {
 			Colors.Base.HotNormal
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
-0020000000
+		TestHelpers.AssertDriverAttributesAre (@"
+0010000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
@@ -148,8 +148,8 @@ public class DrawTests {
 			Colors.Base.HotNormal
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
-0022000000
+		TestHelpers.AssertDriverAttributesAre (@"
+0011000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
@@ -187,7 +187,7 @@ e
 s     
 t     ", _output);
 
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 000000
 0
 0

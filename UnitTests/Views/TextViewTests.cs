@@ -293,7 +293,7 @@ public class TextViewTests {
 			};
 
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("0000000", driver: Application.Driver, attributes);
 
 		_textView.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
@@ -301,7 +301,7 @@ public class TextViewTests {
 		Application.RunIteration (ref rs, ref first);
 		Assert.Equal (new Point (4, 0), _textView.CursorPosition);
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("1111000", driver: Application.Driver, attributes);
 	}
 
 	[Fact]
