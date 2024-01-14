@@ -136,35 +136,7 @@ public class Adornment : View {
 	/// </summary>
 	/// <returns></returns>
 	public override bool OnRenderLineCanvas () => false;
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="clipRect"></param>
-	public virtual void OnDrawSubViews (Rect clipRect)
-	{
-		// TODO: Enable subviews of Adornments (adornments).
-		//	if (Subviews == null) {
-		//		return;
-		//	}
-
-		//	foreach (var view in Subviews) {
-		//		// BUGBUG: v2 - shouldn't this be !view.LayoutNeeded? Why draw if layout is going to happen and we'll just draw again?
-		//		if (view.LayoutNeeded) {
-		//			view.LayoutSubviews ();
-		//		}
-		//		if ((view.Visible && !view.NeedDisplay.IsEmpty && view.Frame.Width > 0 && view.Frame.Height > 0) || view.ChildNeedsDisplay) {
-		//			view.Redraw (view.Bounds);
-
-		//			view.NeedDisplay = Rect.Empty;
-		//			// BUGBUG - v2 why does this need to be set to false?
-		//			// Shouldn't it be set when the subviews draw?
-		//			view.ChildNeedsDisplay = false;
-		//		}
-		//	}
-
-	}
-
+	
 	/// <summary>
 	/// Redraws the Adornments that comprise the <see cref="Adornment"/>.
 	/// </summary>
