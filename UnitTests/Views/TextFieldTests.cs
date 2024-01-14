@@ -1634,4 +1634,29 @@ Les Miśerables", output);
 		_textField.Paste ();
 		Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textField.Text);
 	}
+
+	[Fact, TextFieldTestsAutoInitShutdown]
+	public void Copy_Paste_Text_Changing_Updates_Cursor_Position ()
+	{
+		_textField.TextChanging += _textField_TextChanging;
+
+		void _textField_TextChanging (object sender, TextChangingEventArgs e)
+		{
+			if (e.NewText.GetRuneCount () > 11) {
+				e.NewText = e.NewText [..11];
+			}
+		}
+
+		Assert.Equal (32, _textField.CursorPosition);
+		_textField.SelectAll ();
+		_textField.Cut ();
+		Assert.Equal ("TAB to jump between text fields.", Application.Driver.Clipboard.GetClipboardData ());
+		Assert.Equal (string.Empty, _textField.Text);
+		Assert.Equal (0, _textField.CursorPosition);
+		_textField.Paste ();
+		Assert.Equal ("TAB to jump", _textField.Text);
+		Assert.Equal (11, _textField.CursorPosition);
+
+		_textField.TextChanging -= _textField_TextChanging;
+	}
 }
