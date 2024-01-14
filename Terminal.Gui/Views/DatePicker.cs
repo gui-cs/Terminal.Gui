@@ -77,8 +77,7 @@ public class DatePicker : View {
 			X = Pos.Right (_dateLabel),
 			Y = 0,
 			Width = Dim.Fill (1),
-			Height = 1,
-			IsShortFormat = false
+			Height = 1
 		};
 
 		_calendar = new TableView () {
