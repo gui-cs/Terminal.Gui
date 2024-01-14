@@ -17,6 +17,7 @@ namespace UICatalog.Scenarios {
 
 		int currentGraph = 0;
 		Action [] graphs;
+		MenuItem miShowBorder;
 
 		public override void Setup ()
 		{
@@ -54,6 +55,10 @@ namespace UICatalog.Scenarios {
 					new MenuItem ("MarginLeft--", "", () => Margin(true,false)),
 					new MenuItem ("MarginBottom++", "", () => Margin(false,true)),
 					new MenuItem ("MarginBottom--", "", () => Margin(false,false)),
+					miShowBorder = new MenuItem ("_Show Border", "", () => ShowBorder()){
+						Checked = true,
+						CheckType = MenuItemCheckStyle.Checked
+					}
 				}),
 
 				});
@@ -64,6 +69,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = 60,
 				Height = 20,
+				BorderStyle = LineStyle.Single
 			};
 
 			Win.Add (graphView);
@@ -87,6 +93,13 @@ namespace UICatalog.Scenarios {
 				new StatusItem(KeyCode.CtrlMask | KeyCode.G, "~^G~ Next", ()=>graphs[currentGraph++%graphs.Length]()),
 			});
 			Application.Top.Add (statusBar);
+		}
+
+		private void ShowBorder ()
+		{
+			miShowBorder.Checked = !miShowBorder.Checked;
+
+			graphView.BorderStyle = miShowBorder.Checked == true ? LineStyle.Single : LineStyle.None;
 		}
 
 		private void MultiBarGraph ()
