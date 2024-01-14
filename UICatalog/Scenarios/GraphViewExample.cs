@@ -69,15 +69,12 @@ public class GraphViewExample : Scenario {
 		Application.Top.Add (menu);
 
 		_graphView = new GraphView {
-			X = 1,
-			Y = 1,
-			Width = Dim.Percent (70),
-			Height = Dim.Percent (70),
+			X = 0,
+			Y = 0,
+			Width = 60,
+			Height = Dim.Fill (),
 			BorderStyle = LineStyle.Single
 		};
-		_graphView.Border.Thickness = new Thickness (1, 3, 1, 1);
-		_graphView.Margin.Thickness = new Thickness (2, 2, 2, 2);
-		_graphView.Padding.Thickness = new Thickness (2, 2, 2, 2);
 
 		Win.Add (_graphView);
 
