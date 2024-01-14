@@ -1909,16 +1909,16 @@ namespace Terminal.Gui.ViewsTests {
 111111│2222222222222
 111111│2222222222222
 111111│2222222222222";
-            //			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
-            //			tileView.LayoutSubviews ();
+
 			tileView.Tiles.ElementAt (0).ContentView.Visible = true;
 			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
 			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
-            //			tileView.Draw ();
+
 			tileView.Draw ();
-            //			looksLike =
+
 			looksLike =
 @"
 11111111111111111111
@@ -1931,16 +1931,16 @@ namespace Terminal.Gui.ViewsTests {
 11111111111111111111
 11111111111111111111
 11111111111111111111";
-            //111111│2222222222222
+
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
-            //111111│2222222222222
+
 			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
 			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
 			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
-            //111111│2222222222222
+
 			tileView.Draw ();
-            //111111│2222222222222
+
 			looksLike =
 @"
 22222222222222222222
@@ -1953,7 +1953,7 @@ namespace Terminal.Gui.ViewsTests {
 22222222222222222222
 22222222222222222222
 22222222222222222222";
-            //111111│2222222222222
+
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
 
 			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
@@ -1962,7 +1962,7 @@ namespace Terminal.Gui.ViewsTests {
 			tileView.LayoutSubviews ();
 
 			tileView.Draw ();
-            //			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+
 			looksLike =
 @"
 33333333333333333333
@@ -1975,90 +1975,27 @@ namespace Terminal.Gui.ViewsTests {
 44444444444444444444
 44444444444444444444
 44444444444444444444";
-            //			tileView.LayoutSubviews ();
+
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
-            //			tileView.Draw ();
-            //			looksLike =
-            //@"
-            //11111111111111111111
+
+
+			TestHelpers.AssertDriverContentsAre (looksLike, output);
+
 			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
 			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
 			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
 			tileView.LayoutSubviews ();
-            //11111111111111111111
+
 			tileView.Draw ();
-            //11111111111111111111
+
 			looksLike =
 @"
 			 ";
-            //11111111111111111111
+
 			TestHelpers.AssertDriverContentsAre (looksLike, output);
-            //11111111111111111111
+
 
 		}
-
-            //			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-            //			tileView.Tiles.ElementAt (1).ContentView.Visible = true;
-            //			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-            //			tileView.LayoutSubviews ();
-
-            //			tileView.Draw ();
-
-            //			looksLike =
-            //@"
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222
-            //22222222222222222222";
-
-            //			TestHelpers.AssertDriverContentsAre (looksLike, output);
-
-            //			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-            //			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-            //			tileView.Tiles.ElementAt (2).ContentView.Visible = true;
-            //			tileView.LayoutSubviews ();
-
-            //			tileView.Draw ();
-
-            //			looksLike =
-            //@"
-            //33333333333333333333
-            //33333333333333333333
-            //33333333333333333333
-            //33333333333333333333
-            //33333333333333333333
-            //────────────────────
-            //44444444444444444444
-            //44444444444444444444
-            //44444444444444444444
-            //44444444444444444444";
-
-            //			TestHelpers.AssertDriverContentsAre (looksLike, output);
-
-			TestHelpers.AssertDriverContentsAre (looksLike, output);
-
-            //			TestHelpers.AssertDriverContentsAre (looksLike, output);
-
-            //			tileView.Tiles.ElementAt (0).ContentView.Visible = false;
-            //			tileView.Tiles.ElementAt (1).ContentView.Visible = false;
-            //			tileView.Tiles.ElementAt (2).ContentView.Visible = false;
-            //			tileView.LayoutSubviews ();
-
-            //			tileView.Draw ();
-
-            //			looksLike =
-            //@"
-            // ";
-
-            //			TestHelpers.AssertDriverContentsAre (looksLike, output);
-
-        }
 
 		[Fact, AutoInitShutdown]
 		public void Test_SplitTop_WholeBottom ()

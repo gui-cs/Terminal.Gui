@@ -624,9 +624,6 @@ class Menu : View {
 		return GetNormalColor ();
 	}
 
-	///<inheritdoc/>
-	protected override void OnResizeNeeded () { }
-
 	public override void OnDrawContent (Rect contentArea)
 	{
 		if (_barItems.Children == null) {
