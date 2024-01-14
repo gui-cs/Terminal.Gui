@@ -808,12 +808,12 @@ public class Slider<T> : View {
 		Height = 0;
 		if (_config._sliderOrientation == Orientation.Horizontal) {
 			Bounds = new Rect (Bounds.Location,
-				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcBestLength ()),
-					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical, CalcThickness ())));
+				new Size (int.Min (SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal, CalcBestLength ()),
+					int.Min (SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical, CalcThickness ())));
 		} else {
 			Bounds = new Rect (Bounds.Location,
-				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcThickness ()),
-					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical, CalcBestLength ())));
+				new Size (int.Min (SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal, CalcThickness ()),
+					int.Min (SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical, CalcBestLength ())));
 		}
 	}
 

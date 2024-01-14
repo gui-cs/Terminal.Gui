@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-using Terminal.Gui.Views;
+using Terminal.Gui;
 using Xunit;
 
 namespace Terminal.Gui.ViewsTests;

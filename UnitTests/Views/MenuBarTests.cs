@@ -1539,7 +1539,7 @@ Edit
 			menu.ColorScheme.Disabled
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 00000000000000", Application.Driver, attributes);
 
 		Assert.True (menu.MouseEvent (new MouseEvent {
@@ -1549,7 +1549,7 @@ Edit
 			View = menu
 		}));
 		top.Draw ();
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 11111100000000
 00000000000000
 01111111111110
@@ -1565,7 +1565,7 @@ Edit
 			View = top.Subviews [1]
 		}));
 		top.Subviews [1].Draw ();
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 11111100000000
 00000000000000
 01111111111110
@@ -1581,7 +1581,7 @@ Edit
 			View = top.Subviews [1]
 		}));
 		top.Subviews [1].Draw ();
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 11111100000000
 00000000000000
 01111111111110

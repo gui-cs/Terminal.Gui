@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using Terminal.Gui;
-using static UICatalog.Scenarios.Frames;
+using static UICatalog.Scenarios.Adornments;
 
 namespace UICatalog.Scenarios;
 
@@ -25,7 +25,7 @@ public class ProgressBarStyles : Scenario {
 		ConfigurationManager.Themes.Theme = Theme;
 		ConfigurationManager.Apply ();
 
-		var editor = new FramesEditor {
+		var editor = new AdornmentsEditor {
 			Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}",
 			BorderStyle = LineStyle.Single
 		};
