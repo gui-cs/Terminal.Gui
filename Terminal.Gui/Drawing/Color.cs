@@ -633,23 +633,22 @@ public readonly struct Color : IEquatable<Color> {
 	public static implicit operator Color (int rgba) => new (rgba);
 
 	/// <summary>
-	/// Cast to int.
+	/// Cast to int. 
 	/// </summary>
 	/// <param name="color"></param>
-	public static explicit operator int (Color color) => color.Rgba;
+	public static implicit operator int (Color color) => color.Rgba;
 
 	/// <summary>
-	/// Cast from <see cref="Gui.ColorName"/>.
+	/// Cast from <see cref="Gui.ColorName"/>. May fail if the color is not a named color.
 	/// </summary>
 	/// <param name="colorName"></param>
 	public static explicit operator Color (ColorName colorName) => new (colorName);
 
 	/// <summary>
-	/// Cast to <see cref="Gui.ColorName"/>.
+	/// Cast to <see cref="Gui.ColorName"/>. May fail if the color is not a named color.
 	/// </summary>
 	/// <param name="color"></param>
 	public static explicit operator ColorName (Color color) => color.ColorName;
-
 
 	/// <summary>
 	/// Equality operator for two <see cref="Color"/> objects..
@@ -658,7 +657,6 @@ public readonly struct Color : IEquatable<Color> {
 	/// <param name="right"></param>
 	/// <returns></returns>
 	public static bool operator == (Color left, Color right) => left.Equals (right);
-
 
 	/// <summary>
 	/// Inequality operator for two <see cref="Color"/> objects.
@@ -887,6 +885,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 
 	/// <inheritdoc/>
 	public override string ToString () =>
-		// Note, Unit tests are dependent on this format
+		// Note: Unit tests are dependent on this format
 		$"[{Foreground},{Background}]";
 }

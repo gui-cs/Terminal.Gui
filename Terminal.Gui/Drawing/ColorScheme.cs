@@ -229,8 +229,8 @@ public static class Colors {
 	/// Creates a new dictionary of new <see cref="ColorScheme"/> objects.
 	/// </summary>
 	public static Dictionary<string, ColorScheme> Create () =>
-		// Use reflection to dynamically create the default set of ColorSchemes from the list defined 
-		// by the class. 
+		// Use reflection to dynamically create the default set of ColorScheme names (e.g. "TopLevel", "Base", etc.)
+		// from the list defined by the class. 
 		typeof (Colors).GetProperties ()
 			.Where (p => p.PropertyType == typeof (ColorScheme))
 			.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ()))

@@ -26,5 +26,7 @@ public class ColorSchemeTests {
 		lbl.ColorScheme = scheme;
 		lbl.Draw ();
 	}
+
+	
 	
 }
