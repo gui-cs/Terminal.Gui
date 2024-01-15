@@ -23,7 +23,7 @@ public class ScrollViewTests {
 		Assert.True (sv.AutoHideScrollBars);
 		Assert.True (sv.KeepContentAlwaysInViewport);
 
-		sv = new ScrollView (new Rect (1, 2, 20, 10));
+		sv = new ScrollView () { X = 1, Y = 2, Width = 20, Height = 10 };
 		Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 		Assert.True (sv.CanFocus);
 		Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
@@ -36,7 +36,9 @@ public class ScrollViewTests {
 	[Fact]
 	public void Adding_Views ()
 	{
-		var sv = new ScrollView (new Rect (0, 0, 20, 10)) {
+		var sv = new ScrollView () {
+			Width = 20,
+			Height = 10,
 			ContentSize = new Size (30, 20)
 		};
 		sv.Add (new View () { Width = 10, Height = 5 },
@@ -49,7 +51,9 @@ public class ScrollViewTests {
 	[Fact]
 	public void KeyBindings_Command ()
 	{
-		var sv = new ScrollView (new Rect (0, 0, 20, 10)) {
+		var sv = new ScrollView () {
+			Width = 20,
+			Height = 10,
 			ContentSize = new Size (40, 20)
 		};
 		sv.Add (new View () { Width = 20, Height = 5 },
@@ -606,7 +610,11 @@ public class ScrollViewTests {
 		view.Add (new Label (rule.Repeat (size.Width / rule.Length)) { AutoSize = false, Width = Dim.Fill () });
 		view.Add (new Label (rule.Repeat (size.Height / rule.Length), TextDirection.TopBottom_LeftRight) { Height = Dim.Fill (), AutoSize = false });
 		view.Add (new Label ("[ Press me! ]") { X = 1, Y = 1 });
-		var scrollView = new ScrollView (new Rect (1, 1, 15, 10)) {
+		var scrollView = new ScrollView () {
+			X = 1,
+			Y = 1,
+			Width = 15,
+			Height = 10,
 			ContentSize = size,
 			ShowHorizontalScrollIndicator = true,
 			ShowVerticalScrollIndicator = true

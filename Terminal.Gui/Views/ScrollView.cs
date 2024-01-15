@@ -44,18 +44,9 @@ public class ScrollView : View {
 	ScrollBarView _vertical, _horizontal;
 
 	/// <summary>
-	///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
-	/// </summary>
-	/// <param name="frame"></param>
-	public ScrollView (Rect frame) : base (frame)
-	{
-		SetInitialProperties (frame);
-	}
-
-	/// <summary>
 	///  Initializes a new instance of the <see cref="Gui.ScrollView"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 	/// </summary>
-	public ScrollView () : base ()
+	public ScrollView ()
 	{
 		SetInitialProperties (Rect.Empty);
 	}
