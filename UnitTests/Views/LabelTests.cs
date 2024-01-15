@@ -5,9 +5,9 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class LabelTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public LabelTests (ITestOutputHelper output) => this.output = output;
+	public LabelTests (ITestOutputHelper output) => this._output = output;
 
 	[Fact]
 	[AutoInitShutdown]
@@ -24,7 +24,7 @@ public class LabelTests {
 		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
 		Assert.Equal (KeyCode.Null, label.HotKey);
 		var expected = @"";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 
 		label = new Label ("ARGS") { Text = "Test" };
@@ -38,10 +38,10 @@ public class LabelTests {
 		expected = @"
 Test
 ";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 
-		label = new Label (3, 4, "Test");
+		label = new Label ("Test") { X = 3, Y = 4 };
 		Assert.Equal ("Test", label.Text);
 		Application.Top.Add (label);
 		rs = Application.Begin (Application.Top);
@@ -51,7 +51,7 @@ Test
 		expected = @"
    Test
 ";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 		Application.End (rs);
 	}
@@ -102,7 +102,7 @@ Test
 │                            │
 └────────────────────────────┘
 ";
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
@@ -141,7 +141,7 @@ Test
 └────────────────────────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
@@ -178,7 +178,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -210,7 +210,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 		Assert.True (label.AutoSize);
 		label.Text = "Say Hello 你 changed";
@@ -224,7 +224,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -257,7 +257,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 		Assert.True (label.AutoSize);
 		label.Text = "Say Hello 你 changed";
@@ -271,7 +271,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -301,7 +301,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -333,7 +333,7 @@ Test
 │                            │
 └────────────────────────────┘
 ";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -415,7 +415,7 @@ Test
 └───┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -455,7 +455,7 @@ Test
 └────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -511,7 +511,7 @@ Test
 └──────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -552,7 +552,7 @@ Test
 └────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -577,7 +577,7 @@ Test
 ";
 		Assert.Equal (new Rect (0, 0, width, 1), lblJust.Frame);
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, 3), pos);
 	}
 
@@ -596,7 +596,7 @@ Test
 Demo Simple Rune
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 16, 1), pos);
 	}
 
@@ -632,7 +632,7 @@ n
 e
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 1, 16), pos);
 	}
 
@@ -651,7 +651,7 @@ e
 デモエムポンズ
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 14, 1), pos);
 	}
 
@@ -675,7 +675,7 @@ e
 ズ
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 2, 7), pos);
 	}
 
@@ -705,7 +705,7 @@ e
 ズ
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 2, 7), pos);
 	}
 
@@ -761,7 +761,7 @@ e
 └────────────────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 	}
 
@@ -833,7 +833,7 @@ e
 └───────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
 	}
 
@@ -873,7 +873,7 @@ e
 └─────────────────────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 	}
 
@@ -933,7 +933,7 @@ e
 └───────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 	}
 
@@ -962,7 +962,7 @@ e
 This view needs to be cleared before rewritten.                        
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
 This TextFormatter (tf2) with fill will be cleared on rewritten.       
-", output);
+", _output);
 
 		view.Text = "This view is rewritten.";
 		view.Draw ();
@@ -977,6 +977,6 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
 This view is rewritten.                                                
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
 This TextFormatter (tf2) is rewritten.                                 
-", output);
+", _output);
 	}
 }
