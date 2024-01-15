@@ -82,7 +82,9 @@ public class ConfigProperty {
 	{
 		if (PropertyValue != null) {
 			try {
-				PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+				if (PropertyInfo?.GetValue (null) != null) {
+					PropertyInfo?.SetValue (null, DeepMemberwiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
+				}
 			} catch (TargetInvocationException tie) {
 				// Check if there is an inner exception
 				if (tie.InnerException != null) {

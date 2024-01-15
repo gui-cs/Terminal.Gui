@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -489,7 +492,7 @@ public class ApplicationTests {
 			// 1
 			Colors.Base.Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 1111100000
 1111100000
 1111100000
@@ -518,7 +521,7 @@ public class ApplicationTests {
 			// 1
 			Colors.Base.Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
 0111110000
 0111110000
@@ -663,6 +666,90 @@ public class ApplicationTests {
 		Assert.Null (Application.MouseGrabView); // public
 		Assert.Null (Application.WantContinuousButtonPressedView); // public
 		Assert.False (Application.MoveToOverlappedChild (Application.Top));
+	}
+
+	[Fact]
+	public void Init_ResetState_Resets_Properties ()
+	{
+		ConfigurationManager.ThrowOnJsonErrors = true;
+		// For all the fields/properties of Application, check that they are reset to their default values
+
+		// Set some values
+		
+		Application.Init ();
+		Application._initialized = true;
+
+		// Reset
+		Application.ResetState ();
+
+		void CheckReset ()
+		{
+			// Check that all fields and properties are set to their default values
+
+			// Public Properties
+			Assert.Null (Application.Top);
+			Assert.Null (Application.Current);
+			Assert.Null (Application.MouseGrabView);
+			Assert.Null (Application.WantContinuousButtonPressedView);
+			// Don't check Application.ForceDriver
+			// Assert.Empty (Application.ForceDriver);
+			Assert.False (Application.Force16Colors);
+			Assert.Null (Application.Driver);
+			Assert.Null (Application.MainLoop);
+			Assert.False (Application.EndAfterFirstIteration);
+			Assert.Equal (Key.Empty, Application.AlternateBackwardKey);
+			Assert.Equal (Key.Empty, Application.AlternateForwardKey);
+			Assert.Equal (Key.Empty, Application.QuitKey);
+			Assert.Null (Application.OverlappedChildren);
+			Assert.Null (Application.OverlappedTop);
+
+			// Internal properties
+			Assert.False (Application._initialized);
+			Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
+			Assert.False (Application._forceFakeConsole);
+			Assert.Equal (-1, Application._mainThreadId);
+			Assert.Empty (Application._topLevels);
+			Assert.Null (Application._mouseEnteredView);
+
+			// Events - Can't check
+			//Assert.Null (Application.NotifyNewRunState);
+			//Assert.Null (Application.NotifyNewRunState);
+			//Assert.Null (Application.Iteration);
+			//Assert.Null (Application.SizeChanging);
+			//Assert.Null (Application.GrabbedMouse);
+			//Assert.Null (Application.UnGrabbingMouse);
+			//Assert.Null (Application.GrabbedMouse);
+			//Assert.Null (Application.UnGrabbedMouse);
+			//Assert.Null (Application.MouseEvent);
+			//Assert.Null (Application.KeyDown);
+			//Assert.Null (Application.KeyUp);
+		}
+
+		CheckReset ();
+
+		// Set the values that can be set
+		Application._initialized = true;
+		Application._forceFakeConsole = true;
+		Application._mainThreadId = 1;
+		//Application._topLevels = new List<Toplevel> ();
+		Application._mouseEnteredView = new View ();
+		//Application.SupportedCultures = new List<CultureInfo> ();
+		Application.Force16Colors = true;
+		//Application.ForceDriver = "driver";
+		Application.EndAfterFirstIteration = true;
+		Application.AlternateBackwardKey = Key.A;
+		Application.AlternateForwardKey = Key.B;
+		Application.QuitKey = Key.C;
+		//Application.OverlappedChildren = new List<View> ();
+		//Application.OverlappedTop = 
+		Application._mouseEnteredView = new View ();
+		//Application.WantContinuousButtonPressedView = new View ();
+
+		Application.ResetState ();
+		CheckReset ();
+
+		ConfigurationManager.ThrowOnJsonErrors = false;
+
 	}
 
 	// Invoke Tests

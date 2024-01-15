@@ -560,7 +560,7 @@ public partial class Toplevel : View {
 			superView = top.SuperView;
 		}
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
 		}
 		if (top.Frame.Width <= maxWidth) {
 			nx = Math.Max (targetX, 0);
@@ -607,7 +607,7 @@ public partial class Toplevel : View {
 			maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 		}
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Top + superView.GetFramesThickness ().Bottom;
+			maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
 		}
 		ny = Math.Min (ny, maxWidth);
 		if (top.Frame.Height <= maxWidth) {
@@ -644,7 +644,7 @@ public partial class Toplevel : View {
 		bool layoutSubviews = false;
 		int maxWidth = 0;
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
 		}
 		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal || top?.SuperView == null && top.IsOverlapped)
 		    // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
