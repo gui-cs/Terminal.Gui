@@ -8,11 +8,11 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ScrollBarViewTests {
 	static HostView _hostView;
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 	bool _added;
 	ScrollBarView _scrollBar;
 
-	public ScrollBarViewTests (ITestOutputHelper output) => this.output = output;
+	public ScrollBarViewTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	[AutoInitShutdown]
@@ -39,7 +39,7 @@ public class ScrollBarViewTests {
 ┌──────────────────────────────────────┐
 │◄├────────────────┤░░░░░░░░░░░░░░░░░░►│
 └──────────────────────────────────────┘";
-		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 	}
 
@@ -107,7 +107,7 @@ public class ScrollBarViewTests {
 │░│
 │▼│
 └─┘";
-		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 	}
 
@@ -185,7 +185,7 @@ public class ScrollBarViewTests {
 │░│
 │▼│
 └─┘";
-		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 	}
 
@@ -859,7 +859,7 @@ public class ScrollBarViewTests {
 └───────────────────────────────────────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 45, 20), pos);
 
 		textView.WordWrap = true;
@@ -896,7 +896,7 @@ public class ScrollBarViewTests {
 └────────────────────────┘
 ";
 
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 26, 20), pos);
 
 		((FakeDriver)Application.Driver).SetBufferSize (10, 10);
@@ -923,7 +923,7 @@ public class ScrollBarViewTests {
 └────────┘
 ";
 
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 10, 10), pos);
 	}
 
@@ -954,7 +954,7 @@ This is a tes┴
 This is a tes░
 This is a tes▼
 ◄├─┤░░░░░░░░► 
-", output);
+", _output);
 
 		sbv.Size = 0;
 		sbv.OtherScrollBarView.Size = 0;
@@ -972,7 +972,7 @@ This is a test
 This is a test
 This is a test
 This is a test
-", output);
+", _output);
 
 		sbv.Size = 50;
 		sbv.OtherScrollBarView.Size = 50;
@@ -990,7 +990,7 @@ This is a tes┴
 This is a tes░
 This is a tes▼
 ◄├──┤░░░░░░░► 
-", output);
+", _output);
 
 	}
 
@@ -1018,7 +1018,7 @@ This is a tes┴
 This is a tes░
 This is a tes░
 This is a tes▼
-", output);
+", _output);
 
 		sbv.Size = 0;
 		Assert.Equal (0, sbv.Size);
@@ -1032,7 +1032,7 @@ This is a test
 This is a test
 This is a test
 This is a test
-", output);
+", _output);
 	}
 
 	[Fact]
@@ -1060,7 +1060,7 @@ This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
-This is a test             ", output);
+This is a test             ", _output);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 15,
@@ -1084,7 +1084,7 @@ This is a test{CM.Glyphs.LeftBracket} Click Me! {CM.Glyphs.RightBracket}
 This is a test             
 This is a test             
 This is a test             
-This is a test             ", output);
+This is a test             ", _output);
 
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 15,
@@ -1121,7 +1121,7 @@ This is a tes┴
 This is a tes░
 This is a tes░
 This is a tes▼
-", output);
+", _output);
 
 		sbv.Visible = false;
 		Assert.False (sbv.Visible);
@@ -1133,7 +1133,7 @@ This is a test
 This is a test
 This is a test
 This is a test
-", output);
+", _output);
 
 		sbv.Visible = true;
 		Assert.True (sbv.Visible);
@@ -1145,7 +1145,7 @@ This is a tes┴
 This is a tes░
 This is a tes░
 This is a tes▼
-", output);
+", _output);
 
 		sbv.ClearOnVisibleFalse = true;
 		sbv.Visible = false;
@@ -1157,7 +1157,7 @@ This is a tes
 This is a tes
 This is a tes
 This is a tes
-", output);
+", _output);
 	}
 
 	// This class enables test functions annotated with the [InitShutdown] attribute

@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ChineseUI", "Chinese UI")]
 [ScenarioCategory ("Unicode")]
