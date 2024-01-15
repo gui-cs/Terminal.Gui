@@ -147,10 +147,22 @@ public class DatePicker : View {
 
 	private void DateField_DateChanged (object sender, DateTimeEventArgs<DateTime> e)
 	{
+		Date = e.NewValue;
 		if (e.NewValue.Date.Day != _date.Day) {
 			SelectDayOnCalendar (e.NewValue.Day);
 		}
-		Date = e.NewValue;
+
+		if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year) {
+			_previousMonthButton.Enabled = false;
+		} else {
+			_previousMonthButton.Enabled = true;
+		}
+
+		if (_date.Month == DateTime.MaxValue.Month && _date.Year == DateTime.MaxValue.Year) {
+			_nextMonthButton.Enabled = false;
+		} else {
+			_nextMonthButton.Enabled = true;
+		}
 		CreateCalendar ();
 		SelectDayOnCalendar (_date.Day);
 	}
