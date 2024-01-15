@@ -187,6 +187,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Date Picker.
+        /// </summary>
+        internal static string dpTitle {
+            get {
+                return ResourceManager.GetString("dpTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Any Files.
         /// </summary>
         internal static string fdAnyFiles {

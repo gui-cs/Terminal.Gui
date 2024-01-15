@@ -4,14 +4,16 @@ using Xunit;
 using Xunit.Abstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class DrawTests {
 	readonly ITestOutputHelper _output;
 
 	public DrawTests (ITestOutputHelper output) => _output = output;
 
-	[Fact] [AutoInitShutdown]
+	// TODO: Refactor this test to not depend on TextView etc... Make it as primitive as possible
+	[Fact]
+	[AutoInitShutdown]
 	public void Clipping_AddRune_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 	{
 		var tv = new TextView () {
@@ -29,7 +31,8 @@ public class DrawTests {
 		var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
 		win.Add (tv);
 		Application.Top.Add (win);
-		var lbl = new Label ("ワイドルーン。");
+		// Don't use Label. It sets AutoSize = true which is not what we're testing here.
+		var lbl = new View ("ワイドルーン。");
 		// Don't have unit tests use things that aren't absolutely critical for the test, like Dialog
 		var dg = new Window () { X = 2, Y = 2, Width = 14, Height = 3 };
 		dg.Add (lbl);
@@ -54,7 +57,8 @@ public class DrawTests {
 	}
 
 	// TODO: The tests below that use Label should use View instead.
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Non_Bmp_ConsoleWidth_ColumnWidth_Equal_Two ()
 	{
 		string us = "\U0001d539";
@@ -95,14 +99,15 @@ public class DrawTests {
 			Colors.Base.HotNormal
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
-0020000000
+		TestHelpers.AssertDriverAttributesAre (@"
+0010000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
 	{
 		string us = "\U0000f900";
@@ -143,14 +148,15 @@ public class DrawTests {
 			Colors.Base.HotNormal
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
-0022000000
+		TestHelpers.AssertDriverAttributesAre (@"
+0011000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Colors_On_TextAlignment_Right_And_Bottom ()
 	{
 		var labelRight = new Label ("Test") {
@@ -181,7 +187,7 @@ e
 s     
 t     ", _output);
 
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 000000
 0
 0
@@ -191,7 +197,8 @@ t     ", _output);
 0", Application.Driver, new Attribute [] { Colors.Base.Normal });
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Negative_Bounds_Horizontal_Without_New_Lines ()
 	{
 		// BUGBUG: This previously assumed the default height of a View was 1. 
@@ -235,7 +242,8 @@ t     ", _output);
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Negative_Bounds_Horizontal_With_New_Lines ()
 	{
 		var subView = new View () { Id = "subView", X = 1, Width = 1, Height = 7, Text = "s\nu\nb\nV\ni\ne\nw" };
@@ -304,7 +312,8 @@ t     ", _output);
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Negative_Bounds_Vertical ()
 	{
 		var subView = new View () { Id = "subView", X = 1, Width = 1, Height = 7, Text = "subView", TextDirection = TextDirection.TopBottom_LeftRight };

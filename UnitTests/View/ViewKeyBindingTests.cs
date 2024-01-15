@@ -31,7 +31,7 @@ public class ViewKeyBindingTests {
 			KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
 		}
 	}
-	
+
 	[Fact]
 	[AutoInitShutdown]
 	public void Focus_KeyBinding ()
@@ -63,7 +63,7 @@ public class ViewKeyBindingTests {
 		Assert.True (view.HasFocus);
 		Application.OnKeyDown (Key.F);
 		Assert.True (invoked);
-		
+
 		Assert.True (view.ApplicationCommand);
 		Assert.True (view.HotKeyCommand);
 		Assert.True (view.FocusedCommand);

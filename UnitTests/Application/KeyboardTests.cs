@@ -16,7 +16,7 @@ public class KeyboardTests {
 		RunState.Instances.Clear ();
 #endif
 	}
-	
+
 	[Fact]
 	public void KeyUp_Event ()
 	{
@@ -370,7 +370,7 @@ public class KeyboardTests {
 		var view = new ScopedKeyBindingView ();
 		var invoked = false;
 		view.InvokingKeyBindings += (s, e) => invoked = true;
-		
+
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 

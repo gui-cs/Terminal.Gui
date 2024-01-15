@@ -78,39 +78,57 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
 
+			// Hot key. Both alone and with alt
 			Assert.Equal (KeyCode.T, btn.HotKey);
 			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
 			Assert.True (clicked);
 			clicked = false;
+
 			Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
 			Assert.True (clicked);
 			clicked = false;
+
+			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
+			Assert.True (clicked);
+			clicked = false;
+
+			// IsDefault = false
+			// Space and Enter should work
 			Assert.False (btn.IsDefault);
-			Assert.False (btn.NewKeyDownEvent (new (KeyCode.Enter)));
-			Assert.False (clicked);
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (clicked);
+			clicked = false;
+
+			// IsDefault = true
+			// Space and Enter should work
 			btn.IsDefault = true;
-			Assert.False (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+			Assert.True (clicked);
+			clicked = false;
+
+			// Toplevel does not handle Enter, so it should get passed on to button
 			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.NewKeyDownEvent (new (KeyCode.AltMask | KeyCode.T)));
+
+			// Direct
+			Assert.True (btn.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
-			Assert.True (clicked);
-			clicked = false;
+
 			Assert.True (btn.NewKeyDownEvent (new (KeyCode.Space)));
 			Assert.True (clicked);
 			clicked = false;
+
 			Assert.True (btn.NewKeyDownEvent (new ((KeyCode)'T')));
 			Assert.True (clicked);
 			clicked = false;
-			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
-			Assert.True (clicked);
+
+			// Change hotkey:
 			btn.Text = "Te_st";
-			clicked = false;
 			Assert.True (btn.NewKeyDownEvent (btn.HotKey));
 			Assert.True (clicked);
+			clicked = false;
 		}
 
 		[Fact]
@@ -641,7 +659,7 @@ namespace Terminal.Gui.ViewsTests {
 				args = e;
 
 			};
-			
+
 			btn.HotKey = KeyCode.R;
 			Assert.Same (btn, sender);
 			Assert.Equal (KeyCode.Null, args.OldKey);
