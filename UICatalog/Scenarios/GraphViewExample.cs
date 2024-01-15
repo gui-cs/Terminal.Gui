@@ -64,17 +64,22 @@ public class GraphViewExample : Scenario {
 					CheckType = MenuItemCheckStyle.Checked
 				}
 			})
-
 		});
+		if (ConsoleDriver.Diagnostics == (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler)) {
+			_miDiags.Checked = true;
+		}
 		Application.Top.Add (menu);
 
 		_graphView = new GraphView {
 			X = 0,
 			Y = 0,
-			Width = 60,
+			Width = Dim.Percent (70),
 			Height = Dim.Fill (),
 			BorderStyle = LineStyle.Single
 		};
+		_graphView.Border.Thickness = new Thickness (1, 1, 1, 1);
+		_graphView.Margin.Thickness = new Thickness (1, 1, 1, 1);
+		_graphView.Padding.Thickness = new Thickness (1, 1, 1, 1);
 
 		Win.Add (_graphView);
 
