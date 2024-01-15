@@ -248,20 +248,6 @@ public class ComboBox : View {
 	}
 
 	/// <summary>
-	/// Public constructor
-	/// </summary>
-	/// <param name="rect"></param>
-	/// <param name="source"></param>
-	public ComboBox (Rect rect, IList source) : base (rect)
-	{
-		_search = new TextField ("") { Width = rect.Width };
-		_listview = new ComboListView (this, rect, source, HideDropdownListOnClick) { ColorScheme = Colors.Base };
-
-		SetInitialProperties ();
-		SetSource (source);
-	}
-
-	/// <summary>
 	/// Initialize with the source.
 	/// </summary>
 	/// <param name="source">The source.</param>
