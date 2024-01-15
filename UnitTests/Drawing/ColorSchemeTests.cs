@@ -18,7 +18,7 @@ public class ColorSchemeTests {
 
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
 	public void ColorScheme_New ()
 	{
 		var scheme = new ColorScheme ();
@@ -27,6 +27,17 @@ public class ColorSchemeTests {
 		lbl.Draw ();
 	}
 
-	
-	
+	[Fact]
+	public void Colors_ColorSchemes_Built_Ins ()
+	{
+		Colors.Reset ();
+		var schemes = Colors.ColorSchemes;
+		Assert.NotNull (schemes);
+		Assert.Equal (5, schemes.Count);
+		Assert.True (schemes.ContainsKey ("TopLevel"));
+		Assert.True (schemes.ContainsKey ("Base"));
+		Assert.True (schemes.ContainsKey ("Dialog"));
+		Assert.True (schemes.ContainsKey ("Menu"));
+		Assert.True (schemes.ContainsKey ("Error"));
+	}
 }

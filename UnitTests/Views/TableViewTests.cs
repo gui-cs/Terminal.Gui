@@ -1095,7 +1095,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 
-			tv.ColorScheme = Colors.Base;
+			tv.ColorScheme = Colors.ColorSchemes ["Base"];
 			return tv;
 		}
 
@@ -1133,7 +1133,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tableView.LayoutSubviews ();
 
 			// 3 columns are visibile
@@ -1195,7 +1195,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -1255,7 +1255,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visible
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -1804,7 +1804,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tableView);
 			Application.Begin (Application.Top);
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 25 characters can be printed into table
 			tableView.Bounds = new Rect (0, 0, 25, 5);
@@ -1981,7 +1981,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -2124,7 +2124,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = GetABCDEFTableView (out _);
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -2153,7 +2153,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = GetABCDEFTableView (out _);
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -3003,7 +3003,7 @@ A B C
 
 			var tv = new TableView ();
 			//tv.BeginInit (); tv.EndInit ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 25, 4);
 			tv.Style = new () {
 				ShowHeaders = false,
@@ -3071,7 +3071,7 @@ A B C
 		public void TestEnumerableDataSource_BasicTypes ()
 		{
 			var tv = new TableView ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 50, 6);
 
 			tv.Table = new EnumerableTableSource<Type> (
@@ -3101,7 +3101,7 @@ A B C
 		public void Test_CollectionNavigator ()
 		{
 			var tv = new TableView ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 50, 7);
 
 			tv.Table = new EnumerableTableSource<string> (
@@ -3191,7 +3191,7 @@ A B C
 		private TableView GetTwoRowSixColumnTable (out DataTable dt)
 		{
 			var tableView = new TableView ();
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visible
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -3232,7 +3232,7 @@ A B C
 		private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
 		{
 			var tv = new TableView ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 25, 6);
 
 			var pets = new List<PickablePet> {

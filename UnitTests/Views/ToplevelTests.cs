@@ -15,7 +15,7 @@ public class ToplevelTests {
 	{
 		var top = new Toplevel ();
 
-		Assert.Equal (Colors.TopLevel, top.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["TopLevel"], top.ColorScheme);
 		Assert.Equal ("Fill(0)", top.Width.ToString ());
 		Assert.Equal ("Fill(0)", top.Height.ToString ());
 		Assert.False (top.Running);

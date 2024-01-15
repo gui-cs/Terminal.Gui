@@ -18,7 +18,7 @@ public class Sliders : Scenario {
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			ColorScheme = Colors.Dialog
+			ColorScheme = Colors.ColorSchemes ["Dialog"]
 		};
 
 		Win.Add (configView);

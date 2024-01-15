@@ -50,7 +50,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Height = Dim.Fill (),
 				Width = Dim.Fill (1),
-				//ColorScheme = Colors.TopLevel,
+				//ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				AllowsMarking = false,
 				AllowsMultipleSelection = false
 			};

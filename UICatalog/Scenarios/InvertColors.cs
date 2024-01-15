@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios {
 	public class InvertColors : Scenario {
 		public override void Setup ()
 		{
-			Win.ColorScheme = Colors.TopLevel;
+			Win.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			List<Label> labels = new List<Label> ();
 			var foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();

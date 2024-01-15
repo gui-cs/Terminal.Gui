@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
 
 /// <summary>
-/// Defines the <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.
-/// Containers such as <see cref="Window"/> and <see cref="FrameView"/> use <see cref="ColorScheme"/> to determine
-/// the colors used by sub-views.
+/// Defines a standard set of <see cref="Attribute"/>s for common visible elements in a <see cref="View"/>.
 /// </summary>
 /// <remarks>
+/// <para>
+/// ColorScheme objects are immutable. Once constructed, the properties cannot be changed.
+/// To change a ColorScheme, create a new one with the desired values,
+/// using the <see cref="ColorScheme(ColorScheme)"/> constructor.
+/// </para>
+/// <para>
 /// See also: <see cref="Colors.ColorSchemes"/>.
+/// </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
 public class ColorScheme : IEquatable<ColorScheme> {
@@ -24,14 +26,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	readonly Attribute _normal = Attribute.Default;
 
 	/// <summary>
-	/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to
-	/// track which ColorScheme
-	/// is being accessed.
-	/// </summary>
-	internal string _schemeBeingSet = "";
-
-	/// <summary>
-	/// Creates a new instance.
+	/// Creates a new instance set to the default colors (see <see cref="Attribute.Default"/>).
 	/// </summary>
 	public ColorScheme () : this (Attribute.Default) { }
 
@@ -41,13 +36,14 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="scheme">The scheme to initialize the new instance with.</param>
 	public ColorScheme (ColorScheme scheme)
 	{
-		if (scheme != null) {
-			_normal = scheme.Normal;
-			_focus = scheme.Focus;
-			_hotNormal = scheme.HotNormal;
-			_disabled = scheme.Disabled;
-			_hotFocus = scheme.HotFocus;
+		if (scheme == null) {
+			throw new ArgumentNullException (nameof (scheme));
 		}
+		_normal = scheme.Normal;
+		_focus = scheme.Focus;
+		_hotNormal = scheme.HotNormal;
+		_disabled = scheme.Disabled;
+		_hotFocus = scheme.HotFocus;
 	}
 
 	/// <summary>
@@ -120,7 +116,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	/// <param name="obj"></param>
 	/// <returns>true if the two objects are equal</returns>
-	public override bool Equals (object obj) => Equals (obj as ColorScheme);
+	public override bool Equals (object obj) => Equals (obj is ColorScheme ? (ColorScheme)obj : default);
 
 	/// <summary>
 	/// Returns a hashcode for this instance.
@@ -155,100 +151,86 @@ public class ColorScheme : IEquatable<ColorScheme> {
 }
 
 /// <summary>
-/// The default <see cref="ColorScheme"/>s for the application.
+/// Holds the <see cref="ColorScheme"/>s that define the <see cref="Attribute"/>s that are used by views to render themselves.
 /// </summary>
-/// <remarks>
-/// This property can be set in a Theme to change the default <see cref="Colors"/> for the application.
-/// </remarks>
 public static class Colors {
-
-	static Colors () => ColorSchemes = Create ();
-
+	static Colors () => Reset ();
 	/// <summary>
-	/// The application Toplevel color scheme, for the default Toplevel views.
+	/// Gets a dictionary of defined <see cref="ColorScheme"/> objects.
 	/// </summary>
 	/// <remarks>
-	///         <para>
-	///         This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g.
-	///         <c>edit.ColorScheme = Colors.ColorSchemes["TopLevel"];</c>
-	///         </para>
+	/// <para>
+	/// The <see cref="ColorSchemes"/> dictionary includes the following keys, by default:
+	/// <list type="table">
+	/// <listheader>
+	///         <term>Built-in Color Scheme</term>
+	///         <description>Description</description>
+	/// </listheader>
+	/// <item>
+	///         <term>
+	///         Base
+	///         </term>
+	///         <description>
+	///         The base color scheme used for most Views.
+	///         </description>
+	/// </item>
+	/// <item>
+	///         <term>
+	///         TopLevel
+	///         </term>
+	///         <description>
+	///         The application Toplevel color scheme; used for the <see cref="Toplevel"/> View.
+	///         </description>
+	/// </item>
+	/// <item>
+	///         <term>
+	///         Dialog
+	///         </term>
+	///         <description>
+	///         The dialog color scheme; used for <see cref="Dialog"/>, <see cref="MessageBox"/>, and other views dialog-like views.
+	///         </description>
+	/// </item> 
+	/// <item>
+	///         <term>
+	///         Menu
+	///         </term>
+	///         <description>
+	///         The menu color scheme; used for <see cref="MenuBar"/>, <see cref="ContextMenu"/>, and <see cref="StatusBar"/>. 
+	///         </description>
+	/// </item>
+	/// <item>
+	///         <term>
+	///         Error
+	///         </term>
+	///         <description>
+	///         The color scheme for showing errors, such as in <see cref="MessageBox.ErrorQuery(string, string, string[])"/>. 
+	///         </description>
+	/// </item>
+	/// </list>
+	/// </para>
+	/// <para>
+	/// Changing the values of an entry in this dictionary will affect all views that use the scheme.
+	/// </para>
+	/// <para>
+	/// <see cref="ConfigurationManager"/> can be used to override the default values for these schemes and add additional schemes.
+	/// See <see cref="ConfigurationManager.Themes"/>.
+	/// </para>
 	/// </remarks>
-	public static ColorScheme TopLevel { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The base color scheme, for the default Toplevel views.
-	/// </summary>
-	/// <remarks>
-	///         <para>
-	///         This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g.
-	///         <c>edit.ColorScheme = Colors.ColorSchemes["Base"];</c>
-	///         </para>
-	/// </remarks>
-	public static ColorScheme Base { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The dialog color scheme, for standard popup dialog boxes
-	/// </summary>
-	/// <remarks>
-	///         <para>
-	///         This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g.
-	///         <c>edit.ColorScheme = Colors.ColorSchemes["Dialog"];</c>
-	///         </para>
-	/// </remarks>
-	public static ColorScheme Dialog { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The menu bar color
-	/// </summary>
-	/// <remarks>
-	///         <para>
-	///         This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g.
-	///         <c>edit.ColorScheme = Colors.ColorSchemes["Menu"];</c>
-	///         </para>
-	/// </remarks>
-	public static ColorScheme Menu { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	/// <summary>
-	/// The color scheme for showing errors.
-	/// </summary>
-	/// <remarks>
-	///         <para>
-	///         This API will be deprecated in the future. Use <see cref="Colors.ColorSchemes"/> instead (e.g.
-	///         <c>edit.ColorScheme = Colors.ColorSchemes["Error"];</c>
-	///         </para>
-	/// </remarks>
-	public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
-
-	// BUGBUG: Because this class is static, anyone who changes the color scheme will affect everyone else.
-	/// <summary>
-	/// Provides the defined <see cref="ColorScheme"/>s.
-	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
 	[JsonConverter (typeof (DictionaryJsonConverter<ColorScheme>))]
 	public static Dictionary<string, ColorScheme> ColorSchemes { get; private set; } // Serialization requires this to have a setter (private set;)
 
 	/// <summary>
-	/// Creates a new dictionary of new <see cref="ColorScheme"/> objects.
+	/// Resets the <see cref="ColorSchemes"/> dictionary to the default values.
 	/// </summary>
-	public static Dictionary<string, ColorScheme> Create () =>
-		// Use reflection to dynamically create the default set of ColorScheme names (e.g. "TopLevel", "Base", etc.)
-		// from the list defined by the class. 
-		typeof (Colors).GetProperties ()
-			.Where (p => p.PropertyType == typeof (ColorScheme))
-			.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ()))
-			.ToDictionary (t => t.Key, t => t.Value, new SchemeNameComparerIgnoreCase ());
-
-	// BUGBUG: Consider having this method do `new ColorSchemes [schemeBeingSet]` to ensure 
-	// callers can't change the original scheme..
-	static ColorScheme GetColorScheme ([CallerMemberName] string schemeBeingSet = null) => ColorSchemes [schemeBeingSet];
-
-	static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string schemeBeingSet = null)
-	{
-		// BUGBUG: Consider doing `ColorSchemes [schemeBeingSet] = new ColorSchemes [colorScheme]` to ensure 
-		// callers can't change the original scheme.
-		ColorSchemes [schemeBeingSet] = colorScheme;
-		colorScheme._schemeBeingSet = schemeBeingSet;
-	}
+	public static Dictionary<string, ColorScheme> Reset () =>
+		ColorSchemes = new Dictionary<string, ColorScheme> (comparer: new SchemeNameComparerIgnoreCase ()) {
+			{ "TopLevel", new ColorScheme () },
+			{ "Base", new ColorScheme () },
+			{ "Dialog", new ColorScheme () },
+			{ "Menu", new ColorScheme () },
+			{ "Error", new ColorScheme () },
+		};
 
 	class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
 		public bool Equals (string x, string y)
