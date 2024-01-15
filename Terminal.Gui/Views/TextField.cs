@@ -1375,11 +1375,11 @@ public class TextField : View {
 		       cbTxt +
 		       StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
-		_cursorPosition = selStart + cbTxt.GetRuneCount ();
-		ClearAllSelection ();
-		SetNeedsDisplay ();
-		Adjust ();
-	}
+			_cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
+			ClearAllSelection ();
+			SetNeedsDisplay ();
+			Adjust ();
+		}
 
 	/// <summary>
 	/// Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.
