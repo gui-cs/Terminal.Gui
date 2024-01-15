@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -21,7 +20,7 @@ public class MenuBarItem : MenuItem {
 	/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
 	public MenuBarItem (string title, string help, Action action, Func<bool> canExecute = null, MenuItem parent = null) : base (title, help, action, canExecute, parent)
 	{
-		Initialize (title, null, null, true);
+		SetInitialProperties (title, null, null, true);
 	}
 
 	/// <summary>
@@ -32,7 +31,7 @@ public class MenuBarItem : MenuItem {
 	/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
 	public MenuBarItem (string title, MenuItem [] children, MenuItem parent = null)
 	{
-		Initialize (title, children, parent);
+		SetInitialProperties (title, children, parent);
 	}
 
 	/// <summary>
@@ -43,7 +42,7 @@ public class MenuBarItem : MenuItem {
 	/// <param name="parent">The parent <see cref="MenuItem"/> of this if exist, otherwise is null.</param>
 	public MenuBarItem (string title, List<MenuItem []> children, MenuItem parent = null)
 	{
-		Initialize (title, children, parent);
+		SetInitialProperties (title, children, parent);
 	}
 
 	/// <summary>
@@ -57,7 +56,7 @@ public class MenuBarItem : MenuItem {
 	/// </summary>
 	public MenuBarItem () : this (children: new MenuItem [] { }) { }
 
-	void Initialize (string title, object children, MenuItem parent = null, bool isTopLevel = false)
+	void SetInitialProperties (string title, object children, MenuItem parent = null, bool isTopLevel = false)
 	{
 		if (!isTopLevel && children == null) {
 			throw new ArgumentNullException (nameof (children), "The parameter cannot be null. Use an empty array instead.");

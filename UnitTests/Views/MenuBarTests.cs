@@ -20,7 +20,7 @@ public class MenuBarTests {
 	// TODO: Lots of tests in here really test Menu and MenuItem - Move them to MenuTests.cs
 
 	[Fact]
-	public void Constuctors_Defaults ()
+	public void Constructors_Defaults ()
 	{
 		var menuBar = new MenuBar ();
 		Assert.Equal (KeyCode.F9, menuBar.Key);
