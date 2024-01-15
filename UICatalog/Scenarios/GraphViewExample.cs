@@ -61,14 +61,11 @@ public class GraphViewExample : Scenario {
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miDiags = new MenuItem ("Dri_ver Diagnostics", "", () => EnableDiagnostics ()) {
-					Checked = false,
+					Checked = ConsoleDriver.Diagnostics == (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler),
 					CheckType = MenuItemCheckStyle.Checked
 				}
 			})
 		});
-		if (ConsoleDriver.Diagnostics == (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler)) {
-			_miDiags.Checked = true;
-		}
 		Application.Top.Add (menu);
 
 		_graphView = new GraphView {
