@@ -8,7 +8,7 @@
 using System;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
@@ -40,26 +40,6 @@ public class ScrollBarView : View {
 	bool _showScrollIndicator;
 	int _size, _position;
 	bool _vertical;
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/>
-	/// layout.
-	/// </summary>
-	/// <param name="rect">Frame for the scrollbar.</param>
-	public ScrollBarView (Rect rect) : this (rect, 0, 0, false) { }
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/>
-	/// layout.
-	/// </summary>
-	/// <param name="rect">Frame for the scrollbar.</param>
-	/// <param name="size">The size that this scrollbar represents. Sets the <see cref="Size"/> property.</param>
-	/// <param name="position">The position within this scrollbar. Sets the <see cref="Position"/> property.</param>
-	/// <param name="isVertical">
-	/// If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal. Sets the
-	/// <see cref="IsVertical"/> property.
-	/// </param>
-	public ScrollBarView (Rect rect, int size, int position, bool isVertical) : base (rect) => SetInitialProperties (size, position, isVertical);
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
