@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
@@ -16,11 +17,11 @@ namespace Terminal.Gui;
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
 public class ColorScheme : IEquatable<ColorScheme> {
-	Attribute _disabled = Attribute.Default;
-	Attribute _focus = Attribute.Default;
-	Attribute _hotFocus = Attribute.Default;
-	Attribute _hotNormal = Attribute.Default;
-	Attribute _normal = Attribute.Default;
+	readonly Attribute _disabled = Attribute.Default;
+	readonly Attribute _focus = Attribute.Default;
+	readonly Attribute _hotFocus = Attribute.Default;
+	readonly Attribute _hotNormal = Attribute.Default;
+	readonly Attribute _normal = Attribute.Default;
 
 	/// <summary>
 	/// Used by <see cref="Colors.SetColorScheme(ColorScheme, string)"/> and <see cref="Colors.GetColorScheme(string)"/> to
@@ -67,7 +68,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	public Attribute Normal {
 		get => _normal;
-		set => _normal = value;
+		init => _normal = value;
 	}
 
 	/// <summary>
@@ -75,7 +76,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	public Attribute Focus {
 		get => _focus;
-		set => _focus = value;
+		init => _focus = value;
 	}
 
 	/// <summary>
@@ -83,7 +84,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	public Attribute HotNormal {
 		get => _hotNormal;
-		set => _hotNormal = value;
+		init => _hotNormal = value;
 	}
 
 	/// <summary>
@@ -91,7 +92,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	public Attribute HotFocus {
 		get => _hotFocus;
-		set => _hotFocus = value;
+		init => _hotFocus = value;
 	}
 
 	/// <summary>
@@ -99,7 +100,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	public Attribute Disabled {
 		get => _disabled;
-		set => _disabled = value;
+		init => _disabled = value;
 	}
 
 	/// <summary>
@@ -218,6 +219,7 @@ public static class Colors {
 	/// </remarks>
 	public static ColorScheme Error { get => GetColorScheme (); set => SetColorScheme (value); }
 
+	// BUGBUG: Because this class is static, anyone who changes the color scheme will affect everyone else.
 	/// <summary>
 	/// Provides the defined <see cref="ColorScheme"/>s.
 	/// </summary>
@@ -236,10 +238,14 @@ public static class Colors {
 			.Select (p => new KeyValuePair<string, ColorScheme> (p.Name, new ColorScheme ()))
 			.ToDictionary (t => t.Key, t => t.Value, new SchemeNameComparerIgnoreCase ());
 
+	// BUGBUG: Consider having this method do `new ColorSchemes [schemeBeingSet]` to ensure 
+	// callers can't change the original scheme..
 	static ColorScheme GetColorScheme ([CallerMemberName] string schemeBeingSet = null) => ColorSchemes [schemeBeingSet];
 
 	static void SetColorScheme (ColorScheme colorScheme, [CallerMemberName] string schemeBeingSet = null)
 	{
+		// BUGBUG: Consider doing `ColorSchemes [schemeBeingSet] = new ColorSchemes [colorScheme]` to ensure 
+		// callers can't change the original scheme.
 		ColorSchemes [schemeBeingSet] = colorScheme;
 		colorScheme._schemeBeingSet = schemeBeingSet;
 	}

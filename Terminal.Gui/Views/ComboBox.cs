@@ -396,7 +396,9 @@ public class ComboBox : View {
 			_search.ReadOnly = value;
 			if (_search.ReadOnly) {
 				if (_search.ColorScheme != null) {
-					_search.ColorScheme.Normal = _search.ColorScheme.Focus;
+					_search.ColorScheme = new ColorScheme (_search.ColorScheme) {
+						Normal = _search.ColorScheme.Focus
+					};
 				}
 			}
 		}

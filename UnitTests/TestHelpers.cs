@@ -384,7 +384,7 @@ partial class TestHelpers {
 				switch (match.Count) {
 				case 0:
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-					                     $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]}' was not found.\n" +
+					                     $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n" +
 							     $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n" +
 					                     $"  But Was: <not found>");
 				case > 1:
@@ -396,7 +396,7 @@ partial class TestHelpers {
 
 				if (colorUsed != userExpected) {
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-						$"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.'\n" +
+						$"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.\n" +
 						$"  Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})\n" +
 						$"  But Was:   {colorUsed} ({val})\n");
 				}

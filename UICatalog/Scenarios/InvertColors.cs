@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 					ColorScheme = new ColorScheme (),
 					Y = y
 				};
-				label.ColorScheme.Normal = color;
+				label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
 				Win.Add (label);
 				labels.Add (label);
 			}
@@ -33,13 +33,15 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = foreColors.Length + 1,
 			};
-			button.Clicked += (s,e) => {
+			button.Clicked += (s, e) => {
 
 				foreach (var label in labels) {
 					var color = label.ColorScheme.Normal;
 					color = new Attribute (color.Background, color.Foreground);
 
-					label.ColorScheme.Normal = color;
+					label.ColorScheme = new ColorScheme (label.ColorScheme) {
+						Normal = color
+					};
 					label.Text = $"{color.Foreground} on {color.Background}";
 					label.SetNeedsDisplay ();
 
