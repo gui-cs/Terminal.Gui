@@ -46,29 +46,6 @@ public class CheckBox : View {
 		SetInitialProperties (s, is_checked);
 	}
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="CheckBox"/> using <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <remarks>
-	///   The size of <see cref="CheckBox"/> is computed based on the
-	///   text length. This <see cref="CheckBox"/> is not toggled.
-	/// </remarks>
-	public CheckBox (int x, int y, string s) : this (x, y, s, false)
-	{
-	}
-
-	/// <summary>
-	/// Initializes a new instance of <see cref="CheckBox"/> using <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <remarks>
-	///   The size of <see cref="CheckBox"/> is computed based on the
-	///   text length. 
-	/// </remarks>
-	public CheckBox (int x, int y, string s, bool is_checked) : base (new Rect (x, y, s.Length, 1))
-	{
-		SetInitialProperties (s, is_checked);
-	}
-
 	// TODO: v2 - Remove constructors with parameters
 	/// <summary>
 	/// Private helper to set the initial properties of the View that were provided via constructors.

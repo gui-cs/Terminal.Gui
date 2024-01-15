@@ -36,7 +36,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
-			ckb = new CheckBox (1, 2, "Test");
+			ckb = new CheckBox ("Test") { X = 1, Y = 2 };
 			Assert.True (ckb.AutoSize);
 			Assert.False (ckb.Checked);
 			Assert.False (ckb.AllowNullChecked);
@@ -45,7 +45,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (ckb.CanFocus);
 			Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
 
-			ckb = new CheckBox (3, 4, "Test", true);
+			ckb = new CheckBox ("Test", true) { X = 3, Y = 4 };
 			Assert.True (ckb.AutoSize);
 			Assert.True (ckb.Checked);
 			Assert.False (ckb.AllowNullChecked);

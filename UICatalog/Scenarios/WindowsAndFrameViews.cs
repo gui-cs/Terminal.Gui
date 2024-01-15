@@ -151,8 +151,8 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.Error
 			});
 
-			subWinofFV.Add (new CheckBox (0, 1, "Check me"));
-			subWinofFV.Add (new CheckBox (0, 2, "Or, Check me"));
+			subWinofFV.Add (new CheckBox ("Check me") { Y = 1 });
+			subWinofFV.Add (new CheckBox ("Or, Check me") { Y = 2 });
 
 			frame.Add (subWinofFV);
 			var subFrameViewofFV = new FrameView ("this is a Sub-FrameView") {
@@ -165,10 +165,10 @@ namespace UICatalog.Scenarios {
 			};
 			subFrameViewofFV.Add (new TextField (0, 0, 15, "Edit Me"));
 
-			subFrameViewofFV.Add (new CheckBox (0, 1, "Check me"));
+			subFrameViewofFV.Add (new CheckBox ("Check me") { Y = 1 });
 			// BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 
 			// its client area. #522
-			subFrameViewofFV.Add (new CheckBox (0, 2, "Or, Check me"));
+			subFrameViewofFV.Add (new CheckBox ("Or, Check me") { Y = 2 });
 
 			frame.Add (new CheckBox ("Btn1 (Y = Pos.AnchorEnd (1))") {
 				X = 0,
