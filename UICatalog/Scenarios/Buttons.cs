@@ -32,7 +32,7 @@ public class Buttons : Scenario {
 		defaultButton.Clicked += (s, e) => Application.RequestStop ();
 		Win.Add (defaultButton);
 
-		var swapButton = new Button (50, 0, "Swap Default (Absolute Layout)");
+		var swapButton = new Button ("Swap Default (Absolute Layout)") { X = 50 };
 		swapButton.Clicked += (s, e) => {
 			defaultButton.IsDefault = !defaultButton.IsDefault;
 			swapButton.IsDefault = !swapButton.IsDefault;
@@ -154,7 +154,7 @@ public class Buttons : Scenario {
 		Win.Add (absoluteFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
+		var moveBtnA = new Button ("Move This Button via Frame") {
 			ColorScheme = Colors.Error,
 		};
 		moveBtnA.Clicked += (s, e) => {
@@ -163,7 +163,8 @@ public class Buttons : Scenario {
 		absoluteFrame.Add (moveBtnA);
 
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-		var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
+		var sizeBtnA = new Button (" ~  s  gui.cs   master ↑10 = Со_хранить") {
+			Y = 2,
 			ColorScheme = Colors.Error,
 		};
 		sizeBtnA.Clicked += (s, e) => {

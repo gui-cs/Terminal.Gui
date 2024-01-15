@@ -44,7 +44,7 @@ namespace UICatalog.Scenarios {
 				_itemsList.SetSource (items);
 			};
 
-			_btnActionCancel = new Button (1, 1, "Cancelable Load Items");
+			_btnActionCancel = new Button ("Cancelable Load Items") { X = 1, Y = 1 };
 			_btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
 			Win.Add (new Label ("Data Items:") {
@@ -75,19 +75,19 @@ namespace UICatalog.Scenarios {
 
 			var text = new TextField (1, 3, 100, "Type anything after press the button");
 
-			var _btnAction = new Button (80, 10, "Load Data Action");
+			var _btnAction = new Button ("Load Data Action") { X = 80, Y = 10 };
 			_btnAction.Clicked += (s, e) => _action.Invoke ();
-			var _btnLambda = new Button (80, 12, "Load Data Lambda");
+			var _btnLambda = new Button ("Load Data Lambda") { X = 80, Y = 12 };
 			_btnLambda.Clicked += (s, e) => _lambda.Invoke ();
-			var _btnHandler = new Button (80, 14, "Load Data Handler");
+			var _btnHandler = new Button ("Load Data Handler") { X = 80, Y = 14 };
 			_btnHandler.Clicked += (s, e) => _handler.Invoke (null, new EventArgs ());
-			var _btnSync = new Button (80, 16, "Load Data Synchronous");
+			var _btnSync = new Button ("Load Data Synchronous") { X = 80, Y = 16 };
 			_btnSync.Clicked += (s, e) => _sync.Invoke ();
-			var _btnMethod = new Button (80, 18, "Load Data Method");
+			var _btnMethod = new Button ("Load Data Method") { X = 80, Y = 18 };
 			_btnMethod.Clicked += async (s, e) => await MethodAsync ();
-			var _btnClearData = new Button (80, 20, "Clear Data");
+			var _btnClearData = new Button ("Clear Data") { X = 80, Y = 20 };
 			_btnClearData.Clicked += (s, e) => { _itemsList.Source = null; LogJob ("Cleaning Data"); };
-			var _btnQuit = new Button (80, 22, "Quit");
+			var _btnQuit = new Button ("Quit") { X = 80, Y = 22 };
 			_btnQuit.Clicked += (s, e) => Application.RequestStop ();
 
 			Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);

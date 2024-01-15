@@ -62,37 +62,6 @@ public class Button : View {
 	public Button (string text, bool is_default = false) : base (text) => SetInitialProperties (text, is_default);
 
 	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on the given
-	/// text
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	/// <param name="x">X position where the button will be shown.</param>
-	/// <param name="y">Y position where the button will be shown.</param>
-	/// <param name="text">The button's text</param>
-	public Button (int x, int y, string text) : this (x, y, text, false) { }
-
-	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on the given
-	/// text.
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	/// <param name="x">X position where the button will be shown.</param>
-	/// <param name="y">Y position where the button will be shown.</param>
-	/// <param name="text">The button's text</param>
-	/// <param name="is_default">
-	/// If <c>true</c>, a special decoration is used, and the user pressing the enter key
-	/// in a <see cref="Dialog"/> will implicitly activate this button.
-	/// </param>
-	public Button (int x, int y, string text, bool is_default)
-		: base (new Rect (x, y, text.GetRuneCount () + 4 + (is_default ? 2 : 0), 1), text) => SetInitialProperties (text, is_default);
-
-	/// <summary>
 	/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
 	/// </summary>
 	/// <value><c>true</c> if is default; otherwise, <c>false</c>.</value>

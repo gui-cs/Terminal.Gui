@@ -63,7 +63,7 @@ namespace UICatalog.Scenarios {
 				Id = "3"
 			};
 
-			var testButton = new Button (2, 2, "click me");
+			var testButton = new Button ("click me") { X = 2, Y = 2 };
 			testButton.Clicked += (s,e) => {
 				MessageBox.Query (10, 5, "Test", "test message", "Ok");
 			};

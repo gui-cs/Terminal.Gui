@@ -51,7 +51,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (KeyCode.T, btn.HotKey);
 			Application.End (rs);
 
-			btn = new Button (3, 4, "Test", true);
+			btn = new Button ("Test", true) { X = 3, Y = 4 };
 			Assert.Equal ("Test", btn.Text);
 			Application.Top.Add (btn);
 			rs = Application.Begin (Application.Top);
