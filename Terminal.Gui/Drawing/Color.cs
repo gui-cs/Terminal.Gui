@@ -268,10 +268,13 @@ public readonly struct Color : IEquatable<Color> {
 	/// <param name="rgba">The encoded 24-bit color value (see <see cref="Rgba"/>).</param>
 	public Color (int rgba)
 	{
-		A = (byte)(rgba >> 24 & 0xFF);
-		R = (byte)(rgba >> 16 & 0xFF);
-		G = (byte)(rgba >> 8 & 0xFF);
-		B = (byte)(rgba & 0xFF);
+		unsafe {
+			Span<byte> argbSpan = new Span<byte> ( &rgba, 4 );
+			A = argbSpan [ 3 ];
+			R = argbSpan [ 2 ];
+			G = argbSpan [ 1 ];
+			B = argbSpan [ 0 ];
+		}
 	}
 
 	/// <summary>
@@ -339,13 +342,10 @@ public readonly struct Color : IEquatable<Color> {
 	public int A { get; } // Not currently supported; here for completeness.
 
 	/// <summary>
-	/// Gets or sets the color value encoded as ARGB32.
-	/// <code>
-	/// (&lt;see cref="A"/&gt; &lt;&lt; 24) | (&lt;see cref="R"/&gt; &lt;&lt; 16) | (&lt;see cref="G"/&gt; &lt;&lt; 8) | &lt;see cref="B"/&gt;
-	/// </code>
+	/// Gets the color value encoded as a signed 32-bit integer in ARGB32 format.
 	/// </summary>
 	[JsonIgnore]
-	public int Rgba => A << 24 | R << 16 | G << 8 | B;
+	public int Rgba => BitConverter.ToInt32 ( [(byte)B, (byte)G, (byte)R, (byte)A] );
 
 	/// <summary>
 	/// Gets or sets the 24-bit color value for each of the legacy 16-color values.
