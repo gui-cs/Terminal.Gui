@@ -741,7 +741,7 @@ namespace UICatalog.Scenarios {
 				Title = isFind ? "Find" : "Replace",
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
-				ColorScheme = Colors.TopLevel
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
 			};
 
 			_tabView = new TabView () {

@@ -101,7 +101,7 @@ public class Buttons : Scenario {
 		var removeButton = new Button ("Remove this button") {
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
-			ColorScheme = Colors.Error
+			ColorScheme = Colors.ColorSchemes ["Error"]
 		};
 		Win.Add (removeButton);
 		// This in interesting test case because `moveBtn` and below are laid out relative to this one!
@@ -125,7 +125,7 @@ public class Buttons : Scenario {
 			X = 0,
 			Y = Pos.Center () - 1,
 			Width = 30,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		moveBtn.Clicked += (s, e) => {
 			moveBtn.X = moveBtn.Frame.X + 5;
@@ -139,7 +139,7 @@ public class Buttons : Scenario {
 			X = 0,
 			Y = Pos.Center () + 1,
 			Width = 30,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		sizeBtn.Clicked += (s, e) => {
 			sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -156,8 +156,8 @@ public class Buttons : Scenario {
 		Win.Add (absoluteFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtnA = new Button ("Move This Button via Frame") {
-			ColorScheme = Colors.Error,
+		var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		moveBtnA.Clicked += (s, e) => {
 			moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
@@ -167,8 +167,8 @@ public class Buttons : Scenario {
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 		var sizeBtnA = new Button (" ~  s  gui.cs   master ↑10 = Со_хранить") {
 			Y = 2,
-			ColorScheme = Colors.Error,
-		};
+            ColorScheme = Colors.ColorSchemes["Error"],
+        };
 		sizeBtnA.Clicked += (s, e) => {
 			sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
 		};
@@ -218,7 +218,7 @@ public class Buttons : Scenario {
 			X = 2,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (computedFrame) - 2,
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
 		moveHotKeyBtn.Clicked += (s, e) => {
 			moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
@@ -230,7 +230,7 @@ public class Buttons : Scenario {
 			X = Pos.Left (absoluteFrame) + 1,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
 		moveUnicodeHotKeyBtn.Clicked += (s, e) => {
 			moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);

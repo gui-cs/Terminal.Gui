@@ -16,14 +16,14 @@ public class Mouse : Scenario {
 		Win.Add (test);
 		Win.Add (ml);
 
-		var rmeList = new ListView (rme) {
-			X = Pos.Right (test) + 25,
-			Y = Pos.Top (test) + 1,
-			Width = Dim.Fill () - 1,
-			Height = Dim.Fill (),
-			ColorScheme = Colors.TopLevel
-		};
-		Win.Add (rmeList);
+			var rmeList = new ListView (rme) {
+				X = Pos.Right (test) + 25,
+				Y = Pos.Top (test) + 1,
+				Width = Dim.Fill () - 1,
+				Height = Dim.Fill (),
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			};
+			Win.Add (rmeList);
 
 		Application.MouseEvent += (sender, a) => {
 			ml.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count}";

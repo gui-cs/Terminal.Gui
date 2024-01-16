@@ -108,18 +108,18 @@ public class LabelsAsLabels : Scenario {
 			CanFocus = true,
 		});
 
-		var removeLabel = new Label ("Remove this Label") {
-			X = 2,
-			Y = Pos.Bottom (Label) + 1,
-			ColorScheme = Colors.Error,
-			HotKeySpecifier = (Rune)'_',
-			CanFocus = true,
-		};
-		Win.Add (removeLabel);
-		// This in interesting test case because `moveBtn` and below are laid out relative to this one!
-		removeLabel.Clicked += (s, e) => {
-			// Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
-			//Win.Remove (removeLabel);
+			var removeLabel = new Label ("Remove this Label") {
+				X = 2,
+				Y = Pos.Bottom (Label) + 1,
+				ColorScheme = Colors.ColorSchemes ["Error"],
+				HotKeySpecifier = (Rune)'_',
+				CanFocus = true,
+			};
+			Win.Add (removeLabel);
+			// This in interesting test case because `moveBtn` and below are laid out relative to this one!
+			removeLabel.Clicked += (s,e) => {
+				// Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
+				//Win.Remove (removeLabel);
 
 			removeLabel.Visible = false;
 			Win.SetNeedsDisplay ();
@@ -133,38 +133,38 @@ public class LabelsAsLabels : Scenario {
 		};
 		Win.Add (computedFrame);
 
-		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtn = new Label ("Move This \u263b Label _via Pos") {
-			X = 0,
-			Y = Pos.Center () - 1,
-			Width = 30,
-			ColorScheme = Colors.Error,
-			HotKeySpecifier = (Rune)'_',
-			CanFocus = true,
-		};
-		moveBtn.Clicked += (s, e) => {
-			moveBtn.X = moveBtn.Frame.X + 5;
-			// This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
-			//computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
-		};
-		computedFrame.Add (moveBtn);
+			// Demonstrates how changing the View.Frame property can move Views
+			var moveBtn = new Label ("Move This \u263b Label _via Pos") {
+				X = 0,
+				Y = Pos.Center () - 1,
+				Width = 30,
+				ColorScheme = Colors.ColorSchemes ["Error"],
+				HotKeySpecifier = (Rune)'_',
+				CanFocus = true,
+			};
+			moveBtn.Clicked += (s,e) => {
+				moveBtn.X = moveBtn.Frame.X + 5;
+				// This is already fixed with the call to SetNeedDisplay() in the Pos Dim.
+				//computedFrame.LayoutSubviews (); // BUGBUG: This call should not be needed. View.X is not causing relayout correctly
+			};
+			computedFrame.Add (moveBtn);
 
-		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-		var sizeBtn = new Label ("Size This \u263a Label _via Pos") {
-			//var sizeBtn = new Label ("Size This x Label _via Pos") {
-			X = 0,
-			Y = Pos.Center () + 1,
-			Width = 30,
-			ColorScheme = Colors.Error,
-			HotKeySpecifier = (Rune)'_',
-			CanFocus = true,
-			AutoSize = false
-		};
-		sizeBtn.Clicked += (s, e) => {
-			sizeBtn.Width = sizeBtn.Frame.Width + 5;
-			//computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
-		};
-		computedFrame.Add (sizeBtn);
+			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
+			var sizeBtn = new Label ("Size This \u263a Label _via Pos") {
+				//var sizeBtn = new Label ("Size This x Label _via Pos") {
+				X = 0,
+				Y = Pos.Center () + 1,
+				Width = 30,
+				ColorScheme = Colors.ColorSchemes ["Error"],
+				HotKeySpecifier = (Rune)'_',
+				CanFocus = true,
+				AutoSize = false
+			};
+			sizeBtn.Clicked += (s,e) => {
+				sizeBtn.Width = sizeBtn.Frame.Width + 5;
+				//computedFrame.LayoutSubviews (); // FIXED: This call should not be needed. View.X is not causing relayout correctly
+			};
+			computedFrame.Add (sizeBtn);
 
 		var absoluteFrame = new FrameView ("Absolute Layout") {
 			X = Pos.Right (computedFrame),
@@ -176,8 +176,8 @@ public class LabelsAsLabels : Scenario {
 
 		// Demonstrates how changing the View.Frame property can move Views
 		var moveBtnA = new Label ("Move This Label via Frame") {
-			ColorScheme = Colors.Error,
-			HotKeySpecifier = (Rune)'_',
+			ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
 			CanFocus = true,
 		};
 		moveBtnA.Clicked += (s, e) => {
@@ -188,8 +188,8 @@ public class LabelsAsLabels : Scenario {
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 		var sizeBtnA = new Label (" ~  s  gui.cs   master ↑10 = Со_хранить") {
 			Y = 2,
-			ColorScheme = Colors.Error,
-			HotKeySpecifier = (Rune)'_',
+			ColorScheme = Colors.ColorSchemes["Error"],
+            HotKeySpecifier = (Rune)'_',
 			CanFocus = true,
 			AutoSize = false
 		};
@@ -239,33 +239,33 @@ public class LabelsAsLabels : Scenario {
 			return start + '_' + StringExtensions.ToString (runes.GetRange (i, runes.Count - i));
 		}
 
-		var mhkb = "Click to Change th_is Label's Hotkey";
-		var moveHotKeyBtn = new Label (mhkb) {
-			X = 2,
-			Y = Pos.Bottom (radioGroup) + 1,
-			Width = Dim.Width (computedFrame) - 2,
-			ColorScheme = Colors.TopLevel,
-			HotKeySpecifier = (Rune)'_',
-			CanFocus = true,
-		};
-		moveHotKeyBtn.Clicked += (s, e) => {
-			moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
-		};
-		Win.Add (moveHotKeyBtn);
+			var mhkb = "Click to Change th_is Label's Hotkey";
+			var moveHotKeyBtn = new Label (mhkb) {
+				X = 2,
+				Y = Pos.Bottom (radioGroup) + 1,
+				Width = Dim.Width (computedFrame) - 2,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
+				HotKeySpecifier = (Rune)'_',
+				CanFocus = true,
+			};
+			moveHotKeyBtn.Clicked += (s,e) => {
+				moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
+			};
+			Win.Add (moveHotKeyBtn);
 
-		string muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
-		var moveUnicodeHotKeyBtn = new Label (muhkb) {
-			X = Pos.Left (absoluteFrame) + 1,
-			Y = Pos.Bottom (radioGroup) + 1,
-			Width = Dim.Width (absoluteFrame) - 2,
-			ColorScheme = Colors.TopLevel,
-			HotKeySpecifier = (Rune)'_',
-			CanFocus = true,
-		};
-		moveUnicodeHotKeyBtn.Clicked += (s, e) => {
-			moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
-		};
-		Win.Add (moveUnicodeHotKeyBtn);
+			string muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
+			var moveUnicodeHotKeyBtn = new Label (muhkb) {
+				X = Pos.Left (absoluteFrame) + 1,
+				Y = Pos.Bottom (radioGroup) + 1,
+				Width = Dim.Width (absoluteFrame) - 2,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
+				HotKeySpecifier = (Rune)'_',
+				CanFocus = true,
+			};
+			moveUnicodeHotKeyBtn.Clicked += (s,e) => {
+				moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
+			};
+			Win.Add (moveUnicodeHotKeyBtn);
 
 		radioGroup.SelectedItemChanged += (s, args) => {
 			switch (args.SelectedItem) {

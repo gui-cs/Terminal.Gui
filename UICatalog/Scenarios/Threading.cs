@@ -52,26 +52,26 @@ public class Threading : Scenario {
 			Y = Pos.Y (_btnActionCancel) + 4,
 		});
 
-		_itemsList = new ListView {
-			X = Pos.X (_btnActionCancel),
-			Y = Pos.Y (_btnActionCancel) + 6,
-			Width = 10,
-			Height = 10,
-			ColorScheme = Colors.TopLevel
-		};
+			_itemsList = new ListView {
+				X = Pos.X (_btnActionCancel),
+				Y = Pos.Y (_btnActionCancel) + 6,
+				Width = 10,
+				Height = 10,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			};
 
 		Win.Add (new Label ("Task Logs:") {
 			X = Pos.Right (_itemsList) + 10,
 			Y = Pos.Y (_btnActionCancel) + 4,
 		});
 
-		_logJob = new ListView (_log) {
-			X = Pos.Right (_itemsList) + 10,
-			Y = Pos.Y (_itemsList),
-			Width = 50,
-			Height = Dim.Fill (),
-			ColorScheme = Colors.TopLevel
-		};
+			_logJob = new ListView (log) {
+				X = Pos.Right (_itemsList) + 10,
+				Y = Pos.Y (_itemsList),
+				Width = 50,
+				Height = Dim.Fill (),
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			};
 
 		var text = new TextField ("Type anything after press the button") { X = 1, Y = 3, Width = 100 };
 

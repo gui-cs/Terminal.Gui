@@ -33,9 +33,9 @@ public class Progress : Scenario {
 			}
 		}
 
-		internal ProgressDemo (string title) : base (title)
-		{
-			ColorScheme = Colors.Dialog;
+			internal ProgressDemo (string title) : base (title)
+			{
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 			LeftFrame = new FrameView ("Settings") {
 				X = 0,
@@ -74,15 +74,15 @@ public class Progress : Scenario {
 			Add (pulseButton);
 			Add (stopbutton);
 
-			ActivityProgressBar = new ProgressBar () {
-				X = Pos.Right (LeftFrame) + 1,
-				Y = Pos.Bottom (startButton) + 1,
-				Width = Dim.Fill () - 1,
-				Height = 1,
-				Fraction = 0.25F,
-				ColorScheme = Colors.Error
-			};
-			Add (ActivityProgressBar);
+				ActivityProgressBar = new ProgressBar () {
+					X = Pos.Right (LeftFrame) + 1,
+					Y = Pos.Bottom (startButton) + 1,
+					Width = Dim.Fill () - 1,
+					Height = 1,
+					Fraction = 0.25F,
+					ColorScheme = Colors.ColorSchemes ["Error"]
+				};
+				Add (ActivityProgressBar);
 
 			Spinner = new SpinnerView () {
 				Style = new SpinnerStyle.Dots2 (),
@@ -96,14 +96,14 @@ public class Progress : Scenario {
 
 			Add (Spinner);
 
-			PulseProgressBar = new ProgressBar () {
-				X = Pos.Right (LeftFrame) + 1,
-				Y = Pos.Bottom (ActivityProgressBar) + 1,
-				Width = Dim.Fill () - Spinner.Width,
-				Height = 1,
-				ColorScheme = Colors.Error
-			};
-			Add (PulseProgressBar);
+				PulseProgressBar = new ProgressBar () {
+					X = Pos.Right (LeftFrame) + 1,
+					Y = Pos.Bottom (ActivityProgressBar) + 1,
+					Width = Dim.Fill () - Spinner.Width,
+					Height = 1,
+					ColorScheme = Colors.ColorSchemes ["Error"]
+				};
+				Add (PulseProgressBar);
 
 			_startedLabel = new Label ("Stopped") {
 				X = Pos.Right (LeftFrame) + 1,

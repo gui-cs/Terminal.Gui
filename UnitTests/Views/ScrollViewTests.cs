@@ -499,10 +499,10 @@ public class ScrollViewTests {
                        
                At 15,15", _output);
 
-		var attributes = new Attribute [] {
-						Colors.TopLevel.Normal,
-						Colors.TopLevel.Focus,
-						Colors.Base.Normal
+			var attributes = new Attribute [] {
+						Colors.ColorSchemes ["TopLevel"].Normal,
+						Colors.ColorSchemes ["TopLevel"].Focus,
+						Colors.ColorSchemes ["Base"].Normal
 					};
 
 		TestHelpers.AssertDriverAttributesAre (@"

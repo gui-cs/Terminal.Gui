@@ -160,8 +160,8 @@ public class SingleBackgroundWorker : Scenario {
 				});
 			top.Add (statusBar);
 
-			Title = $"Worker started at {start}.{start:fff}";
-			ColorScheme = Colors.Base;
+				Title = $"Worker started at {start}.{start:fff}";
+				ColorScheme = Colors.ColorSchemes ["Base"];
 
 			Add (new ListView (list) {
 				X = 0,

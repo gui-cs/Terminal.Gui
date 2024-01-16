@@ -252,7 +252,7 @@ public class ComboBox : View {
 	public ComboBox (IList source) : this (string.Empty)
 	{
 		_search = new TextField ("");
-		_listview = new ComboListView (this, source, HideDropdownListOnClick) { ColorScheme = Colors.Base };
+		_listview = new ComboListView (this, source, HideDropdownListOnClick) { ColorScheme = Colors.ColorSchemes ["Base"] };
 
 		SetInitialProperties ();
 		SetSource (source);
@@ -380,7 +380,9 @@ public class ComboBox : View {
 			_search.ReadOnly = value;
 			if (_search.ReadOnly) {
 				if (_search.ColorScheme != null) {
-					_search.ColorScheme.Normal = _search.ColorScheme.Focus;
+					_search.ColorScheme = new ColorScheme (_search.ColorScheme) {
+						Normal = _search.ColorScheme.Focus
+					};
 				}
 			}
 		}

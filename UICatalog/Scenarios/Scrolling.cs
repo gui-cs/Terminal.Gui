@@ -119,7 +119,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label) + 1,
 				Width = 50,
 				Height = 20,
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				ContentSize = new Size (200, 100),
 				//ContentOffset = new Point (0, 0),
 				ShowVerticalScrollIndicator = true,
@@ -134,7 +134,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = 2,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				AutoSize = false
 			};
 			scrollView.Add (horizontalRuler);
@@ -146,7 +146,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				AutoSize = false
 			};
 			scrollView.Add (verticalRuler);
@@ -179,21 +179,21 @@ namespace UICatalog.Scenarios {
 				X = 3,
 				Y = 5,
 				Width = 50,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			});
 
 			scrollView.Add (new TextField ("... the emergency broadcast system.") {
 				X = 3,
 				Y = 10,
 				Width = 50,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			});
 
 			scrollView.Add (new TextField ("Last line") {
 				X = 3,
 				Y = 99,
 				Width = 50,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			});
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right

@@ -240,8 +240,8 @@ public class TreeTableSourceTests: IDisposable {
 	private TableView GetTreeTable (out TreeView<IDescribedThing> tree)
 	{
 		var tableView = new TableView ();
-		tableView.ColorScheme = Colors.TopLevel;
-		tableView.ColorScheme = Colors.TopLevel;
+		tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
+		tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		tableView.Bounds = new Rect (0, 0, 40, 6);
 
 		tableView.Style.ShowHorizontalHeaderUnderline = true;

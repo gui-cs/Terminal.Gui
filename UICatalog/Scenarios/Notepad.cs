@@ -17,7 +17,7 @@ public class Notepad : Scenario {
 	public override void Init ()
 	{
 		Application.Init ();
-		Application.Top.ColorScheme = Colors.Base;
+		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
 
 	public override void Setup ()
