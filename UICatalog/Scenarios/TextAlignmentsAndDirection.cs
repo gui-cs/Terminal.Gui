@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (container) + 1,
 				Width = Dim.Fill (10),
 				Height = Dim.Fill (1),
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				Text = txt
 			};
 

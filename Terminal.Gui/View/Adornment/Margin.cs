@@ -27,7 +27,7 @@ public class Margin : Adornment {
 			if (base.ColorScheme != null) {
 				return base.ColorScheme;
 			}
-			return Parent?.SuperView?.ColorScheme ?? Colors.TopLevel;
+			return Parent?.SuperView?.ColorScheme ?? Colors.ColorSchemes ["TopLevel"];
 		}
 		set {
 			base.ColorScheme = value;

@@ -23,8 +23,8 @@ namespace UICatalog.Scenarios {
 			var multiLineHeight = 5;
 
 			foreach (var alignment in alignments) {
-				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.Dialog, AutoSize = false };
-				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.Dialog, AutoSize = false };
+				singleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.ColorSchemes ["Dialog"], AutoSize = false };
+				multipleLines [(int)alignment] = new Label (txt) { TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"], AutoSize = false };
 			}
 
 			// Add a label & text field so we can demo IsDefault
@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Y (editLabel),
 				Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
 				Height = 4,
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				Text = txt,
 			};
 			edit.TextChanged += (s,e) => {
