@@ -77,9 +77,9 @@ public class Adornments : Scenario {
 		editor.Initialized += (s, e) => {
 			editor.ViewToEdit = view;
 		};
-		//view.Margin.ColorScheme = new ColorScheme (Colors.Dialog);
-		//view.Border.ColorScheme = new ColorScheme (Colors.Error);
-		//view.Padding.ColorScheme = new ColorScheme (Colors.Menu);
+		//view.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Dialog"]);
+		//view.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
+		//view.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Menu"]);
 
 		Application.Run (editor);
 		Application.Shutdown ();

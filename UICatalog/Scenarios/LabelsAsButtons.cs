@@ -114,7 +114,7 @@ namespace UICatalog.Scenarios {
 			var removeLabel = new Label ("Remove this Label") {
 				X = 2,
 				Y = Pos.Bottom (Label) + 1,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 			};
@@ -141,7 +141,7 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = Pos.Center () - 1,
 				Width = 30,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 			};
@@ -158,7 +158,7 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 				AutoSize = false
@@ -179,7 +179,7 @@ namespace UICatalog.Scenarios {
 
 			// Demonstrates how changing the View.Frame property can move Views
 			var moveBtnA = new Label (0, 0, "Move This Label via Frame") {
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 			};
@@ -190,7 +190,7 @@ namespace UICatalog.Scenarios {
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 			var sizeBtnA = new Label (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 				AutoSize = false
@@ -246,7 +246,7 @@ namespace UICatalog.Scenarios {
 				X = 2,
 				Y = Pos.Bottom (radioGroup) + 1,
 				Width = Dim.Width (computedFrame) - 2,
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 			};
@@ -260,7 +260,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Left (absoluteFrame) + 1,
 				Y = Pos.Bottom (radioGroup) + 1,
 				Width = Dim.Width (absoluteFrame) - 2,
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
 			};

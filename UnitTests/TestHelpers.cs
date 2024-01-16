@@ -351,21 +351,20 @@ partial class TestHelpers {
 
 #pragma warning disable xUnit1013 // Public method should be marked as test
 	/// <summary>
-	/// Verifies the console was rendered using the given <paramref name="expectedAttribute"/> at the given locations.
-	/// Pass a bitmap of indexes into <paramref name="expectedAttribute"/> as <paramref name="expectedLook"/> and the
-	/// test method will verify those colors were used in the row/col of the console during rendering
+	/// Verifies <paramref name="expectedAttributes"/> are found at the locations specified by <paramref name="expectedLook"/>.
+	/// <paramref name="expectedLook"/> is a bitmap of indexes into <paramref name="expectedAttributes"/> (e.g. "00110" 
+	/// means the attribute at <c>expectedAttributes[1]</c> is expected at the 3rd and 4th columns of the 1st row of driver.Contents).
 	/// </summary>
 	/// <param name="expectedLook">
-	/// Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes of
-	/// <paramref name="expectedAttribute"/>
+	/// Numbers between 0 and 9 for each row/col of the console.  Must be valid indexes into <paramref name="expectedAttributes"/>.
 	/// </param>
 	/// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
-	/// <param name="expectedAttribute"></param>
-	public static void AssertDriverAttributesAre (string expectedLook, ConsoleDriver driver = null, params Attribute [] expectedAttribute)
+	/// <param name="expectedAttributes"></param>
+	public static void AssertDriverAttributesAre (string expectedLook, ConsoleDriver driver = null, params Attribute [] expectedAttributes)
 	{
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
-		if (expectedAttribute.Length > 10) {
+		if (expectedAttributes.Length > 10) {
 			throw new ArgumentException ("This method only works for UIs that use at most 10 colors");
 		}
 
@@ -381,24 +380,24 @@ partial class TestHelpers {
 
 				var val = contents [line, c].Attribute;
 
-				var match = expectedAttribute.Where (e => e == val).ToList ();
+				var match = expectedAttributes.Where (e => e == val).ToList ();
 				switch (match.Count) {
 				case 0:
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-					                     $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]}' was not found.\n" +
-							     $"  Expected: {string.Join (",", expectedAttribute.Select (c => c))}\n" +
+					                     $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n" +
+							     $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n" +
 					                     $"  But Was: <not found>");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}
 
-				var colorUsed = Array.IndexOf (expectedAttribute, match [0]).ToString () [0];
+				var colorUsed = Array.IndexOf (expectedAttributes, match [0]).ToString () [0];
 				var userExpected = lineString [c];
 
 				if (colorUsed != userExpected) {
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-						$"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.'\n" +
-						$"  Expected: {userExpected} ({expectedAttribute [int.Parse (userExpected.ToString ())]})\n" +
+						$"Unexpected Attribute at Contents[{line},{c}] {contents [line, c]}.\n" +
+						$"  Expected: {userExpected} ({expectedAttributes [int.Parse (userExpected.ToString ())]})\n" +
 						$"  But Was:   {colorUsed} ({val})\n");
 				}
 			}

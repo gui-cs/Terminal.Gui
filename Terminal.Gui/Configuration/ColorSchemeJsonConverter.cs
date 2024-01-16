@@ -28,10 +28,22 @@ namespace Terminal.Gui {
 				throw new JsonException ($"Unexpected StartObject token when parsing ColorScheme: {reader.TokenType}.");
 			}
 
-			var colorScheme = new ColorScheme ();
+			Attribute normal = Attribute.Default;
+			Attribute focus = Attribute.Default;
+			Attribute hotNormal = Attribute.Default;
+			Attribute hotFocus = Attribute.Default;
+			Attribute disabled = Attribute.Default;
 
 			while (reader.Read ()) {
 				if (reader.TokenType == JsonTokenType.EndObject) {
+					var colorScheme = new ColorScheme () {
+						Normal = normal,
+						Focus = focus,
+						HotNormal = hotNormal,
+						HotFocus = hotFocus,
+						Disabled = disabled
+					};
+
 					return colorScheme;
 				}
 
@@ -45,19 +57,19 @@ namespace Terminal.Gui {
 
 				switch (propertyName.ToLower()) {
 				case "normal":
-					colorScheme.Normal = attribute;
+					normal = attribute;
 					break;
 				case "focus":
-					colorScheme.Focus = attribute;
+					focus = attribute;
 					break;
 				case "hotnormal":
-					colorScheme.HotNormal = attribute;
+					hotNormal = attribute;
 					break;
 				case "hotfocus":
-					colorScheme.HotFocus = attribute;
+					hotFocus = attribute;
 					break;
 				case "disabled":
-					colorScheme.Disabled = attribute;
+					disabled = attribute;
 					break;
 				default:
 					throw new JsonException ($"Unrecognized ColorScheme Attribute name: {propertyName}.");

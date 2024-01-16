@@ -175,7 +175,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 5,
 				Width = 25,
 				Height = 1,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				TextAlignment = Terminal.Gui.TextAlignment.Centered
 			};
 

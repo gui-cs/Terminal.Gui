@@ -99,7 +99,7 @@ public class Border : Adornment {
 			return;
 		}
 
-		//Driver.SetAttribute (Colors.Error.Normal);
+		//Driver.SetAttribute (Colors.ColorSchemes ["Error"].Normal);
 		var screenBounds = BoundsToScreen (Frame);
 
 		//OnDrawSubviews (bounds); 

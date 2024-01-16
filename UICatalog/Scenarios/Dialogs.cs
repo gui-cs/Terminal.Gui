@@ -143,7 +143,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 5,
 				Width = 25,
 				Height = 1,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 			};
 			// glyphsNotWords
 			// false:var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };

@@ -278,7 +278,7 @@ public class MenuBar : View {
 		//CanFocus = true;
 		_selected = -1;
 		_selectedSub = -1;
-		ColorScheme = Colors.Menu;
+		ColorScheme = Colors.ColorSchemes ["Menu"];
 		WantMousePositionReports = true;
 		IsMenuOpen = false;
 
