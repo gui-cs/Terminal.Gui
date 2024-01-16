@@ -191,7 +191,7 @@ public class AttributeJsonConverterTests {
 		Assert.Equal (Color.BrightGreen, attribute.Background.ColorName);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestSerialize ()
 	{
 		// Test serializing to human-readable color names
@@ -229,7 +229,7 @@ public class ColorSchemeJsonConverterTests {
 	//		}
 	//		}
 	//	}";
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestColorSchemesSerialization ()
 	{
 		// Arrange

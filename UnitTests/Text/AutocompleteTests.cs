@@ -46,7 +46,7 @@ namespace Terminal.Gui.TextTests {
 			var tv = new TextView ();
 
 			// to begin with we should be using the default menu color scheme
-			Assert.Same (Colors.Menu, tv.Autocomplete.ColorScheme);
+			Assert.Same (Colors.ColorSchemes ["Menu"], tv.Autocomplete.ColorScheme);
 
 			// allocate a new custom scheme
 			tv.Autocomplete.ColorScheme = new ColorScheme () {
@@ -55,7 +55,7 @@ namespace Terminal.Gui.TextTests {
 			};
 
 			// should be separate instance
-			Assert.NotSame (Colors.Menu, tv.Autocomplete.ColorScheme);
+			Assert.NotSame (Colors.ColorSchemes ["Menu"], tv.Autocomplete.ColorScheme);
 
 			// with the values we set on it
 			Assert.Equal (new Color (Color.Black), tv.Autocomplete.ColorScheme.Normal.Foreground);
@@ -153,7 +153,7 @@ namespace Terminal.Gui.TextTests {
 			Assert.Equal (3, g.AllSuggestions.Count);
 			Assert.True (tv.NewKeyDownEvent (new (tv.Autocomplete.SelectionKey)));
 			tv.PositionCursor ();
-			Assert.Equal ($"fortunately Fortunately super feature.", tv.Text);
+			Assert.Equal ($"Fortunately Fortunately super feature.", tv.Text);
 			Assert.Equal (new Point (11, 0), tv.CursorPosition);
 			Assert.Empty (tv.Autocomplete.Suggestions);
 			Assert.Equal (3, g.AllSuggestions.Count);

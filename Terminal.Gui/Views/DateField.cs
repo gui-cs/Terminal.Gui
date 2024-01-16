@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 ///   Simple Date editing <see cref="View"/>
@@ -19,17 +19,10 @@ namespace Terminal.Gui;
 ///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
 /// </remarks>
 public class DateField : TextField {
-	DateTime date;
-	bool isShort;
-	int longFieldLen = 10;
-	int shortFieldLen = 8;
-	string sepChar;
-	string longFormat;
-	string shortFormat;
-
-	int fieldLen => isShort ? shortFieldLen : longFieldLen;
-
-	string format => isShort ? shortFormat : longFormat;
+	DateTime _date;
+	int _fieldLen = 10;
+	string _sepChar;
+	string _format;
 
 	/// <summary>
 	///   DateChanged event, raised when the <see cref="Date"/> property has changed.
@@ -43,15 +36,6 @@ public class DateField : TextField {
 	public event EventHandler<DateTimeEventArgs<DateTime>> DateChanged;
 
 	/// <summary>
-	///    Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	/// <param name="date">Initial date contents.</param>
-	/// <param name="isShort">If true, shows only two digits for the year.</param>
-	public DateField (int x, int y, DateTime date, bool isShort = false) : base (x, y, isShort ? 10 : 12, "") => Initialize (date, isShort);
-
-	/// <summary>
 	///  Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.
 	/// </summary>
 	public DateField () : this (DateTime.MinValue) { }
@@ -62,20 +46,18 @@ public class DateField : TextField {
 	/// <param name="date"></param>
 	public DateField (DateTime date) : base ("")
 	{
-		Width = fieldLen + 2;
-		Initialize (date);
+		Width = _fieldLen + 2;
+		SetInitialProperties (date);
 	}
 
-	void Initialize (DateTime date, bool isShort = false)
+	void SetInitialProperties (DateTime date)
 	{
 		var cultureInfo = CultureInfo.CurrentCulture;
-		sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-		longFormat = GetLongFormat (cultureInfo.DateTimeFormat.ShortDatePattern);
-		shortFormat = GetShortFormat (longFormat);
-		this.isShort = isShort;
+		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
+		_format = $" {cultureInfo.DateTimeFormat.ShortDatePattern}";
 		Date = date;
 		CursorPosition = 1;
-		TextChanged += DateField_Changed;
+		TextChanging += DateField_Changing;
 
 		// Things this view knows how to do
 		AddCommand (Command.DeleteCharRight, () => {
@@ -92,11 +74,11 @@ public class DateField : TextField {
 		AddCommand (Command.Right, () => MoveRight ());
 
 		// Default keybindings for this view
-		KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+		KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
 		KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
 
-		KeyBindings.Add (Key.Delete, Command.DeleteCharLeft);
 		KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+		KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
 
 		KeyBindings.Add (Key.Home, Command.LeftHome);
 		KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
@@ -109,7 +91,6 @@ public class DateField : TextField {
 
 		KeyBindings.Add (Key.CursorRight, Command.Right);
 		KeyBindings.Add (Key.F.WithCtrl, Command.Right);
-
 	}
 
 	/// <inheritdoc />
@@ -127,37 +108,32 @@ public class DateField : TextField {
 		return false;
 	}
 
-	void DateField_Changed (object sender, TextChangedEventArgs e)
+	void DateField_Changing (object sender, TextChangingEventArgs e)
 	{
 		try {
-			if (!DateTime.TryParseExact (GetDate (Text), GetInvarianteFormat (), CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
-				Text = e.OldValue;
+			var cultureInfo = CultureInfo.CurrentCulture;
+			DateTimeFormatInfo ccFmt = cultureInfo.DateTimeFormat;
+			int spaces = 0;
+			for (int i = 0; i < e.NewText.Length; i++) {
+				if (e.NewText [i] == ' ') {
+					spaces++;
+				} else {
+					break;
+				}
 			}
+			spaces += _fieldLen;
+			string trimedText = e.NewText [..spaces];
+			spaces -= _fieldLen;
+			trimedText = trimedText.Replace (new string (' ', spaces), " ");
+			var date = Convert.ToDateTime (trimedText, ccFmt).ToString (ccFmt.ShortDatePattern);
+			if ($" {date}" != e.NewText) {
+				e.NewText = $" {date}";
+			}
+			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
-			Text = e.OldValue;
+			e.Cancel = true;
 		}
 	}
-
-	string GetInvarianteFormat () => $"MM{sepChar}dd{sepChar}yyyy";
-
-	string GetLongFormat (string lf)
-	{
-		string [] frm = lf.Split (sepChar);
-		for (int i = 0; i < frm.Length; i++) {
-			if (frm [i].Contains ("M") && frm [i].GetRuneCount () < 2) {
-				lf = lf.Replace ("M", "MM");
-			}
-			if (frm [i].Contains ("d") && frm [i].GetRuneCount () < 2) {
-				lf = lf.Replace ("d", "dd");
-			}
-			if (frm [i].Contains ("y") && frm [i].GetRuneCount () < 4) {
-				lf = lf.Replace ("yy", "yyyy");
-			}
-		}
-		return $" {lf}";
-	}
-
-	string GetShortFormat (string lf) => lf.Replace ("yyyy", "yy");
 
 	/// <summary>
 	///   Gets or sets the date of the <see cref="DateField"/>.
@@ -165,57 +141,43 @@ public class DateField : TextField {
 	/// <remarks>
 	/// </remarks>
 	public DateTime Date {
-		get => date;
+		get => _date;
 		set {
 			if (ReadOnly) {
 				return;
 			}
 
-			var oldData = date;
-			date = value;
-			Text = value.ToString (format);
-			var args = new DateTimeEventArgs<DateTime> (oldData, value, format);
+			var oldData = _date;
+			_date = value;
+			Text = value.ToString (_format);
+			var args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
 			if (oldData != value) {
 				OnDateChanged (args);
 			}
 		}
 	}
 
-	/// <summary>
-	/// Get or set the date format for the widget.
-	/// </summary>
-	public bool IsShortFormat {
-		get => isShort;
-		set {
-			isShort = value;
-			if (isShort) {
-				Width = 10;
-			} else {
-				Width = 12;
-			}
-			bool ro = ReadOnly;
-			if (ro) {
-				ReadOnly = false;
-			}
-			SetText (Text);
-			ReadOnly = ro;
-			SetNeedsDisplay ();
-		}
-	}
-
 	/// <inheritdoc/>
 	public override int CursorPosition {
 		get => base.CursorPosition;
-		set => base.CursorPosition = Math.Max (Math.Min (value, fieldLen), 1);
+		set => base.CursorPosition = Math.Max (Math.Min (value, _fieldLen), 1);
 	}
 
 	bool SetText (Rune key)
 	{
+		if (CursorPosition > _fieldLen) {
+			CursorPosition = _fieldLen;
+			return false;
+		} else if (CursorPosition < 1) {
+			CursorPosition = 1;
+			return false;
+		}
+
 		var text = Text.EnumerateRunes ().ToList ();
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
-		if (CursorPosition < fieldLen) {
-			newText = newText.Concat (text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))).ToList ();
+		if (CursorPosition < _fieldLen) {
+			newText = [.. newText, .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))];
 		}
 		return SetText (StringExtensions.ToString (newText));
 	}
@@ -226,20 +188,24 @@ public class DateField : TextField {
 			return false;
 		}
 
-		string [] vals = text.Split (sepChar);
-		string [] frm = format.Split (sepChar);
-		bool isValidDate = true;
-		int idx = GetFormatIndex (frm, "y");
-		int year = Int32.Parse (vals [idx]);
+		text = NormalizeFormat (text);
+		string [] vals = text.Split (_sepChar);
+		string [] frm = _format.Split (_sepChar);
+		int year;
 		int month;
 		int day;
+		int idx = GetFormatIndex (frm, "y");
+		if (Int32.Parse (vals [idx]) < 1) {
+			year = 1;
+			vals [idx] = "1";
+		} else {
+			year = Int32.Parse (vals [idx]);
+		}
 		idx = GetFormatIndex (frm, "M");
 		if (Int32.Parse (vals [idx]) < 1) {
-			isValidDate = false;
 			month = 1;
 			vals [idx] = "1";
 		} else if (Int32.Parse (vals [idx]) > 12) {
-			isValidDate = false;
 			month = 12;
 			vals [idx] = "12";
 		} else {
@@ -247,11 +213,9 @@ public class DateField : TextField {
 		}
 		idx = GetFormatIndex (frm, "d");
 		if (Int32.Parse (vals [idx]) < 1) {
-			isValidDate = false;
 			day = 1;
 			vals [idx] = "1";
 		} else if (Int32.Parse (vals [idx]) > 31) {
-			isValidDate = false;
 			day = DateTime.DaysInMonth (year, month);
 			vals [idx] = day.ToString ();
 		} else {
@@ -259,64 +223,55 @@ public class DateField : TextField {
 		}
 		string d = GetDate (month, day, year, frm);
 
-		if (!DateTime.TryParseExact (d, format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result) ||
-		!isValidDate) {
+		if (!DateTime.TryParseExact (d, _format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
 			return false;
 		}
 		Date = result;
 		return true;
 	}
 
+	string NormalizeFormat (string text, string fmt = null, string sepChar = null)
+	{
+		if (string.IsNullOrEmpty (fmt)) {
+			fmt = _format;
+		}
+		if (string.IsNullOrEmpty (sepChar)) {
+			sepChar = _sepChar;
+		}
+		if (fmt.Length != text.Length) {
+			return text;
+		}
+
+		var fmtText = text.ToCharArray ();
+		for (int i = 0; i < text.Length; i++) {
+			var c = fmt [i];
+			if (c.ToString () == sepChar && text [i].ToString () != sepChar) {
+				fmtText [i] = c;
+			}
+		}
+
+		return new string (fmtText);
+	}
+
 	string GetDate (int month, int day, int year, string [] fm)
 	{
 		string date = " ";
 		for (int i = 0; i < fm.Length; i++) {
-			if (fm [i].Contains ("M")) {
+			if (fm [i].Contains ('M')) {
 				date += $"{month,2:00}";
-			} else if (fm [i].Contains ("d")) {
+			} else if (fm [i].Contains ('d')) {
 				date += $"{day,2:00}";
 			} else {
-				if (!isShort && year.ToString ().Length == 2) {
-					string y = DateTime.Now.Year.ToString ();
-					date += y.Substring (0, 2) + year.ToString ();
-				} else if (isShort && year.ToString ().Length == 4) {
-					date += $"{year.ToString ().Substring (2, 2)}";
-				} else {
-					date += $"{year,2:00}";
-				}
+				date += $"{year,4:0000}";
 			}
 			if (i < 2) {
-				date += $"{sepChar}";
+				date += $"{_sepChar}";
 			}
 		}
 		return date;
 	}
 
-	string GetDate (string text)
-	{
-		string [] vals = text.Split (sepChar);
-		string [] frm = format.Split (sepChar);
-		string [] date = { null, null, null };
-
-		for (int i = 0; i < frm.Length; i++) {
-			if (frm [i].Contains ("M")) {
-				date [0] = vals [i].Trim ();
-			} else if (frm [i].Contains ("d")) {
-				date [1] = vals [i].Trim ();
-			} else {
-				string year = vals [i].Trim ();
-				if (year.GetRuneCount () == 2) {
-					string y = DateTime.Now.Year.ToString ();
-					date [2] = y.Substring (0, 2) + year.ToString ();
-				} else {
-					date [2] = vals [i].Trim ();
-				}
-			}
-		}
-		return date [0] + sepChar + date [1] + sepChar + date [2];
-	}
-
-	int GetFormatIndex (string [] fm, string t)
+	static int GetFormatIndex (string [] fm, string t)
 	{
 		int idx = -1;
 		for (int i = 0; i < fm.Length; i++) {
@@ -330,45 +285,63 @@ public class DateField : TextField {
 
 	void IncCursorPosition ()
 	{
-		if (CursorPosition == fieldLen) {
+		if (CursorPosition >= _fieldLen) {
+			CursorPosition = _fieldLen;
 			return;
 		}
-		if (Text [++CursorPosition] == sepChar.ToCharArray () [0]) {
-			CursorPosition++;
-		}
+		CursorPosition++;
+		AdjCursorPosition (CursorPosition);
 	}
 
 	void DecCursorPosition ()
 	{
-		if (CursorPosition == 1) {
+		if (CursorPosition <= 1) {
+			CursorPosition = 1;
 			return;
 		}
-		if (Text [--CursorPosition] == sepChar.ToCharArray () [0]) {
-			CursorPosition--;
-		}
+		CursorPosition--;
+		AdjCursorPosition (CursorPosition, false);
 	}
 
-	void AdjCursorPosition ()
+	void AdjCursorPosition (int point, bool increment = true)
 	{
-		if (Text [CursorPosition] == sepChar.ToCharArray () [0]) {
-			CursorPosition++;
+		var newPoint = point;
+		if (point > _fieldLen) {
+			newPoint = _fieldLen;
+		}
+		if (point < 1) {
+			newPoint = 1;
+		}
+		if (newPoint != point) {
+			CursorPosition = newPoint;
+		}
+
+		while (Text [CursorPosition] == _sepChar [0]) {
+			if (increment) {
+				CursorPosition++;
+			} else {
+				CursorPosition--;
+			}
 		}
 	}
 
 	bool MoveRight ()
 	{
+		ClearAllSelection ();
 		IncCursorPosition ();
 		return true;
 	}
 
 	new bool MoveEnd ()
 	{
-		CursorPosition = fieldLen;
+		ClearAllSelection ();
+		CursorPosition = _fieldLen;
 		return true;
 	}
 
 	bool MoveLeft ()
 	{
+		ClearAllSelection ();
 		DecCursorPosition ();
 		return true;
 	}
@@ -376,6 +349,7 @@ public class DateField : TextField {
 	bool MoveHome ()
 	{
 		// Home, C-A
+		ClearAllSelection ();
 		CursorPosition = 1;
 		return true;
 	}
@@ -387,6 +361,7 @@ public class DateField : TextField {
 			return;
 		}
 
+		ClearAllSelection ();
 		SetText ((Rune)'0');
 		DecCursorPosition ();
 		return;
@@ -399,6 +374,7 @@ public class DateField : TextField {
 			return;
 		}
 
+		ClearAllSelection ();
 		SetText ((Rune)'0');
 		return;
 	}
@@ -406,23 +382,13 @@ public class DateField : TextField {
 	/// <inheritdoc/>
 	public override bool MouseEvent (MouseEvent ev)
 	{
-		if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked)) {
-			return false;
-		}
-		if (!HasFocus) {
-			SetFocus ();
-		}
+		var result = base.MouseEvent (ev);
 
-		int point = ev.X;
-		if (point > fieldLen) {
-			point = fieldLen;
+		if (result && SelectedLength == 0 && ev.Flags.HasFlag (MouseFlags.Button1Pressed)) {
+			int point = ev.X;
+			AdjCursorPosition (point, true);
 		}
-		if (point < 1) {
-			point = 1;
-		}
-		CursorPosition = point;
-		AdjCursorPosition ();
-		return true;
+		return result;
 	}
 
 	/// <summary>

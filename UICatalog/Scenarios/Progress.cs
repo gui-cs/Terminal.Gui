@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 
 			internal ProgressDemo (string title) : base (title)
 			{
-				ColorScheme = Colors.Dialog;
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 				LeftFrame = new FrameView ("Settings") {
 					X = 0,
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 					Width = Dim.Fill () - 1,
 					Height = 1,
 					Fraction = 0.25F,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				};
 				Add (ActivityProgressBar);
 
@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (ActivityProgressBar) + 1,
 					Width = Dim.Fill () - Spinner.Width,
 					Height = 1,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				};
 				Add (PulseProgressBar);
 
@@ -112,11 +112,11 @@ namespace UICatalog.Scenarios {
 				};
 				Add (_startedLabel);
 
-				// Explictly cause layout so the setting of Height below works
-				LayoutSubviews ();
-
-				// Set height to height of controls + spacing + frame
-				Height = 2 + _verticalSpace + startButton.Frame.Height + _verticalSpace + ActivityProgressBar.Frame.Height + _verticalSpace + PulseProgressBar.Frame.Height + _verticalSpace;
+				// TODO: Great use of Dim.Auto
+				Initialized += (s, e) => {
+					// Set height to height of controls + spacing + frame
+					Height = 2 + _verticalSpace + startButton.Frame.Height + _verticalSpace + ActivityProgressBar.Frame.Height + _verticalSpace + PulseProgressBar.Frame.Height + _verticalSpace;
+				};
 			}
 
 			internal void Start ()

@@ -19,6 +19,7 @@ namespace Terminal.Gui.ViewsTests {
 			var cb = new ComboBox ();
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.Null (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -28,6 +29,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb = new ComboBox ("Test");
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal ("Test", cb.Text);
 			Assert.Null (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -37,6 +39,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb = new ComboBox (new Rect (1, 2, 10, 20), new List<string> () { "One", "Two", "Three" });
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.NotNull (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -46,6 +49,7 @@ namespace Terminal.Gui.ViewsTests {
 			cb = new ComboBox (new List<string> () { "One", "Two", "Three" });
 			cb.BeginInit ();
 			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal (string.Empty, cb.Text);
 			Assert.NotNull (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -60,6 +64,9 @@ namespace Terminal.Gui.ViewsTests {
 			var cb = new ComboBox (new List<string> () { "One", "Two", "Three" }) {
 				SelectedItem = 1
 			};
+			cb.BeginInit ();
+			cb.EndInit ();
+			cb.LayoutSubviews ();
 			Assert.Equal ("Two", cb.Text);
 			Assert.NotNull (cb.Source);
 			Assert.False (cb.AutoSize);
@@ -215,17 +222,17 @@ Three
 			Assert.True (cb.NewKeyDownEvent (new (KeyCode.CursorDown))); // losing focus
 			Assert.False (cb.HasFocus);
 			Assert.False (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 			Application.Top.FocusFirst (); // Gets focus again
 			Assert.True (cb.HasFocus);
 			Assert.False (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("One", cb.Text);
 			Assert.True (cb.NewKeyDownEvent (new (KeyCode.U | KeyCode.CtrlMask)));
 			Assert.True (cb.HasFocus);
 			Assert.True (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			Assert.Equal (3, cb.Source.Count);
 		}
@@ -256,7 +263,7 @@ Three
 			Assert.Equal ("One", cb.Text);
 			cb.Text = "T";
 			Assert.True (cb.IsShow);
-			Assert.Equal (0, cb.SelectedItem);
+			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("T", cb.Text);
 			Assert.True (cb.NewKeyDownEvent (new (KeyCode.Enter)));
 			Assert.False (cb.IsShow);
@@ -832,7 +839,7 @@ Three ", output);
 				cb.Subviews [1].GetNormalColor ()
 			};
 
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 222222
@@ -844,7 +851,7 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 000002
@@ -856,7 +863,7 @@ Three ", output);
 			Assert.Equal (-1, cb.SelectedItem);
 			Assert.Equal ("", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 222222
@@ -874,7 +881,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 222222
@@ -886,7 +893,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 222222
 000002
@@ -898,7 +905,7 @@ Three ", output);
 			Assert.Equal (2, cb.SelectedItem);
 			Assert.Equal ("Three", cb.Text);
 			cb.Draw ();
-			TestHelpers.AssertDriverColorsAre (@"
+			TestHelpers.AssertDriverAttributesAre (@"
 000000
 000002
 222222

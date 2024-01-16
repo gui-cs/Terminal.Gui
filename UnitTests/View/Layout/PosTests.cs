@@ -22,7 +22,7 @@ public class PosTests {
 	[Fact]
 	public void AnchorEnd_SetsValue ()
 	{
-		int n = 0;
+		var n = 0;
 		var pos = Pos.AnchorEnd ();
 		Assert.Equal ($"AnchorEnd({n})", pos.ToString ());
 
@@ -34,8 +34,8 @@ public class PosTests {
 	[Fact]
 	public void AnchorEnd_Equal ()
 	{
-		int n1 = 0;
-		int n2 = 0;
+		var n1 = 0;
+		var n2 = 0;
 
 		var pos1 = Pos.AnchorEnd (n1);
 		var pos2 = Pos.AnchorEnd (n2);
@@ -47,13 +47,15 @@ public class PosTests {
 		Assert.NotEqual (pos1, pos2);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[AutoInitShutdown]
 	public void AnchorEnd_Equal_Inside_Window ()
 	{
-		int viewWidth = 10;
-		int viewHeight = 1;
-		var tv = new TextView () {
+		var viewWidth = 10;
+		var viewHeight = 1;
+		var tv = new TextView {
 			X = Pos.AnchorEnd (viewWidth),
 			Y = Pos.AnchorEnd (viewHeight),
 			Width = viewWidth,
@@ -74,13 +76,15 @@ public class PosTests {
 		Application.End (rs);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[AutoInitShutdown]
 	public void AnchorEnd_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
 	{
-		int viewWidth = 10;
-		int viewHeight = 1;
-		var tv = new TextView () {
+		var viewWidth = 10;
+		var viewHeight = 1;
+		var tv = new TextView {
 			X = Pos.AnchorEnd (viewWidth),
 			Y = Pos.AnchorEnd (viewHeight),
 			Width = viewWidth,
@@ -107,211 +111,10 @@ public class PosTests {
 	}
 
 	[Fact]
-	[AutoInitShutdown]
-	public void Bottom_Equal_Inside_Window ()
-	{
-		var win = new Window ();
-
-		var label = new Label ("This should be the last line.") {
-			ColorScheme = Colors.Menu,
-			Width = Dim.Fill (),
-			X = 0,
-			Y = Pos.Bottom (win) - 3 // two lines top and bottom borders more one line above the bottom border
-		};
-
-		win.Add (label);
-
-		var top = Application.Top;
-		top.Add (win);
-		var rs = Application.Begin (top);
-		((FakeDriver)Application.Driver).SetBufferSize (40, 10);
-
-		Assert.True (label.AutoSize);
-		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
-		Assert.Equal (new Rect (0, 7, 38, 1), label.Frame);
-		string expected = @"
-┌──────────────────────────────────────┐
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│This should be the last line.         │
-└──────────────────────────────────────┘
-";
-
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Application.End (rs);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void AnchorEnd_Better_Than_Bottom_Equal_Inside_Window ()
-	{
-		var win = new Window ();
-
-		var label = new Label ("This should be the last line.") {
-			ColorScheme = Colors.Menu,
-			Width = Dim.Fill (),
-			X = 0, // keep unit test focused; don't use Center here
-			Y = Pos.AnchorEnd (1)
-		};
-
-		win.Add (label);
-
-		var top = Application.Top;
-		top.Add (win);
-		var rs = Application.Begin (top);
-		((FakeDriver)Application.Driver).SetBufferSize (40, 10);
-
-		Assert.True (label.AutoSize);
-		Assert.Equal (29, label.Text.Length);
-		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 40, 10), win.Frame);
-		Assert.Equal (new Rect (0, 7, 38, 1), label.Frame);
-		string expected = @"
-┌──────────────────────────────────────┐
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-│This should be the last line.         │
-└──────────────────────────────────────┘
-";
-
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Application.End (rs);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
-	{
-		var win = new Window ();
-
-		var label = new Label ("This should be the last line.") {
-			ColorScheme = Colors.Menu,
-			Width = Dim.Fill (),
-			X = 0,
-			Y = Pos.Bottom (win) - 4 // two lines top and bottom borders more two lines above border
-		};
-
-		win.Add (label);
-
-		var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
-		var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
-		var top = Application.Top;
-		top.Add (win, menu, status);
-		var rs = Application.Begin (top);
-
-		Assert.True (label.AutoSize);
-		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
-		Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
-		Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
-		Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
-		string expected = @"
- Menu                                                                           
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│This should be the last line.                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
- F1 Help                                                                        
-";
-
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Application.End (rs);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void AnchorEnd_Better_Than_Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
-	{
-		var win = new Window ();
-
-		var label = new Label ("This should be the last line.") {
-			ColorScheme = Colors.Menu,
-			Width = Dim.Fill (),
-			X = 0,
-			Y = Pos.AnchorEnd (1)
-		};
-
-		win.Add (label);
-
-		var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
-		var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
-		var top = Application.Top;
-		top.Add (win, menu, status);
-		var rs = Application.Begin (top);
-
-		Assert.True (label.AutoSize);
-		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 80, 1), menu.Frame);
-		Assert.Equal (new Rect (0, 24, 80, 1), status.Frame);
-		Assert.Equal (new Rect (0, 1, 80, 23), win.Frame);
-		Assert.Equal (new Rect (0, 20, 78, 1), label.Frame);
-		string expected = @"
- Menu                                                                           
-┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│                                                                              │
-│This should be the last line.                                                 │
-└──────────────────────────────────────────────────────────────────────────────┘
- F1 Help                                                                        
-";
-
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Application.End (rs);
-	}
-
-	[Fact]
 	public void AnchorEnd_Negative_Throws ()
 	{
 		Pos pos;
-		int n = -1;
+		var n = -1;
 		Assert.Throws<ArgumentException> (() => pos = Pos.AnchorEnd (n));
 	}
 
@@ -331,8 +134,8 @@ public class PosTests {
 	[Fact]
 	public void At_Equal ()
 	{
-		int n1 = 0;
-		int n2 = 0;
+		var n1 = 0;
+		var n2 = 0;
 
 		var pos1 = Pos.At (n1);
 		var pos2 = Pos.At (n2);
@@ -372,7 +175,7 @@ public class PosTests {
 	{
 		string side; // used in format string
 		var testRect = Rect.Empty;
-		int testInt = 0;
+		var testInt = 0;
 		Pos pos;
 
 		// Pos.Left
@@ -521,6 +324,8 @@ public class PosTests {
 #endif
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	// See: https://github.com/gui-cs/Terminal.Gui/issues/504
 	[Fact]
 	[TestRespondersDisposed]
@@ -533,7 +338,7 @@ public class PosTests {
 			Application.Iteration += (s, a) => {
 				Application.RequestStop ();
 			};
-			var win = new Window () {
+			var win = new Window {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -671,39 +476,8 @@ public class PosTests {
 		Assert.Throws<ArgumentException> (() => pos = Pos.Percent (1000001));
 	}
 
-	[Fact]
-	public void ForceValidatePosDim_True_Pos_Validation_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type ()
-	{
-		Application.Init (new FakeDriver ());
-
-		var t = Application.Top;
-
-		var w = new Window () {
-			X = Pos.Left (t) + 2,
-			Y = Pos.At (2)
-		};
-		var v = new View () {
-			X = Pos.Center (),
-			Y = Pos.Percent (10),
-			ValidatePosDim = true
-		};
-
-		w.Add (v);
-		t.Add (w);
-
-		t.Ready += (s, e) => {
-			Assert.Equal (2, w.X = 2);
-			Assert.Equal (2, w.Y = 2);
-			Assert.Throws<ArgumentException> (() => v.X = 2);
-			Assert.Throws<ArgumentException> (() => v.Y = 2);
-		};
-
-		Application.Iteration += (s, a) => Application.RequestStop ();
-
-		Application.Run ();
-		Application.Shutdown ();
-	}
-
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Null ()
 	{
@@ -726,85 +500,8 @@ public class PosTests {
 
 	}
 
-	[Fact]
-	public void Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
-	{
-		Application.Init (new FakeDriver ());
-
-		var t = Application.Top;
-
-		var w = new Window () {
-			X = Pos.Left (t) + 2,
-			Y = Pos.At (2)
-		};
-		var v = new View () {
-			X = Pos.Center (),
-			Y = Pos.Percent (10)
-		};
-
-		w.Add (v);
-		t.Add (w);
-
-		t.Ready += (s, e) => {
-			v.LayoutStyle = LayoutStyle.Absolute;
-			Assert.Equal (2, v.X = 2);
-			Assert.Equal (2, v.Y = 2);
-		};
-
-		Application.Iteration += (s, a) => Application.RequestStop ();
-
-		Application.Run ();
-		Application.Shutdown ();
-	}
-
-	// DONE: Test PosCombine
-	// DONE: Test operators
-	// BUGBUG: v2 - This test is bogus. v1 and references it's superview's (f) superview (w). 
-	//[Fact]
-	//public void PosCombine_Do_Not_Throws ()
-	//{
-	//	Application.Init (new FakeDriver ());
-
-	//	var w = new Window () {
-	//		X = Pos.Left (Application.Top) + 2,
-	//		Y = Pos.Top (Application.Top) + 2
-	//	};
-	//	var f = new FrameView ();
-	//	var v1 = new View () {
-	//		X = Pos.Left (w) + 2,
-	//		Y = Pos.Top (w) + 2
-	//	};
-	//	var v2 = new View () {
-	//		X = Pos.Left (v1) + 2,
-	//		Y = Pos.Top (v1) + 2
-	//	};
-
-	//	f.Add (v1, v2);
-	//	w.Add (f);
-	//	Application.Top.Add (w);
-
-	//	f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
-	//	f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
-
-	//	Application.Top.LayoutComplete += (s, e) => {
-	//		Assert.Equal (0, Application.Top.Frame.X);
-	//		Assert.Equal (0, Application.Top.Frame.Y);
-	//		Assert.Equal (2, w.Frame.X);
-	//		Assert.Equal (2, w.Frame.Y);
-	//		Assert.Equal (2, f.Frame.X);
-	//		Assert.Equal (2, f.Frame.Y);
-	//		Assert.Equal (4, v1.Frame.X);
-	//		Assert.Equal (4, v1.Frame.Y);
-	//		Assert.Equal (6, v2.Frame.X);
-	//		Assert.Equal (6, v2.Frame.Y);
-	//	};
-
-	//	Application.Iteration += (s, a) => Application.RequestStop ();
-
-	//	Application.Run ();
-	//	Application.Shutdown ();
-	//}
-
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[TestRespondersDisposed]
 	public void PosCombine_Will_Throws ()
@@ -813,16 +510,16 @@ public class PosTests {
 
 		var t = Application.Top;
 
-		var w = new Window () {
+		var w = new Window {
 			X = Pos.Left (t) + 2,
 			Y = Pos.Top (t) + 2
 		};
 		var f = new FrameView ();
-		var v1 = new View () {
+		var v1 = new View {
 			X = Pos.Left (w) + 2,
 			Y = Pos.Top (w) + 2
 		};
-		var v2 = new View () {
+		var v2 = new View {
 			X = Pos.Left (v1) + 2,
 			Y = Pos.Top (v1) + 2
 		};
@@ -840,6 +537,8 @@ public class PosTests {
 		v2.Dispose ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[TestRespondersDisposed]
 	public void Pos_Add_Operator ()
@@ -848,9 +547,9 @@ public class PosTests {
 
 		var top = Application.Top;
 
-		var view = new View () { X = 0, Y = 0, Width = 20, Height = 20 };
-		var field = new TextField () { X = 0, Y = 0, Width = 20 };
-		int count = 0;
+		var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
+		var field = new TextField { X = 0, Y = 0, Width = 20 };
+		var count = 0;
 
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
@@ -889,6 +588,8 @@ public class PosTests {
 		Application.Shutdown ();
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	[TestRespondersDisposed]
 	public void Pos_Subtract_Operator ()
@@ -897,12 +598,12 @@ public class PosTests {
 
 		var top = Application.Top;
 
-		var view = new View () { X = 0, Y = 0, Width = 20, Height = 20 };
-		var field = new TextField () { X = 0, Y = 0, Width = 20 };
-		int count = 20;
+		var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
+		var field = new TextField { X = 0, Y = 0, Width = 20 };
+		var count = 20;
 		var listLabels = new List<Label> ();
 
-		for (int i = 0; i < count; i++) {
+		for (var i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
 			var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 			view.Add (label);
@@ -993,7 +694,7 @@ public class PosTests {
 	[Fact]
 	public void Function_SetsValue ()
 	{
-		string text = "Test";
+		var text = "Test";
 		var pos = Pos.Function (() => text.Length);
 		Assert.Equal ("PosFunc(4)", pos.ToString ());
 
@@ -1019,6 +720,8 @@ public class PosTests {
 		Assert.NotEqual (pos1, pos2);
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Theory]
 	[AutoInitShutdown]
 	[InlineData (true)]
@@ -1053,6 +756,8 @@ public class PosTests {
 		}
 	}
 
+	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Fact]
 	public void PosCombine_Referencing_Same_View ()
 	{
@@ -1086,7 +791,7 @@ public class PosTests {
 	[Fact]
 	public void DoNotReturnPosCombine ()
 	{
-		var v = new View () { Id = "V" };
+		var v = new View { Id = "V" };
 
 		var pos = Pos.Left (v);
 		Assert.Equal (
@@ -1118,5 +823,5 @@ public class PosTests {
 			"View(side=bottom,target=View(V)(0,0,0,0))",
 			pos.ToString ());
 	}
-}	
 
+}

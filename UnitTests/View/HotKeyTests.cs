@@ -51,37 +51,37 @@ public class HotKeyTests {
 	[InlineData ((KeyCode)'х')]  // Cyrillic x
 	[InlineData ((KeyCode)'你')] // Chinese ni
 	[InlineData ((KeyCode)'ö')] // German o umlaut
-	public void Set_SetsKeyBindings (Key key)
+	public void Set_SetsKeyBindings (KeyCode key)
 	{
 		var view = new View ();
-		view.HotKey = key;
+		view.HotKey = (Key)key;
 		Assert.Equal (string.Empty, view.Title);
-		Assert.Equal (key, view.HotKey);
+		Assert.Equal ((Key)key, view.HotKey);
 
 		// Verify key bindings were set
 
 		// As passed
-		var commands = view.KeyBindings.GetCommands (key);
+		var commands = view.KeyBindings.GetCommands ((Key)key);
 		Assert.Contains (Command.Accept, commands);
 
-		var baseKey = key.NoShift;
+		var baseKey = ((Key)key).NoShift;
 		// If A...Z, with and without shift
 		if (baseKey.IsKeyCodeAtoZ) {
-			commands = view.KeyBindings.GetCommands (key.WithShift);
+			commands = view.KeyBindings.GetCommands (((Key)key).WithShift);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key.NoShift);
+			commands = view.KeyBindings.GetCommands (((Key)key).NoShift);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key.WithAlt);
+			commands = view.KeyBindings.GetCommands (((Key)key).WithAlt);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key.NoShift.WithAlt);
+			commands = view.KeyBindings.GetCommands (((Key)key).NoShift.WithAlt);
 			Assert.Contains (Command.Accept, commands);
 		} else {
 			// Non A..Z keys should not have shift bindings
-			if (key.IsShift) {
-				commands = view.KeyBindings.GetCommands (key.NoShift);
+			if (((Key)key).IsShift) {
+				commands = view.KeyBindings.GetCommands (((Key)key).NoShift);
 				Assert.Empty (commands);
 			} else {
-				commands = view.KeyBindings.GetCommands (key.WithShift);
+				commands = view.KeyBindings.GetCommands (((Key)key).WithShift);
 				Assert.Empty (commands);
 			}
 		}
@@ -208,13 +208,13 @@ public class HotKeyTests {
 	}
 
 	[Theory]
-	[InlineData ("Test", KeyCode.T)]
+	[InlineData ("Test", KeyCode.Null)]
 	[InlineData ("^Test", KeyCode.T)]
 	[InlineData ("T^est", KeyCode.E)]
 	[InlineData ("Te^st", KeyCode.S)]
 	[InlineData ("Tes^t", KeyCode.T)]
 	[InlineData ("other", KeyCode.Null)]
-	[InlineData ("oTher", KeyCode.T)]
+	[InlineData ("oTher", KeyCode.Null)]
 	[InlineData ("^Öther", (KeyCode)'Ö')]
 	[InlineData ("^öther", (KeyCode)'ö')]
 	// BUGBUG: '!' should be supported. Line 968 of TextFormatter filters on char.IsLetterOrDigit 

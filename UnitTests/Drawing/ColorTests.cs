@@ -1,35 +1,22 @@
-﻿using Terminal.Gui;
-using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Globalization;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using Xunit;
-using static Unix.Terminal.Curses;
+
 namespace Terminal.Gui.DrawingTests;
 
 public class ColorTests {
-
-	[Fact, AutoInitShutdown]
-	public void ColorScheme_New ()
-	{
-		var scheme = new ColorScheme ();
-		var lbl = new Label ();
-		lbl.ColorScheme = scheme;
-		lbl.Draw ();
-	}
+	[Fact]
+	public void Color_Is_Value_Type () =>
+		// prove that Color is a value type
+		Assert.True (typeof (Color).IsValueType);
 
 	[Fact]
 	public void TestAllColors ()
 	{
-		var colorNames = Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().ToList();
-		Attribute [] attrs = new Attribute [colorNames.Count];
+		var colorNames = Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().ToList ();
+		var attrs = new Attribute [colorNames.Count];
 
-		int idx = 0;
+		var idx = 0;
 		foreach (ColorName bg in colorNames) {
 			attrs [idx] = new Attribute (bg, colorNames.Count - 1 - bg);
 			idx++;
@@ -52,12 +39,9 @@ public class ColorTests {
 		Assert.Equal (new Attribute (Color.BrightYellow, Color.Blue), attrs [14]);
 		Assert.Equal (new Attribute (Color.White, Color.Black), attrs [^1]);
 	}
-	
+
 	[Fact]
-	public void ColorNames_HasOnly16DistinctElements ()
-	{
-		Assert.Equal (16, Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().Count ());
-	}
+	public void ColorNames_HasOnly16DistinctElements () => Assert.Equal (16, Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().Count ());
 
 	[Fact]
 	public void ColorNames_HaveCorrectOrdinals ()
@@ -84,9 +68,9 @@ public class ColorTests {
 	public void Color_Constructor_WithRGBValues ()
 	{
 		// Arrange
-		int expectedR = 255;
-		int expectedG = 0;
-		int expectedB = 128;
+		var expectedR = 255;
+		var expectedG = 0;
+		var expectedB = 128;
 
 		// Act
 		var color = new Color (expectedR, expectedG, expectedB);
@@ -102,10 +86,10 @@ public class ColorTests {
 	public void Color_Constructor_WithAlphaAndRGBValues ()
 	{
 		// Arrange
-		int expectedA = 128;
-		int expectedR = 255;
-		int expectedG = 0;
-		int expectedB = 128;
+		var expectedA = 128;
+		var expectedR = 255;
+		var expectedG = 0;
+		var expectedB = 128;
 
 		// Act
 		var color = new Color (expectedR, expectedG, expectedB, expectedA);
@@ -121,7 +105,7 @@ public class ColorTests {
 	public void Color_Constructor_WithRgbaValue ()
 	{
 		// Arrange
-		int expectedRgba = unchecked((int)0xFF804040); // R: 128, G: 64, B: 64, Alpha: 255
+		var expectedRgba = unchecked((int)0xFF804040); // R: 128, G: 64, B: 64, Alpha: 255
 
 		// Act
 		var color = new Color (expectedRgba);
@@ -137,7 +121,7 @@ public class ColorTests {
 	public void Color_Constructor_WithColorName ()
 	{
 		// Arrange
-		ColorName colorName = ColorName.Blue;
+		var colorName = ColorName.Blue;
 		var expectedColor = new Color (0, 55, 218); // Blue
 
 		// Act
@@ -151,10 +135,10 @@ public class ColorTests {
 	public void Color_ToString_WithNamedColor ()
 	{
 		// Arrange
-		Color color = new Color (0, 55, 218); // Blue
+		var color = new Color (0, 55, 218); // Blue
 
 		// Act
-		string colorString = color.ToString ();
+		var colorString = color.ToString ();
 
 		// Assert
 		Assert.Equal ("Blue", colorString);
@@ -164,10 +148,10 @@ public class ColorTests {
 	public void Color_ToString_WithRGBColor ()
 	{
 		// Arrange
-		Color color = new Color (1, 64, 32); // Custom RGB color
+		var color = new Color (1, 64, 32); // Custom RGB color
 
 		// Act
-		string colorString = color.ToString ();
+		var colorString = color.ToString ();
 
 		// Assert
 		Assert.Equal ("#014020", colorString);
@@ -177,7 +161,7 @@ public class ColorTests {
 	public void Color_ImplicitOperator_FromInt ()
 	{
 		// Arrange
-		int Rgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
+		var Rgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
 		var expectedColor = new Color (128, 64, 32);
 
 		// Act
@@ -192,10 +176,10 @@ public class ColorTests {
 	{
 		// Arrange
 		var color = new Color (128, 64, 32);
-		int expectedRgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
+		var expectedRgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
 
 		// Act
-		int Rgba = (int)color;
+		var Rgba = (int)color;
 
 		// Assert
 		Assert.Equal (expectedRgba, Rgba);
@@ -206,11 +190,11 @@ public class ColorTests {
 	public void Color_ImplicitOperator_FromColorNames ()
 	{
 		// Arrange
-		ColorName colorName = ColorName.Blue;
+		var colorName = ColorName.Blue;
 		var expectedColor = new Color (0, 55, 218); // Blue
 
 		// Act
-		Color color = new Color (colorName);
+		var color = new Color (colorName);
 
 		// Assert
 		Assert.Equal (expectedColor, color);
@@ -221,10 +205,10 @@ public class ColorTests {
 	{
 		// Arrange
 		var color = new Color (0, 0, 0x80); // Blue
-		ColorName expectedColorName = ColorName.Blue;
+		var expectedColorName = ColorName.Blue;
 
 		// Act
-		ColorName colorName = (ColorName)color;
+		var colorName = (ColorName)color;
 
 		// Assert
 		Assert.Equal (expectedColorName, colorName);
@@ -321,15 +305,14 @@ public class ColorTests {
 	public void FindClosestColor_ReturnsClosestColor ()
 	{
 		// Test cases with RGB values and expected closest color names
-		var testCases = new []
-		{
-			(new Color(0, 0, 0), ColorName.Black),
-			(new Color(255, 255, 255), ColorName.White),
-			(new Color(5, 100, 255), ColorName.BrightBlue),
-			(new Color(0, 255, 0), ColorName.BrightGreen),
-			(new Color(255, 70, 8), ColorName.BrightRed),
-			(new Color(0, 128, 128), ColorName.Cyan),
-			(new Color(128, 64, 32), ColorName.Yellow),
+		var testCases = new [] {
+			(new Color (0, 0, 0), ColorName.Black),
+			(new Color (255, 255, 255), ColorName.White),
+			(new Color (5, 100, 255), ColorName.BrightBlue),
+			(new Color (0, 255, 0), ColorName.BrightGreen),
+			(new Color (255, 70, 8), ColorName.BrightRed),
+			(new Color (0, 128, 128), ColorName.Cyan),
+			(new Color (128, 64, 32), ColorName.Yellow)
 		};
 
 		foreach (var testCase in testCases) {
@@ -341,20 +324,4 @@ public class ColorTests {
 			Assert.Equal (expectedColorName, actualColorName);
 		}
 	}
-
-	[Fact]
-	public void Color_ColorName_Set_SetsColorBasedOnColorName ()
-	{
-		// Arrange
-		var color = new Color (0, 0, 0); // Black
-		var expectedColor = new Color (ColorName.Magenta);
-
-		// Act
-		color.ColorName = ColorName.Magenta;
-
-		// Assert
-		Assert.Equal (expectedColor, color);
-	}
 }
-
-

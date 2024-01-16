@@ -633,7 +633,7 @@ class Menu : View {
 		Driver.Clip = new Rect (0, 0, Driver.Cols, Driver.Rows);
 		Driver.SetAttribute (GetNormalColor ());
 
-		OnDrawFrames ();
+		OnDrawAdornments ();
 		OnRenderLineCanvas ();
 
 		for (int i = Bounds.Y; i < _barItems.Children.Length; i++) {

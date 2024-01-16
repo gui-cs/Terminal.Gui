@@ -108,14 +108,14 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var styleRadioGroup = new RadioGroup (new string [] { "Center", "Justify", "Left", "Right" }) {
+			var styleRadioGroup = new RadioGroup (new string [] { "_Center", "_Justify", "_Left", "_Right" }) {
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 			};
 			frame.Add (styleRadioGroup);
 
 			frame.ValidatePosDim = true;
-			void Top_Loaded (object sender, EventArgs args)
+			void Top_LayoutComplete (object sender, EventArgs args)
 			{
 				frame.Height =
 					widthEdit.Frame.Height +
@@ -123,10 +123,9 @@ namespace UICatalog.Scenarios {
 					titleEdit.Frame.Height +
 					numButtonsEdit.Frame.Height +
 					glyphsNotWords.Frame.Height +
-					styleRadioGroup.Frame.Height;
-				Application.Top.Loaded -= Top_Loaded;
+					styleRadioGroup.Frame.Height + frame.GetAdornmentsThickness().Vertical;
 			}
-			Application.Top.Loaded += Top_Loaded;
+			Application.Top.LayoutComplete += Top_LayoutComplete;
 
 			Win.Add (frame);
 
@@ -143,14 +142,14 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (frame) + 5,
 				Width = 25,
 				Height = 1,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 			};
 			// glyphsNotWords
 			// false:var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
 			// true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };
 			// \u2781 is ➁ dingbats \ufb70 is	
 
-			var showDialogButton = new Button ("Show Dialog") {
+			var showDialogButton = new Button ("_Show Dialog") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,

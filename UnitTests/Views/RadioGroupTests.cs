@@ -16,42 +16,42 @@ public class RadioGroupTests {
 		var rg = new RadioGroup ();
 		Assert.True (rg.CanFocus);
 		Assert.Empty (rg.RadioLabels);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (Rect.Empty, rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
 		rg = new RadioGroup (new string [] { "Test" });
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (new Rect (1, 2, 20, 5), new string [] { "Test" });
+		rg = new RadioGroup (new string [] { "Test" }) {
+			X = 1,
+			Y = 2,
+			Width = 20,
+			Height = 5,
+		};
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
-		Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (1, 2, new string [] { "Test" });
+		rg = new RadioGroup (new string [] { "Test" }) {
+			X = 1,
+			Y = 2,
+		};
+
+		var view = new View () {
+			Width = 30,
+			Height = 40,
+		};
+		view.Add (rg);
+		view.BeginInit ();
+		view.EndInit ();
+		view.LayoutSubviews ();
+
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
-		Assert.Equal (LayoutStyle.Absolute, rg.LayoutStyle);
-		Assert.Null (rg.X);
-		Assert.Null (rg.Y);
-		Assert.Null (rg.Width);
-		Assert.Null (rg.Height);
 		Assert.Equal (new Rect (1, 2, 6, 1), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 	}
@@ -66,7 +66,7 @@ public class RadioGroupTests {
 	}
 
 	[Fact, AutoInitShutdown]
-	public void DisplayMode_Width_Height_Vertical_Horizontal_Space ()
+	public void Orientation_Width_Height_Vertical_Horizontal_Space ()
 	{
 		var rg = new RadioGroup (new string [] { "Test", "New Test 你" });
 		var win = new Window () {
@@ -79,7 +79,7 @@ public class RadioGroupTests {
 		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
-		Assert.Equal (DisplayModeLayout.Vertical, rg.DisplayMode);
+		Assert.Equal (Orientation.Vertical, rg.Orientation);
 		Assert.Equal (2, rg.RadioLabels.Length);
 		Assert.Equal (0, rg.X);
 		Assert.Equal (0, rg.Y);
@@ -96,10 +96,10 @@ public class RadioGroupTests {
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 
-		rg.DisplayMode = DisplayModeLayout.Horizontal;
+		rg.Orientation = Orientation.Horizontal;
 		Application.Refresh ();
 
-		Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
+		Assert.Equal (Orientation.Horizontal, rg.Orientation);
 		Assert.Equal (2, rg.HorizontalSpace);
 		Assert.Equal (0, rg.X);
 		Assert.Equal (0, rg.Y);
@@ -120,7 +120,7 @@ public class RadioGroupTests {
 		rg.HorizontalSpace = 4;
 		Application.Refresh ();
 
-		Assert.Equal (DisplayModeLayout.Horizontal, rg.DisplayMode);
+		Assert.Equal (Orientation.Horizontal, rg.Orientation);
 		Assert.Equal (4, rg.HorizontalSpace);
 		Assert.Equal (0, rg.X);
 		Assert.Equal (0, rg.Y);
@@ -170,7 +170,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_Are_Added_Correctly ()
 	{
-		var rg = new RadioGroup (new string [] { "Left", "Right" });
+		var rg = new RadioGroup (new string [] { "_Left", "_Right" });
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R));
 
@@ -185,7 +185,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_HotKeys ()
 	{
-		var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
+		var rg = new RadioGroup (new string [] { "_Left", "_Right", "Cen_tered", "_Justified" });
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));

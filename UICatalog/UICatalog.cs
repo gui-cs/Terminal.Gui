@@ -57,7 +57,15 @@ class UICatalogApp {
 	static readonly FileSystemWatcher _currentDirWatcher = new FileSystemWatcher ();
 	static readonly FileSystemWatcher _homeDirWatcher = new FileSystemWatcher ();
 
-	static async Task<int> Main (string [] args)
+	struct Options {
+		public string Driver;
+		public string Scenario;
+		/* etc. */
+	}
+
+	static Options _options;
+
+	static int Main (string [] args)
 	{
 		Console.OutputEncoding = Encoding.Default;
 
@@ -89,26 +97,36 @@ class UICatalogApp {
 			driverOption
 		};
 
+		rootCommand.SetHandler ((context) => {
+			Options options = new Options () {
+				Driver = context.ParseResult.GetValueForOption (driverOption),
+				Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
+				/* etc. */
+			};
+			// See https://github.com/dotnet/command-line-api/issues/796 for the rationale behind this hackery
+			_options = options; ;
+		});
 
-		rootCommand.SetHandler (Main, driverOption, scenarioArgument);
+		rootCommand.Invoke (args);
 
-		return await rootCommand.InvokeAsync (args);
+		UICatalogMain (_options);
+		return 0;
 	}
 
-	static void Main (string driverOptionValue, string scenarioArgumentValue)
+	static void UICatalogMain (Options options)
 	{
 		StartConfigFileWatcher ();
 
 		// By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
 		// regardless of what's in a config file.
-		Application.ForceDriver = _forceDriver = driverOptionValue;
+		Application.ForceDriver = _forceDriver = options.Driver;
 
 		// If a Scenario name has been provided on the commandline
 		// run it and exit when done.
-		if (scenarioArgumentValue != "none") {
+		if (options.Scenario != "none") {
 			_topLevelColorScheme = "Base";
 
-			int item = _scenarios!.FindIndex (s => s.GetName ().Equals (scenarioArgumentValue, StringComparison.OrdinalIgnoreCase));
+			int item = _scenarios!.FindIndex (s => s.GetName ().Equals (options.Scenario, StringComparison.OrdinalIgnoreCase));
 			_selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 
 			Application.Init (driverName: _forceDriver);
@@ -767,7 +785,7 @@ class UICatalogApp {
 			miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
 			int height = ShowStatusBar ? 1 : 0; // + (MenuBar.Visible ? 1 : 0);
-			//ContentPane.Height = Dim.Fill (height);
+							    //ContentPane.Height = Dim.Fill (height);
 
 			StatusBar.Visible = ShowStatusBar;
 

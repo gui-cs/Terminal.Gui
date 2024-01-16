@@ -297,7 +297,7 @@ public class ConfigurationManagerTests {
 		Assert.Equal (pi, Themes ["Default"] ["ColorSchemes"].PropertyInfo);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestConfigurationManagerToJson ()
 	{
 		Reset ();
@@ -307,14 +307,14 @@ public class ConfigurationManagerTests {
 		Settings.Update (stream, "TestConfigurationManagerToJson");
 	}
 
-	[Fact] [AutoInitShutdown (configLocation: ConfigLocations.None)]
+	[Fact, AutoInitShutdown (configLocation: ConfigLocations.None)]
 	public void TestConfigurationManagerInitDriver_NoLocations ()
 	{
 
 
 	}
 
-	[Fact] [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
+	[Fact, AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
 	public void TestConfigurationManagerInitDriver ()
 	{
 		Assert.Equal ("Default", Themes.Theme);
@@ -331,23 +331,23 @@ public class ConfigurationManagerTests {
 		Settings.Update (json, "TestConfigurationManagerInitDriver");
 
 		var colorSchemes = (Dictionary<string, ColorScheme>)Themes [Themes.Theme] ["ColorSchemes"].PropertyValue;
-		Assert.Equal (Colors.Base, colorSchemes ["Base"]);
-		Assert.Equal (Colors.TopLevel, colorSchemes ["TopLevel"]);
-		Assert.Equal (Colors.Error, colorSchemes ["Error"]);
-		Assert.Equal (Colors.Dialog, colorSchemes ["Dialog"]);
-		Assert.Equal (Colors.Menu, colorSchemes ["Menu"]);
+		Assert.Equal (Colors.ColorSchemes ["Base"], colorSchemes ["Base"]);
+		Assert.Equal (Colors.ColorSchemes ["TopLevel"], colorSchemes ["TopLevel"]);
+		Assert.Equal (Colors.ColorSchemes ["Error"], colorSchemes ["Error"]);
+		Assert.Equal (Colors.ColorSchemes ["Dialog"], colorSchemes ["Dialog"]);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], colorSchemes ["Menu"]);
 
-		Colors.Base = colorSchemes ["Base"];
-		Colors.TopLevel = colorSchemes ["TopLevel"];
-		Colors.Error = colorSchemes ["Error"];
-		Colors.Dialog = colorSchemes ["Dialog"];
-		Colors.Menu = colorSchemes ["Menu"];
+		Colors.ColorSchemes ["Base"] = colorSchemes ["Base"];
+		Colors.ColorSchemes ["TopLevel"] = colorSchemes ["TopLevel"];
+		Colors.ColorSchemes ["Error"] = colorSchemes ["Error"];
+		Colors.ColorSchemes ["Dialog"] = colorSchemes ["Dialog"];
+		Colors.ColorSchemes ["Menu"] = colorSchemes ["Menu"];
 
-		Assert.Equal (colorSchemes ["Base"], Colors.Base);
-		Assert.Equal (colorSchemes ["TopLevel"], Colors.TopLevel);
-		Assert.Equal (colorSchemes ["Error"], Colors.Error);
-		Assert.Equal (colorSchemes ["Dialog"], Colors.Dialog);
-		Assert.Equal (colorSchemes ["Menu"], Colors.Menu);
+		Assert.Equal (colorSchemes ["Base"], Colors.ColorSchemes ["Base"]);
+		Assert.Equal (colorSchemes ["TopLevel"], Colors.ColorSchemes ["TopLevel"]);
+		Assert.Equal (colorSchemes ["Error"], Colors.ColorSchemes ["Error"]);
+		Assert.Equal (colorSchemes ["Dialog"], Colors.ColorSchemes ["Dialog"]);
+		Assert.Equal (colorSchemes ["Menu"], Colors.ColorSchemes ["Menu"]);
 	}
 
 	[Fact]
@@ -518,7 +518,7 @@ public class ConfigurationManagerTests {
 		Assert.Equal (new Color (Color.Blue), Colors.ColorSchemes ["Base"].Normal.Background);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void TestConfigurationManagerInvalidJsonThrows ()
 	{
 		ThrowOnJsonErrors = true;
@@ -690,7 +690,7 @@ public class ConfigurationManagerTests {
 		ThrowOnJsonErrors = false;
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
 	{
 		//var _configFilename = "config.json";

@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = 1,
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.ColorSchemes ["Error"]
 			};
 
 			Application.Top.Add (horizontalRuler);
@@ -47,7 +47,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.ColorSchemes ["Error"]
 			};
 
 			Application.Top.LayoutComplete += (s, a) => {
@@ -79,17 +79,19 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (margin),
 				Height = 7
 			};
-			subWin.Title = $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+			subWin.Initialized += (s, a) => {
+				subWin.Title = $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+			};
 			Application.Top.Add (subWin);
 
 			int i = 1;
 			string txt = "Resize the terminal to see computed layout in action.";
 			var labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
 			subWin.Add (labelList.ToArray ());
 
 			var frameView = new FrameView () {
@@ -98,14 +100,17 @@ namespace UICatalog.Scenarios {
 				Width = 30,
 				Height = 7
 			};
-			frameView.Title = $"{frameView.GetType ().Name} {{X={frameView.X},Y={frameView.Y},Width={frameView.Width},Height={frameView.Height}}}";
+			frameView.Initialized += (sender, args) => {
+				var fv = sender as FrameView;
+				fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+			};
 			i = 1;
 			labelList = new List<Label> ();
 			labelList.Add (new Label ($"The lines below show different TextAlignments"));
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
-			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.Dialog });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+			labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
 			frameView.Add (labelList.ToArray ());
 			Application.Top.Add (frameView);
 
@@ -115,7 +120,10 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = 7,
 			};
-			frameView.Title = $"{frameView.GetType ().Name} {{X={frameView.X},Y={frameView.Y},Width={frameView.Width},Height={frameView.Height}}}";
+			frameView.Initialized += (sender, args) => {
+				var fv = sender as FrameView;
+				fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+			};
 			Application.Top.Add (frameView);
 
 			// Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
@@ -124,7 +132,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Percent (50),
 				Width = Dim.Percent (80),
 				Height = Dim.Percent (10),
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			};
 			textView.Text = $"This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
 			Application.Top.Add (textView);
@@ -234,7 +242,7 @@ namespace UICatalog.Scenarios {
 			// This is intentionally convoluted to illustrate potential bugs.
 			var anchorEndLabel1 = new Label ("This Label should be the 2nd to last line (AnchorEnd (2)).") {
 				TextAlignment = Terminal.Gui.TextAlignment.Centered,
-				ColorScheme = Colors.Menu,
+				ColorScheme = Colors.ColorSchemes ["Menu"],
 				Width = Dim.Fill (5),
 				X = 5,
 				Y = Pos.AnchorEnd (2)
@@ -245,7 +253,7 @@ namespace UICatalog.Scenarios {
 			// This is intentionally convoluted to illustrate potential bugs.
 			var anchorEndLabel2 = new TextField ("This TextField should be the 3rd to last line (AnchorEnd (2) - 1).") {
 				TextAlignment = Terminal.Gui.TextAlignment.Left,
-				ColorScheme = Colors.Menu,
+				ColorScheme = Colors.ColorSchemes ["Menu"],
 				Width = Dim.Fill (5),
 				X = 5,
 				Y = Pos.AnchorEnd (2) - 1 // Pos.Combine

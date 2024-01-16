@@ -301,7 +301,7 @@ namespace Terminal.Gui {
 		/// Overridden so no Frames get drawn (BUGBUG: v2 fix this hack)
 		/// </summary>
 		/// <returns></returns>
-		public override bool OnDrawFrames ()
+		public override bool OnDrawAdornments ()
 		{
 			return false;
 		}

@@ -1,4 +1,10 @@
-Fixes #_____ - Include a terse summary of the change or which issue is fixed.
+## Fixes
+
+- Fixes #_____
+
+## Proposed Changes/Todos
+
+- [ ] Todo 1
 
 ## Pull Request checklist:
 

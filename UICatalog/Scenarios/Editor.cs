@@ -741,7 +741,7 @@ namespace UICatalog.Scenarios {
 				Title = isFind ? "Find" : "Replace",
 				X = Win.Bounds.Width / 2 - 30,
 				Y = Win.Bounds.Height / 2 - 10,
-				ColorScheme = Colors.TopLevel
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
 			};
 
 			_tabView = new TabView () {
@@ -751,9 +751,9 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill ()
 			};
 
-			_tabView.AddTab (new Tab ("Find", FindTab ()), isFind);
+			_tabView.AddTab (new Tab () { DisplayText = "Find", View = FindTab () }, isFind);
 			var replace = ReplaceTab ();
-			_tabView.AddTab (new Tab ("Replace", replace), !isFind);
+			_tabView.AddTab (new Tab () { DisplayText = "Replace", View = replace }, !isFind);
 			_tabView.SelectedTabChanged += (s, e) => _tabView.SelectedTab.View.FocusFirst ();
 			_winDialog.Add (_tabView);
 
