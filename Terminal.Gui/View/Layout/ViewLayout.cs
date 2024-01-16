@@ -560,7 +560,7 @@ public partial class View {
 		var relativeBounds = SuperView is { IsInitialized: true } ? SuperView.Bounds :
 			Application.Top != null && Application.Top.IsInitialized ? Application.Top.Bounds :
 										   Application.Driver?.Bounds ??
-										   Rect.Empty;
+										   new Rect (0, 0, int.MaxValue, int.MaxValue);
 		SetRelativeLayout (relativeBounds);
 
 		// TODO: Determine what, if any of the below is actually needed here.
