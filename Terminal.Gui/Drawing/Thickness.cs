@@ -109,8 +109,8 @@ namespace Terminal.Gui {
 		/// the rectangle described by <see cref="GetInside(Rect)"/>.
 		/// </summary>
 		/// <param name="outside">Describes the location and size of the rectangle that contains the thickness.</param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
+		/// <param name="x">The x coord to check.</param>
+		/// <param name="y">The y coord to check.</param>
 		/// <returns><see langword="true"/> if the specified coordinate is within the thickness; <see langword="false"/> otherwise.</returns>
 		public bool Contains (Rect outside, int x, int y)
 		{
