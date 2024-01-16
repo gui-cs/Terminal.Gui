@@ -30,7 +30,7 @@ public class TextFieldTests {
 			//                                                    1         2         3 
 			//                                          01234567890123456789012345678901=32 (Length)
 			TextFieldTests._textField = new TextField ("TAB to jump between text fields.") {
-				ColorScheme = Colors.Base
+				ColorScheme = Colors.ColorSchemes ["Base"]
 			};
 		}
 

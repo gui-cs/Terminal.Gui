@@ -657,7 +657,9 @@ public class FileDialog : Dialog {
 		tbPath.Caption = Style.PathCaption;
 		tbFind.Caption = Style.SearchCaption;
 
-		tbPath.Autocomplete.ColorScheme.Normal = new Attribute (Color.Black, tbPath.ColorScheme.Normal.Background);
+		tbPath.Autocomplete.ColorScheme = new ColorScheme (tbPath.ColorScheme) {
+			Normal = new Attribute (Color.Black, tbPath.ColorScheme.Normal.Background)
+		};
 
 		_treeRoots = Style.TreeRootGetter ();
 		Style.IconProvider.IsOpenGetter = treeView.IsExpanded;

@@ -278,9 +278,9 @@ namespace Terminal.Gui {
 			}
 
 			if (useErrorColors) {
-				d.ColorScheme = Colors.Error;
+				d.ColorScheme = Colors.ColorSchemes ["Error"];
 			} else {
-				d.ColorScheme = Colors.Dialog;
+				d.ColorScheme = Colors.ColorSchemes ["Dialog"];
 			}
 
 			var messageLabel = new Label () {

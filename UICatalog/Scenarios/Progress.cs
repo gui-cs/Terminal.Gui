@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 
 			internal ProgressDemo (string title) : base (title)
 			{
-				ColorScheme = Colors.Dialog;
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 				LeftFrame = new FrameView ("Settings") {
 					X = 0,
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 					Width = Dim.Fill () - 1,
 					Height = 1,
 					Fraction = 0.25F,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				};
 				Add (ActivityProgressBar);
 
@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (ActivityProgressBar) + 1,
 					Width = Dim.Fill () - Spinner.Width,
 					Height = 1,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				};
 				Add (PulseProgressBar);
 

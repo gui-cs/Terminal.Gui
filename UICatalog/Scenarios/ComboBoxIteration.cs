@@ -24,7 +24,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (listview);
 
 			var lbComboBox = new Label () {
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				X = Pos.Right (lbListView) + 1,
 				Width = Dim.Percent (40)
 			};

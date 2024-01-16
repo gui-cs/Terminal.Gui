@@ -704,9 +704,9 @@ public class OverlappedTests {
  └───┘", _output);
 		var attributes = new [] {
 			// 0
-			Colors.TopLevel.Normal,
+			Colors.ColorSchemes ["TopLevel"].Normal,
 			// 1
-			Colors.Base.Normal
+			Colors.ColorSchemes ["Base"].Normal
 		};
 		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
