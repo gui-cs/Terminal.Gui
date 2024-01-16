@@ -269,11 +269,19 @@ public readonly struct Color : IEquatable<Color> {
 	public Color (int rgba)
 	{
 		unsafe {
-			Span<byte> argbSpan = new Span<byte> ( &rgba, 4 );
-			A = argbSpan [ 3 ];
-			R = argbSpan [ 2 ];
-			G = argbSpan [ 1 ];
-			B = argbSpan [ 0 ];
+			ReadOnlySpan<byte> argbSpan = new ReadOnlySpan<byte> ( &rgba, 4 );
+			if ( BitConverter.IsLittleEndian ) {
+				A = argbSpan [ 3 ];
+				R = argbSpan [ 2 ];
+				G = argbSpan [ 1 ];
+				B = argbSpan [ 0 ];
+			}
+			else {
+				A = argbSpan [ 0 ];
+				R = argbSpan [ 1 ];
+				G = argbSpan [ 2 ];
+				B = argbSpan [ 3 ];
+			}
 		}
 	}
 
