@@ -1328,7 +1328,7 @@ namespace Terminal.Gui {
 
 				if (NeedsFormat) {
 					var shown_text = _text;
-					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out var newHotKey)) {
+					if (FindHotKey (_text, HotKeySpecifier, false, out _hotKeyPos, out var newHotKey)) {
 						HotKey = newHotKey;
 						shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);

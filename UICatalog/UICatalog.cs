@@ -315,8 +315,9 @@ class UICatalogApp {
 		public TableView ScenarioList;
 		CollectionNavigator _scenarioCollectionNav = new CollectionNavigator ();
 
-		public StatusItem DriverName;
-		public StatusItem OS;
+		public Shortcut DriverName;
+		public Shortcut OS;
+		public Bar StatusBar;
 
 		public UICatalogTopLevel ()
 		{
@@ -335,32 +336,61 @@ class UICatalogApp {
 				})
 			});
 
-			DriverName = new StatusItem (Key.Empty, "Driver:", null);
-			OS = new StatusItem (Key.Empty, "OS:", null);
-
-			StatusBar = new StatusBar () {
-				Visible = ShowStatusBar
+			StatusBar = new Bar () {
+				Visible = ShowStatusBar,
+				StatusBarStyle = true,
+				Y = Pos.AnchorEnd(1),
+				Height = 1,
+				Width = Dim.Fill ()
 			};
 
-			StatusBar.Items = new StatusItem [] {
-				new StatusItem (Application.QuitKey, $"~{Application.QuitKey} to quit", () => {
-					if (_selectedScenario is null) {
-						// This causes GetScenarioToRun to return null
-						_selectedScenario = null;
-						RequestStop ();
-					} else {
-						_selectedScenario.RequestStop ();
-					}
-				}),
-				new StatusItem (Key.F10, "~F10~ Status Bar", () => {
-					StatusBar.Visible = !StatusBar.Visible;
-					//ContentPane!.Height = Dim.Fill(StatusBar.Visible ? 1 : 0);
-					LayoutSubviews ();
-					SetSubViewNeedsDisplay ();
-				}),
-				DriverName,
-				OS
+			var quitKeyShortcut = new Shortcut () {
+				Title = $"Quit",
+				Key = Application.QuitKey,
+				KeyBindingScope = KeyBindingScope.Application,
+				Command = Terminal.Gui.Command.QuitToplevel,
 			};
+			StatusBar.Add (quitKeyShortcut);
+
+			var force16ColorsShortcut = new Shortcut {
+				Key = Key.F6,
+				KeyBindingScope = KeyBindingScope.HotKey,
+				Command = Terminal.Gui.Command.ToggleChecked,
+				CommandView = new CheckBox() { Text = "Force 16 Colors" }
+			};
+			var cb = force16ColorsShortcut.CommandView as CheckBox;
+			cb.Toggled += (s, e) => {
+				var cb = s as CheckBox;
+				Application.Force16Colors = (bool)!cb.Checked!;
+				Application.Refresh ();
+			};
+			StatusBar.Add (force16ColorsShortcut);
+
+			var toggleSB = new Shortcut () {
+				Key = Key.F10,
+				Title = "Show/Hide",
+				KeyBindingScope = KeyBindingScope.HotKey,
+				Command = Terminal.Gui.Command.Accept,
+			};
+			toggleSB.Accept += (s, e) => {
+				StatusBar.Visible = !StatusBar.Visible;
+				LayoutSubviews ();
+				SetSubViewNeedsDisplay ();
+			};
+
+			StatusBar.Add (toggleSB);
+
+			DriverName = new Shortcut () {
+				Key = Key.Empty,
+				Title = "Driver:",
+			};
+			OS = new Shortcut () {
+				Key = Key.Empty,
+				Title = "OS:"
+			};
+
+			StatusBar.Add (DriverName);
+			StatusBar.Add (OS);
 
 			// Create the Category list view. This list never changes.
 			CategoryList = new ListView (_categories) {
@@ -573,24 +603,24 @@ class UICatalogApp {
 		}
 
 
-		MenuItem [] CreateForce16ColorItems ()
-		{
-			var menuItems = new List<MenuItem> ();
-			miForce16Colors = new MenuItem {
-				Title = "Force _16 Colors",
-				Shortcut = (KeyCode)Key.F6,
-				Checked = Application.Force16Colors,
-				CanExecute = () => (bool)Application.Driver.SupportsTrueColor
-			};
-			miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
-			miForce16Colors.Action += () => {
-				miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
-				Application.Refresh ();
-			};
-			menuItems.Add (miForce16Colors);
+		//MenuItem [] CreateForce16ColorItems ()
+		//{
+		//	var menuItems = new List<MenuItem> ();
+		//	miForce16Colors = new MenuItem {
+		//		Title = "Force _16 Colors",
+		//		Shortcut = (KeyCode)Key.F6,
+		//		Checked = Application.Force16Colors,
+		//		CanExecute = () => (bool)Application.Driver.SupportsTrueColor
+		//	};
+		//	miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
+		//	miForce16Colors.Action += () => {
+		//		miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
+		//		Application.Refresh ();
+		//	};
+		//	menuItems.Add (miForce16Colors);
 
-			return menuItems.ToArray ();
-		}
+		//	return menuItems.ToArray ();
+		//}
 
 		MenuItem [] CreateDisabledEnabledMouseItems ()
 		{
@@ -717,8 +747,10 @@ class UICatalogApp {
 
 		public MenuItem []? CreateThemeMenuItems ()
 		{
-			var menuItems = CreateForce16ColorItems ().ToList ();
-			menuItems.Add (null!);
+			//var menuItems = CreateForce16ColorItems ().ToList ();
+			//menuItems.Add (null!);
+
+			var menuItems = new List<MenuItem> ();
 
 			int schemeCount = 0;
 			foreach (var theme in Themes!) {
@@ -779,8 +811,8 @@ class UICatalogApp {
 			ColorScheme = Colors.ColorSchemes [_topLevelColorScheme];
 
 			MenuBar.Menus [0].Children [0].Shortcut = (KeyCode)Application.QuitKey;
-			StatusBar.Items [0].Shortcut = Application.QuitKey;
-			StatusBar.Items [0].Title = $"~{Application.QuitKey} to quit";
+
+			((Shortcut)StatusBar.Subviews [0]).Key = Application.QuitKey;
 
 			miIsMouseDisabled!.Checked = Application.IsMouseDisabled;
 
@@ -827,7 +859,7 @@ class UICatalogApp {
 		// after a scenario was selected to run. This proves the main UI Catalog
 		// 'app' closed cleanly.
 		foreach (var inst in Responder.Instances) {
-			
+
 			Debug.Assert (inst.WasDisposed);
 		}
 		Responder.Instances.Clear ();

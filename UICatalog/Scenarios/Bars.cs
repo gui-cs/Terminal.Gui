@@ -175,7 +175,7 @@ public class bars : Scenario {
 		var bar = new Bar () {
 			X = 0,
 			Y = Pos.AnchorEnd (1),
-			Width = Dim.Fill(),
+			Width = Dim.Fill (),
 			Height = 1
 		};
 		var shortcut = new Shortcut () {
@@ -184,6 +184,28 @@ public class bars : Scenario {
 			Key = Application.QuitKey,
 			KeyBindingScope = KeyBindingScope.Application,
 			Command = Command.QuitToplevel
+		};
+
+		bar.Add (shortcut);
+
+		shortcut = new Shortcut () {
+			Text = "Help Text",
+			Title = $"Help",
+			Key = Key.F1,
+			KeyBindingScope = KeyBindingScope.HotKey,
+			Command = Command.Accept
+		};
+
+		var labelHelp = new Label () {
+			X = Pos.Center (),
+			Y = Pos.Top (bar) - 1,
+			Text = "Help"
+		};
+		Application.Top.Add (labelHelp);
+
+		shortcut.Accept += (s, e) => {
+			labelHelp.Text = labelHelp.Text + "!";
+			e.Handled = true;
 		};
 
 		bar.Add (shortcut);

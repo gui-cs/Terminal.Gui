@@ -71,8 +71,6 @@ namespace Terminal.Gui {
 			}
 
 			var args = new MouseEventEventArgs (mouseEvent);
-			if (OnMouseClick (args))
-				return true;
 			if (MouseEvent (mouseEvent))
 				return true;
 
@@ -82,7 +80,7 @@ namespace Terminal.Gui {
 					SetNeedsDisplay ();
 				}
 
-				return true;
+				return OnMouseClick (args);
 			}
 			return false;
 		}

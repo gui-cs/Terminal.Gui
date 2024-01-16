@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -41,14 +42,15 @@ public class Shortcut : View {
 		KeyBindings.Add (KeyCode.Space, Gui.Command.Accept);
 
 		_container = new View () { Id = "_container", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
-		CommandView = new View () { Id = "_commandView", CanFocus = true, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_') };
+		CommandView = new View () { Id = "_commandView", CanFocus = false, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_') };
 		HelpView = new View () { Id = "_helpView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
 		HelpView.TextAlignment = TextAlignment.Left;
 		KeyView = new View () { Id = "_keyView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
+
 		HelpView.TextAlignment = TextAlignment.Right;
 
-		_container.MouseClick += SubView_MouseClick;
-		_commandView.MouseClick += SubView_MouseClick;
+		_container.MouseClick += Container_MouseClick;
+		//_commandView.MouseClick += SubView_MouseClick;
 		HelpView.MouseClick += SubView_MouseClick;
 		KeyView.MouseClick += SubView_MouseClick;
 
@@ -67,6 +69,13 @@ public class Shortcut : View {
 		if (!IsInitialized) {
 			return;
 		}
+
+		var cs = new ColorScheme (ColorScheme) {
+			Normal = ColorScheme.HotNormal,
+			HotNormal = ColorScheme.Normal
+		};
+		KeyView.ColorScheme = cs;
+
 		HelpView.X = Pos.Right (CommandView) + 2;
 		KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns());
 		if (AutoSize) {
@@ -86,10 +95,14 @@ public class Shortcut : View {
 		_commandView.Text = Title;
 	}
 
+	private void Container_MouseClick (object sender, MouseEventEventArgs e)
+	{
+		e.Handled = OnAccept ();
+	}
+
 	private void SubView_MouseClick (object sender, MouseEventEventArgs e)
 	{
-		OnAccept ();
-		SetFocus ();
+		e.Handled = OnAccept ();
 	}
 
 	/// <summary>
@@ -122,11 +135,15 @@ public class Shortcut : View {
 	public Key Key {
 		get => _key;
 		set {
+			if (value == null) {
+				throw new ArgumentNullException ();
+			}
 			_key = value;
 			if (Command != null) {
 				UpdateKeyBinding ();
 			}
 			KeyView.Text = $"{Key}";
+			KeyView.Visible = Key != Key.Empty;
 		}
 	}
 
@@ -180,7 +197,7 @@ public class Shortcut : View {
 	/// raised when the button is activated either with
 	/// the mouse or the keyboard.
 	/// </remarks>
-	public event EventHandler Accept;
+	public event EventHandler<HandledEventArgs> Accept;
 
 	/// <summary>
 	/// Called when the <see cref="Command.Accept"/> command is received. This
@@ -189,25 +206,32 @@ public class Shortcut : View {
 	/// </summary>
 	public virtual bool OnAccept ()
 	{
-		Accept?.Invoke (this, EventArgs.Empty);
-
 		if (Key == null || Key == Key.Empty) {
 			return false;
 		}
+
+		bool handled = false;
 		var keyCopy = new Key (Key);
 
 		switch (KeyBindingScope) {
 		case KeyBindingScope.Application:
 			// Simulate a key down to invoke the Application scoped key binding
-			return Application.OnKeyDown (keyCopy);
+			handled = Application.OnKeyDown (keyCopy);
+			break;
 		case KeyBindingScope.Focused:
 			//throw new InvalidOperationException ();
-			return false;
+			handled = false;
+			break;
 		case KeyBindingScope.HotKey:
-			return _commandView.InvokeCommand (Gui.Command.Accept) == true;
-		default:
-			return false;
+			handled = _commandView.InvokeCommand (Gui.Command.Accept) == true;
+			break;
 		}
+		if (handled == false) {
+			var args = new HandledEventArgs ();
+			Accept?.Invoke (this, args);
+			handled = args.Handled;
+		}
+		return handled;
 	}
 
 	public View CommandView {
@@ -242,6 +266,17 @@ public class Shortcut : View {
 		}
 	}
 
+	public override bool CanFocus {
+		get {
+			if (KeyView != null) {
+				return KeyView.Visible && CommandView is Shortcut;
+			}
+			return base.CanFocus;
+		}
+		set {
+			base.CanFocus = value;
+		}
+	}
 
 	public override bool OnEnter (View view)
 	{
@@ -254,6 +289,12 @@ public class Shortcut : View {
 
 		_container.ColorScheme = cs;
 
+		cs = new ColorScheme (ColorScheme) {
+			Normal = ColorScheme.HotFocus,
+			HotNormal = ColorScheme.Focus
+		};
+		KeyView.ColorScheme = cs;
+
 		return base.OnEnter (view);
 	}
 
@@ -265,6 +306,12 @@ public class Shortcut : View {
 		};
 
 		_container.ColorScheme = cs;
+
+		cs = new ColorScheme (ColorScheme) {
+			Normal = ColorScheme.HotNormal,
+			HotNormal = ColorScheme.Normal
+		};
+		KeyView.ColorScheme = cs;
 
 		return base.OnLeave (view);
 	}
