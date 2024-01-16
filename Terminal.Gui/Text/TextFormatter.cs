@@ -960,12 +960,14 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="text">The text to look in.</param>
 		/// <param name="hotKeySpecifier">The HotKey specifier (e.g. '_') to look for.</param>
-		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the first upper case character as the HotKey will be enabled.
-		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.</param>
 		/// <param name="hotPos">Outputs the Rune index into <c>text</c>.</param>
 		/// <param name="hotKey">Outputs the hotKey. <see cref="Key.Empty"/> if not found.</param>
+		/// <param name="firstUpperCase">If <c>true</c> the legacy behavior of identifying the
+		/// first upper case character as the HotKey will be enabled.
+		/// Regardless of the value of this parameter, <c>hotKeySpecifier</c> takes precedence.
+		/// Defaults to <see langword="false"/>.</param>
 		/// <returns><c>true</c> if a HotKey was found; <c>false</c> otherwise.</returns>
-		public static bool FindHotKey (string text, Rune hotKeySpecifier, bool firstUpperCase, out int hotPos, out Key hotKey)
+		public static bool FindHotKey (string text, Rune hotKeySpecifier, out int hotPos, out Key hotKey, bool firstUpperCase = false)
 		{
 			if (string.IsNullOrEmpty (text) || hotKeySpecifier == (Rune)0xFFFF) {
 				hotPos = -1;
@@ -1328,7 +1330,7 @@ namespace Terminal.Gui {
 
 				if (NeedsFormat) {
 					var shown_text = _text;
-					if (FindHotKey (_text, HotKeySpecifier, true, out _hotKeyPos, out var newHotKey)) {
+					if (FindHotKey (_text, HotKeySpecifier, out _hotKeyPos, out var newHotKey)) {
 						HotKey = newHotKey;
 						shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
 						shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
@@ -1412,7 +1414,7 @@ namespace Terminal.Gui {
 			foreach (var line in Lines) {
 				sb.AppendLine (line);
 			}
-			return sb.ToString ();
+			return sb.ToString ().TrimEnd (Environment.NewLine.ToCharArray ());
 		}
 
 		/// <summary>

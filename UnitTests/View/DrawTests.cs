@@ -1,8 +1,6 @@
 ﻿using System.Text;
-using System;
 using Xunit;
 using Xunit.Abstractions;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -380,6 +378,18 @@ t     ", _output);
 		content.Y = 0;
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+	}
+
+	[Theory, SetupFakeDriver]
+	[InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
+	[InlineData ("a𐐀b")]
+	void DrawHotString_NonBmp (string expected)
+	{
+		var view = new View () { Width = 10, Height = 1 };
+		view.DrawHotString (expected, Attribute.Default, Attribute.Default);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
 	}
 
 	[Fact, AutoInitShutdown]

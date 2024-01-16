@@ -227,7 +227,7 @@
     <value>New Folder</value>
   </data>
   <data name="btnNo" xml:space="preserve">
-    <value>No</value>
+    <value>_No</value>
   </data>
   <data name="fdRenameFailedTitle" xml:space="preserve">
     <value>Rename Failed</value>
@@ -239,25 +239,25 @@
     <value>Rename</value>
   </data>
   <data name="btnYes" xml:space="preserve">
-    <value>Yes</value>
+    <value>_Yes</value>
   </data>
   <data name="fdExisting" xml:space="preserve">
     <value>Existing</value>
   </data>
   <data name="btnOpen" xml:space="preserve">
-    <value>Open</value>
+    <value>O_pen</value>
   </data>
   <data name="btnSave" xml:space="preserve">
-    <value>Save</value>
+    <value>_Save</value>
   </data>
   <data name="btnSaveAs" xml:space="preserve">
-    <value>Save as</value>
+    <value>Save _as</value>
   </data>
   <data name="btnOk" xml:space="preserve">
-    <value>OK</value>
+    <value>_OK</value>
   </data>
   <data name="btnCancel" xml:space="preserve">
-    <value>Cancel</value>
+    <value>_Cancel</value>
   </data>
   <data name="fdCtxDelete" xml:space="preserve">
     <value>_Delete</value>

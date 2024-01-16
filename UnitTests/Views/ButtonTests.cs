@@ -1,23 +1,28 @@
 ﻿using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests;
+namespace Terminal.Gui.ViewsTests; 
+
 public class ButtonTests {
 	readonly ITestOutputHelper _output;
 
-	public ButtonTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public ButtonTests (ITestOutputHelper output) => _output = output;
 
-	[Fact, AutoInitShutdown]
+	[Fact] [SetupFakeDriver]
 	public void Constructors_Defaults ()
 	{
 		var btn = new Button ();
 		Assert.Equal (string.Empty, btn.Text);
-		Application.Top.Add (btn);
-		var rs = Application.Begin (Application.Top);
+		btn.BeginInit ();
+		btn.EndInit ();
 
+		Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+		Assert.False (btn.IsDefault);
+		Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
+		Assert.Equal ('_', btn.HotKeySpecifier.Value);
+		Assert.True (btn.CanFocus);
+		Assert.Equal (new Rect (0, 0, 4, 1), btn.Bounds);
+		Assert.Equal (new Rect (0, 0, 4, 1), btn.Frame);
 		Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
 		Assert.False (btn.IsDefault);
 		Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
@@ -29,42 +34,50 @@ public class ButtonTests {
 		Assert.Equal (string.Empty, btn.Title);
 		Assert.Equal (KeyCode.Null, btn.HotKey);
 
+		btn.Draw ();
+
 		var expected = @$"
 {CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
 ";
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Application.End (rs);
 
-		btn = new Button ("ARGS", true) { Text = "Test" };
-		Assert.Equal ("Test", btn.Text);
-		Application.Top.Add (btn);
-		rs = Application.Begin (Application.Top);
+		btn = new Button ("ARGS", true) { Text = "_Test" };
+		btn.BeginInit ();
+		btn.EndInit ();
+		Assert.Equal ('_', btn.HotKeySpecifier.Value);
+		Assert.Equal (Key.T, btn.HotKey);
+		Assert.Equal ("_Test", btn.Text);
 
-		Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+		Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Format ());
 		Assert.True (btn.IsDefault);
 		Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
-		Assert.Equal ('_', btn.HotKeySpecifier.Value);
 		Assert.True (btn.CanFocus);
 		Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 		Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
 		Assert.Equal (KeyCode.T, btn.HotKey);
-		Application.End (rs);
 
-		btn = new Button ("Test", true) { X = 3, Y = 4 };
-		Assert.Equal ("Test", btn.Text);
-		Application.Top.Add (btn);
-		rs = Application.Begin (Application.Top);
+		btn = new Button (1, 2, "_abc", true);
+		btn.BeginInit ();
+		btn.EndInit ();
+		Assert.Equal ("_abc", btn.Text);
+		Assert.Equal (Key.A, btn.HotKey);
 
-		Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+		Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Format ());
 		Assert.True (btn.IsDefault);
 		Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 		Assert.Equal ('_', btn.HotKeySpecifier.Value);
 		Assert.True (btn.CanFocus);
-		Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
-		Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
-		Assert.Equal (KeyCode.T, btn.HotKey);
 
-		Application.End (rs);
+		Application.Driver.ClearContents ();
+		btn.Draw ();
+
+		expected = @$"
+ {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}
+";
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
+		Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
+		Assert.Equal (new Rect (1, 2, 10, 1), btn.Frame);
 	}
 
 	[Fact]
@@ -72,21 +85,24 @@ public class ButtonTests {
 	public void KeyBindings_Command ()
 	{
 		var clicked = false;
-		Button btn = new Button ("_Test");
+		var btn = new Button ("_Test");
 		btn.Clicked += (s, e) => clicked = true;
 		Application.Top.Add (btn);
 		Application.Begin (Application.Top);
 
 		// Hot key. Both alone and with alt
 		Assert.Equal (KeyCode.T, btn.HotKey);
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T)));
 		Assert.True (clicked);
 		clicked = false;
 
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.AltMask)));
 		Assert.True (clicked);
 		clicked = false;
 
+		Assert.True (btn.NewKeyDownEvent (btn.HotKey));
+		Assert.True (clicked);
+		clicked = false;
 		Assert.True (btn.NewKeyDownEvent (btn.HotKey));
 		Assert.True (clicked);
 		clicked = false;
@@ -94,32 +110,32 @@ public class ButtonTests {
 		// IsDefault = false
 		// Space and Enter should work
 		Assert.False (btn.IsDefault);
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
 		Assert.True (clicked);
 		clicked = false;
 
 		// IsDefault = true
 		// Space and Enter should work
 		btn.IsDefault = true;
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
 		Assert.True (clicked);
 		clicked = false;
 
 		// Toplevel does not handle Enter, so it should get passed on to button
-		Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.Enter)));
+		Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.Enter)));
 		Assert.True (clicked);
 		clicked = false;
 
 		// Direct
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.Enter)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Enter)));
 		Assert.True (clicked);
 		clicked = false;
 
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.Space)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Space)));
 		Assert.True (clicked);
 		clicked = false;
 
-		Assert.True (btn.NewKeyDownEvent (new ((KeyCode)'T')));
+		Assert.True (btn.NewKeyDownEvent (new Key ((KeyCode)'T')));
 		Assert.True (clicked);
 		clicked = false;
 
@@ -135,22 +151,22 @@ public class ButtonTests {
 	public void HotKeyChange_Works ()
 	{
 		var clicked = false;
-		Button btn = new Button ("Test");
+		var btn = new Button ("_Test");
 		btn.Clicked += (s, e) => clicked = true;
 		Application.Top.Add (btn);
 		Application.Begin (Application.Top);
 
 		Assert.Equal (KeyCode.T, btn.HotKey);
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.T)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T)));
 		Assert.True (clicked);
 
 		clicked = false;
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.T | KeyCode.AltMask)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.T | KeyCode.AltMask)));
 		Assert.True (clicked);
 
 		clicked = false;
 		btn.HotKey = KeyCode.E;
-		Assert.True (btn.NewKeyDownEvent (new (KeyCode.E | KeyCode.AltMask)));
+		Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.E | KeyCode.AltMask)));
 		Assert.True (clicked);
 	}
 
@@ -162,7 +178,7 @@ public class ButtonTests {
 	[AutoInitShutdown]
 	public void KeyBindingExample ()
 	{
-		int pressed = 0;
+		var pressed = 0;
 		var btn = new Button ("Press Me");
 
 		btn.Clicked += (s, e) => pressed++;
@@ -173,42 +189,44 @@ public class ButtonTests {
 
 		Application.Top.Add (btn);
 		Application.Begin (Application.Top);
+		Application.Top.Add (btn);
+		Application.Begin (Application.Top);
 
 		// default keybinding is Space which results in keypress
-		Application.OnKeyDown (new ((KeyCode)' '));
+		Application.OnKeyDown (new Key ((KeyCode)' '));
 		Assert.Equal (1, pressed);
 
 		// remove the default keybinding (Space)
 		btn.KeyBindings.Clear (Command.Default, Command.Accept);
 
 		// After clearing the default keystroke the Space button no longer does anything for the Button
-		Application.OnKeyDown (new ((KeyCode)' '));
+		Application.OnKeyDown (new Key ((KeyCode)' '));
 		Assert.Equal (1, pressed);
 
 		// Set a new binding of b for the click (Accept) event
 		btn.KeyBindings.Add (KeyCode.B, Command.Default, Command.Accept);
 
 		// now pressing B should call the button click event
-		Application.OnKeyDown (new (KeyCode.B));
+		Application.OnKeyDown (new Key (KeyCode.B));
 		Assert.Equal (2, pressed);
 
 		// now pressing Shift-B should NOT call the button click event
-		Application.OnKeyDown (new (KeyCode.ShiftMask | KeyCode.B));
+		Application.OnKeyDown (new Key (KeyCode.ShiftMask | KeyCode.B));
 		Assert.Equal (2, pressed);
 
 		// now pressing Alt-B should NOT call the button click event
-		Application.OnKeyDown (new (KeyCode.AltMask | KeyCode.B));
+		Application.OnKeyDown (new Key (KeyCode.AltMask | KeyCode.B));
 		Assert.Equal (2, pressed);
 
 		// now pressing Shift-Alt-B should NOT call the button click event
-		Application.OnKeyDown (new (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.B));
+		Application.OnKeyDown (new Key (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.B));
 		Assert.Equal (2, pressed);
 	}
 
 	[Fact]
 	public void TestAssignTextToButton ()
 	{
-		View b = new Button () { Text = "heya" };
+		View b = new Button { Text = "heya" };
 		Assert.Equal ("heya", b.Text);
 		Assert.Contains ("heya", b.TextFormatter.Text);
 		b.Text = "heyb";
@@ -223,14 +241,17 @@ public class ButtonTests {
 	public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
 	{
 		var super = new View ();
-		var btn = new Button ("Test");
+		var btn = new Button ("_Test");
 		super.Add (btn);
 		super.BeginInit ();
 		super.EndInit ();
 
-		Assert.Equal ("Test", btn.Text);
+		Assert.Equal ("_Test", btn.Text);
 		Assert.Equal (KeyCode.T, btn.HotKey);
 
+		btn.Text = string.Empty;
+		Assert.Equal ("", btn.Text);
+		Assert.Equal (KeyCode.Null, btn.HotKey);
 		btn.Text = string.Empty;
 		Assert.Equal ("", btn.Text);
 		Assert.Equal (KeyCode.Null, btn.HotKey);
@@ -247,7 +268,7 @@ public class ButtonTests {
 			X = Pos.Center (),
 			Y = Pos.Center ()
 		};
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
@@ -255,7 +276,10 @@ public class ButtonTests {
 		Application.Top.Add (win);
 
 		Assert.False (btn.IsInitialized);
+		Assert.False (btn.IsInitialized);
 
+		Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
@@ -279,20 +303,23 @@ public class ButtonTests {
 	[Fact, AutoInitShutdown]
 	public void Update_Parameterless_Only_On_Or_After_Initialize ()
 	{
-		var btn = new Button () {
+		var btn = new Button {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Text = "Say Hello 你"
 		};
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		win.Add (btn);
 		Application.Top.Add (win);
 
 		Assert.False (btn.IsInitialized);
+		Assert.False (btn.IsInitialized);
 
+		Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 
@@ -316,23 +343,26 @@ public class ButtonTests {
 	[Fact, AutoInitShutdown]
 	public void AutoSize_Stays_True_With_EmptyText ()
 	{
-		var btn = new Button () {
+		var btn = new Button {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			AutoSize = true
 		};
 
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		win.Add (btn);
 		Application.Top.Add (win);
 
 		Assert.True (btn.AutoSize);
+		Assert.True (btn.AutoSize);
 
 		btn.Text = "Say Hello 你";
+		btn.Text = "Say Hello 你";
 
+		Assert.True (btn.AutoSize);
 		Assert.True (btn.AutoSize);
 
 		Application.Begin (Application.Top);
@@ -351,19 +381,20 @@ public class ButtonTests {
 	[Fact, AutoInitShutdown]
 	public void AutoSize_Stays_True_Center ()
 	{
-		var btn = new Button () {
+		var btn = new Button {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Text = "Say Hello 你"
 		};
 
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		win.Add (btn);
 		Application.Top.Add (win);
 
+		Assert.True (btn.AutoSize);
 		Assert.True (btn.AutoSize);
 
 		Application.Begin (Application.Top);
@@ -393,10 +424,10 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void AutoSize_Stays_True_AnchorEnd ()
 	{
-		var btn = new Button () {
+		var btn = new Button {
 			Y = Pos.Center (),
 			Text = "Say Hello 你",
 			AutoSize = true
@@ -404,14 +435,16 @@ public class ButtonTests {
 		var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
 
 		btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
+		btn.X = Pos.AnchorEnd () - Pos.Function (() => btn.TextFormatter.Text.GetColumns ());
 
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		win.Add (btn);
 		Application.Top.Add (win);
 
+		Assert.True (btn.AutoSize);
 		Assert.True (btn.AutoSize);
 
 		Application.Begin (Application.Top);
@@ -442,7 +475,7 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void AutoSize_False_With_Fixed_Width ()
 	{
 		var tab = new View ();
@@ -508,13 +541,13 @@ public class ButtonTests {
 		};
 		tab.Add (ckbMatchWholeWord);
 
-		var tabView = new TabView () {
+		var tabView = new TabView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
 		tabView.AddTab (new Tab () { DisplayText = "Find", View = tab }, true);
 
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
@@ -562,7 +595,7 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_True ()
 	{
 		var button = new Button ("Process keys") {
@@ -570,7 +603,7 @@ public class ButtonTests {
 			Y = Pos.Center (),
 			IsDefault = true
 		};
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
@@ -594,7 +627,7 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact] [AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
 		var button = new Button ("Process keys") {
@@ -604,7 +637,7 @@ public class ButtonTests {
 			IsDefault = true,
 			AutoSize = false
 		};
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
@@ -625,10 +658,11 @@ public class ButtonTests {
 
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
-	[Fact, AutoInitShutdown]
+
+	[Fact] [AutoInitShutdown]
 	public void Button_HotKeyChanged_EventFires ()
 	{
-		var btn = new Button ("Yar");
+		var btn = new Button ("_Yar");
 
 		object sender = null;
 		KeyChangedEventArgs args = null;
@@ -636,16 +670,24 @@ public class ButtonTests {
 		btn.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
+		btn.HotKeyChanged += (s, e) => {
+			sender = s;
+			args = e;
 
+		};
 		};
 
 		btn.HotKey = KeyCode.R;
 		Assert.Same (btn, sender);
 		Assert.Equal (KeyCode.Y, args.OldKey);
 		Assert.Equal (KeyCode.R, args.NewKey);
-
+		btn.HotKey = KeyCode.R;
+		Assert.Same (btn, sender);
+		Assert.Equal (KeyCode.Y, args.OldKey);
+		Assert.Equal (KeyCode.R, args.NewKey);
 	}
-	[Fact, AutoInitShutdown]
+
+	[Fact] [AutoInitShutdown]
 	public void Button_HotKeyChanged_EventFires_WithNone ()
 	{
 		var btn = new Button ();
@@ -656,6 +698,7 @@ public class ButtonTests {
 		btn.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
+
 		};
 
 		btn.HotKey = KeyCode.R;
