@@ -69,20 +69,21 @@ public class Shortcut : View {
 		if (!IsInitialized) {
 			return;
 		}
-
-		var cs = new ColorScheme (ColorScheme) {
-			Normal = ColorScheme.HotNormal,
-			HotNormal = ColorScheme.Normal
-		};
-		KeyView.ColorScheme = cs;
-
+		if (ColorScheme != null) {
+			var cs = new ColorScheme (ColorScheme) {
+				Normal = ColorScheme.HotNormal,
+				HotNormal = ColorScheme.Normal
+			};
+			KeyView.ColorScheme = cs;
+		}
+		
 		HelpView.X = Pos.Right (CommandView) + 2;
-		KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns());
+		KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns ());
 		if (AutoSize) {
 			var thickness = GetAdornmentsThickness ();
 			_container.Width = _commandView.Frame.Width +
-			                   (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width + 2 : 0) +
-			                   (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width + 2 : 0);
+					   (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width + 2 : 0) +
+					   (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width + 2 : 0);
 			Width = _container.Width + thickness.Horizontal;
 		} else {
 			//Width = Dim.Fill ();
@@ -390,7 +391,7 @@ public class Bar : View {
 				subview.Width = Dim.Fill ();
 
 			}
-			Height = Subviews.Count + GetAdornmentsThickness ().Vertical; 
+			Height = Subviews.Count + GetAdornmentsThickness ().Vertical;
 			break;
 		}
 	}

@@ -381,4 +381,16 @@ t     ", _output);
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 	}
+
+	[Theory, SetupFakeDriver]
+	[InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
+	[InlineData ("a𐐀b")]
+	void DrawHotString_NonBmp (string expected)
+	{
+		var view = new View () { Width = 10, Height = 1 };
+		view.DrawHotString (expected, Attribute.Default, Attribute.Default);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
+	}
 }

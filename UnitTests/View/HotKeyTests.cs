@@ -208,13 +208,13 @@ public class HotKeyTests {
 	}
 
 	[Theory]
-	[InlineData ("Test", KeyCode.T)]
+	[InlineData ("Test", KeyCode.Null)]
 	[InlineData ("^Test", KeyCode.T)]
 	[InlineData ("T^est", KeyCode.E)]
 	[InlineData ("Te^st", KeyCode.S)]
 	[InlineData ("Tes^t", KeyCode.T)]
 	[InlineData ("other", KeyCode.Null)]
-	[InlineData ("oTher", KeyCode.T)]
+	[InlineData ("oTher", KeyCode.Null)]
 	[InlineData ("^Öther", (KeyCode)'Ö')]
 	[InlineData ("^öther", (KeyCode)'ö')]
 	// BUGBUG: '!' should be supported. Line 968 of TextFormatter filters on char.IsLetterOrDigit 
