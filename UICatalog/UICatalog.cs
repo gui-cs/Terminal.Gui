@@ -97,9 +97,9 @@ class UICatalogApp {
 			driverOption
 		};
 
-		rootCommand.SetHandler ((context) => {
+		rootCommand.SetHandler (context => {
 			Options options = new Options () {
-				Driver = context.ParseResult.GetValueForOption (driverOption),
+				Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
 				Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
 				/* etc. */
 			};

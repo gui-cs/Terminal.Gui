@@ -808,12 +808,12 @@ public class Slider<T> : View {
 		Height = 0;
 		if (_config._sliderOrientation == Orientation.Horizontal) {
 			Bounds = new Rect (Bounds.Location,
-				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcBestLength ()),
-					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical,    CalcThickness ())));
+				new Size (int.Min (SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal, CalcBestLength ()),
+					int.Min (SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical, CalcThickness ())));
 		} else {
 			Bounds = new Rect (Bounds.Location,
-				new Size (int.Min (SuperView.Bounds.Width - GetFramesThickness ().Horizontal, CalcThickness ()),
-					int.Min (SuperView.Bounds.Height - GetFramesThickness ().Vertical,    CalcBestLength ())));
+				new Size (int.Min (SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal, CalcThickness ()),
+					int.Min (SuperView.Bounds.Height - GetAdornmentsThickness ().Vertical, CalcBestLength ())));
 		}
 	}
 
@@ -1047,7 +1047,7 @@ public class Slider<T> : View {
 		// Attributes
 
 		var normalAttr = new Attribute (Color.White, Color.Black);
-		var setAtrr = new Attribute (Color.Black,    Color.White);
+		var setAtrr = new Attribute (Color.Black, Color.White);
 		if (IsInitialized) {
 			normalAttr = ColorScheme?.Normal ?? Application.Current.ColorScheme.Normal;
 			setAtrr = Style.SetChar.Attribute ?? ColorScheme.HotNormal;
@@ -1187,7 +1187,7 @@ public class Slider<T> : View {
 	{
 		// Attributes
 		var normalAttr = new Attribute (Color.White, Color.Black);
-		var setAttr = new Attribute (Color.Black,    Color.White);
+		var setAttr = new Attribute (Color.Black, Color.White);
 		var spaceAttr = normalAttr;
 		if (IsInitialized) {
 			normalAttr = Style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
@@ -1459,15 +1459,15 @@ public class Slider<T> : View {
 
 	void SetCommands ()
 	{
-		AddCommand (Command.Right,       () => MovePlus ());
-		AddCommand (Command.LineDown,    () => MovePlus ());
-		AddCommand (Command.Left,        () => MoveMinus ());
-		AddCommand (Command.LineUp,      () => MoveMinus ());
-		AddCommand (Command.LeftHome,    () => MoveStart ());
-		AddCommand (Command.RightEnd,    () => MoveEnd ());
+		AddCommand (Command.Right, () => MovePlus ());
+		AddCommand (Command.LineDown, () => MovePlus ());
+		AddCommand (Command.Left, () => MoveMinus ());
+		AddCommand (Command.LineUp, () => MoveMinus ());
+		AddCommand (Command.LeftHome, () => MoveStart ());
+		AddCommand (Command.RightEnd, () => MoveEnd ());
 		AddCommand (Command.RightExtend, () => ExtendPlus ());
-		AddCommand (Command.LeftExtend,  () => ExtendMinus ());
-		AddCommand (Command.Accept,      () => Set ());
+		AddCommand (Command.LeftExtend, () => ExtendMinus ());
+		AddCommand (Command.Accept, () => Set ());
 
 		SetKeyBindings ();
 	}
@@ -1497,8 +1497,8 @@ public class Slider<T> : View {
 			KeyBindings.Add (KeyCode.CursorUp | KeyCode.CtrlMask, Command.LeftExtend);
 
 		}
-		KeyBindings.Add (KeyCode.Home,  Command.LeftHome);
-		KeyBindings.Add (KeyCode.End,   Command.RightEnd);
+		KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+		KeyBindings.Add (KeyCode.End, Command.RightEnd);
 		KeyBindings.Add (KeyCode.Enter, Command.Accept);
 		KeyBindings.Add (KeyCode.Space, Command.Accept);
 

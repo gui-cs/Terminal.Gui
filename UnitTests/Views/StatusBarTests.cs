@@ -14,12 +14,14 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact]
 		public void StatusItem_Constructor ()
 		{
+			Application.Init ();
 			var si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", null);
 			Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, si.Shortcut);
 			Assert.Equal ($"{Application.QuitKey} to Quit", si.Title);
 			Assert.Null (si.Action);
 			si = new StatusItem (Application.QuitKey, $"{Application.QuitKey} to Quit", () => { });
 			Assert.NotNull (si.Action);
+			Application.Shutdown ();
 		}
 
 		[Fact]
@@ -29,7 +31,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (sb.Items);
 			Assert.False (sb.CanFocus);
-			Assert.Equal (Colors.Menu, sb.ColorScheme);
+			Assert.Equal (Colors.ColorSchemes ["Menu"], sb.ColorScheme);
 			Assert.Equal (0, sb.X);
 			Assert.Equal ("AnchorEnd(1)", sb.Y.ToString ());
 			Assert.Equal (Dim.Fill (), sb.Width);

@@ -193,7 +193,7 @@ public partial class View {
 			if (AutoSize || string.IsNullOrEmpty (TextFormatter.Text)) {
 				return false;
 			}
-			
+
 			switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 			case true:
 				var colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
@@ -307,7 +307,7 @@ public partial class View {
 			x = Bounds.X;
 			y = Bounds.Y;
 		}
-		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction); 
+		var rect = TextFormatter.CalcRect (x, y, TextFormatter.Text, TextFormatter.Direction);
 		int newWidth = rect.Size.Width - GetHotKeySpecifierLength () + (Margin == null ? 0 : Margin.Thickness.Horizontal + Border.Thickness.Horizontal + Padding.Thickness.Horizontal);
 		int newHeight = rect.Size.Height - GetHotKeySpecifierLength (false) + (Margin == null ? 0 : Margin.Thickness.Vertical + Border.Thickness.Vertical + Padding.Thickness.Vertical);
 		return new Size (newWidth, newHeight);

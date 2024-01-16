@@ -42,7 +42,7 @@ public static partial class Application {
 	/// </summary>
 	public static Toplevel OverlappedTop {
 		get {
-			if (Top.IsOverlappedContainer) {
+			if (Top is { IsOverlappedContainer: true }) {
 				return Top;
 			}
 			return null;

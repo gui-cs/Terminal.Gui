@@ -92,7 +92,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};
-			theme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			theme ["ColorSchemes"].PropertyValue = Colors.Reset ();
 			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
 
 			var colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
@@ -109,7 +109,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				HotFocus = colorScheme.HotFocus,
 				Disabled = colorScheme.Disabled,
 			};
-			newTheme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			newTheme ["ColorSchemes"].PropertyValue = Colors.Reset ();
 			((Dictionary<string, ColorScheme>)newTheme ["ColorSchemes"].PropertyValue) ["test"] = newColorScheme;
 
 			// Act
@@ -133,7 +133,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			var theme = new ThemeScope ();
 			Assert.NotEmpty (theme);
 
-			theme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			Assert.Equal (5, Colors.ColorSchemes.Count);
+
+			theme ["ColorSchemes"].PropertyValue = Colors.ColorSchemes;
 			var colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
 			Assert.Equal (Colors.ColorSchemes.Count, colorSchemes.Count);
 
@@ -148,7 +150,9 @@ namespace Terminal.Gui.ConfigurationTests {
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};
 
-			newTheme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			newTheme ["ColorSchemes"].PropertyValue = Colors.Reset ();
+			Assert.Equal (5, Colors.ColorSchemes.Count);
+
 			// add a new ColorScheme to the newTheme
 			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
 

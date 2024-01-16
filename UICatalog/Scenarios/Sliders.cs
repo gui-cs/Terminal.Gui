@@ -18,7 +18,7 @@ public class Sliders : Scenario {
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			ColorScheme = Colors.Dialog
+			ColorScheme = Colors.ColorSchemes ["Dialog"]
 		};
 
 		Win.Add (configView);
@@ -35,7 +35,7 @@ public class Sliders : Scenario {
 			BorderStyle = LineStyle.Single
 		};
 
-		slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen,       Color.Black);
+		slider.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		slider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
 		slider.Options = new List<SliderOption<string>> {
@@ -79,7 +79,7 @@ public class Sliders : Scenario {
 		};
 		slider.SetOption (0); // Legends
 		slider.SetOption (1); // RangeAllowSingle
-		//slider.SetOption (3); // AutoSize
+				      //slider.SetOption (3); // AutoSize
 
 		#region Slider Orientation Slider
 		var slider_orientation_slider = new Slider<string> (new List<string> { "Horizontal", "Vertical" }) {
@@ -195,7 +195,7 @@ public class Sliders : Scenario {
 			AutoSize = true
 		};
 
-		sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen,       Color.Black);
+		sliderFGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		sliderFGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
 		var colorOptions = new List<SliderOption<(Color, Color)>> ();
@@ -216,13 +216,15 @@ public class Sliders : Scenario {
 				var data = e.Options.First ().Value.Data;
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
 					s.ColorScheme = new ColorScheme (s.ColorScheme);
-					s.ColorScheme.Normal = new Attribute (data.Item2, s.ColorScheme.Normal.Background);
+					s.ColorScheme = new ColorScheme(s.ColorScheme) {
+						Normal = new Attribute (data.Item2, s.ColorScheme.Normal.Background)
+					};
 
-					s.Style.OptionChar.Attribute = new Attribute (data.Item1,             s.ColorScheme.Normal.Background);
-					s.Style.SetChar.Attribute = new Attribute (data.Item1,                s.Style.SetChar.Attribute?.Background ?? s.ColorScheme.Normal.Background);
-					s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1,    s.ColorScheme.Normal.Background);
-					s.Style.RangeChar.Attribute = new Attribute (data.Item1,              s.ColorScheme.Normal.Background);
-					s.Style.SpaceChar.Attribute = new Attribute (data.Item1,              s.ColorScheme.Normal.Background);
+					s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+					s.Style.SetChar.Attribute = new Attribute (data.Item1, s.Style.SetChar.Attribute?.Background ?? s.ColorScheme.Normal.Background);
+					s.Style.LegendAttributes.SetAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+					s.Style.RangeChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
+					s.Style.SpaceChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 					s.Style.LegendAttributes.NormalAttribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 				}
 			}
@@ -240,7 +242,7 @@ public class Sliders : Scenario {
 			AutoSize = true
 		};
 
-		sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen,       Color.Black);
+		sliderBGColor.Style.SetChar.Attribute = new Attribute (Color.BrightGreen, Color.Black);
 		sliderBGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
 		sliderBGColor.Options = colorOptions;
@@ -252,8 +254,9 @@ public class Sliders : Scenario {
 				var data = e.Options.First ().Value.Data;
 
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
-					s.ColorScheme = new ColorScheme (s.ColorScheme);
-					s.ColorScheme.Normal = new Attribute (s.ColorScheme.Normal.Foreground, data.Item2);
+					s.ColorScheme = new ColorScheme (s.ColorScheme) {
+						Normal = new Attribute (s.ColorScheme.Normal.Foreground, data.Item2)
+					};
 				}
 			}
 		};

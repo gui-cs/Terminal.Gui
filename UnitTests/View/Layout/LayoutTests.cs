@@ -106,7 +106,8 @@ public class LayoutTests {
 		super.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TrySetWidth_ForceValidatePosDim ()
 	{
 		var top = new View () {
@@ -142,7 +143,8 @@ public class LayoutTests {
 		Assert.Equal (60, rWidth);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TrySetHeight_ForceValidatePosDim ()
 	{
 		var top = new View () {
@@ -179,7 +181,8 @@ public class LayoutTests {
 		Assert.Equal (5, rHeight);
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void GetCurrentWidth_TrySetWidth ()
 	{
 		var top = new View () {
@@ -189,9 +192,9 @@ public class LayoutTests {
 				      };
 
 		var v = new View () {
-					    Width          = Dim.Fill (),
-					    ValidatePosDim = true
-				    };
+			Width = Dim.Fill (),
+			ValidatePosDim = true
+		};
 		top.Add (v);
 		top.BeginInit ();
 		top.EndInit ();
@@ -228,9 +231,9 @@ public class LayoutTests {
 				      };
 
 		var v = new View () {
-					    Height         = Dim.Fill (),
-					    ValidatePosDim = true
-				    };
+			Height = Dim.Fill (),
+			ValidatePosDim = true
+		};
 		top.Add (v);
 		top.BeginInit ();
 		top.EndInit ();
@@ -261,10 +264,10 @@ public class LayoutTests {
 	public void DimFill_SizedCorrectly ()
 	{
 		var view = new View () {
-					       Width       = Dim.Fill (),
-					       Height      = Dim.Fill (),
-					       BorderStyle = LineStyle.Single,
-				       };
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+			BorderStyle = LineStyle.Single,
+		};
 		Application.Top.Add (view);
 		var rs = Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (32, 5);
@@ -272,14 +275,15 @@ public class LayoutTests {
 		Application.Top.LayoutSubviews ();
 		//view.SetRelativeLayout (new Rect (0, 0, 32, 5));
 		Assert.Equal (32, view.Frame.Width);
-		Assert.Equal (5,  view.Frame.Height);
+		Assert.Equal (5, view.Frame.Height);
 	}
 
 
 	// Tested in AbsoluteLayoutTests.cs
 	// public void Pos_Dim_Are_Null_If_Not_Initialized_On_Constructor_IsAdded_False ()
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (1)]
 	[InlineData (2)]
 	[InlineData (3)]
@@ -417,7 +421,8 @@ public class LayoutTests {
 		Application.End (rs);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (1)]
 	[InlineData (2)]
 	[InlineData (3)]
@@ -568,15 +573,16 @@ public class LayoutTests {
 		Application.End (rs);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void PosCombine_DimCombine_View_With_SubViews ()
 	{
 		var clicked = false;
 		var top = Application.Top;
 		var win1 = new Window () { Id = "win1", Width = 20, Height = 10 };
 		var view1 = new View ("view1");
-		var win2 = new Window () { Id = "win2", Y      = Pos.Bottom (view1) + 1, Width = 10, Height  = 3 };
-		var view2 = new View () { Id  = "view2", Width = Dim.Fill (), Height           = 1, CanFocus = true };
+		var win2 = new Window () { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
+		var view2 = new View () { Id = "view2", Width = Dim.Fill (), Height = 1, CanFocus = true };
 		view2.MouseClick += (sender, e) => clicked = true;
 		var view3 = new View () { Id = "view3", Width = Dim.Fill (1), Height = 1, CanFocus = true };
 
@@ -599,11 +605,11 @@ public class LayoutTests {
 │                  │
 └──────────────────┘", _output);
 		Assert.Equal (new Rect (0, 0, 80, 25), top.Frame);
-		Assert.Equal (new Rect (0, 0, 5,  1),  view1.Frame);
+		Assert.Equal (new Rect (0, 0, 5, 1), view1.Frame);
 		Assert.Equal (new Rect (0, 0, 20, 10), win1.Frame);
-		Assert.Equal (new Rect (0, 2, 10, 3),  win2.Frame);
-		Assert.Equal (new Rect (0, 0, 8,  1),  view2.Frame);
-		Assert.Equal (new Rect (0, 0, 7,  1),  view3.Frame);
+		Assert.Equal (new Rect (0, 2, 10, 3), win2.Frame);
+		Assert.Equal (new Rect (0, 0, 8, 1), view2.Frame);
+		Assert.Equal (new Rect (0, 0, 7, 1), view3.Frame);
 		var foundView = View.FindDeepestView (top, 9, 4, out int rx, out int ry);
 		Assert.Equal (foundView, view2);
 		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
@@ -616,7 +622,8 @@ public class LayoutTests {
 		Application.End (rs);
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Draw_Vertical_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 	{
 		Application.Init (new FakeDriver ());
@@ -647,7 +654,8 @@ public class LayoutTests {
 		Application.Shutdown ();
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
 	{
 		Application.Init (new FakeDriver ());
@@ -680,18 +688,18 @@ public class LayoutTests {
 		Application.Init (new FakeDriver ());
 
 		var w = new Window () {
-					      X = Pos.Left (Application.Top) + 2,
-					      Y = Pos.Top (Application.Top) + 2
-				      };
+			X = Pos.Left (Application.Top) + 2,
+			Y = Pos.Top (Application.Top) + 2
+		};
 		var f = new FrameView ();
 		var v1 = new View () {
-					     X = Pos.Left (w) + 2,
-					     Y = Pos.Top (w) + 2
-				     };
+			X = Pos.Left (w) + 2,
+			Y = Pos.Top (w) + 2
+		};
 		var v2 = new View () {
-					     X = Pos.Left (v1) + 2,
-					     Y = Pos.Top (v1) + 2
-				     };
+			X = Pos.Left (v1) + 2,
+			Y = Pos.Top (v1) + 2
+		};
 
 		f.Add (v1, v2);
 		w.Add (f);
@@ -718,7 +726,7 @@ public class LayoutTests {
 		Assert.Throws<InvalidOperationException> (() => Application.Run ());
 		Application.Shutdown ();
 	}
-	
+
 	// Was named AutoSize_Pos_Validation_Do_Not_Throws_If_NewValue_Is_PosAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	// but doesn't actually have anything to do with AutoSize.
 	[Fact]
@@ -729,14 +737,14 @@ public class LayoutTests {
 		var t = Application.Top;
 
 		var w = new Window () {
-					      X = Pos.Left (t) + 2,
-					      Y = Pos.At (2)
-				      };
+			X = Pos.Left (t) + 2,
+			Y = Pos.At (2)
+		};
 
 		var v = new View () {
-					    X = Pos.Center (),
-					    Y = Pos.Percent (10)
-				    };
+			X = Pos.Center (),
+			Y = Pos.Percent (10)
+		};
 
 		w.Add (v);
 		t.Add (w);

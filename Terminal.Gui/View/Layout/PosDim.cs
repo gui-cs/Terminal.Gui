@@ -4,12 +4,136 @@ namespace Terminal.Gui;
 
 /// <summary>
 /// Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
+/// Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
 /// relative to the ending dimension. Integer values are implicitly convertible to
 /// an absolute <see cref="Pos"/>. These objects are created using the static methods Percent,
+/// AnchorEnd, and Center. The <see cref="Pos"/> objects can be combined with the addition and
 /// AnchorEnd, and Center. The <see cref="Pos"/> objects can be combined with the addition and
 /// subtraction operators.
 /// </summary>
 /// <remarks>
+///         <para>
+///         Use the <see cref="Pos"/> objects on the X or Y properties of a view to control the position.
+///         </para>
+///         <para>
+///         These can be used to set the absolute position, when merely assigning an
+///         integer value (via the implicit integer to <see cref="Pos"/> conversion), and they can be combined
+///         to produce more useful layouts, like: Pos.Center - 3, which would shift the position
+///         of the <see cref="View"/> 3 characters to the left after centering for example.
+///         </para>
+///         <para>
+///         Reference coordinates of another view by using the methods Left(View), Right(View), Bottom(View), Top(View).
+///         The X(View) and Y(View) are
+///         aliases to Left(View) and Top(View) respectively.
+///         </para>
+///         <para>
+///                 <list type="table">
+///                         <listheader>
+///                                 <term>Pos Object</term>
+///                                 <description>Description</description>
+///                         </listheader>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Function(Func{int})"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that computes the position by executing the provided
+///                                 function. The function will be called every time the position is needed.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Percent(float)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that is a percentage of the width or height of the
+///                                 SuperView.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Anchor(int)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom)
+///                                 of the dimension,
+///                                 useful to flush the layout from the right or bottom.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Center"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.At(int)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that is an absolute position based on the specified
+///                                 integer value.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Left"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified
+///                                 <see cref="View"/>.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.X(View)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified
+///                                 <see cref="View"/>.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Top(View)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified
+///                                 <see cref="View"/>.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Y(View)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified
+///                                 <see cref="View"/>.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Right(View)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the
+///                                 specified <see cref="View"/>.
+///                                 </description>
+///                         </item>
+///                         <item>
+///                                 <term>
+///                                         <see cref="Pos.Bottom(View)"/>
+///                                 </term>
+///                                 <description>
+///                                 Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the
+///                                 specified <see cref="View"/>
+///                                 </description>
+///                         </item>
+/// 
+///                 </list>
+///         </para>
 ///         <para>
 ///         Use the <see cref="Pos"/> objects on the X or Y properties of a view to control the position.
 ///         </para>

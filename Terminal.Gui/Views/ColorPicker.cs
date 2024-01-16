@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Event arguments for the <see cref="Color"/> events.
@@ -94,9 +94,9 @@ public class ColorPicker : View {
 			var prev = (ColorName)_selectColorIndex;
 			_selectColorIndex = (int)value;
 			ColorChanged?.Invoke (this, new ColorEventArgs {
-									       PreviousColor = new Color (prev),
-									       Color         = new Color (value)
-								       });
+				PreviousColor = new Color (prev),
+				Color = new Color (value)
+			});
 			SetNeedsDisplay ();
 		}
 	}
@@ -112,8 +112,8 @@ public class ColorPicker : View {
 		AddCommands ();
 		AddKeyBindings ();
 		LayoutStarted += (o, a) => {
-			var thickness = GetFramesThickness ();
-			Width  = _cols * BoxWidth + thickness.Vertical;
+			var thickness = GetAdornmentsThickness ();
+			Width = _cols * BoxWidth + thickness.Vertical;
 			Height = _rows * BoxHeight + thickness.Horizontal;
 		};
 	}
@@ -123,9 +123,9 @@ public class ColorPicker : View {
 	/// </summary>
 	void AddCommands ()
 	{
-		AddCommand (Command.Left,     () => MoveLeft ());
-		AddCommand (Command.Right,    () => MoveRight ());
-		AddCommand (Command.LineUp,   () => MoveUp ());
+		AddCommand (Command.Left, () => MoveLeft ());
+		AddCommand (Command.Right, () => MoveRight ());
+		AddCommand (Command.LineUp, () => MoveUp ());
 		AddCommand (Command.LineDown, () => MoveDown ());
 	}
 
@@ -134,10 +134,10 @@ public class ColorPicker : View {
 	/// </summary>
 	void AddKeyBindings ()
 	{
-		KeyBindings.Add (KeyCode.CursorLeft,  Command.Left);
+		KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
 		KeyBindings.Add (KeyCode.CursorRight, Command.Right);
-		KeyBindings.Add (KeyCode.CursorUp,    Command.LineUp);
-		KeyBindings.Add (KeyCode.CursorDown,  Command.LineDown);
+		KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+		KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
 	}
 
 	///<inheritdoc/>
@@ -190,10 +190,10 @@ public class ColorPicker : View {
 		} else if (rect.Height == 1) {
 			lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 		} else {
-			lc.AddLine (rect.Location,                                                  rect.Width, Orientation.Horizontal, LineStyle.Dotted);
+			lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 			lc.AddLine (new Point (rect.Location.X, rect.Location.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 
-			lc.AddLine (rect.Location,                                                 rect.Height, Orientation.Vertical, LineStyle.Dotted);
+			lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
 			lc.AddLine (new Point (rect.Location.X + rect.Width - 1, rect.Location.Y), rect.Height, Orientation.Vertical, LineStyle.Dotted);
 		}
 		foreach (var p in lc.GetMap ()) {

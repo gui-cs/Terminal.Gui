@@ -177,4 +177,7 @@
   <data name="btnOpen" xml:space="preserve">
     <value>Abrir</value>
   </data>
+  <data name="dpTitle" xml:space="preserve">
+    <value>Seletor de Data</value>
+  </data>
 </root>

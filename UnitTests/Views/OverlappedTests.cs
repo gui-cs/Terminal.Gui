@@ -47,7 +47,7 @@ public class OverlappedTests {
 		Application.Shutdown ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Application_RequestStop_With_Params_On_A_Not_OverlappedContainer_Always_Use_Application_Current ()
 	{
 		var top1 = new Toplevel ();
@@ -683,7 +683,7 @@ public class OverlappedTests {
 	[Fact]
 	public void MoveToOverlappedChild_Throw_NullReferenceException_Passing_Null_Parameter () => Assert.Throws<NullReferenceException> (delegate { Application.MoveToOverlappedChild (null); });
 
-	[Fact] [AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Visible_False_Does_Not_Clear ()
 	{
 		var overlapped = new Overlapped ();
@@ -704,11 +704,11 @@ public class OverlappedTests {
  └───┘", _output);
 		var attributes = new [] {
 			// 0
-			Colors.TopLevel.Normal,
+			Colors.ColorSchemes ["TopLevel"].Normal,
 			// 1
-			Colors.Base.Normal
+			Colors.ColorSchemes ["Base"].Normal
 		};
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
 0111110000
 0111110000
@@ -732,7 +732,7 @@ public class OverlappedTests {
   │   │
   │   │
   └───┘", _output);
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 0000000000
 0000000000
 0011111000

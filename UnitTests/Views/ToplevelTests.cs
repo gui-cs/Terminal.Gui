@@ -15,9 +15,9 @@ public class ToplevelTests {
 	{
 		var top = new Toplevel ();
 
-		Assert.Equal (Colors.TopLevel, top.ColorScheme);
-		Assert.Equal ("Fill(0)",       top.Width.ToString ());
-		Assert.Equal ("Fill(0)",       top.Height.ToString ());
+		Assert.Equal (Colors.ColorSchemes ["TopLevel"], top.ColorScheme);
+		Assert.Equal ("Fill(0)", top.Width.ToString ());
+		Assert.Equal ("Fill(0)", top.Height.ToString ());
 		Assert.False (top.Running);
 		Assert.False (top.Modal);
 		Assert.Null (top.MenuBar);
@@ -1253,7 +1253,7 @@ public class ToplevelTests {
 		Application.Begin (window);
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 20, 3),  window.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -1278,7 +1278,7 @@ public class ToplevelTests {
 
 		Application.Refresh ();
 		Assert.Equal (new Rect (0, 0, 40, 10), top.Frame);
-		Assert.Equal (new Rect (0, 0, 20, 3),  window.Frame);
+		Assert.Equal (new Rect (0, 0, 20, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │                  │
@@ -1393,7 +1393,7 @@ public class ToplevelTests {
 
 		firstIteration = false;
 		Application.RunIteration (ref rs, ref firstIteration);
-		Assert.Equal (window,                 Application.MouseGrabView);
+		Assert.Equal (window, Application.MouseGrabView);
 		Assert.Equal (new Rect (1, 1, 10, 3), window.Frame);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
  ┌────────┐

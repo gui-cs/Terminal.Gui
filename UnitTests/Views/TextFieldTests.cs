@@ -30,7 +30,7 @@ public class TextFieldTests {
 			//                                                    1         2         3 
 			//                                          01234567890123456789012345678901=32 (Length)
 			TextFieldTests._textField = new TextField ("TAB to jump between text fields.") {
-				ColorScheme = Colors.Base
+				ColorScheme = Colors.ColorSchemes ["Base"]
 			};
 		}
 
@@ -59,14 +59,14 @@ public class TextFieldTests {
 			};
 
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("0000000", driver: Application.Driver, attributes);
 		_textField.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
 		bool first = true;
 		Application.RunIteration (ref rs, ref first);
 		Assert.Equal (4, _textField.CursorPosition);
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("1111000", driver: Application.Driver, attributes);
 	}
 
 	[Fact]
@@ -1307,8 +1307,12 @@ public class TextFieldTests {
 			View = tf
 		};
 
+		// In #3183 OnMouseClicked is no longer called before MouseEvent().
+		// This call causes the context menu to pop, and MouseEvent() returns true.
+		// Thus, the clickCounter is NOT incremented.
+		// Which is correct, because the user did NOT click with the left mouse button.
 		Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
-		Assert.Equal (2, clickCounter);
+		Assert.Equal (1, clickCounter);
 	}
 
 	private void SuppressKey (object s, Key arg)
@@ -1633,5 +1637,30 @@ Les Miśerables", output);
 		Assert.Equal (string.Empty, _textField.Text);
 		_textField.Paste ();
 		Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textField.Text);
+	}
+
+	[Fact, TextFieldTestsAutoInitShutdown]
+	public void Copy_Paste_Text_Changing_Updates_Cursor_Position ()
+	{
+		_textField.TextChanging += _textField_TextChanging;
+
+		void _textField_TextChanging (object sender, TextChangingEventArgs e)
+		{
+			if (e.NewText.GetRuneCount () > 11) {
+				e.NewText = e.NewText [..11];
+			}
+		}
+
+		Assert.Equal (32, _textField.CursorPosition);
+		_textField.SelectAll ();
+		_textField.Cut ();
+		Assert.Equal ("TAB to jump between text fields.", Application.Driver.Clipboard.GetClipboardData ());
+		Assert.Equal (string.Empty, _textField.Text);
+		Assert.Equal (0, _textField.CursorPosition);
+		_textField.Paste ();
+		Assert.Equal ("TAB to jump", _textField.Text);
+		Assert.Equal (11, _textField.CursorPosition);
+
+		_textField.TextChanging -= _textField_TextChanging;
 	}
 }

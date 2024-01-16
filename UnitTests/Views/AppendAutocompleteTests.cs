@@ -11,7 +11,8 @@ public class AppendAutocompleteTests {
 
 	public AppendAutocompleteTests (ITestOutputHelper output) => this.output = output;
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_ShowThenAccept_MatchCase ()
 	{
 		var tf = GetTextFieldsInView ();
@@ -45,7 +46,8 @@ public class AppendAutocompleteTests {
 		Assert.NotSame (tf, Application.Top.Focused);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_ShowThenAccept_CasesDiffer ()
 	{
 		var tf = GetTextFieldsInView ();
@@ -76,7 +78,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("my FISH", tf.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");
@@ -104,7 +107,8 @@ public class AppendAutocompleteTests {
 		Assert.NotSame (tf, Application.Top.Focused);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_AfterCloseKey_ReappearsOnLetter ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");
@@ -132,7 +136,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("fi", tf.Text);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData ("ffffffffffffffffffffffffff", "ffffffffff")]
 	[InlineData ("f234567890",                 "f234567890")]
 	[InlineData ("fisérables",                 "fisérables")]
@@ -148,7 +153,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("f", tf.Text);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (ConsoleKey.UpArrow)]
 	[InlineData (ConsoleKey.DownArrow)]
 	public void TestAutoAppend_CycleSelections (ConsoleKey cycleKey)
@@ -178,7 +184,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("f", tf.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_NoRender_WhenNoMatch ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");
@@ -197,7 +204,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("fx", tf.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_NoRender_WhenCursorNotAtEnd ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");

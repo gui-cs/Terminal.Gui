@@ -3,7 +3,7 @@ using System.Globalization;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class TabViewTests {
 	readonly ITestOutputHelper output;
@@ -23,7 +23,7 @@ public class TabViewTests {
 		tv.EndInit ();
 		tv.ColorScheme = new ColorScheme ();
 		tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi") { Width = 2 }), false);
-		tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")),                  false);
+		tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);
 		return tv;
 	}
 
@@ -36,9 +36,9 @@ public class TabViewTests {
 		Tab tab1;
 		Tab tab2;
 		tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
-		tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")),    true);
+		tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")), true);
 
-		Assert.Equal (2,    tv.Tabs.Count);
+		Assert.Equal (2, tv.Tabs.Count);
 		Assert.Equal (tab2, tv.SelectedTab);
 
 		Application.Shutdown ();
@@ -102,7 +102,7 @@ public class TabViewTests {
 
 		tv.SelectedTab = tab2;
 
-		Assert.Equal (1,    called);
+		Assert.Equal (1, called);
 		Assert.Equal (tab1, oldTab);
 		Assert.Equal (tab2, newTab);
 
@@ -179,7 +179,7 @@ public class TabViewTests {
 
 		tv.SwitchTabBy (1);
 
-		Assert.Equal (1,    called);
+		Assert.Equal (1, called);
 		Assert.Equal (tab2, tv.SelectedTab);
 
 		//reset called counter
@@ -189,7 +189,7 @@ public class TabViewTests {
 		tv.SwitchTabBy (2);
 
 		// even though we go right 2 indexes the event should only be called once
-		Assert.Equal (1,    called);
+		Assert.Equal (1, called);
 		Assert.Equal (tab4, tv.SelectedTab);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
@@ -233,11 +233,12 @@ public class TabViewTests {
 		Application.Shutdown ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
-		tv.Width  = 10;
+		tv.Width = 10;
 		tv.Height = 5;
 
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -306,13 +307,14 @@ public class TabViewTests {
 └────────┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
-		tv.Width  = 10;
+		tv.Width = 10;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { ShowTopLine = false };
+		tv.Style = new TabStyle { ShowTopLine = false };
 		tv.ApplyStyleChanges ();
 
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -382,11 +384,12 @@ public class TabViewTests {
 └────────┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 4;
+		tv.Width = 4;
 		tv.Height = 5;
 		tv.LayoutSubviews ();
 
@@ -400,13 +403,14 @@ public class TabViewTests {
 └──┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 4;
+		tv.Width = 4;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { ShowTopLine = false };
+		tv.Style = new TabStyle { ShowTopLine = false };
 		tv.ApplyStyleChanges ();
 		tv.LayoutSubviews ();
 
@@ -420,11 +424,12 @@ public class TabViewTests {
 └──┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 3;
+		tv.Width = 3;
 		tv.Height = 5;
 		tv.LayoutSubviews ();
 
@@ -438,13 +443,14 @@ public class TabViewTests {
 └─┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 3;
+		tv.Width = 3;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { ShowTopLine = false };
+		tv.Style = new TabStyle { ShowTopLine = false };
 		tv.ApplyStyleChanges ();
 		tv.LayoutSubviews ();
 
@@ -458,13 +464,14 @@ public class TabViewTests {
 └─┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
-		tv.Width  = 10;
+		tv.Width = 10;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { TabsOnBottom = true };
+		tv.Style = new TabStyle { TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -521,13 +528,14 @@ public class TabViewTests {
 └───────┘ ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
-		tv.Width  = 10;
+		tv.Width = 10;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+		tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
@@ -597,13 +605,14 @@ public class TabViewTests {
 │abcdefg│ ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 4;
+		tv.Width = 4;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { TabsOnBottom = true };
+		tv.Style = new TabStyle { TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 		tv.LayoutSubviews ();
 
@@ -617,13 +626,14 @@ public class TabViewTests {
 └─┘ ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 4;
+		tv.Width = 4;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+		tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 		tv.LayoutSubviews ();
 
@@ -637,13 +647,14 @@ public class TabViewTests {
 │T│ ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 3;
+		tv.Width = 3;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { TabsOnBottom = true };
+		tv.Style = new TabStyle { TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 		tv.LayoutSubviews ();
 
@@ -657,13 +668,14 @@ public class TabViewTests {
 └┘ ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
 	{
 		var tv = GetTabView (out _, out _, false);
-		tv.Width  = 3;
+		tv.Width = 3;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
+		tv.Style = new TabStyle { ShowTopLine = false, TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 		tv.LayoutSubviews ();
 
@@ -677,11 +689,12 @@ public class TabViewTests {
 ││ ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
-		tv.Width  = 20;
+		tv.Width = 20;
 		tv.Height = 5;
 
 		tv.LayoutSubviews ();
@@ -710,13 +723,14 @@ public class TabViewTests {
 └──────────────────┘", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
-		tv.Width  = 20;
+		tv.Width = 20;
 		tv.Height = 5;
-		tv.Style  = new TabStyle { TabsOnBottom = true };
+		tv.Style = new TabStyle { TabsOnBottom = true };
 		tv.ApplyStyleChanges ();
 
 		tv.LayoutSubviews ();
@@ -745,12 +759,13 @@ public class TabViewTests {
 └──────────────┘    ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MouseClick_ChangesTab ()
 	{
 		var tv = GetTabView (out var tab1, out var tab2, false);
 
-		tv.Width  = 20;
+		tv.Width = 20;
 		tv.Height = 5;
 
 		tv.LayoutSubviews ();
@@ -778,55 +793,55 @@ public class TabViewTests {
 		// Waving mouse around does not trigger click
 		for (var i = 0; i < 100; i++) {
 			tabRow.MouseEvent (new MouseEvent {
-								  X     = i,
-								  Y     = 1,
-								  Flags = MouseFlags.ReportMousePosition
-							  });
+				X = i,
+				Y = 1,
+				Flags = MouseFlags.ReportMousePosition
+			});
 
 			Assert.Null (clicked);
 			Assert.Equal (tab1, tv.SelectedTab);
 		}
 
 		tabRow.MouseEvent (new MouseEvent {
-							  X     = 3,
-							  Y     = 1,
-							  Flags = MouseFlags.Button1Clicked
-						  });
+			X = 3,
+			Y = 1,
+			Flags = MouseFlags.Button1Clicked
+		});
 
 		Assert.Equal (tab1, clicked);
 		Assert.Equal (tab1, tv.SelectedTab);
 
 		// Click to tab2
 		tabRow.MouseEvent (new MouseEvent {
-							  X     = 7,
-							  Y     = 1,
-							  Flags = MouseFlags.Button1Clicked
-						  });
+			X = 7,
+			Y = 1,
+			Flags = MouseFlags.Button1Clicked
+		});
 
 		Assert.Equal (tab2, clicked);
 		Assert.Equal (tab2, tv.SelectedTab);
 
 		// cancel navigation
 		tv.TabClicked += (s, e) => {
-			clicked              = e.Tab;
+			clicked = e.Tab;
 			e.MouseEvent.Handled = true;
 		};
 
 		tabRow.MouseEvent (new MouseEvent {
-							  X     = 3,
-							  Y     = 1,
-							  Flags = MouseFlags.Button1Clicked
-						  });
+			X = 3,
+			Y = 1,
+			Flags = MouseFlags.Button1Clicked
+		});
 
 		// Tab 1 was clicked but event handler blocked navigation
 		Assert.Equal (tab1, clicked);
 		Assert.Equal (tab2, tv.SelectedTab);
 
 		tabRow.MouseEvent (new MouseEvent {
-							  X     = 10,
-							  Y     = 1,
-							  Flags = MouseFlags.Button1Clicked
-						  });
+			X = 10,
+			Y = 1,
+			Flags = MouseFlags.Button1Clicked
+		});
 
 		// Clicking beyond last tab should raise event with null Tab
 		Assert.Null (clicked);

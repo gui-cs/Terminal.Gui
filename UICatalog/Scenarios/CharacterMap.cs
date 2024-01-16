@@ -36,7 +36,7 @@ public class CharacterMap : Scenario {
 	public override void Init ()
 	{
 		Application.Init ();
-		Application.Top.ColorScheme = Colors.Base;
+		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
 
 	public override void Setup ()
@@ -330,7 +330,7 @@ class CharMap : ScrollView {
 
 	public CharMap ()
 	{
-		ColorScheme = Colors.Dialog;
+		ColorScheme = Colors.ColorSchemes ["Dialog"];
 		CanFocus = true;
 		ContentSize = new Size (RowWidth, (int)((MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight));
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,7 +12,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///         <para>
 ///         Toplevels can run as modal (popup) views, started by calling
-///         <see cref="Application.Run(Toplevel, System.Func{System.Exception,bool})"/>.
+///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
 ///         They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has
 ///         been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>).
 ///         </para>
@@ -22,12 +22,10 @@ namespace Terminal.Gui;
 ///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional
 ///         Toplevels can be created
 ///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and
-///         call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
+///         call <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
 ///         </para>
 /// </remarks>
 public partial class Toplevel : View {
-	internal static Point? _dragPosition;
-	Point _startGrabPoint;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
@@ -253,7 +251,7 @@ public partial class Toplevel : View {
 
 	void SetInitialProperties ()
 	{
-		ColorScheme = Colors.TopLevel;
+		ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 		Application.GrabbingMouse += Application_GrabbingMouse;
 		Application.UnGrabbingMouse += Application_UnGrabbingMouse;
@@ -292,64 +290,32 @@ public partial class Toplevel : View {
 			Application.Refresh ();
 			return true;
 		});
-		AddCommand (Command.Accept, () => {
-			// TODO: Perhaps all views should support the concept of being default?
-			// TODO: It's bad that Toplevel is tightly coupled with Button
-			if (Subviews.FirstOrDefault (v => v is Button && ((Button)v).IsDefault && ((Button)v).Enabled) is Button defaultBtn) {
-				defaultBtn.InvokeCommand (Command.Accept);
-				return true;
-			}
-			return false;
-		});
+
 
 		// Default keybindings for this view
-		KeyBindings.Add ((KeyCode)Application.QuitKey, Command.QuitToplevel);
+		KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
 
-		KeyBindings.Add (KeyCode.CursorRight, Command.NextView);
-		KeyBindings.Add (KeyCode.CursorDown,  Command.NextView);
-		KeyBindings.Add (KeyCode.CursorLeft,  Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorUp,    Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorDown,  Command.NextView);
-		KeyBindings.Add (KeyCode.CursorLeft,  Command.PreviousView);
-		KeyBindings.Add (KeyCode.CursorUp,    Command.PreviousView);
+		KeyBindings.Add (Key.CursorRight, Command.NextView);
+		KeyBindings.Add (Key.CursorDown, Command.NextView);
+		KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
+		KeyBindings.Add (Key.CursorUp, Command.PreviousView);
 
-		KeyBindings.Add (KeyCode.Tab,                                        Command.NextView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask,                    Command.PreviousView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask,                     Command.NextViewOrTop);
-		KeyBindings.Add (KeyCode.Tab,                                        Command.NextView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask,                    Command.PreviousView);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.CtrlMask,                     Command.NextViewOrTop);
-		KeyBindings.Add (KeyCode.Tab | KeyCode.ShiftMask | KeyCode.CtrlMask, Command.PreviousViewOrTop);
+		KeyBindings.Add (Key.Tab, Command.NextView);
+		KeyBindings.Add (Key.Tab.WithShift, Command.PreviousView);
+		KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
+		KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
 
-		KeyBindings.Add (KeyCode.F5,                                Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey,  Command.NextViewOrTop);     // Needed on Unix
-		KeyBindings.Add (KeyCode.F5,                                Command.Refresh);
-		KeyBindings.Add ((KeyCode)Application.AlternateForwardKey,  Command.NextViewOrTop);     // Needed on Unix
-		KeyBindings.Add ((KeyCode)Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
+		KeyBindings.Add (Key.F5, Command.Refresh);
+		KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
+		KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
 
 #if UNIX_KEY_BINDINGS
-			KeyBindings.Add (Key.Z | Key.CtrlMask, Command.Suspend);
-			KeyBindings.Add (Key.L | Key.CtrlMask, Command.Refresh);// Unix
-			KeyBindings.Add (Key.F | Key.CtrlMask, Command.NextView);// Unix
-			KeyBindings.Add (Key.I | Key.CtrlMask, Command.NextView); // Unix
-			KeyBindings.Add (Key.B | Key.CtrlMask, Command.PreviousView);// Unix
+			KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
+			KeyBindings.Add (Key.L.WithCtrl, Command.Refresh);// Unix
+			KeyBindings.Add (Key.F.WithCtrl, Command.NextView);// Unix
+			KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
+			KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView);// Unix
 #endif
-		// This enables the default button to be activated by the Enter key.
-		KeyBindings.Add (KeyCode.Enter, Command.Accept);
-	}
-
-	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
-	{
-		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
-			e.Cancel = true;
-		}
-	}
-
-	void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
-	{
-		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
-			e.Cancel = true;
-		}
 	}
 
 	/// <summary>
@@ -363,7 +329,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		AlternateForwardKeyChanged?.Invoke (this, e);
 	}
 
@@ -378,7 +344,7 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		AlternateBackwardKeyChanged?.Invoke (this, e);
 	}
 
@@ -393,15 +359,9 @@ public partial class Toplevel : View {
 	/// <param name="e"></param>
 	public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
 	{
-		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+		KeyBindings.Replace (e.OldKey, e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
-
-	/// <summary>
-	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
-	/// </summary>
-	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new (new Rect (0, 0, Driver.Cols, Driver.Rows));
 
 	void MovePreviousViewOrTop ()
 	{
@@ -609,7 +569,7 @@ public partial class Toplevel : View {
 			superView = top.SuperView;
 		}
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
 		}
 		if (top.Frame.Width <= maxWidth) {
 			nx = Math.Max (targetX, 0);
@@ -656,7 +616,7 @@ public partial class Toplevel : View {
 			maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 		}
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Top + superView.GetFramesThickness ().Bottom;
+			maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
 		}
 		ny = Math.Min (ny, maxWidth);
 		if (top.Frame.Height <= maxWidth) {
@@ -694,7 +654,7 @@ public partial class Toplevel : View {
 		var layoutSubviews = false;
 		var maxWidth = 0;
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
 		}
 		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal || top?.SuperView == null && top.IsOverlapped)
 		    // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
@@ -778,6 +738,23 @@ public partial class Toplevel : View {
 			return true;
 		}
 		return false;
+	}
+
+	internal static Point? _dragPosition;
+	Point _startGrabPoint;
+
+	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+	{
+		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
+			e.Cancel = true;
+		}
+	}
+
+	void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+	{
+		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
+			e.Cancel = true;
+		}
 	}
 
 	///<inheritdoc/>

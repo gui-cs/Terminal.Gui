@@ -169,7 +169,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (80);
 				Height = Dim.Percent (50);
 
-				ColorScheme = Colors.Base;
+				ColorScheme = Colors.ColorSchemes ["Base"];
 
 				var label = new Label ("Worker collection Log") {
 					X = Pos.Center (),
@@ -308,14 +308,14 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (85);
 				Height = Dim.Percent (85);
 
-				ColorScheme = Colors.Dialog;
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 				Title = "Run Worker";
 
 				label = new Label ("Press start to do the work or close to quit.") {
 					X = Pos.Center (),
 					Y = 1,
-					ColorScheme = Colors.Dialog
+					ColorScheme = Colors.ColorSchemes ["Dialog"]
 				};
 				Add (label);
 

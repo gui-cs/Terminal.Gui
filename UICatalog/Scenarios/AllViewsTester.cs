@@ -72,7 +72,7 @@ public class AllViewsTester : Scenario {
 			Width = 15,
 			Height = Dim.Fill (1), // for status bar
 			CanFocus = false,
-			ColorScheme = Colors.TopLevel
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 
 		_classListView = new ListView (_viewClasses.Keys.ToList ()) {
@@ -81,7 +81,7 @@ public class AllViewsTester : Scenario {
 			Width = Dim.Fill (0),
 			Height = Dim.Fill (0),
 			AllowsMarking = false,
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			SelectedItem = 0
 		};
 		_classListView.OpenSelectedItem += (s, a) => {
@@ -106,7 +106,7 @@ public class AllViewsTester : Scenario {
 			Width = Dim.Fill (),
 			Height = 10,
 			CanFocus = false,
-			ColorScheme = Colors.TopLevel
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 		_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
 		_computedCheckBox.Toggled += (s, e) => {
@@ -228,7 +228,7 @@ public class AllViewsTester : Scenario {
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),
 			Height = Dim.Fill (1), // + 1 for status bar
-			ColorScheme = Colors.Dialog
+			ColorScheme = Colors.ColorSchemes ["Dialog"]
 		};
 
 		Application.Top.Add (_leftPane, _settingsPane, _hostPane);
@@ -285,8 +285,8 @@ public class AllViewsTester : Scenario {
 	}
 
 	// TODO: This is missing some
-	List<string> _posNames = new() { "Factor", "AnchorEnd", "Center", "Absolute" };
-	List<string> _dimNames = new() { "Factor", "Fill", "Absolute" };
+	List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
+	List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
 
 	void UpdateSettings (View view)
 	{
@@ -340,7 +340,7 @@ public class AllViewsTester : Scenario {
 
 		// Set the colorscheme to make it stand out if is null by default
 		if (view.ColorScheme == null) {
-			view.ColorScheme = Colors.Base;
+			view.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 
 		// If the view supports a Text property, set it so we have something to look at
@@ -387,10 +387,10 @@ public class AllViewsTester : Scenario {
 		//view.X = Pos.Center ();
 		//view.Y = Pos.Center ();
 		if (view.Width == null || view.Frame.Width == 0) {
-			view.Width = Dim.Fill();
+			view.Width = Dim.Fill ();
 		}
 		if (view.Height == null || view.Frame.Height == 0) {
-			view.Height = Dim.Fill();
+			view.Height = Dim.Fill ();
 		}
 		UpdateSettings (view);
 		UpdateTitle (view);

@@ -24,9 +24,9 @@ public class ListColumns : Scenario {
 	MenuItem _miSmoothScrolling;
 	MenuItem _miTopline;
 
-	ColorScheme alternatingColorScheme;
-	DataTable currentTable;
-	TableView listColView;
+	ColorScheme _alternatingColorScheme;
+	DataTable _currentTable;
+	TableView _listColView;
 
 	public override void Setup ()
 	{
@@ -34,7 +34,7 @@ public class ListColumns : Scenario {
 		Win.Y = 1;                 // menu
 		Win.Height = Dim.Fill (1); // status bar
 
-		listColView = new TableView {
+		_listColView = new TableView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
@@ -58,36 +58,36 @@ public class ListColumns : Scenario {
 			}),
 			new ("_View", new [] {
 				_miTopline = new MenuItem ("_TopLine", "", () => ToggleTopline ()) {
-					Checked = listColView.Style.ShowHorizontalHeaderOverline,
+					Checked = _listColView.Style.ShowHorizontalHeaderOverline,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline ()) {
-					Checked = listColView.Style.ShowHorizontalBottomline,
+					Checked = _listColView.Style.ShowHorizontalBottomline,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miCellLines = new MenuItem ("_CellLines", "", () => ToggleCellLines ()) {
-					Checked = listColView.Style.ShowVerticalCellLines,
+					Checked = _listColView.Style.ShowVerticalCellLines,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn ()) {
-					Checked = listColView.Style.ExpandLastColumn,
+					Checked = _listColView.Style.ExpandLastColumn,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miAlwaysUseNormalColorForVerticalCellLines =
 					new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "",
 						() => ToggleAlwaysUseNormalColorForVerticalCellLines ()) {
-						Checked = listColView.Style.AlwaysUseNormalColorForVerticalCellLines,
+						Checked = _listColView.Style.AlwaysUseNormalColorForVerticalCellLines,
 						CheckType = MenuItemCheckStyle.Checked
 					},
 				_miSmoothScrolling = new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling ()) {
-					Checked = listColView.Style.SmoothHorizontalScrolling,
+					Checked = _listColView.Style.SmoothHorizontalScrolling,
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miAlternatingColors = new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors ())
 					{ CheckType = MenuItemCheckStyle.Checked },
 				_miCursor = new MenuItem ("Invert Selected Cell First Character", "",
 					() => ToggleInvertSelectedCellFirstCharacter ()) {
-					Checked = listColView.Style.InvertSelectedCellFirstCharacter,
+					Checked = _listColView.Style.InvertSelectedCellFirstCharacter,
 					CheckType = MenuItemCheckStyle.Checked
 				}
 			}),
@@ -114,11 +114,11 @@ public class ListColumns : Scenario {
 		});
 		Application.Top.Add (statusBar);
 
-		Win.Add (listColView);
+		Win.Add (_listColView);
 
 		var selectedCellLabel = new Label {
 			X = 0,
-			Y = Pos.Bottom (listColView),
+			Y = Pos.Bottom (_listColView),
 			Text = "0,0",
 			Width = Dim.Fill (),
 			TextAlignment = TextAlignment.Right
@@ -127,12 +127,12 @@ public class ListColumns : Scenario {
 
 		Win.Add (selectedCellLabel);
 
-		listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{listColView.SelectedRow},{listColView.SelectedColumn}"; };
-		listColView.KeyDown += TableViewKeyPress;
+		_listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{_listColView.SelectedRow},{_listColView.SelectedColumn}"; };
+		_listColView.KeyDown += TableViewKeyPress;
 
 		SetupScrollBar ();
 
-		alternatingColorScheme = new ColorScheme {
+		_alternatingColorScheme = new ColorScheme {
 
 			Disabled = Win.ColorScheme.Disabled,
 			HotFocus = Win.ColorScheme.HotFocus,
@@ -141,24 +141,24 @@ public class ListColumns : Scenario {
 		};
 
 		// if user clicks the mouse in TableView
-		listColView.MouseClick += (s, e) => {
+		_listColView.MouseClick += (s, e) => {
 
-			listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out var clickedCol);
+			_listColView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out var clickedCol);
 		};
 
-		listColView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
+		_listColView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 	}
 
 	void SetupScrollBar ()
 	{
-		var scrollBar = new ScrollBarView (listColView, true); // (listColView, true, true);
+		var scrollBar = new ScrollBarView (_listColView, true); // (listColView, true, true);
 
 		scrollBar.ChangedPosition += (s, e) => {
-			listColView.RowOffset = scrollBar.Position;
-			if (listColView.RowOffset != scrollBar.Position) {
-				scrollBar.Position = listColView.RowOffset;
+			_listColView.RowOffset = scrollBar.Position;
+			if (_listColView.RowOffset != scrollBar.Position) {
+				scrollBar.Position = _listColView.RowOffset;
 			}
-			listColView.SetNeedsDisplay ();
+			_listColView.SetNeedsDisplay ();
 		};
 		/*
 		scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
@@ -170,9 +170,9 @@ public class ListColumns : Scenario {
 		};
 		*/
 
-		listColView.DrawContent += (s, e) => {
-			scrollBar.Size = listColView.Table?.Rows ?? 0;
-			scrollBar.Position = listColView.RowOffset;
+		_listColView.DrawContent += (s, e) => {
+			scrollBar.Size = _listColView.Table?.Rows ?? 0;
+			scrollBar.Position = _listColView.RowOffset;
 			//scrollBar.OtherScrollBarView.Size = listColView.Table?.Columns - 1 ?? 0;
 			//scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
 			scrollBar.Refresh ();
@@ -185,11 +185,11 @@ public class ListColumns : Scenario {
 		if (e.KeyCode == KeyCode.Delete) {
 
 			// set all selected cells to null
-			foreach (var pt in listColView.GetAllSelectedCells ()) {
-				currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
+			foreach (var pt in _listColView.GetAllSelectedCells ()) {
+				_currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
 			}
 
-			listColView.Update ();
+			_listColView.Update ();
 			e.Handled = true;
 		}
 
@@ -198,48 +198,48 @@ public class ListColumns : Scenario {
 	void ToggleTopline ()
 	{
 		_miTopline.Checked = !_miTopline.Checked;
-		listColView.Style.ShowHorizontalHeaderOverline = (bool)_miTopline.Checked;
-		listColView.Update ();
+		_listColView.Style.ShowHorizontalHeaderOverline = (bool)_miTopline.Checked;
+		_listColView.Update ();
 	}
 
 	void ToggleBottomline ()
 	{
 		_miBottomline.Checked = !_miBottomline.Checked;
-		listColView.Style.ShowHorizontalBottomline = (bool)_miBottomline.Checked;
-		listColView.Update ();
+		_listColView.Style.ShowHorizontalBottomline = (bool)_miBottomline.Checked;
+		_listColView.Update ();
 	}
 
 	void ToggleExpandLastColumn ()
 	{
 		_miExpandLastColumn.Checked = !_miExpandLastColumn.Checked;
-		listColView.Style.ExpandLastColumn = (bool)_miExpandLastColumn.Checked;
+		_listColView.Style.ExpandLastColumn = (bool)_miExpandLastColumn.Checked;
 
-		listColView.Update ();
+		_listColView.Update ();
 
 	}
 
 	void ToggleAlwaysUseNormalColorForVerticalCellLines ()
 	{
 		_miAlwaysUseNormalColorForVerticalCellLines.Checked = !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
-		listColView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)_miAlwaysUseNormalColorForVerticalCellLines.Checked;
+		_listColView.Style.AlwaysUseNormalColorForVerticalCellLines = (bool)_miAlwaysUseNormalColorForVerticalCellLines.Checked;
 
-		listColView.Update ();
+		_listColView.Update ();
 	}
 
 	void ToggleSmoothScrolling ()
 	{
 		_miSmoothScrolling.Checked = !_miSmoothScrolling.Checked;
-		listColView.Style.SmoothHorizontalScrolling = (bool)_miSmoothScrolling.Checked;
+		_listColView.Style.SmoothHorizontalScrolling = (bool)_miSmoothScrolling.Checked;
 
-		listColView.Update ();
+		_listColView.Update ();
 
 	}
 
 	void ToggleCellLines ()
 	{
 		_miCellLines.Checked = !_miCellLines.Checked;
-		listColView.Style.ShowVerticalCellLines = (bool)_miCellLines.Checked;
-		listColView.Update ();
+		_listColView.Style.ShowVerticalCellLines = (bool)_miCellLines.Checked;
+		_listColView.Update ();
 	}
 
 	void ToggleAlternatingColors ()
@@ -248,49 +248,49 @@ public class ListColumns : Scenario {
 		_miAlternatingColors.Checked = !_miAlternatingColors.Checked;
 
 		if (_miAlternatingColors.Checked == true) {
-			listColView.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? alternatingColorScheme : null; };
+			_listColView.Style.RowColorGetter = a => { return a.RowIndex % 2 == 0 ? _alternatingColorScheme : null; };
 		} else {
-			listColView.Style.RowColorGetter = null;
+			_listColView.Style.RowColorGetter = null;
 		}
-		listColView.SetNeedsDisplay ();
+		_listColView.SetNeedsDisplay ();
 	}
 
 	void ToggleInvertSelectedCellFirstCharacter ()
 	{
 		//toggle menu item
 		_miCursor.Checked = !_miCursor.Checked;
-		listColView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
-		listColView.SetNeedsDisplay ();
+		_listColView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
+		_listColView.SetNeedsDisplay ();
 	}
 
 	void ToggleVerticalOrientation ()
 	{
 		_miOrientVertical.Checked = !_miOrientVertical.Checked;
-		if ((ListTableSource)listColView.Table != null) {
-			((ListTableSource)listColView.Table).Style.Orientation = (bool)_miOrientVertical.Checked ? Orientation.Vertical : Orientation.Horizontal;
-			listColView.SetNeedsDisplay ();
+		if ((ListTableSource)_listColView.Table != null) {
+			((ListTableSource)_listColView.Table).Style.Orientation = (bool)_miOrientVertical.Checked ? Orientation.Vertical : Orientation.Horizontal;
+			_listColView.SetNeedsDisplay ();
 		}
 	}
 
 	void ToggleScrollParallel ()
 	{
 		_miScrollParallel.Checked = !_miScrollParallel.Checked;
-		if ((ListTableSource)listColView.Table != null) {
-			((ListTableSource)listColView.Table).Style.ScrollParallel = (bool)_miScrollParallel.Checked;
-			listColView.SetNeedsDisplay ();
+		if ((ListTableSource)_listColView.Table != null) {
+			((ListTableSource)_listColView.Table).Style.ScrollParallel = (bool)_miScrollParallel.Checked;
+			_listColView.SetNeedsDisplay ();
 		}
 	}
 
 	void SetListMinWidth ()
 	{
 		RunListWidthDialog ("MinCellWidth", (s, v) => s.MinCellWidth = v, s => s.MinCellWidth);
-		listColView.SetNeedsDisplay ();
+		_listColView.SetNeedsDisplay ();
 	}
 
 	void SetListMaxWidth ()
 	{
 		RunListWidthDialog ("MaxCellWidth", (s, v) => s.MaxCellWidth = v, s => s.MaxCellWidth);
-		listColView.SetNeedsDisplay ();
+		_listColView.SetNeedsDisplay ();
 	}
 
 	void RunListWidthDialog (string prompt, Action<TableView, int> setter, Func<TableView, int> getter)
@@ -306,7 +306,7 @@ public class ListColumns : Scenario {
 		var d = new Dialog (ok, cancel) { Title = prompt };
 
 		var tf = new TextField {
-			Text = getter (listColView).ToString (),
+			Text = getter (_listColView).ToString (),
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill ()
@@ -320,14 +320,14 @@ public class ListColumns : Scenario {
 		if (accepted) {
 
 			try {
-				setter (listColView, int.Parse (tf.Text));
+				setter (_listColView, int.Parse (tf.Text));
 			} catch (Exception ex) {
 				MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
 			}
 		}
 	}
 
-	void CloseExample () => listColView.Table = null;
+	void CloseExample () => _listColView.Table = null;
 
 	void Quit () => Application.RequestStop ();
 
@@ -335,9 +335,9 @@ public class ListColumns : Scenario {
 
 	void SetTable (IList list)
 	{
-		listColView.Table = new ListTableSource (list, listColView);
-		if ((ListTableSource)listColView.Table != null) {
-			currentTable = ((ListTableSource)listColView.Table).DataTable;
+		_listColView.Table = new ListTableSource (list, _listColView);
+		if ((ListTableSource)_listColView.Table != null) {
+			_currentTable = ((ListTableSource)_listColView.Table).DataTable;
 		}
 	}
 

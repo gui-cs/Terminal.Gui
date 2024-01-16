@@ -37,7 +37,7 @@ public class TextViewTests {
 			//         01234567890123456789012345678901=32 (Length)
 			var buff = Encoding.Unicode.GetBytes (txt);
 			var ms = new System.IO.MemoryStream (buff).ToArray ();
-			_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.Base };
+			_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 			_textView.Text = Encoding.Unicode.GetString (ms);
 		}
 
@@ -293,7 +293,7 @@ public class TextViewTests {
 			};
 
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("0000000", driver: Application.Driver, attributes);
 
 		_textView.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
@@ -301,7 +301,7 @@ public class TextViewTests {
 		Application.RunIteration (ref rs, ref first);
 		Assert.Equal (new Point (4, 0), _textView.CursorPosition);
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("1111000", driver: Application.Driver, attributes);
 	}
 
 	[Fact]

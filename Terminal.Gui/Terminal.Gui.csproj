@@ -40,7 +40,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="20.0.4" />
-    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.1" />
     <PackageReference Include="System.Management" Version="8.0.0" />
     <PackageReference Include="Wcwidth" Version="2.0.0" />
     <!-- Enable Nuget Source Link for github -->

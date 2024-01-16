@@ -92,15 +92,15 @@ public class DrawTests {
 
 		var expectedColors = new Attribute [] {
 			// 0
-			Colors.Base.Normal,
+			Colors.ColorSchemes ["Base"].Normal,
 			// 1
-			Colors.Base.Focus,
+			Colors.ColorSchemes ["Base"].Focus,
 			// 2
-			Colors.Base.HotNormal
+			Colors.ColorSchemes ["Base"].HotNormal
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
-0020000000
+		TestHelpers.AssertDriverAttributesAre (@"
+0010000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
@@ -141,15 +141,15 @@ public class DrawTests {
 
 		var expectedColors = new Attribute [] {
 			// 0
-			Colors.Base.Normal,
+			Colors.ColorSchemes ["Base"].Normal,
 			// 1
-			Colors.Base.Focus,
+			Colors.ColorSchemes ["Base"].Focus,
 			// 2
-			Colors.Base.HotNormal
+			Colors.ColorSchemes ["Base"].HotNormal
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
-0022000000
+		TestHelpers.AssertDriverAttributesAre (@"
+0011000000
 0000000000
 0111000000
 0000000000", Application.Driver, expectedColors);
@@ -163,14 +163,14 @@ public class DrawTests {
 			Width = 6,
 			Height = 1,
 			TextAlignment = TextAlignment.Right,
-			ColorScheme = Colors.Base
+			ColorScheme = Colors.ColorSchemes ["Base"]
 		};
 		var labelBottom = new Label ("Test", TextDirection.TopBottom_LeftRight) {
 			Y = 1,
 			Width = 1,
 			Height = 6,
 			VerticalTextAlignment = VerticalTextAlignment.Bottom,
-			ColorScheme = Colors.Base
+			ColorScheme = Colors.ColorSchemes ["Base"]
 		};
 		var top = Application.Top;
 		top.Add (labelRight, labelBottom);
@@ -187,14 +187,14 @@ e
 s     
 t     ", _output);
 
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 000000
 0
 0
 0
 0
 0
-0", Application.Driver, new Attribute [] { Colors.Base.Normal });
+0", Application.Driver, new Attribute [] { Colors.ColorSchemes ["Base"].Normal });
 	}
 
 	[Fact]

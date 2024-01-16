@@ -58,7 +58,7 @@ public partial class View {
 	/// Gets or sets whether this View will use it's SuperView's <see cref="LineCanvas"/> for
 	/// rendering any border lines. If <see langword="true"/> the rendering of any borders drawn
 	/// by this Frame will be done by it's parent's SuperView. If <see langword="false"/> (the default)
-	/// this View's <see cref="OnDrawFrames()"/> method will be called to render the borders.
+	/// this View's <see cref="OnDrawAdornments"/> method will be called to render the borders.
 	/// </summary>
 	public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
@@ -87,7 +87,14 @@ public partial class View {
 	/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 	/// If it's overridden can return other values.
 	/// </returns>
-	public virtual Attribute GetFocusColor () => Enabled ? ColorScheme.Focus : ColorScheme.Disabled;
+	public virtual Attribute GetFocusColor ()
+	{
+		var cs = ColorScheme;
+		if (ColorScheme == null) {
+			cs = new ColorScheme ();
+		}
+		return Enabled ? cs.Focus : cs.Disabled;
+	}
 
 	/// <summary>
 	/// Determines the current <see cref="ColorScheme"/> based on the <see cref="Enabled"/> value.
@@ -97,7 +104,14 @@ public partial class View {
 	/// or <see cref="Terminal.Gui.ColorScheme.Disabled"/> if <see cref="Enabled"/> is <see langword="false"/>.
 	/// If it's overridden can return other values.
 	/// </returns>
-	public virtual Attribute GetHotNormalColor () => Enabled ? ColorScheme.HotNormal : ColorScheme.Disabled;
+	public virtual Attribute GetHotNormalColor ()
+	{
+		var cs = ColorScheme;
+		if (ColorScheme == null) {
+			cs = new ColorScheme ();
+		}
+		return Enabled ? cs.HotNormal : cs.Disabled;
+	}
 
 	/// <summary>
 	/// Displays the specified character in the specified column and row of the View.
@@ -122,7 +136,7 @@ public partial class View {
 	/// </summary>
 	protected void ClearNeedsDisplay ()
 	{
-		_needsDisplayRect   = Rect.Empty;
+		_needsDisplayRect = Rect.Empty;
 		SubViewNeedsDisplay = false;
 	}
 
@@ -159,7 +173,7 @@ public partial class View {
 		} else {
 			var x = Math.Min (_needsDisplayRect.X, region.X);
 			var y = Math.Min (_needsDisplayRect.Y, region.Y);
-			var w = Math.Max (_needsDisplayRect.Width,  region.Width);
+			var w = Math.Max (_needsDisplayRect.Width, region.Width);
 			var h = Math.Max (_needsDisplayRect.Height, region.Height);
 			_needsDisplayRect = new Rect (x, y, w, h);
 		}
@@ -260,6 +274,9 @@ public partial class View {
 	/// </remarks>
 	public Rect ClipToBounds ()
 	{
+		if (Driver == null) {
+			return Rect.Empty;
+		}
 		var previous = Driver.Clip;
 		Driver.Clip = Rect.Intersect (previous, BoundsToScreen (Bounds));
 		return previous;
@@ -334,7 +351,7 @@ public partial class View {
 	/// method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
 	/// </summary>
 	/// <returns></returns>
-	public virtual bool OnDrawFrames ()
+	public virtual bool OnDrawAdornments ()
 	{
 		if (!IsInitialized) {
 			return false;
@@ -372,13 +389,13 @@ public partial class View {
 		if (!CanBeVisible (this)) {
 			return;
 		}
-		OnDrawFrames ();
+		OnDrawAdornments ();
 
 		var prevClip = ClipToBounds ();
 
 		if (ColorScheme != null) {
 			//Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
-			Driver.SetAttribute (GetNormalColor ());
+			Driver?.SetAttribute (GetNormalColor ());
 		}
 
 		// Invoke DrawContentEvent
@@ -389,7 +406,9 @@ public partial class View {
 			OnDrawContent (Bounds);
 		}
 
-		Driver.Clip = prevClip;
+		if (Driver != null) {
+			Driver.Clip = prevClip;
+		}
 
 		OnRenderLineCanvas ();
 		// Invoke DrawContentCompleteEvent
@@ -474,7 +493,7 @@ public partial class View {
 	{
 		if (NeedsDisplay) {
 			if (SuperView != null) {
-				Clear (BoundsToScreen (Bounds));
+				Clear (BoundsToScreen (contentArea));
 			}
 
 			if (!string.IsNullOrEmpty (TextFormatter.Text)) {
@@ -483,7 +502,7 @@ public partial class View {
 				}
 			}
 			// This should NOT clear 
-			TextFormatter?.Draw (BoundsToScreen (Bounds), HasFocus ? GetFocusColor () : GetNormalColor (),
+			TextFormatter?.Draw (BoundsToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
 				HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
 				Rect.Empty, false);
 			SetSubViewNeedsDisplay ();

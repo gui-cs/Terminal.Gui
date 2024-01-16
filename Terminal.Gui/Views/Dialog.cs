@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 
 /// <summary>
 /// The <see cref="Dialog"/> <see cref="View"/> is a <see cref="Window"/> that by default is centered and contains one 
-/// or more <see cref="Button"/>s. It defaults to the <see cref="Colors.Dialog"/> color scheme and has a 1 cell padding around the edges.
+/// or more <see cref="Button"/>s. It defaults to the <c>Colors.ColorSchemes ["Dialog"]</c> color scheme and has a 1 cell padding around the edges.
 /// </summary>
 /// <remarks>
 ///  To run the <see cref="Dialog"/> modally, create the <see cref="Dialog"/>, and pass it to <see cref="Application.Run(Func{Exception, bool})"/>. 
@@ -65,10 +65,12 @@ public class Dialog : Window {
 		Width = Dim.Percent (85);// Dim.Auto (min: Dim.Percent (10));
 		Height = Dim.Percent (85);//Dim.Auto (min: Dim.Percent (50));
 
-		ColorScheme = Colors.Dialog;
+		ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 		Modal = true;
 		ButtonAlignment = DefaultButtonAlignment;
+
+		KeyBindings.Add (Key.Esc, Command.QuitToplevel);
 
 		if (buttons != null) {
 			foreach (var b in buttons) {
@@ -104,6 +106,7 @@ public class Dialog : Window {
 		//button.AutoSize = false; // BUGBUG: v2 - Hack to get around autosize not accounting for Margin?
 		buttons.Add (button);
 		Add (button);
+
 		SetNeedsDisplay ();
 		if (IsInitialized) {
 			LayoutSubviews ();
@@ -227,17 +230,5 @@ public class Dialog : Window {
 			}
 			break;
 		}
-	}
-
-	// BUGBUG: Why is this not handled by a key binding???
-	///<inheritdoc/>
-	public override bool OnProcessKeyDown (Key a)
-	{
-		switch (a.KeyCode) {
-		case KeyCode.Esc:
-			Application.RequestStop (this);
-			return true;
-		}
-		return false;
 	}
 }

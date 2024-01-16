@@ -278,9 +278,9 @@ namespace Terminal.Gui {
 			}
 
 			if (useErrorColors) {
-				d.ColorScheme = Colors.Error;
+				d.ColorScheme = Colors.ColorSchemes ["Error"];
 			} else {
-				d.ColorScheme = Colors.Dialog;
+				d.ColorScheme = Colors.ColorSchemes ["Dialog"];
 			}
 
 			var messageLabel = new Label () {
@@ -303,20 +303,20 @@ namespace Terminal.Gui {
 				// TODO: replace with Dim.Fit when implemented
 				var maxBounds = d.SuperView?.Bounds ?? Application.Top.Bounds;
 				if (wrapMessage) {
-					messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetFramesThickness ().Horizontal, maxBounds.Size.Height - d.GetFramesThickness ().Vertical);
+					messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetAdornmentsThickness ().Horizontal, maxBounds.Size.Height - d.GetAdornmentsThickness ().Vertical);
 				}
 				var msg = messageLabel.TextFormatter.Format ();
 				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
 				// Ensure the width fits the text + buttons
-				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetFramesThickness ().Horizontal,
-								d.GetButtonsWidth () + d.buttons.Count + d.GetFramesThickness ().Horizontal));
+				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
+								d.GetButtonsWidth () + d.buttons.Count + d.GetAdornmentsThickness ().Horizontal));
 				if (newWidth > d.Frame.Width) {
 					d.Width = newWidth;
 				}
 				// Ensure height fits the text + vspace + buttons
 				var lastLine = messageLabel.TextFormatter.Lines [^1];
-				d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetFramesThickness ().Vertical);
+				d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetAdornmentsThickness ().Vertical);
 				d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
 			};
 

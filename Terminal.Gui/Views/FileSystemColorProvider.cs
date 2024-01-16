@@ -14,7 +14,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		public Color GetColor (IFileSystemInfo file)
+		public Color? GetColor (IFileSystemInfo file)
 		{
 			if (FilenameToColor.ContainsKey (file.Name)) {
 				return FilenameToColor [file.Name];
@@ -443,8 +443,10 @@ namespace Terminal.Gui {
 
 		private static Color StringToColor (string str)
 		{
-			Color.TryParse (str, out var c);
-			return c ?? throw new System.Exception ("Failed to parse Color from " + str);
+			if (!Color.TryParse (str, out var c)) {
+				throw new System.Exception ("Failed to parse Color from " + str);
+			}
+			return c;
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Args for events where the <see cref="View.SuperView"/> of a <see cref="View"/> is changed

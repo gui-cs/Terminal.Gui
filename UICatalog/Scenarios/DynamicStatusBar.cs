@@ -105,7 +105,7 @@ public class DynamicStatusBar : Scenario {
 			_frmStatusBar.Add (_btnAdd);
 
 			_lstItems = new ListView (new List<DynamicStatusItemList> ()) {
-				ColorScheme = Colors.Dialog,
+				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				Y = Pos.Top (_btnAddStatusBar) + 2,
 				Width = Dim.Fill () - Dim.Width (_btnAdd) - 1,
 				Height = Dim.Fill (),

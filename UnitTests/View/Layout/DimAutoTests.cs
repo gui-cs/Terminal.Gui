@@ -200,19 +200,24 @@ public class DimAutoTests {
 		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
 		superView.LayoutSubviews (); // no throw
 
-		Assert.Throws<InvalidOperationException> (() => subView.Width = Dim.Fill ());
+		subView.Width = Dim.Fill ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Width = 10;
 
-		Assert.Throws<InvalidOperationException> (() => subView.Height = Dim.Fill ());
+		subView.Height = Dim.Fill ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Height = 10;
 
-		Assert.Throws<InvalidOperationException> (() => subView.Height = Dim.Percent (50));
+		subView.Height = Dim.Percent (50);
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Height = 10;
 		
-		Assert.Throws<InvalidOperationException> (() => subView.X = Pos.Center ());
+		subView.X = Pos.Center ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
-		
-		Assert.Throws<InvalidOperationException> (() => subView.Y = Pos.Center ());
+
+		subView.Y = Pos.Center ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Y = 0;
 
 		subView.Width = 10;
@@ -256,21 +261,25 @@ public class DimAutoTests {
 		superView.SetRelativeLayout (new Rect (0, 0, 0, 0));
 		superView.LayoutSubviews (); // no throw
 
-		Assert.Throws<InvalidOperationException> (() => subView.Height = Dim.Fill () + 3);
+		subView.Height = Dim.Fill () + 3;
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Height = 0;
 
-		Assert.Throws<InvalidOperationException> (() => subView.Height = 3 + Dim.Fill ());
+		subView.Height = 3 + Dim.Fill ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Height = 0;
 
-		Assert.Throws<InvalidOperationException> (() => subView.Height = 3 + 5 + Dim.Fill ());
+		subView.Height = 3 + 5 + Dim.Fill ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Height = 0;
 
-		
-		Assert.Throws<InvalidOperationException> (() => subView.Height = 3 + 5 + Dim.Percent (10));
+		subView.Height = 3 + 5 + Dim.Percent (10);
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.Height = 0;
 
 		// Tests nested Combine
-		Assert.Throws<InvalidOperationException> (() => subView.Height = 5 + new Dim.DimCombine (true, 3, new Dim.DimCombine (true, Dim.Percent (10), 9)));
+		subView.Height = 5 + new Dim.DimCombine (true, 3, new Dim.DimCombine (true, Dim.Percent (10), 9));
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 	}
 
 	[Fact]
@@ -315,23 +324,29 @@ public class DimAutoTests {
 		subView.X = new Pos.PosCombine (true, Pos.Right (subView2), new Pos.PosCombine (true, 7, 9));
 		superView.SetRelativeLayout (new Rect (0, 0, 0, 0)); // no throw
 
-		Assert.Throws<InvalidOperationException> (() => subView.X = Pos.Center () + 3);
+		subView.X = Pos.Center () + 3;
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
 		
-		Assert.Throws<InvalidOperationException> (() => subView.X = 3 + Pos.Center ());
+		subView.X = 3 + Pos.Center ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
 
-		Assert.Throws<InvalidOperationException> (() => subView.X = 3 + 5 + Pos.Center ());
+		subView.X = 3 + 5 + Pos.Center ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
 
-		Assert.Throws<InvalidOperationException> (() => subView.X = 3 + 5 + Pos.Percent (10));
+		subView.X = 3 + 5 + Pos.Percent (10);
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
 
-		Assert.Throws<InvalidOperationException> (() => subView.X = Pos.Percent (10) + Pos.Center ());
+		subView.X = Pos.Percent (10) + Pos.Center ();
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
 
 		// Tests nested Combine
-		Assert.Throws<InvalidOperationException> (() => subView.X = 5 + new Pos.PosCombine (true, Pos.Right (subView2), new Pos.PosCombine (true, Pos.Center (), 9)));
+		subView.X = 5 + new Pos.PosCombine (true, Pos.Right (subView2), new Pos.PosCombine (true, Pos.Center (), 9));
+		Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new Rect (0, 0, 0, 0)));
 		subView.X = 0;
 	}
 

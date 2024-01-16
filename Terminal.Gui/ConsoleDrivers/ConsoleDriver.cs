@@ -62,7 +62,7 @@ public abstract class ConsoleDriver {
 		get => _cols;
 		internal set {
 			_cols = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -73,7 +73,7 @@ public abstract class ConsoleDriver {
 		get => _rows;
 		internal set {
 			_rows = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -467,7 +467,7 @@ public abstract class ConsoleDriver {
 	public virtual Attribute MakeColor (Color foreground, Color background) =>
 		// Encode the colors into the int value.
 		new (
-			0, // only used by cursesdriver!
+			-1, // only used by cursesdriver!
 			foreground,
 			background
 		);
@@ -535,13 +535,13 @@ public abstract class ConsoleDriver {
 		Off = 0b_0000_0000,
 
 		/// <summary>
-		/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
+		/// When enabled, <see cref="View.OnDrawAdornments"/> will draw a 
 		/// ruler in the frame for any side with a padding value greater than 0.
 		/// </summary>
 		FrameRuler = 0b_0000_0001,
 
 		/// <summary>
-		/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
+		/// When enabled, <see cref="View.OnDrawAdornments"/> will draw a 
 		/// 'L', 'R', 'T', and 'B' when clearing <see cref="Thickness"/>'s instead of ' '.
 		/// </summary>
 		FramePadding = 0b_0000_0010

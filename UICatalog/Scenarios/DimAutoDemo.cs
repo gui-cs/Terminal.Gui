@@ -21,7 +21,7 @@ public class DimAutoDemo : Scenario {
 			X = Pos.Left (textField),
 			Y = Pos.Bottom (textField),
 			AutoSize = true,
-			ColorScheme = Colors.Error
+			ColorScheme = Colors.ColorSchemes["Error"]
 		};
 
 		textField.TextChanged += (s, e) => {
@@ -89,7 +89,7 @@ public class DimAutoDemo : Scenario {
 			Y = 0,
 			Height = Dim.Auto (min: 3),
 			Width = Dim.Auto (min: 20),
-			ColorScheme = Colors.Menu
+			ColorScheme = Colors.ColorSchemes ["Menu"]
 		};
 
 		var text = new TextField () {
