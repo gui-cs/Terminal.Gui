@@ -20,9 +20,29 @@ namespace Terminal.Gui;
 /// </remarks>
 public class DateField : TextField {
 	DateTime _date;
-	int _fieldLen = 10;
-	string _sepChar;
-	string _format;
+
+
+	/// <summary>
+	/// Format of date. The default is CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern.
+	/// </summary>
+	//public string Format { get; set; } = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+	public string Format { get; set; } = " " + CultureInfo.GetCultureInfo ("pl-PL").DateTimeFormat.ShortDatePattern;
+
+	private int FieldLen => Format.Trim ().Length;
+
+	private char Separator {
+		get {
+			if (!string.IsNullOrEmpty (Format)) {
+				var sep = Format
+					.Where (c => !char.IsLetterOrDigit (c))
+					.Where (c => !char.IsWhiteSpace (c))
+					.FirstOrDefault ();
+				return sep;
+			}
+
+			return '/';
+		}
+	}
 
 	/// <summary>
 	///   DateChanged event, raised when the <see cref="Date"/> property has changed.
@@ -46,15 +66,13 @@ public class DateField : TextField {
 	/// <param name="date"></param>
 	public DateField (DateTime date) : base ("")
 	{
-		Width = _fieldLen + 2;
+		Width = FieldLen + 2;
 		SetInitialProperties (date);
 	}
 
 	void SetInitialProperties (DateTime date)
 	{
-		var cultureInfo = CultureInfo.CurrentCulture;
-		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-		_format = $" {cultureInfo.DateTimeFormat.ShortDatePattern}";
+		//CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo ("en-GB");
 		Date = date;
 		CursorPosition = 1;
 		TextChanging += DateField_Changing;
@@ -111,8 +129,6 @@ public class DateField : TextField {
 	void DateField_Changing (object sender, TextChangingEventArgs e)
 	{
 		try {
-			var cultureInfo = CultureInfo.CurrentCulture;
-			DateTimeFormatInfo ccFmt = cultureInfo.DateTimeFormat;
 			int spaces = 0;
 			for (int i = 0; i < e.NewText.Length; i++) {
 				if (e.NewText [i] == ' ') {
@@ -121,13 +137,14 @@ public class DateField : TextField {
 					break;
 				}
 			}
-			spaces += _fieldLen;
-			string trimedText = e.NewText [..spaces];
-			spaces -= _fieldLen;
-			trimedText = trimedText.Replace (new string (' ', spaces), " ");
-			var date = Convert.ToDateTime (trimedText, ccFmt).ToString (ccFmt.ShortDatePattern);
-			if ($" {date}" != e.NewText) {
-				e.NewText = $" {date}";
+			spaces += FieldLen;
+			//string trimedText = e.NewText [..spaces];
+			string trimedText = e.NewText [..Math.Min (spaces, e.NewText.Length)];
+			spaces -= FieldLen;
+			trimedText = trimedText.Replace (new string (' ', spaces), " ").Trim ();
+			string textDate = _date.ToString (Format);
+			if (textDate != e.NewText) {
+				e.NewText = textDate; // cos tu
 			}
 			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
@@ -149,8 +166,8 @@ public class DateField : TextField {
 
 			var oldData = _date;
 			_date = value;
-			Text = value.ToString (_format);
-			var args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
+			Text = value.ToString (Format);
+			var args = new DateTimeEventArgs<DateTime> (oldData, value, Format);
 			if (oldData != value) {
 				OnDateChanged (args);
 			}
@@ -160,13 +177,13 @@ public class DateField : TextField {
 	/// <inheritdoc/>
 	public override int CursorPosition {
 		get => base.CursorPosition;
-		set => base.CursorPosition = Math.Max (Math.Min (value, _fieldLen), 1);
+		set => base.CursorPosition = Math.Max (Math.Min (value, FieldLen), 1);
 	}
 
 	bool SetText (Rune key)
 	{
-		if (CursorPosition > _fieldLen) {
-			CursorPosition = _fieldLen;
+		if (CursorPosition > FieldLen) {
+			CursorPosition = FieldLen;
 			return false;
 		} else if (CursorPosition < 1) {
 			CursorPosition = 1;
@@ -176,7 +193,7 @@ public class DateField : TextField {
 		var text = Text.EnumerateRunes ().ToList ();
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
-		if (CursorPosition < _fieldLen) {
+		if (CursorPosition < FieldLen) {
 			newText = [.. newText, .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))];
 		}
 		return SetText (StringExtensions.ToString (newText));
@@ -189,8 +206,8 @@ public class DateField : TextField {
 		}
 
 		text = NormalizeFormat (text);
-		string [] vals = text.Split (_sepChar);
-		string [] frm = _format.Split (_sepChar);
+		string [] vals = text.Split (Separator);
+		string [] frm = Format.Split (Separator);
 		int year;
 		int month;
 		int day;
@@ -223,7 +240,7 @@ public class DateField : TextField {
 		}
 		string d = GetDate (month, day, year, frm);
 
-		if (!DateTime.TryParseExact (d, _format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
+		if (!DateTime.TryParseExact (d, Format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
 			return false;
 		}
 		Date = result;
@@ -233,10 +250,10 @@ public class DateField : TextField {
 	string NormalizeFormat (string text, string fmt = null, string sepChar = null)
 	{
 		if (string.IsNullOrEmpty (fmt)) {
-			fmt = _format;
+			fmt = Format;
 		}
 		if (string.IsNullOrEmpty (sepChar)) {
-			sepChar = _sepChar;
+			sepChar = Separator.ToString ();
 		}
 		if (fmt.Length != text.Length) {
 			return text;
@@ -265,7 +282,7 @@ public class DateField : TextField {
 				date += $"{year,4:0000}";
 			}
 			if (i < 2) {
-				date += $"{_sepChar}";
+				date += $"{Separator}";
 			}
 		}
 		return date;
@@ -285,8 +302,8 @@ public class DateField : TextField {
 
 	void IncCursorPosition ()
 	{
-		if (CursorPosition >= _fieldLen) {
-			CursorPosition = _fieldLen;
+		if (CursorPosition >= FieldLen) {
+			CursorPosition = FieldLen;
 			return;
 		}
 		CursorPosition++;
@@ -306,8 +323,8 @@ public class DateField : TextField {
 	void AdjCursorPosition (int point, bool increment = true)
 	{
 		var newPoint = point;
-		if (point > _fieldLen) {
-			newPoint = _fieldLen;
+		if (point > FieldLen) {
+			newPoint = FieldLen;
 		}
 		if (point < 1) {
 			newPoint = 1;
@@ -316,7 +333,7 @@ public class DateField : TextField {
 			CursorPosition = newPoint;
 		}
 
-		while (Text [CursorPosition] == _sepChar [0]) {
+		while (Text [CursorPosition] == Separator) {
 			if (increment) {
 				CursorPosition++;
 			} else {
@@ -335,7 +352,7 @@ public class DateField : TextField {
 	new bool MoveEnd ()
 	{
 		ClearAllSelection ();
-		CursorPosition = _fieldLen;
+		CursorPosition = FieldLen;
 		return true;
 	}
 

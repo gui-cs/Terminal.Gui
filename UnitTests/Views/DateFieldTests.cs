@@ -170,4 +170,15 @@ public class DateFieldTests {
 		Assert.Equal (4, df.CursorPosition);
 		CultureInfo.CurrentCulture = cultureBackup;
 	}
+
+
+	[Theory]
+	[InlineData ("2022-01-16", '-')] // Separator is '-'
+	[InlineData ("2022/01/16", '/')] // Separator is '/'
+	[InlineData ("2022.01.16", '.')] // Separator is '.'
+	public void Check_If_Current_Separator_Is_Valid (string textDate, char separato)
+	{
+
+	}
+
 }
