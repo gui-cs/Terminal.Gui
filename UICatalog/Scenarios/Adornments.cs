@@ -5,8 +5,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Adornments Demo", "Demonstrates Margin, Border, and Padding on Views.")]
-[ScenarioCategory ("Layout")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Layout"), ScenarioCategory ("Borders")]
 public class Adornments : Scenario {
 
 	public override void Init ()
@@ -193,7 +192,7 @@ public class Adornments : Scenario {
 			_bottomEdit.TextChanging += Edit_TextChanging;
 			Add (_bottomEdit);
 
-			var copyTop = new Button ("Copy Top") {
+			var copyTop = new Button ("Cop_y Top") {
 				X = Pos.Center () + 1,
 				Y = Pos.Bottom (_bottomEdit)
 			};
@@ -370,7 +369,7 @@ public class Adornments : Scenario {
 				Add (_paddingEditor);
 
 				_diagCheckBox = new CheckBox {
-					Text = "Diagnostics",
+					Text = "_Diagnostics",
 					Y = Pos.Bottom (_paddingEditor)
 				};
 				_diagCheckBox.Toggled += (s, e) => {
