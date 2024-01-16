@@ -56,7 +56,7 @@ public class ButtonTests {
 		Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
 		Assert.Equal (KeyCode.T, btn.HotKey);
 
-		btn = new Button (1, 2, "_abc", true);
+		btn = new Button { X = 1, Y = 2, Text = "_abc", IsDefault = true };
 		btn.BeginInit ();
 		btn.EndInit ();
 		Assert.Equal ("_abc", btn.Text);
@@ -76,8 +76,8 @@ public class ButtonTests {
 ";
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
-		Assert.Equal (new Rect (1, 2, 10, 1), btn.Frame);
+		Assert.Equal (new Rect (0, 0, 9, 1), btn.Bounds);
+		Assert.Equal (new Rect (1, 2, 9, 1), btn.Frame);
 	}
 
 	[Fact]
