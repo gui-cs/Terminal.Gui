@@ -148,7 +148,7 @@ namespace ReactiveExample {
 		}
 
 		Button LoginButton (View previous) {
-			var loginButton = new Button () {
+			var loginButton = new Button {
 				X = Pos.Left(previous),
 				Y = Pos.Top(previous) + 1,
 				Width = 40,

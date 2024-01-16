@@ -296,7 +296,7 @@ public class ListColumns : Scenario {
 	void RunListWidthDialog (string prompt, Action<TableView, int> setter, Func<TableView, int> getter)
 	{
 		var accepted = false;
-		var ok = new Button () { Text = "Ok", IsDefault = true };
+		var ok = new Button { Text = "Ok", IsDefault = true };
 		ok.Clicked += (s, e) => {
 			accepted = true;
 			Application.RequestStop ();

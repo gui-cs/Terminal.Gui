@@ -803,7 +803,7 @@ namespace UICatalog.Scenarios {
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button () {
+			var btnFindNext = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
@@ -816,7 +816,7 @@ namespace UICatalog.Scenarios {
 			btnFindNext.Clicked += (s, e) => FindNext ();
 			d.Add (btnFindNext);
 
-			var btnFindPrevious = new Button () {
+			var btnFindPrevious = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
@@ -835,7 +835,7 @@ namespace UICatalog.Scenarios {
 				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button () {
+			var btnCancel = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
 				Width = 20,
@@ -898,7 +898,7 @@ namespace UICatalog.Scenarios {
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button () {
+			var btnFindNext = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
@@ -928,7 +928,7 @@ namespace UICatalog.Scenarios {
 			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
 			d.Add (txtToReplace);
 
-			var btnFindPrevious = new Button () {
+			var btnFindPrevious = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
@@ -940,7 +940,7 @@ namespace UICatalog.Scenarios {
 			btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
-			var btnReplaceAll = new Button () {
+			var btnReplaceAll = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
@@ -960,7 +960,7 @@ namespace UICatalog.Scenarios {
 				btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button () {
+			var btnCancel = new Button {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
 				Width = 20,

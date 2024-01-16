@@ -47,7 +47,7 @@ namespace Terminal.Gui {
 		{
 
 			bool confirm = false;
-			var btnOk = new Button () {
+			var btnOk = new Button {
 				IsDefault = true,
 				Text = Strings.btnOk
 			};
@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 				confirm = true;
 				Application.RequestStop ();
 			};
-			var btnCancel = new Button () { Text = Strings.btnCancel };
+			var btnCancel = new Button { Text = Strings.btnCancel };
 			btnCancel.Clicked += (s, e) => {
 				confirm = false;
 				Application.RequestStop ();

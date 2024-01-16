@@ -92,7 +92,7 @@ public class DatePicker : View {
 			}
 		};
 
-		_previousMonthButton = new Button () {
+		_previousMonthButton = new Button {
 			X = Pos.Center () - 4,
 			Y = Pos.Bottom (_calendar) - 1,
 			Height = 1,
@@ -106,7 +106,7 @@ public class DatePicker : View {
 			_dateField.Date = Date;
 		};
 
-		_nextMonthButton = new Button () {
+		_nextMonthButton = new Button {
 			X = Pos.Right (_previousMonthButton) + 2,
 			Y = Pos.Bottom (_calendar) - 1,
 			Height = 1,

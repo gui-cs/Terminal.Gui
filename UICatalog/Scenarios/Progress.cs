@@ -54,19 +54,19 @@ public class Progress : Scenario {
 
 			Add (LeftFrame);
 
-			var startButton = new Button () {
+			var startButton = new Button {
 				X = Pos.Right (LeftFrame) + 1,
 				Y = 0,
 				Text = "Start Timer"
 			};
 			startButton.Clicked += (s, e) => Start ();
-			var pulseButton = new Button () {
+			var pulseButton = new Button {
 				X = Pos.Right (startButton) + 2,
 				Y = Pos.Y (startButton),
 				Text = "Pulse"
 			};
 			pulseButton.Clicked += (s, e) => Pulse ();
-			var stopbutton = new Button () {
+			var stopbutton = new Button {
 				X = Pos.Right (pulseButton) + 2,
 				Y = Pos.Top (pulseButton),
 				Text = "Stop Timer"
@@ -251,7 +251,7 @@ public class Progress : Scenario {
 		};
 		Win.Add (mainLoopTimeoutDemo);
 
-		var startBoth = new Button () {
+		var startBoth = new Button {
 			X = Pos.Center (),
 			Y = Pos.Bottom (mainLoopTimeoutDemo) + 1,
 			Text = "Start Both"

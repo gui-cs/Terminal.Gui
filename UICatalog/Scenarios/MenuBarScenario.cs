@@ -170,7 +170,7 @@ public class MenuBarScenario : Scenario {
 			_focusedView.Text = Application.Top.MostFocused?.ToString() ?? "None";
 		};
 
-		var openBtn = new Button () {
+		var openBtn = new Button {
 			X = Pos.Center (),
 			Y = 4,
 			Text = "_Open Menu",
@@ -181,7 +181,7 @@ public class MenuBarScenario : Scenario {
 		};
 		Application.Top.Add (openBtn);
 
-		var hideBtn = new Button () {
+		var hideBtn = new Button {
 			X = Pos.Center (),
 			Y = Pos.Bottom(openBtn),
 			Text = "Toggle Menu._Visible",
@@ -191,7 +191,7 @@ public class MenuBarScenario : Scenario {
 		};
 		Application.Top.Add (hideBtn);
 
-		var enableBtn = new Button () {
+		var enableBtn = new Button {
 			X = Pos.Center (),
 			Y = Pos.Bottom (hideBtn),
 			Text = "_Toggle Menu.Enable",

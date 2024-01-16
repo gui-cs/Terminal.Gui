@@ -82,7 +82,7 @@ namespace UICatalog.Scenarios {
 				};
 				_stylePicker.SelectedItem = 1;
 
-				_addLayerBtn = new Button () {
+				_addLayerBtn = new Button {
 					Text = "New Layer",
 					X = Pos.Center (),
 					Y = Pos.Bottom (_stylePicker),

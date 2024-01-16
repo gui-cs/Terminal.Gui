@@ -87,7 +87,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lblShippedControlKeys);
 
-			var button = new Button () {
+			var button = new Button {
 				X = Pos.Center (),
 				Y = Pos.Center () + 7,
 				IsDefault = true,

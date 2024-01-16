@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (edit);
 
-			var unicodeSample = new Button () {
+			var unicodeSample = new Button {
 				X = Pos.Right (edit) + 1,
 				Y = 0,
 				Text = "Unicode Sample"
@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (unicodeSample);
 
-			var update = new Button () {
+			var update = new Button {
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
 				Text = "_Update"

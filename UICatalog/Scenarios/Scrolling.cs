@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 			}
 			Application.Top.Loaded += Top_Loaded;
 
-			var pressMeButton = new Button () {
+			var pressMeButton = new Button {
 				X = 3,
 				Y = 3,
 				Text = "Press me!"
@@ -168,7 +168,7 @@ namespace UICatalog.Scenarios {
 			pressMeButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
 			scrollView.Add (pressMeButton);
 
-			var aLongButton = new Button () {
+			var aLongButton = new Button {
 				X = 3,
 				Y = 4,
 				Width = Dim.Fill (3),
@@ -199,7 +199,7 @@ namespace UICatalog.Scenarios {
 			});
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right
-			var anchorButton = new Button () {
+			var anchorButton = new Button {
 				Y = Pos.AnchorEnd () - 1,
 				Text = "Bottom Right"
 			};

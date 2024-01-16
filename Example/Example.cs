@@ -48,7 +48,7 @@ public class ExampleWindow : Window {
 		};
 
 		// Create login button
-		var btnLogin = new Button () {
+		var btnLogin = new Button {
 			Text = "Login",
 			Y = Pos.Bottom(passwordLabel) + 1,
 			// center the login button horizontally

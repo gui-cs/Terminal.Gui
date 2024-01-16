@@ -48,7 +48,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = 20
 			};
-			_button = new Button () {
+			_button = new Button {
 				X = Pos.Center (),
 				Y = 5
 			};

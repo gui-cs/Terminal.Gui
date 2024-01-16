@@ -102,7 +102,7 @@ public class ResponderTests {
 		Assert.False (Responder.IsOverridden (new DerivedView () { Text = "DerivedView does not override MouseEvent" }, "MouseEvent"));
 
 		// OnKeyDown is defined on View and NOT overrident on Button
-		Assert.False (Responder.IsOverridden (new Button () { Text = "Button does not override OnKeyDown" }, "OnKeyDown"));
+		Assert.False (Responder.IsOverridden (new Button { Text = "Button does not override OnKeyDown" }, "OnKeyDown"));
 
 #if DEBUG_IDISPOSABLE
 		// HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
@@ -128,7 +128,7 @@ public class ResponderTests {
 		Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides MouseEvent" }, "MouseEvent"));
 		Assert.True (Responder.IsOverridden (new ScrollBarView () { Text = "ScrollBarView overrides OnDrawContent" }, "OnDrawContent"));
 
-		Assert.True (Responder.IsOverridden (new Button () { Text = "Button overrides MouseEvent" }, "MouseEvent"));
+		Assert.True (Responder.IsOverridden (new Button { Text = "Button overrides MouseEvent" }, "MouseEvent"));
 #if DEBUG_IDISPOSABLE
 		// HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
 		Responder.Instances.Clear ();

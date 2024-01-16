@@ -44,7 +44,7 @@ public class Threading : Scenario {
 			_itemsList.SetSource (items);
 		};
 
-		_btnActionCancel = new Button () { X = 1, Y = 1, Text = "Cancelable Load Items" };
+		_btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
 		_btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
 		Win.Add (new Label ("Data Items:") {
@@ -75,19 +75,19 @@ public class Threading : Scenario {
 
 		var text = new TextField ("Type anything after press the button") { X = 1, Y = 3, Width = 100 };
 
-		var _btnAction = new Button () { X = 80, Y = 10, Text = "Load Data Action" };
+		var _btnAction = new Button { X = 80, Y = 10, Text = "Load Data Action" };
 		_btnAction.Clicked += (s, e) => _action.Invoke ();
-		var _btnLambda = new Button () { X = 80, Y = 12, Text = "Load Data Lambda" };
+		var _btnLambda = new Button { X = 80, Y = 12, Text = "Load Data Lambda" };
 		_btnLambda.Clicked += (s, e) => _lambda.Invoke ();
-		var _btnHandler = new Button () { X = 80, Y = 14, Text = "Load Data Handler" };
+		var _btnHandler = new Button { X = 80, Y = 14, Text = "Load Data Handler" };
 		_btnHandler.Clicked += (s, e) => _handler.Invoke (null, new EventArgs ());
-		var _btnSync = new Button () { X = 80, Y = 16, Text = "Load Data Synchronous" };
+		var _btnSync = new Button { X = 80, Y = 16, Text = "Load Data Synchronous" };
 		_btnSync.Clicked += (s, e) => _sync.Invoke ();
-		var _btnMethod = new Button () { X = 80, Y = 18, Text = "Load Data Method" };
+		var _btnMethod = new Button { X = 80, Y = 18, Text = "Load Data Method" };
 		_btnMethod.Clicked += async (s, e) => await MethodAsync ();
-		var _btnClearData = new Button () { X = 80, Y = 20, Text = "Clear Data" };
+		var _btnClearData = new Button { X = 80, Y = 20, Text = "Clear Data" };
 		_btnClearData.Clicked += (s, e) => { _itemsList.Source = null; LogJob ("Cleaning Data"); };
-		var _btnQuit = new Button () { X = 80, Y = 22, Text = "Quit" };
+		var _btnQuit = new Button { X = 80, Y = 22, Text = "Quit" };
 		_btnQuit.Clicked += (s, e) => Application.RequestStop ();
 
 		Win.Add (_itemsList, _btnActionCancel, _logJob, text, _btnAction, _btnLambda, _btnHandler, _btnSync, _btnMethod, _btnClearData, _btnQuit);

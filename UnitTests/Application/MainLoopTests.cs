@@ -731,7 +731,7 @@ public class MainLoopTests {
 
 		btn.Clicked += RunAsyncTest;
 
-		var totalbtn = new Button () {
+		var totalbtn = new Button {
 			X = Pos.Right (btn),
 			Text = "total"
 		};

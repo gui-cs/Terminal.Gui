@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 			secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 			var buttonLbl = new Label () { Text = "Second Step Button: ", X = 0, Y = 0 };
-			var button = new Button () {
+			var button = new Button {
 				Text = "Press Me to Rename Step",
 				X = Pos.Right (buttonLbl),
 				Y = Pos.Top (buttonLbl)

@@ -36,7 +36,7 @@ public class WindowsAndFrameViews : Scenario {
 		Win.Padding.Thickness = new Thickness (padding);
 		Win.Margin.Thickness = new Thickness (margin);
 
-		var paddingButton = new Button () {
+		var paddingButton = new Button {
 			X = Pos.Center (),
 			Y = 0,
 			ColorScheme = Colors.ColorSchemes ["Error"],
@@ -44,7 +44,7 @@ public class WindowsAndFrameViews : Scenario {
 		};
 		paddingButton.Clicked += (s, e) => About ();
 		Win.Add (paddingButton);
-		Win.Add (new Button () {
+		Win.Add (new Button {
 			X = Pos.Center (),
 			Y = Pos.AnchorEnd (1),
 			ColorScheme = Colors.ColorSchemes ["Error"],
@@ -74,7 +74,7 @@ public class WindowsAndFrameViews : Scenario {
 			win.Padding.Thickness = new Thickness (pad);
 
 			win.ColorScheme = Colors.ColorSchemes ["Dialog"];
-			var pressMeButton = new Button () {
+			var pressMeButton = new Button {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.ColorSchemes ["Error"],

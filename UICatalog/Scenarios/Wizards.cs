@@ -90,7 +90,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (actionLabel);
 
-			var showWizardButton = new Button () {
+			var showWizardButton = new Button {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
@@ -149,7 +149,7 @@ namespace UICatalog.Scenarios {
 					secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 					var buttonLbl = new Label () { Text = "Second Step Button: ", X = 1, Y = 1 };
-					var button = new Button () {
+					var button = new Button {
 						Text = "Press Me to Rename Step",
 						X = Pos.Right (buttonLbl),
 						Y = Pos.Top (buttonLbl)
@@ -222,7 +222,7 @@ namespace UICatalog.Scenarios {
 					};
 					var help = "This is helpful.";
 					fourthStep.Add (someText);
-					var hideHelpBtn = new Button () {
+					var hideHelpBtn = new Button {
 						Text = "Press me to show/hide help",
 						X = Pos.Center (),
 						Y = Pos.AnchorEnd (1)

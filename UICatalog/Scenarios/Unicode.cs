@@ -51,7 +51,7 @@ public class UnicodeInMenu : Scenario {
 		Win.Add (testlabel);
 		label = new Label ("Button:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 		Win.Add (label);
-		var button = new Button () { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
+		var button = new Button { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
 		Win.Add (button);
 
 		label = new Label ("CheckBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };

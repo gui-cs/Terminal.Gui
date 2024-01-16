@@ -22,7 +22,7 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (label);
 
-		var btnInput = new Button () {
+		var btnInput = new Button {
 			X = Pos.AnchorEnd (16),
 			Text = "Select Input"
 		};
@@ -61,7 +61,7 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (label);
 
-		var btnOutput = new Button () {
+		var btnOutput = new Button {
 			X = Pos.AnchorEnd (17),
 			Y = Pos.Top (label),
 			Text = "Select Output"
