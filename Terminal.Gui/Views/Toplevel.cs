@@ -28,16 +28,6 @@ namespace Terminal.Gui;
 public partial class Toplevel : View {
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
-	/// <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <param name="frame">
-	/// A Superview-relative rectangle specifying the location and size for the new
-	/// Toplevel
-	/// </param>
-	public Toplevel (Rect frame) : base (frame) => SetInitialProperties ();
-
-	/// <summary>
 	/// Initializes a new instance of the <see cref="Toplevel"/> class with
 	/// <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen. The <see cref="View.Width"/> and
 	/// <see cref="View.Height"/> properties
