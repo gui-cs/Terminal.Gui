@@ -88,17 +88,16 @@ public class BasicColors : Scenario {
 		};
 		Win.Add (viewBackground);
 
-			Application.MouseEvent += (s, e) => {
-				if (e.MouseEvent.View != null) {
-					var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
-					var back = e.MouseEvent.View.GetNormalColor ().Background;
-					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
-					viewForeground.ColorScheme = new ColorScheme (viewForeground.ColorScheme) { Normal = new Attribute (fore, fore) };
+		Application.MouseEvent += (s, e) => {
+			if (e.MouseEvent.View != null) {
+				var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
+				var back = e.MouseEvent.View.GetNormalColor ().Background;
+				lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
+				viewForeground.ColorScheme = new ColorScheme (viewForeground.ColorScheme) { Normal = new Attribute (fore, fore) };
 
-					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";
-					viewBackground.ColorScheme = new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
-				}
-			};
-		}
+				lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";
+				viewBackground.ColorScheme = new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
+			}
+		};
 	}
 }

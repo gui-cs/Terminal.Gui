@@ -156,7 +156,7 @@ public class Buttons : Scenario {
 		Win.Add (absoluteFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
+		var moveBtnA = new Button ("Move This Button via Frame") {
 			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		moveBtnA.Clicked += (s, e) => {
@@ -167,8 +167,8 @@ public class Buttons : Scenario {
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 		var sizeBtnA = new Button (" ~  s  gui.cs   master ↑10 = Со_хранить") {
 			Y = 2,
-            ColorScheme = Colors.ColorSchemes["Error"],
-        };
+			ColorScheme = Colors.ColorSchemes ["Error"],
+		};
 		sizeBtnA.Clicked += (s, e) => {
 			sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
 		};
