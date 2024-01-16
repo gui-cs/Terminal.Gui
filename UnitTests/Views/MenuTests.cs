@@ -15,7 +15,7 @@ public class MenuTests {
 	}
 
 	// TODO: Create more low-level unit tests for Menu and MenuItem
-	
+
 	[Fact]
 	public void Menu_Constructors_Defaults ()
 	{

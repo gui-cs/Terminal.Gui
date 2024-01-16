@@ -512,7 +512,7 @@ public class ButtonTests {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		tabView.AddTab (new Tab ("Find", tab), true);
+		tabView.AddTab (new Tab () { DisplayText = "Find", View = tab }, true);
 
 		var win = new Window () {
 			Width = Dim.Fill (),
@@ -547,9 +547,9 @@ public class ButtonTests {
 		var btn3 = $"{CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}";
 		var expected = @$"
 ┌────────────────────────────────────────────────────┐
-│┌────┐                                              │
+│╭────╮                                              │
 ││Find│                                              │
-││    └─────────────────────────────────────────────┐│
+││    ╰─────────────────────────────────────────────╮│
 ││                                                  ││
 ││   Find: Testing buttons.       {btn1}   ││
 ││                               {btn2}  ││
@@ -656,13 +656,11 @@ public class ButtonTests {
 		btn.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
-
 		};
 
 		btn.HotKey = KeyCode.R;
 		Assert.Same (btn, sender);
 		Assert.Equal (KeyCode.Null, args.OldKey);
 		Assert.Equal (KeyCode.R, args.NewKey);
-
 	}
 }

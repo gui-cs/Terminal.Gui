@@ -135,7 +135,6 @@ public class CheckBoxTests {
 		Assert.Equal ($"{CM.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
 
 		checkBox.AutoSize = false;
-		checkBox.AutoSize = false;
 		// It isn't auto-size so the height is guaranteed by the SetMinWidthHeight
 		checkBox.Text = "Check this out 你 changed";
 		var firstIteration = false;
