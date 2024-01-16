@@ -332,7 +332,7 @@ public class Bar : View {
 	void SetInitialProperties ()
 	{
 		AutoSize = false;
-		ColorScheme = Colors.Menu;
+		ColorScheme = Colors.ColorSchemes ["Menu"];
 		CanFocus = true;
 
 		LayoutStarted += Bar_LayoutStarted;
