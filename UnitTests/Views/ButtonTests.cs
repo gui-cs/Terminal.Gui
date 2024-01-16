@@ -512,7 +512,7 @@ public class ButtonTests {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		tabView.AddTab (new Tab ("Find", tab), true);
+		tabView.AddTab (new Tab () { DisplayText = "Find", View = tab }, true);
 
 		var win = new Window () {
 			Width = Dim.Fill (),

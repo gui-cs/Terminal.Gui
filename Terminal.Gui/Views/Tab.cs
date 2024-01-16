@@ -23,20 +23,7 @@ public class Tab : View {
 	/// </summary>
 	public Tab ()
 	{
-
-	}
-
-	/// <summary>
-	/// Creates a new tab with the given text hosting a view.
-	/// </summary>
-	/// <param name="displayText">The real text.</param>
-	/// <param name="view">The hosted view.</param>
-	public Tab (string displayText, View view)
-	{
-		this.DisplayText = displayText;
-		this.View = view;
 		BorderStyle = LineStyle.Rounded;
 		CanFocus = true;
-		Visible = false;
 	}
 }
