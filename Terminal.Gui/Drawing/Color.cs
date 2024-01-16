@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -247,7 +247,7 @@ public readonly struct Color : IEquatable<Color> {
 	}.ToImmutableDictionary ();
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Color"/> class.
+	/// Initializes a new instance of the <see cref="Color"/> <see langword="struct"/> using the supplied component values.
 	/// </summary>
 	/// <param name="red">The red 8-bits.</param>
 	/// <param name="green">The green 8-bits.</param>
