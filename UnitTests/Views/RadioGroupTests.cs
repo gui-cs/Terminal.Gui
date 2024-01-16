@@ -170,7 +170,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_Are_Added_Correctly ()
 	{
-		var rg = new RadioGroup (new string [] { "Left", "Right" });
+		var rg = new RadioGroup (new string [] { "_Left", "_Right" });
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R));
 
@@ -185,7 +185,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_HotKeys ()
 	{
-		var rg = new RadioGroup (new string [] { "Left", "Right", "Cen_tered", "Justified" });
+		var rg = new RadioGroup (new string [] { "_Left", "_Right", "Cen_tered", "_Justified" });
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));

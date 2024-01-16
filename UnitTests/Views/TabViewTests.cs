@@ -6,9 +6,9 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class TabViewTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public TabViewTests (ITestOutputHelper output) => this.output = output;
+	public TabViewTests (ITestOutputHelper output) => this._output = output;
 
 	TabView GetTabView () => GetTabView (out _, out _);
 
@@ -22,8 +22,8 @@ public class TabViewTests {
 		tv.BeginInit ();
 		tv.EndInit ();
 		tv.ColorScheme = new ColorScheme ();
-		tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi") { Width = 2 }), false);
-		tv.AddTab (tab2 = new Tab ("Tab2", new Label ("hi2")), false);
+		tv.AddTab (tab1 = new Tab () { DisplayText = "Tab1", View = new TextField("hi") { Width = 2 } }, false);
+		tv.AddTab (tab2 = new Tab () { DisplayText = "Tab2", View = new Label("hi2") }, false);
 		return tv;
 	}
 
@@ -35,8 +35,8 @@ public class TabViewTests {
 		var tv = new TabView ();
 		Tab tab1;
 		Tab tab2;
-		tv.AddTab (tab1 = new Tab ("Tab1", new TextField ("hi")), false);
-		tv.AddTab (tab2 = new Tab ("Tab1", new Label ("hi2")), true);
+		tv.AddTab (tab1 = new Tab () { DisplayText = "Tab1", View = new TextField("hi") }, false);
+		tv.AddTab (tab2 = new Tab () { DisplayText = "Tab1", View = new Label("hi2") }, true);
 
 		Assert.Equal (2, tv.Tabs.Count);
 		Assert.Equal (tab2, tv.SelectedTab);
@@ -244,67 +244,67 @@ public class TabViewTests {
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
 		tv.LayoutSubviews ();
 
-		// Test two tab names that fit 
-		tab1.Text = "12";
-		tab2.Text = "13";
+			// Test two tab names that fit 
+			tab1.DisplayText = "12";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌──┐      
-│12│13    
-│  └─────┐
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭──┬──╮   
+│12│13│   
+│  ╰──┴──╮
 │hi      │
-└────────┘", output);
+└────────┘", _output);
 
 		tv.SelectedTab = tab2;
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-   ┌──┐   
- 12│13│   
-┌──┘  └──┐
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭──┬──╮   
+│12│13│   
+├──╯  ╰──╮
 │hi2     │
-└────────┘", output);
+└────────┘", _output);
 
-		tv.SelectedTab = tab1;
-		// Test first tab name too long
-		tab1.Text = "12345678910";
-		tab2.Text = "13";
+			tv.SelectedTab = tab1;
+			// Test first tab name too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌───────┐ 
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭───────╮ 
 │1234567│ 
-│       └►
+│       ╰►
 │hi      │
-└────────┘", output);
+└────────┘", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌──┐      
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭──╮      
 │13│      
-◄  └─────┐
+◄  ╰─────╮
 │hi2     │
-└────────┘", output);
+└────────┘", _output);
 
-		// now make both tabs too long
-		tab1.Text = "12345678910";
-		tab2.Text = "abcdefghijklmnopq";
+			// now make both tabs too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "abcdefghijklmnopq";
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌───────┐ 
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭───────╮ 
 │abcdefg│ 
-◄       └┐
+◄       ╰╮
 │hi2     │
-└────────┘", output);
+└────────┘", _output);
 	}
 
 	[Fact]
@@ -320,44 +320,44 @@ public class TabViewTests {
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
 		tv.LayoutSubviews ();
 
-		// Test two tab names that fit 
-		tab1.Text = "12";
-		tab2.Text = "13";
+			// Test two tab names that fit 
+			tab1.DisplayText = "12";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-│12│13    
-│  └─────┐
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│12│13│   
+│  ╰──┴──╮
 │hi      │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 		tv.SelectedTab = tab2;
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
- 12│13│   
-┌──┘  └──┐
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+│12│13│   
+├──╯  ╰──╮
 │hi2     │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 		tv.SelectedTab = tab1;
 
-		// Test first tab name too long
-		tab1.Text = "12345678910";
-		tab2.Text = "13";
+			// Test first tab name too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │1234567│ 
-│       └►
+│       ╰►
 │hi      │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -365,23 +365,23 @@ public class TabViewTests {
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │13│      
-◄  └─────┐
+◄  ╰─────╮
 │hi2     │
 │        │
-└────────┘", output);
+└────────┘", _output);
 
-		// now make both tabs too long
-		tab1.Text = "12345678910";
-		tab2.Text = "abcdefghijklmnopq";
+			// now make both tabs too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "abcdefghijklmnopq";
 
 		tv.Draw ();
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │abcdefg│ 
-◄       └┐
+◄       ╰╮
 │hi2     │
 │        │
-└────────┘", output);
+└────────┘", _output);
 	}
 
 	[Fact]
@@ -395,12 +395,12 @@ public class TabViewTests {
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌─┐ 
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭─╮ 
 │T│ 
-│ └►
+│ ╰►
 │hi│
-└──┘", output);
+└──┘", _output);
 	}
 
 	[Fact]
@@ -418,10 +418,10 @@ public class TabViewTests {
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │T│ 
-│ └►
+│ ╰►
 │hi│
 │  │
-└──┘", output);
+└──┘", _output);
 	}
 
 	[Fact]
@@ -435,12 +435,12 @@ public class TabViewTests {
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌┐ 
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭╮ 
 ││ 
-│└►
+│╰►
 │h│
-└─┘", output);
+└─┘", _output);
 	}
 
 	[Fact]
@@ -458,10 +458,10 @@ public class TabViewTests {
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ││ 
-│└►
+│╰►
 │h│
 │ │
-└─┘", output);
+└─┘", _output);
 	}
 
 	[Fact]
@@ -477,31 +477,31 @@ public class TabViewTests {
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
 		tv.LayoutSubviews ();
 
-		// Test two tab names that fit 
-		tab1.Text = "12";
-		tab2.Text = "13";
+			// Test two tab names that fit 
+			tab1.DisplayText = "12";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
-│  ┌─────┘
-│12│13    
-└──┘      ", output);
+│  ╭──┬──╯
+│12│13│   
+╰──┴──╯   ", _output);
 
-		// Test first tab name too long
-		tab1.Text = "12345678910";
-		tab2.Text = "13";
+			// Test first tab name too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi      │
-│       ┌►
+│       ╭►
 │1234567│ 
-└───────┘ ", output);
+╰───────╯ ", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -510,23 +510,23 @@ public class TabViewTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
-◄  ┌─────┘
+◄  ╭─────╯
 │13│      
-└──┘      ", output);
+╰──╯      ", _output);
 
-		// now make both tabs too long
-		tab1.Text = "12345678910";
-		tab2.Text = "abcdefghijklmnopq";
+			// now make both tabs too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "abcdefghijklmnopq";
 
 		tv.Draw ();
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌────────┐
 │hi2     │
-◄       ┌┘
+◄       ╭╯
 │abcdefg│ 
-└───────┘ ", output);
-	}
+╰───────╯ ", _output);
+		}
 
 	[Fact]
 	[AutoInitShutdown]
@@ -541,9 +541,9 @@ public class TabViewTests {
 		// Ensures that the tab bar subview gets the bounds of the parent TabView
 		tv.LayoutSubviews ();
 
-		// Test two tab names that fit 
-		tab1.Text = "12";
-		tab2.Text = "13";
+			// Test two tab names that fit 
+			tab1.DisplayText = "12";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
@@ -551,8 +551,8 @@ public class TabViewTests {
 ┌────────┐
 │hi      │
 │        │
-│  ┌─────┘
-│12│13    ", output);
+│  ╭──┬──╯
+│12│13│   ", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -562,14 +562,14 @@ public class TabViewTests {
 ┌────────┐
 │hi2     │
 │        │
-└──┐  ┌──┘
- 12│13│   ", output);
+├──╮  ╭──╯
+│12│13│   ", _output);
 
 		tv.SelectedTab = tab1;
 
-		// Test first tab name too long
-		tab1.Text = "12345678910";
-		tab2.Text = "13";
+			// Test first tab name too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "13";
 
 		tv.Draw ();
 
@@ -577,8 +577,8 @@ public class TabViewTests {
 ┌────────┐
 │hi      │
 │        │
-│       ┌►
-│1234567│ ", output);
+│       ╭►
+│1234567│ ", _output);
 
 		//switch to tab2
 		tv.SelectedTab = tab2;
@@ -588,12 +588,12 @@ public class TabViewTests {
 ┌────────┐
 │hi2     │
 │        │
-◄  ┌─────┘
-│13│      ", output);
+◄  ╭─────╯
+│13│      ", _output);
 
-		// now make both tabs too long
-		tab1.Text = "12345678910";
-		tab2.Text = "abcdefghijklmnopq";
+			// now make both tabs too long
+			tab1.DisplayText = "12345678910";
+			tab2.DisplayText = "abcdefghijklmnopq";
 
 		tv.Draw ();
 
@@ -601,8 +601,8 @@ public class TabViewTests {
 ┌────────┐
 │hi2     │
 │        │
-◄       ┌┘
-│abcdefg│ ", output);
+◄       ╭╯
+│abcdefg│ ", _output);
 	}
 
 	[Fact]
@@ -621,10 +621,10 @@ public class TabViewTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──┐
 │hi│
-│ ┌►
+│ ╭►
 │T│ 
-└─┘ ", output);
-	}
+╰─╯ ", _output);
+		}
 
 	[Fact]
 	[AutoInitShutdown]
@@ -643,8 +643,8 @@ public class TabViewTests {
 ┌──┐
 │hi│
 │  │
-│ ┌►
-│T│ ", output);
+│ ╭►
+│T│ ", _output);
 	}
 
 	[Fact]
@@ -663,10 +663,10 @@ public class TabViewTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌─┐
 │h│
-│┌►
+│╭►
 ││ 
-└┘ ", output);
-	}
+╰╯ ", _output);
+		}
 
 	[Fact]
 	[AutoInitShutdown]
@@ -685,8 +685,8 @@ public class TabViewTests {
 ┌─┐
 │h│
 │ │
-│┌►
-││ ", output);
+│╭►
+││ ", _output);
 	}
 
 	[Fact]
@@ -699,28 +699,28 @@ public class TabViewTests {
 
 		tv.LayoutSubviews ();
 
-		tab1.Text = "Tab0";
-		tab2.Text = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+			tab1.DisplayText = "Tab0";
+			tab2.DisplayText = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌────┐              
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭────╮              
 │Tab0│              
-│    └─────────────►
+│    ╰─────────────►
 │hi                │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
 		tv.SelectedTab = tab2;
 
 		tv.Draw ();
 
-		TestHelpers.AssertDriverContentsWithFrameAre (@"
-┌──────────────┐    
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+╭──────────────╮    
 │Les Misérables│    
-◄              └───┐
+◄              ╰───╮
 │hi2               │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 	}
 
 	[Fact]
@@ -735,17 +735,17 @@ public class TabViewTests {
 
 		tv.LayoutSubviews ();
 
-		tab1.Text = "Tab0";
-		tab2.Text = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+			tab1.DisplayText = "Tab0";
+			tab2.DisplayText = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
 		tv.Draw ();
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │hi                │
-│    ┌─────────────►
+│    ╭─────────────►
 │Tab0│              
-└────┘              ", output);
+╰────╯              ", _output);
 
 		tv.SelectedTab = tab2;
 
@@ -754,10 +754,10 @@ public class TabViewTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │hi2               │
-◄              ┌───┘
+◄              ╭───╯
 │Les Misérables│    
-└──────────────┘    ", output);
-	}
+╰──────────────╯    ", _output);
+		}
 
 	[Fact]
 	[AutoInitShutdown]
@@ -772,82 +772,402 @@ public class TabViewTests {
 
 		tv.Draw ();
 
-		var tabRow = tv.Subviews [0];
-		Assert.Equal ("TabRowView", tabRow.GetType ().Name);
+			var tabRow = tv.Subviews [0];
+			Assert.Equal ("TabRowView", tabRow.GetType ().Name);
 
-		TestHelpers.AssertDriverContentsAre (@"
-┌────┐              
-│Tab1│Tab2          
-│    └─────────────┐
+			TestHelpers.AssertDriverContentsAre (@"
+╭────┬────╮
+│Tab1│Tab2│
+│    ╰────┴────────╮
 │hi                │
 └──────────────────┘
-", output);
+", _output);
 
-		Tab clicked = null;
+			Tab clicked = null;
 
+			tv.TabClicked += (s, e) => {
+				clicked = e.Tab;
+			};
 
-		tv.TabClicked += (s, e) => {
-			clicked = e.Tab;
-		};
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
 
-		// Waving mouse around does not trigger click
-		for (var i = 0; i < 100; i++) {
-			tabRow.MouseEvent (new MouseEvent {
-				X = i,
+			MouseEventEventArgs args;
+
+			// Waving mouse around does not trigger click
+			for (int i = 0; i < 100; i++) {
+				args = new MouseEventEventArgs (new MouseEvent {
+					X = i,
+					Y = 1,
+					Flags = MouseFlags.ReportMousePosition
+				});
+				Application.OnMouseEvent (args);
+				Application.Refresh ();
+				Assert.Null (clicked);
+				Assert.Equal (tab1, tv.SelectedTab);
+			}
+
+			args = new MouseEventEventArgs (new MouseEvent {
+				X = 3,
 				Y = 1,
-				Flags = MouseFlags.ReportMousePosition
+				Flags = MouseFlags.Button1Clicked
 			});
-
-			Assert.Null (clicked);
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			Assert.Equal (tab1, clicked);
 			Assert.Equal (tab1, tv.SelectedTab);
+
+			// Click to tab2
+			args = new MouseEventEventArgs (new MouseEvent {
+				X = 6,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			Assert.Equal (tab2, clicked);
+			Assert.Equal (tab2, tv.SelectedTab);
+
+			// cancel navigation
+			tv.TabClicked += (s, e) => {
+				clicked = e.Tab;
+				e.MouseEvent.Handled = true;
+			};
+
+			args = new MouseEventEventArgs (new MouseEvent {
+				X = 3,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			// Tab 1 was clicked but event handler blocked navigation
+			Assert.Equal (tab1, clicked);
+			Assert.Equal (tab2, tv.SelectedTab);
+
+			args = new MouseEventEventArgs (new MouseEvent {
+				X = 12,
+				Y = 1,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			// Clicking beyond last tab should raise event with null Tab
+			Assert.Null (clicked);
+			Assert.Equal (tab2, tv.SelectedTab);
 		}
 
-		tabRow.MouseEvent (new MouseEvent {
-			X = 3,
-			Y = 1,
-			Flags = MouseFlags.Button1Clicked
-		});
+		[Fact, AutoInitShutdown]
+		public void MouseClick_Right_Left_Arrows_ChangesTab ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
 
-		Assert.Equal (tab1, clicked);
-		Assert.Equal (tab1, tv.SelectedTab);
+			tv.Width = 7;
+			tv.Height = 5;
 
-		// Click to tab2
-		tabRow.MouseEvent (new MouseEvent {
-			X = 7,
-			Y = 1,
-			Flags = MouseFlags.Button1Clicked
-		});
+			tv.LayoutSubviews ();
 
-		Assert.Equal (tab2, clicked);
-		Assert.Equal (tab2, tv.SelectedTab);
+			tv.Draw ();
 
-		// cancel navigation
-		tv.TabClicked += (s, e) => {
-			clicked = e.Tab;
-			e.MouseEvent.Handled = true;
-		};
+			var tabRow = tv.Subviews [0];
+			Assert.Equal ("TabRowView", tabRow.GetType ().Name);
 
-		tabRow.MouseEvent (new MouseEvent {
-			X = 3,
-			Y = 1,
-			Flags = MouseFlags.Button1Clicked
-		});
+			TestHelpers.AssertDriverContentsAre (@"
+╭────╮
+│Tab1│
+│    ╰►
+│hi   │
+└─────┘
+", _output);
 
-		// Tab 1 was clicked but event handler blocked navigation
-		Assert.Equal (tab1, clicked);
-		Assert.Equal (tab2, tv.SelectedTab);
+			Tab clicked = null;
 
-		tabRow.MouseEvent (new MouseEvent {
-			X = 10,
-			Y = 1,
-			Flags = MouseFlags.Button1Clicked
-		});
+			tv.TabClicked += (s, e) => {
+				clicked = e.Tab;
+			};
 
-		// Clicking beyond last tab should raise event with null Tab
-		Assert.Null (clicked);
-		Assert.Equal (tab2, tv.SelectedTab);
+			Tab oldChanged = null;
+			Tab newChanged = null;
 
-	}
+			tv.SelectedTabChanged += (s, e) => {
+				oldChanged = e.OldTab;
+				newChanged = e.NewTab;
+			};
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			// Click the right arrow
+			var args = new MouseEventEventArgs (new MouseEvent {
+				X = 6,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			Assert.Null (clicked);
+			Assert.Equal (tab1, oldChanged);
+			Assert.Equal (tab2, newChanged);
+			Assert.Equal (tab2, tv.SelectedTab);
+			TestHelpers.AssertDriverContentsAre (@"
+╭────╮
+│Tab2│
+◄    ╰╮
+│hi2  │
+└─────┘
+", _output);
+
+			// Click the left arrow
+			args = new MouseEventEventArgs (new MouseEvent {
+				X = 0,
+				Y = 2,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			Assert.Null (clicked);
+			Assert.Equal (tab2, oldChanged);
+			Assert.Equal (tab1, newChanged);
+			Assert.Equal (tab1, tv.SelectedTab);
+			TestHelpers.AssertDriverContentsAre (@"
+╭────╮
+│Tab1│
+│    ╰►
+│hi   │
+└─────┘
+", _output);
+		}
+
+		[Fact, AutoInitShutdown]
+		public void MouseClick_Right_Left_Arrows_ChangesTab_With_Border ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+
+			tv.Width = 9;
+			tv.Height = 7;
+
+			Assert.Equal (LineStyle.None, tv.BorderStyle);
+			tv.BorderStyle = LineStyle.Single;
+
+			tv.LayoutSubviews ();
+
+			tv.Draw ();
+
+			var tabRow = tv.Subviews [0];
+			Assert.Equal ("TabRowView", tabRow.GetType ().Name);
+
+			TestHelpers.AssertDriverContentsAre (@"
+┌───────┐
+│╭────╮ │
+││Tab1│ │
+││    ╰►│
+││hi   ││
+│└─────┘│
+└───────┘
+", _output);
+
+			Tab clicked = null;
+
+			tv.TabClicked += (s, e) => {
+				clicked = e.Tab;
+			};
+
+			Tab oldChanged = null;
+			Tab newChanged = null;
+
+			tv.SelectedTabChanged += (s, e) => {
+				oldChanged = e.OldTab;
+				newChanged = e.NewTab;
+			};
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			// Click the right arrow
+			var args = new MouseEventEventArgs (new MouseEvent {
+				X = 7,
+				Y = 3,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			Assert.Null (clicked);
+			Assert.Equal (tab1, oldChanged);
+			Assert.Equal (tab2, newChanged);
+			Assert.Equal (tab2, tv.SelectedTab);
+			TestHelpers.AssertDriverContentsAre (@"
+┌───────┐
+│╭────╮ │
+││Tab2│ │
+│◄    ╰╮│
+││hi2  ││
+│└─────┘│
+└───────┘
+", _output);
+
+			// Click the left arrow
+			args = new MouseEventEventArgs (new MouseEvent {
+				X = 1,
+				Y = 3,
+				Flags = MouseFlags.Button1Clicked
+			});
+			Application.OnMouseEvent (args);
+			Application.Refresh ();
+			Assert.Null (clicked);
+			Assert.Equal (tab2, oldChanged);
+			Assert.Equal (tab1, newChanged);
+			Assert.Equal (tab1, tv.SelectedTab);
+			TestHelpers.AssertDriverContentsAre (@"
+┌───────┐
+│╭────╮ │
+││Tab1│ │
+││    ╰►│
+││hi   ││
+│└─────┘│
+└───────┘
+", _output);
+		}
+
+		[Fact]
+		public void EnsureValidScrollOffsets_TabScrollOffset ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2);
+
+			// Make tab width small to force only one tab visible at once
+			tv.Width = 4;
+
+			tv.SelectedTab = tab1;
+			Assert.Equal (0, tv.TabScrollOffset);
+
+			tv.TabScrollOffset = 10;
+			tv.SelectedTab = tab2;
+			Assert.Equal (1, tv.TabScrollOffset);
+
+			tv.TabScrollOffset = -1;
+			tv.SelectedTab = tab1;
+			Assert.Equal (0, tv.TabScrollOffset);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void ProcessKey_Down_Up_Right_Left_Home_End_PageDown_PageUp ()
+		{
+			var tv = GetTabView (out var tab1, out var tab2, false);
+
+			tv.Width = 7;
+			tv.Height = 5;
+
+			var btn = new Button ("Ok") { Y = Pos.Bottom (tv) + 1, Width = 7 };
+
+			var top = Application.Top;
+			top.Add (tv, btn);
+			Application.Begin (top);
+
+			// Is the selected tab view hosting focused
+			Assert.Equal (tab1, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+			Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
+
+			// Press the cursor up key to focus the selected tab
+			var args = new Key (Key.CursorUp);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			// Is the selected tab focused
+			Assert.Equal (tab1, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			Tab oldChanged = null;
+			Tab newChanged = null;
+
+			tv.SelectedTabChanged += (s, e) => {
+				oldChanged = e.OldTab;
+				newChanged = e.NewTab;
+			};
+
+			// Press the cursor right key to select the next tab
+			args = new Key (Key.CursorRight);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab1, oldChanged);
+			Assert.Equal (tab2, newChanged);
+			Assert.Equal (tab2, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			// Press the cursor down key to focused the selected tab view hosting
+			args =new Key (Key.CursorDown);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab2, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+			// The tab view hosting is a label which can't be focused
+			// and the View container is the focused one
+			Assert.Equal (tv.Subviews [1], top.Focused.MostFocused);
+
+			// Press the cursor up key to focus the selected tab
+			args = new Key (Key.CursorUp);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			// Is the selected tab focused
+			Assert.Equal (tab2, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			// Press the cursor left key to select the previous tab
+			args = new Key(Key.CursorLeft);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab2, oldChanged);
+			Assert.Equal (tab1, newChanged);
+			Assert.Equal (tab1, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			// Press the end key to select the last tab
+			args = new Key(Key.End);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab1, oldChanged);
+			Assert.Equal (tab2, newChanged);
+			Assert.Equal (tab2, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			// Press the home key to select the first tab
+			args = new Key(Key.Home);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab2, oldChanged);
+			Assert.Equal (tab1, newChanged);
+			Assert.Equal (tab1, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			// Press the page down key to select the next set of tabs
+			args = new Key(Key.PageDown);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab1, oldChanged);
+			Assert.Equal (tab2, newChanged);
+			Assert.Equal (tab2, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+
+			// Press the page up key to select the previous set of tabs
+			args = new Key(Key.PageUp);
+			Application.OnKeyDown (args);
+			Application.Refresh ();
+			Assert.Equal (tab2, oldChanged);
+			Assert.Equal (tab1, newChanged);
+			Assert.Equal (tab1, tv.SelectedTab);
+			Assert.Equal (tv, top.Focused);
+			Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
+		}
 
 	void InitFakeDriver ()
 	{

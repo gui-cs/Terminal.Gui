@@ -1251,7 +1251,7 @@ public static partial class Application {
 			}
 		}
 
-		bool FrameHandledMouseEvent (Adornment frame)
+		bool AdornmentHandledMouseEvent(Adornment frame)
 		{
 			if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
 				var boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
@@ -1272,10 +1272,10 @@ public static partial class Application {
 		if (view != null) {
 			// Work inside-out (Padding, Border, Margin)
 			// TODO: Debate whether inside-out or outside-in is the right strategy
-			if (FrameHandledMouseEvent (view?.Padding)) {
+			if (AdornmentHandledMouseEvent(view?.Padding)) {
 				return;
 			}
-			if (FrameHandledMouseEvent (view?.Border)) {
+			if (AdornmentHandledMouseEvent(view?.Border)) {
 				if (view is Toplevel) {
 					// TODO: This is a temporary hack to work around the fact that 
 					// drag handling is handled in Toplevel (See Issue #2537)
@@ -1314,7 +1314,7 @@ public static partial class Application {
 				return;
 			}
 
-			if (FrameHandledMouseEvent (view?.Margin)) {
+			if (AdornmentHandledMouseEvent(view?.Margin)) {
 				return;
 			}
 

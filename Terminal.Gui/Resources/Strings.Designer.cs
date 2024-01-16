@@ -61,7 +61,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cancel.
+        ///   Looks up a localized string similar to _Cancel.
         /// </summary>
         internal static string btnCancel {
             get {
@@ -70,7 +70,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No.
+        ///   Looks up a localized string similar to _No.
         /// </summary>
         internal static string btnNo {
             get {
@@ -79,7 +79,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to OK.
+        ///   Looks up a localized string similar to _OK.
         /// </summary>
         internal static string btnOk {
             get {
@@ -88,7 +88,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open.
+        ///   Looks up a localized string similar to O_pen.
         /// </summary>
         internal static string btnOpen {
             get {
@@ -97,7 +97,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save.
+        ///   Looks up a localized string similar to _Save.
         /// </summary>
         internal static string btnSave {
             get {
@@ -106,7 +106,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Save as.
+        ///   Looks up a localized string similar to Save _as.
         /// </summary>
         internal static string btnSaveAs {
             get {
@@ -115,7 +115,7 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Yes.
+        ///   Looks up a localized string similar to _Yes.
         /// </summary>
         internal static string btnYes {
             get {
