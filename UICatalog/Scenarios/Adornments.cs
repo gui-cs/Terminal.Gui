@@ -340,7 +340,7 @@ public class Adornments : Scenario {
 					LayoutSubviews ();
 				};
 
-				var ckbTitle = new CheckBox ("Show Title") {
+				var ckbTitle = new CheckBox ("Sho_w Title") {
 					BorderStyle = LineStyle.Double,
 					X = Pos.Left (_borderEditor),
 					Y = Pos.Bottom (_borderEditor) - 1,
@@ -370,7 +370,7 @@ public class Adornments : Scenario {
 				Add (_paddingEditor);
 
 				_diagCheckBox = new CheckBox {
-					Text = "Diagnostics",
+					Text = "Dia_gnostics",
 					Y = Pos.Bottom (_paddingEditor)
 				};
 				_diagCheckBox.Toggled += (s, e) => {

@@ -32,6 +32,7 @@ public partial class View {
 
 	void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 	{
+		_hotKey = e.NewKey;
 		HotKeyChanged?.Invoke (this, e);
 	}
 
@@ -580,7 +581,7 @@ public partial class View {
 		}
 
 		// Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
-		foreach (var view in Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out var _))) {
+		foreach (var view in Subviews.Where (v => v.Enabled && v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out var _))) {
 			// TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
 			if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out var binding)) {
 				keyEvent.Scope = KeyBindingScope.HotKey;
@@ -687,7 +688,7 @@ public partial class View {
 	public bool? InvokeCommand (Command command)
 	{
 		if (!CommandImplementations.ContainsKey (command)) {
-			throw new NotSupportedException (@$"{command} is not supported by ({GetType ().Name}).");
+			throw new NotSupportedException (@$"{command} is not supported by ({this}).");
 			return null;
 		}
 		return CommandImplementations [command] ();

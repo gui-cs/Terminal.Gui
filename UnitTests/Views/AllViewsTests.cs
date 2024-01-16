@@ -113,6 +113,14 @@ public class AllViewsTests {
 				continue;
 			}
 
+			// The vType is first in SubViews and has CanFocus set, so it should be focused
+			Assert.True (vType.HasFocus, $"{vType} should have focus");
+			Assert.Equal (1, vTypeEnter);
+			Assert.Equal (0, vTypeLeave);
+
+			var expectedLeave = 1;
+
+			// Tab out of the view
 			if (vType is TextView) {
 				top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
 			} else if (vType is DatePicker) {
@@ -122,12 +130,18 @@ public class AllViewsTests {
 			} else {
 				top.NewKeyDownEvent (new (KeyCode.Tab));
 			}
+
+			// We should have left vType
+			Assert.True (view.HasFocus, $"{view} should have focus, but {Application.Top.MostFocused} has focus.");
+			Assert.Equal (expectedLeave, vTypeLeave);
+
+			// Tab back in
 			top.NewKeyDownEvent (new (KeyCode.Tab));
 
-			Assert.Equal (2, vTypeEnter);
-			Assert.Equal (1, vTypeLeave);
-			Assert.Equal (1, viewEnter);
-			Assert.Equal (1, viewLeave);
+			Assert.Equal (expectedLeave + 1, vTypeEnter);
+			Assert.Equal (expectedLeave, vTypeLeave);
+			Assert.Equal (expectedLeave, viewEnter);
+			Assert.Equal (expectedLeave, viewLeave);
 
 			Application.Shutdown ();
 		}

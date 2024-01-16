@@ -58,7 +58,7 @@ public class ScenarioTests {
 
 				// The only key we care about is the QuitKey
 				Application.Top.KeyDown += (object sender, Key args) => {
-					output.WriteLine ($"  Keypress: {args.KeyCode}");
+					_output.WriteLine ($"  Keypress: {args.KeyCode}");
 				};
 
 			uint abortTime = 500;

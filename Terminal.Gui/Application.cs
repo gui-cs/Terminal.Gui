@@ -1508,21 +1508,6 @@ public static partial class Application {
 		}
 
 		return InvokeApplicationKeyBindings (_topLevels.Cast<View> ().ToList (), keyEvent);
-
-
-		//foreach (var topLevel in _topLevels.ToList ()) {
-		//	foreach (var view in topLevel.Subviews.Where (v => v.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _))) {
-		//		if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.Application, out var _)) {
-		//			keyEvent.Scope = KeyBindingScope.Application;
-		//			bool? handled = view.OnInvokingKeyBindings (keyEvent);
-		//			if (handled != null && (bool)handled) {
-		//				return true;
-		//			}
-		//		}
-		//	}
-		//}
-
-		//return false;
 	}
 
 	/// <summary>

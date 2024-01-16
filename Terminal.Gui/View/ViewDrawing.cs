@@ -441,6 +441,7 @@ public partial class View {
 		}
 
 		if (Subviews.Any (s => s.SuperViewRendersLineCanvas)) {
+			// BUGBUG: Should this be s => s.Enabled && s.Super...?
 			foreach (var subview in Subviews.Where (s => s.SuperViewRendersLineCanvas)) {
 				// Combine the LineCanvas'
 				LineCanvas.Merge (subview.LineCanvas);
@@ -496,6 +497,10 @@ public partial class View {
 					TextFormatter.NeedsFormat = true;
 				}
 			}
+
+			if (Text == "Quit Application") {
+
+			}
 			// This should NOT clear 
 			TextFormatter?.Draw (BoundsToScreen (contentArea), HasFocus ? GetFocusColor () : GetNormalColor (),
 				HasFocus ? ColorScheme.HotFocus : GetHotNormalColor (),
@@ -516,6 +521,9 @@ public partial class View {
 			foreach (var view in subviewsNeedingDraw) {
 				//view.Frame.IntersectsWith (bounds)) {
 				// && (view.Frame.IntersectsWith (bounds) || bounds.X < 0 || bounds.Y < 0)) {
+				if (view.Text == "Quit Application") {
+
+				}
 				if (view.LayoutNeeded) {
 					view.LayoutSubviews ();
 				}

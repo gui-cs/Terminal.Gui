@@ -827,7 +827,6 @@ class UICatalogApp {
 		// after a scenario was selected to run. This proves the main UI Catalog
 		// 'app' closed cleanly.
 		foreach (var inst in Responder.Instances) {
-
 			
 			Debug.Assert (inst.WasDisposed);
 		}

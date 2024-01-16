@@ -37,12 +37,14 @@ public class Label : View {
 		AutoSize = autosize;
 		// Things this view knows how to do
 		AddCommand (Command.Default, () => {
-			// BUGBUG: This is a hack, but it does work.
-			var can = CanFocus;
-			CanFocus = true;
+			//// BUGBUG: This is a hack, but it does work.
+			//var can = CanFocus;
+			//if (SuperView?.CanFocus == true) {
+			//	CanFocus = true;
+			//}
 			SetFocus ();
-			SuperView.FocusNext ();
-			CanFocus = can;
+			SuperView?.FocusNext ();
+			//CanFocus = can;
 			return true;
 		});
 		AddCommand (Command.Accept, () => AcceptKey ());

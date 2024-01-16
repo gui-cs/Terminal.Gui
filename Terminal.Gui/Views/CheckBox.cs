@@ -194,9 +194,10 @@ public class CheckBox : View {
 
 	bool ToggleChecked ()
 	{
-		if (!HasFocus) {
-			SetFocus ();
-		}
+		// BUGBUG: I don't think this should change focus.
+		//if (!HasFocus) {
+		//	SetFocus ();
+		//}
 		var previousChecked = Checked;
 		if (AllowNullChecked) {
 			switch (previousChecked) {
