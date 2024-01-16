@@ -194,7 +194,7 @@ public class CheckBox : View {
 
 	bool ToggleChecked ()
 	{
-		// BUGBUG: I don't think this should change focus.
+		// BUGBUG: Commented out in #3037 as this should not change focus
 		//if (!HasFocus) {
 		//	SetFocus ();
 		//}

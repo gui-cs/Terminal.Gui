@@ -32,7 +32,7 @@ public partial class View {
 
 	void TextFormatter_HotKeyChanged (object sender, KeyChangedEventArgs e)
 	{
-		_hotKey = e.NewKey;
+		HotKey = e.NewKey;
 		HotKeyChanged?.Invoke (this, e);
 	}
 
