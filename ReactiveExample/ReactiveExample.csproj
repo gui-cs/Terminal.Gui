@@ -11,8 +11,8 @@
     <InformationalVersion>2.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ReactiveUI.Fody" Version="19.5.31" />
-    <PackageReference Include="ReactiveUI" Version="19.5.31" />
+    <PackageReference Include="ReactiveUI.Fody" Version="19.5.39" />
+    <PackageReference Include="ReactiveUI" Version="19.5.39" />
     <PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator" Version="1.3.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
