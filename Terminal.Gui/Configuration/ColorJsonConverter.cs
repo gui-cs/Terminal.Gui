@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -35,8 +35,8 @@ namespace Terminal.Gui {
 					// Return the parsed color
 					return new Color(color);
 				}
-				if (Color.TryParse (colorString, out Color parsedColor)) {
-					return parsedColor;
+				if (Color.TryParse (colorString, out Color? parsedColor)) {
+					return parsedColor.Value;
 				}
 				throw new JsonException ($"Unexpected color name: {colorString}.");
 			} else {
