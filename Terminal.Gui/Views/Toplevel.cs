@@ -251,7 +251,7 @@ public partial class Toplevel : View {
 
 	void SetInitialProperties ()
 	{
-		ColorScheme = Colors.TopLevel;
+		ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 		Application.GrabbingMouse += Application_GrabbingMouse;
 		Application.UnGrabbingMouse += Application_UnGrabbingMouse;
