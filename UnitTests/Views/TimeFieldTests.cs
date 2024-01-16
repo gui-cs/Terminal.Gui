@@ -19,13 +19,13 @@ public class TimeFieldTests {
 		Assert.Equal (1, tf.CursorPosition);
 		Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
 
-		tf = new TimeField (1, 2, time);
+		tf = new TimeField (time) { X = 1, Y = 2 };
 		Assert.False (tf.IsShortFormat);
 		Assert.Equal (time, tf.Time);
 		Assert.Equal (1, tf.CursorPosition);
 		Assert.Equal (new Rect (1, 2, 10, 1), tf.Frame);
 
-		tf = new TimeField (3, 4, time, true);
+		tf = new TimeField (time, true) { X = 3, Y = 4 };
 		Assert.True (tf.IsShortFormat);
 		Assert.Equal (time, tf.Time);
 		Assert.Equal (1, tf.CursorPosition);

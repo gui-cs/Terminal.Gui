@@ -43,11 +43,9 @@ public class TimeField : TextField {
 	/// <summary>
 	///    Initializes a new instance of <see cref="TimeField"/> using <see cref="LayoutStyle.Absolute"/> positioning.
 	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
 	/// <param name="time">Initial time.</param>
 	/// <param name="isShort">If true, the seconds are hidden. Sets the <see cref="IsShortFormat"/> property.</param>
-	public TimeField (int x, int y, TimeSpan time, bool isShort = false) : base (x, y, isShort ? 7 : 10, "")
+	public TimeField (TimeSpan time, bool isShort = false) : base (string.Empty)
 	{
 		SetInitialProperties (time, isShort);
 	}
@@ -58,7 +56,6 @@ public class TimeField : TextField {
 	/// <param name="time">Initial time</param>
 	public TimeField (TimeSpan time) : base (string.Empty)
 	{
-		Width = _fieldLen + 2;
 		SetInitialProperties (time);
 	}
 
@@ -74,6 +71,7 @@ public class TimeField : TextField {
 		_longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
 		_shortFormat = $" hh\\{_sepChar}mm";
 		this._isShort = isShort;
+		Width = _fieldLen + 2;
 		Time = time;
 		CursorPosition = 1;
 		TextChanging += TextField_TextChanging;
