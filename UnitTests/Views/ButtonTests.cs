@@ -11,13 +11,13 @@ namespace Terminal.Gui.ViewsTests {
 			this.output = output;
 		}
 
-		[Fact, AutoInitShutdown]
+		[Fact, SetupFakeDriver]
 		public void Constructors_Defaults ()
 		{
 			var btn = new Button ();
 			Assert.Equal (string.Empty, btn.Text);
-			Application.Top.Add (btn);
-			var rs = Application.Begin (Application.Top);
+			btn.BeginInit ();
+			btn.EndInit ();
 
 			Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
 			Assert.False (btn.IsDefault);
@@ -30,42 +30,50 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (string.Empty, btn.Title);
 			Assert.Equal (KeyCode.Null, btn.HotKey);
 
+			btn.Draw ();
+			
 			var expected = @$"
 {CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
 ";
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-			Application.End (rs);
 
-			btn = new Button ("ARGS", true) { Text = "Test" };
-			Assert.Equal ("Test", btn.Text);
-			Application.Top.Add (btn);
-			rs = Application.Begin (Application.Top);
+			btn = new Button ("ARGS", true) { Text = "_Test" };
+			btn.BeginInit ();
+			btn.EndInit ();
+			Assert.Equal ('_', btn.HotKeySpecifier.Value);
+			Assert.Equal (Key.T, btn.HotKey);
+			Assert.Equal ("_Test", btn.Text);
 
-			Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Format());
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
-			Assert.Equal ('_', btn.HotKeySpecifier.Value);
 			Assert.True (btn.CanFocus);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
 			Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
 			Assert.Equal (KeyCode.T, btn.HotKey);
-			Application.End (rs);
 
-			btn = new Button (3, 4, "Test", true);
-			Assert.Equal ("Test", btn.Text);
-			Application.Top.Add (btn);
-			rs = Application.Begin (Application.Top);
+			btn = new Button (1, 2, "_abc", true);
+			btn.BeginInit ();
+			btn.EndInit ();
+			Assert.Equal ("_abc", btn.Text);
+			Assert.Equal (Key.A, btn.HotKey);
 
-			Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+			Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Format ());
 			Assert.True (btn.IsDefault);
 			Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 			Assert.Equal ('_', btn.HotKeySpecifier.Value);
 			Assert.True (btn.CanFocus);
-			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
-			Assert.Equal (new Rect (3, 4, 10, 1), btn.Frame);
-			Assert.Equal (KeyCode.T, btn.HotKey);
 
-			Application.End (rs);
+			Application.Driver.ClearContents ();
+			btn.Draw ();
+
+			expected = @$"
+ {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}
+";
+			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+
+			Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
+			Assert.Equal (new Rect (1, 2, 10, 1), btn.Frame);
 		}
 
 		[Fact]
@@ -136,7 +144,7 @@ namespace Terminal.Gui.ViewsTests {
 		public void HotKeyChange_Works ()
 		{
 			var clicked = false;
-			Button btn = new Button ("Test");
+			Button btn = new Button ("_Test");
 			btn.Clicked += (s, e) => clicked = true;
 			Application.Top.Add (btn);
 			Application.Begin (Application.Top);
@@ -224,12 +232,12 @@ namespace Terminal.Gui.ViewsTests {
 		public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
 		{
 			var super = new View ();
-			var btn = new Button ("Test");
+			var btn = new Button ("_Test");
 			super.Add (btn);
 			super.BeginInit ();
 			super.EndInit ();
 
-			Assert.Equal ("Test", btn.Text);
+			Assert.Equal ("_Test", btn.Text);
 			Assert.Equal (KeyCode.T, btn.HotKey);
 
 			btn.Text = string.Empty;
@@ -629,7 +637,7 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void Button_HotKeyChanged_EventFires ()
 		{
-			var btn = new Button ("Yar");
+			var btn = new Button ("_Yar");
 
 			object sender = null;
 			KeyChangedEventArgs args = null;
