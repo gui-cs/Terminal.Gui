@@ -48,15 +48,6 @@ public class TextField : View {
 	public TextField (string text) : base (text) => SetInitialProperties (text, text.GetRuneCount () + 1);
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="TextField"/> class using <see cref="LayoutStyle.Absolute"/> positioning.
-	/// </summary>
-	/// <param name="x">The x coordinate.</param>
-	/// <param name="y">The y coordinate.</param>
-	/// <param name="w">The width.</param>
-	/// <param name="text">Initial text contents.</param>
-	public TextField (int x, int y, int w, string text) : base (new Rect (x, y, w, 1)) => SetInitialProperties (text, w);
-
-	/// <summary>
 	/// Gets or sets the text to render in control when no value has
 	/// been entered yet and the <see cref="View"/> does not yet have
 	/// input focus.

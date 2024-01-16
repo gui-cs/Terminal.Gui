@@ -16,7 +16,9 @@ public class Buttons : Scenario {
 		};
 		Win.Add (editLabel);
 		// Add a TextField using Absolute layout. 
-		var edit = new TextField (31, 0, 15, "") {
+		var edit = new TextField ("") {
+			X = 31,
+			Width = 15,
 			HotKey = Key.Y.WithAlt,
 		};
 		Win.Add (edit);

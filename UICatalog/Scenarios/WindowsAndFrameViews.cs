@@ -163,7 +163,7 @@ public class WindowsAndFrameViews : Scenario {
 			ColorScheme = Colors.Base,
 			Text = "The Text in the FrameView",
 		};
-		subFrameViewofFV.Add (new TextField (0, 0, 15, "Edit Me"));
+		subFrameViewofFV.Add (new TextField ("Edit Me") { Width = 15 });
 
 		subFrameViewofFV.Add (new CheckBox ("Check me") { Y = 1 });
 		// BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 

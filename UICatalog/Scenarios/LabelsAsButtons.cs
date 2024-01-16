@@ -15,7 +15,7 @@ public class LabelsAsLabels : Scenario {
 		};
 		Win.Add (editLabel);
 		// Add a TextField using Absolute layout. 
-		var edit = new TextField (31, 0, 15, "");
+		var edit = new TextField ("") { X = 31, Width = 15 };
 		Win.Add (edit);
 
 		// This is the default Label (IsDefault = true); if user presses ENTER in the TextField

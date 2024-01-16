@@ -73,7 +73,7 @@ public class Threading : Scenario {
 			ColorScheme = Colors.TopLevel
 		};
 
-		var text = new TextField (1, 3, 100, "Type anything after press the button");
+		var text = new TextField ("Type anything after press the button") { X = 1, Y = 3, Width = 100 };
 
 		var _btnAction = new Button ("Load Data Action") { X = 80, Y = 10 };
 		_btnAction.Clicked += (s, e) => _action.Invoke ();
