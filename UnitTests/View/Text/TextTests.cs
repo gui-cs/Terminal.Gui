@@ -423,7 +423,7 @@ public class TextTests {
 	[AutoInitShutdown]
 	public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 	{
-		var win = new Window (new Rect (0, 0, 30, 80));
+		var win = new Window () { Width = 30, Height = 80 };
 		var label = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill () };
 		win.Add (label);
 		Application.Top.Add (win);

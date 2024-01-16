@@ -1953,7 +1953,7 @@ Y
 	[AutoInitShutdown]
 	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
 	{
-		var win = new Window (new Rect (0, 0, 30, 50));
+		var win = new Window () { Width = 30, Height = 50 };
 		var label = new Label { Width = Dim.Fill () };
 		win.Add (label);
 		Application.Top.Add (win);
@@ -2002,7 +2002,7 @@ Y
 	[AutoInitShutdown]
 	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_With_Initialization ()
 	{
-		var win = new Window (new Rect (0, 0, 30, 80));
+		var win = new Window () { Width = 30, Height = 80 };
 		var label = new Label { Width = Dim.Fill () };
 		win.Add (label);
 		Application.Top.Add (win);

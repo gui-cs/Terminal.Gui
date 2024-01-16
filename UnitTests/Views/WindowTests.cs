@@ -18,12 +18,12 @@ public class WindowTests {
 		Assert.Equal (string.Empty, r.Title);
 		// Toplevels have Width/Height set to Dim.Fill
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
-		// If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
-		Assert.Equal ("Window()(0,0,2147483647,2147483647)", r.ToString ());
+		// If there's no SuperView, Top, or Driver, the default Fill width is 0
+		Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
-		Assert.Equal (new Rect (0, 0, 2147483645, 2147483645), r.Bounds);
-		Assert.Equal (new Rect (0, 0, 2147483647, 2147483647), r.Frame);
+		Assert.Equal (new Rect (0, 0, 0, 0), r.Bounds);
+		Assert.Equal (new Rect (0, 0, 0, 0), r.Frame);
 		Assert.Null (r.Focused);
 		Assert.NotNull (r.ColorScheme);
 		Assert.Equal (0, r.X);
@@ -39,10 +39,8 @@ public class WindowTests {
 		Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 		// Empty Rect
-		r = new Window (Rect.Empty) { Title = "title" };
+		r = new Window () { Title = "title", Frame = Rect.Empty };
 		Assert.NotNull (r);
-		Assert.Equal ("title", r.Title);
-		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("title", r.Title);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
@@ -65,7 +63,7 @@ public class WindowTests {
 		Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 		// Rect with values
-		r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
+		r = new Window () { X = 1, Y = 2, Width = 3, Height = 4, Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);

@@ -273,7 +273,7 @@ public class DimTests {
 	{
 		var t = new View ("top") { Width = 80, Height = 25 };
 
-		var w = new Window (new Rect (1, 2, 4, 5)) { Title = "w" };
+		var w = new Window () { X = 1, Y = 2, Width = 4, Height = 5, Title = "w" };
 		t.Add (w);
 		t.LayoutSubviews ();
 

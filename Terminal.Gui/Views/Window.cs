@@ -20,12 +20,6 @@ public class Window : Toplevel {
 	/// </summary>
 	public Window () => SetInitialProperties ();
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Window"/> class using
-	/// <see cref="LayoutStyle.Computed"/> positioning.
-	/// </summary>
-	public Window (Rect frame) : base (frame) => SetInitialProperties ();
-
 	// TODO: enable this
 	///// <summary>
 	///// The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is <see cref="LineStyle.Single"/>.

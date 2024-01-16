@@ -485,7 +485,7 @@ public class PosTests {
 
 		var t = Application.Top;
 
-		var w = new Window (new Rect (1, 2, 4, 5));
+		var w = new Window () { X = 1, Y = 2, Width = 3, Height = 5 };
 		t.Add (w);
 
 		t.Ready += (s, e) => {

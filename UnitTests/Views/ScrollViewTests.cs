@@ -620,7 +620,7 @@ public class ScrollViewTests {
 			ShowVerticalScrollIndicator = true
 		};
 		scrollView.Add (view);
-		var win = new Window (new Rect (1, 1, 20, 14));
+		var win = new Window () { X = 1, Y = 1, Width = 20, Height = 14 };
 		win.Add (scrollView);
 		Application.Top.Add (win);
 		Application.Begin (Application.Top);
