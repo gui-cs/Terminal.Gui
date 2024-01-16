@@ -286,6 +286,29 @@ public readonly struct Color : IEquatable<Color> {
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the <see cref="Color"/> class with an encoded 24-bit color value.
+	/// </summary>
+	/// <param name="rgba">The encoded 24-bit color value (see <see cref="Rgba"/>).</param>
+	public Color (uint rgba)
+	{
+		unsafe {
+			ReadOnlySpan<byte> argbSpan = new ReadOnlySpan<byte> ( &rgba, 4 );
+			if ( BitConverter.IsLittleEndian ) {
+				A = argbSpan [ 3 ];
+				R = argbSpan [ 2 ];
+				G = argbSpan [ 1 ];
+				B = argbSpan [ 0 ];
+			}
+			else {
+				A = argbSpan [ 0 ];
+				R = argbSpan [ 1 ];
+				G = argbSpan [ 2 ];
+				B = argbSpan [ 3 ];
+			}
+		}
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color value.
 	/// </summary>
 	/// <param name="colorName">The 16-color value.</param>
