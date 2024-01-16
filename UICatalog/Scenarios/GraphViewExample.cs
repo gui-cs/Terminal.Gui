@@ -18,6 +18,7 @@ public class GraphViewExample : Scenario {
 	GraphView _graphView;
 	MenuItem _miDiags;
 	MenuItem _miShowBorder;
+	Thickness _thickness = new Thickness (1, 1, 1, 1);
 
 	public override void Setup ()
 	{
@@ -60,21 +61,23 @@ public class GraphViewExample : Scenario {
 					CheckType = MenuItemCheckStyle.Checked
 				},
 				_miDiags = new MenuItem ("Dri_ver Diagnostics", "", () => EnableDiagnostics ()) {
-					Checked = false,
+					Checked = ConsoleDriver.Diagnostics == (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler),
 					CheckType = MenuItemCheckStyle.Checked
 				}
 			})
-
 		});
 		Application.Top.Add (menu);
 
 		_graphView = new GraphView {
 			X = 0,
 			Y = 0,
-			Width = 60,
+			Width = Dim.Percent (70),
 			Height = Dim.Fill (),
 			BorderStyle = LineStyle.Single
 		};
+		_graphView.Border.Thickness = _thickness;
+		_graphView.Margin.Thickness = _thickness;
+		_graphView.Padding.Thickness = _thickness;
 
 		Win.Add (_graphView);
 
@@ -105,9 +108,9 @@ public class GraphViewExample : Scenario {
 
 		if (_miShowBorder.Checked == true) {
 			_graphView.BorderStyle = LineStyle.Single;
-			_graphView.Border.Thickness = new Thickness (1, 3, 1, 1);
-			_graphView.Margin.Thickness = new Thickness (2, 2, 2, 2);
-			_graphView.Padding.Thickness = new Thickness (2, 2, 2, 2);
+			_graphView.Border.Thickness = _thickness;
+			_graphView.Margin.Thickness = _thickness;
+			_graphView.Padding.Thickness = _thickness;
 		} else {
 			_graphView.BorderStyle = LineStyle.None;
 			_graphView.Margin.Thickness = Thickness.Empty;
