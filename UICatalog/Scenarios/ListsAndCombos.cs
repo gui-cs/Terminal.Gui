@@ -109,17 +109,19 @@ namespace UICatalog.Scenarios {
 				scrollBarCbx.Refresh ();
 			};
 
-			var btnMoveUp = new Button ("Move _Up") {
+			var btnMoveUp = new Button {
 				X = 1,
 				Y = Pos.Bottom(lbListView),
+				Text = "Move _Up"
 			};
 			btnMoveUp.Clicked += (s,e) => {
 				listview.MoveUp ();
 			};
 
-			var btnMoveDown = new Button ("Move _Down") {
+			var btnMoveDown = new Button {
 				X = Pos.Right (btnMoveUp) + 1,
 				Y = Pos.Bottom (lbListView),
+				Text = "Move _Down"
 			};
 			btnMoveDown.Clicked += (s,e) => {
 				listview.MoveDown ();

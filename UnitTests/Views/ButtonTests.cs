@@ -41,7 +41,7 @@ public class ButtonTests {
 ";
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-		btn = new Button ("ARGS", true) { Text = "_Test" };
+		btn = new Button { Text = "_Test", IsDefault = true };
 		btn.BeginInit ();
 		btn.EndInit ();
 		Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -85,7 +85,7 @@ public class ButtonTests {
 	public void KeyBindings_Command ()
 	{
 		var clicked = false;
-		var btn = new Button ("_Test");
+		var btn = new Button { Text = "_Test" };
 		btn.Clicked += (s, e) => clicked = true;
 		Application.Top.Add (btn);
 		Application.Begin (Application.Top);
@@ -151,7 +151,7 @@ public class ButtonTests {
 	public void HotKeyChange_Works ()
 	{
 		var clicked = false;
-		var btn = new Button ("_Test");
+		var btn = new Button { Text = "_Test" };
 		btn.Clicked += (s, e) => clicked = true;
 		Application.Top.Add (btn);
 		Application.Begin (Application.Top);
@@ -179,7 +179,7 @@ public class ButtonTests {
 	public void KeyBindingExample ()
 	{
 		var pressed = 0;
-		var btn = new Button ("Press Me");
+		var btn = new Button { Text = "Press Me" };
 
 		btn.Clicked += (s, e) => pressed++;
 
@@ -241,7 +241,7 @@ public class ButtonTests {
 	public void Setting_Empty_Text_Sets_HoKey_To_KeyNull ()
 	{
 		var super = new View ();
-		var btn = new Button ("_Test");
+		var btn = new Button { Text = "_Test" };
 		super.Add (btn);
 		super.BeginInit ();
 		super.EndInit ();
@@ -264,9 +264,10 @@ public class ButtonTests {
 	[Fact, AutoInitShutdown]
 	public void Update_Only_On_Or_After_Initialize ()
 	{
-		var btn = new Button ("Say Hello 你") {
+		var btn = new Button {
 			X = Pos.Center (),
-			Y = Pos.Center ()
+			Y = Pos.Center (),
+			Text = "Say Hello 你"
 		};
 		var win = new Window {
 			Width = Dim.Fill (),
@@ -497,33 +498,36 @@ public class ButtonTests {
 		};
 		tab.Add (txtToFind);
 
-		var btnFindNext = new Button ("Find _Next") {
+		var btnFindNext = new Button {
 			X = Pos.Right (txtToFind) + 1,
 			Y = Pos.Top (label),
 			Width = 20,
 			Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 			TextAlignment = TextAlignment.Centered,
 			IsDefault = true,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Find _Next"
 		};
 		tab.Add (btnFindNext);
 
-		var btnFindPrevious = new Button ("Find _Previous") {
+		var btnFindPrevious = new Button {
 			X = Pos.Right (txtToFind) + 1,
 			Y = Pos.Top (btnFindNext) + 1,
 			Width = 20,
 			Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 			TextAlignment = TextAlignment.Centered,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Find _Previous"
 		};
 		tab.Add (btnFindPrevious);
 
-		var btnCancel = new Button ("Cancel") {
+		var btnCancel = new Button {
 			X = Pos.Right (txtToFind) + 1,
 			Y = Pos.Top (btnFindPrevious) + 2,
 			Width = 20,
 			TextAlignment = TextAlignment.Centered,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Cancel"
 		};
 		tab.Add (btnCancel);
 
@@ -598,10 +602,11 @@ public class ButtonTests {
 	[Fact] [AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_True ()
 	{
-		var button = new Button ("Process keys") {
+		var button = new Button {
 			X = Pos.Center (),
 			Y = Pos.Center (),
-			IsDefault = true
+			IsDefault = true,
+			Text = "Process keys"
 		};
 		var win = new Window {
 			Width = Dim.Fill (),
@@ -630,12 +635,13 @@ public class ButtonTests {
 	[Fact] [AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
-		var button = new Button ("Process keys") {
+		var button = new Button {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Width = 20,
 			IsDefault = true,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Process keys"
 		};
 		var win = new Window {
 			Width = Dim.Fill (),
@@ -662,7 +668,7 @@ public class ButtonTests {
 	[Fact] [AutoInitShutdown]
 	public void Button_HotKeyChanged_EventFires ()
 	{
-		var btn = new Button ("_Yar");
+		var btn = new Button { Text = "_Yar" };
 
 		object sender = null;
 		KeyChangedEventArgs args = null;
@@ -670,11 +676,11 @@ public class ButtonTests {
 		btn.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
+		};
+
 		btn.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
-
-		};
 		};
 
 		btn.HotKey = KeyCode.R;

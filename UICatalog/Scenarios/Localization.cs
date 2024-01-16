@@ -85,16 +85,18 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (_allowAnyCheckBox);
 
-			var openDialogButton = new Button ("Open") {
+			var openDialogButton = new Button {
 				X = Pos.Right (_allowAnyCheckBox) + 1,
-				Y = Pos.Bottom (textAndFileDialogLabel) + 1
+				Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+				Text = "Open"
 			};
 			openDialogButton.Clicked += (sender, e) => ShowFileDialog (false);
 			Win.Add (openDialogButton);
 
-			var saveDialogButton = new Button ("Save") {
+			var saveDialogButton = new Button {
 				X = Pos.Right (openDialogButton) + 1,
-				Y = Pos.Bottom (textAndFileDialogLabel) + 1
+				Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+				Text = "Save"
 			};
 			saveDialogButton.Clicked += (sender, e) => ShowFileDialog (true);
 			Win.Add (saveDialogButton);
@@ -107,9 +109,10 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (wizardLabel);
 
-			var wizardButton = new Button ("Open _wizard") {
+			var wizardButton = new Button {
 				X = 2,
-				Y = Pos.Bottom (wizardLabel) + 1
+				Y = Pos.Bottom (wizardLabel) + 1,
+				Text = "Open _wizard"
 			};
 			wizardButton.Clicked += (sender, e) => ShowWizard ();
 			Win.Add (wizardButton);

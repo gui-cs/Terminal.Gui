@@ -77,10 +77,10 @@ public class Wizard : Dialog {
 		Add (separator);
 
 		// BUGBUG: Space is to work around https://github.com/gui-cs/Terminal.Gui/issues/1812
-		backBtn = new Button (Strings.wzBack) { AutoSize = true };
+		backBtn = new Button () { AutoSize = true, Text = Strings.wzBack };
 		AddButton (backBtn);
 
-		nextfinishBtn = new Button (Strings.wzFinish) { AutoSize = true };
+		nextfinishBtn = new Button () { AutoSize = true, Text = Strings.wzFinish };
 		nextfinishBtn.IsDefault = true;
 		AddButton (nextfinishBtn);
 

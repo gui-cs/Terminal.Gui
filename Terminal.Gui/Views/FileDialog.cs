@@ -83,10 +83,11 @@ public class FileDialog : Dialog {
 		this.fileSystem = fileSystem;
 		Style = new FileDialogStyle (fileSystem);
 
-		btnOk = new Button (Style.OkButtonText) {
+		btnOk = new Button () {
 			Y = Pos.AnchorEnd (1),
 			X = Pos.Function (CalculateOkButtonPosX),
-			IsDefault = true
+			IsDefault = true,
+			Text = Style.OkButtonText
 		};
 		btnOk.Clicked += (s, e) => Accept (true);
 		btnOk.KeyDown += (s, k) => {
@@ -94,9 +95,10 @@ public class FileDialog : Dialog {
 			NavigateIf (k, KeyCode.CursorUp, tableView);
 		};
 
-		btnCancel = new Button (Strings.btnCancel) {
+		btnCancel = new Button () {
 			Y = Pos.AnchorEnd (1),
-			X = Pos.Right (btnOk) + 1
+			X = Pos.Right (btnOk) + 1,
+			Text = Strings.btnCancel
 		};
 		btnCancel.KeyDown += (s, k) => {
 			NavigateIf (k, KeyCode.CursorLeft, btnToggleSplitterCollapse);
@@ -205,8 +207,9 @@ public class FileDialog : Dialog {
 		splitContainer.Tiles.ElementAt (0).ContentView.Add (treeView);
 		splitContainer.Tiles.ElementAt (1).ContentView.Add (tableView);
 
-		btnToggleSplitterCollapse = new Button (GetToggleSplitterText (false)) {
-			Y = Pos.AnchorEnd (1)
+		btnToggleSplitterCollapse = new Button () {
+			Y = Pos.AnchorEnd (1),
+			Text = GetToggleSplitterText (false)
 		};
 		btnToggleSplitterCollapse.Clicked += (s, e) => {
 			var tile = splitContainer.Tiles.ElementAt (0);

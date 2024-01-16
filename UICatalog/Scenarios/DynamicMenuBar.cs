@@ -99,43 +99,50 @@ namespace UICatalog.Scenarios {
 					Height = Dim.Fill ()
 				};
 
-				var _btnAddMenuBar = new Button ("Add a MenuBar") {
+				var _btnAddMenuBar = new Button {
 					Y = 1,
+					Text = "Add a MenuBar"
 				};
 				_frmMenu.Add (_btnAddMenuBar);
 
-				var _btnMenuBarUp = new Button ("^") {
-					X = Pos.Center ()
+				var _btnMenuBarUp = new Button {
+					X = Pos.Center (),
+					Text = "^"
 				};
 				_frmMenu.Add (_btnMenuBarUp);
 
-				var _btnMenuBarDown = new Button ("v") {
+				var _btnMenuBarDown = new Button {
 					X = Pos.Center (),
-					Y = Pos.Bottom (_btnMenuBarUp)
+					Y = Pos.Bottom (_btnMenuBarUp),
+					Text = "v"
 				};
 				_frmMenu.Add (_btnMenuBarDown);
 
-				var _btnRemoveMenuBar = new Button ("Remove a MenuBar") {
-					Y = 1
+				var _btnRemoveMenuBar = new Button {
+					Y = 1,
+					Text = "Remove a MenuBar"
 				};
 				_btnRemoveMenuBar.X = Pos.AnchorEnd () - (Pos.Right (_btnRemoveMenuBar) - Pos.Left (_btnRemoveMenuBar));
 				_frmMenu.Add (_btnRemoveMenuBar);
 
-				var _btnPrevious = new Button ("<") {
+				var _btnPrevious = new Button {
 					X = Pos.Left (_btnAddMenuBar),
-					Y = Pos.Top (_btnAddMenuBar) + 2
+					Y = Pos.Top (_btnAddMenuBar) + 2,
+					Text = "<"
 				};
 				_frmMenu.Add (_btnPrevious);
 
-				var _btnAdd = new Button (" Add  ") {
+				var _btnAdd = new Button {
 					Y = Pos.Top (_btnPrevious) + 2,
+					Text = " Add  "
 				};
 				_btnAdd.X = Pos.AnchorEnd () - (Pos.Right (_btnAdd) - Pos.Left (_btnAdd));
 				_frmMenu.Add (_btnAdd);
 
-				var _btnNext = new Button (">") {
+				var _btnNext = new Button {
 					X = Pos.X (_btnAdd),
 					Y = Pos.Top (_btnPrevious),
+					Text = ">"
 				};
 				_frmMenu.Add (_btnNext);
 
@@ -159,9 +166,10 @@ namespace UICatalog.Scenarios {
 				};
 				_frmMenu.Add (_lblParent);
 
-				var _btnPreviowsParent = new Button ("..") {
+				var _btnPreviowsParent = new Button {
 					X = Pos.Left (_btnAddMenuBar),
-					Y = Pos.Top (_btnPrevious) + 1
+					Y = Pos.Top (_btnPrevious) + 1,
+					Text = ".."
 				};
 				_frmMenu.Add (_btnPreviowsParent);
 
@@ -179,21 +187,24 @@ namespace UICatalog.Scenarios {
 				_btnNext.TabIndex = _lstMenus.TabIndex + 1;
 				_btnAdd.TabIndex = _btnNext.TabIndex + 1;
 
-				var _btnRemove = new Button ("Remove") {
+				var _btnRemove = new Button {
 					X = Pos.Left (_btnAdd),
-					Y = Pos.Top (_btnAdd) + 1
+					Y = Pos.Top (_btnAdd) + 1,
+					Text = "Remove"
 				};
 				_frmMenu.Add (_btnRemove);
 
-				var _btnUp = new Button ("^") {
+				var _btnUp = new Button {
 					X = Pos.Right (_lstMenus) + 2,
-					Y = Pos.Top (_btnRemove) + 2
+					Y = Pos.Top (_btnRemove) + 2,
+					Text = "^"
 				};
 				_frmMenu.Add (_btnUp);
 
-				var _btnDown = new Button ("v") {
+				var _btnDown = new Button {
 					X = Pos.Right (_lstMenus) + 2,
-					Y = Pos.Top (_btnUp) + 1
+					Y = Pos.Top (_btnUp) + 1,
+					Text = "v"
 				};
 				_frmMenu.Add (_btnDown);
 
@@ -284,15 +295,17 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				var _btnOk = new Button ("Ok") {
+				var _btnOk = new Button {
 					X = Pos.Right (_frmMenu) + 20,
 					Y = Pos.Bottom (_frmMenuDetails),
+					Text = "Ok"
 				};
 				Add (_btnOk);
 
-				var _btnCancel = new Button ("Cancel") {
+				var _btnCancel = new Button {
 					X = Pos.Right (_btnOk) + 3,
 					Y = Pos.Top (_btnOk),
+					Text = "Cancel"
 				};
 				_btnCancel.Clicked += (s, e) => {
 					SetFrameDetails (_currentEditMenuBarItem);
@@ -770,9 +783,10 @@ namespace UICatalog.Scenarios {
 				};
 				Add (_txtShortcut);
 
-				var _btnShortcut = new Button ("Clear Shortcut") {
+				var _btnShortcut = new Button {
 					X = Pos.X (_lblShortcut),
-					Y = Pos.Bottom (_txtShortcut) + 1
+					Y = Pos.Bottom (_txtShortcut) + 1,
+					Text = "Clear Shortcut"
 				};
 				_btnShortcut.Clicked += (s, e) => {
 					_txtShortcut.Text = "";
@@ -854,8 +868,9 @@ namespace UICatalog.Scenarios {
 					EditMenuBarItem (_menuItem);
 				}
 
-				var _btnOk = new Button ("Ok") {
+				var _btnOk = new Button {
 					IsDefault = true,
+					Text = "Ok"
 				};
 				_btnOk.Clicked += (s, e) => {
 					if (string.IsNullOrEmpty (_txtTitle.Text)) {
@@ -865,7 +880,7 @@ namespace UICatalog.Scenarios {
 						Application.RequestStop ();
 					}
 				};
-				var _btnCancel = new Button ("Cancel");
+				var _btnCancel = new Button { Text = "Cancel" };
 				_btnCancel.Clicked += (s, e) => {
 					_txtTitle.Text = string.Empty;
 					Application.RequestStop ();

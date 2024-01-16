@@ -42,21 +42,30 @@ public class Button : View {
 	/// The width of the <see cref="Button"/> is computed based on the
 	/// text length. The height will always be 1.
 	/// </remarks>
-	public Button () : this (string.Empty, false) { }
+	public Button ()
+	{
+		TextAlignment = TextAlignment.Centered;
+		VerticalTextAlignment = VerticalTextAlignment.Middle;
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.
-	/// </summary>
-	/// <remarks>
-	/// The width of the <see cref="Button"/> is computed based on the
-	/// text length. The height will always be 1.
-	/// </remarks>
-	/// <param name="text">The button's text</param>
-	/// <param name="is_default">
-	/// If <c>true</c>, a special decoration is used, and the user pressing the enter key
-	/// in a <see cref="Dialog"/> will implicitly activate this button.
-	/// </param>
-	public Button (string text, bool is_default = false) : base (text) => SetInitialProperties (text, is_default);
+		HotKeySpecifier = new Rune ('_');
+
+		_leftBracket = Glyphs.LeftBracket;
+		_rightBracket = Glyphs.RightBracket;
+		_leftDefault = Glyphs.LeftDefaultIndicator;
+		_rightDefault = Glyphs.RightDefaultIndicator;
+
+		CanFocus = true;
+		AutoSize = true;
+
+		// Override default behavior of View
+		// Command.Default sets focus
+		AddCommand (Command.Accept, () => {
+			OnClicked ();
+			return true;
+		});
+		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
+		KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
+	}
 
 	/// <summary>
 	/// Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.
@@ -81,39 +90,6 @@ public class Button : View {
 	/// </summary>
 	public bool NoPadding { get; set; }
 
-	// TODO: v2 - Remove constructors with parameters
-	/// <summary>
-	/// Private helper to set the initial properties of the View that were provided via constructors.
-	/// </summary>
-	/// <param name="text"></param>
-	/// <param name="is_default"></param>
-	void SetInitialProperties (string text, bool is_default)
-	{
-		TextAlignment = TextAlignment.Centered;
-		VerticalTextAlignment = VerticalTextAlignment.Middle;
-
-		HotKeySpecifier = new Rune ('_');
-
-		_leftBracket = Glyphs.LeftBracket;
-		_rightBracket = Glyphs.RightBracket;
-		_leftDefault = Glyphs.LeftDefaultIndicator;
-		_rightDefault = Glyphs.RightDefaultIndicator;
-
-		CanFocus = true;
-		AutoSize = true;
-		_isDefault = is_default;
-		Text = text ?? string.Empty;
-
-		// Override default behavior of View
-		// Command.Default sets focus
-		AddCommand (Command.Accept, () => {
-			OnClicked ();
-			return true;
-		});
-		KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
-		KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
-	}
-
 	/// <inheritdoc/>
 	protected override void UpdateTextFormatterText ()
 	{
@@ -129,7 +105,6 @@ public class Button : View {
 			}
 		}
 	}
-
 
 	/// <summary>
 	/// Virtual method to invoke the <see cref="Clicked"/> event.

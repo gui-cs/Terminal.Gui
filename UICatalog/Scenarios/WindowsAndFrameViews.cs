@@ -36,17 +36,19 @@ public class WindowsAndFrameViews : Scenario {
 		Win.Padding.Thickness = new Thickness (padding);
 		Win.Margin.Thickness = new Thickness (margin);
 
-		var paddingButton = new Button ($"Padding of container is {padding}") {
+		var paddingButton = new Button () {
 			X = Pos.Center (),
 			Y = 0,
 			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = $"Padding of container is {padding}"
 		};
 		paddingButton.Clicked += (s, e) => About ();
 		Win.Add (paddingButton);
-		Win.Add (new Button ("Press ME! (Y = Pos.AnchorEnd(1))") {
+		Win.Add (new Button () {
 			X = Pos.Center (),
 			Y = Pos.AnchorEnd (1),
-			ColorScheme = Colors.ColorSchemes ["Error"]
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = "Press ME! (Y = Pos.AnchorEnd(1))"
 		});
 		Application.Top.Add (Win);
 
@@ -72,10 +74,11 @@ public class WindowsAndFrameViews : Scenario {
 			win.Padding.Thickness = new Thickness (pad);
 
 			win.ColorScheme = Colors.ColorSchemes ["Dialog"];
-			var pressMeButton = new Button ("Press me! (Y = 0)") {
+			var pressMeButton = new Button () {
 				X = Pos.Center (),
 				Y = 0,
 				ColorScheme = Colors.ColorSchemes ["Error"],
+				Text = "Press me! (Y = 0)"
 			};
 			pressMeButton.Clicked += (s, e) =>
 			    MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");

@@ -348,52 +348,58 @@ public class DimTests {
 			Height = 5
 		};
 
-		var v1 = new Button ("v1") {
+		var v1 = new Button {
 			AutoSize = false,
 			X = Pos.X (f1) + 2,
 			Y = Pos.Bottom (f1) + 2,
 			Width = Dim.Width (f1) - 2,
 			Height = Dim.Fill () - 2,
-			ValidatePosDim = true
+			ValidatePosDim = true,
+			Text = "v1"
 		};
 
-		var v2 = new Button ("v2") {
+		var v2 = new Button {
 			AutoSize = false,
 			X = Pos.X (f2) + 2,
 			Y = Pos.Bottom (f2) + 2,
 			Width = Dim.Width (f2) - 2,
 			Height = Dim.Fill () - 2,
-			ValidatePosDim = true
+			ValidatePosDim = true,
+			Text = "v2"
 		};
 
-		var v3 = new Button ("v3") {
+		var v3 = new Button {
 			AutoSize = false,
 			Width = Dim.Percent (10),
 			Height = Dim.Percent (10),
-			ValidatePosDim = true
+			ValidatePosDim = true,
+			Text = "v3"
 		};
 
-		var v4 = new Button ("v4") {
+		var v4 = new Button {
 			AutoSize = false,
 			Width = Dim.Sized (50),
 			Height = Dim.Sized (50),
-			ValidatePosDim = true
+			ValidatePosDim = true,
+			Text = "v4"
 		};
 
-		var v5 = new Button ("v5") {
+		var v5 = new Button {
 			AutoSize = false,
 			Width = Dim.Width (v1) - Dim.Width (v3),
 			Height = Dim.Height (v1) - Dim.Height (v3),
-			ValidatePosDim = true
+			ValidatePosDim = true,
+			Text = "v5"
 		};
 
-		var v6 = new Button ("v6") {
+		var v6 = new Button {
 			AutoSize = false,
 			X = Pos.X (f2),
 			Y = Pos.Bottom (f2) + 2,
 			Width = Dim.Percent (20, true),
 			Height = Dim.Percent (20, true),
-			ValidatePosDim = true
+			ValidatePosDim = true,
+			Text = "v6"
 		};
 
 		w.Add (f1, f2, v1, v2, v3, v4, v5, v6);

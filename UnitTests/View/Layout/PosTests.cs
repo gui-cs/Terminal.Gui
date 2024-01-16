@@ -346,8 +346,9 @@ public class PosTests {
 			};
 			Application.Top.Add (win);
 
-			var button = new Button ("button") {
-				X = Pos.Center ()
+			var button = new Button {
+				X = Pos.Center (),
+				Text = "button"
 			};
 			win.Add (button);
 

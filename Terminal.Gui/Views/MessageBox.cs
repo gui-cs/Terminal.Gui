@@ -251,7 +251,7 @@ namespace Terminal.Gui {
 					defaultButton = buttons.Length - 1;
 				}
 				foreach (var s in buttons) {
-					var b = new Button (s);
+					var b = new Button () { Text = s};
 					if (count == defaultButton) {
 						b.IsDefault = true;
 					}

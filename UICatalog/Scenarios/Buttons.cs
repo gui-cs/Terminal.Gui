@@ -24,16 +24,17 @@ public class Buttons : Scenario {
 
 		// This is the default button (IsDefault = true); if user presses ENTER in the TextField
 		// the scenario will quit
-		var defaultButton = new Button ("_Quit") {
+		var defaultButton = new Button {
 			X = Pos.Center (),
 			//TODO: Change to use Pos.AnchorEnd()
 			Y = Pos.Bottom (Win) - 3,
 			IsDefault = true,
+			Text = "_Quit"
 		};
 		defaultButton.Clicked += (s, e) => Application.RequestStop ();
 		Win.Add (defaultButton);
 
-		var swapButton = new Button ("S_wap Default (Absolute Layout)") { X = 50 };
+		var swapButton = new Button { X = 50, Text = "S_wap Default (Absolute Layout)" };
 		swapButton.Clicked += (s, e) => {
 			defaultButton.IsDefault = !defaultButton.IsDefault;
 			swapButton.IsDefault = !swapButton.IsDefault;
@@ -59,11 +60,12 @@ public class Buttons : Scenario {
 		//With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
 		var x = Pos.Right (colorButtonsLabel) + 2;
 		foreach (var colorScheme in Colors.ColorSchemes) {
-			var colorButton = new Button ($"_{colorScheme.Key}") {
+			var colorButton = new Button {
 				ColorScheme = colorScheme.Value,
 				//X = Pos.Right (prev) + 2,
 				X = x,
 				Y = Pos.Y (colorButtonsLabel),
+				Text = $"_{colorScheme.Key}"
 			};
 			DoMessage (colorButton, colorButton.Text);
 			Win.Add (colorButton);
@@ -72,35 +74,40 @@ public class Buttons : Scenario {
 		}
 
 		Button button;
-		Win.Add (button = new Button ("A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
+		Win.Add (button = new Button {
 			X = 2,
 			Y = Pos.Bottom (colorButtonsLabel) + 1,
+			Text = "A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?"
 		});
 		DoMessage (button, button.Text);
 
 		// Note the 'N' in 'Newline' will be the hotkey
-		Win.Add (button = new Button ("a Newline\nin the button") {
+		Win.Add (button = new Button {
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
+			Text = "a Newline\nin the button"
 		});
 		button.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
-		var textChanger = new Button ("Te_xt Changer") {
+		var textChanger = new Button {
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
+			Text = "Te_xt Changer"
 		};
 		Win.Add (textChanger);
 		textChanger.Clicked += (s, e) => textChanger.Text += "!";
 
-		Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
+		Win.Add (button = new Button {
 			X = Pos.Right (textChanger) + 2,
 			Y = Pos.Y (textChanger),
+			Text = "Lets see if this will move as \"Text Changer\" grows"
 		});
 
-		var removeButton = new Button ("Remove this button") {
+		var removeButton = new Button {
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
-			ColorScheme = Colors.ColorSchemes ["Error"]
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = "Remove this button"
 		};
 		Win.Add (removeButton);
 		// This in interesting test case because `moveBtn` and below are laid out relative to this one!
@@ -120,11 +127,12 @@ public class Buttons : Scenario {
 		Win.Add (computedFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtn = new Button ("Move This \u263b Button v_ia Pos") {
+		var moveBtn = new Button {
 			X = 0,
 			Y = Pos.Center () - 1,
 			Width = 30,
 			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = "Move This \u263b Button v_ia Pos"
 		};
 		moveBtn.Clicked += (s, e) => {
 			moveBtn.X = moveBtn.Frame.X + 5;
@@ -134,11 +142,12 @@ public class Buttons : Scenario {
 		computedFrame.Add (moveBtn);
 
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-		var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
+		var sizeBtn = new Button {
 			X = 0,
 			Y = Pos.Center () + 1,
 			Width = 30,
 			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = "Size This \u263a Button _via Pos"
 		};
 		sizeBtn.Clicked += (s, e) => {
 			sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -155,8 +164,9 @@ public class Buttons : Scenario {
 		Win.Add (absoluteFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtnA = new Button ("Move This Button via Frame") {
+		var moveBtnA = new Button {
 			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = "Move This Button via Frame"
 		};
 		moveBtnA.Clicked += (s, e) => {
 			moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
@@ -164,9 +174,10 @@ public class Buttons : Scenario {
 		absoluteFrame.Add (moveBtnA);
 
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-		var sizeBtnA = new Button (" ~  s  gui.cs   master ↑_10 = Сохранить") {
+		var sizeBtnA = new Button {
 			Y = 2,
 			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
 		};
 		sizeBtnA.Clicked += (s, e) => {
 			sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
@@ -213,11 +224,12 @@ public class Buttons : Scenario {
 		}
 
 		var mhkb = "Click to Change th_is Button's Hotkey";
-		var moveHotKeyBtn = new Button (mhkb) {
+		var moveHotKeyBtn = new Button {
 			X = 2,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (computedFrame) - 2,
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Text = mhkb
 		};
 		moveHotKeyBtn.Clicked += (s, e) => {
 			moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
@@ -225,11 +237,12 @@ public class Buttons : Scenario {
 		Win.Add (moveHotKeyBtn);
 
 		var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
-		var moveUnicodeHotKeyBtn = new Button (muhkb) {
+		var moveUnicodeHotKeyBtn = new Button {
 			X = Pos.Left (absoluteFrame) + 1,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Text = muhkb
 		};
 		moveUnicodeHotKeyBtn.Clicked += (s, e) => {
 			moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);

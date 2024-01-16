@@ -62,7 +62,7 @@ public class SingleBackgroundWorker : Scenario {
 		{
 			_worker = new BackgroundWorker () { WorkerSupportsCancellation = true };
 
-			var cancel = new Button ("Cancel Worker");
+			var cancel = new Button () { Text = "Cancel Worker" };
 			cancel.Clicked += (s, e) => {
 				if (_worker == null) {
 					_log.Add ($"Worker is not running at {DateTime.Now}!");

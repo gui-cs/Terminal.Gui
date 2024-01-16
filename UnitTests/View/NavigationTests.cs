@@ -665,7 +665,7 @@ namespace Terminal.Gui.ViewTests {
 		public void Enabled_False_Sets_HasFocus_To_False ()
 		{
 			var wasClicked = false;
-			var view = new Button ("Click Me");
+			var view = new Button { Text = "Click Me" };
 			view.Clicked += (s, e) => wasClicked = !wasClicked;
 			Application.Top.Add (view);
 
@@ -694,7 +694,7 @@ namespace Terminal.Gui.ViewTests {
 		public void Enabled_Sets_Also_Sets_Subviews ()
 		{
 			var wasClicked = false;
-			var button = new Button ("Click Me");
+			var button = new Button { Text = "Click Me" };
 			button.IsDefault = true;
 			button.Clicked += (s, e) => wasClicked = !wasClicked;
 			var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };

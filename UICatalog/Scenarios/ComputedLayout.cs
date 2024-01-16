@@ -58,16 +58,18 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (verticalRuler);
 
 			// Demonstrate At - Using Pos.At to locate a view in an absolute location
-			var atButton = new Button ("At(2,1)") {
+			var atButton = new Button {
 				X = Pos.At (2),
-				Y = Pos.At (1)
+				Y = Pos.At (1),
+				Text = "At(2,1)"
 			};
 			Application.Top.Add (atButton);
 
 			// Throw in a literal absolute - Should function identically to above
-			var absoluteButton = new Button ("X = 30, Y = 1") {
+			var absoluteButton = new Button {
 				X = 30,
-				Y = 1
+				Y = 1,
+				Text = "X = 30, Y = 1"
 			};
 			Application.Top.Add (absoluteButton);
 
@@ -137,9 +139,10 @@ namespace UICatalog.Scenarios {
 			textView.Text = $"This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
 			Application.Top.Add (textView);
 
-			var oddballButton = new Button ("These buttons demo convoluted PosCombine scenarios") {
+			var oddballButton = new Button {
 				X = Pos.Center (),
-				Y = Pos.Bottom (textView) + 1
+				Y = Pos.Bottom (textView) + 1,
+				Text = "These buttons demo convoluted PosCombine scenarios"
 			};
 			Application.Top.Add (oddballButton);
 
@@ -147,33 +150,38 @@ namespace UICatalog.Scenarios {
 			// Demonstrate odd-ball Combine scenarios
 			// Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
 
-			oddballButton = new Button ("Center + 0") {
+			oddballButton = new Button {
 				X = Pos.Center () + 0,
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Center + 0"
 			};
 			Application.Top.Add (oddballButton);
 
-			oddballButton = new Button ("Center + 1") {
+			oddballButton = new Button {
 				X = Pos.Center () + 1,
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Center + 1"
 			};
 			Application.Top.Add (oddballButton);
 
-			oddballButton = new Button ("0 + Center") {
+			oddballButton = new Button {
 				X = 0 + Pos.Center (),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "0 + Center"
 			};
 			Application.Top.Add (oddballButton);
 
-			oddballButton = new Button ("1 + Center") {
+			oddballButton = new Button {
 				X = 1 + Pos.Center (),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "1 + Center"
 			};
 			Application.Top.Add (oddballButton);
 
-			oddballButton = new Button ("Center - 1") {
+			oddballButton = new Button {
 				X = Pos.Center () - 1,
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Center - 1"
 			};
 			Application.Top.Add (oddballButton);
 
@@ -186,46 +194,52 @@ namespace UICatalog.Scenarios {
 
 			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
 			// The `- Pos.Percent(5)` is there so at least something is visible
-			oddballButton = new Button ("Center + Center - Percent(50)") {
+			oddballButton = new Button {
 				X = Pos.Center () + Pos.Center () - Pos.Percent (50),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Center + Center - Percent(50)"
 			};
 			Application.Top.Add (oddballButton);
 
 			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
 			// The `- Pos.Percent(5)` is there so at least something is visible
-			oddballButton = new Button ("Percent(50) + Center - Percent(50)") {
+			oddballButton = new Button {
 				X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Percent(50) + Center - Percent(50)"
 			};
 			Application.Top.Add (oddballButton);
 
 			// This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
 			// The `- Pos.Percent(5)` is there so at least something is visible
-			oddballButton = new Button ("Center + Percent(50) - Percent(50)") {
+			oddballButton = new Button {
 				X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Center + Percent(50) - Percent(50)"
 			};
 			Application.Top.Add (oddballButton);
 
 			#endregion
 			// This demonstrates nonsense: Same as At(0)
-			oddballButton = new Button ("Center - Center - Percent(50)") {
+			oddballButton = new Button {
 				X = Pos.Center () + Pos.Center () - Pos.Percent (50),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Center - Center - Percent(50)"
 			};
 			Application.Top.Add (oddballButton);
 
 			// This demonstrates combining Percents)
-			oddballButton = new Button ("Percent(40) + Percent(10)") {
+			oddballButton = new Button {
 				X = Pos.Percent (40) + Pos.Percent (10),
-				Y = Pos.Bottom (oddballButton)
+				Y = Pos.Bottom (oddballButton),
+				Text = "Percent(40) + Percent(10)"
 			};
 			Application.Top.Add (oddballButton);
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right
-			var anchorButton = new Button ("Button using AnchorEnd") {
+			var anchorButton = new Button {
 				Y = Pos.AnchorEnd () - 1,
+				Text = "Button using AnchorEnd"
 			};
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 			anchorButton.Clicked += (s, e) => {
@@ -261,8 +275,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (anchorEndLabel2);
 
 			// Show positioning vertically using Pos.AnchorEnd via Pos.Combine
-			var leftButton = new Button ("Left") {
-				Y = Pos.AnchorEnd () - 1 // Pos.Combine
+			var leftButton = new Button {
+				Y = Pos.AnchorEnd () - 1, // Pos.Combine
+				Text = "Left"
 			};
 			leftButton.Clicked += (s, e) => {
 				// This demonstrates how to have a dynamically sized button
@@ -274,9 +289,10 @@ namespace UICatalog.Scenarios {
 			};
 
 			// show positioning vertically using Pos.AnchorEnd
-			var centerButton = new Button ("Center") {
+			var centerButton = new Button {
 				X = Pos.Center (),
-				Y = Pos.AnchorEnd (1)  // Pos.AnchorEnd(1)
+				Y = Pos.AnchorEnd (1),  // Pos.AnchorEnd(1)
+				Text = "Center"
 			};
 			centerButton.Clicked += (s, e) => {
 				// This demonstrates how to have a dynamically sized button
@@ -288,8 +304,9 @@ namespace UICatalog.Scenarios {
 			};
 
 			// show positioning vertically using another window and Pos.Bottom
-			var rightButton = new Button ("Right") {
-				Y = Pos.Y (centerButton)
+			var rightButton = new Button {
+				Y = Pos.Y (centerButton),
+				Text = "Right"
 			};
 			rightButton.Clicked += (s, e) => {
 				// This demonstrates how to have a dynamically sized button

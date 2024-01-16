@@ -72,9 +72,9 @@ namespace UICatalog.Scenarios {
 		{
 			bool okPressed = false;
 
-			var ok = new Button ("Ok", is_default: true);
+			var ok = new Button { Text = "Ok", IsDefault = true };
 			ok.Clicked += (s, e) => { okPressed = true; Application.RequestStop (); };
-			var cancel = new Button ("Cancel");
+			var cancel = new Button { Text = "Cancel" };
 			cancel.Clicked += (s, e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = title };
 

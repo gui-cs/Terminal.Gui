@@ -1042,7 +1042,7 @@ This is a test
 		var clicked = false;
 		var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 		var label = new Label (text) { Width = 14, Height = 5 };
-		var btn = new Button ("Click Me!") { X = 14 };
+		var btn = new Button { X = 14, Text = "Click Me!" };
 		btn.Clicked += (s, e) => clicked = true;
 		Application.Top.Add (label, btn);
 

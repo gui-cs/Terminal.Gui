@@ -96,9 +96,10 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lblDateFmt);
 
-			var swapButton = new Button ("Swap Long/Short & Read/Read Only") {
+			var swapButton = new Button () {
 				X = Pos.Center (),
 				Y = Pos.Bottom (Win) - 5,
+				Text = "Swap Long/Short & Read/Read Only"
 			};
 			swapButton.Clicked += (s,e) => {
 				longTime.ReadOnly = !longTime.ReadOnly;

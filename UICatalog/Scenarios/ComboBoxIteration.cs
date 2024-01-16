@@ -52,8 +52,9 @@ namespace UICatalog.Scenarios {
 			Win.Add (lbComboBox, comboBox);
 			Win.Add (new TextField { X = Pos.Right (listview) + 1, Y = Pos.Top (comboBox) + 3, Height = 1, Width = 20 });
 
-			var btnTwo = new Button ("Two") {
+			var btnTwo = new Button {
 				X = Pos.Right (comboBox) + 1,
+				Text = "Two"
 			};
 			btnTwo.Clicked += (s,e) => {
 				items = new List<string> () { "one", "two" };
@@ -63,9 +64,10 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (btnTwo);
 
-			var btnThree = new Button ("Three") {
+			var btnThree = new Button {
 				X = Pos.Right (comboBox) + 1,
-				Y = Pos.Top (comboBox)
+				Y = Pos.Top (comboBox),
+				Text = "Three"
 			};
 			btnThree.Clicked += (s,e) => {
 				items = new List<string> () { "one", "two", "three" };

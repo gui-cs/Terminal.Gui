@@ -1452,7 +1452,7 @@ public class ToplevelTests {
 │                  │
 └──────────────────┘", _output);
 
-		var btnPopup = new Button ("Popup");
+		var btnPopup = new Button { Text = "Popup" };
 		var testWindow = new Window { X = 2, Y = 1, Width = 15, Height = 10 };
 		testWindow.Add (btnPopup);
 		btnPopup.Clicked += (s, e) => {

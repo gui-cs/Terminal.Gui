@@ -41,9 +41,10 @@ namespace UICatalog.Scenarios {
 			cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
 			Win.Add (cbUseTrueColor);
 
-			var btnOpenImage = new Button ("Open Image") {
+			var btnOpenImage = new Button {
 				X = Pos.Right (cbUseTrueColor) + 2,
-				Y = 0
+				Y = 0,
+				Text = "Open Image"
 			};
 			Win.Add (btnOpenImage);
 

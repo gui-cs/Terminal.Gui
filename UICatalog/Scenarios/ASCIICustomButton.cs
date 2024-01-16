@@ -42,42 +42,21 @@ namespace UICatalog.Scenarios {
 		}
 
 		public class ASCIICustomButton : Button {
-			public string Description => $"Description of: {id}";
+			public string Description => $"Description of: {Id}";
 
 			public event Action<ASCIICustomButton> PointerEnter;
 
 			private Label fill;
 			private FrameView border;
-			private string id;
 
-			public ASCIICustomButton (string text, Pos x, Pos y, int width, int height) : base (text)
+			public void CustomInitialize ()
 			{
-				CustomInitialize ("", text, x, y, width, height);
-			}
-
-			public ASCIICustomButton (string id, string text, Pos x, Pos y, int width, int height) : base (text)
-			{
-				CustomInitialize (id, text, x, y, width, height);
-			}
-
-			private void CustomInitialize (string id, string text, Pos x, Pos y, int width, int height)
-			{
-				this.id = id;
-				X = x;
-				Y = y;
-
-				Frame = new Rect {
-					Width = width,
-					Height = height
-				};
-
 				border = new FrameView () {
-					Width = width,
-					Height = height
+					Width = Width,
+					Height = Height
 				};
 
 				AutoSize = false;
-				//LayoutStyle = LayoutStyle.Absolute;
 
 				var fillText = new System.Text.StringBuilder ();
 				for (int i = 0; i < Bounds.Height; i++) {
@@ -94,14 +73,12 @@ namespace UICatalog.Scenarios {
 					CanFocus = false
 				};
 
-				var title = new Label (text) {
+				var title = new Label (Text) {
 					X = Pos.Center (),
 					Y = Pos.Center (),
 				};
 
 				border.MouseClick += This_MouseClick;
-				// BUGBUG: v2 This uses internal knowledge of FrameView an breaks in v2 where FrameView does not have a ContentView
-				//border.Subviews [0].MouseClick += This_MouseClick;
 				fill.MouseClick += This_MouseClick;
 				title.MouseClick += This_MouseClick;
 
@@ -153,6 +130,7 @@ namespace UICatalog.Scenarios {
 		public class ScrollViewTestWindow : Window {
 			private List<Button> buttons;
 			private const int BUTTONS_ON_PAGE = 7;
+			private const int BUTTON_WIDTH = 25;
 			private const int BUTTON_HEIGHT = 3;
 
 			private ScrollView scrollView;
@@ -201,8 +179,8 @@ namespace UICatalog.Scenarios {
 				int count = 20;
 				for (int j = 0; j < count; j++) {
 					Pos yPos = prevButton == null ? 0 : Pos.Bottom (prevButton);
-					var button = new ASCIICustomButton (j.ToString (), $"section {j}", 0, yPos, 25, BUTTON_HEIGHT);
-					button.Id = $"button{j}";
+					var button = new ASCIICustomButton { Id = j.ToString (), Text = $"section {j}", Y = yPos, Width = BUTTON_WIDTH, Height = BUTTON_HEIGHT };
+					button.CustomInitialize ();
 					button.Clicked += Button_Clicked;
 					button.PointerEnter += Button_PointerEnter;
 					button.MouseClick += Button_MouseClick;
@@ -212,7 +190,8 @@ namespace UICatalog.Scenarios {
 					prevButton = button;
 				}
 
-				var closeButton = new ASCIICustomButton ("close", "Close", 0, Pos.Bottom (prevButton), 25, BUTTON_HEIGHT);
+				var closeButton = new ASCIICustomButton { Id = "close", Text = "Close", Y = Pos.Bottom (prevButton), Width = BUTTON_WIDTH, Height = BUTTON_HEIGHT };
+				closeButton.CustomInitialize ();
 				closeButton.Clicked += Button_Clicked;
 				closeButton.PointerEnter += Button_PointerEnter;
 				closeButton.MouseClick += Button_MouseClick;

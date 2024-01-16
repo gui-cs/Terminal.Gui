@@ -160,17 +160,19 @@ namespace UICatalog.Scenarios {
 			}
 			Application.Top.Loaded += Top_Loaded;
 
-			var pressMeButton = new Button ("Press me!") {
+			var pressMeButton = new Button () {
 				X = 3,
 				Y = 3,
+				Text = "Press me!"
 			};
 			pressMeButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
 			scrollView.Add (pressMeButton);
 
-			var aLongButton = new Button ("A very long button. Should be wide enough to demo clipping!") {
+			var aLongButton = new Button () {
 				X = 3,
 				Y = 4,
 				Width = Dim.Fill (3),
+				Text = "A very long button. Should be wide enough to demo clipping!"
 			};
 			aLongButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
 			scrollView.Add (aLongButton);
@@ -197,8 +199,9 @@ namespace UICatalog.Scenarios {
 			});
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right
-			var anchorButton = new Button ("Bottom Right") {
+			var anchorButton = new Button () {
 				Y = Pos.AnchorEnd () - 1,
+				Text = "Bottom Right"
 			};
 			// TODO: Use Pos.Width instead of (Right-Left) when implemented (#502)
 			anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));

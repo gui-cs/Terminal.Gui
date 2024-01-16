@@ -597,7 +597,7 @@ class CharMap : ScrollView {
 		var client = new UcdApiClient ();
 		string decResponse = string.Empty;
 
-		var waitIndicator = new Dialog (new Button ("Cancel")) {
+		var waitIndicator = new Dialog (new Button { Text = "Cancel" }) {
 			Title = "Getting Code Point Information",
 			X = Pos.Center (),
 			Y = Pos.Center (),
@@ -663,9 +663,9 @@ class CharMap : ScrollView {
 
 			string title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
 
-			var copyGlyph = new Button ("Copy _Glyph");
-			var copyCP = new Button ("Copy Code _Point");
-			var cancel = new Button ("Cancel");
+			var copyGlyph = new Button { Text = "Copy _Glyph" };
+			var copyCP = new Button { Text = "Copy Code _Point" };
+			var cancel = new Button { Text = "Cancel" };
 
 			var dlg = new Dialog (copyGlyph, copyCP, cancel) {
 				Title = title

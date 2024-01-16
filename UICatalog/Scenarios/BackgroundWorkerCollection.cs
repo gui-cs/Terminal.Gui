@@ -327,14 +327,14 @@ namespace UICatalog.Scenarios {
 				};
 				Add (listView);
 
-				start = new Button ("Start") { IsDefault = true, ClearOnVisibleFalse = false };
+				start = new Button { Text = "Start", IsDefault = true, ClearOnVisibleFalse = false };
 				start.Clicked += (s, e) => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();
 				};
 				Add (start);
 
-				close = new Button ("Close");
+				close = new Button { Text = "Close" };
 				close.Clicked += OnReportClosed;
 				Add (close);
 
@@ -344,7 +344,7 @@ namespace UICatalog.Scenarios {
 					}
 				};
 
-				LayoutStarted += (s,e) => {
+				LayoutStarted += (s, e) => {
 					var btnsWidth = start.Frame.Width + close.Frame.Width + 2 - 1;
 					var shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
 

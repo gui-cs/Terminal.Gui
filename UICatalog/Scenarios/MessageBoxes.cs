@@ -180,10 +180,11 @@ namespace UICatalog.Scenarios {
 
 			//var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
-			var showMessageBoxButton = new Button ("_Show MessageBox") {
+			var showMessageBoxButton = new Button {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
+				Text = "_Show MessageBox"
 			};
 			showMessageBoxButton.Clicked += (s, e) => {
 				try {

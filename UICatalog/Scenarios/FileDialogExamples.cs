@@ -132,9 +132,10 @@ namespace UICatalog.Scenarios {
 			cbFlipButtonOrder = new CheckBox ("Flip Order") { X = x, Y = y++ };
 			Win.Add (cbFlipButtonOrder);
 
-			var btn = new Button ($"Run Dialog") {
+			var btn = new Button {
 				X = 1,
-				Y = 9
+				Y = 9,
+				Text = "Run Dialog"
 			};
 
 			SetupHandler (btn);

@@ -147,21 +147,22 @@ namespace UICatalog {
 			};
 			Add (keyLabel);
 
-			var btnChange = new Button ("Ch_ange") {
+			var btnChange = new Button {
 				X = Pos.Percent (50),
 				Y = 1,
+				Text = "Ch_ange"
 			};
 			Add (btnChange);
 			btnChange.Clicked += RemapKey;
 
-			var close = new Button ("Ok");
+			var close = new Button { Text = "Ok" };
 			close.Clicked += (s,e) => {
 				Application.RequestStop ();
 				ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
 			};
 			AddButton (close);
 
-			var cancel = new Button ("Cancel");
+			var cancel = new Button { Text = "Cancel" };
 			cancel.Clicked += (s,e)=>Application.RequestStop();
 			AddButton (cancel);
 

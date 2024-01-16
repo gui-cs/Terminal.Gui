@@ -148,10 +148,11 @@ namespace ReactiveExample {
 		}
 
 		Button LoginButton (View previous) {
-			var loginButton = new Button ("Login") {
+			var loginButton = new Button () {
 				X = Pos.Left(previous),
 				Y = Pos.Top(previous) + 1,
-				Width = 40
+				Width = 40,
+				Text = "Login"
 			};
 			loginButton
 				.Events ()
@@ -163,10 +164,11 @@ namespace ReactiveExample {
 		}
 
 		Button ClearButton (View previous) {
-			var clearButton = new Button("Clear") {
+			var clearButton = new Button() {
 				X = Pos.Left(previous),
 				Y = Pos.Top(previous) + 1,
-				Width = 40
+				Width = 40,
+				Text = "Clear"
 			};
 			clearButton
 				.Events ()

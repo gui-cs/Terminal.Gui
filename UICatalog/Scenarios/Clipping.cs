@@ -62,7 +62,7 @@ public class Clipping : Scenario {
 				Id = "3"
 			};
 
-		var testButton = new Button ("click me") { X = 2, Y = 2 };
+		var testButton = new Button { X = 2, Y = 2, Text = "click me" };
 		testButton.Clicked += (s, e) => {
 			MessageBox.Query (10, 5, "Test", "test message", "Ok");
 		};

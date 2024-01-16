@@ -47,14 +47,15 @@ namespace Terminal.Gui {
 		{
 
 			bool confirm = false;
-			var btnOk = new Button (Strings.btnOk) {
+			var btnOk = new Button () {
 				IsDefault = true,
+				Text = Strings.btnOk
 			};
 			btnOk.Clicked += (s, e) => {
 				confirm = true;
 				Application.RequestStop ();
 			};
-			var btnCancel = new Button (Strings.btnCancel);
+			var btnCancel = new Button () { Text = Strings.btnCancel };
 			btnCancel.Clicked += (s, e) => {
 				confirm = false;
 				Application.RequestStop ();

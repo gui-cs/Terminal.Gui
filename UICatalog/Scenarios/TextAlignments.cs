@@ -49,19 +49,20 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (edit);
 
-			var unicodeSample = new Button ("Unicode Sample") {
+			var unicodeSample = new Button () {
 				X = Pos.Right (edit) + 1,
 				Y = 0,
+				Text = "Unicode Sample"
 			};
 			unicodeSample.Clicked += (s,e) => {
 				edit.Text = unicodeSampleText;
 			};
 			Win.Add (unicodeSample);
 
-			var update = new Button ("_Update") {
+			var update = new Button () {
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
-
+				Text = "_Update"
 			};
 			update.Clicked += (s,e) => {
 				foreach (var alignment in alignments) {

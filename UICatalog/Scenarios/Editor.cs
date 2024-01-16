@@ -803,25 +803,27 @@ namespace UICatalog.Scenarios {
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button ("Find _Next") {
+			var btnFindNext = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Find _Next"
 			};
 			btnFindNext.Clicked += (s, e) => FindNext ();
 			d.Add (btnFindNext);
 
-			var btnFindPrevious = new Button ("Find _Previous") {
+			var btnFindPrevious = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Find _Previous"
 			};
 			btnFindPrevious.Clicked += (s, e) => FindPrevious ();
 			d.Add (btnFindPrevious);
@@ -833,12 +835,13 @@ namespace UICatalog.Scenarios {
 				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button ("Cancel") {
+			var btnCancel = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
 				Width = 20,
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Cancel"
 			};
 			btnCancel.Clicked += (s, e) => {
 				DisposeWinDialog ();
@@ -895,14 +898,15 @@ namespace UICatalog.Scenarios {
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button ("Replace _Next") {
+			var btnFindNext = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Replace _Next"
 			};
 			btnFindNext.Clicked += (s, e) => ReplaceNext ();
 			d.Add (btnFindNext);
@@ -924,24 +928,26 @@ namespace UICatalog.Scenarios {
 			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
 			d.Add (txtToReplace);
 
-			var btnFindPrevious = new Button ("Replace _Previous") {
+			var btnFindPrevious = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Replace _Previous"
 			};
 			btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
-			var btnReplaceAll = new Button ("Replace _All") {
+			var btnReplaceAll = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Replace _All"
 			};
 			btnReplaceAll.Clicked += (s, e) => ReplaceAll ();
 			d.Add (btnReplaceAll);
@@ -954,12 +960,13 @@ namespace UICatalog.Scenarios {
 				btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button ("Cancel") {
+			var btnCancel = new Button () {
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
 				Width = 20,
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
+				AutoSize = false,
+				Text = "Cancel"
 			};
 			btnCancel.Clicked += (s, e) => {
 				DisposeWinDialog ();

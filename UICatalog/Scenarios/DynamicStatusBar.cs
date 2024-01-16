@@ -87,19 +87,22 @@ public class DynamicStatusBar : Scenario {
 				Height = Dim.Fill (2)
 			};
 
-			var _btnAddStatusBar = new Button ("Add a StatusBar") {
+			var _btnAddStatusBar = new Button {
 				Y = 1,
+				Text = "Add a StatusBar"
 			};
 			_frmStatusBar.Add (_btnAddStatusBar);
 
-			var _btnRemoveStatusBar = new Button ("Remove a StatusBar") {
-				Y = 1
+			var _btnRemoveStatusBar = new Button {
+				Y = 1,
+				Text = "Remove a StatusBar"
 			};
 			_btnRemoveStatusBar.X = Pos.AnchorEnd () - (Pos.Right (_btnRemoveStatusBar) - Pos.Left (_btnRemoveStatusBar));
 			_frmStatusBar.Add (_btnRemoveStatusBar);
 
-			var _btnAdd = new Button (" Add  ") {
+			var _btnAdd = new Button {
 				Y = Pos.Top (_btnRemoveStatusBar) + 2,
+				Text = " Add  "
 			};
 			_btnAdd.X = Pos.AnchorEnd () - (Pos.Right (_btnAdd) - Pos.Left (_btnAdd));
 			_frmStatusBar.Add (_btnAdd);
@@ -112,21 +115,24 @@ public class DynamicStatusBar : Scenario {
 			};
 			_frmStatusBar.Add (_lstItems);
 
-			var _btnRemove = new Button ("Remove") {
+			var _btnRemove = new Button {
 				X = Pos.Left (_btnAdd),
-				Y = Pos.Top (_btnAdd) + 1
+				Y = Pos.Top (_btnAdd) + 1,
+				Text = "Remove"
 			};
 			_frmStatusBar.Add (_btnRemove);
 
-			var _btnUp = new Button ("^") {
+			var _btnUp = new Button {
 				X = Pos.Right (_lstItems) + 2,
-				Y = Pos.Top (_btnRemove) + 2
+				Y = Pos.Top (_btnRemove) + 2,
+				Text = "^"
 			};
 			_frmStatusBar.Add (_btnUp);
 
-			var _btnDown = new Button ("v") {
+			var _btnDown = new Button {
 				X = Pos.Right (_lstItems) + 2,
-				Y = Pos.Top (_btnUp) + 1
+				Y = Pos.Top (_btnUp) + 1,
+				Text = "v"
 			};
 			_frmStatusBar.Add (_btnDown);
 
@@ -172,15 +178,17 @@ public class DynamicStatusBar : Scenario {
 				}
 			};
 
-			var _btnOk = new Button ("Ok") {
+			var _btnOk = new Button {
 				X = Pos.Right (_frmStatusBar) + 20,
 				Y = Pos.Bottom (_frmStatusBarDetails),
+				Text = "Ok"
 			};
 			Add (_btnOk);
 
-			var _btnCancel = new Button ("Cancel") {
+			var _btnCancel = new Button {
 				X = Pos.Right (_btnOk) + 3,
 				Y = Pos.Top (_btnOk),
+				Text = "Cancel"
 			};
 			_btnCancel.Clicked += (s, e) => {
 				SetFrameDetails (_currentEditStatusItem);
@@ -445,9 +453,10 @@ public class DynamicStatusBar : Scenario {
 			};
 			Add (_txtShortcut);
 
-			var _btnShortcut = new Button ("Clear Shortcut") {
+			var _btnShortcut = new Button {
 				X = Pos.X (_lblShortcut),
-				Y = Pos.Bottom (_txtShortcut) + 1
+				Y = Pos.Bottom (_txtShortcut) + 1,
+				Text = "Clear Shortcut"
 			};
 			_btnShortcut.Clicked += (s, e) => {
 				_txtShortcut.Text = "";
@@ -467,8 +476,9 @@ public class DynamicStatusBar : Scenario {
 				EditStatusItem (_statusItem);
 			}
 
-			var _btnOk = new Button ("Ok") {
+			var _btnOk = new Button {
 				IsDefault = true,
+				Text = "OK",
 			};
 			_btnOk.Clicked += (s, e) => {
 				if (string.IsNullOrEmpty (_txtTitle.Text)) {
@@ -482,7 +492,7 @@ public class DynamicStatusBar : Scenario {
 					Application.RequestStop ();
 				}
 			};
-			var _btnCancel = new Button ("Cancel");
+			var _btnCancel = new Button { Text = "Cancel" };
 			_btnCancel.Clicked += (s, e) => {
 				_txtTitle.Text = string.Empty;
 				Application.RequestStop ();

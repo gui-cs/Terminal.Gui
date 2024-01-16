@@ -25,9 +25,10 @@ public class Adornments : Scenario {
 			};
 		};
 
-		var button = new Button ("Press me!") {
+		var button = new Button {
 			X = Pos.Center (),
-			Y = Pos.Center ()
+			Y = Pos.Center (),
+			Text = "Press me!"
 		};
 		button.Clicked += (s, e) => MessageBox.Query (20, 7, "Hi", $"Am I a {view.GetType ().Name}?", "Yes", "No");
 
@@ -41,10 +42,11 @@ public class Adornments : Scenario {
 		};
 		label.Border.Thickness = new Thickness (1, 3, 1, 1);
 
-		var tf2 = new Button ("Button") {
+		var tf2 = new Button {
 			X = Pos.AnchorEnd (10),
 			Y = Pos.AnchorEnd (1),
-			Width = 10
+			Width = 10,
+			Text = "Button"
 		};
 		var tv = new Label {
 			Y = Pos.AnchorEnd (3),
@@ -192,9 +194,10 @@ public class Adornments : Scenario {
 			_bottomEdit.TextChanging += Edit_TextChanging;
 			Add (_bottomEdit);
 
-			var copyTop = new Button ("Cop_y Top") {
+			var copyTop = new Button {
 				X = Pos.Center () + 1,
-				Y = Pos.Bottom (_bottomEdit)
+				Y = Pos.Bottom (_bottomEdit),
+				Text = "Cop_y Top"
 			};
 			copyTop.Clicked += (s, e) => {
 				Thickness = new Thickness (Thickness.Top);

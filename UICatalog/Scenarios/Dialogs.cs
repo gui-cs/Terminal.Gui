@@ -149,10 +149,11 @@ namespace UICatalog.Scenarios {
 			// true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };
 			// \u2781 is ➁ dingbats \ufb70 is	
 
-			var showDialogButton = new Button ("_Show Dialog") {
+			var showDialogButton = new Button {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
+				Text = "_Show Dialog"
 			};
 			showDialogButton.Clicked += (s, e) => {
 				var dlg = CreateDemoDialog (widthEdit, heightEdit, titleEdit, numButtonsEdit, glyphsNotWords, styleRadioGroup, buttonPressedLabel);
@@ -183,11 +184,15 @@ namespace UICatalog.Scenarios {
 					Button button = null;
 					if (glyphsNotWords.Checked == true) {
 						buttonId = i;
-						button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
-							is_default: buttonId == 0);
+						button = new Button {
+							Text = NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
+							IsDefault = buttonId == 0
+						};
 					} else {
-						button = new Button (NumberToWords.Convert (buttonId),
-						       is_default: buttonId == 0);
+						button = new Button {
+							Text = NumberToWords.Convert (buttonId),
+							IsDefault = buttonId == 0
+						};
 					}
 					button.Clicked += (s, e) => {
 						clicked = buttonId;
@@ -214,19 +219,24 @@ namespace UICatalog.Scenarios {
 					dialog.Width = width;
 				}
 
-				var add = new Button ("Add a button") {
+				var add = new Button {
 					X = Pos.Center (),
-					Y = Pos.Center ()
+					Y = Pos.Center (),
+					Text = "Add a button"
 				};
 				add.Clicked += (s, e) => {
 					var buttonId = buttons.Count;
 					Button button;
 					if (glyphsNotWords.Checked == true) {
-						button = new Button (NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
-							is_default: buttonId == 0);
+						button = new Button {
+							Text = NumberToWords.Convert (buttonId) + " " + Char.ConvertFromUtf32 (buttonId + CODE_POINT),
+							IsDefault = buttonId == 0
+						};
 					} else {
-						button = new Button (NumberToWords.Convert (buttonId),
-							is_default: buttonId == 0);
+						button = new Button {
+							Text = NumberToWords.Convert (buttonId),
+							IsDefault = buttonId == 0
+						};
 					}
 					button.Clicked += (s, e) => {
 						clicked = buttonId;
@@ -241,9 +251,10 @@ namespace UICatalog.Scenarios {
 				};
 				dialog.Add (add);
 
-				var addChar = new Button ($"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button") {
+				var addChar = new Button {
 					X = Pos.Center (),
-					Y = Pos.Center () + 1
+					Y = Pos.Center () + 1,
+					Text = $"Add a {Char.ConvertFromUtf32 (CODE_POINT)} to each button"
 				};
 				addChar.Clicked += (s, e) => {
 					foreach (var button in buttons) {

@@ -90,10 +90,11 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (actionLabel);
 
-			var showWizardButton = new Button ("Show Wizard") {
+			var showWizardButton = new Button () {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
+				Text = "Show Wizard"
 			};
 
 			showWizardButton.Clicked += (s, e) => {
