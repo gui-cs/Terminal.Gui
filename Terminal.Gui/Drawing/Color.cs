@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
@@ -463,8 +463,8 @@ public readonly struct Color : IEquatable<Color> {
 	/// </summary>
 	/// <param name="text">
 	/// The text to analyze. Formats supported are
-	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", and any of the
-	/// <see cref="Gui.ColorName"/>.
+	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
+	/// and any of the <see cref="Gui.ColorName"/> string values.
 	/// </param>
 	/// <param name="color">The parsed value.</param>
 	/// <returns>A boolean value indicating whether parsing was successful.</returns>
@@ -473,85 +473,198 @@ public readonly struct Color : IEquatable<Color> {
 	/// </remarks>
 	public static bool TryParse (string? text, [NotNullWhen (true)] out Color? color)
 	{
+		if ( TryParse ( text.AsSpan ( ), null, out Color c ) ) {
+			color = c;
+			return true;
+		}
+		color = null;
+		return false;
+	}
+
+	/// <summary>
+	/// Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.
+	/// </summary>
+	/// <param name="text">
+	/// The text to analyze. Formats supported are
+	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
+	/// and any of the <see cref="Gui.ColorName"/> string values.
+	/// </param>
+	/// <param name="ignoredFormatProvider">
+	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored.
+	/// </param>
+	/// <returns>A <see cref="Color"/> value equivalent to <paramref name="text"/>, if parsing was successful.</returns>
+	/// <remarks>
+	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
+	/// </remarks>
+	/// <exception cref="ArgumentException"> with an inner <see cref="FormatException"/> if <paramref name="text"/> was unable to be successfully parsed as a <see cref="Color"/>, for any reason.</exception>
+	public static Color Parse ( string? text, IFormatProvider? ignoredFormatProvider = null )
+	{
+		if ( !TryParse ( text, out Color? color ) ) {
+			throw new ArgumentException ( "Failed to parse input string as a Color", nameof ( text ), new FormatException ( "Input string was in an invalid format." ) );
+		}
+		return color.Value;
+	}
+
+	/// <summary>
+	/// Converts the provided <see langword="string"/> to a new <see cref="Color"/> value.
+	/// </summary>
+	/// <param name="text">
+	/// The text to analyze. Formats supported are
+	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
+	/// and any of the <see cref="ColorName"/> string values.
+	/// </param>
+	/// <param name="ignoredFormatProvider">
+	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored. Just pass <see langword="null"/>.
+	/// </param>
+	/// <param name="result">The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if unsuccessful.</param>
+	/// <returns>A <see langword="bool"/> value indicating whether parsing was successful.</returns>
+	/// <remarks>
+	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
+	/// </remarks>
+	public static bool TryParse ( string? text, IFormatProvider? ignoredFormatProvider, out Color result )
+	{
+		if ( !TryParse ( text, out Color? color ) ) {
+			result = default;
+			return false;
+		}
+		result = color.Value;
+		return true;
+	}
+
+	/// <summary>
+	/// Converts the provided <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to a new <see cref="Color"/> value.
+	/// </summary>
+	/// <param name="text">
+	/// The text to analyze. Formats supported are
+	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
+	/// and any of the <see cref="Gui.ColorName"/> string values.
+	/// </param>
+	/// <param name="ignoredFormatProvider">
+	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored.
+	/// </param>
+	/// <returns>A <see cref="Color"/> value equivalent to <paramref name="text"/>, if parsing was successful.</returns>
+	/// <remarks>
+	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
+	/// </remarks>
+	/// <exception cref="ArgumentException"> with an inner <see cref="FormatException"/> if <paramref name="text"/> was unable to be successfully parsed as a <see cref="Color"/>, for any reason.</exception>
+	public static Color Parse ( ReadOnlySpan<char> text, IFormatProvider? ignoredFormatProvider = null )
+	{
+		if ( !TryParse ( text, ignoredFormatProvider, out Color color ) ) {
+			throw new ArgumentException ( "Failed to parse input string as a Color", nameof ( text ), new FormatException ( "Input string was in an invalid format." ) );
+		}
+		return color;
+	}
+
+	/// <summary>
+	/// Converts the provided <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to a new <see cref="Color"/> value.
+	/// </summary>
+	/// <param name="text">
+	/// The text to analyze. Formats supported are
+	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
+	/// and any of the <see cref="ColorName"/> string values.
+	/// </param>
+	/// <param name="ignoredFormatProvider">
+	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored. Just pass <see langword="null"/>.
+	/// </param>
+	/// <param name="color">The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if unsuccessful.</param>
+	/// <returns>A <see langword="bool"/> value indicating whether parsing was successful.</returns>
+	/// <remarks>
+	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
+	/// </remarks>
+	public static bool TryParse ( ReadOnlySpan<char> text, IFormatProvider? ignoredFormatProvider, out Color color )
+	{
 		// empty color
-		if (string.IsNullOrWhiteSpace(text)) {
-			color = null;
+		if (  text.IsEmpty || text.IsWhiteSpace ( ) || text.Length < 4 ) {
+			color = default;
 			return false;
 		}
 
-		// #RRGGBB, #RGB
-		if (text [0] == '#' && text.Length is 7 or 4) {
-			if (text.Length == 7) {
-				var r = Convert.ToInt32 (text.Substring (1, 2), 16);
-				var g = Convert.ToInt32 (text.Substring (3, 2), 16);
-				var b = Convert.ToInt32 (text.Substring (5, 2), 16);
-				color = new Color (r, g, b);
-			} else {
-				var rText = char.ToString (text [1]);
-				var gText = char.ToString (text [2]);
-				var bText = char.ToString (text [3]);
-
-				var r = Convert.ToInt32 (rText + rText, 16);
-				var g = Convert.ToInt32 (gText + gText, 16);
-				var b = Convert.ToInt32 (bText + bText, 16);
-				color = new Color (r, g, b);
-			}
-			return true;
-		}
-
-		// #RRGGBB, #RGBA
-		if (text [0] == '#' && text.Length is 8 or 5) {
-			if (text.Length == 7) {
-				var r = Convert.ToInt32 (text.Substring (1, 2), 16);
-				var g = Convert.ToInt32 (text.Substring (3, 2), 16);
-				var b = Convert.ToInt32 (text.Substring (5, 2), 16);
-				var a = Convert.ToInt32 (text.Substring (7, 2), 16);
-				color = new Color (a, r, g, b);
-			} else {
-				var rText = char.ToString (text [1]);
-				var gText = char.ToString (text [2]);
-				var bText = char.ToString (text [3]);
-				var aText = char.ToString (text [4]);
-
-				var r = Convert.ToInt32 (aText + aText, 16);
-				var g = Convert.ToInt32 (rText + rText, 16);
-				var b = Convert.ToInt32 (gText + gText, 16);
-				var a = Convert.ToInt32 (bText + bText, 16);
-				color = new Color (r, g, b, a);
-			}
-			return true;
-		}
-
-		// rgb(r,g,b)
-		var match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+)\)");
-		if (match.Success) {
-			var r = int.Parse (match.Groups [1].Value);
-			var g = int.Parse (match.Groups [2].Value);
-			var b = int.Parse (match.Groups [3].Value);
-			color = new Color (r, g, b);
-			return true;
-		}
-
-		// rgb(r,g,b,a)
-		match = Regex.Match (text, @"rgb\((\d+),(\d+),(\d+),(\d+)\)");
-		if (match.Success) {
-			var r = int.Parse (match.Groups [1].Value);
-			var g = int.Parse (match.Groups [2].Value);
-			var b = int.Parse (match.Groups [3].Value);
-			var a = int.Parse (match.Groups [4].Value);
-			color = new Color (r, g, b, a);
-			return true;
-		}
-
-		if (Enum.TryParse<ColorName> (text, true, out var colorName)) {
+		switch ( text ) {
+		case { } when Enum.TryParse<ColorName> ( text, true, out var colorName ):
+		{
 			color = new Color (colorName);
 			return true;
 		}
+		case ['#', var rChar, var gChar, var bChar] chars when chars[1..].IsAllAsciiDigits():
+		{
+			// #RGB
+			color = new Color ( red: byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), green: byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), blue: byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ) );
+		}
+			return true;
+		case ['#', var rChar, var gChar, var bChar, var aChar] chars when chars [ 1.. ].IsAllAsciiDigits():
+		{
+			// #RGBA
+			color = new Color ( red: byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), green: byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), blue: byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ), alpha: byte.Parse ( [aChar, aChar], NumberStyles.HexNumber ) );
+		}
+			return true;
+		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char] chars when chars[1..].IsAllAsciiDigits():
+		{
+			// #RRGGBB
+			color = new Color ( red: byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), green: byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), blue: byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ) );
+		}
+			return true;
+		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char, var a1Char, var a2Char] chars when chars[1..].IsAllAsciiDigits():
+		{
+			// #RRGGBBAA
+			color = new Color ( red: byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), green: byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), blue: byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ), alpha: byte.Parse ( [a1Char, a2Char], NumberStyles.HexNumber ) );
+		}
+			return true;
+		case ['r', 'g', 'b', '(', .., ')']:
+		{
+			Span<Range> substrings = new Span<Range> ( );
+			if ( text [ 5..^1 ].Split ( substrings, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries ) < 3
+				|| !substrings.AreAllElementsAllAsciiDigits ( ) ) {
+				color = default;
+				return false;
+			}
 
-		color = new Color ();
-		return false;
+			switch ( substrings.Length ) {
+			case 3:
+				// rgb(r,g,b)
+				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ) );
+				return true;
+			case 4:
+				// rgb(r,g,b,a)
+				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ), alpha: byte.Parse ( text[substrings [ 3 ]] ) );
+				return true;
+			default:
+				color = default;
+				return false;
+			}
+		}
+		case ['r', 'g', 'b', 'a', '(', .., ')']:
+		{
+			Span<Range> substrings = new Span<Range> ( );
+			if ( text [ 5..^1 ].Split ( substrings,',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries ) < 3
+				|| !substrings.AreAllElementsAllAsciiDigits (  ) ){
+				color = default;
+				return false;
+			}
+			//if ( !substrings.All ( static s => s.All ( char.IsAsciiDigit ) ) ) {
+			//	return false;
+			//}
+
+			switch ( substrings.Length ) {
+			case 3:
+				// rgba(r,g,b)
+				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ) );
+				return true;
+			case 4:
+				// rgba(r,g,b,a)
+				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ), alpha: byte.Parse ( text[substrings [ 3 ]] ) );
+				return true;
+			default:
+				color = default;
+				return false;
+			}
+		}
+	    default:
+			color = default;
+			return false;
+		}
 	}
-    #nullable restore
+	#nullable restore
+
 
 	/// <summary>
 	/// Converts the color to a string representation.
