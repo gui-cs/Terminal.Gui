@@ -23,9 +23,6 @@ namespace Terminal.Gui;
 ///         Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').
 ///         </para>
 ///         <para>
-///         If no hot key specifier is found, the first uppercase letter encountered will be used as the hot key.
-///         </para>
-///         <para>
 ///         When the button is configured as the default (<see cref="IsDefault"/>) and the user presses
 ///         the ENTER key, if no other <see cref="View"/> processes the key, the <see cref="Button"/>'s
 ///         <see cref="Clicked"/> event will will be fired.
