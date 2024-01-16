@@ -72,7 +72,7 @@ public class AllViewsTester : Scenario {
 			Width = 15,
 			Height = Dim.Fill (1), // for status bar
 			CanFocus = false,
-			ColorScheme = Colors.TopLevel
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 
 		_classListView = new ListView (_viewClasses.Keys.ToList ()) {
@@ -81,7 +81,7 @@ public class AllViewsTester : Scenario {
 			Width = Dim.Fill (0),
 			Height = Dim.Fill (0),
 			AllowsMarking = false,
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			SelectedItem = 0
 		};
 		_classListView.OpenSelectedItem += (s, a) => {
@@ -106,7 +106,7 @@ public class AllViewsTester : Scenario {
 			Width = Dim.Fill (),
 			Height = 10,
 			CanFocus = false,
-			ColorScheme = Colors.TopLevel
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 		_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
 		_computedCheckBox.Toggled += (s, e) => {
@@ -228,7 +228,7 @@ public class AllViewsTester : Scenario {
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),
 			Height = Dim.Fill (1), // + 1 for status bar
-			ColorScheme = Colors.Dialog
+			ColorScheme = Colors.ColorSchemes ["Dialog"]
 		};
 
 		Application.Top.Add (_leftPane, _settingsPane, _hostPane);
@@ -340,7 +340,7 @@ public class AllViewsTester : Scenario {
 
 		// Set the colorscheme to make it stand out if is null by default
 		if (view.ColorScheme == null) {
-			view.ColorScheme = Colors.Base;
+			view.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 
 		// If the view supports a Text property, set it so we have something to look at
