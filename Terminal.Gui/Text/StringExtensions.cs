@@ -155,33 +155,6 @@ public static class StringExtensions {
 	}
 
 	/// <summary>
-	/// Determines if every <see cref="Range"/> in this <see cref="Span{T}"/> of <see langword="Range"/>s is (or is implicitly representable as) a <see langword="string"/> composed entirely of ASCII digits.
-	/// </summary>
-	/// <param name="rangeSpan">A <see cref="Span{T}"/> of <see cref="Range"/> to check.</param>
-	/// <returns>A <see langword="bool"/> indicating if all elements of the <see cref="Span{T}"/> are made up entirely of ASCII digits (<see langword="true"/>) or not (<see langword="false"/></returns>
-	/// <seealso cref="IsAllAsciiDigits"/>
-	internal static bool AreAllElementsAllAsciiDigits ( this Span<Range> rangeSpan )
-	{
-		foreach ( var stringRange in rangeSpan ) {
-			if ( !stringRange.ToString ( ).All ( char.IsAsciiDigit ) )
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-    /// <summary>
-    /// Determines if this <see cref="Span{T}"/> of <see langword="char"/> is composed entirely of ASCII digits.
-    /// </summary>
-    /// <param name="stringSpan">A <see cref="Span{T}"/> of <see langword="char"/> to check.</param>
-    /// <returns>A <see langword="bool"/> indicating if all elements of the <see cref="Span{T}"/> are ASCII digits (<see langword="true"/>) or not (<see langword="false"/></returns>
-	public static bool IsAllAsciiDigits ( this Span<char> stringSpan )
-	{
-		return stringSpan.ToString ( ).All ( char.IsAsciiDigit );
-	}
-	
-	/// <summary>
     /// Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII digits.
     /// </summary>
     /// <param name="stringSpan">A <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to check.</param>
@@ -189,5 +162,15 @@ public static class StringExtensions {
 	public static bool IsAllAsciiDigits ( this ReadOnlySpan<char> stringSpan )
 	{
 		return stringSpan.ToString ( ).All ( char.IsAsciiDigit );
+	}
+
+	/// <summary>
+    /// Determines if this <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> is composed entirely of ASCII digits.
+    /// </summary>
+    /// <param name="stringSpan">A <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to check.</param>
+    /// <returns>A <see langword="bool"/> indicating if all elements of the <see cref="ReadOnlySpan{T}"/> are ASCII digits (<see langword="true"/>) or not (<see langword="false"/></returns>
+	public static bool IsAllAsciiHexDigits ( this ReadOnlySpan<char> stringSpan )
+	{
+		return stringSpan.ToString ( ).All ( char.IsAsciiHexDigit );
 	}
 }

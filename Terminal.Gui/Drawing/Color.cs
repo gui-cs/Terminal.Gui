@@ -580,91 +580,88 @@ public readonly struct Color : IEquatable<Color> {
 		}
 
 		switch ( text ) {
-		case { } when Enum.TryParse<ColorName> ( text, true, out var colorName ):
-		{
-			color = new Color (colorName);
-			return true;
-		}
-		case ['#', var rChar, var gChar, var bChar] chars when chars[1..].IsAllAsciiDigits():
+		case ['#', var rChar, var gChar, var bChar] chars when chars[1..].IsAllAsciiHexDigits():
 		{
 			// #RGB
-			color = new Color ( red: byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), green: byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), blue: byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ) );
+			color = new Color ( byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ) );
 		}
 			return true;
-		case ['#', var rChar, var gChar, var bChar, var aChar] chars when chars [ 1.. ].IsAllAsciiDigits():
+		case ['#', var rChar, var gChar, var bChar, var aChar] chars when chars [ 1.. ].IsAllAsciiHexDigits():
 		{
 			// #RGBA
-			color = new Color ( red: byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), green: byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), blue: byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ), alpha: byte.Parse ( [aChar, aChar], NumberStyles.HexNumber ) );
+			color = new Color ( byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ), byte.Parse ( [aChar, aChar], NumberStyles.HexNumber ) );
 		}
 			return true;
-		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char] chars when chars[1..].IsAllAsciiDigits():
+		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char] chars when chars[1..].IsAllAsciiHexDigits():
 		{
 			// #RRGGBB
-			color = new Color ( red: byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), green: byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), blue: byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ) );
+			color = new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ) );
 		}
 			return true;
-		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char, var a1Char, var a2Char] chars when chars[1..].IsAllAsciiDigits():
+		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char, var a1Char, var a2Char] chars when chars[1..].IsAllAsciiHexDigits():
 		{
 			// #RRGGBBAA
-			color = new Color ( red: byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), green: byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), blue: byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ), alpha: byte.Parse ( [a1Char, a2Char], NumberStyles.HexNumber ) );
+			color = new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ), byte.Parse ( [a1Char, a2Char], NumberStyles.HexNumber ) );
 		}
 			return true;
 		case ['r', 'g', 'b', '(', .., ')']:
 		{
-			Span<Range> substrings = new Span<Range> ( );
-			if ( text [ 5..^1 ].Split ( substrings, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries ) < 3
-				|| !substrings.AreAllElementsAllAsciiDigits ( ) ) {
-				color = default;
-				return false;
-			}
-
-			switch ( substrings.Length ) {
-			case 3:
-				// rgb(r,g,b)
-				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ) );
-				return true;
-			case 4:
-				// rgb(r,g,b,a)
-				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ), alpha: byte.Parse ( text[substrings [ 3 ]] ) );
-				return true;
-			default:
-				color = default;
-				return false;
-			}
+			ReadOnlySpan<char> valuesSubstring = text [ 4..^1 ];
+			return TryParseRgbaDecimalString ( in valuesSubstring, out color );
 		}
 		case ['r', 'g', 'b', 'a', '(', .., ')']:
 		{
-			Span<Range> substrings = new Span<Range> ( );
-			if ( text [ 5..^1 ].Split ( substrings,',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries ) < 3
-				|| !substrings.AreAllElementsAllAsciiDigits (  ) ){
-				color = default;
-				return false;
-			}
-			//if ( !substrings.All ( static s => s.All ( char.IsAsciiDigit ) ) ) {
-			//	return false;
-			//}
-
-			switch ( substrings.Length ) {
-			case 3:
-				// rgba(r,g,b)
-				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ) );
-				return true;
-			case 4:
-				// rgba(r,g,b,a)
-				color = new Color ( red: byte.Parse ( text[substrings [ 0 ]] ), green: byte.Parse ( text[substrings [ 1 ]] ), blue: byte.Parse ( text[substrings [ 2 ]] ), alpha: byte.Parse ( text[substrings [ 3 ]] ) );
-				return true;
-			default:
-				color = default;
-				return false;
-			}
+			ReadOnlySpan<char> valuesSubstring = text [ 5..^1 ];
+			return TryParseRgbaDecimalString ( in valuesSubstring, out color );
 		}
-	    default:
+		case { } when char.IsLetter ( text[0] ) && Enum.TryParse<ColorName> ( text, true, out var colorName ):
+		{
+			color = new Color (colorName);
+			return true;
+		}
+		default:
 			color = default;
 			return false;
 		}
+		static bool TryParseRgbaDecimalString ( in ReadOnlySpan<char> valuesSubstring, out Color c )
+		{
+
+			var valueRanges = new Span<Range> ( new Range [4] );
+			valuesSubstring.Split ( valueRanges, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+
+			ReadOnlySpan<char> rSpan = valuesSubstring[valueRanges [ 0 ]];
+			if ( !rSpan.IsAllAsciiDigits ( ) ) {
+				throw new FormatException ( $"Value for red component ({rSpan}) in color string must be a base-10 number from 0 to 255." );
+			}
+			ReadOnlySpan<char> gSpan = valuesSubstring[valueRanges [ 1 ]];
+			if ( !gSpan.IsAllAsciiDigits ( ) ) {
+				throw new FormatException ( $"Value for green component ({gSpan}) in color string must be a base-10 number from 0 to 255." );
+			}
+			ReadOnlySpan<char> bSpan = valuesSubstring[valueRanges [ 2 ]];
+			if ( !bSpan.IsAllAsciiDigits ( ) ) {
+				throw new FormatException ($"Value for blue component ({bSpan}) in color string must be a base-10 number from 0 to 255.");
+			}
+
+			switch ( valueRanges.Length ) {
+			case 3:
+				// rgba(r,g,b)
+				c = new Color ( byte.Parse ( rSpan ), byte.Parse ( gSpan ), byte.Parse ( bSpan ) );
+				return true;
+			case 4:
+				// rgba(r,g,b,a)
+				ReadOnlySpan<char> aSpan = valuesSubstring[valueRanges [ 3 ]];
+				if ( !aSpan.IsAllAsciiDigits ( ) ) {
+					throw new FormatException ($"Value for alpha component ({aSpan}) in color string must be a base-10 number from 0 to 255.");
+				}
+				c = new Color ( byte.Parse ( rSpan ), byte.Parse ( gSpan ), byte.Parse ( bSpan ), byte.Parse ( aSpan ) );
+				return true;
+			default:
+				c = default;
+				return false;
+			}
+		}
 	}
 	#nullable restore
-
 
 	/// <summary>
 	/// Converts the color to a string representation.
