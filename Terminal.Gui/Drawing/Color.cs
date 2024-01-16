@@ -253,7 +253,8 @@ public readonly struct Color : IEquatable<Color> {
 	/// <param name="green">The green 8-bits.</param>
 	/// <param name="blue">The blue 8-bits.</param>
 	/// <param name="alpha">Optional; defaults to 0xFF. The Alpha channel is not supported by Terminal.Gui.</param>
-	public Color (int red, int green, int blue, int alpha = 0xFF)
+	/// <remarks>Alpha channel is not currently supported by Terminal.Gui.</remarks>
+	public Color ( int red = 0, int green = 0, int blue = 0, int alpha = byte.MaxValue )
 	{
 		R = red;
 		G = green;
