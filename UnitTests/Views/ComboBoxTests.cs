@@ -78,10 +78,12 @@ namespace Terminal.Gui.ViewsTests {
 		[AutoInitShutdown]
 		public void EnsureKeyEventsDoNotCauseExceptions ()
 		{
-			var comboBox = new ComboBox ("0");
+			var comboBox = new ComboBox () {
+				Width = 0,
+				Source = ListView.MakeWrapper(Enumerable.Range (0, 15).Select (x => x.ToString ()).ToArray ()),
+				SelectedItem = 1
+			};
 
-			var source = Enumerable.Range (0, 15).Select (x => x.ToString ()).ToArray ();
-			comboBox.SetSource (source);
 
 			Application.Top.Add (comboBox);
 

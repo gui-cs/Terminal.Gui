@@ -252,7 +252,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		static IListDataSource MakeWrapper (IList source)
+		public static IListDataSource MakeWrapper (IList source)
 		{
 			return new ListWrapper (source);
 		}
