@@ -304,7 +304,6 @@ class UICatalogApp {
 	public class UICatalogTopLevel : Toplevel {
 		public MenuItem? miUseSubMenusSingleFrame;
 		public MenuItem? miIsMenuBorderDisabled;
-		public MenuItem? miForce16Colors;
 		public MenuItem? miIsMouseDisabled;
 
 		public ListView CategoryList;
@@ -359,9 +358,10 @@ class UICatalogApp {
 				CommandView = new CheckBox() { Text = "Force 16 Colors" }
 			};
 			var cb = force16ColorsShortcut.CommandView as CheckBox;
+			cb.Checked = Application.Force16Colors;
 			cb.Toggled += (s, e) => {
 				var cb = s as CheckBox;
-				Application.Force16Colors = (bool)!cb.Checked!;
+				Application.Force16Colors = cb!.Checked == true;
 				Application.Refresh ();
 			};
 			StatusBar.Add (force16ColorsShortcut);
@@ -602,26 +602,6 @@ class UICatalogApp {
 			return menuItems.ToArray ();
 		}
 
-
-		//MenuItem [] CreateForce16ColorItems ()
-		//{
-		//	var menuItems = new List<MenuItem> ();
-		//	miForce16Colors = new MenuItem {
-		//		Title = "Force _16 Colors",
-		//		Shortcut = (KeyCode)Key.F6,
-		//		Checked = Application.Force16Colors,
-		//		CanExecute = () => (bool)Application.Driver.SupportsTrueColor
-		//	};
-		//	miForce16Colors.CheckType |= MenuItemCheckStyle.Checked;
-		//	miForce16Colors.Action += () => {
-		//		miForce16Colors.Checked = Application.Force16Colors = (bool)!miForce16Colors.Checked!;
-		//		Application.Refresh ();
-		//	};
-		//	menuItems.Add (miForce16Colors);
-
-		//	return menuItems.ToArray ();
-		//}
-
 		MenuItem [] CreateDisabledEnabledMouseItems ()
 		{
 			var menuItems = new List<MenuItem> ();
@@ -747,9 +727,6 @@ class UICatalogApp {
 
 		public MenuItem []? CreateThemeMenuItems ()
 		{
-			//var menuItems = CreateForce16ColorItems ().ToList ();
-			//menuItems.Add (null!);
-
 			var menuItems = new List<MenuItem> ();
 
 			int schemeCount = 0;

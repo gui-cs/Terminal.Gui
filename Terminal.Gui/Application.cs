@@ -71,7 +71,8 @@ public static partial class Application {
 		}
 		// Don't reset ForceDriver; it needs to be set before Init is called.
 		//ForceDriver = string.Empty;
-		Force16Colors = false;
+		// Don't reset Force16Colors; it should persist across apps.
+		//Force16Colors = false;
 		_forceFakeConsole = false;
 		
 		// Run State stuff
