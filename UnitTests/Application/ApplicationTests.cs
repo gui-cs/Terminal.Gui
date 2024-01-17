@@ -734,7 +734,7 @@ public class ApplicationTests {
 		//Application._topLevels = new List<Toplevel> ();
 		Application._mouseEnteredView = new View ();
 		//Application.SupportedCultures = new List<CultureInfo> ();
-		Application.Force16Colors = true;
+		//Application.Force16Colors = true;
 		//Application.ForceDriver = "driver";
 		Application.EndAfterFirstIteration = true;
 		Application.AlternateBackwardKey = Key.A;
