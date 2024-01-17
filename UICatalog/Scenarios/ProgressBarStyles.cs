@@ -168,9 +168,11 @@ public class ProgressBarStyles : Scenario {
 			}
 		};
 
-		var ckbBidirectional = new CheckBox ("BidirectionalMarquee", true) {
+		var ckbBidirectional = new CheckBox {
 			X = Pos.Center (),
-			Y = Pos.Bottom (continuousPB) + 1
+			Y = Pos.Bottom (continuousPB) + 1,
+			Text = "BidirectionalMarquee",
+			Checked = true
 		};
 		editor.Add (ckbBidirectional);
 

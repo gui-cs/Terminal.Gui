@@ -238,7 +238,7 @@ public class ScenarioTests {
 			CanFocus = false,
 			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
-		_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
+		_computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
 		_settingsPane.Add (_computedCheckBox);
 
 		var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };

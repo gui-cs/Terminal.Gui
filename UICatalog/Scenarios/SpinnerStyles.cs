@@ -41,33 +41,37 @@ namespace UICatalog.Scenarios {
 			preview.Add (spinner);
 			spinner.AutoSpin = true;
 
-			var ckbAscii = new CheckBox ("Ascii Only", false) {
+			var ckbAscii = new CheckBox {
 				X = Pos.Center () - 7,
 				Y = Pos.Bottom (preview),
 				Enabled = false,
-				Checked = true
+				Checked = true,
+				Text = "Ascii Only"
 			};
 			Win.Add (ckbAscii);
 
-			var ckbNoSpecial = new CheckBox ("No Special", false) {
+			var ckbNoSpecial = new CheckBox {
 				X = Pos.Center () + 7,
 				Y = Pos.Bottom (preview),
 				Enabled = false,
-				Checked = true
+				Checked = true,
+				Text = "No Special"
 			};
 			Win.Add (ckbNoSpecial);
 
-			var ckbReverse = new CheckBox ("Reverse", false) {
+			var ckbReverse = new CheckBox {
 				X = Pos.Center () - 22,
 				Y = Pos.Bottom (preview) + 1,
-				Checked = false
+				Checked = false,
+				Text = "Reverse"
 			};
 			Win.Add (ckbReverse);
 
-			var ckbBounce = new CheckBox ("Bounce", false) {
+			var ckbBounce = new CheckBox {
 				X = Pos.Right (ckbReverse) + 2,
 				Y = Pos.Bottom (preview) + 1,
-				Checked = false
+				Checked = false,
+				Text = "Bounce"
 			};
 			Win.Add (ckbBounce);
 

@@ -90,17 +90,19 @@ public class Text : Scenario {
 
 		// By default TextView is a multi-line control. It can be forced to 
 		// single-line mode.
-		var chxMultiline = new CheckBox ("Multiline") {
+		var chxMultiline = new CheckBox {
 			X = Pos.Left (textView),
 			Y = Pos.Bottom (textView),
-			Checked = textView.Multiline
+			Checked = textView.Multiline,
+			Text = "Multiline"
 		};
 		Win.Add (chxMultiline);
 
-		var chxWordWrap = new CheckBox ("Word Wrap") {
+		var chxWordWrap = new CheckBox {
 			X = Pos.Right (chxMultiline) + 2,
 			Y = Pos.Top (chxMultiline),
-			Checked = textView.WordWrap
+			Checked = textView.WordWrap,
+			Text = "Word Wrap"
 		};
 		chxWordWrap.Toggled += (s, e) => textView.WordWrap = (bool)e.NewValue;
 		Win.Add (chxWordWrap);
@@ -108,10 +110,11 @@ public class Text : Scenario {
 		// TextView captures Tabs (so users can enter /t into text) by default;
 		// This means using Tab to navigate doesn't work by default. This shows
 		// how to turn tab capture off.
-		var chxCaptureTabs = new CheckBox ("Capture Tabs") {
+		var chxCaptureTabs = new CheckBox {
 			X = Pos.Right (chxWordWrap) + 2,
 			Y = Pos.Top (chxWordWrap),
-			Checked = textView.AllowsTab
+			Checked = textView.AllowsTab,
+			Text = "Capture Tabs"
 		};
 
 		chxMultiline.Toggled += (s, e) => {

@@ -133,11 +133,12 @@ namespace UICatalog.Scenarios {
 
 			// JUSTIFY CHECKBOX
 
-			var justifyCheckbox = new CheckBox ("Justify") {
+			var justifyCheckbox = new CheckBox {
 				X = Pos.Right (container) + 1,
 				Y = Pos.Y (container) + 1,
 				Width = Dim.Fill (10),
-				Height = 1
+				Height = 1,
+				Text = "Justify"
 			};
 
 			justifyCheckbox.Toggled += (s,e) => {

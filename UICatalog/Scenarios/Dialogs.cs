@@ -94,10 +94,12 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (numButtonsEdit);
 
-			var glyphsNotWords = new CheckBox ($"Add {Char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support", false) {
+			var glyphsNotWords = new CheckBox {
 				X = Pos.Left (numButtonsEdit),
 				Y = Pos.Bottom (label),
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
+				Text = $"Add {Char.ConvertFromUtf32 (CODE_POINT)} to button text to stress wide char support",
+				Checked = false
 			};
 			frame.Add (glyphsNotWords);
 

@@ -41,9 +41,11 @@ namespace UICatalog.Scenarios {
 			blockText.Text = block.ToString (); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
 			Win.Add (blockText);
 
-			var unicodeCheckBox = new CheckBox ("Unicode", Application.Top.HotKeySpecifier == (Rune)' ') {
+			var unicodeCheckBox = new CheckBox {
 				X = 0,
 				Y = Pos.Bottom (blockText) + 1,
+				Text = "Unicode",
+				Checked = Application.Top.HotKeySpecifier == (Rune)' '
 			};
 
 			Win.Add (unicodeCheckBox);

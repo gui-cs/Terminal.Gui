@@ -56,8 +56,8 @@ public class UnicodeInMenu : Scenario {
 
 		label = new Label ("CheckBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
 		Win.Add (label);
-		var checkBox = new CheckBox (gitString) { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
-		var checkBoxRight = new CheckBox ($"Align Right - {gitString}") { X = 20, Y = Pos.Bottom (checkBox), Width = Dim.Percent (50), TextAlignment = TextAlignment.Right };
+		var checkBox = new CheckBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), Text = gitString };
+		var checkBoxRight = new CheckBox { X = 20, Y = Pos.Bottom (checkBox), Width = Dim.Percent (50), TextAlignment = TextAlignment.Right, Text = $"Align Right - {gitString}" };
 		Win.Add (checkBox, checkBoxRight);
 
 		label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1 };

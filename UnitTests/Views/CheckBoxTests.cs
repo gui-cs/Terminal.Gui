@@ -20,7 +20,7 @@ public class CheckBoxTests {
 		Assert.True (ckb.CanFocus);
 		Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
 
-		ckb = new CheckBox ("Test", true);
+		ckb = new CheckBox { Text = "Test", Checked = true };
 		Assert.True (ckb.AutoSize);
 		Assert.True (ckb.Checked);
 		Assert.False (ckb.AllowNullChecked);
@@ -29,7 +29,7 @@ public class CheckBoxTests {
 		Assert.True (ckb.CanFocus);
 		Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
-		ckb = new CheckBox ("Test") { X = 1, Y = 2 };
+		ckb = new CheckBox { X = 1, Y = 2, Text = "Test" };
 		Assert.True (ckb.AutoSize);
 		Assert.False (ckb.Checked);
 		Assert.False (ckb.AllowNullChecked);
@@ -38,7 +38,7 @@ public class CheckBoxTests {
 		Assert.True (ckb.CanFocus);
 		Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
 
-		ckb = new CheckBox ("Test", true) { X = 3, Y = 4 };
+		ckb = new CheckBox { X = 3, Y = 4, Text = "Test", Checked = true };
 		Assert.True (ckb.AutoSize);
 		Assert.True (ckb.Checked);
 		Assert.False (ckb.AllowNullChecked);
@@ -497,7 +497,7 @@ public class CheckBoxTests {
 	[Fact] [AutoInitShutdown]
 	public void AllowNullChecked_Get_Set ()
 	{
-		var checkBox = new CheckBox ("Check this out 你");
+		var checkBox = new CheckBox { Text = "Check this out 你" };
 		var top = Application.Top;
 		top.Add (checkBox);
 		Application.Begin (top);

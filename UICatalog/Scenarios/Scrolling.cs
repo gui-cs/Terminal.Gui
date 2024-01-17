@@ -217,27 +217,35 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (scrollView);
 
-			var hCheckBox = new CheckBox ("Horizontal Scrollbar", scrollView.ShowHorizontalScrollIndicator) {
+			var hCheckBox = new CheckBox {
 				X = Pos.X (scrollView),
 				Y = Pos.Bottom (scrollView),
+				Text = "Horizontal Scrollbar",
+				Checked = scrollView.ShowHorizontalScrollIndicator
 			};
 			Win.Add (hCheckBox);
 
-			var vCheckBox = new CheckBox ("Vertical Scrollbar", scrollView.ShowVerticalScrollIndicator) {
+			var vCheckBox = new CheckBox {
 				X = Pos.Right (hCheckBox) + 3,
 				Y = Pos.Bottom (scrollView),
+				Text = "Vertical Scrollbar",
+				Checked = scrollView.ShowVerticalScrollIndicator
 			};
 			Win.Add (vCheckBox);
 
 			var t = "Auto Hide Scrollbars";
-			var ahCheckBox = new CheckBox (t, scrollView.AutoHideScrollBars) {
+			var ahCheckBox = new CheckBox {
 				X = Pos.Left (scrollView),
 				Y = Pos.Bottom (hCheckBox),
+				Text = t,
+				Checked = scrollView.AutoHideScrollBars
 			};
 			var k = "Keep Content Always In Viewport";
-			var keepCheckBox = new CheckBox (k, scrollView.AutoHideScrollBars) {
+			var keepCheckBox = new CheckBox {
 				X = Pos.Left (scrollView),
 				Y = Pos.Bottom (ahCheckBox),
+				Text = k,
+				Checked = scrollView.AutoHideScrollBars
 			};
 			hCheckBox.Toggled += (s, e) => {
 				if (ahCheckBox.Checked == false) {

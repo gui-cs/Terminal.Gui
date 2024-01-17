@@ -109,7 +109,7 @@ public class AllViewsTester : Scenario {
 			CanFocus = false,
 			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
-		_computedCheckBox = new CheckBox ("_Computed Layout", true) { X = 0, Y = 0 };
+		_computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "_Computed Layout", Checked = true };
 		_computedCheckBox.Toggled += (s, e) => {
 			if (_curView != null) {
 				_hostPane.LayoutSubviews ();

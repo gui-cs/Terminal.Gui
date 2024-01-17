@@ -697,22 +697,25 @@ namespace UICatalog.Scenarios {
 				};
 				Add (_txtAction);
 
-				_ckbIsTopLevel = new CheckBox ("IsTopLevel") {
+				_ckbIsTopLevel = new CheckBox {
 					X = Pos.Left (_lblTitle),
-					Y = Pos.Bottom (_lblAction) + 5
+					Y = Pos.Bottom (_lblAction) + 5,
+					Text = "IsTopLevel"
 				};
 				Add (_ckbIsTopLevel);
 
-				_ckbSubMenu = new CheckBox ("Has sub-menus") {
+				_ckbSubMenu = new CheckBox {
 					X = Pos.Left (_lblTitle),
 					Y = Pos.Bottom (_ckbIsTopLevel),
-					Checked = _menuItem == null ? !hasParent : HasSubMenus (_menuItem)
+					Checked = _menuItem == null ? !hasParent : HasSubMenus (_menuItem),
+					Text = "Has sub-menus"
 				};
 				Add (_ckbSubMenu);
 
-				_ckbNullCheck = new CheckBox ("Allow null checked") {
+				_ckbNullCheck = new CheckBox {
 					X = Pos.Left (_lblTitle),
-					Y = Pos.Bottom (_ckbSubMenu)
+					Y = Pos.Bottom (_ckbSubMenu),
+					Text = "Allow null checked"
 				};
 				Add (_ckbNullCheck);
 

@@ -21,19 +21,21 @@ namespace UICatalog.Scenarios {
 			Win.Add (lblDriverName);
 			y++;
 
-			var cbSupportsTrueColor = new CheckBox ("Driver supports true color ") {
+			var cbSupportsTrueColor = new CheckBox {
 				X = x,
 				Y = y++,
 				Checked = canTrueColor,
-				CanFocus = false
+				CanFocus = false,
+				Text = "Driver supports true color "
 			};
 			Win.Add (cbSupportsTrueColor);
 
-			var cbUseTrueColor = new CheckBox ("Force 16 colors") {
+			var cbUseTrueColor = new CheckBox {
 				X = x,
 				Y = y++,
 				Checked = Application.Force16Colors,
 				Enabled = canTrueColor,
+				Text = "Force 16 colors"
 			};
 			cbUseTrueColor.Toggled += (_, evt) => {
 				Application.Force16Colors = evt.NewValue ?? false;

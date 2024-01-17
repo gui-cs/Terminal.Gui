@@ -37,23 +37,27 @@ namespace UICatalog.Scenarios {
 
 			textField.TextChanged += (s,e) => SetupTileView ();
 
-			cbHorizontal = new CheckBox ("Horizontal") {
-				X = Pos.Right (textField) + 1
+			cbHorizontal = new CheckBox {
+				X = Pos.Right (textField) + 1,
+				Text = "Horizontal"
 			};
 			cbHorizontal.Toggled += (s, e) => SetupTileView ();
 
-			cbBorder = new CheckBox ("Border") {
-				X = Pos.Right (cbHorizontal) + 1
+			cbBorder = new CheckBox {
+				X = Pos.Right (cbHorizontal) + 1,
+				Text = "Border"
 			};
 			cbBorder.Toggled += (s, e) => SetupTileView ();
 
-			cbTitles = new CheckBox ("Titles") {
-				X = Pos.Right (cbBorder) + 1
+			cbTitles = new CheckBox {
+				X = Pos.Right (cbBorder) + 1,
+				Text = "Titles"
 			};
 			cbTitles.Toggled += (s,e) => SetupTileView ();
 
-			cbUseLabels = new CheckBox ("Use Labels") {
-				X = Pos.Right (cbTitles) + 1
+			cbUseLabels = new CheckBox {
+				X = Pos.Right (cbTitles) + 1,
+				Text = "Use Labels"
 			};
 			cbUseLabels.Toggled += (s, e) => SetupTileView ();
 

@@ -531,17 +531,19 @@ public class ButtonTests {
 		};
 		tab.Add (btnCancel);
 
-		var ckbMatchCase = new CheckBox ("Match c_ase") {
+		var ckbMatchCase = new CheckBox {
 			X = 0,
 			Y = Pos.Top (txtToFind) + 2,
-			Checked = true
+			Checked = true,
+			Text = "Match c_ase"
 		};
 		tab.Add (ckbMatchCase);
 
-		var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
+		var ckbMatchWholeWord = new CheckBox {
 			X = 0,
 			Y = Pos.Top (ckbMatchCase) + 1,
-			Checked = false
+			Checked = false,
+			Text = "Match _whole word"
 		};
 		tab.Add (ckbMatchWholeWord);
 

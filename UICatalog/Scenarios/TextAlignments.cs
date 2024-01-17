@@ -72,9 +72,11 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (update);
 
-			var enableHotKeyCheckBox = new CheckBox ("Enable Hotkey (_)", false) {
+			var enableHotKeyCheckBox = new CheckBox {
 				X = 0,
 				Y = Pos.Bottom (edit),
+				Text = "Enable Hotkey (_)",
+				Checked = false
 			};
 
 			Win.Add (enableHotKeyCheckBox);

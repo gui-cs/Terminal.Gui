@@ -10,7 +10,7 @@ public class CheckBox : View {
 	Rune _charNullChecked;
 	Rune _charChecked;
 	Rune _charUnChecked;
-	bool? @_checked;
+	bool? @_checked = false;
 	bool _allowNullChecked;
 
 	/// <summary>
@@ -34,34 +34,13 @@ public class CheckBox : View {
 	/// <summary>
 	/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
 	/// </summary>
-	public CheckBox () : this (string.Empty) { }
-
-	/// <summary>
-	/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
-	/// </summary>
-	/// <param name="s">S.</param>
-	/// <param name="is_checked">If set to <c>true</c> is checked.</param>
-	public CheckBox (string s, bool is_checked = false) : base ()
-	{
-		SetInitialProperties (s, is_checked);
-	}
-
-	// TODO: v2 - Remove constructors with parameters
-	/// <summary>
-	/// Private helper to set the initial properties of the View that were provided via constructors.
-	/// </summary>
-	/// <param name="s"></param>
-	/// <param name="is_checked"></param>
-	void SetInitialProperties (string s, bool is_checked)
-	{
+	public CheckBox () {
 		_charNullChecked = CM.Glyphs.NullChecked;
 		_charChecked = CM.Glyphs.Checked;
 		_charUnChecked = CM.Glyphs.UnChecked;
-		Checked = is_checked;
 		HotKeySpecifier = (Rune)'_';
 		CanFocus = true;
 		AutoSize = true;
-		Text = s;
 
 		// Things this view knows how to do
 		AddCommand (Command.ToggleChecked, () => ToggleChecked ());
@@ -76,7 +55,6 @@ public class CheckBox : View {
 		// Default keybindings for this view
 		KeyBindings.Add (Key.Space, Command.ToggleChecked);
 	}
-
 
 	/// <inheritdoc/>
 	public override Key HotKey {

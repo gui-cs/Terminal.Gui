@@ -20,27 +20,31 @@ namespace UICatalog.Scenarios {
 		{
 			_scenarios = Scenario.GetScenarios ();
 
-			_customRenderCB = new CheckBox ("Use custom rendering") {
+			_customRenderCB = new CheckBox {
 				X = 0,
 				Y = 0,
 				Height = 1,
+				Text = "Use custom rendering"
 			};
 			Win.Add (_customRenderCB);
 			_customRenderCB.Toggled += _customRenderCB_Toggled;
 
-			_allowMarkingCB = new CheckBox ("Allow Marking") {
+			_allowMarkingCB = new CheckBox {
 				X = Pos.Right (_customRenderCB) + 1,
 				Y = 0,
 				Height = 1,
+				Text = "Allow Marking",
+				AllowNullChecked = false
 			};
 			Win.Add (_allowMarkingCB);
 			_allowMarkingCB.Toggled += AllowMarkingCB_Toggled;
 
-			_allowMultipleCB = new CheckBox ("Allow Multi-Select") {
+			_allowMultipleCB = new CheckBox {
 				X = Pos.Right (_allowMarkingCB) + 1,
 				Y = 0,
 				Height = 1,
-				Visible = (bool)_allowMarkingCB.Checked
+				Visible = (bool)_allowMarkingCB.Checked,
+				Text = "Allow Multi-Select"
 			};
 			Win.Add (_allowMultipleCB);
 			_allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
@@ -86,9 +90,11 @@ namespace UICatalog.Scenarios {
 			_listView.SetSource (_scenarios);
 
 			var k = "Keep Content Always In Viewport";
-			var keepCheckBox = new CheckBox (k, scrollBar.AutoHideScrollBars) {
+			var keepCheckBox = new CheckBox {
 				X = Pos.AnchorEnd (k.Length + 3),
 				Y = 0,
+				Text = k,
+				Checked = scrollBar.AutoHideScrollBars
 			};
 			keepCheckBox.Toggled += (s,e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
 			Win.Add (keepCheckBox);

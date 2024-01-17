@@ -154,8 +154,8 @@ public class WindowsAndFrameViews : Scenario {
 			ColorScheme = Colors.ColorSchemes ["Error"]
 		});
 
-		subWinofFV.Add (new CheckBox ("Check me") { Y = 1 });
-		subWinofFV.Add (new CheckBox ("Or, Check me") { Y = 2 });
+		subWinofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
+		subWinofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
 		frame.Add (subWinofFV);
 		var subFrameViewofFV = new FrameView ("this is a Sub-FrameView") {
@@ -168,17 +168,19 @@ public class WindowsAndFrameViews : Scenario {
 		};
 		subFrameViewofFV.Add (new TextField ("Edit Me") { Width = 15 });
 
-		subFrameViewofFV.Add (new CheckBox ("Check me") { Y = 1 });
+		subFrameViewofFV.Add (new CheckBox () { Y = 1, Text = "Check me" });
 		// BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 
 		// its client area. #522
-		subFrameViewofFV.Add (new CheckBox ("Or, Check me") { Y = 2 });
+		subFrameViewofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
-		frame.Add (new CheckBox ("Btn1 (Y = Pos.AnchorEnd (1))") {
+		frame.Add (new CheckBox {
 			X = 0,
 			Y = Pos.AnchorEnd (1),
+			Text = "Btn1 (Y = Pos.AnchorEnd (1))"
 		});
-		CheckBox c = new CheckBox ("Btn2 (Y = Pos.AnchorEnd (1))") {
+		CheckBox c = new CheckBox {
 			Y = Pos.AnchorEnd (1),
+			Text = "Btn2 (Y = Pos.AnchorEnd (1))"
 		};
 		c.X = Pos.AnchorEnd () - (Pos.Right (c) - Pos.Left (c));
 		frame.Add (c);

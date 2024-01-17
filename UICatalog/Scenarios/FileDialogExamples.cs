@@ -33,25 +33,25 @@ namespace UICatalog.Scenarios {
 			var y = 0;
 			var x = 1;
 
-			cbMustExist = new CheckBox ("Must Exist") { Checked = true, Y = y++, X = x };
+			cbMustExist = new CheckBox { Checked = true, Y = y++, X = x, Text = "Must Exist" };
 			Win.Add (cbMustExist);
 
-			cbUseColors = new CheckBox ("Use Colors") { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x };
+			cbUseColors = new CheckBox { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x, Text = "Use Colors" };
 			Win.Add (cbUseColors);
 
-			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X = x };
+			cbCaseSensitive = new CheckBox { Checked = false, Y = y++, X = x, Text = "Case Sensitive Search" };
 			Win.Add (cbCaseSensitive);
 
-			cbAllowMultipleSelection = new CheckBox ("Multiple") { Checked = false, Y = y++, X = x };
+			cbAllowMultipleSelection = new CheckBox { Checked = false, Y = y++, X = x, Text = "Multiple" };
 			Win.Add (cbAllowMultipleSelection);
 
-			cbShowTreeBranchLines = new CheckBox ("Tree Branch Lines") { Checked = true, Y = y++, X = x };
+			cbShowTreeBranchLines = new CheckBox { Checked = true, Y = y++, X = x, Text = "Tree Branch Lines" };
 			Win.Add (cbShowTreeBranchLines);
 
-			cbAlwaysTableShowHeaders = new CheckBox ("Always Show Headers") { Checked = true, Y = y++, X = x };
+			cbAlwaysTableShowHeaders = new CheckBox { Checked = true, Y = y++, X = x, Text = "Always Show Headers" };
 			Win.Add (cbAlwaysTableShowHeaders);
 
-			cbDrivesOnlyInTree = new CheckBox ("Only Show Drives") { Checked = false, Y = y++, X = x };
+			cbDrivesOnlyInTree = new CheckBox { Checked = false, Y = y++, X = x, Text = "Only Show Drives" };
 			Win.Add (cbDrivesOnlyInTree);
 
 			y = 0;
@@ -129,7 +129,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (new Label ("Cancel Text:") { X = x, Y = y++ });
 			tbCancelButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbCancelButton);
-			cbFlipButtonOrder = new CheckBox ("Flip Order") { X = x, Y = y++ };
+			cbFlipButtonOrder = new CheckBox { X = x, Y = y++, Text = "Flip Order" };
 			Win.Add (cbFlipButtonOrder);
 
 			var btn = new Button {

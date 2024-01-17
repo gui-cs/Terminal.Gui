@@ -20,21 +20,24 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (txtInput);
 
-			var ckbShift = new CheckBox ("Shift") {
+			var ckbShift = new CheckBox {
 				X = Pos.Center (),
-				Y = Pos.Center () - 4
+				Y = Pos.Center () - 4,
+				Text = "Shift"
 			};
 			Win.Add (ckbShift);
 
-			var ckbAlt = new CheckBox ("Alt") {
+			var ckbAlt = new CheckBox {
 				X = Pos.Center (),
-				Y = Pos.Center () - 3
+				Y = Pos.Center () - 3,
+				Text = "Alt"
 			};
 			Win.Add (ckbAlt);
 
-			var ckbControl = new CheckBox ("Control") {
+			var ckbControl = new CheckBox {
 				X = Pos.Center (),
-				Y = Pos.Center () - 2
+				Y = Pos.Center () - 2,
+				Text = "Control"
 			};
 			Win.Add (ckbControl);
 

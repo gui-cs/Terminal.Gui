@@ -139,9 +139,11 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
-			var ckbWrapMessage = new CheckBox ("_Wrap Message", true) {
+			var ckbWrapMessage = new CheckBox {
 				X = Pos.Right (label) + 1,
-				Y = Pos.Bottom (styleRadioGroup)
+				Y = Pos.Bottom (styleRadioGroup),
+				Text = "_Wrap Message",
+				Checked = true
 			};
 			frame.Add (ckbWrapMessage);
 

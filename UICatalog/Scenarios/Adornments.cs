@@ -342,13 +342,14 @@ public class Adornments : Scenario {
 					LayoutSubviews ();
 				};
 
-				var ckbTitle = new CheckBox ("Show Title") {
+				var ckbTitle = new CheckBox {
 					BorderStyle = LineStyle.Double,
 					X = Pos.Left (_borderEditor),
 					Y = Pos.Bottom (_borderEditor) - 1,
 					Width = Dim.Width (_borderEditor),
 					Checked = true,
-					SuperViewRendersLineCanvas = true
+					SuperViewRendersLineCanvas = true,
+					Text = "Show Title"
 				};
 				ckbTitle.Toggled += (sender, args) => {
 					if (ckbTitle.Checked == true) {
