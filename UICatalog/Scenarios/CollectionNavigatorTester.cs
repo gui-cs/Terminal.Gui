@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 
 		System.Collections.Generic.List<string> _items = new string [] {
@@ -95,7 +95,7 @@ namespace UICatalog.Scenarios {
 					allowMarking,
 					allowMultiSelection,
 					null,
-					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit(), null, null, Application.QuitKey),
+					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit(), null, null, (KeyCode)Application.QuitKey),
 				}),
 				new MenuBarItem("_Quit", $"{Application.QuitKey}", () => Quit()),
 			});

@@ -15,8 +15,8 @@ namespace UICatalog.Scenarios {
 			// string txt = "┌──┴──┐\n┤HELLO├\n└──┬──┘";
 			string txt = "HELLO WORLD";
 
-			var color1 = new ColorScheme { Normal = Application.Driver.MakeAttribute (Color.Black, Color.Gray) };
-			var color2 = new ColorScheme { Normal = Application.Driver.MakeAttribute (Color.Black, Color.DarkGray) };
+			var color1 = new ColorScheme { Normal = new Attribute (Color.Black, Color.Gray) };
+			var color2 = new ColorScheme { Normal = new Attribute (Color.Black, Color.DarkGray) };
 
 			var txts = new List<Label> (); // single line
 			var mtxts = new List<Label> (); // multi line
@@ -105,7 +105,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (container) + 1,
 				Width = Dim.Fill (10),
 				Height = Dim.Fill (1),
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				Text = txt
 			};
 

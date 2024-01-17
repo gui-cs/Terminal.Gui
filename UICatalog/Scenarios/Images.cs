@@ -5,56 +5,51 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
-
-
+using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Images", Description: "Demonstration of how to render an image with/without true color support.")]
 	[ScenarioCategory ("Colors")]
+	[ScenarioCategory ("Drawing")]
 	public class Images : Scenario {
 		public override void Setup ()
 		{
 			base.Setup ();
 
-			var x = 0;
-			var y = 0;
-
 			var canTrueColor = Application.Driver.SupportsTrueColor;
 
-			var lblDriverName = new Label ($"Current driver is {Application.Driver.GetType ().Name}") {
-				X = x,
-				Y = y++
+			var lblDriverName = new Label ($"Driver is {Application.Driver.GetType ().Name}") {
+				X = 0,
+				Y = 0
 			};
 			Win.Add (lblDriverName);
-			y++;
 
-			var cbSupportsTrueColor = new CheckBox ("Driver supports true color ") {
-				X = x,
-				Y = y++,
+			var cbSupportsTrueColor = new CheckBox ("supports true color ") {
+				X = Pos.Right(lblDriverName) + 2,
+				Y = 0,
 				Checked = canTrueColor,
 				CanFocus = false
 			};
 			Win.Add (cbSupportsTrueColor);
 
 			var cbUseTrueColor = new CheckBox ("Use true color") {
-				X = x,
-				Y = y++,
-				Checked = Application.Driver.Force16Colors,
+				X = Pos.Right(cbSupportsTrueColor) + 2,
+				Y = 0,
+				Checked = !Application.Force16Colors,
 				Enabled = canTrueColor,
 			};
-			cbUseTrueColor.Toggled += (_, evt) => Application.Driver.Force16Colors = evt.NewValue ?? false;
+			cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
 			Win.Add (cbUseTrueColor);
 
 			var btnOpenImage = new Button ("Open Image") {
-				X = x,
-				Y = y++
+				X = Pos.Right (cbUseTrueColor) + 2,
+				Y = 0
 			};
 			Win.Add (btnOpenImage);
 
 			var imageView = new ImageView () {
-				X = x,
-				Y = y++,
+				X = 0,
+				Y = Pos.Bottom(lblDriverName),
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
@@ -62,11 +57,16 @@ namespace UICatalog.Scenarios {
 
 
 			btnOpenImage.Clicked += (_, _) => {
-				var ofd = new OpenDialog ("Open Image") { AllowsMultipleSelection = false };
+				var ofd = new OpenDialog ("Open Image") { AllowsMultipleSelection = false,  };
 				Application.Run (ofd);
 
-				if (ofd.Canceled)
+				if (ofd.Path is not null) {
+					Directory.SetCurrentDirectory (Path.GetFullPath(Path.GetDirectoryName(ofd.Path)!));
+				}
+
+				if (ofd.Canceled) {
 					return;
+				}
 
 				var path = ofd.FilePaths [0];
 
@@ -89,6 +89,7 @@ namespace UICatalog.Scenarios {
 				}
 
 				imageView.SetImage (img);
+				Application.Refresh ();
 			};
 		}
 
@@ -124,7 +125,7 @@ namespace UICatalog.Scenarios {
 					for (int x = 0; x < bounds.Width; x++) {
 						var rgb = matchSize [x, y];
 
-						var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new TrueColor (), new TrueColor (rgb.R, rgb.G, rgb.B)));
+						var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new Color (), new Color (rgb.R, rgb.G, rgb.B)));
 
 						Driver.SetAttribute (attr);
 						AddRune (x, y, (System.Text.Rune)' ');

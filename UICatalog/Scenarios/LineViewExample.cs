@@ -9,7 +9,7 @@ using static UICatalog.Scenario;
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Line View", Description: "Demonstrates drawing lines using the LineView control.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("LineView")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("LineView"),ScenarioCategory ("Borders")]
 	public class LineViewExample : Scenario {
 
 		public override void Setup ()
@@ -17,7 +17,6 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 			new MenuBarItem ("_File", new MenuItem [] {

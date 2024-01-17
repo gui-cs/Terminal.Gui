@@ -6,7 +6,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "RuneWidthGreaterThanOne", Description: "Test rune width greater than one")]
-	[ScenarioCategory ("Controls")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("Text and Formatting"), ScenarioCategory ("Tests"),]
 	public class RuneWidthGreaterThanOne : Scenario {
 		private Label _label;
 		private TextField _text;
@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				ColorScheme = new ColorScheme () {
-					Normal = Colors.Base.Focus
+					Normal = Colors.ColorSchemes ["Base"].Focus
 				}
 			};
 			_text = new TextField () {

@@ -84,11 +84,11 @@ namespace UICatalog.Scenarios {
 					Height = 4
 				};
 
-				var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter) {
+				var _txtDelimiter = new TextField (MenuBar.ShortcutDelimiter.ToString()) {
 					X = Pos.Center (),
 					Width = 2,
 				};
-				_txtDelimiter.TextChanged += (s, _) => MenuBar.ShortcutDelimiter = _txtDelimiter.Text;
+				_txtDelimiter.TextChanged += (s, _) => MenuBar.ShortcutDelimiter = _txtDelimiter.Text.ToRunes()[0];
 				_frmDelimiter.Add (_txtDelimiter);
 
 				Add (_frmDelimiter);
@@ -140,7 +140,7 @@ namespace UICatalog.Scenarios {
 				_frmMenu.Add (_btnNext);
 
 				var _lblMenuBar = new Label () {
-					ColorScheme = Colors.Dialog,
+					ColorScheme = Colors.ColorSchemes ["Dialog"],
 					TextAlignment = TextAlignment.Centered,
 					X = Pos.Right (_btnPrevious) + 1,
 					Y = Pos.Top (_btnPrevious),
@@ -166,7 +166,7 @@ namespace UICatalog.Scenarios {
 				_frmMenu.Add (_btnPreviowsParent);
 
 				_lstMenus = new ListView (new List<DynamicMenuItemList> ()) {
-					ColorScheme = Colors.Dialog,
+					ColorScheme = Colors.ColorSchemes ["Dialog"],
 					X = Pos.Right (_btnPrevious) + 1,
 					Y = Pos.Top (_btnPrevious) + 2,
 					Width = _lblMenuBar.Width,
@@ -723,30 +723,28 @@ namespace UICatalog.Scenarios {
 					ReadOnly = true
 				};
 				_txtShortcut.KeyDown += (s, e) => {
-					if (!ProcessKey (e.KeyEvent)) {
+					if (!ProcessKey (e)) {
 						return;
 					}
-
-					var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-					if (CheckShortcut (k, true)) {
+					if (CheckShortcut (e.KeyCode, true)) {
 						e.Handled = true;
 					}
 				};
 
-				bool ProcessKey (KeyEvent ev)
+				bool ProcessKey (Key ev)
 				{
-					switch (ev.Key) {
-					case Key.CursorUp:
-					case Key.CursorDown:
-					case Key.Tab:
-					case Key.BackTab:
+					switch (ev.KeyCode) {
+					case KeyCode.CursorUp:
+					case KeyCode.CursorDown:
+					case KeyCode.Tab:
+					case KeyCode.Tab | KeyCode.ShiftMask:
 						return false;
 					}
 
 					return true;
 				}
 
-				bool CheckShortcut (Key k, bool pre)
+				bool CheckShortcut (KeyCode k, bool pre)
 				{
 					var m = _menuItem != null ? _menuItem : new MenuItem ();
 					if (pre && !ShortcutHelper.PreShortcutValidation (k)) {
@@ -760,14 +758,13 @@ namespace UICatalog.Scenarios {
 						}
 						return true;
 					}
-					_txtShortcut.Text = ShortcutHelper.GetShortcutTag (k);
+					_txtShortcut.Text = Key.ToString (k, MenuBar.ShortcutDelimiter);// ShortcutHelper.GetShortcutTag (k);
 
 					return true;
 				}
 
 				_txtShortcut.KeyUp += (s, e) => {
-					var k = ShortcutHelper.GetModifiersKey (e.KeyEvent);
-					if (CheckShortcut (k, false)) {
+					if (CheckShortcut (e.KeyCode, false)) {
 						e.Handled = true;
 					}
 				};

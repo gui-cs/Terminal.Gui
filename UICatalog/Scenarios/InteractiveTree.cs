@@ -15,7 +15,6 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
 
 			var menu = new MenuBar (new MenuBarItem [] {
 				new MenuBarItem ("_File", new MenuItem [] {
@@ -30,23 +29,23 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (),
 				Height = Dim.Fill (1),
 			};
-			treeView.KeyPress += TreeView_KeyPress;
+			treeView.KeyDown += TreeView_KeyPress;
 
 			Win.Add (treeView);
 
 			var statusBar = new StatusBar (new StatusItem [] {
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(Key.CtrlMask | Key.C, "~^C~ Add Child", () => AddChildNode()),
-				new StatusItem(Key.CtrlMask | Key.T, "~^T~ Add Root", () => AddRootNode()),
-				new StatusItem(Key.CtrlMask | Key.R, "~^R~ Rename Node", () => RenameNode()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Add Child", () => AddChildNode()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.T, "~^T~ Add Root", () => AddRootNode()),
+				new StatusItem(KeyCode.CtrlMask | KeyCode.R, "~^R~ Rename Node", () => RenameNode()),
 			});
 			Application.Top.Add (statusBar);
 
 		}
 
-		private void TreeView_KeyPress (object sender, KeyEventEventArgs obj)
+		private void TreeView_KeyPress (object sender, Key obj)
 		{
-			if (obj.KeyEvent.Key == Key.DeleteChar) {
+			if (obj.KeyCode == KeyCode.Delete) {
 
 				var toDelete = treeView.SelectedObject;
 

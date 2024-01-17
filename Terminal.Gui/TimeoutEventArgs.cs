@@ -5,7 +5,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// <see cref="EventArgs"/> for timeout events (e.g. <see cref="MainLoop.TimeoutAdded"/>)
 	/// </summary>
-	public class TimeoutEventArgs : EventArgs {
+	internal class TimeoutEventArgs : EventArgs {
 		/// <summary>
 		/// Gets the timeout callback handler
 		/// </summary>

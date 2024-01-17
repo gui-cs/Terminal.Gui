@@ -68,6 +68,9 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal ("U+0061 'a'; Normal: Red,Red; Focus: White,Black; HotNormal: White,Black; HotFocus: White,Black; Disabled: White,Black", rc2.ToString ());
 		}
 
+
+		// TODO: Move the tests below to View or Color - they test ColorScheme, not RuneCell primitives.
+
 		private TextView CreateTextView ()
 		{
 			return new TextView () { Width = 30, Height = 10 };
@@ -100,15 +103,15 @@ Error   ";
 
 			var attributes = new Attribute [] {
 				// 0
-				Colors.TopLevel.Focus,
+				Colors.ColorSchemes ["TopLevel"].Focus,
 				// 1
-				Colors.Base.Focus,
+				Colors.ColorSchemes ["Base"].Focus,
 				// 2
-				Colors.Dialog.Focus,
+				Colors.ColorSchemes ["Dialog"].Focus,
 				// 3
-				Colors.Menu.Focus,
+				Colors.ColorSchemes ["Menu"].Focus,
 				// 4
-				Colors.Error.Focus
+				Colors.ColorSchemes ["Error"].Focus
 			};
 			var expectedColor = @"
 0000000000
@@ -116,12 +119,12 @@ Error   ";
 2222220000
 3333000000
 4444400000";
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverAttributesAre (expectedColor, driver: Application.Driver, attributes);
 
 			tv.WordWrap = true;
 			Application.Refresh ();
 			TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverAttributesAre (expectedColor, driver: Application.Driver, attributes);
 
 			tv.CursorPosition = new Point (6, 2);
 			tv.SelectionStartColumn = 0;
@@ -149,7 +152,7 @@ Dialogror ";
 4444444444
 4444000000
 4444444440";
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverAttributesAre (expectedColor, driver: Application.Driver, attributes);
 
 			tv.Undo ();
 			tv.CursorPosition = new Point (0, 3);
@@ -180,7 +183,7 @@ ror       ";
 4444000000
 4444440000
 4440000000";
-			TestHelpers.AssertDriverColorsAre (expectedColor, attributes);
+			TestHelpers.AssertDriverAttributesAre (expectedColor, driver: Application.Driver, attributes);
 
 			Application.End (rs);
 		}

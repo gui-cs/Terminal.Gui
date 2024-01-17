@@ -23,9 +23,9 @@ namespace Terminal.Gui {
 		}
 
 		/// <inheritdoc/>
-		public override bool OnDrawFrames ()
+		public override bool OnDrawAdornments ()
 		{
-			var screenBounds = ViewToScreen (Bounds);
+			var screenBounds = BoundsToScreen (Bounds);
 			LineCanvas lc;
 
 			lc = SuperView?.LineCanvas;
@@ -43,7 +43,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public override void OnDrawContent (Rect contentArea)
 		{
-			OnDrawFrames ();
+			OnDrawAdornments ();
 		}
 	}
 }

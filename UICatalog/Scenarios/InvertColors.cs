@@ -10,21 +10,21 @@ namespace UICatalog.Scenarios {
 	public class InvertColors : Scenario {
 		public override void Setup ()
 		{
-			Win.ColorScheme = Colors.TopLevel;
+			Win.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			List<Label> labels = new List<Label> ();
-			var foreColors = Enum.GetValues (typeof (Color)).Cast<Color> ().ToArray ();
+			var foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();
 			for (int y = 0; y < foreColors.Length; y++) {
 
 				var fore = foreColors [y];
 				var back = foreColors [(y + 1) % foreColors.Length];
-				var color = Application.Driver.MakeAttribute (fore, back);
+				var color = new Attribute (fore, back);
 
 				var label = new Label ($"{fore} on {back}") {
 					ColorScheme = new ColorScheme (),
 					Y = y
 				};
-				label.ColorScheme.Normal = color;
+				label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
 				Win.Add (label);
 				labels.Add (label);
 			}
@@ -33,13 +33,15 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = foreColors.Length + 1,
 			};
-			button.Clicked += (s,e) => {
+			button.Clicked += (s, e) => {
 
 				foreach (var label in labels) {
 					var color = label.ColorScheme.Normal;
-					color = Application.Driver.MakeAttribute (color.Background, color.Foreground);
+					color = new Attribute (color.Background, color.Foreground);
 
-					label.ColorScheme.Normal = color;
+					label.ColorScheme = new ColorScheme (label.ColorScheme) {
+						Normal = color
+					};
 					label.Text = $"{color.Foreground} on {color.Background}";
 					label.SetNeedsDisplay ();
 

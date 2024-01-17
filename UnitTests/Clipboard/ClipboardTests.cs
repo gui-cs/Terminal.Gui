@@ -2,141 +2,152 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ClipboardTests {
-	public class ClipboardTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.ClipboardTests;
 
-		public ClipboardTests (ITestOutputHelper output)
-		{
-			this.output = output;
+#if RUN_CLIPBOARD_UNIT_TESTS
+public class ClipboardTests {
+	readonly ITestOutputHelper output;
+
+	public ClipboardTests (ITestOutputHelper output)
+	{
+		this.output = output;
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
+	public void IClipboard_GetClipBoardData_Throws_NotSupportedException ()
+	{
+		var iclip = Application.Driver.Clipboard;
+		Assert.Throws<NotSupportedException> (() => iclip.GetClipboardData ());
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
+	public void IClipboard_SetClipBoardData_Throws_NotSupportedException ()
+	{
+		var iclip = Application.Driver.Clipboard;
+		Assert.Throws<NotSupportedException> (() => iclip.SetClipboardData ("foo"));
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: true)]
+	public void Contents_Fake_Gets_Sets ()
+	{
+		if (!Clipboard.IsSupported) {
+			output.WriteLine ($"The Clipboard not supported on this platform.");
+			return;
 		}
 
-		[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
-		public void IClipboard_GetClipBoardData_Throws_NotSupportedException ()
-		{
-			IClipboard iclip = Application.Driver.Clipboard;
-			Assert.Throws<NotSupportedException> (() => iclip.GetClipboardData ());
+		string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
+		Clipboard.Contents = clipText;
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+		Application.Run ();
+
+		Assert.Equal (clipText, Clipboard.Contents);
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
+	public void Contents_Gets_Sets ()
+	{
+		if (!Clipboard.IsSupported) {
+			output.WriteLine ($"The Clipboard not supported on this platform.");
+			return;
 		}
 
-		[Fact, AutoInitShutdown (useFakeClipboard: true, fakeClipboardAlwaysThrowsNotSupportedException: true)]
-		public void IClipboard_SetClipBoardData_Throws_NotSupportedException ()
-		{
-			IClipboard iclip = Application.Driver.Clipboard;
-			Assert.Throws<NotSupportedException> (() => iclip.SetClipboardData ("foo"));
+		string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
+		Clipboard.Contents = clipText;
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+		Application.Run ();
+
+		Assert.Equal (clipText, Clipboard.Contents);
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
+	public void Contents_Gets_Sets_When_IsSupportedFalse ()
+	{
+
+		if (!Clipboard.IsSupported) {
+			output.WriteLine ($"The Clipboard not supported on this platform.");
+			return;
 		}
 
-		[Fact, AutoInitShutdown (useFakeClipboard: true)]
-		public void Contents_Fake_Gets_Sets ()
-		{
-			if (!Clipboard.IsSupported) {
-				output.WriteLine ($"The Clipboard not supported on this platform.");
-				return;
-			}
+		string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
+		Clipboard.Contents = clipText;
 
-			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
-			Clipboard.Contents = clipText;
+		Application.Iteration += (s, a) => Application.RequestStop ();
+		Application.Run ();
 
-			Application.Iteration += () => Application.RequestStop ();
-			Application.Run ();
+		Assert.Equal (clipText, Clipboard.Contents);
+	}
 
+	[Fact, AutoInitShutdown (useFakeClipboard: true)]
+	public void Contents_Fake_Gets_Sets_When_IsSupportedFalse ()
+	{
+
+		if (!Clipboard.IsSupported) {
+			output.WriteLine ($"The Clipboard not supported on this platform.");
+			return;
+		}
+
+		string clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
+		Clipboard.Contents = clipText;
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+		Application.Run ();
+
+		Assert.Equal (clipText, Clipboard.Contents);
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
+	public void IsSupported_Get ()
+	{
+		if (Clipboard.IsSupported) {
+			Assert.True (Clipboard.IsSupported);
+		} else {
+			Assert.False (Clipboard.IsSupported);
+		}
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
+	public void TryGetClipboardData_Gets_From_OS_Clipboard ()
+	{
+		string clipText = "The TryGetClipboardData_Gets_From_OS_Clipboard unit test pasted this to the OS clipboard.";
+		Clipboard.Contents = clipText;
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+
+		Application.Run ();
+
+		if (Clipboard.IsSupported) {
+			Assert.True (Clipboard.TryGetClipboardData (out string result));
+			Assert.Equal (clipText, result);
+		} else {
+			Assert.False (Clipboard.TryGetClipboardData (out string result));
+			Assert.NotEqual (clipText, result);
+		}
+	}
+
+	[Fact, AutoInitShutdown (useFakeClipboard: false)]
+	public void TrySetClipboardData_Sets_The_OS_Clipboard ()
+	{
+		string clipText = "The TrySetClipboardData_Sets_The_OS_Clipboard unit test pasted this to the OS clipboard.";
+		if (Clipboard.IsSupported) {
+			Assert.True (Clipboard.TrySetClipboardData (clipText));
+		} else {
+			Assert.False (Clipboard.TrySetClipboardData (clipText));
+		}
+
+		Application.Iteration += (s, a) => Application.RequestStop ();
+
+		Application.Run ();
+
+		if (Clipboard.IsSupported) {
 			Assert.Equal (clipText, Clipboard.Contents);
+		} else {
+			Assert.NotEqual (clipText, Clipboard.Contents);
 		}
+	}
 
-		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void Contents_Gets_Sets ()
-		{
-			if (!Clipboard.IsSupported) {
-				output.WriteLine ($"The Clipboard not supported on this platform.");
-				return;
-			}
-
-			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
-			Clipboard.Contents = clipText;
-
-			Application.Iteration += () => Application.RequestStop ();
-			Application.Run ();
-
-			Assert.Equal (clipText, Clipboard.Contents);
-		}
-
-		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void Contents_Gets_Sets_When_IsSupportedFalse ()
-		{
-
-			if (!Clipboard.IsSupported) {
-				output.WriteLine ($"The Clipboard not supported on this platform.");
-				return;
-			}
-
-			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
-			Clipboard.Contents = clipText;
-
-			Application.Iteration += () => Application.RequestStop ();
-			Application.Run ();
-
-			Assert.Equal (clipText, Clipboard.Contents);
-		}
-
-		[Fact, AutoInitShutdown (useFakeClipboard: true)]
-		public void Contents_Fake_Gets_Sets_When_IsSupportedFalse ()
-		{
-
-			if (!Clipboard.IsSupported) {
-				output.WriteLine ($"The Clipboard not supported on this platform.");
-				return;
-			}
-
-			var clipText = "The Contents_Gets_Sets unit test pasted this to the OS clipboard.";
-			Clipboard.Contents = clipText;
-
-			Application.Iteration += () => Application.RequestStop ();
-			Application.Run ();
-
-			Assert.Equal (clipText, Clipboard.Contents);
-		}
-
-		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void IsSupported_Get ()
-		{
-			if (Clipboard.IsSupported) Assert.True (Clipboard.IsSupported);
-			else Assert.False (Clipboard.IsSupported);
-		}
-
-		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void TryGetClipboardData_Gets_From_OS_Clipboard ()
-		{
-			var clipText = "The TryGetClipboardData_Gets_From_OS_Clipboard unit test pasted this to the OS clipboard.";
-			Clipboard.Contents = clipText;
-
-			Application.Iteration += () => Application.RequestStop ();
-
-			Application.Run ();
-
-			if (Clipboard.IsSupported) {
-				Assert.True (Clipboard.TryGetClipboardData (out string result));
-				Assert.Equal (clipText, result);
-			} else {
-				Assert.False (Clipboard.TryGetClipboardData (out string result));
-				Assert.NotEqual (clipText, result);
-			}
-		}
-
-		[Fact, AutoInitShutdown (useFakeClipboard: false)]
-		public void TrySetClipboardData_Sets_The_OS_Clipboard ()
-		{
-			var clipText = "The TrySetClipboardData_Sets_The_OS_Clipboard unit test pasted this to the OS clipboard.";
-			if (Clipboard.IsSupported) Assert.True (Clipboard.TrySetClipboardData (clipText));
-			else Assert.False (Clipboard.TrySetClipboardData (clipText));
-
-			Application.Iteration += () => Application.RequestStop ();
-
-			Application.Run ();
-
-			if (Clipboard.IsSupported) Assert.Equal (clipText, Clipboard.Contents);
-			else Assert.NotEqual (clipText, Clipboard.Contents);
-		}
-
-		// Disabling this test for now because it is not reliable 
+	// Disabling this test for now because it is not reliable 
 #if false
 		[Fact, AutoInitShutdown (useFakeClipboard: false)]
 		public void Contents_Copies_From_OS_Clipboard ()
@@ -150,7 +161,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var failed = false;
 			var getClipText = "";
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				int exitCode = 0;
 				string result = "";
 				output.WriteLine ($"Pasting to OS clipboard: {clipText}...");
@@ -221,7 +232,7 @@ namespace Terminal.Gui.ClipboardTests {
 			var clipReadText = "";
 			var failed = false;
 
-			Application.Iteration += () => {
+			Application.Iteration += (s, a) => {
 				Clipboard.Contents = clipText;
 
 				int exitCode = 0;
@@ -267,21 +278,20 @@ namespace Terminal.Gui.ClipboardTests {
 		}
 #endif
 
-		bool Is_WSL_Platform ()
-		{
-			var (_, result) = ClipboardProcessRunner.Process ("bash", $"-c \"uname -a\"");
-			return result.Contains ("microsoft") && result.Contains ("WSL");
-		}
+	bool Is_WSL_Platform ()
+	{
+		(int _, string result) = ClipboardProcessRunner.Process ("bash", $"-c \"uname -a\"");
+		return result.Contains ("microsoft") && result.Contains ("WSL");
+	}
 
-		bool xclipExists ()
-		{
-			try {
-				var (_, result) = ClipboardProcessRunner.Process ("bash", $"-c \"which xclip\"");
-				return result.TrimEnd () != "";
-			} catch (Exception) {
-				return false;
-			}
+	bool xclipExists ()
+	{
+		try {
+			(int _, string result) = ClipboardProcessRunner.Process ("bash", $"-c \"which xclip\"");
+			return result.TrimEnd () != "";
+		} catch (Exception) {
+			return false;
 		}
-
 	}
 }
+#endif

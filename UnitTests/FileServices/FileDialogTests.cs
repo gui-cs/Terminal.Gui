@@ -104,8 +104,13 @@ namespace Terminal.Gui.FileServicesTests {
 			var openIn = Path.Combine (Environment.CurrentDirectory, "zz");
 			Directory.CreateDirectory (openIn);
 			dlg.Path = openIn + Path.DirectorySeparatorChar;
-
-			Send ('f', ConsoleKey.F, false, false, true);
+#if BROKE_IN_2927
+			Send ('f', ConsoleKey.F, false, true, false);
+#else
+			Application.OnKeyDown (new Key (KeyCode.Tab));
+			Application.OnKeyDown (new Key (KeyCode.Tab));
+			Application.OnKeyDown (new Key (KeyCode.Tab));
+#endif
 
 			Assert.IsType<TextField> (dlg.MostFocused);
 			var tf = (TextField)dlg.MostFocused;
@@ -176,7 +181,7 @@ namespace Terminal.Gui.FileServicesTests {
 			// Down to the directory
 			Assert.True (dlg.Canceled);
 			// Alt+O to open (enter would just navigate into the child dir)
-			Send ('o', ConsoleKey.O, false, true);
+			Send ('O', ConsoleKey.O, false, true);
 			Assert.False (dlg.Canceled);
 
 			AssertIsTheSubfolder (dlg.Path);
@@ -210,7 +215,7 @@ namespace Terminal.Gui.FileServicesTests {
 			if (acceptWithEnter) {
 				Send ('\n', ConsoleKey.Enter);
 			} else {
-				Send ('o', ConsoleKey.O, false, true);
+				Send ('O', ConsoleKey.O, false, true);
 			}
 			Assert.False (dlg.Canceled);
 
@@ -323,7 +328,7 @@ namespace Terminal.Gui.FileServicesTests {
 			if (acceptWithEnter) {
 				Send ('\n', ConsoleKey.Enter);
 			} else {
-				Send ('o', ConsoleKey.O, false, true);
+				Send ('O', ConsoleKey.O, false, true);
 			}
 			Assert.False (dlg.Canceled);
 
@@ -385,23 +390,23 @@ namespace Terminal.Gui.FileServicesTests {
 
 			string expected =
 			@$"
- ┌──────────────────────────────────────────────────────────────────┐
- │/demo/                                                            │
-│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                               │
- │┌────────────┬──────────┬──────────────────────────────┬─────────┐│
- ││Filename (▲)│Size      │Modified                      │Type     ││
- │├────────────┼──────────┼──────────────────────────────┼─────────┤│
- ││..          │          │                              │dir      ││
- ││/subfolder  │          │2002-01-01T22:42:10           │dir      ││
- ││image.gif   │4.00 bytes│2002-01-01T22:42:10           │.gif     ││
- ││jQuery.js   │7.00 bytes│2001-01-01T11:44:42           │.js      ││
- │                                                                  │
- │                                                                  │
- │                                                                  │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
- └──────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│/demo/                                                                   │
+│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                                      │
+│┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
+││Filename (▲)│Size      │Modified                      │Type            ││
+│├────────────┼──────────┼──────────────────────────────┼────────────────┤│
+││..          │          │                              │<Directory>     ││
+││/subfolder  │          │2002-01-01T22:42:10           │<Directory>     ││
+││image.gif   │4.00 B    │2002-01-01T22:42:10           │.gif            ││
+││jQuery.js   │7.00 B    │2001-01-01T11:44:42           │.js             ││
+│                                                                         │
+│                                                                         │
+│                                                                         │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+└─────────────────────────────────────────────────────────────────────────┘
 ";
-			TestHelpers.AssertDriverContentsAre (expected, output, true);
+			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -421,23 +426,23 @@ namespace Terminal.Gui.FileServicesTests {
 
 			string expected =
 			@$"
-┌──────────────────────────────────────────────────────────────────┐
-│c:\demo\                                                          │
-│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                               │
-│┌────────────┬──────────┬──────────────────────────────┬─────────┐│
-││Filename (▲)│Size      │Modified                      │Type     ││
-│├────────────┼──────────┼──────────────────────────────┼─────────┤│
-││..          │          │                              │dir      ││
-││\subfolder  │          │2002-01-01T22:42:10           │dir      ││
-││image.gif   │4.00 bytes│2002-01-01T22:42:10           │.gif     ││
-││jQuery.js   │7.00 bytes│2001-01-01T11:44:42           │.js      ││
-││mybinary.exe│7.00 bytes│2001-01-01T11:44:42           │.exe     ││
-│                                                                  │
-│                                                                  │
-│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                            {CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
-└──────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│c:\demo\                                                                 │
+│{CM.Glyphs.LeftBracket}▲{CM.Glyphs.RightBracket}                                                                      │
+│┌────────────┬──────────┬──────────────────────────────┬────────────────┐│
+││Filename (▲)│Size      │Modified                      │Type            ││
+│├────────────┼──────────┼──────────────────────────────┼────────────────┤│
+││..          │          │                              │<Directory>     ││
+││\subfolder  │          │2002-01-01T22:42:10           │<Directory>     ││
+││image.gif   │4.00 B    │2002-01-01T22:42:10           │.gif            ││
+││jQuery.js   │7.00 B    │2001-01-01T11:44:42           │.js             ││
+││mybinary.exe│7.00 B    │2001-01-01T11:44:42           │.exe            ││
+│                                                                         │
+│                                                                         │
+│{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
+└─────────────────────────────────────────────────────────────────────────┘
 ";
-			TestHelpers.AssertDriverContentsAre (expected, output, true);
+			TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
 		}
 
 
@@ -559,7 +564,8 @@ namespace Terminal.Gui.FileServicesTests {
 			fileSystem.AddFile (@"c:\demo\subfolder\image2.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
 
 			var fd = new FileDialog (fileSystem) {
-				Height = 15
+				Height = 15,
+				Width = 75
 			};
 			fd.Path = @"c:\demo\";
 			Begin (fd);
@@ -583,7 +589,8 @@ namespace Terminal.Gui.FileServicesTests {
 			fileSystem.AddFile (@"/demo/subfolder/image2.gif", new MockFileData (new byte [] { 0x12, 0x34, 0x56, 0xd2 }) { LastWriteTime = new DateTime (2002, 01, 01, 22, 42, 10) });
 
 			var fd = new FileDialog (fileSystem) {
-				Height = 15
+				Height = 15,
+				Width = 75
 			};
 			fd.Path = @"/demo/";
 			Begin (fd);

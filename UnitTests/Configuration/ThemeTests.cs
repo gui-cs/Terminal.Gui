@@ -38,8 +38,8 @@ namespace Terminal.Gui.ConfigurationTests {
 				{ "test",  colorScheme }
 			};
 
-			Assert.Equal (Color.Red, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground);
-			Assert.Equal (Color.Green, ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background);
+			Assert.Equal (new Color (Color.Red), ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Foreground);
+			Assert.Equal (new Color (Color.Green), ((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"].Normal.Background);
 
 			// Act
 			Themes.Theme = "testTheme";
@@ -47,8 +47,8 @@ namespace Terminal.Gui.ConfigurationTests {
 
 			// Assert
 			var updatedScheme = Colors.ColorSchemes ["test"];
-			Assert.Equal (Color.Red, updatedScheme.Normal.Foreground);
-			Assert.Equal (Color.Green, updatedScheme.Normal.Background);
+			Assert.Equal (new Color (Color.Red), updatedScheme.Normal.Foreground);
+			Assert.Equal (new Color (Color.Green), updatedScheme.Normal.Background);
 
 			// remove test ColorScheme from Colors to avoid failures on others unit tests with ColorScheme
 			Colors.ColorSchemes.Remove ("test");
@@ -88,11 +88,11 @@ namespace Terminal.Gui.ConfigurationTests {
 				// is always White/Black
 				Normal = new Attribute (Color.Red, Color.Green),
 				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
+				HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};
-			theme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			theme ["ColorSchemes"].PropertyValue = Colors.Reset ();
 			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
 
 			var colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
@@ -109,7 +109,7 @@ namespace Terminal.Gui.ConfigurationTests {
 				HotFocus = colorScheme.HotFocus,
 				Disabled = colorScheme.Disabled,
 			};
-			newTheme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			newTheme ["ColorSchemes"].PropertyValue = Colors.Reset ();
 			((Dictionary<string, ColorScheme>)newTheme ["ColorSchemes"].PropertyValue) ["test"] = newColorScheme;
 
 			// Act
@@ -118,10 +118,10 @@ namespace Terminal.Gui.ConfigurationTests {
 			// Assert
 			colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
 			// Normal should have changed
-			Assert.Equal (Color.Blue, colorSchemes ["Test"].Normal.Foreground);
-			Assert.Equal (Color.BrightBlue, colorSchemes ["Test"].Normal.Background);
-			Assert.Equal (Color.Cyan, colorSchemes ["Test"].Focus.Foreground);
-			Assert.Equal (Color.BrightCyan, colorSchemes ["Test"].Focus.Background);
+			Assert.Equal (new Color (Color.Blue), colorSchemes ["Test"].Normal.Foreground);
+			Assert.Equal (new Color (Color.BrightBlue), colorSchemes ["Test"].Normal.Background);
+			Assert.Equal (new Color (Color.Cyan), colorSchemes ["Test"].Focus.Foreground);
+			Assert.Equal (new Color (Color.BrightCyan), colorSchemes ["Test"].Focus.Background);
 		}
 
 		[Fact]
@@ -133,7 +133,9 @@ namespace Terminal.Gui.ConfigurationTests {
 			var theme = new ThemeScope ();
 			Assert.NotEmpty (theme);
 
-			theme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			Assert.Equal (5, Colors.ColorSchemes.Count);
+
+			theme ["ColorSchemes"].PropertyValue = Colors.ColorSchemes;
 			var colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
 			Assert.Equal (Colors.ColorSchemes.Count, colorSchemes.Count);
 
@@ -143,12 +145,14 @@ namespace Terminal.Gui.ConfigurationTests {
 				// is always White/Black
 				Normal = new Attribute (Color.Red, Color.Green),
 				Focus = new Attribute (Color.Cyan, Color.BrightCyan),
-				HotNormal = new Attribute (Color.Brown, Color.BrightYellow),
+				HotNormal = new Attribute (Color.Yellow, Color.BrightYellow),
 				HotFocus = new Attribute (Color.Green, Color.BrightGreen),
 				Disabled = new Attribute (Color.Gray, Color.DarkGray),
 			};
 
-			newTheme ["ColorSchemes"].PropertyValue = Colors.Create ();
+			newTheme ["ColorSchemes"].PropertyValue = Colors.Reset ();
+			Assert.Equal (5, Colors.ColorSchemes.Count);
+
 			// add a new ColorScheme to the newTheme
 			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
 

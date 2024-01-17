@@ -77,6 +77,15 @@ namespace Terminal.Gui {
 			ConfigurationManager.Applied += ConfigurationManager_Applied;
 		}
 
+		/// <summary>
+		/// Creates a new instance with the given <paramref name="lines"/>.
+		/// </summary>
+		/// <param name="lines">Initial lines for the canvas.</param>
+		public LineCanvas (IEnumerable<StraightLine> lines) : this()
+		{
+			_lines = lines.ToList();
+		}
+
 		private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
 		{
 			foreach (var irr in runeResolvers) {
@@ -85,6 +94,11 @@ namespace Terminal.Gui {
 		}
 
 		private List<StraightLine> _lines = new List<StraightLine> ();
+
+		/// <summary>
+		/// Gets the lines in the canvas.
+		/// </summary>
+		public IReadOnlyCollection<StraightLine> Lines { get { return _lines.AsReadOnly(); } }
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
 			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
@@ -336,19 +350,19 @@ namespace Terminal.Gui {
 			/// </summary>
 			public abstract void SetGlyphs ();
 
-			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+			public Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
 			{
-				var useRounded = intersects.Any (i => i.Line.Length != 0 && (
-					i.Line.Style == LineStyle.Rounded || i.Line.Style == LineStyle.RoundedDashed || i.Line.Style == LineStyle.RoundedDotted));
+				var useRounded = intersects.Any (i => i?.Line.Length != 0 && (
+					i?.Line.Style == LineStyle.Rounded || i?.Line.Style == LineStyle.RoundedDashed || i?.Line.Style == LineStyle.RoundedDotted));
 
 				// Note that there aren't any glyphs for intersections of double lines with heavy lines
 
-				bool doubleHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && l.Line.Style == LineStyle.Double);
-				bool doubleVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && l.Line.Style == LineStyle.Double);
+				bool doubleHorizontal = intersects.Any (l => l?.Line.Orientation == Orientation.Horizontal && l.Line.Style == LineStyle.Double);
+				bool doubleVertical = intersects.Any (l => l?.Line.Orientation == Orientation.Vertical && l.Line.Style == LineStyle.Double);
 
-				bool thickHorizontal = intersects.Any (l => l.Line.Orientation == Orientation.Horizontal && (
+				bool thickHorizontal = intersects.Any (l => l?.Line.Orientation == Orientation.Horizontal && (
 					l.Line.Style == LineStyle.Heavy || l.Line.Style == LineStyle.HeavyDashed || l.Line.Style == LineStyle.HeavyDotted));
-				bool thickVertical = intersects.Any (l => l.Line.Orientation == Orientation.Vertical && (
+				bool thickVertical = intersects.Any (l => l?.Line.Orientation == Orientation.Vertical && (
 					l.Line.Style == LineStyle.Heavy || l.Line.Style == LineStyle.HeavyDashed || l.Line.Style == LineStyle.HeavyDotted));
 
 				if (doubleHorizontal) {
@@ -489,7 +503,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		private Rune? GetRuneForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
 		{
 			if (!intersects.Any ()) {
 				return null;
@@ -497,18 +511,18 @@ namespace Terminal.Gui {
 
 			var runeType = GetRuneTypeForIntersects (intersects);
 
-			if (runeResolvers.ContainsKey (runeType)) {
-				return runeResolvers [runeType].GetRuneForIntersects (driver, intersects);
+			if (runeResolvers.TryGetValue (runeType, out var resolver)) {
+				return resolver.GetRuneForIntersects (driver, intersects);
 			}
 
 			// TODO: Remove these once we have all of the below ported to IntersectionRuneResolvers
-			var useDouble = intersects.Any (i => i.Line.Style == LineStyle.Double);
-			var useDashed = intersects.Any (i => i.Line.Style == LineStyle.Dashed || i.Line.Style == LineStyle.RoundedDashed);
-			var useDotted = intersects.Any (i => i.Line.Style == LineStyle.Dotted || i.Line.Style == LineStyle.RoundedDotted);
+			var useDouble = intersects.Any (i => i?.Line.Style == LineStyle.Double);
+			var useDashed = intersects.Any (i => i?.Line.Style == LineStyle.Dashed || i?.Line.Style == LineStyle.RoundedDashed);
+			var useDotted = intersects.Any (i => i?.Line.Style == LineStyle.Dotted || i?.Line.Style == LineStyle.RoundedDotted);
 			// horiz and vert lines same as Single for Rounded
-			var useThick = intersects.Any (i => i.Line.Style == LineStyle.Heavy);
-			var useThickDashed = intersects.Any (i => i.Line.Style == LineStyle.HeavyDashed);
-			var useThickDotted = intersects.Any (i => i.Line.Style == LineStyle.HeavyDotted);
+			var useThick = intersects.Any (i => i?.Line.Style == LineStyle.Heavy);
+			var useThickDashed = intersects.Any (i => i?.Line.Style == LineStyle.HeavyDashed);
+			var useThickDotted = intersects.Any (i => i?.Line.Style == LineStyle.HeavyDotted);
 			// TODO: Support ruler
 			//var useRuler = intersects.Any (i => i.Line.Style == LineStyle.Ruler && i.Line.Length != 0);
 
@@ -545,19 +559,9 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Attribute? GetAttributeForIntersects (IntersectionDefinition [] intersects)
-		{
-			var set = new List<IntersectionDefinition> (intersects.Where (i => i.Line.Attribute?.HasValidColors ?? false));
+		private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) =>intersects [0]!.Line.Attribute;
 
-			if (set.Count == 0) {
-				return null;
-			}
-
-			return set [0].Line.Attribute;
-
-		}
-
-		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition [] intersects)
+		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
 		{
 			if (!intersects.Any ()) {
 				return null;
@@ -566,15 +570,15 @@ namespace Terminal.Gui {
 			var cell = new Cell ();
 			var rune = GetRuneForIntersects (driver, intersects);
 			if (rune.HasValue) {
-				cell.Runes.Add (rune.Value);
+				cell.Rune = rune.Value;
 			}
 			cell.Attribute = GetAttributeForIntersects (intersects);
 			return cell;
 		}
 
-		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
+		private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition? [] intersects)
 		{
-			var set = new HashSet<IntersectionType> (intersects.Select (i => i.Type));
+			var set = new HashSet<IntersectionType> (intersects.Select (i => i!.Type));
 
 			#region Cross Conditions
 			if (Has (set,
@@ -696,9 +700,9 @@ namespace Terminal.Gui {
 			return IntersectionRuneType.Dot;
 		}
 
-		private bool All (IntersectionDefinition [] intersects, Orientation orientation)
+		private bool All (IntersectionDefinition? [] intersects, Orientation orientation)
 		{
-			return intersects.All (i => i.Line.Orientation == orientation);
+			return intersects.All (i => i!.Line.Orientation == orientation);
 		}
 
 		/// <summary>

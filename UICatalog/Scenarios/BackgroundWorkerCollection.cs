@@ -33,10 +33,10 @@ namespace UICatalog.Scenarios {
 
 				menu = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_Options", new MenuItem [] {
-						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, Key.CtrlMask | Key.R),
-						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, Key.CtrlMask | Key.C),
+						new MenuItem ("_Run Worker", "", () => workerApp.RunWorker(), null, null, KeyCode.CtrlMask | KeyCode.R),
+						new MenuItem ("_Cancel Worker", "", () => workerApp.CancelWorker(), null, null, KeyCode.CtrlMask | KeyCode.C),
 						null,
-						new MenuItem ("_Quit", "", () => Quit(), null, null, Application.QuitKey)
+						new MenuItem ("_Quit", "", () => Quit(), null, null, (KeyCode)Application.QuitKey)
 					}),
 					new MenuBarItem ("_View", new MenuItem [] { }),
 					new MenuBarItem ("_Window", new MenuItem [] { })
@@ -46,8 +46,8 @@ namespace UICatalog.Scenarios {
 
 				var statusBar = new StatusBar (new [] {
 					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-					new StatusItem(Key.CtrlMask | Key.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
-					new StatusItem(Key.CtrlMask | Key.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
+					new StatusItem(KeyCode.CtrlMask | KeyCode.R, "~^R~ Run Worker", () => workerApp.RunWorker()),
+					new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Cancel Worker", () => workerApp.CancelWorker())
 				});
 				Add (statusBar);
 
@@ -56,7 +56,7 @@ namespace UICatalog.Scenarios {
 
 				Closed += OverlappedMain_Closed;
 
-				Application.Iteration += () => {
+				Application.Iteration += (s, a) => {
 					if (canOpenWorkerApp && !workerApp.Running && Application.OverlappedTop.Running) {
 						Application.Run (workerApp);
 					}
@@ -169,7 +169,7 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (80);
 				Height = Dim.Percent (50);
 
-				ColorScheme = Colors.Base;
+				ColorScheme = Colors.ColorSchemes ["Base"];
 
 				var label = new Label ("Worker collection Log") {
 					X = Pos.Center (),
@@ -308,14 +308,14 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Percent (85);
 				Height = Dim.Percent (85);
 
-				ColorScheme = Colors.Dialog;
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 				Title = "Run Worker";
 
 				label = new Label ("Press start to do the work or close to quit.") {
 					X = Pos.Center (),
 					Y = 1,
-					ColorScheme = Colors.Dialog
+					ColorScheme = Colors.ColorSchemes ["Dialog"]
 				};
 				Add (label);
 
@@ -338,8 +338,8 @@ namespace UICatalog.Scenarios {
 				close.Clicked += OnReportClosed;
 				Add (close);
 
-				KeyPress += (s, e) => {
-					if (e.KeyEvent.Key == Key.Esc) {
+				KeyDown += (s, e) => {
+					if (e.KeyCode == KeyCode.Esc) {
 						OnReportClosed (this, EventArgs.Empty);
 					}
 				};

@@ -4,10 +4,8 @@ using System.Data;
 using Terminal.Gui;
 using System.Linq;
 using System.Globalization;
-using static Terminal.Gui.TableView;
 using System.Text;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios {
 
@@ -60,8 +58,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			Application.Top.LayoutSubviews ();
-
+			
 			this.tableView = new TableView () {
 				X = 0,
 				Y = 0,
@@ -113,9 +110,9 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (menu);
 
 			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Key.F2, "~F2~ OpenExample", () => OpenExample(true)),
-				new StatusItem(Key.F3, "~F3~ CloseExample", () => CloseExample()),
-				new StatusItem(Key.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
+				new StatusItem(KeyCode.F2, "~F2~ OpenExample", () => OpenExample(true)),
+				new StatusItem(KeyCode.F3, "~F3~ CloseExample", () => CloseExample()),
+				new StatusItem(KeyCode.F4, "~F4~ OpenSimple", () => OpenSimple(true)),
 				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
 			});
 			Application.Top.Add (statusBar);
@@ -135,7 +132,7 @@ namespace UICatalog.Scenarios {
 
 			tableView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}"; };
 			tableView.CellActivated += EditCurrentCell;
-			tableView.KeyPress += TableViewKeyPress;
+			tableView.KeyDown += TableViewKeyPress;
 
 			SetupScrollBar ();
 
@@ -143,7 +140,7 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.Red, Win.ColorScheme.Normal.Background)
+				Normal = new Attribute (Color.Red, Win.ColorScheme.Normal.Background)
 			};
 
 			alternatingColorScheme = new ColorScheme () {
@@ -151,14 +148,14 @@ namespace UICatalog.Scenarios {
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.White, Color.BrightBlue)
+				Normal = new Attribute (Color.White, Color.BrightBlue)
 			};
 			redColorSchemeAlt = new ColorScheme () {
 
 				Disabled = Win.ColorScheme.Disabled,
 				HotFocus = Win.ColorScheme.HotFocus,
 				Focus = Win.ColorScheme.Focus,
-				Normal = Application.Driver.MakeAttribute (Color.Red, Color.BrightBlue)
+				Normal = new Attribute (Color.Red, Color.BrightBlue)
 			};
 
 			// if user clicks the mouse in TableView
@@ -183,7 +180,7 @@ namespace UICatalog.Scenarios {
 				}
 			};
 
-			tableView.AddKeyBinding (Key.Space, Command.ToggleChecked);
+			tableView.KeyBindings.Add (KeyCode.Space, Command.ToggleChecked);
 		}
 
 		private void ShowAllColumns ()
@@ -488,13 +485,13 @@ namespace UICatalog.Scenarios {
 
 		}
 
-		private void TableViewKeyPress (object sender, KeyEventEventArgs e)
+		private void TableViewKeyPress (object sender, Key e)
 		{
 			if(currentTable == null) {
 				return;
 			}
 
-			if (e.KeyEvent.Key == Key.DeleteChar) {
+			if (e.KeyCode == KeyCode.Delete) {
 
 				if (tableView.FullRowSelect) {
 					// Delete button deletes all rows when in full row mode

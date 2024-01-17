@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Line Drawing", Description: "Demonstrates LineCanvas.")]
 	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("Layout")]
+	[ScenarioCategory ("Drawing")]
 	public class LineDrawing : Scenario {
 
 		public override void Setup ()
@@ -33,7 +33,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyPress += (s,e) => { e.Handled = canvas.ProcessKey (e.KeyEvent); };
+			Win.KeyDown += (s,e) => { e.Handled = canvas.OnKeyDown (e); };
 		}
 
 		class ToolsView : Window {
@@ -55,8 +55,8 @@ namespace UICatalog.Scenarios {
 			private void ToolsView_Initialized (object sender, EventArgs e)
 			{
 				LayoutSubviews ();
-				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetFramesThickness ().Horizontal;
-				Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetFramesThickness ().Vertical;
+				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
+				Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
 				SuperView.LayoutSubviews ();
 			}
 
@@ -77,10 +77,10 @@ namespace UICatalog.Scenarios {
 					X = 0,
 					Y = Pos.Bottom (_colorPicker)
 				};
-
 				_stylePicker.SelectedItemChanged += (s, a) => {
 					SetStyle?.Invoke ((LineStyle)a.SelectedItem);
 				};
+				_stylePicker.SelectedItem = 1;
 
 				_addLayerBtn = new Button () {
 					Text = "New Layer",
@@ -96,7 +96,7 @@ namespace UICatalog.Scenarios {
 		class DrawingArea : View {
 			List<LineCanvas> _layers = new List<LineCanvas> ();
 			LineCanvas _currentLayer;
-			Color _currentColor = Color.White;
+			Color _currentColor = new Color (Color.White);
 			StraightLine _currentLine = null;
 
 			public LineStyle LineStyle { get; set; }
@@ -108,9 +108,11 @@ namespace UICatalog.Scenarios {
 
 			Stack<StraightLine> undoHistory = new ();
 
-			public override bool ProcessKey (KeyEvent e)
+			//// BUGBUG: Why is this not handled by a key binding???
+			public override bool OnKeyDown (Key e)
 			{
-				if (e.Key == (Key.Z | Key.CtrlMask)) {
+				// BUGBUG: These should be implemented with key bindings
+				if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();
 					if(pop != null) {
 						undoHistory.Push (pop);
@@ -119,7 +121,7 @@ namespace UICatalog.Scenarios {
 					}
 				}
 
-				if (e.Key == (Key.Y | Key.CtrlMask)) {
+				if (e.KeyCode == (KeyCode.Y | KeyCode.CtrlMask)) {
 					if (undoHistory.Any()) {
 						var pop = undoHistory.Pop ();
 						_currentLayer.AddLine(pop);
@@ -127,9 +129,9 @@ namespace UICatalog.Scenarios {
 						return true;
 					}
 				}
-
-				return base.ProcessKey (e);
+				return false;
 			}
+			
 			internal void AddLayer ()
 			{
 				_currentLayer = new LineCanvas ();
@@ -144,7 +146,7 @@ namespace UICatalog.Scenarios {
 					foreach (var c in canvas.GetCellMap ()) {
 						Driver.SetAttribute (c.Value.Attribute ?? ColorScheme.Normal);
 						// TODO: #2616 - Support combining sequences that don't normalize
-						this.AddRune (c.Key.X, c.Key.Y, c.Value.Runes [0]);
+						this.AddRune (c.Key.X, c.Key.Y, c.Value.Rune);
 					}
 				}
 			}
@@ -153,14 +155,16 @@ namespace UICatalog.Scenarios {
 			{
 				if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 					if (_currentLine == null) {
-
+						// Mouse pressed down
 						_currentLine = new StraightLine (
-							new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().X),
+							new Point (mouseEvent.X, mouseEvent.Y),
 							0, Orientation.Vertical, LineStyle, new Attribute (_currentColor, GetNormalColor ().Background));
+						
 						_currentLayer.AddLine (_currentLine);
 					} else {
+						// Mouse dragged
 						var start = _currentLine.Start;
-						var end = new Point (mouseEvent.X - GetBoundsOffset ().X, mouseEvent.Y - GetBoundsOffset ().Y);
+						var end = new Point (mouseEvent.X, mouseEvent.Y);
 						var orientation = Orientation.Vertical;
 						var length = end.Y - start.Y;
 
@@ -181,7 +185,27 @@ namespace UICatalog.Scenarios {
 						SetNeedsDisplay ();
 					}
 				} else {
+
+					// Mouse released
 					if (_currentLine != null) {
+
+						if(_currentLine.Length == 0) {
+							_currentLine.Length = 1;
+						}
+
+						if(_currentLine.Style == LineStyle.None) {
+
+							// Treat none as eraser
+							var idx = _layers.IndexOf (_currentLayer);
+							_layers.Remove (_currentLayer);
+
+							_currentLayer = new LineCanvas(
+								_currentLayer.Lines.Exclude (_currentLine.Start, _currentLine.Length, _currentLine.Orientation)
+								);
+
+							_layers.Insert (idx, _currentLayer);
+						}
+
 						_currentLine = null;
 						undoHistory.Clear ();
 						SetNeedsDisplay ();

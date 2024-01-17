@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 
 			internal ProgressDemo (string title) : base (title)
 			{
-				ColorScheme = Colors.Dialog;
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
 				LeftFrame = new FrameView ("Settings") {
 					X = 0,
@@ -81,7 +81,7 @@ namespace UICatalog.Scenarios {
 					Width = Dim.Fill () - 1,
 					Height = 1,
 					Fraction = 0.25F,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				};
 				Add (ActivityProgressBar);
 
@@ -102,7 +102,7 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (ActivityProgressBar) + 1,
 					Width = Dim.Fill () - Spinner.Width,
 					Height = 1,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				};
 				Add (PulseProgressBar);
 
@@ -112,18 +112,18 @@ namespace UICatalog.Scenarios {
 				};
 				Add (_startedLabel);
 
-				// Explictly cause layout so the setting of Height below works
-				LayoutSubviews ();
-
-				// Set height to height of controls + spacing + frame
-				Height = 2 + _verticalSpace + startButton.Frame.Height + _verticalSpace + ActivityProgressBar.Frame.Height + _verticalSpace + PulseProgressBar.Frame.Height + _verticalSpace;
+				// TODO: Great use of Dim.Auto
+				Initialized += (s, e) => {
+					// Set height to height of controls + spacing + frame
+					Height = 2 + _verticalSpace + startButton.Frame.Height + _verticalSpace + ActivityProgressBar.Frame.Height + _verticalSpace + PulseProgressBar.Frame.Height + _verticalSpace;
+				};
 			}
 
 			internal void Start ()
 			{
 				Started = true;
 				StartBtnClick?.Invoke ();
-				Application.MainLoop.Invoke(()=>{
+				Application.Invoke(()=>{
 					Spinner.Visible = true;
 					ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
 					this.LayoutSubviews();
@@ -135,7 +135,7 @@ namespace UICatalog.Scenarios {
 				Started = false;
 				StopBtnClick?.Invoke ();
 
-				Application.MainLoop.Invoke(()=>{
+				Application.Invoke(()=>{
 					Spinner.Visible = false;
 					ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
 					this.LayoutSubviews();
@@ -182,7 +182,7 @@ namespace UICatalog.Scenarios {
 				_systemTimer = new Timer ((o) => {
 					// Note the check for Mainloop being valid. System.Timers can run after they are Disposed.
 					// This code must be defensive for that. 
-					Application.MainLoop?.Invoke (() => systemTimerDemo.Pulse ());
+					Application.Invoke (() => systemTimerDemo.Pulse ());
 				}, null, 0, _systemTimerTick);
 			};
 
@@ -209,7 +209,7 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (systemTimerDemo);
 
-			// Demo #2 - Use Application.MainLoop.AddTimeout (no threads)
+			// Demo #2 - Use Application.AddTimeout (no threads)
 			var mainLoopTimeoutDemo = new ProgressDemo ("Application.AddTimer (no threads)") {
 				X = 0,
 				Y = Pos.Bottom (systemTimerDemo),
@@ -221,7 +221,7 @@ namespace UICatalog.Scenarios {
 				mainLoopTimeoutDemo.ActivityProgressBar.Fraction = 0F;
 				mainLoopTimeoutDemo.PulseProgressBar.Fraction = 0F;
 
-				_mainLoopTimeout = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick), (loop) => {
+				_mainLoopTimeout = Application.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick), () => {
 					mainLoopTimeoutDemo.Pulse ();
 					
 					return true;
@@ -229,7 +229,7 @@ namespace UICatalog.Scenarios {
 			};
 			mainLoopTimeoutDemo.StopBtnClick = () => {
 				if (_mainLoopTimeout != null) {
-					Application.MainLoop.RemoveTimeout (_mainLoopTimeout);
+					Application.RemoveTimeout (_mainLoopTimeout);
 					_mainLoopTimeout = null;
 				}
 

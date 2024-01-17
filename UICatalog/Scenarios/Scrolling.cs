@@ -4,10 +4,8 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Scrolling", Description: "Demonstrates ScrollView etc...")]
-	[ScenarioCategory ("Controls")]
-	[ScenarioCategory ("ScrollView")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("ScrollView"), ScenarioCategory ("Tests")]
 	public class Scrolling : Scenario {
-
 		class Box10x : View {
 			int w = 40;
 			int h = 50;
@@ -121,7 +119,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Bottom (label) + 1,
 				Width = 50,
 				Height = 20,
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				ContentSize = new Size (200, 100),
 				//ContentOffset = new Point (0, 0),
 				ShowVerticalScrollIndicator = true,
@@ -136,7 +134,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = 2,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				AutoSize = false
 			};
 			scrollView.Add (horizontalRuler);
@@ -148,7 +146,7 @@ namespace UICatalog.Scenarios {
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				AutoSize = false
 			};
 			scrollView.Add (verticalRuler);
@@ -181,21 +179,21 @@ namespace UICatalog.Scenarios {
 				X = 3,
 				Y = 5,
 				Width = 50,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			});
 
 			scrollView.Add (new TextField ("... the emergency broadcast system.") {
 				X = 3,
 				Y = 10,
 				Width = 50,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			});
 
 			scrollView.Add (new TextField ("Last line") {
 				X = 3,
 				Y = 99,
 				Width = 50,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			});
 
 			// Demonstrate AnchorEnd - Button is anchored to bottom/right
@@ -293,8 +291,8 @@ namespace UICatalog.Scenarios {
 				Width = 50,
 			};
 			Win.Add (mousePos);
-			Application.RootMouseEvent += delegate (MouseEvent me) {
-				mousePos.Text = $"Mouse: ({me.X},{me.Y}) - {me.Flags} {count++}";
+			Application.MouseEvent += (sender, a) => {
+				mousePos.Text = $"Mouse: ({a.MouseEvent.X},{a.MouseEvent.Y}) - {a.MouseEvent.Flags} {count++}";
 			};
 
 			var progress = new ProgressBar {
@@ -305,12 +303,12 @@ namespace UICatalog.Scenarios {
 			Win.Add (progress);
 
 			bool pulsing = true;
-			bool timer (MainLoop caller)
+			bool timer ()
 			{
 				progress.Pulse ();
 				return pulsing;
 			}
-			Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
+			Application.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 			void Top_Unloaded (object sender, EventArgs args)
 			{

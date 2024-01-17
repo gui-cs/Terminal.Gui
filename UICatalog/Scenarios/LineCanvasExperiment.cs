@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "LineCanvas Experiments", Description: "Experiments with LineCanvas")]
-	[ScenarioCategory ("LineCanvas")]
+	[ScenarioCategory ("Drawing"), ScenarioCategory ("Borders"), ScenarioCategory ("Proof of Concept")]
 	public class LineCanvasExperiment : Scenario {
 
 		public override void Init ()
@@ -123,10 +123,10 @@ namespace UICatalog.Scenarios {
 				Y = 8,
 				Width = 25,
 				Height = 10,
-				//ColorScheme = Colors.Error,
+				//ColorScheme = Colors.ColorSchemes ["Error"],
 				SuperViewRendersLineCanvas = true
 			};
-			marginWindow.Margin.ColorScheme = Colors.Dialog;
+			marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
 			marginWindow.Margin.Thickness = new Thickness (1);
 			marginWindow.Border.Thickness = new Thickness (1,2,1,1);
 

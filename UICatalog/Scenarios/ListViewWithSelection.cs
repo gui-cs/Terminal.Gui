@@ -2,10 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Nodes;
 using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "List View With Selection", Description: "ListView with columns and selection")]
@@ -53,7 +50,7 @@ namespace UICatalog.Scenarios {
 				Y = 2,
 				Height = Dim.Fill (),
 				Width = Dim.Fill (1),
-				//ColorScheme = Colors.TopLevel,
+				//ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				AllowsMarking = false,
 				AllowsMultipleSelection = false
 			};

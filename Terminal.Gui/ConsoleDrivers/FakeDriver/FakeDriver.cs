@@ -2,21 +2,16 @@
 // FakeDriver.cs: A fake ConsoleDriver for unit tests. 
 //
 using System;
-using System.Buffers;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Text;
+using Terminal.Gui.ConsoleDrivers;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
-using Unix.Terminal;
-using static Terminal.Gui.WindowsConsole;
-using System.Drawing;
 
 namespace Terminal.Gui;
+
 /// <summary>
 /// Implements a mock ConsoleDriver for unit testing
 /// </summary>
@@ -24,9 +19,10 @@ public class FakeDriver : ConsoleDriver {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 	public class Behaviors {
-
 		public bool UseFakeClipboard { get; internal set; }
+
 		public bool FakeClipboardAlwaysThrowsNotSupportedException { get; internal set; }
+
 		public bool FakeClipboardIsSupportedAlwaysFalse { get; internal set; }
 
 		public Behaviors (bool useFakeClipboard = false, bool fakeClipboardAlwaysThrowsNotSupportedException = false, bool fakeClipboardIsSupportedAlwaysTrue = false)
@@ -47,6 +43,8 @@ public class FakeDriver : ConsoleDriver {
 
 	public FakeDriver ()
 	{
+		Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
+		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 		if (FakeBehaviors.UseFakeClipboard) {
 			Clipboard = new FakeClipboard (FakeBehaviors.FakeClipboardAlwaysThrowsNotSupportedException, FakeBehaviors.FakeClipboardIsSupportedAlwaysFalse);
 		} else {
@@ -64,26 +62,28 @@ public class FakeDriver : ConsoleDriver {
 		}
 	}
 
-	public override void End ()
+	internal override void End ()
 	{
 		FakeConsole.ResetColor ();
 		FakeConsole.Clear ();
 	}
-	
-	public override void Init (Action terminalResized)
+
+	FakeMainLoop _mainLoopDriver = null;
+
+	internal override MainLoop Init ()
 	{
 		FakeConsole.MockKeyPresses.Clear ();
-
-		TerminalResized = terminalResized;
 
 		Cols = FakeConsole.WindowWidth = FakeConsole.BufferWidth = FakeConsole.WIDTH;
 		Rows = FakeConsole.WindowHeight = FakeConsole.BufferHeight = FakeConsole.HEIGHT;
 		FakeConsole.Clear ();
 		ResizeScreen ();
-		// Call InitializeColorSchemes before UpdateOffScreen as it references Colors
-		CurrentAttribute = MakeColor (Color.White, Color.Black);
-		InitializeColorSchemes ();
+		CurrentAttribute = new Attribute (Color.White, Color.Black);
 		ClearContents ();
+
+		_mainLoopDriver = new FakeMainLoop (this);
+		_mainLoopDriver.MockKeyPressed = MockKeyPressedHandler;
+		return new MainLoop (_mainLoopDriver);
 	}
 
 
@@ -134,11 +134,11 @@ public class FakeDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground;
-						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.ColorName;
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.ColorName;
 					}
 					outputWidth++;
-					var rune = (Rune)Contents [row, col].Runes [0];
+					var rune = (Rune)Contents [row, col].Rune;
 					output.Append (rune.ToString ());
 					if (rune.IsSurrogatePair () && rune.GetColumns () < 2) {
 						WriteToConsole (output, ref lastCol, row, ref outputWidth);
@@ -168,7 +168,7 @@ public class FakeDriver : ConsoleDriver {
 			foreach (var c in output.ToString ()) {
 				FakeConsole.Write (c);
 			}
-			
+
 			output.Clear ();
 			lastCol += outputWidth;
 			outputWidth = 0;
@@ -186,104 +186,60 @@ public class FakeDriver : ConsoleDriver {
 	}
 
 	#region Color Handling
-
-	// Cache the list of ConsoleColor values.
-	private static readonly HashSet<int> ConsoleColorValues = new HashSet<int> (
-		Enum.GetValues (typeof (ConsoleColor)).OfType<ConsoleColor> ().Select (c => (int)c)
-	);
-
-	void SetColor (int color)
-	{
-		if (ConsoleColorValues.Contains (color & 0xffff)) {
-			FakeConsole.BackgroundColor = (ConsoleColor)(color & 0xffff);
-		}
-		if (ConsoleColorValues.Contains ((color >> 16) & 0xffff)) {
-			FakeConsole.ForegroundColor = (ConsoleColor)((color >> 16) & 0xffff);
-		}
-	}
-
-	/// <remarks>
-	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
-	/// Extracts the foreground and background colors from the encoded value.
-	/// Assumes a 4-bit encoded value for both foreground and background colors.
-	/// </remarks>
-	internal override void GetColors (int value, out Color foreground, out Color background)
-	{
-		// Assume a 4-bit encoded value for both foreground and background colors.
-		foreground = (Color)((value >> 16) & 0xF);
-		background = (Color)(value & 0xF);
-	}
-
-	/// <remarks>
-	/// In the FakeDriver, colors are encoded as an int; same as NetDriver
-	/// However, the foreground color is stored in the most significant 16 bits, 
-	/// and the background color is stored in the least significant 16 bits.
-	/// </remarks>
-	public override Attribute MakeColor (Color foreground, Color background)
-	{
-		// Encode the colors into the int value.
-		return new Attribute (
-			value: ((((int)foreground) & 0xffff) << 16) | (((int)background) & 0xffff),
-			foreground: foreground,
-			background: background
-		);
-	}
-
+	///// <remarks>
+	///// In the FakeDriver, colors are encoded as an int; same as NetDriver
+	///// However, the foreground color is stored in the most significant 16 bits, 
+	///// and the background color is stored in the least significant 16 bits.
+	///// </remarks>
+	//public override Attribute MakeColor (Color foreground, Color background)
+	//{
+	//	// Encode the colors into the int value.
+	//	return new Attribute (
+	//		platformColor: 0,//((((int)foreground.ColorName) & 0xffff) << 16) | (((int)background.ColorName) & 0xffff),
+	//		foreground: foreground,
+	//		background: background
+	//	);
+	//}
 	#endregion
 
-	public ConsoleKeyInfo FromVKPacketToKConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
-	{
-		if (consoleKeyInfo.Key != ConsoleKey.Packet) {
-			return consoleKeyInfo;
-		}
 
-		var mod = consoleKeyInfo.Modifiers;
-		var shift = (mod & ConsoleModifiers.Shift) != 0;
-		var alt = (mod & ConsoleModifiers.Alt) != 0;
-		var control = (mod & ConsoleModifiers.Control) != 0;
-
-		var keyChar = ConsoleKeyMapping.GetKeyCharFromConsoleKey (consoleKeyInfo.KeyChar, consoleKeyInfo.Modifiers, out uint virtualKey, out _);
-
-		return new ConsoleKeyInfo ((char)keyChar, (ConsoleKey)virtualKey, shift, alt, control);
-	}
-
-	Key MapKey (ConsoleKeyInfo keyInfo)
+	KeyCode MapKey (ConsoleKeyInfo keyInfo)
 	{
 		switch (keyInfo.Key) {
 		case ConsoleKey.Escape:
-			return MapKeyModifiers (keyInfo, Key.Esc);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Esc);
 		case ConsoleKey.Tab:
-			return keyInfo.Modifiers == ConsoleModifiers.Shift ? Key.BackTab : Key.Tab;
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Tab);
 		case ConsoleKey.Clear:
-			return MapKeyModifiers (keyInfo, Key.Clear);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Clear);
 		case ConsoleKey.Home:
-			return MapKeyModifiers (keyInfo, Key.Home);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Home);
 		case ConsoleKey.End:
-			return MapKeyModifiers (keyInfo, Key.End);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.End);
 		case ConsoleKey.LeftArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorLeft);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorLeft);
 		case ConsoleKey.RightArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorRight);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorRight);
 		case ConsoleKey.UpArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorUp);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorUp);
 		case ConsoleKey.DownArrow:
-			return MapKeyModifiers (keyInfo, Key.CursorDown);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.CursorDown);
 		case ConsoleKey.PageUp:
-			return MapKeyModifiers (keyInfo, Key.PageUp);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageUp);
 		case ConsoleKey.PageDown:
-			return MapKeyModifiers (keyInfo, Key.PageDown);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PageDown);
 		case ConsoleKey.Enter:
-			return MapKeyModifiers (keyInfo, Key.Enter);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Enter);
 		case ConsoleKey.Spacebar:
-			return MapKeyModifiers (keyInfo, keyInfo.KeyChar == 0 ? Key.Space : (Key)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, keyInfo.KeyChar == 0 ? KeyCode.Space : (KeyCode)keyInfo.KeyChar);
 		case ConsoleKey.Backspace:
-			return MapKeyModifiers (keyInfo, Key.Backspace);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Backspace);
 		case ConsoleKey.Delete:
-			return MapKeyModifiers (keyInfo, Key.DeleteChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Delete);
 		case ConsoleKey.Insert:
-			return MapKeyModifiers (keyInfo, Key.InsertChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.Insert);
 		case ConsoleKey.PrintScreen:
-			return MapKeyModifiers (keyInfo, Key.PrintScreen);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, KeyCode.PrintScreen);
 
 		case ConsoleKey.Oem1:
 		case ConsoleKey.Oem2:
@@ -299,126 +255,42 @@ public class FakeDriver : ConsoleDriver {
 		case ConsoleKey.OemPlus:
 		case ConsoleKey.OemMinus:
 			if (keyInfo.KeyChar == 0) {
-				return Key.Unknown;
+				return KeyCode.Null;
 			}
 
-			return (Key)((uint)keyInfo.KeyChar);
+			return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 		}
 
 		var key = keyInfo.Key;
 		if (key >= ConsoleKey.A && key <= ConsoleKey.Z) {
 			var delta = key - ConsoleKey.A;
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.A + delta));
+			if (keyInfo.KeyChar != (uint)key) {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
 			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.A + delta));
+			if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control)
+			|| keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt)
+			|| keyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
+				return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)KeyCode.A + delta));
 			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.A + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0) {
-					return (Key)(((uint)Key.AltMask | (uint)Key.CtrlMask) | ((uint)Key.A + delta));
-				} else {
-					return (Key)((uint)keyInfo.KeyChar);
-				}
-			}
-			return (Key)((uint)keyInfo.KeyChar);
-		}
-		if (key >= ConsoleKey.D0 && key <= ConsoleKey.D9) {
-			var delta = key - ConsoleKey.D0;
-			if (keyInfo.Modifiers == ConsoleModifiers.Alt) {
-				return (Key)(((uint)Key.AltMask) | ((uint)Key.D0 + delta));
-			}
-			if (keyInfo.Modifiers == ConsoleModifiers.Control) {
-				return (Key)(((uint)Key.CtrlMask) | ((uint)Key.D0 + delta));
-			}
-			if (keyInfo.Modifiers == (ConsoleModifiers.Shift | ConsoleModifiers.Alt)) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
-			}
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				if (keyInfo.KeyChar == 0 || keyInfo.KeyChar == 30) {
-					return MapKeyModifiers (keyInfo, (Key)((uint)Key.D0 + delta));
-				}
-			}
-			return (Key)((uint)keyInfo.KeyChar);
-		}
-		if (key >= ConsoleKey.F1 && key <= ConsoleKey.F12) {
-			var delta = key - ConsoleKey.F1;
-			if ((keyInfo.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				return MapKeyModifiers (keyInfo, (Key)((uint)Key.F1 + delta));
-			}
-
-			return (Key)((uint)Key.F1 + delta);
-		}
-		if (keyInfo.KeyChar != 0) {
-			return MapKeyModifiers (keyInfo, (Key)((uint)keyInfo.KeyChar));
+			var alphaBase = ((keyInfo.Modifiers != ConsoleModifiers.Shift)) ? 'A' : 'a';
+			return (KeyCode)((uint)alphaBase + delta);
 		}
 
-		return (Key)(0xffffffff);
+		return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)((uint)keyInfo.KeyChar));
 	}
 
-	KeyModifiers keyModifiers;
-
-	private Key MapKeyModifiers (ConsoleKeyInfo keyInfo, Key key)
-	{
-		Key keyMod = new Key ();
-		if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0) {
-			keyMod = Key.ShiftMask;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0) {
-			keyMod |= Key.CtrlMask;
-		}
-		if ((keyInfo.Modifiers & ConsoleModifiers.Alt) != 0) {
-			keyMod |= Key.AltMask;
-		}
-
-		return keyMod != Key.Null ? keyMod | key : key;
-	}
-
-	Action<KeyEvent> _keyDownHandler;
-	Action<KeyEvent> _keyHandler;
-	Action<KeyEvent> _keyUpHandler;
 	private CursorVisibility _savedCursorVisibility;
 
-	public override void PrepareToRun (MainLoop mainLoop, Action<KeyEvent> keyHandler, Action<KeyEvent> keyDownHandler, Action<KeyEvent> keyUpHandler, Action<MouseEvent> mouseHandler)
+	void MockKeyPressedHandler (ConsoleKeyInfo consoleKeyInfo)
 	{
-		_keyDownHandler = keyDownHandler;
-		_keyHandler = keyHandler;
-		_keyUpHandler = keyUpHandler;
-
-		// Note: Net doesn't support keydown/up events and thus any passed keyDown/UpHandlers will never be called
-		(mainLoop.MainLoopDriver as FakeMainLoop).KeyPressed += (consoleKey) => ProcessInput (consoleKey);
-	}
-
-	void ProcessInput (ConsoleKeyInfo consoleKey)
-	{
-		if (consoleKey.Key == ConsoleKey.Packet) {
-			consoleKey = FromVKPacketToKConsoleKeyInfo (consoleKey);
-		}
-		keyModifiers = new KeyModifiers ();
-		if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Shift)) {
-			keyModifiers.Shift = true;
-		}
-		if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Alt)) {
-			keyModifiers.Alt = true;
-		}
-		if (consoleKey.Modifiers.HasFlag (ConsoleModifiers.Control)) {
-			keyModifiers.Ctrl = true;
-		}
-		var map = MapKey (consoleKey);
-		if (map == (Key)0xffffffff) {
-			if ((consoleKey.Modifiers & (ConsoleModifiers.Shift | ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0) {
-				_keyDownHandler (new KeyEvent (map, keyModifiers));
-				_keyUpHandler (new KeyEvent (map, keyModifiers));
-			}
-			return;
+		if (consoleKeyInfo.Key == ConsoleKey.Packet) {
+			consoleKeyInfo = ConsoleKeyMapping.DecodeVKPacketToKConsoleKeyInfo (consoleKeyInfo);
 		}
 
-		_keyDownHandler (new KeyEvent (map, keyModifiers));
-		_keyHandler (new KeyEvent (map, keyModifiers));
-		_keyUpHandler (new KeyEvent (map, keyModifiers));
+		var map = MapKey (consoleKeyInfo);
+		OnKeyDown (new Key (map));
+		OnKeyUp (new Key (map));
+		//OnKeyPressed (new KeyEventArgs (map));
 	}
 
 	/// <inheritdoc/>
@@ -454,7 +326,7 @@ public class FakeDriver : ConsoleDriver {
 
 	public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
 	{
-		ProcessInput (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
+		MockKeyPressedHandler (new ConsoleKeyInfo (keyChar, key, shift, alt, control));
 	}
 
 	public void SetBufferSize (int width, int height)
@@ -490,7 +362,7 @@ public class FakeDriver : ConsoleDriver {
 	{
 		ResizeScreen ();
 		ClearContents ();
-		TerminalResized?.Invoke ();
+		OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 	}
 
 	public virtual void ResizeScreen ()
@@ -524,15 +396,14 @@ public class FakeDriver : ConsoleDriver {
 			if (Col >= 0 && Col < FakeConsole.BufferWidth && Row >= 0 && Row < FakeConsole.BufferHeight) {
 				FakeConsole.SetCursorPosition (Col, Row);
 			}
-		} catch (System.IO.IOException) {
-		} catch (ArgumentOutOfRangeException) {
-		}
+		} catch (System.IO.IOException) { } catch (ArgumentOutOfRangeException) { }
 	}
 
 	#region Not Implemented
 	public override void Suspend ()
 	{
-		throw new NotImplementedException ();
+		return;
+		//throw new NotImplementedException ();
 	}
 	#endregion
 
