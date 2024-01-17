@@ -107,69 +107,6 @@ public class ScenarioTests {
 #endif
 	}
 
-//	[Fact]
-//	public void Run_All_Scenarios ()
-//	{
-//		var scenarios = Scenario.GetScenarios ();
-//		Assert.NotEmpty (scenarios);
-
-//		foreach (var scenario in scenarios) {
-//			_output.WriteLine ($"Running Scenario '{scenario.GetName ()}'");
-
-//			Application.Init (new FakeDriver ());
-
-//			// Press QuitKey 
-//			Assert.Empty (FakeConsole.MockKeyPresses);
-//			// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-//			// by adding this Space it seems to work.
-//			//FakeConsole.PushMockKeyPress (Key.Space);
-//			FakeConsole.PushMockKeyPress ((KeyCode)Application.QuitKey);
-
-//			// The only key we care about is the QuitKey
-//			Application.Top.KeyDown += (sender, args) => {
-//				_output.WriteLine ($"  Keypress: {args.KeyCode}");
-//				// BUGBUG: (#2474) For some reason ReadKey is not returning the QuitKey for some Scenarios
-//				// by adding this Space it seems to work.
-//				// See #2474 for why this is commented out
-//				Assert.Equal (Application.QuitKey.KeyCode, args.KeyCode);
-//			};
-
-//			uint abortTime = 500;
-//			// If the scenario doesn't close within 500ms, this will force it to quit
-//			var forceCloseCallback = () => {
-//				if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
-//					Application.RequestStop ();
-//					// See #2474 for why this is commented out
-//					Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
-//				}
-//				return false;
-//			};
-//			//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
-//			_ = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), forceCloseCallback);
-
-//			Application.Iteration += (s, a) => {
-//				//output.WriteLine ($"  iteration {++iterations}");
-//				if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
-//					Application.RequestStop ();
-//					Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
-//				}
-//			};
-
-//			scenario.Init ();
-//			scenario.Setup ();
-//			scenario.Run ();
-//			scenario.Dispose ();
-
-//			Application.Shutdown ();
-//#if DEBUG_IDISPOSABLE
-//			Assert.Empty (Responder.Instances);
-//#endif
-//		}
-//#if DEBUG_IDISPOSABLE
-//		Assert.Empty (Responder.Instances);
-//#endif
-//	}
-
 	[Fact]
 	public void Run_Generic ()
 	{
