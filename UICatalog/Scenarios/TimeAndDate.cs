@@ -35,7 +35,6 @@ namespace UICatalog.Scenarios {
 			var shortDate = new DateField (DateTime.Now) {
 				X = Pos.Center (),
 				Y = Pos.Bottom (shortTime) + 1,
-				IsShortFormat = true,
 				ReadOnly = true,
 			};
 			shortDate.DateChanged += DateChanged;
@@ -44,8 +43,7 @@ namespace UICatalog.Scenarios {
 			var longDate = new DateField (DateTime.Now) {
 				X = Pos.Center (),
 				Y = Pos.Bottom (shortDate) + 1,
-				IsShortFormat = false,
-				ReadOnly = true,
+				ReadOnly = false,
 			};
 			longDate.DateChanged += DateChanged;
 			Win.Add (longDate);
@@ -111,9 +109,6 @@ namespace UICatalog.Scenarios {
 
 				longDate.ReadOnly = !longDate.ReadOnly;
 				shortDate.ReadOnly = !shortDate.ReadOnly;
-
-				longDate.IsShortFormat = !longDate.IsShortFormat;
-				shortDate.IsShortFormat = !shortDate.IsShortFormat;
 			};
 			Win.Add (swapButton);
 		}

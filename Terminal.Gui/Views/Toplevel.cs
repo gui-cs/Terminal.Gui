@@ -1,88 +1,171 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
-/// Toplevel views can be modally executed. They are used for both an application's main view (filling the entire screeN and
-/// for pop-up views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and <see cref="Wizard"/>.
+/// Toplevel views are used for both an application's main view (filling the entire screen and
+/// for modal (pop-up) views such as <see cref="Dialog"/>, <see cref="MessageBox"/>, and
+/// <see cref="Wizard"/>).
 /// </summary>
 /// <remarks>
-///   <para>
-///     Toplevels can be modally executing views, started by calling <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>. 
-///     They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has 
-///     been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>). 
-///   </para>
-///   <para>
-///     A Toplevel is created when an application initializes Terminal.Gui by calling <see cref="Application.Init"/>.
-///     The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional Toplevels can be created 
-///     and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and 
-///     call <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>.
-///   </para>
+///         <para>
+///         Toplevels can run as modal (popup) views, started by calling
+///         <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
+///         They return control to the caller when <see cref="Application.RequestStop(Toplevel)"/> has
+///         been called (which sets the <see cref="Toplevel.Running"/> property to <c>false</c>).
+///         </para>
+///         <para>
+///         A Toplevel is created when an application initializes Terminal.Gui by calling
+///         <see cref="Application.Init"/>.
+///         The application Toplevel can be accessed via <see cref="Application.Top"/>. Additional
+///         Toplevels can be created
+///         and run (e.g. <see cref="Dialog"/>s. To run a Toplevel, create the <see cref="Toplevel"/> and
+///         call <see cref="Application.Run(Toplevel, Func{Exception,bool})"/>.
+///         </para>
 /// </remarks>
 public partial class Toplevel : View {
+
 	/// <summary>
-	/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not. 
+	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified
+	/// <see cref="LayoutStyle.Absolute"/> layout.
+	/// </summary>
+	/// <param name="frame">
+	/// A Superview-relative rectangle specifying the location and size for the new
+	/// Toplevel
+	/// </param>
+	public Toplevel (Rect frame) : base (frame) => SetInitialProperties ();
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Toplevel"/> class with
+	/// <see cref="LayoutStyle.Computed"/> layout, defaulting to full screen. The <see cref="View.Width"/> and
+	/// <see cref="View.Height"/> properties
+	/// will be set to the dimensions of the terminal using <see cref="Dim.Fill"/>.
+	/// </summary>
+	public Toplevel ()
+	{
+		SetInitialProperties ();
+		Width = Dim.Fill ();
+		Height = Dim.Fill ();
+	}
+
+	/// <summary>
+	/// Gets or sets whether the main loop for this <see cref="Toplevel"/> is running or not.
 	/// </summary>
 	/// <remarks>
-	///    Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/> instead. 
+	/// Setting this property directly is discouraged. Use <see cref="Application.RequestStop"/>
+	/// instead.
 	/// </remarks>
 	public bool Running { get; set; }
 
 	/// <summary>
+	/// Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.
+	/// </summary>
+	/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
+	public override bool CanFocus => SuperView == null ? true : base.CanFocus;
+
+	/// <summary>
+	/// Determines whether the <see cref="Toplevel"/> is modal or not.
+	/// If set to <c>false</c> (the default):
+	/// <list type="bullet">
+	///         <item>
+	///                 <description><see cref="View.OnKeyDown"/> events will propagate keys upwards.</description>
+	///         </item>
+	///         <item>
+	///                 <description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
+	///         </item>
+	/// </list>
+	/// If set to <c>true</c>:
+	/// <list type="bullet">
+	///         <item>
+	///                 <description><see cref="View.OnKeyDown"/> events will NOT propagate keys upwards.</description>
+	///         </item>
+	///         <item>
+	///                 <description>
+	///                 The Toplevel will and look like a modal (pop-up) (e.g. see
+	///                 <see cref="Dialog"/>.
+	///                 </description>
+	///         </item>
+	/// </list>
+	/// </summary>
+	public bool Modal { get; set; }
+
+	/// <summary>
+	/// Gets or sets the menu for this Toplevel.
+	/// </summary>
+	public virtual MenuBar MenuBar { get; set; }
+
+	/// <summary>
+	/// Gets or sets the status bar for this Toplevel.
+	/// </summary>
+	public virtual StatusBar StatusBar { get; set; }
+
+	/// <summary>
+	/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
+	/// <see langword="false"/>, otherwise.
+	/// </summary>
+	public bool IsLoaded { get; private set; }
+
+	/// <summary>
 	/// Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded.
-	/// A Loaded event handler is a good place to finalize initialization before calling 
+	/// A Loaded event handler is a good place to finalize initialization before calling
 	/// <see cref="Application.RunLoop(RunState)"/>.
 	/// </summary>
 	public event EventHandler Loaded;
 
 	/// <summary>
 	/// Invoked when the <see cref="Toplevel"/> main loop has started it's first iteration.
-	/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and focus has been set.
-	/// changes. 
-	/// <para>A Ready event handler is a good place to finalize initialization after calling 
-	/// <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.</para>
+	/// Subscribe to this event to perform tasks when the <see cref="Toplevel"/> has been laid out and
+	/// focus has been set.
+	/// changes.
+	/// <para>
+	/// A Ready event handler is a good place to finalize initialization after calling
+	/// <see cref="Application.Run(Func{Exception, bool})"/> on this <see cref="Toplevel"/>.
+	/// </para>
 	/// </summary>
 	public event EventHandler Ready;
 
 	/// <summary>
 	/// Invoked when the Toplevel <see cref="RunState"/> has been unloaded.
-	/// A Unloaded event handler is a good place to dispose objects after calling <see cref="Application.End(RunState)"/>.
+	/// A Unloaded event handler is a good place to dispose objects after calling
+	/// <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler Unloaded;
 
 	/// <summary>
-	/// Invoked when the Toplevel <see cref="RunState"/> becomes the <see cref="Application.Current"/> Toplevel.
+	/// Invoked when the Toplevel <see cref="RunState"/> becomes the <see cref="Application.Current"/>
+	/// Toplevel.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> Activate;
 
 	/// <summary>
-	/// Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.
+	/// Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/>
+	/// Toplevel.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> Deactivate;
 
 	/// <summary>
-	/// Invoked when a child of the Toplevel <see cref="RunState"/> is closed by  
+	/// Invoked when a child of the Toplevel <see cref="RunState"/> is closed by
 	/// <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> ChildClosed;
 
 	/// <summary>
-	/// Invoked when the last child of the Toplevel <see cref="RunState"/> is closed from 
+	/// Invoked when the last child of the Toplevel <see cref="RunState"/> is closed from
 	/// by <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler AllChildClosed;
 
 	/// <summary>
-	/// Invoked when the Toplevel's <see cref="RunState"/> is being closed by  
+	/// Invoked when the Toplevel's <see cref="RunState"/> is being closed by
 	/// <see cref="Application.RequestStop(Toplevel)"/>.
 	/// </summary>
 	public event EventHandler<ToplevelClosingEventArgs> Closing;
 
 	/// <summary>
-	/// Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.
+	/// Invoked when the Toplevel's <see cref="RunState"/> is closed by
+	/// <see cref="Application.End(RunState)"/>.
 	/// </summary>
 	public event EventHandler<ToplevelEventArgs> Closed;
 
@@ -131,7 +214,8 @@ public partial class Toplevel : View {
 	internal virtual void OnActivate (Toplevel deactivated) => Activate?.Invoke (this, new ToplevelEventArgs (deactivated));
 
 	/// <summary>
-	/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first time. 
+	/// Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for
+	/// the first time.
 	/// </summary>
 	public virtual void OnLoaded ()
 	{
@@ -143,7 +227,7 @@ public partial class Toplevel : View {
 	}
 
 	/// <summary>
-	/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the 
+	/// Called from <see cref="Application.RunLoop"/> after the <see cref="Toplevel"/> has entered the
 	/// first iteration of the loop.
 	/// </summary>
 	internal virtual void OnReady ()
@@ -165,26 +249,9 @@ public partial class Toplevel : View {
 		Unloaded?.Invoke (this, EventArgs.Empty);
 	}
 
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Toplevel"/> class with the specified <see cref="LayoutStyle.Absolute"/> layout.
-	/// </summary>
-	/// <param name="frame">A Superview-relative rectangle specifying the location and size for the new Toplevel</param>
-	public Toplevel (Rect frame) : base (frame) => SetInitialProperties ();
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Toplevel"/> class with <see cref="LayoutStyle.Computed"/> layout, 
-	/// defaulting to full screen.
-	/// </summary>
-	public Toplevel () : base ()
-	{
-		SetInitialProperties ();
-		Width = Dim.Fill ();
-		Height = Dim.Fill ();
-	}
-
 	void SetInitialProperties ()
 	{
-		ColorScheme = Colors.TopLevel;
+		ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 		Application.GrabbingMouse += Application_GrabbingMouse;
 		Application.UnGrabbingMouse += Application_UnGrabbingMouse;
@@ -251,20 +318,6 @@ public partial class Toplevel : View {
 #endif
 	}
 
-	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
-	{
-		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
-			e.Cancel = true;
-		}
-	}
-
-	void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
-	{
-		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
-			e.Cancel = true;
-		}
-	}
-
 	/// <summary>
 	/// Invoked when the <see cref="Application.AlternateForwardKey"/> is changed.
 	/// </summary>
@@ -309,60 +362,6 @@ public partial class Toplevel : View {
 		KeyBindings.Replace (e.OldKey, e.NewKey);
 		QuitKeyChanged?.Invoke (this, e);
 	}
-
-	/// <summary>
-	/// Convenience factory method that creates a new Toplevel with the current terminal dimensions.
-	/// </summary>
-	/// <returns>The created Toplevel.</returns>
-	public static Toplevel Create () => new Toplevel (new Rect (0, 0, Driver.Cols, Driver.Rows));
-
-	/// <summary>
-	/// Gets or sets a value indicating whether this <see cref="Toplevel"/> can focus.
-	/// </summary>
-	/// <value><c>true</c> if can focus; otherwise, <c>false</c>.</value>
-	public override bool CanFocus => SuperView == null ? true : base.CanFocus;
-
-	/// <summary>
-	/// Determines whether the <see cref="Toplevel"/> is modal or not. 
-	/// If set to <c>false</c> (the default):
-	/// 
-	/// <list type="bullet">
-	///   <item>
-	///		<description><see cref="View.OnKeyDown"/> events will propagate keys upwards.</description>
-	///   </item>
-	///   <item>
-	///		<description>The Toplevel will act as an embedded view (not a modal/pop-up).</description>
-	///   </item>
-	/// </list>
-	///
-	/// If set to <c>true</c>:
-	/// 
-	/// <list type="bullet">
-	///   <item>
-	///		<description><see cref="View.OnKeyDown"/> events will NOT propagate keys upwards.</description>
-	///	  </item>
-	///   <item>
-	///		<description>The Toplevel will and look like a modal (pop-up) (e.g. see <see cref="Dialog"/>.</description>
-	///   </item>
-	/// </list>
-	/// </summary>
-	public bool Modal { get; set; }
-
-	/// <summary>
-	/// Gets or sets the menu for this Toplevel.
-	/// </summary>
-	public virtual MenuBar MenuBar { get; set; }
-
-	/// <summary>
-	/// Gets or sets the status bar for this Toplevel.
-	/// </summary>
-	public virtual StatusBar StatusBar { get; set; }
-
-	/// <summary>
-	/// <see langword="true"/> if was already loaded by the <see cref="Application.Begin(Toplevel)"/>
-	/// <see langword="false"/>, otherwise.
-	/// </summary>
-	public bool IsLoaded { get; private set; }
 
 	void MovePreviousViewOrTop ()
 	{
@@ -561,7 +560,7 @@ public partial class Toplevel : View {
 			superView = top.SuperView;
 		}
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
 		}
 		if (top.Frame.Width <= maxWidth) {
 			nx = Math.Max (targetX, 0);
@@ -608,7 +607,7 @@ public partial class Toplevel : View {
 			maxWidth = statusVisible ? top.SuperView.Frame.Height - 1 : top.SuperView.Frame.Height;
 		}
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Top + superView.GetFramesThickness ().Bottom;
+			maxWidth -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
 		}
 		ny = Math.Min (ny, maxWidth);
 		if (top.Frame.Height <= maxWidth) {
@@ -645,11 +644,12 @@ public partial class Toplevel : View {
 		bool layoutSubviews = false;
 		int maxWidth = 0;
 		if (superView.Margin != null && superView == top.SuperView) {
-			maxWidth -= superView.GetFramesThickness ().Left + superView.GetFramesThickness ().Right;
+			maxWidth -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
 		}
-		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal
-			|| top?.SuperView == null && top.IsOverlapped)
-		&& (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) && top.LayoutStyle == LayoutStyle.Computed) {
+		if ((superView != top || top?.SuperView != null || top != Application.Top && top.Modal || top?.SuperView == null && top.IsOverlapped)
+		    // BUGBUG: Prevously PositionToplevel required LayotuStyle.Computed
+		    &&
+		    (top.Frame.X + top.Frame.Width > maxWidth || ny > top.Frame.Y) /*&& top.LayoutStyle == LayoutStyle.Computed*/) {
 
 			if ((top.X == null || top.X is Pos.PosAbsolute) && top.Frame.X != nx) {
 				top.X = nx;
@@ -662,8 +662,7 @@ public partial class Toplevel : View {
 		}
 
 		// TODO: v2 - This is a hack to get the StatusBar to be positioned correctly.
-		if (sb != null && !top.Subviews.Contains (sb) && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0)
-		&& top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
+		if (sb != null && !top.Subviews.Contains (sb) && ny + top.Frame.Height != superView.Frame.Height - (sb.Visible ? 1 : 0) && top.Height is Dim.DimFill && -top.Height.Anchor (0) < 1) {
 
 			top.Height = Dim.Fill (sb.Visible ? 1 : 0);
 			layoutSubviews = true;
@@ -733,6 +732,20 @@ public partial class Toplevel : View {
 
 	internal static Point? _dragPosition;
 	Point _startGrabPoint;
+
+	void Application_UnGrabbingMouse (object sender, GrabMouseEventArgs e)
+	{
+		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
+			e.Cancel = true;
+		}
+	}
+
+	void Application_GrabbingMouse (object sender, GrabMouseEventArgs e)
+	{
+		if (Application.MouseGrabView == this && _dragPosition.HasValue) {
+			e.Cancel = true;
+		}
+	}
 
 	///<inheritdoc/>
 	public override bool MouseEvent (MouseEvent mouseEvent)
@@ -910,9 +923,8 @@ public class ToplevelEqualityComparer : IEqualityComparer<Toplevel> {
 			return false;
 		} else if (x.Id == y.Id) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/// <summary>Returns a hash code for the specified object.</summary>
@@ -949,12 +961,13 @@ public sealed class ToplevelComparer : IComparer<Toplevel> {
 	{
 		if (ReferenceEquals (x, y)) {
 			return 0;
-		} else if (x == null) {
-			return -1;
-		} else if (y == null) {
-			return 1;
-		} else {
-			return string.Compare (x.Id, y.Id);
 		}
+		if (x == null) {
+			return -1;
+		}
+		if (y == null) {
+			return 1;
+		}
+		return string.Compare (x.Id, y.Id);
 	}
 }

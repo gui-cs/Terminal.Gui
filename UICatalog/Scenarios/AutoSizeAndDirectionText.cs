@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios {
 		{
 			var text = "Hello World";
 			var wideText = "Hello World 你";
-			var color = Colors.Dialog;
+			var color = Colors.ColorSchemes ["Dialog"];
 
 			var labelH = new Label (text, TextDirection.LeftRight_TopBottom) {
 				X = 1,

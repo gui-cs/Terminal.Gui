@@ -278,7 +278,7 @@ public class MenuBar : View {
 		//CanFocus = true;
 		_selected = -1;
 		_selectedSub = -1;
-		ColorScheme = Colors.Menu;
+		ColorScheme = Colors.ColorSchemes ["Menu"];
 		WantMousePositionReports = true;
 		IsMenuOpen = false;
 
@@ -1445,7 +1445,7 @@ public class MenuBar : View {
 		if (Driver == null) {
 			return Point.Empty;
 		}
-		var superViewFrame = SuperView == null ? new Rect (0, 0, Driver.Cols, Driver.Rows) : SuperView.Frame;
+		var superViewFrame = SuperView == null ? Driver.Bounds : SuperView.Frame;
 		var sv = SuperView == null ? Application.Current : SuperView;
 		var boundsOffset = sv.GetBoundsOffset ();
 		return new Point (superViewFrame.X - sv.Frame.X - boundsOffset.X,
@@ -1458,7 +1458,7 @@ public class MenuBar : View {
 	/// <returns>The location offset.</returns>
 	internal Point GetScreenOffsetFromCurrent ()
 	{
-		var screen = new Rect (0, 0, Driver.Cols, Driver.Rows);
+		var screen = Driver.Bounds;
 		var currentFrame = Application.Current.Frame;
 		var boundsOffset = Application.Top.GetBoundsOffset ();
 		return new Point (screen.X - currentFrame.X - boundsOffset.X

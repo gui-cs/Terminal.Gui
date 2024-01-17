@@ -25,7 +25,7 @@ public class MenuBarTests {
 		var menuBar = new MenuBar ();
 		Assert.Equal (KeyCode.F9, menuBar.Key);
 		var menu = new Menu (menuBar, 0, 0, new MenuBarItem (), null, menuBar.MenusBorderStyle);
-		Assert.Equal (Colors.Menu, menu.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], menu.ColorScheme);
 		Assert.True (menu.CanFocus);
 		Assert.False (menu.WantContinuousButtonPressed);
 		Assert.Equal (LineStyle.Single, menuBar.MenusBorderStyle);
@@ -36,7 +36,7 @@ public class MenuBarTests {
 		Assert.IsType<Dim.DimFill> (menuBar.Width);
 		Assert.Equal (1, menuBar.Height);
 		Assert.Empty (menuBar.Menus);
-		Assert.Equal (Colors.Menu, menuBar.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
 		Assert.True (menuBar.WantMousePositionReports);
 		Assert.False (menuBar.IsMenuOpen);
 
@@ -46,7 +46,7 @@ public class MenuBarTests {
 		Assert.IsType<Dim.DimFill> (menuBar.Width);
 		Assert.Equal (1, menuBar.Height);
 		Assert.Empty (menuBar.Menus);
-		Assert.Equal (Colors.Menu, menuBar.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
 		Assert.True (menuBar.WantMousePositionReports);
 		Assert.False (menuBar.IsMenuOpen);
 
@@ -1539,7 +1539,7 @@ Edit
 			menu.ColorScheme.Disabled
 		};
 
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 00000000000000", Application.Driver, attributes);
 
 		Assert.True (menu.MouseEvent (new MouseEvent {
@@ -1549,7 +1549,7 @@ Edit
 			View = menu
 		}));
 		top.Draw ();
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 11111100000000
 00000000000000
 01111111111110
@@ -1565,7 +1565,7 @@ Edit
 			View = top.Subviews [1]
 		}));
 		top.Subviews [1].Draw ();
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 11111100000000
 00000000000000
 01111111111110
@@ -1581,7 +1581,7 @@ Edit
 			View = top.Subviews [1]
 		}));
 		top.Subviews [1].Draw ();
-		TestHelpers.AssertDriverColorsAre (@"
+		TestHelpers.AssertDriverAttributesAre (@"
 11111100000000
 00000000000000
 01111111111110
@@ -2754,5 +2754,59 @@ wo
 
 		var exception = Record.Exception (() => Assert.True (menu.NewKeyDownEvent (new Key (KeyCode.AltMask | KeyCode.Q))));
 		Assert.Null (exception);
+	}
+
+	[Fact]
+	public void RemoveAndThenAddMenuBar_ShouldNotChangeWidth ()
+	{
+		MenuBar menuBar;
+		MenuBar menuBar2;
+
+		// TODO: When https: //github.com/gui-cs/Terminal.Gui/issues/3136 is fixed, 
+		// TODO: Change this to Window
+		var w = new View ();
+		menuBar2 = new Terminal.Gui.MenuBar ();
+		menuBar = new Terminal.Gui.MenuBar ();
+		w.Width = Dim.Fill (0);
+		w.Height = Dim.Fill (0);
+		w.X = 0;
+		w.Y = 0;
+
+		w.Visible = true;
+		// TODO: When https: //github.com/gui-cs/Terminal.Gui/issues/3136 is fixed, 
+		// TODO: uncomment this.
+		//w.Modal = false;
+		w.Title = "";
+		menuBar.Width = Dim.Fill (0);
+		menuBar.Height = 1;
+		menuBar.X = 0;
+		menuBar.Y = 0;
+		menuBar.Visible = true;
+		w.Add (menuBar);
+
+		menuBar2.Width = Dim.Fill (0);
+		menuBar2.Height = 1;
+		menuBar2.X = 0;
+		menuBar2.Y = 4;
+		menuBar2.Visible = true;
+		w.Add (menuBar2);
+
+
+		var menuBars = w.Subviews.OfType<MenuBar> ().ToArray ();
+		Assert.Equal (2, menuBars.Length);
+
+		Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+		Assert.Equal (Dim.Fill (0), menuBars [1].Width);
+
+		// Goes wrong here
+		w.Remove (menuBar);
+		w.Remove (menuBar2);
+
+		w.Add (menuBar);
+		w.Add (menuBar2);
+
+		// These assertions fail
+		Assert.Equal (Dim.Fill (0), menuBars [0].Width);
+		Assert.Equal (Dim.Fill (0), menuBars [1].Width);
 	}
 }

@@ -16,14 +16,10 @@ namespace Terminal.Gui.ViewsTests {
 		public void Constructors_Defaults ()
 		{
 			var sv = new ScrollView ();
-			Assert.Equal (LayoutStyle.Computed, sv.LayoutStyle);
+			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (0, 0, 0, 0), sv.Frame);
 			Assert.Equal (Rect.Empty, sv.Frame);
-			Assert.Null (sv.X);
-			Assert.Null (sv.Y);
-			Assert.Null (sv.Width);
-			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
@@ -33,10 +29,6 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (LayoutStyle.Absolute, sv.LayoutStyle);
 			Assert.True (sv.CanFocus);
 			Assert.Equal (new Rect (1, 2, 20, 10), sv.Frame);
-			Assert.Null (sv.X);
-			Assert.Null (sv.Y);
-			Assert.Null (sv.Width);
-			Assert.Null (sv.Height);
 			Assert.Equal (Point.Empty, sv.ContentOffset);
 			Assert.Equal (Size.Empty, sv.ContentSize);
 			Assert.True (sv.AutoHideScrollBars);
@@ -196,6 +188,8 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (sv);
 			Application.Begin (Application.Top);
 
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
+
 			Assert.False (sv.AutoHideScrollBars);
 			Assert.True (sv.ShowHorizontalScrollIndicator);
 			Assert.True (sv.ShowVerticalScrollIndicator);
@@ -214,7 +208,9 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 
 			sv.ShowHorizontalScrollIndicator = false;
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
 			sv.ShowVerticalScrollIndicator = true;
+			Assert.Equal (new Rect (0, 0, 10, 10), sv.Bounds);
 
 			Assert.False (sv.AutoHideScrollBars);
 			Assert.False (sv.ShowHorizontalScrollIndicator);
@@ -223,6 +219,7 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (@"
          ▲
          ┬
+         │
          │
          │
          │
@@ -249,7 +246,7 @@ namespace Terminal.Gui.ViewsTests {
          
          
          
-◄├─────┤► 
+◄├──────┤► 
 ", output);
 
 			sv.ShowHorizontalScrollIndicator = false;
@@ -373,235 +370,234 @@ namespace Terminal.Gui.ViewsTests {
 ", output);
 		}
 
-		// BUGBUG: v2 - I can't figure out what this test is trying to test and it fails in weird ways
-		// Disabling for now
-		//[Fact, AutoInitShutdown]
-		//public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
-		//{
-		//	var sv = new ScrollView {
-		//		X = 3,
-		//		Y = 3,
-		//		Width = 10,
-		//		Height = 10,
-		//		ContentSize = new Size (50, 50)
-		//	};
-		//	for (int i = 0; i < 8; i++) {
-		//		sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
-		//	}
-		//	Application.Top.Add (sv);
-		//	Application.Begin (Application.Top);
+		// There still have an issue with lower right corner of the scroll view
+		[Fact, AutoInitShutdown]
+		public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
+		{
+			var sv = new ScrollView {
+				X = 3,
+				Y = 3,
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (50, 50)
+			};
+			for (int i = 0; i < 8; i++) {
+				sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
+			}
+			Application.Top.Add (sv);
+			Application.Begin (Application.Top);
 
-		//	TestHelpers.AssertDriverContentsWithFrameAre (@"
-		// █████████▲
-		// ██████But┬
-		// █████████┴
-		// ┌────────░
-		// │     But░
-		// └────────░
-		// ┌────────░
-		// │     But░
-		// └────────▼
-		// ◄├┤░░░░░► ", output);
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   █████████▲
+   ██████But┬
+   █████████┴
+   ┌────────░
+   │     But░
+   └────────░
+   ┌────────░
+   │     But░
+   └────────▼
+   ◄├┤░░░░░►─", output);
 
-		//	sv.ContentOffset = new Point (5, 5);
-		//	sv.LayoutSubviews ();
-		//	Application.Refresh ();
-		//	TestHelpers.AssertDriverContentsWithFrameAre (@"
-		// ─────────▲
-		// ─────────┬
-		//  Button 2│
-		// ─────────┴
-		// ─────────░
-		//  Button 3░
-		// ─────────░
-		// ─────────░
-		//  Button 4▼
-		// ◄├─┤░░░░► ", output);
-		//}
+			sv.ContentOffset = new Point (5, 5);
+			sv.LayoutSubviews ();
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+   ─────────▲
+   ─────────┬
+    Button 2│
+   ─────────┴
+   ─────────░
+    Button 3░
+   ─────────░
+   ─────────░
+    Button 4▼
+   ◄├─┤░░░░►─", output);
+		}
 
-		//private class CustomButton : FrameView {
-		//	private Label labelFill;
-		//	private Label labelText;
+		private class CustomButton : FrameView {
+			private Label labelFill;
+			private Label labelText;
 
-		//	public CustomButton (string fill, string text, int width, int height) : base ()
-		//	{
-		//		Width = width;
-		//		Height = height;
-		//		labelFill = new Label () { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
-		//		labelFill.LayoutComplete += (s, e) => {
-		//			var fillText = new System.Text.StringBuilder ();
-		//			for (int i = 0; i < labelFill.Bounds.Height; i++) {
-		//				if (i > 0) {
-		//					fillText.AppendLine ("");
-		//				}
-		//				for (int j = 0; j < labelFill.Bounds.Width; j++) {
-		//					fillText.Append (fill);
-		//				}
-		//			}
-		//			labelFill.Text = fillText;
-		//		};
+			public CustomButton (string fill, string text, int width, int height) : base ()
+			{
+				Width = width;
+				Height = height;
+				//labelFill = new Label () { AutoSize = false, X = Pos.Center (), Y = Pos.Center (), Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+				labelFill = new Label () { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill (), Visible = false };
+				labelFill.LayoutComplete += (s, e) => {
+					var fillText = new System.Text.StringBuilder ();
+					for (int i = 0; i < labelFill.Bounds.Height; i++) {
+						if (i > 0) {
+							fillText.AppendLine ("");
+						}
+						for (int j = 0; j < labelFill.Bounds.Width; j++) {
+							fillText.Append (fill);
+						}
+					}
+					labelFill.Text = fillText.ToString ();
+				};
 
-		//		labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };
-		//		Add (labelFill, labelText);
-		//		CanFocus = true;
-		//	}
+				labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };
+				Add (labelFill, labelText);
+				CanFocus = true;
+			}
 
-		//	public override bool OnEnter (View view)
-		//	{
-		//		Border.BorderStyle = BorderStyle.None;
-		//		Border.DrawMarginFrame = false;
-		//		labelFill.Visible = true;
-		//		view = this;
-		//		return base.OnEnter (view);
-		//	}
+			public override bool OnEnter (View view)
+			{
+				Border.LineStyle = LineStyle.None;
+				Border.Thickness = new Thickness (0);
+				labelFill.Visible = true;
+				view = this;
+				return base.OnEnter (view);
+			}
 
-		//	public override bool OnLeave (View view)
-		//	{
-		//		Border.BorderStyle = BorderStyle.Single;
-		//		Border.DrawMarginFrame = true;
-		//		labelFill.Visible = false;
-		//		if (view == null)
-		//			view = this;
-		//		return base.OnLeave (view);
-		//	}
-		//}
+			public override bool OnLeave (View view)
+			{
+				Border.LineStyle = LineStyle.Single;
+				Border.Thickness = new Thickness (1);
+				labelFill.Visible = false;
+				if (view == null)
+					view = this;
+				return base.OnLeave (view);
+			}
+		}
+		// There are still issue with the lower right corner of the scroll view
+		[Fact, AutoInitShutdown]
+		public void Clear_Window_Inside_ScrollView ()
+		{
+			var topLabel = new Label ("At 15,0") { X = 15 };
+			var sv = new ScrollView {
+				X = 3,
+				Y = 3,
+				Width = 10,
+				Height = 10,
+				ContentSize = new Size (23, 23),
+				KeepContentAlwaysInViewport = false
+			};
+			var bottomLabel = new Label ("At 15,15") { X = 15, Y = 15 };
+			Application.Top.Add (topLabel, sv, bottomLabel);
+			Application.Begin (Application.Top);
 
-		// BUGBUG: Broke this test with #2483 - @bdisp I need your help figuring out why
-//		[Fact, AutoInitShutdown]
-//		public void Clear_Window_Inside_ScrollView ()
-//		{
-//			var topLabel = new Label ("At 15,0") { X = 15 };
-//			var sv = new ScrollView {
-//				X = 3,
-//				Y = 3,
-//				Width = 10,
-//				Height = 10,
-//				ContentSize = new Size (23, 23),
-//				KeepContentAlwaysInViewport = false
-//			};
-//			var bottomLabel = new Label ("At 15,15") { X = 15, Y = 15 };
-//			Application.Top.Add (topLabel, sv, bottomLabel);
-//			Application.Begin (Application.Top);
-
-//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-//               At 15,0 
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+               At 15,0 
                        
                        
-//            ▲          
-//            ┬          
-//            ┴          
-//            ░          
-//            ░          
-//            ░          
-//            ░          
-//            ░          
-//            ▼          
-//   ◄├┤░░░░░►           
+            ▲          
+            ┬          
+            ┴          
+            ░          
+            ░          
+            ░          
+            ░          
+            ░          
+            ▼          
+   ◄├┤░░░░░►           
                        
                        
-//               At 15,15", output);
+               At 15,15", output);
 
-//			var attributes = new Attribute [] {
-//				Colors.TopLevel.Normal,
-//				Colors.TopLevel.Focus,
-//				Colors.Base.Normal
-//			};
+			var attributes = new Attribute [] {
+						Colors.ColorSchemes ["TopLevel"].Normal,
+						Colors.ColorSchemes ["TopLevel"].Focus,
+						Colors.ColorSchemes ["Base"].Normal
+					};
 
-//			TestHelpers.AssertDriverColorsAre (@"
-//00000000000000000000000
-//00000000000000000000000
-//00000000000000000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00011111111110000000000
-//00000000000000000000000
-//00000000000000000000000
-//00000000000000000000000", attributes);
+			TestHelpers.AssertDriverAttributesAre (@"
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00011111111100000000000
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000", null, attributes);
 
-//			sv.Add (new Window { X = 3, Y = 3, Width = 20, Height = 20 });
+			sv.Add (new Window { X = 3, Y = 3, Width = 20, Height = 20 });
 
-//			Application.Refresh ();
-//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-//               At 15,0 
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+               At 15,0 
                        
                        
-//            ▲          
-//            ┬          
-//            ┴          
-//      ┌─────░          
-//      │     ░          
-//      │     ░          
-//      │     ░          
-//      │     ░          
-//      │     ▼          
-//   ◄├┤░░░░░►           
+            ▲          
+            ┬          
+            ┴          
+      ┌─────░          
+      │     ░          
+      │     ░          
+      │     ░          
+      │     ░          
+      │     ▼          
+   ◄├┤░░░░░►           
                        
                        
-//               At 15,15", output);
+               At 15,15", output);
 
-//			TestHelpers.AssertDriverColorsAre (@"
-//00000000000000000000000
-//00000000000000000000000
-//00000000000000000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000022222210000000000
-//00000022222210000000000
-//00000022222210000000000
-//00000022222210000000000
-//00000022222210000000000
-//00000022222210000000000
-//00011111111110000000000
-//00000000000000000000000
-//00000000000000000000000
-//00000000000000000000000", attributes);
+			TestHelpers.AssertDriverAttributesAre (@"
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00000022222210000000000
+00011111111120000000000
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000", null, attributes);
 
-//			sv.ContentOffset = new Point (20, 20);
-//			Application.Refresh ();
-//			TestHelpers.AssertDriverContentsWithFrameAre (@"
-//               At 15,0 
+			sv.ContentOffset = new Point (20, 20);
+			Application.Refresh ();
+			TestHelpers.AssertDriverContentsWithFrameAre (@"
+               At 15,0 
                        
                        
-//     │      ▲          
-//     │      ░          
-//   ──┘      ░          
-//            ░          
-//            ░          
-//            ┬          
-//            │          
-//            ┴          
-//            ▼          
-//   ◄░░░░├─┤►           
+     │      ▲          
+     │      ░          
+   ──┘      ░          
+            ░          
+            ░          
+            ┬          
+            │          
+            ┴          
+            ▼          
+   ◄░░░░├─┤►           
                        
                        
-//               At 15,15", output);
+               At 15,15", output);
 
-//			TestHelpers.AssertDriverColorsAre (@"
-//00000000000000000000000
-//00000000000000000000000
-//00000000000000000000000
-//00022200000010000000000
-//00022200000010000000000
-//00022200000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00000000000010000000000
-//00011111111110000000000
-//00000000000000000000000
-//00000000000000000000000
-//00000000000000000000000", attributes);
-//		}
+			TestHelpers.AssertDriverAttributesAre (@"
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000
+00022200000010000000000
+00022200000010000000000
+00022200000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00000000000010000000000
+00011111111100000000000
+00000000000000000000000
+00000000000000000000000
+00000000000000000000000", null, attributes);
+		}
 
 		[Fact, AutoInitShutdown]
 		public void DrawTextFormatter_Respects_The_Clip_Bounds ()

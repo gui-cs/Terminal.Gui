@@ -15,9 +15,9 @@ public class MenuTests {
 	}
 
 	// TODO: Create more low-level unit tests for Menu and MenuItem
-	
+
 	[Fact]
-	public void Menu_Constuctors_Defaults ()
+	public void Menu_Constructors_Defaults ()
 	{
 		Assert.Throws<ArgumentNullException> (() => new Menu (null, 0, 0, null));
 
@@ -28,7 +28,7 @@ public class MenuTests {
 	}
 
 	[Fact]
-	public void MenuItem_Constuctors_Defaults ()
+	public void MenuItem_Constructors_Defaults ()
 	{
 		var menuItem = new MenuItem ();
 		Assert.Equal ("", menuItem.Title);

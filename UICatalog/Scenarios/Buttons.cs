@@ -3,8 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 [ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons.")]
-[ScenarioCategory ("Controls")]
-[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Controls"), ScenarioCategory ("Layout")]
 public class Buttons : Scenario {
 	public override void Setup ()
 	{
@@ -32,7 +31,7 @@ public class Buttons : Scenario {
 		defaultButton.Clicked += (s, e) => Application.RequestStop ();
 		Win.Add (defaultButton);
 
-		var swapButton = new Button (50, 0, "Swap Default (Absolute Layout)");
+		var swapButton = new Button (50, 0, "S_wap Default (Absolute Layout)");
 		swapButton.Clicked += (s, e) => {
 			defaultButton.IsDefault = !defaultButton.IsDefault;
 			swapButton.IsDefault = !swapButton.IsDefault;
@@ -58,7 +57,7 @@ public class Buttons : Scenario {
 		//With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
 		var x = Pos.Right (colorButtonsLabel) + 2;
 		foreach (var colorScheme in Colors.ColorSchemes) {
-			var colorButton = new Button ($"{colorScheme.Key}") {
+			var colorButton = new Button ($"_{colorScheme.Key}") {
 				ColorScheme = colorScheme.Value,
 				//X = Pos.Right (prev) + 2,
 				X = x,
@@ -99,7 +98,7 @@ public class Buttons : Scenario {
 		var removeButton = new Button ("Remove this button") {
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
-			ColorScheme = Colors.Error
+			ColorScheme = Colors.ColorSchemes ["Error"]
 		};
 		Win.Add (removeButton);
 		// This in interesting test case because `moveBtn` and below are laid out relative to this one!
@@ -119,11 +118,11 @@ public class Buttons : Scenario {
 		Win.Add (computedFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtn = new Button ("Move This \u263b Button _via Pos") {
+		var moveBtn = new Button ("Move This \u263b Button v_ia Pos") {
 			X = 0,
 			Y = Pos.Center () - 1,
 			Width = 30,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		moveBtn.Clicked += (s, e) => {
 			moveBtn.X = moveBtn.Frame.X + 5;
@@ -137,7 +136,7 @@ public class Buttons : Scenario {
 			X = 0,
 			Y = Pos.Center () + 1,
 			Width = 30,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		sizeBtn.Clicked += (s, e) => {
 			sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -155,7 +154,7 @@ public class Buttons : Scenario {
 
 		// Demonstrates how changing the View.Frame property can move Views
 		var moveBtnA = new Button (0, 0, "Move This Button via Frame") {
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		moveBtnA.Clicked += (s, e) => {
 			moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
@@ -163,8 +162,8 @@ public class Buttons : Scenario {
 		absoluteFrame.Add (moveBtnA);
 
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-		var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
-			ColorScheme = Colors.Error,
+		var sizeBtnA = new Button (0, 2, " ~  s  gui.cs   master ↑_10 = Сохранить") {
+			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		sizeBtnA.Clicked += (s, e) => {
 			sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
@@ -215,7 +214,7 @@ public class Buttons : Scenario {
 			X = 2,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (computedFrame) - 2,
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
 		moveHotKeyBtn.Clicked += (s, e) => {
 			moveHotKeyBtn.Text = MoveHotkey (moveHotKeyBtn.Text);
@@ -227,7 +226,7 @@ public class Buttons : Scenario {
 			X = Pos.Left (absoluteFrame) + 1,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
 		moveUnicodeHotKeyBtn.Clicked += (s, e) => {
 			moveUnicodeHotKeyBtn.Text = MoveHotkey (moveUnicodeHotKeyBtn.Text);
