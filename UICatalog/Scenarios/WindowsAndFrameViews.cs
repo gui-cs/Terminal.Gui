@@ -168,7 +168,7 @@ public class WindowsAndFrameViews : Scenario {
 		};
 		subFrameViewofFV.Add (new TextField ("Edit Me") { Width = 15 });
 
-		subFrameViewofFV.Add (new CheckBox () { Y = 1, Text = "Check me" });
+		subFrameViewofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
 		// BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 
 		// its client area. #522
 		subFrameViewofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });

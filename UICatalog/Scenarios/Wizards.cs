@@ -165,7 +165,7 @@ namespace UICatalog.Scenarios {
 					lbl = new Label () { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
 					var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 					secondStep.Add (lbl, lastNameField);
-					var thirdStepEnabledCeckBox = new CheckBox () { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
+					var thirdStepEnabledCeckBox = new CheckBox { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
 					secondStep.Add (thirdStepEnabledCeckBox);
 
 					// Add a frame 
@@ -270,7 +270,7 @@ namespace UICatalog.Scenarios {
 					var lastStep = new WizardStep () { Title = "The last step" };
 					wizard.AddStep (lastStep);
 					lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
-					var finalFinalStepEnabledCeckBox = new CheckBox () { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
+					var finalFinalStepEnabledCeckBox = new CheckBox { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
 					lastStep.Add (finalFinalStepEnabledCeckBox);
 
 					// Add an optional FINAL last step

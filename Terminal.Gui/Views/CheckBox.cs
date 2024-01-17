@@ -34,7 +34,8 @@ public class CheckBox : View {
 	/// <summary>
 	/// Initializes a new instance of <see cref="CheckBox"/> based on the given text, using <see cref="LayoutStyle.Computed"/> layout.
 	/// </summary>
-	public CheckBox () {
+	public CheckBox ()
+	{
 		_charNullChecked = CM.Glyphs.NullChecked;
 		_charChecked = CM.Glyphs.Checked;
 		_charUnChecked = CM.Glyphs.UnChecked;
