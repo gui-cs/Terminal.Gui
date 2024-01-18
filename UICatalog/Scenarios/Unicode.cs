@@ -2,7 +2,7 @@
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Unicode", "Tries to test Unicode in all controls (#204)")]
 [ScenarioCategory ("Text and Formatting")]
@@ -62,7 +62,7 @@ public class UnicodeInMenu : Scenario {
 
 		label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1 };
 		Win.Add (label);
-		var comboBox = new ComboBox () {
+		var comboBox = new ComboBox {
 			X = 20,
 			Y = Pos.Y (label),
 			Width = Dim.Percent (50)

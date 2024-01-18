@@ -230,36 +230,11 @@ public class ComboBox : View {
 	/// <summary>
 	/// Public constructor
 	/// </summary>
-	public ComboBox () : this (string.Empty) { }
-
-	/// <summary>
-	/// Public constructor
-	/// </summary>
-	/// <param name="text"></param>
-	public ComboBox (string text) : base ()
+	public ComboBox ()
 	{
 		_search = new TextField ("");
 		_listview = new ComboListView (this, HideDropdownListOnClick) { CanFocus = true, TabStop = false };
 
-		SetInitialProperties ();
-		Text = text;
-	}
-
-	/// <summary>
-	/// Initialize with the source.
-	/// </summary>
-	/// <param name="source">The source.</param>
-	public ComboBox (IList source) : this (string.Empty)
-	{
-		_search = new TextField ("");
-		_listview = new ComboListView (this, source, HideDropdownListOnClick) { ColorScheme = Colors.ColorSchemes ["Base"] };
-
-		SetInitialProperties ();
-		SetSource (source);
-	}
-
-	void SetInitialProperties ()
-	{
 		_search.TextChanged += Search_Changed;
 
 		_listview.Y = Pos.Bottom (_search);
@@ -330,7 +305,7 @@ public class ComboBox : View {
 		KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
 	}
 
-	bool _isShow = false;
+	bool _isShow;
 	int _selectedItem = -1;
 	int _lastSelectedItem = -1;
 	bool _hideDropdownListOnClick;
@@ -343,7 +318,7 @@ public class ComboBox : View {
 		get => _selectedItem;
 		set {
 			if (_selectedItem != value && (value == -1
-							|| _source != null && value > -1 && value < _source.Count)) {
+					|| _source != null && value > -1 && value < _source.Count)) {
 
 				_selectedItem = _lastSelectedItem = value;
 				if (_selectedItem != -1) {

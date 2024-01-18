@@ -26,7 +26,7 @@ public class ComboBoxTests {
 		Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
 		Assert.Equal (-1, cb.SelectedItem);
 
-		cb = new ComboBox ("Test");
+		cb = new ComboBox { Text = "Test" };
 		cb.BeginInit ();
 		cb.EndInit ();
 		cb.LayoutSubviews ();
@@ -36,11 +36,12 @@ public class ComboBoxTests {
 		Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
 		Assert.Equal (-1, cb.SelectedItem);
 
-		cb = new ComboBox (new List<string> () { "One", "Two", "Three" }) {
+		cb = new ComboBox {
 			X = 1,
 			Y = 2,
 			Width = 10,
-			Height = 20
+			Height = 20,
+			Source = new ListWrapper (new List<string> () { "One", "Two", "Three" })
 		};
 		cb.BeginInit ();
 		cb.EndInit ();
@@ -51,7 +52,9 @@ public class ComboBoxTests {
 		Assert.Equal (new Rect (1, 2, 10, 20), cb.Frame);
 		Assert.Equal (-1, cb.SelectedItem);
 
-		cb = new ComboBox (new List<string> () { "One", "Two", "Three" });
+		cb = new ComboBox {
+			Source = new ListWrapper (new List<string> () { "One", "Two", "Three" })
+		};
 		cb.BeginInit ();
 		cb.EndInit ();
 		cb.LayoutSubviews ();
@@ -62,11 +65,11 @@ public class ComboBoxTests {
 		Assert.Equal (-1, cb.SelectedItem);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void Constructor_With_Source_Initialize_With_The_Passed_SelectedItem ()
 	{
-		var cb = new ComboBox (new List<string> () { "One", "Two", "Three" }) {
+		var cb = new ComboBox {
+			Source = new ListWrapper (new List<string> () { "One", "Two", "Three" }),
 			SelectedItem = 1
 		};
 		cb.BeginInit ();
@@ -79,11 +82,10 @@ public class ComboBoxTests {
 		Assert.Equal (1, cb.SelectedItem);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void EnsureKeyEventsDoNotCauseExceptions ()
 	{
-		var comboBox = new ComboBox ("0");
+		var comboBox = new ComboBox { Text = "0" };
 
 		var source = Enumerable.Range (0, 15).Select (x => x.ToString ()).ToArray ();
 		comboBox.SetSource (source);
@@ -95,12 +97,11 @@ public class ComboBoxTests {
 		}
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, AutoInitShutdown]
 	public void KeyBindings_Command ()
 	{
 		List<string> source = new List<string> () { "One", "Two", "Three" };
-		ComboBox cb = new ComboBox () { Width = 10 };
+		ComboBox cb = new ComboBox { Width = 10 };
 		cb.SetSource (source);
 		Application.Top.Add (cb);
 		Application.Top.FocusFirst ();
