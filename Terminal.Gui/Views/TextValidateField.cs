@@ -480,7 +480,7 @@ namespace Terminal.Gui {
 				curPos = _cursorPosition + left;
 				Move (curPos, 0);
 			}
-			if (curPos >= Bounds.Width) {
+			if (curPos < 0 || curPos >= Bounds.Width) {
 				Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 			} else {
 				Application.Driver.SetCursorVisibility (CursorVisibility.Default);
