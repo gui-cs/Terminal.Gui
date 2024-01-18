@@ -17,7 +17,7 @@ public class Notepad : Scenario {
 	public override void Init ()
 	{
 		Application.Init ();
-		Application.Top.ColorScheme = Colors.Base;
+		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
 
 	public override void Setup ()
@@ -275,7 +275,14 @@ public class Notepad : Scenario {
 	/// <param name="fileInfo">File that was read or null if a new blank document</param>
 	private void Open (FileInfo fileInfo, string tabName)
 	{
-		var tab = new OpenedFile (_focusedTabView, tabName, fileInfo);
+		var tab = new OpenedFile () {
+			DisplayText = tabName,
+			File = fileInfo
+		};
+		tab.View = tab.CreateTextView (fileInfo);
+		tab.SavedText = tab.View.Text;
+		tab.RegisterTextViewEvents (_focusedTabView);
+
 		_focusedTabView.AddTab (tab, true);
 	}
 
@@ -336,15 +343,7 @@ public class Notepad : Scenario {
 
 		public bool UnsavedChanges => !string.Equals (SavedText, View.Text);
 
-		public OpenedFile (TabView parent, string name, FileInfo file)
-			: base (name, CreateTextView (file))
-		{
-			File = file;
-			SavedText = View.Text;
-			RegisterTextViewEvents (parent);
-		}
-
-		private void RegisterTextViewEvents (TabView parent)
+		public void RegisterTextViewEvents (TabView parent)
 		{
 			var textView = (TextView)View;
 			// when user makes changes rename tab to indicate unsaved
@@ -370,7 +369,7 @@ public class Notepad : Scenario {
 			};
 		}
 
-		private static View CreateTextView (FileInfo file)
+		public View CreateTextView (FileInfo file)
 		{
 			string initialText = string.Empty;
 			if (file != null && file.Exists) {
@@ -390,7 +389,10 @@ public class Notepad : Scenario {
 
 		public OpenedFile CloneTo (TabView other)
 		{
-			var newTab = new OpenedFile (other, base.Text.ToString (), File);
+			var newTab = new OpenedFile () { DisplayText = base.Text, File = File };
+			newTab.View = newTab.CreateTextView (newTab.File);
+			newTab.SavedText = newTab.View.Text;
+			newTab.RegisterTextViewEvents (other);
 			other.AddTab (newTab, true);
 			return newTab;
 		}

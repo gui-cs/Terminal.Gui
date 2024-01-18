@@ -5,8 +5,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Adornments Demo", "Demonstrates Margin, Border, and Padding on Views.")]
-[ScenarioCategory ("Layout")]
-[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Layout"), ScenarioCategory ("Borders")]
 public class Adornments : Scenario {
 
 	public override void Init ()
@@ -77,9 +76,9 @@ public class Adornments : Scenario {
 		editor.Initialized += (s, e) => {
 			editor.ViewToEdit = view;
 		};
-		//view.Margin.ColorScheme = new ColorScheme (Colors.Dialog);
-		//view.Border.ColorScheme = new ColorScheme (Colors.Error);
-		//view.Padding.ColorScheme = new ColorScheme (Colors.Menu);
+		//view.Margin.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Dialog"]);
+		//view.Border.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Error"]);
+		//view.Padding.ColorScheme = new ColorScheme (Colors.ColorSchemes ["Menu"]);
 
 		Application.Run (editor);
 		Application.Shutdown ();
@@ -193,7 +192,7 @@ public class Adornments : Scenario {
 			_bottomEdit.TextChanging += Edit_TextChanging;
 			Add (_bottomEdit);
 
-			var copyTop = new Button ("Copy Top") {
+			var copyTop = new Button ("Cop_y Top") {
 				X = Pos.Center () + 1,
 				Y = Pos.Bottom (_bottomEdit)
 			};
@@ -370,7 +369,7 @@ public class Adornments : Scenario {
 				Add (_paddingEditor);
 
 				_diagCheckBox = new CheckBox {
-					Text = "Diagnostics",
+					Text = "_Diagnostics",
 					Y = Pos.Bottom (_paddingEditor)
 				};
 				_diagCheckBox.Toggled += (s, e) => {

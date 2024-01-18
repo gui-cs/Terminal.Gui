@@ -331,23 +331,23 @@ public class ConfigurationManagerTests {
 		Settings.Update (json, "TestConfigurationManagerInitDriver");
 
 		var colorSchemes = (Dictionary<string, ColorScheme>)Themes [Themes.Theme] ["ColorSchemes"].PropertyValue;
-		Assert.Equal (Colors.Base, colorSchemes ["Base"]);
-		Assert.Equal (Colors.TopLevel, colorSchemes ["TopLevel"]);
-		Assert.Equal (Colors.Error, colorSchemes ["Error"]);
-		Assert.Equal (Colors.Dialog, colorSchemes ["Dialog"]);
-		Assert.Equal (Colors.Menu, colorSchemes ["Menu"]);
+		Assert.Equal (Colors.ColorSchemes ["Base"], colorSchemes ["Base"]);
+		Assert.Equal (Colors.ColorSchemes ["TopLevel"], colorSchemes ["TopLevel"]);
+		Assert.Equal (Colors.ColorSchemes ["Error"], colorSchemes ["Error"]);
+		Assert.Equal (Colors.ColorSchemes ["Dialog"], colorSchemes ["Dialog"]);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], colorSchemes ["Menu"]);
 
-		Colors.Base = colorSchemes ["Base"];
-		Colors.TopLevel = colorSchemes ["TopLevel"];
-		Colors.Error = colorSchemes ["Error"];
-		Colors.Dialog = colorSchemes ["Dialog"];
-		Colors.Menu = colorSchemes ["Menu"];
+		Colors.ColorSchemes ["Base"] = colorSchemes ["Base"];
+		Colors.ColorSchemes ["TopLevel"] = colorSchemes ["TopLevel"];
+		Colors.ColorSchemes ["Error"] = colorSchemes ["Error"];
+		Colors.ColorSchemes ["Dialog"] = colorSchemes ["Dialog"];
+		Colors.ColorSchemes ["Menu"] = colorSchemes ["Menu"];
 
-		Assert.Equal (colorSchemes ["Base"], Colors.Base);
-		Assert.Equal (colorSchemes ["TopLevel"], Colors.TopLevel);
-		Assert.Equal (colorSchemes ["Error"], Colors.Error);
-		Assert.Equal (colorSchemes ["Dialog"], Colors.Dialog);
-		Assert.Equal (colorSchemes ["Menu"], Colors.Menu);
+		Assert.Equal (colorSchemes ["Base"], Colors.ColorSchemes ["Base"]);
+		Assert.Equal (colorSchemes ["TopLevel"], Colors.ColorSchemes ["TopLevel"]);
+		Assert.Equal (colorSchemes ["Error"], Colors.ColorSchemes ["Error"]);
+		Assert.Equal (colorSchemes ["Dialog"], Colors.ColorSchemes ["Dialog"]);
+		Assert.Equal (colorSchemes ["Menu"], Colors.ColorSchemes ["Menu"]);
 	}
 
 	[Fact]

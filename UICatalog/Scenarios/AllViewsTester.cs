@@ -7,35 +7,36 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
-[ScenarioCategory ("Layout")]
-[ScenarioCategory ("Tests")]
-[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Layout")] [ScenarioCategory ("Tests")] [ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario {
-	FrameView _leftPane;
 	ListView _classListView;
+	CheckBox _computedCheckBox;
+	View _curView;
+	readonly List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
 	FrameView _hostPane;
+	RadioGroup _hRadioGroup;
+	TextField _hText;
+	int _hVal;
+	FrameView _leftPane;
+	FrameView _locationFrame;
 
-	Dictionary<string, Type> _viewClasses;
-	View _curView = null;
+	// TODO: This is missing some
+	readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
 
 	// Settings
 	FrameView _settingsPane;
-	CheckBox _computedCheckBox;
-	FrameView _locationFrame;
-	RadioGroup _xRadioGroup;
-	TextField _xText;
-	int _xVal = 0;
-	RadioGroup _yRadioGroup;
-	TextField _yText;
-	int _yVal = 0;
-
 	FrameView _sizeFrame;
+
+	Dictionary<string, Type> _viewClasses;
 	RadioGroup _wRadioGroup;
 	TextField _wText;
-	int _wVal = 0;
-	RadioGroup _hRadioGroup;
-	TextField _hText;
-	int _hVal = 0;
+	int _wVal;
+	RadioGroup _xRadioGroup;
+	TextField _xText;
+	int _xVal;
+	RadioGroup _yRadioGroup;
+	TextField _yText;
+	int _yVal;
 
 	public override void Init ()
 	{
@@ -62,9 +63,9 @@ public class AllViewsTester : Scenario {
 		Application.Top.Add (statusBar);
 
 		_viewClasses = GetAllViewClassesCollection ()
-				.OrderBy (t => t.Name)
-				.Select (t => new KeyValuePair<string, Type> (t.Name, t))
-				.ToDictionary (t => t.Key, t => t.Value);
+			.OrderBy (t => t.Name)
+			.Select (t => new KeyValuePair<string, Type> (t.Name, t))
+			.ToDictionary (t => t.Key, t => t.Value);
 
 		_leftPane = new FrameView ("Classes") {
 			X = 0,
@@ -72,16 +73,16 @@ public class AllViewsTester : Scenario {
 			Width = 15,
 			Height = Dim.Fill (1), // for status bar
 			CanFocus = false,
-			ColorScheme = Colors.TopLevel
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 
 		_classListView = new ListView (_viewClasses.Keys.ToList ()) {
 			X = 0,
 			Y = 0,
-			Width = Dim.Fill (0),
-			Height = Dim.Fill (0),
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
 			AllowsMarking = false,
-			ColorScheme = Colors.TopLevel,
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			SelectedItem = 0
 		};
 		_classListView.OpenSelectedItem += (s, a) => {
@@ -106,9 +107,9 @@ public class AllViewsTester : Scenario {
 			Width = Dim.Fill (),
 			Height = 10,
 			CanFocus = false,
-			ColorScheme = Colors.TopLevel
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
-		_computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
+		_computedCheckBox = new CheckBox ("_Computed Layout", true) { X = 0, Y = 0 };
 		_computedCheckBox.Toggled += (s, e) => {
 			if (_curView != null) {
 				_hostPane.LayoutSubviews ();
@@ -116,7 +117,7 @@ public class AllViewsTester : Scenario {
 		};
 		_settingsPane.Add (_computedCheckBox);
 
-		string [] radioItems = new string [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
+		string [] radioItems = { "_Percent(x)", "_AnchorEnd(x)", "_Center", "A_t(x)" };
 		_locationFrame = new FrameView ("Location (Pos)") {
 			X = Pos.Left (_computedCheckBox),
 			Y = Pos.Bottom (_computedCheckBox),
@@ -125,7 +126,7 @@ public class AllViewsTester : Scenario {
 		};
 		_settingsPane.Add (_locationFrame);
 
-		var label = new Label ("x:") { X = 0, Y = 0 };
+		var label = new Label ("X:") { X = 0, Y = 0 };
 		_locationFrame.Add (label);
 		_xRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -143,8 +144,8 @@ public class AllViewsTester : Scenario {
 
 		_locationFrame.Add (_xRadioGroup);
 
-		radioItems = new string [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-		label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
+		radioItems = new [] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
+		label = new Label ("Y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
 		_locationFrame.Add (label);
 		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_yText.TextChanged += (s, args) => {
@@ -168,8 +169,8 @@ public class AllViewsTester : Scenario {
 			Width = 40
 		};
 
-		radioItems = new string [] { "Percent(width)", "Fill(width)", "Sized(width)" };
-		label = new Label ("width:") { X = 0, Y = 0 };
+		radioItems = new [] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
+		label = new Label ("Width:") { X = 0, Y = 0 };
 		_sizeFrame.Add (label);
 		_wRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -194,8 +195,8 @@ public class AllViewsTester : Scenario {
 		_sizeFrame.Add (_wText);
 		_sizeFrame.Add (_wRadioGroup);
 
-		radioItems = new string [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-		label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
+		radioItems = new [] { "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
+		label = new Label ("Height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
 		_sizeFrame.Add (label);
 		_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_hText.TextChanged += (s, args) => {
@@ -228,7 +229,7 @@ public class AllViewsTester : Scenario {
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),
 			Height = Dim.Fill (1), // + 1 for status bar
-			ColorScheme = Colors.Dialog
+			ColorScheme = Colors.ColorSchemes ["Dialog"]
 		};
 
 		Application.Top.Add (_leftPane, _settingsPane, _hostPane);
@@ -278,27 +279,21 @@ public class AllViewsTester : Scenario {
 			};
 		} catch (Exception e) {
 			MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
-		} finally {
-			//view.LayoutStyle = layout;
 		}
 		UpdateTitle (view);
 	}
 
-	// TODO: This is missing some
-	List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
-	List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
-
 	void UpdateSettings (View view)
 	{
-		string x = view.X.ToString ();
-		string y = view.Y.ToString ();
+		var x = view.X.ToString ();
+		var y = view.Y.ToString ();
 		_xRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.Where (s => x.Contains (s)).First ());
 		_yRadioGroup.SelectedItem = _posNames.IndexOf (_posNames.Where (s => y.Contains (s)).First ());
 		_xText.Text = $"{view.Frame.X}";
 		_yText.Text = $"{view.Frame.Y}";
 
-		string w = view.Width.ToString ();
-		string h = view.Height.ToString ();
+		var w = view.Width.ToString ();
+		var h = view.Height.ToString ();
 		_wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => w.Contains (s)).First ());
 		_hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => h.Contains (s)).First ());
 		_wText.Text = $"{view.Frame.Width}";
@@ -311,7 +306,7 @@ public class AllViewsTester : Scenario {
 	{
 		var types = new List<Type> ();
 		foreach (var type in typeof (View).Assembly.GetTypes ()
-						.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
+			.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
 			types.Add (type);
 		}
 		types.Add (typeof (View));
@@ -340,7 +335,7 @@ public class AllViewsTester : Scenario {
 
 		// Set the colorscheme to make it stand out if is null by default
 		if (view.ColorScheme == null) {
-			view.ColorScheme = Colors.Base;
+			view.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 
 		// If the view supports a Text property, set it so we have something to look at
@@ -364,7 +359,7 @@ public class AllViewsTester : Scenario {
 
 		// If the view supports a Source property, set it so we have something to look at
 		if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource)) {
-			var source = new ListWrapper (new List<string> () { "Test Text #1", "Test Text #2", "Test Text #3" });
+			var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
 			view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 		}
 
