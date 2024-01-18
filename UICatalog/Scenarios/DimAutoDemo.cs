@@ -1,4 +1,5 @@
 using Terminal.Gui;
+using static Terminal.Gui.Dim;
 
 namespace UICatalog.Scenarios;
 
@@ -15,33 +16,46 @@ public class DimAutoDemo : Scenario {
 
 	public override void Setup ()
 	{
-		var textField = new TextField { Text = "Type here", X = 1, Y = 0, Width = 20, Height = 1 };
+		var textField = new TextField { Text = "", X = 1, Y = 0, Width = 20, Height = 1 };
 
-		var label = new Label {
-			X = Pos.Left (textField),
+		var hlabel = new Label {
+			Text = textField.Text,
+			X = Pos.Left (textField) + 1,
 			Y = Pos.Bottom (textField),
-			AutoSize = true,
+			AutoSize = false,
+			Width = Dim.Auto (style: DimAutoStyle.Text, min: 20),
 			ColorScheme = Colors.ColorSchemes["Error"]
 		};
 
-		textField.TextChanged += (s, e) => {
-			label.Text = textField.Text;
+		var vlabel = new Label {
+			Text = textField.Text,
+			X = Pos.Left (textField),
+			Y = Pos.Bottom (textField) + 1,
+			AutoSize = false,
+			Height = Dim.Auto (style: DimAutoStyle.Text, min: 10),
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 
-		var resetButton = new Button () {
-			Text = "P_ut Button Back",
-			Y = Pos.Bottom (label)
+		textField.TextChanged += (s, e) => {
+			hlabel.Text = textField.Text;
+			vlabel.Text = textField.Text;
 		};
-		resetButton.X = Pos.AnchorEnd () - 19;
 
 		var movingButton = new Button () {
-			Text = "Press to make button move down.",
-			X = 0,
-			Y = Pos.Bottom (resetButton),
+			Text = "P_ress to make button move down.",
+			X = 2,
+			Y = Pos.Bottom (hlabel),
 			Width = 10
 		};
 		movingButton.Clicked += (s, e) => {
 			movingButton.Y = movingButton.Frame.Y + 1;
+		};
+
+		var resetButton = new Button () {
+			Text = "P_ut Button Back",
+			X = 30,//Pos.AnchorEnd () - 19,
+			Y = Pos.Top (movingButton),
 		};
 
 
@@ -49,14 +63,14 @@ public class DimAutoDemo : Scenario {
 			Title = "Type in the TextField to make View grow.",
 			X = 3,
 			Y = 3,
-			Width = Dim.Auto (min: Dim.Percent (50)),
+			Width = Dim.Auto (min: 50),
 			Height = Dim.Auto (min: 10)
 		};
 		view.ValidatePosDim = true;
-		view.Add (textField, label, resetButton, movingButton);
+		view.Add (textField, hlabel, vlabel, resetButton, movingButton);
 
 		resetButton.Clicked += (s, e) => {
-			movingButton.Y = Pos.Bottom (resetButton);
+			movingButton.Y = Pos.Bottom (hlabel);
 		};
 
 		var dlgButton = new Button () {

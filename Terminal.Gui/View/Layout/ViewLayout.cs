@@ -828,13 +828,17 @@ public partial class View {
 					var thickness = GetAdornmentsThickness ();
 					//newDimension = GetNewDimension (auto._min, location, dimension, autosize);
 					if (width) {
-						var furthestRight = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.X is not Pos.PosAnchorEnd).Max (v => v.Frame.X + v.Frame.Width);
-						//Debug.Assert(superviewBounds.Width == (SuperView?.Bounds.Width ?? 0));
-						newDimension = int.Max (furthestRight + thickness.Left + thickness.Right, auto._min?.Anchor (superviewBounds.Width) ?? 0);
+						var max = int.Max (GetAutoSize ().Width, auto._min?.Anchor (superviewBounds.Width) ?? 0);
+						if (auto._style == Dim.DimAutoStyle.Subviews) {
+							max = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.X is not Pos.PosAnchorEnd).Max (v => v.Frame.X + v.Frame.Width);
+						}
+						newDimension = int.Max (max + thickness.Left + thickness.Right, auto._min?.Anchor (superviewBounds.Width) ?? 0);
 					} else {
-						var furthestBottom = Subviews.Count == 0 ? 0 : Subviews.Max (v => v.Frame.Y + v.Frame.Height);
-						//Debug.Assert (superviewBounds.Height == (SuperView?.Bounds.Height ?? 0));
-						newDimension = int.Max (furthestBottom + thickness.Top + thickness.Bottom, auto._min?.Anchor (superviewBounds.Height) ?? 0);
+						var max = int.Max (GetAutoSize ().Height, auto._min?.Anchor (superviewBounds.Height) ?? 0);
+						if (auto._style == Dim.DimAutoStyle.Subviews) {
+							max = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.Y is not Pos.PosAnchorEnd).Max (v => v.Frame.Y + v.Frame.Height);
+						}
+						newDimension = int.Max (max + thickness.Top + thickness.Bottom, auto._min?.Anchor (superviewBounds.Height) ?? 0);
 					}
 					break;
 
@@ -928,7 +932,6 @@ public partial class View {
 
 			// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
 			if (!SetFrameToFitText ()) {
-				SetTextFormatterSize ();
 				SetTextFormatterSize ();
 			}
 		}

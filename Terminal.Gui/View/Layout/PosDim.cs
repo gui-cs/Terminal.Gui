@@ -702,9 +702,9 @@ public class Dim {
 	/// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
 	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Subviews, Dim min = null, Dim max = null)
 	{
-		if (style == DimAutoStyle.Text) {
-			throw new NotImplementedException (@"DimAutoStyle.Text is not implemented.");
-		}
+		//if (style == DimAutoStyle.Text) {
+		//	throw new NotImplementedException (@"DimAutoStyle.Text is not implemented.");
+		//}
 		//if (min != null) {
 		//	throw new NotImplementedException (@"min is not implemented");
 		//}
