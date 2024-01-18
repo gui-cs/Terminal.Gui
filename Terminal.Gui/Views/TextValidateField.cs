@@ -6,7 +6,6 @@
 //
 
 using System.Text;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -104,7 +103,7 @@ namespace Terminal.Gui {
 		/// <para><a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.maskedtextbox.mask?view=net-5.0">Masking elements</a></para>
 		/// </summary>
 		public class NetMaskedTextProvider : ITextValidateProvider {
-			MaskedTextProvider provider;
+			MaskedTextProvider _provider;
 
 			/// <summary>
 			/// Empty Constructor
@@ -119,13 +118,13 @@ namespace Terminal.Gui {
 			/// </summary>
 			public string Mask {
 				get {
-					return provider?.Mask;
+					return _provider?.Mask;
 				}
 				set {
-					var current = provider != null ? provider.ToString (false, false) : string.Empty;
-					provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
+					var current = _provider != null ? _provider.ToString (false, false) : string.Empty;
+					_provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
 					if (string.IsNullOrEmpty (current) == false) {
-						provider.Set (current);
+						_provider.Set (current);
 					}
 				}
 			}
@@ -133,32 +132,32 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public string Text {
 				get {
-					return provider.ToString ();
+					return _provider.ToString ();
 				}
 				set {
-					provider.Set (value);
+					_provider.Set (value);
 				}
 			}
 
 			///<inheritdoc/>
-			public bool IsValid => provider.MaskCompleted;
+			public bool IsValid => _provider.MaskCompleted;
 
 			///<inheritdoc/>
 			public bool Fixed => true;
 
 			///<inheritdoc/>
-			public string DisplayText => provider.ToDisplayString ();
+			public string DisplayText => _provider.ToDisplayString ();
 
 			///<inheritdoc/>
 			public int Cursor (int pos)
 			{
 				if (pos < 0) {
 					return CursorStart ();
-				} else if (pos > provider.Length) {
+				} else if (pos > _provider.Length) {
 					return CursorEnd ();
 				} else {
-					var p = provider.FindEditPositionFrom (pos, false);
-					if (p == -1) p = provider.FindEditPositionFrom (pos, true);
+					var p = _provider.FindEditPositionFrom (pos, false);
+					if (p == -1) p = _provider.FindEditPositionFrom (pos, true);
 					return p;
 				}
 			}
@@ -167,44 +166,44 @@ namespace Terminal.Gui {
 			public int CursorStart ()
 			{
 				return
-					provider.IsEditPosition (0)
+					_provider.IsEditPosition (0)
 					? 0
-					: provider.FindEditPositionFrom (0, true);
+					: _provider.FindEditPositionFrom (0, true);
 			}
 
 			///<inheritdoc/>
 			public int CursorEnd ()
 			{
 				return
-					provider.IsEditPosition (provider.Length - 1)
-					? provider.Length - 1
-					: provider.FindEditPositionFrom (provider.Length, false);
+					_provider.IsEditPosition (_provider.Length - 1)
+					? _provider.Length - 1
+					: _provider.FindEditPositionFrom (_provider.Length, false);
 			}
 
 			///<inheritdoc/>
 			public int CursorLeft (int pos)
 			{
-				var c = provider.FindEditPositionFrom (pos - 1, false);
+				var c = _provider.FindEditPositionFrom (pos - 1, false);
 				return c == -1 ? pos : c;
 			}
 
 			///<inheritdoc/>
 			public int CursorRight (int pos)
 			{
-				var c = provider.FindEditPositionFrom (pos + 1, true);
+				var c = _provider.FindEditPositionFrom (pos + 1, true);
 				return c == -1 ? pos : c;
 			}
 
 			///<inheritdoc/>
 			public bool Delete (int pos)
 			{
-				return provider.Replace (' ', pos);// .RemoveAt (pos);
+				return _provider.Replace (' ', pos);// .RemoveAt (pos);
 			}
 
 			///<inheritdoc/>
 			public bool InsertAt (char ch, int pos)
 			{
-				return provider.Replace (ch, pos);
+				return _provider.Replace (ch, pos);
 			}
 		}
 		#endregion
@@ -215,9 +214,9 @@ namespace Terminal.Gui {
 		/// Regex Provider for TextValidateField.
 		/// </summary>
 		public class TextRegexProvider : ITextValidateProvider {
-			Regex regex;
-			List<Rune> text;
-			List<Rune> pattern;
+			Regex _regex;
+			List<Rune> _text;
+			List<Rune> _pattern;
 
 			/// <summary>
 			/// Empty Constructor.
@@ -232,10 +231,10 @@ namespace Terminal.Gui {
 			/// </summary>
 			public string Pattern {
 				get {
-					return StringExtensions.ToString (pattern);
+					return StringExtensions.ToString (_pattern);
 				}
 				set {
-					pattern = value.ToRuneList ();
+					_pattern = value.ToRuneList ();
 					CompileMask ();
 					SetupText ();
 				}
@@ -244,10 +243,10 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public string Text {
 				get {
-					return StringExtensions.ToString (text);
+					return StringExtensions.ToString (_text);
 				}
 				set {
-					text = value != string.Empty ? value.ToRuneList () : null;
+					_text = value != string.Empty ? value.ToRuneList () : null;
 					SetupText ();
 				}
 			}
@@ -258,7 +257,7 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public bool IsValid {
 				get {
-					return Validate (text);
+					return Validate (_text);
 				}
 			}
 
@@ -272,7 +271,7 @@ namespace Terminal.Gui {
 
 			bool Validate (List<Rune> text)
 			{
-				var match = regex.Match (StringExtensions.ToString (text));
+				var match = _regex.Match (StringExtensions.ToString (text));
 				return match.Success;
 			}
 
@@ -281,7 +280,7 @@ namespace Terminal.Gui {
 			{
 				if (pos < 0) {
 					return CursorStart ();
-				} else if (pos >= text.Count) {
+				} else if (pos >= _text.Count) {
 					return CursorEnd ();
 				} else {
 					return pos;
@@ -297,7 +296,7 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public int CursorEnd ()
 			{
-				return text.Count;
+				return _text.Count;
 			}
 
 			///<inheritdoc/>
@@ -312,7 +311,7 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public int CursorRight (int pos)
 			{
-				if (pos < text.Count) {
+				if (pos < _text.Count) {
 					return pos + 1;
 				}
 				return pos;
@@ -321,8 +320,8 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public bool Delete (int pos)
 			{
-				if (text.Count > 0 && pos < text.Count) {
-					text.RemoveAt (pos);
+				if (_text.Count > 0 && pos < _text.Count) {
+					_text.RemoveAt (pos);
 				}
 				return true;
 			}
@@ -330,10 +329,10 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public bool InsertAt (char ch, int pos)
 			{
-				var aux = text.ToList ();
+				var aux = _text.ToList ();
 				aux.Insert (pos, (Rune)ch);
 				if (Validate (aux) || ValidateOnInput == false) {
-					text.Insert (pos, (Rune)ch);
+					_text.Insert (pos, (Rune)ch);
 					return true;
 				}
 				return false;
@@ -341,11 +340,11 @@ namespace Terminal.Gui {
 
 			void SetupText ()
 			{
-				if (text != null && IsValid) {
+				if (_text != null && IsValid) {
 					return;
 				}
 
-				text = new List<Rune> ();
+				_text = new List<Rune> ();
 			}
 
 			/// <summary>
@@ -353,7 +352,7 @@ namespace Terminal.Gui {
 			/// </summary>
 			private void CompileMask ()
 			{
-				regex = new Regex (StringExtensions.ToString (pattern), RegexOptions.Compiled);
+				_regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled);
 			}
 		}
 		#endregion
@@ -364,8 +363,8 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TextValidateField : View {
 
-		ITextValidateProvider provider;
-		int cursorPosition = 0;
+		ITextValidateProvider _provider;
+		int _cursorPosition;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -415,11 +414,11 @@ namespace Terminal.Gui {
 		/// Provider
 		/// </summary>
 		public ITextValidateProvider Provider {
-			get => provider;
+			get => _provider;
 			set {
-				provider = value;
-				if (provider.Fixed == true) {
-					this.Width = provider.DisplayText == string.Empty ? 10 : Text.Length;
+				_provider = value;
+				if (_provider.Fixed == true) {
+					this.Width = _provider.DisplayText == string.Empty ? 10 : Text.Length;
 				}
 				HomeKeyHandler ();
 				SetNeedsDisplay ();
@@ -431,11 +430,11 @@ namespace Terminal.Gui {
 		{
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 
-				var c = provider.Cursor (mouseEvent.X - GetMargins (Frame.Width).left);
-				if (provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0) {
+				var c = _provider.Cursor (mouseEvent.X - GetMargins (Frame.Width).left);
+				if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0) {
 					c += 1;
 				}
-				cursorPosition = c;
+				_cursorPosition = c;
 				SetFocus ();
 				SetNeedsDisplay ();
 				return true;
@@ -448,17 +447,17 @@ namespace Terminal.Gui {
 		/// </summary>
 		public new string Text {
 			get {
-				if (provider == null) {
+				if (_provider == null) {
 					return string.Empty;
 				}
 
-				return provider.Text;
+				return _provider.Text;
 			}
 			set {
-				if (provider == null) {
+				if (_provider == null) {
 					return;
 				}
-				provider.Text = value;
+				_provider.Text = value;
 
 				SetNeedsDisplay ();
 			}
@@ -472,10 +471,10 @@ namespace Terminal.Gui {
 			// Fixed = true, is for inputs thar have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
 			// When it's right-aligned and it's a normal input, the cursor behaves differently.
-			if (provider?.Fixed == false && TextAlignment == TextAlignment.Right) {
-				Move (cursorPosition + left - 1, 0);
+			if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right) {
+				Move (_cursorPosition + left - 1, 0);
 			} else {
-				Move (cursorPosition + left, 0);
+				Move (_cursorPosition + left, 0);
 			}
 		}
 
@@ -503,7 +502,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void OnDrawContent (Rect contentArea)
 		{
-			if (provider == null) {
+			if (_provider == null) {
 				Move (0, 0);
 				Driver.AddStr ("Error: ITextValidateProvider not set!");
 				return;
@@ -525,8 +524,8 @@ namespace Terminal.Gui {
 			// Content
 			Driver.SetAttribute (textColor);
 			// Content
-			for (int i = 0; i < provider.DisplayText.Length; i++) {
-				Driver.AddRune ((Rune)provider.DisplayText [i]);
+			for (int i = 0; i < _provider.DisplayText.Length; i++) {
+				Driver.AddRune ((Rune)_provider.DisplayText [i]);
 			}
 
 			// Right Margin
@@ -542,10 +541,10 @@ namespace Terminal.Gui {
 		/// <returns>True if moved.</returns>
 		bool CursorLeft ()
 		{
-			var current = cursorPosition;
-			cursorPosition = provider.CursorLeft (cursorPosition);
+			var current = _cursorPosition;
+			_cursorPosition = _provider.CursorLeft (_cursorPosition);
 			SetNeedsDisplay ();
-			return current != cursorPosition;
+			return current != _cursorPosition;
 		}
 
 		/// <summary>
@@ -554,10 +553,10 @@ namespace Terminal.Gui {
 		/// <returns>True if moved.</returns>
 		bool CursorRight ()
 		{
-			var current = cursorPosition;
-			cursorPosition = provider.CursorRight (cursorPosition);
+			var current = _cursorPosition;
+			_cursorPosition = _provider.CursorRight (_cursorPosition);
 			SetNeedsDisplay ();
-			return current != cursorPosition;
+			return current != _cursorPosition;
 		}
 
 		/// <summary>
@@ -566,11 +565,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		bool BackspaceKeyHandler ()
 		{
-			if (provider.Fixed == false && TextAlignment == TextAlignment.Right && cursorPosition <= 1) {
+			if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && _cursorPosition <= 1) {
 				return false;
 			}
-			cursorPosition = provider.CursorLeft (cursorPosition);
-			provider.Delete (cursorPosition);
+			_cursorPosition = _provider.CursorLeft (_cursorPosition);
+			_provider.Delete (_cursorPosition);
 			SetNeedsDisplay ();
 			return true;
 		}
@@ -581,10 +580,10 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		bool DeleteKeyHandler ()
 		{
-			if (provider.Fixed == false && TextAlignment == TextAlignment.Right) {
-				cursorPosition = provider.CursorLeft (cursorPosition);
+			if (_provider.Fixed == false && TextAlignment == TextAlignment.Right) {
+				_cursorPosition = _provider.CursorLeft (_cursorPosition);
 			}
-			provider.Delete (cursorPosition);
+			_provider.Delete (_cursorPosition);
 			SetNeedsDisplay ();
 			return true;
 		}
@@ -595,7 +594,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		bool HomeKeyHandler ()
 		{
-			cursorPosition = provider.CursorStart ();
+			_cursorPosition = _provider.CursorStart ();
 			SetNeedsDisplay ();
 			return true;
 		}
@@ -606,7 +605,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		bool EndKeyHandler ()
 		{
-			cursorPosition = provider.CursorEnd ();
+			_cursorPosition = _provider.CursorEnd ();
 			SetNeedsDisplay ();
 			return true;
 		}
@@ -614,17 +613,17 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override bool OnProcessKeyDown (Key a)
 		{
-			if (provider == null) {
+			if (_provider == null) {
 				return false;
 			}
 
 			if (a.AsRune == default) {
 				return false;
 			}
-			
+
 			var key = a.AsRune;
 
-			var inserted = provider.InsertAt ((char)key.Value, cursorPosition);
+			var inserted = _provider.InsertAt ((char)key.Value, _cursorPosition);
 
 			if (inserted) {
 				CursorRight ();
@@ -638,11 +637,11 @@ namespace Terminal.Gui {
 		/// </summary>
 		public virtual bool IsValid {
 			get {
-				if (provider == null) {
+				if (_provider == null) {
 					return false;
 				}
 
-				return provider.IsValid;
+				return _provider.IsValid;
 			}
 		}
 	}
