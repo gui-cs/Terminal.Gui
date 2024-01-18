@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Terminal.Gui.TextValidateProviders;
+using System;
 
 namespace Terminal.Gui {
 
@@ -88,6 +89,22 @@ namespace Terminal.Gui {
 			/// Gets the formatted string for display.
 			/// </summary>
 			string DisplayText { get; }
+
+			/// <summary>
+			/// Method that invoke the <see cref="TextChanged"/> event if it's defined.
+			/// </summary>
+			/// <param name="oldValue">The previous text before replaced.</param>
+			/// <returns>Returns the <see cref="TextChangedEventArgs"/></returns>
+			void OnTextChanged (TextChangedEventArgs oldValue);
+
+			/// <summary>
+			/// Changed event, raised when the text has changed.
+			/// <remarks>
+			/// This event is raised when the <see cref="Text"/> changes.
+			/// The passed <see cref="EventArgs"/> is a <see cref="string"/> containing the old value.
+			/// </remarks>
+			/// </summary>
+			event EventHandler<TextChangedEventArgs> TextChanged;
 		}
 
 		//////////////////////////////////////////////////////////////////////////////
@@ -104,6 +121,9 @@ namespace Terminal.Gui {
 		/// </summary>
 		public class NetMaskedTextProvider : ITextValidateProvider {
 			MaskedTextProvider _provider;
+
+			/// <inheritdoc/>
+			public event EventHandler<TextChangedEventArgs> TextChanged;
 
 			/// <summary>
 			/// Empty Constructor
@@ -197,14 +217,27 @@ namespace Terminal.Gui {
 			///<inheritdoc/>
 			public bool Delete (int pos)
 			{
-				return _provider.Replace (' ', pos);// .RemoveAt (pos);
+				var oldValue = Text;
+				var result = _provider.Replace (' ', pos);// .RemoveAt (pos);
+				if (result) {
+					OnTextChanged (new TextChangedEventArgs (oldValue));
+				}
+				return result;
 			}
 
 			///<inheritdoc/>
 			public bool InsertAt (char ch, int pos)
 			{
-				return _provider.Replace (ch, pos);
+				var oldValue = Text;
+				var result = _provider.Replace (ch, pos);
+				if (result) {
+					OnTextChanged (new TextChangedEventArgs (oldValue));
+				}
+				return result;
 			}
+
+			/// <inheritdoc/>
+			public void OnTextChanged (TextChangedEventArgs oldValue) => TextChanged?.Invoke (this, oldValue);
 		}
 		#endregion
 
@@ -217,6 +250,9 @@ namespace Terminal.Gui {
 			Regex _regex;
 			List<Rune> _text;
 			List<Rune> _pattern;
+
+			/// <inheritdoc/>
+			public event EventHandler<TextChangedEventArgs> TextChanged;
 
 			/// <summary>
 			/// Empty Constructor.
@@ -321,7 +357,9 @@ namespace Terminal.Gui {
 			public bool Delete (int pos)
 			{
 				if (_text.Count > 0 && pos < _text.Count) {
+					var oldValue = Text;
 					_text.RemoveAt (pos);
+					OnTextChanged (new TextChangedEventArgs (oldValue));
 				}
 				return true;
 			}
@@ -332,7 +370,9 @@ namespace Terminal.Gui {
 				var aux = _text.ToList ();
 				aux.Insert (pos, (Rune)ch);
 				if (Validate (aux) || ValidateOnInput == false) {
+					var oldValue = Text;
 					_text.Insert (pos, (Rune)ch);
+					OnTextChanged (new TextChangedEventArgs (oldValue));
 					return true;
 				}
 				return false;
@@ -354,6 +394,9 @@ namespace Terminal.Gui {
 			{
 				_regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled);
 			}
+
+			/// <inheritdoc/>
+			public void OnTextChanged (TextChangedEventArgs oldValue) => TextChanged?.Invoke (this, oldValue);
 		}
 		#endregion
 	}
@@ -368,11 +411,18 @@ namespace Terminal.Gui {
 		int _defaultLength = 10;
 
 		/// <summary>
+		/// Changed event, raised when the text has changed.
+		/// <remarks>
+		/// This event is raised when the <see cref="Text"/> changes.
+		/// The passed <see cref="EventArgs"/> is a <see cref="string"/> containing the old value.
+		/// </remarks>
+		/// </summary>
+		public event EventHandler<TextChangedEventArgs> TextChanged;
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
-		public TextValidateField () : this (null)
-		{
-		}
+		public TextValidateField () : this (null) { }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -390,6 +440,8 @@ namespace Terminal.Gui {
 		{
 			Height = 1;
 			CanFocus = true;
+
+			Provider.TextChanged += Provider_TextChanged;
 
 			// Things this view knows how to do
 			AddCommand (Command.LeftHome, () => { HomeKeyHandler (); return true; });
@@ -410,6 +462,9 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
 			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
 		}
+
+		private void Provider_TextChanged (object sender, TextChangedEventArgs e) =>
+			TextChanged?.Invoke (this, new TextChangedEventArgs (e.OldValue));
 
 		/// <summary>
 		/// Provider

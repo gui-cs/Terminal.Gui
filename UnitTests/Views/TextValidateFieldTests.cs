@@ -354,6 +354,26 @@ public class TextValidateField_NET_Provider_Tests {
 		Assert.NotEqual (field.Provider.DisplayText.Length, field.Provider.Text.Length);
 		Assert.Equal (new string (' ', field.Text.Length), field.Provider.Text);
 	}
+
+	[Fact]
+	public void OnTextChanged_TextChanged_Event ()
+	{
+		var wasTextChanged = false;
+
+		var field = new TextValidateField (new NetMaskedTextProvider ("--(0000)--")) {
+			TextAlignment = TextAlignment.Left,
+			Width = 30
+		};
+
+		field.TextChanged += (sender, e) => wasTextChanged = true;
+
+		field.NewKeyDownEvent (new (KeyCode.D1));
+
+		Assert.Equal ("--(1___)--", field.Provider.DisplayText);
+		Assert.False (field.IsValid);
+		Assert.Equal ("--(1   )--", field.Provider.Text);
+		Assert.True (wasTextChanged);
+	}
 }
 
 public class TextValidateField_Regex_Provider_Tests {
@@ -551,5 +571,25 @@ public class TextValidateField_Regex_Provider_Tests {
 
 		Assert.Equal ("4123", field.Text);
 		Assert.False (field.IsValid);
+	}
+
+	[Fact]
+	public void OnTextChanged_TextChanged_Event ()
+	{
+		var wasTextChanged = false;
+
+		var field = new TextValidateField (new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }) {
+			TextAlignment = TextAlignment.Centered,
+			Width = 20
+		};
+
+		field.TextChanged += (sender, e) => wasTextChanged = true;
+
+		field.NewKeyDownEvent (new (KeyCode.D1));
+
+		Assert.Equal ("1", field.Provider.DisplayText);
+		Assert.False (field.IsValid);
+		Assert.Equal ("1", field.Provider.Text);
+		Assert.True (wasTextChanged);
 	}
 }
