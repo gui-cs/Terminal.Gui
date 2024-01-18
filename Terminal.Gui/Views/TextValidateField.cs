@@ -411,15 +411,6 @@ namespace Terminal.Gui {
 		int _defaultLength = 10;
 
 		/// <summary>
-		/// Changed event, raised when the text has changed.
-		/// <remarks>
-		/// This event is raised when the <see cref="Text"/> changes.
-		/// The passed <see cref="EventArgs"/> is a <see cref="string"/> containing the old value.
-		/// </remarks>
-		/// </summary>
-		public event EventHandler<TextChangedEventArgs> TextChanged;
-
-		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
 		/// </summary>
 		public TextValidateField () : this (null) { }
@@ -441,8 +432,6 @@ namespace Terminal.Gui {
 			Height = 1;
 			CanFocus = true;
 
-			Provider.TextChanged += Provider_TextChanged;
-
 			// Things this view knows how to do
 			AddCommand (Command.LeftHome, () => { HomeKeyHandler (); return true; });
 			AddCommand (Command.RightEnd, () => { EndKeyHandler (); return true; });
@@ -462,9 +451,6 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
 			KeyBindings.Add (KeyCode.CursorRight, Command.Right);
 		}
-
-		private void Provider_TextChanged (object sender, TextChangedEventArgs e) =>
-			TextChanged?.Invoke (this, new TextChangedEventArgs (e.OldValue));
 
 		/// <summary>
 		/// Provider

@@ -221,7 +221,7 @@ public class Text : Scenario {
 		};
 		Win.Add (labelMirroringNetProviderField);
 
-		netProviderField.TextChanged += (s, prev) => {
+		netProviderField.Provider.TextChanged += (s, prev) => {
 			labelMirroringNetProviderField.Text = netProviderField.Text;
 		};
 
@@ -249,7 +249,7 @@ public class Text : Scenario {
 		};
 		Win.Add (labelMirroringRegexProviderField);
 
-		regexProviderField.TextChanged += (s, prev) => {
+		regexProviderField.Provider.TextChanged += (s, prev) => {
 			labelMirroringRegexProviderField.Text = regexProviderField.Text;
 		};
 

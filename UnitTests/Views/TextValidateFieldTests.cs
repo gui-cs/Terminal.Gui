@@ -365,7 +365,7 @@ public class TextValidateField_NET_Provider_Tests {
 			Width = 30
 		};
 
-		field.TextChanged += (sender, e) => wasTextChanged = true;
+		field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
 		field.NewKeyDownEvent (new (KeyCode.D1));
 
@@ -583,7 +583,7 @@ public class TextValidateField_Regex_Provider_Tests {
 			Width = 20
 		};
 
-		field.TextChanged += (sender, e) => wasTextChanged = true;
+		field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
 		field.NewKeyDownEvent (new (KeyCode.D1));
 
