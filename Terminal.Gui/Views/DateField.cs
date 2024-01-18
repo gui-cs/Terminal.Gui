@@ -19,6 +19,9 @@ namespace Terminal.Gui;
 ///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
 /// </remarks>
 public class DateField : TextField {
+
+	private const string RIGHT_TO_LEFT_MARK = "\u200f";
+
 	DateTime _date;
 	private string _separator;
 	private string _format;
@@ -125,7 +128,7 @@ public class DateField : TextField {
 			trimedText = trimedText.Replace (new string (' ', spaces), " ");
 			var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
 			if ($" {date}" != e.NewText) {
-				e.NewText = $" {date}".Replace ("\u200f", "");
+				e.NewText = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
 			}
 			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
@@ -148,7 +151,7 @@ public class DateField : TextField {
 			var oldData = _date;
 			_date = value;
 			Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()))
-				.Replace ("\u200f", "");
+				.Replace (RIGHT_TO_LEFT_MARK, "");
 			var args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
 			if (oldData != value) {
 				OnDateChanged (args);
@@ -166,7 +169,7 @@ public class DateField : TextField {
 				CultureInfo.CurrentCulture = value;
 				_separator = GetDataSeparator (value.DateTimeFormat.DateSeparator);
 				_format = " " + StandardizeDateFormat (value.DateTimeFormat.ShortDatePattern);
-				Text = Date.ToString (_format).Replace ("\u200f", "");
+				Text = Date.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "");
 			}
 		}
 	}
@@ -205,8 +208,8 @@ public class DateField : TextField {
 		text = NormalizeFormat (text);
 		string [] vals = text.Split (_separator);
 		for (var i = 0; i < vals.Length; i++) {
-			if (vals [i].Contains ('\u200f')) {
-				vals [i] = vals [i].Replace ("\u200f", "");
+			if (vals [i].Contains (RIGHT_TO_LEFT_MARK)) {
+				vals [i] = vals [i].Replace (RIGHT_TO_LEFT_MARK, "");
 			}
 		}
 		string [] frm = _format.Split (_separator);
@@ -308,8 +311,8 @@ public class DateField : TextField {
 	private string GetDataSeparator (string separator)
 	{
 		var sepChar = separator.Trim ();
-		if (sepChar.Length > 1 && sepChar.Contains ('\u200f')) {
-			sepChar = sepChar.Replace ("\u200f", "");
+		if (sepChar.Length > 1 && sepChar.Contains (RIGHT_TO_LEFT_MARK)) {
+			sepChar = sepChar.Replace (RIGHT_TO_LEFT_MARK, "");
 		}
 
 		return sepChar;
