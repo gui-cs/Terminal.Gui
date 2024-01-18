@@ -125,7 +125,7 @@ public class DateField : TextField {
 			trimedText = trimedText.Replace (new string (' ', spaces), " ");
 			var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
 			if ($" {date}" != e.NewText) {
-				e.NewText = $" {date}";
+				e.NewText = $" {date}".Replace ("\u200f", "");
 			}
 			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
@@ -147,7 +147,8 @@ public class DateField : TextField {
 
 			var oldData = _date;
 			_date = value;
-			Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()));
+			Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()))
+				.Replace ("\u200f", "");
 			var args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
 			if (oldData != value) {
 				OnDateChanged (args);
@@ -165,7 +166,7 @@ public class DateField : TextField {
 				CultureInfo.CurrentCulture = value;
 				_separator = GetDataSeparator (value.DateTimeFormat.DateSeparator);
 				_format = " " + StandardizeDateFormat (value.DateTimeFormat.ShortDatePattern);
-				Text = Date.ToString (_format);
+				Text = Date.ToString (_format).Replace ("\u200f", "");
 			}
 		}
 	}
@@ -259,17 +260,9 @@ public class DateField : TextField {
 		if (string.IsNullOrEmpty (sepChar)) {
 			sepChar = _separator;
 		}
-		//if (_separator.Contains ("\u200F")) {
-		//	// remove U+200F RIGHT-TO-LEFT MARK
-		//	fmt = fmt.Replace ("\u200F", "");
-		//	text = text.Replace ("\u200F", "");
-		//	sepChar = _separator = "/";
-		//}
 		if (fmt.Length != text.Length) {
 			return text;
 		}
-
-
 
 		var fmtText = text.ToCharArray ();
 		for (int i = 0; i < text.Length; i++) {
@@ -467,6 +460,4 @@ public class DateField : TextField {
 	/// </summary>
 	/// <param name="args">Event arguments</param>
 	public virtual void OnDateChanged (DateTimeEventArgs<DateTime> args) => DateChanged?.Invoke (this, args);
-
-
 }
