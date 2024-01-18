@@ -419,7 +419,7 @@ namespace Terminal.Gui {
 			set {
 				_provider = value;
 				if (_provider.Fixed) {
-					this.Width = _provider.DisplayText == string.Empty ? 10 : Text.Length;
+					this.Width = _provider.DisplayText == string.Empty ? _defaultLength : _provider.DisplayText.Length;
 				}
 				// HomeKeyHandler already call SetNeedsDisplay
 				HomeKeyHandler ();
