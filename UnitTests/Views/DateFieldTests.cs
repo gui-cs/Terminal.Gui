@@ -189,6 +189,9 @@ public class DateFieldTests {
 				&& (format.StartsWith ('d') || format.StartsWith ('M'))) {
 
 				switch (culture.Name) {
+				case "ar-SA":
+					Assert.Equal ($" 04{separator}11{separator}1390", df.Text);
+					break;
 				case "th":
 				case "th-TH":
 					Assert.Equal ($" 01{separator}01{separator}2514", df.Text);
