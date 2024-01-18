@@ -42,17 +42,22 @@ public class Shortcut : View {
 		KeyBindings.Add (KeyCode.Space, Gui.Command.Accept);
 
 		_container = new View () { Id = "_container", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
-		CommandView = new View () { Id = "_commandView", CanFocus = false, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_') };
-		HelpView = new View () { Id = "_helpView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
-		HelpView.TextAlignment = TextAlignment.Left;
-		KeyView = new View () { Id = "_keyView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
-
-		HelpView.TextAlignment = TextAlignment.Right;
-
 		_container.MouseClick += Container_MouseClick;
-		//_commandView.MouseClick += SubView_MouseClick;
+
+		CommandView = new View () { Id = "_commandView", CanFocus = false, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_') };
+		
+		HelpView = new View () { Id = "_helpView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
+		HelpView.TextAlignment = TextAlignment.Right;
 		HelpView.MouseClick += SubView_MouseClick;
+
+		KeyView = new View () { Id = "_keyView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
 		KeyView.MouseClick += SubView_MouseClick;
+
+		//CommandView.CanFocus = CanFocus;
+		//HelpView.CanFocus = CanFocus;
+		//KeyView.CanFocus = CanFocus;
+
+		//_commandView.MouseClick += SubView_MouseClick;
 
 		LayoutStarted += Shortcut_LayoutStarted;
 
@@ -76,11 +81,14 @@ public class Shortcut : View {
 			};
 			KeyView.ColorScheme = cs;
 		}
-		
+
 		HelpView.X = Pos.Right (CommandView) + 2;
 		KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns ());
 		if (AutoSize) {
 			var thickness = GetAdornmentsThickness ();
+			CommandView.SetRelativeLayout (Driver.Bounds);
+			HelpView.SetRelativeLayout (Driver.Bounds);
+			KeyView.SetRelativeLayout (Driver.Bounds);
 			_container.Width = _commandView.Frame.Width +
 					   (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width + 2 : 0) +
 					   (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width + 2 : 0);
@@ -104,6 +112,9 @@ public class Shortcut : View {
 	private void SubView_MouseClick (object sender, MouseEventEventArgs e)
 	{
 		e.Handled = OnAccept ();
+		if (CanFocus) {
+			SetFocus ();
+		}
 	}
 
 	/// <summary>
@@ -247,11 +258,9 @@ public class Shortcut : View {
 			}
 			_commandView = value;
 			_commandView.Id = "_commandView";
-			_commandView.CanFocus = true;
 			_commandView.AutoSize = true;
 			_commandView.X = 0;
 			_commandView.Y = Pos.Center ();
-			_commandView.CanFocus = false;
 			_commandView.MouseClick += SubView_MouseClick;
 
 			_commandView.HotKeyChanged += (s, e) => {
@@ -269,12 +278,14 @@ public class Shortcut : View {
 
 	public override bool CanFocus {
 		get {
-			if (KeyView != null) {
-				return KeyView.Visible && CommandView is Shortcut;
-			}
 			return base.CanFocus;
 		}
 		set {
+			//if (IsInitialized) {
+			//	CommandView.CanFocus = value;
+			//	HelpView.CanFocus = value;
+			//	KeyView.CanFocus = value;
+			//}
 			base.CanFocus = value;
 		}
 	}
@@ -336,10 +347,10 @@ public class Bar : View {
 		ColorScheme = Colors.ColorSchemes ["Menu"];
 		CanFocus = true;
 
-		LayoutStarted += Bar_LayoutStarted;
+		LayoutComplete += Bar_LayoutComplete;
 	}
 
-	private void Bar_LayoutStarted (object sender, LayoutEventArgs e)
+	private void Bar_LayoutComplete (object sender, LayoutEventArgs e)
 	{
 		View prevSubView = null;
 
@@ -381,16 +392,13 @@ public class Bar : View {
 				}
 				prevSubView = subview;
 
-				subview.AutoSize = true;
 				subview.SetRelativeLayout (Driver.Bounds);
-				Width = maxSubviewWidth + GetAdornmentsThickness ().Horizontal;
-				subview.SetRelativeLayout (Bounds);
+				maxSubviewWidth = Math.Max (maxSubviewWidth, subview.Frame.Width);
 
-				subview.AutoSize = false;
 				subview.X = 0;
-				subview.Width = Dim.Fill ();
 
 			}
+			Width = maxSubviewWidth + GetAdornmentsThickness ().Horizontal;
 			Height = Subviews.Count + GetAdornmentsThickness ().Vertical;
 			break;
 		}
@@ -441,7 +449,7 @@ public class Bar : View {
 		get => _autoSize;
 		set {
 			_autoSize = value;
-			Bar_LayoutStarted (null, null);
+			Bar_LayoutComplete (null, null);
 		}
 	}
 
