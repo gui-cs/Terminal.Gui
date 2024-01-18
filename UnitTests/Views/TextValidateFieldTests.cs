@@ -340,6 +340,20 @@ public class TextValidateField_NET_Provider_Tests {
 		Assert.False (field.IsValid);
 		Assert.Equal ("--(1  1)--", field.Provider.Text);
 	}
+
+	[Fact]
+	public void Default_Width_Is_Always_Equal_To_The_Provider_DisplayText_Length ()
+	{
+		// 9-Digit or space, optional. 0-Digit, required. L-Letter, required.
+		// > Shift up. Converts all characters that follow to uppercase.
+		// | Disable a previous shift up or shift down.
+		// A-Alphanumeric, required. a-Alphanumeric, optional.
+		var field = new TextValidateField (new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa"));
+
+		Assert.Equal (field.Bounds.Width, field.Provider.DisplayText.Length);
+		Assert.NotEqual (field.Provider.DisplayText.Length, field.Provider.Text.Length);
+		Assert.Equal (new string (' ', field.Text.Length), field.Provider.Text);
+	}
 }
 
 public class TextValidateField_Regex_Provider_Tests {
