@@ -318,6 +318,11 @@ public class DateField : TextField {
 		return sepChar;
 	}
 
+
+
+	// Converts various date formats to a uniform 10-character format. 
+	// This aids in simplifying the handling of single-digit months and days, 
+	// and reduces the number of distinct date formats to maintain.
 	private static string StandardizeDateFormat (string format) =>
 	    format switch {
 		    "MM/dd/yyyy" => "MM/dd/yyyy",
