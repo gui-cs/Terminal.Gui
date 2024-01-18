@@ -123,7 +123,7 @@ namespace Terminal.Gui {
 				set {
 					var current = _provider != null ? _provider.ToString (false, false) : string.Empty;
 					_provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
-					if (string.IsNullOrEmpty (current) == false) {
+					if (!string.IsNullOrEmpty (current)) {
 						_provider.Set (current);
 					}
 				}
@@ -365,6 +365,7 @@ namespace Terminal.Gui {
 
 		ITextValidateProvider _provider;
 		int _cursorPosition;
+		int _defaultLength = 10;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TextValidateField"/> class using <see cref="LayoutStyle.Computed"/> positioning.
@@ -417,11 +418,11 @@ namespace Terminal.Gui {
 			get => _provider;
 			set {
 				_provider = value;
-				if (_provider.Fixed == true) {
+				if (_provider.Fixed) {
 					this.Width = _provider.DisplayText == string.Empty ? 10 : Text.Length;
 				}
+				// HomeKeyHandler already call SetNeedsDisplay
 				HomeKeyHandler ();
-				SetNeedsDisplay ();
 			}
 		}
 
@@ -430,9 +431,9 @@ namespace Terminal.Gui {
 		{
 			if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
 
-				var c = _provider.Cursor (mouseEvent.X - GetMargins (Frame.Width).left);
+				var c = _provider.Cursor (mouseEvent.X - GetMargins (Bounds.Width).left);
 				if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0) {
-					c += 1;
+					c++;
 				}
 				_cursorPosition = c;
 				SetFocus ();
@@ -466,7 +467,7 @@ namespace Terminal.Gui {
 		///<inheritdoc/>
 		public override void PositionCursor ()
 		{
-			var (left, _) = GetMargins (Frame.Width);
+			var (left, _) = GetMargins (Bounds.Width);
 
 			// Fixed = true, is for inputs that have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
