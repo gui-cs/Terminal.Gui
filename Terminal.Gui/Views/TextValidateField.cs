@@ -382,10 +382,10 @@ namespace Terminal.Gui {
 				Provider = provider;
 			}
 
-			Initialize ();
+			SetInitialProperties ();
 		}
 
-		void Initialize ()
+		void SetInitialProperties ()
 		{
 			Height = 1;
 			CanFocus = true;
@@ -468,7 +468,7 @@ namespace Terminal.Gui {
 		{
 			var (left, _) = GetMargins (Frame.Width);
 
-			// Fixed = true, is for inputs thar have fixed width, like masked ones.
+			// Fixed = true, is for inputs that have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
 			// When it's right-aligned and it's a normal input, the cursor behaves differently.
 			if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right) {
