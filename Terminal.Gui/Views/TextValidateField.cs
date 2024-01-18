@@ -472,10 +472,18 @@ namespace Terminal.Gui {
 			// Fixed = true, is for inputs that have fixed width, like masked ones.
 			// Fixed = false, is for normal input.
 			// When it's right-aligned and it's a normal input, the cursor behaves differently.
+			int curPos;
 			if (_provider?.Fixed == false && TextAlignment == TextAlignment.Right) {
-				Move (_cursorPosition + left - 1, 0);
+				curPos = _cursorPosition + left - 1;
+				Move (curPos, 0);
 			} else {
-				Move (_cursorPosition + left, 0);
+				curPos = _cursorPosition + left;
+				Move (curPos, 0);
+			}
+			if (curPos >= Bounds.Width) {
+				Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+			} else {
+				Application.Driver.SetCursorVisibility (CursorVisibility.Default);
 			}
 		}
 
@@ -644,6 +652,22 @@ namespace Terminal.Gui {
 
 				return _provider.IsValid;
 			}
+		}
+
+		///<inheritdoc/>
+		public override bool OnEnter (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+
+			return base.OnEnter (view);
+		}
+
+		///<inheritdoc/>
+		public override bool OnLeave (View view)
+		{
+			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
+
+			return base.OnLeave (view);
 		}
 	}
 }
