@@ -19,7 +19,7 @@ public class Shortcut : View {
 	KeyBindingScope _keyBindingScope;
 	Command? _command;
 
-	readonly View _container;
+	internal readonly View _container;
 	View _commandView;
 	bool _autoSize;
 
@@ -40,18 +40,23 @@ public class Shortcut : View {
 		});
 		AddCommand (Gui.Command.Accept, () => OnAccept ());
 		KeyBindings.Add (KeyCode.Space, Gui.Command.Accept);
+		KeyBindings.Add (KeyCode.Enter, Gui.Command.Accept);
 
 		_container = new View () { Id = "_container", CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 		_container.MouseClick += Container_MouseClick;
 
 		CommandView = new View () { Id = "_commandView", CanFocus = false, AutoSize = true, X = 0, Y = Pos.Center (), HotKeySpecifier = new Rune ('_') };
-		
+
 		HelpView = new View () { Id = "_helpView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
 		HelpView.TextAlignment = TextAlignment.Right;
 		HelpView.MouseClick += SubView_MouseClick;
 
 		KeyView = new View () { Id = "_keyView", CanFocus = false, AutoSize = true, Y = Pos.Center () };
 		KeyView.MouseClick += SubView_MouseClick;
+
+		CommandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+		HelpView.Margin.Thickness = new Thickness (1, 0, 1, 0);
+		KeyView.Margin.Thickness = new Thickness (1, 0, 1, 0);
 
 		//CommandView.CanFocus = CanFocus;
 		//HelpView.CanFocus = CanFocus;
@@ -60,20 +65,15 @@ public class Shortcut : View {
 		//_commandView.MouseClick += SubView_MouseClick;
 
 		LayoutStarted += Shortcut_LayoutStarted;
-
 		TitleChanged += Shortcut_TitleChanged;
+		Initialized += Shortcut_Initialized;
 
 		_container.Add (_commandView, HelpView, KeyView);
 		Add (_container);
 	}
 
-	private void Shortcut_LayoutStarted (object sender, LayoutEventArgs e) => SetSubViewLayout ();
-
-	void SetSubViewLayout ()
+	private void Shortcut_Initialized (object sender, EventArgs e)
 	{
-		if (!IsInitialized) {
-			return;
-		}
 		if (ColorScheme != null) {
 			var cs = new ColorScheme (ColorScheme) {
 				Normal = ColorScheme.HotNormal,
@@ -81,22 +81,31 @@ public class Shortcut : View {
 			};
 			KeyView.ColorScheme = cs;
 		}
+	}
+	private void Shortcut_LayoutStarted (object sender, LayoutEventArgs e) => SetSubViewLayout ();
 
-		HelpView.X = Pos.Right (CommandView) + 2;
-		KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns ());
+	void SetSubViewLayout ()
+	{
+		if (!IsInitialized) {
+			return;
+		}
+
 		if (AutoSize) {
-			var thickness = GetAdornmentsThickness ();
 			CommandView.SetRelativeLayout (Driver.Bounds);
 			HelpView.SetRelativeLayout (Driver.Bounds);
 			KeyView.SetRelativeLayout (Driver.Bounds);
 			_container.Width = _commandView.Frame.Width +
-					   (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width + 2 : 0) +
-					   (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width + 2 : 0);
-			Width = _container.Width + thickness.Horizontal;
+			                   (HelpView.Visible && HelpView.Text.Length > 0 ? HelpView.Frame.Width : 0) +
+			                   (KeyView.Visible && KeyView.Text.Length > 0 ? KeyView.Frame.Width : 0);
+			Width = _container.Width + GetAdornmentsThickness ().Horizontal;
 		} else {
 			//Width = Dim.Fill ();
 			//Height = 1;
 		}
+
+		HelpView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1 + HelpView.Text.GetColumns () + 1) - 1;
+		KeyView.X = Pos.AnchorEnd (KeyView.Text.GetColumns () + 1) - 1;
+
 	}
 
 	private void Shortcut_TitleChanged (object sender, TitleEventArgs e)
@@ -114,6 +123,25 @@ public class Shortcut : View {
 		e.Handled = OnAccept ();
 		if (CanFocus) {
 			SetFocus ();
+		}
+	}
+
+	public override ColorScheme ColorScheme {
+		get {
+			if (base.ColorScheme == null) {
+				return SuperView?.ColorScheme ?? base.ColorScheme;
+			}
+			return base.ColorScheme;
+		} 
+		set {
+			base.ColorScheme = value;
+			if (ColorScheme != null) {
+				var cs = new ColorScheme (ColorScheme) {
+					Normal = ColorScheme.HotNormal,
+					HotNormal = ColorScheme.Normal
+				};
+				KeyView.ColorScheme = cs;
+			}
 		}
 	}
 
@@ -262,6 +290,7 @@ public class Shortcut : View {
 			_commandView.X = 0;
 			_commandView.Y = Pos.Center ();
 			_commandView.MouseClick += SubView_MouseClick;
+			_commandView.Margin.Thickness = new Thickness (1, 0, 1, 0);
 
 			_commandView.HotKeyChanged += (s, e) => {
 				if (_commandView.HotKey != Key.Empty) {
@@ -377,27 +406,45 @@ public class Bar : View {
 		case Orientation.Vertical:
 			int maxSubviewWidth = 0;
 			for (var index = 0; index < Subviews.Count; index++) {
-				var subview = Subviews [index];
-				if (!subview.Visible) {
+				var barItem = Subviews [index];
+				if (!barItem.Visible) {
 					continue;
 				}
 				if (prevSubView == null) {
-					subview.Y = 0;
+					barItem.Y = 0;
 				} else {
 					// Make view to right be autosize
 					//Subviews [^1].AutoSize = true;
 
 					// Align the view to the bottom of the previous view
-					subview.Y = Pos.Bottom (prevSubView);
+					barItem.Y = Pos.Bottom (prevSubView);
 				}
-				prevSubView = subview;
+				prevSubView = barItem;
 
-				subview.SetRelativeLayout (Driver.Bounds);
-				maxSubviewWidth = Math.Max (maxSubviewWidth, subview.Frame.Width);
+				barItem.SetRelativeLayout (Driver.Bounds);
+				maxSubviewWidth = Math.Max (maxSubviewWidth, barItem.Frame.Width);
 
-				subview.X = 0;
+				barItem.X = 0;
 
 			}
+			for (var index = 0; index < Subviews.Count; index++) {
+				var shortcut = Subviews [index] as Shortcut;
+				if (shortcut == null || !shortcut.Visible) {
+					continue;
+				}
+
+				if (AutoSize) {
+					shortcut._container.Width = int.Max (maxSubviewWidth, shortcut.CommandView.Frame.Width +
+					       (shortcut.HelpView.Visible && shortcut.HelpView.Text.Length > 0 ? shortcut.HelpView.Frame.Width : 0) +
+					       (shortcut.KeyView.Visible && shortcut.KeyView.Text.Length > 0 ? shortcut.KeyView.Frame.Width : 0));
+					shortcut.AutoSize = false;
+					shortcut.Width = maxSubviewWidth;
+				} else {
+					//Width = Dim.Fill ();
+					//Height = 1;
+				}
+			}
+
 			Width = maxSubviewWidth + GetAdornmentsThickness ().Horizontal;
 			Height = Subviews.Count + GetAdornmentsThickness ().Vertical;
 			break;
@@ -411,13 +458,19 @@ public class Bar : View {
 		}
 
 		if (StatusBarStyle) {
-			view.Margin.Thickness = new Thickness (1, 0, 0, 0);
 			// Light up right border
 			view.BorderStyle = LineStyle.Single;
 			view.Border.Thickness = new Thickness (0, 0, 1, 0);
-			view.Padding.Thickness = new Thickness (0, 0, 1, 0);
 		}
-		//view.Padding.ColorScheme = Colors.Menu;
+
+		if (view is not Shortcut) {
+			if (StatusBarStyle) {
+				view.Padding.Thickness = new Thickness (0, 0, 1, 0);
+			}
+			view.Margin.Thickness = new Thickness (1, 0, 0, 0);
+		}
+
+		//view.ColorScheme = ColorScheme;
 
 		// Add any HotKey keybindings to our bindings
 		var bindings = view.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.HotKey);

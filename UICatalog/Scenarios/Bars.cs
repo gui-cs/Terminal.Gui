@@ -203,7 +203,23 @@ public class bars : Scenario {
 				});
 			};
 
-			contextMenu.Add (newMenu, open, save);
+			var saveAs = new Shortcut () {
+				Title = "Save _As...",
+				Text = "Save As",
+				Key = Key.S.WithCtrl,
+				AutoSize = true,
+				Width = Dim.Fill (),
+				CanFocus = true,
+			};
+			saveAs.Accept += (s, e) => {
+				menuWindow.RequestStop ();
+				Application.AddTimeout (new System.TimeSpan (0), () => {
+					MessageBox.Query ("File", "Save As");
+					return false;
+				});
+			};
+
+			contextMenu.Add (newMenu, open, save, saveAs);
 
 			menuWindow.KeyBindings.Add (Key.Esc, Command.QuitToplevel);
 			menuWindow.LayoutComplete += (s, e) => {
