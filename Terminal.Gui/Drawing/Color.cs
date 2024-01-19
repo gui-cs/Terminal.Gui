@@ -413,32 +413,11 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	// Euclidean distance between the input color and each dictionary color in RGB space,
 	// and keeps track of the closest entry found so far. The function returns a KeyValuePair
 	// representing the closest color entry and its associated color name.
-	internal static ColorName FindClosestColor (Color inputColor)
-	{
-		var closestColor = ColorName.Black; // Default to Black
-		var closestDistance = double.MaxValue;
+	[SkipLocalsInit]
+	internal static ColorName FindClosestColor ( Color inputColor ) => _colorToNameMap.MinBy ( pair => CalculateColorDistance ( inputColor, pair.Key ) ).Value;
 
-		foreach (var colorEntry in _colorToNameMap) {
-			var distance = CalculateColorDistance (inputColor, colorEntry.Key);
-			if (distance < closestDistance) {
-				closestDistance = distance;
-				closestColor = colorEntry.Value;
-			}
-		}
-
-		return closestColor;
-	}
-
-	static double CalculateColorDistance (Color color1, Color color2)
-	{
-		// Calculate the Euclidean distance between two colors
-		var deltaR = color1.R - (double)color2.R;
-		var deltaG = color1.G - (double)color2.G;
-		var deltaB = color1.B - (double)color2.B;
-
-		return Math.Sqrt (deltaR * deltaR + deltaG * deltaG + deltaB * deltaB);
-	}
-#nullable enable
+	[SkipLocalsInit]
+	static float CalculateColorDistance ( in Vector3 color1, in Vector3 color2 ) => Vector3.Distance ( color1, color2 );
 
 	/// <summary>
 	/// Converts the provided string to a new <see cref="Color"/> instance.
