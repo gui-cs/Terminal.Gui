@@ -310,13 +310,18 @@ namespace Terminal.Gui {
 
 				// Ensure the width fits the text + buttons
 				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
-								d.GetButtonsWidth () + d.buttons.Count + d.GetAdornmentsThickness ().Horizontal));
+					d.GetButtonsWidth () + d.buttons.Count + d.GetAdornmentsThickness ().Horizontal));
 				if (newWidth > d.Frame.Width) {
 					d.Width = newWidth;
 				}
+
 				// Ensure height fits the text + vspace + buttons
-				var lastLine = messageLabel.TextFormatter.Lines [^1];
-				d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetAdornmentsThickness ().Vertical);
+				if (messageSize.Height == 0) {
+					d.Height = Math.Max (height, 3 + d.GetAdornmentsThickness ().Vertical);
+				} else {
+					var lastLine = messageLabel.TextFormatter.Lines [^1];
+					d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetAdornmentsThickness ().Vertical);
+				}
 				d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
 			};
 

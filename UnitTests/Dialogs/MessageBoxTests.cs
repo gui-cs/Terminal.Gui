@@ -552,7 +552,7 @@ ffffffffffffffffffff
 	[InlineData ("\n", false, 1)]
 	[InlineData (" \n", true, 1)]
 	[InlineData (" \n", false, 2)]
-	public void Message_Empty_Or_A_NewLline_WrapMessagge_True_Or_False (string message, bool wrapMessage, int linesLength)
+	public void Message_Empty_Or_A_NewLine_WrapMessage_True_Or_False (string message, bool wrapMessage, int numLines)
 	{
 		var iterations = -1;
 		Application.Begin (Application.Top);
@@ -566,14 +566,16 @@ ffffffffffffffffffff
 				Application.RequestStop ();
 			} else if (iterations == 1) {
 				Application.Refresh ();
-				if (linesLength == 1) {
+				switch (numLines) {
+				case 1:
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
-                │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
+                │                   { CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘", _output);
-				} else {
+					break;
+				default:
 					TestHelpers.AssertDriverContentsWithFrameAre (@$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
@@ -581,6 +583,7 @@ ffffffffffffffffffff
                 │                                              │
                 │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘", _output);
+					break;
 				}
 				Application.RequestStop ();
 			}

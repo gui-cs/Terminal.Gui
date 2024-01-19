@@ -1310,6 +1310,11 @@ public class TextFormatter {
 		if (!wordWrap) {
 			text = ReplaceTABWithSpaces (text, tabWidth);
 			if (multiLine) {
+				// Abhorrent case: Just a new line
+				if (text == "\n") {
+					lineResult.Add (string.Empty);
+					return lineResult;
+				}
 				string [] lines = null;
 				if (text.Contains ("\r\n")) {
 					lines = text.Split ("\r\n");

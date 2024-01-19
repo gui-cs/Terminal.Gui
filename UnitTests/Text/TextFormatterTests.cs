@@ -1362,26 +1362,28 @@ public class TextFormatterTests {
 	[InlineData ("A sentence has words.\r\nLine 2.", 29, -1, TextAlignment.Left, false, 2, false, new [] { "A sentence has words.", "Line 2." })]
 	[InlineData ("A sentence has words.\r\nLine 2.", 30, 0, TextAlignment.Left, false, 2, false, new [] { "A sentence has words.", "Line 2." })]
 	[InlineData ("A sentence has words.\r\nLine 2.", 31, 1, TextAlignment.Left, false, 2, false, new [] { "A sentence has words.", "Line 2." })]
+	// Abhorrent case where only a newline is specified
+	[InlineData ("\n", 1, 0, TextAlignment.Left, false, 1, true, new [] { "" })]
 	public void Reformat_NoWordrap_NewLines_MultiLine_True (string text,
 								int maxWidth,
 								int widthOffset,
 								TextAlignment textAlignment,
 								bool wrap,
-								int linesCount,
+								int expectedLines,
 								bool stringEmpty,
 								IEnumerable<string> resultLines)
 	{
 		Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
-		var list = TextFormatter.Format (text, maxWidth, textAlignment, wrap, false, 0, TextDirection.LeftRight_TopBottom, true);
-		Assert.NotEmpty (list);
-		Assert.True (list.Count == linesCount);
+		var lineList = TextFormatter.Format (text, maxWidth, textAlignment, wrap, false, 0, TextDirection.LeftRight_TopBottom, true);
+		//Assert.NotEmpty (lineList);
+		Assert.Equal (expectedLines, lineList.Count);
 		if (stringEmpty) {
-			Assert.Equal (string.Empty, list [0]);
+			Assert.Equal (string.Empty, lineList [0]);
 		} else {
-			Assert.NotEqual (string.Empty, list [0]);
+			Assert.NotEqual (string.Empty, lineList [0]);
 		}
 
-		Assert.Equal (list, resultLines);
+		Assert.Equal (lineList, resultLines);
 	}
 
 	[Theory]
