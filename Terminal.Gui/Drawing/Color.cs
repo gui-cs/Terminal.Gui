@@ -361,7 +361,7 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	public int Rgba { get; }
 
 	/// <summary>
-	/// Gets or sets the 24-bit color value for each of the legacy 16-color values.
+	/// Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.
 	/// </summary>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
 	public static Dictionary<ColorName, string> Colors {
