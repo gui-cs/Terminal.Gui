@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Terminal.Gui.DrawingTests;
 
-public class ColorTests {
+public partial class ColorTests {
 	[Fact]
 	public void Color_Is_Value_Type () =>
 		// prove that Color is a value type
@@ -64,73 +64,6 @@ public class ColorTests {
 		Assert.Equal (13, (int)ColorName.BrightMagenta);
 		Assert.Equal (14, (int)ColorName.BrightYellow);
 		Assert.Equal (15, (int)ColorName.White);
-	}
-
-	[Fact]
-	public void Color_Constructor_WithRGBValues ()
-	{
-		// Arrange
-		var expectedR = 255;
-		var expectedG = 0;
-		var expectedB = 128;
-
-		// Act
-		var color = new Color (expectedR, expectedG, expectedB);
-
-		// Assert
-		Assert.Equal (expectedR, color.R);
-		Assert.Equal (expectedG, color.G);
-		Assert.Equal (expectedB, color.B);
-		Assert.Equal (0xFF, color.A); // Alpha should be FF by default
-	}
-
-	[Fact]
-	public void Color_Constructor_WithAlphaAndRGBValues ()
-	{
-		// Arrange
-		var expectedA = 128;
-		var expectedR = 255;
-		var expectedG = 0;
-		var expectedB = 128;
-
-		// Act
-		var color = new Color (expectedR, expectedG, expectedB, expectedA);
-
-		// Assert
-		Assert.Equal (expectedR, color.R);
-		Assert.Equal (expectedG, color.G);
-		Assert.Equal (expectedB, color.B);
-		Assert.Equal (expectedA, color.A);
-	}
-
-	[Fact]
-	public void Color_Constructor_WithRgbaValue ()
-	{
-		// Arrange
-		var expectedRgba = unchecked((int)0xFF804040); // R: 128, G: 64, B: 64, Alpha: 255
-
-		// Act
-		var color = new Color (expectedRgba);
-
-		// Assert
-		Assert.Equal (128, color.R);
-		Assert.Equal (64, color.G);
-		Assert.Equal (64, color.B);
-		Assert.Equal (255, color.A);
-	}
-
-	[Fact]
-	public void Color_Constructor_WithColorName ()
-	{
-		// Arrange
-		var colorName = ColorName.Blue;
-		var expectedColor = new Color (0, 55, 218); // Blue
-
-		// Act
-		var color = new Color (colorName);
-
-		// Assert
-		Assert.Equal (expectedColor, color);
 	}
 
 	[Fact]
