@@ -151,28 +151,21 @@ public partial class ColorTests {
 
 
 
-	[Fact]
-	public void Color_EqualityOperator_WithColorAndColor ()
+	[Theory]
+	[CombinatorialData]
+	public void Color_GeneratedEqualityOperators ( [CombinatorialValues ( 0, short.MaxValue, int.MaxValue, uint.MaxValue )] uint u1, [CombinatorialValues ( 0, short.MaxValue, int.MaxValue, uint.MaxValue )] uint u2 )
 	{
-		// Arrange
-		var color1 = new Color (255, 128, 64, 32);
-		var color2 = new Color (255, 128, 64, 32);
+		Color color1 = u1;
+		Color color2 = u2;
 
-		// Act & Assert
-		Assert.True (color1 == color2);
-		Assert.False (color1 != color2);
-	}
-
-	[Fact]
-	public void Color_InequalityOperator_WithColorAndColor ()
-	{
-		// Arrange
-		var color1 = new Color (255, 128, 64, 32);
-		var color2 = new Color (128, 64, 32, 16);
-
-		// Act & Assert
-		Assert.False (color1 == color2);
-		Assert.True (color1 != color2);
+		if ( u1 == u2 ) {
+			Assert.True ( color1 == color2 );
+			Assert.False ( color1 != color2 );
+		}
+		else {
+			Assert.True ( color1 != color2 );
+			Assert.False ( color1 == color2 );
+		}
 	}
 
 	[Fact]
