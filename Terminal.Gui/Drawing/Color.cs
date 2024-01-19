@@ -195,9 +195,9 @@ public enum AnsiColorCode {
 /// Represents a 24-bit color. Provides automatic mapping between the legacy 4-bit (16 color) system and 24-bit colors (see
 /// <see cref="ColorName"/>). Used with <see cref="Attribute"/>.
 /// </summary>
-[JsonConverter (typeof (ColorJsonConverter))]
-public readonly struct Color : IEquatable<Color> {
-
+[JsonConverter ( typeof ( ColorJsonConverter ) )]
+[StructLayout(LayoutKind.Explicit)]
+public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable, IUtf8SpanFormattable,IMinMaxValue<Color>, IEqualityOperators<Color, ColorName, bool> {
 	// TODO: Make this map configurable via ConfigurationManager
 	// TODO: This does not need to be a Dictionary, but can be an 16 element array.
 	/// <summary>
@@ -226,7 +226,7 @@ public readonly struct Color : IEquatable<Color> {
 
 
 	/// <summary>
-	/// Defines the 16 legacy color names and values that can be used to set the
+	/// Defines the 16 legacy color names and values that can be used to set them
 	/// </summary>
 	internal static ImmutableDictionary<ColorName, AnsiColorCode> _colorNameToAnsiColorMap = new Dictionary<ColorName, AnsiColorCode> {
 		{ ColorName.Black, AnsiColorCode.BLACK },
@@ -255,71 +255,48 @@ public readonly struct Color : IEquatable<Color> {
 	/// <param name="blue">The blue 8-bits.</param>
 	/// <param name="alpha">Optional; defaults to 0xFF. The Alpha channel is not supported by Terminal.Gui.</param>
 	/// <remarks>Alpha channel is not currently supported by Terminal.Gui.</remarks>
+	/// <exception cref="OverflowException">If the value of any parameter is greater than <see cref="byte.MaxValue"/>.</exception>
+	/// <exception cref="ArgumentOutOfRangeException">If the value of any parameter is negative.</exception>
 	public Color ( int red = 0, int green = 0, int blue = 0, int alpha = byte.MaxValue )
 	{
-		R = red;
-		G = green;
-		B = blue;
-		A = alpha;
+		ArgumentOutOfRangeException.ThrowIfNegative ( red, nameof ( red ) );
+		ArgumentOutOfRangeException.ThrowIfNegative ( green, nameof ( green ) );
+		ArgumentOutOfRangeException.ThrowIfNegative ( blue, nameof ( blue ) );
+		ArgumentOutOfRangeException.ThrowIfNegative ( alpha, nameof ( alpha ) );
+
+		A = Convert.ToByte ( alpha );
+		R = Convert.ToByte ( red );
+		G = Convert.ToByte ( green );
+		B = Convert.ToByte ( blue );
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Color"/> class with an encoded 24-bit color value.
+	/// Initializes a new instance of the <see cref="Color"/> class with an encoded signed 32-bit color value in ARGB32 format.
 	/// </summary>
-	/// <param name="rgba">The encoded 24-bit color value (see <see cref="Rgba"/>).</param>
-	public Color (int rgba)
+	/// <param name="rgba">The encoded 32-bit color value (see <see cref="Rgba"/>).</param>
+	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
+	public Color ( int rgba )
 	{
-		unsafe {
-			ReadOnlySpan<byte> argbSpan = new ReadOnlySpan<byte> ( &rgba, 4 );
-			if ( BitConverter.IsLittleEndian ) {
-				A = argbSpan [ 3 ];
-				R = argbSpan [ 2 ];
-				G = argbSpan [ 1 ];
-				B = argbSpan [ 0 ];
-			}
-			else {
-				A = argbSpan [ 0 ];
-				R = argbSpan [ 1 ];
-				G = argbSpan [ 2 ];
-				B = argbSpan [ 3 ];
-			}
-		}
+		Rgba = rgba;
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Color"/> class with an encoded 24-bit color value.
+	/// Initializes a new instance of the <see cref="Color"/> class with an encoded unsigned 32-bit color value in ARGB32 format.
 	/// </summary>
-	/// <param name="rgba">The encoded 24-bit color value (see <see cref="Rgba"/>).</param>
-	public Color (uint rgba)
+	/// <param name="argb">The encoded unsigned 32-bit color value (see <see cref="Argb"/>).</param>
+	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
+	public Color ( uint argb )
 	{
-		unsafe {
-			ReadOnlySpan<byte> argbSpan = new ReadOnlySpan<byte> ( &rgba, 4 );
-			if ( BitConverter.IsLittleEndian ) {
-				A = argbSpan [ 3 ];
-				R = argbSpan [ 2 ];
-				G = argbSpan [ 1 ];
-				B = argbSpan [ 0 ];
-			}
-			else {
-				A = argbSpan [ 0 ];
-				R = argbSpan [ 1 ];
-				G = argbSpan [ 2 ];
-				B = argbSpan [ 3 ];
-			}
-		}
+		Argb = argb;
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color value.
+	/// Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.
 	/// </summary>
 	/// <param name="colorName">The 16-color value.</param>
-	public Color (ColorName colorName)
+	public Color ( ColorName colorName )
 	{
-		var c = FromColorName (colorName);
-		R = c.R;
-		G = c.G;
-		B = c.B;
-		A = c.A;
+		this = FromColorName ( colorName );
 	}
 
 	/// <summary>
@@ -327,57 +304,61 @@ public readonly struct Color : IEquatable<Color> {
 	/// for details.
 	/// </summary>
 	/// <param name="colorString"></param>
-	/// <exception cref="Exception"></exception>
-	public Color (string colorString)
+	/// <exception cref="ArgumentNullException">If <paramref name="colorString"/> is <see langword="null"/>.</exception>
+	/// <exception cref="ArgumentException">If <paramref name="colorString"/> is an empty string or consists of only whitespace characters.</exception>
+	/// <exception cref="ColorParseException">If thrown by <see cref="Parse(string?,System.IFormatProvider?)"/></exception>
+	public Color ( string colorString )
 	{
-		if (!TryParse (colorString, out var c)) {
-			throw new ArgumentOutOfRangeException (nameof (colorString));
-		}
-		R = c.Value.R;
-		G = c.Value.G;
-		B = c.Value.B;
-		A = c.Value.A;
+		ArgumentException.ThrowIfNullOrWhiteSpace ( colorString, nameof ( colorString ) );
+		this = Parse ( colorString, CultureInfo.InvariantCulture );
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Color"/>.
+	/// Initializes a new instance of the <see cref="Color"/> with all channels set to 0.
 	/// </summary>
-	public Color ()
+	public Color ( )
 	{
-		R = 0;
-		G = 0;
-		B = 0;
-		A = 0xFF;
+		Argb = 0u;
 	}
+
+    /// <summary>
+    /// Gets the value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.
+    /// </summary>
+	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
+	[field: FieldOffset(0)]
+	public uint Argb { get; }
 
 	/// <summary>
 	/// Red color component.
 	/// </summary>
-	public int R { get; }
+	[field: FieldOffset ( 2 )]
+	public byte R { get; }
 
 	/// <summary>
 	/// Green color component.
 	/// </summary>
-	public int G { get; }
+	[field: FieldOffset ( 1 )]
+	public byte G { get; }
 
 	/// <summary>
 	/// Blue color component.
 	/// </summary>
-	public int B { get; }
+	[field: FieldOffset ( 0 )]
+	public byte B { get; }
 
 	/// <summary>
 	/// Alpha color component.
 	/// </summary>
-	/// <remarks>
-	/// The Alpha channel is not supported by Terminal.Gui.
-	/// </remarks>
-	public int A { get; } // Not currently supported; here for completeness.
+	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
+	[field: FieldOffset ( 3 )]
+	public byte A { get; }
 
 	/// <summary>
 	/// Gets the color value encoded as a signed 32-bit integer in ARGB32 format.
 	/// </summary>
 	[JsonIgnore]
-	public int Rgba => BitConverter.ToInt32 ( [(byte)B, (byte)G, (byte)R, (byte)A] );
+	[field: FieldOffset ( 0 )]
+	public int Rgba { get; }
 
 	/// <summary>
 	/// Gets or sets the 24-bit color value for each of the legacy 16-color values.
