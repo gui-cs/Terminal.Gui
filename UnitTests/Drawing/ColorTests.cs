@@ -315,6 +315,17 @@ public class ColorTests {
 	}
 
 	[Theory]
+    [CombinatorialData]
+	public void Argb_Returns_Expected_Value ( [CombinatorialValues(0,255)]byte a, [CombinatorialRange(0,255,51)]byte r, [CombinatorialRange(0,153,51)]byte g, [CombinatorialRange(0,128,32)]byte b )
+	{
+		Color color = new ( r, g, b, a );
+		// Color.Rgba is expected to be a signed int32 in little endian order (a,b,g,r)
+		ReadOnlySpan<byte> littleEndianBytes = [b, g, r, a];
+		uint expectedArgb = BitConverter.ToUInt32( littleEndianBytes );
+		Assert.Equal ( expectedArgb, color.Argb );
+	}
+
+	[Theory]
 	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.TryParse_string_Returns_False_For_Invalid_Inputs ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
 	public void TryParse_string_Returns_False_For_Invalid_Inputs ( string? input )
 	{
