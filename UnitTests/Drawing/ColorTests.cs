@@ -282,31 +282,16 @@ public class ColorTests {
 		Assert.Equal (expectedColorName, colorName);
 	}
 
-	[Fact]
-	public void FindClosestColor_ReturnsClosestColor ()
+	[Theory]
+	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.FindClosestColor_ReturnsClosestColor ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
+	public void FindClosestColor_ReturnsClosestColor ( Color inputColor, ColorName expectedColorName )
 	{
-		// Test cases with RGB values and expected closest color names
-		var testCases = new [] {
-			(new Color (0, 0, 0), ColorName.Black),
-			(new Color (255, 255, 255), ColorName.White),
-			(new Color (5, 100, 255), ColorName.BrightBlue),
-			(new Color (0, 255, 0), ColorName.BrightGreen),
-			(new Color (255, 70, 8), ColorName.BrightRed),
-			(new Color (0, 128, 128), ColorName.Cyan),
-			(new Color (128, 64, 32), ColorName.Yellow)
-		};
+		var actualColorName = Color.FindClosestColor ( inputColor );
 
-		foreach (var testCase in testCases) {
-			var inputColor = testCase.Item1;
-			var expectedColorName = testCase.Item2;
-
-			var actualColorName = Color.FindClosestColor (inputColor);
-
-			Assert.Equal (expectedColorName, actualColorName);
-		}
+		Assert.Equal ( expectedColorName, actualColorName );
 	}
 
-    #nullable enable
+#nullable enable
 	[Theory]
 	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.TryParse_string_Returns_True_For_Valid_Inputs ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
 	public void TryParse_string_Returns_True_For_Valid_Inputs ( string? input, int expectedColorArgb )
@@ -442,6 +427,19 @@ public static class ColorTestsTheoryDataGenerators {
 			}
 		}
 		return values;
+	}
+
+	public static TheoryData<Color, ColorName> FindClosestColor_ReturnsClosestColor ( )
+	{
+		TheoryData<Color, ColorName> data = [];
+		data.Add ( new Color ( 0, 0, 0 ), ColorName.Black );
+		data.Add ( new Color ( 255, 255, 255 ), ColorName.White );
+		data.Add ( new Color ( 5, 100, 255 ), ColorName.BrightBlue );
+		data.Add ( new Color ( 0, 255, 0 ), ColorName.BrightGreen );
+		data.Add ( new Color ( 255, 70, 8 ), ColorName.BrightRed );
+		data.Add ( new Color ( 0, 128, 128 ), ColorName.Cyan );
+		data.Add ( new Color ( 128, 64, 32 ), ColorName.Yellow );
+		return data;
 	}
 }
 #nullable restore
