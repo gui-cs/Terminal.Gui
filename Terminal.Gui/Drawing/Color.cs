@@ -200,7 +200,7 @@ public enum AnsiColorCode {
 /// </summary>
 [JsonConverter ( typeof ( ColorJsonConverter ) )]
 [StructLayout(LayoutKind.Explicit)]
-public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable, IUtf8SpanFormattable,IMinMaxValue<Color>, IEqualityOperators<Color, ColorName, bool> {
+public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable, IUtf8SpanFormattable,IMinMaxValue<Color> {
 	// TODO: Make this map configurable via ConfigurationManager
 	// TODO: This does not need to be a Dictionary, but can be an 16 element array.
 	/// <summary>
@@ -940,23 +940,6 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// <returns></returns>
 	public static bool operator != (ColorName left, Color right) => left != right.ColorName;
 
-	/// <summary>
-	/// Equality operator for <see cref="Color"/> and <see cref="Gui.ColorName"/> objects.
-	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns></returns>
-	public static bool operator == (Color left, ColorName right) => left.ColorName == right;
-
-	/// <summary>
-	/// Inequality operator for <see cref="Color"/> and <see cref="Gui.ColorName"/> objects.
-	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns></returns>
-	public static bool operator != (Color left, ColorName right) => left.ColorName != right;
-
-	/// <inheritdoc/>
 	public override int GetHashCode ( ) => Rgba.GetHashCode ( );
 	#endregion
 
@@ -979,4 +962,32 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	{
 		return TryParse ( Encoding.UTF8.GetString ( utf8Text ), provider, out result );
 	}
+
+	/// <summary>
+	/// Determines if the closest named <see cref="Color"/> to <see langword="this"/> is the provided <paramref name="namedColor"/>.
+	/// </summary>
+	/// <param name="namedColor">The <see cref="ColorName"/> to check if this <see cref="Color"/> is closer to than any other configured named color.</param>
+	/// <returns><see langword="true"/> if the closest named color is the provided value.<br/>
+	/// <see langword="false"/> if any other named color is closer to this <see cref="Color"/> than <paramref name="namedColor"/>.
+	/// </returns>
+	/// <remarks>If <see langword="this"/> is equidistant from two named colors, the result of this method is not guaranteed to be determinate.</remarks>
+	public bool IsClosestToNamedColor ( in ColorName namedColor) => ColorName == namedColor;
+
+
+	/// <summary>
+	/// Determines if the closest named <see cref="Color"/> to <paramref name="color"/>/> is the provided <paramref name="namedColor"/>.
+	/// </summary>
+	/// <param name="color">The color to test against the <see cref="ColorName"/> value in <paramref name="namedColor"/>.</param>
+	/// <param name="namedColor">The <see cref="ColorName"/> to check if this <see cref="Color"/> is closer to than any other configured named color.</param>
+	/// <returns><see langword="true"/> if the closest named color to <paramref name="color"/> is the provided value.<br/>
+	/// <see langword="false"/> if any other named color is closer to <paramref name="color"/> than <paramref name="namedColor"/>.
+	/// </returns>
+	/// <remarks>If <paramref name="color"/> is equidistant from two named colors, the result of this method is not guaranteed to be determinate.</remarks>
+	public static bool IsColorClosestToNamedColor ( in Color color, in ColorName namedColor )
+	{
+		return color.IsClosestToNamedColor ( in namedColor );
+	}
+
+	/// <inheritdoc/>
+
 }
