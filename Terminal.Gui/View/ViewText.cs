@@ -177,7 +177,7 @@ public partial class View {
 		//if (AutoSize == false) {
 		//	throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
 		//}
-		
+
 		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
 		// <summary>
 		// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.
@@ -302,7 +302,7 @@ public partial class View {
 
 	/// <summary>
 	/// Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
-	/// <see cref="Direction"/> specified by the
+	/// <see cref="NavigationDirection"/> specified by the
 	/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
 	/// </summary>
 	/// <returns>The <see cref="Size"/> the <see cref="Frame"/> needs to be set to fit the text.</returns>

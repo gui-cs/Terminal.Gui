@@ -268,8 +268,18 @@ public partial class View {
 
 
 	#region Focus
-	internal enum Direction {
+	/// <summary>
+	/// Exposed as `internal` for unit tests. Indicates focus navigation direction.
+	/// </summary>
+	internal enum NavigationDirection {
+		/// <summary>
+		/// Navigate forward.
+		/// </summary>
 		Forward,
+		
+		/// <summary>
+		/// Navigate backwards.
+		/// </summary>
 		Backward
 	}
 
@@ -283,9 +293,9 @@ public partial class View {
 	/// </summary>
 	public event EventHandler<FocusEventArgs> Leave;
 
-	Direction _focusDirection;
+	NavigationDirection _focusDirection;
 
-	internal Direction FocusDirection {
+	internal NavigationDirection FocusDirection {
 		get => SuperView?.FocusDirection ?? _focusDirection;
 		set {
 			if (SuperView != null) {
@@ -529,7 +539,7 @@ public partial class View {
 	public void EnsureFocus ()
 	{
 		if (Focused == null && _subviews?.Count > 0) {
-			if (FocusDirection == Direction.Forward) {
+			if (FocusDirection == NavigationDirection.Forward) {
 				FocusFirst ();
 			} else {
 				FocusLast ();
@@ -594,7 +604,7 @@ public partial class View {
 			return false;
 		}
 
-		FocusDirection = Direction.Backward;
+		FocusDirection = NavigationDirection.Backward;
 		if (_tabIndexes == null || _tabIndexes.Count == 0) {
 			return false;
 		}
@@ -644,7 +654,7 @@ public partial class View {
 			return false;
 		}
 
-		FocusDirection = Direction.Forward;
+		FocusDirection = NavigationDirection.Forward;
 		if (_tabIndexes == null || _tabIndexes.Count == 0) {
 			return false;
 		}

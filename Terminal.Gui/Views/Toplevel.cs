@@ -403,7 +403,7 @@ public partial class Toplevel : View {
 			old?.SetNeedsDisplay ();
 			Focused?.SetNeedsDisplay ();
 		} else {
-			FocusNearestView (SuperView?.TabIndexes?.Reverse (), Direction.Backward);
+			FocusNearestView (SuperView?.TabIndexes?.Reverse (), NavigationDirection.Backward);
 		}
 	}
 
@@ -417,7 +417,7 @@ public partial class Toplevel : View {
 			old?.SetNeedsDisplay ();
 			Focused?.SetNeedsDisplay ();
 		} else {
-			FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
+			FocusNearestView (SuperView?.TabIndexes, NavigationDirection.Forward);
 		}
 	}
 
@@ -444,7 +444,7 @@ public partial class Toplevel : View {
 		return view;
 	}
 
-	void FocusNearestView (IEnumerable<View> views, Direction direction)
+	void FocusNearestView (IEnumerable<View> views, NavigationDirection direction)
 	{
 		if (views == null) {
 			return;
@@ -459,7 +459,7 @@ public partial class Toplevel : View {
 				found = true;
 			}
 			if (found && v != this) {
-				if (direction == Direction.Forward) {
+				if (direction == NavigationDirection.Forward) {
 					SuperView?.FocusNext ();
 				} else {
 					SuperView?.FocusPrev ();
