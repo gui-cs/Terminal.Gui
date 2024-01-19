@@ -1026,3 +1026,24 @@ public readonly struct Attribute : IEquatable<Attribute> {
 		// Note: Unit tests are dependent on this format
 		$"[{Foreground},{Background}]";
 }
+
+/// <summary>
+/// An interface to support custom formatting and parsing of <see cref="Color"/> values.
+/// </summary>
+public interface ICustomColorFormatter : IFormatProvider, ICustomFormatter {
+	/// <summary>
+	/// A method that returns a <see cref="Color"/> value based on the <paramref name="text"/> specified.
+	/// </summary>
+	/// <param name="text">A string or other <see cref="ReadOnlySpan{T}"/> of <see langword="char"/> to parse as a <see cref="Color"/>.</param>
+	/// <returns>A <see cref="Color"/> value equivalent to <paramref name="text"/>.</returns>
+	Color Parse ( ReadOnlySpan<char> text );
+
+	/// <summary>
+	/// A method that returns a <see langword="string"/> based on the <paramref name="text"/> specified a
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <param name="text"></param>
+	/// <param name="args"></param>
+	/// <returns></returns>
+	string Format ( string? text, byte r, byte g, byte b, byte a );
+}
