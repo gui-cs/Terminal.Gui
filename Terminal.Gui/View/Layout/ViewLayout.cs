@@ -838,8 +838,8 @@ public partial class View {
 				SetNeedsLayout ();
 			}
 
-			// BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
-			if (!SetFrameToFitText ()) {
+			// BUGBUG: This causes the frame size to change even if AutoSize == false. This is not correct behavior. 
+			if (/*AutoSize && */!SetFrameToFitText ()) {
 				SetTextFormatterSize ();
 			}
 		}
@@ -1125,6 +1125,10 @@ public partial class View {
 	/// <returns>whether the Bounds was changed or not</returns>
 	bool ResizeBoundsToFit (Size size)
 	{
+		//if (AutoSize == false) {
+		//	throw new InvalidOperationException ("ResizeBoundsToFit can only be called when AutoSize is true");
+		//}
+
 		var boundsChanged = false;
 		var canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out var rW);
 		var canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out var rH);

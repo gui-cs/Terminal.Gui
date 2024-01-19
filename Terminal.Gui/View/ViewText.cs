@@ -146,10 +146,13 @@ public partial class View {
 			OnResizeNeeded ();
 		} else if (directionChanged && IsAdded) {
 			ResizeBoundsToFit (Bounds.Size);
-			// BUGBUG: I think this call is redundant.
-			SetFrameToFitText ();
+			// BUGBUG: Regardless of whether SetFrameToFitText is correct or not, it is called
+			// BUGBUG: From SetRelativeLayout so this call is redundant.
+			//SetFrameToFitText ();
 		} else {
-			SetFrameToFitText ();
+			// BUGBUG: Regardless of whether SetFrameToFitText is correct or not, it is called
+			// BUGBUG: From SetRelativeLayout so this call is redundant.
+			//SetFrameToFitText ();
 		}
 		SetTextFormatterSize ();
 		SetNeedsDisplay ();
@@ -171,6 +174,10 @@ public partial class View {
 	/// </remarks>
 	bool SetFrameToFitText ()
 	{
+		//if (AutoSize == false) {
+		//	throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
+		//}
+		
 		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
 		// <summary>
 		// Gets the minimum dimensions required to fit the View's <see cref="Text"/>, factoring in <see cref="TextDirection"/>.

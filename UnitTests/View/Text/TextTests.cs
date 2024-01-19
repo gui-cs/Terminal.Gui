@@ -88,6 +88,7 @@ public class TextTests {
 
 		Assert.Equal (5, text.Length);
 		Assert.False (view.AutoSize);
+		// BUGBUG: If AutoSize == false, the Height should not be changed by the TextFormatter. The dims should be 0,0.
 		Assert.Equal (new Rect (0, 0, 3, 1), view.Frame);
 		Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
 		Assert.Single (view.TextFormatter.Lines);
