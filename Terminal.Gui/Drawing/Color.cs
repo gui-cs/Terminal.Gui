@@ -718,6 +718,13 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	public static implicit operator uint (Color color) => color.Argb;
 
 	/// <summary>
+	/// Implicit conversion from <see langword="uint"/> to <see cref="Color"/>.
+	/// </summary>
+	/// <param name="u"></param>
+	[Pure]
+	public static implicit operator Color ( uint u ) => new ( u );
+
+	/// <summary>
 	/// Cast from <see cref="Gui.ColorName"/>.
 	/// </summary>
 	/// <param name="colorName"></param>
