@@ -616,7 +616,7 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
 	/// and any of the <see cref="ColorName"/> string values.
 	/// </param>
-	/// <param name="ignoredFormatProvider">
+	/// <param name="formatProvider">
 	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored. Just pass <see langword="null"/>.
 	/// </param>
 	/// <param name="color">The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if unsuccessful.</param>
@@ -624,97 +624,20 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// <remarks>
 	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
 	/// </remarks>
-	public static bool TryParse ( ReadOnlySpan<char> text, IFormatProvider? ignoredFormatProvider, out Color color )
+	[Pure]
+	[SkipLocalsInit]
+	public static bool TryParse ( ReadOnlySpan<char> text, IFormatProvider? formatProvider, out Color color )
 	{
-		// empty color
-		if (  text.IsEmpty || text.IsWhiteSpace ( ) || text.Length < 4 ) {
+		try {
+			Color c = Parse ( text, formatProvider );
+			color = c;
+			return true;
+		}
+		catch ( ColorParseException ) {
 			color = default;
 			return false;
-		}
-
-		switch ( text ) {
-		case ['#', var rChar, var gChar, var bChar] chars when chars[1..].IsAllAsciiHexDigits():
-		{
-			// #RGB
-			color = new Color ( byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ) );
-		}
-			return true;
-		case ['#', var rChar, var gChar, var bChar, var aChar] chars when chars [ 1.. ].IsAllAsciiHexDigits():
-		{
-			// #RGBA
-			color = new Color ( byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ), byte.Parse ( [aChar, aChar], NumberStyles.HexNumber ) );
-		}
-			return true;
-		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char] chars when chars[1..].IsAllAsciiHexDigits():
-		{
-			// #RRGGBB
-			color = new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ) );
-		}
-			return true;
-		case ['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char, var a1Char, var a2Char] chars when chars[1..].IsAllAsciiHexDigits():
-		{
-			// #RRGGBBAA
-			color = new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ), byte.Parse ( [a1Char, a2Char], NumberStyles.HexNumber ) );
-		}
-			return true;
-		case ['r', 'g', 'b', '(', .., ')']:
-		{
-			ReadOnlySpan<char> valuesSubstring = text [ 4..^1 ];
-			return TryParseRgbaDecimalString ( in valuesSubstring, out color );
-		}
-		case ['r', 'g', 'b', 'a', '(', .., ')']:
-		{
-			ReadOnlySpan<char> valuesSubstring = text [ 5..^1 ];
-			return TryParseRgbaDecimalString ( in valuesSubstring, out color );
-		}
-		case { } when char.IsLetter ( text[0] ) && Enum.TryParse<ColorName> ( text, true, out var colorName ):
-		{
-			color = new Color (colorName);
-			return true;
-		}
-		default:
-			color = default;
-			return false;
-		}
-		static bool TryParseRgbaDecimalString ( in ReadOnlySpan<char> valuesSubstring, out Color c )
-		{
-
-			var valueRanges = new Span<Range> ( new Range [4] );
-			valuesSubstring.Split ( valueRanges, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-
-			ReadOnlySpan<char> rSpan = valuesSubstring[valueRanges [ 0 ]];
-			if ( !rSpan.IsAllAsciiDigits ( ) ) {
-				throw new FormatException ( $"Value for red component ({rSpan}) in color string must be a base-10 number from 0 to 255." );
-			}
-			ReadOnlySpan<char> gSpan = valuesSubstring[valueRanges [ 1 ]];
-			if ( !gSpan.IsAllAsciiDigits ( ) ) {
-				throw new FormatException ( $"Value for green component ({gSpan}) in color string must be a base-10 number from 0 to 255." );
-			}
-			ReadOnlySpan<char> bSpan = valuesSubstring[valueRanges [ 2 ]];
-			if ( !bSpan.IsAllAsciiDigits ( ) ) {
-				throw new FormatException ($"Value for blue component ({bSpan}) in color string must be a base-10 number from 0 to 255.");
-			}
-
-			switch ( valueRanges.Length ) {
-			case 3:
-				// rgba(r,g,b)
-				c = new Color ( byte.Parse ( rSpan ), byte.Parse ( gSpan ), byte.Parse ( bSpan ) );
-				return true;
-			case 4:
-				// rgba(r,g,b,a)
-				ReadOnlySpan<char> aSpan = valuesSubstring[valueRanges [ 3 ]];
-				if ( !aSpan.IsAllAsciiDigits ( ) ) {
-					throw new FormatException ($"Value for alpha component ({aSpan}) in color string must be a base-10 number from 0 to 255.");
-				}
-				c = new Color ( byte.Parse ( rSpan ), byte.Parse ( gSpan ), byte.Parse ( bSpan ), byte.Parse ( aSpan ) );
-				return true;
-			default:
-				c = default;
-				return false;
-			}
 		}
 	}
-	#nullable restore
 
 	/// <summary>
 	/// Converts the color to a string representation.
