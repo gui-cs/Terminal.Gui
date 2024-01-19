@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Buffers.Binary;
 using System.Globalization;
 using System.Linq;
@@ -347,6 +347,28 @@ public class ColorTests {
 
 		string parameterlessToStringValue = testColor.ToString ( );
 		Assert.Equal ( parameterlessToStringValue, testStringWithExplicitInvariantCulture );
+	}
+
+	[Theory]
+	[CombinatorialData]
+	public void Parse_And_ToString_RoundTrip_For_Known_FormatStrings ([CombinatorialValues(null,"","g","G","d","D")] string? formatString,[CombinatorialValues(0,64,255)] byte r,[CombinatorialValues(0,64,255)] byte g,[CombinatorialValues(0,64,255)] byte b  )
+	{
+		Color constructedColor = new ( r, g, b, 255 );
+
+		// Pre-conditions for the rest of the test to be valid
+		Assert.Equal ( r, constructedColor.R );
+		Assert.Equal ( g, constructedColor.G );
+		Assert.Equal ( b, constructedColor.B );
+		Assert.Equal ( 255, constructedColor.A);
+
+		//Get the ToString result with the specified format string
+		string formattedColorString = constructedColor.ToString ( formatString );
+
+		// Now parse that string
+		Color parsedColor = Color.Parse ( formattedColorString );
+
+		// They should have identical underlying values
+		Assert.Equal ( constructedColor.Argb, parsedColor.Argb );
 	}
 }
 
