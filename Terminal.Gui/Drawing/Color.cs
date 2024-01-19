@@ -660,6 +660,94 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 		// Otherwise return as an RGB hex value.
 		return $"#{R:X2}{G:X2}{B:X2}";
 	}
+	/// <inheritdoc cref="object.ToString" />
+	/// <summary>
+	///   Returns a <see langword="string" /> representation of the current <see cref="Color" /> value, according to the provided
+	///   <paramref name="formatString" /> and optional <paramref name="formatProvider" />.
+	/// </summary>
+	/// <param name="formatString">
+	///   A format string that will be passed to <see cref="string.Format(System.IFormatProvider?,string,object?[])" />. See remarks for parameters
+	///   passed to
+	/// </param>
+	/// <param name="formatProvider">
+	///   An optional <see cref="IFormatProvider" /> to use when formatting the <see cref="Color" /> using custom format strings not specified for
+	///   this method. Provides this instance as <see cref="Argb" />.<br /> If this parameter is not null, the specified
+	///   <see cref="IFormatProvider" /> will be used instead of the custom formatting provided by the <see cref="Color" /> type.See remarks.
+	/// </param>
+	/// <remarks>
+	///   Pre-defined format strings for this method, if a custom <paramref name="formatProvider" /> is not supplied are: <list type="bullet">
+	///     <listheader>
+	///       <term>Value</term> <description>Result</description>
+	///     </listheader> <item>
+	///       <term>g or null or empty string</term> <description>
+	///         General/default format - Returns a named <see cref="Color" /> if there is a match, or a 24-bit/3-byte/6-hex digit string in
+	///         "#RRGGBB" format.
+	///       </description>
+	///     </item> <item>
+	///       <term>G</term> <description>
+	///         Extended general format - Returns a named <see cref="Color" /> if there is a match, or a 32-bit/4-byte/8-hex digit string in
+	///         "#RRGGBBAA" format.
+	///       </description>
+	///     </item> <item>
+	///       <term>d</term> <description>
+	///         Decimal format - Returns a 3-component decimal representation of the <see cref="Color" /> in "rgb(R,G,B)" format.
+	///       </description>
+	///     </item> <item>
+	///       <term>D</term> <description>
+	///         Extended decimal format - Returns a 4-component decimal representation of the <see cref="Color" /> in "rgba(R,G,B,A)" format.
+	///       </description>
+	///     </item>
+	///   </list>
+	///   <para>
+	///     If <paramref name="formatProvider" /> is provided and is a non-null <see cref="ICustomColorFormatter"/>, the following behaviors are available, for the
+	///     specified values of <paramref name="formatString" />:
+	/// <list type="bullet">
+	///       <listheader>
+	///         <term>Value</term> <description>Result</description>
+	///       </listheader>
+	/// <item>
+	///         <term>null or empty string</term> <description>
+	///           Calls <see cref="ICustomColorFormatter.Format(string?,byte,byte,byte,byte)}" /> on the provided
+	///           <paramref name="formatProvider" /> with the null string, and <see cref="R" />, <see cref="G" />, <see cref="B" />, and <see cref="A" /> as typed
+	///           arguments of type <see cref="Byte" />.
+	///         </description>
+	///       </item>
+	/// <item>
+	///         <term>All other values</term> <description>
+	///           Calls <see cref="string.Format{TArg0}" /> with the provided <paramref name="formatProvider" /> and
+	///           <paramref name="formatString" /> (parsed as a <see cref="CompositeFormat" />), with the value of <see cref="Argb" /> as the sole
+	///           <see langword="uint" />-typed argument.
+	///         </description>
+	///       </item>
+	///     </list>
+	///   </para>
+	/// </remarks>
+	public string ToString ([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? formatString, IFormatProvider? formatProvider = null )
+	{
+		return ( formatString, formatProvider ) switch {
+			// Null or empty string and null formatProvider - Revert to 'g' case behavior
+			(null or { Length: 0 }, null) => ToString ( ),
+			// Null or empty string and formatProvider is an ICustomColorFormatter - Output according to the given ICustomColorFormatted, with R, G, B, and A as typed arguments
+			(null or { Length: 0 }, ICustomColorFormatter ccf) => ccf.Format ( null, R, G, B, A ),
+			// Null or empty string and formatProvider is otherwise non-null but not the invariant culture - Output according to string.Format with the given IFormatProvider and R, G, B, and A as boxed arguments, with string.Empty as the format string
+			(null or { Length: 0 }, { }) when !Equals ( formatProvider, CultureInfo.InvariantCulture ) => string.Format ( formatProvider, formatString ?? string.Empty, R, G, B, A ),
+			// Null or empty string and formatProvider is the invariant culture - Output according to string.Format with the given IFormatProvider and R, G, B, and A as boxed arguments, with string.Empty as the format string
+			(null or { Length: 0 }, { }) when Equals ( formatProvider, CultureInfo.InvariantCulture ) => $"#{R:X2}{G:X2}{B:X2}",
+			// Non-null string and non-null formatProvider - let formatProvider handle it and give it Argb
+			({ }, { }) => string.Format ( formatProvider, CompositeFormat.Parse ( formatString ), R, G, B, A ),
+			// g format string and null formatProvider - Output as 24-bit hex according to invariant culture rules from R, G, and B
+			(['g'], null) => ToString ( ),
+			// G format string and null formatProvider - Output as 32-bit hex according to invariant culture rules from Argb
+			(['G'], null) => $"#{Argb:X8}",
+			// d format string and null formatProvider - Output as 24-bit decimal rgb(r,g,b) according to invariant culture rules from R, G, and B
+			(['d'], null) => $"rgb({R:D},{G:D},{B:D})",
+			// D format string and null formatProvider - Output as 32-bit decimal rgba(r,g,b,a) according to invariant culture rules from R, G, B, and A
+			(['D'], null) => $"rgba({R:D},{G:D},{B:D},{A:D})",
+			// All other cases (formatString is not null here) - Delegate to formatProvider, first, and otherwise to invariant culture, and try to format the provided string from Argb
+			({ }, _) => string.Format ( formatProvider ?? CultureInfo.InvariantCulture, CompositeFormat.Parse ( formatString ), R, G, B, A ),
+		};
+	}
+
 	/// <inheritdoc />
 	/// <remarks>
 	///   <para>
