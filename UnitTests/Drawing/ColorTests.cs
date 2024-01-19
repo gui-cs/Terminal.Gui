@@ -304,10 +304,14 @@ public class ColorTests {
 	}
 
 	[Theory]
-	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.Rgba_Returns_Expected_Value ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
-	public void Rgba_Returns_Expected_Value ( in Color color, in int expectedValue )
+    [CombinatorialData]
+	public void Rgba_Returns_Expected_Value ( [CombinatorialValues(0,255)]byte a, [CombinatorialRange(0,255,51)]byte r, [CombinatorialRange(0,153,51)]byte g, [CombinatorialRange(0,128,32)]byte b )
 	{
-		Assert.Equal ( expectedValue, color.Rgba );
+		Color color = new ( r, g, b, a );
+		// Color.Rgba is expected to be a signed int32 in little endian order (a,b,g,r)
+		ReadOnlySpan<byte> littleEndianBytes = [b, g, r, a];
+		int expectedRgba = BitConverter.ToInt32 ( littleEndianBytes );
+		Assert.Equal ( expectedRgba, color.Rgba );
 	}
 
 	[Theory]
@@ -414,21 +418,6 @@ public static class ColorTestsTheoryDataGenerators {
 		}
 		return values;
 	}
-	public static TheoryData<Color, int> Rgba_Returns_Expected_Value ( )
-	{
-		TheoryData<Color, int> values = [];
-		for ( byte a = 0; a < 102; a += 51 ) {
-			for ( byte r = 0; r < 255; r += 51 ) {
-				for ( byte g = 0; g < 153; g += 51 ) {
-					for ( byte b = 0; b < 128; b += 16 ) {
-						values.Add ( new Color ( r, g, b, a ), BinaryPrimitives.ReadInt32LittleEndian ( [b, g, r, a] ) );
-					}
-				}
-			}
-		}
-		return values;
-	}
-
 	public static TheoryData<Color, ColorName> FindClosestColor_ReturnsClosestColor ( )
 	{
 		TheoryData<Color, ColorName> data = [];
