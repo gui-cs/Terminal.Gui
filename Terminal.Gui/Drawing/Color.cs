@@ -538,14 +538,14 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 				// #RGB
 				['#', var rChar, var gChar, var bChar] chars when chars [ 1.. ].IsAllAsciiHexDigits ( ) =>
 					new Color ( byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ) ),
-				// #RGBA
-				['#', var rChar, var gChar, var bChar, var aChar] chars when chars [ 1.. ].IsAllAsciiHexDigits ( ) =>
+				// #ARGB
+				['#', var aChar, var rChar, var gChar, var bChar] chars when chars [ 1.. ].IsAllAsciiHexDigits ( ) =>
 					new Color ( byte.Parse ( [rChar, rChar], NumberStyles.HexNumber ), byte.Parse ( [gChar, gChar], NumberStyles.HexNumber ), byte.Parse ( [bChar, bChar], NumberStyles.HexNumber ), byte.Parse ( [aChar, aChar], NumberStyles.HexNumber ) ),
 				// #RRGGBB
 				['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char] chars when chars [ 1.. ].IsAllAsciiHexDigits ( ) =>
-					new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ) ),
-				// #RRGGBBAA
-				['#', var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char, var a1Char, var a2Char] chars when chars [ 1.. ].IsAllAsciiHexDigits ( ) =>
+					new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ), byte.MaxValue ),
+				// #AARRGGBB
+				['#', var a1Char, var a2Char, var r1Char, var r2Char, var g1Char, var g2Char, var b1Char, var b2Char] chars when chars [ 1.. ].IsAllAsciiHexDigits ( ) =>
 					new Color ( byte.Parse ( [r1Char, r2Char], NumberStyles.HexNumber ), byte.Parse ( [g1Char, g2Char], NumberStyles.HexNumber ), byte.Parse ( [b1Char, b2Char], NumberStyles.HexNumber ), byte.Parse ( [a1Char, a2Char], NumberStyles.HexNumber ) ),
 				_ => throw new ColorParseException ( in hexString, reason: $"Color hex string {hexString} was not in a supported format", in hexString )
 			},
@@ -744,15 +744,15 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 			(null or { Length: 0 }, { }) when !Equals ( formatProvider, CultureInfo.InvariantCulture ) => string.Format ( formatProvider, formatString ?? string.Empty, R, G, B, A ),
 			// Null or empty string and formatProvider is the invariant culture - Output according to string.Format with the given IFormatProvider and R, G, B, and A as boxed arguments, with string.Empty as the format string
 			(null or { Length: 0 }, { }) when Equals ( formatProvider, CultureInfo.InvariantCulture ) => $"#{R:X2}{G:X2}{B:X2}",
-			// Non-null string and non-null formatProvider - let formatProvider handle it and give it Argb
+			// Non-null string and non-null formatProvider - let formatProvider handle it and give it R, G, B, and A
 			({ }, { }) => string.Format ( formatProvider, CompositeFormat.Parse ( formatString ), R, G, B, A ),
 			// g format string and null formatProvider - Output as 24-bit hex according to invariant culture rules from R, G, and B
 			(['g'], null) => ToString ( ),
 			// G format string and null formatProvider - Output as 32-bit hex according to invariant culture rules from Argb
-			(['G'], null) => $"#{Argb:X8}",
+			(['G'], null) => $"#{A:X2}{R:X2}{G:X2}{B:X2}",
 			// d format string and null formatProvider - Output as 24-bit decimal rgb(r,g,b) according to invariant culture rules from R, G, and B
 			(['d'], null) => $"rgb({R:D},{G:D},{B:D})",
-			// D format string and null formatProvider - Output as 32-bit decimal rgba(r,g,b,a) according to invariant culture rules from R, G, B, and A
+			// D format string and null formatProvider - Output as 32-bit decimal rgba(r,g,b,a) according to invariant culture rules from R, G, B, and A. Non-standard: a is a decimal byte value.
 			(['D'], null) => $"rgba({R:D},{G:D},{B:D},{A:D})",
 			// All other cases (formatString is not null here) - Delegate to formatProvider, first, and otherwise to invariant culture, and try to format the provided string from Argb
 			({ }, _) => string.Format ( formatProvider ?? CultureInfo.InvariantCulture, CompositeFormat.Parse ( formatString ), R, G, B, A ),

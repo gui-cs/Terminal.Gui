@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers.Binary;
 using System.Globalization;
 using System.Linq;
@@ -385,7 +385,7 @@ public static class ColorTestsTheoryDataGenerators {
 			values.Add ( $"rgb({i - 16:D},{i:D},{i + 16:D})", expectedRgb );
 			values.Add ( $"rgba({i - 16:D},{i:D},{i + 16:D},{i:D})", expectedRgba );
 			values.Add ( $"#{i - 16:X2}{i:X2}{i + 16:X2}", expectedRgb );
-			values.Add ( $"#{i - 16:X2}{i:X2}{i + 16:X2}{i:X2}", expectedRgba );
+			values.Add ( $"#{i:X2}{i - 16:X2}{i:X2}{i + 16:X2}", expectedRgba );
 		}
 		for ( byte i = 1; i < 0xE; i++ ) {
 			values.Add ( $"#{i - 1:X0}{i:X0}{i + 1:X0}", BinaryPrimitives.ReadInt32LittleEndian (
@@ -397,7 +397,7 @@ public static class ColorTestsTheoryDataGenerators {
 				(byte)( i - 1 | i - 1 << 4 ),
 				255
 			] ) );
-			values.Add ( $"#{i - 1:X0}{i:X0}{i + 1:X0}{i:X0}", BinaryPrimitives.ReadInt32LittleEndian (
+			values.Add ( $"#{i:X0}{i - 1:X0}{i:X0}{i + 1:X0}", BinaryPrimitives.ReadInt32LittleEndian (
 			[
 				(byte)( i + 1 | i + 1 << 4 ),
 				(byte)( i | i << 4 ),
