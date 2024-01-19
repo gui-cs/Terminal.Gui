@@ -33,7 +33,7 @@
     <PackageReference Include="System.Management" Version="8.0.0" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <InternalsVisibleTo Include="UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100fd7deb717c0f441d4810936b1647de0a6070b76998b13196a2d215164059eca258f957b65d902f209acb5d953f35f78faea4bee8a303cbc9e651130cb3b1157a9459274ecd40d92c3a5fe17a9f7b4c2e3bc618d9d55528606d6dea8744be2f05b67817e4d80067015e2402e5680a3876ed71099d40b13471739484e6b16e1cc7" />
+    <InternalsVisibleTo Include="UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c135ca0dc72ed9549b7ebf23772eb9e3dc2dc9e4a4fb795fa88404a175cfbe230a3d5edb1802c7952b1b5edbeb8136dc16ea6ab03f3f6fed01e9937d8ef40378bee9a31502cd56bfc14adfb2858d438c66d87aea4c54c49bfad28a282bed869af33ac256fe9584b1c5b96479b52a0c95b5a400a7b833820faa272d16ce0586ed" />
   </ItemGroup>
   <PropertyGroup>
     <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
