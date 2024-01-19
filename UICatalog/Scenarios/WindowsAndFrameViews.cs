@@ -3,6 +3,7 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Windows & FrameViews", Description: "Stress Tests Windows, sub-Windows, and FrameViews.")]
 [ScenarioCategory ("Layout")]
 public class WindowsAndFrameViews : Scenario {
@@ -97,14 +98,14 @@ public class WindowsAndFrameViews : Scenario {
 				ColorScheme = Colors.ColorSchemes ["Error"]
 			});
 			win.Add (subWin);
-			var frameView = new FrameView ("This is a Sub-FrameView") {
+			var frameView = new FrameView {
 				X = Pos.Percent (50),
 				Y = 1,
 				Width = Dim.Percent (100, true), // Or Dim.Percent (50)
 				Height = 5,
 				ColorScheme = Colors.ColorSchemes ["Base"],
 				Text = "The Text in the FrameView",
-
+				Title = "This is a Sub-FrameView"
 			};
 			frameView.Add (new TextField ("Edit Me!") {
 				Y = 1,
@@ -128,11 +129,12 @@ public class WindowsAndFrameViews : Scenario {
 		//   a checkbox
 		//   a checkbox
 		FrameView frame = null;
-		frame = new FrameView ($"This is a FrameView") {
+		frame = new FrameView () {
 			X = margin,
 			Y = Pos.Bottom (listWin.Last ()) + (margin / 2),
 			Width = Dim.Fill (margin),
 			Height = contentHeight + 2,  // 2 for default padding
+			Title = "This is a FrameView"
 		};
 		frame.ColorScheme = Colors.ColorSchemes ["Dialog"];
 		frame.Add (new Label ("This is a Label! (Y = 0)") {
@@ -158,13 +160,14 @@ public class WindowsAndFrameViews : Scenario {
 		subWinofFV.Add (new CheckBox { Y = 2, Text = "Or, Check me" });
 
 		frame.Add (subWinofFV);
-		var subFrameViewofFV = new FrameView ("this is a Sub-FrameView") {
+		var subFrameViewofFV = new FrameView {
 			X = Pos.Percent (50),
 			Y = 1,
 			Width = Dim.Percent (100),
 			Height = Dim.Fill () - 1,
 			ColorScheme = Colors.ColorSchemes ["Base"],
 			Text = "The Text in the FrameView",
+			Title = "this is a Sub-FrameView"
 		};
 		subFrameViewofFV.Add (new TextField ("Edit Me") { Width = 15 });
 

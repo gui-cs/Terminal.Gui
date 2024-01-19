@@ -8,12 +8,9 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 public class TextFieldTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public TextFieldTests (ITestOutputHelper output)
-	{
-		this.output = output;
-	}
+	public TextFieldTests (ITestOutputHelper output) => _output = output;
 
 	// This class enables test functions annotated with the [InitShutdown] attribute
 	// to have a function called before the test function is called and after.
@@ -885,10 +882,11 @@ public class TextFieldTests {
 			ReadOnly = true,
 			Text = "some text"
 		};
-		var fv = new FrameView ("I shouldn't get focus") {
+		var fv = new FrameView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			CanFocus = false,
+			Title = "I shouldn't get focus"
 		};
 		fv.Add (tf);
 		top.Add (fv);
@@ -1439,18 +1437,18 @@ public class TextFieldTests {
 		Application.Begin (top);
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-Les Misérables", output);
+Les Misérables", _output);
 
 		tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-Les Misérables", output);
+Les Misérables", _output);
 
 		// incorrect order will result with a wrong accent place
 		tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-Les Miśerables", output);
+Les Miśerables", _output);
 	}
 
 	[Fact, AutoInitShutdown]
@@ -1462,22 +1460,22 @@ Les Miśerables", output);
 		Application.Begin (top);
 
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-ắ", output);
+ắ", _output);
 
 		tf.Text = "\u1eaf";
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-ắ", output);
+ắ", _output);
 
 		tf.Text = "\u0103\u0301";
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-ắ", output);
+ắ", _output);
 
 		tf.Text = "\u0061\u0306\u0301";
 		Application.Refresh ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
-ắ", output);
+ắ", _output);
 	}
 
 	[Fact, AutoInitShutdown]
@@ -1486,19 +1484,19 @@ Les Miśerables", output);
 		var tf = GetTextFieldsInView ();
 
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre ("", output);
+		TestHelpers.AssertDriverContentsAre ("", _output);
 
 		// Caption has no effect when focused
 		tf.Caption = "Enter txt";
 		Assert.True (tf.HasFocus);
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre ("", output);
+		TestHelpers.AssertDriverContentsAre ("", _output);
 
 		Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
 		Assert.False (tf.HasFocus);
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre ("Enter txt", output);
+		TestHelpers.AssertDriverContentsAre ("Enter txt", _output);
 	}
 
 	[Theory, AutoInitShutdown]
@@ -1509,7 +1507,7 @@ Les Miśerables", output);
 		var tf = GetTextFieldsInView ();
 
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre ("", output);
+		TestHelpers.AssertDriverContentsAre ("", _output);
 
 		tf.Caption = "Enter txt";
 		Application.Driver.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
@@ -1517,12 +1515,12 @@ Les Miśerables", output);
 		// Caption should appear when not focused and no text
 		Assert.False (tf.HasFocus);
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre ("Enter txt", output);
+		TestHelpers.AssertDriverContentsAre ("Enter txt", _output);
 
 		// but disapear when text is added
 		tf.Text = content;
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre (content, output);
+		TestHelpers.AssertDriverContentsAre (content, _output);
 	}
 
 	[Fact, AutoInitShutdown]
@@ -1540,7 +1538,7 @@ Les Miśerables", output);
 		Assert.False (tf.HasFocus);
 
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre ("Misérables", output);
+		TestHelpers.AssertDriverContentsAre ("Misérables", _output);
 	}
 
 	[Theory, AutoInitShutdown]
@@ -1555,7 +1553,7 @@ Les Miśerables", output);
 		Assert.False (tf.HasFocus);
 
 		tf.Draw ();
-		TestHelpers.AssertDriverContentsAre (expectedRender, output);
+		TestHelpers.AssertDriverContentsAre (expectedRender, _output);
 	}
 
 	private TextField GetTextFieldsInView ()

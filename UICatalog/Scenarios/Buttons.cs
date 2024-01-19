@@ -2,6 +2,7 @@
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons.")]
 [ScenarioCategory ("Controls"), ScenarioCategory ("Layout")]
 public class Buttons : Scenario {
@@ -118,11 +119,12 @@ public class Buttons : Scenario {
 			removeButton.Visible = false;
 		};
 
-		var computedFrame = new FrameView ("Computed Layout") {
+		var computedFrame = new FrameView () {
 			X = 0,
 			Y = Pos.Bottom (removeButton) + 1,
 			Width = Dim.Percent (50),
-			Height = 5
+			Height = 5,
+			Title = "Computed Layout"
 		};
 		Win.Add (computedFrame);
 
@@ -155,11 +157,12 @@ public class Buttons : Scenario {
 		};
 		computedFrame.Add (sizeBtn);
 
-		var absoluteFrame = new FrameView ("Absolute Layout") {
+		var absoluteFrame = new FrameView {
 			X = Pos.Right (computedFrame),
 			Y = Pos.Bottom (removeButton) + 1,
 			Width = Dim.Fill (),
-			Height = 5
+			Height = 5,
+			Title = "Absolute Layout"
 		};
 		Win.Add (absoluteFrame);
 

@@ -14,10 +14,7 @@ public class TextViewTests {
 	private static TextView _textView;
 	readonly ITestOutputHelper _output;
 
-	public TextViewTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public TextViewTests (ITestOutputHelper output) => _output = output;
 
 	// This class enables test functions annotated with the [InitShutdown] attribute
 	// to have a function called before the test function is called and after.
@@ -2418,10 +2415,11 @@ line.
 			ReadOnly = true,
 			Text = "some text"
 		};
-		var fv = new FrameView ("I shouldn't get focus") {
+		var fv = new FrameView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			CanFocus = false,
+			Title = "I shouldn't get focus"
 		};
 		fv.Add (tv);
 		top.Add (fv);
@@ -3062,7 +3060,7 @@ Line 2.", _output);
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateForwardKey));
 		Assert.False (tv.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateBackwardKey));
-		
+
 		Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
 		Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
 

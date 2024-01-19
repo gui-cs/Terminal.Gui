@@ -334,18 +334,20 @@ public class DimTests {
 			Height = 100
 		};
 
-		var f1 = new FrameView ("f1") {
+		var f1 = new FrameView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Percent (50),
-			Height = 5
+			Height = 5,
+			Title = "f1"
 		};
 
-		var f2 = new FrameView ("f2") {
+		var f2 = new FrameView {
 			X = Pos.Right (f1),
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = 5
+			Height = 5,
+			Title = "f2"
 		};
 
 		var v1 = new Button {

@@ -33,15 +33,16 @@ public class Progress : Scenario {
 			}
 		}
 
-			internal ProgressDemo (string title) : base (title)
+			internal ProgressDemo ()
 			{
 				ColorScheme = Colors.ColorSchemes ["Dialog"];
 
-			LeftFrame = new FrameView ("Settings") {
+			LeftFrame = new FrameView {
 				X = 0,
 				Y = 0,
 				Height = Dim.Percent (100),
-				Width = Dim.Percent (25)
+				Width = Dim.Percent (25),
+				Title = "Settings"
 			};
 			var lbl = new Label ("Tick every (ms):") { X = 1, Y = 1 };
 			LeftFrame.Add (lbl);
@@ -169,10 +170,11 @@ public class Progress : Scenario {
 	public override void Setup ()
 	{
 		// Demo #1 - Use System.Timer (and threading)
-		var systemTimerDemo = new ProgressDemo ("System.Timer (threads)") {
+		var systemTimerDemo = new ProgressDemo {
 			X = 0,
 			Y = 0,
 			Width = Dim.Percent (100),
+			Title = "System.Timer (threads)"
 		};
 		systemTimerDemo.StartBtnClick = () => {
 			_systemTimer?.Dispose ();
@@ -212,10 +214,11 @@ public class Progress : Scenario {
 		Win.Add (systemTimerDemo);
 
 		// Demo #2 - Use Application.AddTimeout (no threads)
-		var mainLoopTimeoutDemo = new ProgressDemo ("Application.AddTimer (no threads)") {
+		var mainLoopTimeoutDemo = new ProgressDemo {
 			X = 0,
 			Y = Pos.Bottom (systemTimerDemo),
 			Width = Dim.Percent (100),
+			Title = "Application.AddTimer (no threads)"
 		};
 		mainLoopTimeoutDemo.StartBtnClick = () => {
 			mainLoopTimeoutDemo.StopBtnClick ();

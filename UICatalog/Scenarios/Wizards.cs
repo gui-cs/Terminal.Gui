@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -10,11 +7,12 @@ namespace UICatalog.Scenarios {
 	public class Wizards : Scenario {
 		public override void Setup ()
 		{
-			var frame = new FrameView ("Wizard Options") {
+			var frame = new FrameView {
 				X = Pos.Center (),
 				Y = 0,
 				Width = Dim.Percent (75),
 				ColorScheme = Colors.ColorSchemes ["Base"],
+				Title = "Wizard Options"
 			};
 			Win.Add (frame);
 
@@ -169,11 +167,12 @@ namespace UICatalog.Scenarios {
 					secondStep.Add (thirdStepEnabledCeckBox);
 
 					// Add a frame 
-					var frame = new FrameView ($"A Broken Frame (by Depeche Mode)") {
+					var frame = new FrameView () {
 						X = 0,
 						Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
 						Width = Dim.Fill (),
-						Height = 4
+						Height = 4,
+						Title = "A Broken Frame (by Depeche Mode)"
 					};
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					secondStep.Add (frame);

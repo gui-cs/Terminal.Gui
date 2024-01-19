@@ -5,10 +5,7 @@ namespace Terminal.Gui.ViewsTests;
 public class FrameViewTests {
 	readonly ITestOutputHelper _output;
 
-	public FrameViewTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public FrameViewTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void Constructors_Defaults ()
@@ -18,12 +15,12 @@ public class FrameViewTests {
 		Assert.Equal (string.Empty, fv.Text);
 		Assert.Equal (LineStyle.Single, fv.BorderStyle);
 
-		fv = new FrameView ("Test");
+		fv = new FrameView { Title = "Test" };
 		Assert.Equal ("Test", fv.Title);
 		Assert.Equal (string.Empty, fv.Text);
 		Assert.Equal (LineStyle.Single, fv.BorderStyle);
 
-		fv = new FrameView ("Test") { X = 1, Y = 2, Width = 10, Height = 20 };
+		fv = new FrameView { X = 1, Y = 2, Width = 10, Height = 20, Title = "Test" };
 		Assert.Equal ("Test", fv.Title);
 		Assert.Equal (string.Empty, fv.Text);
 		fv.BeginInit ();

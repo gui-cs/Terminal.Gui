@@ -6,7 +6,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UICatalog.Tests; 
+namespace UICatalog.Tests;
 
 public class ScenarioTests {
 	readonly ITestOutputHelper _output;
@@ -230,23 +230,25 @@ public class ScenarioTests {
 		};
 		_leftPane.Add (_classListView);
 
-		_settingsPane = new FrameView ("Settings") {
+		_settingsPane = new FrameView {
 			X = Pos.Right (_leftPane),
 			Y = 0, // for menu
 			Width = Dim.Fill (),
 			Height = 10,
 			CanFocus = false,
-			ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Title = "Settings"
 		};
 		_computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
 		_settingsPane.Add (_computedCheckBox);
 
 		var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
-		_locationFrame = new FrameView ("Location (Pos)") {
+		_locationFrame = new FrameView {
 			X = Pos.Left (_computedCheckBox),
 			Y = Pos.Bottom (_computedCheckBox),
 			Height = 3 + radioItems.Length,
-			Width = 36
+			Width = 36,
+			Title = "Location (Pos)"
 		};
 		_settingsPane.Add (_locationFrame);
 
@@ -272,11 +274,12 @@ public class ScenarioTests {
 		};
 		_locationFrame.Add (_yRadioGroup);
 
-		_sizeFrame = new FrameView ("Size (Dim)") {
+		_sizeFrame = new FrameView {
 			X = Pos.Right (_locationFrame),
 			Y = Pos.Y (_locationFrame),
 			Height = 3 + radioItems.Length,
-			Width = 40
+			Width = 40,
+			Title = "Size (Dim)"
 		};
 
 		radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
@@ -304,7 +307,7 @@ public class ScenarioTests {
 
 		_settingsPane.Add (_sizeFrame);
 
-		_hostPane = new FrameView ("") {
+		_hostPane = new FrameView {
 			X = Pos.Right (_leftPane),
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),

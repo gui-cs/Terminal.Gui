@@ -76,11 +76,12 @@ public class TabViewExample : Scenario {
 
 		Win.Add (_tabView);
 
-		var frameRight = new FrameView ("About") {
+		var frameRight = new FrameView {
 			X = Pos.Right (_tabView),
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
+			Title = "About"
 		};
 
 		frameRight.Add (new TextView () {
@@ -91,11 +92,12 @@ public class TabViewExample : Scenario {
 
 		Win.Add (frameRight);
 
-		var frameBelow = new FrameView ("Bottom Frame") {
+		var frameBelow = new FrameView {
 			X = 0,
 			Y = Pos.Bottom (_tabView),
 			Width = _tabView.Width,
 			Height = Dim.Fill (),
+			Title = "Bottom Frame"
 		};
 
 		frameBelow.Add (new TextView () {

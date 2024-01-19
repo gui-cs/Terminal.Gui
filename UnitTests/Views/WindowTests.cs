@@ -109,10 +109,11 @@ public class WindowTests {
 			new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
 		});
 
-		var fv = new FrameView ("Frame View") {
+		var fv = new FrameView {
 			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (1)
+			Height = Dim.Fill (1),
+			Title = "Frame View"
 		};
 		var win = new Window ();
 		win.Add (menu, sb, fv);

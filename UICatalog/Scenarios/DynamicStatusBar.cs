@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Dynamic StatusBar", Description: "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
 [ScenarioCategory ("Top Level Windows")]
 public class DynamicStatusBar : Scenario {
@@ -61,15 +62,16 @@ public class DynamicStatusBar : Scenario {
 
 		public DynamicStatusItemModel DataContext { get; set; }
 
-		public DynamicStatusBarSample () : base ()
+		public DynamicStatusBarSample ()
 		{
 			DataContext = new DynamicStatusItemModel ();
 
-			var _frmDelimiter = new FrameView ("Shortcut Delimiter:") {
+			var _frmDelimiter = new FrameView {
 				X = Pos.Center (),
 				Y = 0,
 				Width = 25,
-				Height = 4
+				Height = 4,
+				Title = "Shortcut Delimiter:"
 			};
 
 			var _txtDelimiter = new TextField ($"{StatusBar.ShortcutDelimiter}") {
@@ -81,10 +83,11 @@ public class DynamicStatusBar : Scenario {
 
 			Add (_frmDelimiter);
 
-			var _frmStatusBar = new FrameView ("Items:") {
+			var _frmStatusBar = new FrameView {
 				Y = 5,
 				Width = Dim.Percent (50),
-				Height = Dim.Fill (2)
+				Height = Dim.Fill (2),
+				Title = "Items:"
 			};
 
 			var _btnAddStatusBar = new Button {
@@ -138,11 +141,12 @@ public class DynamicStatusBar : Scenario {
 
 			Add (_frmStatusBar);
 
-			var _frmStatusBarDetails = new DynamicStatusBarDetails ("StatusBar Item Details:") {
+			var _frmStatusBarDetails = new DynamicStatusBarDetails {
 				X = Pos.Right (_frmStatusBar),
 				Y = Pos.Top (_frmStatusBar),
 				Width = Dim.Fill (),
-				Height = Dim.Fill (4)
+				Height = Dim.Fill (4),
+				Title = "StatusBar Item Details:"
 			};
 			Add (_frmStatusBarDetails);
 
@@ -358,12 +362,13 @@ public class DynamicStatusBar : Scenario {
 		public TextView _txtAction;
 		public TextField _txtShortcut;
 
-		public DynamicStatusBarDetails (StatusItem statusItem = null) : this (statusItem == null ? "Adding New StatusBar Item." : "Editing StatusBar Item.")
+		public DynamicStatusBarDetails (StatusItem statusItem = null)
 		{
 			_statusItem = statusItem;
+			Title = statusItem == null ? "Adding New StatusBar Item." : "Editing StatusBar Item.";
 		}
 
-		public DynamicStatusBarDetails (string title) : base (title)
+		public DynamicStatusBarDetails ()
 		{
 			var _lblTitle = new Label ("Title:") {
 				Y = 1

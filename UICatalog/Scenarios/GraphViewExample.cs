@@ -81,11 +81,12 @@ public class GraphViewExample : Scenario {
 
 		Win.Add (_graphView);
 
-		var frameRight = new FrameView ("About") {
+		var frameRight = new FrameView {
 			X = Pos.Right (_graphView) + 1,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill ()
+			Height = Dim.Fill (),
+			Title = "About"
 		};
 
 		frameRight.Add (_about = new TextView {
