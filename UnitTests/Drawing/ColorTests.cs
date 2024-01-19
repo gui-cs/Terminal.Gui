@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Buffers.Binary;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -331,6 +332,21 @@ public class ColorTests {
 		bool tryParseStatus = Color.TryParse ( input, out Color? color );
 		Assert.False ( tryParseStatus );
 		Assert.Null ( color );
+	}
+
+	[Theory]
+    [CombinatorialData]
+	public void ToString_WithInvariantCultureAndNullString_IsSameAsParameterless ([CombinatorialValues(0,64,128,255)]byte r, [CombinatorialValues(0,64,128,255)]byte g, [CombinatorialValues(0,64,128,255)]byte b )
+	{
+		string expected = $"#{r:X2}{g:X2}{b:X2}";
+		Color testColor = new ( r, g, b );
+
+		string testStringWithExplicitInvariantCulture = testColor.ToString ( null, CultureInfo.InvariantCulture );
+		Assert.Equal ( expected, testStringWithExplicitInvariantCulture );
+
+
+		string parameterlessToStringValue = testColor.ToString ( );
+		Assert.Equal ( parameterlessToStringValue, testStringWithExplicitInvariantCulture );
 	}
 }
 
