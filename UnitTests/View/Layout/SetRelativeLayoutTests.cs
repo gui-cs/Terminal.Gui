@@ -8,6 +8,42 @@ public class SetRelativeLayoutTests {
 
 	public SetRelativeLayoutTests (ITestOutputHelper output) => _output = output;
 
+
+	[Fact]
+	public void DimFill_Is_Honored ()
+	{
+		var view = new View () {
+			X = 1,
+			Y = 1,
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+		};
+		
+		view.SetRelativeLayout (new Rect (0, 0, 80, 25));
+		Assert.Equal ("Fill(0)", view.Width.ToString ());
+		Assert.Equal (1, view.Frame.X);
+		Assert.Equal (1, view.Frame.Y);
+		Assert.Equal (79, view.Frame.Width);
+		Assert.Equal (24, view.Frame.Height);
+		Assert.Equal (0, view.Bounds.X);
+		Assert.Equal (0, view.Bounds.Y);
+		Assert.Equal (79, view.Bounds.Width);
+		Assert.Equal (24, view.Bounds.Height);
+
+		view.X = 0;
+		view.Y = 0;
+		Assert.Equal ("Absolute(0)", view.X.ToString ());
+		Assert.Equal ("Fill(0)", view.Width.ToString ());
+		view.SetRelativeLayout (new Rect (0, 0, 80, 25));
+		Assert.Equal (0, view.Frame.X);
+		Assert.Equal (0, view.Frame.Y);
+		Assert.Equal (80, view.Frame.Width);
+		Assert.Equal (25, view.Frame.Height);
+		Assert.Equal (0, view.Bounds.X);
+		Assert.Equal (0, view.Bounds.Y);
+		Assert.Equal (80, view.Bounds.Width);
+		Assert.Equal (25, view.Bounds.Height);
+	}
 	[Fact]
 	public void ComputedPosDim_StayComputed ()
 	{

@@ -480,88 +480,18 @@ public class ViewTests {
 	}
 
 
-	[Fact, AutoInitShutdown]
+	[Fact]
 	public void Internal_Tests ()
 	{
 		var rect = new Rect (1, 1, 10, 1);
 		var view = new View (rect);
-		var top = Application.Top;
-		top.Add (view);
 
 		Assert.Empty (view.InternalSubviews);
-		// BUGBUG: v2 - _needsDisplay needs debugging - test disabled for now.
-		//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
-		Assert.True (view.LayoutNeeded);
-		Assert.False (view.SubViewNeedsDisplay);
+
+
 		Assert.False (view._addingView);
 		view._addingView = true;
 		Assert.True (view._addingView);
-		view.BoundsToScreen (0, 0, out var rcol, out var rrow);
-		Assert.Equal (1,          rcol);
-		Assert.Equal (1,          rrow);
-		Assert.Equal (rect,       view.BoundsToScreen (view.Bounds));
-		Assert.Equal (top.Bounds, view.ScreenClip (top.Bounds));
-		Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
-
-		var runState = Application.Begin (top);
-
-		// BUGBUG: This is a SetRelativeLayout test. It should be moved to SetRelativeLayoutTests.cs
-		view.Width = Dim.Fill (); // Width should be 79 (Top.Width - 1)
-		Assert.Equal ("Fill(0)", view.Width.ToString ());
-		view.Height = Dim.Fill (); // Height should be 24 (Top.Height - 1)
-
-		// #3127: Before: Frame was not being set when Width and Height were set to Dim.Fill()
-		//	  After: Frame is set to the parent's Frame when Width and Height are set to Dim.Fill()
-		Assert.Equal (79, view.Bounds.Width);
-		Assert.Equal (24, view.Bounds.Height);
-		//view.LayoutStyle = LayoutStyle.Computed;
-		view.SetRelativeLayout (top.Bounds);
-		Assert.Equal ("Fill(0)", view.Width.ToString ());
-		Assert.Equal (1,         view.Frame.X);
-		Assert.Equal (1,         view.Frame.Y);
-		Assert.Equal (79,        view.Frame.Width);
-		Assert.Equal (24,        view.Frame.Height);
-		Assert.Equal (0,         view.Bounds.X);
-		Assert.Equal (0,         view.Bounds.Y);
-		Assert.Equal (79,        view.Bounds.Width);
-		Assert.Equal (24,        view.Bounds.Height);
-
-		// BUGBUG: This is a SetRelativeLayout test. It should be moved to SetRelativeLayoutTests.cs
-		view.X = 0;
-		view.Y = 0;
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Fill(0)",     view.Width.ToString ());
-		view.SetRelativeLayout (top.Bounds);
-		Assert.Equal (0,  view.Frame.X);
-		Assert.Equal (0,  view.Frame.Y);
-		Assert.Equal (80, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
-		Assert.Equal (0,  view.Bounds.X);
-		Assert.Equal (0,  view.Bounds.Y);
-		Assert.Equal (80, view.Bounds.Width);
-		Assert.Equal (25, view.Bounds.Height);
-
-		// BUGBUG: This is a layout test. It should be moved to LayoutTests.cs
-		var layoutStarted = false;
-		view.LayoutStarted += (s, e) => layoutStarted = true;
-		view.OnLayoutStarted (null);
-		Assert.True (layoutStarted);
-		view.LayoutComplete += (s, e) => layoutStarted = false;
-		view.OnLayoutComplete (null);
-		Assert.False (layoutStarted);
-
-		// This test has been moved to SetRlativeLayoutTests because it is testing
-		// SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
-		// because in v1 Pos.Center was broken in this regard!
-		view.X = Pos.Center () - 41;
-		view.Y = Pos.Center () - 13;
-		view.SetRelativeLayout (top.Bounds);
-		top.LayoutSubviews (); // BUGBUG: v2 - ??
-		view.BoundsToScreen (0, 0, out rcol, out rrow);
-		Assert.Equal (-41, rcol);
-		Assert.Equal (-13, rrow);
-
-		Application.End (runState);
 	}
 
 	[Fact, AutoInitShutdown]

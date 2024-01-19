@@ -14,6 +14,39 @@ public class LayoutTests {
 	public LayoutTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
+	public void Constructor_Sets_Correct_Layout_Properties ()
+	{
+		var rect = new Rect (1, 1, 10, 1);
+		var view = new View (rect);
+
+		Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
+		Assert.Equal (rect, view.Frame);
+		
+		Assert.True (view.LayoutNeeded);
+		Assert.False (view.SubViewNeedsDisplay);
+		view.BoundsToScreen (0, 0, out var rcol, out var rrow, false);
+		Assert.Equal (1, rcol);
+		Assert.Equal (1, rrow);
+		Assert.Equal (rect, view.BoundsToScreen (view.Bounds));
+		Assert.True (view.LayoutStyle == LayoutStyle.Absolute);
+	}
+
+	[Fact]
+	public void LayoutStarted_Complete_Events_Are_Invoked ()
+	{
+		var view = new View ();
+
+		var layoutStarted = false;
+		view.LayoutStarted += (s, e) => layoutStarted = true;
+		view.OnLayoutStarted (null);
+		Assert.True (layoutStarted);
+		view.LayoutComplete += (s, e) => layoutStarted = false;
+		view.OnLayoutComplete (null);
+		Assert.False (layoutStarted);
+
+	}
+
+	[Fact]
 	public void TopologicalSort_Missing_Add ()
 	{
 		var root = new View ();

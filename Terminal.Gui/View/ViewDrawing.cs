@@ -248,17 +248,6 @@ public partial class View {
 		Driver.SetAttribute (prev);
 	}
 
-	// Clips a rectangle in screen coordinates to the dimensions currently available on the screen
-	internal Rect ScreenClip (Rect regionScreen)
-	{
-		var x = regionScreen.X < 0 ? 0 : regionScreen.X;
-		var y = regionScreen.Y < 0 ? 0 : regionScreen.Y;
-		var w = regionScreen.X + regionScreen.Width >= Driver.Cols ? Driver.Cols - regionScreen.X : regionScreen.Width;
-		var h = regionScreen.Y + regionScreen.Height >= Driver.Rows ? Driver.Rows - regionScreen.Y : regionScreen.Height;
-
-		return new Rect (x, y, w, h);
-	}
-
 	/// <summary>
 	/// Expands the <see cref="ConsoleDriver"/>'s clip region to include <see cref="Bounds"/>.
 	/// </summary>
