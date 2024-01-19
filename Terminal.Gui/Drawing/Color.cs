@@ -1,10 +1,13 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
+using System.Buffers.Binary;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.Linq;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -479,22 +482,20 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
 	/// and any of the <see cref="ColorName"/> string values.
 	/// </param>
-	/// <param name="ignoredFormatProvider">
-	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored. Just pass <see langword="null"/>.
+	/// <param name="formatProvider">
+	///   Optional <see cref="IFormatProvider"/> to provide formatting services for the input text.<br/>
+	/// Defaults to <see cref="CultureInfo.InvariantCulture"/> if <see langword="null"/>.
 	/// </param>
 	/// <param name="result">The parsed value, if successful, or <see langword="default"/>(<see cref="Color"/>), if unsuccessful.</param>
 	/// <returns>A <see langword="bool"/> value indicating whether parsing was successful.</returns>
 	/// <remarks>
 	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
 	/// </remarks>
-	public static bool TryParse ( string? text, IFormatProvider? ignoredFormatProvider, out Color result )
+	[Pure]
+    [SkipLocalsInit]
+	public static bool TryParse ( string? text, IFormatProvider? formatProvider, out Color result )
 	{
-		if ( !TryParse ( text, out Color? color ) ) {
-			result = default;
-			return false;
-		}
-		result = color.Value;
-		return true;
+		return TryParse ( text.AsSpan ( ), formatProvider ?? CultureInfo.InvariantCulture, out result );
 	}
 
 	/// <summary>
@@ -651,15 +652,25 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	///         </para>
 	/// </remarks>
 	/// <returns></returns>
-	public override string ToString ()
+	[Pure]
+	[SkipLocalsInit]
+	public override string ToString ( )
 	{
 		// If Values has an exact match with a named color (in _colorNames), use that.
-		if (_colorToNameMap.TryGetValue (this, out var colorName)) {
-			return Enum.GetName (typeof (ColorName), colorName);
+		if ( _colorToNameMap.TryGetValue ( this, out var colorName ) ) {
+			return Enum.GetName ( typeof ( ColorName ), colorName );
 		}
 		// Otherwise return as an RGB hex value.
 		return $"#{R:X2}{G:X2}{B:X2}";
 	}
+	/// <inheritdoc />
+	public bool TryFormat ( Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
+	{
+		//TODO: Finish this
+		throw new NotImplementedException ( );
+	}
+
+
 	/// <inheritdoc cref="object.ToString" />
 	/// <summary>
 	///   Returns a <see langword="string" /> representation of the current <see cref="Color" /> value, according to the provided
@@ -945,19 +956,29 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// <returns></returns>
 	public static bool operator != (Color left, ColorName right) => left.ColorName != right;
 
-
 	/// <inheritdoc/>
-	public override bool Equals (object obj) => obj is Color other && Equals (other);
-
-	/// <inheritdoc/>
-	public bool Equals (Color other) => R == other.R &&
-	                                    G == other.G &&
-	                                    B == other.B &&
-	                                    A == other.A;
-
-	/// <inheritdoc/>
-	public override int GetHashCode () => HashCode.Combine (R, G, B, A);
+	public override int GetHashCode ( ) => Rgba.GetHashCode ( );
 	#endregion
+
+	/// <inheritdoc />
+	/// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning white.</returns>
+	public static Color MaxValue => new ( byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue );
+
+	/// <inheritdoc />
+	/// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to zero.</returns>
+	/// <remarks>Though this returns a <see cref="Color"/> with <see cref="A"/>, <see cref="R"/>, <see cref="G"/>, and <see cref="B"/> all set to zero, Terminal.Gui will treat it as black, because the alpha channel is not supported.</remarks>
+	public static Color MinValue => new ( byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue );
+
+	/// <inheritdoc />
+	public static Color Parse ( ReadOnlySpan<byte> utf8Text, IFormatProvider? provider )
+	{
+		return Parse ( Encoding.UTF8.GetString ( utf8Text ), provider );
+	}
+	/// <inheritdoc />
+	public static bool TryParse ( ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Color result )
+	{
+		return TryParse ( Encoding.UTF8.GetString ( utf8Text ), provider, out result );
+	}
 }
 
 /// <summary>
