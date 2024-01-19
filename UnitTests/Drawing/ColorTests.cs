@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers.Binary;
 using System.Linq;
 using Xunit;
@@ -242,36 +242,15 @@ public class ColorTests {
 	}
 
 	[Fact]
-	public void Color_EqualityOperator_WithColorNamesAndColor ()
+	public void Color_IsClosestToNamedColor_ReturnsExpectedValue ()
 	{
 		// Arrange
 		var color1 = new Color (ColorName.Red);
 		var color2 = new Color (197, 15, 31); // Red in RGB
 
-		// Act & Assert
-		Assert.True (ColorName.Red == color1);
-		Assert.False (ColorName.Red != color1);
+		Assert.True ( color1.IsClosestToNamedColor ( ColorName.Red ) );
 
-		Assert.True (color1 == ColorName.Red);
-		Assert.False (color1 != ColorName.Red);
-
-		Assert.True (color2 == ColorName.Red);
-		Assert.False (color2 != ColorName.Red);
-	}
-
-	[Fact]
-	public void Color_InequalityOperator_WithColorNamesAndColor ()
-	{
-		// Arrange
-		var color1 = new Color (ColorName.Red);
-		var color2 = new Color (58, 150, 221); // Cyan in RGB
-
-		// Act & Assert
-		Assert.False (ColorName.Red == color2);
-		Assert.True (ColorName.Red != color2);
-
-		Assert.False (color2 == ColorName.Red);
-		Assert.True (color2 != ColorName.Red);
+		Assert.True ( color2.IsClosestToNamedColor ( ColorName.Red ) );
 	}
 
 	[Fact]

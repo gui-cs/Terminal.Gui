@@ -921,36 +921,21 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// <summary>
 	/// Implicit conversion from <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>, <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
 	/// </summary>
-	/// <param name="color"></param>
+	/// <param name="v"></param>
 	public static implicit operator Color ( Vector3 v ) => new ( (byte)v.X, (byte)v.Y, (byte)v.Z );
 
-	/// <summary>
-	/// Equality operator for <see cref="Color"/> and <see cref="Gui.ColorName"/> objects.
-	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns></returns>
-	public static bool operator == (ColorName left, Color right) => left == right.ColorName;
-
-	/// <summary>
-	/// Inequality operator for <see cref="Color"/> and <see cref="Gui.ColorName"/> objects.
-	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns></returns>
-	public static bool operator != (ColorName left, Color right) => left != right.ColorName;
-
+	/// <inheritdoc />
 	public override int GetHashCode ( ) => Rgba.GetHashCode ( );
 	#endregion
 
 	/// <inheritdoc />
 	/// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning white.</returns>
-	public static Color MaxValue => new ( byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue );
+	public static Color MaxValue => new ( uint.MaxValue );
 
 	/// <inheritdoc />
 	/// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to zero.</returns>
 	/// <remarks>Though this returns a <see cref="Color"/> with <see cref="A"/>, <see cref="R"/>, <see cref="G"/>, and <see cref="B"/> all set to zero, Terminal.Gui will treat it as black, because the alpha channel is not supported.</remarks>
-	public static Color MinValue => new ( byte.MinValue, byte.MinValue, byte.MinValue, byte.MinValue );
+	public static Color MinValue => new ( uint.MinValue );
 
 	/// <inheritdoc />
 	public static Color Parse ( ReadOnlySpan<byte> utf8Text, IFormatProvider? provider )
