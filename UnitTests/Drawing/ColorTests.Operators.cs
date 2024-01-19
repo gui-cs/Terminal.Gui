@@ -6,32 +6,26 @@ namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
 
-	[Fact]
-	public void Color_ImplicitOperator_FromInt ( )
+	[Theory]
+    [CombinatorialData]
+	public void ImplicitOperator_FromInt_RoundTripsCorrectly ( [CombinatorialRandomData(Count=16)]int expectedValue )
 	{
-		// Arrange
-		var Rgba = unchecked( (int)0xFF804020 ); // R: 128, G: 64, B: 32, Alpha: 255
-		var expectedColor = new Color ( 128, 64, 32 );
+		Color color = expectedValue;
 
-		// Act
-		Color color = Rgba;
-
-		// Assert
-		Assert.Equal ( expectedColor, color );
+		Assert.Equal ( expectedValue, color.Rgba );
 	}
-	[Fact]
-	public void Color_ExplicitOperator_ToInt ( )
-	{
-		// Arrange
-		var color = new Color ( 128, 64, 32 );
-		var expectedRgba = unchecked( (int)0xFF804020 ); // R: 128, G: 64, B: 32, Alpha: 255
 
-		// Act
+	[Theory]
+	[CombinatorialData]
+	public void ImplicitOperator_ToInt_RoundTripsCorrectly ( [CombinatorialRandomData(Count=16)]int expectedValue )
+	{
+		var color = new Color ( expectedValue );
+
 		var Rgba = (int)color;
 
-		// Assert
-		Assert.Equal ( expectedRgba, Rgba );
+		Assert.Equal ( expectedValue, Rgba );
 	}
+
 	[Fact]
 	public void Color_ImplicitOperator_FromColorNames ( )
 	{
