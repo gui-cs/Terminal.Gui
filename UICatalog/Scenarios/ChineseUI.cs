@@ -19,7 +19,7 @@ public class ChineseUI : Scenario {
 		};
 		top.Add (win);
 
-		var buttonPanel = new FrameView () {
+		var buttonPanel = new FrameView {
 			Title = "Command",
 			X = 0,
 			Y = 1,

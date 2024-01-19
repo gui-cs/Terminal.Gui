@@ -165,7 +165,7 @@ public class AllViewsTester : Scenario {
 		_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_locationFrame.Add (_yRadioGroup);
 
-		_sizeFrame = new FrameView () {
+		_sizeFrame = new FrameView {
 			X = Pos.Right (_locationFrame),
 			Y = Pos.Y (_locationFrame),
 			Height = 3 + radioItems.Length,

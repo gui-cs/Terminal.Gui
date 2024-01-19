@@ -119,7 +119,7 @@ public class Buttons : Scenario {
 			removeButton.Visible = false;
 		};
 
-		var computedFrame = new FrameView () {
+		var computedFrame = new FrameView {
 			X = 0,
 			Y = Pos.Bottom (removeButton) + 1,
 			Width = Dim.Percent (50),

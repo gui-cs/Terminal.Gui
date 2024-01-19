@@ -129,7 +129,7 @@ public class WindowsAndFrameViews : Scenario {
 		//   a checkbox
 		//   a checkbox
 		FrameView frame = null;
-		frame = new FrameView () {
+		frame = new FrameView {
 			X = margin,
 			Y = Pos.Bottom (listWin.Last ()) + (margin / 2),
 			Width = Dim.Fill (margin),

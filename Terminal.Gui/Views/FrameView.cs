@@ -11,7 +11,8 @@ public class FrameView : View {
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 	/// </summary>
-	public FrameView () {
+	public FrameView ()
+	{
 		Border.Thickness = new Thickness (1);
 		Border.LineStyle = DefaultBorderStyle;
 		//Border.ColorScheme = ColorScheme;

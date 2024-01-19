@@ -1,8 +1,4 @@
-﻿using Terminal.Gui;
-using System.Text;
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
@@ -11,6 +7,7 @@ using Xunit.Abstractions;
 using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DrawingTests;
+
 public class ThicknessTests {
 
 	readonly ITestOutputHelper output;
@@ -484,7 +481,7 @@ public class ThicknessTests {
 	public void DrawTests_Ruler ()
 	{
 		// Add a frame so we can see the ruler
-		var f = new FrameView () {
+		var f = new FrameView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),

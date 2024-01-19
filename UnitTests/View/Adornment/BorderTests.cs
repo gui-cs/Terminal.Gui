@@ -217,7 +217,7 @@ public class BorderTests {
 	{
 		Application.Top.BorderStyle = LineStyle.Double;
 
-		var frame = new FrameView () {
+		var frame = new FrameView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
@@ -244,7 +244,7 @@ public class BorderTests {
 	{
 		Application.Top.BorderStyle = LineStyle.Double;
 
-		var frame = new FrameView () {
+		var frame = new FrameView {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
