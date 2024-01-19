@@ -1,11 +1,13 @@
 using System;
+using System.Buffers.Binary;
+using System.Numerics;
 using Xunit;
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
 	[Theory]
     [CombinatorialData]
-	public void Color_Constructor_WithRGBValues_AllValuesCorrect ( [CombinatorialValues(0,1,254)]byte r, [CombinatorialValues(0,1,253)]byte g, [CombinatorialValues(0,1,252)]byte b )
+	public void Constructor_WithRGBValues_AllValuesCorrect ( [CombinatorialValues(0,1,254)]byte r, [CombinatorialValues(0,1,253)]byte g, [CombinatorialValues(0,1,252)]byte b )
 	{
 		var color = new Color ( r, g, b );
 
@@ -25,7 +27,7 @@ public partial class ColorTests {
 
 	[Theory]
 	[CombinatorialData]
-	public void Color_Constructor_WithRGBAValues_AllValuesCorrect ( [CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
+	public void Constructor_WithRGBAValues_AllValuesCorrect ( [CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
 	{
 		var color = new Color ( r, g, b, a );
 
@@ -45,7 +47,7 @@ public partial class ColorTests {
 
 	[Theory]
 	[CombinatorialData]
-	public void Color_Constructor_WithSignedInteger_AllValuesCorrect ([CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
+	public void Constructor_WithSignedInteger_AllValuesCorrect ([CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
 	{
 		ReadOnlySpan<byte> bytes = [b, g, r, a];
 		int expectedRgba = BitConverter.ToInt32 ( bytes );
@@ -65,7 +67,7 @@ public partial class ColorTests {
 
 	[Theory]
 	[CombinatorialData]
-	public void Color_Constructor_WithUnsignedInteger_AllValuesCorrect ([CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
+	public void Constructor_WithUnsignedInteger_AllChannelsCorrect ([CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
 	{
 		ReadOnlySpan<byte> bytes = [b, g, r, a];
 		int expectedRgba = BitConverter.ToInt32 ( bytes );
@@ -77,9 +79,7 @@ public partial class ColorTests {
 			( ) => Assert.Equal ( r, color.R ),
 			( ) => Assert.Equal ( g, color.G ),
 			( ) => Assert.Equal ( b, color.B ),
-			( ) => Assert.Equal ( a, color.A ),
-			( ) => Assert.Equal ( expectedRgba, color.Rgba ),
-			( ) => Assert.Equal ( expectedArgb, color.Argb )
+			( ) => Assert.Equal ( a, color.A )
 		);
 	}
 
