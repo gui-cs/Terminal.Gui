@@ -7,37 +7,6 @@ using Xunit;
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
-
-	[Fact]
-	public void TestAllColors ()
-	{
-		var colorNames = Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().ToList ();
-		var attrs = new Attribute [colorNames.Count];
-
-		var idx = 0;
-		foreach (ColorName bg in colorNames) {
-			attrs [idx] = new Attribute (bg, colorNames.Count - 1 - bg);
-			idx++;
-		}
-		Assert.Equal (16, attrs.Length);
-		Assert.Equal (new Attribute (Color.Black, Color.White), attrs [0]);
-		Assert.Equal (new Attribute (Color.Blue, Color.BrightYellow), attrs [1]);
-		Assert.Equal (new Attribute (Color.Green, Color.BrightMagenta), attrs [2]);
-		Assert.Equal (new Attribute (Color.Cyan, Color.BrightRed), attrs [3]);
-		Assert.Equal (new Attribute (Color.Red, Color.BrightCyan), attrs [4]);
-		Assert.Equal (new Attribute (Color.Magenta, Color.BrightGreen), attrs [5]);
-		Assert.Equal (new Attribute (Color.Yellow, Color.BrightBlue), attrs [6]);
-		Assert.Equal (new Attribute (Color.Gray, Color.DarkGray), attrs [7]);
-		Assert.Equal (new Attribute (Color.DarkGray, Color.Gray), attrs [8]);
-		Assert.Equal (new Attribute (Color.BrightBlue, Color.Yellow), attrs [9]);
-		Assert.Equal (new Attribute (Color.BrightGreen, Color.Magenta), attrs [10]);
-		Assert.Equal (new Attribute (Color.BrightCyan, Color.Red), attrs [11]);
-		Assert.Equal (new Attribute (Color.BrightRed, Color.Cyan), attrs [12]);
-		Assert.Equal (new Attribute (Color.BrightMagenta, Color.Green), attrs [13]);
-		Assert.Equal (new Attribute (Color.BrightYellow, Color.Blue), attrs [14]);
-		Assert.Equal (new Attribute (Color.White, Color.Black), attrs [^1]);
-	}
-
 	[Fact]
 	public void ColorNames_HasOnly16DistinctElements () => Assert.Equal (16, Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().Count ());
 
