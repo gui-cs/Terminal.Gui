@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <!-- https://stackoverflow.com/questions/294216/why-does-c-sharp-forbid-generic-attribute-types -->
@@ -45,6 +45,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Using Include="Terminal.Gui" />
+    <Using Include="Xunit" />
+  </ItemGroup>
   <PropertyGroup Label="FineCodeCoverage">
     <Enabled>
       False
@@ -63,5 +67,7 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 </Project>
