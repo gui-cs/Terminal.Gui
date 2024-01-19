@@ -142,43 +142,49 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	}
 
     /// <summary>
-    /// Gets the value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.
+    /// The value of this <see cref="Color"/> as a <see langword="uint"/> in ARGB32 format.
     /// </summary>
 	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
-	[field: FieldOffset(0)]
-	public uint Argb { get; }
-
-	/// <summary>
-	/// Red color component.
-	/// </summary>
-	[field: FieldOffset ( 2 )]
-	public byte R { get; }
-
-	/// <summary>
-	/// Green color component.
-	/// </summary>
-	[field: FieldOffset ( 1 )]
-	public byte G { get; }
-
-	/// <summary>
-	/// Blue color component.
-	/// </summary>
+	[JsonIgnore]
 	[field: FieldOffset ( 0 )]
-	public byte B { get; }
+	public readonly uint Argb;
+
 
 	/// <summary>
-	/// Alpha color component.
+	/// The value of the red color component.
 	/// </summary>
-	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
-	[field: FieldOffset ( 3 )]
-	public byte A { get; }
+	[JsonIgnore]
+	[field: FieldOffset ( 2 )]
+	public readonly byte R;
 
 	/// <summary>
-	/// Gets the color value encoded as a signed 32-bit integer in ARGB32 format.
+	/// The value of the green color component.
+	/// </summary>
+	[JsonIgnore]
+	[field: FieldOffset ( 1 )]
+	public readonly byte G;
+
+	/// <summary>
+	/// The value of the blue color component.
 	/// </summary>
 	[JsonIgnore]
 	[field: FieldOffset ( 0 )]
-	public int Rgba { get; }
+	public readonly byte B;
+
+	/// <summary>
+	/// The value of the alpha channel component
+	/// </summary>
+	/// <remarks>The alpha channel is not currently supported, so the value of the alpha channel bits will not affect rendering.</remarks>
+	[JsonIgnore]
+	[field: FieldOffset ( 3 )]
+	public readonly byte A;
+
+	/// <summary>
+	/// The value of this <see cref="Color"/> encoded as a signed 32-bit integer in ARGB32 format.
+	/// </summary>
+	[JsonIgnore]
+	[field: FieldOffset ( 0 )]
+	public readonly int Rgba;
 
 	/// <summary>
 	/// Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.
