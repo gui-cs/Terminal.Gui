@@ -779,20 +779,30 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 
 	// TODO: Verify implict/explicit are correct for below
 	#region Operators
+
 	/// <summary>
 	/// Cast from int.
 	/// </summary>
 	/// <param name="rgba"></param>
+	[Pure]
 	public static implicit operator Color (int rgba) => new (rgba);
 
 	/// <summary>
 	/// Cast to int. 
 	/// </summary>
 	/// <param name="color"></param>
+	[Pure]
 	public static implicit operator int (Color color) => color.Rgba;
 
 	/// <summary>
-	/// Cast from <see cref="Gui.ColorName"/>. May fail if the color is not a named color.
+	/// Cast to int.
+	/// </summary>
+	/// <param name="color"></param>
+	[Pure]
+	public static implicit operator uint (Color color) => color.Argb;
+
+	/// <summary>
+	/// Cast from <see cref="Gui.ColorName"/>.
 	/// </summary>
 	/// <param name="colorName"></param>
 	public static explicit operator Color (ColorName colorName) => new (colorName);
@@ -804,20 +814,16 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	public static explicit operator ColorName (Color color) => color.ColorName;
 
 	/// <summary>
-	/// Equality operator for two <see cref="Color"/> objects..
+	/// Implicit conversion to <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>, <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
 	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns></returns>
-	public static bool operator == (Color left, Color right) => left.Equals (right);
+	/// <param name="color"></param>
+	public static implicit operator Vector3 ( Color color ) => new ( color.R, color.G, color.B );
 
 	/// <summary>
-	/// Inequality operator for two <see cref="Color"/> objects.
+	/// Implicit conversion from <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>, <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
 	/// </summary>
-	/// <param name="left"></param>
-	/// <param name="right"></param>
-	/// <returns></returns>
-	public static bool operator != (Color left, Color right) => !left.Equals (right);
+	/// <param name="color"></param>
+	public static implicit operator Color ( Vector3 v ) => new ( (byte)v.X, (byte)v.Y, (byte)v.Z );
 
 	/// <summary>
 	/// Equality operator for <see cref="Color"/> and <see cref="Gui.ColorName"/> objects.
