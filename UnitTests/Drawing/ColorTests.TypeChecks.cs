@@ -94,4 +94,10 @@ public partial class ColorTests {
 	public void Is_Value_Type ( ) =>
 		// prove that Color is a value type
 		Assert.True ( typeof ( Color ).IsValueType );
+
+	[Fact]
+	[Trait ( "Category", "Type Checks" )]
+	[Trait ( "Category", "Change Control" )]
+	public void ColorName_Has_Exactly_16_Defined_Values ( ) => Assert.Equal ( 16, Enum.GetValues<ColorName> ( ).DistinctBy ( static cname => (int)cname ).Count ( ) );
+
 }

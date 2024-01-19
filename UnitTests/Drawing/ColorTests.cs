@@ -7,8 +7,6 @@ using Xunit;
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
-	[Fact]
-	public void ColorNames_HasOnly16DistinctElements () => Assert.Equal (16, Enum.GetValues (typeof (ColorName)).Cast<int> ().Distinct ().Count ());
 
 	[Fact]
 	public void ColorNames_HaveCorrectOrdinals ()
