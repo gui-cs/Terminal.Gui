@@ -614,7 +614,7 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// </summary>
 	/// <param name="text">
 	/// The text to analyze. Formats supported are
-	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
+	/// "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
 	/// and any of the <see cref="ColorName"/> string values.
 	/// </param>
 	/// <param name="formatProvider">
@@ -697,7 +697,7 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	///     </item> <item>
 	///       <term>G</term> <description>
 	///         Extended general format - Returns a named <see cref="Color" /> if there is a match, or a 32-bit/4-byte/8-hex digit string in
-	///         "#RRGGBBAA" format.
+	///         "#AARRGGBB" format.
 	///       </description>
 	///     </item> <item>
 	///       <term>d</term> <description>
