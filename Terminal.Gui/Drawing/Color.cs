@@ -450,20 +450,25 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	/// "#RGB", "#RRGGBB", "#RGBA", "#RRGGBBAA", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)", "rgba(r,g,b,a)",
 	/// and any of the <see cref="Gui.ColorName"/> string values.
 	/// </param>
-	/// <param name="ignoredFormatProvider">
+	/// <param name="formatProvider">
 	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored.
 	/// </param>
 	/// <returns>A <see cref="Color"/> value equivalent to <paramref name="text"/>, if parsing was successful.</returns>
 	/// <remarks>
 	/// While <see cref="Color"/> supports the alpha channel <see cref="A"/>, Terminal.Gui does not.
 	/// </remarks>
-	/// <exception cref="ArgumentException"> with an inner <see cref="FormatException"/> if <paramref name="text"/> was unable to be successfully parsed as a <see cref="Color"/>, for any reason.</exception>
-	public static Color Parse ( string? text, IFormatProvider? ignoredFormatProvider = null )
+	/// <exception cref="ArgumentNullException">If <paramref name="text"/> is <see langword="null"/>.</exception>
+	/// <exception cref="ArgumentException">If <paramref name="text"/> is an empty string or consists of only whitespace characters.</exception>
+	/// <exception cref="ColorParseException">If thrown by <see cref="Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.</exception>
+	[Pure]
+    [SkipLocalsInit]
+	public static Color Parse ( string? text, IFormatProvider? formatProvider = null )
 	{
-		if ( !TryParse ( text, out Color? color ) ) {
-			throw new ArgumentException ( "Failed to parse input string as a Color", nameof ( text ), new FormatException ( "Input string was in an invalid format." ) );
+		ArgumentException.ThrowIfNullOrWhiteSpace ( text, nameof ( text ) );
+		if ( text is { Length: < 3 } && formatProvider is null ) {
+			throw new ColorParseException ( colorString: text, reason: "Provided text is too short to be any known color format.", badValue: text );
 		}
-		return color.Value;
+		return Parse ( text.AsSpan ( ), formatProvider ?? CultureInfo.InvariantCulture );
 	}
 
 	/// <summary>
