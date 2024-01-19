@@ -148,6 +148,9 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="right"></param>
 	/// <returns><c>true</c> if the two objects are not equivalent</returns>
 	public static bool operator != (ColorScheme left, ColorScheme right) => !(left == right);
+
+	/// <inheritdoc />
+	public override string ToString ( ) => $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}";
 }
 
 /// <summary>
