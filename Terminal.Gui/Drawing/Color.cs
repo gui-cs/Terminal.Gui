@@ -645,6 +645,40 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 		// Otherwise return as an RGB hex value.
 		return $"#{R:X2}{G:X2}{B:X2}";
 	}
+	/// <inheritdoc />
+	/// <remarks>
+	///   <para>
+	///     This method should be used only when absolutely necessary, because it <b>always</b> has more overhead than <see cref="ToString(string?,System.IFormatProvider?)" />, as this method results
+	///     in an intermediate allocation of one or more instances of <see langword="string" /> and a copy of that string to <paramref name="destination"/> if formatting was successful.<br /> When possible, use
+	///     <see cref="ToString(string?,System.IFormatProvider?)" />, which attempts to avoid intermediate allocations.
+	///   </para>
+	///   <para>
+	///     This method only returns <see langword="true" /> and with its output written to <paramref name="destination" /> if the formatted
+	///     string, <i>in its entirety</i>, will fit in <paramref name="destination" />. If the resulting formatted string is too large to fit in
+	///     <paramref name="destination" />, the result will be false and <paramref name="destination" /> will be unaltered.
+	///   </para>
+	/// <para>
+	/// The resulting formatted string may be <b>shorter</b> than <paramref name="destination"/>. When this method returns <see langword="true"/>, use <paramref name="charsWritten"/> when handling the value of <paramref name="destination"/>.</para>
+	/// </remarks>
+	[Pure]
+	public bool TryFormat ( Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
+	{
+		try {
+			string formattedString = ToString ( format.ToString (  ), provider );
+			if ( formattedString.Length <= destination.Length ) {
+				formattedString.CopyTo ( destination );
+				charsWritten = formattedString.Length;
+				return true;
+			}
+		}
+		catch {
+			charsWritten = 0;
+			return false;
+		}
+		charsWritten = 0;
+		return false;
+	}
+
 
 	#region Legacy Color Names
 	/// <summary>
