@@ -972,7 +972,4 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	{
 		return color.IsClosestToNamedColor ( in namedColor );
 	}
-
-	/// <inheritdoc/>
-
 }
