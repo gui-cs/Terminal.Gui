@@ -7,10 +7,6 @@ using Xunit;
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
-	[Fact]
-	public void Color_Is_Value_Type () =>
-		// prove that Color is a value type
-		Assert.True (typeof (Color).IsValueType);
 
 	[Fact]
 	public void TestAllColors ()
@@ -92,81 +88,7 @@ public partial class ColorTests {
 		Assert.Equal ("#014020", colorString);
 	}
 
-	[Fact]
-	public void Color_ImplicitOperator_FromInt ()
-	{
-		// Arrange
-		var Rgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
-		var expectedColor = new Color (128, 64, 32);
 
-		// Act
-		Color color = Rgba;
-
-		// Assert
-		Assert.Equal (expectedColor, color);
-	}
-
-	[Fact]
-	public void Color_ExplicitOperator_ToInt ()
-	{
-		// Arrange
-		var color = new Color (128, 64, 32);
-		var expectedRgba = unchecked((int)0xFF804020); // R: 128, G: 64, B: 32, Alpha: 255
-
-		// Act
-		var Rgba = (int)color;
-
-		// Assert
-		Assert.Equal (expectedRgba, Rgba);
-	}
-
-
-	[Fact]
-	public void Color_ImplicitOperator_FromColorNames ()
-	{
-		// Arrange
-		var colorName = ColorName.Blue;
-		var expectedColor = new Color (0, 55, 218); // Blue
-
-		// Act
-		var color = new Color (colorName);
-
-		// Assert
-		Assert.Equal (expectedColor, color);
-	}
-
-	[Fact]
-	public void Color_ExplicitOperator_ToColorNames ()
-	{
-		// Arrange
-		var color = new Color (0, 0, 0x80); // Blue
-		var expectedColorName = ColorName.Blue;
-
-		// Act
-		var colorName = (ColorName)color;
-
-		// Assert
-		Assert.Equal (expectedColorName, colorName);
-	}
-
-
-
-	[Theory]
-	[CombinatorialData]
-	public void Color_GeneratedEqualityOperators ( [CombinatorialValues ( 0, short.MaxValue, int.MaxValue, uint.MaxValue )] uint u1, [CombinatorialValues ( 0, short.MaxValue, int.MaxValue, uint.MaxValue )] uint u2 )
-	{
-		Color color1 = u1;
-		Color color2 = u2;
-
-		if ( u1 == u2 ) {
-			Assert.True ( color1 == color2 );
-			Assert.False ( color1 != color2 );
-		}
-		else {
-			Assert.True ( color1 != color2 );
-			Assert.False ( color1 == color2 );
-		}
-	}
 
 	[Fact]
 	public void Color_IsClosestToNamedColor_ReturnsExpectedValue ()
@@ -298,7 +220,7 @@ public partial class ColorTests {
 	}
 }
 
-public static class ColorTestsTheoryDataGenerators {
+public static partial class ColorTestsTheoryDataGenerators {
 	public static TheoryData<string?> TryParse_string_Returns_False_For_Invalid_Inputs ( )
 	{
 		TheoryData<string?> values = [
