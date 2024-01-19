@@ -479,26 +479,15 @@ public class ViewTests {
 		}
 	}
 
-	[Fact]
-	public void View_Direction_Has_Correct_Values ()
-	{
-		Assert.Equal (new [] { View.NavigationDirection.Forward, View.NavigationDirection.Backward },
-			Enum.GetValues (typeof (View.NavigationDirection)));
 
-	}
-	
 	[Fact, AutoInitShutdown]
 	public void Internal_Tests ()
 	{
-
 		var rect = new Rect (1, 1, 10, 1);
 		var view = new View (rect);
 		var top = Application.Top;
 		top.Add (view);
 
-		Assert.Equal (View.NavigationDirection.Forward, view.FocusDirection);
-		view.FocusDirection = View.NavigationDirection.Backward;
-		Assert.Equal (View.NavigationDirection.Backward, view.FocusDirection);
 		Assert.Empty (view.InternalSubviews);
 		// BUGBUG: v2 - _needsDisplay needs debugging - test disabled for now.
 		//Assert.Equal (new Rect (new Point (0, 0), rect.Size), view._needsDisplay);
