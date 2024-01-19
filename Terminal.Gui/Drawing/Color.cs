@@ -898,7 +898,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// <summary>
 	/// Initializes a new instance from an existing instance.
 	/// </summary>
-	public Attribute (Attribute attr)
+	public Attribute (in Attribute attr)
 	{
 		PlatformColor = -1;
 		Foreground = new Color (attr.Foreground.ColorName);
@@ -922,7 +922,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// <param name="platformColor">platform-dependent color value.</param>
 	/// <param name="foreground">Foreground</param>
 	/// <param name="background">Background</param>
-	internal Attribute (int platformColor, Color foreground, Color background)
+	internal Attribute (int platformColor, in Color foreground, in Color background)
 	{
 		Foreground = foreground;
 		Background = background;
