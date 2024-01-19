@@ -79,6 +79,45 @@ public class TextFormatterTests {
 		Assert.NotEmpty (tf.Lines);
 	}
 
+	[Fact]
+	public void Size_Zero_Lines_Is_Empty ()
+	{
+		var tf = new TextFormatter ();
+		Assert.Equal (Size.Empty, tf.Size);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines[0]));
+
+		tf.Size = new Size (0, 0);
+		Assert.Equal (Size.Empty, tf.Size);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+
+		tf.Size = new Size (0, 1);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+
+		tf.Size = new Size (1, 0);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+
+		tf.Text = "123 456";
+		Assert.Equal (new Size (0, 0), tf.FormatAndGetSize ());
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+
+		tf.Size = new Size (0, 0);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+
+		tf.Size = new Size (0, 1);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+
+		tf.Size = new Size (1, 0);
+		Assert.Single (tf.Lines);
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+	}
+
 	[Theory]
 	[InlineData (TextDirection.LeftRight_TopBottom, false)]
 	[InlineData (TextDirection.LeftRight_TopBottom, true)]

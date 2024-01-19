@@ -480,7 +480,6 @@ public partial class View : Responder, ISupportInitializeNotification {
 				   LayoutStyle layoutStyle = LayoutStyle.Computed,
 				   TextDirection direction = TextDirection.LeftRight_TopBottom)
 	{
-		TextFormatter = new TextFormatter ();
 		TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 		TextDirection = direction;
 

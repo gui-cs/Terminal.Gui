@@ -565,9 +565,11 @@ public partial class View {
 
 		// TODO: Determine what, if any of the below is actually needed here.
 		if (IsInitialized) {
-			SetFrameToFitText ();
+			if (AutoSize) {
+				SetFrameToFitText ();
+				SetTextFormatterSize ();
+			}
 			LayoutAdornments ();
-			SetTextFormatterSize ();
 			SetNeedsLayout ();
 			SetNeedsDisplay ();
 		}
@@ -833,13 +835,10 @@ public partial class View {
 			}
 
 			if (IsInitialized) {
-				// TODO: Figure out what really is needed here. All unit tests (except AutoSize) pass as-is
-				SetTextFormatterSize ();
 				SetNeedsLayout ();
 			}
 
-			// BUGBUG: This causes the frame size to change even if AutoSize == false. This is not correct behavior. 
-			if (/*AutoSize && */!SetFrameToFitText ()) {
+			if (AutoSize && !SetFrameToFitText ()) {
 				SetTextFormatterSize ();
 			}
 		}
@@ -1098,6 +1097,11 @@ public partial class View {
 		v.LayoutNeeded = false;
 	}
 
+	/// <summary>
+	/// If <paramref name="autoSize"/> is true, resizes the view.
+	/// </summary>
+	/// <param name="autoSize"></param>
+	/// <returns></returns>
 	bool ResizeView (bool autoSize)
 	{
 		if (!autoSize) {

@@ -306,7 +306,7 @@ namespace Terminal.Gui {
 					messageLabel.TextFormatter.Size = new Size (maxBounds.Size.Width - d.GetAdornmentsThickness ().Horizontal, maxBounds.Size.Height - d.GetAdornmentsThickness ().Vertical);
 				}
 				var msg = messageLabel.TextFormatter.Format ();
-				var messageSize = messageLabel.TextFormatter.GetFormattedSize ();
+				var messageSize = messageLabel.TextFormatter.FormatAndGetSize ();
 
 				// Ensure the width fits the text + buttons
 				var newWidth = Math.Max (width, Math.Max (messageSize.Width + d.GetAdornmentsThickness ().Horizontal,

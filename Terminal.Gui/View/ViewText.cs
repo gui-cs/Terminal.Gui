@@ -47,9 +47,9 @@ public partial class View {
 	}
 
 	/// <summary>
-	/// Gets or sets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
+	/// Gets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
 	/// </summary>
-	public TextFormatter TextFormatter { get; set; }
+	public TextFormatter TextFormatter { get; init ; } = new TextFormatter ();
 
 	/// <summary>
 	/// Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
@@ -144,7 +144,7 @@ public partial class View {
 
 		if (!ValidatePosDim && directionChanged && AutoSize || ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize) {
 			OnResizeNeeded ();
-		} else if (directionChanged && IsAdded) {
+		} else if (AutoSize && directionChanged && IsAdded) {
 			ResizeBoundsToFit (Bounds.Size);
 			// BUGBUG: Regardless of whether SetFrameToFitText is correct or not, it is called
 			// BUGBUG: From SetRelativeLayout so this call is redundant.
@@ -174,9 +174,9 @@ public partial class View {
 	/// </remarks>
 	bool SetFrameToFitText ()
 	{
-		//if (AutoSize == false) {
-		//	throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
-		//}
+		if (AutoSize == false) {
+			throw new InvalidOperationException ("SetFrameToFitText can only be called when AutoSize is true");
+		}
 
 		// BUGBUG: This API is broken - should not assume Frame.Height == Bounds.Height
 		// <summary>
@@ -275,7 +275,7 @@ public partial class View {
 		TextFormatter.Size.Height - GetHotKeySpecifierLength (false));
 
 	/// <summary>
-	/// Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
+	/// Internal API. Sets <see cref="TextFormatter"/>.Size to the current <see cref="Bounds"/> size, adjusted for
 	/// <see cref="TextFormatter.HotKeySpecifier"/>.
 	/// </summary>
 	/// <remarks>
