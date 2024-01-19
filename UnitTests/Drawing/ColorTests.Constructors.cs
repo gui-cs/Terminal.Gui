@@ -43,39 +43,46 @@ public partial class ColorTests {
 		);
 	}
 
-	[Fact]
-	public void Color_Constructor_WithAlphaAndRGBValues ( )
+	[Theory]
+	[CombinatorialData]
+	public void Color_Constructor_WithSignedInteger_AllValuesCorrect ([CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
 	{
-		// Arrange
-		var expectedA = 128;
-		var expectedR = 255;
-		var expectedG = 0;
-		var expectedB = 128;
+		ReadOnlySpan<byte> bytes = [b, g, r, a];
+		int expectedRgba = BitConverter.ToInt32 ( bytes );
+		uint expectedArgb = BitConverter.ToUInt32 ( bytes );
 
-		// Act
-		var color = new Color ( expectedR, expectedG, expectedB, expectedA );
-
-		// Assert
-		Assert.Equal ( expectedR, color.R );
-		Assert.Equal ( expectedG, color.G );
-		Assert.Equal ( expectedB, color.B );
-		Assert.Equal ( expectedA, color.A );
-	}
-	[Fact]
-	public void Color_Constructor_WithRgbaValue ( )
-	{
-		// Arrange
-		var expectedRgba = unchecked( (int)0xFF804040 ); // R: 128, G: 64, B: 64, Alpha: 255
-
-		// Act
 		var color = new Color ( expectedRgba );
 
-		// Assert
-		Assert.Equal ( 128, color.R );
-		Assert.Equal ( 64, color.G );
-		Assert.Equal ( 64, color.B );
-		Assert.Equal ( 255, color.A );
+		Assert.Multiple (
+			( ) => Assert.Equal ( r, color.R ),
+			( ) => Assert.Equal ( g, color.G ),
+			( ) => Assert.Equal ( b, color.B ),
+			( ) => Assert.Equal ( a, color.A ),
+			( ) => Assert.Equal ( expectedRgba, color.Rgba ),
+			( ) => Assert.Equal ( expectedArgb, color.Argb )
+		);
 	}
+
+	[Theory]
+	[CombinatorialData]
+	public void Color_Constructor_WithUnsignedInteger_AllValuesCorrect ([CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
+	{
+		ReadOnlySpan<byte> bytes = [b, g, r, a];
+		int expectedRgba = BitConverter.ToInt32 ( bytes );
+		uint expectedArgb = BitConverter.ToUInt32 ( bytes );
+
+		var color = new Color ( expectedArgb );
+
+		Assert.Multiple (
+			( ) => Assert.Equal ( r, color.R ),
+			( ) => Assert.Equal ( g, color.G ),
+			( ) => Assert.Equal ( b, color.B ),
+			( ) => Assert.Equal ( a, color.A ),
+			( ) => Assert.Equal ( expectedRgba, color.Rgba ),
+			( ) => Assert.Equal ( expectedArgb, color.Argb )
+		);
+	}
+
 	[Fact]
 	public void Color_Constructor_WithColorName ( )
 	{
