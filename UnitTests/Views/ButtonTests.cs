@@ -585,5 +585,21 @@ namespace Terminal.Gui.ViewTests {
 
 			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void IsDefault_True_Does_Not_Get_The_Focus_On_Enter_Key ()
+		{
+			var wasClicked = false;
+			var view = new View { CanFocus = true };
+			var btn = new Button { Text = "Ok", IsDefault = true };
+			btn.Clicked += () => wasClicked = true;
+			Application.Top.Add (view, btn);
+			Application.Begin (Application.Top);
+			Assert.True (view.HasFocus);
+
+			Application.Top.ProcessColdKey (new KeyEvent (Key.Enter, new KeyModifiers ()));
+			Assert.True (view.HasFocus);
+			Assert.True (wasClicked);
+		}
 	}
 }
