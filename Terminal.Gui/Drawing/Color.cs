@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -193,10 +194,10 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 	public static Dictionary<ColorName, string> Colors {
 		get =>
 			// Transform _colorToNameMap into a Dictionary<ColorNames,string>
-			_colorToNameMap.ToDictionary (kvp => kvp.Value, kvp => $"#{kvp.Key.R:X2}{kvp.Key.G:X2}{kvp.Key.B:X2}");
+			_colorToNameMap.ToDictionary (static kvp => kvp.Value,static kvp => $"#{kvp.Key.R:X2}{kvp.Key.G:X2}{kvp.Key.B:X2}");
 		set {
 			// Transform Dictionary<ColorNames,string> into _colorToNameMap
-			var newMap = value.ToDictionary (kvp => new Color (kvp.Value), kvp => {
+			var newMap = value.ToDictionary ( static kvp => new Color ( kvp.Value ), kvp => {
 				if (Enum.TryParse<ColorName> (kvp.Key.ToString (), true, out var colorName)) {
 					return colorName;
 				}
