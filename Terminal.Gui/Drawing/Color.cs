@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -18,7 +17,7 @@ namespace Terminal.Gui;
 /// </summary>
 [JsonConverter ( typeof ( ColorJsonConverter ) )]
 [StructLayout(LayoutKind.Explicit)]
-public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable, IUtf8SpanFormattable,IMinMaxValue<Color> {
+public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable, IUtf8SpanFormattable,IMinMaxValue<Color> {
 	// TODO: Make this map configurable via ConfigurationManager
 	// TODO: This does not need to be a Dictionary, but can be an 16 element array.
 	/// <summary>
@@ -702,59 +701,6 @@ public readonly record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Co
 
 	// TODO: Verify implict/explicit are correct for below
 	#region Operators
-
-	/// <summary>
-	/// Cast from int.
-	/// </summary>
-	/// <param name="rgba"></param>
-	[Pure]
-	public static implicit operator Color (int rgba) => new (rgba);
-
-	/// <summary>
-	/// Cast to int. 
-	/// </summary>
-	/// <param name="color"></param>
-	[Pure]
-	public static implicit operator int (Color color) => color.Rgba;
-
-	/// <summary>
-	/// Cast to int.
-	/// </summary>
-	/// <param name="color"></param>
-	[Pure]
-	public static implicit operator uint (Color color) => color.Argb;
-
-	/// <summary>
-	/// Implicit conversion from <see langword="uint"/> to <see cref="Color"/>.
-	/// </summary>
-	/// <param name="u"></param>
-	[Pure]
-	public static implicit operator Color ( uint u ) => new ( u );
-
-	/// <summary>
-	/// Cast from <see cref="Gui.ColorName"/>.
-	/// </summary>
-	/// <param name="colorName"></param>
-	public static explicit operator Color (ColorName colorName) => new (colorName);
-
-	/// <summary>
-	/// Cast to <see cref="Gui.ColorName"/>. May fail if the color is not a named color.
-	/// </summary>
-	/// <param name="color"></param>
-	public static explicit operator ColorName (Color color) => color.ColorName;
-
-	/// <summary>
-	/// Implicit conversion to <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>, <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
-	/// </summary>
-	/// <param name="color"></param>
-	public static implicit operator Vector3 ( Color color ) => new ( color.R, color.G, color.B );
-
-	/// <summary>
-	/// Implicit conversion from <see cref="Vector3"/>, where <see cref="Vector3.X"/> = <see cref="R"/>, <see cref="Vector3.Y"/> = <see cref="G"/>, and <see cref="Vector3.Z"/> = <see cref="B"/>.
-	/// </summary>
-	/// <param name="v"></param>
-	public static implicit operator Color ( Vector3 v ) => new ( (byte)v.X, (byte)v.Y, (byte)v.Z );
-
 	/// <inheritdoc />
 	public override int GetHashCode ( ) => Rgba.GetHashCode ( );
 	#endregion
