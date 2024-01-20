@@ -146,13 +146,7 @@ public partial class View {
 			OnResizeNeeded ();
 		} else if (AutoSize && directionChanged && IsAdded) {
 			ResizeBoundsToFit (Bounds.Size);
-			// BUGBUG: Regardless of whether SetFrameToFitText is correct or not, it is called
-			// BUGBUG: From SetRelativeLayout so this call is redundant.
-			//SetFrameToFitText ();
 		} else {
-			// BUGBUG: Regardless of whether SetFrameToFitText is correct or not, it is called
-			// BUGBUG: From SetRelativeLayout so this call is redundant.
-			//SetFrameToFitText ();
 		}
 		SetTextFormatterSize ();
 		SetNeedsDisplay ();

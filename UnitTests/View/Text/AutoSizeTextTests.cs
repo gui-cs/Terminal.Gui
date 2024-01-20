@@ -857,19 +857,24 @@ public class AutoSizeTextTests {
 		super.Dispose ();
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void AutoSize_True_Setting_With_Height_Horizontal ()
 	{
+		var top = new View () {  Width = 25, Height = 25 };
+		
 		var label = new Label ("Hello") { Width = 10, Height = 2, ValidatePosDim = true };
 		var viewX = new View ("X") { X = Pos.Right (label) };
 		var viewY = new View ("Y") { Y = Pos.Bottom (label) };
 
-		Application.Top.Add (label, viewX, viewY);
-		var rs = Application.Begin (Application.Top);
-
+		top.Add (label, viewX, viewY);
+		top.BeginInit ();
+		top.EndInit ();
+		
 		Assert.True (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
+
+		top.LayoutSubviews ();
+		top.Draw ();
 
 		var expected = @"
 Hello     X
@@ -882,10 +887,12 @@ Y
 		Assert.Equal (new Rect (0, 0, 11, 3), pos);
 
 		label.AutoSize = false;
-		Application.Refresh ();
 
 		Assert.False (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 10, 2), label.Frame);
+
+		top.LayoutSubviews ();
+		top.Draw ();
 
 		expected = @"
 Hello     X
@@ -896,7 +903,6 @@ Y
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 11, 3), pos);
-		Application.End (rs);
 	}
 
 	[Fact]
@@ -996,9 +1002,10 @@ Y
 
 
 	[Fact]
-	[AutoInitShutdown]
 	public void AutoSize_True_Equal_Before_And_After_IsInitialized_With_Different_Orders ()
 	{
+		var top = new Toplevel ();
+		
 		var view1 = new View { Text = "Say Hello view1 你", AutoSize = true, Width = 10, Height = 5, ValidatePosDim = true };
 		var view2 = new View { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = true, ValidatePosDim = true };
 		var view3 = new View { AutoSize = true, Width = 10, Height = 5, Text = "Say Hello view3 你", ValidatePosDim = true };
@@ -1026,7 +1033,7 @@ Y
 			Text = "Say Hello view6 你",
 			ValidatePosDim = true
 		};
-		Application.Top.Add (view1, view2, view3, view4, view5, view6);
+		top.Add (view1, view2, view3, view4, view5, view6);
 
 		Assert.False (view1.IsInitialized);
 		Assert.False (view2.IsInitialized);
@@ -1060,7 +1067,8 @@ Y
 		Assert.True (view6.AutoSize);
 		Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
 
-		var rs = Application.Begin (Application.Top);
+		top.BeginInit ();
+		top.EndInit ();
 
 		Assert.True (view1.IsInitialized);
 		Assert.True (view2.IsInitialized);
@@ -1092,7 +1100,6 @@ Y
 		Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
 		Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 		Assert.Equal ("Absolute(17)", view6.Height.ToString ());
-		Application.End (rs);
 	}
 
 	[Fact]
@@ -1948,79 +1955,22 @@ Y
 		Application.End (rs);
 	}
 
-
 	[Fact]
-	[AutoInitShutdown]
-	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
-	{
-		var win = new Window (new Rect (0, 0, 30, 50));
-		var label = new Label { Width = Dim.Fill () };
-		win.Add (label);
-		Application.Top.Add (win);
-
-		Assert.True (label.IsAdded);
-
-		Assert.True (label.AutoSize);
-
-		// #3127: Before: 
-		//		 Text is empty but height=1 by default, see Label view
-		//		 BUGBUG: LayoutSubviews has not been called, so this test is not really valid (pos/dim are indeterminate, not 0)
-		//		 Not really a bug because View call OnResizeNeeded method on the SetInitialProperties method
-		// #3127: After: Text is empty Width=Dim.Fill is honored. 
-		//        LayoutSubViews has not been called, and OnResizeNeeded ends up using Application.Top.Bounds
-		//        Which has a width of 80.
-		Assert.Equal ("(0,0,80,1)", label.Bounds.ToString ());
-
-		label.Text = "First line\nSecond line";
-		Application.Top.LayoutSubviews ();
-
-		Assert.True (label.AutoSize);
-		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
-		Assert.False (label.IsInitialized);
-
-		var rs = Application.Begin (Application.Top);
-
-		Assert.True (label.AutoSize);
-		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
-		Assert.True (label.IsInitialized);
-
-		label.AutoSize = false;
-
-		// Width should still be Dim.Fill
-		Assert.Equal ("Fill(0)", label.Width.ToString ());
-
-		// Height should be 2
-		Assert.Equal ("Absolute(2)", label.Height.ToString ());
-		Assert.Equal (2, label.Frame.Height);
-
-		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
-		Application.End (rs);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
 	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_With_Initialization ()
 	{
 		var win = new Window (new Rect (0, 0, 30, 80));
 		var label = new Label { Width = Dim.Fill () };
 		win.Add (label);
-		Application.Top.Add (win);
+		win.BeginInit ();
+		win.EndInit ();
 
 		// Text is empty but height=1 by default. 
 		Assert.True (label.AutoSize);
-		Assert.Equal ("(0,0,80,1)", label.Bounds.ToString ());
-
-		var rs = Application.Begin (Application.Top);
-
+		Assert.Equal ("(0,0,28,1)", label.Bounds.ToString ());
 		Assert.True (label.AutoSize);
-		// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
-		// and height 0 because wasn't set and the text is empty
-		// BUGBUG: Because of #2450, this test is bogus: pos/dim is indeterminate!
-		//Assert.Equal ("(0,0,28,0)", label.Bounds.ToString ());
 
 		label.Text = "First line\nSecond line";
-		Application.Refresh ();
+		win.LayoutSubviews ();
 
 		// Here the AutoSize ensuring the right size with width 28 (Dim.Fill)
 		// and height 2 because wasn't set and the text has 2 lines
@@ -2028,7 +1978,7 @@ Y
 		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 
 		label.AutoSize = false;
-		Application.Refresh ();
+		win.LayoutSubviews ();
 
 		// Here the SetMinWidthHeight ensuring the minimum height
 		// #3127: After: (0,0,28,2) because turning off AutoSize leaves
@@ -2037,7 +1987,7 @@ Y
 		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 
 		label.Text = "First changed line\nSecond changed line\nNew line";
-		Application.Refresh ();
+		win.LayoutSubviews ();
 
 		// Here the AutoSize is false and the width 28 (Dim.Fill) and
 		// #3127: Before: height 1 because it wasn't set and SetMinWidthHeight ensuring the minimum height
@@ -2046,14 +1996,12 @@ Y
 		Assert.Equal ("(0,0,28,2)", label.Bounds.ToString ());
 
 		label.AutoSize = true;
-		Application.Refresh ();
 
+		win.LayoutSubviews ();
 		// Here the AutoSize ensuring the right size with width 19 (width of longest line)
 		// and height 3 because the text has 3 lines
 		Assert.True (label.AutoSize);
 		Assert.Equal ("(0,0,19,3)", label.Bounds.ToString ());
-
-		Application.End (rs);
 	}
 
 
@@ -2638,5 +2586,250 @@ Y
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 9, height + 2), pos);
+	}
+
+
+	[Fact]
+	[AutoInitShutdown]
+	public void TrySetWidth_ForceValidatePosDim ()
+	{
+		var top = new View () {
+			X = 0,
+			Y = 0,
+			Width = 80
+		};
+
+		var v = new View () {
+			Width = Dim.Fill (),
+			ValidatePosDim = true
+		};
+		top.Add (v);
+
+		Assert.False (v.TrySetWidth (70, out int rWidth));
+		Assert.Equal (70, rWidth);
+
+		v.Width = Dim.Fill (1);
+		Assert.False (v.TrySetWidth (70, out rWidth));
+		Assert.Equal (69, rWidth);
+
+		v.Width = 0;
+		Assert.True (v.TrySetWidth (70, out rWidth));
+		Assert.Equal (70, rWidth);
+		Assert.False (v.IsInitialized);
+
+		Application.Top.Add (top);
+		Application.Begin (Application.Top);
+
+		Assert.True (v.IsInitialized);
+		v.Width = 75;
+		Assert.True (v.TrySetWidth (60, out rWidth));
+		Assert.Equal (60, rWidth);
+	}
+
+	[Fact]
+	[AutoInitShutdown]
+	public void TrySetHeight_ForceValidatePosDim ()
+	{
+		var top = new View () {
+			X = 0,
+			Y = 0,
+			Height = 20
+		};
+
+		var v = new View () {
+			Height = Dim.Fill (),
+			ValidatePosDim = true
+		};
+		top.Add (v);
+
+		Assert.False (v.TrySetHeight (10, out int rHeight));
+		Assert.Equal (10, rHeight);
+
+		v.Height = Dim.Fill (1);
+		Assert.False (v.TrySetHeight (10, out rHeight));
+		Assert.Equal (9, rHeight);
+
+		v.Height = 0;
+		Assert.True (v.TrySetHeight (10, out rHeight));
+		Assert.Equal (10, rHeight);
+		Assert.False (v.IsInitialized);
+
+		Application.Top.Add (top);
+		Application.Begin (Application.Top);
+
+		Assert.True (v.IsInitialized);
+
+		v.Height = 15;
+		Assert.True (v.TrySetHeight (5, out rHeight));
+		Assert.Equal (5, rHeight);
+	}
+
+	[Fact]
+	[TestRespondersDisposed]
+	public void GetCurrentWidth_TrySetWidth ()
+	{
+		var top = new View () {
+			X = 0,
+			Y = 0,
+			Width = 80
+		};
+
+		var v = new View () {
+			Width = Dim.Fill (),
+			ValidatePosDim = true
+		};
+		top.Add (v);
+		top.BeginInit ();
+		top.EndInit ();
+		top.LayoutSubviews ();
+
+		Assert.False (v.AutoSize);
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
+		Assert.Equal (80, v.Frame.Width);
+
+		v.Width = Dim.Fill (1);
+		top.LayoutSubviews ();
+
+		Assert.False (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimFill);
+		Assert.Equal (79, v.Frame.Width);
+
+		v.AutoSize = true;
+		top.LayoutSubviews ();
+
+		Assert.True (v.TrySetWidth (0, out _));
+		Assert.True (v.Width is Dim.DimAbsolute);
+		Assert.Equal (79, v.Frame.Width);
+		top.Dispose ();
+	}
+
+	[Fact]
+	public void GetCurrentHeight_TrySetHeight ()
+	{
+		var top = new View () {
+			X = 0,
+			Y = 0,
+			Height = 20
+		};
+
+		var v = new View () {
+			Height = Dim.Fill (),
+			ValidatePosDim = true
+		};
+		top.Add (v);
+		top.BeginInit ();
+		top.EndInit ();
+		top.LayoutSubviews ();
+
+		Assert.False (v.AutoSize);
+		Assert.False (v.TrySetHeight (0, out _));
+		Assert.Equal (20, v.Frame.Height);
+
+		v.Height = Dim.Fill (1);
+		top.LayoutSubviews ();
+
+		Assert.False (v.TrySetHeight (0, out _));
+		Assert.True (v.Height is Dim.DimFill);
+		Assert.Equal (19, v.Frame.Height);
+
+		v.AutoSize = true;
+		top.LayoutSubviews ();
+
+		Assert.True (v.TrySetHeight (0, out _));
+		Assert.True (v.Height is Dim.DimAbsolute);
+		Assert.Equal (19, v.Frame.Height);
+		top.Dispose ();
+	}
+
+	// Moved from DimTests.cs
+	[Theory]
+	[AutoInitShutdown]
+	[InlineData (0, true)]
+	[InlineData (0, false)]
+	[InlineData (50, true)]
+	[InlineData (50, false)]
+	public void DimPercentPlusOne (int startingDistance, bool testHorizontal)
+	{
+		var container = new View {
+			Width = 100,
+			Height = 100
+		};
+
+		var label = new Label {
+			X = testHorizontal ? startingDistance : 0,
+			Y = testHorizontal ? 0 : startingDistance,
+			Width = testHorizontal ? Dim.Percent (50) + 1 : 1,
+			Height = testHorizontal ? 1 : Dim.Percent (50) + 1
+		};
+
+		container.Add (label);
+		Application.Top.Add (container);
+		Application.Top.BeginInit ();
+		Application.Top.EndInit ();
+		Application.Top.LayoutSubviews ();
+
+		Assert.Equal (100, container.Frame.Width);
+		Assert.Equal (100, container.Frame.Height);
+
+		if (testHorizontal) {
+			Assert.Equal (51, label.Frame.Width);
+			Assert.Equal (1, label.Frame.Height);
+		} else {
+			Assert.Equal (1, label.Frame.Width);
+			Assert.Equal (51, label.Frame.Height);
+		}
+	}
+
+
+	[Fact, AutoInitShutdown]
+	public void Test_Label_Full_Border ()
+	{
+		var label = new Label () { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
+		Application.Top.Add (label);
+		Application.Begin (Application.Top);
+
+		Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
+		Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+┌────┐
+│Test│
+└────┘", _output);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void Test_Label_Without_Top_Border ()
+	{
+		var label = new Label () { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
+		label.Border.Thickness = new Thickness (1, 0, 1, 1);
+		Application.Top.Add (label);
+		Application.Begin (Application.Top);
+
+		Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
+		Assert.Equal (new Rect (0, 0, 4, 2), label.Bounds);
+		Application.Begin (Application.Top);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+│Test│
+│    │
+└────┘", _output);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void Test_Label_With_Top_Margin_Without_Top_Border ()
+	{
+		var label = new Label () { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
+		label.Margin.Thickness = new Thickness (0, 1, 0, 0);
+		label.Border.Thickness = new Thickness (1, 0, 1, 1);
+		Application.Top.Add (label);
+		Application.Begin (Application.Top);
+
+		Assert.Equal (new Rect (0, 0, 6, 3), label.Frame);
+		Assert.Equal (new Rect (0, 0, 4, 1), label.Bounds);
+		Application.Begin (Application.Top);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+│Test│
+└────┘", _output);
 	}
 }

@@ -129,7 +129,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute {
 	/// <summary>
 	/// Enables test functions annotated with the [SetupFakeDriver] attribute to
 	/// set Application.Driver to new FakeDriver(). The driver is setup with
-	/// 10 rows and columns.
+	/// 25 rows and columns.
 	/// </summary>
 	public SetupFakeDriverAttribute () { }
 
@@ -137,7 +137,7 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute {
 	{
 		Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 		Assert.Null (Application.Driver);
-		Application.Driver = new FakeDriver () { Rows = 10, Cols = 10 };
+		Application.Driver = new FakeDriver () { Rows = 25, Cols = 25 };
 	}
 
 	public override void After (MethodInfo methodUnderTest)

@@ -683,7 +683,7 @@ public class DimTests {
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
 				field.Text = $"Label {count}";
-				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+				var label = new View (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
 				view.Add (label);
 				Assert.Equal ($"Label {count}", label.Text);
 				Assert.Equal ($"Absolute({count})", label.Y.ToString ());
@@ -831,7 +831,6 @@ public class DimTests {
 	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
 	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Theory]
-	[AutoInitShutdown]
 	[InlineData (0, true)]
 	[InlineData (0, false)]
 	[InlineData (50, true)]
@@ -843,28 +842,27 @@ public class DimTests {
 			Height = 100
 		};
 
-		var label = new Label {
+		var view = new View {
 			X = testHorizontal ? startingDistance : 0,
 			Y = testHorizontal ? 0 : startingDistance,
 			Width = testHorizontal ? Dim.Percent (50) + 1 : 1,
 			Height = testHorizontal ? 1 : Dim.Percent (50) + 1
 		};
 
-		container.Add (label);
-		Application.Top.Add (container);
-		Application.Top.BeginInit ();
-		Application.Top.EndInit ();
-		Application.Top.LayoutSubviews ();
+		container.Add (view);
+		container.BeginInit ();
+		container.EndInit ();
+		container.LayoutSubviews ();
 
 		Assert.Equal (100, container.Frame.Width);
 		Assert.Equal (100, container.Frame.Height);
 
 		if (testHorizontal) {
-			Assert.Equal (51, label.Frame.Width);
-			Assert.Equal (1, label.Frame.Height);
+			Assert.Equal (51, view.Frame.Width);
+			Assert.Equal (1, view.Frame.Height);
 		} else {
-			Assert.Equal (1, label.Frame.Width);
-			Assert.Equal (51, label.Frame.Height);
+			Assert.Equal (1, view.Frame.Width);
+			Assert.Equal (51, view.Frame.Height);
 		}
 	}
 

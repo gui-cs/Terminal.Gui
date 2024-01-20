@@ -754,8 +754,9 @@ public partial class View {
 					break;
 
 				case Dim.DimAbsolute:
-					// DimAbsoulte.Anchor (int width) ignores width and returns n
+					// DimAbsolute.Anchor (int width) ignores width and returns n
 					newDimension = Math.Max (d.Anchor (0), 0);
+					//newDimension = AutoSize && true ? autosize : newDimension;
 					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
 
@@ -1125,6 +1126,9 @@ public partial class View {
 	/// <summary>
 	/// Resizes the View to fit the specified size. Factors in the HotKey.
 	/// </summary>
+	/// <remarks>
+	/// ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).
+	/// </remarks>
 	/// <param name="size"></param>
 	/// <returns>whether the Bounds was changed or not</returns>
 	bool ResizeBoundsToFit (Size size)
@@ -1155,6 +1159,9 @@ public partial class View {
 	/// <summary>
 	/// Determines if the View's <see cref="Width"/> can be set to a new value.
 	/// </summary>
+	/// <remarks>
+	/// TrySetWidth can only be called when AutoSize is true (or being set to true).
+	/// </remarks>
 	/// <param name="desiredWidth"></param>
 	/// <param name="resultWidth">
 	/// Contains the width that would result if <see cref="Width"/> were set to
@@ -1197,6 +1204,9 @@ public partial class View {
 	/// <summary>
 	/// Determines if the View's <see cref="Height"/> can be set to a new value.
 	/// </summary>
+	/// <remarks>
+	/// TrySetHidth can only be called when AutoSize is true (or being set to true).
+	/// </remarks>
 	/// <param name="desiredHeight"></param>
 	/// <param name="resultHeight">
 	/// Contains the width that would result if <see cref="Height"/> were set to
