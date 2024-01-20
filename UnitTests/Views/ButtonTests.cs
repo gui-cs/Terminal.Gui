@@ -706,4 +706,20 @@ public class ButtonTests {
 		Assert.Equal (KeyCode.Null, args.OldKey);
 		Assert.Equal (KeyCode.R, args.NewKey);
 	}
+
+	[Fact, AutoInitShutdown]
+	public void IsDefault_True_On_Toplevel_Fire_Clicked_Event_On_Enter_Key ()
+	{
+		var wasClicked = false;
+		var view = new View { CanFocus = true };
+		var btn = new Button { Text = "Ok", IsDefault = true };
+		btn.Clicked += (s, e) => wasClicked = true;
+		Application.Top.Add (view, btn);
+		Application.Begin (Application.Top);
+		Assert.True (view.HasFocus);
+
+		Application.OnKeyDown (new (Key.Enter));
+		Assert.True (view.HasFocus);
+		Assert.True (wasClicked);
+	}
 }

@@ -291,6 +291,17 @@ public partial class Toplevel : View {
 			return true;
 		});
 
+		// This enables the default button to be activated by the Enter key.
+		AddCommand (Command.Accept, () => {
+			// TODO: Perhaps all views should support the concept of being default?
+			if (Subviews.FirstOrDefault (v => v is Button { IsDefault: true, Enabled: true }) is Button defaultBtn) {
+				defaultBtn.InvokeCommand (Command.Accept);
+				return true;
+			}
+			return false;
+		});
+
+		KeyBindings.Add (Key.Enter, Command.Accept);
 
 		// Default keybindings for this view
 		KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
