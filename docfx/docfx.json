@@ -9,7 +9,8 @@
           ]
         }
       ],
-      "dest": "api"
+      "dest": "api",
+      "memberLayout": "separatePages"
     },
     {
       "src": [
@@ -20,7 +21,8 @@
           ]
         }
       ],
-      "dest": "api/UICatalog"
+      "dest": "api/UICatalog",
+      "memberLayout": "separatePages"
     }
   ],
   "build": {
