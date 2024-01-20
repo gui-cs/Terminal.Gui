@@ -219,7 +219,7 @@ namespace Terminal.Gui {
 
 		bool AcceptKey ()
 		{
-			if (!HasFocus) {
+			if (!IsDefault && !HasFocus) {
 				SetFocus ();
 			}
 			OnClicked ();
