@@ -8,7 +8,7 @@ public class ButtonTests {
 
 	public ButtonTests (ITestOutputHelper output) => _output = output;
 
-	[Fact] [SetupFakeDriver]
+	[Fact, SetupFakeDriver]
 	public void Constructors_Defaults ()
 	{
 		var btn = new Button ();

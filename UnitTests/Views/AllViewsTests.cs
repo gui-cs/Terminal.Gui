@@ -31,6 +31,9 @@ public class AllViewsTests {
 			view.X = Pos.Center ();
 			view.Y = Pos.Center ();
 
+			// Turn off AutoSize
+			view.AutoSize = false;
+
 			// Ensure the view has positive dimensions
 			view.Width = 10;
 			view.Height = 10;

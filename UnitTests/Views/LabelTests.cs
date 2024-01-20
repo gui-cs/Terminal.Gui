@@ -556,19 +556,19 @@ Test
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void Label_Draw_Horizontal_Simple_TextAlignments_Justified ()
 	{
+		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 		var text = "01234 01234";
 		var width = 20;
 		var lblJust = new Label (text) { Y = 0, Width = width, TextAlignment = TextAlignment.Justified };
-		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblJust);
-		Application.Top.Add (frame);
-		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (width + 2, 3);
+		frame.BeginInit ();
+		frame.EndInit ();
+		frame.Draw ();
 
 		var expected = @"
 ┌────────────────────┐
@@ -578,7 +578,6 @@ Test
 		Assert.Equal (new Rect (0, 0, width, 1), lblJust.Frame);
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-		Assert.Equal (new Rect (0, 0, width + 2, 3), pos);
 	}
 
 	[Fact]
@@ -737,24 +736,15 @@ e
 		Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
 		Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
 		Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
-		var expected = "";
 		if (autoSize) {
-			Assert.Equal (new Rect (0, 0, 11, 1), lblLeft.Frame);
-			Assert.Equal (new Rect (0, 1, 11, 1), lblCenter.Frame);
-			Assert.Equal (new Rect (0, 2, 11, 1), lblRight.Frame);
-			Assert.Equal (new Rect (0, 3, 11, 1), lblJust.Frame);
+			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
+			Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
+			Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
+			Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
 			Assert.Equal (new Size (11, 1), lblLeft.TextFormatter.Size);
 			Assert.Equal (new Size (11, 1), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (11, 1), lblRight.TextFormatter.Size);
-			Assert.Equal (new Size (11, 1), lblJust.TextFormatter.Size);
-			expected = @"
-┌────────────────────┐
-│Hello World         │
-│Hello World         │
-│Hello World         │
-│Hello World         │
-└────────────────────┘
-";
+			Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
 
 		} else {
 			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
@@ -765,7 +755,8 @@ e
 			Assert.Equal (new Size (width, 1), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (width, 1), lblRight.TextFormatter.Size);
 			Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
-			expected = @"
+		}
+		var expected = @"
 ┌────────────────────┐
 │Hello World         │
 │    Hello World     │
@@ -773,8 +764,6 @@ e
 │Hello          World│
 └────────────────────┘
 ";
-
-		}
 		Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 	}

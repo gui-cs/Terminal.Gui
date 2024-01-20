@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Channels;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -8,13 +9,58 @@ namespace Terminal.Gui.ViewTests;
 /// <summary>
 /// Tests of the  <see cref="View.Text"/> property with <see cref="View.AutoSize"/> set to false.
 /// </summary>
-public class TextTests {
+public class AutoSizeFalseTests {
 	readonly ITestOutputHelper _output;
 
-	public TextTests (ITestOutputHelper output) => _output = output;
+	public AutoSizeFalseTests (ITestOutputHelper output) => _output = output;
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, SetupFakeDriver]
+	public void AutoSize_False_Setting_AutoSize_False_Keeps_Dims ()
+	{
+		var super = new View () {
+			Width = 10,
+			Height = 10,
+		};
+		var view = new View ();
+		view.Width = 2;
+		view.Height = 1;
+		Assert.Equal ("Absolute(2)", view.Width.ToString());
+		Assert.Equal ("Absolute(1)", view.Height.ToString ());
+
+		super.Add (view);
+		super.BeginInit ();
+		super.EndInit ();
+		super.LayoutSubviews ();
+		Assert.Equal ("Absolute(2)", view.Width.ToString ());
+		Assert.Equal ("Absolute(1)", view.Height.ToString ());
+
+		view.AutoSize = true;
+		// There's no Text, so the view should be sized (0, 0)
+		Assert.Equal ("Absolute(0)", view.Width.ToString ());
+		Assert.Equal ("Absolute(0)", view.Height.ToString ());
+
+		view.Width = 2;
+		view.Height = 1;
+		// AutoSize = true, so changing Dims does nothing
+		Assert.Equal ("Absolute(0)", view.Width.ToString ());
+		Assert.Equal ("Absolute(0)", view.Height.ToString ());
+
+		view.AutoSize = false;
+		Assert.Equal ("Absolute(0)", view.Width.ToString ());
+		Assert.Equal ("Absolute(0)", view.Height.ToString ());
+
+		view.Width = 2;
+		view.Height = 1;
+		Assert.Equal ("Absolute(2)", view.Width.ToString ());
+		Assert.Equal ("Absolute(1)", view.Height.ToString ());
+
+		view.AutoSize = false;
+		Assert.Equal ("Absolute(2)", view.Width.ToString ());
+		Assert.Equal ("Absolute(1)", view.Height.ToString ());
+	}
+
+
+	[Fact, SetupFakeDriver]
 	public void AutoSize_False_View_IsEmpty_False_Return_Null_Lines ()
 	{
 		var text = "Views";
@@ -23,22 +69,27 @@ public class TextTests {
 			Height = 1,
 			Text = text
 		};
-		var win = new Window {
+		var frame = new FrameView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		win.Add (view);
-		Application.Top.Add (win);
-		Application.Begin (Application.Top);
+		frame.Add (view);
+
 		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+		frame.BeginInit ();
+		frame.EndInit ();
+		frame.LayoutSubviews ();
 
 		Assert.Equal (5, text.Length);
 		Assert.False (view.AutoSize);
 		Assert.Equal (new Rect (0, 0, 3, 1), view.Frame);
 		Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
 		Assert.Equal (new List<string> { "Vie" }, view.TextFormatter.Lines);
-		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
-		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
+		Assert.Equal (new Rect (0, 0, 10, 4), frame.Frame);
+
+		frame.LayoutSubviews ();
+		frame.Clear ();
+		frame.Draw ();
 		var expected = @"
 ┌────────┐
 │Vie     │
@@ -52,7 +103,10 @@ public class TextTests {
 		text = "0123456789";
 		Assert.Equal (10, text.Length);
 		view.Width = Dim.Fill () - text.Length;
-		Application.Refresh ();
+
+		frame.LayoutSubviews ();
+		frame.Clear ();
+		frame.Draw ();
 
 		Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
 		Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
@@ -96,119 +150,6 @@ public class TextTests {
 	}
 
 	[Fact]
-	[AutoInitShutdown]
-	public void AutoSize_False_Label_IsEmpty_True_Return_Null_Lines ()
-	{
-		var text = "Label";
-		var label = new Label {
-			Width = Dim.Fill () - text.Length,
-			Height = 1,
-			Text = text,
-			AutoSize = false
-		};
-		var win = new Window {
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
-		win.Add (label);
-		Application.Top.Add (win);
-		Application.Begin (Application.Top);
-		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
-
-		Assert.Equal (5, text.Length);
-		Assert.False (label.AutoSize);
-		Assert.Equal (new Rect (0, 0, 3, 1), label.Frame);
-		Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
-		Assert.Equal (new List<string> { "Lab" }, label.TextFormatter.Lines);
-		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
-		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
-		var expected = @"
-┌────────┐
-│Lab     │
-│        │
-└────────┘
-";
-
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 10, 4), pos);
-
-		text = "0123456789";
-		Assert.Equal (10, text.Length);
-		label.Width = Dim.Fill () - text.Length;
-		Application.Refresh ();
-
-		Assert.False (label.AutoSize);
-		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
-		Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
-		Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines);
-		expected = @"
-┌────────┐
-│        │
-│        │
-└────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 10, 4), pos);
-	}
-
-	[Fact]
-	[AutoInitShutdown]
-	public void AutoSize_False_Label_Height_Zero_Returns_Minimum_Height ()
-	{
-		var text = "Label";
-		var label = new Label {
-			Width = Dim.Fill () - text.Length,
-			Text = text,
-			AutoSize = false
-		};
-		var win = new Window {
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
-		win.Add (label);
-		Application.Top.Add (win);
-		Application.Begin (Application.Top);
-		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
-
-		Assert.Equal (5, text.Length);
-		Assert.False (label.AutoSize);
-		Assert.Equal (new Rect (0, 0, 3, 1), label.Frame);
-		Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
-		Assert.Single (label.TextFormatter.Lines);
-		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
-		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
-		var expected = @"
-┌────────┐
-│Lab     │
-│        │
-└────────┘
-";
-
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 10, 4), pos);
-
-		text = "0123456789";
-		Assert.Equal (10, text.Length);
-		label.Width = Dim.Fill () - text.Length;
-		Application.Refresh ();
-
-		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
-		Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines));
-		Assert.Null (exception);
-		expected = @"
-┌────────┐
-│        │
-│        │
-└────────┘
-";
-
-		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 10, 4), pos);
-	}
-
-	[Fact]
 	public void AutoSize_False_If_Text_Empty ()
 	{
 		var view1 = new View ();
@@ -243,14 +184,14 @@ public class TextTests {
 	public void AutoSize_False_ResizeView_Is_Always_False ()
 	{
 		var super = new View ();
-		var label = new Label { AutoSize = false };
-		super.Add (label);
+		var view = new View { };
+		super.Add (view);
 
-		label.Text = "New text";
+		view.Text = "New text";
 		super.LayoutSubviews ();
 
-		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+		Assert.False (view.AutoSize);
+		Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
 		super.Dispose ();
 	}
 
@@ -259,24 +200,24 @@ public class TextTests {
 	public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 	{
 		var win = new Window (new Rect (0, 0, 30, 80));
-		var label = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill () };
-		win.Add (label);
+		var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
+		win.Add (view);
 		Application.Top.Add (win);
 
-		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,80,25)", label.Bounds.ToString ());
+		Assert.False (view.AutoSize);
+		Assert.Equal ("(0,0,80,25)", view.Bounds.ToString ());
 
-		label.Text = "New text\nNew line";
+		view.Text = "New text\nNew line";
 		Application.Top.LayoutSubviews ();
 
-		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,28,78)", label.Bounds.ToString ());
-		Assert.False (label.IsInitialized);
+		Assert.False (view.AutoSize);
+		Assert.Equal ("(0,0,28,78)", view.Bounds.ToString ());
+		Assert.False (view.IsInitialized);
 
 		var rs = Application.Begin (Application.Top);
-		Assert.True (label.IsInitialized);
-		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,28,78)", label.Bounds.ToString ());
+		Assert.True (view.IsInitialized);
+		Assert.False (view.AutoSize);
+		Assert.Equal ("(0,0,28,78)", view.Bounds.ToString ());
 		Application.End (rs);
 	}
 
@@ -449,7 +390,7 @@ public class TextTests {
 ";
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		
+
 		verticalView.Text = $"最初の行{Environment.NewLine}二行目";
 		Assert.True (verticalView.TextFormatter.NeedsFormat);
 

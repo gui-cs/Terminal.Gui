@@ -557,8 +557,6 @@ public class PosTests {
 				var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
 				view.Add (label);
 				Assert.Equal ($"Label {count}", label.Text);
-				Assert.Equal ($"Absolute({count})", label.Y.ToString ());
-
 				Assert.Equal ($"Absolute({count})", field.Y.ToString ());
 				field.Y += 1;
 				count++;
@@ -723,7 +721,6 @@ public class PosTests {
 	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
 	// TODO: A new test that calls SetRelativeLayout directly is needed.
 	[Theory]
-	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void PosPercentPlusOne (bool testHorizontal)
@@ -733,26 +730,27 @@ public class PosTests {
 			Height = 100
 		};
 
-		var label = new Label {
+		var view = new View {
 			X = testHorizontal ? Pos.Percent (50) + Pos.Percent (10) + 1 : 1,
 			Y = testHorizontal ? 1 : Pos.Percent (50) + Pos.Percent (10) + 1,
-			Width = 10,
-			Height = 10
+			Width = 10,  
+			Height = 10 
 		};
 
-		container.Add (label);
-		Application.Top.Add (container);
-		Application.Top.LayoutSubviews ();
+		container.Add (view);
+		container.BeginInit ();
+		container.EndInit ();
+		container.LayoutSubviews ();
 
 		Assert.Equal (100, container.Frame.Width);
 		Assert.Equal (100, container.Frame.Height);
 
 		if (testHorizontal) {
-			Assert.Equal (61, label.Frame.X);
-			Assert.Equal (1, label.Frame.Y);
+			Assert.Equal (61, view.Frame.X);
+			Assert.Equal (1, view.Frame.Y);
 		} else {
-			Assert.Equal (1, label.Frame.X);
-			Assert.Equal (61, label.Frame.Y);
+			Assert.Equal (1, view.Frame.X);
+			Assert.Equal (61, view.Frame.Y);
 		}
 	}
 

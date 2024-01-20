@@ -756,7 +756,9 @@ public partial class View {
 				case Dim.DimAbsolute:
 					// DimAbsolute.Anchor (int width) ignores width and returns n
 					newDimension = Math.Max (d.Anchor (0), 0);
-					newDimension = AutoSize ? autosize : newDimension;
+
+					// BUGBUG: AutoSize does two things: makes text fit AND changes the view's dimensions
+					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 					break;
 
 				case Dim.DimFill:
@@ -821,6 +823,7 @@ public partial class View {
 			// Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
 			// the view LayoutStyle.Absolute.
 			_frame = r;
+
 			if (_x is Pos.PosAbsolute) {
 				_x = Frame.X;
 			}
@@ -837,8 +840,23 @@ public partial class View {
 			if (IsInitialized) {
 				SetNeedsLayout ();
 			}
+		}
+		if (AutoSize) {
+			if (autosize.Width == 0 || autosize.Height == 0) {
+				// Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
+				// the view LayoutStyle.Absolute.
+				_frame = new Rect (Frame.Location, autosize);
+				if (autosize.Width == 0) {
+					_width = 0;
+				}
+				if (autosize.Height == 0) {
+					_height = 0;
+				}
 
-			if (AutoSize && !SetFrameToFitText ()) {
+				if (IsInitialized) {
+					SetNeedsLayout ();
+				}
+			} else if (!SetFrameToFitText ()) {
 				SetTextFormatterSize ();
 			}
 		}
