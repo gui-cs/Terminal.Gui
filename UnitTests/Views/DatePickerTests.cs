@@ -28,14 +28,17 @@ public class DatePickerTests {
 	public void DatePicker_Initialize_ShouldSetCurrentDate ()
 	{
 		var datePicker = new DatePicker ();
-		var format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-		Assert.Equal (DateTime.Now.ToString (format), datePicker.Text);
+		Assert.Equal (DateTime.Now.Date.Day, datePicker.Date.Day);
+		Assert.Equal (DateTime.Now.Date.Month, datePicker.Date.Month);
+		Assert.Equal (DateTime.Now.Date.Year, datePicker.Date.Year);
 	}
 
 	[Fact]
 	public void DatePicker_SetDate_ShouldChangeText ()
 	{
-		var datePicker = new DatePicker ();
+		var datePicker = new DatePicker () {
+			Culture = CultureInfo.GetCultureInfo ("en-GB")
+		};
 		var newDate = new DateTime (2024, 1, 15);
 		var format = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
 
