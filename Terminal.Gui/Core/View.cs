@@ -1500,8 +1500,11 @@ namespace Terminal.Gui {
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
-				Clear ();
-				SetChildNeedsDisplay ();
+				if (ColorScheme != null) {
+					Driver.SetAttribute (GetNormalColor ());
+					Clear ();
+					SetChildNeedsDisplay ();
+				}
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
