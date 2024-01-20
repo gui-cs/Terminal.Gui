@@ -4563,5 +4563,23 @@ Label", output);
 			TestHelpers.AssertDriverContentsAre (@"
 Label", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void View_Instance_Use_Attribute_Normal_On_Draw ()
+		{
+			var view = new View { Id = "view", X = 1, Y = 1, Width = 4, Height = 1, Text = "Test", CanFocus = true };
+			var root = new View { Id = "root", Width = Dim.Fill (), Height = Dim.Fill () };
+			root.Add (view);
+			Application.Top.Add (root);
+			Application.Begin (Application.Top);
+
+			TestHelpers.AssertDriverContentsAre (@"
+Test", output);
+
+			TestHelpers.AssertDriverColorsAre (@"
+000000
+011110
+000000", new Attribute [] { Colors.TopLevel.Normal, Colors.TopLevel.Focus });
+		}
 	}
 }
