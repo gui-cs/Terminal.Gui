@@ -57,7 +57,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Y (_btnActionCancel) + 6,
 				Width = 10,
 				Height = 10,
-				ColorScheme = Colors.TopLevel
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
 			};
 
 			Win.Add (new Label ("Task Logs:") {
@@ -70,7 +70,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Y (_itemsList),
 				Width = 50,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.TopLevel
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
 			};
 
 			var text = new TextField (1, 3, 100, "Type anything after press the button");

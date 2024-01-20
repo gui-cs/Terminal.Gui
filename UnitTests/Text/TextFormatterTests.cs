@@ -287,7 +287,7 @@ public class TextFormatterTests {
 		Key hotKey = KeyCode.Null;
 		var result = false;
 
-		result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out hotPos, out hotKey);
+		result = TextFormatter.FindHotKey (text, hotKeySpecifier, out hotPos, out hotKey, supportFirstUpperCase);
 		Assert.False (result);
 		Assert.Equal (-1, hotPos);
 		Assert.Equal (KeyCode.Null, hotKey);
@@ -310,7 +310,7 @@ public class TextFormatterTests {
 	{
 		var hotKeySpecifier = (Rune)'_';
 
-		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out var hotPos, out var hotKey);
+		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, out var hotPos, out var hotKey, supportFirstUpperCase);
 		if (expectedResult) {
 			Assert.True (result);
 		} else {
@@ -338,7 +338,7 @@ public class TextFormatterTests {
 	{
 		var hotKeySpecifier = (Rune)'_';
 
-		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out var hotPos, out var hotKey);
+		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, out var hotPos, out var hotKey, supportFirstUpperCase);
 		if (expectedResult) {
 			Assert.True (result);
 		} else {
@@ -364,7 +364,7 @@ public class TextFormatterTests {
 	{
 		var hotKeySpecifier = (Rune)'_';
 
-		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out var hotPos, out var hotKey);
+		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, out var hotPos, out var hotKey, supportFirstUpperCase);
 		if (expectedResult) {
 			Assert.True (result);
 		} else {
@@ -387,7 +387,7 @@ public class TextFormatterTests {
 
 		var hotKeySpecifier = (Rune)0;
 
-		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out var hotPos, out var hotKey);
+		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, out var hotPos, out var hotKey, supportFirstUpperCase);
 		if (expectedResult) {
 			Assert.True (result);
 		} else {
@@ -411,7 +411,7 @@ public class TextFormatterTests {
 	{
 		var hotKeySpecifier = (Rune)'_';
 
-		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, false, out var _, out var hotKey);
+		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, out var _, out var hotKey, false);
 		Assert.Equal (found, result);
 		Assert.Equal (expected, hotKey);
 	}
@@ -431,7 +431,7 @@ public class TextFormatterTests {
 
 		var hotKeySpecifier = (Rune)0;
 
-		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, supportFirstUpperCase, out var hotPos, out var hotKey);
+		var result = TextFormatter.FindHotKey (text, hotKeySpecifier, out var hotPos, out var hotKey, supportFirstUpperCase);
 		Assert.False (result);
 		Assert.Equal (-1, hotPos);
 		Assert.Equal (KeyCode.Null, hotKey);

@@ -37,7 +37,7 @@ public class TextViewTests {
 			//         01234567890123456789012345678901=32 (Length)
 			var buff = Encoding.Unicode.GetBytes (txt);
 			var ms = new System.IO.MemoryStream (buff).ToArray ();
-			_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.Base };
+			_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 			_textView.Text = Encoding.Unicode.GetString (ms);
 		}
 

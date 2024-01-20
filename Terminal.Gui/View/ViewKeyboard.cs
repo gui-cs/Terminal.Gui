@@ -194,7 +194,7 @@ public partial class View {
 		if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF')) {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
-		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
+		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, out _, out var hk)) {
 			if (_hotKey.KeyCode != hk) {
 				HotKey = hk;
 			}

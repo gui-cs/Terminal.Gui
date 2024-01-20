@@ -30,7 +30,7 @@ public class TextFieldTests {
 			//                                                    1         2         3 
 			//                                          01234567890123456789012345678901=32 (Length)
 			TextFieldTests._textField = new TextField ("TAB to jump between text fields.") {
-				ColorScheme = Colors.Base
+				ColorScheme = Colors.ColorSchemes ["Base"]
 			};
 		}
 
@@ -1307,8 +1307,12 @@ public class TextFieldTests {
 			View = tf
 		};
 
+		// In #3183 OnMouseClicked is no longer called before MouseEvent().
+		// This call causes the context menu to pop, and MouseEvent() returns true.
+		// Thus, the clickCounter is NOT incremented.
+		// Which is correct, because the user did NOT click with the left mouse button.
 		Application.OnMouseEvent (new MouseEventEventArgs (mouseEvent));
-		Assert.Equal (2, clickCounter);
+		Assert.Equal (1, clickCounter);
 	}
 
 	private void SuppressKey (object s, Key arg)

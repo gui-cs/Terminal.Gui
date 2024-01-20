@@ -23,7 +23,7 @@ namespace UICatalog.Scenarios {
 				Y = Pos.Top (test) + 1,
 				Width = Dim.Fill () - 1,
 				Height = Dim.Fill (),
-				ColorScheme = Colors.TopLevel
+				ColorScheme = Colors.ColorSchemes ["TopLevel"]
 			};
 			Win.Add (rmeList);
 

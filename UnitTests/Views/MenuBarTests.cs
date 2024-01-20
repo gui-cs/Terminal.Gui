@@ -25,7 +25,7 @@ public class MenuBarTests {
 		var menuBar = new MenuBar ();
 		Assert.Equal (KeyCode.F9, menuBar.Key);
 		var menu = new Menu (menuBar, 0, 0, new MenuBarItem (), null, menuBar.MenusBorderStyle);
-		Assert.Equal (Colors.Menu, menu.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], menu.ColorScheme);
 		Assert.True (menu.CanFocus);
 		Assert.False (menu.WantContinuousButtonPressed);
 		Assert.Equal (LineStyle.Single, menuBar.MenusBorderStyle);
@@ -36,7 +36,7 @@ public class MenuBarTests {
 		Assert.IsType<Dim.DimFill> (menuBar.Width);
 		Assert.Equal (1, menuBar.Height);
 		Assert.Empty (menuBar.Menus);
-		Assert.Equal (Colors.Menu, menuBar.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
 		Assert.True (menuBar.WantMousePositionReports);
 		Assert.False (menuBar.IsMenuOpen);
 
@@ -46,7 +46,7 @@ public class MenuBarTests {
 		Assert.IsType<Dim.DimFill> (menuBar.Width);
 		Assert.Equal (1, menuBar.Height);
 		Assert.Empty (menuBar.Menus);
-		Assert.Equal (Colors.Menu, menuBar.ColorScheme);
+		Assert.Equal (Colors.ColorSchemes ["Menu"], menuBar.ColorScheme);
 		Assert.True (menuBar.WantMousePositionReports);
 		Assert.False (menuBar.IsMenuOpen);
 

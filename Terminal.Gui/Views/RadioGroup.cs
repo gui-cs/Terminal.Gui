@@ -170,14 +170,14 @@ public class RadioGroup : View {
 		set {
 			// Remove old hot key bindings
 			foreach (var label in _radioLabels) {
-				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out var hotKey)) {
+				if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out var hotKey)) {
 					AddKeyBindingsForHotKey (hotKey, KeyCode.Null);
 				}
 			}
 			var prevCount = _radioLabels.Count;
 			_radioLabels = value.ToList ();
 			foreach (var label in _radioLabels) {
-				if (TextFormatter.FindHotKey (label, HotKeySpecifier, true, out _, out var hotKey)) {
+				if (TextFormatter.FindHotKey (label, HotKeySpecifier, out _, out var hotKey)) {
 					AddKeyBindingsForHotKey (KeyCode.Null, hotKey);
 				}
 			}
@@ -202,7 +202,7 @@ public class RadioGroup : View {
 		if (KeyBindings.TryGet (key, out _)) {
 			// Search RadioLabels 
 			for (int i = 0; i < _radioLabels.Count; i++) {
-				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, true, out _, out var hotKey)
+				if (TextFormatter.FindHotKey (_radioLabels [i], HotKeySpecifier, out _, out var hotKey, true)
 					&& (key.NoAlt.NoCtrl.NoShift) == hotKey) {
 					SelectedItem = i;
 					keyEvent.Scope = KeyBindingScope.HotKey;
@@ -246,7 +246,7 @@ public class RadioGroup : View {
 			var rl = _radioLabels [i];
 			Driver.SetAttribute (GetNormalColor ());
 			Driver.AddStr ($"{(i == _selected ? CM.Glyphs.Selected : CM.Glyphs.UnSelected)} ");
-			TextFormatter.FindHotKey (rl, HotKeySpecifier, true, out int hotPos, out var hotKey);
+			TextFormatter.FindHotKey (rl, HotKeySpecifier, out int hotPos, out var hotKey);
 			if (hotPos != -1 && (hotKey != KeyCode.Null)) {
 				var rlRunes = rl.ToRunes ();
 				for (int j = 0; j < rlRunes.Length; j++) {

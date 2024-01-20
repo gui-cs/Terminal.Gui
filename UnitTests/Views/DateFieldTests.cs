@@ -170,4 +170,78 @@ public class DateFieldTests {
 		Assert.Equal (4, df.CursorPosition);
 		CultureInfo.CurrentCulture = cultureBackup;
 	}
+
+	[Fact]
+	public void Using_All_Culture_StandardizeDateFormat ()
+	{
+		CultureInfo cultureBackup = CultureInfo.CurrentCulture;
+
+		DateTime date = DateTime.Parse ("1/1/1971");
+		foreach (var culture in CultureInfo.GetCultures (CultureTypes.AllCultures)) {
+			CultureInfo.CurrentCulture = culture;
+			var separator = culture.DateTimeFormat.DateSeparator.Trim ();
+			if (separator.Length > 1 && separator.Contains ('\u200f')) {
+				separator = separator.Replace ("\u200f", "");
+			}
+			var format = culture.DateTimeFormat.ShortDatePattern;
+			DateField df = new DateField (date);
+			if ((!culture.TextInfo.IsRightToLeft || (culture.TextInfo.IsRightToLeft && !df.Text.Contains ('\u200f')))
+				&& (format.StartsWith ('d') || format.StartsWith ('M'))) {
+
+				switch (culture.Name) {
+				case "ar-SA":
+					Assert.Equal ($" 04{separator}11{separator}1390", df.Text);
+					break;
+				case "th":
+				case "th-TH":
+					Assert.Equal ($" 01{separator}01{separator}2514", df.Text);
+					break;
+				default:
+					Assert.Equal ($" 01{separator}01{separator}1971", df.Text);
+					break;
+				}
+			} else if (culture.TextInfo.IsRightToLeft) {
+				if (df.Text.Contains ('\u200f')) {
+					// It's a Unicode Character (U+200F) - Right-to-Left Mark (RLM)
+					Assert.True (df.Text.Contains ('\u200f'));
+					switch (culture.Name) {
+					case "ar-SA":
+						Assert.Equal ($" 04‏{separator}11‏{separator}1390", df.Text);
+						break;
+					default:
+						Assert.Equal ($" 01‏{separator}01‏{separator}1971", df.Text);
+						break;
+					}
+				} else {
+					switch (culture.Name) {
+					case "ckb-IR":
+					case "fa":
+					case "fa-AF":
+					case "fa-IR":
+					case "lrc":
+					case "lrc-IR":
+					case "mzn":
+					case "mzn-IR":
+					case "ps":
+					case "ps-AF":
+					case "uz-Arab":
+					case "uz-Arab-AF":
+						Assert.Equal ($" 1349{separator}10{separator}11", df.Text);
+						break;
+					default:
+						Assert.Equal ($" 1971{separator}01{separator}01", df.Text);
+						break;
+					}
+				}
+			} else {
+				switch (culture.Name) {
+				default:
+					Assert.Equal ($" 1971{separator}01{separator}01", df.Text);
+					break;
+				}
+			}
+		}
+
+		CultureInfo.CurrentCulture = cultureBackup;
+	}
 }

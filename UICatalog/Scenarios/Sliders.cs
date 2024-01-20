@@ -18,7 +18,7 @@ public class Sliders : Scenario {
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			ColorScheme = Colors.Dialog
+			ColorScheme = Colors.ColorSchemes ["Dialog"]
 		};
 
 		Win.Add (configView);
@@ -216,7 +216,9 @@ public class Sliders : Scenario {
 				var data = e.Options.First ().Value.Data;
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
 					s.ColorScheme = new ColorScheme (s.ColorScheme);
-					s.ColorScheme.Normal = new Attribute (data.Item2, s.ColorScheme.Normal.Background);
+					s.ColorScheme = new ColorScheme(s.ColorScheme) {
+						Normal = new Attribute (data.Item2, s.ColorScheme.Normal.Background)
+					};
 
 					s.Style.OptionChar.Attribute = new Attribute (data.Item1, s.ColorScheme.Normal.Background);
 					s.Style.SetChar.Attribute = new Attribute (data.Item1, s.Style.SetChar.Attribute?.Background ?? s.ColorScheme.Normal.Background);
@@ -252,8 +254,9 @@ public class Sliders : Scenario {
 				var data = e.Options.First ().Value.Data;
 
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
-					s.ColorScheme = new ColorScheme (s.ColorScheme);
-					s.ColorScheme.Normal = new Attribute (s.ColorScheme.Normal.Foreground, data.Item2);
+					s.ColorScheme = new ColorScheme (s.ColorScheme) {
+						Normal = new Attribute (s.ColorScheme.Normal.Foreground, data.Item2)
+					};
 				}
 			}
 		};

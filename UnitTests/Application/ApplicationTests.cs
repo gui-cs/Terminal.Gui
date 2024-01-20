@@ -490,7 +490,7 @@ public class ApplicationTests {
 			// 0
 			new Attribute (ColorName.White, ColorName.Black),
 			// 1
-			Colors.Base.Normal
+			Colors.ColorSchemes ["Base"].Normal
 		};
 		TestHelpers.AssertDriverAttributesAre (@"
 1111100000
@@ -519,7 +519,7 @@ public class ApplicationTests {
 			// 0
 			new Attribute (ColorName.White, ColorName.Black),
 			// 1
-			Colors.Base.Normal
+			Colors.ColorSchemes ["Base"].Normal
 		};
 		TestHelpers.AssertDriverAttributesAre (@"
 0000000000

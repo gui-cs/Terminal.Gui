@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios {
 		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 
 		System.Collections.Generic.List<string> _items = new string [] {

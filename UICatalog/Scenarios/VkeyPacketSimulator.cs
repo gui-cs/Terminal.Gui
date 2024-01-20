@@ -32,7 +32,7 @@ public class VkeyPacketSimulator : Scenario {
 		var inputHorizontalRuler = new Label ("") {
 			Y = Pos.Bottom (btnInput),
 			Width = Dim.Fill (),
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 			AutoSize = false
 		};
 		Win.Add (inputHorizontalRuler);
@@ -40,7 +40,7 @@ public class VkeyPacketSimulator : Scenario {
 		var inputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
 			Y = Pos.Bottom (btnInput),
 			Width = 1,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 			AutoSize = false
 		};
 		Win.Add (inputVerticalRuler);
@@ -69,7 +69,7 @@ public class VkeyPacketSimulator : Scenario {
 		var outputHorizontalRuler = new Label ("") {
 			Y = Pos.Bottom (btnOutput),
 			Width = Dim.Fill (),
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 			AutoSize = false
 		};
 		Win.Add (outputHorizontalRuler);
@@ -78,7 +78,7 @@ public class VkeyPacketSimulator : Scenario {
 			Y = Pos.Bottom (btnOutput),
 			Width = 1,
 			Height = Dim.Fill (),
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 			AutoSize = false
 		};
 		Win.Add (outputVerticalRuler);

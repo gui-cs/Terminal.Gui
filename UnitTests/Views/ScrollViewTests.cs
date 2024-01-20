@@ -498,9 +498,9 @@ namespace Terminal.Gui.ViewsTests {
                At 15,15", output);
 
 			var attributes = new Attribute [] {
-						Colors.TopLevel.Normal,
-						Colors.TopLevel.Focus,
-						Colors.Base.Normal
+						Colors.ColorSchemes ["TopLevel"].Normal,
+						Colors.ColorSchemes ["TopLevel"].Focus,
+						Colors.ColorSchemes ["Base"].Normal
 					};
 
 			TestHelpers.AssertDriverAttributesAre (@"

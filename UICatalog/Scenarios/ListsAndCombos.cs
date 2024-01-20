@@ -25,7 +25,7 @@ namespace UICatalog.Scenarios {
 
 			// ListView
 			var lbListView = new Label ("Listview") {
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				X = 0,
 				Width = Dim.Percent (40)
 			};
@@ -67,7 +67,7 @@ namespace UICatalog.Scenarios {
 
 			// ComboBox
 			var lbComboBox = new Label ("ComboBox") {
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				X = Pos.Right (lbListView) + 1,
 				Width = Dim.Percent(40)
 			};

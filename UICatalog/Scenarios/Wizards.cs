@@ -14,7 +14,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 0,
 				Width = Dim.Percent (75),
-				ColorScheme = Colors.Base,
+				ColorScheme = Colors.ColorSchemes ["Base"],
 			};
 			Win.Add (frame);
 
@@ -86,7 +86,7 @@ namespace UICatalog.Scenarios {
 			var actionLabel = new Label ("") {
 				X = Pos.Right (label),
 				Y = Pos.AnchorEnd (1),
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 			};
 			Win.Add (actionLabel);
 
@@ -217,7 +217,7 @@ namespace UICatalog.Scenarios {
 						Height = Dim.Fill (1),
 						WordWrap = true,
 						AllowsTab = false,
-						ColorScheme = Colors.Base
+						ColorScheme = Colors.ColorSchemes ["Base"]
 					};
 					var help = "This is helpful.";
 					fourthStep.Add (someText);

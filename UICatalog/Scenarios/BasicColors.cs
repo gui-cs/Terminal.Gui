@@ -91,9 +91,10 @@ namespace UICatalog.Scenarios {
 					var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
 					var back = e.MouseEvent.View.GetNormalColor ().Background;
 					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
-					viewForeground.ColorScheme.Normal = new Attribute (fore, fore);
+					viewForeground.ColorScheme = new ColorScheme (viewForeground.ColorScheme) { Normal = new Attribute (fore, fore) };
+
 					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";
-					viewBackground.ColorScheme.Normal = new Attribute (back, back);
+					viewBackground.ColorScheme = new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
 				}
 			};
 		}

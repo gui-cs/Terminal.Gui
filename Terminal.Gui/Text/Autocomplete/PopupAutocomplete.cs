@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 		public override ColorScheme ColorScheme {
 			get {
 				if (colorScheme == null) {
-					colorScheme = Colors.Menu;
+					colorScheme = Colors.ColorSchemes ["Menu"];
 				}
 				return colorScheme;
 			}

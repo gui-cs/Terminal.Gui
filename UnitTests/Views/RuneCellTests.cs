@@ -103,15 +103,15 @@ Error   ";
 
 			var attributes = new Attribute [] {
 				// 0
-				Colors.TopLevel.Focus,
+				Colors.ColorSchemes ["TopLevel"].Focus,
 				// 1
-				Colors.Base.Focus,
+				Colors.ColorSchemes ["Base"].Focus,
 				// 2
-				Colors.Dialog.Focus,
+				Colors.ColorSchemes ["Dialog"].Focus,
 				// 3
-				Colors.Menu.Focus,
+				Colors.ColorSchemes ["Menu"].Focus,
 				// 4
-				Colors.Error.Focus
+				Colors.ColorSchemes ["Error"].Focus
 			};
 			var expectedColor = @"
 0000000000

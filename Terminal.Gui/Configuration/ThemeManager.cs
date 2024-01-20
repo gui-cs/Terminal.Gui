@@ -133,7 +133,7 @@ public class ThemeManager : IDictionary<string, ThemeScope> {
 	internal static void Reset ()
 	{
 		Debug.WriteLine ($"Themes.Reset()");
-
+		Colors.Reset ();
 		Themes?.Clear ();
 		SelectedTheme = string.Empty;
 	}

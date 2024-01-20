@@ -274,6 +274,9 @@ public partial class View {
 	/// </remarks>
 	public Rect ClipToBounds ()
 	{
+		if (Driver == null) {
+			return Rect.Empty;
+		}
 		var previous = Driver.Clip;
 		Driver.Clip = Rect.Intersect (previous, BoundsToScreen (Bounds));
 		return previous;
@@ -296,8 +299,8 @@ public partial class View {
 	{
 		var hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
 		Application.Driver.SetAttribute (normalColor);
-		foreach (var rune in text) {
-			if (rune == hotkeySpec.Value) {
+		foreach (var rune in text.EnumerateRunes ()) {
+			if (rune == new Rune(hotkeySpec.Value)) {
 				Application.Driver.SetAttribute (hotColor);
 				continue;
 			}
@@ -392,7 +395,7 @@ public partial class View {
 
 		if (ColorScheme != null) {
 			//Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
-			Driver.SetAttribute (GetNormalColor ());
+			Driver?.SetAttribute (GetNormalColor ());
 		}
 
 		// Invoke DrawContentEvent
@@ -403,7 +406,9 @@ public partial class View {
 			OnDrawContent (Bounds);
 		}
 
-		Driver.Clip = prevClip;
+		if (Driver != null) {
+			Driver.Clip = prevClip;
+		}
 
 		OnRenderLineCanvas ();
 		// Invoke DrawContentCompleteEvent

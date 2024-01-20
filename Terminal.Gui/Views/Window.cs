@@ -34,7 +34,7 @@ public class Window : Toplevel {
 	///// This property can be set in a Theme to change the default <see cref="LineStyle"/> for all <see cref="Window"/>s. 
 	///// </remarks>
 	/////[SerializableConfigurationProperty (Scope = typeof (ThemeScope)), JsonConverter (typeof (JsonStringEnumConverter))]
-	////public static ColorScheme DefaultColorScheme { get; set; } = Colors.Base;
+	////public static ColorScheme DefaultColorScheme { get; set; } = Colors.ColorSchemes ["Base"];
 
 	/// <summary>
 	/// The default <see cref="LineStyle"/> for <see cref="Window"/>'s border. The default is
@@ -51,7 +51,7 @@ public class Window : Toplevel {
 	void SetInitialProperties ()
 	{
 		CanFocus = true;
-		ColorScheme = Colors.Base; // TODO: make this a theme property
+		ColorScheme = Colors.ColorSchemes ["Base"]; // TODO: make this a theme property
 		BorderStyle = DefaultBorderStyle;
 
 		// This enables the default button to be activated by the Enter key.

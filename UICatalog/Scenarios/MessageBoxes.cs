@@ -14,7 +14,6 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
-				Height = 12
 			};
 			Win.Add (frame);
 
@@ -140,14 +139,14 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (styleRadioGroup);
 
-			var ckbWrapMessage = new CheckBox ("Wrap Message", true) {
+			var ckbWrapMessage = new CheckBox ("_Wrap Message", true) {
 				X = Pos.Right (label) + 1,
-				Y = Pos.Top (label) + 3
+				Y = Pos.Bottom (styleRadioGroup)
 			};
 			frame.Add (ckbWrapMessage);
 
 			frame.ValidatePosDim = true;
-			void Top_Loaded (object sender, EventArgs args)
+			void Top_LayoutComplete (object sender, EventArgs args)
 			{
 				frame.Height =
 					widthEdit.Frame.Height +
@@ -157,36 +156,36 @@ namespace UICatalog.Scenarios {
 					numButtonsEdit.Frame.Height +
 					defaultButtonEdit.Frame.Height +
 					styleRadioGroup.Frame.Height +
-					2 +
-					ckbWrapMessage.Frame.Height;
-				Application.Top.Loaded -= Top_Loaded;
+					ckbWrapMessage.Frame.Height +
+					frame.GetAdornmentsThickness ().Vertical;
+				Application.Top.Loaded -= Top_LayoutComplete;
 			}
-			//Application.Top.Loaded += Top_Loaded;
+			Application.Top.LayoutComplete += Top_LayoutComplete;
 
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (frame) + 4,
+				Y = Pos.Bottom (frame) + 2,
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
 			var buttonPressedLabel = new Label (" ") {
 				X = Pos.Center (),
-				Y = Pos.Bottom (frame) + 5,
+				Y = Pos.Bottom (label) + 1,
 				Width = 25,
 				Height = 1,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				TextAlignment = Terminal.Gui.TextAlignment.Centered
 			};
 
 			//var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
-			var showMessageBoxButton = new Button ("Show MessageBox") {
+			var showMessageBoxButton = new Button ("_Show MessageBox") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
 			};
-			showMessageBoxButton.Clicked += (s,e) => {
+			showMessageBoxButton.Clicked += (s, e) => {
 				try {
 					int width = int.Parse (widthEdit.Text);
 					int height = int.Parse (heightEdit.Text);

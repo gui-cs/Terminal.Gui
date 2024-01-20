@@ -467,7 +467,7 @@ public abstract class ConsoleDriver {
 	public virtual Attribute MakeColor (Color foreground, Color background) =>
 		// Encode the colors into the int value.
 		new (
-			0, // only used by cursesdriver!
+			-1, // only used by cursesdriver!
 			foreground,
 			background
 		);

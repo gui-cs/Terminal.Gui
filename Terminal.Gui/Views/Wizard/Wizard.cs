@@ -512,13 +512,13 @@ public class Wizard : Dialog {
 				SizeStep (step);
 			}
 			if (base.Modal) {
-				ColorScheme = Colors.Dialog;
+				ColorScheme = Colors.ColorSchemes ["Dialog"];
 				BorderStyle = LineStyle.Rounded;
 			} else {
 				if (SuperView != null) {
 					ColorScheme = SuperView.ColorScheme;
 				} else {
-					ColorScheme = Colors.Base;
+					ColorScheme = Colors.ColorSchemes ["Base"];
 				}
 				CanFocus = true;
 				BorderStyle = LineStyle.None;
