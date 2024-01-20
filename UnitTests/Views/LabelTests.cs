@@ -21,7 +21,7 @@ public class LabelTests {
 		Assert.Equal (TextAlignment.Left, label.TextAlignment);
 		Assert.True (label.AutoSize);
 		Assert.False (label.CanFocus);
-		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
+		Assert.Equal (new Rect (0, 0, 0, 0), label.Frame);
 		Assert.Equal (KeyCode.Null, label.HotKey);
 		var expected = @"";
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
@@ -709,24 +709,25 @@ e
 		Assert.Equal (new Rect (0, 0, 2, 7), pos);
 	}
 
-	[Theory]
-	[AutoInitShutdown]
+	[Theory, SetupFakeDriver]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void Label_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
 	{
+		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
+
 		var text = "Hello World";
 		var width = 20;
 		var lblLeft = new Label (text) { Width = width, AutoSize = autoSize };
 		var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize };
 		var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize };
 		var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize };
-		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
-		Application.Top.Add (frame);
-		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (width + 2, 6);
+		frame.BeginInit ();
+		frame.EndInit ();
+		frame.Draw ();
 
 		Assert.True (lblLeft.AutoSize == autoSize);
 		Assert.True (lblCenter.AutoSize == autoSize);
@@ -736,23 +737,35 @@ e
 		Assert.True (lblCenter.TextFormatter.AutoSize == autoSize);
 		Assert.True (lblRight.TextFormatter.AutoSize == autoSize);
 		Assert.True (lblJust.TextFormatter.AutoSize == autoSize);
-		Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
-		Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
-		Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
-		Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
+		var expected = "";
 		if (autoSize) {
+			Assert.Equal (new Rect (0, 0, 11, 1), lblLeft.Frame);
+			Assert.Equal (new Rect (0, 1, 11, 1), lblCenter.Frame);
+			Assert.Equal (new Rect (0, 2, 11, 1), lblRight.Frame);
+			Assert.Equal (new Rect (0, 3, 11, 1), lblJust.Frame);
 			Assert.Equal (new Size (11, 1), lblLeft.TextFormatter.Size);
 			Assert.Equal (new Size (11, 1), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (11, 1), lblRight.TextFormatter.Size);
+			Assert.Equal (new Size (11, 1), lblJust.TextFormatter.Size);
+			expected = @"
+┌────────────────────┐
+│Hello World         │
+│Hello World         │
+│Hello World         │
+│Hello World         │
+└────────────────────┘
+";
+
 		} else {
+			Assert.Equal (new Rect (0, 0, width, 1), lblLeft.Frame);
+			Assert.Equal (new Rect (0, 1, width, 1), lblCenter.Frame);
+			Assert.Equal (new Rect (0, 2, width, 1), lblRight.Frame);
+			Assert.Equal (new Rect (0, 3, width, 1), lblJust.Frame);
 			Assert.Equal (new Size (width, 1), lblLeft.TextFormatter.Size);
 			Assert.Equal (new Size (width, 1), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (width, 1), lblRight.TextFormatter.Size);
-		}
-		Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
-		Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
-
-		var expected = @"
+			Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
+			expected = @"
 ┌────────────────────┐
 │Hello World         │
 │    Hello World     │
@@ -761,8 +774,9 @@ e
 └────────────────────┘
 ";
 
+		}
+		Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-		Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 	}
 
 	[Theory]

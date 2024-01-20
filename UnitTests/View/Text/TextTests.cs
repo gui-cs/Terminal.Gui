@@ -250,7 +250,7 @@ public class TextTests {
 		super.LayoutSubviews ();
 
 		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,0,1)", label.Bounds.ToString ());
+		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 		super.Dispose ();
 	}
 

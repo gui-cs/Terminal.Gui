@@ -756,8 +756,7 @@ public partial class View {
 				case Dim.DimAbsolute:
 					// DimAbsolute.Anchor (int width) ignores width and returns n
 					newDimension = Math.Max (d.Anchor (0), 0);
-					//newDimension = AutoSize && true ? autosize : newDimension;
-					newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
+					newDimension = AutoSize ? autosize : newDimension;
 					break;
 
 				case Dim.DimFill:
