@@ -4579,7 +4579,7 @@ Test", output);
 			TestHelpers.AssertDriverColorsAre (@"
 000000
 011110
-000000", [Colors.TopLevel.Normal, Colors.TopLevel.Focus]);
+000000", new Attribute [] { Colors.TopLevel.Normal, Colors.TopLevel.Focus });
 		}
 	}
 }
