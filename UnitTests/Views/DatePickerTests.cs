@@ -65,7 +65,7 @@ public class DatePickerTests {
 		Assert.True (datePicker.NewKeyDownEvent (new (KeyCode.Enter)));
 		Assert.Equal (1, datePicker.Date.Month);
 
-		// Date should not change as next month is disabled
+		// Date should not change as previous month button is disabled
 		Assert.False (datePicker.NewKeyDownEvent (new (KeyCode.Enter)));
 		Assert.Equal (1, datePicker.Date.Month);
 	}
@@ -89,7 +89,7 @@ public class DatePickerTests {
 		Assert.True (datePicker.NewKeyDownEvent (new (KeyCode.Enter)));
 		Assert.Equal (12, datePicker.Date.Month);
 
-		// Date should not change as next month is disabled
+		// Date should not change as next month button is disabled
 		Assert.False (datePicker.NewKeyDownEvent (new (KeyCode.Enter)));
 		Assert.Equal (12, datePicker.Date.Month);
 	}
