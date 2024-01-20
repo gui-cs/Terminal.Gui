@@ -79,7 +79,6 @@ namespace Terminal.Gui {
 			}
 			if (container != null) {
 				container.Closing -= Container_Closing;
-				container.Resized -= Container_Resized;
 			}
 		}
 
@@ -93,7 +92,6 @@ namespace Terminal.Gui {
 			}
 			container = Application.Current;
 			container.Closing += Container_Closing;
-			container.Resized += Container_Resized;
 			var frame = container.Frame;
 			var position = Position;
 			if (Host != null) {
@@ -143,13 +141,6 @@ namespace Terminal.Gui {
 			menuBar.MenuAllClosed += MenuBar_MenuAllClosed;
 			IsShow = true;
 			menuBar.OpenMenu ();
-		}
-
-		private void Container_Resized (Size obj)
-		{
-			if (IsShow) {
-				Show ();
-			}
 		}
 
 		private void Container_Closing (ToplevelClosingEventArgs obj)

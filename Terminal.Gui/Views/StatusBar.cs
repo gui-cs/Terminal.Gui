@@ -16,9 +16,9 @@ namespace Terminal.Gui {
 	/// Each <see cref="StatusItem"/> has a title, a shortcut (hotkey), and an <see cref="Action"/> that will be invoked when the 
 	/// <see cref="StatusItem.Shortcut"/> is pressed.
 	/// The <see cref="StatusItem.Shortcut"/> will be a global hotkey for the application in the current context of the screen.
-	/// The colour of the <see cref="StatusItem.Title"/> will be changed after each ~. 
+	/// The colour of the <see cref="StatusItem.Title"/> will be changed after each ~ (can be customized using <see cref="HotTextSpecifier"/>).
 	/// A <see cref="StatusItem.Title"/> set to `~F1~ Help` will render as *F1* using <see cref="ColorScheme.HotNormal"/> and
-	/// *Help* as <see cref="ColorScheme.HotNormal"/>.
+	/// *Help* as <see cref="ColorScheme.Normal"/>.
 	/// </summary>
 	public class StatusItem {
 		/// <summary>
@@ -64,6 +64,15 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>Function to determine if the action is can be executed or not.</value>
 		public Func<bool> CanExecute { get; set; }
+
+		/// <summary>
+		/// Gets or sets the rune that toggles the text color between <see cref="ColorScheme.Normal"/> and <see cref="ColorScheme.HotNormal"/>.
+		/// The default value is '~'.
+		/// Therefore, '~F1~ Help' will be rendered as 'F1' using <see cref="ColorScheme.HotNormal"/> and 'Help' using <see cref="ColorScheme.Normal"/>.
+		/// In order to use '~' as part of the title (e.g., to denote the home directory as a part of the current directory),
+		/// <see cref="HotTextSpecifier"/> should be changed to a different rune.
+		/// </summary>
+		public Rune HotTextSpecifier { get; set; } = '~';
 
 		/// <summary>
 		/// Returns <see langword="true"/> if the status item is enabled. This method is a wrapper around <see cref="CanExecute"/>.
@@ -157,9 +166,10 @@ namespace Terminal.Gui {
 			Driver.SetAttribute (scheme);
 			for (int i = 0; i < Items.Length; i++) {
 				var title = Items [i].Title.ToString ();
+				var hotTextSpecifier = Items [i].HotTextSpecifier;
 				Driver.SetAttribute (DetermineColorSchemeFor (Items [i]));
 				for (int n = 0; n < Items [i].Title.RuneCount; n++) {
-					if (title [n] == '~') {
+					if (title [n] == hotTextSpecifier) {
 						if (Items [i].IsEnabled ()) {
 							scheme = ToggleScheme (scheme);
 						}
@@ -197,23 +207,23 @@ namespace Terminal.Gui {
 
 			int pos = 1;
 			for (int i = 0; i < Items.Length; i++) {
-				if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i].Title)) {
+				if (me.X >= pos && me.X < pos + GetItemTitleLength (Items [i])) {
 					var item = Items [i];
 					if (item.IsEnabled ()) {
 						Run (item.Action);
 					}
 					break;
 				}
-				pos += GetItemTitleLength (Items [i].Title) + 3;
+				pos += GetItemTitleLength (Items [i]) + 3;
 			}
 			return true;
 		}
 
-		int GetItemTitleLength (ustring title)
+		int GetItemTitleLength (StatusItem item)
 		{
 			int len = 0;
-			foreach (var ch in title) {
-				if (ch == '~')
+			foreach (var ch in item.Title) {
+				if (ch == item.HotTextSpecifier)
 					continue;
 				len++;
 			}
