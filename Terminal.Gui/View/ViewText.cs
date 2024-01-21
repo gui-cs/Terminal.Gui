@@ -133,21 +133,21 @@ public partial class View {
 		}
 	}
 
-	void UpdateTextDirection (TextDirection newDirection)
+	// only called from EndInit
+	void EndInit_Text ()
 	{
-		var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction) != TextFormatter.IsHorizontalDirection (newDirection);
-		TextFormatter.Direction = newDirection;
-
 		var isValidOldAutoSize = AutoSize && IsValidAutoSize (out var _);
 
 		UpdateTextFormatterText ();
 
-		if (!ValidatePosDim && directionChanged && AutoSize || ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize) {
+		if (!ValidatePosDim && AutoSize || ValidatePosDim && AutoSize && isValidOldAutoSize) {
 			OnResizeNeeded ();
-		} else if (AutoSize && directionChanged && IsAdded) {
+		} else if (AutoSize && IsAdded) {
 			ResizeBoundsToFit (Bounds.Size);
 		} else {
 		}
+
+		SetHotKey ();
 		SetTextFormatterSize ();
 		SetNeedsDisplay ();
 	}
