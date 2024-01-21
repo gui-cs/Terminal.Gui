@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Terminal.Gui; 
 
@@ -8,6 +9,36 @@ namespace Terminal.Gui;
 /// <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
 public class TableStyle {
+
+	/// <summary>
+	/// Gets or sets the LineStyle for the borders surrounding header rows of a <see cref="TableView"/>.
+	/// Defaults to <see cref="LineStyle.Single"/>.
+	/// </summary>
+	public LineStyle OuterHeaderBorderStyle { get; set; } = LineStyle.Single;
+
+	/// <summary>
+	/// Gets or sets the LineStyle for the vertical lines separating header items in a <see cref="TableView"/>.
+	/// Defaults to <see cref="LineStyle.Single"/>.
+	/// </summary>
+	public LineStyle InnerHeaderBorderStyle { get; set; } = LineStyle.Single;
+
+	/// <summary>
+	/// Gets or sets the LineStyle for the borders surrounding the regular (non-header) portion of a <see cref="TableView"/>.
+	/// Defaults to <see cref="LineStyle.Single"/>.
+	/// </summary>
+	public LineStyle OuterBorderStyle { get; set; } = LineStyle.Single;
+
+	/// <summary>
+	/// Gets or sets the LineStyle for the lines separating regular (non-header) items in a <see cref="TableView"/>.
+	/// Defaults to <see cref="LineStyle.Single"/>.
+	/// </summary>
+	public LineStyle InnerBorderStyle { get; set; } = LineStyle.Single;
+
+	/// <summary>
+	/// Gets or sets the color Attribute of the inner and outer borders of a <see cref="TableView"/>.
+	/// Defaults to Attribute(-1, -1) which results in <see cref="Border.ColorScheme.Normal"/>.
+	/// </summary>
+	public Attribute BorderColor { get; set; } = new Attribute(-1, -1);
 
 	/// <summary>
 	/// Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>.
@@ -69,11 +100,37 @@ public class TableStyle {
 	/// </summary>
 	public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 
+	// TODO: Fix this, or just remove it [and SeparatorSymbol]?
 	/// <summary>
 	/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
 	/// vertical cell lines (even when <see cref="TableView.FullRowSelect"/> is on).
 	/// </summary>
-	public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
+	//public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
+
+	/// <summary>
+	/// The symbol to add after each cell value and header value to visually seperate values (if not using vertical gridlines)
+	/// </summary>
+	//public char SeparatorSymbol { get; set; } = ' ';
+
+	/// <summary>
+	/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
+	/// </summary>
+	public string NullSymbol { get; set; } = "-";
+
+	/// <summary>
+	/// The symbol to pad around values (between separators) in the header line
+	/// </summary>
+	public char HeaderPaddingSymbol { get; set; } = ' ';
+
+	/// <summary>
+	/// The symbol to pad around values (between separators)
+	/// </summary>
+	public char CellPaddingSymbol { get; set; } = ' ';
+
+	/// <summary>
+	/// The symbol to pad outside table (if Style.ExpandLastColumn is false)
+	/// </summary>
+	public char BackgroundSymbol { get; set; } = ' ';
 
 	/// <summary>
 	/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)

@@ -29,7 +29,7 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miCellLines;
 		private MenuItem _miFullRowSelect;
 		private MenuItem _miExpandLastColumn;
-		private MenuItem _miAlwaysUseNormalColorForVerticalCellLines;
+		//private MenuItem _miAlwaysUseNormalColorForVerticalCellLines;
 		private MenuItem _miSmoothScrolling;
 		private MenuItem _miAlternatingColors;
 		private MenuItem _miCursor;
@@ -43,12 +43,12 @@ namespace UICatalog.Scenarios {
 		ColorScheme redColorSchemeAlt;
 		ColorScheme alternatingColorScheme;
 
-		enum TableLineStyleType
+		enum TableBorderStyleType
 		{
-			OuterHeaderLineStyle,
-			InnerHeaderLineStyle,
-			OuterLineStyle,
-			InnerLineStyle,
+			OuterHeaderBorderStyle,
+			InnerHeaderBorderStyle,
+			OuterBorderStyle,
+			InnerBorderStyle,
 		}
 
 		HashSet<FileSystemInfo> _checkedFileSystemInfos = new HashSet<FileSystemInfo> ();
@@ -86,10 +86,11 @@ namespace UICatalog.Scenarios {
 					_miShowHorizontalScrollIndicators = new MenuItem ("Horizontal_ScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
 					_miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
 					_miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("AlwaysUse_NormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
-					new MenuItem ("_LineStyles", "", () => SetLineStyles()),
-					new MenuItem ("AllLines", "", () => ToggleAllCellLines()),
-					new MenuItem ("NoLines", "", () => ToggleNoCellLines()),
+					//_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("AlwaysUse_NormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					new MenuItem ("_BorderStyles", "", () => SetBorderStyles()),
+					new MenuItem ("_BorderColor", "", () => SetBorderColor()),
+					new MenuItem ("AllBorders", "", () => ToggleAllCellLines()),
+					new MenuItem ("NoBorders", "", () => ToggleNoCellLines()),
 					_miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
 					_miSmoothScrolling = new MenuItem ("S_moothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					_miAlternatingColors = new MenuItem ("Alte_rnatingColors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
@@ -366,20 +367,20 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
-		// TODO: Play with table borders
-		private void SetLineStyles ()
+		private void SetBorderStyles ()
 		{
 			var style = tableView.Style;
-			var chosenType = TableLineStyleType.OuterHeaderLineStyle;
+			var chosenType = TableBorderStyleType.OuterHeaderBorderStyle;
 			var chosenStyle = LineStyle.None;
+
 			if (style != null) {
 				// Change selection to existing style value for default type
-				chosenStyle = style.OuterHeaderLineStyle;
+				chosenStyle = style.OuterHeaderBorderStyle;
 			}
 
-			var borderTypeEnum = Enum.GetNames (typeof (TableLineStyleType));
+			var borderTypeEnum = Enum.GetNames (typeof (TableBorderStyleType));
 			var rbBorderType = new RadioGroup (borderTypeEnum.Select (
-				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+				e => e.ToString ()).ToArray ()) {
 				X = 0,
 				Y = 0,
 			};
@@ -393,7 +394,7 @@ namespace UICatalog.Scenarios {
 
 			var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 			var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
-				e => NStack.ustring.Make (e.ToString ())).ToArray ()) {
+				e => e.ToString ()).ToArray ()) {
 				X = Pos.Right (rbBorderType) + 2,
 				Y = 0,
 				SelectedItem = (int) chosenStyle
@@ -401,25 +402,25 @@ namespace UICatalog.Scenarios {
 
 			// Change selection to existing style value for given type
 			rbBorderType.SelectedItemChanged += (s, e) => {
-				chosenType = (TableLineStyleType) e.SelectedItem;
+				chosenType = (TableBorderStyleType)e.SelectedItem;
 				var str = chosenType.ToString ();
 				switch (e.SelectedItem) {
 				case 0:
-					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.OuterHeaderLineStyle;
+					rbBorderStyle.SelectedItem = (int) (TableBorderStyleType) style.OuterHeaderBorderStyle;
 					break;
 				case 1:
-					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.InnerHeaderLineStyle;
+					rbBorderStyle.SelectedItem = (int) (TableBorderStyleType) style.InnerHeaderBorderStyle;
 					break;
 				case 2:
-					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.OuterLineStyle;
+					rbBorderStyle.SelectedItem = (int) (TableBorderStyleType) style.OuterBorderStyle;
 					break;
 				case 3:
-					rbBorderStyle.SelectedItem = (int) (TableLineStyleType) style.InnerLineStyle;
+					rbBorderStyle.SelectedItem = (int) (TableBorderStyleType) style.InnerBorderStyle;
 					break;
 				}
 			};
 			rbBorderStyle.SelectedItemChanged += (s, e) => {
-				chosenStyle = (LineStyle) e.SelectedItem;
+				chosenStyle = (LineStyle)e.SelectedItem;
 			};
 
 			d.Add (rbBorderType, rbBorderStyle);
@@ -431,22 +432,91 @@ namespace UICatalog.Scenarios {
 				try {
 					switch ((int)chosenType) {
 					case 0:
-						Action<TableStyle, LineStyle> setterHdrOut = (s, v) => s.OuterHeaderLineStyle = v;
+						Action<TableStyle, LineStyle> setterHdrOut = (s, v) => s.OuterHeaderBorderStyle = v;
 						setterHdrOut (style, chosenStyle);
 						break;
 					case 1:
-						Action<TableStyle, LineStyle> setterHdrIn = (s, v) => s.InnerHeaderLineStyle = v;
+						Action<TableStyle, LineStyle> setterHdrIn = (s, v) => s.InnerHeaderBorderStyle = v;
 						setterHdrIn (style, chosenStyle);
 						break;
 					case 2:
-						Action<TableStyle, LineStyle> setterOut = (s, v) => s.OuterLineStyle = v;
+						Action<TableStyle, LineStyle> setterOut = (s, v) => s.OuterBorderStyle = v;
 						setterOut (style, chosenStyle);
 						break;
 					case 3:
-						Action<TableStyle, LineStyle> setterIn = (s, v) => s.InnerLineStyle = v;
+						Action<TableStyle, LineStyle> setterIn = (s, v) => s.InnerBorderStyle = v;
 						setterIn (style, chosenStyle);
 						break;
 					}
+				} catch (Exception ex) {
+					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
+				}
+
+				tableView.Update ();
+			}
+		}
+
+		private void SetBorderColor ()
+		{
+			var style = tableView.Style;
+			Color chosenForeground;
+			Color chosenBackground;
+			if (style.BorderColor.Foreground != -1) {
+				chosenForeground = style.BorderColor.Foreground;
+			} else {
+				chosenForeground = tableView.Border.ColorScheme.Normal.Foreground;
+			}
+			if (style.BorderColor.Background != -1) {
+				chosenBackground = style.BorderColor.Background;
+			} else {
+				chosenBackground = tableView.Border.ColorScheme.Normal.Background;
+			}
+
+			var accepted = false;
+			var ok = new Button ("Ok", is_default: true);
+			ok.Clicked += (s, e) => { accepted = true; Application.RequestStop (); };
+			var cancel = new Button ("Cancel");
+			cancel.Clicked += (s, e) => { Application.RequestStop (); };
+			var d = new Dialog (ok, cancel) { Title = "BorderColor" };
+
+			var colorEnum = Enum.GetNames (typeof (ColorName));
+			var rbBorderFgTitle = new Label ("Foreground") {
+				X = 0,
+				Y = 0
+			};
+			var rbBorderForeground = new RadioGroup (colorEnum.Select (
+				e => e.ToString ()).ToArray ()) {
+				X = 0,
+				Y = Pos.Bottom(rbBorderFgTitle),
+				SelectedItem = (int)chosenForeground
+			};
+			var rbBorderBgTitle = new Label ("Background") {
+				X = Pos.Right (rbBorderForeground) + 2,
+				Y = 0
+			};
+			var rbBorderBackground = new RadioGroup (colorEnum.Select (
+				e => e.ToString ()).ToArray ()) {
+				X = Pos.Right (rbBorderForeground) + 2,
+				Y = Pos.Bottom(rbBorderBgTitle),
+				SelectedItem = (int)chosenBackground
+			};
+
+			rbBorderForeground.SelectedItemChanged += (s, e) => {
+				Color.TryParse (colorEnum [e.SelectedItem], out var c); chosenForeground = c;
+			};
+			rbBorderBackground.SelectedItemChanged += (s, e) => {
+				Color.TryParse (colorEnum [e.SelectedItem], out var c); chosenBackground = c;
+			};
+
+			d.Add (rbBorderFgTitle, rbBorderForeground, rbBorderBgTitle, rbBorderBackground);
+
+			Application.Run (d);
+
+			if (accepted) {
+
+				try {
+					Action<TableStyle, Attribute> setterCol = (s, v) => s.BorderColor = v;
+					setterCol (style, new Attribute (chosenForeground, chosenBackground));
 				} catch (Exception ex) {
 					MessageBox.ErrorQuery (60, 20, "Failed to set", ex.Message, "Ok");
 				}
@@ -638,6 +708,7 @@ namespace UICatalog.Scenarios {
 			}
 		}
 
+		/*
 		private void ToggleAlwaysUseNormalColorForVerticalCellLines ()
 		{
 			_miAlwaysUseNormalColorForVerticalCellLines.Checked = !_miAlwaysUseNormalColorForVerticalCellLines.Checked;
@@ -645,6 +716,8 @@ namespace UICatalog.Scenarios {
 
 			tableView.Update ();
 		}
+		*/
+
 		private void ToggleSmoothScrolling ()
 		{
 			_miSmoothScrolling.Checked = !_miSmoothScrolling.Checked;

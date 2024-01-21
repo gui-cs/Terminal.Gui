@@ -147,26 +147,6 @@ namespace Terminal.Gui {
 		public int MaxCellWidth { get; set; } = DefaultMaxCellWidth;
 
 		/// <summary>
-		/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
-		/// </summary>
-		public string NullSymbol { get; set; } = "-";
-
-		/// <summary>
-		/// The symbol to add after each cell value and header value to visually seperate values (if not using vertical gridlines)
-		/// </summary>
-		public char SeparatorSymbol { get; set; } = ' ';
-
-		/// <summary>
-		/// The symbol to pad around values (between separators)
-		/// </summary>
-		public char HeaderPaddingSymbol { get; set; } = ' ';
-
-		/// <summary>
-		/// The symbol to pad around values (between separators)
-		/// </summary>
-		public char CellPaddingSymbol { get; set; } = ' ';
-
-		/// <summary>
 		/// This event is raised when the selected cell in the table changes.
 		/// </summary>
 		public event EventHandler<SelectedCellChangedEventArgs> SelectedCellChanged;
@@ -306,10 +286,19 @@ namespace Terminal.Gui {
 
 			// render the cell lines
 			grid.Clear ();
-			if (Style.LineColor.Initialized)
-				Driver.SetAttribute (Style.LineColor);
-			else
-				Driver.SetAttribute (this.ColorScheme.Normal);
+			Color fg;
+			Color bg;
+			if (Style.BorderColor.Foreground == -1) {
+				fg = this.Border.ColorScheme.Normal.Foreground;
+			} else {
+				fg = Style.BorderColor.Foreground;
+			}
+			if (Style.BorderColor.Background == -1) {
+				bg = this.Border.ColorScheme.Normal.Background;
+			} else {
+				bg = Style.BorderColor.Background;
+			}
+			Driver.SetAttribute (new Attribute(fg, bg));
 			RenderCellLines (width, Table.Rows, columnsToRender);
 
 			foreach (var p in grid.GetMap (Bounds)) {
@@ -337,7 +326,7 @@ namespace Terminal.Gui {
 
 			// render the header contents
 			if (Style.ShowHeaders && hh > 0) {
-				var padChar = HeaderPaddingSymbol;
+				var padChar = Style.HeaderPaddingSymbol;
 
 				var yh = hh - 1;
 				if (Style.ShowHorizontalHeaderUnderline) {
@@ -351,9 +340,11 @@ namespace Terminal.Gui {
 					var colStyle = Style.GetColumnStyleIfAny (current.Column);
 					var colName = table.ColumnNames [current.Column];
 
+					/*
 					if (!Style.ShowVerticalHeaderLines && current.X - 1 >= 0) {
-						AddRune (current.X - 1, yh, SeparatorSymbol);
+						AddRune (current.X - 1, yh, (Rune)Style.SeparatorSymbol);
 					}
+					*/
 
 					Move (current.X, yh);
 
@@ -361,25 +352,27 @@ namespace Terminal.Gui {
 						Style.ShowHorizontalHeaderThroughline &&
 						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
 
-						if (colName.Sum (c => Rune.ColumnWidth (c)) < current.Width) {
+						if (colName.Sum (c => ((Rune)c).GetColumns ()) < current.Width) {
 							Driver.AddStr (colName);
 						} else {
-							Driver.AddStr (new string (colName.TakeWhile (h => (current.Width -= Rune.ColumnWidth (h)) > 0).ToArray ()));
+							Driver.AddStr (new string (colName.TakeWhile (h => (current.Width -= ((Rune)h).GetColumns ()) > 0).ToArray ()));
 						}
 					} else {
 						Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle, padChar));
 					}
 
 					if (!Style.ExpandLastColumn) {
+						/*
 						if (!Style.ShowVerticalHeaderLines && current.IsVeryLast) {
-							AddRune (current.X + current.Width - 1, yh, SeparatorSymbol);
+							AddRune (current.X + current.Width - 1, yh, (Rune)Style.SeparatorSymbol);
 						}
+						*/
 						if (i == columnsToRender.Length - 1) {
 							for (int j = current.X + current.Width; j < Bounds.Width; j++) {
 								Driver.SetAttribute (GetNormalColor ());
-								AddRune (j, yh, ' ');
+								AddRune (j, yh, (Rune)Style.BackgroundSymbol);
 								if (Style.ShowHorizontalHeaderUnderline) {
-									AddRune (j, yh + 1, ' ');
+									AddRune (j, yh + 1, (Rune)Style.BackgroundSymbol);
 								}
 							}
 						}
@@ -390,7 +383,7 @@ namespace Terminal.Gui {
 			// render the cell contents
 			for (var line = hh; line < frame.Height; line++) {
 
-				var padChar = CellPaddingSymbol;
+				var padChar = Style.CellPaddingSymbol;
 
 				//work out what Row to render
 				var rowToRender = RowOffset + (line - hh);
@@ -453,30 +446,30 @@ namespace Terminal.Gui {
 
 			if (hh > 0) {
 				if (Style.ShowHorizontalHeaderOverline) {
-					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.OuterHeaderLineStyle);
+					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.OuterHeaderBorderStyle);
 					row++;
 				}
 				if (Style.ShowHeaders) {
 					if (Style.ShowHorizontalHeaderThroughline &&
 						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
-						grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.InnerHeaderLineStyle);
+						grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.InnerHeaderBorderStyle);
 					}
 					row++;
 				}
 				if (Style.ShowHorizontalHeaderUnderline) {
-					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.OuterHeaderLineStyle);
+					grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.OuterHeaderBorderStyle);
 					row++;
 				}
 
-				if (row > 1 && Style.ShowVerticalHeaderLines && Style.InnerHeaderLineStyle != LineStyle.None) {
+				if (row > 1 && Style.ShowVerticalHeaderLines && Style.InnerHeaderBorderStyle != LineStyle.None) {
 					foreach (var col in columnsToRender) {
-						var lineStyle = Style.InnerHeaderLineStyle;
+						var lineStyle = Style.InnerHeaderBorderStyle;
 						if (col.X - 1 == 0) {
-							lineStyle = Style.OuterHeaderLineStyle;
+							lineStyle = Style.OuterHeaderBorderStyle;
 						}
 						grid.AddLine (new Point (col.X - 1, 0), row, Orientation.Vertical, lineStyle);
 					}
-					grid.AddLine (new Point (width - 1, 0), row, Orientation.Vertical, Style.OuterHeaderLineStyle);
+					grid.AddLine (new Point (width - 1, 0), row, Orientation.Vertical, Style.OuterHeaderBorderStyle);
 				}
 			}
 
@@ -487,18 +480,18 @@ namespace Terminal.Gui {
 			// render the vertical cell lines
 			if (Style.ShowVerticalCellLines) {
 				foreach (var col in columnsToRender) {
-					var lineStyle = Style.InnerLineStyle;
+					var lineStyle = Style.InnerBorderStyle;
 					if (col.X - 1 == 0) {
-						lineStyle = Style.OuterLineStyle;
+						lineStyle = Style.OuterBorderStyle;
 					}
 					grid.AddLine (new Point (col.X - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, lineStyle);
 				}
-				grid.AddLine (new Point (width - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, Style.OuterLineStyle);
+				grid.AddLine (new Point (width - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, Style.OuterBorderStyle);
 			}
 
 			// render the bottom line
 			if (Style.ShowHorizontalBottomline) {
-				grid.AddLine (new Point (0, height - RowOffset + hh - 1), width, Orientation.Horizontal, Style.OuterLineStyle);
+				grid.AddLine (new Point (0, height - RowOffset + hh - 1), width, Orientation.Horizontal, Style.OuterBorderStyle);
 			}
 		}
 
@@ -552,9 +545,6 @@ namespace Terminal.Gui {
 				color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
 			}
 
-			//Driver.SetAttribute (color);
-			//Driver.AddStr (new string (' ', Bounds.Width));
-
 			// Render cells for each visible header for the current row
 			for (int i = 0; i < columnsToRender.Length; i++) {
 
@@ -606,7 +596,7 @@ namespace Terminal.Gui {
 				RenderCell (cellColor, render, isPrimaryCell);
 
 				// Style.AlwaysUseNormalColorForVerticalCellLines is no longer possible after switch to LineCanvas
-				// except when cell lines are disabled and SeparatorSymbol is used
+				// except when cell lines are disabled and Style.SeparatorSymbol is used
 
 				if (!Style.ShowVerticalCellLines) {
 					if (isSelectedCell) {
@@ -617,36 +607,10 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (color);
 				}
 
-				// If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
-				if (!FullRowSelect)
-					Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
-
-					if (Style.AlwaysUseNormalColorForVerticalCellLines) {
-						color = rowScheme.Normal;
-
-					} else if (scheme != rowScheme) {
-
-						// Reset color scheme to normal for drawing separators if we drew text with custom scheme
-						if (isSelectedCell) {
-							color = focused ? rowScheme.HotFocus : rowScheme.HotNormal;
-						} else {
-							color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
-						}
-					}
-					Driver.SetAttribute (color);
-
-					if (current.X - 1 >= 0) {
-						AddRune (current.X - 1, row, SeparatorSymbol);
-					}
-					if (!Style.ExpandLastColumn && current.IsVeryLast) {
-						AddRune (current.X + current.Width - 1, row, SeparatorSymbol);
-					}
-				}
-
 				if (!Style.ExpandLastColumn && i == columnsToRender.Length - 1) {
 					for (int j = current.X + current.Width; j < Bounds.Width; j++) {
 						Driver.SetAttribute (GetNormalColor ());
-						AddRune (j, row, ' ');
+						AddRune (j, row, (Rune)Style.BackgroundSymbol);
 					}
 				}
 			}
@@ -1765,7 +1729,7 @@ namespace Terminal.Gui {
 		private string GetRepresentation (object value, ColumnStyle colStyle)
 		{
 			if (value == null || value == DBNull.Value) {
-				return string.IsNullOrEmpty(NullSymbol) ? " " : NullSymbol;
+				return string.IsNullOrEmpty(Style.NullSymbol) ? " " : Style.NullSymbol;
 			}
 
 			return colStyle != null ? colStyle.GetRepresentation (value) : value.ToString ();
