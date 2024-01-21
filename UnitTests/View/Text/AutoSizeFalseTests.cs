@@ -226,7 +226,7 @@ public class AutoSizeFalseTests {
 	public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Differents_Orders ()
 	{
 		var view1 = new View { Text = "Say Hello view1 你", AutoSize = false, Width = 10, Height = 5 };
-		var view2 = new View { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = false };
+		var view2 = new View { Text = "Say Hello view2 你", AutoSize = false, Width = 10, Height = 5};
 		var view3 = new View { AutoSize = false, Width = 10, Height = 5, Text = "Say Hello view3 你" };
 		var view4 = new View {
 			Text = "Say Hello view4 你",
@@ -237,9 +237,9 @@ public class AutoSizeFalseTests {
 		};
 		var view5 = new View {
 			Text = "Say Hello view5 你",
+			AutoSize = false,
 			Width = 10,
 			Height = 5,
-			AutoSize = false,
 			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		var view6 = new View {

@@ -19,12 +19,12 @@ namespace UICatalog.Scenarios {
 			Win.Add (frame);
 
 			var label = new Label ("Width:") {
+				AutoSize = false,
 				X = 0,
 				Y = 0,
 				Width = 15,
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
-				AutoSize = false
 			};
 			frame.Add (label);
 			var widthEdit = new TextField ("80") {
@@ -36,12 +36,12 @@ namespace UICatalog.Scenarios {
 			frame.Add (widthEdit);
 
 			label = new Label ("Height:") {
+				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
-				AutoSize = false
 			};
 			frame.Add (label);
 			var heightEdit = new TextField ("20") {
@@ -53,12 +53,12 @@ namespace UICatalog.Scenarios {
 			frame.Add (heightEdit);
 
 			label = new Label ("Title:") {
+				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
 				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
-				AutoSize = false
 			};
 			frame.Add (label);
 			var titleEdit = new TextField ("Gandolf") {

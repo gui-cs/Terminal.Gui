@@ -787,10 +787,10 @@ namespace UICatalog.Scenarios {
 			var lblWidth = "Replace:".Length;
 
 			var label = new Label ("Find:") {
+				AutoSize = false,
 				Y = 1,
 				Width = lblWidth,
 				TextAlignment = TextAlignment.Right,
-				AutoSize = false
 			};
 			d.Add (label);
 
@@ -804,24 +804,24 @@ namespace UICatalog.Scenarios {
 			d.Add (txtToFind);
 
 			var btnFindNext = new Button ("Find _Next") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
-				AutoSize = false
 			};
 			btnFindNext.Clicked += (s, e) => FindNext ();
 			d.Add (btnFindNext);
 
 			var btnFindPrevious = new Button ("Find _Previous") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
 			};
 			btnFindPrevious.Clicked += (s, e) => FindPrevious ();
 			d.Add (btnFindPrevious);
@@ -834,11 +834,11 @@ namespace UICatalog.Scenarios {
 			};
 
 			var btnCancel = new Button ("Cancel") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
 				Width = 20,
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
 			};
 			btnCancel.Clicked += (s, e) => {
 				DisposeWinDialog ();
@@ -879,10 +879,10 @@ namespace UICatalog.Scenarios {
 			var lblWidth = "Replace:".Length;
 
 			var label = new Label ("Find:") {
+				AutoSize = false,
 				Y = 1,
 				Width = lblWidth,
 				TextAlignment = TextAlignment.Right,
-				AutoSize = false
 			};
 			d.Add (label);
 
@@ -896,13 +896,13 @@ namespace UICatalog.Scenarios {
 			d.Add (txtToFind);
 
 			var btnFindNext = new Button ("Replace _Next") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
 				IsDefault = true,
-				AutoSize = false
 			};
 			btnFindNext.Clicked += (s, e) => ReplaceNext ();
 			d.Add (btnFindNext);
@@ -925,23 +925,23 @@ namespace UICatalog.Scenarios {
 			d.Add (txtToReplace);
 
 			var btnFindPrevious = new Button ("Replace _Previous") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
 			};
 			btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
 			var btnReplaceAll = new Button ("Replace _All") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
 				Width = 20,
 				Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
 			};
 			btnReplaceAll.Clicked += (s, e) => ReplaceAll ();
 			d.Add (btnReplaceAll);
@@ -955,11 +955,11 @@ namespace UICatalog.Scenarios {
 			};
 
 			var btnCancel = new Button ("Cancel") {
+				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
 				Width = 20,
 				TextAlignment = TextAlignment.Centered,
-				AutoSize = false
 			};
 			btnCancel.Clicked += (s, e) => {
 				DisposeWinDialog ();

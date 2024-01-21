@@ -33,7 +33,6 @@ public class Label : View {
 
 	void SetInitialProperties (bool autosize = true)
 	{
-		Height   = 1;
 		AutoSize = autosize;
 		// Things this view knows how to do
 		AddCommand (Command.Default, () => {

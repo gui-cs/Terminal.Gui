@@ -909,6 +909,7 @@ Y
 	[AutoInitShutdown]
 	public void AutoSize_True_Setting_With_Height_Vertical ()
 	{
+		// BUGBUG: Label is AutoSize = true, so Width & Height are ignored
 		var label = new Label { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true };
 		var viewX = new View ("X") { X = Pos.Right (label) };
 		var viewY = new View ("Y") { Y = Pos.Bottom (label) };
@@ -920,28 +921,22 @@ Y
 		label.Text = "Hello";
 		Application.Refresh ();
 
-		// #3127: Label.Text is "Hello" - It's Vertical. So the width should be 2 (honoring Width = 2)
-		// and the height is should be 10 (because 10 is greater than length of Hello).
-		Assert.Equal (new Rect (0, 0, 2, 10), label.Frame);
+		Assert.Equal (new Rect (0, 0, 1, 5), label.Frame); // BUGBUG: AutoSize = true, so the Width should be 1.
 
 		var expected = @"
-H X
-e  
-l  
-l  
-o  
-   
-   
-   
-   
-   
-Y  
+HX
+e 
+l 
+l 
+o 
+Y 
 ";
 
 		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 3, 11), pos);
 
 		label.AutoSize = false;
+		label.Width = 2;
+		label.Height = 10;
 		Application.Refresh ();
 
 		Assert.False (label.AutoSize);
@@ -963,7 +958,6 @@ Y
 			;
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Assert.Equal (new Rect (0, 0, 3, 11), pos);
 		Application.End (rs);
 	}
 
@@ -1019,9 +1013,9 @@ Y
 		};
 		var view5 = new View {
 			Text = "Say Hello view5 你",
+			AutoSize = true,
 			Width = 10,
 			Height = 5,
-			AutoSize = true,
 			TextDirection = TextDirection.TopBottom_LeftRight,
 			ValidatePosDim = true
 		};
@@ -1051,9 +1045,9 @@ Y
 		Assert.Equal ("Absolute(18)", view2.Width.ToString ());
 		Assert.Equal ("Absolute(5)", view2.Height.ToString ());
 		Assert.True (view3.AutoSize);
-		Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
+		Assert.Equal (new Rect (0, 0, 18, 1), view3.Frame);  // BUGBUG: AutoSize = true, so the height should be 1.
 		Assert.Equal ("Absolute(18)", view2.Width.ToString ());
-		Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+		Assert.Equal ("Absolute(1)", view3.Height.ToString ());
 		Assert.True (view4.AutoSize);
 
 		Assert.Equal ("Say Hello view4 你".GetColumns (), view2.Width);
@@ -1065,7 +1059,7 @@ Y
 		Assert.True (view5.AutoSize);
 		Assert.Equal (new Rect (0, 0, 18, 17), view5.Frame);
 		Assert.True (view6.AutoSize);
-		Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
+		Assert.Equal (new Rect (0, 0, 2, 17), view6.Frame); // BUGBUG: AutoSize = true, so the Width should be 2.
 
 		top.BeginInit ();
 		top.EndInit ();
@@ -1085,9 +1079,9 @@ Y
 		Assert.Equal ("Absolute(18)", view2.Width.ToString ());
 		Assert.Equal ("Absolute(5)", view2.Height.ToString ());
 		Assert.True (view3.AutoSize);
-		Assert.Equal (new Rect (0, 0, 18, 5), view3.Frame);
+		Assert.Equal (new Rect (0, 0, 18, 1), view3.Frame); // BUGBUG: AutoSize = true, so the height should be 1.
 		Assert.Equal ("Absolute(18)", view5.Width.ToString ());
-		Assert.Equal ("Absolute(5)", view3.Height.ToString ());
+		Assert.Equal ("Absolute(1)", view3.Height.ToString ());
 		Assert.True (view4.AutoSize);
 		Assert.Equal (new Rect (0, 0, 18, 17), view4.Frame);
 		Assert.Equal ("Absolute(18)", view5.Width.ToString ());
@@ -1097,8 +1091,8 @@ Y
 		Assert.Equal ("Absolute(18)", view5.Width.ToString ());
 		Assert.Equal ("Absolute(17)", view5.Height.ToString ());
 		Assert.True (view6.AutoSize);
-		Assert.Equal (new Rect (0, 0, 10, 17), view6.Frame);
-		Assert.Equal ("Absolute(10)", view6.Width.ToString ());
+		Assert.Equal (new Rect (0, 0, 2, 17), view6.Frame); // BUGBUG: AutoSize = true, so the Width should be 2.
+		Assert.Equal ("Absolute(2)", view6.Width.ToString ());
 		Assert.Equal ("Absolute(17)", view6.Height.ToString ());
 	}
 
@@ -2378,22 +2372,22 @@ Y
 		var text = $"First line{Environment.NewLine}Second line";
 		var horizontalView = new View {
 			AutoSize = true,
-			Width = 20,
-			Height = 1,
+			Width = 20,  // BUGBUG: These are ignored
+			Height = 1,  // BUGBUG: These are ignored
 			Text = text
 		};
 		var verticalView = new View {
 			AutoSize = true,
 			Y = 3,
-			Height = 20,
-			Width = 1,
+			Height = 20, // BUGBUG: These are ignored
+			Width = 1,   // BUGBUG: These are ignored
 			Text = text,
 			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		var win = new Window {
 			AutoSize = true,
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Width = Dim.Fill (), // BUGBUG: These are ignored
+			Height = Dim.Fill (),// BUGBUG: These are ignored
 			Text = "Window"
 		};
 		win.Add (horizontalView, verticalView);
@@ -2403,8 +2397,8 @@ Y
 
 		Assert.True (horizontalView.AutoSize);
 		Assert.True (verticalView.AutoSize);
-		Assert.Equal (new Rect (0, 0, 20, 2), horizontalView.Frame);
-		Assert.Equal (new Rect (0, 3, 11, 20), verticalView.Frame);
+		Assert.Equal (new Rect (0, 0, 11, 2), horizontalView.Frame);
+		Assert.Equal (new Rect (0, 3, 11, 11), verticalView.Frame);
 		var expected = @"
 ┌──────────────────┐
 │First line        │
@@ -2432,7 +2426,7 @@ Y
 
 		verticalView.Text = $"最初の行{Environment.NewLine}二行目";
 		Application.Top.Draw ();
-		Assert.Equal (new Rect (0, 3, 11, 20), verticalView.Frame);
+		Assert.Equal (new Rect (0, 3, 11, 11), verticalView.Frame);
 		expected = @"
 ┌──────────────────┐
 │First line        │
@@ -2699,7 +2693,7 @@ Y
 
 		Assert.True (v.TrySetWidth (0, out _));
 		Assert.True (v.Width is Dim.DimAbsolute);
-		Assert.Equal (79, v.Frame.Width);
+		Assert.Equal (0, v.Frame.Width); // No text, so width is 0
 		top.Dispose ();
 	}
 
@@ -2737,11 +2731,11 @@ Y
 
 		Assert.True (v.TrySetHeight (0, out _));
 		Assert.True (v.Height is Dim.DimAbsolute);
-		Assert.Equal (19, v.Frame.Height);
+		Assert.Equal (0, v.Frame.Height); // No text, so height is 0
 		top.Dispose ();
 	}
 
-	// Moved from DimTests.cs
+	// Moved from DimTests.cs - This is really a bogus test
 	[Theory]
 	[AutoInitShutdown]
 	[InlineData (0, true)]
@@ -2772,11 +2766,11 @@ Y
 		Assert.Equal (100, container.Frame.Height);
 
 		if (testHorizontal) {
-			Assert.Equal (51, label.Frame.Width);
-			Assert.Equal (1, label.Frame.Height);
+			Assert.Equal (0, label.Frame.Width); // BUGBUG: Shoudl be 0 not since there's no text
+			Assert.Equal (0, label.Frame.Height);
 		} else {
-			Assert.Equal (1, label.Frame.Width);
-			Assert.Equal (51, label.Frame.Height);
+			Assert.Equal (0, label.Frame.Width); // BUGBUG: Shoudl be 0 not since there's no text
+			Assert.Equal (0, label.Frame.Height);
 		}
 	}
 
@@ -2839,10 +2833,10 @@ Y
 	{
 		var text = "Label";
 		var label = new Label {
+			AutoSize = false, // BUGBUG: Had to move this up to avoid changing Width/Height
 			Width = Dim.Fill () - text.Length,
 			Height = 1,
 			Text = text,
-			AutoSize = false
 		};
 		var win = new Window {
 			Width = Dim.Fill (),

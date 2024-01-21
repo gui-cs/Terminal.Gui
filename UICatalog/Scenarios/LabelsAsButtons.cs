@@ -155,13 +155,13 @@ namespace UICatalog.Scenarios {
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 			var sizeBtn = new Label ("Size This \u263a Label _via Pos") {
 				//var sizeBtn = new Label ("Size This x Label _via Pos") {
+				AutoSize = false,
 				X = 0,
 				Y = Pos.Center () + 1,
 				Width = 30,
 				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
-				AutoSize = false
 			};
 			sizeBtn.Clicked += (s,e) => {
 				sizeBtn.Width = sizeBtn.Frame.Width + 5;
@@ -190,10 +190,10 @@ namespace UICatalog.Scenarios {
 
 			// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 			var sizeBtnA = new Label (0, 2, " ~  s  gui.cs   master ↑10 = Со_хранить") {
+				AutoSize = false,
 				ColorScheme = Colors.ColorSchemes ["Error"],
 				HotKeySpecifier = (Rune)'_',
 				CanFocus = true,
-				AutoSize = false
 			};
 			sizeBtnA.Clicked += (s,e) => {
 				sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);

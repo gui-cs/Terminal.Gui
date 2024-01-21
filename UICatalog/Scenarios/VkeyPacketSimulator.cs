@@ -30,18 +30,18 @@ public class VkeyPacketSimulator : Scenario {
 		const string ruler = "|123456789";
 
 		var inputHorizontalRuler = new Label ("") {
+			AutoSize = false,
 			Y = Pos.Bottom (btnInput),
 			Width = Dim.Fill (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = false
 		};
 		Win.Add (inputHorizontalRuler);
 
 		var inputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
+			AutoSize = false,
 			Y = Pos.Bottom (btnInput),
 			Width = 1,
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = false
 		};
 		Win.Add (inputVerticalRuler);
 
@@ -67,19 +67,19 @@ public class VkeyPacketSimulator : Scenario {
 		Win.Add (btnOutput);
 
 		var outputHorizontalRuler = new Label ("") {
+			AutoSize = false,
 			Y = Pos.Bottom (btnOutput),
 			Width = Dim.Fill (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = false
 		};
 		Win.Add (outputHorizontalRuler);
 
 		var outputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
+			AutoSize = false,
 			Y = Pos.Bottom (btnOutput),
 			Width = 1,
 			Height = Dim.Fill (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = false
 		};
 		Win.Add (outputVerticalRuler);
 

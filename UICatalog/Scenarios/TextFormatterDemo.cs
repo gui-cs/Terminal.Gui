@@ -25,7 +25,7 @@ namespace UICatalog.Scenarios {
 			string text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 			string unicode = "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-			Label blockText = new Label () { ColorScheme = Colors.ColorSchemes ["TopLevel"], X = 0, Y = 0, Height = 10, Width = Dim.Fill (0), AutoSize = false };
+			Label blockText = new Label () { AutoSize = false, ColorScheme = Colors.ColorSchemes ["TopLevel"], X = 0, Y = 0, Height = 10, Width = Dim.Fill (0) };
 
 			var block = new StringBuilder ();
 			block.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");
@@ -55,8 +55,8 @@ namespace UICatalog.Scenarios {
 			var multiLineHeight = 5;
 
 			foreach (var alignment in alignments) {
-				singleLines [(int)alignment] = new Label (text) { TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = 1, ColorScheme = Colors.ColorSchemes ["Dialog"], AutoSize = false };
-				multipleLines [(int)alignment] = new Label (text) { TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"], AutoSize = false };
+				singleLines [(int)alignment] = new Label (text) { AutoSize = false, TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = 1, ColorScheme = Colors.ColorSchemes ["Dialog"] };
+				multipleLines [(int)alignment] = new Label (text) { AutoSize = false, TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"]};
 			}
 
 			var label = new Label ($"Demonstrating single-line (should clip):") { Y = Pos.Bottom (unicodeCheckBox) + 1 };

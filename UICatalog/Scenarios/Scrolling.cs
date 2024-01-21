@@ -130,29 +130,30 @@ namespace UICatalog.Scenarios {
 			const string rule = "0123456789";
 
 			var horizontalRuler = new Label () {
+				AutoSize = false,
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = 2,
 				ColorScheme = Colors.ColorSchemes ["Error"],
-				AutoSize = false
 			};
 			scrollView.Add (horizontalRuler);
 
 			const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
 			var verticalRuler = new Label () {
+				AutoSize = false,
 				X = 0,
 				Y = 0,
 				Width = 1,
 				Height = Dim.Fill (),
 				ColorScheme = Colors.ColorSchemes ["Error"],
-				AutoSize = false
 			};
 			scrollView.Add (verticalRuler);
 
 			void Top_Loaded (object sender, EventArgs args)
 			{
+				// BUGBUG: Replace with ConsoleDriver.Diagnostics ruler
 				horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
 					"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
 				verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];

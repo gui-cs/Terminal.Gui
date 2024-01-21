@@ -140,9 +140,9 @@ namespace UICatalog.Scenarios {
 		private View CreateLabelView (int number)
 		{
 			return new Label {
+				AutoSize = false,
 				Width = Dim.Fill (),
 				Height = 1,
-				AutoSize = false,
 				Text = number.ToString ().Repeat (1000),
 				CanFocus = true,
 			};

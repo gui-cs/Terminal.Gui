@@ -498,6 +498,9 @@ public partial class View {
 	public virtual bool AutoSize {
 		get => _autoSize;
 		set {
+			if (Width != Dim.Sized (0) && Height != Dim.Sized (0)) {
+				Debug.WriteLine ($@"WARNING: {GetType().Name} - Setting {nameof (AutoSize)} invalidates {nameof (Width)} and {nameof (Height)}.");
+			} 
 			var v = ResizeView (value);
 			TextFormatter.AutoSize = v;
 			if (_autoSize != v) {
