@@ -1,7 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using Xunit;
-using Xunit.Sdk;
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
@@ -9,7 +6,7 @@ public partial class ColorTests {
 	[Theory]
 	[CombinatorialData]
 	[Trait ( "Category", "Operators" )]
-	public void ImplicitOperator_FromInt_RoundTripsCorrectly ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
+	public void ImplicitOperator_FromInt_ReturnsCorrectColorValue ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
 	{
 		Color color = expectedValue;
 
@@ -19,33 +16,23 @@ public partial class ColorTests {
 	[Theory]
 	[CombinatorialData]
 	[Trait ( "Category", "Operators" )]
-	public void ImplicitOperator_ToInt_RoundTripsCorrectly ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
+	public void ImplicitOperator_ToInt_ReturnsCorrectInt32Value ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
 	{
-		var color = new Color ( expectedValue );
+		Color color = new ( expectedValue );
 
-		var Rgba = (int)color;
+		int colorAsInt32 = color;
 
-		Assert.Equal ( expectedValue, Rgba );
+		Assert.Equal ( expectedValue, colorAsInt32 );
 	}
 
 	[Theory]
 	[Trait ( "Category", "Operators" )]
 	[MemberData(nameof(ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly), MemberType = typeof(ColorTestsTheoryDataGenerators))]
-	public void ExplicitOperator_FromColorName_RoundTripsCorrectly ( ColorName cname, Color expectedColor )
+	public void ExplicitOperator_FromColorName_ReturnsCorrectColorValue ( ColorName cname, Color expectedColor )
 	{
-		Color color = (Color)cname;
+		Color color = cname;
 
 		Assert.Equal ( expectedColor, color );
-	}
-
-	[Theory]
-	[Trait ( "Category", "Operators" )]
-	[MemberData(nameof(ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly), MemberType = typeof(ColorTestsTheoryDataGenerators))]
-	public void ExplicitOperator_ToColorName_RoundTripsCorrectly (ColorName expectedColorName, Color color )
-	{
-		var colorName = (ColorName)color;
-
-		Assert.Equal ( expectedColorName, colorName );
 	}
 
 	[Theory]

@@ -91,7 +91,7 @@ public partial class ColorTests {
 		var expectedColorName = ColorName.Yellow;
 
 		// Act
-		var colorName = color.ColorName;
+		var colorName = color.GetClosestNamedColor ( );
 
 		// Assert
 		Assert.Equal (expectedColorName, colorName);
@@ -101,7 +101,7 @@ public partial class ColorTests {
 	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.FindClosestColor_ReturnsClosestColor ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
 	public void FindClosestColor_ReturnsClosestColor ( Color inputColor, ColorName expectedColorName )
 	{
-		var actualColorName = Color.FindClosestColor ( inputColor );
+		var actualColorName = Color.GetClosestNamedColor ( inputColor );
 
 		Assert.Equal ( expectedColorName, actualColorName );
 	}

@@ -25,7 +25,7 @@ public class PaddingTests {
 			Focus = new Attribute (Color.Green, Color.Red),
 		};
 		
-		Assert.Equal (ColorName.Red, view.Padding.GetNormalColor ().Foreground.ColorName);
+		Assert.Equal (ColorName.Red, view.Padding.GetNormalColor ().Foreground.GetClosestNamedColor ( ));
 		Assert.Equal (view.GetNormalColor (), view.Padding.GetNormalColor ());
 
 		view.BeginInit ();
