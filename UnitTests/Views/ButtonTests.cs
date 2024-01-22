@@ -475,6 +475,7 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
+	// TODO: Refactor this test to not depend on anything but Button
 	[Fact] [AutoInitShutdown]
 	public void AutoSize_False_With_Fixed_Width ()
 	{
@@ -483,10 +484,10 @@ public class ButtonTests {
 		var lblWidth = 8;
 
 		var label = new Label ("Find:") {
+			AutoSize = false,
 			Y = 1,
 			Width = lblWidth,
 			TextAlignment = TextAlignment.Right,
-			AutoSize = false
 		};
 		tab.Add (label);
 
@@ -498,32 +499,32 @@ public class ButtonTests {
 		tab.Add (txtToFind);
 
 		var btnFindNext = new Button ("Find _Next") {
+			AutoSize = false,
 			X = Pos.Right (txtToFind) + 1,
 			Y = Pos.Top (label),
 			Width = 20,
 			Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 			TextAlignment = TextAlignment.Centered,
 			IsDefault = true,
-			AutoSize = false
 		};
 		tab.Add (btnFindNext);
 
 		var btnFindPrevious = new Button ("Find _Previous") {
+			AutoSize = false,
 			X = Pos.Right (txtToFind) + 1,
 			Y = Pos.Top (btnFindNext) + 1,
 			Width = 20,
 			Enabled = !string.IsNullOrEmpty (txtToFind.Text),
 			TextAlignment = TextAlignment.Centered,
-			AutoSize = false
 		};
 		tab.Add (btnFindPrevious);
 
 		var btnCancel = new Button ("Cancel") {
+			AutoSize = false,
 			X = Pos.Right (txtToFind) + 1,
 			Y = Pos.Top (btnFindPrevious) + 2,
 			Width = 20,
 			TextAlignment = TextAlignment.Centered,
-			AutoSize = false
 		};
 		tab.Add (btnCancel);
 
@@ -631,11 +632,11 @@ public class ButtonTests {
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
 		var button = new Button ("Process keys") {
+			AutoSize = false,
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Width = 20,
 			IsDefault = true,
-			AutoSize = false
 		};
 		var win = new Window {
 			Width = Dim.Fill (),

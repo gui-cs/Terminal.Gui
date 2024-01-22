@@ -86,6 +86,7 @@ public class AllViewsTests {
 				Application.Shutdown ();
 				continue;
 			}
+			vType.AutoSize = false;
 			vType.X = 0;
 			vType.Y = 0;
 			vType.Width = 10;

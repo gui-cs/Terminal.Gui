@@ -39,12 +39,6 @@ public class AutoSizeFalseTests {
 		Assert.Equal ("Absolute(0)", view.Width.ToString ());
 		Assert.Equal ("Absolute(0)", view.Height.ToString ());
 
-		view.Width = 2;
-		view.Height = 1;
-		// AutoSize = true, so changing Dims does nothing
-		Assert.Equal ("Absolute(0)", view.Width.ToString ());
-		Assert.Equal ("Absolute(0)", view.Height.ToString ());
-
 		view.AutoSize = false;
 		Assert.Equal ("Absolute(0)", view.Width.ToString ());
 		Assert.Equal ("Absolute(0)", view.Height.ToString ());

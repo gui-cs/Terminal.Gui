@@ -42,11 +42,14 @@ public class Adornments : Scenario {
 		label.Border.Thickness = new Thickness (1, 3, 1, 1);
 
 		var tf2 = new Button ("Button") {
+			AutoSize = false,
 			X = Pos.AnchorEnd (10),
 			Y = Pos.AnchorEnd (1),
+			Height =1,
 			Width = 10
 		};
 		var tv = new Label {
+			AutoSize = false,
 			Y = Pos.AnchorEnd (3),
 			Width = 25,
 			Height = Dim.Fill (),
@@ -340,10 +343,12 @@ public class Adornments : Scenario {
 				};
 
 				var ckbTitle = new CheckBox ("Show Title") {
+					AutoSize = false,
 					BorderStyle = LineStyle.Double,
 					X = Pos.Left (_borderEditor),
 					Y = Pos.Bottom (_borderEditor) - 1,
 					Width = Dim.Width (_borderEditor),
+					Height = 1,
 					Checked = true,
 					SuperViewRendersLineCanvas = true
 				};

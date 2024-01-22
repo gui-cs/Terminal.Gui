@@ -729,7 +729,7 @@ public class DimTests {
 
 		for (int i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
-			var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+			var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height/*, Width = 20*/ };
 			view.Add (label);
 			Assert.Equal ($"Label {i}", label.Text);
 			Assert.Equal ($"Absolute({i})", label.Y.ToString ());

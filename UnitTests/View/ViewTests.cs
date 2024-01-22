@@ -796,7 +796,7 @@ public class ViewTests {
 
 		var v = label ?
 			new Label (new string ('c', 100)) {
-								  Width = Dim.Fill ()
+								  //Width = Dim.Fill ()
 							  } :
 			(View)new TextView {
 						   Height = 1,
@@ -1177,7 +1177,7 @@ At 0,0
 
 		var label = new Label ("This should be the first line.") {
 										 ColorScheme = Colors.ColorSchemes ["Menu"],
-										 Width       = Dim.Fill (),
+										 //Width       = Dim.Fill (),
 										 X           = 0, // don't overcomplicate unit tests
 										 Y           = 0
 									 };
@@ -1222,7 +1222,7 @@ At 0,0
 		Assert.Equal (new Rect (20, 8, 60, 16), new Rect (
 			frame.Frame.Left, frame.Frame.Top,
 			frame.Frame.Right, frame.Frame.Bottom));
-		Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+		Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
 		Assert.Equal (new Rect (0, 1, 13, 1), button.Frame); // this proves frame was set
 		Application.End (runState);
 	}

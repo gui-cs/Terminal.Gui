@@ -13,8 +13,8 @@ namespace UICatalog.Scenarios {
 			var labelH = new Label (text, TextDirection.LeftRight_TopBottom) {
 				X = 1,
 				Y = 1,
-				Width = 11,
-				Height = 1,
+				//Width = 11,
+				//Height = 1,
 				ColorScheme = color
 			};
 			Win.Add (labelH);
@@ -22,8 +22,8 @@ namespace UICatalog.Scenarios {
 			var labelV = new Label (text, TextDirection.TopBottom_LeftRight) {
 				X = 70,
 				Y = 1,
-				Width = 1,
-				Height = 11,
+				//Width = 1,
+				//Height = 11,
 				ColorScheme = color
 			};
 			Win.Add (labelV);

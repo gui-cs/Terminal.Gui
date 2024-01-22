@@ -289,9 +289,13 @@ namespace Terminal.Gui {
 				TextAlignment = TextAlignment.Centered,
 				X = 0,
 				Y = 0,
-				Width = Dim.Fill (0),
-				Height = Dim.Fill (1),
 			};
+
+			if (!messageLabel.AutoSize) {
+				messageLabel.Width = Dim.Fill (0);
+				messageLabel.Height = Dim.Fill (1);
+
+			}
 			messageLabel.TextFormatter.WordWrap = wrapMessage;
 			messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
 			d.Add (messageLabel);

@@ -71,8 +71,7 @@ public class DatePicker : View {
 		Date = date;
 		_dateLabel = new Label ("Date: ") {
 			X = 0,
-			Y = 0,
-			Height = 1,
+			Y = 0
 		};
 
 		_dateField = new DateField (DateTime.Now) {
@@ -98,8 +97,8 @@ public class DatePicker : View {
 		_previousMonthButton = new Button (GetBackButtonText ()) {
 			X = Pos.Center () - 4,
 			Y = Pos.Bottom (_calendar) - 1,
-			Height = 1,
-			Width = CalculateCalendarWidth () / 2
+			//Height = 1,
+			//Width = CalculateCalendarWidth () / 2
 		};
 
 		_previousMonthButton.Clicked += (sender, e) => {
@@ -111,8 +110,8 @@ public class DatePicker : View {
 		_nextMonthButton = new Button (GetForwardButtonText ()) {
 			X = Pos.Right (_previousMonthButton) + 2,
 			Y = Pos.Bottom (_calendar) - 1,
-			Height = 1,
-			Width = CalculateCalendarWidth () / 2
+			//Height = 1,
+			//Width = CalculateCalendarWidth () / 2
 		};
 
 		_nextMonthButton.Clicked += (sender, e) => {

@@ -383,7 +383,7 @@ t     ", _output);
 	[Theory, SetupFakeDriver]
 	[InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
 	[InlineData ("a𐐀b")]
-	void DrawHotString_NonBmp (string expected)
+	public void DrawHotString_NonBmp (string expected)
 	{
 		var view = new View () { Width = 10, Height = 1 };
 		view.DrawHotString (expected, Attribute.Default, Attribute.Default);
@@ -392,84 +392,92 @@ t     ", _output);
 
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds ()
 	{
-		var label = new Label () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
-		Application.Top.Add (label);
-		Application.Begin (Application.Top);
+		var view = new View () { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
+		view.BeginInit ();
+		view.EndInit ();
+		view.SetRelativeLayout (Application.Driver.Bounds);
 
-		Assert.Equal ("(0,0,2,2)", label.Frame.ToString ());
-		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+		Assert.Equal ("(0,0,2,2)", view.Frame.ToString ());
+		Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+
+		view.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌┐
 └┘", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Top ()
 	{
-		var label = new Label () { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
-		label.Border.Thickness = new Thickness (1, 0, 1, 1);
-		Application.Top.Add (label);
-		Application.Begin (Application.Top);
+		var view = new View () { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
+		view.Border.Thickness = new Thickness (1, 0, 1, 1);
 
-		Assert.Equal ("(0,0,2,1)", label.Frame.ToString ());
-		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
-		// BUGBUG: Top thickness is 0 and top shouldn't draw,
-		// but my changes weren't merged and TabViewTests passed
-		// without them and thus I give up
-		// The output before was ││ but I think it's also correct └┘
+		view.BeginInit ();
+		view.EndInit ();
+		view.SetRelativeLayout (Application.Driver.Bounds);
+
+		Assert.Equal ("(0,0,2,1)", view.Frame.ToString ());
+		Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+
+		view.Draw ();
+		// BUGBUG: Wha? Is this right? Shouldn't it be "└┘"???
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌┐", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Bottom ()
 	{
-		var label = new Label () { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
-		label.Border.Thickness = new Thickness (1, 1, 1, 0);
-		Application.Top.Add (label);
-		Application.Begin (Application.Top);
+		var view = new View () { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
+		view.Border.Thickness = new Thickness (1, 1, 1, 0);
+		view.BeginInit ();
+		view.EndInit ();
+		view.SetRelativeLayout (Application.Driver.Bounds);
 
-		Assert.Equal ("(0,0,2,1)", label.Frame.ToString ());
-		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
-		// BUGBUG: Bottom thickness is 0 and bottom shouldn't draw,
-		// but my changes weren't merged and TabViewTests passed
-		// without them and thus I give up
-		// The output before was ── but I think it's also correct ┌┐
+		Assert.Equal ("(0,0,2,1)", view.Frame.ToString ());
+		Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+
+		view.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Left ()
 	{
-		var label = new Label () { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
-		label.Border.Thickness = new Thickness (0, 1, 1, 1);
-		Application.Top.Add (label);
-		Application.Begin (Application.Top);
+		var view = new View () { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
+		view.Border.Thickness = new Thickness (0, 1, 1, 1);
+		view.BeginInit ();
+		view.EndInit ();
+		view.SetRelativeLayout (Application.Driver.Bounds);
 
-		Assert.Equal ("(0,0,1,2)", label.Frame.ToString ());
-		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+		Assert.Equal ("(0,0,1,2)", view.Frame.ToString ());
+		Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+
+		view.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │
 │", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Right ()
 	{
-		var label = new Label () { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
-		label.Border.Thickness = new Thickness (1, 1, 0, 1);
-		Application.Top.Add (label);
-		Application.Begin (Application.Top);
+		var view = new View () { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
+		view.Border.Thickness = new Thickness (1, 1, 0, 1);
+		view.BeginInit ();
+		view.EndInit ();
+		view.SetRelativeLayout (Application.Driver.Bounds);
 
-		Assert.Equal ("(0,0,1,2)", label.Frame.ToString ());
-		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
+		Assert.Equal ("(0,0,1,2)", view.Frame.ToString ());
+		Assert.Equal ("(0,0,0,0)", view.Bounds.ToString ());
+
+		view.Draw ();
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 │
 │", _output);
 	}
-
 }

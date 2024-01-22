@@ -554,7 +554,7 @@ public class PosTests {
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
 				field.Text = $"Label {count}";
-				var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
+				var label = new Label (field.Text) { X = 0, Y = field.Y/*, Width = 20*/ };
 				view.Add (label);
 				Assert.Equal ($"Label {count}", label.Text);
 				Assert.Equal ($"Absolute({count})", field.Y.ToString ());
@@ -603,7 +603,7 @@ public class PosTests {
 
 		for (var i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
-			var label = new Label (field.Text) { X = 0, Y = field.Y, Width = 20 };
+			var label = new Label (field.Text) { X = 0, Y = field.Y/*, Width = 20*/ };
 			view.Add (label);
 			Assert.Equal ($"Label {i}", label.Text);
 			Assert.Equal ($"Absolute({i})", field.Y.ToString ());

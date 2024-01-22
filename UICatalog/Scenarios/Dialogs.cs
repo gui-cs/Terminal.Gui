@@ -18,6 +18,7 @@ namespace UICatalog.Scenarios {
 			};
 
 			var label = new Label ("Width:") {
+				AutoSize = false,
 				X = 0,
 				Y = 0,
 				Width = 15,
@@ -35,6 +36,7 @@ namespace UICatalog.Scenarios {
 			frame.Add (widthEdit);
 
 			label = new Label ("Height:") {
+				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
@@ -61,6 +63,7 @@ namespace UICatalog.Scenarios {
 			});
 
 			label = new Label ("Title:") {
+				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
 				Width = Dim.Width (label),
@@ -78,6 +81,7 @@ namespace UICatalog.Scenarios {
 			frame.Add (titleEdit);
 
 			label = new Label ("Num Buttons:") {
+				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),  // BUGBUG: if this is Pos.Bottom (titleEdit) the initial LayoutSubviews does not work correctly?!?!
 				Width = Dim.Width (label),
@@ -132,12 +136,12 @@ namespace UICatalog.Scenarios {
 			label = new Label ("Button Pressed:") {
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 4,
-				Height = 1,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
 
 			var buttonPressedLabel = new Label (" ") {
+				AutoSize = false,
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 5,
 				Width = 25,

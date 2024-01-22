@@ -112,17 +112,6 @@ public class TextTests {
 		Assert.Equal ($"Hello{Environment.NewLine} {Environment.NewLine}World", view.TextFormatter.Format ());
 	}
 
-	/// <summary>
-	/// Can be overridden if the <see cref="Terminal.Gui.TextFormatter.Text"/> has
-	/// different format than the default.
-	/// </summary>
-	//protected virtual void UpdateTextFormatterText ()
-	//{
-	//	if (TextFormatter != null) {
-	//		TextFormatter.Text = _text;
-	//	}
-	//}
-
 	class TestView : View {
 		protected override void UpdateTextFormatterText ()
 		{
@@ -134,7 +123,6 @@ public class TextTests {
 	[Fact]
 	public void UpdateTextFormatterText_Overridden ()
 	{
-		
 		var view = new TestView () {
 			Text = "Hello World"
 		};
@@ -142,6 +130,11 @@ public class TextTests {
 		Assert.Equal ("Hello World", view.Text);
 		Assert.Equal (">Hello World<", view.TextFormatter.Text);
 	}
+
+	// Test behavior of AutoSize property. 
+	// - Default is false
+	// - Setting to true invalidates Height/Width
+	// - Setting to false invalidates Height/Width
 
 	
 }

@@ -134,20 +134,21 @@ public partial class View {
 	}
 
 	// only called from EndInit
-	void EndInit_Text ()
+	void UpdateTextDirection (TextDirection newDirection)
 	{
+		var directionChanged = TextFormatter.IsHorizontalDirection (TextFormatter.Direction) != TextFormatter.IsHorizontalDirection (newDirection);
+		TextFormatter.Direction = newDirection;
+
 		var isValidOldAutoSize = AutoSize && IsValidAutoSize (out var _);
 
 		UpdateTextFormatterText ();
 
-		if (!ValidatePosDim && AutoSize || ValidatePosDim && AutoSize && isValidOldAutoSize) {
+		if (!ValidatePosDim && directionChanged && AutoSize || ValidatePosDim && directionChanged && AutoSize && isValidOldAutoSize) {
 			OnResizeNeeded ();
-		} else if (AutoSize && IsAdded) {
+		} else if (AutoSize && directionChanged && IsAdded) {
 			ResizeBoundsToFit (Bounds.Size);
 		} else {
 		}
-
-		SetHotKey ();
 		SetTextFormatterSize ();
 		SetNeedsDisplay ();
 	}

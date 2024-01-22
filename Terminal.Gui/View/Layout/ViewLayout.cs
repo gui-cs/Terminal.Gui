@@ -412,13 +412,17 @@ public partial class View {
 		set {
 			_width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
-			if (ValidatePosDim) {
-				var isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (_width);
-
-				if (IsAdded && AutoSize && !isValidNewAutSize) {
-					throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
-				}
+			if (AutoSize) {
+				throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
 			}
+
+			//if (ValidatePosDim) {
+			var isValidNewAutoSize = AutoSize && IsValidAutoSizeWidth (_width);
+
+				if (IsAdded && AutoSize && !isValidNewAutoSize) {
+					throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
+				}
+			//}
 			OnResizeNeeded ();
 		}
 	}
@@ -452,13 +456,17 @@ public partial class View {
 		set {
 			_height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
-			if (ValidatePosDim) {
-				var isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (_height);
-
-				if (IsAdded && AutoSize && !isValidNewAutSize) {
-					throw new InvalidOperationException ("Must set AutoSize to false before setting the Height.");
-				}
+			if (AutoSize) {
+				throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Height)}.");
 			}
+
+			//if (ValidatePosDim) {
+			var isValidNewAutoSize = AutoSize && IsValidAutoSizeHeight (_height);
+
+				if (IsAdded && AutoSize && !isValidNewAutoSize) {
+					throw new InvalidOperationException (@$"Must set AutoSize to false before setting the {nameof (Height)}.");
+				}
+			//}
 			OnResizeNeeded ();
 		}
 	}
@@ -839,10 +847,8 @@ public partial class View {
 			if (_height is Dim.DimAbsolute) {
 				_height = Frame.Height;
 			}
-
-			if (IsInitialized) {
-				SetNeedsLayout ();
-			}
+			SetNeedsLayout ();
+			SetNeedsDisplay ();
 		}
 		if (AutoSize) {
 			if (autosize.Width == 0 || autosize.Height == 0) {
@@ -855,13 +861,11 @@ public partial class View {
 				if (autosize.Height == 0) {
 					_height = 0;
 				}
-
-				if (IsInitialized) {
-					SetNeedsLayout ();
-				}
 			} else if (!SetFrameToFitText ()) {
 				SetTextFormatterSize ();
 			}
+			SetNeedsLayout ();
+			SetNeedsDisplay ();
 		}
 	}
 
