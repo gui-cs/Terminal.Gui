@@ -1,6 +1,6 @@
 // This code is adapted from https://github.com/devblackops/Terminal-Icons (which also uses the MIT license).
 
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 
 namespace Terminal.Gui {
