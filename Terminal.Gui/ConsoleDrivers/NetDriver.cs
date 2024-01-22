@@ -853,7 +853,7 @@ class NetDriver : ConsoleDriver {
 
 						if (Force16Colors) {
 							output.Append (EscSeqUtils.CSI_SetGraphicsRendition (
-								MapColors ((ConsoleColor)attr.Background.ColorName, false), MapColors ((ConsoleColor)attr.Foreground.ColorName, true)));
+								MapColors ((ConsoleColor)attr.Background.GetClosestNamedColor ( ), false), MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor ( ), true)));
 						} else {
 							output.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
 							output.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));

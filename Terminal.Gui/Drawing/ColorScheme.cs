@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -14,16 +13,16 @@ namespace Terminal.Gui;
 /// using the <see cref="ColorScheme(ColorScheme)"/> constructor.
 /// </para>
 /// <para>
-/// See also: <see cref="Colors.ColorSchemes"/>.
+/// See also: <see cref="ColorSchemesConfiguration.ColorSchemes"/>.
 /// </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
 public class ColorScheme : IEquatable<ColorScheme> {
-	readonly Attribute _disabled = Attribute.Default;
-	readonly Attribute _focus = Attribute.Default;
-	readonly Attribute _hotFocus = Attribute.Default;
-	readonly Attribute _hotNormal = Attribute.Default;
-	readonly Attribute _normal = Attribute.Default;
+	readonly Attribute _disabled;
+	readonly Attribute _focus;
+	readonly Attribute _hotFocus;
+	readonly Attribute _hotNormal;
+	readonly Attribute _normal;
 
 	/// <summary>
 	/// Creates a new instance set to the default colors (see <see cref="Attribute.Default"/>).
@@ -226,14 +225,17 @@ public static class Colors {
 	/// <summary>
 	/// Resets the <see cref="ColorSchemes"/> dictionary to the default values.
 	/// </summary>
-	public static Dictionary<string, ColorScheme> Reset () =>
-		ColorSchemes = new Dictionary<string, ColorScheme> (comparer: new SchemeNameComparerIgnoreCase ()) {
-			{ "TopLevel", new ColorScheme () },
-			{ "Base", new ColorScheme () },
-			{ "Dialog", new ColorScheme () },
-			{ "Menu", new ColorScheme () },
-			{ "Error", new ColorScheme () },
-		};
+	public static Dictionary<string, ColorScheme> Reset ()
+	{
+		ColorSchemes ??= new Dictionary<string, ColorScheme> ( 5, CultureInfo.InvariantCulture.CompareInfo.GetStringComparer ( CompareOptions.IgnoreCase ) );
+		ColorSchemes.Clear ( );
+		ColorSchemes.Add ( "TopLevel", new ColorScheme ( ) );
+		ColorSchemes.Add ( "Base", new ColorScheme ( ) );
+		ColorSchemes.Add ( "Dialog", new ColorScheme ( ) );
+		ColorSchemes.Add ( "Menu", new ColorScheme ( ) );
+		ColorSchemes.Add ( "Error", new ColorScheme ( ) );
+		return ColorSchemes;
+	}
 
 	class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
 		public bool Equals (string x, string y)

@@ -186,7 +186,7 @@ class CursesDriver : ConsoleDriver {
 	public override Attribute MakeColor (Color foreground, Color background)
 	{
 		if (!RunningUnitTests) {
-			return MakeColor (ColorNameToCursesColorNumber (foreground.ColorName), ColorNameToCursesColorNumber (background.ColorName));
+			return MakeColor (ColorNameToCursesColorNumber (foreground.GetClosestNamedColor ( )), ColorNameToCursesColorNumber (background.GetClosestNamedColor ( )));
 		} else {
 			return new Attribute (
 				0,

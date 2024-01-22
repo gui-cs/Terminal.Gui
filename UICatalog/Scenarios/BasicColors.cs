@@ -90,10 +90,10 @@ namespace UICatalog.Scenarios {
 				if (e.MouseEvent.View != null) {
 					var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
 					var back = e.MouseEvent.View.GetNormalColor ().Background;
-					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
+					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.GetClosestNamedColor ( )} ";
 					viewForeground.ColorScheme = new ColorScheme (viewForeground.ColorScheme) { Normal = new Attribute (fore, fore) };
 
-					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";
+					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.GetClosestNamedColor ( )} ";
 					viewBackground.ColorScheme = new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
 				}
 			};

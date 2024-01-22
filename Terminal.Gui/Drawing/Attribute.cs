@@ -16,7 +16,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// <summary>
 	/// Default empty attribute.
 	/// </summary>
-	public static readonly Attribute Default = new (Color.White, Color.Black);
+	public static readonly Attribute Default = new (Color.White, ColorName.Black);
 
 	/// <summary>
 	/// The <see cref="ConsoleDriver"/>-specific color value.
@@ -42,8 +42,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	public Attribute ()
 	{
 		PlatformColor = -1;
-		Foreground = new Color (Default.Foreground.ColorName);
-		Background = new Color (Default.Background.ColorName);
+		Foreground = Default.Foreground;
+		Background = Default.Background;
 	}
 
 	/// <summary>
@@ -52,8 +52,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	public Attribute (in Attribute attr)
 	{
 		PlatformColor = -1;
-		Foreground = new Color (attr.Foreground.ColorName);
-		Background = new Color (attr.Background.ColorName);
+		Foreground = attr.Foreground;
+		Background = attr.Background;
 	}
 
 	/// <summary>
@@ -63,8 +63,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	internal Attribute (int platformColor)
 	{
 		PlatformColor = platformColor;
-		Foreground = new Color (Default.Foreground.ColorName);
-		Background = new Color (Default.Background.ColorName);
+		Foreground = Default.Foreground;
+		Background = Default.Background;
 	}
 
 	/// <summary>
@@ -79,14 +79,6 @@ public readonly struct Attribute : IEquatable<Attribute> {
 		Background = background;
 		PlatformColor = platformColor;
 	}
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Attribute"/> struct.
-	/// </summary>
-	/// <param name="platformColor">platform-dependent color value.</param>
-	/// <param name="foreground">Foreground</param>
-	/// <param name="background">Background</param>
-	internal Attribute (int platformColor, ColorName foreground, ColorName background) : this (platformColor, new Color (foreground), new Color (background)) { }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Attribute"/> struct.
@@ -120,7 +112,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	/// </summary>
 	/// <param name="foregroundName">Foreground</param>
 	/// <param name="backgroundName">Background</param>
-	public Attribute (ColorName foregroundName, ColorName backgroundName) : this (new Color (foregroundName), new Color (backgroundName)) { }
+	public Attribute (in ColorName foregroundName, in ColorName backgroundName) : this (new Color (foregroundName), new Color (backgroundName)) { }
 
 
 	/// <summary>

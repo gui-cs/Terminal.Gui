@@ -181,14 +181,14 @@ public class AttributeJsonConverterTests {
 		// Test deserializing from human-readable color names
 		string json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\"}";
 		var attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
-		Assert.Equal (Color.Blue, attribute.Foreground.ColorName);
-		Assert.Equal (Color.Green, attribute.Background.ColorName);
+		Assert.Equal (Color.Blue, attribute.Foreground.GetClosestNamedColor ( ));
+		Assert.Equal (Color.Green, attribute.Background.GetClosestNamedColor ( ));
 
 		// Test deserializing from RGB values
 		json = "{\"Foreground\":\"rgb(255,0,0)\",\"Background\":\"rgb(0,255,0)\"}";
 		attribute = JsonSerializer.Deserialize<Attribute> (json, ConfigurationManagerTests._jsonOptions);
-		Assert.Equal (Color.Red, attribute.Foreground.ColorName);
-		Assert.Equal (Color.BrightGreen, attribute.Background.ColorName);
+		Assert.Equal (Color.Red, attribute.Foreground.GetClosestNamedColor ( ));
+		Assert.Equal (Color.BrightGreen, attribute.Background.GetClosestNamedColor ( ));
 	}
 
 	[Fact, AutoInitShutdown]

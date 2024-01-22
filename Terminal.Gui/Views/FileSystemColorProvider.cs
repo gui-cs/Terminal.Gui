@@ -16,12 +16,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Color? GetColor (IFileSystemInfo file)
 		{
-			if (FilenameToColor.ContainsKey (file.Name)) {
-				return FilenameToColor [file.Name];
+			if ( FilenameToColor.TryGetValue ( file.Name, out Color nameColor ) ) {
+				return nameColor;
 			}
 
-			if (ExtensionToColor.ContainsKey (file.Extension)) {
-				return ExtensionToColor [file.Extension];
+			if ( ExtensionToColor.TryGetValue ( file.Extension, out Color extColor ) ) {
+				return extColor;
 			}
 
 			return null;
