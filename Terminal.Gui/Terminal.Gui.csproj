@@ -29,7 +29,7 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="NStack.Core" Version="1.0.7" />
+    <PackageReference Include="NStack.Core" Version="1.1.1" />
     <PackageReference Include="System.Management" Version="8.0.0" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
