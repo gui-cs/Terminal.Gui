@@ -305,7 +305,7 @@ public partial class View {
 
 		var h = Bounds.Size.Height + GetHotKeySpecifierLength ();
 		if (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews) {
-			h = SuperView?.Bounds.Height ?? 0;
+			TextFormatter.NeedsFormat = true;
 			h = TextFormatter.GetFormattedSize ().Height;
 		}
 		TextFormatter.Size = new Size (w, h);

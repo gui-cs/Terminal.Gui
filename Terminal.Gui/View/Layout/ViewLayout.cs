@@ -830,7 +830,7 @@ public partial class View {
 					var subviews = 0;
 
 					if (auto._style is Dim.DimAutoStyle.Text or Dim.DimAutoStyle.Auto) {
-						if (Id == "multiLine") {
+						if (Id == "vlabel") {
 
 						}
 

@@ -16,7 +16,17 @@ public class DimAutoDemo : Scenario {
 
 	public override void Setup ()
 	{
+		var view = new FrameView () {
+			Title = "Type to make View grow",
+			X = 1,
+			Y = 1,
+			Width = Dim.Auto (style: DimAutoStyle.Subviews, min: 40),
+			Height = Dim.Auto (style: DimAutoStyle.Subviews, min: 10)
+		};
+		view.ValidatePosDim = true;
+
 		var textEdit = new TextView { Text = "", X = 1, Y = 0, Width = 20, Height = 4 };
+		view.Add (textEdit);
 
 		var hlabel = new Label {
 			Text = textEdit.Text,
@@ -24,29 +34,35 @@ public class DimAutoDemo : Scenario {
 			Y = Pos.Bottom (textEdit),
 			AutoSize = false,
 			Width = Dim.Auto (style: DimAutoStyle.Text, min: 20),
-			ColorScheme = Colors.ColorSchemes["Error"]
+			Height = 1,
+			ColorScheme = Colors.ColorSchemes ["Error"]
 		};
+		view.Add (hlabel);
 
 		var vlabel = new Label {
 			Text = textEdit.Text,
 			X = Pos.Left (textEdit),
 			Y = Pos.Bottom (textEdit) + 1,
 			AutoSize = false,
+			Width = 1,
 			Height = Dim.Auto (style: DimAutoStyle.Text, min: 8),
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			TextDirection = TextDirection.TopBottom_LeftRight
+			//TextDirection = TextDirection.TopBottom_LeftRight
 		};
+		vlabel.Id = "vlabel";
+		view.Add (vlabel);
 
 		var heightAuto = new View () {
 			X = Pos.Right (vlabel) + 1,
 			Y = Pos.Bottom (hlabel) + 1,
 			Width = 20,
-			Height = Dim.Auto(),
+			Height = Dim.Auto (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
 			Title = "W: 20, H: Auto",
 			BorderStyle = LineStyle.Rounded
 		};
 		heightAuto.Id = "heightAuto";
+		view.Add (heightAuto);
 
 		var widthAuto = new View () {
 			X = Pos.Right (heightAuto) + 1,
@@ -58,6 +74,7 @@ public class DimAutoDemo : Scenario {
 			BorderStyle = LineStyle.Rounded
 		};
 		widthAuto.Id = "widthAuto";
+		view.Add (widthAuto);
 
 		var bothAuto = new View () {
 			X = Pos.Right (widthAuto) + 1,
@@ -69,6 +86,7 @@ public class DimAutoDemo : Scenario {
 			BorderStyle = LineStyle.Rounded
 		};
 		bothAuto.Id = "bothAuto";
+		view.Add (bothAuto);
 
 		textEdit.ContentsChanged += (s, e) => {
 			hlabel.Text = textEdit.Text;
@@ -81,12 +99,13 @@ public class DimAutoDemo : Scenario {
 		var movingButton = new Button () {
 			Text = "_Move down",
 			X = Pos.Right (vlabel),
-			Y = Pos.Bottom (heightAuto),
+			Y = Pos.Bottom (vlabel),
 			Width = 10
 		};
 		movingButton.Clicked += (s, e) => {
 			movingButton.Y = movingButton.Frame.Y + 1;
 		};
+		view.Add (movingButton);
 
 		var resetButton = new Button () {
 			Text = "_Reset Button",
@@ -94,19 +113,10 @@ public class DimAutoDemo : Scenario {
 			Y = Pos.Top (movingButton),
 		};
 
-		var view = new FrameView () {
-			Title = "Type to make View grow",
-			X = 1,
-			Y = 1,
-			Width = Dim.Auto (style: DimAutoStyle.Subviews, min: 40),
-			Height = Dim.Auto (style: DimAutoStyle.Subviews, min: 10)
-		};
-		view.ValidatePosDim = true;
-		view.Add (textEdit, hlabel, vlabel, heightAuto, widthAuto, bothAuto, resetButton, movingButton);
-
 		resetButton.Clicked += (s, e) => {
 			movingButton.Y = Pos.Bottom (hlabel);
 		};
+		view.Add (resetButton);
 
 		var dlgButton = new Button () {
 			Text = "Open Test _Dialog",
