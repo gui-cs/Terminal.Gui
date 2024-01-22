@@ -116,6 +116,7 @@ namespace Terminal.Gui {
 			contentBottomRightCorner.Width = 1;
 			contentBottomRightCorner.Height = 1;
 			contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
+			contentBottomRightCorner.DrawContent += ContentBottomRightCorner_DrawContent;
 			ClearOnVisibleFalse = false;
 		}
 
@@ -159,6 +160,12 @@ namespace Terminal.Gui {
 				me.Handled = true;
 				Host.SetFocus ();
 			}
+		}
+
+		private void ContentBottomRightCorner_DrawContent (Rect obj)
+		{
+			Driver.SetAttribute (Host.HasFocus ? GetFocusColor () : GetNormalColor ());
+			Host.SuperView.AddRune (contentBottomRightCorner.Frame.X, contentBottomRightCorner.Frame.Y, ' ');
 		}
 
 		void Init (int size, int position, bool isVertical)
@@ -600,12 +607,6 @@ namespace Terminal.Gui {
 
 					Driver.AddRune (Driver.RightArrow);
 				}
-			}
-
-			if (contentBottomRightCorner != null && hosted && showBothScrollIndicator) {
-				contentBottomRightCorner.Redraw (contentBottomRightCorner.Bounds);
-			} else if (otherScrollBarView != null && otherScrollBarView.contentBottomRightCorner != null && otherScrollBarView.hosted && otherScrollBarView.showBothScrollIndicator) {
-				otherScrollBarView.contentBottomRightCorner.Redraw (otherScrollBarView.contentBottomRightCorner.Bounds);
 			}
 		}
 

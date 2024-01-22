@@ -15,7 +15,7 @@ namespace UICatalog.Scenarios {
 
 			Application.Run<MainApp> ();
 
-			Application.Top.Dispose ();
+			System.Diagnostics.Debug.Assert (Application.Top == null);
 		}
 
 		public class MainApp : Toplevel {

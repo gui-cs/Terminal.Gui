@@ -2,53 +2,44 @@ name: Build and publish API docs
 
 on:
   push:
-    branches: [main]
+  # only publish v2 (main or develop); v2 is published via the Terminal.GuiV2Docs repo
+    branches: [main, develop]
+
+permissions:
+  id-token: write 
+  pages: write
 
 jobs:
-  generate-docs:
+  # Single deploy job since we're just deploying
+  deploy:
+    name: Build and Deploy API docs to github-pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: windows-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3.0.3
-      with:
-        dotnet-version: 6.0.100
-    
-    - name: Setup DocFX
-      uses: crazy-max/ghaction-chocolatey@v2
-      with:
-        args: install docfx    
-
-    - name: Install dependencies
-      run: dotnet restore        
-
     - name: DocFX Build
       working-directory: docfx
-      # https://stackoverflow.com/questions/56726429/how-to-run-multiple-commands-in-one-github-actions-docker
       run: |
-        rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
-        docfx docfx.json
-      continue-on-error: false      
+        dotnet tool install -g docfx
+        $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
+        docfx metadata
+        docfx build
+      continue-on-error: false
 
-    - name: Publish
-      if: github.event_name == 'push'
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs
-        force_orphan: true
-
-    # - name: Use docfx to build API Docs
-    #   uses: nikeee/docfx-action@v1.0.0
-    #   with:
-    #     args: docfx/docfx.json
-
-    # # Publish generated site using GitHub Pages
-    # - uses: maxheld83/ghpages@master
-    #   name: Publish API Documentation on GitHub Pages
-    #   env:
-    #     BUILD_DIR: docs # docfx's default output directory is _site
-    #     GH_PAT: ${{ secrets.GH_PAT }} # See https://github.com/maxheld83/ghpages
+        path: docfx/_site
+       
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}

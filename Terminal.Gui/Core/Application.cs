@@ -86,7 +86,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public static Toplevel MdiTop {
 			get {
-				if (Top.IsMdiContainer) {
+				if (Top?.IsMdiContainer == true) {
 					return Top;
 				}
 				return null;
@@ -516,11 +516,8 @@ namespace Terminal.Gui {
 			protected virtual void Dispose (bool disposing)
 			{
 				if (Toplevel != null && disposing) {
-					throw new InvalidOperationException ("You must clean up (Dispose) the Toplevel before calling Application.RunState.Dispose");
-					// BUGBUG: It's insidious that we call EndFirstTopLevel here so I moved it to End.
-					//EndFirstTopLevel (Toplevel);
-					//Toplevel.Dispose ();
-					//Toplevel = null;
+					Toplevel.Dispose ();
+					Toplevel = null;
 				}
 			}
 		}
@@ -531,7 +528,7 @@ namespace Terminal.Gui {
 				return;
 			}
 
-			var chain = toplevels.ToList ();
+			var chain = toplevels.Where (t => t.Visible).ToList ();
 			foreach (var topLevel in chain) {
 				if (topLevel.ProcessHotKey (ke)) {
 					EnsuresMdiTopOnFrontIfMdiTopMostFocused ();
@@ -696,6 +693,16 @@ namespace Terminal.Gui {
 		public static View MouseGrabView => mouseGrabView;
 
 		/// <summary>
+		/// Invoked when a view wants to grab the mouse; can be canceled.
+		/// </summary>
+		public static event Func<View, bool> GrabbingMouse;
+
+		/// <summary>
+		/// Invoked when a view wants ungrab the mouse; can be canceled.
+		/// </summary>
+		public static event Func<View, bool> UnGrabbingMouse;
+
+		/// <summary>
 		/// Event to be invoked when a view grab the mouse.
 		/// </summary>
 		public static event Action<View> GrabbedMouse;
@@ -714,9 +721,11 @@ namespace Terminal.Gui {
 		{
 			if (view == null)
 				return;
-			OnGrabbedMouse (view);
-			mouseGrabView = view;
-			Driver.UncookMouse ();
+			if (!OnGrabbingMouse (view)) {
+				OnGrabbedMouse (view);
+				mouseGrabView = view;
+				Driver.UncookMouse ();
+			}
 		}
 
 		/// <summary>
@@ -726,9 +735,25 @@ namespace Terminal.Gui {
 		{
 			if (mouseGrabView == null)
 				return;
-			OnUnGrabbedMouse (mouseGrabView);
-			mouseGrabView = null;
-			Driver.CookMouse ();
+			if (!OnUnGrabbingMouse (mouseGrabView)) {
+				OnUnGrabbedMouse (mouseGrabView);
+				mouseGrabView = null;
+				Driver.CookMouse ();
+			}
+		}
+
+		static bool OnGrabbingMouse (View view)
+		{
+			if (view == null || GrabbingMouse == null)
+				return false;
+			return (bool)(GrabbingMouse?.Invoke (view));
+		}
+
+		static bool OnUnGrabbingMouse (View view)
+		{
+			if (view == null || UnGrabbingMouse == null)
+				return false;
+			return (bool)(UnGrabbingMouse?.Invoke (view));
 		}
 
 		static void OnGrabbedMouse (View view)
@@ -1062,6 +1087,7 @@ namespace Terminal.Gui {
 			// Set Current and Top to the next TopLevel on the stack
 			if (toplevels.Count == 0) {
 				Current = null;
+				Top = null;
 			} else {
 				Current = toplevels.Peek ();
 				if (toplevels.Count == 1 && Current == MdiTop) {
@@ -1074,8 +1100,6 @@ namespace Terminal.Gui {
 				Refresh ();
 			}
 
-			runState.Toplevel?.Dispose ();
-			runState.Toplevel = null;
 			runState.Dispose ();
 		}
 

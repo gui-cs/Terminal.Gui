@@ -234,7 +234,11 @@ namespace Terminal.Gui {
 
 				SetNeedsDisplay ();
 				var touched = view.Frame;
-				Border.Child.Remove (view);
+				if (view == Border.Child) {
+					base.Remove (view);
+				} else {
+					Border.Child.Remove (view);
+				}
 
 				if (Border.Child.InternalSubviews.Count < 1) {
 					CanFocus = false;

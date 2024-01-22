@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using NStack;
 
 namespace Terminal.Gui {
@@ -1501,8 +1500,11 @@ namespace Terminal.Gui {
 				(GetType ().IsNestedPublic && !IsOverridden (this, "Redraw") || GetType ().Name == "View") &&
 				(!NeedDisplay.IsEmpty || ChildNeedsDisplay || LayoutNeeded)) {
 
-				Clear ();
-				SetChildNeedsDisplay ();
+				if (ColorScheme != null) {
+					Driver.SetAttribute (GetNormalColor ());
+					Clear ();
+					SetChildNeedsDisplay ();
+				}
 			}
 
 			if (!ustring.IsNullOrEmpty (TextFormatter.Text)) {
@@ -2944,6 +2946,7 @@ namespace Terminal.Gui {
 				subview.Dispose ();
 			}
 			base.Dispose (disposing);
+			System.Diagnostics.Debug.Assert (InternalSubviews.Count == 0);
 		}
 
 		/// <summary>

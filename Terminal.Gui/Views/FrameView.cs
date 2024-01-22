@@ -9,7 +9,6 @@
 //  - Does not support IEnumerable
 // Any udpates done here should probably be done in Window as well; TODO: Merge these classes
 
-using System;
 using System.Linq;
 using NStack;
 
@@ -202,7 +201,11 @@ namespace Terminal.Gui {
 
 			SetNeedsDisplay ();
 			var touched = view.Frame;
-			contentView.Remove (view);
+			if (view == contentView) {
+				base.Remove (view);
+			} else {
+				contentView.Remove (view);
+			}
 
 			if (contentView.InternalSubviews.Count < 1)
 				this.CanFocus = false;

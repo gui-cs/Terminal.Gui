@@ -363,5 +363,50 @@ namespace Terminal.Gui.TopLevelTests {
 │                  │
 └──────────────────┘", output);
 		}
+
+		[Fact, AutoInitShutdown]
+		public void Window_On_Non_Toplevel_Superview_Cannot_Overflows_His_Bounds ()
+		{
+			var win = new Window () { Width = Dim.Fill (5), Height = Dim.Fill (5) };
+			var view = new View () { X = 3, Y = 3, Width = 10, Height = 10 };
+			view.Add (win);
+			Application.Top.Add (view);
+			Application.Begin (Application.Top);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 3,
+					Y = 3,
+					Flags = MouseFlags.Button1Pressed
+				});
+
+			Assert.Equal (win, Application.MouseGrabView);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 2,
+					Y = 2,
+					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+				});
+
+			Assert.Equal (win, Application.MouseGrabView);
+			Assert.Equal (new Rect (0, 0, 5, 5), win.Frame);
+
+			ReflectionTools.InvokePrivate (
+				typeof (Application),
+				"ProcessMouseEvent",
+				new MouseEvent () {
+					X = 14,
+					Y = 14,
+					Flags = MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition
+				});
+
+			Assert.Equal (win, Application.MouseGrabView);
+			Assert.Equal (new Rect (4, 4, 5, 5), win.Frame);
+		}
 	}
 }

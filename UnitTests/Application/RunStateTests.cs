@@ -48,12 +48,11 @@ namespace Terminal.Gui.ApplicationTests {
 			rs = new Application.RunState (top);
 			Assert.NotNull (rs);
 
-			// Should throw because Toplevel was not cleaned up
-			Assert.Throws<InvalidOperationException> (() => rs.Dispose ());
+			// Should not throw because Toplevel was cleaned up
+			var exception = Record.Exception (() => rs.Dispose ());
+			Assert.Null (exception);
 
-			rs.Toplevel.Dispose ();
-			rs.Toplevel = null;
-			rs.Dispose ();
+			Assert.Null (rs.Toplevel);
 #if DEBUG_IDISPOSABLE
 			Assert.True (rs.WasDisposed);
 			Assert.True (top.WasDisposed);
@@ -63,7 +62,7 @@ namespace Terminal.Gui.ApplicationTests {
 		void Init ()
 		{
 			Application.Init (new FakeDriver ());
-			
+
 			Assert.NotNull (Application.Driver);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (SynchronizationContext.Current);
@@ -74,7 +73,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding RunState-based instances left
-			foreach (var inst in Application.RunState.Instances) 				Assert.True (inst.WasDisposed);
+			foreach (var inst in Application.RunState.Instances) Assert.True (inst.WasDisposed);
 #endif
 		}
 
@@ -94,7 +93,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.End (rs);
 
 			Assert.Null (Application.Current);
-			Assert.NotNull (Application.Top);
+			Assert.Null (Application.Top);
 			Assert.NotNull (Application.MainLoop);
 			Assert.NotNull (Application.Driver);
 
@@ -104,7 +103,46 @@ namespace Terminal.Gui.ApplicationTests {
 			Assert.True (rs.WasDisposed);
 #endif
 
+			Assert.Null (Application.MainLoop);
+			Assert.Null (Application.Driver);
+		}
+
+		WeakReference CreateToplevelInstance ()
+		{
+			// Setup Mock driver
+			Init ();
+
+			var top = new Toplevel ();
+			var rs = Application.Begin (top);
+
+			Assert.NotNull (rs);
+			Assert.Equal (top, Application.Current);
+			Assert.Equal (top, Application.Top);
+			Application.End (rs);
+#if DEBUG_IDISPOSABLE
+			Assert.True (rs.WasDisposed);
+			Assert.True (top.WasDisposed);
+#endif
+			Assert.Null (Application.Current);
 			Assert.Null (Application.Top);
+			Assert.NotNull (top);
+			Assert.NotNull (Application.MainLoop);
+			Assert.NotNull (Application.Driver);
+
+			return new WeakReference (top, true);
+		}
+
+		[Fact]
+		public void Begin_End_Cleans_Up_RunState_Without_Shutdown ()
+		{
+			WeakReference wrInstance = CreateToplevelInstance ();
+
+			GC.Collect ();
+			GC.WaitForPendingFinalizers ();
+			Assert.False (wrInstance.IsAlive);
+
+			// Shutdown Mock driver
+			Shutdown ();
 			Assert.Null (Application.MainLoop);
 			Assert.Null (Application.Driver);
 		}

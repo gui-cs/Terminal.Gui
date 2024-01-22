@@ -166,7 +166,8 @@ namespace UICatalog.Scenarios {
 				_scrollBar.Size = _textView.Lines;
 				_scrollBar.Position = _textView.TopRow;
 				if (_scrollBar.OtherScrollBarView != null) {
-					_scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
+					// + 1 is needed to show the cursor at the end of a line.
+					_scrollBar.OtherScrollBarView.Size = _textView.Maxlength + 1;
 					_scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
 				}
 				_scrollBar.LayoutSubviews ();

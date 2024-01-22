@@ -1,11 +1,21 @@
 # Builds the Terminal.gui API documentation using docfx
 
-dotnet build --configuration Release ../Terminal.sln
+$prevPwd = $PWD; Set-Location -ErrorAction Stop -LiteralPath $PSScriptRoot
 
-rm ../docs -Recurse -Force -ErrorAction SilentlyContinue
+try {
+    $PWD  # output the current location 
 
-$env:DOCFX_SOURCE_BRANCH_NAME="main"
+    dotnet tool update -g docfx
 
-docfx --metadata
+    # Force delete metadata
+    rm ./api  -Recurse -Force -ErrorAction SilentlyContinue
 
-docfx --serve --force
+    $env:DOCFX_SOURCE_BRANCH_NAME="v2_develop"
+
+    docfx --serve
+}
+finally {
+  # Restore the previous location.
+  $prevPwd | Set-Location
+}
+

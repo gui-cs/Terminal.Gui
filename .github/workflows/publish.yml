@@ -32,7 +32,7 @@ jobs:
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 7.0
         dotnet-quality: 'ga'

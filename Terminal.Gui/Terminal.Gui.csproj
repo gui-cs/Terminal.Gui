@@ -29,11 +29,11 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="NStack.Core" Version="1.0.7" />
-    <PackageReference Include="System.Management" Version="7.0.2" />
+    <PackageReference Include="NStack.Core" Version="1.1.1" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
     <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-    <InternalsVisibleTo Include="UnitTests" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <InternalsVisibleTo Include="UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c135ca0dc72ed9549b7ebf23772eb9e3dc2dc9e4a4fb795fa88404a175cfbe230a3d5edb1802c7952b1b5edbeb8136dc16ea6ab03f3f6fed01e9937d8ef40378bee9a31502cd56bfc14adfb2858d438c66d87aea4c54c49bfad28a282bed869af33ac256fe9584b1c5b96479b52a0c95b5a400a7b833820faa272d16ce0586ed" />
   </ItemGroup>
   <PropertyGroup>
     <!-- Uncomment the RestoreSources element to have dotnet restore pull NStack from a local dir for testing -->
@@ -101,5 +101,7 @@
     <EnableSourceLink>true</EnableSourceLink>
     <!--<DebugType>Embedded</DebugType>-->
     <Authors>Miguel de Icaza, Tig Kindel (@tig), @BDisp</Authors>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>Terminal.Gui.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 </Project>

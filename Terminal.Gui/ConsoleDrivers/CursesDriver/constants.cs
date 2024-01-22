@@ -106,6 +106,7 @@ namespace Unix.Terminal {
 		public const int KeyHome = unchecked((int)0x106);
 		public const int KeyMouse = unchecked((int)0x199);
 		public const int KeyCSI = unchecked((int)0x5b);
+		public const int KeySS3 = unchecked((int)0x4f);
 		public const int KeyEnd = unchecked((int)0x168);
 		public const int KeyDeleteChar = unchecked((int)0x14a);
 		public const int KeyInsertChar = unchecked((int)0x14b);

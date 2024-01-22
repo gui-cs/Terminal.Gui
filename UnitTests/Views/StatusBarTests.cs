@@ -129,6 +129,25 @@ CTRL-O Open {Application.Driver.VLine} CTRL-Q Quit
 		}
 
 		[Fact]
+		[AutoInitShutdown]
+		public void Redraw_Output_Custom_HotTextSpecifier ()
+		{
+			var sb = new StatusBar (new StatusItem [] {
+				new StatusItem (Key.CtrlMask | Key.T, "~CTRL-T~ _Text_", null),
+				new StatusItem (Key.CtrlMask | Key.O, "_CTRL-O_ ~/Work", null) { HotTextSpecifier = '_' },
+			});
+			Application.Top.Add (sb);
+
+			sb.Redraw (sb.Bounds);
+
+			string expected = @$"
+CTRL-T _Text_ {Application.Driver.VLine} CTRL-O ~/Work
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+		}
+
+		[Fact]
 		public void AddItemAt_RemoveItem_Replacing ()
 		{
 			var sb = new StatusBar (new StatusItem [] {
