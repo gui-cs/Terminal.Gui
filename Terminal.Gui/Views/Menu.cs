@@ -424,6 +424,10 @@ namespace Terminal.Gui {
 				WantMousePositionReports = host.WantMousePositionReports;
 			}
 
+			if (Application.Current != null) {
+				Application.Current.Resized += Current_Resized;
+			}
+
 			// Things this view knows how to do
 			AddCommand (Command.LineUp, () => MoveUp ());
 			AddCommand (Command.LineDown, () => MoveDown ());
@@ -447,6 +451,13 @@ namespace Terminal.Gui {
 			AddKeyBinding (Key.CursorRight, Command.Right);
 			AddKeyBinding (Key.Esc, Command.Cancel);
 			AddKeyBinding (Key.Enter, Command.Accept);
+		}
+
+		private void Current_Resized (Size obj)
+		{
+			if (host.IsMenuOpen) {
+				host.CloseAllMenus ();
+			}
 		}
 
 		internal Attribute DetermineColorSchemeFor (MenuItem item, int index)
@@ -845,6 +856,15 @@ namespace Terminal.Gui {
 			Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 			return base.OnEnter (view);
+		}
+
+		protected override void Dispose (bool disposing)
+		{
+			if (Application.Current != null) {
+				Application.Current.Resized -= Current_Resized;
+			}
+
+			base.Dispose (disposing);
 		}
 	}
 
