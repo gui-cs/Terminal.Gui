@@ -15,7 +15,7 @@ public readonly partial record struct Color {
 	///   Use <see cref="implicit operator Vector4(Color)" /> to maintain full value.
 	/// </remarks>
 	[Pure]
-	public static explicit operator Vector3 ( Color color ) => new ( color.B, color.G, color.R );
+	public static explicit operator Vector3 ( Color color ) => new ( color.R, color.G, color.B );
 	/// <summary>
 	///   Implicit conversion from <see langword="int" /> to <see cref="Color" />, via the <see cref="Color(int)" /> costructor.
 	/// </summary>
