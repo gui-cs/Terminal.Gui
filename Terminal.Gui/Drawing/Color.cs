@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
