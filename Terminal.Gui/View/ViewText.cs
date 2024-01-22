@@ -292,8 +292,12 @@ public partial class View {
 
 		var w = Bounds.Size.Width + GetHotKeySpecifierLength ();
 		if (Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews) {
-			w = SuperView?.Bounds.Width ?? 0;
-			TextFormatter.Size = new Size (SuperView?.Bounds.Width ?? 0, Bounds.Size.Height + GetHotKeySpecifierLength ());
+			if (Height is Dim.DimAuto) {
+				// Both are auto. 
+				TextFormatter.Size = new Size (SuperView?.Bounds.Width ?? 0, SuperView?.Bounds.Height ?? 0);
+			} else {
+				TextFormatter.Size = new Size (SuperView?.Bounds.Width ?? 0, Bounds.Size.Height + GetHotKeySpecifierLength ());
+			}
 			w = TextFormatter.GetFormattedSize ().Width;
 		} else {
 			TextFormatter.Size = new Size (w, SuperView?.Bounds.Height ?? 0);

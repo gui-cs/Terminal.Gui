@@ -40,9 +40,11 @@ public class DimAutoDemo : Scenario {
 		var heightAuto = new View () {
 			X = Pos.Right (vlabel) + 1,
 			Y = Pos.Bottom (hlabel) + 1,
-			Width = 10,
+			Width = 20,
 			Height = Dim.Auto(),
-			ColorScheme = Colors.ColorSchemes ["Error"]
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Title = "W: 20, H: Auto",
+			BorderStyle = LineStyle.Rounded
 		};
 		heightAuto.Id = "heightAuto";
 
@@ -50,17 +52,30 @@ public class DimAutoDemo : Scenario {
 			X = Pos.Right (heightAuto) + 1,
 			Y = Pos.Bottom (hlabel) + 1,
 			Width = Dim.Auto (),
-			Height = 3,
-			ColorScheme = Colors.ColorSchemes ["Error"]
+			Height = 5,
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Title = "W: Auto, H: 5",
+			BorderStyle = LineStyle.Rounded
 		};
-		heightAuto.Id = "widthAuto";
+		widthAuto.Id = "widthAuto";
 
+		var bothAuto = new View () {
+			X = Pos.Right (widthAuto) + 1,
+			Y = Pos.Bottom (hlabel) + 1,
+			Width = Dim.Auto (),
+			Height = Dim.Auto (),
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Title = "W: Auto, H: Auto",
+			BorderStyle = LineStyle.Rounded
+		};
+		bothAuto.Id = "bothAuto";
 
 		textEdit.ContentsChanged += (s, e) => {
 			hlabel.Text = textEdit.Text;
 			vlabel.Text = textEdit.Text;
 			heightAuto.Text = textEdit.Text;
 			widthAuto.Text = textEdit.Text;
+			bothAuto.Text = textEdit.Text;
 		};
 
 		var movingButton = new Button () {
@@ -87,7 +102,7 @@ public class DimAutoDemo : Scenario {
 			Height = Dim.Auto (style: DimAutoStyle.Subviews, min: 10)
 		};
 		view.ValidatePosDim = true;
-		view.Add (textEdit, hlabel, vlabel, heightAuto, widthAuto, resetButton, movingButton);
+		view.Add (textEdit, hlabel, vlabel, heightAuto, widthAuto, bothAuto, resetButton, movingButton);
 
 		resetButton.Clicked += (s, e) => {
 			movingButton.Y = Pos.Bottom (hlabel);
