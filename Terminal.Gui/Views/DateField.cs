@@ -19,10 +19,14 @@ namespace Terminal.Gui;
 ///   The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.
 /// </remarks>
 public class DateField : TextField {
+
+	private const string RIGHT_TO_LEFT_MARK = "\u200f";
+
 	DateTime _date;
-	int _fieldLen = 10;
-	string _sepChar;
-	string _format;
+	private string _separator;
+	private string _format;
+	private readonly int _dateFieldLength = 12;
+	private int FormatLength => StandardizeDateFormat (_format).Trim ().Length;
 
 	/// <summary>
 	///   DateChanged event, raised when the <see cref="Date"/> property has changed.
@@ -46,15 +50,14 @@ public class DateField : TextField {
 	/// <param name="date"></param>
 	public DateField (DateTime date) : base ("")
 	{
-		Width = _fieldLen + 2;
+		Width = _dateFieldLength;
 		SetInitialProperties (date);
 	}
 
 	void SetInitialProperties (DateTime date)
 	{
-		var cultureInfo = CultureInfo.CurrentCulture;
-		_sepChar = cultureInfo.DateTimeFormat.DateSeparator;
-		_format = $" {cultureInfo.DateTimeFormat.ShortDatePattern}";
+		_format = $" {StandardizeDateFormat (Culture.DateTimeFormat.ShortDatePattern)}";
+		_separator = GetDataSeparator (Culture.DateTimeFormat.DateSeparator);
 		Date = date;
 		CursorPosition = 1;
 		TextChanging += DateField_Changing;
@@ -111,8 +114,6 @@ public class DateField : TextField {
 	void DateField_Changing (object sender, TextChangingEventArgs e)
 	{
 		try {
-			var cultureInfo = CultureInfo.CurrentCulture;
-			DateTimeFormatInfo ccFmt = cultureInfo.DateTimeFormat;
 			int spaces = 0;
 			for (int i = 0; i < e.NewText.Length; i++) {
 				if (e.NewText [i] == ' ') {
@@ -121,13 +122,13 @@ public class DateField : TextField {
 					break;
 				}
 			}
-			spaces += _fieldLen;
+			spaces += FormatLength;
 			string trimedText = e.NewText [..spaces];
-			spaces -= _fieldLen;
+			spaces -= FormatLength;
 			trimedText = trimedText.Replace (new string (' ', spaces), " ");
-			var date = Convert.ToDateTime (trimedText, ccFmt).ToString (ccFmt.ShortDatePattern);
+			var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
 			if ($" {date}" != e.NewText) {
-				e.NewText = $" {date}";
+				e.NewText = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
 			}
 			AdjCursorPosition (CursorPosition, true);
 		} catch (Exception) {
@@ -149,7 +150,8 @@ public class DateField : TextField {
 
 			var oldData = _date;
 			_date = value;
-			Text = value.ToString (_format);
+			Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()))
+				.Replace (RIGHT_TO_LEFT_MARK, "");
 			var args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
 			if (oldData != value) {
 				OnDateChanged (args);
@@ -157,16 +159,31 @@ public class DateField : TextField {
 		}
 	}
 
+	/// <summary>
+	/// CultureInfo for date. The default is CultureInfo.CurrentCulture.
+	/// </summary>
+	public CultureInfo Culture {
+		get => CultureInfo.CurrentCulture;
+		set {
+			if (value is not null) {
+				CultureInfo.CurrentCulture = value;
+				_separator = GetDataSeparator (value.DateTimeFormat.DateSeparator);
+				_format = " " + StandardizeDateFormat (value.DateTimeFormat.ShortDatePattern);
+				Text = Date.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "");
+			}
+		}
+	}
+
 	/// <inheritdoc/>
 	public override int CursorPosition {
 		get => base.CursorPosition;
-		set => base.CursorPosition = Math.Max (Math.Min (value, _fieldLen), 1);
+		set => base.CursorPosition = Math.Max (Math.Min (value, FormatLength), 1);
 	}
 
 	bool SetText (Rune key)
 	{
-		if (CursorPosition > _fieldLen) {
-			CursorPosition = _fieldLen;
+		if (CursorPosition > FormatLength) {
+			CursorPosition = FormatLength;
 			return false;
 		} else if (CursorPosition < 1) {
 			CursorPosition = 1;
@@ -176,7 +193,7 @@ public class DateField : TextField {
 		var text = Text.EnumerateRunes ().ToList ();
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
-		if (CursorPosition < _fieldLen) {
+		if (CursorPosition < FormatLength) {
 			newText = [.. newText, .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))];
 		}
 		return SetText (StringExtensions.ToString (newText));
@@ -189,8 +206,13 @@ public class DateField : TextField {
 		}
 
 		text = NormalizeFormat (text);
-		string [] vals = text.Split (_sepChar);
-		string [] frm = _format.Split (_sepChar);
+		string [] vals = text.Split (_separator);
+		for (var i = 0; i < vals.Length; i++) {
+			if (vals [i].Contains (RIGHT_TO_LEFT_MARK)) {
+				vals [i] = vals [i].Replace (RIGHT_TO_LEFT_MARK, "");
+			}
+		}
+		string [] frm = _format.Split (_separator);
 		int year;
 		int month;
 		int day;
@@ -223,10 +245,13 @@ public class DateField : TextField {
 		}
 		string d = GetDate (month, day, year, frm);
 
-		if (!DateTime.TryParseExact (d, _format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var result)) {
+		DateTime date;
+		try {
+			date = Convert.ToDateTime (d);
+		} catch (Exception) {
 			return false;
 		}
-		Date = result;
+		Date = date;
 		return true;
 	}
 
@@ -236,7 +261,7 @@ public class DateField : TextField {
 			fmt = _format;
 		}
 		if (string.IsNullOrEmpty (sepChar)) {
-			sepChar = _sepChar;
+			sepChar = _separator;
 		}
 		if (fmt.Length != text.Length) {
 			return text;
@@ -265,7 +290,7 @@ public class DateField : TextField {
 				date += $"{year,4:0000}";
 			}
 			if (i < 2) {
-				date += $"{_sepChar}";
+				date += $"{_separator}";
 			}
 		}
 		return date;
@@ -283,10 +308,57 @@ public class DateField : TextField {
 		return idx;
 	}
 
+	private string GetDataSeparator (string separator)
+	{
+		var sepChar = separator.Trim ();
+		if (sepChar.Length > 1 && sepChar.Contains (RIGHT_TO_LEFT_MARK)) {
+			sepChar = sepChar.Replace (RIGHT_TO_LEFT_MARK, "");
+		}
+
+		return sepChar;
+	}
+
+
+
+	// Converts various date formats to a uniform 10-character format. 
+	// This aids in simplifying the handling of single-digit months and days, 
+	// and reduces the number of distinct date formats to maintain.
+	private static string StandardizeDateFormat (string format) =>
+	    format switch {
+		    "MM/dd/yyyy" => "MM/dd/yyyy",
+		    "yyyy-MM-dd" => "yyyy-MM-dd",
+		    "yyyy/MM/dd" => "yyyy/MM/dd",
+		    "dd/MM/yyyy" => "dd/MM/yyyy",
+		    "d?/M?/yyyy" => "dd/MM/yyyy",
+		    "dd.MM.yyyy" => "dd.MM.yyyy",
+		    "dd-MM-yyyy" => "dd-MM-yyyy",
+		    "dd/MM yyyy" => "dd/MM/yyyy",
+		    "d. M. yyyy" => "dd.MM.yyyy",
+		    "yyyy.MM.dd" => "yyyy.MM.dd",
+		    "g yyyy/M/d" => "yyyy/MM/dd",
+		    "d/M/yyyy" => "dd/MM/yyyy",
+		    "d?/M?/yyyy g" => "dd/MM/yyyy",
+		    "d-M-yyyy" => "dd-MM-yyyy",
+		    "d.MM.yyyy" => "dd.MM.yyyy",
+		    "d.MM.yyyy '?'." => "dd.MM.yyyy",
+		    "M/d/yyyy" => "MM/dd/yyyy",
+		    "d. M. yyyy." => "dd.MM.yyyy",
+		    "d.M.yyyy." => "dd.MM.yyyy",
+		    "g yyyy-MM-dd" => "yyyy-MM-dd",
+		    "d.M.yyyy" => "dd.MM.yyyy",
+		    "d/MM/yyyy" => "dd/MM/yyyy",
+		    "yyyy/M/d" => "yyyy/MM/dd",
+		    "dd. MM. yyyy." => "dd.MM.yyyy",
+		    "yyyy. MM. dd." => "yyyy.MM.dd",
+		    "yyyy. M. d." => "yyyy.MM.dd",
+		    "d. MM. yyyy" => "dd.MM.yyyy",
+		    _ => "dd/MM/yyyy"
+	    };
+
 	void IncCursorPosition ()
 	{
-		if (CursorPosition >= _fieldLen) {
-			CursorPosition = _fieldLen;
+		if (CursorPosition >= FormatLength) {
+			CursorPosition = FormatLength;
 			return;
 		}
 		CursorPosition++;
@@ -306,8 +378,8 @@ public class DateField : TextField {
 	void AdjCursorPosition (int point, bool increment = true)
 	{
 		var newPoint = point;
-		if (point > _fieldLen) {
-			newPoint = _fieldLen;
+		if (point > FormatLength) {
+			newPoint = FormatLength;
 		}
 		if (point < 1) {
 			newPoint = 1;
@@ -316,7 +388,7 @@ public class DateField : TextField {
 			CursorPosition = newPoint;
 		}
 
-		while (Text [CursorPosition] == _sepChar [0]) {
+		while (Text [CursorPosition].ToString () == _separator) {
 			if (increment) {
 				CursorPosition++;
 			} else {
@@ -335,7 +407,7 @@ public class DateField : TextField {
 	new bool MoveEnd ()
 	{
 		ClearAllSelection ();
-		CursorPosition = _fieldLen;
+		CursorPosition = FormatLength;
 		return true;
 	}
 
