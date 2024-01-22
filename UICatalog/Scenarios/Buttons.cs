@@ -119,9 +119,11 @@ public class Buttons : Scenario {
 
 		// Demonstrates how changing the View.Frame property can move Views
 		var moveBtn = new Button ("Move This \u263b Button v_ia Pos") {
+			AutoSize = false,
 			X = 0,
 			Y = Pos.Center () - 1,
 			Width = 30,
+			Height = 1,
 			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		moveBtn.Clicked += (s, e) => {
@@ -133,9 +135,11 @@ public class Buttons : Scenario {
 
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
 		var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
+			AutoSize = false,
 			X = 0,
 			Y = Pos.Center () + 1,
 			Width = 30,
+			Height = 1,
 			ColorScheme = Colors.ColorSchemes ["Error"],
 		};
 		sizeBtn.Clicked += (s, e) => {
@@ -211,8 +215,10 @@ public class Buttons : Scenario {
 
 		var mhkb = "Click to Change th_is Button's Hotkey";
 		var moveHotKeyBtn = new Button (mhkb) {
+			AutoSize = false,
 			X = 2,
 			Y = Pos.Bottom (radioGroup) + 1,
+			Height = 1,
 			Width = Dim.Width (computedFrame) - 2,
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
@@ -223,9 +229,11 @@ public class Buttons : Scenario {
 
 		var muhkb = " ~  s  gui.cs   master ↑10 = Сохранить";
 		var moveUnicodeHotKeyBtn = new Button (muhkb) {
+			AutoSize = false,
 			X = Pos.Left (absoluteFrame) + 1,
 			Y = Pos.Bottom (radioGroup) + 1,
 			Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
+			Height = 1,
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
 		moveUnicodeHotKeyBtn.Clicked += (s, e) => {

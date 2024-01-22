@@ -16,6 +16,7 @@ namespace UICatalog.Scenarios {
 			foreach (ColorName bg in colors) {
 				Attribute attr = new Attribute (bg, colors.Length - 1 - bg);
 				var vl = new Label (bg.ToString (), TextDirection.TopBottom_LeftRight) {
+					AutoSize = false,
 					X = vx,
 					Y = 0,
 					Width = 1,
@@ -25,6 +26,7 @@ namespace UICatalog.Scenarios {
 				};
 				Win.Add (vl);
 				var hl = new Label (bg.ToString ()) {
+					AutoSize = false,
 					X = 15,
 					Y = y,
 					Width = 13,
