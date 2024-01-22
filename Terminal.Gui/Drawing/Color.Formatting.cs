@@ -337,10 +337,21 @@ public readonly partial record struct Color {
 		}
 	}
 	/// <inheritdoc />
+	/// <remarks>
+	///   Use of this method involves a stack allocation of <paramref name="utf8Destination" />.Length * 2 bytes. Use of the overload taking a char
+	///   span is recommended.
+	/// </remarks>
 	public bool TryFormat ( Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider provider )
 	{
-		//TODO: Finish this
-		throw new NotImplementedException ( );
+		Span<char> charDestination = stackalloc char [utf8Destination.Length * 2];
+		if ( TryFormat ( charDestination, out int charsWritten, format, provider ) ) {
+			Encoding.UTF8.GetBytes ( charDestination, utf8Destination );
+			bytesWritten = charsWritten / 2;
+			return true;
+		}
+		utf8Destination.Clear ( );
+		bytesWritten = 0;
+		return false;
 	}
 
 	/// <inheritdoc />
