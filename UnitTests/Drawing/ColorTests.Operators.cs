@@ -4,30 +4,8 @@ namespace Terminal.Gui.DrawingTests;
 public partial class ColorTests {
 
 	[Theory]
-	[CombinatorialData]
 	[Trait ( "Category", "Operators" )]
-	public void ImplicitOperator_FromInt_ReturnsCorrectColorValue ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
-	{
-		Color color = expectedValue;
-
-		Assert.Equal ( expectedValue, color.Rgba );
-	}
-
-	[Theory]
-	[CombinatorialData]
-	[Trait ( "Category", "Operators" )]
-	public void ImplicitOperator_ToInt_ReturnsCorrectInt32Value ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
-	{
-		Color color = new ( expectedValue );
-
-		int colorAsInt32 = color;
-
-		Assert.Equal ( expectedValue, colorAsInt32 );
-	}
-
-	[Theory]
-	[Trait ( "Category", "Operators" )]
-	[MemberData(nameof(ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly), MemberType = typeof(ColorTestsTheoryDataGenerators))]
+	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
 	public void ExplicitOperator_FromColorName_ReturnsCorrectColorValue ( ColorName cname, Color expectedColor )
 	{
 		Color color = cname;
@@ -51,9 +29,52 @@ public partial class ColorTests {
 			Assert.False ( color1 == color2 );
 		}
 	}
-}
 
+	[Theory]
+	[CombinatorialData]
+	[Trait ( "Category", "Operators" )]
+	public void ImplicitOperator_FromInt_ReturnsCorrectColorValue ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
+	{
+		Color color = expectedValue;
+
+		Assert.Equal ( expectedValue, color.Rgba );
+	}
+
+	[Theory]
+	[CombinatorialData]
+	[Trait ( "Category", "Operators" )]
+	public void ImplicitOperator_ToInt_ReturnsCorrectInt32Value ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
+	{
+		Color color = new ( expectedValue );
+
+		int colorAsInt32 = color;
+
+		Assert.Equal ( expectedValue, colorAsInt32 );
+	}
+}
 public static partial class ColorTestsTheoryDataGenerators {
+
+	public static TheoryData<ColorName, Color> ExplicitOperator_FromColorName_RoundTripsCorrectly ( )
+	{
+		TheoryData<ColorName, Color> data = [];
+		data.Add ( ColorName.Black, new Color ( 12, 12, 12 ) );
+		data.Add ( ColorName.Blue, new Color ( 0, 55, 218 ) );
+		data.Add ( ColorName.Green, new Color ( 19, 161, 14 ) );
+		data.Add ( ColorName.Cyan, new Color ( 58, 150, 221 ) );
+		data.Add ( ColorName.Red, new Color ( 197, 15, 31 ) );
+		data.Add ( ColorName.Magenta, new Color ( 136, 23, 152 ) );
+		data.Add ( ColorName.Yellow, new Color ( 128, 64, 32 ) );
+		data.Add ( ColorName.Gray, new Color ( 204, 204, 204 ) );
+		data.Add ( ColorName.DarkGray, new Color ( 118, 118, 118 ) );
+		data.Add ( ColorName.BrightBlue, new Color ( 59, 120, 255 ) );
+		data.Add ( ColorName.BrightGreen, new Color ( 22, 198, 12 ) );
+		data.Add ( ColorName.BrightCyan, new Color ( 97, 214, 214 ) );
+		data.Add ( ColorName.BrightRed, new Color ( 231, 72, 86 ) );
+		data.Add ( ColorName.BrightMagenta, new Color ( 180, 0, 158 ) );
+		data.Add ( ColorName.BrightYellow, new Color ( 249, 241, 165 ) );
+		data.Add ( ColorName.White, new Color ( 242, 242, 242 ) );
+		return data;
+	}
 	public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets ( )
 	{
 		TheoryData<FieldInfo, int> data = [];
@@ -65,27 +86,4 @@ public static partial class ColorTestsTheoryDataGenerators {
 		data.Add ( typeof ( Color ).GetField ( "A", BindingFlags.Instance | BindingFlags.Public | BindingFlags.ExactBinding ), 3 );
 		return data;
 	}
-
-	public static TheoryData<ColorName, Color> ExplicitOperator_FromColorName_RoundTripsCorrectly ( )
-	{
-		TheoryData<ColorName, Color> data = [];
-		data.Add ( ColorName.Black, new ( 12, 12, 12 ) );
-		data.Add ( ColorName.Blue, new ( 0, 55, 218 ) );
-		data.Add ( ColorName.Green, new ( 19, 161, 14 ) );
-		data.Add ( ColorName.Cyan, new ( 58, 150, 221 ) );
-		data.Add ( ColorName.Red, new ( 197, 15, 31 ) );
-		data.Add ( ColorName.Magenta, new ( 136, 23, 152 ) );
-		data.Add ( ColorName.Yellow, new ( 128, 64, 32 ) );
-		data.Add ( ColorName.Gray, new ( 204, 204, 204 ) );
-		data.Add ( ColorName.DarkGray, new ( 118, 118, 118 ) );
-		data.Add ( ColorName.BrightBlue, new ( 59, 120, 255 ) );
-		data.Add ( ColorName.BrightGreen, new ( 22, 198, 12 ) );
-		data.Add ( ColorName.BrightCyan, new ( 97, 214, 214 ) );
-		data.Add ( ColorName.BrightRed, new ( 231, 72, 86 ) );
-		data.Add ( ColorName.BrightMagenta, new ( 180, 0, 158 ) );
-		data.Add ( ColorName.BrightYellow, new ( 249, 241, 165 ) );
-		data.Add ( ColorName.White, new ( 242, 242, 242 ) );
-		return data;
-	}
-
 }
