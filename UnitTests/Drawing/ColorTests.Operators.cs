@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Numerics;
+using System.Reflection;
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
@@ -11,6 +12,20 @@ public partial class ColorTests {
 		Color color = cname;
 
 		Assert.Equal ( expectedColor, color );
+	}
+
+	[Theory]
+	[Trait ( "Category", "Operators" )]
+    [CombinatorialData]
+	public void ExplicitOperator_ToVector3_ReturnsCorrectValue ([CombinatorialRange(0,255,51)] byte r, [CombinatorialRange(0,255,51)]byte g, [CombinatorialRange(0,255,51)]byte b, [CombinatorialValues(0,255)] byte a )
+	{
+		Color color = new ( r, g, b, a );
+
+		Vector3 vector = (Vector3)color;
+
+		Assert.Equal ( color.R, vector.X );
+		Assert.Equal ( color.G, vector.Y );
+		Assert.Equal ( color.B, vector.Z );
 	}
 
 	[Theory]
@@ -75,6 +90,7 @@ public static partial class ColorTestsTheoryDataGenerators {
 		data.Add ( ColorName.White, new Color ( 242, 242, 242 ) );
 		return data;
 	}
+
 	public static TheoryData<FieldInfo, int> Fields_At_Expected_Offsets ( )
 	{
 		TheoryData<FieldInfo, int> data = [];
