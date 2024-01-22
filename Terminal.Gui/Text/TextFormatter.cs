@@ -866,7 +866,7 @@ namespace Terminal.Gui {
 		}
 
 		/// <summary>
-		///  Calculates the rectangle required to hold text, assuming no word wrapping or justification.
+		/// Calculates the rectangle required to hold a formatted string of text.
 		/// </summary>
 		/// <param name="x">The x location of the rectangle</param>
 		/// <param name="y">The y location of the rectangle</param>
@@ -1303,9 +1303,12 @@ namespace Terminal.Gui {
 		public Size GetFormattedSize ()
 		{
 			var lines = Lines;
-			var width = Lines.Max (line => line.GetColumns ());
-			var height = Lines.Count;
-			return new Size (width, height);
+			if (Lines.Count > 0) {
+				var width = Lines.Max (line => line.GetColumns ());
+				var height = Lines.Count;
+				return new Size (width, height);
+			}
+			return Size.Empty;
 		}
 
 		/// <summary>

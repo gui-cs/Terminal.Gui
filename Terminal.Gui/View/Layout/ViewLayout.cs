@@ -783,7 +783,7 @@ public partial class View {
 		if (AutoSize) {
 			// Note this is global to this function and used as such within the local functions defined
 			// below. In v2 AutoSize will be re-factored to not need to be dealt with in this function.
-			autosize = GetAutoSize ();
+			autosize = GetTextAutoSize ();
 		}
 
 		// TODO: Since GetNewLocationAndDimension does not depend on View, it can be moved into PosDim.cs
@@ -826,20 +826,27 @@ public partial class View {
 
 				case Dim.DimAuto auto:
 					var thickness = GetAdornmentsThickness ();
-					//newDimension = GetNewDimension (auto._min, location, dimension, autosize);
-					if (width) {
-						var max = int.Max (GetAutoSize ().Width, auto._min?.Anchor (superviewBounds.Width) ?? 0);
-						if (auto._style == Dim.DimAutoStyle.Subviews) {
-							max = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.X is not Pos.PosAnchorEnd).Max (v => v.Frame.X + v.Frame.Width);
+					var text = 0;
+					var subviews = 0;
+
+					if (auto._style is Dim.DimAutoStyle.Text or Dim.DimAutoStyle.Auto) {
+						if (Id == "multiLine") {
+
 						}
-						newDimension = int.Max (max + thickness.Left + thickness.Right, auto._min?.Anchor (superviewBounds.Width) ?? 0);
-					} else {
-						var max = int.Max (GetAutoSize ().Height, auto._min?.Anchor (superviewBounds.Height) ?? 0);
-						if (auto._style == Dim.DimAutoStyle.Subviews) {
-							max = Subviews.Count == 0 ? 0 : Subviews.Where (v => v.Y is not Pos.PosAnchorEnd).Max (v => v.Frame.Y + v.Frame.Height);
-						}
-						newDimension = int.Max (max + thickness.Top + thickness.Bottom, auto._min?.Anchor (superviewBounds.Height) ?? 0);
-					}
+
+						text = int.Max (width ? TextFormatter.Size.Width : TextFormatter.Size.Height, 
+							auto._min?.Anchor (width ? superviewBounds.Width : superviewBounds.Height) ?? 0);
+					} 
+					
+					if (auto._style is Dim.DimAutoStyle.Subviews or Dim.DimAutoStyle.Auto) {
+						subviews = Subviews.Count == 0 ? 0 : Subviews
+							.Where (v => width ? v.X is not Pos.PosAnchorEnd : v.Y is not Pos.PosAnchorEnd)
+							.Max (v => width ? v.Frame.X + v.Frame.Width : v.Frame.Y + v.Frame.Height);
+					} 
+					
+					var max = int.Max (text, subviews);
+					newDimension = int.Max (width ? max + thickness.Left + thickness.Right : max + thickness.Top + thickness.Bottom,
+						auto._min?.Anchor (width ? superviewBounds.Width : superviewBounds.Height) ?? 0);
 					break;
 
 				case Dim.DimAbsolute:
@@ -875,7 +882,7 @@ public partial class View {
 				// TODO: Move combine logic into PosCombine?
 				// TODO: Move combine logic into PosCombine?
 				int left, right;
-				(left, newDimension) = GetNewLocationAndDimension (width,  superviewBounds, combine._left,  dim, autosizeDimension);
+				(left, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._left, dim, autosizeDimension);
 				(right, newDimension) = GetNewLocationAndDimension (width, superviewBounds, combine._right, dim, autosizeDimension);
 				if (combine._add) {
 					newLocation = left + right;
@@ -980,7 +987,7 @@ public partial class View {
 			}
 			return;
 		case Pos.PosCombine pc:
-			CollectPos (pc._left,  from, ref nNodes, ref nEdges);
+			CollectPos (pc._left, from, ref nNodes, ref nEdges);
 			CollectPos (pc._right, from, ref nNodes, ref nEdges);
 			break;
 		}
@@ -999,7 +1006,7 @@ public partial class View {
 			}
 			return;
 		case Dim.DimCombine dc:
-			CollectDim (dc._left,  from, ref nNodes, ref nEdges);
+			CollectDim (dc._left, from, ref nNodes, ref nEdges);
 			CollectDim (dc._right, from, ref nNodes, ref nEdges);
 			break;
 		}
@@ -1015,7 +1022,7 @@ public partial class View {
 			}
 			CollectPos (v.X, v, ref nNodes, ref nEdges);
 			CollectPos (v.Y, v, ref nNodes, ref nEdges);
-			CollectDim (v.Width,  v, ref nNodes, ref nEdges);
+			CollectDim (v.Width, v, ref nNodes, ref nEdges);
 			CollectDim (v.Height, v, ref nNodes, ref nEdges);
 		}
 	}
@@ -1153,7 +1160,7 @@ public partial class View {
 
 		CheckDimAuto ();
 
-		LayoutAdornments (); 
+		LayoutAdornments ();
 
 		var oldBounds = Bounds;
 		OnLayoutStarted (new LayoutEventArgs { OldBounds = oldBounds });
@@ -1211,7 +1218,7 @@ public partial class View {
 		}
 
 		var boundsChanged = true;
-		var newFrameSize = GetAutoSize ();
+		var newFrameSize = GetTextAutoSize ();
 		if (IsInitialized && newFrameSize != Frame.Size) {
 			if (ValidatePosDim) {
 				// BUGBUG: This ain't right, obviously.  We need to figure out how to handle this.

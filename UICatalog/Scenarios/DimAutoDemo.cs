@@ -16,36 +16,57 @@ public class DimAutoDemo : Scenario {
 
 	public override void Setup ()
 	{
-		var textField = new TextField { Text = "", X = 1, Y = 0, Width = 20, Height = 1 };
+		var textEdit = new TextView { Text = "", X = 1, Y = 0, Width = 20, Height = 4 };
 
 		var hlabel = new Label {
-			Text = textField.Text,
-			X = Pos.Left (textField) + 1,
-			Y = Pos.Bottom (textField),
+			Text = textEdit.Text,
+			X = Pos.Left (textEdit) + 1,
+			Y = Pos.Bottom (textEdit),
 			AutoSize = false,
 			Width = Dim.Auto (style: DimAutoStyle.Text, min: 20),
 			ColorScheme = Colors.ColorSchemes["Error"]
 		};
 
 		var vlabel = new Label {
-			Text = textField.Text,
-			X = Pos.Left (textField),
-			Y = Pos.Bottom (textField) + 1,
+			Text = textEdit.Text,
+			X = Pos.Left (textEdit),
+			Y = Pos.Bottom (textEdit) + 1,
 			AutoSize = false,
-			Height = Dim.Auto (style: DimAutoStyle.Text, min: 10),
+			Height = Dim.Auto (style: DimAutoStyle.Text, min: 8),
 			ColorScheme = Colors.ColorSchemes ["Error"],
 			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 
-		textField.TextChanged += (s, e) => {
-			hlabel.Text = textField.Text;
-			vlabel.Text = textField.Text;
+		var heightAuto = new View () {
+			X = Pos.Right (vlabel) + 1,
+			Y = Pos.Bottom (hlabel) + 1,
+			Width = 10,
+			Height = Dim.Auto(),
+			ColorScheme = Colors.ColorSchemes ["Error"]
+		};
+		heightAuto.Id = "heightAuto";
+
+		var widthAuto = new View () {
+			X = Pos.Right (heightAuto) + 1,
+			Y = Pos.Bottom (hlabel) + 1,
+			Width = Dim.Auto (),
+			Height = 3,
+			ColorScheme = Colors.ColorSchemes ["Error"]
+		};
+		heightAuto.Id = "widthAuto";
+
+
+		textEdit.ContentsChanged += (s, e) => {
+			hlabel.Text = textEdit.Text;
+			vlabel.Text = textEdit.Text;
+			heightAuto.Text = textEdit.Text;
+			widthAuto.Text = textEdit.Text;
 		};
 
 		var movingButton = new Button () {
-			Text = "P_ress to make button move down.",
-			X = 2,
-			Y = Pos.Bottom (hlabel),
+			Text = "_Move down",
+			X = Pos.Right (vlabel),
+			Y = Pos.Bottom (heightAuto),
 			Width = 10
 		};
 		movingButton.Clicked += (s, e) => {
@@ -53,21 +74,20 @@ public class DimAutoDemo : Scenario {
 		};
 
 		var resetButton = new Button () {
-			Text = "P_ut Button Back",
-			X = 30,//Pos.AnchorEnd () - 19,
+			Text = "_Reset Button",
+			X = Pos.Right(movingButton),
 			Y = Pos.Top (movingButton),
 		};
 
-
 		var view = new FrameView () {
-			Title = "Type in the TextField to make View grow.",
-			X = 3,
-			Y = 3,
-			Width = Dim.Auto (min: 50),
-			Height = Dim.Auto (min: 10)
+			Title = "Type to make View grow",
+			X = 1,
+			Y = 1,
+			Width = Dim.Auto (style: DimAutoStyle.Subviews, min: 40),
+			Height = Dim.Auto (style: DimAutoStyle.Subviews, min: 10)
 		};
 		view.ValidatePosDim = true;
-		view.Add (textField, hlabel, vlabel, resetButton, movingButton);
+		view.Add (textEdit, hlabel, vlabel, heightAuto, widthAuto, resetButton, movingButton);
 
 		resetButton.Clicked += (s, e) => {
 			movingButton.Y = Pos.Bottom (hlabel);

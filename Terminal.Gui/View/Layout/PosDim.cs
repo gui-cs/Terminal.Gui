@@ -666,27 +666,39 @@ public class Dim {
 	internal virtual int Anchor (int width) => 0;
 
 	/// <summary>
-	///         Specifies how <see cref="DimAuto" /> will compute the dimension.
+	/// Specifies how <see cref="DimAuto" /> will compute the dimension.
 	/// </summary>
 	public enum DimAutoStyle {
 		/// <summary>
-		///         The dimension will be computed from the view's <see cref="View.Text" />. NOT CURRENTLY SUPPORTED.
+		/// The dimension will be computed using both the view's <see cref="View.Text"/> and
+		/// <see cref="View.Subviews" />.
+		/// The larger of the corresponding text dimension or Subview in <see cref="View.Subviews" />
+		/// with the largest corresponding position plus dimension will determine the dimension.
 		/// </summary>
-		Text,
+		Auto,
 
 		/// <summary>
-		///         The dimension will be computed from the view's <see cref="View.Subviews" />.
+		/// The Subview in <see cref="View.Subviews" /> with the largest corresponding position plus dimension
+		/// will determine the dimension.
+		/// The corresponding dimension of the view's <see cref="View.Text"/> will be ignored.
 		/// </summary>
-		Subviews
+		Subviews,
+
+		/// <summary>
+		/// The corresponding dimension of the view's <see cref="View.Text" />, formatted using the <see cref="View.TextFormatter"/> settings,
+		/// will be used to determine the dimension. 
+		/// The corresponding dimensions of the <see cref="View.Subviews"/> will be ignored.
+		/// </summary>
+		Text
 	}
 
 	/// <summary>
-	///         Creates a <see cref="Dim" /> object that automatically sizes the view to fit all of the view's SubViews.
+	/// Creates a <see cref="Dim" /> object that automatically sizes the view to fit all of the view's SubViews and/or Text.
 	/// </summary>
 	/// <example>
-	///         This initializes a <see cref="View" /> with two SubViews. The view will be automatically sized to fit the two
-	///         SubViews.
-	///         <code>
+	/// This initializes a <see cref="View" /> with two SubViews. The view will be automatically sized to fit the two
+	/// SubViews.
+	/// <code>
 	/// var button = new Button () { Text = "Click Me!", X = 1, Y = 1, Width = 10, Height = 1 };
 	/// var textField = new TextField { Text = "Type here", X = 1, Y = 2, Width = 20, Height = 1 };
 	/// var view = new Window () { Title = "MyWindow", X = 0, Y = 0, Width = Dim.AutoSize (), Height = Dim.AutoSize () };
@@ -695,19 +707,12 @@ public class Dim {
 	/// </example>
 	/// <returns>The AutoSize <see cref="Dim" /> object.</returns>
 	/// <param name="style">
-	///         Specifies how <see cref="DimAuto" /> will compute the dimension. The default is
-	///         <see cref="DimAutoStyle.Text" />. NOT CURRENTLY SUPPORTED.
+	/// Specifies how <see cref="DimAuto" /> will compute the dimension. The default is <see cref="DimAutoStyle.Auto" />. 
 	/// </param>
-	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
+	/// <param name="min">Specifies the minimum dimension that view will be automatically sized to.</param>
 	/// <param name="max">Specifies the maximum dimension that view will be automatically sized to. NOT CURRENTLY SUPPORTED.</param>
-	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Subviews, Dim min = null, Dim max = null)
+	public static Dim Auto (DimAutoStyle style = DimAutoStyle.Auto, Dim min = null, Dim max = null)
 	{
-		//if (style == DimAutoStyle.Text) {
-		//	throw new NotImplementedException (@"DimAutoStyle.Text is not implemented.");
-		//}
-		//if (min != null) {
-		//	throw new NotImplementedException (@"min is not implemented");
-		//}
 		if (max != null) {
 			throw new NotImplementedException (@"max is not implemented");
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -289,17 +290,33 @@ public partial class View {
 			return;
 		}
 
-		TextFormatter.Size = new Size (Bounds.Size.Width + GetHotKeySpecifierLength (),
-			Bounds.Size.Height + GetHotKeySpecifierLength (false));
+		var w = Bounds.Size.Width + GetHotKeySpecifierLength ();
+		if (Width is Dim.DimAuto widthAuto && widthAuto._style != Dim.DimAutoStyle.Subviews) {
+			w = SuperView?.Bounds.Width ?? 0;
+			TextFormatter.Size = new Size (SuperView?.Bounds.Width ?? 0, Bounds.Size.Height + GetHotKeySpecifierLength ());
+			w = TextFormatter.GetFormattedSize ().Width;
+		} else {
+			TextFormatter.Size = new Size (w, SuperView?.Bounds.Height ?? 0);
+		}
+
+		var h = Bounds.Size.Height + GetHotKeySpecifierLength ();
+		if (Height is Dim.DimAuto heightAuto && heightAuto._style != Dim.DimAutoStyle.Subviews) {
+			h = SuperView?.Bounds.Height ?? 0;
+			h = TextFormatter.GetFormattedSize ().Height;
+		}
+		TextFormatter.Size = new Size (w, h);
 	}
 
+	// TODO: Refactor this to return the Bounds size, not Frame. Move code that accounts for
+	// TODO: Thickness out to callers.
 	/// <summary>
-	/// Gets the Frame dimensions required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
-	/// <see cref="Direction"/> specified by the
-	/// <see cref="TextFormatter"/> property and accounting for any <see cref="HotKeySpecifier"/> characters.
+	/// Gets the size of the <see cref="Frame"/> required to fit <see cref="Text"/> within <see cref="Bounds"/> using the text
+	/// formatting settings of <see cref="View.TextFormatter"/> and accounting for <see cref="HotKeySpecifier"/>.
 	/// </summary>
-	/// <returns>The <see cref="Size"/> the <see cref="Frame"/> needs to be set to fit the text.</returns>
-	public Size GetAutoSize ()
+	/// <remarks>
+	/// </remarks>
+	/// <returns>The <see cref="Size"/> of the <see cref="Frame"/> required to fit the formatted text.</returns>
+	public Size GetTextAutoSize ()
 	{
 		var x = 0;
 		var y = 0;
