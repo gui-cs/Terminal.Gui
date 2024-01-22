@@ -8,6 +8,7 @@
 ![Bugs](https://img.shields.io/github/issues/gui-cs/gui.cs/bug)
 
 ***The current, stable, release of Terminal.Gui is [v1.x](https://www.nuget.org/packages/Terminal.Gui). It is stable, rich, and broadly used. The team is now focused on designing and building a significant upgrade we're referring to as `v2`. Therefore:***
+
  * *`v1` is now in maintenance mode, meaning we will accept PRs for v1.x (the `develop` branch) only for issues impacting existing functionality.*
  * *All new development happens on the `v2_develop` branch. See the V2 discussion [here](https://github.com/gui-cs/Terminal.Gui/discussions/1940).*
  * *The latest v2 API Docs* (generated from `v2_develop`) can be found [here](https://gui-cs.github.io/Terminal.GuiV2Docs/). 
