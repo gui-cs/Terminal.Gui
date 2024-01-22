@@ -1,10 +1,7 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Globalization;
-using System.Linq;
-using Xunit;
 
-namespace Terminal.Gui.DrawingTests;
+namespace Terminal.Gui.Drawing.Tests;
 
 public partial class ColorTests {
 
