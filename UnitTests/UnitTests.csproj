@@ -58,5 +58,7 @@
     <IncludeTestAssembly>
       False
     </IncludeTestAssembly>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>UnitTests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 </Project>
