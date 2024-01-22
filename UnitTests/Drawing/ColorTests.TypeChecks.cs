@@ -7,6 +7,20 @@ public partial class ColorTests {
 	[Fact]
 	[Trait ( "Category", "Type Checks" )]
 	[Trait ( "Category", "Change Control" )]
+	public void ColorName_Has_Exactly_16_Defined_Values ( ) => Assert.Equal ( 16, Enum.GetValues<ColorName> ( ).DistinctBy ( static cname => (int)cname ).Count ( ) );
+
+	[Theory]
+	[Trait ( "Category", "Type Checks" )]
+	[Trait ( "Category", "Change Control" )]
+	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.ColorName_HasCorrectOrdinals ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
+	public void ColorName_HasCorrectOrdinals ( ColorName cname, int ordinal )
+	{
+		Assert.Equal ( (int)cname, ordinal );
+	}
+
+	[Fact]
+	[Trait ( "Category", "Type Checks" )]
+	[Trait ( "Category", "Change Control" )]
 	[SkipLocalsInit]
 	public unsafe void Fields_At_Expected_Offsets ( )
 	{
@@ -94,10 +108,27 @@ public partial class ColorTests {
 	public void Is_Value_Type ( ) =>
 		// prove that Color is a value type
 		Assert.True ( typeof ( Color ).IsValueType );
-
-	[Fact]
-	[Trait ( "Category", "Type Checks" )]
-	[Trait ( "Category", "Change Control" )]
-	public void ColorName_Has_Exactly_16_Defined_Values ( ) => Assert.Equal ( 16, Enum.GetValues<ColorName> ( ).DistinctBy ( static cname => (int)cname ).Count ( ) );
-
+}
+public static partial class ColorTestsTheoryDataGenerators {
+	public static TheoryData<ColorName, int> ColorName_HasCorrectOrdinals ( )
+	{
+		TheoryData<ColorName, int> data = [];
+		data.Add ( ColorName.Black, 0 );
+		data.Add ( ColorName.Blue, 1 );
+		data.Add ( ColorName.Green, 2 );
+		data.Add ( ColorName.Cyan, 3 );
+		data.Add ( ColorName.Red, 4 );
+		data.Add ( ColorName.Magenta, 5 );
+		data.Add ( ColorName.Yellow, 6 );
+		data.Add ( ColorName.Gray, 7 );
+		data.Add ( ColorName.DarkGray, 8 );
+		data.Add ( ColorName.BrightBlue, 9 );
+		data.Add ( ColorName.BrightGreen, 10 );
+		data.Add ( ColorName.BrightCyan, 11 );
+		data.Add ( ColorName.BrightRed, 12 );
+		data.Add ( ColorName.BrightMagenta, 13 );
+		data.Add ( ColorName.BrightYellow, 14 );
+		data.Add ( ColorName.White, 15 );
+		return data;
+	}
 }

@@ -6,27 +6,6 @@ namespace Terminal.Gui.Drawing.Tests;
 public partial class ColorTests {
 
 	[Fact]
-	public void ColorNames_HaveCorrectOrdinals ()
-	{
-		Assert.Equal (0, (int)ColorName.Black);
-		Assert.Equal (1, (int)ColorName.Blue);
-		Assert.Equal (2, (int)ColorName.Green);
-		Assert.Equal (3, (int)ColorName.Cyan);
-		Assert.Equal (4, (int)ColorName.Red);
-		Assert.Equal (5, (int)ColorName.Magenta);
-		Assert.Equal (6, (int)ColorName.Yellow);
-		Assert.Equal (7, (int)ColorName.Gray);
-		Assert.Equal (8, (int)ColorName.DarkGray);
-		Assert.Equal (9, (int)ColorName.BrightBlue);
-		Assert.Equal (10, (int)ColorName.BrightGreen);
-		Assert.Equal (11, (int)ColorName.BrightCyan);
-		Assert.Equal (12, (int)ColorName.BrightRed);
-		Assert.Equal (13, (int)ColorName.BrightMagenta);
-		Assert.Equal (14, (int)ColorName.BrightYellow);
-		Assert.Equal (15, (int)ColorName.White);
-	}
-
-	[Fact]
 	public void Color_ToString_WithNamedColor ()
 	{
 		// Arrange
