@@ -115,6 +115,7 @@ public readonly partial record struct Color {
 	[Pure]
 	public bool TryFormat ( Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider )
 	{
+		// TODO: This can probably avoid a string allocation with a little more work
 		try {
 			string formattedString = ToString ( format.ToString ( ), provider );
 			if ( formattedString.Length <= destination.Length ) {
@@ -124,9 +125,11 @@ public readonly partial record struct Color {
 			}
 		}
 		catch {
+			destination.Clear ( );
 			charsWritten = 0;
 			return false;
 		}
+		destination.Clear ( );
 		charsWritten = 0;
 		return false;
 	}
@@ -385,8 +388,9 @@ public readonly partial record struct Color {
 	public override string ToString ( )
 	{
 		// If Values has an exact match with a named color (in _colorNames), use that.
-		return ColorExtensions.ColorToNameMap.TryGetValue ( this, out ColorName colorName ) ? Enum.GetName ( typeof ( ColorName ), colorName ) :
-			// Otherwise return as an RGB hex value.
+		return ColorExtensions.ColorToNameMap.TryGetValue ( this, out ColorName colorName )
+			? Enum.GetName ( typeof ( ColorName ), colorName )
+			: // Otherwise return as an RGB hex value.
 			$"#{R:X2}{G:X2}{B:X2}";
 	}
 	/// <summary>Converts the provided string to a new <see cref="Color" /> instance.</summary>
