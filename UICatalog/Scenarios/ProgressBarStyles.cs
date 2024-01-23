@@ -33,7 +33,7 @@ public class ProgressBarStyles : Scenario {
 
 		const float fractionStep = 0.01F;
 
-		var pbList = new ListView () {
+		var pbList = new ListView {
 			Title = "Focused ProgressBar",
 			Y = 0,
 			X = Pos.Center (),

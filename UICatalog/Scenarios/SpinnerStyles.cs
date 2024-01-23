@@ -110,7 +110,7 @@ public class SpinnerViewStyles : Scenario {
 		if (styleArray.Length < 1)
 			return;
 
-		var styles = new ListView () {
+		var styles = new ListView {
 			X = Pos.Center (),
 			Y = Pos.Bottom (preview) + 2,
 			Height = Dim.Fill (),

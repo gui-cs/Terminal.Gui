@@ -312,7 +312,7 @@ public class BackgroundWorkerCollection : Scenario {
 			};
 			Add (label);
 
-			listView = new ListView () {
+			listView = new ListView {
 				X = 0,
 				Y = 2,
 				Width = Dim.Fill (),

@@ -130,7 +130,7 @@ public class ToplevelTests {
 				});
 				top.Add (statusBar);
 
-				win.Add (new ListView () {
+				win.Add (new ListView {
 					X = 0,
 					Y = 0,
 					Width = Dim.Fill (),

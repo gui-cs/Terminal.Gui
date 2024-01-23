@@ -5,6 +5,7 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
+
 public class ListViewTests {
 	readonly ITestOutputHelper _output;
 
@@ -203,7 +204,7 @@ public class ListViewTests {
 	{
 		var rendered = false;
 		var source = new List<string> () { "one", "two", "three" };
-		var lv = new ListView () { Width = Dim.Fill (), Height = Dim.Fill () };
+		var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
 		lv.RowRender += (s, _) => rendered = true;
 		Application.Top.Add (lv);
 		Application.Begin (Application.Top);
