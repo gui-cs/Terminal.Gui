@@ -78,7 +78,7 @@ public readonly partial record struct Color {
 	///   <see cref="G" />, and <see cref="Vector3.Z" /> = <see cref="B" />.
 	/// </summary>
 	[Pure]
-	public static implicit operator Vector4 ( Color color ) => new ( color.A, color.B, color.G, color.R );
+	public static implicit operator Vector4 ( Color color ) => new ( color.R, color.G, color.B, color.A );
 
 	/// <summary>
 	///   Implicit conversion from <see cref="Vector3" />, where <see cref="Vector3.X" /> = <see cref="R" />, <see cref="Vector3.Y" /> =
