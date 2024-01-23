@@ -137,11 +137,11 @@ public class WindowsAndFrameViews : Scenario {
 			Title = "This is a FrameView"
 		};
 		frame.ColorScheme = Colors.ColorSchemes ["Dialog"];
-		frame.Add (new Label ("This is a Label! (Y = 0)") {
+		frame.Add (new Label () {
 			X = Pos.Center (),
 			Y = 0,
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			//Clicked = () => MessageBox.ErrorQuery (frame.Title, "Neat?", "Yes", "No")
+			Text = "This is a Label! (Y = 0)"
 		});
 		var subWinofFV = new Window () {
 			Title = "This is a Sub-Window",

@@ -44,7 +44,7 @@ public class Progress : Scenario {
 				Width = Dim.Percent (25),
 				Title = "Settings"
 			};
-			var lbl = new Label ("Tick every (ms):") { X = 1, Y = 1 };
+			var lbl = new Label { X = 1, Y = 1, Text = "Tick every (ms):"	 };
 			LeftFrame.Add (lbl);
 			Speed = new TextField ("") {
 				X = Pos.X (lbl),
@@ -109,9 +109,10 @@ public class Progress : Scenario {
 				};
 				Add (PulseProgressBar);
 
-			_startedLabel = new Label ("Stopped") {
+			_startedLabel = new Label {
 				X = Pos.Right (LeftFrame) + 1,
 				Y = Pos.Bottom (PulseProgressBar),
+				Text = "Stopped"
 			};
 			Add (_startedLabel);
 

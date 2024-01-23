@@ -14,7 +14,7 @@ public class DrawTests {
 	[AutoInitShutdown]
 	public void Clipping_AddRune_Left_Or_Right_Replace_Previous_Or_Next_Wide_Rune_With_Space ()
 	{
-		var tv = new TextView () {
+		var tv = new TextView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			Text = @"これは広いルーンラインです。
@@ -26,19 +26,19 @@ public class DrawTests {
 これは広いルーンラインです。
 これは広いルーンラインです。"
 		};
-		var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+		var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 		win.Add (tv);
 		Application.Top.Add (win);
 		// Don't use Label. It sets AutoSize = true which is not what we're testing here.
-		var lbl = new View ("ワイドルーン。");
+		var lbl = new View { Text = "ワイドルーン。", AutoSize = true };
 		// Don't have unit tests use things that aren't absolutely critical for the test, like Dialog
-		var dg = new Window () { X = 2, Y = 2, Width = 14, Height = 3 };
+		var dg = new Window { X = 2, Y = 2, Width = 14, Height = 3 };
 		dg.Add (lbl);
 		Application.Begin (Application.Top);
 		Application.Begin (dg);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
-		string expected = @$"
+		string expected = @"
 ┌────────────────────────────┐
 │これは広いルーンラインです。│
 │�┌────────────┐�ラインです。│
@@ -70,7 +70,7 @@ public class DrawTests {
 		Assert.Equal (1, r.GetColumns ());
 
 		var win = new Window () { Title = us };
-		var label = new Label (r.ToString ());
+		var label = new Label { Text = r.ToString () };
 		var tf = new TextField (us) { Y = 1, Width = 3 };
 		win.Add (label, tf);
 		var top = Application.Top;
@@ -119,7 +119,7 @@ public class DrawTests {
 		Assert.Equal (2, r.GetColumns ());
 
 		var win = new Window () { Title = us };
-		var label = new Label (r.ToString ());
+		var label = new Label { Text = r.ToString() };
 		var tf = new TextField (us) { Y = 1, Width = 3 };
 		win.Add (label, tf);
 		var top = Application.Top;
@@ -157,18 +157,21 @@ public class DrawTests {
 	[AutoInitShutdown]
 	public void Colors_On_TextAlignment_Right_And_Bottom ()
 	{
-		var labelRight = new Label ("Test") {
+		var labelRight = new Label {
 			Width = 6,
 			Height = 1,
 			TextAlignment = TextAlignment.Right,
-			ColorScheme = Colors.ColorSchemes ["Base"]
+			ColorScheme = Colors.ColorSchemes ["Base"],
+			Text = "Test"
 		};
-		var labelBottom = new Label ("Test", TextDirection.TopBottom_LeftRight) {
+		var labelBottom = new Label {
 			Y = 1,
 			Width = 1,
 			Height = 6,
 			VerticalTextAlignment = VerticalTextAlignment.Bottom,
-			ColorScheme = Colors.ColorSchemes ["Base"]
+			ColorScheme = Colors.ColorSchemes ["Base"],
+			Text = "Test",
+			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		var top = Application.Top;
 		top.Add (labelRight, labelBottom);

@@ -5,6 +5,7 @@ using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 namespace Terminal.Gui.ViewsTests;
+
 public class ContextMenuTests {
 	readonly ITestOutputHelper _output;
 
@@ -175,7 +176,7 @@ public class ContextMenuTests {
 	[Fact, AutoInitShutdown]
 	public void Key_Changing ()
 	{
-		var lbl = new Label ("Original");
+		var lbl = new Label { Text = "Original" };
 
 		var cm = new ContextMenu ();
 
@@ -202,7 +203,7 @@ public class ContextMenuTests {
 	[Fact, AutoInitShutdown]
 	public void MouseFlags_Changing ()
 	{
-		var lbl = new Label ("Original");
+		var lbl = new Label { Text = "Original" };
 
 		var cm = new ContextMenu ();
 
@@ -570,9 +571,10 @@ public class ContextMenuTests {
 				new MenuBarItem ("Edit", "", null)
 			});
 
-		var label = new Label ("Label:") {
+		var label = new Label {
 			X = 2,
-			Y = 3
+			Y = 3,
+			Text = "Label:"
 		};
 
 		var tf = new TextField ("TextField") {
@@ -587,8 +589,8 @@ public class ContextMenuTests {
 			});
 
 		Application.Top.Add (menu, label, tf, statusBar);
-		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (45, 17);
+		Application.Begin (Application.Top);
 
 		Assert.Equal (new Rect (9, 3, 20, 1), tf.Frame);
 		Assert.True (tf.HasFocus);
@@ -631,10 +633,7 @@ public class ContextMenuTests {
 				new MenuBarItem ("Edit", "", null)
 			});
 
-		var label = new Label ("Label:") {
-			X = 2,
-			Y = 3
-		};
+		var label = new Label { X = 2, Y = 3, Text = "Label:" };
 
 		var tf = new TextField ("TextField") {
 			X = Pos.Right (label) + 1,

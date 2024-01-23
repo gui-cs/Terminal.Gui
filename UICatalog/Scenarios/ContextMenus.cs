@@ -4,6 +4,7 @@ using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "ContextMenus", Description: "Context Menu Sample.")]
 [ScenarioCategory ("Menus")]
 public class ContextMenus : Scenario {
@@ -21,14 +22,12 @@ public class ContextMenus : Scenario {
 		var width = 20;
 		KeyCode winContextMenuKey = KeyCode.Space | KeyCode.CtrlMask;
 
-		var label = new Label ($"Press '{winContextMenuKey}' to open the Window context menu.") {
-			X = Pos.Center (),
-			Y = 1
-		};
+		var label = new Label { X = Pos.Center(), Y = 1, Text = $"Press '{winContextMenuKey}' to open the Window context menu." };
 		Win.Add (label);
-		label = new Label ($"Press '{ContextMenu.DefaultKey}' to open the TextField context menu.") {
+		label = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			Text = $"Press '{ContextMenu.DefaultKey}' to open the TextField context menu."
 		};
 		Win.Add (label);
 

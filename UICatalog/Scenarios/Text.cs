@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Text Input Controls", "Tests all text input controls")]
 [ScenarioCategory ("Controls")]
@@ -42,10 +42,11 @@ public class Text : Scenario {
 		}
 		Win.Add (textField);
 
-		var labelMirroringTextField = new Label (textField.Text) {
+		var labelMirroringTextField = new Label {
 			X = Pos.Right (textField) + 1,
 			Y = Pos.Top (textField),
-			Width = Dim.Fill (1) - 1
+			Width = Dim.Fill (1) - 1,
+			Text = textField.Text
 		};
 		Win.Add (labelMirroringTextField);
 
@@ -171,11 +172,12 @@ public class Text : Scenario {
 			};
 			Win.Add (dateField);
 
-		var labelMirroringDateField = new Label (dateField.Text) {
+		var labelMirroringDateField = new Label {
 			X = Pos.Right (dateField) + 1,
 			Y = Pos.Top (dateField),
 			Width = Dim.Width (dateField),
-			Height = Dim.Height (dateField)
+			Height = Dim.Height (dateField),
+			Text = dateField.Text
 		};
 		Win.Add (labelMirroringDateField);
 
@@ -191,20 +193,22 @@ public class Text : Scenario {
 		};
 		Win.Add (_timeField);
 
-		_labelMirroringTimeField = new Label (_timeField.Text) {
+		_labelMirroringTimeField = new Label {
 			X = Pos.Right (_timeField) + 1,
 			Y = Pos.Top (_timeField),
 			Width = Dim.Width (_timeField),
-			Height = Dim.Height (_timeField)
+			Height = Dim.Height (_timeField),
+			Text = _timeField.Text
 		};
 		Win.Add (_labelMirroringTimeField);
 
 		_timeField.TimeChanged += TimeChanged;
 
 		// MaskedTextProvider - uses .NET MaskedTextProvider
-		var netProviderLabel = new Label ("NetMaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]") {
+		var netProviderLabel = new Label {
 			X = Pos.Left (dateField),
-			Y = Pos.Bottom (dateField) + 1
+			Y = Pos.Bottom (dateField) + 1,
+			Text = "NetMaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]"
 		};
 		Win.Add (netProviderLabel);
 
@@ -218,9 +222,10 @@ public class Text : Scenario {
 		Win.Add (netProviderField);
 
 		// TextRegexProvider - Regex provider implemented by Terminal.Gui
-		var regexProvider = new Label ("TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
+		var regexProvider = new Label {
 			X = Pos.Left (netProviderLabel),
-			Y = Pos.Bottom (netProviderLabel) + 1
+			Y = Pos.Bottom (netProviderLabel) + 1,
+			Text = "TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]"
 		};
 		Win.Add (regexProvider);
 
@@ -234,9 +239,10 @@ public class Text : Scenario {
 
 		Win.Add (regexProviderField);
 
-		var labelAppendAutocomplete = new Label ("Append Autocomplete:") {
+		var labelAppendAutocomplete = new Label {
 			Y = Pos.Y (regexProviderField) + 2,
-			X = 1
+			X = 1,
+			Text = "Append Autocomplete:"
 		};
 		var appendAutocompleteTextField = new TextField {
 			X = Pos.Right (labelAppendAutocomplete),

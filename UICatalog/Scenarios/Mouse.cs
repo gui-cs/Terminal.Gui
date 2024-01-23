@@ -2,6 +2,7 @@
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Mouse", Description: "Demonstrates how to capture mouse events")]
 [ScenarioCategory ("Mouse and Keyboard")]
 public class Mouse : Scenario {
@@ -9,10 +10,10 @@ public class Mouse : Scenario {
 	{
 		Label ml;
 		int count = 0;
-		ml = new Label ("Mouse: ") { X = 1, Y = 1, Width = 50, Height = 1 };
+		ml = new Label { X = 1, Y = 1, Width = 50, Height = 1, Text = "Mouse: " };
 		List<string> rme = new List<string> ();
 
-		var test = new Label ("Se iniciará el análisis") { X = 1, Y = 2 };
+		var test = new Label { X = 1, Y = 2, Text = "Se iniciará el análisis" };
 		Win.Add (test);
 		Win.Add (ml);
 
@@ -32,7 +33,7 @@ public class Mouse : Scenario {
 		};
 
 		// I have no idea what this was intended to show off in demo.c
-		var drag = new Label ("Drag: ") { X = 1, Y = 4 };
+		var drag = new Label { X = 1, Y = 4, Text = "Drag: " };
 		var dragText = new TextField ("") {
 			X = Pos.Right (drag),
 			Y = Pos.Top (drag),

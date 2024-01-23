@@ -24,16 +24,20 @@ public class TextFieldTests {
 		{
 			base.Before (methodUnderTest);
 
-			//                                                    1         2         3 
-			//                                          01234567890123456789012345678901=32 (Length)
-			TextFieldTests._textField = new TextField ("TAB to jump between text fields.") {
-				ColorScheme = Colors.ColorSchemes ["Base"]
+			//Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
+			_textField = new TextField {
+				ColorScheme = new (Colors.ColorSchemes ["Base"]),
+				//                1         2         3 
+				//      01234567890123456789012345678901=32 (Length)
+				Text = "TAB to jump between text fields.",
+				Width = 32
 			};
 		}
 
 		public override void After (MethodInfo methodUnderTest)
 		{
-			TextFieldTests._textField = null;
+			_textField.Dispose ();
+			_textField = null;
 			base.After (methodUnderTest);
 		}
 	}
@@ -57,6 +61,10 @@ public class TextFieldTests {
 
 		//                                             TAB to jump between text fields.
 		TestHelpers.AssertDriverAttributesAre ("0000000", driver: Application.Driver, attributes);
+
+		// Cursor is at the end
+		Assert.Equal (32, _textField.CursorPosition);
+		_textField.CursorPosition = 0;
 		_textField.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
 		bool first = true;
@@ -70,6 +78,8 @@ public class TextFieldTests {
 	[TextFieldTestsAutoInitShutdown]
 	public void Changing_SelectedStart_Or_CursorPosition_Update_SelectedLength_And_SelectedText ()
 	{
+		_textField.BeginInit ();
+		_textField.EndInit ();
 		_textField.SelectedStart = 2;
 		Assert.Equal (32, _textField.CursorPosition);
 		Assert.Equal (30, _textField.SelectedLength);
@@ -766,6 +776,9 @@ public class TextFieldTests {
 		var tf = new TextField ("ABC");
 		tf.EnsureFocus ();
 		Assert.Equal ("ABC", tf.Text);
+		tf.BeginInit ();
+		tf.EndInit ();
+
 		Assert.Equal (3, tf.CursorPosition);
 
 		// now delete the C
@@ -944,6 +957,9 @@ public class TextFieldTests {
 	public void KeyBindings_Command ()
 	{
 		var tf = new TextField ("This is a test.") { Width = 20 };
+		tf.BeginInit ();
+		tf.EndInit ();
+
 		Assert.Equal (15, tf.Text.Length);
 		Assert.Equal (15, tf.CursorPosition);
 		Assert.False (tf.ReadOnly);
@@ -1334,6 +1350,9 @@ public class TextFieldTests {
 			Y = 1,
 			Width = 20
 		};
+		tf.BeginInit ();
+		tf.EndInit ();
+
 		Assert.Equal (0, tf.ScrollOffset);
 		Assert.Equal (16, tf.CursorPosition);
 
@@ -1349,6 +1368,8 @@ public class TextFieldTests {
 	{
 		var text = "Testing";
 		var tf = new TextField (text);
+		tf.BeginInit ();
+		tf.EndInit ();
 
 		Assert.Equal (text, tf.Text);
 		tf.ClearHistoryChanges ();
@@ -1592,6 +1613,9 @@ Les Miśerables", _output);
 	public void WordBackward_WordForward_Mixed ()
 	{
 		var tf = new TextField ("Test with0. and!.?;-@+") { Width = 30 };
+		tf.BeginInit ();
+		tf.EndInit ();
+
 		tf.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.CursorLeft));
 		Assert.Equal (15, tf.CursorPosition);
 		tf.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.CursorLeft));
@@ -1619,6 +1643,11 @@ Les Miśerables", _output);
 	public void Cursor_Position_Initialization ()
 	{
 		Assert.False (_textField.IsInitialized);
+		// BUGBUG: IsInitialized is false and
+		// CursorPosition wasn't calculated yet
+		Assert.Equal (0, _textField.CursorPosition);
+		_textField.BeginInit ();
+		_textField.EndInit ();
 		Assert.Equal (32, _textField.CursorPosition);
 		Assert.Equal (0, _textField.SelectedLength);
 		Assert.Null (_textField.SelectedText);
@@ -1640,6 +1669,9 @@ Les Miśerables", _output);
 	[Fact, TextFieldTestsAutoInitShutdown]
 	public void Copy_Paste_Text_Changing_Updates_Cursor_Position ()
 	{
+		_textField.BeginInit ();
+		_textField.EndInit ();
+
 		_textField.TextChanging += _textField_TextChanging;
 
 		void _textField_TextChanging (object sender, TextChangingEventArgs e)

@@ -663,8 +663,9 @@ public class DynamicMenuBar : Scenario {
 
 		public DynamicMenuBarDetails ()
 		{
-			var _lblTitle = new Label ("Title:") {
-				Y = 1
+			var _lblTitle = new Label {
+				Y = 1,
+				Text = "Title:"
 			};
 			Add (_lblTitle);
 
@@ -675,10 +676,7 @@ public class DynamicMenuBar : Scenario {
 			};
 			Add (_txtTitle);
 
-			var _lblHelp = new Label ("Help:") {
-				X = Pos.Left (_lblTitle),
-				Y = Pos.Bottom (_lblTitle) + 1
-			};
+			var _lblHelp = new Label () { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblTitle) + 1, Text = "Help:" };
 			Add (_lblHelp);
 
 			_txtHelp = new TextField () {
@@ -688,10 +686,7 @@ public class DynamicMenuBar : Scenario {
 			};
 			Add (_txtHelp);
 
-			var _lblAction = new Label ("Action:") {
-				X = Pos.Left (_lblTitle),
-				Y = Pos.Bottom (_lblHelp) + 1
-			};
+			var _lblAction = new Label () { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblHelp) + 1, Text = "Action:" };
 			Add (_lblAction);
 
 			_txtAction = new TextView () {
@@ -731,9 +726,10 @@ public class DynamicMenuBar : Scenario {
 			};
 			Add (_rbChkStyle);
 
-			var _lblShortcut = new Label ("Shortcut:") {
+			var _lblShortcut = new Label {
 				X = Pos.Right (_ckbSubMenu) + 10,
-				Y = Pos.Top (_ckbSubMenu)
+				Y = Pos.Top (_ckbSubMenu),
+				Text = "Shortcut:"
 			};
 			Add (_lblShortcut);
 

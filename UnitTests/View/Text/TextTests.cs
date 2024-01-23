@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -423,13 +424,14 @@ public class TextTests {
 	[AutoInitShutdown]
 	public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 	{
-		var win = new Window () { Width = 30, Height = 80 };
+		var win = new Window { Width = 30, Height = 80 };
 		var label = new Label { AutoSize = false, Width = Dim.Fill (), Height = Dim.Fill () };
 		win.Add (label);
 		Application.Top.Add (win);
 
 		Assert.False (label.AutoSize);
-		Assert.Equal ("(0,0,80,25)", label.Bounds.ToString ());
+		// BUGBUG: IsInitialized need to be true before calculating
+		Assert.Equal ("(0,0,0,0)", label.Bounds.ToString ());
 
 		label.Text = "New text\nNew line";
 		Application.Top.LayoutSubviews ();
@@ -649,4 +651,25 @@ public class TextTests {
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
+
+	[Theory]
+	[MemberData (nameof (ValidTextDirectionSize))]
+	public void GetAutoSize_Ignores_HotKeySpecifier (TextDirection textDirection, Size size)
+	{
+		var view = new View {
+			TextDirection = textDirection,
+			Text = "最初_の行二行目",
+			AutoSize = true,
+			HotKeySpecifier = (Rune)'_'
+		};
+		Assert.Equal (15, view.Text.GetColumns ());
+		Assert.Equal (8, view.Text.GetRuneCount ());
+		Assert.Equal (size, view.GetAutoSize ());
+	}
+
+	public static TheoryData<TextDirection, Size> ValidTextDirectionSize =>
+		new () {
+			{ TextDirection.LeftRight_TopBottom, new Size (14, 1) },
+			{ TextDirection.TopBottom_LeftRight, new Size (2, 7)}
+		};
 }

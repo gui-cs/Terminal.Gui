@@ -1,6 +1,7 @@
 ﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Basic Colors", Description: "Show all basic colors.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Text and Formatting")]
@@ -15,32 +16,36 @@ public class BasicColors : Scenario {
 
 		foreach (ColorName bg in colors) {
 			Attribute attr = new Attribute (bg, colors.Length - 1 - bg);
-			var vl = new Label (bg.ToString (), TextDirection.TopBottom_LeftRight) {
+			var vl = new Label {
 				X = vx,
 				Y = 0,
 				Width = 1,
 				Height = 13,
 				VerticalTextAlignment = VerticalTextAlignment.Bottom,
-				ColorScheme = new ColorScheme () { Normal = attr }
+				ColorScheme = new ColorScheme () { Normal = attr },
+				Text = bg.ToString (),
+				TextDirection = TextDirection.TopBottom_LeftRight
 			};
 			Win.Add (vl);
-			var hl = new Label (bg.ToString ()) {
+			var hl = new Label {
 				X = 15,
 				Y = y,
 				Width = 13,
 				Height = 1,
 				TextAlignment = TextAlignment.Right,
-				ColorScheme = new ColorScheme () { Normal = attr }
+				ColorScheme = new ColorScheme () { Normal = attr },
+				Text = bg.ToString ()
 			};
 			Win.Add (hl);
 			vx++;
 			foreach (ColorName fg in colors) {
 				var c = new Attribute (fg, bg);
 				var t = x.ToString ();
-				var l = new Label (t [t.Length - 1].ToString ()) {
+				var l = new Label {
 					X = x,
 					Y = y,
-					ColorScheme = new ColorScheme () { Normal = c }
+					ColorScheme = new ColorScheme () { Normal = c },
+					Text = t [t.Length - 1].ToString ()
 				};
 				Win.Add (l);
 				x++;
@@ -49,13 +54,11 @@ public class BasicColors : Scenario {
 			y++;
 		}
 
-		Win.Add (new Label ("Mouse over to get the Attribute:") {
+		Win.Add (new Label {
 			X = Pos.AnchorEnd (36),
+			Text = "Mouse over to get the Attribute:"
 		});
-		Win.Add (new Label ("Foreground:") {
-			X = Pos.AnchorEnd (35),
-			Y = 2
-		});
+		Win.Add (new Label { X = Pos.AnchorEnd(35), Y = 2, Text = "Foreground:" });
 
 		var lblForeground = new Label () {
 			X = Pos.AnchorEnd (23),
@@ -70,10 +73,7 @@ public class BasicColors : Scenario {
 		};
 		Win.Add (viewForeground);
 
-		Win.Add (new Label ("Background:") {
-			X = Pos.AnchorEnd (35),
-			Y = 4
-		});
+		Win.Add (new Label { X = Pos.AnchorEnd(35), Y = 4, Text = "Background:" });
 
 		var lblBackground = new Label () {
 			X = Pos.AnchorEnd (23),

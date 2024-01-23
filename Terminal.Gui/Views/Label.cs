@@ -13,22 +13,10 @@ namespace Terminal.Gui;
 /// </remarks>
 public class Label : View {
 	/// <inheritdoc/>
-	public Label () => SetInitialProperties ();
-
-	/// <inheritdoc/>
-	public Label (Rect frame, bool autosize = false) : base (frame) => SetInitialProperties (autosize);
-
-	/// <inheritdoc/>
-	public Label (string text, bool autosize = true) : base (text) => SetInitialProperties (autosize);
-
-	/// <inheritdoc/>
-	public Label (string text, TextDirection direction, bool autosize = true)
-		: base (text, direction) => SetInitialProperties (autosize);
-
-	void SetInitialProperties (bool autosize = true)
+	public Label ()
 	{
 		Height = 1;
-		AutoSize = autosize;
+		AutoSize = true;
 		// Things this view knows how to do
 		AddCommand (Command.Default, () => {
 			// BUGBUG: This is a hack, but it does work.

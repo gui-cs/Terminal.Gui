@@ -17,8 +17,9 @@ public class VkeyPacketSimulator : Scenario {
 
 	public override void Setup ()
 	{
-		var label = new Label ("Input") {
-			X = Pos.Center ()
+		var label = new Label {
+			X = Pos.Center (),
+			Text = "Input"
 		};
 		Win.Add (label);
 
@@ -30,7 +31,7 @@ public class VkeyPacketSimulator : Scenario {
 
 		const string ruler = "|123456789";
 
-		var inputHorizontalRuler = new Label ("") {
+		var inputHorizontalRuler = new Label {
 			Y = Pos.Bottom (btnInput),
 			Width = Dim.Fill (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
@@ -38,11 +39,12 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (inputHorizontalRuler);
 
-		var inputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
+		var inputVerticalRuler = new Label {
 			Y = Pos.Bottom (btnInput),
 			Width = 1,
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = false
+			AutoSize = false,
+			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		Win.Add (inputVerticalRuler);
 
@@ -55,9 +57,10 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (tvInput);
 
-		label = new Label ("Output") {
+		label = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (tvInput)
+			Y = Pos.Bottom (tvInput),
+			Text = "Output"
 		};
 		Win.Add (label);
 
@@ -68,7 +71,7 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (btnOutput);
 
-		var outputHorizontalRuler = new Label ("") {
+		var outputHorizontalRuler = new Label {
 			Y = Pos.Bottom (btnOutput),
 			Width = Dim.Fill (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
@@ -76,12 +79,13 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (outputHorizontalRuler);
 
-		var outputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
+		var outputVerticalRuler = new Label {
 			Y = Pos.Bottom (btnOutput),
 			Width = 1,
 			Height = Dim.Fill (),
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = false
+			AutoSize = false,
+			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		Win.Add (outputVerticalRuler);
 

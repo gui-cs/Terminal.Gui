@@ -129,7 +129,7 @@ public class AllViewsTester : Scenario {
 		};
 		_settingsPane.Add (_locationFrame);
 
-		var label = new Label ("X:") { X = 0, Y = 0 };
+		var label = new Label { X = 0, Y = 0, Text = "X:" };
 		_locationFrame.Add (label);
 		_xRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -148,7 +148,7 @@ public class AllViewsTester : Scenario {
 		_locationFrame.Add (_xRadioGroup);
 
 		radioItems = new [] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
-		label = new Label ("Y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
+		label = new Label { X = Pos.Right(_xRadioGroup) + 1, Y = 0, Text = "Y:" };
 		_locationFrame.Add (label);
 		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_yText.TextChanged += (s, args) => {
@@ -174,7 +174,7 @@ public class AllViewsTester : Scenario {
 		};
 
 		radioItems = new [] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
-		label = new Label ("Width:") { X = 0, Y = 0 };
+		label = new Label { X = 0, Y = 0, Text = "Width:" };
 		_sizeFrame.Add (label);
 		_wRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -200,7 +200,7 @@ public class AllViewsTester : Scenario {
 		_sizeFrame.Add (_wRadioGroup);
 
 		radioItems = new [] { "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
-		label = new Label ("Height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
+		label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "Height:" };
 		_sizeFrame.Add (label);
 		_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_hText.TextChanged += (s, args) => {

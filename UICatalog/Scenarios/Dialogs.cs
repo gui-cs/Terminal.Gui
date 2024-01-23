@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Dialogs", Description: "Demonstrates how to the Dialog class")]
 [ScenarioCategory ("Dialogs")]
 public class Dialogs : Scenario {
@@ -17,13 +18,7 @@ public class Dialogs : Scenario {
 			Title = "Dialog Options"
 		};
 
-		var label = new Label ("Width:") {
-			X = 0,
-			Y = 0,
-			Width = 15,
-			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
-		};
+		var label = new Label () { X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Width:" };
 		frame.Add (label);
 
 		var widthEdit = new TextField ("0") {
@@ -34,12 +29,13 @@ public class Dialogs : Scenario {
 		};
 		frame.Add (widthEdit);
 
-		label = new Label ("Height:") {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Width = Dim.Width (label),
 			Height = 1,
 			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			Text = "Height:"
 		};
 		frame.Add (label);
 
@@ -51,22 +47,14 @@ public class Dialogs : Scenario {
 		};
 		frame.Add (heightEdit);
 
-		frame.Add (new Label ("If height & width are both 0,") {
+		frame.Add (new Label {
 			X = Pos.Right (widthEdit) + 2,
 			Y = Pos.Top (widthEdit),
+			Text = "If height & width are both 0,"
 		});
-		frame.Add (new Label ("the Dialog will size to 80% of container.") {
-			X = Pos.Right (heightEdit) + 2,
-			Y = Pos.Top (heightEdit),
-		});
+		frame.Add (new Label { X = Pos.Right(heightEdit) + 2, Y = Pos.Top(heightEdit), Text = "the Dialog will size to 80% of container." });
 
-		label = new Label ("Title:") {
-			X = 0,
-			Y = Pos.Bottom (label),
-			Width = Dim.Width (label),
-			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
-		};
+		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Title:" };
 		frame.Add (label);
 
 		var titleEdit = new TextField ("Title") {
@@ -77,13 +65,7 @@ public class Dialogs : Scenario {
 		};
 		frame.Add (titleEdit);
 
-		label = new Label ("Num Buttons:") {
-			X = 0,
-			Y = Pos.Bottom (label),  // BUGBUG: if this is Pos.Bottom (titleEdit) the initial LayoutSubviews does not work correctly?!?!
-			Width = Dim.Width (label),
-			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
-		};
+		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Num Buttons:" };
 		frame.Add (label);
 
 		var numButtonsEdit = new TextField ("3") {
@@ -103,11 +85,7 @@ public class Dialogs : Scenario {
 		};
 		frame.Add (glyphsNotWords);
 
-		label = new Label ("Button Style:") {
-			X = 0,
-			Y = Pos.Bottom (glyphsNotWords),
-			TextAlignment = Terminal.Gui.TextAlignment.Right
-		};
+		label = new Label { X = 0, Y = Pos.Bottom(glyphsNotWords), TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Button Style:" };
 		frame.Add (label);
 
 		var styleRadioGroup = new RadioGroup (new string [] { "_Center", "_Justify", "_Left", "_Right" }) {
@@ -131,21 +109,16 @@ public class Dialogs : Scenario {
 
 		Win.Add (frame);
 
-		label = new Label ("Button Pressed:") {
+		label = new Label {
 			X = Pos.Center (),
 			Y = Pos.Bottom (frame) + 4,
 			Height = 1,
 			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			Text = "Button Pressed:"
 		};
 		Win.Add (label);
 
-		var buttonPressedLabel = new Label (" ") {
-			X = Pos.Center (),
-			Y = Pos.Bottom (frame) + 5,
-			Width = 25,
-			Height = 1,
-			ColorScheme = Colors.ColorSchemes ["Error"],
-		};
+		var buttonPressedLabel = new Label () { X = Pos.Center(), Y = Pos.Bottom(frame) + 5, Width = 25, Height = 1, ColorScheme = Colors.ColorSchemes["Error"], Text = " " };
 		// glyphsNotWords
 		// false:var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
 		// true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };

@@ -42,12 +42,7 @@ public class Localization : Scenario {
 			});
 		Application.Top.Add (menu);
 
-		var selectLanguageLabel = new Label ("Please select a language.") {
-			X = 2,
-			Y = 1,
-			Width = Dim.Fill (2),
-			AutoSize = true
-		};
+		var selectLanguageLabel = new Label { X = 2, Y = 1, Width = Dim.Fill(2), AutoSize = true, Text = "Please select a language." };
 		Win.Add (selectLanguageLabel);
 
 		_languageComboBox = new ComboBox {
@@ -64,12 +59,8 @@ public class Localization : Scenario {
 		_languageComboBox.SelectedItemChanged += LanguageComboBox_SelectChanged;
 		Win.Add (_languageComboBox);
 
-		var textAndFileDialogLabel = new Label ("Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked.") {
-			X = 2,
-			Y = Pos.Top (_languageComboBox) + 3,
-			Width = Dim.Fill (2),
-			AutoSize = true
-		};
+		var textAndFileDialogLabel = new Label { X = 2, Y = Pos.Top(_languageComboBox) + 3, Width = Dim.Fill(2), AutoSize = true, 
+			Text = "Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked." };
 		Win.Add (textAndFileDialogLabel);
 
 		var textField = new TextView {
@@ -104,12 +95,7 @@ public class Localization : Scenario {
 		saveDialogButton.Clicked += (sender, e) => ShowFileDialog (true);
 		Win.Add (saveDialogButton);
 
-		var wizardLabel = new Label ("Click the button to open a wizard.") {
-			X = 2,
-			Y = Pos.Bottom (textField) + 1,
-			Width = Dim.Fill (2),
-			AutoSize = true
-		};
+		var wizardLabel = new Label { X = 2, Y = Pos.Bottom(textField) + 1, Width = Dim.Fill(2), AutoSize = true, Text = "Click the button to open a wizard." };
 		Win.Add (wizardLabel);
 
 		var wizardButton = new Button {

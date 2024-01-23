@@ -9,11 +9,7 @@ public class Buttons : Scenario {
 	public override void Setup ()
 	{
 		// Add a label & text field so we can demo IsDefault
-		var editLabel = new Label ("TextField (to demo IsDefault):") {
-			X = 0,
-			Y = 0,
-			TabStop = true,
-		};
+		var editLabel = new Label { X = 0, Y = 0, TabStop = true, Text = "TextField (to demo IsDefault):" };
 		Win.Add (editLabel);
 		// Add a TextField using Absolute layout. 
 		var edit = new TextField ("") {
@@ -27,8 +23,7 @@ public class Buttons : Scenario {
 		// the scenario will quit
 		var defaultButton = new Button {
 			X = Pos.Center (),
-			//TODO: Change to use Pos.AnchorEnd()
-			Y = Pos.Bottom (Win) - 3,
+			Y = Pos.AnchorEnd (1),
 			IsDefault = true,
 			Text = "_Quit"
 		};
@@ -50,28 +45,26 @@ public class Buttons : Scenario {
 			};
 		}
 
-		var colorButtonsLabel = new Label ("Color Buttons:") {
-			X = 0,
-			Y = Pos.Bottom (editLabel) + 1,
-		};
+		var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom(editLabel) + 1, Text = "Color Buttons:" };
 		Win.Add (colorButtonsLabel);
 
-		//View prev = colorButtonsLabel;
+		View prev = colorButtonsLabel;
 
 		//With this method there is no need to call Application.TopReady += () => Application.TopRedraw (Top.Bounds);
 		var x = Pos.Right (colorButtonsLabel) + 2;
 		foreach (var colorScheme in Colors.ColorSchemes) {
 			var colorButton = new Button {
 				ColorScheme = colorScheme.Value,
-				//X = Pos.Right (prev) + 2,
-				X = x,
+				X = Pos.Right (prev) + 2,
+				//X = x,
 				Y = Pos.Y (colorButtonsLabel),
 				Text = $"_{colorScheme.Key}"
 			};
 			DoMessage (colorButton, colorButton.Text);
 			Win.Add (colorButton);
-			//prev = colorButton;
-			x += colorButton.Frame.Width + 2;
+			prev = colorButton;
+			// BUGBUG: AutoSize is true and the X doesn't change
+			//x += colorButton.Frame.Width + 2;
 		}
 
 		Button button;
@@ -187,9 +180,10 @@ public class Buttons : Scenario {
 		};
 		absoluteFrame.Add (sizeBtnA);
 
-		var label = new Label ("Text Alignment (changes the four buttons above): ") {
+		var label = new Label {
 			X = 2,
 			Y = Pos.Bottom (computedFrame) + 1,
+			Text = "Text Alignment (changes the four buttons above): "
 		};
 		Win.Add (label);
 

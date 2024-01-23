@@ -19,6 +19,10 @@ public class WindowTests {
 		// Toplevels have Width/Height set to Dim.Fill
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 		// If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
+		// BUGBUG: IsInitialized is false and no size was provided
+		Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
+		r.BeginInit ();
+		r.EndInit ();
 		Assert.Equal ("Window()(0,0,2147483647,2147483647)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);

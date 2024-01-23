@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Threading", Description: "Demonstration of how to use threading in different ways")]
 [ScenarioCategory ("Threading")]
 public class Threading : Scenario {
@@ -47,9 +48,10 @@ public class Threading : Scenario {
 		_btnActionCancel = new Button { X = 1, Y = 1, Text = "Cancelable Load Items" };
 		_btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
-		Win.Add (new Label ("Data Items:") {
+		Win.Add (new Label {
 			X = Pos.X (_btnActionCancel),
 			Y = Pos.Y (_btnActionCancel) + 4,
+			Text = "Data Items:"
 		});
 
 		_itemsList = new ListView {
@@ -60,9 +62,10 @@ public class Threading : Scenario {
 			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 
-		Win.Add (new Label ("Task Logs:") {
+		Win.Add (new Label {
 			X = Pos.Right (_itemsList) + 10,
 			Y = Pos.Y (_btnActionCancel) + 4,
+			Text = "Task Logs:"
 		});
 
 		_logJob = new ListView (_log) {

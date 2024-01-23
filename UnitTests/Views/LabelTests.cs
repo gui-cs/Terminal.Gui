@@ -27,7 +27,7 @@ public class LabelTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 
-		label = new Label ("ARGS") { Text = "Test" };
+		label = new Label { Text = "Test" };
 		Assert.True (label.AutoSize);
 		Assert.Equal ("Test", label.Text);
 		Application.Top.Add (label);
@@ -41,7 +41,7 @@ Test
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 
-		label = new Label ("Test") { X = 3, Y = 4 };
+		label = new Label { X = 3, Y = 4, Text = "Test" };
 		Assert.Equal ("Test", label.Text);
 		Application.Top.Add (label);
 		rs = Application.Begin (Application.Top);
@@ -74,10 +74,7 @@ Test
 	[AutoInitShutdown]
 	public void Update_Only_On_Or_After_Initialize ()
 	{
-		var label = new Label ("Say Hello 你") {
-			X = Pos.Center (),
-			Y = Pos.Center ()
-		};
+		var label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
 		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -278,10 +275,7 @@ Test
 	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_True ()
 	{
-		var Label = new Label ("012345678901") {
-			X = Pos.Center (),
-			Y = Pos.Center ()
-		};
+		var Label = new Label { X = Pos.Center (), Y = Pos.Center (), Text = "012345678901" };
 		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -308,13 +302,7 @@ Test
 	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
-		var Label = new Label ("012345678901") {
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			AutoSize = false,
-			Width = 20,
-			TextAlignment = TextAlignment.Centered
-		};
+		var Label = new Label { X = Pos.Center (), Y = Pos.Center (), AutoSize = false, Width = 20, TextAlignment = TextAlignment.Centered, Text = "012345678901" };
 		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -340,7 +328,7 @@ Test
 	[AutoInitShutdown]
 	public void Label_HotKeyChanged_EventFires ()
 	{
-		var label = new Label ("Yar");
+		var label = new Label { Text = "Yar" };
 		label.HotKey = 'Y';
 
 		object sender = null;
@@ -390,7 +378,7 @@ Test
 		foreach (var line in wrappedLines) {
 			breakLines += $"{line}{Environment.NewLine}";
 		}
-		var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill () };
+		var label = new Label { Width = Dim.Fill (), Height = Dim.Fill (), Text = breakLines };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (label);
@@ -431,11 +419,7 @@ Test
 		for (var i = 0; i < wrappedLines.Count; i++) {
 			breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 		}
-		var label = new Label (breakLines) {
-			TextDirection = TextDirection.TopBottom_LeftRight,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+		var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Width = Dim.Fill (), Height = Dim.Fill (), Text = breakLines };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (label);
@@ -473,7 +457,7 @@ Test
 		foreach (var line in wrappedLines) {
 			breakLines += $"{line}{Environment.NewLine}";
 		}
-		var label = new Label (breakLines) { Width = Dim.Fill (), Height = Dim.Fill (), AutoSize = autoSize };
+		var label = new Label { Width = Dim.Fill (), Height = Dim.Fill (), AutoSize = autoSize, Text = breakLines };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (label);
@@ -527,11 +511,7 @@ Test
 		for (var i = 0; i < wrappedLines.Count; i++) {
 			breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 		}
-		var label = new Label (breakLines) {
-			TextDirection = TextDirection.TopBottom_LeftRight,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+		var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Width = Dim.Fill (), Height = Dim.Fill (), Text = breakLines };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (label);
@@ -562,7 +542,7 @@ Test
 	{
 		var text = "01234 01234";
 		var width = 20;
-		var lblJust = new Label (text) { Y = 0, Width = width, TextAlignment = TextAlignment.Justified };
+		var lblJust = new Label { Y = 0, Width = width, TextAlignment = TextAlignment.Justified, Text = text };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblJust);
@@ -585,7 +565,7 @@ Test
 	[AutoInitShutdown]
 	public void Label_Draw_Horizontal_Simple_Runes ()
 	{
-		var label = new Label ("Demo Simple Rune");
+		var label = new Label { Text = "Demo Simple Rune" };
 		Application.Top.Add (label);
 		Application.Begin (Application.Top);
 
@@ -604,8 +584,9 @@ Demo Simple Rune
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Simple_Runes ()
 	{
-		var label = new Label ("Demo Simple Rune") {
-			TextDirection = TextDirection.TopBottom_LeftRight
+		var label = new Label {
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			Text = "Demo Simple Rune"
 		};
 		Application.Top.Add (label);
 		Application.Begin (Application.Top);
@@ -640,7 +621,7 @@ e
 	[AutoInitShutdown]
 	public void Label_Draw_Horizontal_Wide_Runes ()
 	{
-		var label = new Label ("デモエムポンズ");
+		var label = new Label { Text = "デモエムポンズ" };
 		Application.Top.Add (label);
 		Application.Begin (Application.Top);
 
@@ -659,9 +640,7 @@ e
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Wide_Runes ()
 	{
-		var label = new Label ("デモエムポンズ") {
-			TextDirection = TextDirection.TopBottom_LeftRight
-		};
+		var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Text = "デモエムポンズ" };
 		Application.Top.Add (label);
 		Application.Begin (Application.Top);
 
@@ -683,12 +662,7 @@ e
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Wide_Runes_With_ForceValidatePosDim ()
 	{
-		var label = new Label ("デモエムポンズ") {
-			Width = Dim.Fill (),
-			Height = Dim.Percent (50f),
-			TextDirection = TextDirection.TopBottom_LeftRight,
-			ValidatePosDim = true
-		};
+		var label = new Label { Width = Dim.Fill (), Height = Dim.Percent (50f), TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true, Text = "デモエムポンズ" };
 		Application.Top.Add (label);
 		Application.Begin (Application.Top);
 
@@ -717,10 +691,10 @@ e
 	{
 		var text = "Hello World";
 		var width = 20;
-		var lblLeft = new Label (text) { Width = width, AutoSize = autoSize };
-		var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize };
-		var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize };
-		var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize };
+		var lblLeft = new Label { Width = width, AutoSize = autoSize, Text = text };
+		var lblCenter = new Label { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize, Text = text };
+		var lblRight = new Label { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize, Text = text };
+		var lblJust = new Label { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize, Text = text };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -773,10 +747,10 @@ e
 	{
 		var text = "Hello World";
 		var height = 20;
-		var lblLeft = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { Height = height };
-		var lblCenter = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { X = 2, Height = height, VerticalTextAlignment = VerticalTextAlignment.Middle };
-		var lblRight = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { X = 4, Height = height, VerticalTextAlignment = VerticalTextAlignment.Bottom };
-		var lblJust = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { X = 6, Height = height, VerticalTextAlignment = VerticalTextAlignment.Justified };
+		var lblLeft = new Label { Height = height, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
+		var lblCenter = new Label { X = 2, Height = height, VerticalTextAlignment = VerticalTextAlignment.Middle, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
+		var lblRight = new Label { X = 4, Height = height, VerticalTextAlignment = VerticalTextAlignment.Bottom, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
+		var lblJust = new Label { X = 6, Height = height, VerticalTextAlignment = VerticalTextAlignment.Justified, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -843,10 +817,10 @@ e
 	{
 		var text = "こんにちは 世界";
 		var width = 25;
-		var lblLeft = new Label (text) { Width = width };
-		var lblCenter = new Label (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered };
-		var lblRight = new Label (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right };
-		var lblJust = new Label (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified };
+		var lblLeft = new Label { Width = width, Text = text };
+		var lblCenter = new Label { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, Text = text };
+		var lblRight = new Label { Y = 2, Width = width, TextAlignment = TextAlignment.Right, Text = text };
+		var lblJust = new Label { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, Text = text };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -883,10 +857,10 @@ e
 	{
 		var text = "こんにちは 世界";
 		var height = 23;
-		var lblLeft = new Label (text) { Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight };
-		var lblCenter = new Label (text) { X = 3, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Middle };
-		var lblRight = new Label (text) { X = 6, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Bottom };
-		var lblJust = new Label (text) { X = 9, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Justified };
+		var lblLeft = new Label { Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, Text = text };
+		var lblCenter = new Label { X = 3, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Middle, Text = text };
+		var lblRight = new Label { X = 6, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Bottom, Text = text };
+		var lblJust = new Label { X = 9, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Justified, Text = text };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -899,10 +873,10 @@ e
 		Assert.True (lblCenter.AutoSize);
 		Assert.True (lblRight.AutoSize);
 		Assert.True (lblJust.AutoSize);
-		Assert.Equal (new Rect (0, 0, 15, height), lblLeft.Frame);
-		Assert.Equal (new Rect (3, 0, 15, height), lblCenter.Frame);
-		Assert.Equal (new Rect (6, 0, 15, height), lblRight.Frame);
-		Assert.Equal (new Rect (9, 0, 15, height), lblJust.Frame);
+		Assert.Equal (new Rect (0, 0, 2, height), lblLeft.Frame);
+		Assert.Equal (new Rect (3, 0, 2, height), lblCenter.Frame);
+		Assert.Equal (new Rect (6, 0, 2, height), lblRight.Frame);
+		Assert.Equal (new Rect (9, 0, 2, height), lblJust.Frame);
 		Assert.Equal (new Rect (0, 0, 13, height + 2), frame.Frame);
 
 		var expected = @"
@@ -937,11 +911,54 @@ e
 		Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
-	public void Label_Draw_Fill_Remaining ()
+	[Fact, AutoInitShutdown]
+	public void Label_Draw_Fill_Remaining_AutoSize_True ()
 	{
-		var view = new View ("This view needs to be cleared before rewritten.");
+		var label = new Label { Text = "This label needs to be cleared before rewritten." };
+
+		var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
+		tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
+		var tf1Size = tf1.Size;
+
+		var tf2 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
+		tf2.Text = "This TextFormatter (tf2) with fill will be cleared on rewritten.";
+		var tf2Size = tf2.Size;
+
+		Application.Top.Add (label);
+		Application.Begin (Application.Top);
+
+		Assert.True (label.AutoSize);
+
+		tf1.Draw (new Rect (new Point (0, 1), tf1Size), label.GetNormalColor (), label.ColorScheme.HotNormal, default, false);
+
+		tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+This label needs to be cleared before rewritten.                       
+This TextFormatter (tf1) without fill will not be cleared on rewritten.
+This TextFormatter (tf2) with fill will be cleared on rewritten.       
+", _output);
+
+		label.Text = "This label is rewritten.";
+		label.Draw ();
+
+		tf1.Text = "This TextFormatter (tf1) is rewritten.";
+		tf1.Draw (new Rect (new Point (0, 1), tf1Size), label.GetNormalColor (), label.ColorScheme.HotNormal, default, false);
+
+		tf2.Text = "This TextFormatter (tf2) is rewritten.";
+		tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+This label is rewritten.                                               
+This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
+This TextFormatter (tf2) is rewritten.                                 
+", _output);
+	}
+
+	[Fact, AutoInitShutdown]
+	public void View_Draw_Fill_Remaining_AutoSize_False ()
+	{
+		var view = new View { Text = "This view needs to be cleared before rewritten.", Width = Dim.Fill () };
 
 		var tf1 = new TextFormatter { Direction = TextDirection.LeftRight_TopBottom };
 		tf1.Text = "This TextFormatter (tf1) without fill will not be cleared on rewritten.";
@@ -953,6 +970,8 @@ e
 
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
+
+		Assert.False (view.AutoSize);
 
 		tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal, default, false);
 

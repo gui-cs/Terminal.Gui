@@ -338,20 +338,20 @@ public class ToplevelTests {
 		var isRunning = false;
 
 		var win1 = new Window { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
-		var lblTf1W1 = new Label ("Enter text in TextField on Win1:") { Id = "lblTf1W1" };
+		var lblTf1W1 = new Label { Id = "lblTf1W1", Text = "Enter text in TextField on Win1:" };
 		var tf1W1 = new TextField ("Text1 on Win1") { Id = "tf1W1", X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
-		var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Id = "lblTvW1", Y = Pos.Bottom (lblTf1W1) + 1 };
+		var lblTvW1 = new Label { Id = "lblTvW1", Y = Pos.Bottom(lblTf1W1) + 1, Text = "Enter text in TextView on Win1:" };
 		var tvW1 = new TextView { Id = "tvW1", X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1" };
-		var lblTf2W1 = new Label ("Enter text in TextField on Win1:") { Id = "lblTf2W1", Y = Pos.Bottom (lblTvW1) + 1 };
+		var lblTf2W1 = new Label { Id = "lblTf2W1", Y = Pos.Bottom(lblTvW1) + 1, Text = "Enter text in TextField on Win1:" };
 		var tf2W1 = new TextField ("Text2 on Win1") { Id = "tf2W1", X = Pos.Left (tf1W1), Width = Dim.Fill () };
 		win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
 		var win2 = new Window { Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50f), Height = Dim.Fill () };
-		var lblTf1W2 = new Label ("Enter text in TextField on Win2:") { Id = "lblTf1W2" };
+		var lblTf1W2 = new Label { Id = "lblTf1W2", Text = "Enter text in TextField on Win2:" };
 		var tf1W2 = new TextField ("Text1 on Win2") { Id = "tf1W2", X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
-		var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Id = "lblTvW2", Y = Pos.Bottom (lblTf1W2) + 1 };
+		var lblTvW2 = new Label { Id = "lblTvW2", Y = Pos.Bottom(lblTf1W2) + 1, Text = "Enter text in TextView on Win2:" };
 		var tvW2 = new TextView { Id = "tvW2", X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2" };
-		var lblTf2W2 = new Label ("Enter text in TextField on Win2:") { Id = "lblTf2W2", Y = Pos.Bottom (lblTvW2) + 1 };
+		var lblTf2W2 = new Label { Id = "lblTf2W2", Y = Pos.Bottom(lblTvW2) + 1, Text = "Enter text in TextField on Win2:" };
 		var tf2W2 = new TextField ("Text2 on Win2") { Id = "tf2W2", X = Pos.Left (tf1W2), Width = Dim.Fill () };
 		win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
@@ -466,20 +466,20 @@ public class ToplevelTests {
 		var isRunning = true;
 
 		var win1 = new Window { Id = "win1", Width = Dim.Percent (50f), Height = Dim.Fill () };
-		var lblTf1W1 = new Label ("Enter text in TextField on Win1:");
+		var lblTf1W1 = new Label { Text = "Enter text in TextField on Win1:" };
 		var tf1W1 = new TextField ("Text1 on Win1") { X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill () };
-		var lblTvW1 = new Label ("Enter text in TextView on Win1:") { Y = Pos.Bottom (lblTf1W1) + 1 };
+		var lblTvW1 = new Label { Y = Pos.Bottom(lblTf1W1) + 1, Text = "Enter text in TextView on Win1:" };
 		var tvW1 = new TextView { X = Pos.Left (tf1W1), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win1" };
-		var lblTf2W1 = new Label ("Enter text in TextField on Win1:") { Y = Pos.Bottom (lblTvW1) + 1 };
+		var lblTf2W1 = new Label { Y = Pos.Bottom(lblTvW1) + 1, Text = "Enter text in TextField on Win1:" };
 		var tf2W1 = new TextField ("Text2 on Win1") { X = Pos.Left (tf1W1), Width = Dim.Fill () };
 		win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
 
 		var win2 = new Window { Id = "win2", Width = Dim.Percent (50f), Height = Dim.Fill () };
-		var lblTf1W2 = new Label ("Enter text in TextField on Win2:");
+		var lblTf1W2 = new Label { Text = "Enter text in TextField on Win2:" };
 		var tf1W2 = new TextField ("Text1 on Win2") { X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill () };
-		var lblTvW2 = new Label ("Enter text in TextView on Win2:") { Y = Pos.Bottom (lblTf1W2) + 1 };
+		var lblTvW2 = new Label { Y = Pos.Bottom(lblTf1W2) + 1, Text = "Enter text in TextView on Win2:" };
 		var tvW2 = new TextView { X = Pos.Left (tf1W2), Width = Dim.Fill (), Height = 2, Text = "First line Win1\nSecond line Win2" };
-		var lblTf2W2 = new Label ("Enter text in TextField on Win2:") { Y = Pos.Bottom (lblTvW2) + 1 };
+		var lblTf2W2 = new Label { Y = Pos.Bottom(lblTvW2) + 1, Text = "Enter text in TextField on Win2:" };
 		var tf2W2 = new TextField ("Text2 on Win2") { X = Pos.Left (tf1W2), Width = Dim.Fill () };
 		win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
 
@@ -1091,7 +1091,7 @@ public class ToplevelTests {
 	{
 		var top = Application.Top;
 		var subTop = new Toplevel ();
-		var view = new View (new Rect (0, 0, 20, 10));
+		var view = new View { Frame = new Rect (0, 0, 20, 10) };
 		subTop.Add (view);
 		top.Add (subTop);
 
@@ -1349,15 +1349,15 @@ public class ToplevelTests {
 	{
 		// Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
 		var window = new Window { Width = 10, Height = 3 };
-		window.Add (new Label (
-			"Test") {
+		window.Add (new Label {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			TextAlignment = TextAlignment.Centered,
 			VerticalTextAlignment = VerticalTextAlignment.Middle,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Test"
 		});
 
 		var rs = Application.Begin (window);

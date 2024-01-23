@@ -4,6 +4,7 @@ using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 /// <summary>
 /// This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. 
 /// [x] - Using Dim.Fill to fill a window
@@ -26,27 +27,21 @@ public class ComputedLayout : Scenario {
 	{
 		// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
 		const string rule = "|123456789";
-		var horizontalRuler = new Label (rule, false) {
-			AutoSize = false,
-			X = 0,
-			Y = 0,
-			Width = Dim.Fill (),
-			Height = 1,
-			ColorScheme = Colors.ColorSchemes ["Error"]
-		};
+		var horizontalRuler = new Label { AutoSize = false, X = 0, Y = 0, Width = Dim.Fill(), Height = 1, ColorScheme = Colors.ColorSchemes["Error"], Text = rule };
 
 		Application.Top.Add (horizontalRuler);
 
 		// Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
 		const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-		var verticalRuler = new Label (vrule, false) {
+		var verticalRuler = new Label {
 			AutoSize = false,
 			X = 0,
 			Y = 0,
 			Width = 1,
 			Height = Dim.Fill (),
-			ColorScheme = Colors.ColorSchemes ["Error"]
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = vrule
 		};
 
 		Application.Top.LayoutComplete += (s, a) => {
@@ -88,11 +83,11 @@ public class ComputedLayout : Scenario {
 		int i = 1;
 		string txt = "Resize the terminal to see computed layout in action.";
 		var labelList = new List<Label> ();
-		labelList.Add (new Label ($"The lines below show different TextAlignments"));
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+		labelList.Add (new Label { Text = $"The lines below show different TextAlignments" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
 		subWin.Add (labelList.ToArray ());
 
 		var frameView = new FrameView {
@@ -107,11 +102,11 @@ public class ComputedLayout : Scenario {
 		};
 		i = 1;
 		labelList = new List<Label> ();
-		labelList.Add (new Label ($"The lines below show different TextAlignments"));
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
-		labelList.Add (new Label ($"{i++}-{txt}") { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"] });
+		labelList.Add (new Label { Text = $"The lines below show different TextAlignments" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
 		frameView.Add (labelList.ToArray ());
 		Application.Top.Add (frameView);
 
@@ -253,12 +248,13 @@ public class ComputedLayout : Scenario {
 
 		// Demonstrate AnchorEnd(n) 
 		// This is intentionally convoluted to illustrate potential bugs.
-		var anchorEndLabel1 = new Label ("This Label should be the 2nd to last line (AnchorEnd (2)).") {
+		var anchorEndLabel1 = new Label {
 			TextAlignment = Terminal.Gui.TextAlignment.Centered,
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			Width = Dim.Fill (5),
 			X = 5,
-			Y = Pos.AnchorEnd (2)
+			Y = Pos.AnchorEnd (2),
+			Text = "This Label should be the 2nd to last line (AnchorEnd (2))."
 		};
 		Application.Top.Add (anchorEndLabel1);
 

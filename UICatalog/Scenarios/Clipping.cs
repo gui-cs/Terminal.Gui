@@ -18,9 +18,9 @@ public class Clipping : Scenario {
 			//Win.Y = 2;
 			//Win.Width = Dim.Fill () - 4;
 			//Win.Height = Dim.Fill () - 2;
-			var label = new Label ("ScrollView (new Rect (3, 3, 50, 20)) with a 200, 100 ContentSize...") {
+			var label = new Label {
 				X = 0, Y = 0,
-				//ColorScheme = Colors.ColorSchemes ["Dialog"]
+				Text = "ScrollView (new Rect (3, 3, 50, 20)) with a 200, 100 ContentSize..."
 			};
 			Application.Top.Add (label);
 

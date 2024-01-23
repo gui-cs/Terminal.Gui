@@ -12,9 +12,10 @@ public class Keys : Scenario {
 		List<string> keyPressedList = new List<string> ();
 		List<string> invokingKeyBindingsList = new List<string> ();
 
-		var editLabel = new Label ("Type text here:") {
+		var editLabel = new Label {
 			X = 0,
 			Y = 0,
+			Text = "Type text here:"
 		};
 		Win.Add (editLabel);
 
@@ -37,43 +38,26 @@ public class Keys : Scenario {
 		};
 
 		// Last KeyPress: ______
-		var keyPressedLabel = new Label ("Last TextView.KeyPressed:") {
-			X = Pos.Left (editLabel),
-			Y = Pos.Top (editLabel) + 1,
-		};
+		var keyPressedLabel = new Label { X = Pos.Left(editLabel), Y = Pos.Top(editLabel) + 1, Text = "Last TextView.KeyPressed:" };
 		Win.Add (keyPressedLabel);
-		var labelTextViewKeypress = new Label ("") {
-			X = Pos.Right (keyPressedLabel) + 1,
-			Y = Pos.Top (keyPressedLabel),
-			TextAlignment = Terminal.Gui.TextAlignment.Centered,
-			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = true
-		};
+		var labelTextViewKeypress = new Label { X = Pos.Right(keyPressedLabel) + 1, Y = Pos.Top(keyPressedLabel) };
 		Win.Add (labelTextViewKeypress);
 
 		edit.KeyDown += (s, e) => labelTextViewKeypress.Text = e.ToString ();
 
-		keyPressedLabel = new Label ("Last Application.KeyDown:") {
+		keyPressedLabel = new Label {
 			X = Pos.Left (keyPressedLabel),
 			Y = Pos.Bottom (keyPressedLabel),
+			Text = "Last Application.KeyDown:"
 		};
 		Win.Add (keyPressedLabel);
-		var labelAppKeypress = new Label ("") {
-			X = Pos.Right (keyPressedLabel) + 1,
-			Y = Pos.Top (keyPressedLabel),
-			TextAlignment = Terminal.Gui.TextAlignment.Centered,
-			ColorScheme = Colors.ColorSchemes ["Error"],
-			AutoSize = true
-		};
+		var labelAppKeypress = new Label { X = Pos.Right(keyPressedLabel) + 1, Y = Pos.Top(keyPressedLabel) };
 		Win.Add (labelAppKeypress);
 
 		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
 
 		// Key stroke log:
-		var keyLogLabel = new Label ("Application Key Events:") {
-			X = Pos.Left (editLabel),
-			Y = Pos.Top (editLabel) + 4,
-		};
+		var keyLogLabel = new Label { X = Pos.Left(editLabel), Y = Pos.Top(editLabel) + 4, Text = "Application Key Events:" };
 		Win.Add (keyLogLabel);
 		var maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
 		var yOffset = 1;
@@ -88,10 +72,7 @@ public class Keys : Scenario {
 		Win.Add (keyEventListView);
 
 		// OnKeyPressed
-		var onKeyPressedLabel = new Label ("TextView KeyDown:") {
-			X = Pos.Right (keyEventListView) + 1,
-			Y = Pos.Top (editLabel) + 4,
-		};
+		var onKeyPressedLabel = new Label { X = Pos.Right(keyEventListView) + 1, Y = Pos.Top(editLabel) + 4, Text = "TextView KeyDown:" };
 		Win.Add (onKeyPressedLabel);
 
 		yOffset = 1;
@@ -105,9 +86,10 @@ public class Keys : Scenario {
 		Win.Add (onKeyPressedListView);
 
 		// OnInvokeKeyBindings
-		var onInvokingKeyBindingsLabel = new Label ("TextView InvokingKeyBindings:") {
+		var onInvokingKeyBindingsLabel = new Label {
 			X = Pos.Right (onKeyPressedListView) + 1,
 			Y = Pos.Top (editLabel) + 4,
+			Text = "TextView InvokingKeyBindings:"
 		};
 		Win.Add (onInvokingKeyBindingsLabel);
 		var onInvokingKeyBindingsListView = new ListView (invokingKeyBindingsList) {

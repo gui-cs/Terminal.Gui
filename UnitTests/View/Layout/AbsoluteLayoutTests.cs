@@ -32,7 +32,7 @@ public class AbsoluteLayoutTests {
 		v.Dispose ();
 
 		frame = new Rect (1, 2, 3, 4);
-		v = new View (frame);
+		v = new View { Frame = frame };
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (frame, v.Frame);
 		Assert.Equal (new Rect (0, 0, frame.Width, frame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
@@ -42,7 +42,7 @@ public class AbsoluteLayoutTests {
 		Assert.Equal (Dim.Sized (4), v.Height);
 		v.Dispose ();
 
-		v = new View (frame, "v");
+		v = new View { Frame = frame, Text = "v" };
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		Assert.Equal (frame, v.Frame);
 		Assert.Equal (new Rect (0, 0, frame.Width, frame.Height), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
@@ -52,15 +52,17 @@ public class AbsoluteLayoutTests {
 		Assert.Equal (Dim.Sized (4), v.Height);
 		v.Dispose ();
 
-		v = new View (frame.X, frame.Y, "v");
+		v = new View { X = frame.X, Y = frame.Y, Text = "v" };
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 		// BUGBUG: v2 - I think the default size should be 0,0 not 1,1
-		Assert.Equal (new Rect (frame.X, frame.Y, 1, 1), v.Frame);
-		Assert.Equal (new Rect (0, 0, 1, 1), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
+		// That is correct it should be 0,0 because AutoSize is false
+		// and the size wasn't set on the initializer
+		Assert.Equal (new Rect (frame.X, frame.Y, 0, 0), v.Frame);
+		Assert.Equal (new Rect (0, 0, 0, 0), v.Bounds); // With Absolute Bounds *is* deterministic before Layout
 		Assert.Equal (Pos.At (1), v.X);
 		Assert.Equal (Pos.At (2), v.Y);
-		Assert.Equal (Dim.Sized (1), v.Width);
-		Assert.Equal (Dim.Sized (1), v.Height);
+		Assert.Equal (Dim.Sized (0), v.Width);
+		Assert.Equal (Dim.Sized (0), v.Height);
 		v.Dispose ();
 
 		v = new View ();
@@ -155,7 +157,7 @@ public class AbsoluteLayoutTests {
 		var frame = new Rect (1, 2, 3, 4);
 		var newFrame = new Rect (1, 2, 30, 40);
 
-		var v = new View (frame);
+		var v = new View { Frame = frame };
 		v.Height = newFrame.Height;
 		v.Width = newFrame.Width;
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
@@ -186,7 +188,7 @@ public class AbsoluteLayoutTests {
 		var frame = new Rect (1, 2, 3, 4);
 		var newFrame = new Rect (10, 20, 3, 4);
 
-		var v = new View (frame);
+		var v = new View { Frame = frame };
 		v.X = newFrame.X;
 		v.Y = newFrame.Y;
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
@@ -329,7 +331,7 @@ public class AbsoluteLayoutTests {
 		// TODO: correct behavior, but is silent. Perhaps an exception?
 		var frame = new Rect (1, 2, 3, 4);
 		var newBounds = new Rect (10, 20, 30, 40);
-		var view = new View (frame);
+		var view = new View { Frame = frame };
 		view.Bounds = newBounds;
 		Assert.Equal (new Rect (0, 0, 30, 40), view.Bounds);
 		Assert.Equal (new Rect (1, 2, 30, 40), view.Frame);
@@ -341,7 +343,7 @@ public class AbsoluteLayoutTests {
 		var frame = new Rect (1, 2, 3, 4);
 		var newBounds = new Rect (0, 0, 30, 40);
 
-		var v = new View (frame);
+		var v = new View { Frame = frame };
 		Assert.True (v.LayoutStyle == LayoutStyle.Absolute);
 
 		v.Bounds = newBounds;

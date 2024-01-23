@@ -23,7 +23,7 @@ public class TabViewTests {
 		tv.EndInit ();
 		tv.ColorScheme = new ColorScheme ();
 		tv.AddTab (tab1 = new Tab () { DisplayText = "Tab1", View = new TextField("hi") { Width = 2 } }, false);
-		tv.AddTab (tab2 = new Tab () { DisplayText = "Tab2", View = new Label("hi2") }, false);
+		tv.AddTab (tab2 = new Tab () { DisplayText = "Tab2", View = new Label { Text = "hi2" } }, false);
 		return tv;
 	}
 
@@ -36,7 +36,7 @@ public class TabViewTests {
 		Tab tab1;
 		Tab tab2;
 		tv.AddTab (tab1 = new Tab () { DisplayText = "Tab1", View = new TextField("hi") }, false);
-		tv.AddTab (tab2 = new Tab () { DisplayText = "Tab1", View = new Label("hi2") }, true);
+		tv.AddTab (tab2 = new Tab () { DisplayText = "Tab1", View = new Label { Text = "hi2" } }, true);
 
 		Assert.Equal (2, tv.Tabs.Count);
 		Assert.Equal (tab2, tv.SelectedTab);

@@ -370,7 +370,7 @@ public class SetRelativeLayoutTests {
 	public void PosDimFunction ()
 	{
 		var screen = new Rect (0, 0, 30, 1);
-		var view = new View ("abc");
+		var view = new View { Text = "abc", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
 		view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
 
 		int GetViewWidth ()
@@ -379,13 +379,16 @@ public class SetRelativeLayoutTests {
 		}
 
 		// view will be 3 chars wide. It's X will be 27 (30 - 3).
+		// BUGBUG: IsInitialized need to be true before calculate
+		view.BeginInit ();
+		view.EndInit ();
 		view.SetRelativeLayout (screen);
 		Assert.Equal (27, view.Frame.X);
 		Assert.Equal (0, view.Frame.Y);
 		Assert.Equal (3, view.Frame.Width);
 		Assert.Equal (1, view.Frame.Height);
 
-		var tf = new TextField ("01234567890123456789");
+		var tf = new TextField { Text = "01234567890123456789" };
 		tf.Width = Dim.Fill (1) - Dim.Function (GetViewWidth);
 
 		// tf will fill the screen minus 1 minus the width of view (3).
@@ -395,6 +398,5 @@ public class SetRelativeLayoutTests {
 		Assert.Equal (0, tf.Frame.Y);
 		Assert.Equal (26, tf.Frame.Width);
 		Assert.Equal (1, tf.Frame.Height);
-
 	}
 }

@@ -5,6 +5,7 @@ using System.Threading;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
+
 [ScenarioMetadata (Name: "Single BackgroundWorker", Description: "A single BackgroundWorker threading opening another Toplevel")]
 [ScenarioCategory ("Threading")]
 [ScenarioCategory ("Top Level Windows")]
@@ -43,9 +44,10 @@ public class SingleBackgroundWorker : Scenario {
 
 			var top = new Toplevel ();
 
-			top.Add (new Label ("Worker Log") {
+			top.Add (new Label {
 				X = Pos.Center (),
-				Y = 0
+				Y = 0,
+				Text = "Worker Log"
 			});
 
 			_listLog = new ListView (_log) {
@@ -80,9 +82,10 @@ public class SingleBackgroundWorker : Scenario {
 			_listLog.SetNeedsDisplay ();
 
 			var md = new Dialog (cancel) { Title = $"Running Worker started at {_startStaging}.{_startStaging:fff}" };
-			md.Add (new Label ("Wait for worker to finish...") {
+			md.Add (new Label {
 				X = Pos.Center (),
-				Y = Pos.Center ()
+				Y = Pos.Center (),
+				Text = "Wait for worker to finish..."
 			});
 
 			_worker.DoWork += (s, e) => {

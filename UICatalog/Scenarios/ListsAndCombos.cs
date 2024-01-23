@@ -24,11 +24,7 @@ public class ListsAndCombos : Scenario {
 		}
 
 		// ListView
-		var lbListView = new Label ("Listview") {
-			ColorScheme = Colors.ColorSchemes ["TopLevel"],
-			X = 0,
-			Width = Dim.Percent (40)
-		};
+		var lbListView = new Label { ColorScheme = Colors.ColorSchemes["TopLevel"], X = 0, Width = Dim.Percent(40), Text = "Listview" };
 
 		var listview = new ListView (items) {
 			X = 0,
@@ -66,10 +62,11 @@ public class ListsAndCombos : Scenario {
 		};
 
 		// ComboBox
-		var lbComboBox = new Label ("ComboBox") {
+		var lbComboBox = new Label {
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			X = Pos.Right (lbListView) + 1,
-			Width = Dim.Percent (40)
+			Width = Dim.Percent (40),
+			Text = "ComboBox"
 		};
 
 		var comboBox = new ComboBox {

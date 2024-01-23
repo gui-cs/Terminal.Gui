@@ -41,7 +41,7 @@ public class ViewTests {
 		r.Dispose ();
 
 		// Empty Rect
-		r = new View (Rect.Empty);
+		r = new View { Frame = Rect.Empty };
 		Assert.NotNull (r);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("View()(0,0,0,0)", r.ToString ());
@@ -66,7 +66,7 @@ public class ViewTests {
 		r.Dispose ();
 
 		// Rect with values
-		r = new View (new Rect (1, 2, 3, 4));
+		r = new View { Frame = new Rect (1, 2, 3, 4) };
 		Assert.NotNull (r);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("View()(1,2,3,4)", r.ToString ());
@@ -91,9 +91,12 @@ public class ViewTests {
 		r.Dispose ();
 
 		// Initializes a view with a vertical direction
-		r = new View ("Vertical View", TextDirection.TopBottom_LeftRight);
+		r = new View { Text = "Vertical View", TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = true }; // BUGBUG: AutoSize or Height need be set
 		Assert.NotNull (r);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
+		// BUGBUG: IsInitialized must be true to process calculation
+		r.BeginInit ();
+		r.EndInit ();
 		Assert.Equal ("View(Vertical View)(0,0,1,13)", r.ToString ());
 		Assert.False (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -139,16 +142,17 @@ public class ViewTests {
 	}
 
 	[Fact, TestRespondersDisposed]
-	public void View_With_No_Difference_Between_An_Object_Initializer_And_A_Constructor ()
+	public void View_With_No_Difference_Between_An_Object_Initializer_Compute_And_A_Absolute ()
 	{
-		// Object Initializer
+		// Object Initializer Computed
 		var view = new View {
 			X = 1,
 			Y = 2,
 			Width = 3,
 			Height = 4
 		};
-		var super = new View (new Rect (0, 0, 10, 10));
+		// Object Initializer Absolute
+		var super = new View { Frame = new Rect(0, 0, 10, 10) };
 		super.Add (view);
 		super.BeginInit ();
 		super.EndInit ();
@@ -187,8 +191,8 @@ public class ViewTests {
 		Assert.True (view.Bounds.IsEmpty);
 		view.Dispose ();
 
-		// Constructor
-		view = new View (1, 2, "");
+		// Object Initializer
+		view = new View { X = 1, Y = 2, Text = "" };
 		Assert.Equal (1, view.X);
 		Assert.Equal (2, view.Y);
 		Assert.Equal (0, view.Width);
@@ -463,7 +467,7 @@ public class ViewTests {
 				lbl = new Label { Text = text };
 			} else {
 				// Calling the Text constructor.
-				lbl = new Label (text);
+				lbl = new Label { Text = text };
 			}
 			Application.Top.Add (lbl);
 			Application.Begin (Application.Top);
@@ -486,7 +490,7 @@ public class ViewTests {
 			Enum.GetValues (typeof (View.Direction)));
 
 		var rect = new Rect (1, 1, 10, 1);
-		var view = new View (rect);
+		var view = new View { Frame = rect };
 		var top = Application.Top;
 		top.Add (view);
 
@@ -787,15 +791,18 @@ public class ViewTests {
 	[Fact, AutoInitShutdown]
 	public void Visible_Clear_The_View_Output ()
 	{
-		var view = new View ("Testing visibility."); // use View, not Label to avoid AutoSize == true
-		Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
-		Assert.Equal (1, view.Height);
+		var view = new View { Text = "Testing visibility." }; // use View, not Label to avoid AutoSize == true
+		// BUGBUG: AutoSize is false and size wasn't provided so it's 0,0
+		Assert.Equal (0, view.Frame.Width);
+		Assert.Equal (0, view.Height);
 		var win = new Window ();
 		win.Add (view);
 		var top = Application.Top;
 		top.Add (win);
 		var rs = Application.Begin (top);
 
+		view.AutoSize = true;
+		Assert.Equal ("Testing visibility.".Length, view.Frame.Width);
 		Assert.True (view.Visible);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -870,8 +877,9 @@ public class ViewTests {
 		var root = new View { Width = 20, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 
 		var v = label ?
-			new Label (new string ('c', 100)) {
-				Width = Dim.Fill ()
+			new Label {
+				Width = Dim.Fill (),
+				Text = new string ('c', 100)
 			} :
 			(View)new TextView {
 				Height = 1,
@@ -929,7 +937,7 @@ cccccccccccccccccccc", output);
 	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -963,7 +971,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -999,7 +1007,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -1035,7 +1043,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -1073,7 +1081,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -1108,7 +1116,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Correct_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -1146,7 +1154,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -1180,7 +1188,7 @@ At 0,0
 	[Fact, AutoInitShutdown]
 	public void Incorrect_Redraw_Bounds_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
 	{
-		var label = new Label ("At 0,0");
+		var label = new Label { Text = "At 0,0" };
 		var view = new DerivedView {
 			X = 2,
 			Y = 2,
@@ -1223,10 +1231,10 @@ At 0,0
 		var top = new View { Width = Dim.Fill (), Height = 1 };
 		var bottom = new View { Width = Dim.Fill (), Height = 1, Y = 2 };
 
-		top.Add (new Label ("111"));
+		top.Add (new Label { Text = "111" });
 		v.Add (top);
 		v.Add (new LineView (Orientation.Horizontal) { Y = 1 });
-		bottom.Add (new Label ("222"));
+		bottom.Add (new Label { Text = "222" });
 		v.Add (bottom);
 
 		v.BeginInit ();
@@ -1250,12 +1258,7 @@ At 0,0
 	{
 		var frame = new FrameView ();
 
-		var label = new Label ("This should be the first line.") {
-			ColorScheme = Colors.ColorSchemes ["Menu"],
-			Width = Dim.Fill (),
-			X = 0, // don't overcomplicate unit tests
-			Y = 0
-		};
+		var label = new Label { ColorScheme = Colors.ColorSchemes ["Menu"], Width = Dim.Fill (), X = 0, Y = 0, Text = "This should be the first line." };
 
 		var button = new Button {
 			X = 0, // don't overcomplicate unit tests

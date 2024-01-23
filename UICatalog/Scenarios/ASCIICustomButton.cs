@@ -69,14 +69,16 @@ public class ASCIICustomButtonTest : Scenario {
 				}
 			}
 
-			fill = new Label (fillText.ToString ()) {
+			fill = new Label {
 				Visible = false,
-				CanFocus = false
+				CanFocus = false,
+				Text = fillText.ToString ()
 			};
 
-			var title = new Label (Text) {
+			var title = new Label {
 				X = Pos.Center (),
 				Y = Pos.Center (),
+				Text = Text
 			};
 
 			border.MouseClick += This_MouseClick;
@@ -158,9 +160,10 @@ public class ASCIICustomButtonTest : Scenario {
 				Width = Dim.Fill ();
 				Height = Dim.Fill ();
 
-				titleLabel = new Label ("DOCUMENTS") {
+				titleLabel = new Label {
 					X = 0,
-					Y = 0
+					Y = 0,
+					Text = "DOCUMENTS"
 				};
 
 				scrollView = new ScrollView () {

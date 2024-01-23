@@ -440,7 +440,7 @@ public class ScrollViewTests {
 				labelFill.Text = fillText.ToString ();
 			};
 
-			labelText = new Label (text) { X = Pos.Center (), Y = Pos.Center () };
+			labelText = new Label { X = Pos.Center(), Y = Pos.Center(), Text = text };
 			Add (labelFill, labelText);
 			CanFocus = true;
 		}
@@ -468,7 +468,7 @@ public class ScrollViewTests {
 	[Fact, AutoInitShutdown]
 	public void Clear_Window_Inside_ScrollView ()
 	{
-		var topLabel = new Label ("At 15,0") { X = 15 };
+		var topLabel = new Label { X = 15, Text = "At 15,0" };
 		var sv = new ScrollView {
 			X = 3,
 			Y = 3,
@@ -477,7 +477,7 @@ public class ScrollViewTests {
 			ContentSize = new Size (23, 23),
 			KeepContentAlwaysInViewport = false
 		};
-		var bottomLabel = new Label ("At 15,15") { X = 15, Y = 15 };
+		var bottomLabel = new Label { X = 15, Y = 15, Text = "At 15,15" };
 		Application.Top.Add (topLabel, sv, bottomLabel);
 		Application.Begin (Application.Top);
 
@@ -606,10 +606,10 @@ public class ScrollViewTests {
 	{
 		var rule = "0123456789";
 		var size = new Size (40, 40);
-		var view = new View (new Rect (Point.Empty, size));
-		view.Add (new Label (rule.Repeat (size.Width / rule.Length)) { AutoSize = false, Width = Dim.Fill () });
-		view.Add (new Label (rule.Repeat (size.Height / rule.Length), TextDirection.TopBottom_LeftRight) { Height = Dim.Fill (), AutoSize = false });
-		view.Add (new Label ("[ Press me! ]") { X = 1, Y = 1 });
+		var view = new View { Frame = new Rect (Point.Empty, size) };
+		view.Add (new Label { AutoSize = false, Width = Dim.Fill (), Text = rule.Repeat (size.Width / rule.Length) });
+		view.Add (new Label { Height = Dim.Fill (), AutoSize = false, Text = rule.Repeat (size.Height / rule.Length), TextDirection = TextDirection.TopBottom_LeftRight });
+		view.Add (new Label { X = 1, Y = 1, Text = "[ Press me! ]" });
 		var scrollView = new ScrollView () {
 			X = 1,
 			Y = 1,

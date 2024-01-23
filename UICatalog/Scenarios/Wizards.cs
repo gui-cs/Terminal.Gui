@@ -17,13 +17,14 @@ public class Wizards : Scenario {
 		};
 		Win.Add (frame);
 
-		var label = new Label ("Width:") {
+		var label = new Label {
 			X = 0,
 			Y = 0,
 			Width = 15,
 			Height = 1,
 			TextAlignment = Terminal.Gui.TextAlignment.Right,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Width:"
 		};
 		frame.Add (label);
 		var widthEdit = new TextField ("80") {
@@ -34,13 +35,14 @@ public class Wizards : Scenario {
 		};
 		frame.Add (widthEdit);
 
-		label = new Label ("Height:") {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Width = Dim.Width (label),
 			Height = 1,
 			TextAlignment = Terminal.Gui.TextAlignment.Right,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Height:"
 		};
 		frame.Add (label);
 		var heightEdit = new TextField ("20") {
@@ -51,13 +53,14 @@ public class Wizards : Scenario {
 		};
 		frame.Add (heightEdit);
 
-		label = new Label ("Title:") {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Width = Dim.Width (label),
 			Height = 1,
 			TextAlignment = Terminal.Gui.TextAlignment.Right,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Title:"
 		};
 		frame.Add (label);
 		var titleEdit = new TextField ("Gandolf") {
@@ -75,14 +78,15 @@ public class Wizards : Scenario {
 		}
 		Application.Top.Loaded += Top_Loaded;
 
-		label = new Label ("Action:") {
+		label = new Label {
 			X = Pos.Center (),
 			Y = Pos.AnchorEnd (1),
 			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			Text = "Action:"
 		};
 		Win.Add (label);
 
-		var actionLabel = new Label ("") {
+		var actionLabel = new Label {
 			X = Pos.Right (label),
 			Y = Pos.AnchorEnd (1),
 			ColorScheme = Colors.ColorSchemes ["Error"],

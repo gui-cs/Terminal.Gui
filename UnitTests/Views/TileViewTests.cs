@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -2009,13 +2008,13 @@ public class TileViewTests {
 
 		Assert.True (tileView.TrySplitTile (0, 2, out TileView top));
 
-		top.Tiles.ElementAt (0).ContentView.Add (new Label ("bleh"));
-		top.Tiles.ElementAt (1).ContentView.Add (new Label ("blah"));
+		top.Tiles.ElementAt (0).ContentView.Add (new Label { Text = "bleh" });
+		top.Tiles.ElementAt (1).ContentView.Add (new Label { Text = "blah" });
 		top.BeginInit ();
 		top.EndInit ();
 		top.LayoutSubviews ();
 
-		tileView.Tiles.ElementAt (1).ContentView.Add (new Label ("Hello"));
+		tileView.Tiles.ElementAt (1).ContentView.Add (new Label { Text = "Hello" });
 		tileView.ColorScheme = new ColorScheme ();
 		top.ColorScheme = new ColorScheme ();
 
@@ -2260,11 +2259,11 @@ public class TileViewTests {
 			tv.LineStyle = LineStyle.None;
 		}
 
-		tv.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (2).ContentView.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (3).ContentView.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (4).ContentView.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		tv.Tiles.ElementAt (0).ContentView.Add (new Label { AutoSize = false, Width = Dim.Fill(), Height = 1, Text = new string('1', 100) });
+		tv.Tiles.ElementAt (1).ContentView.Add (new Label { AutoSize = false, Width = Dim.Fill(), Height = 1, Text = new string('2', 100) });
+		tv.Tiles.ElementAt (2).ContentView.Add (new Label { AutoSize = false, Width = Dim.Fill(), Height = 1, Text = new string('3', 100) });
+		tv.Tiles.ElementAt (3).ContentView.Add (new Label { AutoSize = false, Width = Dim.Fill(), Height = 1, Text = new string('4', 100) });
+		tv.Tiles.ElementAt (4).ContentView.Add (new Label { AutoSize = false, Width = Dim.Fill(), Height = 1, Text = new string('5', 100) });
 
 		Application.Top.Add (tv);
 		tv.BeginInit ();
@@ -2294,10 +2293,10 @@ public class TileViewTests {
 
 		container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
-		container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-		container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
-		container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-		container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
+		container.Tiles.ElementAt (0).ContentView.Add (new Label { Width = Dim.Fill (), Height = 1, AutoSize = false, Text = new string ('1', 100) });
+		container.Tiles.ElementAt (0).ContentView.Add (new Label { Width = Dim.Fill(), Height = 1, AutoSize = false, Y = 1, Text = new string('1', 100) });
+		container.Tiles.ElementAt (1).ContentView.Add (new Label { Width = Dim.Fill(), Height = 1, AutoSize = false, Text = new string('2', 100) });
+		container.Tiles.ElementAt (1).ContentView.Add (new Label { Width = Dim.Fill(), Height = 1, AutoSize = false, Y = 1, Text = new string('2', 100) });
 
 		container.Tiles.ElementAt (0).MinSize = 0;
 		container.Tiles.ElementAt (1).MinSize = 0;

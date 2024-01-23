@@ -58,18 +58,18 @@ public class TabViewExample : Scenario {
 			BorderStyle = LineStyle.Single
 		};
 
-		_tabView.AddTab (new Tab () { DisplayText = "Tab1", View = new Label ("hodor!") }, false);
+		_tabView.AddTab (new Tab () { DisplayText = "Tab1", View = new Label { Text = "hodor!" } }, false);
 		_tabView.AddTab (new Tab () { DisplayText = "Tab2", View = new TextField ("durdur") }, false);
 		_tabView.AddTab (new Tab () { DisplayText = "Interactive Tab", View = GetInteractiveTab () }, false);
 		_tabView.AddTab (new Tab () { DisplayText = "Big Text", View = GetBigTextFileTab () }, false);
 		_tabView.AddTab (new Tab () {
 			DisplayText = "Long name Tab, I mean seriously long.  Like you would not believe how long this tab's name is its just too much really woooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooowwww thats long",
-			View = new Label ("This tab has a very long name which should be truncated.  See TabView.MaxTabTextWidth")
+			View = new Label { Text = "This tab has a very long name which should be truncated.  See TabView.MaxTabTextWidth" }
 		}, false);
-		_tabView.AddTab (new Tab () { DisplayText = "Les Mise" + '\u0301' + "rables", View = new Label ("This tab name is unicode") }, false);
-		_tabView.AddTab (new Tab () { DisplayText = "Les Mise" + '\u0328' + '\u0301' + "rables", View = new Label ("This tab name has two combining marks. Only one will show due to Issue #2616.") }, false);
+		_tabView.AddTab (new Tab () { DisplayText = "Les Mise" + '\u0301' + "rables", View = new Label { Text = "This tab name is unicode" } }, false);
+		_tabView.AddTab (new Tab () { DisplayText = "Les Mise" + '\u0328' + '\u0301' + "rables", View = new Label { Text = "This tab name has two combining marks. Only one will show due to Issue #2616." } }, false);
 		for (int i = 0; i < 100; i++) {
-			_tabView.AddTab (new Tab () { DisplayText = $"Tab{i}", View = new Label($"Welcome to tab {i}") }, false);
+			_tabView.AddTab (new Tab () { DisplayText = $"Tab{i}", View = new Label { Text = $"Welcome to tab {i}" } }, false);
 		}
 
 		_tabView.SelectedTab = _tabView.Tabs.First ();
@@ -126,7 +126,7 @@ public class TabViewExample : Scenario {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		var lblName = new Label ("Name:");
+		var lblName = new Label { Text = "Name:" };
 		interactiveTab.Add (lblName);
 
 		var tbName = new TextField () {
@@ -135,8 +135,9 @@ public class TabViewExample : Scenario {
 		};
 		interactiveTab.Add (tbName);
 
-		var lblAddr = new Label ("Address:") {
-			Y = 1
+		var lblAddr = new Label {
+			Y = 1,
+			Text = "Address:"
 		};
 		interactiveTab.Add (lblAddr);
 

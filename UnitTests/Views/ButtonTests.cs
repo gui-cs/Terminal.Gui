@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class ButtonTests {
 	readonly ITestOutputHelper _output;
@@ -483,18 +483,20 @@ public class ButtonTests {
 
 		var lblWidth = 8;
 
-		var label = new Label ("Find:") {
+		var label = new Label {
 			Y = 1,
 			Width = lblWidth,
 			TextAlignment = TextAlignment.Right,
-			AutoSize = false
+			AutoSize = false,
+			Text = "Find:"
 		};
 		tab.Add (label);
 
-		var txtToFind = new TextField ("Testing buttons.") {
+		var txtToFind = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
-			Width = 20
+			Width = 20,
+			Text = "Testing buttons."
 		};
 		tab.Add (txtToFind);
 
@@ -551,7 +553,7 @@ public class ButtonTests {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
-		tabView.AddTab (new Tab () { DisplayText = "Find", View = tab }, true);
+		tabView.AddTab (new Tab { DisplayText = "Find", View = tab }, true);
 
 		var win = new Window {
 			Width = Dim.Fill (),

@@ -18,6 +18,13 @@ public class CheckBoxTests {
 		Assert.Equal (string.Empty, ckb.Text);
 		Assert.Equal ($"{CM.Glyphs.UnChecked} ", ckb.TextFormatter.Text);
 		Assert.True (ckb.CanFocus);
+		// BUGBUG: IsInitialized is false and
+		// the AutoSize wasn't calculated yet
+		Assert.False (ckb.IsInitialized);
+		Assert.Equal (new Rect (0, 0, 0, 1), ckb.Frame);
+		ckb.BeginInit ();
+		ckb.EndInit ();
+		Assert.True (ckb.IsInitialized);
 		Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
 
 		ckb = new CheckBox { Text = "Test", Checked = true };
@@ -27,6 +34,8 @@ public class CheckBoxTests {
 		Assert.Equal ("Test", ckb.Text);
 		Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
 		Assert.True (ckb.CanFocus);
+		ckb.BeginInit ();
+		ckb.EndInit ();
 		Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
 		ckb = new CheckBox { X = 1, Y = 2, Text = "Test" };
@@ -36,6 +45,8 @@ public class CheckBoxTests {
 		Assert.Equal ("Test", ckb.Text);
 		Assert.Equal ($"{CM.Glyphs.UnChecked} Test", ckb.TextFormatter.Text);
 		Assert.True (ckb.CanFocus);
+		ckb.BeginInit ();
+		ckb.EndInit ();
 		Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
 
 		ckb = new CheckBox { X = 3, Y = 4, Text = "Test", Checked = true };
@@ -45,6 +56,8 @@ public class CheckBoxTests {
 		Assert.Equal ("Test", ckb.Text);
 		Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
 		Assert.True (ckb.CanFocus);
+		ckb.BeginInit ();
+		ckb.EndInit ();
 		Assert.Equal (new Rect (3, 4, 6, 1), ckb.Frame);
 	}
 
@@ -128,6 +141,7 @@ public class CheckBoxTests {
 		Assert.Equal ("Check this out 你", checkBox.Text);
 		Assert.Equal ($"{CM.Glyphs.UnChecked} Check this out 你", checkBox.TextFormatter.Text);
 		Assert.True (checkBox.AutoSize);
+		Assert.Equal ("Absolute(19)", checkBox.Width.ToString ());
 
 		checkBox.Checked = true;
 		Assert.Equal ($"{CM.Glyphs.Checked} Check this out 你", checkBox.TextFormatter.Text);
@@ -332,10 +346,10 @@ public class CheckBoxTests {
 
 		checkBox1.Checked = true;
 		Assert.Equal (new Rect (1, 1, 25, 1), checkBox1.Frame);
-		//Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
+		Assert.Equal (new Size (25, 1), checkBox1.TextFormatter.Size);
 		checkBox2.Checked = true;
 		Assert.Equal (new Rect (1, 2, 25, 1), checkBox2.Frame);
-		//Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
+		Assert.Equal (new Size (25, 1), checkBox2.TextFormatter.Size);
 		Application.Refresh ();
 		expected = @$"
 ┌┤Test Demo 你├──────────────┐

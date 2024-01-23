@@ -83,13 +83,13 @@ public class DimTests {
 	public void SetsValue ()
 	{
 		var testVal = Rect.Empty;
-		var testValView = new View (testVal);
+		var testValView = new View { Frame = testVal };
 		var dim = Dim.Width (testValView);
 		Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
 		testValView.Dispose ();
 
 		testVal = new Rect (1, 2, 3, 4);
-		testValView = new View (testVal);
+		testValView = new View { Frame = testVal };
 		dim = Dim.Width (testValView);
 		Assert.Equal ($"View(Width,View(){testVal})", dim.ToString ());
 		testValView.Dispose ();
@@ -154,13 +154,13 @@ public class DimTests {
 	public void Height_SetsValue ()
 	{
 		var testVal = Rect.Empty;
-		var testValview = new View (testVal);
+		var testValview = new View { Frame = testVal };
 		var dim = Dim.Height (testValview);
 		Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
 		testValview.Dispose ();
 
 		testVal = new Rect (1, 2, 3, 4);
-		testValview = new View (testVal);
+		testValview = new View { Frame = testVal };
 		dim = Dim.Height (testValview);
 		Assert.Equal ($"View(Height,View(){testVal})", dim.ToString ());
 		testValview.Dispose ();
@@ -691,7 +691,7 @@ public class DimTests {
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
 				field.Text = $"Label {count}";
-				var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+				var label = new Label { X = 0, Y = view.Bounds.Height, Width = 20, Text = field.Text };
 				view.Add (label);
 				Assert.Equal ($"Label {count}", label.Text);
 				Assert.Equal ($"Absolute({count})", label.Y.ToString ());
@@ -737,7 +737,7 @@ public class DimTests {
 
 		for (int i = 0; i < count; i++) {
 			field.Text = $"Label {i}";
-			var label = new Label (field.Text) { X = 0, Y = view.Bounds.Height, Width = 20 };
+			var label = new Label { X = 0, Y = view.Bounds.Height, Width = 20, Text = field.Text };
 			view.Add (label);
 			Assert.Equal ($"Label {i}", label.Text);
 			Assert.Equal ($"Absolute({i})", label.Y.ToString ());
@@ -798,7 +798,7 @@ public class DimTests {
 		Assert.Equal (dimCombine._right, dimAbsolute);
 		Assert.Equal (20, dimCombine.Anchor (100));
 
-		var view = new View (new Rect (20, 10, 20, 1));
+		var view = new View { Frame = new Rect (20, 10, 20, 1) };
 		var dimViewHeight = new Dim.DimView (view, 0);
 		Assert.Equal (1, dimViewHeight.Anchor (0));
 		var dimViewWidth = new Dim.DimView (view, 1);

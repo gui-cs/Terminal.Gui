@@ -36,31 +36,31 @@ public class UnicodeInMenu : Scenario {
 		});
 		Application.Top.Add (statusBar);
 
-		var label = new Label ("Label:") { X = 0, Y = 1 };
+		var label = new Label { X = 0, Y = 1, Text = "Label:" };
 		Win.Add (label);
-		var testlabel = new Label (gitString) { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50) };
+		var testlabel = new Label { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), Text = gitString };
 		Win.Add (testlabel);
 
-		label = new Label ("Label (CanFocus):") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(label) + 1, Text = "Label (CanFocus):" };
 		Win.Add (label);
 		var sb = new StringBuilder ();
 		sb.Append ('e');
 		sb.Append ('\u0301');
 		sb.Append ('\u0301');
-		testlabel = new Label ($"Should be [e with two accents, but isn't due to #2616]: [{sb}]") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), CanFocus = true, HotKeySpecifier = new Rune ('&') };
+		testlabel = new Label { X = 20, Y = Pos.Y(label), Width = Dim.Percent(50), CanFocus = true, HotKeySpecifier = new Rune('&'), Text = $"Should be [e with two accents, but isn't due to #2616]: [{sb}]" };
 		Win.Add (testlabel);
-		label = new Label ("Button:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(label) + 1, Text = "Button:" };
 		Win.Add (label);
 		var button = new Button { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
 		Win.Add (button);
 
-		label = new Label ("CheckBox:") { X = Pos.X (label), Y = Pos.Bottom (label) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(label) + 1, Text = "CheckBox:" };
 		Win.Add (label);
 		var checkBox = new CheckBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), Text = gitString };
 		var checkBoxRight = new CheckBox { X = 20, Y = Pos.Bottom (checkBox), Width = Dim.Percent (50), TextAlignment = TextAlignment.Right, Text = $"Align Right - {gitString}" };
 		Win.Add (checkBox, checkBoxRight);
 
-		label = new Label ("ComboBox:") { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(checkBoxRight) + 1, Text = "ComboBox:" };
 		Win.Add (label);
 		var comboBox = new ComboBox {
 			X = 20,
@@ -72,7 +72,7 @@ public class UnicodeInMenu : Scenario {
 		Win.Add (comboBox);
 		comboBox.Text = gitString;
 
-		label = new Label ("HexView:") { X = Pos.X (label), Y = Pos.Bottom (label) + 2 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(label) + 2, Text = "HexView:" };
 		Win.Add (label);
 		var hexView = new HexView (new System.IO.MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить"))) {
 			X = 20,
@@ -82,7 +82,7 @@ public class UnicodeInMenu : Scenario {
 		};
 		Win.Add (hexView);
 
-		label = new Label ("ListView:") { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(hexView) + 1, Text = "ListView:" };
 		Win.Add (label);
 		var listView = new ListView (new List<string> () { "item #1", gitString, "Со_хранить", unicode }) {
 			X = 20,
@@ -92,7 +92,7 @@ public class UnicodeInMenu : Scenario {
 		};
 		Win.Add (listView);
 
-		label = new Label ("RadioGroup:") { X = Pos.X (label), Y = Pos.Bottom (listView) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(listView) + 1, Text = "RadioGroup:" };
 		Win.Add (label);
 		var radioGroup = new RadioGroup (new string [] { "item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ" }, 0) {
 			X = 20,
@@ -101,12 +101,12 @@ public class UnicodeInMenu : Scenario {
 		};
 		Win.Add (radioGroup);
 
-		label = new Label ("TextField:") { X = Pos.X (label), Y = Pos.Bottom (radioGroup) + 1 };
+		label = new Label { X = Pos.X(label), Y = Pos.Bottom(radioGroup) + 1, Text = "TextField:" };
 		Win.Add (label);
 		var textField = new TextField (gitString + " = Со_хранить") { X = 20, Y = Pos.Y (label), Width = Dim.Percent (60) };
 		Win.Add (textField);
 
-		label = new Label ("TextView:") { X = Pos.X (label), Y = Pos.Bottom (textField) + 1 };
+		label = new Label { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
 		Win.Add (label);
 		var textView = new TextView () {
 			X = 20,

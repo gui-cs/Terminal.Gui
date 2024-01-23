@@ -199,7 +199,7 @@ public class DialogTests {
 
 		d.SetBufferSize (width, 1);
 
-		(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button { Text = btnText});
+		(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Center, new Button { Text = btnText });
 		// Center
 		TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 		End (runstate);
@@ -515,7 +515,7 @@ public class DialogTests {
 
 		// Left
 		buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {CM.Glyphs.LeftBracket} n{CM.Glyphs.VLine}";
-		(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button { Text = btn1Text }, new Button { Text = btn2Text }, new Button { Text = btn3Text }, new Button { Text = btn4Text }	);
+		(runstate, var _) = RunButtonTestDialog (title, width, Dialog.ButtonAlignments.Left, new Button { Text = btn1Text }, new Button { Text = btn2Text }, new Button { Text = btn3Text }, new Button { Text = btn4Text });
 		TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 		End (runstate);
 	}
@@ -954,16 +954,40 @@ public class DialogTests {
 
 		win.Loaded += (s, a) => {
 			var dlg = new Dialog { Width = 18, Height = 3 };
-			Assert.Equal (16, dlg.Bounds.Width);
+			// BUGBUG: Only PosAbsolute and DimAbsolute are available before IsInitialized
+			Assert.Equal ("(0,0,18,3)", dlg.Frame.ToString ());
+			Assert.Equal ("(0,0,16,1)", dlg.Bounds.ToString ());
 
 			Button btn = null;
 			btn = new Button {
 				X = Pos.AnchorEnd () - Pos.Function (Btn_Width),
 				Text = "Ok"
 			};
+			dlg.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
+			// Now dlg Pos/Dim was calculated
+			Assert.Equal (16, dlg.Bounds.Width);
+			Assert.Equal (1, dlg.Bounds.Height);
+			Assert.Equal (18, dlg.Frame.Width);
+			Assert.Equal (3, dlg.Frame.Height);
+			Assert.Equal (1, dlg.Frame.X);
+			Assert.Equal (1, dlg.Frame.Y);
+			btn.SetRelativeLayout (dlg.Bounds);
+			// BUGBUG: IsInitialized is false
+			// and thus the btn.Bounds.Width is 0
+			// on the Btn_Width method
+			// calculating the wrong value
+			// dlg.Bounds.Width (16) - btn.Bounds.Width (0) = 16
+			Assert.False (btn.IsInitialized);
+			Assert.Equal (16, btn.Frame.X);
+			// Now btn.Bounds.Width has
+			// the correct value of 6
+			Assert.Equal (6, btn.Bounds.Width);
+			btn.BeginInit ();
+			btn.EndInit ();
 			btn.SetRelativeLayout (dlg.Bounds);
 			Assert.Equal (6, btn.Bounds.Width);
-			Assert.Equal (10, btn.Frame.X); // dlg.Bounds.Width (16) - btn.Frame.Width (6) = 10
+			Assert.Equal (6, btn.Frame.Width);
+			Assert.Equal (10, btn.Frame.X); // dlg.Bounds.Width (16) - btn.Bounds.Width (6) = 10
 			Assert.Equal (0, btn.Frame.Y);
 			Assert.Equal (6, btn.Frame.Width);
 			Assert.Equal (1, btn.Frame.Height);
@@ -991,7 +1015,7 @@ public class DialogTests {
 				var expected = @"
 ┌──────────────────┐
 │┌────────────────┐│
-││012345678 ⟦ Ok ⟧││
+││23456789  ⟦ Ok ⟧││
 │└────────────────┘│
 └──────────────────┘";
 
@@ -1005,7 +1029,7 @@ public class DialogTests {
 				expected = @"
 ┌──────────────────┐
 │┌────────────────┐│
-││012345678 ⟦ Ok ⟧││
+││23456789  ⟦ Ok ⟧││
 │└────────────────┘│
 └──────────────────┘";
 				_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);

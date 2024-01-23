@@ -370,9 +370,7 @@ public class DynamicStatusBar : Scenario {
 
 		public DynamicStatusBarDetails ()
 		{
-			var _lblTitle = new Label ("Title:") {
-				Y = 1
-			};
+			var _lblTitle = new Label () { Y = 1, Text = "Title:" };
 			Add (_lblTitle);
 
 			_txtTitle = new TextField () {
@@ -382,10 +380,7 @@ public class DynamicStatusBar : Scenario {
 			};
 			Add (_txtTitle);
 
-			var _lblAction = new Label ("Action:") {
-				X = Pos.Left (_lblTitle),
-				Y = Pos.Bottom (_lblTitle) + 1
-			};
+			var _lblAction = new Label () { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblTitle) + 1, Text = "Action:" };
 			Add (_lblAction);
 
 			_txtAction = new TextView () {
@@ -396,9 +391,10 @@ public class DynamicStatusBar : Scenario {
 			};
 			Add (_txtAction);
 
-			var _lblShortcut = new Label ("Shortcut:") {
+			var _lblShortcut = new Label {
 				X = Pos.Left (_lblTitle),
-				Y = Pos.Bottom (_txtAction) + 1
+				Y = Pos.Bottom (_txtAction) + 1,
+				Text = "Shortcut:"
 			};
 			Add (_lblShortcut);
 
