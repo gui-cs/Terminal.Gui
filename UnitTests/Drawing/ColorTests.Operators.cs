@@ -36,6 +36,16 @@ public partial class ColorTests {
 	}
 
 	[Theory]
+	[CombinatorialData]
+	[Trait ( "Category", "Operators" )]
+	public void GetHashCode_DelegatesTo_Rgba ( [CombinatorialRandomData ( Count = 16 )] int rgba )
+	{
+		Color color = new ( rgba );
+
+		Assert.Equal ( rgba.GetHashCode ( ), color.GetHashCode ( ) );
+	}
+
+	[Theory]
 	[Trait ( "Category", "Operators" )]
 	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
 	public void ImplicitOperator_FromColorName_ReturnsCorrectColorValue ( ColorName cname, Color expectedColor )
@@ -130,7 +140,6 @@ public partial class ColorTests {
 		Assert.Equal ( b, vector.Z );
 		Assert.Equal ( a, vector.W );
 	}
-
 }
 public static partial class ColorTestsTheoryDataGenerators {
 
