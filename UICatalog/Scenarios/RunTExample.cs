@@ -26,7 +26,8 @@ namespace UICatalog.Scenarios {
 					Text = "Username:"
 				};
 
-				usernameText = new TextField ("") {
+				usernameText = new TextField () { 
+Text = "", 
 					// Position text field adjacent to the label
 					X = Pos.Right (usernameLabel) + 1,
 
@@ -40,7 +41,8 @@ namespace UICatalog.Scenarios {
 					Y = Pos.Bottom (usernameLabel) + 1
 				};
 
-				var passwordText = new TextField ("") {
+				var passwordText = new TextField () { 
+Text = "", 
 					Secret = true,
 					// align with the text box above
 					X = Pos.Left (usernameText),

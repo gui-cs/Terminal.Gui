@@ -69,7 +69,8 @@ public class DatePicker : View {
 		Title = "Date Picker";
 		BorderStyle = LineStyle.Single;
 		Date = date;
-		_dateLabel = new Label ("Date: ") {
+		_dateLabel = new Label () {
+			Text = "Date: ",
 			X = 0,
 			Y = 0
 		};

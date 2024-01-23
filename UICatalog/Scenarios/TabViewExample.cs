@@ -69,14 +69,15 @@ public class TabViewExample : Scenario {
 		_tabView.AddTab (new Tab () { DisplayText = "Les Mise" + '\u0301' + "rables", View = new Label ("This tab name is unicode") }, false);
 		_tabView.AddTab (new Tab () { DisplayText = "Les Mise" + '\u0328' + '\u0301' + "rables", View = new Label ("This tab name has two combining marks. Only one will show due to Issue #2616.") }, false);
 		for (int i = 0; i < 100; i++) {
-			_tabView.AddTab (new Tab () { DisplayText = $"Tab{i}", View = new Label($"Welcome to tab {i}") }, false);
+			_tabView.AddTab (new Tab () { DisplayText = $"Tab{i}", View = new Label ($"Welcome to tab {i}") }, false);
 		}
 
 		_tabView.SelectedTab = _tabView.Tabs.First ();
 
 		Win.Add (_tabView);
 
-		var frameRight = new FrameView ("About") {
+		var frameRight = new FrameView () {
+			Title = "About",
 			X = Pos.Right (_tabView),
 			Y = 0,
 			Width = Dim.Fill (),
@@ -91,7 +92,8 @@ public class TabViewExample : Scenario {
 
 		Win.Add (frameRight);
 
-		var frameBelow = new FrameView ("Bottom Frame") {
+		var frameBelow = new FrameView () {
+			Title = "Bottom Frame",
 			X = 0,
 			Y = Pos.Bottom (_tabView),
 			Width = _tabView.Width,
@@ -133,7 +135,8 @@ public class TabViewExample : Scenario {
 		};
 		interactiveTab.Add (tbName);
 
-		var lblAddr = new Label ("Address:") {
+		var lblAddr = new Label () {
+			Text = "Address:",
 			Y = 1
 		};
 		interactiveTab.Add (lblAddr);

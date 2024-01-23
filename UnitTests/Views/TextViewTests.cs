@@ -2418,7 +2418,8 @@ line.
 			ReadOnly = true,
 			Text = "some text"
 		};
-		var fv = new FrameView ("I shouldn't get focus") {
+		var fv = new FrameView () {
+			Title = "I shouldn't get focus",
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			CanFocus = false,
@@ -3062,7 +3063,7 @@ Line 2.", _output);
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateForwardKey));
 		Assert.False (tv.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateBackwardKey));
-		
+
 		Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
 		Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
 

@@ -419,9 +419,9 @@ public partial class View {
 			//if (ValidatePosDim) {
 			var isValidNewAutoSize = AutoSize && IsValidAutoSizeWidth (_width);
 
-				if (IsAdded && AutoSize && !isValidNewAutoSize) {
-					throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
-				}
+			if (IsAdded && AutoSize && !isValidNewAutoSize) {
+				throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
+			}
 			//}
 			OnResizeNeeded ();
 		}
@@ -463,9 +463,9 @@ public partial class View {
 			//if (ValidatePosDim) {
 			var isValidNewAutoSize = AutoSize && IsValidAutoSizeHeight (_height);
 
-				if (IsAdded && AutoSize && !isValidNewAutoSize) {
-					throw new InvalidOperationException (@$"Must set AutoSize to false before setting the {nameof (Height)}.");
-				}
+			if (IsAdded && AutoSize && !isValidNewAutoSize) {
+				throw new InvalidOperationException (@$"Must set AutoSize to false before setting the {nameof (Height)}.");
+			}
 			//}
 			OnResizeNeeded ();
 		}
@@ -507,8 +507,8 @@ public partial class View {
 		get => _autoSize;
 		set {
 			if (Width != Dim.Sized (0) && Height != Dim.Sized (0)) {
-				Debug.WriteLine ($@"WARNING: {GetType().Name} - Setting {nameof (AutoSize)} invalidates {nameof (Width)} and {nameof (Height)}.");
-			} 
+				Debug.WriteLine ($@"WARNING: {GetType ().Name} - Setting {nameof (AutoSize)} invalidates {nameof (Width)} and {nameof (Height)}.");
+			}
 			var v = ResizeView (value);
 			TextFormatter.AutoSize = v;
 			if (_autoSize != v) {

@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DriverTests; 
+namespace Terminal.Gui.DriverTests;
 
 public class ConsoleDriverTests {
 	readonly ITestOutputHelper output;
@@ -232,7 +232,8 @@ public class ConsoleDriverTests {
 	//			System.Threading.Tasks.Task.Run (() => {
 	//				System.Threading.Tasks.Task.Delay (500).Wait ();
 	//				Application.Invoke (() => {
-	//					var lbl = new Label ("Hello World") { X = Pos.Center () };
+	//					var lbl = new Label () { 
+	// Text = "Hello World",  X = Pos.Center () };
 	//					var dlg = new Dialog ();
 	//					dlg.Add (lbl);
 	//					Application.Begin (dlg);

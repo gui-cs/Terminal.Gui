@@ -120,7 +120,8 @@ public class ProgressBarStyles : Scenario {
 		};
 		editor.Add (rbPBFormat);
 
-		var button = new Button ("Start timer") {
+		var button = new Button () { 
+Text = "Start timer", 
 			X = Pos.Center (),
 			Y = Pos.Bottom (rbPBFormat) + 1
 		};

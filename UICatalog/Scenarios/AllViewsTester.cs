@@ -7,7 +7,9 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
-[ScenarioCategory ("Layout")] [ScenarioCategory ("Tests")] [ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Tests")]
+[ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario {
 	ListView _classListView;
 	CheckBox _computedCheckBox;
@@ -67,7 +69,8 @@ public class AllViewsTester : Scenario {
 			.Select (t => new KeyValuePair<string, Type> (t.Name, t))
 			.ToDictionary (t => t.Key, t => t.Value);
 
-		_leftPane = new FrameView ("Classes") {
+		_leftPane = new FrameView () {
+			Title = "Classes",
 			X = 0,
 			Y = 0,
 			Width = 15,
@@ -101,7 +104,8 @@ public class AllViewsTester : Scenario {
 		};
 		_leftPane.Add (_classListView);
 
-		_settingsPane = new FrameView ("Settings") {
+		_settingsPane = new FrameView () {
+			Title = "Settings",
 			X = Pos.Right (_leftPane),
 			Y = 0, // for menu
 			Width = Dim.Fill (),
@@ -118,7 +122,8 @@ public class AllViewsTester : Scenario {
 		_settingsPane.Add (_computedCheckBox);
 
 		string [] radioItems = { "_Percent(x)", "_AnchorEnd(x)", "_Center", "A_t(x)" };
-		_locationFrame = new FrameView ("Location (Pos)") {
+		_locationFrame = new FrameView () {
+			Title = "Location (Pos)",
 			X = Pos.Left (_computedCheckBox),
 			Y = Pos.Bottom (_computedCheckBox),
 			Height = 3 + radioItems.Length,
@@ -126,7 +131,11 @@ public class AllViewsTester : Scenario {
 		};
 		_settingsPane.Add (_locationFrame);
 
-		var label = new Label ("X:") { X = 0, Y = 0 };
+		var label = new Label () {
+			Text = "X:",
+			X = 0,
+			Y = 0
+		};
 		_locationFrame.Add (label);
 		_xRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -145,7 +154,11 @@ public class AllViewsTester : Scenario {
 		_locationFrame.Add (_xRadioGroup);
 
 		radioItems = new [] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
-		label = new Label ("Y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
+		label = new Label () {
+			Text = "Y:",
+			X = Pos.Right (_xRadioGroup) + 1,
+			Y = 0
+		};
 		_locationFrame.Add (label);
 		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_yText.TextChanged += (s, args) => {
@@ -162,7 +175,8 @@ public class AllViewsTester : Scenario {
 		_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_locationFrame.Add (_yRadioGroup);
 
-		_sizeFrame = new FrameView ("Size (Dim)") {
+		_sizeFrame = new FrameView () {
+			Title = "Size (Dim)",
 			X = Pos.Right (_locationFrame),
 			Y = Pos.Y (_locationFrame),
 			Height = 3 + radioItems.Length,
@@ -170,7 +184,11 @@ public class AllViewsTester : Scenario {
 		};
 
 		radioItems = new [] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
-		label = new Label ("Width:") { X = 0, Y = 0 };
+		label = new Label () {
+			Text = "Width:",
+			X = 0,
+			Y = 0
+		};
 		_sizeFrame.Add (label);
 		_wRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -196,7 +214,11 @@ public class AllViewsTester : Scenario {
 		_sizeFrame.Add (_wRadioGroup);
 
 		radioItems = new [] { "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
-		label = new Label ("Height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
+		label = new Label () {
+			Text = "Height:",
+			X = Pos.Right (_wRadioGroup) + 1,
+			Y = 0
+		};
 		_sizeFrame.Add (label);
 		_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_hText.TextChanged += (s, args) => {
@@ -224,7 +246,8 @@ public class AllViewsTester : Scenario {
 
 		_settingsPane.Add (_sizeFrame);
 
-		_hostPane = new FrameView ("") {
+		_hostPane = new FrameView () {
+			Title = "",
 			X = Pos.Right (_leftPane),
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),

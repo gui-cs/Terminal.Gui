@@ -5,9 +5,9 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewsTests;
 
 public class LabelTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public LabelTests (ITestOutputHelper output) => this.output = output;
+	public LabelTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	[AutoInitShutdown]
@@ -24,10 +24,12 @@ public class LabelTests {
 		Assert.Equal (new Rect (0, 0, 0, 0), label.Frame);
 		Assert.Equal (KeyCode.Null, label.HotKey);
 		var expected = @"";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 
-		label = new Label ("ARGS") { Text = "Test" };
+		label = new Label () {
+			Text = "Test"
+		};
 		Assert.True (label.AutoSize);
 		Assert.Equal ("Test", label.Text);
 		Application.Top.Add (label);
@@ -38,7 +40,7 @@ public class LabelTests {
 		expected = @"
 Test
 ";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 
 		label = new Label (3, 4, "Test");
@@ -51,7 +53,7 @@ Test
 		expected = @"
    Test
 ";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 		Application.End (rs);
 	}
@@ -74,7 +76,8 @@ Test
 	[AutoInitShutdown]
 	public void Update_Only_On_Or_After_Initialize ()
 	{
-		var label = new Label ("Say Hello 你") {
+		var label = new Label () {
+			Text = "Say Hello 你",
 			X = Pos.Center (),
 			Y = Pos.Center ()
 		};
@@ -102,7 +105,7 @@ Test
 │                            │
 └────────────────────────────┘
 ";
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
@@ -141,7 +144,7 @@ Test
 └────────────────────────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
@@ -178,7 +181,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -210,7 +213,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 		Assert.True (label.AutoSize);
 		label.Text = "Say Hello 你 changed";
@@ -224,7 +227,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -257,7 +260,7 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
 		Assert.True (label.AutoSize);
 		label.Text = "Say Hello 你 changed";
@@ -271,14 +274,15 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
 	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_True ()
 	{
-		var Label = new Label ("012345678901") {
+		var Label = new Label () {
+			Text = "012345678901",
 			X = Pos.Center (),
 			Y = Pos.Center ()
 		};
@@ -301,14 +305,15 @@ Test
 └────────────────────────────┘
 ";
 
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
 	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
-		var Label = new Label ("012345678901") {
+		var Label = new Label () {
+			Text = "012345678901",
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			AutoSize = false,
@@ -333,7 +338,7 @@ Test
 │                            │
 └────────────────────────────┘
 ";
-		TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -415,7 +420,7 @@ Test
 └───┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -456,7 +461,7 @@ Test
 └────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -502,7 +507,7 @@ Test
 			Assert.Equal (new Rect (0, 0, width, height - 2), label.Frame);
 		} else {
 			Assert.Equal (new Size (width, height), label.TextFormatter.Size);
-			Assert.Equal (new Rect (0, 0, width, height ), label.Frame);
+			Assert.Equal (new Rect (0, 0, width, height), label.Frame);
 		}
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
 
@@ -519,7 +524,7 @@ Test
 └──────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -561,7 +566,7 @@ Test
 └────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), pos);
 	}
 
@@ -586,7 +591,7 @@ Test
 ";
 		Assert.Equal (new Rect (0, 0, width, 1), lblJust.Frame);
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -604,7 +609,7 @@ Test
 Demo Simple Rune
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 16, 1), pos);
 	}
 
@@ -612,7 +617,8 @@ Demo Simple Rune
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Simple_Runes ()
 	{
-		var label = new Label ("Demo Simple Rune") {
+		var label = new Label () {
+			Text = "Demo Simple Rune",
 			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		Application.Top.Add (label);
@@ -640,7 +646,7 @@ n
 e
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 1, 16), pos);
 	}
 
@@ -659,7 +665,7 @@ e
 デモエムポンズ
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 14, 1), pos);
 	}
 
@@ -667,7 +673,8 @@ e
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Wide_Runes ()
 	{
-		var label = new Label ("デモエムポンズ") {
+		var label = new Label () {
+			Text = "デモエムポンズ",
 			TextDirection = TextDirection.TopBottom_LeftRight
 		};
 		Application.Top.Add (label);
@@ -683,7 +690,7 @@ e
 ズ
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 2, 7), pos);
 	}
 
@@ -691,7 +698,8 @@ e
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Wide_Runes_With_ForceValidatePosDim ()
 	{
-		var label = new Label ("デモエムポンズ") {
+		var label = new Label () {
+			Text = "デモエムポンズ",
 			AutoSize = false,
 			Width = Dim.Fill (),
 			Height = Dim.Percent (50f),
@@ -714,7 +722,7 @@ e
 ズ
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 2, 7), pos);
 	}
 
@@ -727,10 +735,10 @@ e
 
 		var text = "Hello World";
 		var width = 20;
-		var lblLeft = new Label (text) { AutoSize = autoSize};
+		var lblLeft = new Label (text) { AutoSize = autoSize };
 		var lblCenter = new Label (text) { AutoSize = autoSize, Y = 1, TextAlignment = TextAlignment.Centered };
-		var lblRight = new Label (text) { AutoSize = autoSize, Y = 2, TextAlignment = TextAlignment.Right};
-		var lblJust = new Label (text) { AutoSize = autoSize, Y = 3, TextAlignment = TextAlignment.Justified};
+		var lblRight = new Label (text) { AutoSize = autoSize, Y = 2, TextAlignment = TextAlignment.Right };
+		var lblJust = new Label (text) { AutoSize = autoSize, Y = 3, TextAlignment = TextAlignment.Justified };
 
 		if (!autoSize) {
 			lblLeft.Width = lblCenter.Width = lblRight.Width = lblJust.Width = width;
@@ -788,7 +796,7 @@ e
 ";
 		}
 		Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Theory]
@@ -799,7 +807,7 @@ e
 	{
 		var text = "Hello World";
 		var height = 20;
-		var lblLeft = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) {  };
+		var lblLeft = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { };
 		var lblCenter = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { X = 2, VerticalTextAlignment = VerticalTextAlignment.Middle };
 		var lblRight = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { X = 4, VerticalTextAlignment = VerticalTextAlignment.Bottom };
 		var lblJust = new Label (text, TextDirection.TopBottom_LeftRight, autoSize) { X = 6, VerticalTextAlignment = VerticalTextAlignment.Justified };
@@ -808,7 +816,7 @@ e
 		if (!autoSize) {
 			lblLeft.Height = lblCenter.Height = lblRight.Height = lblJust.Height = height;
 		}
-		
+
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
 		Application.Top.Add (frame);
 		Application.Begin (Application.Top);
@@ -889,7 +897,7 @@ e
 		}
 		Assert.Equal (new Rect (0, 0, 9, height + 2), frame.Frame);
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -928,7 +936,7 @@ e
 └─────────────────────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
 	[Fact]
@@ -987,7 +995,7 @@ e
 └───────────┘
 ";
 
-		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 	}
 
@@ -1016,7 +1024,7 @@ e
 This view needs to be cleared before rewritten.                        
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
 This TextFormatter (tf2) with fill will be cleared on rewritten.       
-", output);
+", _output);
 
 		view.Text = "This view is rewritten.";
 		view.Draw ();
@@ -1031,6 +1039,6 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
 This view is rewritten.                                                
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
 This TextFormatter (tf2) is rewritten.                                 
-", output);
+", _output);
 	}
 }

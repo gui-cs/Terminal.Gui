@@ -29,7 +29,8 @@ namespace UICatalog.Scenarios {
 				labels.Add (label);
 			}
 
-			var button = new Button ("Invert color!") {
+			var button = new Button () { 
+Text = "Invert color!", 
 				X = Pos.Center (),
 				Y = foreColors.Length + 1,
 			};

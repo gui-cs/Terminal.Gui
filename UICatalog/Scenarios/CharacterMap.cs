@@ -48,7 +48,8 @@ public class CharacterMap : Scenario {
 		};
 		Application.Top.Add (_charMap);
 
-		var jumpLabel = new Label ("_Jump To Code Point:") {
+		var jumpLabel = new Label () { 
+Text = "_Jump To Code Point:", 
 			X = Pos.Right (_charMap) + 1,
 			Y = Pos.Y (_charMap),
 			HotKeySpecifier = (Rune)'_'
@@ -58,7 +59,8 @@ public class CharacterMap : Scenario {
 			X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"
 		};
 		Application.Top.Add (jumpEdit);
-		_errorLabel = new Label ("err") { X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
+		_errorLabel = new Label () { 
+Text = "err",  X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
 		Application.Top.Add (_errorLabel);
 
 		jumpEdit.TextChanged += JumpEdit_TextChanged;

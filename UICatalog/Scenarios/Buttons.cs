@@ -8,7 +8,8 @@ public class Buttons : Scenario {
 	public override void Setup ()
 	{
 		// Add a label & text field so we can demo IsDefault
-		var editLabel = new Label ("TextField (to demo IsDefault):") {
+		var editLabel = new Label () {
+			Text = "TextField (to demo IsDefault):",
 			X = 0,
 			Y = 0,
 			TabStop = true,
@@ -22,7 +23,8 @@ public class Buttons : Scenario {
 
 		// This is the default button (IsDefault = true); if user presses ENTER in the TextField
 		// the scenario will quit
-		var defaultButton = new Button ("_Quit") {
+		var defaultButton = new Button () {
+			Text = "_Quit",
 			X = Pos.Center (),
 			//TODO: Change to use Pos.AnchorEnd()
 			Y = Pos.Bottom (Win) - 3,
@@ -46,7 +48,8 @@ public class Buttons : Scenario {
 			};
 		}
 
-		var colorButtonsLabel = new Label ("Color Buttons:") {
+		var colorButtonsLabel = new Label () {
+			Text = "Color Buttons:",
 			X = 0,
 			Y = Pos.Bottom (editLabel) + 1,
 		};
@@ -70,32 +73,37 @@ public class Buttons : Scenario {
 		}
 
 		Button button;
-		Win.Add (button = new Button ("A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?") {
+		Win.Add (button = new Button () {
+			Text = "A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?",
 			X = 2,
 			Y = Pos.Bottom (colorButtonsLabel) + 1,
 		});
 		DoMessage (button, button.Text);
 
 		// Note the 'N' in 'Newline' will be the hotkey
-		Win.Add (button = new Button ("a Newline\nin the button") {
+		Win.Add (button = new Button () {
+			Text = "a Newline\nin the button",
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
 		});
 		button.Clicked += (s, e) => MessageBox.Query ("Message", "Question?", "Yes", "No");
 
-		var textChanger = new Button ("Te_xt Changer") {
+		var textChanger = new Button () {
+			Text = "Te_xt Changer",
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
 		};
 		Win.Add (textChanger);
 		textChanger.Clicked += (s, e) => textChanger.Text += "!";
 
-		Win.Add (button = new Button ("Lets see if this will move as \"Text Changer\" grows") {
+		Win.Add (button = new Button () {
+			Text = "Lets see if this will move as \"Text Changer\" grows",
 			X = Pos.Right (textChanger) + 2,
 			Y = Pos.Y (textChanger),
 		});
 
-		var removeButton = new Button ("Remove this button") {
+		var removeButton = new Button () {
+			Text = "Remove this button",
 			X = 2,
 			Y = Pos.Bottom (button) + 1,
 			ColorScheme = Colors.ColorSchemes ["Error"]
@@ -109,7 +117,8 @@ public class Buttons : Scenario {
 			removeButton.Visible = false;
 		};
 
-		var computedFrame = new FrameView ("Computed Layout") {
+		var computedFrame = new FrameView () {
+			Title = "Computed Layout",
 			X = 0,
 			Y = Pos.Bottom (removeButton) + 1,
 			Width = Dim.Percent (50),
@@ -118,7 +127,8 @@ public class Buttons : Scenario {
 		Win.Add (computedFrame);
 
 		// Demonstrates how changing the View.Frame property can move Views
-		var moveBtn = new Button ("Move This \u263b Button v_ia Pos") {
+		var moveBtn = new Button () {
+			Text = "Move This \u263b Button v_ia Pos",
 			AutoSize = false,
 			X = 0,
 			Y = Pos.Center () - 1,
@@ -134,7 +144,8 @@ public class Buttons : Scenario {
 		computedFrame.Add (moveBtn);
 
 		// Demonstrates how changing the View.Frame property can SIZE Views (#583)
-		var sizeBtn = new Button ("Size This \u263a Button _via Pos") {
+		var sizeBtn = new Button () {
+			Text = "Size This \u263a Button _via Pos",
 			AutoSize = false,
 			X = 0,
 			Y = Pos.Center () + 1,
@@ -148,7 +159,8 @@ public class Buttons : Scenario {
 		};
 		computedFrame.Add (sizeBtn);
 
-		var absoluteFrame = new FrameView ("Absolute Layout") {
+		var absoluteFrame = new FrameView () {
+			Title = "Absolute Layout",
 			X = Pos.Right (computedFrame),
 			Y = Pos.Bottom (removeButton) + 1,
 			Width = Dim.Fill (),
@@ -174,7 +186,8 @@ public class Buttons : Scenario {
 		};
 		absoluteFrame.Add (sizeBtnA);
 
-		var label = new Label ("Text Alignment (changes the four buttons above): ") {
+		var label = new Label () {
+			Text = "Text Alignment (changes the four buttons above): ",
 			X = 2,
 			Y = Pos.Bottom (computedFrame) + 1,
 		};

@@ -25,7 +25,8 @@ namespace UICatalog.Scenarios {
 			});
 			Application.Top.Add (menu);
 
-			Win.Add (new Label ("Regular Line") { Y = 0 });
+			Win.Add (new Label () { 
+Text = "Regular Line",  Y = 0 });
 
 			// creates a horizontal line
 			var line = new LineView () {
@@ -34,7 +35,8 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (line);
 
-			Win.Add (new Label ("Double Width Line") { Y = 2 });
+			Win.Add (new Label () { 
+Text = "Double Width Line",  Y = 2 });
 
 			// creates a horizontal line
 			var doubleLine = new LineView () {
@@ -44,7 +46,8 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (doubleLine);
 
-			Win.Add (new Label ("Short Line") { Y = 4 });
+			Win.Add (new Label () { 
+Text = "Short Line",  Y = 4 });
 
 			// creates a horizontal line
 			var shortLine = new LineView () {
@@ -54,7 +57,8 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (shortLine);
 
-			Win.Add (new Label ("Arrow Line") { Y = 6 });
+			Win.Add (new Label () { 
+Text = "Arrow Line",  Y = 6 });
 
 			// creates a horizontal line
 			var arrowLine = new LineView () {
@@ -66,7 +70,8 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (arrowLine);
 
-			Win.Add (new Label ("Vertical Line") { Y = 9,X=11 });
+			Win.Add (new Label () { 
+Text = "Vertical Line",  Y = 9,X=11 });
 
 			// creates a horizontal line
 			var verticalLine = new LineView (Orientation.Vertical) {
@@ -75,7 +80,8 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (verticalLine);
 
-			Win.Add (new Label ("Vertical Arrow") { Y = 11, X = 28 });
+			Win.Add (new Label () { 
+Text = "Vertical Arrow",  Y = 11, X = 28 });
 
 			// creates a horizontal line
 			var verticalArrow = new LineView (Orientation.Vertical) {

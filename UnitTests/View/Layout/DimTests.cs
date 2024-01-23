@@ -271,7 +271,11 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
 	{
-		var t = new View ("top") { Width = 80, Height = 25 };
+		var t = new View () {
+			Text = "top",
+			Width = 80,
+			Height = 25
+		};
 
 		var w = new Window (new Rect (1, 2, 4, 5)) { Title = "w" };
 		t.Add (w);
@@ -288,13 +292,18 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	{
-		var t = new View ("top") { Width = 80, Height = 25 };
+		var t = new View () {
+			Text = "top",
+			Width = 80,
+			Height = 25
+		};
 
 		var w = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Sized (10)
 		};
-		var v = new View ("v") {
+		var v = new View () {
+			Text = "v",
 			Width = Dim.Width (w) - 2,
 			Height = Dim.Percent (10)
 		};
@@ -334,21 +343,24 @@ public class DimTests {
 			Height = 100
 		};
 
-		var f1 = new FrameView ("f1") {
+		var f1 = new FrameView () {
+			Title = "f1",
 			X = 0,
 			Y = 0,
 			Width = Dim.Percent (50),
 			Height = 5
 		};
 
-		var f2 = new FrameView ("f2") {
+		var f2 = new FrameView () {
+			Title = "f2",
 			X = Pos.Right (f1),
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = 5
 		};
 
-		var v1 = new Button ("v1") {
+		var v1 = new Button () {
+			Text = "v1",
 			AutoSize = false,
 			X = Pos.X (f1) + 2,
 			Y = Pos.Bottom (f1) + 2,
@@ -357,7 +369,8 @@ public class DimTests {
 			ValidatePosDim = true
 		};
 
-		var v2 = new Button ("v2") {
+		var v2 = new Button () {
+			Text = "v2",
 			AutoSize = false,
 			X = Pos.X (f2) + 2,
 			Y = Pos.Bottom (f2) + 2,
@@ -366,28 +379,32 @@ public class DimTests {
 			ValidatePosDim = true
 		};
 
-		var v3 = new Button ("v3") {
+		var v3 = new Button () {
+			Text = "v3",
 			AutoSize = false,
 			Width = Dim.Percent (10),
 			Height = Dim.Percent (10),
 			ValidatePosDim = true
 		};
 
-		var v4 = new Button ("v4") {
+		var v4 = new Button () {
+			Text = "v4",
 			AutoSize = false,
 			Width = Dim.Sized (50),
 			Height = Dim.Sized (50),
 			ValidatePosDim = true
 		};
 
-		var v5 = new Button ("v5") {
+		var v5 = new Button () {
+			Text = "v5",
 			AutoSize = false,
 			Width = Dim.Width (v1) - Dim.Width (v3),
 			Height = Dim.Height (v1) - Dim.Height (v3),
 			ValidatePosDim = true
 		};
 
-		var v6 = new Button ("v6") {
+		var v6 = new Button () {
+			Text = "v6",
 			AutoSize = false,
 			X = Pos.X (f2),
 			Y = Pos.Bottom (f2) + 2,
@@ -515,25 +532,6 @@ public class DimTests {
 		Application.Run ();
 	}
 
-	// See #2461
-	//[Fact]
-	//public void Dim_Referencing_SuperView_Throws ()
-	//{
-	//	var super = new View ("super") {
-	//		Width = 10,
-	//		Height = 10
-	//	};
-	//	var view = new View ("view") {
-	//		Width = Dim.Width (super),	// this is not allowed
-	//		Height = Dim.Height (super),    // this is not allowed
-	//	};
-
-	//	super.Add (view);
-	//	super.BeginInit ();
-	//	super.EndInit ();
-	//	Assert.Throws<InvalidOperationException> (() => super.LayoutSubviews ());
-	//}
-
 	// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
 	// TODO: A new test that calls SetRelativeLayout directly is needed.
 
@@ -589,7 +587,11 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
 	{
-		var t = new View ("top") { Width = 80, Height = 25 };
+		var t = new View () {
+			Text = "top",
+			Width = 80,
+			Height = 25
+		};
 
 		var w = new Window {
 			Width = Dim.Width (t) - 2,  // 78
@@ -872,11 +874,13 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_Referencing_SuperView_Does_Not_Throw ()
 	{
-		var super = new View ("super") {
+		var super = new View () {
+			Text = "super",
 			Width = 10,
 			Height = 10
 		};
-		var view = new View ("view") {
+		var view = new View () {
+			Text = "view",
 			Width = Dim.Width (super),  // this is allowed
 			Height = Dim.Height (super) // this is allowed
 		};
@@ -896,15 +900,18 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_SyperView_Referencing_SubView_Throws ()
 	{
-		var super = new View ("super") {
+		var super = new View () {
+			Text = "super",
 			Width = 10,
 			Height = 10
 		};
-		var view2 = new View ("view2") {
+		var view2 = new View () {
+			Text = "view2",
 			Width = 10,
 			Height = 10
 		};
-		var view = new View ("view") {
+		var view = new View () {
+			Text = "view",
 			Width = Dim.Width (view2),  // this is not allowed
 			Height = Dim.Height (view2) // this is not allowed
 		};

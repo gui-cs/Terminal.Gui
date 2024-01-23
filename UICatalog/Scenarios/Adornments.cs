@@ -16,16 +16,20 @@ public class Adornments : Scenario {
 		Application.Top.ColorScheme = Colors.ColorSchemes [TopLevelColorScheme];
 
 		var view = new Window { Title = "The Window" };
-		var tf1 = new TextField ("TextField") { Width = 10 };
-		var color = new ColorPicker () { Title = "BG", BoxHeight = 1, BoxWidth =1, X = Pos.AnchorEnd(11) };
+		var tf1 = new TextField () {
+			Text = "TextField",
+			Width = 10
+		};
+		var color = new ColorPicker () { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd (11) };
 		color.BorderStyle = LineStyle.RoundedDotted;
 		color.ColorChanged += (s, e) => {
 			color.SuperView.ColorScheme = new ColorScheme (color.SuperView.ColorScheme) {
-				Normal = new Attribute(color.SuperView.ColorScheme.Normal.Foreground, e.Color)
+				Normal = new Attribute (color.SuperView.ColorScheme.Normal.Foreground, e.Color)
 			};
 		};
 
-		var button = new Button ("Press me!") {
+		var button = new Button () {
+			Text = "Press me!",
 			X = Pos.Center (),
 			Y = Pos.Center ()
 		};
@@ -41,11 +45,12 @@ public class Adornments : Scenario {
 		};
 		label.Border.Thickness = new Thickness (1, 3, 1, 1);
 
-		var tf2 = new Button ("Button") {
+		var tf2 = new Button () {
+			Text = "Button",
 			AutoSize = false,
 			X = Pos.AnchorEnd (10),
 			Y = Pos.AnchorEnd (1),
-			Height =1,
+			Height = 1,
 			Width = 10
 		};
 		var tv = new Label {
@@ -163,7 +168,8 @@ public class Adornments : Scenario {
 		{
 			var editWidth = 3;
 
-			_topEdit = new TextField ("") {
+			_topEdit = new TextField () {
+				Text = "",
 				X = Pos.Center (),
 				Y = 0,
 				Width = editWidth
@@ -171,7 +177,8 @@ public class Adornments : Scenario {
 			_topEdit.TextChanging += Edit_TextChanging;
 			Add (_topEdit);
 
-			_leftEdit = new TextField ("") {
+			_leftEdit = new TextField () {
+				Text = "",
 				X = Pos.Left (_topEdit) - editWidth,
 				Y = Pos.Bottom (_topEdit),
 				Width = editWidth
@@ -179,7 +186,8 @@ public class Adornments : Scenario {
 			_leftEdit.TextChanging += Edit_TextChanging;
 			Add (_leftEdit);
 
-			_rightEdit = new TextField ("") {
+			_rightEdit = new TextField () {
+				Text = "",
 				X = Pos.Right (_topEdit),
 				Y = Pos.Bottom (_topEdit),
 				Width = editWidth
@@ -187,7 +195,8 @@ public class Adornments : Scenario {
 			_rightEdit.TextChanging += Edit_TextChanging;
 			Add (_rightEdit);
 
-			_bottomEdit = new TextField ("") {
+			_bottomEdit = new TextField () {
+				Text = "",
 				X = Pos.Center (),
 				Y = Pos.Bottom (_leftEdit),
 				Width = editWidth
@@ -195,7 +204,8 @@ public class Adornments : Scenario {
 			_bottomEdit.TextChanging += Edit_TextChanging;
 			Add (_bottomEdit);
 
-			var copyTop = new Button ("Cop_y Top") {
+			var copyTop = new Button () {
+				Text = "Cop_y Top",
 				X = Pos.Center () + 1,
 				Y = Pos.Bottom (_bottomEdit)
 			};
@@ -342,7 +352,8 @@ public class Adornments : Scenario {
 					LayoutSubviews ();
 				};
 
-				var ckbTitle = new CheckBox ("Show Title") {
+				var ckbTitle = new CheckBox () {
+					Text = "Show Title",
 					AutoSize = false,
 					BorderStyle = LineStyle.Double,
 					X = Pos.Left (_borderEditor),

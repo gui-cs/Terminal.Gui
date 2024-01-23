@@ -21,7 +21,7 @@ public class LayoutTests {
 
 		Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
 		Assert.Equal (rect, view.Frame);
-		
+
 		Assert.True (view.LayoutNeeded);
 		Assert.False (view.SubViewNeedsDisplay);
 		view.BoundsToScreen (0, 0, out var rcol, out var rrow, false);
@@ -511,7 +511,8 @@ public class LayoutTests {
 
 		var top = Application.Top;
 
-		var view = new View ("view") {
+		var view = new View () {
+			Text = "view",
 			Y = -2,
 			Height = 10,
 			TextDirection = TextDirection.TopBottom_LeftRight
@@ -543,7 +544,10 @@ public class LayoutTests {
 
 		var top = Application.Top;
 
-		var view = new View ("view") { X = -2 };
+		var view = new View () {
+			Text = "view",
+			X = -2
+		};
 		top.Add (view);
 
 		Application.Iteration += (s, a) => {

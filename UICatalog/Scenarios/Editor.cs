@@ -786,7 +786,8 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label ("Find:") {
+			var label = new Label () { 
+Text = "Find:", 
 				AutoSize = false,
 				Y = 1,
 				Width = lblWidth,
@@ -803,7 +804,8 @@ namespace UICatalog.Scenarios {
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button ("Find _Next") {
+			var btnFindNext = new Button () { 
+Text = "Find _Next", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
@@ -815,7 +817,8 @@ namespace UICatalog.Scenarios {
 			btnFindNext.Clicked += (s, e) => FindNext ();
 			d.Add (btnFindNext);
 
-			var btnFindPrevious = new Button ("Find _Previous") {
+			var btnFindPrevious = new Button () { 
+Text = "Find _Previous", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
@@ -833,7 +836,8 @@ namespace UICatalog.Scenarios {
 				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button ("Cancel") {
+			var btnCancel = new Button () { 
+Text = "Cancel", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
@@ -845,7 +849,8 @@ namespace UICatalog.Scenarios {
 			};
 			d.Add (btnCancel);
 
-			var ckbMatchCase = new CheckBox ("Match c_ase") {
+			var ckbMatchCase = new CheckBox () { 
+Text = "Match c_ase", 
 				X = 0,
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
@@ -853,7 +858,8 @@ namespace UICatalog.Scenarios {
 			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
-			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
+			var ckbMatchWholeWord = new CheckBox () { 
+Text = "Match _whole word", 
 				X = 0,
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
@@ -878,7 +884,8 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label ("Find:") {
+			var label = new Label () { 
+Text = "Find:", 
 				AutoSize = false,
 				Y = 1,
 				Width = lblWidth,
@@ -895,7 +902,8 @@ namespace UICatalog.Scenarios {
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button ("Replace _Next") {
+			var btnFindNext = new Button () { 
+Text = "Replace _Next", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
@@ -907,7 +915,8 @@ namespace UICatalog.Scenarios {
 			btnFindNext.Clicked += (s, e) => ReplaceNext ();
 			d.Add (btnFindNext);
 
-			label = new Label ("Replace:") {
+			label = new Label () { 
+Text = "Replace:", 
 				X = Pos.Left (label),
 				Y = Pos.Top (label) + 1,
 				Width = lblWidth,
@@ -924,7 +933,8 @@ namespace UICatalog.Scenarios {
 			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
 			d.Add (txtToReplace);
 
-			var btnFindPrevious = new Button ("Replace _Previous") {
+			var btnFindPrevious = new Button () { 
+Text = "Replace _Previous", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
@@ -935,7 +945,8 @@ namespace UICatalog.Scenarios {
 			btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
-			var btnReplaceAll = new Button ("Replace _All") {
+			var btnReplaceAll = new Button () { 
+Text = "Replace _All", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
@@ -954,7 +965,8 @@ namespace UICatalog.Scenarios {
 				btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button ("Cancel") {
+			var btnCancel = new Button () { 
+Text = "Cancel", 
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
@@ -966,7 +978,8 @@ namespace UICatalog.Scenarios {
 			};
 			d.Add (btnCancel);
 
-			var ckbMatchCase = new CheckBox ("Match c_ase") {
+			var ckbMatchCase = new CheckBox () { 
+Text = "Match c_ase", 
 				X = 0,
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
@@ -974,7 +987,8 @@ namespace UICatalog.Scenarios {
 			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
-			var ckbMatchWholeWord = new CheckBox ("Match _whole word") {
+			var ckbMatchWholeWord = new CheckBox () { 
+Text = "Match _whole word", 
 				X = 0,
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord

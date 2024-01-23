@@ -65,7 +65,8 @@ public class DynamicStatusBar : Scenario {
 		{
 			DataContext = new DynamicStatusItemModel ();
 
-			var _frmDelimiter = new FrameView ("Shortcut Delimiter:") {
+			var _frmDelimiter = new FrameView () {
+				Title = "Shortcut Delimiter:",
 				X = Pos.Center (),
 				Y = 0,
 				Width = 25,
@@ -81,24 +82,28 @@ public class DynamicStatusBar : Scenario {
 
 			Add (_frmDelimiter);
 
-			var _frmStatusBar = new FrameView ("Items:") {
+			var _frmStatusBar = new FrameView () {
+				Title = "Items:",
 				Y = 5,
 				Width = Dim.Percent (50),
 				Height = Dim.Fill (2)
 			};
 
-			var _btnAddStatusBar = new Button ("Add a StatusBar") {
+			var _btnAddStatusBar = new Button () {
+				Text = "Add a StatusBar",
 				Y = 1,
 			};
 			_frmStatusBar.Add (_btnAddStatusBar);
 
-			var _btnRemoveStatusBar = new Button ("Remove a StatusBar") {
+			var _btnRemoveStatusBar = new Button () {
+				Text = "Remove a StatusBar",
 				Y = 1
 			};
 			_btnRemoveStatusBar.X = Pos.AnchorEnd () - (Pos.Right (_btnRemoveStatusBar) - Pos.Left (_btnRemoveStatusBar));
 			_frmStatusBar.Add (_btnRemoveStatusBar);
 
-			var _btnAdd = new Button (" Add  ") {
+			var _btnAdd = new Button () {
+				Text = " Add  ",
 				Y = Pos.Top (_btnRemoveStatusBar) + 2,
 			};
 			_btnAdd.X = Pos.AnchorEnd () - (Pos.Right (_btnAdd) - Pos.Left (_btnAdd));
@@ -112,19 +117,22 @@ public class DynamicStatusBar : Scenario {
 			};
 			_frmStatusBar.Add (_lstItems);
 
-			var _btnRemove = new Button ("Remove") {
+			var _btnRemove = new Button () {
+				Text = "Remove",
 				X = Pos.Left (_btnAdd),
 				Y = Pos.Top (_btnAdd) + 1
 			};
 			_frmStatusBar.Add (_btnRemove);
 
-			var _btnUp = new Button ("^") {
+			var _btnUp = new Button () {
+				Text = "^",
 				X = Pos.Right (_lstItems) + 2,
 				Y = Pos.Top (_btnRemove) + 2
 			};
 			_frmStatusBar.Add (_btnUp);
 
-			var _btnDown = new Button ("v") {
+			var _btnDown = new Button () {
+				Text = "v",
 				X = Pos.Right (_lstItems) + 2,
 				Y = Pos.Top (_btnUp) + 1
 			};
@@ -132,7 +140,8 @@ public class DynamicStatusBar : Scenario {
 
 			Add (_frmStatusBar);
 
-			var _frmStatusBarDetails = new DynamicStatusBarDetails ("StatusBar Item Details:") {
+			var _frmStatusBarDetails = new DynamicStatusBarDetails () {
+				Text = "StatusBar Item Details:",
 				X = Pos.Right (_frmStatusBar),
 				Y = Pos.Top (_frmStatusBar),
 				Width = Dim.Fill (),
@@ -172,13 +181,15 @@ public class DynamicStatusBar : Scenario {
 				}
 			};
 
-			var _btnOk = new Button ("Ok") {
+			var _btnOk = new Button () {
+				Text = "Ok",
 				X = Pos.Right (_frmStatusBar) + 20,
 				Y = Pos.Bottom (_frmStatusBarDetails),
 			};
 			Add (_btnOk);
 
-			var _btnCancel = new Button ("Cancel") {
+			var _btnCancel = new Button () {
+				Text = "Cancel",
 				X = Pos.Right (_btnOk) + 3,
 				Y = Pos.Top (_btnOk),
 			};
@@ -357,7 +368,8 @@ public class DynamicStatusBar : Scenario {
 
 		public DynamicStatusBarDetails (string title) : base (title)
 		{
-			var _lblTitle = new Label ("Title:") {
+			var _lblTitle = new Label () {
+				Text = "Title:",
 				Y = 1
 			};
 			Add (_lblTitle);
@@ -369,7 +381,8 @@ public class DynamicStatusBar : Scenario {
 			};
 			Add (_txtTitle);
 
-			var _lblAction = new Label ("Action:") {
+			var _lblAction = new Label () {
+				Text = "Action:",
 				X = Pos.Left (_lblTitle),
 				Y = Pos.Bottom (_lblTitle) + 1
 			};
@@ -383,7 +396,8 @@ public class DynamicStatusBar : Scenario {
 			};
 			Add (_txtAction);
 
-			var _lblShortcut = new Label ("Shortcut:") {
+			var _lblShortcut = new Label () {
+				Text = "Shortcut:",
 				X = Pos.Left (_lblTitle),
 				Y = Pos.Bottom (_txtAction) + 1
 			};
@@ -445,7 +459,8 @@ public class DynamicStatusBar : Scenario {
 			};
 			Add (_txtShortcut);
 
-			var _btnShortcut = new Button ("Clear Shortcut") {
+			var _btnShortcut = new Button () {
+				Text = "Clear Shortcut",
 				X = Pos.X (_lblShortcut),
 				Y = Pos.Bottom (_txtShortcut) + 1
 			};
@@ -467,7 +482,8 @@ public class DynamicStatusBar : Scenario {
 				EditStatusItem (_statusItem);
 			}
 
-			var _btnOk = new Button ("Ok") {
+			var _btnOk = new Button () {
+				Text = "Ok",
 				IsDefault = true,
 			};
 			_btnOk.Clicked += (s, e) => {

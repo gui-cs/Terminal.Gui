@@ -49,7 +49,7 @@ public partial class View {
 	/// <summary>
 	/// Gets the <see cref="Gui.TextFormatter"/> used to format <see cref="Text"/>.
 	/// </summary>
-	public TextFormatter TextFormatter { get; init ; } = new TextFormatter ();
+	public TextFormatter TextFormatter { get; init; } = new TextFormatter ();
 
 	/// <summary>
 	/// Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved

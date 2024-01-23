@@ -689,7 +689,7 @@ public class BorderTests {
 		};
 		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.ColorName);
 		Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.ColorName);
-		Assert.Equal (view.GetNormalColor(), view.Border.GetNormalColor ());
+		Assert.Equal (view.GetNormalColor (), view.Border.GetNormalColor ());
 		Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 
 		view.BeginInit ();

@@ -178,7 +178,8 @@ namespace UICatalog.Scenarios {
 					Width = Dim.Fill ();
 					Height = Dim.Fill ();
 
-					titleLabel = new Label ("DOCUMENTS") {
+					titleLabel = new Label () {
+						Text = "DOCUMENTS",
 						X = 0,
 						Y = 0
 					};

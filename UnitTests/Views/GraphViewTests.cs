@@ -5,7 +5,7 @@ using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 #region Helper Classes
 class FakeHAxis : HorizontalAxis {
@@ -1535,7 +1535,8 @@ public class PathAnnotationTests {
 		try {
 			// Create a label with a short text 
 			// AutoSize off because you can't change dims AND have autosize on
-			var lbl1 = new Label ("ff") {
+			var lbl1 = new Label () {
+				Text = "ff",
 				AutoSize = false
 			};
 

@@ -12,13 +12,15 @@ public class Keys : Scenario {
 		List<string> keyPressedList = new List<string> ();
 		List<string> invokingKeyBindingsList = new List<string> ();
 
-		var editLabel = new Label ("Type text here:") {
+		var editLabel = new Label () { 
+Text = "Type text here:", 
 			X = 0,
 			Y = 0,
 		};
 		Win.Add (editLabel);
 
-		var edit = new TextField ("") {
+		var edit = new TextField () { 
+Text = "", 
 			X = Pos.Right (editLabel) + 1,
 			Y = Pos.Top (editLabel),
 			Width = Dim.Fill (2),
@@ -37,12 +39,14 @@ public class Keys : Scenario {
 		};
 
 		// Last KeyPress: ______
-		var keyPressedLabel = new Label ("Last TextView.KeyPressed:") {
+		var keyPressedLabel = new Label () { 
+Text = "Last TextView.KeyPressed:", 
 			X = Pos.Left (editLabel),
 			Y = Pos.Top (editLabel) + 1,
 		};
 		Win.Add (keyPressedLabel);
-		var labelTextViewKeypress = new Label ("") {
+		var labelTextViewKeypress = new Label () { 
+Text = "", 
 			X = Pos.Right (keyPressedLabel) + 1,
 			Y = Pos.Top (keyPressedLabel),
 			TextAlignment = Terminal.Gui.TextAlignment.Centered,
@@ -53,12 +57,14 @@ public class Keys : Scenario {
 
 		edit.KeyDown += (s, e) => labelTextViewKeypress.Text = e.ToString ();
 
-		keyPressedLabel = new Label ("Last Application.KeyDown:") {
+		keyPressedLabel = new Label () { 
+Text = "Last Application.KeyDown:", 
 			X = Pos.Left (keyPressedLabel),
 			Y = Pos.Bottom (keyPressedLabel),
 		};
 		Win.Add (keyPressedLabel);
-		var labelAppKeypress = new Label ("") {
+		var labelAppKeypress = new Label () { 
+Text = "", 
 			X = Pos.Right (keyPressedLabel) + 1,
 			Y = Pos.Top (keyPressedLabel),
 			TextAlignment = Terminal.Gui.TextAlignment.Centered,
@@ -70,7 +76,8 @@ public class Keys : Scenario {
 		Application.KeyDown += (s, e) => labelAppKeypress.Text = e.ToString ();
 
 		// Key stroke log:
-		var keyLogLabel = new Label ("Application Key Events:") {
+		var keyLogLabel = new Label () { 
+Text = "Application Key Events:", 
 			X = Pos.Left (editLabel),
 			Y = Pos.Top (editLabel) + 4,
 		};
@@ -88,7 +95,8 @@ public class Keys : Scenario {
 		Win.Add (keyEventListView);
 
 		// OnKeyPressed
-		var onKeyPressedLabel = new Label ("TextView KeyDown:") {
+		var onKeyPressedLabel = new Label () { 
+Text = "TextView KeyDown:", 
 			X = Pos.Right (keyEventListView) + 1,
 			Y = Pos.Top (editLabel) + 4,
 		};
@@ -105,7 +113,8 @@ public class Keys : Scenario {
 		Win.Add (onKeyPressedListView);
 
 		// OnInvokeKeyBindings
-		var onInvokingKeyBindingsLabel = new Label ("TextView InvokingKeyBindings:") {
+		var onInvokingKeyBindingsLabel = new Label () { 
+Text = "TextView InvokingKeyBindings:", 
 			X = Pos.Right (onKeyPressedListView) + 1,
 			Y = Pos.Top (editLabel) + 4,
 		};

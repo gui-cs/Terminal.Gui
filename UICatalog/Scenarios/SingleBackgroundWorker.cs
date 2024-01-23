@@ -43,7 +43,8 @@ namespace UICatalog.Scenarios {
 
 				var top = new Toplevel ();
 
-				top.Add (new Label ("Worker Log") {
+				top.Add (new Label () { 
+Text = "Worker Log", 
 					X = Pos.Center (),
 					Y = 0
 				});
@@ -80,7 +81,8 @@ namespace UICatalog.Scenarios {
 				listLog.SetNeedsDisplay ();
 
 				var md = new Dialog (cancel) { Title = $"Running Worker started at {startStaging}.{startStaging:fff}" };
-				md.Add (new Label ("Wait for worker to finish...") {
+				md.Add (new Label () { 
+Text = "Wait for worker to finish...", 
 					X = Pos.Center (),
 					Y = Pos.Center ()
 				});

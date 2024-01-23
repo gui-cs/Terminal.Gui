@@ -33,25 +33,32 @@ namespace UICatalog.Scenarios {
 			var y = 0;
 			var x = 1;
 
-			cbMustExist = new CheckBox ("Must Exist") { Checked = true, Y = y++, X = x };
+			cbMustExist = new CheckBox () { 
+Text = "Must Exist",  Checked = true, Y = y++, X = x };
 			Win.Add (cbMustExist);
 
-			cbUseColors = new CheckBox ("Use Colors") { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x };
+			cbUseColors = new CheckBox () { 
+Text = "Use Colors",  Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x };
 			Win.Add (cbUseColors);
 
-			cbCaseSensitive = new CheckBox ("Case Sensitive Search") { Checked = false, Y = y++, X = x };
+			cbCaseSensitive = new CheckBox () { 
+Text = "Case Sensitive Search",  Checked = false, Y = y++, X = x };
 			Win.Add (cbCaseSensitive);
 
-			cbAllowMultipleSelection = new CheckBox ("Multiple") { Checked = false, Y = y++, X = x };
+			cbAllowMultipleSelection = new CheckBox () { 
+Text = "Multiple",  Checked = false, Y = y++, X = x };
 			Win.Add (cbAllowMultipleSelection);
 
-			cbShowTreeBranchLines = new CheckBox ("Tree Branch Lines") { Checked = true, Y = y++, X = x };
+			cbShowTreeBranchLines = new CheckBox () { 
+Text = "Tree Branch Lines",  Checked = true, Y = y++, X = x };
 			Win.Add (cbShowTreeBranchLines);
 
-			cbAlwaysTableShowHeaders = new CheckBox ("Always Show Headers") { Checked = true, Y = y++, X = x };
+			cbAlwaysTableShowHeaders = new CheckBox () { 
+Text = "Always Show Headers",  Checked = true, Y = y++, X = x };
 			Win.Add (cbAlwaysTableShowHeaders);
 
-			cbDrivesOnlyInTree = new CheckBox ("Only Show Drives") { Checked = false, Y = y++, X = x };
+			cbDrivesOnlyInTree = new CheckBox () { 
+Text = "Only Show Drives",  Checked = false, Y = y++, X = x };
 			Win.Add (cbDrivesOnlyInTree);
 
 			y = 0;
@@ -62,7 +69,8 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Height = 4
 			});
-			Win.Add (new Label ("Caption") { X = x++, Y = y++ });
+			Win.Add (new Label () { 
+Text = "Caption",  X = x++, Y = y++ });
 
 			rgCaption = new RadioGroup { X = x, Y = y };
 			rgCaption.RadioLabels = new string [] { "Ok", "Open", "Save" };
@@ -76,7 +84,8 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Height = 4
 			});
-			Win.Add (new Label ("OpenMode") { X = x++, Y = y++ });
+			Win.Add (new Label () { 
+Text = "OpenMode",  X = x++, Y = y++ });
 
 			rgOpenMode = new RadioGroup { X = x, Y = y };
 			rgOpenMode.RadioLabels = new string [] { "File", "Directory", "Mixed" };
@@ -90,14 +99,17 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Height = 4
 			});
-			Win.Add (new Label ("Icons") { X = x++, Y = y++ });
+			Win.Add (new Label () { 
+Text = "Icons",  X = x++, Y = y++ });
 
 			rgIcons = new RadioGroup { X = x, Y = y };
 			rgIcons.RadioLabels = new string [] { "None", "Unicode", "Nerd*" };
 			Win.Add (rgIcons);
 
-			Win.Add (new Label ("* Requires installing Nerd fonts") { Y = Pos.AnchorEnd (2) });
-			Win.Add (new Label ("  (see: https://github.com/devblackops/Terminal-Icons)") { Y = Pos.AnchorEnd (1) });
+			Win.Add (new Label () { 
+Text = "* Requires installing Nerd fonts",  Y = Pos.AnchorEnd (2) });
+			Win.Add (new Label () { 
+Text = "  (see: https://github.com/devblackops/Terminal-Icons)",  Y = Pos.AnchorEnd (1) });
 
 			y = 5;
 			x = 24;
@@ -107,7 +119,8 @@ namespace UICatalog.Scenarios {
 				Y = y + 1,
 				Height = 4
 			});
-			Win.Add (new Label ("Allowed") { X = x++, Y = y++ });
+			Win.Add (new Label () { 
+Text = "Allowed",  X = x++, Y = y++ });
 
 			rgAllowedTypes = new RadioGroup { X = x, Y = y };
 			rgAllowedTypes.RadioLabels = new string [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
@@ -121,15 +134,19 @@ namespace UICatalog.Scenarios {
 				Y = y + 1,
 				Height = 4
 			});
-			Win.Add (new Label ("Buttons") { X = x++, Y = y++ });
+			Win.Add (new Label () { 
+Text = "Buttons",  X = x++, Y = y++ });
 
-			Win.Add (new Label ("Ok Text:") { X = x, Y = y++ });
+			Win.Add (new Label () { 
+Text = "Ok Text:",  X = x, Y = y++ });
 			tbOkButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbOkButton);
-			Win.Add (new Label ("Cancel Text:") { X = x, Y = y++ });
+			Win.Add (new Label () { 
+Text = "Cancel Text:",  X = x, Y = y++ });
 			tbCancelButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbCancelButton);
-			cbFlipButtonOrder = new CheckBox ("Flip Order") { X = x, Y = y++ };
+			cbFlipButtonOrder = new CheckBox () { 
+Text = "Flip Order",  X = x, Y = y++ };
 			Win.Add (cbFlipButtonOrder);
 
 			var btn = new Button ($"Run Dialog") {

@@ -111,7 +111,8 @@ public class WindowTests {
 			new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
 		});
 
-		var fv = new FrameView ("Frame View") {
+		var fv = new FrameView () {
+			Title = "Frame View",
 			Y = 1,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (1)

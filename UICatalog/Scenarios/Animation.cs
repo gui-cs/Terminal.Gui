@@ -29,12 +29,14 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (imageView);
 
-			var lbl = new Label ("Image by Wikiscient") {
+			var lbl = new Label () { 
+Text = "Image by Wikiscient", 
 				Y = Pos.AnchorEnd (2)
 			};
 			Win.Add (lbl);
 
-			var lbl2 = new Label ("https://commons.wikimedia.org/wiki/File:Spinning_globe.gif") {
+			var lbl2 = new Label () { 
+Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif", 
 				Y = Pos.AnchorEnd (1)
 			};
 			Win.Add (lbl2);

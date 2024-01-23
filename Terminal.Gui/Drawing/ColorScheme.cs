@@ -105,11 +105,11 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="other"></param>
 	/// <returns>true if the two objects are equal</returns>
 	public bool Equals (ColorScheme other) => other != null &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+						  EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+						  EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+						  EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+						  EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+						  EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 
 	/// <summary>
 	/// Compares two <see cref="ColorScheme"/> objects for equality.

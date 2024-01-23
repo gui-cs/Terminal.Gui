@@ -117,6 +117,7 @@ public class ListColumns : Scenario {
 		Win.Add (_listColView);
 
 		var selectedCellLabel = new Label {
+			AutoSize = false,
 			X = 0,
 			Y = Pos.Bottom (_listColView),
 			Text = "0,0",

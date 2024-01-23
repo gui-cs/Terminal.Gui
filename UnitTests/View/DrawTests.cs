@@ -157,7 +157,8 @@ public class DrawTests {
 	[AutoInitShutdown]
 	public void Colors_On_TextAlignment_Right_And_Bottom ()
 	{
-		var viewRight = new View ("Test") {
+		var viewRight = new View () {
+			Text = "Test",
 			Width = 6,
 			Height = 1,
 			TextAlignment = TextAlignment.Right,

@@ -112,6 +112,7 @@ namespace UICatalog.Scenarios {
 				X = 0,
 				Y = Pos.Bottom (tableView),
 				Text = "0,0",
+				AutoSize = false,
 				Width = Dim.Fill (),
 				TextAlignment = TextAlignment.Right
 

@@ -47,7 +47,8 @@ namespace UICatalog.Scenarios {
 			_btnActionCancel = new Button (1, 1, "Cancelable Load Items");
 			_btnActionCancel.Clicked += (s, e) => Application.Invoke (CallLoadItemsAsync);
 
-			Win.Add (new Label ("Data Items:") {
+			Win.Add (new Label () { 
+Text = "Data Items:", 
 				X = Pos.X (_btnActionCancel),
 				Y = Pos.Y (_btnActionCancel) + 4,
 			});
@@ -60,7 +61,8 @@ namespace UICatalog.Scenarios {
 				ColorScheme = Colors.ColorSchemes ["TopLevel"]
 			};
 
-			Win.Add (new Label ("Task Logs:") {
+			Win.Add (new Label () { 
+Text = "Task Logs:", 
 				X = Pos.Right (_itemsList) + 10,
 				Y = Pos.Y (_btnActionCancel) + 4,
 			});

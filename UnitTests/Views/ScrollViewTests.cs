@@ -2,7 +2,7 @@
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class ScrollViewTests {
 	readonly ITestOutputHelper output;
@@ -171,7 +171,8 @@ public class ScrollViewTests {
 		Assert.Equal (new Point (-39, -19), sv.ContentOffset);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoHideScrollBars_False_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
 	{
 		var sv = new ScrollView {
@@ -268,7 +269,8 @@ public class ScrollViewTests {
 ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
 	{
 		var sv = new ScrollView {
@@ -303,7 +305,8 @@ public class ScrollViewTests {
 ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
 	{
 		var sv = new ScrollView {
@@ -334,7 +337,8 @@ public class ScrollViewTests {
 ", output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
 	{
 		var sv = new ScrollView {
@@ -369,7 +373,8 @@ public class ScrollViewTests {
 	}
 
 	// There still have an issue with lower right corner of the scroll view
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Frame_And_Labels_Does_Not_Overspill_ScrollView ()
 	{
 		var sv = new ScrollView {
@@ -414,10 +419,14 @@ public class ScrollViewTests {
 	}
 
 	// There are still issue with the lower right corner of the scroll view
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Clear_Window_Inside_ScrollView ()
 	{
-		var topLabel = new Label ("At 15,0") { X = 15 };
+		var topLabel = new Label () {
+			Text = "At 15,0",
+			X = 15
+		};
 		var sv = new ScrollView {
 			X = 3,
 			Y = 3,
@@ -426,7 +435,11 @@ public class ScrollViewTests {
 			ContentSize = new Size (23, 23),
 			KeepContentAlwaysInViewport = false
 		};
-		var bottomLabel = new Label ("At 15,15") { X = 15, Y = 15 };
+		var bottomLabel = new Label () {
+			Text = "At 15,15",
+			X = 15,
+			Y = 15
+		};
 		Application.Top.Add (topLabel, sv, bottomLabel);
 		Application.Begin (Application.Top);
 
@@ -550,7 +563,8 @@ public class ScrollViewTests {
 00000000000000000000000", null, attributes);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void DrawTextFormatter_Respects_The_Clip_Bounds ()
 	{
 		var rule = "0123456789";
@@ -875,7 +889,8 @@ public class ScrollViewTests {
 		Assert.Equal (new Rect (1, 1, 21, 14), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Remove_Added_View_Is_Allowed ()
 	{
 		var sv = new ScrollView {

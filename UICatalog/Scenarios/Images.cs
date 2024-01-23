@@ -24,7 +24,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lblDriverName);
 
-			var cbSupportsTrueColor = new CheckBox ("supports true color ") {
+			var cbSupportsTrueColor = new CheckBox () { 
+Text = "supports true color ", 
 				X = Pos.Right(lblDriverName) + 2,
 				Y = 0,
 				Checked = canTrueColor,
@@ -32,7 +33,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (cbSupportsTrueColor);
 
-			var cbUseTrueColor = new CheckBox ("Use true color") {
+			var cbUseTrueColor = new CheckBox () { 
+Text = "Use true color", 
 				X = Pos.Right(cbSupportsTrueColor) + 2,
 				Y = 0,
 				Checked = !Application.Force16Colors,
@@ -41,7 +43,8 @@ namespace UICatalog.Scenarios {
 			cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
 			Win.Add (cbUseTrueColor);
 
-			var btnOpenImage = new Button ("Open Image") {
+			var btnOpenImage = new Button () { 
+Text = "Open Image", 
 				X = Pos.Right (cbUseTrueColor) + 2,
 				Y = 0
 			};
@@ -57,7 +60,8 @@ namespace UICatalog.Scenarios {
 
 
 			btnOpenImage.Clicked += (_, _) => {
-				var ofd = new OpenDialog ("Open Image") { AllowsMultipleSelection = false,  };
+				var ofd = new OpenDialog () { 
+Text = "Open Image",  AllowsMultipleSelection = false,  };
 				Application.Run (ofd);
 
 				if (ofd.Path is not null) {

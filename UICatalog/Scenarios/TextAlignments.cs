@@ -28,7 +28,8 @@ namespace UICatalog.Scenarios {
 			}
 
 			// Add a label & text field so we can demo IsDefault
-			var editLabel = new Label ("Text:") {
+			var editLabel = new Label () { 
+Text = "Text:", 
 				X = 0,
 				Y = 0,
 			};
@@ -49,7 +50,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (edit);
 
-			var unicodeSample = new Button ("Unicode Sample") {
+			var unicodeSample = new Button () { 
+Text = "Unicode Sample", 
 				X = Pos.Right (edit) + 1,
 				Y = 0,
 			};
@@ -58,7 +60,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (unicodeSample);
 
-			var update = new Button ("_Update") {
+			var update = new Button () { 
+Text = "_Update", 
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
 

@@ -289,7 +289,7 @@ public partial class View {
 		var hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
 		Application.Driver.SetAttribute (normalColor);
 		foreach (var rune in text.EnumerateRunes ()) {
-			if (rune == new Rune(hotkeySpec.Value)) {
+			if (rune == new Rune (hotkeySpec.Value)) {
 				Application.Driver.SetAttribute (hotColor);
 				continue;
 			}

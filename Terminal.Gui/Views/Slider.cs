@@ -804,8 +804,6 @@ public class Slider<T> : View {
 		if (!IsInitialized || AutoSize == false) {
 			return;
 		}
-		Width = 0;
-		Height = 0;
 		if (_config._sliderOrientation == Orientation.Horizontal) {
 			Bounds = new Rect (Bounds.Location,
 				new Size (int.Min (SuperView.Bounds.Width - GetAdornmentsThickness ().Horizontal, CalcBestLength ()),

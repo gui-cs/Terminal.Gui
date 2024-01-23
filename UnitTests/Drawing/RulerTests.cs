@@ -1,194 +1,187 @@
-﻿using Terminal.Gui;
-using System.Text;
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DrawingTests {
-	public class RulerTests {
+namespace Terminal.Gui.DrawingTests; 
 
-		readonly ITestOutputHelper output;
-		
-		public RulerTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class RulerTests {
 
-		[Fact ()]
-		public void Constructor_Defaults ()
-		{
-			var r = new Ruler ();
-			Assert.Equal (0, r.Length);
-			Assert.Equal (Orientation.Horizontal, r.Orientation);
-		}
+	readonly ITestOutputHelper _output;
 
-		[Fact ()]
-		public void Orientation_set ()
-		{
-			var r = new Ruler ();
-			Assert.Equal (Orientation.Horizontal, r.Orientation);
-			r.Orientation = Orientation.Vertical;
-			Assert.Equal (Orientation.Vertical, r.Orientation);
-		}
+	public RulerTests (ITestOutputHelper output) => _output = output;
 
-		[Fact ()]
-		public void Length_set ()
-		{
-			var r = new Ruler ();
-			Assert.Equal (0, r.Length);
-			r.Length = 42;
-			Assert.Equal (42, r.Length);
-		}
+	[Fact]
+	public void Constructor_Defaults ()
+	{
+		var r = new Ruler ();
+		Assert.Equal (0, r.Length);
+		Assert.Equal (Orientation.Horizontal, r.Orientation);
+	}
 
-		[Fact ()]
-		public void Attribute_set ()
-		{
-			var newAttribute = new Attribute (Color.Red, Color.Green);
+	[Fact]
+	public void Orientation_set ()
+	{
+		var r = new Ruler ();
+		Assert.Equal (Orientation.Horizontal, r.Orientation);
+		r.Orientation = Orientation.Vertical;
+		Assert.Equal (Orientation.Vertical, r.Orientation);
+	}
 
-			var r = new Ruler ();
-			r.Attribute = newAttribute;
-			Assert.Equal (newAttribute, r.Attribute);
-		}
+	[Fact]
+	public void Length_set ()
+	{
+		var r = new Ruler ();
+		Assert.Equal (0, r.Length);
+		r.Length = 42;
+		Assert.Equal (42, r.Length);
+	}
 
-		[Fact (), AutoInitShutdown]
-		public void Draw_Default ()
-		{
-			((FakeDriver)Application.Driver).SetBufferSize (25, 25);
+	[Fact]
+	public void Attribute_set ()
+	{
+		var newAttribute = new Attribute (Color.Red, Color.Green);
 
-			var r = new Ruler ();
-			r.Draw (new Point (0, 0));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
-		}
+		var r = new Ruler ();
+		r.Attribute = newAttribute;
+		Assert.Equal (newAttribute, r.Attribute);
+	}
 
-		[Fact (), AutoInitShutdown]
-		public void Draw_Horizontal ()
-		{
-			var len = 15;
+	[Fact] [AutoInitShutdown]
+	public void Draw_Default ()
+	{
+		((FakeDriver)Application.Driver).SetBufferSize (25, 25);
 
-			// Add a frame so we can see the ruler
-			var f = new FrameView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-			Application.Top.Add (f);
-			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
-			Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+		var r = new Ruler ();
+		r.Draw (new Point (0, 0));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
+	}
 
-			var r = new Ruler ();
-			Assert.Equal (Orientation.Horizontal, r.Orientation);
+	[Fact] [AutoInitShutdown]
+	public void Draw_Horizontal ()
+	{
+		var len = 15;
 
-			r.Length = len;
-			r.Draw (new Point (0, 0));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Add a frame so we can see the ruler
+		var f = new FrameView {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+		Application.Top.Add (f);
+		Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
+		Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+
+		var r = new Ruler ();
+		Assert.Equal (Orientation.Horizontal, r.Orientation);
+
+		r.Length = len;
+		r.Draw (new Point (0, 0));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 |123456789|1234────┐
 │                  │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
-			// Postive offset
-			Application.Refresh ();
-			r.Draw (new Point (1, 1));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Postive offset
+		Application.Refresh ();
+		r.Draw (new Point (1, 1));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │|123456789|1234   │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
-			// Negative offset
-			Application.Refresh ();
-			r.Draw (new Point (-1, 1));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Negative offset
+		Application.Refresh ();
+		r.Draw (new Point (-1, 1));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 123456789|1234     │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
-			// Clip
-			Application.Refresh ();
-			r.Draw (new Point (10, 1));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Clip
+		Application.Refresh ();
+		r.Draw (new Point (10, 1));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌──────────────────┐
 │         |123456789
 │                  │
 │                  │
-└──────────────────┘", output);
-		}
+└──────────────────┘", _output);
+	}
 
-		[Fact (), AutoInitShutdown]
-		public void Draw_Horizontal_Start ()
-		{
-			var len = 15;
+	[Fact] [AutoInitShutdown]
+	public void Draw_Horizontal_Start ()
+	{
+		var len = 15;
 
-			// Add a frame so we can see the ruler
-			var f = new FrameView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
-			Application.Top.Add (f);
-			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
-			Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
+		// Add a frame so we can see the ruler
+		var f = new FrameView {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
+		Application.Top.Add (f);
+		Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (len + 5, 5);
+		Assert.Equal (new Rect (0, 0, len + 5, 5), f.Frame);
 
-			var r = new Ruler ();
-			Assert.Equal (Orientation.Horizontal, r.Orientation);
+		var r = new Ruler ();
+		Assert.Equal (Orientation.Horizontal, r.Orientation);
 
-			r.Length = len;
-			r.Draw (new Point (0, 0), 1);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		r.Length = len;
+		r.Draw (new Point (0, 0), 1);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 123456789|12345────┐
 │                  │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
-			Application.Refresh ();
-			r.Length = len;
-			r.Draw (new Point (1, 0), 1);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		Application.Refresh ();
+		r.Length = len;
+		r.Draw (new Point (1, 0), 1);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌123456789|12345───┐
 │                  │
 │                  │
 │                  │
-└──────────────────┘", output);
-		}
+└──────────────────┘", _output);
+	}
 
-		[Fact (), AutoInitShutdown]
-		public void Draw_Vertical ()
-		{
-			var len = 15;
+	[Fact] [AutoInitShutdown]
+	public void Draw_Vertical ()
+	{
+		var len = 15;
 
-			// Add a frame so we can see the ruler
-			var f = new FrameView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
+		// Add a frame so we can see the ruler
+		var f = new FrameView {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
 
-			Application.Top.Add (f);
-			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
-			Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
+		Application.Top.Add (f);
+		Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
+		Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
 
-			var r = new Ruler ();
-			r.Orientation = Orientation.Vertical;
-			r.Length = len;
-			r.Draw (new Point (0, 0));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		var r = new Ruler ();
+		r.Orientation = Orientation.Vertical;
+		r.Length = len;
+		r.Draw (new Point (0, 0));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 -───┐
 1   │
 2   │
@@ -208,12 +201,12 @@ namespace Terminal.Gui.DrawingTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
-			// Postive offset
-			Application.Refresh ();
-			r.Draw (new Point (1, 1));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Postive offset
+		Application.Refresh ();
+		r.Draw (new Point (1, 1));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───┐
 │-  │
 │1  │
@@ -233,12 +226,12 @@ namespace Terminal.Gui.DrawingTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
-			// Negative offset
-			Application.Refresh ();
-			r.Draw (new Point (1, -1));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Negative offset
+		Application.Refresh ();
+		r.Draw (new Point (1, -1));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌1──┐
 │2  │
 │3  │
@@ -258,12 +251,12 @@ namespace Terminal.Gui.DrawingTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
-			// Clip
-			Application.Refresh ();
-			r.Draw (new Point (1, 10));
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		// Clip
+		Application.Refresh ();
+		r.Draw (new Point (1, 10));
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───┐
 │   │
 │   │
@@ -283,32 +276,32 @@ namespace Terminal.Gui.DrawingTests {
 │6  │
 │7  │
 │8  │
-└9──┘", output);
-		}
+└9──┘", _output);
+	}
 
-		[Fact (), AutoInitShutdown]
-		public void Draw_Vertical_Start ()
-		{
-			var len = 15;
+	[Fact] [AutoInitShutdown]
+	public void Draw_Vertical_Start ()
+	{
+		var len = 15;
 
-			// Add a frame so we can see the ruler
-			var f = new FrameView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (),
-			};
+		// Add a frame so we can see the ruler
+		var f = new FrameView {
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = Dim.Fill ()
+		};
 
-			Application.Top.Add (f);
-			Application.Begin (Application.Top);
-			((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
-			Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
+		Application.Top.Add (f);
+		Application.Begin (Application.Top);
+		((FakeDriver)Application.Driver).SetBufferSize (5, len + 5);
+		Assert.Equal (new Rect (0, 0, 5, len + 5), f.Frame);
 
-			var r = new Ruler ();
-			r.Orientation = Orientation.Vertical;
-			r.Length = len;
-			r.Draw (new Point (0, 0), 1);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		var r = new Ruler ();
+		r.Orientation = Orientation.Vertical;
+		r.Length = len;
+		r.Draw (new Point (0, 0), 1);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 1───┐
 2   │
 3   │
@@ -328,12 +321,12 @@ namespace Terminal.Gui.DrawingTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
-			Application.Refresh ();
-			r.Length = len;
-			r.Draw (new Point (0, 1), 1);
-			TestHelpers.AssertDriverContentsWithFrameAre (@"
+		Application.Refresh ();
+		r.Length = len;
+		r.Draw (new Point (0, 1), 1);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
 ┌───┐
 1   │
 2   │
@@ -353,9 +346,7 @@ namespace Terminal.Gui.DrawingTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
-		}
 	}
 }
-

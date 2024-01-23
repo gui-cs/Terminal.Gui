@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.ViewTests; 
+namespace Terminal.Gui.ViewTests;
 
 public class NavigationTests {
 	readonly ITestOutputHelper _output;
@@ -21,14 +21,16 @@ public class NavigationTests {
 		var top = new Toplevel ();
 
 		var win = new Window ();
-		var winSubview = new View ("WindowSubview") {
+		var winSubview = new View () {
+			Text = "WindowSubview",
 			CanFocus = true
 		};
 		win.Add (winSubview);
 		top.Add (win);
 
 		var frm = new FrameView ();
-		var frmSubview = new View ("FrameSubview") {
+		var frmSubview = new View () {
+			Text = "FrameSubview",
 			CanFocus = true
 		};
 		frm.Add (frmSubview);
@@ -1029,7 +1031,8 @@ public class NavigationTests {
 		top.SetFocus ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void SetHasFocus_Do_Not_Throws_If_OnLeave_Remove_Focused_Changing_To_Null ()
 	{
 		var view1Leave = false;
@@ -1064,7 +1067,8 @@ public class NavigationTests {
 		subView1subView1.Dispose ();
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Remove_Does_Not_Change_Focus ()
 	{
 		Assert.True (Application.Top.CanFocus);
@@ -1102,7 +1106,8 @@ public class NavigationTests {
 		Assert.False (leave);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void SetFocus_View_With_Null_Superview_Does_Not_Throw_Exception ()
 	{
 		Assert.True (Application.Top.CanFocus);
@@ -1114,7 +1119,8 @@ public class NavigationTests {
 		Assert.True (Application.Top.HasFocus);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void FocusNext_Does_Not_Throws_If_A_View_Was_Removed_From_The_Collection ()
 	{
 		var top1 = Application.Top;
@@ -1160,7 +1166,8 @@ public class NavigationTests {
 		Assert.Null (view3);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ScreenToView_ViewToScreen_FindDeepestView_Full_Top ()
 	{
 		var top = Application.Current;
@@ -1283,7 +1290,8 @@ public class NavigationTests {
 		Assert.Equal (4, ry);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ScreenToView_ViewToScreen_FindDeepestView_Smaller_Top ()
 	{
 		var top = new Toplevel { X = 3, Y = 2, Width = 20, Height = 10, BorderStyle = LineStyle.Single };

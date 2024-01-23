@@ -90,7 +90,7 @@ public class TextTests {
 
 		view.PreserveTrailingSpaces = true;
 		Assert.True (view.PreserveTrailingSpaces);
-	
+
 	}
 
 	// Test that View.PreserveTrailingSpaces removes trailing spaces
@@ -106,7 +106,7 @@ public class TextTests {
 		view.TextFormatter.Size = new Size (5, 3);
 
 		view.PreserveTrailingSpaces = false;
-		Assert.Equal ($"Hello{Environment.NewLine}World", view.TextFormatter.Format());
+		Assert.Equal ($"Hello{Environment.NewLine}World", view.TextFormatter.Format ());
 
 		view.PreserveTrailingSpaces = true;
 		Assert.Equal ($"Hello{Environment.NewLine} {Environment.NewLine}World", view.TextFormatter.Format ());
@@ -136,5 +136,5 @@ public class TextTests {
 	// - Setting to true invalidates Height/Width
 	// - Setting to false invalidates Height/Width
 
-	
+
 }

@@ -885,7 +885,8 @@ public class TextFieldTests {
 			ReadOnly = true,
 			Text = "some text"
 		};
-		var fv = new FrameView ("I shouldn't get focus") {
+		var fv = new FrameView () {
+			Title = "I shouldn't get focus",
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			CanFocus = false,
@@ -945,7 +946,9 @@ public class TextFieldTests {
 	[AutoInitShutdown (useFakeClipboard: true)]
 	public void KeyBindings_Command ()
 	{
-		var tf = new TextField ("This is a test.") { Width = 20 };
+		var tf = new TextField ("This is a test.") {
+			Width = 20
+		};
 		Assert.Equal (15, tf.Text.Length);
 		Assert.Equal (15, tf.CursorPosition);
 		Assert.False (tf.ReadOnly);
@@ -1433,7 +1436,10 @@ public class TextFieldTests {
 	[Fact, AutoInitShutdown]
 	public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
 	{
-		var tf = new TextField ("Les Misérables") { Width = 30 };
+		var tf = new TextField () {
+			Text = "Les Misérables",
+			Width = 30
+		};
 		var top = Application.Top;
 		top.Add (tf);
 		Application.Begin (top);
@@ -1456,7 +1462,10 @@ Les Miśerables", output);
 	[Fact, AutoInitShutdown]
 	public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
 	{
-		var tf = new TextField ("ắ") { Width = 3 };
+		var tf = new TextField () {
+			Text = "ắ",
+			Width = 3
+		};
 		var top = Application.Top;
 		top.Add (tf);
 		Application.Begin (top);
@@ -1593,7 +1602,9 @@ Les Miśerables", output);
 	[Fact]
 	public void WordBackward_WordForward_Mixed ()
 	{
-		var tf = new TextField ("Test with0. and!.?;-@+") { Width = 30 };
+		var tf = new TextField ("Test with0. and!.?;-@+") {
+			Width = 30
+		};
 		tf.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.CursorLeft));
 		Assert.Equal (15, tf.CursorPosition);
 		tf.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.CursorLeft));

@@ -31,7 +31,8 @@ public class MyScenario : Scenario {
 		// With a Scenario, after UI Catalog calls `Scenario.Setup` it calls
 		// `Scenario.Run` which calls `Application.Run`. Example:
 
-		var button = new Button ("Press me!") {
+		var button = new Button () { 
+Text = "Press me!", 
 			AutoSize = false,
 			X = Pos.Center (),
 			Y = Pos.Center (),

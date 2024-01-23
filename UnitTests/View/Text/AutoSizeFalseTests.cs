@@ -24,7 +24,7 @@ public class AutoSizeFalseTests {
 		var view = new View ();
 		view.Width = 2;
 		view.Height = 1;
-		Assert.Equal ("Absolute(2)", view.Width.ToString());
+		Assert.Equal ("Absolute(2)", view.Width.ToString ());
 		Assert.Equal ("Absolute(1)", view.Height.ToString ());
 
 		super.Add (view);
@@ -220,7 +220,7 @@ public class AutoSizeFalseTests {
 	public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Differents_Orders ()
 	{
 		var view1 = new View { Text = "Say Hello view1 你", AutoSize = false, Width = 10, Height = 5 };
-		var view2 = new View { Text = "Say Hello view2 你", AutoSize = false, Width = 10, Height = 5};
+		var view2 = new View { Text = "Say Hello view2 你", AutoSize = false, Width = 10, Height = 5 };
 		var view3 = new View { AutoSize = false, Width = 10, Height = 5, Text = "Say Hello view3 你" };
 		var view4 = new View {
 			Text = "Say Hello view4 你",

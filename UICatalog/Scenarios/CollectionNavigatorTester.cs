@@ -120,6 +120,7 @@ namespace UICatalog.Scenarios {
 		{
 			var label = new Label () {
 				Text = "ListView",
+				AutoSize = false,
 				TextAlignment = TextAlignment.Centered,
 				X = 0,
 				Y = 1, // for menu
@@ -140,7 +141,7 @@ namespace UICatalog.Scenarios {
 
 			_listView.SetSource (_items);
 
-			_listView.KeystrokeNavigator.SearchStringChanged += (s,e) => {
+			_listView.KeystrokeNavigator.SearchStringChanged += (s, e) => {
 				label.Text = $"ListView: {e.SearchString}";
 			};
 		}
@@ -151,6 +152,7 @@ namespace UICatalog.Scenarios {
 		{
 			var label = new Label () {
 				Text = "TreeView",
+				AutoSize = false,
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_listView) + 2,
 				Y = 1, // for menu
@@ -177,7 +179,7 @@ namespace UICatalog.Scenarios {
 			_treeView.ExpandAll ();
 			_treeView.GoToFirst ();
 
-			_treeView.KeystrokeNavigator.SearchStringChanged += (s,e) => {
+			_treeView.KeystrokeNavigator.SearchStringChanged += (s, e) => {
 				label.Text = $"TreeView: {e.SearchString}";
 			};
 		}

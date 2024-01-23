@@ -346,7 +346,8 @@ public class PosTests {
 			};
 			Application.Top.Add (win);
 
-			var button = new Button ("button") {
+			var button = new Button () {
+				Text = "button",
 				X = Pos.Center ()
 			};
 			win.Add (button);
@@ -733,8 +734,8 @@ public class PosTests {
 		var view = new View {
 			X = testHorizontal ? Pos.Percent (50) + Pos.Percent (10) + 1 : 1,
 			Y = testHorizontal ? 1 : Pos.Percent (50) + Pos.Percent (10) + 1,
-			Width = 10,  
-			Height = 10 
+			Width = 10,
+			Height = 10
 		};
 
 		container.Add (view);
@@ -759,15 +760,18 @@ public class PosTests {
 	[Fact]
 	public void PosCombine_Referencing_Same_View ()
 	{
-		var super = new View ("super") {
+		var super = new View () {
+			Text = "super",
 			Width = 10,
 			Height = 10
 		};
-		var view1 = new View ("view1") {
+		var view1 = new View () {
+			Text = "view1",
 			Width = 2,
 			Height = 2
 		};
-		var view2 = new View ("view2") {
+		var view2 = new View () {
+			Text = "view2",
 			Width = 2,
 			Height = 2
 		};

@@ -859,16 +859,29 @@ public class AutoSizeTrueTests {
 	[Fact, SetupFakeDriver]
 	public void AutoSize_True_Setting_With_Height_Horizontal ()
 	{
-		var top = new View () {  Width = 25, Height = 25 };
-		
-		var label = new Label ("Hello") {/* Width = 10, Height = 2, */ValidatePosDim = true };
-		var viewX = new View ("X") { X = Pos.Right (label) };
-		var viewY = new View ("Y") { Y = Pos.Bottom (label) };
+		var top = new View () { Width = 25, Height = 25 };
+
+		var label = new Label () {
+			Text = "Hello", /* Width = 10, Height = 2, */
+			ValidatePosDim = true
+		};
+		var viewX = new View () {
+			Text = "X",
+			X = Pos.Right (label),
+			Width = 1,
+			Height = 1
+		};
+		var viewY = new View () {
+			Text = "Y",
+			Y = Pos.Bottom (label),
+			Width = 1,
+			Height = 1
+		};
 
 		top.Add (label, viewX, viewY);
 		top.BeginInit ();
 		top.EndInit ();
-		
+
 		Assert.True (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 5, 1), label.Frame);
 
@@ -906,8 +919,18 @@ Y
 	{
 		// BUGBUG: Label is AutoSize = true, so Width & Height are ignored
 		var label = new Label { /*Width = 2, Height = 10, */TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true };
-		var viewX = new View ("X") { X = Pos.Right (label) };
-		var viewY = new View ("Y") { Y = Pos.Bottom (label) };
+		var viewX = new View () {
+			Text = "X",
+			X = Pos.Right (label),
+			Width = 1,
+			Height = 1
+		};
+		var viewY = new View () {
+			Text = "Y",
+			Y = Pos.Bottom (label),
+			Width = 1,
+			Height = 1
+		};
 
 		Application.Top.Add (label, viewX, viewY);
 		var rs = Application.Begin (Application.Top);
@@ -994,7 +1017,7 @@ Y
 	public void AutoSize_True_Equal_Before_And_After_IsInitialized_With_Different_Orders ()
 	{
 		var top = new Toplevel ();
-		
+
 		var view1 = new View { Text = "Say Hello view1 你", AutoSize = true/*, Width = 10, Height = 5*/, ValidatePosDim = true };
 		var view2 = new View { Text = "Say Hello view2 你", Width = 10, Height = 5, AutoSize = true, ValidatePosDim = true };
 		var view3 = new View { AutoSize = true/*, Width = 10, Height = 5*/, Text = "Say Hello view3 你", ValidatePosDim = true };
@@ -1231,7 +1254,13 @@ Y
 	{
 		var top = Application.Top;
 
-		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
+		var view = new View () {
+			Text = "View with long text",
+			X = 0,
+			Y = 0,
+			Width = 20,
+			Height = 1
+		};
 		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
 		var count = 0;
 		// Label is AutoSize == true
@@ -1293,7 +1322,13 @@ Y
 	public void AutoSize_Dim_Subtract_Operator_With_Text ()
 	{
 		var top = Application.Top;
-		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
+		var view = new View () {
+			Text = "View with long text",
+			X = 0,
+			Y = 0,
+			Width = 20,
+			Height = 1
+		};
 		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
 		var count = 20;
 		// Label is AutoSize == true
@@ -1373,7 +1408,8 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label ("This should be the last line.") {
+		var label = new Label () {
+			Text = "This should be the last line.",
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			//Width = Dim.Fill (),
 			X = 0, // keep unit test focused; don't use Center here
@@ -1417,7 +1453,8 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label ("This should be the last line.") {
+		var label = new Label () {
+			Text = "This should be the last line.",
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			//Width = Dim.Fill (),
 			X = 0,
@@ -1461,7 +1498,8 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label ("This should be the last line.") {
+		var label = new Label () {
+			Text = "This should be the last line.",
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			//Width = Dim.Fill (),
 			X = 0,
@@ -1521,7 +1559,8 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label ("This should be the last line.") {
+		var label = new Label () {
+			Text = "This should be the last line.",
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			//Width = Dim.Fill (),
 			X = 0,
@@ -2821,61 +2860,61 @@ Y
 	}
 
 
-//	[Fact]
-//	[AutoInitShutdown]
-//	public void AutoSize_False_Label_IsEmpty_True_Return_Null_Lines ()
-//	{
-//		var text = "Label";
-//		var label = new Label {
-//			AutoSize = false, 
-//			Height = 1,
-//			Text = text,
-//		};
-//		var win = new Window {
-//			Width = Dim.Fill (),
-//			Height = Dim.Fill ()
-//		};
-//		win.Add (label);
-//		Application.Top.Add (win);
-//		Application.Begin (Application.Top);
-//		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
+	//	[Fact]
+	//	[AutoInitShutdown]
+	//	public void AutoSize_False_Label_IsEmpty_True_Return_Null_Lines ()
+	//	{
+	//		var text = "Label";
+	//		var label = new Label {
+	//			AutoSize = false, 
+	//			Height = 1,
+	//			Text = text,
+	//		};
+	//		var win = new Window {
+	//			Width = Dim.Fill (),
+	//			Height = Dim.Fill ()
+	//		};
+	//		win.Add (label);
+	//		Application.Top.Add (win);
+	//		Application.Begin (Application.Top);
+	//		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-//		Assert.Equal (5, text.Length);
-//		Assert.False (label.AutoSize);
-//		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
-//		Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
-//		Assert.Equal (new List<string> { "Lab" }, label.TextFormatter.Lines);
-//		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
-//		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
-//		var expected = @"
-//┌────────┐
-//│Lab     │
-//│        │
-//└────────┘
-//";
+	//		Assert.Equal (5, text.Length);
+	//		Assert.False (label.AutoSize);
+	//		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
+	//		Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
+	//		Assert.Equal (new List<string> { "Lab" }, label.TextFormatter.Lines);
+	//		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
+	//		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
+	//		var expected = @"
+	//┌────────┐
+	//│Lab     │
+	//│        │
+	//└────────┘
+	//";
 
-//		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-//		Assert.Equal (new Rect (0, 0, 10, 4), pos);
+	//		var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+	//		Assert.Equal (new Rect (0, 0, 10, 4), pos);
 
-//		text = "0123456789";
-//		Assert.Equal (10, text.Length);
-//		//label.Width = Dim.Fill () - text.Length;
-//		Application.Refresh ();
+	//		text = "0123456789";
+	//		Assert.Equal (10, text.Length);
+	//		//label.Width = Dim.Fill () - text.Length;
+	//		Application.Refresh ();
 
-//		Assert.False (label.AutoSize);
-//		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
-//		Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
-//		Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines);
-//		expected = @"
-//┌────────┐
-//│        │
-//│        │
-//└────────┘
-//";
+	//		Assert.False (label.AutoSize);
+	//		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
+	//		Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
+	//		Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines);
+	//		expected = @"
+	//┌────────┐
+	//│        │
+	//│        │
+	//└────────┘
+	//";
 
-//		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-//		Assert.Equal (new Rect (0, 0, 10, 4), pos);
-//	}
+	//		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+	//		Assert.Equal (new Rect (0, 0, 10, 4), pos);
+	//	}
 
 	[Fact, SetupFakeDriver]
 	public void AutoSize_False_Label_Height_Zero_Stays_Zero ()

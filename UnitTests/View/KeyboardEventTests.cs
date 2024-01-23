@@ -445,7 +445,7 @@ public class KeyboardEventTests {
 
 			bool keyUp = false;
 			view.KeyUp += (s, a) => {
-				a.Handled = true;  
+				a.Handled = true;
 				keyUp = true;
 			};
 

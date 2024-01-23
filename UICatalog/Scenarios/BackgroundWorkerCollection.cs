@@ -171,7 +171,8 @@ namespace UICatalog.Scenarios {
 
 				ColorScheme = Colors.ColorSchemes ["Base"];
 
-				var label = new Label ("Worker collection Log") {
+				var label = new Label () { 
+Text = "Worker collection Log", 
 					X = Pos.Center (),
 					Y = 0
 				};
@@ -312,7 +313,8 @@ namespace UICatalog.Scenarios {
 
 				Title = "Run Worker";
 
-				label = new Label ("Press start to do the work or close to quit.") {
+				label = new Label () { 
+Text = "Press start to do the work or close to quit.", 
 					X = Pos.Center (),
 					Y = 1,
 					ColorScheme = Colors.ColorSchemes ["Dialog"]
@@ -327,7 +329,8 @@ namespace UICatalog.Scenarios {
 				};
 				Add (listView);
 
-				start = new Button ("Start") { IsDefault = true, ClearOnVisibleFalse = false };
+				start = new Button () { 
+Text = "Start",  IsDefault = true, ClearOnVisibleFalse = false };
 				start.Clicked += (s, e) => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();

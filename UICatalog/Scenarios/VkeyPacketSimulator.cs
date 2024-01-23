@@ -17,19 +17,22 @@ public class VkeyPacketSimulator : Scenario {
 
 	public override void Setup ()
 	{
-		var label = new Label ("Input") {
+		var label = new Label () { 
+Text = "Input", 
 			X = Pos.Center ()
 		};
 		Win.Add (label);
 
-		var btnInput = new Button ("Select Input") {
+		var btnInput = new Button () { 
+Text = "Select Input", 
 			X = Pos.AnchorEnd (16)
 		};
 		Win.Add (btnInput);
 
 		const string ruler = "|123456789";
 
-		var inputHorizontalRuler = new Label ("") {
+		var inputHorizontalRuler = new Label () { 
+Text = "", 
 			AutoSize = false,
 			Y = Pos.Bottom (btnInput),
 			Width = Dim.Fill (),
@@ -54,19 +57,22 @@ public class VkeyPacketSimulator : Scenario {
 		};
 		Win.Add (tvInput);
 
-		label = new Label ("Output") {
+		label = new Label () { 
+Text = "Output", 
 			X = Pos.Center (),
 			Y = Pos.Bottom (tvInput)
 		};
 		Win.Add (label);
 
-		var btnOutput = new Button ("Select Output") {
+		var btnOutput = new Button () { 
+Text = "Select Output", 
 			X = Pos.AnchorEnd (17),
 			Y = Pos.Top (label)
 		};
 		Win.Add (btnOutput);
 
-		var outputHorizontalRuler = new Label ("") {
+		var outputHorizontalRuler = new Label () { 
+Text = "", 
 			AutoSize = false,
 			Y = Pos.Bottom (btnOutput),
 			Width = Dim.Fill (),

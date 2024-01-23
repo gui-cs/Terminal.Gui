@@ -147,7 +147,8 @@ namespace UICatalog {
 			};
 			Add (keyLabel);
 
-			var btnChange = new Button ("Ch_ange") {
+			var btnChange = new Button () { 
+Text = "Ch_ange", 
 				X = Pos.Percent (50),
 				Y = 1,
 			};

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Provides navigation and a user interface (UI) to collect related data across multiple steps. Each step (<see cref="WizardStep"/>) can host 
@@ -37,7 +37,7 @@ namespace Terminal.Gui;
 /// var secondStep = new WizardStep ("Second Step");
 /// wizard.AddStep(secondStep);
 /// secondStep.HelpText = "This is the help text for the Second Step.";
-/// var lbl = new Label ("Name:") { AutoSize = true };
+/// var lbl = new Label () { Text = "Name:",  AutoSize = true };
 /// secondStep.Add(lbl);
 /// 
 /// var name = new TextField () { X = Pos.Right (lbl) + 1, Width = Dim.Fill () - 1 };

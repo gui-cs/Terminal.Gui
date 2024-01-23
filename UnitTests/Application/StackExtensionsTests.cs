@@ -12,8 +12,8 @@ namespace Terminal.Gui.ApplicationTests {
 
 			int index = Toplevels.Count - 1;
 			foreach (var top in Toplevels) {
-				if (top.GetType () == typeof (Toplevel)) 					Assert.Equal ("Top", top.Id);
-else 					Assert.Equal ($"w{index}", top.Id);
+				if (top.GetType () == typeof (Toplevel)) Assert.Equal ("Top", top.Id);
+				else Assert.Equal ($"w{index}", top.Id);
 				index--;
 			}
 
@@ -105,7 +105,7 @@ else 					Assert.Equal ($"w{index}", top.Id);
 			// Only allows unique keys
 			var hCodes = new HashSet<int> ();
 
-			foreach (var top in Toplevels) 				Assert.True (hCodes.Add (top.GetHashCode ()));
+			foreach (var top in Toplevels) Assert.True (hCodes.Add (top.GetHashCode ()));
 		}
 
 		[Fact]

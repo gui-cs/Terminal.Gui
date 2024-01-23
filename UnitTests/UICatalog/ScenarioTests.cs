@@ -6,7 +6,7 @@ using Terminal.Gui;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UICatalog.Tests; 
+namespace UICatalog.Tests;
 
 public class ScenarioTests {
 	readonly ITestOutputHelper _output;
@@ -230,7 +230,8 @@ public class ScenarioTests {
 		};
 		_leftPane.Add (_classListView);
 
-		_settingsPane = new FrameView ("Settings") {
+		_settingsPane = new FrameView () {
+			Title = "Settings",
 			X = Pos.Right (_leftPane),
 			Y = 0, // for menu
 			Width = Dim.Fill (),
@@ -242,7 +243,8 @@ public class ScenarioTests {
 		_settingsPane.Add (_computedCheckBox);
 
 		var radioItems = new [] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
-		_locationFrame = new FrameView ("Location (Pos)") {
+		_locationFrame = new FrameView () {
+			Title = "Location (Pos)",
 			X = Pos.Left (_computedCheckBox),
 			Y = Pos.Bottom (_computedCheckBox),
 			Height = 3 + radioItems.Length,
@@ -250,7 +252,11 @@ public class ScenarioTests {
 		};
 		_settingsPane.Add (_locationFrame);
 
-		var label = new Label ("x:") { X = 0, Y = 0 };
+		var label = new Label () {
+			Text = "x:",
+			X = 0,
+			Y = 0
+		};
 		_locationFrame.Add (label);
 		_xRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -262,7 +268,11 @@ public class ScenarioTests {
 		_locationFrame.Add (_xRadioGroup);
 
 		radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-		label = new Label ("y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
+		label = new Label () {
+			Text = "y:",
+			X = Pos.Right (_xRadioGroup) + 1,
+			Y = 0
+		};
 		_locationFrame.Add (label);
 		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_locationFrame.Add (_yText);
@@ -272,7 +282,8 @@ public class ScenarioTests {
 		};
 		_locationFrame.Add (_yRadioGroup);
 
-		_sizeFrame = new FrameView ("Size (Dim)") {
+		_sizeFrame = new FrameView () {
+			Title = "Size (Dim)",
 			X = Pos.Right (_locationFrame),
 			Y = Pos.Y (_locationFrame),
 			Height = 3 + radioItems.Length,
@@ -280,7 +291,11 @@ public class ScenarioTests {
 		};
 
 		radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
-		label = new Label ("width:") { X = 0, Y = 0 };
+		label = new Label () {
+			Text = "width:",
+			X = 0,
+			Y = 0
+		};
 		_sizeFrame.Add (label);
 		_wRadioGroup = new RadioGroup (radioItems) {
 			X = 0,
@@ -291,7 +306,11 @@ public class ScenarioTests {
 		_sizeFrame.Add (_wRadioGroup);
 
 		radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-		label = new Label ("height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
+		label = new Label () {
+			Text = "height:",
+			X = Pos.Right (_wRadioGroup) + 1,
+			Y = 0
+		};
 		_sizeFrame.Add (label);
 		_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_sizeFrame.Add (_hText);
@@ -304,7 +323,8 @@ public class ScenarioTests {
 
 		_settingsPane.Add (_sizeFrame);
 
-		_hostPane = new FrameView ("") {
+		_hostPane = new FrameView () {
+			Title = "",
 			X = Pos.Right (_leftPane),
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),
@@ -519,8 +539,10 @@ public class ScenarioTests {
 
 			//_curView.X = Pos.Center ();
 			//_curView.Y = Pos.Center ();
-			view.Width = Dim.Percent (75);
-			view.Height = Dim.Percent (75);
+			if (!view.AutoSize) {
+				view.Width = Dim.Percent (75);
+				view.Height = Dim.Percent (75);
+			}
 
 			// Set the colorscheme to make it stand out if is null by default
 			if (view.ColorScheme == null) {

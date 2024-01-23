@@ -10,7 +10,8 @@ namespace UICatalog.Scenarios {
 	public class Wizards : Scenario {
 		public override void Setup ()
 		{
-			var frame = new FrameView ("Wizard Options") {
+			var frame = new FrameView () {
+				Title = "Wizard Options",
 				X = Pos.Center (),
 				Y = 0,
 				Width = Dim.Percent (75),
@@ -18,7 +19,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (frame);
 
-			var label = new Label ("Width:") {
+			var label = new Label () {
+				Text = "Width:",
 				AutoSize = false,
 				X = 0,
 				Y = 0,
@@ -27,7 +29,8 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var widthEdit = new TextField ("80") {
+			var widthEdit = new TextField () {
+				Text = "80",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
@@ -35,7 +38,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (widthEdit);
 
-			label = new Label ("Height:") {
+			label = new Label () {
+				Text = "Height:",
 				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
@@ -44,7 +48,8 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var heightEdit = new TextField ("20") {
+			var heightEdit = new TextField () {
+				Text = "20",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
@@ -52,7 +57,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (heightEdit);
 
-			label = new Label ("Title:") {
+			label = new Label () {
+				Text = "Title:",
 				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
@@ -61,7 +67,8 @@ namespace UICatalog.Scenarios {
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			frame.Add (label);
-			var titleEdit = new TextField ("Gandolf") {
+			var titleEdit = new TextField () {
+				Text = "Gandolf",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = Dim.Fill (),
@@ -76,21 +83,24 @@ namespace UICatalog.Scenarios {
 			}
 			Application.Top.Loaded += Top_Loaded;
 
-			label = new Label ("Action:") {
+			label = new Label () {
+				Text = "Action:",
 				X = Pos.Center (),
 				Y = Pos.AnchorEnd (1),
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
 
-			var actionLabel = new Label ("") {
+			var actionLabel = new Label () {
+				Text = "",
 				X = Pos.Right (label),
 				Y = Pos.AnchorEnd (1),
 				ColorScheme = Colors.ColorSchemes ["Error"],
 			};
 			Win.Add (actionLabel);
 
-			var showWizardButton = new Button ("Show Wizard") {
+			var showWizardButton = new Button () {
+				Text = "Show Wizard",
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
@@ -137,7 +147,7 @@ namespace UICatalog.Scenarios {
 					};
 
 					// Add 1st step
-					var firstStep = new WizardStep () { Title = "End User License Agreement"};
+					var firstStep = new WizardStep () { Title = "End User License Agreement" };
 					firstStep.NextButtonText = "Accept!";
 					firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 					wizard.AddStep (firstStep);
@@ -168,7 +178,8 @@ namespace UICatalog.Scenarios {
 					secondStep.Add (thirdStepEnabledCeckBox);
 
 					// Add a frame 
-					var frame = new FrameView ($"A Broken Frame (by Depeche Mode)") {
+					var frame = new FrameView () {
+						Title = $"A Broken Frame (by Depeche Mode)",
 						X = 0,
 						Y = Pos.Bottom (thirdStepEnabledCeckBox) + 2,
 						Width = Dim.Fill (),
@@ -177,7 +188,7 @@ namespace UICatalog.Scenarios {
 					frame.Add (new TextField ("This is a TextField inside of the frame."));
 					secondStep.Add (frame);
 					wizard.StepChanging += (s, args) => {
-						if (args.OldStep == secondStep && string.IsNullOrEmpty(firstNameField.Text)) {
+						if (args.OldStep == secondStep && string.IsNullOrEmpty (firstNameField.Text)) {
 							args.Cancel = true;
 							var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
 						}

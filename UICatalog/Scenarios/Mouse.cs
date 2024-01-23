@@ -34,8 +34,10 @@ namespace UICatalog.Scenarios {
 			};
 
 			// I have no idea what this was intended to show off in demo.c
-			var drag = new Label ("Drag: ") { X = 1, Y = 4 };
-			var dragText = new TextField ("") {
+			var drag = new Label () { 
+Text = "Drag: ",  X = 1, Y = 4 };
+			var dragText = new TextField () { 
+Text = "", 
 				X = Pos.Right (drag),
 				Y = Pos.Top (drag),
 				Width = 40

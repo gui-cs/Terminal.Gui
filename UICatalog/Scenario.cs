@@ -61,7 +61,7 @@ namespace UICatalog;
 /// 		public override void Setup ()
 /// 		{
 /// 			// Put your scenario code here, e.g.
-/// 			Win.Add (new Button ("Press me!") {
+/// 			Win.Add (new Button () { Text = "Press me!", 
 /// 				X = Pos.Center (),
 /// 				Y = Pos.Center (),
 /// 				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", "Yes", "No")

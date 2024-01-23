@@ -704,9 +704,9 @@ public readonly struct Color : IEquatable<Color> {
 
 	/// <inheritdoc/>
 	public bool Equals (Color other) => R == other.R &&
-	                                    G == other.G &&
-	                                    B == other.B &&
-	                                    A == other.A;
+					    G == other.G &&
+					    B == other.B &&
+					    A == other.A;
 
 	/// <inheritdoc/>
 	public override int GetHashCode () => HashCode.Combine (R, G, B, A);
@@ -877,8 +877,8 @@ public readonly struct Attribute : IEquatable<Attribute> {
 
 	/// <inheritdoc/>
 	public bool Equals (Attribute other) => PlatformColor == other.PlatformColor &&
-	                                        Foreground == other.Foreground &&
-	                                        Background == other.Background;
+						Foreground == other.Foreground &&
+						Background == other.Background;
 
 	/// <inheritdoc/>
 	public override int GetHashCode () => HashCode.Combine (PlatformColor, Foreground, Background);

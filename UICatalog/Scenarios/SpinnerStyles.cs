@@ -71,7 +71,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (ckbBounce);
 
-			var delayLabel = new Label ("Delay:") {
+			var delayLabel = new Label () { 
+Text = "Delay:", 
 				X = Pos.Right (ckbBounce) + 2,
 				Y = Pos.Bottom (preview) + 1
 			};
@@ -87,7 +88,8 @@ namespace UICatalog.Scenarios {
 					spinner.SpinDelay = i;
 			};
 
-			var customLabel = new Label ("Custom:") {
+			var customLabel = new Label () { 
+Text = "Custom:", 
 				X = Pos.Right (delayField) + 2,
 				Y = Pos.Bottom (preview) + 1
 			};

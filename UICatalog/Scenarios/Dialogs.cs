@@ -11,13 +11,15 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			var frame = new FrameView ("Dialog Options") {
+			var frame = new FrameView () {
+				Title = "Dialog Options",
 				X = Pos.Center (),
 				Y = 1,
 				Width = Dim.Percent (75),
 			};
 
-			var label = new Label ("Width:") {
+			var label = new Label () {
+				Text = "Width:",
 				AutoSize = false,
 				X = 0,
 				Y = 0,
@@ -27,7 +29,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var widthEdit = new TextField ("0") {
+			var widthEdit = new TextField () {
+				Text = "0",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
@@ -35,7 +38,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (widthEdit);
 
-			label = new Label ("Height:") {
+			label = new Label () {
+				Text = "Height:",
 				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
@@ -45,7 +49,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var heightEdit = new TextField ("0") {
+			var heightEdit = new TextField () {
+				Text = "0",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
@@ -53,16 +58,19 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (heightEdit);
 
-			frame.Add (new Label ("If height & width are both 0,") {
+			frame.Add (new Label () {
+				Text = "If height & width are both 0,",
 				X = Pos.Right (widthEdit) + 2,
 				Y = Pos.Top (widthEdit),
 			});
-			frame.Add (new Label ("the Dialog will size to 80% of container.") {
+			frame.Add (new Label () {
+				Text = "the Dialog will size to 80% of container.",
 				X = Pos.Right (heightEdit) + 2,
 				Y = Pos.Top (heightEdit),
 			});
 
-			label = new Label ("Title:") {
+			label = new Label () {
+				Text = "Title:",
 				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),
@@ -72,7 +80,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var titleEdit = new TextField ("Title") {
+			var titleEdit = new TextField () {
+				Text = "Title",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = Dim.Fill (),
@@ -80,7 +89,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (titleEdit);
 
-			label = new Label ("Num Buttons:") {
+			label = new Label () {
+				Text = "Num Buttons:",
 				AutoSize = false,
 				X = 0,
 				Y = Pos.Bottom (label),  // BUGBUG: if this is Pos.Bottom (titleEdit) the initial LayoutSubviews does not work correctly?!?!
@@ -90,7 +100,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (label);
 
-			var numButtonsEdit = new TextField ("3") {
+			var numButtonsEdit = new TextField () {
+				Text = "3",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 5,
@@ -105,7 +116,8 @@ namespace UICatalog.Scenarios {
 			};
 			frame.Add (glyphsNotWords);
 
-			label = new Label ("Button Style:") {
+			label = new Label () {
+				Text = "Button Style:",
 				X = 0,
 				Y = Pos.Bottom (glyphsNotWords),
 				TextAlignment = Terminal.Gui.TextAlignment.Right
@@ -127,20 +139,22 @@ namespace UICatalog.Scenarios {
 					titleEdit.Frame.Height +
 					numButtonsEdit.Frame.Height +
 					glyphsNotWords.Frame.Height +
-					styleRadioGroup.Frame.Height + frame.GetAdornmentsThickness().Vertical;
+					styleRadioGroup.Frame.Height + frame.GetAdornmentsThickness ().Vertical;
 			}
 			Application.Top.LayoutComplete += Top_LayoutComplete;
 
 			Win.Add (frame);
 
-			label = new Label ("Button Pressed:") {
+			label = new Label () {
+				Text = "Button Pressed:",
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 4,
 				TextAlignment = Terminal.Gui.TextAlignment.Right,
 			};
 			Win.Add (label);
 
-			var buttonPressedLabel = new Label (" ") {
+			var buttonPressedLabel = new Label () {
+				Text = " ",
 				AutoSize = false,
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 5,
@@ -153,7 +167,8 @@ namespace UICatalog.Scenarios {
 			// true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };
 			// \u2781 is ➁ dingbats \ufb70 is	
 
-			var showDialogButton = new Button ("_Show Dialog") {
+			var showDialogButton = new Button () {
+				Text = "_Show Dialog",
 				X = Pos.Center (),
 				Y = Pos.Bottom (frame) + 2,
 				IsDefault = true,
@@ -168,7 +183,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (buttonPressedLabel);
 		}
 
-		Dialog CreateDemoDialog (TextField widthEdit, TextField heightEdit, TextField titleEdit, TextField numButtonsEdit, CheckBox glyphsNotWords, RadioGroup styleRadioGroup,  Label buttonPressedLabel)
+		Dialog CreateDemoDialog (TextField widthEdit, TextField heightEdit, TextField titleEdit, TextField numButtonsEdit, CheckBox glyphsNotWords, RadioGroup styleRadioGroup, Label buttonPressedLabel)
 		{
 			Dialog dialog = null;
 			try {
@@ -218,7 +233,8 @@ namespace UICatalog.Scenarios {
 					dialog.Width = width;
 				}
 
-				var add = new Button ("Add a button") {
+				var add = new Button () {
+					Text = "Add a button",
 					X = Pos.Center (),
 					Y = Pos.Center ()
 				};

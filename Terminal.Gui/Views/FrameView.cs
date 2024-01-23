@@ -33,7 +33,8 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Gui.FrameView"/> class using <see cref="LayoutStyle.Computed"/> layout.
 		/// </summary>
-		public FrameView () : this (title: string.Empty) {
+		public FrameView () : this (title: string.Empty)
+		{
 
 		}
 

@@ -216,7 +216,7 @@ public class Sliders : Scenario {
 				var data = e.Options.First ().Value.Data;
 				foreach (var s in Win.Subviews.OfType<Slider> ()) {
 					s.ColorScheme = new ColorScheme (s.ColorScheme);
-					s.ColorScheme = new ColorScheme(s.ColorScheme) {
+					s.ColorScheme = new ColorScheme (s.ColorScheme) {
 						Normal = new Attribute (data.Item2, s.ColorScheme.Normal.Background)
 					};
 
