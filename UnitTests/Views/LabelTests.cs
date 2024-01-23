@@ -536,6 +536,7 @@ Test
 			breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 		}
 		var label = new Label (breakLines) {
+			AutoSize = false,
 			TextDirection = TextDirection.TopBottom_LeftRight,
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -547,7 +548,7 @@ Test
 		Application.Begin (Application.Top);
 		((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
 
-		Assert.True (label.AutoSize);
+		Assert.False (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, width, height), label.Frame);
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
 

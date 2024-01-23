@@ -2260,11 +2260,11 @@ public class TileViewTests {
 			tv.LineStyle = LineStyle.None;
 		}
 
-		tv.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (2).ContentView.Add (new Label (new string ('3', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (3).ContentView.Add (new Label (new string ('4', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
-		tv.Tiles.ElementAt (4).ContentView.Add (new Label (new string ('5', 100)) { AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		tv.Tiles.ElementAt (0).ContentView.Add (new Label () { Text = new string ('1', 100), AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		tv.Tiles.ElementAt (1).ContentView.Add (new Label () { Text = new string ('2', 100), AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		tv.Tiles.ElementAt (2).ContentView.Add (new Label () { Text = new string ('3', 100), AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		tv.Tiles.ElementAt (3).ContentView.Add (new Label () { Text = new string ('4', 100), AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		tv.Tiles.ElementAt (4).ContentView.Add (new Label () { Text = new string ('5', 100), AutoSize = false, Width = Dim.Fill (), Height = 1 });
 
 		Application.Top.Add (tv);
 		tv.BeginInit ();
@@ -2294,10 +2294,10 @@ public class TileViewTests {
 
 		container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
-		container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-		container.Tiles.ElementAt (0).ContentView.Add (new Label (new string ('1', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
-		container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false });
-		container.Tiles.ElementAt (1).ContentView.Add (new Label (new string ('2', 100)) { Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1 });
+		container.Tiles.ElementAt (0).ContentView.Add (new Label () { Text = new string ('1', 100), AutoSize = false, Width = Dim.Fill (), Height = 1 });
+		container.Tiles.ElementAt (0).ContentView.Add (new Label () { Text = new string ('1', 100), AutoSize = false, Width = Dim.Fill (), Height = 1, Y = 1 });
+		container.Tiles.ElementAt (1).ContentView.Add (new Label () { Text = new string ('2', 100), AutoSize = false, Width = Dim.Fill (), Height = 1});
+		container.Tiles.ElementAt (1).ContentView.Add (new Label () { Text = new string ('2', 100), AutoSize = false, Width = Dim.Fill (), Height = 1, Y = 1 });
 
 		container.Tiles.ElementAt (0).MinSize = 0;
 		container.Tiles.ElementAt (1).MinSize = 0;

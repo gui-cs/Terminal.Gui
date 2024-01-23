@@ -1349,15 +1349,15 @@ public class ToplevelTests {
 	{
 		// Don't use Dialog as a Top, use a Window instead - dialog has complex layout behavior that is not needed here.
 		var window = new Window { Width = 10, Height = 3 };
-		window.Add (new Label (
-			"Test") {
+		window.Add (new Label () {
+			Text = "Test",
+			AutoSize = false,
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			TextAlignment = TextAlignment.Centered,
 			VerticalTextAlignment = VerticalTextAlignment.Middle,
-			AutoSize = false
 		});
 
 		var rs = Application.Begin (window);

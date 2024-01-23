@@ -1059,7 +1059,7 @@ public class TabViewTests {
 			tv.Width = 7;
 			tv.Height = 5;
 
-			var btn = new Button ("Ok") { Y = Pos.Bottom (tv) + 1, Width = 7 };
+			var btn = new Button ("Ok") { AutoSize = false, Y = Pos.Bottom (tv) + 1, Width = 7 };
 
 			var top = Application.Top;
 			top.Add (tv, btn);
