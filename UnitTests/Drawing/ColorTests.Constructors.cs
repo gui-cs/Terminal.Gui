@@ -2,6 +2,20 @@ namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
 
+	[Fact]
+	public void Constructor_Empty_ReturnsColorWithZeroValue ( )
+	{
+		Color color = new ( );
+		Assert.Multiple (
+			( ) => Assert.Equal ( 0, color.Rgba ),
+			( ) => Assert.Equal ( 0u, color.Argb ),
+			( ) => Assert.Equal ( 0, color.R ),
+			( ) => Assert.Equal ( 0, color.G ),
+			( ) => Assert.Equal ( 0, color.B ),
+			( ) => Assert.Equal ( 0, color.A )
+		);
+	}
+
 	[Theory]
 	[CombinatorialData]
 	public void Constructor_WithByteRGBAValues_AllValuesCorrect ( [CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
