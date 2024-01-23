@@ -220,13 +220,14 @@ public class ScenarioTests {
 			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
 
-		_classListView = new ListView (_viewClasses.Keys.ToList ()) {
+		_classListView = new ListView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			AllowsMarking = false,
-			ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Source = new ListWrapper (_viewClasses.Keys.ToList ())
 		};
 		_leftPane.Add (_classListView);
 

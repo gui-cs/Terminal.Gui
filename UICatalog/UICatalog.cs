@@ -363,7 +363,7 @@ class UICatalogApp {
 			};
 
 			// Create the Category list view. This list never changes.
-			CategoryList = new ListView (_categories) {
+			CategoryList = new ListView {
 				X = 0,
 				Y = 1,
 				Width = Dim.Percent (30),
@@ -372,7 +372,8 @@ class UICatalogApp {
 				CanFocus = true,
 				Title = "Categories",
 				BorderStyle = LineStyle.Single,
-				SuperViewRendersLineCanvas = true
+				SuperViewRendersLineCanvas = true,
+				Source = new ListWrapper (_categories)
 			};
 			CategoryList.OpenSelectedItem += (s, a) => {
 				ScenarioList!.SetFocus ();

@@ -176,12 +176,13 @@ public class DynamicMenuBar : Scenario {
 			};
 			_frmMenu.Add (_btnPreviowsParent);
 
-			_lstMenus = new ListView (new List<DynamicMenuItemList> ()) {
+			_lstMenus = new ListView {
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				X = Pos.Right (_btnPrevious) + 1,
 				Y = Pos.Top (_btnPrevious) + 2,
 				Width = _lblMenuBar.Width,
 				Height = Dim.Fill (),
+				Source = new ListWrapper (new List<DynamicMenuItemList> ())
 			};
 			_frmMenu.Add (_lstMenus);
 

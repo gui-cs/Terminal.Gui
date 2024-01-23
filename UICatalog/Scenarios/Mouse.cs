@@ -17,13 +17,7 @@ public class Mouse : Scenario {
 		Win.Add (test);
 		Win.Add (ml);
 
-			var rmeList = new ListView (rme) {
-				X = Pos.Right (test) + 25,
-				Y = Pos.Top (test) + 1,
-				Width = Dim.Fill () - 1,
-				Height = Dim.Fill (),
-				ColorScheme = Colors.ColorSchemes ["TopLevel"]
-			};
+			var rmeList = new ListView { X = Pos.Right(test) + 25, Y = Pos.Top(test) + 1, Width = Dim.Fill() - 1, Height = Dim.Fill(), ColorScheme = Colors.ColorSchemes["TopLevel"], Source = new ListWrapper(rme) };
 			Win.Add (rmeList);
 
 		Application.MouseEvent += (sender, a) => {

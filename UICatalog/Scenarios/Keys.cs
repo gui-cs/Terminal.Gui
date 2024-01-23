@@ -62,12 +62,7 @@ public class Keys : Scenario {
 		var maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
 		var yOffset = 1;
 		var keyEventlist = new List<string> ();
-		var keyEventListView = new ListView (keyEventlist) {
-			X = 0,
-			Y = Pos.Top (keyLogLabel) + yOffset,
-			Width = "Key Down:".Length + maxKeyString,
-			Height = Dim.Fill (),
-		};
+		var keyEventListView = new ListView { X = 0, Y = Pos.Top(keyLogLabel) + yOffset, Width = "Key Down:".Length + maxKeyString, Height = Dim.Fill(), Source = new ListWrapper(keyEventlist) };
 		keyEventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		Win.Add (keyEventListView);
 
@@ -76,12 +71,7 @@ public class Keys : Scenario {
 		Win.Add (onKeyPressedLabel);
 
 		yOffset = 1;
-		var onKeyPressedListView = new ListView (keyPressedList) {
-			X = Pos.Left (onKeyPressedLabel),
-			Y = Pos.Top (onKeyPressedLabel) + yOffset,
-			Width = maxKeyString,
-			Height = Dim.Fill (),
-		};
+		var onKeyPressedListView = new ListView { X = Pos.Left(onKeyPressedLabel), Y = Pos.Top(onKeyPressedLabel) + yOffset, Width = maxKeyString, Height = Dim.Fill(), Source = new ListWrapper(keyPressedList) };
 		onKeyPressedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		Win.Add (onKeyPressedListView);
 
@@ -92,12 +82,7 @@ public class Keys : Scenario {
 			Text = "TextView InvokingKeyBindings:"
 		};
 		Win.Add (onInvokingKeyBindingsLabel);
-		var onInvokingKeyBindingsListView = new ListView (invokingKeyBindingsList) {
-			X = Pos.Left (onInvokingKeyBindingsLabel),
-			Y = Pos.Top (onInvokingKeyBindingsLabel) + yOffset,
-			Width = Dim.Fill (1),
-			Height = Dim.Fill (),
-		};
+		var onInvokingKeyBindingsListView = new ListView { X = Pos.Left(onInvokingKeyBindingsLabel), Y = Pos.Top(onInvokingKeyBindingsLabel) + yOffset, Width = Dim.Fill(1), Height = Dim.Fill(), Source = new ListWrapper(invokingKeyBindingsList) };
 		onInvokingKeyBindingsListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		Win.Add (onInvokingKeyBindingsListView);
 

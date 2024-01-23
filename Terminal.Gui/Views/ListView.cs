@@ -262,35 +262,6 @@ public class ListView : View {
 	/// </summary>
 	public ListView ()
 	{
-		SetInitialProperties ();
-	}
-
-	/// <summary>
-	/// Initializes a new instance of <see cref="ListView"/> that will display the provided data source, using relative positioning.
-	/// </summary>
-	/// <param name="source"><see cref="IListDataSource"/> object that provides a mechanism to render the data. 
-	/// The number of elements on the collection should not change, if you must change, set 
-	/// the "Source" property to reset the internal settings of the ListView.</param>
-	public ListView (IListDataSource source)
-	{
-		this._source = source;
-		SetInitialProperties ();
-	}
-
-	/// <summary>
-	/// Initializes a new instance of <see cref="ListView"/> that will display the contents of the object 
-	/// implementing the <see cref="IList"/> interface with an absolute position.
-	/// </summary>
-	/// <param name="source">An IList data source, if the elements of the IList are strings, 
-	/// the string is rendered, otherwise the ToString() method is invoked on the result.</param>
-	public ListView (IList source) : this (MakeWrapper (source))
-	{
-		SetInitialProperties ();
-	}
-
-	void SetInitialProperties ()
-	{
-		Source = _source;
 		CanFocus = true;
 
 		// Things this view knows how to do

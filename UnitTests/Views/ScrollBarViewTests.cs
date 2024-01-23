@@ -595,11 +595,12 @@ public class ScrollBarViewTests {
 			for (var i = 0; i < 50; i++) {
 				source.Add ($"item {i}");
 			}
-			var listView = new ListView (source) {
+			var listView = new ListView {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				Source = new ListWrapper (source)
 			};
 			win.Add (listView);
 			var newScrollBarView = new ScrollBarView (listView, true, false) {
@@ -664,11 +665,12 @@ public class ScrollBarViewTests {
 			source.Add (text);
 		}
 
-		var listView = new ListView (source) {
+		var listView = new ListView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill ()
+			Height = Dim.Fill (),
+			Source = new ListWrapper (source)
 		};
 		win.Add (listView);
 

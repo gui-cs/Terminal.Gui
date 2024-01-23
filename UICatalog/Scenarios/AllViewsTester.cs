@@ -7,7 +7,9 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
-[ScenarioCategory ("Layout")] [ScenarioCategory ("Tests")] [ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Tests")]
+[ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario {
 	ListView _classListView;
 	CheckBox _computedCheckBox;
@@ -77,15 +79,7 @@ public class AllViewsTester : Scenario {
 			Title = "Classes"
 		};
 
-		_classListView = new ListView (_viewClasses.Keys.ToList ()) {
-			X = 0,
-			Y = 0,
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			AllowsMarking = false,
-			ColorScheme = Colors.ColorSchemes ["TopLevel"],
-			SelectedItem = 0
-		};
+		_classListView = new ListView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (), AllowsMarking = false, ColorScheme = Colors.ColorSchemes ["TopLevel"], SelectedItem = 0, Source = new ListWrapper (_viewClasses.Keys.ToList ()) };
 		_classListView.OpenSelectedItem += (s, a) => {
 			_settingsPane.SetFocus ();
 		};
@@ -148,7 +142,7 @@ public class AllViewsTester : Scenario {
 		_locationFrame.Add (_xRadioGroup);
 
 		radioItems = new [] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
-		label = new Label { X = Pos.Right(_xRadioGroup) + 1, Y = 0, Text = "Y:" };
+		label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "Y:" };
 		_locationFrame.Add (label);
 		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
 		_yText.TextChanged += (s, args) => {

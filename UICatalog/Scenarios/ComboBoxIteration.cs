@@ -17,10 +17,11 @@ public class ComboBoxIteration : Scenario {
 		};
 		Win.Add (lbListView);
 
-		var listview = new ListView (items) {
+		var listview = new ListView {
 			Y = Pos.Bottom (lbListView) + 1,
 			Width = 10,
-			Height = Dim.Fill (2)
+			Height = Dim.Fill (2),
+			Source = new ListWrapper (items)
 		};
 		Win.Add (listview);
 

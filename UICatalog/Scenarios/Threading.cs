@@ -68,12 +68,13 @@ public class Threading : Scenario {
 			Text = "Task Logs:"
 		});
 
-		_logJob = new ListView (_log) {
+		_logJob = new ListView {
 			X = Pos.Right (_itemsList) + 10,
 			Y = Pos.Y (_itemsList),
 			Width = 50,
 			Height = Dim.Fill (),
-			ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Source = new ListWrapper (_log)
 		};
 
 		var text = new TextField ("Type anything after press the button") { X = 1, Y = 3, Width = 100 };

@@ -84,11 +84,12 @@ public class UnicodeInMenu : Scenario {
 
 		label = new Label { X = Pos.X(label), Y = Pos.Bottom(hexView) + 1, Text = "ListView:" };
 		Win.Add (label);
-		var listView = new ListView (new List<string> () { "item #1", gitString, "Со_хранить", unicode }) {
+		var listView = new ListView {
 			X = 20,
 			Y = Pos.Y (label),
 			Width = Dim.Percent (60),
-			Height = 3
+			Height = 3,
+			Source = new ListWrapper (new List<string> () { "item #1", gitString, "Со_хранить", unicode })
 		};
 		Win.Add (listView);
 

@@ -24,7 +24,11 @@ public class ComboBox : View {
 
 		public ComboListView (ComboBox container, bool hideDropdownListOnClick) => SetInitialProperties (container, hideDropdownListOnClick);
 
-		public ComboListView (ComboBox container, IList source, bool hideDropdownListOnClick) : base (source) => SetInitialProperties (container, hideDropdownListOnClick);
+		public ComboListView (ComboBox container, IList source, bool hideDropdownListOnClick)
+		{
+			Source = new ListWrapper (source);
+			SetInitialProperties (container, hideDropdownListOnClick);
+		}
 
 		void SetInitialProperties (ComboBox container, bool hideDropdownListOnClick)
 		{

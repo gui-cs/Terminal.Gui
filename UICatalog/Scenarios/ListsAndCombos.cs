@@ -26,11 +26,12 @@ public class ListsAndCombos : Scenario {
 		// ListView
 		var lbListView = new Label { ColorScheme = Colors.ColorSchemes["TopLevel"], X = 0, Width = Dim.Percent(40), Text = "Listview" };
 
-		var listview = new ListView (items) {
+		var listview = new ListView {
 			X = 0,
 			Y = Pos.Bottom (lbListView) + 1,
 			Height = Dim.Fill (2),
-			Width = Dim.Percent (40)
+			Width = Dim.Percent (40),
+			Source = new ListWrapper (items)
 		};
 		listview.SelectedItemChanged += (object s, ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
 		Win.Add (lbListView, listview);

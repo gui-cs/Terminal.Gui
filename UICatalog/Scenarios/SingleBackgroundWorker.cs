@@ -50,12 +50,7 @@ public class SingleBackgroundWorker : Scenario {
 				Text = "Worker Log"
 			});
 
-			_listLog = new ListView (_log) {
-				X = 0,
-				Y = 2,
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+			_listLog = new ListView { X = 0, Y = 2, Width = Dim.Fill(), Height = Dim.Fill(), Source = new ListWrapper(_log) };
 			top.Add (_listLog);
 			Add (top);
 		}
@@ -166,11 +161,12 @@ public class SingleBackgroundWorker : Scenario {
 				Title = $"Worker started at {start}.{start:fff}";
 				ColorScheme = Colors.ColorSchemes ["Base"];
 
-			Add (new ListView (list) {
+			Add (new ListView {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
-				Height = Dim.Fill ()
+				Height = Dim.Fill (),
+				Source = new ListWrapper (list)
 			});
 
 			top.Add (this);

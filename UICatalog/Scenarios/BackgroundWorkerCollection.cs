@@ -174,12 +174,7 @@ public class BackgroundWorkerCollection : Scenario {
 			var label = new Label { X = Pos.Center (), Y = 0, Text = "Worker collection Log" };
 			Add (label);
 
-			listLog = new ListView (log) {
-				X = 0,
-				Y = Pos.Bottom (label),
-				Width = Dim.Fill (),
-				Height = Dim.Fill ()
-			};
+			listLog = new ListView { X = 0, Y = Pos.Bottom(label), Width = Dim.Fill(), Height = Dim.Fill(), Source = new ListWrapper(log) };
 			Add (listLog);
 		}
 
