@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using System.Reflection;
-namespace Terminal.Gui.DrawingTests;
+namespace Terminal.Gui.Drawing.Tests;
 
 public partial class ColorTests {
 

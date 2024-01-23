@@ -1,8 +1,4 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.Numerics;
-using Xunit;
-namespace Terminal.Gui.DrawingTests;
+﻿namespace Terminal.Gui.Drawing.Tests;
 
 public partial class ColorTests {
 	[Theory]
