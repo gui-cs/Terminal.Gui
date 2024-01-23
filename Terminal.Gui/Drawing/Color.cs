@@ -161,7 +161,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 	/// Get returns the <see cref="GetClosestNamedColor"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded
 	/// map.
 	/// </remarks>
-	public ColorName GetClosestNamedColor ( ) => GetClosestNamedColor ( in this );
+	public ColorName GetClosestNamedColor ( ) => GetClosestNamedColor ( this );
 
 	/// <summary>
 	/// Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName"/> value.
@@ -181,7 +181,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// The order of the values in the passed Vector3 must be </remarks>
     /// <returns></returns>
 	[SkipLocalsInit]
-	internal static ColorName GetClosestNamedColor ( in Color inputColor ) => ColorExtensions.ColorToNameMap.MinBy ( pair => CalculateColorDistance ( inputColor, pair.Key ) ).Value;
+	internal static ColorName GetClosestNamedColor ( Color inputColor ) => ColorExtensions.ColorToNameMap.MinBy ( pair => CalculateColorDistance ( inputColor, pair.Key ) ).Value;
 
 	[SkipLocalsInit]
 	static float CalculateColorDistance ( in Vector4 color1, in Vector4 color2 ) => Vector4.Distance ( color1, color2 );
