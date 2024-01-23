@@ -687,8 +687,8 @@ public class ScrollBarViewTests {
 		};
 
 		listView.DrawContent += (s, e) => {
-			newScrollBarView.Size = listView.Maxlength;
-			Assert.Equal (newScrollBarView.Size, listView.Maxlength);
+			newScrollBarView.Size = listView.MaxLength;
+			Assert.Equal (newScrollBarView.Size, listView.MaxLength);
 			newScrollBarView.Position = listView.LeftItem;
 			Assert.Equal (newScrollBarView.Position, listView.LeftItem);
 			newScrollBarView.Refresh ();

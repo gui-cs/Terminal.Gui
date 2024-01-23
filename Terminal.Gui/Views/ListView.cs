@@ -222,7 +222,7 @@ public class ListView : View {
 			if (_source == null)
 				return;
 
-			if (value < 0 || (Maxlength > 0 && value >= Maxlength))
+			if (value < 0 || (MaxLength > 0 && value >= MaxLength))
 				throw new ArgumentException ("value");
 			_left = value;
 			SetNeedsDisplay ();
@@ -232,7 +232,7 @@ public class ListView : View {
 	/// <summary>
 	/// Gets the widest item in the list.
 	/// </summary>
-	public int Maxlength => (_source?.Length) ?? 0;
+	public int MaxLength => (_source?.Length) ?? 0;
 
 	/// <summary>
 	/// Gets or sets the index of the currently selected item.
@@ -624,7 +624,7 @@ public class ListView : View {
 	/// <param name="cols">Number of columns to scroll right.</param>
 	public virtual bool ScrollRight (int cols)
 	{
-		_left = Math.Max (Math.Min (_left + cols, Maxlength - 1), 0);
+		_left = Math.Max (Math.Min (_left + cols, MaxLength - 1), 0);
 		SetNeedsDisplay ();
 		return true;
 	}

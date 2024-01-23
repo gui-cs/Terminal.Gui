@@ -82,7 +82,7 @@ namespace UICatalog.Scenarios {
 			_listView.DrawContent += (s,e) => {
 				scrollBar.Size = _listView.Source.Count - 1;
 				scrollBar.Position = _listView.TopItem;
-				scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
+				scrollBar.OtherScrollBarView.Size = _listView.MaxLength - 1;
 				scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
 				scrollBar.Refresh ();
 			};

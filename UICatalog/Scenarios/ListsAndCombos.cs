@@ -56,7 +56,7 @@ public class ListsAndCombos : Scenario {
 		listview.DrawContent += (s, e) => {
 			scrollBar.Size = listview.Source.Count - 1;
 			scrollBar.Position = listview.TopItem;
-			scrollBar.OtherScrollBarView.Size = listview.Maxlength - 1;
+			scrollBar.OtherScrollBarView.Size = listview.MaxLength - 1;
 			scrollBar.OtherScrollBarView.Position = listview.LeftItem;
 			scrollBar.Refresh ();
 		};
@@ -101,7 +101,7 @@ public class ListsAndCombos : Scenario {
 		comboBox.DrawContent += (s, e) => {
 			scrollBarCbx.Size = comboBox.Source.Count;
 			scrollBarCbx.Position = ((ListView)comboBox.Subviews [1]).TopItem;
-			scrollBarCbx.OtherScrollBarView.Size = ((ListView)comboBox.Subviews [1]).Maxlength - 1;
+			scrollBarCbx.OtherScrollBarView.Size = ((ListView)comboBox.Subviews [1]).MaxLength - 1;
 			scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.Subviews [1]).LeftItem;
 			scrollBarCbx.Refresh ();
 		};
