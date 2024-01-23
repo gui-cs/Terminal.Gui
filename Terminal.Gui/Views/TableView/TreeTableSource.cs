@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T : class {
-	
+
 	private TreeView<T> _tree;
 	private string [] _cols;
 	private Dictionary<string, Func<T, object>> _lamdas;

@@ -4,12 +4,11 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests {
-	public class StraightLineExtensionsTests
-	{
+	public class StraightLineExtensionsTests {
 		private ITestOutputHelper _output;
 
 
-		public StraightLineExtensionsTests(ITestOutputHelper output)
+		public StraightLineExtensionsTests (ITestOutputHelper output)
 		{
 			this._output = output;
 		}
@@ -108,7 +107,7 @@ namespace Terminal.Gui.DrawingTests {
 			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=0 to y=2
-						.Exclude (new Point (2,0), 3, Orientation.Vertical)
+						.Exclude (new Point (2, 0), 3, Orientation.Vertical)
 						.ToArray ();
 			// y=3 to y=10
 			var afterLine = Assert.Single (after);
@@ -122,7 +121,7 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestExcludeParallel_VerticalLines_VerticalSplit ()
 		{
 			// y=1 to y=10
-			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=4 to y=5
 						.Exclude (new Point (2, 4), 2, Orientation.Vertical)
@@ -147,10 +146,10 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestExcludeParallel_VerticalLines_CoverCompletely ()
 		{
 			// y=1 to y=10
-			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=4 to y=5
-						.Exclude (new Point (2,1), 10, Orientation.Vertical)
+						.Exclude (new Point (2, 1), 10, Orientation.Vertical)
 						.ToArray ();
 			Assert.Empty (after);
 		}
@@ -193,7 +192,7 @@ namespace Terminal.Gui.DrawingTests {
 						.Exclude (new Point (1, 0), 10, Orientation.Vertical)
 						.ToArray ();
 			// x=2 to x=10,
-			var lineAfter = Assert.Single(after);
+			var lineAfter = Assert.Single (after);
 
 			Assert.Equal (2, lineAfter.Start.X);
 			Assert.Equal (2, lineAfter.Start.Y);
@@ -228,7 +227,7 @@ namespace Terminal.Gui.DrawingTests {
 						.Exclude (new Point (0, 0), 10, Orientation.Vertical)
 						.ToArray ();
 			// Exclusion line is too far to the left so hits nothing
-			Assert.Same(Assert.Single (after),l1);
+			Assert.Same (Assert.Single (after), l1);
 		}
 		[Fact, AutoInitShutdown]
 		public void TestExcludePerpendicular_HorizontalLine_VerticalExclusion_MissRight ()
@@ -248,13 +247,13 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_ClipTop ()
 		{
 			// y=1 to y=10
-			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=1 x=0-10
-						.Exclude (new Point (0,1), 10, Orientation.Horizontal)
+						.Exclude (new Point (0, 1), 10, Orientation.Horizontal)
 						.ToArray ();
 			// y=2 to y=10,
-			var lineAfter = Assert.Single(after);
+			var lineAfter = Assert.Single (after);
 
 			Assert.Equal (2, lineAfter.Start.Y);
 			Assert.Equal (2, lineAfter.Start.X);
@@ -265,10 +264,10 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_ClipBottom ()
 		{
 			// y=1 to y=10
-			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=10 x=0-10
-						.Exclude (new Point (0,10), 10, Orientation.Horizontal)
+						.Exclude (new Point (0, 10), 10, Orientation.Horizontal)
 						.ToArray ();
 			// y=1 to y=9,
 			var lineAfter = Assert.Single (after);
@@ -283,22 +282,22 @@ namespace Terminal.Gui.DrawingTests {
 		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_MissTop ()
 		{
 			// y=1 to y=10
-			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=0 x=0-10
 						.Exclude (new Point (0, 0), 10, Orientation.Horizontal)
 						.ToArray ();
 			// Exclusion line is too far above so hits nothing
-			Assert.Same(Assert.Single (after),l1);
+			Assert.Same (Assert.Single (after), l1);
 		}
 		[Fact, AutoInitShutdown]
 		public void TestExcludePerpendicular_VerticalLine_HorizontalExclusion_MissBottom ()
 		{
 			// y=1 to y=10
-			var l1 = new StraightLine (new Point (2,1), 10, Orientation.Vertical, LineStyle.Single);
+			var l1 = new StraightLine (new Point (2, 1), 10, Orientation.Vertical, LineStyle.Single);
 			var after = new StraightLine [] { l1 }
 						// exclude y=11 x=0-10
-						.Exclude (new Point (0,11), 10, Orientation.Horizontal)
+						.Exclude (new Point (0, 11), 10, Orientation.Horizontal)
 						.ToArray ();
 			// Exclusion line is too far to the right so hits nothing
 			Assert.Same (Assert.Single (after), l1);
@@ -307,13 +306,13 @@ namespace Terminal.Gui.DrawingTests {
 		#endregion Perpendicular Intersection Tests
 
 		[Fact, AutoInitShutdown]
-		public void LineCanvasIntegrationTest()
+		public void LineCanvasIntegrationTest ()
 		{
-			var lc = new LineCanvas();
-			lc.AddLine(new Point(0,0),10,Orientation.Horizontal,LineStyle.Single);
-			lc.AddLine(new Point(9,0),5,Orientation.Vertical,LineStyle.Single);
-			lc.AddLine(new Point(9,4),-10,Orientation.Horizontal,LineStyle.Single);
-			lc.AddLine(new Point(0,4),-5,Orientation.Vertical,LineStyle.Single);
+			var lc = new LineCanvas ();
+			lc.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+			lc.AddLine (new Point (9, 0), 5, Orientation.Vertical, LineStyle.Single);
+			lc.AddLine (new Point (9, 4), -10, Orientation.Horizontal, LineStyle.Single);
+			lc.AddLine (new Point (0, 4), -5, Orientation.Vertical, LineStyle.Single);
 
 
 			TestHelpers.AssertEqual (this._output,
@@ -322,55 +321,55 @@ namespace Terminal.Gui.DrawingTests {
 │        │
 │        │
 │        │
-└────────┘",$"{Environment.NewLine}{lc}");
+└────────┘", $"{Environment.NewLine}{lc}");
 			var origLines = lc.Lines;
 
-			lc = new LineCanvas(origLines.Exclude(new Point(0,0),10,Orientation.Horizontal));
+			lc = new LineCanvas (origLines.Exclude (new Point (0, 0), 10, Orientation.Horizontal));
 
 			TestHelpers.AssertEqual (this._output,
 				@"
 │        │
 │        │
 │        │
-└────────┘",$"{Environment.NewLine}{lc}");
+└────────┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(0,1),10,Orientation.Horizontal));
+			lc = new LineCanvas (origLines.Exclude (new Point (0, 1), 10, Orientation.Horizontal));
 			TestHelpers.AssertEqual (this._output,
 				@"
 ┌────────┐
           
 │        │
 │        │
-└────────┘",$"{Environment.NewLine}{lc}");
+└────────┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(0,2),10,Orientation.Horizontal));
+			lc = new LineCanvas (origLines.Exclude (new Point (0, 2), 10, Orientation.Horizontal));
 			TestHelpers.AssertEqual (this._output,
 				@"
 ┌────────┐
 │        │
           
 │        │
-└────────┘",$"{Environment.NewLine}{lc}");
+└────────┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(0,3),10,Orientation.Horizontal));
+			lc = new LineCanvas (origLines.Exclude (new Point (0, 3), 10, Orientation.Horizontal));
 			TestHelpers.AssertEqual (this._output,
 				@"
 ┌────────┐
 │        │
 │        │
           
-└────────┘",$"{Environment.NewLine}{lc}");
+└────────┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(0,4),10,Orientation.Horizontal));
+			lc = new LineCanvas (origLines.Exclude (new Point (0, 4), 10, Orientation.Horizontal));
 			TestHelpers.AssertEqual (this._output,
 				@"
 ┌────────┐
 │        │
 │        │
-│        │",$"{Environment.NewLine}{lc}");
+│        │", $"{Environment.NewLine}{lc}");
 
 
-			lc = new LineCanvas(origLines.Exclude(new Point(0,0),10,Orientation.Vertical));
+			lc = new LineCanvas (origLines.Exclude (new Point (0, 0), 10, Orientation.Vertical));
 
 			TestHelpers.AssertEqual (this._output,
 				@"
@@ -378,9 +377,9 @@ namespace Terminal.Gui.DrawingTests {
         │
         │
         │
-────────┘",$"{Environment.NewLine}{lc}");
+────────┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(1,0),10,Orientation.Vertical));
+			lc = new LineCanvas (origLines.Exclude (new Point (1, 0), 10, Orientation.Vertical));
 
 			TestHelpers.AssertEqual (this._output,
 				@"
@@ -388,9 +387,9 @@ namespace Terminal.Gui.DrawingTests {
 │        │
 │        │
 │        │
-└ ───────┘",$"{Environment.NewLine}{lc}");
+└ ───────┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(8,0),10,Orientation.Vertical));
+			lc = new LineCanvas (origLines.Exclude (new Point (8, 0), 10, Orientation.Vertical));
 
 			TestHelpers.AssertEqual (this._output,
 				@"
@@ -398,9 +397,9 @@ namespace Terminal.Gui.DrawingTests {
 │        │
 │        │
 │        │
-└─────── ┘",$"{Environment.NewLine}{lc}");
+└─────── ┘", $"{Environment.NewLine}{lc}");
 
-			lc = new LineCanvas(origLines.Exclude(new Point(9,0),10,Orientation.Vertical));
+			lc = new LineCanvas (origLines.Exclude (new Point (9, 0), 10, Orientation.Vertical));
 
 			TestHelpers.AssertEqual (this._output,
 				@"
@@ -408,7 +407,7 @@ namespace Terminal.Gui.DrawingTests {
 │        
 │        
 │        
-└────────",$"{Environment.NewLine}{lc}");
+└────────", $"{Environment.NewLine}{lc}");
 
 		}
 	}

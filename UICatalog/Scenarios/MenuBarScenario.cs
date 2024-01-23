@@ -1,10 +1,11 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MenuBar", "Demonstrates the MenuBar using the same menu used in unit tests.")]
-[ScenarioCategory ("Controls")] [ScenarioCategory ("Menu")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Menu")]
 public class MenuBarScenario : Scenario {
 	/// <summary>
 	/// This method creates at test menu bar. It is called by the MenuBar unit tests so
@@ -89,7 +90,7 @@ public class MenuBarScenario : Scenario {
 		Application.Top.Add (label);
 
 		_currentMenuBarItem = new Label () {
-			X = Pos.Right(label),
+			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
@@ -97,7 +98,7 @@ public class MenuBarScenario : Scenario {
 
 		label = new Label () {
 			X = 0,
-			Y = Pos.Bottom(label),
+			Y = Pos.Bottom (label),
 			Text = "Current MenuItem: "
 		};
 		Application.Top.Add (label);
@@ -122,7 +123,7 @@ public class MenuBarScenario : Scenario {
 			Text = ""
 		};
 		Application.Top.Add (_lastAction);
-		
+
 		label = new Label () {
 			X = 0,
 			Y = Pos.Bottom (label),
@@ -164,10 +165,10 @@ public class MenuBarScenario : Scenario {
 			_lastAction.Text = string.Empty;
 			_lastKey.Text = e.ToString ();
 		};
-		
+
 		// There's no focus change event, so this is a bit of a hack.
 		menuBar.LayoutComplete += (s, e) => {
-			_focusedView.Text = Application.Top.MostFocused?.ToString() ?? "None";
+			_focusedView.Text = Application.Top.MostFocused?.ToString () ?? "None";
 		};
 
 		var openBtn = new Button () {
@@ -183,7 +184,7 @@ public class MenuBarScenario : Scenario {
 
 		var hideBtn = new Button () {
 			X = Pos.Center (),
-			Y = Pos.Bottom(openBtn),
+			Y = Pos.Bottom (openBtn),
 			Text = "Toggle Menu._Visible",
 		};
 		hideBtn.Clicked += (s, e) => {

@@ -102,7 +102,8 @@ public class CheckboxTests {
 		Assert.Equal (new Rect (0, 0, 6, 1), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_StaysVisible ()
 	{
 		var checkBox = new CheckBox {
@@ -179,7 +180,8 @@ public class CheckboxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Left ()
 	{
 		var checkBox = new CheckBox {
@@ -229,7 +231,8 @@ public class CheckboxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Centered ()
 	{
 		var checkBox = new CheckBox {
@@ -281,7 +284,8 @@ public class CheckboxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Justified ()
 	{
 		var checkBox1 = new CheckBox {
@@ -350,7 +354,8 @@ public class CheckboxTests {
 		Assert.Equal (new Rect (0, 0, 30, 6), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Right ()
 	{
 		var checkBox = new CheckBox {
@@ -402,7 +407,8 @@ public class CheckboxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_AnchorEnd_Without_HotKeySpecifier ()
 	{
 		var checkBox = new CheckBox {
@@ -448,7 +454,8 @@ public class CheckboxTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_AnchorEnd_With_HotKeySpecifier ()
 	{
 		var checkBox = new CheckBox {
@@ -494,7 +501,8 @@ public class CheckboxTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AllowNullChecked_Get_Set ()
 	{
 		var checkBox = new CheckBox ("Check this out 你");

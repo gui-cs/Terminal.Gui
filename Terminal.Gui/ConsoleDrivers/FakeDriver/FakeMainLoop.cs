@@ -1,5 +1,4 @@
 ﻿using System;
-using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui;
 

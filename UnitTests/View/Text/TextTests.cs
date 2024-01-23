@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Channels;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace Terminal.Gui.ViewTests;
 

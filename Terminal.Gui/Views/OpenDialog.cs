@@ -11,11 +11,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Terminal.Gui.Resources;
-using System.Collections.ObjectModel;
 
 namespace Terminal.Gui {
 
@@ -72,7 +70,7 @@ namespace Terminal.Gui {
 			OpenMode = openMode;
 			Title = title;
 			Style.OkButtonText = openMode == OpenMode.File ? Strings.btnOpen : openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
-			
+
 			if (allowedTypes != null) {
 				AllowedTypes = allowedTypes;
 			}
@@ -82,8 +80,8 @@ namespace Terminal.Gui {
 		/// </summary>
 		/// <value>The file paths.</value>
 		public IReadOnlyList<string> FilePaths {
-			get => Canceled ? Enumerable.Empty<string> ().ToList().AsReadOnly()
-				: AllowsMultipleSelection ? base.MultiSelected : new ReadOnlyCollection<string>(new [] { Path });
+			get => Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly ()
+				: AllowsMultipleSelection ? base.MultiSelected : new ReadOnlyCollection<string> (new [] { Path });
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Terminal.Gui;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests {
@@ -76,7 +74,7 @@ namespace Terminal.Gui.ViewsTests {
 			//expected = "|";
 			//TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 		}
-		
+
 		[Fact, AutoInitShutdown]
 		public void TestSpinnerView_NoThrottle ()
 		{

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Defines rendering options that affect how the table is displayed.

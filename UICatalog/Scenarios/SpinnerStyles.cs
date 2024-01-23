@@ -71,8 +71,8 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (ckbBounce);
 
-			var delayLabel = new Label () { 
-Text = "Delay:", 
+			var delayLabel = new Label () {
+				Text = "Delay:",
 				X = Pos.Right (ckbBounce) + 2,
 				Y = Pos.Bottom (preview) + 1
 			};
@@ -88,8 +88,8 @@ Text = "Delay:",
 					spinner.SpinDelay = i;
 			};
 
-			var customLabel = new Label () { 
-Text = "Custom:", 
+			var customLabel = new Label () {
+				Text = "Custom:",
 				X = Pos.Right (delayField) + 2,
 				Y = Pos.Bottom (preview) + 1
 			};
@@ -133,7 +133,7 @@ Text = "Custom:",
 					SetCustom ();
 				} else {
 					spinner.Visible = true;
-					spinner.Style = (SpinnerStyle)Activator.CreateInstance(styleDict [e.Item].Value);
+					spinner.Style = (SpinnerStyle)Activator.CreateInstance (styleDict [e.Item].Value);
 					delayField.Text = spinner.SpinDelay.ToString ();
 					ckbBounce.Checked = spinner.SpinBounce;
 					ckbNoSpecial.Checked = !spinner.HasSpecialCharacters;

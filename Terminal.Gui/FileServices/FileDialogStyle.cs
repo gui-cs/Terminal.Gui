@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui.Resources;
 using static System.Environment;
-using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 

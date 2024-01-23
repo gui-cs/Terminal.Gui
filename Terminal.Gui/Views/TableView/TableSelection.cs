@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Describes a selected region of the table

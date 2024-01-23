@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Linq;
 using Terminal.Gui;
-using System.Linq;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Tile View Nesting", Description: "Demonstrates recursive nesting of TileViews")]
@@ -35,28 +34,28 @@ namespace UICatalog.Scenarios {
 				Text = "2",
 			};
 
-			textField.TextChanged += (s,e) => SetupTileView ();
+			textField.TextChanged += (s, e) => SetupTileView ();
 
-			cbHorizontal = new CheckBox () { 
-Text = "Horizontal", 
+			cbHorizontal = new CheckBox () {
+				Text = "Horizontal",
 				X = Pos.Right (textField) + 1
 			};
 			cbHorizontal.Toggled += (s, e) => SetupTileView ();
 
-			cbBorder = new CheckBox () { 
-Text = "Border", 
+			cbBorder = new CheckBox () {
+				Text = "Border",
 				X = Pos.Right (cbHorizontal) + 1
 			};
 			cbBorder.Toggled += (s, e) => SetupTileView ();
 
-			cbTitles = new CheckBox () { 
-Text = "Titles", 
+			cbTitles = new CheckBox () {
+				Text = "Titles",
 				X = Pos.Right (cbBorder) + 1
 			};
-			cbTitles.Toggled += (s,e) => SetupTileView ();
+			cbTitles.Toggled += (s, e) => SetupTileView ();
 
-			cbUseLabels = new CheckBox () { 
-Text = "Use Labels", 
+			cbUseLabels = new CheckBox () {
+				Text = "Use Labels",
 				X = Pos.Right (cbTitles) + 1
 			};
 			cbUseLabels.Toggled += (s, e) => SetupTileView ();
@@ -85,7 +84,7 @@ Text = "Use Labels",
 
 			Application.Top.Add (menu);
 
-			Win.Loaded += (s,e) => loaded = true;
+			Win.Loaded += (s, e) => loaded = true;
 		}
 
 		private void SetupTileView ()
@@ -96,7 +95,7 @@ Text = "Use Labels",
 			bool? border = cbBorder.Checked;
 			bool? startHorizontal = cbHorizontal.Checked;
 
-			foreach(var sub in workArea.Subviews) {
+			foreach (var sub in workArea.Subviews) {
 				sub.Dispose ();
 			}
 			workArea.RemoveAll ();

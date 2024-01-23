@@ -32,7 +32,7 @@ namespace Terminal.Gui {
 		/// </summary>
 		public bool UseUnicodeCharacters {
 			get => _useUnicodeCharacters;
-			set { 
+			set {
 				_useUnicodeCharacters = value;
 				if (value) {
 					UseNerdIcons = false;
@@ -72,15 +72,15 @@ namespace Terminal.Gui {
 
 			return UseUnicodeCharacters ? ConfigurationManager.Glyphs.File : new Rune (' ');
 		}
-		
+
 		/// <summary>
 		/// Returns <see cref="GetIcon(IFileSystemInfo)"/> with an extra
 		/// space on the end if icon is likely to overlap adjacent cells.
 		/// </summary>
-		public string GetIconWithOptionalSpace(IFileSystemInfo fileSystemInfo)
+		public string GetIconWithOptionalSpace (IFileSystemInfo fileSystemInfo)
 		{
 			var space = UseNerdIcons ? " " : "";
-			return GetIcon(fileSystemInfo) + space;
+			return GetIcon (fileSystemInfo) + space;
 		}
 	}
 }

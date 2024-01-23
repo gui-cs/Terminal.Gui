@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,7 +68,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
-		public LineCanvas()
+		public LineCanvas ()
 		{
 			// TODO: Refactor ConfigurationManager to not use an event handler for this.
 			// Instead, have it call a method on any class appropriately attributed
@@ -81,9 +80,9 @@ namespace Terminal.Gui {
 		/// Creates a new instance with the given <paramref name="lines"/>.
 		/// </summary>
 		/// <param name="lines">Initial lines for the canvas.</param>
-		public LineCanvas (IEnumerable<StraightLine> lines) : this()
+		public LineCanvas (IEnumerable<StraightLine> lines) : this ()
 		{
-			_lines = lines.ToList();
+			_lines = lines.ToList ();
 		}
 
 		private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
@@ -98,7 +97,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the lines in the canvas.
 		/// </summary>
-		public IReadOnlyCollection<StraightLine> Lines { get { return _lines.AsReadOnly(); } }
+		public IReadOnlyCollection<StraightLine> Lines { get { return _lines.AsReadOnly (); } }
 
 		Dictionary<IntersectionRuneType, IntersectionRuneResolver> runeResolvers = new Dictionary<IntersectionRuneType, IntersectionRuneResolver> {
 			{IntersectionRuneType.ULCorner,new ULIntersectionRuneResolver()},
@@ -153,11 +152,11 @@ namespace Terminal.Gui {
 		/// Removes the last line added to the canvas
 		/// </summary>
 		/// <returns></returns>
-		public StraightLine RemoveLastLine()
+		public StraightLine RemoveLastLine ()
 		{
 			var l = _lines.LastOrDefault ();
-			if(l != null) {
-				_lines.Remove(l);
+			if (l != null) {
+				_lines.Remove (l);
 			}
 
 			return l!;
@@ -339,11 +338,11 @@ namespace Terminal.Gui {
 			internal Rune _thickBoth;
 			internal Rune _normal;
 
-			public IntersectionRuneResolver()
+			public IntersectionRuneResolver ()
 			{
 				SetGlyphs ();
 			}
-			
+
 			/// <summary>
 			/// Sets the glyphs used. Call this method after construction and any time 
 			/// ConfigurationManager has updated the settings.
@@ -559,7 +558,7 @@ namespace Terminal.Gui {
 			}
 		}
 
-		private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) =>intersects [0]!.Line.Attribute;
+		private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects) => intersects [0]!.Line.Attribute;
 
 		private Cell? GetCellForIntersects (ConsoleDriver driver, IntersectionDefinition? [] intersects)
 		{
@@ -739,7 +738,7 @@ namespace Terminal.Gui {
 				AddLine (line);
 			}
 		}
-		
+
 		/// <inheritdoc />
 		public void Dispose ()
 		{

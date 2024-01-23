@@ -3,9 +3,8 @@ using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DrawingTests; 
+namespace Terminal.Gui.DrawingTests;
 
 public class RulerTests {
 
@@ -49,7 +48,8 @@ public class RulerTests {
 		Assert.Equal (newAttribute, r.Attribute);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Default ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (25, 25);
@@ -59,7 +59,8 @@ public class RulerTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Horizontal ()
 	{
 		var len = 15;
@@ -119,7 +120,8 @@ public class RulerTests {
 └──────────────────┘", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Horizontal_Start ()
 	{
 		var len = 15;
@@ -159,7 +161,8 @@ public class RulerTests {
 └──────────────────┘", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Vertical ()
 	{
 		var len = 15;
@@ -279,7 +282,8 @@ public class RulerTests {
 └9──┘", _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Vertical_Start ()
 	{
 		var len = 15;

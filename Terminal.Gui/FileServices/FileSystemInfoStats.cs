@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui.Resources;
@@ -100,7 +99,7 @@ namespace Terminal.Gui {
 
 			int mag = (int)Math.Log (value, ByteConversion);
 			double adjustedSize = value / Math.Pow (1000, mag);
-			return string.Format (culture.NumberFormat,"{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
+			return string.Format (culture.NumberFormat, "{0:n2} {1}", adjustedSize, SizeSuffixes [mag]);
 		}
 	}
 }

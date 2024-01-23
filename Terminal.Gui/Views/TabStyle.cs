@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Describes render stylistic selections of a <see cref="TabView"/>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Terminal.Gui;
+﻿using System.Collections.Generic;
 using Xunit;
 
 namespace Terminal.Gui.ApplicationTests {

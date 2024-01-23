@@ -1,12 +1,5 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-using static Terminal.Gui.ConfigurationManager;
+﻿using System.Text.Json;
+using Xunit;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class AppScopeTests {
@@ -48,16 +41,16 @@ namespace Terminal.Gui.ConfigurationTests {
 			Assert.Null (AppSettingsTestClass.TestProperty);
 			Assert.NotEmpty (ConfigurationManager.AppSettings);
 			Assert.Null (ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue);
-			
+
 			AppSettingsTestClass.TestProperty = true;
 			ConfigurationManager.Reset ();
 			Assert.True (AppSettingsTestClass.TestProperty);
 			Assert.NotEmpty (ConfigurationManager.AppSettings);
 			Assert.Null (ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
-			
+
 			ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue = false;
 			Assert.False (ConfigurationManager.AppSettings ["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
-			
+
 			// ConfigurationManager.Settings should NOT apply theme settings
 			ConfigurationManager.Settings.Apply ();
 			Assert.True (AppSettingsTestClass.TestProperty);

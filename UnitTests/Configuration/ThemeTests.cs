@@ -1,14 +1,7 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Text.Json;
+using Xunit;
 using static Terminal.Gui.ConfigurationManager;
-using Attribute = Terminal.Gui.Attribute;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class ThemeTests {

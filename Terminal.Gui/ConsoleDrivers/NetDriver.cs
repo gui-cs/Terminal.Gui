@@ -3,7 +3,6 @@
 //
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 using static Terminal.Gui.NetEvents;
-using static Terminal.Gui.WindowsConsole;
 
 namespace Terminal.Gui;
 

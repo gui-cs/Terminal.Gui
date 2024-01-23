@@ -92,7 +92,7 @@ public static class ConfigurationManager {
 
 	static readonly string _configFilename = "config.json";
 
-	internal static readonly JsonSerializerOptions _serializerOptions = new() {
+	internal static readonly JsonSerializerOptions _serializerOptions = new () {
 		ReadCommentHandling = JsonCommentHandling.Skip,
 		PropertyNameCaseInsensitive = true,
 		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -157,14 +157,16 @@ public static class ConfigurationManager {
 	/// <summary>
 	/// Application-specific configuration settings scope.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)] [JsonPropertyName ("AppSettings")]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+	[JsonPropertyName ("AppSettings")]
 	public static AppScope? AppSettings { get; set; }
 
 	/// <summary>
 	/// The set of glyphs used to draw checkboxes, lines, borders, etc...See also
 	/// <seealso cref="Terminal.Gui.GlyphDefinitions"/>.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)] [JsonPropertyName ("Glyphs")]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+	[JsonPropertyName ("Glyphs")]
 	public static GlyphDefinitions Glyphs { get; set; } = new ();
 
 	/// <summary>
@@ -199,9 +201,9 @@ public static class ConfigurationManager {
 		// Get Terminal.Gui.dll classes
 
 		var types = from assembly in AppDomain.CurrentDomain.GetAssemblies ()
-			from type in assembly.GetTypes ()
-			where type.GetProperties ().Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
-			select type;
+			    from type in assembly.GetTypes ()
+			    where type.GetProperties ().Any (prop => prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) != null)
+			    select type;
 
 		foreach (var classWithConfig in types) {
 			classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
@@ -211,11 +213,11 @@ public static class ConfigurationManager {
 		classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
 
 		foreach (var p in from c in classesWithConfigProps
-			let props = c.Value.GetProperties (BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Where (prop =>
-				prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
-			let enumerable = props
-			from p in enumerable
-			select p) {
+				  let props = c.Value.GetProperties (BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Where (prop =>
+					  prop.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty)
+				  let enumerable = props
+				  from p in enumerable
+				  select p) {
 			if (p.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is SerializableConfigurationProperty scp) {
 				if (p.GetGetMethod (true)!.IsStatic) {
 					// If the class name is omitted, JsonPropertyName is allowed. 

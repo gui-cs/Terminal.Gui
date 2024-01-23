@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// A single <see cref="ContentView"/> presented in a <see cref="TileView"/>. To create

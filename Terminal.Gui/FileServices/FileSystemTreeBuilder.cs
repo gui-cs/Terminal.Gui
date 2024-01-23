@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 
@@ -43,7 +42,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public IEnumerable<IFileSystemInfo> GetChildren (IFileSystemInfo forObject)
 		{
-			return this.TryGetChildren (forObject).OrderBy(k=>k,Sorter);
+			return this.TryGetChildren (forObject).OrderBy (k => k, Sorter);
 		}
 
 		private IEnumerable<IFileSystemInfo> TryGetChildren (IFileSystemInfo entry)

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Terminal.Gui;
 
@@ -191,7 +189,7 @@ public class Key : EventArgs, IEquatable<Key> {
 
 		// Extract the base key code
 		var baseKey = key;
-		if (baseKey.HasFlag(KeyCode.ShiftMask)) {
+		if (baseKey.HasFlag (KeyCode.ShiftMask)) {
 			baseKey &= ~KeyCode.ShiftMask;
 		}
 
@@ -525,7 +523,7 @@ public class Key : EventArgs, IEquatable<Key> {
 		// "Ctrl+" (trim)
 		// "Ctrl++" (trim)
 
-		if (input.Length > 1 && new Rune(input [^1]) == separator && new Rune(input [^2]) != separator) {
+		if (input.Length > 1 && new Rune (input [^1]) == separator && new Rune (input [^2]) != separator) {
 			return input [..^1];
 		}
 		return input;

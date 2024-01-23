@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 
 namespace Terminal.Gui;
@@ -27,7 +26,7 @@ public class ShortcutHelper {
 	/// The keystroke combination used in the <see cref="Shortcut"/> as string.
 	/// </summary>
 	public virtual string ShortcutTag => Key.ToString (shortcut, MenuBar.ShortcutDelimiter);
-	
+
 	/// <summary>
 	/// Return key as string.
 	/// </summary>
@@ -76,7 +75,7 @@ public class ShortcutHelper {
 			delimiter = MenuBar.ShortcutDelimiter;
 		}
 
-		string [] keys = sCut.Split (delimiter.ToString());
+		string [] keys = sCut.Split (delimiter.ToString ());
 		for (int i = 0; i < keys.Length; i++) {
 			var k = keys [i];
 			if (k == "Ctrl") {

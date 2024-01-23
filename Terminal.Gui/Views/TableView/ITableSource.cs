@@ -2,8 +2,7 @@
 	/// <summary>
 	/// Tabular matrix of data to be displayed in a <see cref="TableView"/>.
 	/// </summary>
-	public interface ITableSource
-	{
+	public interface ITableSource {
 		/// <summary>
 		/// Gets the number of rows in the table.
 		/// </summary>
@@ -17,7 +16,7 @@
 		/// <summary>
 		/// Gets the label for each column.
 		/// </summary>
-		string[] ColumnNames { get; }
+		string [] ColumnNames { get; }
 
 		/// <summary>
 		/// Returns the data at the given indexes of the table (row, column).
@@ -25,8 +24,7 @@
 		/// <param name="row"></param>
 		/// <param name="col"></param>
 		/// <returns></returns>
-		object this[int row, int col]
-		{
+		object this [int row, int col] {
 			get;
 		}
 	}

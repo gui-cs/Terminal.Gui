@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Xunit;
-using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui.ConsoleDrivers;
 public class ConsoleKeyMappingTests {
@@ -284,7 +282,7 @@ public class ConsoleKeyMappingTests {
 		}
 	}
 #endif
-	
+
 	[Theory]
 	[InlineData ('a', ConsoleKey.A, false, false, false, (KeyCode)'a')]
 	[InlineData ('A', ConsoleKey.A, true, false, false, KeyCode.A | KeyCode.ShiftMask)]

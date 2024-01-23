@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Contains a dictionary of the <see cref="ThemeManager.Theme"/>s for a Terminal.Gui application.

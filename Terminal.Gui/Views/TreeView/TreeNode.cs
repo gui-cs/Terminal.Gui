@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Interface to implement when you want the regular (non generic) <see cref="TreeView"/>

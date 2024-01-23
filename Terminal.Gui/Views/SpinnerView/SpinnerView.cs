@@ -80,8 +80,8 @@ namespace Terminal.Gui {
 			_bounce = false;
 			SpinReverse = false;
 			SetStyle (DEFAULT_STYLE);
-			
-			AdvanceAnimation();
+
+			AdvanceAnimation ();
 		}
 
 		private void SetStyle (SpinnerStyle style)
@@ -155,7 +155,7 @@ namespace Terminal.Gui {
 		/// <remarks>Ensure this method is called on the main UI
 		/// thread e.g. via <see cref="Application.Invoke"/>
 		/// </remarks>
-		public void AdvanceAnimation()
+		public void AdvanceAnimation ()
 		{
 			if (DateTime.Now - _lastRender > TimeSpan.FromMilliseconds (SpinDelay)) {
 
@@ -195,7 +195,7 @@ namespace Terminal.Gui {
 				_lastRender = DateTime.Now;
 			}
 
-			SetNeedsDisplay();
+			SetNeedsDisplay ();
 		}
 
 		/// <summary>

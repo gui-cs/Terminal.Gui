@@ -24,18 +24,18 @@ namespace UICatalog.Scenarios {
 			};
 			Win.Add (lblDriverName);
 
-			var cbSupportsTrueColor = new CheckBox () { 
-Text = "supports true color ", 
-				X = Pos.Right(lblDriverName) + 2,
+			var cbSupportsTrueColor = new CheckBox () {
+				Text = "supports true color ",
+				X = Pos.Right (lblDriverName) + 2,
 				Y = 0,
 				Checked = canTrueColor,
 				CanFocus = false
 			};
 			Win.Add (cbSupportsTrueColor);
 
-			var cbUseTrueColor = new CheckBox () { 
-Text = "Use true color", 
-				X = Pos.Right(cbSupportsTrueColor) + 2,
+			var cbUseTrueColor = new CheckBox () {
+				Text = "Use true color",
+				X = Pos.Right (cbSupportsTrueColor) + 2,
 				Y = 0,
 				Checked = !Application.Force16Colors,
 				Enabled = canTrueColor,
@@ -43,8 +43,8 @@ Text = "Use true color",
 			cbUseTrueColor.Toggled += (_, evt) => Application.Force16Colors = !evt.NewValue ?? false;
 			Win.Add (cbUseTrueColor);
 
-			var btnOpenImage = new Button () { 
-Text = "Open Image", 
+			var btnOpenImage = new Button () {
+				Text = "Open Image",
 				X = Pos.Right (cbUseTrueColor) + 2,
 				Y = 0
 			};
@@ -52,7 +52,7 @@ Text = "Open Image",
 
 			var imageView = new ImageView () {
 				X = 0,
-				Y = Pos.Bottom(lblDriverName),
+				Y = Pos.Bottom (lblDriverName),
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 			};
@@ -60,12 +60,14 @@ Text = "Open Image",
 
 
 			btnOpenImage.Clicked += (_, _) => {
-				var ofd = new OpenDialog () { 
-Text = "Open Image",  AllowsMultipleSelection = false,  };
+				var ofd = new OpenDialog () {
+					Text = "Open Image",
+					AllowsMultipleSelection = false,
+				};
 				Application.Run (ofd);
 
 				if (ofd.Path is not null) {
-					Directory.SetCurrentDirectory (Path.GetFullPath(Path.GetDirectoryName(ofd.Path)!));
+					Directory.SetCurrentDirectory (Path.GetFullPath (Path.GetDirectoryName (ofd.Path)!));
 				}
 
 				if (ofd.Canceled) {
@@ -110,7 +112,7 @@ Text = "Open Image",  AllowsMultipleSelection = false,  };
 				this.SetNeedsDisplay ();
 			}
 
-			public override void OnDrawContent(Rect bounds)
+			public override void OnDrawContent (Rect bounds)
 			{
 				base.OnDrawContent (bounds);
 

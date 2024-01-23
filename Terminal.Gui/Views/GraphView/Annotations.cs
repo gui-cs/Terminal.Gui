@@ -183,7 +183,7 @@ namespace Terminal.Gui {
 				Application.Driver.AddStr (str);
 
 				linesDrawn++;
-				
+
 				// Legend has run out of space
 				if (linesDrawn >= Bounds.Height) {
 					break;

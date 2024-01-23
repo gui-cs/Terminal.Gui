@@ -124,7 +124,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override int GetHashCode ()
 		{
-			return X.GetHashCode() ^ Y.GetHashCode ();
+			return X.GetHashCode () ^ Y.GetHashCode ();
 		}
 
 		/// <summary>

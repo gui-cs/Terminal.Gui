@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Terminal.Gui;
-using static UICatalog.Scenario;
 
 namespace UICatalog.Scenarios {
 
 	[ScenarioMetadata (Name: "Line View", Description: "Demonstrates drawing lines using the LineView control.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("LineView"),ScenarioCategory ("Borders")]
+	[ScenarioCategory ("Controls"), ScenarioCategory ("LineView"), ScenarioCategory ("Borders")]
 	public class LineViewExample : Scenario {
 
 		public override void Setup ()
@@ -25,8 +20,10 @@ namespace UICatalog.Scenarios {
 			});
 			Application.Top.Add (menu);
 
-			Win.Add (new Label () { 
-Text = "Regular Line",  Y = 0 });
+			Win.Add (new Label () {
+				Text = "Regular Line",
+				Y = 0
+			});
 
 			// creates a horizontal line
 			var line = new LineView () {
@@ -35,8 +32,10 @@ Text = "Regular Line",  Y = 0 });
 
 			Win.Add (line);
 
-			Win.Add (new Label () { 
-Text = "Double Width Line",  Y = 2 });
+			Win.Add (new Label () {
+				Text = "Double Width Line",
+				Y = 2
+			});
 
 			// creates a horizontal line
 			var doubleLine = new LineView () {
@@ -46,8 +45,10 @@ Text = "Double Width Line",  Y = 2 });
 
 			Win.Add (doubleLine);
 
-			Win.Add (new Label () { 
-Text = "Short Line",  Y = 4 });
+			Win.Add (new Label () {
+				Text = "Short Line",
+				Y = 4
+			});
 
 			// creates a horizontal line
 			var shortLine = new LineView () {
@@ -57,8 +58,10 @@ Text = "Short Line",  Y = 4 });
 
 			Win.Add (shortLine);
 
-			Win.Add (new Label () { 
-Text = "Arrow Line",  Y = 6 });
+			Win.Add (new Label () {
+				Text = "Arrow Line",
+				Y = 6
+			});
 
 			// creates a horizontal line
 			var arrowLine = new LineView () {
@@ -70,8 +73,11 @@ Text = "Arrow Line",  Y = 6 });
 
 			Win.Add (arrowLine);
 
-			Win.Add (new Label () { 
-Text = "Vertical Line",  Y = 9,X=11 });
+			Win.Add (new Label () {
+				Text = "Vertical Line",
+				Y = 9,
+				X = 11
+			});
 
 			// creates a horizontal line
 			var verticalLine = new LineView (Orientation.Vertical) {
@@ -80,8 +86,11 @@ Text = "Vertical Line",  Y = 9,X=11 });
 
 			Win.Add (verticalLine);
 
-			Win.Add (new Label () { 
-Text = "Vertical Arrow",  Y = 11, X = 28 });
+			Win.Add (new Label () {
+				Text = "Vertical Arrow",
+				Y = 11,
+				X = 28
+			});
 
 			// creates a horizontal line
 			var verticalArrow = new LineView (Orientation.Vertical) {

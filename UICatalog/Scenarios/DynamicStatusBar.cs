@@ -1,10 +1,10 @@
-﻿using System.Text;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;

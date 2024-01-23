@@ -7,44 +7,44 @@ namespace UICatalog.Scenarios {
 	public class SendKeys : Scenario {
 		public override void Setup ()
 		{
-			var label = new Label () { 
-Text = "Insert the text to send:", 
+			var label = new Label () {
+				Text = "Insert the text to send:",
 				X = Pos.Center (),
 				Y = Pos.Center () - 6
 			};
 			Win.Add (label);
 
-			var txtInput = new TextField () { 
-Text = "MockKeyPresses", 
+			var txtInput = new TextField () {
+				Text = "MockKeyPresses",
 				X = Pos.Center (),
 				Y = Pos.Center () - 5,
 				Width = 20
 			};
 			Win.Add (txtInput);
 
-			var ckbShift = new CheckBox () { 
-Text = "Shift", 
+			var ckbShift = new CheckBox () {
+				Text = "Shift",
 				X = Pos.Center (),
 				Y = Pos.Center () - 4
 			};
 			Win.Add (ckbShift);
 
-			var ckbAlt = new CheckBox () { 
-Text = "Alt", 
+			var ckbAlt = new CheckBox () {
+				Text = "Alt",
 				X = Pos.Center (),
 				Y = Pos.Center () - 3
 			};
 			Win.Add (ckbAlt);
 
-			var ckbControl = new CheckBox () { 
-Text = "Control", 
+			var ckbControl = new CheckBox () {
+				Text = "Control",
 				X = Pos.Center (),
 				Y = Pos.Center () - 2
 			};
 			Win.Add (ckbControl);
 
-			label = new Label () { 
-Text = "Result keys:", 
+			label = new Label () {
+				Text = "Result keys:",
 				X = Pos.Center (),
 				Y = Pos.Center () + 1
 			};
@@ -93,8 +93,8 @@ Text = "Result keys:",
 			};
 			Win.Add (lblShippedControlKeys);
 
-			var button = new Button () { 
-Text = "Process keys", 
+			var button = new Button () {
+				Text = "Process keys",
 				X = Pos.Center (),
 				Y = Pos.Center () + 7,
 				IsDefault = true
@@ -121,7 +121,7 @@ Text = "Process keys",
 				txtInput.SetFocus ();
 			}
 
-			button.Clicked += (s,e) => ProcessInput ();
+			button.Clicked += (s, e) => ProcessInput ();
 
 			Win.KeyDown += (s, e) => {
 				if (e.KeyCode == KeyCode.Enter) {

@@ -14,16 +14,14 @@
 // still incorrect so we still need this hack.
 #define HACK_CHECK_WINCHANGED
 
-using System.Text;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using Terminal.Gui.ConsoleDrivers;
-using static Unix.Terminal.Delegates;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
 
 namespace Terminal.Gui;
@@ -826,7 +824,7 @@ internal class WindowsDriver : ConsoleDriver {
 		// TODO: if some other Windows-based terminal supports true color, update this logic to not
 		// force 16color mode (.e.g ConEmu which really doesn't work well at all).
 		_isWindowsTerminal = _isWindowsTerminal = Environment.GetEnvironmentVariable ("WT_SESSION") != null ||
-		                                          Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
+							  Environment.GetEnvironmentVariable ("VSAPPIDNAME") != null;
 		if (!_isWindowsTerminal) {
 			Force16Colors = true;
 		}

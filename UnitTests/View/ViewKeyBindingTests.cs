@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;

@@ -5,11 +5,10 @@
 //	José Miguel Perricone (jmperricone@hotmail.com)
 //
 
-using System.Text;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Terminal.Gui.TextValidateProviders;
 
@@ -621,7 +620,7 @@ namespace Terminal.Gui {
 			if (a.AsRune == default) {
 				return false;
 			}
-			
+
 			var key = a.AsRune;
 
 			var inserted = provider.InsertAt ((char)key.Value, cursorPosition);

@@ -18,7 +18,7 @@ public class SetRelativeLayoutTests {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 		};
-		
+
 		view.SetRelativeLayout (new Rect (0, 0, 80, 25));
 		Assert.Equal ("Fill(0)", view.Width.ToString ());
 		Assert.Equal (1, view.Frame.X);

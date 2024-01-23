@@ -7,7 +7,7 @@ using System.Text.Json;
 using Xunit;
 using static Terminal.Gui.ConfigurationManager;
 
-namespace Terminal.Gui.ConfigurationTests; 
+namespace Terminal.Gui.ConfigurationTests;
 
 public class ConfigurationManagerTests {
 	public static readonly JsonSerializerOptions _jsonOptions = new JsonSerializerOptions {

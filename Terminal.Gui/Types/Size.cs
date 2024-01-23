@@ -14,8 +14,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Stores an ordered pair of integers, which specify a Height and Width.
 	/// </summary>
-	public struct Size
-	{
+	public struct Size {
 		int width, height;
 
 		/// <summary>
@@ -33,7 +32,7 @@ namespace Terminal.Gui {
 
 		public static Size operator + (Size sz1, Size sz2)
 		{
-			return new Size (sz1.Width + sz2.Width, 
+			return new Size (sz1.Width + sz2.Width,
 					 sz1.Height + sz2.Height);
 		}
 
@@ -49,7 +48,7 @@ namespace Terminal.Gui {
 
 		public static bool operator == (Size sz1, Size sz2)
 		{
-			return ((sz1.Width == sz2.Width) && 
+			return ((sz1.Width == sz2.Width) &&
 				(sz1.Height == sz2.Height));
 		}
 
@@ -65,7 +64,7 @@ namespace Terminal.Gui {
 
 		public static bool operator != (Size sz1, Size sz2)
 		{
-			return ((sz1.Width != sz2.Width) || 
+			return ((sz1.Width != sz2.Width) ||
 				(sz1.Height != sz2.Height));
 		}
 
@@ -79,7 +78,7 @@ namespace Terminal.Gui {
 
 		public static Size operator - (Size sz1, Size sz2)
 		{
-			return new Size (sz1.Width - sz2.Width, 
+			return new Size (sz1.Width - sz2.Width,
 					 sz1.Height - sz2.Height);
 		}
 
@@ -193,7 +192,7 @@ namespace Terminal.Gui {
 			if (!(obj is Size))
 				return false;
 
-			return (this == (Size) obj);
+			return (this == (Size)obj);
 		}
 
 		/// <summary>
@@ -206,7 +205,7 @@ namespace Terminal.Gui {
 
 		public override int GetHashCode ()
 		{
-			return width^height;
+			return width ^ height;
 		}
 
 		/// <summary>
@@ -230,7 +229,7 @@ namespace Terminal.Gui {
 		/// <param name="sz2">The second Size structure to add.</param>
 		public static Size Add (Size sz1, Size sz2)
 		{
-			return new Size (sz1.Width + sz2.Width, 
+			return new Size (sz1.Width + sz2.Width,
 					 sz1.Height + sz2.Height);
 
 		}
@@ -243,7 +242,7 @@ namespace Terminal.Gui {
 		/// <param name="sz2">The second Size structure to subtract.</param>
 		public static Size Subtract (Size sz1, Size sz2)
 		{
-			return new Size (sz1.Width - sz2.Width, 
+			return new Size (sz1.Width - sz2.Width,
 					 sz1.Height - sz2.Height);
 		}
 

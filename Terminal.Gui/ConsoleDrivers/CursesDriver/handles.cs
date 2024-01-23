@@ -139,12 +139,12 @@ namespace Unix.Terminal {
 			{
 				return Curses.wnoutrefresh (Handle);
 			}
-	
+
 			public int move (int line, int col)
 			{
 				return Curses.wmove (Handle, line, col);
 			}
-	
+
 			public int addch (char ch)
 			{
 				return Curses.waddch (Handle, ch);
@@ -160,16 +160,16 @@ namespace Unix.Terminal {
 				return Curses.wrefresh (Handle);
 			}
 		}
-	
-	 	// Currently unused, to do later
-	 	internal class Screen {
-	 		public readonly IntPtr Handle;
-	 		
-	 		internal Screen (IntPtr handle)
-	 		{
-	 			Handle = handle;
-	 		}
-	 	}
+
+		// Currently unused, to do later
+		internal class Screen {
+			public readonly IntPtr Handle;
+
+			internal Screen (IntPtr handle)
+			{
+				Handle = handle;
+			}
+		}
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 	}

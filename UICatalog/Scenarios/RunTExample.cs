@@ -26,8 +26,8 @@ namespace UICatalog.Scenarios {
 					Text = "Username:"
 				};
 
-				usernameText = new TextField () { 
-Text = "", 
+				usernameText = new TextField () {
+					Text = "",
 					// Position text field adjacent to the label
 					X = Pos.Right (usernameLabel) + 1,
 
@@ -41,8 +41,8 @@ Text = "",
 					Y = Pos.Bottom (usernameLabel) + 1
 				};
 
-				var passwordText = new TextField () { 
-Text = "", 
+				var passwordText = new TextField () {
+					Text = "",
 					Secret = true,
 					// align with the text box above
 					X = Pos.Left (usernameText),
@@ -60,7 +60,7 @@ Text = "",
 				};
 
 				// When login button is clicked display a message popup
-				btnLogin.Clicked += (s,e) => {
+				btnLogin.Clicked += (s, e) => {
 					if (usernameText.Text == "admin" && passwordText.Text == "password") {
 						MessageBox.Query ("Login Successful", $"Username: {usernameText.Text}", "Ok");
 						Application.RequestStop ();

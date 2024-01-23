@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -11,8 +10,7 @@ namespace Terminal.Gui {
 	/// Interface for <see cref="FileDialog"/> restrictions on which file type(s) the
 	/// user is allowed to select/enter.
 	/// </summary>
-	public interface IAllowedType
-	{
+	public interface IAllowedType {
 		/// <summary>
 		/// Returns true if the file at <paramref name="path"/> is compatible with this
 		/// allow option.  Note that the file may not exist (e.g. in the case of saving).
@@ -85,22 +83,22 @@ namespace Terminal.Gui {
 
 			var desc = $"{this.Description} ({string.Join (";", this.Extensions.Select (e => '*' + e).ToArray ())})";
 
-			if(desc.Length > maxLength) {
-				return desc.Substring (0, maxLength-2) + "…";
+			if (desc.Length > maxLength) {
+				return desc.Substring (0, maxLength - 2) + "…";
 			}
 			return desc;
 		}
 
 		/// <inheritdoc/>
-		public bool IsAllowed(string path)
+		public bool IsAllowed (string path)
 		{
-			if(string.IsNullOrWhiteSpace(path)) {
+			if (string.IsNullOrWhiteSpace (path)) {
 				return false;
 			}
 
 			var extension = Path.GetExtension (path);
 
-			if(this.Extensions.Any(e=>path.EndsWith(e, StringComparison.InvariantCultureIgnoreCase))) {
+			if (this.Extensions.Any (e => path.EndsWith (e, StringComparison.InvariantCultureIgnoreCase))) {
 				return true;
 			}
 
@@ -112,5 +110,5 @@ namespace Terminal.Gui {
 			return this.Extensions.Any (e => e.Equals (extension, StringComparison.InvariantCultureIgnoreCase));
 		}
 	}
-	
+
 }

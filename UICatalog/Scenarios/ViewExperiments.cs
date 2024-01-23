@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("View Experiments", "v2 View Experiments")]
 [ScenarioCategory ("Controls"), ScenarioCategory ("Borders"), ScenarioCategory ("Layout"), ScenarioCategory ("Proof of Concept")]

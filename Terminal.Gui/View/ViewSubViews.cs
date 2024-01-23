@@ -276,7 +276,7 @@ public partial class View {
 		/// Navigate forward.
 		/// </summary>
 		Forward,
-		
+
 		/// <summary>
 		/// Navigate backwards.
 		/// </summary>

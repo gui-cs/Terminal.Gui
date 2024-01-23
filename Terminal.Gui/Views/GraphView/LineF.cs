@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Describes two points in graph space and a line between them

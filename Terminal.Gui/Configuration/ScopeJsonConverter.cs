@@ -114,8 +114,8 @@ internal class ScopeJsonConverter<scopeT> : JsonConverter<scopeT> where scopeT :
 					.Where (cp =>
 					cp.Value.PropertyInfo?.GetCustomAttribute (typeof (SerializableConfigurationProperty)) is
 					SerializableConfigurationProperty scp && scp?.Scope == typeof (scopeT))
-					where p.Value.PropertyValue != null
-					select p) {
+				  where p.Value.PropertyValue != null
+				  select p) {
 
 			writer.WritePropertyName (p.Key);
 			var propertyType = p.Value.PropertyInfo?.PropertyType;

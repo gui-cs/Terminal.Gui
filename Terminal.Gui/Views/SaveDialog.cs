@@ -11,7 +11,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui {
@@ -44,7 +43,7 @@ namespace Terminal.Gui {
 			Title = title;
 			Style.OkButtonText = Strings.btnSave;
 
-			if(allowedTypes != null) {
+			if (allowedTypes != null) {
 				AllowedTypes = allowedTypes;
 			}
 		}

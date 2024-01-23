@@ -16,7 +16,8 @@ public class OverlappedTests {
 #endif
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Dispose_Toplevel_IsOverlappedContainer_False_With_Begin_End ()
 	{
 		Application.Init (new FakeDriver ());
@@ -35,7 +36,8 @@ public class OverlappedTests {
 #endif
 	}
 
-	[Fact] [TestRespondersDisposed]
+	[Fact]
+	[TestRespondersDisposed]
 	public void Dispose_Toplevel_IsOverlappedContainer_True_With_Begin ()
 	{
 		Application.Init (new FakeDriver ());

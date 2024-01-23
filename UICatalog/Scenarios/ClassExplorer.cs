@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -87,22 +86,21 @@ namespace UICatalog.Scenarios {
 				Height = Dim.Fill (),
 			};
 
-			var lblSearch = new Label("Search");
-			var tfSearch = new TextField(){
+			var lblSearch = new Label ("Search");
+			var tfSearch = new TextField () {
 				Width = 20,
-				X = Pos.Right(lblSearch),
+				X = Pos.Right (lblSearch),
 			};
 
-			Win.Add(lblSearch);
-			Win.Add(tfSearch);
+			Win.Add (lblSearch);
+			Win.Add (tfSearch);
 
-			var filter = new TreeViewTextFilter<object>(_treeView);
+			var filter = new TreeViewTextFilter<object> (_treeView);
 			_treeView.Filter = filter;
-			tfSearch.TextChanged += (s,e)=>{
-				filter.Text = tfSearch.Text.ToString();
-				if(_treeView.SelectedObject != null)
-				{
-					_treeView.EnsureVisible(_treeView.SelectedObject);
+			tfSearch.TextChanged += (s, e) => {
+				filter.Text = tfSearch.Text.ToString ();
+				if (_treeView.SelectedObject != null) {
+					_treeView.EnsureVisible (_treeView.SelectedObject);
 				}
 			};
 

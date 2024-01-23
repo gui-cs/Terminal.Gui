@@ -8,8 +8,8 @@ namespace Terminal.Gui.ViewsTests {
 		public void Default_Constructor ()
 		{
 			var pb = new ProgressBar ();
-			pb.BeginInit();
-			pb.EndInit();
+			pb.BeginInit ();
+			pb.EndInit ();
 
 			Assert.False (pb.CanFocus);
 			Assert.Equal (0, pb.Fraction);

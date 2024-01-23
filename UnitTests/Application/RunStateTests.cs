@@ -1,13 +1,8 @@
 using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Terminal.Gui;
 using Xunit;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ApplicationTests {
 	/// <summary>
@@ -73,7 +68,7 @@ namespace Terminal.Gui.ApplicationTests {
 			Application.Shutdown ();
 #if DEBUG_IDISPOSABLE
 			// Validate there are no outstanding RunState-based instances left
-			foreach (var inst in RunState.Instances) 				Assert.True (inst.WasDisposed);
+			foreach (var inst in RunState.Instances) Assert.True (inst.WasDisposed);
 #endif
 		}
 

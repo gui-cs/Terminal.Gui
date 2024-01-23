@@ -40,13 +40,13 @@ public class FrameTests {
 	[InlineData (1, 10, 10, 11, 11)]
 	public void FrameToScreen_SuperView (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
 	{
-		var super = new View() {
+		var super = new View () {
 			X = superOffset,
 			Y = superOffset,
 			Width = 20,
 			Height = 20
 		};
-		
+
 		var view = new View () {
 			X = frameX,
 			Y = frameY,

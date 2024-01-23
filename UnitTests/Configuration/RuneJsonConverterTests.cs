@@ -1,6 +1,6 @@
 ﻿using System.Text;
-using Xunit;
 using System.Text.Json;
+using Xunit;
 
 namespace Terminal.Gui.ConfigurationTests;
 public class RunJsonConverterTests {

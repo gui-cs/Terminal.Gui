@@ -2,8 +2,6 @@
 // Driver.cs: Curses-based Driver
 //
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Terminal.Gui.ConsoleDrivers;
@@ -19,7 +17,7 @@ class CursesDriver : ConsoleDriver {
 		get => Curses.Cols;
 		internal set {
 			Curses.Cols = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -27,7 +25,7 @@ class CursesDriver : ConsoleDriver {
 		get => Curses.Lines;
 		internal set {
 			Curses.Lines = value;
-			ClearContents();
+			ClearContents ();
 		}
 	}
 
@@ -527,7 +525,7 @@ class CursesDriver : ConsoleDriver {
 					} else {
 						k = (KeyCode)((uint)(KeyCode.AltMask | KeyCode.CtrlMask) + wch2);
 					}
-				} 
+				}
 				key = new Key (k);
 			} else {
 				key = new Key (KeyCode.Esc);
@@ -549,8 +547,8 @@ class CursesDriver : ConsoleDriver {
 				}
 			} else if (wch >= (uint)KeyCode.A && wch <= (uint)KeyCode.Z) {
 				k = (KeyCode)wch | KeyCode.ShiftMask;
-			} 
-			
+			}
+
 			if (wch == '\n' || wch == '\r') {
 				k = KeyCode.Enter;
 			}

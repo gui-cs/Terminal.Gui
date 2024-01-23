@@ -124,7 +124,7 @@ namespace UICatalog.Scenarios {
 				AddRune (State.Apple.X, State.Apple.Y, _appleRune);
 				Driver.SetAttribute (white);
 			}
-			
+
 			// BUGBUG: Should (can) this use key bindings instead.
 			public override bool OnKeyDown (Key keyEvent)
 			{

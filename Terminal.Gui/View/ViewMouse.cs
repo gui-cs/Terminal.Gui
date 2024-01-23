@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 public partial class View {
 

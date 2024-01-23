@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -675,7 +667,7 @@ public class ApplicationTests {
 		// For all the fields/properties of Application, check that they are reset to their default values
 
 		// Set some values
-		
+
 		Application.Init ();
 		Application._initialized = true;
 

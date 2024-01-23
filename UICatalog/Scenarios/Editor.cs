@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Globalization;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -786,8 +786,8 @@ namespace UICatalog.Scenarios {
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label () { 
-Text = "Find:", 
+			var label = new Label () {
+				Text = "Find:",
 				AutoSize = false,
 				Y = 1,
 				Width = lblWidth,
@@ -804,8 +804,8 @@ Text = "Find:",
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button () { 
-Text = "Find _Next", 
+			var btnFindNext = new Button () {
+				Text = "Find _Next",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
@@ -817,8 +817,8 @@ Text = "Find _Next",
 			btnFindNext.Clicked += (s, e) => FindNext ();
 			d.Add (btnFindNext);
 
-			var btnFindPrevious = new Button () { 
-Text = "Find _Previous", 
+			var btnFindPrevious = new Button () {
+				Text = "Find _Previous",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
@@ -836,8 +836,8 @@ Text = "Find _Previous",
 				btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button () { 
-Text = "Cancel", 
+			var btnCancel = new Button () {
+				Text = "Cancel",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 2,
@@ -849,8 +849,8 @@ Text = "Cancel",
 			};
 			d.Add (btnCancel);
 
-			var ckbMatchCase = new CheckBox () { 
-Text = "Match c_ase", 
+			var ckbMatchCase = new CheckBox () {
+				Text = "Match c_ase",
 				X = 0,
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
@@ -858,8 +858,8 @@ Text = "Match c_ase",
 			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
-			var ckbMatchWholeWord = new CheckBox () { 
-Text = "Match _whole word", 
+			var ckbMatchWholeWord = new CheckBox () {
+				Text = "Match _whole word",
 				X = 0,
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord
@@ -884,8 +884,8 @@ Text = "Match _whole word",
 
 			var lblWidth = "Replace:".Length;
 
-			var label = new Label () { 
-Text = "Find:", 
+			var label = new Label () {
+				Text = "Find:",
 				AutoSize = false,
 				Y = 1,
 				Width = lblWidth,
@@ -902,8 +902,8 @@ Text = "Find:",
 			txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 			d.Add (txtToFind);
 
-			var btnFindNext = new Button () { 
-Text = "Replace _Next", 
+			var btnFindNext = new Button () {
+				Text = "Replace _Next",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (label),
@@ -915,8 +915,8 @@ Text = "Replace _Next",
 			btnFindNext.Clicked += (s, e) => ReplaceNext ();
 			d.Add (btnFindNext);
 
-			label = new Label () { 
-Text = "Replace:", 
+			label = new Label () {
+				Text = "Replace:",
 				X = Pos.Left (label),
 				Y = Pos.Top (label) + 1,
 				Width = lblWidth,
@@ -933,8 +933,8 @@ Text = "Replace:",
 			txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
 			d.Add (txtToReplace);
 
-			var btnFindPrevious = new Button () { 
-Text = "Replace _Previous", 
+			var btnFindPrevious = new Button () {
+				Text = "Replace _Previous",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindNext) + 1,
@@ -945,8 +945,8 @@ Text = "Replace _Previous",
 			btnFindPrevious.Clicked += (s, e) => ReplacePrevious ();
 			d.Add (btnFindPrevious);
 
-			var btnReplaceAll = new Button () { 
-Text = "Replace _All", 
+			var btnReplaceAll = new Button () {
+				Text = "Replace _All",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnFindPrevious) + 1,
@@ -965,8 +965,8 @@ Text = "Replace _All",
 				btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
 			};
 
-			var btnCancel = new Button () { 
-Text = "Cancel", 
+			var btnCancel = new Button () {
+				Text = "Cancel",
 				AutoSize = false,
 				X = Pos.Right (txtToFind) + 1,
 				Y = Pos.Top (btnReplaceAll) + 1,
@@ -978,8 +978,8 @@ Text = "Cancel",
 			};
 			d.Add (btnCancel);
 
-			var ckbMatchCase = new CheckBox () { 
-Text = "Match c_ase", 
+			var ckbMatchCase = new CheckBox () {
+				Text = "Match c_ase",
 				X = 0,
 				Y = Pos.Top (txtToFind) + 2,
 				Checked = _matchCase
@@ -987,8 +987,8 @@ Text = "Match c_ase",
 			ckbMatchCase.Toggled += (s, e) => _matchCase = (bool)ckbMatchCase.Checked;
 			d.Add (ckbMatchCase);
 
-			var ckbMatchWholeWord = new CheckBox () { 
-Text = "Match _whole word", 
+			var ckbMatchWholeWord = new CheckBox () {
+				Text = "Match _whole word",
 				X = 0,
 				Y = Pos.Top (ckbMatchCase) + 1,
 				Checked = _matchWholeWord

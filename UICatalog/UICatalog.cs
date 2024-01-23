@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 

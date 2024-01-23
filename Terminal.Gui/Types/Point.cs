@@ -11,13 +11,11 @@
 using System;
 using System.Globalization;
 
-namespace Terminal.Gui
-{
+namespace Terminal.Gui {
 	/// <summary>
 	/// Represents an ordered pair of integer x- and y-coordinates that defines a point in a two-dimensional plane.
 	/// </summary>
-	public struct Point
-	{
+	public struct Point {
 		/// <summary>
 		/// Gets or sets the x-coordinate of this Point.
 		/// </summary>
@@ -41,7 +39,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	An uninitialized Point Structure.
 		/// </remarks>
-	
+
 		public static readonly Point Empty;
 
 		/// <summary>
@@ -57,7 +55,7 @@ namespace Terminal.Gui
 		{
 			return new Point (pt.X + sz.Width, pt.Y + sz.Height);
 		}
-		
+
 		/// <summary>
 		///	Equality Operator
 		/// </summary>
@@ -72,7 +70,7 @@ namespace Terminal.Gui
 		{
 			return ((left.X == right.X) && (left.Y == right.Y));
 		}
-		
+
 		/// <summary>
 		///	Inequality Operator
 		/// </summary>
@@ -87,7 +85,7 @@ namespace Terminal.Gui
 		{
 			return ((left.X != right.X) || (left.Y != right.Y));
 		}
-		
+
 		/// <summary>
 		///	Subtraction Operator
 		/// </summary>
@@ -101,7 +99,7 @@ namespace Terminal.Gui
 		{
 			return new Point (pt.X - sz.Width, pt.Y - sz.Height);
 		}
-		
+
 		/// <summary>
 		///	Point to Size Conversion
 		/// </summary>
@@ -129,7 +127,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Creates a Point from a Size value.
 		/// </remarks>
-		
+
 		public Point (Size sz)
 		{
 			X = sz.Width;
@@ -143,7 +141,7 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Creates a Point from a specified x,y coordinate pair.
 		/// </remarks>
-		
+
 		public Point (int x, int y)
 		{
 			this.X = x;
@@ -175,13 +173,13 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Checks equivalence of this Point and another object.
 		/// </remarks>
-		
+
 		public override bool Equals (object obj)
 		{
 			if (!(obj is Point))
 				return false;
 
-			return (this == (Point) obj);
+			return (this == (Point)obj);
 		}
 
 		/// <summary>
@@ -191,10 +189,10 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Calculates a hashing value.
 		/// </remarks>
-		
+
 		public override int GetHashCode ()
 		{
-			return X^Y;
+			return X ^ Y;
 		}
 
 		/// <summary>
@@ -210,7 +208,7 @@ namespace Terminal.Gui
 			X += dx;
 			Y += dy;
 		}
-		
+
 		/// <summary>
 		///	ToString Method
 		/// </summary>
@@ -218,10 +216,10 @@ namespace Terminal.Gui
 		/// <remarks>
 		///	Formats the Point as a string in coordinate notation.
 		/// </remarks>
-		
+
 		public override string ToString ()
 		{
-			return string.Format ("{{X={0},Y={1}}}", X.ToString (CultureInfo.InvariantCulture), 
+			return string.Format ("{{X={0},Y={1}}}", X.ToString (CultureInfo.InvariantCulture),
 				Y.ToString (CultureInfo.InvariantCulture));
 		}
 

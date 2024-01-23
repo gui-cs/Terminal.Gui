@@ -51,8 +51,8 @@ public class StringTests {
 	[InlineData ("👨‍👩‍👦‍👦👨‍👩‍👦‍👦", 16)]
 	[InlineData ("山", 2)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
 	[InlineData ("山🙂", 4)] // The character for "mountain" in Chinese/Japanese/Korean (山), Unicode U+5C71
-	//[InlineData ("\ufe20\ufe21", 2)] // Combining Ligature Left Half ︠ - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
-	//				 // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+				//[InlineData ("\ufe20\ufe21", 2)] // Combining Ligature Left Half ︠ - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+				//				 // Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
 	public void TestGetColumns_MultiRune_WideBMP (string str, int expected)
 	{
 		Assert.Equal (expected, str.GetColumns ());

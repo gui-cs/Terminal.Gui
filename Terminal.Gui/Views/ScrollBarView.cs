@@ -8,7 +8,7 @@
 using System;
 using System.Text;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical

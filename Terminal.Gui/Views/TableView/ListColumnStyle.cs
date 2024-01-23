@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 /// <summary>
 /// Defines rendering options that affect how the view is displayed.
 /// </summary>

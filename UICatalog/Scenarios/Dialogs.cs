@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Terminal.Gui;
 

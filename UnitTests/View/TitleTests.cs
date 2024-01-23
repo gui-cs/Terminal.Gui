@@ -1,13 +1,8 @@
-﻿using System.Text;
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ViewTests {
 	public class TitleTests {

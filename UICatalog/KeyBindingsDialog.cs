@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace UICatalog {
 
 	class KeyBindingsDialog : Dialog {
 		// TODO: Update to use Key instead of KeyCode
-		static Dictionary<Command,KeyCode> CurrentBindings = new Dictionary<Command,KeyCode>();
-		private Command[] commands;
+		static Dictionary<Command, KeyCode> CurrentBindings = new Dictionary<Command, KeyCode> ();
+		private Command [] commands;
 		private ListView commandsListView;
 		private Label keyLabel;
 
@@ -62,7 +60,7 @@ namespace UICatalog {
 				// (and always was wrong). Parents don't get to be told when new views are added
 				// to them
 
-				view.Added += (s,e)=>RecordView(e.Child);
+				view.Added += (s, e) => RecordView (e.Child);
 			}
 
 			internal static void Initialize ()
@@ -86,7 +84,7 @@ namespace UICatalog {
 
 			private void ApplyKeyBindingsToAllKnownViews ()
 			{
-				if(keybindings == null) {
+				if (keybindings == null) {
 					return;
 				}
 
@@ -101,16 +99,15 @@ namespace UICatalog {
 						continue;
 					}
 
-					var supported = new HashSet<Command>(view.GetSupportedCommands ());
+					var supported = new HashSet<Command> (view.GetSupportedCommands ());
 
 					foreach (var kvp in keybindings) {
-						
+
 						// if the view supports the keybinding
-						if(supported.Contains(kvp.Key))
-						{
+						if (supported.Contains (kvp.Key)) {
 							// if the key was bound to any other commands clear that
 							view.KeyBindings.Remove (kvp.Value);
-							view.KeyBindings.Add (kvp.Value,kvp.Key);
+							view.KeyBindings.Add (kvp.Value, kvp.Key);
 						}
 
 						// mark that we have done this view so don't need to set keybindings again on it
@@ -120,7 +117,7 @@ namespace UICatalog {
 			}
 		}
 
-		public KeyBindingsDialog () : base()
+		public KeyBindingsDialog () : base ()
 		{
 			Title = "Keybindings";
 			//Height = 50;
@@ -128,9 +125,9 @@ namespace UICatalog {
 			if (ViewTracker.Instance == null) {
 				ViewTracker.Initialize ();
 			}
-			
+
 			// known commands that views can support
-			commands = Enum.GetValues (typeof (Command)).Cast<Command>().ToArray();
+			commands = Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ();
 
 			commandsListView = new ListView (commands) {
 				Width = Dim.Percent (50),
@@ -141,14 +138,14 @@ namespace UICatalog {
 
 			keyLabel = new Label () {
 				Text = "Key: None",
-				Width = Dim.Fill(),
-				X = Pos.Percent(50),
+				Width = Dim.Fill (),
+				X = Pos.Percent (50),
 				Y = 0
 			};
 			Add (keyLabel);
 
-			var btnChange = new Button () { 
-Text = "Ch_ange", 
+			var btnChange = new Button () {
+				Text = "Ch_ange",
 				X = Pos.Percent (50),
 				Y = 1,
 			};
@@ -156,14 +153,14 @@ Text = "Ch_ange",
 			btnChange.Clicked += RemapKey;
 
 			var close = new Button ("Ok");
-			close.Clicked += (s,e) => {
+			close.Clicked += (s, e) => {
 				Application.RequestStop ();
 				ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
 			};
 			AddButton (close);
 
 			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s,e)=>Application.RequestStop();
+			cancel.Clicked += (s, e) => Application.RequestStop ();
 			AddButton (cancel);
 
 			// Register event handler as the last thing in constructor to prevent early calls
@@ -171,7 +168,7 @@ Text = "Ch_ange",
 			commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
 
 			// Setup to show first ListView entry
-			SetTextBoxToShowBinding (commands.First());
+			SetTextBoxToShowBinding (commands.First ());
 		}
 
 		private void RemapKey (object sender, EventArgs e)
@@ -187,7 +184,7 @@ Text = "Ch_ange",
 			};
 			Application.Run (dlg);
 
-			if(key.HasValue) {
+			if (key.HasValue) {
 				CurrentBindings [cmd] = key.Value;
 				SetTextBoxToShowBinding (cmd);
 			}

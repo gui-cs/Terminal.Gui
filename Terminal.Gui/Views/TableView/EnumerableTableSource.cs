@@ -53,7 +53,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Gets the object collection hosted by this wrapper.
 		/// </summary>
-		public IReadOnlyCollection<T> Data => this.data.AsReadOnly();
+		public IReadOnlyCollection<T> Data => this.data.AsReadOnly ();
 
 		/// <inheritdoc/>
 		public IEnumerable<T> GetAllObjects ()
@@ -64,7 +64,7 @@ namespace Terminal.Gui {
 		/// <inheritdoc/>
 		public T GetObjectOnRow (int row)
 		{
-			return Data.ElementAt(row);
+			return Data.ElementAt (row);
 		}
 	}
 }

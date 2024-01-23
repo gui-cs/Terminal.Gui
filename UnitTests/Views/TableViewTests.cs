@@ -1,17 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Terminal.Gui;
-using Xunit;
 using System.Globalization;
-using Xunit.Abstractions;
+using System.Linq;
 using System.Reflection;
-using Terminal.Gui.ViewTests;
-using System.Collections;
-using static Terminal.Gui.SpinnerStyle;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests {
 

@@ -25,7 +25,7 @@ namespace Terminal.Gui {
 
 			foreach (var l in collection) {
 
-				if(l.Length == 0) {
+				if (l.Length == 0) {
 					toReturn.Add (l);
 					continue;
 				}
@@ -52,7 +52,7 @@ namespace Terminal.Gui {
 						toReturn.Add (l);
 					} else {
 
-						
+
 
 						if (lDiffMax < eDiffMin) {
 							// Line ends before exclusion starts
@@ -89,7 +89,7 @@ namespace Terminal.Gui {
 									if (len == 1) {
 										len = -1;
 									}
-										
+
 									toReturn.Add (CreateLineFromDiff (l, from, len));
 								}
 							}
@@ -100,30 +100,28 @@ namespace Terminal.Gui {
 					// line is perpendicular to exclusion
 
 					// Does the constant plane of the exclusion appear within the differing plane of the line?
-					if(econstPoint >= lDiffMin && econstPoint <= lDiffMax) {
+					if (econstPoint >= lDiffMin && econstPoint <= lDiffMax) {
 						// Yes, e.g. Vertical exclusion's x is within xmin/xmax of the horizontal line
 
 						// Vice versa must also be true
 						// for example there is no intersection if the vertical exclusion line does not
 						// stretch down far enough to reach the line
-						if(lconstPoint >= eDiffMin && lconstPoint <= eDiffMax) {
+						if (lconstPoint >= eDiffMin && lconstPoint <= eDiffMax) {
 
 							// Perpendicular intersection occurs here
 							var intersection = l.Orientation == Orientation.Horizontal ?
-								new Point (econstPoint,lconstPoint) :
-								new Point (lconstPoint,econstPoint);
+								new Point (econstPoint, lconstPoint) :
+								new Point (lconstPoint, econstPoint);
 
 							// To snip out this single point we will use a recursive call
 							// snipping 1 length along the orientation of l (i.e. parallel)
 							toReturn.AddRange (new [] { l }.Exclude (intersection, 1, l.Orientation));
-						}
-						else {
+						} else {
 							// No intersection
 							toReturn.Add (l);
 						}
 
-					}
-					else {
+					} else {
 						// Lines do not intersect
 						toReturn.Add (l);
 					}
@@ -148,7 +146,7 @@ namespace Terminal.Gui {
 		/// <returns>The minimum x or y (whichever is differing) point on the line, controlling for negative lengths. </returns>
 		private static int GetLineStartOnDiffAxis (Point start, int length, Orientation orientation)
 		{
-			if(length == 0) {
+			if (length == 0) {
 				throw new ArgumentException ("0 length lines are not supported", nameof (length));
 			}
 

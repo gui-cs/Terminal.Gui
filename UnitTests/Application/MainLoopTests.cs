@@ -13,8 +13,8 @@ namespace Terminal.Gui.ApplicationTests;
 public class MainLoopTests {
 
 	// See Also ConsoleDRivers/MainLoopDriverTests.cs for tests of the MainLoopDriver
-	
-	
+
+
 	// Idle Handler tests
 	[Fact]
 	public void AddIdle_Adds_And_Removes ()

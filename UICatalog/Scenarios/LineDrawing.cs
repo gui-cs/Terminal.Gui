@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace UICatalog.Scenarios {
 
@@ -33,7 +32,7 @@ namespace UICatalog.Scenarios {
 			Win.Add (canvas);
 			Win.Add (tools);
 
-			Win.KeyDown += (s,e) => { e.Handled = canvas.OnKeyDown (e); };
+			Win.KeyDown += (s, e) => { e.Handled = canvas.OnKeyDown (e); };
 		}
 
 		class ToolsView : Window {
@@ -114,7 +113,7 @@ namespace UICatalog.Scenarios {
 				// BUGBUG: These should be implemented with key bindings
 				if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask)) {
 					var pop = _currentLayer.RemoveLastLine ();
-					if(pop != null) {
+					if (pop != null) {
 						undoHistory.Push (pop);
 						SetNeedsDisplay ();
 						return true;
@@ -122,16 +121,16 @@ namespace UICatalog.Scenarios {
 				}
 
 				if (e.KeyCode == (KeyCode.Y | KeyCode.CtrlMask)) {
-					if (undoHistory.Any()) {
+					if (undoHistory.Any ()) {
 						var pop = undoHistory.Pop ();
-						_currentLayer.AddLine(pop);
+						_currentLayer.AddLine (pop);
 						SetNeedsDisplay ();
 						return true;
 					}
 				}
 				return false;
 			}
-			
+
 			internal void AddLayer ()
 			{
 				_currentLayer = new LineCanvas ();
@@ -159,7 +158,7 @@ namespace UICatalog.Scenarios {
 						_currentLine = new StraightLine (
 							new Point (mouseEvent.X, mouseEvent.Y),
 							0, Orientation.Vertical, LineStyle, new Attribute (_currentColor, GetNormalColor ().Background));
-						
+
 						_currentLayer.AddLine (_currentLine);
 					} else {
 						// Mouse dragged
@@ -189,17 +188,17 @@ namespace UICatalog.Scenarios {
 					// Mouse released
 					if (_currentLine != null) {
 
-						if(_currentLine.Length == 0) {
+						if (_currentLine.Length == 0) {
 							_currentLine.Length = 1;
 						}
 
-						if(_currentLine.Style == LineStyle.None) {
+						if (_currentLine.Style == LineStyle.None) {
 
 							// Treat none as eraser
 							var idx = _layers.IndexOf (_currentLayer);
 							_layers.Remove (_currentLayer);
 
-							_currentLayer = new LineCanvas(
+							_currentLayer = new LineCanvas (
 								_currentLayer.Lines.Exclude (_currentLine.Start, _currentLine.Length, _currentLine.Orientation)
 								);
 

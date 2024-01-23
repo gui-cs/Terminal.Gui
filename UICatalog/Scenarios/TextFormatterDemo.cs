@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -56,7 +55,7 @@ namespace UICatalog.Scenarios {
 
 			foreach (var alignment in alignments) {
 				singleLines [(int)alignment] = new Label (text) { AutoSize = false, TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = 1, ColorScheme = Colors.ColorSchemes ["Dialog"] };
-				multipleLines [(int)alignment] = new Label (text) { AutoSize = false, TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"]};
+				multipleLines [(int)alignment] = new Label (text) { AutoSize = false, TextAlignment = alignment, X = 0, Width = Dim.Fill (), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"] };
 			}
 
 			var label = new Label ($"Demonstrating single-line (should clip):") { Y = Pos.Bottom (unicodeCheckBox) + 1 };
@@ -79,7 +78,7 @@ namespace UICatalog.Scenarios {
 				label = multipleLines [(int)alignment];
 			}
 
-			unicodeCheckBox.Toggled += (s,e) => {
+			unicodeCheckBox.Toggled += (s, e) => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;
 					multipleLines [(int)alignment].Text = e.OldValue == true ? text : unicode;

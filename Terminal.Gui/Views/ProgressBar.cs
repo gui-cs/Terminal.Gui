@@ -1,5 +1,5 @@
-﻿using System.Text;
-using System;
+﻿using System;
+using System.Text;
 
 namespace Terminal.Gui;
 /// <summary>

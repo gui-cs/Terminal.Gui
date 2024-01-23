@@ -1,10 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -785,7 +784,7 @@ namespace Terminal.Gui {
 			}
 
 			if (me.Y + top >= source.Count
-				|| me.Y + top  < 0
+				|| me.Y + top < 0
 				|| me.Y + top > top + Bounds.Height) {
 				return true;
 			}

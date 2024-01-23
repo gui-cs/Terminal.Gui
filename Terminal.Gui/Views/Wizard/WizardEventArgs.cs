@@ -1,5 +1,4 @@
 ﻿using System;
-using static Terminal.Gui.Wizard;
 
 namespace Terminal.Gui {
 	/// <summary>

@@ -1,8 +1,7 @@
 using System;
-using System.Text;
-using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui;
 
@@ -338,7 +337,7 @@ public class MenuBar : View {
 				SuperView.KeyUp += SuperView_KeyUp;
 			}
 		};
-#endif       
+#endif
 	}
 
 #if SUPPORT_ALT_TO_ACTIVATE_MENU
@@ -350,7 +349,7 @@ public class MenuBar : View {
 		AltKeyUpHandler(e);
 	}
 #endif
-	
+
 	internal void AltKeyUpHandler (Key e)
 	{
 		if (e.KeyCode == KeyCode.AltMask) {
@@ -567,7 +566,7 @@ public class MenuBar : View {
 		}
 		return false;
 	}
-#endregion Keyboard handling
+	#endregion Keyboard handling
 
 	bool _initialCanFocus;
 

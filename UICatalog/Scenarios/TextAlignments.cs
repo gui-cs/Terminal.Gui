@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
@@ -24,12 +23,12 @@ namespace UICatalog.Scenarios {
 
 			foreach (var alignment in alignments) {
 				singleLines [(int)alignment] = new Label (txt) { AutoSize = false, TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.ColorSchemes ["Dialog"] };
-				multipleLines [(int)alignment] = new Label (txt) { AutoSize = false, TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"]};
+				multipleLines [(int)alignment] = new Label (txt) { AutoSize = false, TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"] };
 			}
 
 			// Add a label & text field so we can demo IsDefault
-			var editLabel = new Label () { 
-Text = "Text:", 
+			var editLabel = new Label () {
+				Text = "Text:",
 				X = 0,
 				Y = 0,
 			};
@@ -42,7 +41,7 @@ Text = "Text:",
 				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				Text = txt,
 			};
-			edit.TextChanged += (s,e) => {
+			edit.TextChanged += (s, e) => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = edit.Text;
 					multipleLines [(int)alignment].Text = edit.Text;
@@ -50,23 +49,23 @@ Text = "Text:",
 			};
 			Win.Add (edit);
 
-			var unicodeSample = new Button () { 
-Text = "Unicode Sample", 
+			var unicodeSample = new Button () {
+				Text = "Unicode Sample",
 				X = Pos.Right (edit) + 1,
 				Y = 0,
 			};
-			unicodeSample.Clicked += (s,e) => {
+			unicodeSample.Clicked += (s, e) => {
 				edit.Text = unicodeSampleText;
 			};
 			Win.Add (unicodeSample);
 
-			var update = new Button () { 
-Text = "_Update", 
+			var update = new Button () {
+				Text = "_Update",
 				X = Pos.Right (edit) + 1,
 				Y = Pos.Bottom (edit) - 1,
 
 			};
-			update.Clicked += (s,e) => {
+			update.Clicked += (s, e) => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].Text = edit.Text;
 					multipleLines [(int)alignment].Text = edit.Text;
@@ -102,7 +101,7 @@ Text = "_Update",
 				label = multipleLines [(int)alignment];
 			}
 
-			enableHotKeyCheckBox.Toggled += (s,e) => {
+			enableHotKeyCheckBox.Toggled += (s, e) => {
 				foreach (var alignment in alignments) {
 					singleLines [(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
 					multipleLines [(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';

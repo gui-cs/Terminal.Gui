@@ -1,5 +1,4 @@
 ﻿using System;
-using Terminal.Gui;
 using Xunit;
 
 namespace Terminal.Gui.TypeTests {

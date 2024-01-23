@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text.Json.Serialization;
-using static Terminal.Gui.ConfigurationManager;
+﻿using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// The <see cref="Scope{T}"/> class for application-defined configuration settings.

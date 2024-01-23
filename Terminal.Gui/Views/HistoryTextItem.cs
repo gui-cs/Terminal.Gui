@@ -1,7 +1,6 @@
 ﻿// TextView.cs: multi-line text editing
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Terminal.Gui {
 	partial class HistoryText {

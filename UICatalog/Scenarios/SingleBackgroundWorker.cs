@@ -43,8 +43,8 @@ namespace UICatalog.Scenarios {
 
 				var top = new Toplevel ();
 
-				top.Add (new Label () { 
-Text = "Worker Log", 
+				top.Add (new Label () {
+					Text = "Worker Log",
 					X = Pos.Center (),
 					Y = 0
 				});
@@ -64,7 +64,7 @@ Text = "Worker Log",
 				worker = new BackgroundWorker () { WorkerSupportsCancellation = true };
 
 				var cancel = new Button ("Cancel Worker");
-				cancel.Clicked += (s,e) => {
+				cancel.Clicked += (s, e) => {
 					if (worker == null) {
 						log.Add ($"Worker is not running at {DateTime.Now}!");
 						listLog.SetNeedsDisplay ();
@@ -81,8 +81,8 @@ Text = "Worker Log",
 				listLog.SetNeedsDisplay ();
 
 				var md = new Dialog (cancel) { Title = $"Running Worker started at {startStaging}.{startStaging:fff}" };
-				md.Add (new Label () { 
-Text = "Wait for worker to finish...", 
+				md.Add (new Label () {
+					Text = "Wait for worker to finish...",
 					X = Pos.Center (),
 					Y = Pos.Center ()
 				});
@@ -135,7 +135,7 @@ Text = "Wait for worker to finish...",
 			public StagingUIController (DateTime? start, List<string> list)
 			{
 				top = new Toplevel (Application.Top.Frame);
-				top.KeyDown += (s,e) => {
+				top.KeyDown += (s, e) => {
 					// Prevents Ctrl+Q from closing this.
 					// Only Ctrl+C is allowed.
 					if (e == Application.QuitKey) {

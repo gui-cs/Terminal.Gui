@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Linq;
 using System.Globalization;
-using System.Reflection;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace Terminal.Gui;
 
@@ -58,7 +58,7 @@ public static partial class Application {
 		_mainThreadId = -1;
 		Iteration = null;
 		EndAfterFirstIteration = false;
-		
+
 		// Driver stuff
 		if (Driver != null) {
 			Driver.SizeChanged -= Driver_SizeChanged;
@@ -72,7 +72,7 @@ public static partial class Application {
 		//ForceDriver = string.Empty;
 		Force16Colors = false;
 		_forceFakeConsole = false;
-		
+
 		// Run State stuff
 		NotifyNewRunState = null;
 		NotifyStopRunState = null;
@@ -1251,7 +1251,7 @@ public static partial class Application {
 			}
 		}
 
-		bool AdornmentHandledMouseEvent(Adornment frame)
+		bool AdornmentHandledMouseEvent (Adornment frame)
 		{
 			if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
 				var boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
@@ -1272,10 +1272,10 @@ public static partial class Application {
 		if (view != null) {
 			// Work inside-out (Padding, Border, Margin)
 			// TODO: Debate whether inside-out or outside-in is the right strategy
-			if (AdornmentHandledMouseEvent(view?.Padding)) {
+			if (AdornmentHandledMouseEvent (view?.Padding)) {
 				return;
 			}
-			if (AdornmentHandledMouseEvent(view?.Border)) {
+			if (AdornmentHandledMouseEvent (view?.Border)) {
 				if (view is Toplevel) {
 					// TODO: This is a temporary hack to work around the fact that 
 					// drag handling is handled in Toplevel (See Issue #2537)
@@ -1314,7 +1314,7 @@ public static partial class Application {
 				return;
 			}
 
-			if (AdornmentHandledMouseEvent(view?.Margin)) {
+			if (AdornmentHandledMouseEvent (view?.Margin)) {
 				return;
 			}
 

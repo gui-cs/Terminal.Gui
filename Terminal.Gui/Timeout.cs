@@ -6,7 +6,7 @@
 //
 using System;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Provides data for timers running manipulation.

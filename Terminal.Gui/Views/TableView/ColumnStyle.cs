@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Describes how to render a given column in  a <see cref="TableView"/> including <see cref="Alignment"/> 

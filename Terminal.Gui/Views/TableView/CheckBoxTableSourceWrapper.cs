@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -73,11 +72,11 @@ namespace Terminal.Gui {
 		public object this [int row, int col] {
 			get {
 				if (col == 0) {
-					if(UseRadioButtons) {
+					if (UseRadioButtons) {
 						return IsChecked (row) ? RadioCheckedRune : RadioUnCheckedRune;
 					}
 
-					return IsChecked(row) ? CheckedRune : UnCheckedRune;
+					return IsChecked (row) ? CheckedRune : UnCheckedRune;
 				}
 
 				return Wrapping [row, col - 1];
@@ -103,16 +102,16 @@ namespace Terminal.Gui {
 		private void TableView_MouseClick (object sender, MouseEventEventArgs e)
 		{
 			// we only care about clicks (not movements)
-			if(!e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Clicked)) {
+			if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button1Clicked)) {
 				return;
 			}
 
-			var hit = tableView.ScreenToCell (e.MouseEvent.X,e.MouseEvent.Y, out int? headerIfAny);
+			var hit = tableView.ScreenToCell (e.MouseEvent.X, e.MouseEvent.Y, out int? headerIfAny);
 
-			if(headerIfAny.HasValue && headerIfAny.Value == 0) {
+			if (headerIfAny.HasValue && headerIfAny.Value == 0) {
 
 				// clicking in header with radio buttons does nothing
-				if(UseRadioButtons) {
+				if (UseRadioButtons) {
 					return;
 				}
 
@@ -120,11 +119,10 @@ namespace Terminal.Gui {
 				ToggleAllRows ();
 				e.Handled = true;
 				tableView.SetNeedsDisplay ();
-			}
-			else
-			if(hit.HasValue && hit.Value.X == 0) {
+			} else
+			if (hit.HasValue && hit.Value.X == 0) {
 
-				if(UseRadioButtons) {
+				if (UseRadioButtons) {
 
 					ClearAllToggles ();
 					ToggleRow (hit.Value.Y);
@@ -141,20 +139,19 @@ namespace Terminal.Gui {
 		{
 			// Suppress default toggle behavior when using checkboxes
 			// and instead handle ourselves
-			var range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray();
+			var range = tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray ();
 
-			if(UseRadioButtons) {
-				
+			if (UseRadioButtons) {
+
 				// multi selection makes it unclear what to toggle in this situation
-				if(range.Length != 1) {
+				if (range.Length != 1) {
 					e.Cancel = true;
 					return;
 				}
 
 				ClearAllToggles ();
 				ToggleRow (range.Single ());
-			}
-			else {
+			} else {
 				ToggleRows (range);
 			}
 

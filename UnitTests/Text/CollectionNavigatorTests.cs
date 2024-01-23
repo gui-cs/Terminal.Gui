@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -383,7 +382,7 @@ public class CollectionNavigatorTests {
 
 		Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x", true));
 	}
-	
+
 	[Theory]
 	[InlineData (KeyCode.A, true)]
 	[InlineData (KeyCode.Z, true)]

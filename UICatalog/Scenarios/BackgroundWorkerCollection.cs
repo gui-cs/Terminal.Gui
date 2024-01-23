@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -171,8 +170,8 @@ namespace UICatalog.Scenarios {
 
 				ColorScheme = Colors.ColorSchemes ["Base"];
 
-				var label = new Label () { 
-Text = "Worker collection Log", 
+				var label = new Label () {
+					Text = "Worker collection Log",
 					X = Pos.Center (),
 					Y = 0
 				};
@@ -313,8 +312,8 @@ Text = "Worker collection Log",
 
 				Title = "Run Worker";
 
-				label = new Label () { 
-Text = "Press start to do the work or close to quit.", 
+				label = new Label () {
+					Text = "Press start to do the work or close to quit.",
 					X = Pos.Center (),
 					Y = 1,
 					ColorScheme = Colors.ColorSchemes ["Dialog"]
@@ -329,8 +328,11 @@ Text = "Press start to do the work or close to quit.",
 				};
 				Add (listView);
 
-				start = new Button () { 
-Text = "Start",  IsDefault = true, ClearOnVisibleFalse = false };
+				start = new Button () {
+					Text = "Start",
+					IsDefault = true,
+					ClearOnVisibleFalse = false
+				};
 				start.Clicked += (s, e) => {
 					Staging = new Staging (DateTime.Now);
 					RequestStop ();
@@ -347,7 +349,7 @@ Text = "Start",  IsDefault = true, ClearOnVisibleFalse = false };
 					}
 				};
 
-				LayoutStarted += (s,e) => {
+				LayoutStarted += (s, e) => {
 					var btnsWidth = start.Frame.Width + close.Frame.Width + 2 - 1;
 					var shiftLeft = Math.Max ((Bounds.Width - btnsWidth) / 2 - 2, 0);
 

@@ -4,8 +4,7 @@ namespace Terminal.Gui {
 	/// <summary>
 	/// Event args for the <see cref="TableView.CellToggled"/> event.
 	/// </summary>
-	public class CellToggledEventArgs : EventArgs
-	{
+	public class CellToggledEventArgs : EventArgs {
 		/// <summary>
 		/// The current table to which the new indexes refer.  May be null e.g. if selection change is the result of clearing the table from the view
 		/// </summary>

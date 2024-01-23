@@ -147,9 +147,9 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public override int GetHashCode ()
 		{
-			return width.GetHashCode() ^ height.GetHashCode ();
+			return width.GetHashCode () ^ height.GetHashCode ();
 		}
-		
+
 		/// <summary>
 		/// Creates a human-readable string that represents this <see cref='Terminal.Gui.SizeF'/>.
 		/// </summary>

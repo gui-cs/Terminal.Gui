@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -30,39 +29,39 @@ namespace Terminal.Gui;
 public static class Clipboard {
 	static string _contents = string.Empty;
 
-		/// <summary>
-		/// Gets (copies from) or sets (pastes to) the contents of the OS clipboard.
-		/// </summary>
-		public static string Contents {
-			get {
-				try {
-					if (IsSupported) {
-						var clipData = Application.Driver.Clipboard.GetClipboardData ();
-						if (clipData == null) {
-							// throw new InvalidOperationException ($"{Application.Driver.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
-							clipData = string.Empty;
-						}
-						_contents = clipData;
+	/// <summary>
+	/// Gets (copies from) or sets (pastes to) the contents of the OS clipboard.
+	/// </summary>
+	public static string Contents {
+		get {
+			try {
+				if (IsSupported) {
+					var clipData = Application.Driver.Clipboard.GetClipboardData ();
+					if (clipData == null) {
+						// throw new InvalidOperationException ($"{Application.Driver.GetType ().Name}.GetClipboardData returned null instead of string.Empty");
+						clipData = string.Empty;
 					}
-				} catch (Exception) {
-					_contents = string.Empty;
+					_contents = clipData;
 				}
-				return _contents;
+			} catch (Exception) {
+				_contents = string.Empty;
 			}
-			set {
-				try {
-					if (IsSupported) {
-						if (value == null) {
-							value = string.Empty;
-						}
-						Application.Driver.Clipboard.SetClipboardData (value);
+			return _contents;
+		}
+		set {
+			try {
+				if (IsSupported) {
+					if (value == null) {
+						value = string.Empty;
 					}
-					_contents = value;
-				} catch (Exception) {
-					_contents = value;
+					Application.Driver.Clipboard.SetClipboardData (value);
 				}
+				_contents = value;
+			} catch (Exception) {
+				_contents = value;
 			}
 		}
+	}
 
 	/// <summary>
 	/// Returns true if the environmental dependencies are in place to interact with the OS clipboard.

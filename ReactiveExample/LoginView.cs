@@ -1,15 +1,15 @@
+using ReactiveMarbles.ObservableEvents;
+using ReactiveUI;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text;
-using ReactiveUI;
 using Terminal.Gui;
-using ReactiveMarbles.ObservableEvents;
 
 namespace ReactiveExample {
 	public class LoginView : Window, IViewFor<LoginViewModel> {
-		readonly CompositeDisposable _disposable = new CompositeDisposable();
-		
-		public LoginView (LoginViewModel viewModel) : base() {
+		readonly CompositeDisposable _disposable = new CompositeDisposable ();
+
+		public LoginView (LoginViewModel viewModel) : base ()
+		{
 			Title = "Reactive Extensions Example";
 			ViewModel = viewModel;
 			var usernameLengthLabel = UsernameLengthLabel (TitleLabel ());
@@ -21,24 +21,27 @@ namespace ReactiveExample {
 			var clearButton = ClearButton (loginButton);
 			LoginProgressLabel (clearButton);
 		}
-		
+
 		public LoginViewModel ViewModel { get; set; }
 
-		protected override void Dispose (bool disposing) {
+		protected override void Dispose (bool disposing)
+		{
 			_disposable.Dispose ();
 			base.Dispose (disposing);
 		}
 
-		Label TitleLabel () {
-			var label = new Label("Login Form");
+		Label TitleLabel ()
+		{
+			var label = new Label ("Login Form");
 			Add (label);
 			return label;
 		}
 
-		TextField UsernameInput (View previous) {
+		TextField UsernameInput (View previous)
+		{
 			var usernameInput = new TextField (ViewModel.Username) {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			ViewModel
@@ -56,10 +59,11 @@ namespace ReactiveExample {
 			return usernameInput;
 		}
 
-		Label UsernameLengthLabel (View previous) {
+		Label UsernameLengthLabel (View previous)
+		{
 			var usernameLengthLabel = new Label {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			ViewModel
@@ -71,10 +75,11 @@ namespace ReactiveExample {
 			return usernameLengthLabel;
 		}
 
-		TextField PasswordInput (View previous) {
+		TextField PasswordInput (View previous)
+		{
 			var passwordInput = new TextField (ViewModel.Password) {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			ViewModel
@@ -92,10 +97,11 @@ namespace ReactiveExample {
 			return passwordInput;
 		}
 
-		Label PasswordLengthLabel (View previous) {
+		Label PasswordLengthLabel (View previous)
+		{
 			var passwordLengthLabel = new Label {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			ViewModel
@@ -107,21 +113,22 @@ namespace ReactiveExample {
 			return passwordLengthLabel;
 		}
 
-		Label ValidationLabel (View previous) {
+		Label ValidationLabel (View previous)
+		{
 			var error = "Please, enter user name and password.";
 			var success = "The input is valid!";
-			var validationLabel = new Label(error) {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+			var validationLabel = new Label (error) {
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			ViewModel
-				.WhenAnyValue (x => x.IsValid)	
+				.WhenAnyValue (x => x.IsValid)
 				.Select (valid => valid ? success : error)
 				.BindTo (validationLabel, x => x.Text)
 				.DisposeWith (_disposable);
 			ViewModel
-				.WhenAnyValue (x => x.IsValid)	
+				.WhenAnyValue (x => x.IsValid)
 				.Select (valid => valid ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"])
 				.BindTo (validationLabel, x => x.ColorScheme)
 				.DisposeWith (_disposable);
@@ -129,12 +136,13 @@ namespace ReactiveExample {
 			return validationLabel;
 		}
 
-		Label LoginProgressLabel (View previous) {
+		Label LoginProgressLabel (View previous)
+		{
 			var progress = "Logging in...";
 			var idle = "Press 'Login' to log in.";
-			var loginProgressLabel = new Label(idle) {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+			var loginProgressLabel = new Label (idle) {
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			ViewModel
@@ -147,11 +155,12 @@ namespace ReactiveExample {
 			return loginProgressLabel;
 		}
 
-		Button LoginButton (View previous) {
-			var loginButton = new Button () { 
-Text = "Login", 
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+		Button LoginButton (View previous)
+		{
+			var loginButton = new Button () {
+				Text = "Login",
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			loginButton
@@ -163,10 +172,11 @@ Text = "Login",
 			return loginButton;
 		}
 
-		Button ClearButton (View previous) {
-			var clearButton = new Button("Clear") {
-				X = Pos.Left(previous),
-				Y = Pos.Top(previous) + 1,
+		Button ClearButton (View previous)
+		{
+			var clearButton = new Button ("Clear") {
+				X = Pos.Left (previous),
+				Y = Pos.Top (previous) + 1,
 				Width = 40
 			};
 			clearButton
@@ -177,10 +187,10 @@ Text = "Login",
 			Add (clearButton);
 			return clearButton;
 		}
-		
+
 		object IViewFor.ViewModel {
 			get => ViewModel;
-			set => ViewModel = (LoginViewModel) value;
+			set => ViewModel = (LoginViewModel)value;
 		}
 	}
 }

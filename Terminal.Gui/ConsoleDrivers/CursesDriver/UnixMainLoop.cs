@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using static Terminal.Gui.NetEvents;
 
 namespace Terminal.Gui {
 	/// <summary>

@@ -1,10 +1,10 @@
-using System.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Terminal.Gui {
 	internal class AutocompleteFilepathContext : AutocompleteContext {

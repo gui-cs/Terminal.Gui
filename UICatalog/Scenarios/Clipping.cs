@@ -1,5 +1,4 @@
-﻿using System;
-using Terminal.Gui;
+﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "Clipping", Description: "Used to test that things clip correctly")]
@@ -19,9 +18,10 @@ namespace UICatalog.Scenarios {
 			//Win.Y = 2;
 			//Win.Width = Dim.Fill () - 4;
 			//Win.Height = Dim.Fill () - 2;
-			var label = new Label () { 
-Text = "ScrollView (new Rect (3, 3, 50, 20)) with a 200, 100 ContentSize...", 
-				X = 0, Y = 0,
+			var label = new Label () {
+				Text = "ScrollView (new Rect (3, 3, 50, 20)) with a 200, 100 ContentSize...",
+				X = 0,
+				Y = 0,
 				//ColorScheme = Colors.ColorSchemes ["Dialog"]
 			};
 			Application.Top.Add (label);
@@ -65,7 +65,7 @@ Text = "ScrollView (new Rect (3, 3, 50, 20)) with a 200, 100 ContentSize...",
 			};
 
 			var testButton = new Button (2, 2, "click me");
-			testButton.Clicked += (s,e) => {
+			testButton.Clicked += (s, e) => {
 				MessageBox.Query (10, 5, "Test", "test message", "Ok");
 			};
 			embedded3.Add (testButton);

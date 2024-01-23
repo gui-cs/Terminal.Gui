@@ -10,7 +10,8 @@ public class TileViewTests {
 
 	public TileViewTests (ITestOutputHelper output) => _output = output;
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -32,7 +33,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_WithBorder ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -54,7 +56,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_Focused ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -93,7 +96,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_Focused_WithBorder ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -132,7 +136,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_Focused_50PercentSplit ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -178,7 +183,8 @@ public class TileViewTests {
 		Assert.IsType<Pos.PosFactor> (tileView.SplitterDistances.ElementAt (0));
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Horizontal ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -200,7 +206,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_View1MinSize_Absolute ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -244,7 +251,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_View1MinSize_Absolute_WithBorder ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -288,7 +296,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_View2MinSize_Absolute ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -333,7 +342,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Vertical_View2MinSize_Absolute_WithBorder ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -377,7 +387,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_InsertPanelAtStart ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -394,7 +405,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_InsertPanelMiddle ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -411,7 +423,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_InsertPanelAtEnd ()
 	{
 		var tileView = Get11By3TileView (out var line, true);
@@ -428,7 +441,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Horizontal_Focused ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -471,7 +485,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_Horizontal_View1MinSize_Absolute ()
 	{
 		var tileView = Get11By3TileView (out var line);
@@ -518,7 +533,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTileView_CannotSetSplitterPosToFuncEtc ()
 	{
 		var tileView = Get11By3TileView ();
@@ -534,7 +550,8 @@ public class TileViewTests {
 		Assert.Equal ("Only Percent and Absolute values are supported. Passed value was PosCombine", ex.Message);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer2LeftAnd1Right_RendersNicely ()
 	{
 		var tileView = GetNestedContainer2Left1Right (false);
@@ -577,7 +594,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_RendersNicely ()
 	{
 		var tileView = GetNestedContainer3Right1Down (false);
@@ -640,7 +658,8 @@ public class TileViewTests {
 		Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_WithBorder_RendersNicely ()
 	{
 		var tileView = GetNestedContainer3Right1Down (true);
@@ -702,7 +721,8 @@ public class TileViewTests {
 		Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_WithTitledBorder_RendersNicely ()
 	{
 		var tileView = GetNestedContainer3Right1Down (true, true);
@@ -724,7 +744,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_WithBorder_RemovingTiles ()
 	{
 		var tileView = GetNestedContainer3Right1Down (true);
@@ -809,7 +830,8 @@ public class TileViewTests {
 		Assert.Null (tileView.RemoveTile (0));
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void TestTileView_IndexOf (bool recursive)
@@ -846,7 +868,8 @@ public class TileViewTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedRoots_BothRoots_BothCanHaveBorders ()
 	{
 		var tv = new TileView {
@@ -894,7 +917,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1 ()
 	{
 		var tv = Get5x1TilesView ();
@@ -943,7 +967,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1_NoBorder ()
 	{
 		var tv = Get5x1TilesView (false);
@@ -994,7 +1019,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder ()
 	{
 		var tv = Get5x1TilesView ();
@@ -1051,7 +1077,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder_NoBorder ()
 	{
 		var tv = Get5x1TilesView (false);
@@ -1107,7 +1134,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours ()
 	{
 		var tv = Get5x1TilesView ();
@@ -1165,7 +1193,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours_NoBorder ()
 	{
 		var tv = Get5x1TilesView (false);
@@ -1224,7 +1253,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter2 ()
 	{
 		var tv = Get5x1TilesView ();
@@ -1285,7 +1315,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter2_NoBorder ()
 	{
 		var tv = Get5x1TilesView (false);
@@ -1349,7 +1380,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours ()
 	{
 		var tv = Get5x1TilesView ();
@@ -1407,7 +1439,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours_NoBorder ()
 	{
 		var tv = Get5x1TilesView (false);
@@ -1466,7 +1499,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4 ()
 	{
 		var tv = Get5x1TilesView ();
@@ -1528,7 +1562,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4_NoBorder ()
 	{
 		var tv = Get5x1TilesView (false);
@@ -1589,7 +1624,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedNonRoots_OnlyOneRoot_OnlyRootCanHaveBorders ()
 	{
 		var tv = new TileView {
@@ -1635,7 +1671,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestTrySplit_ShouldRetainTitle ()
 	{
 		var tv = new TileView ();
@@ -1649,7 +1686,8 @@ public class TileViewTests {
 		Assert.Empty (tv.Tiles.ElementAt (0).Title);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_TileVisibility_WithBorder ()
 	{
 		var tileView = GetNestedContainer3Right1Down (true);
@@ -1831,7 +1869,8 @@ public class TileViewTests {
 	}
 
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_TileVisibility_WithoutBorder ()
 	{
 		var tileView = GetNestedContainer3Right1Down (false);
@@ -2003,7 +2042,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test_SplitTop_WholeBottom ()
 	{
 		var tileView = new TileView (2) {
@@ -2048,7 +2088,8 @@ public class TileViewTests {
 
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill ()
 	{
 		var tileView = GetNestedContainer3Right1Down (true, true, 1);
@@ -2070,7 +2111,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestNestedContainer3RightAnd1Down_TitleTriesToOverspill ()
 	{
 		var tileView = GetNestedContainer3Right1Down (true, true, 1);
@@ -2098,7 +2140,8 @@ public class TileViewTests {
 		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount ()
 	{
 		var tv = GetTileView (20, 10);
@@ -2122,7 +2165,8 @@ public class TileViewTests {
 			});
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile ()
 	{
 		var tv = GetTileView (20, 10);
@@ -2147,7 +2191,8 @@ public class TileViewTests {
 			});
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (0)]
 	[InlineData (1)]
 	public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx)

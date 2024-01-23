@@ -1,16 +1,10 @@
-﻿using Xunit;
-using Terminal.Gui;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Text.Json;
-using static Terminal.Gui.ConfigurationManager;
+using Xunit;
 
 namespace Terminal.Gui.ConfigurationTests {
 	public class ThemeScopeTests {
-		public static readonly JsonSerializerOptions _jsonOptions = new() {
+		public static readonly JsonSerializerOptions _jsonOptions = new () {
 			Converters = {
 				//new AttributeJsonConverter (),
 				//new ColorJsonConverter ()
@@ -33,7 +27,7 @@ namespace Terminal.Gui.ConfigurationTests {
 		}
 
 		[Fact]
-		public void AllThemesPresent()
+		public void AllThemesPresent ()
 		{
 			ConfigurationManager.Reset ();
 			Assert.True (ConfigurationManager.Themes.ContainsKey ("Default"));
@@ -62,7 +56,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ThemeManager.Themes! [ThemeManager.SelectedTheme]!.Apply ();
 			Assert.Equal (Dialog.ButtonAlignments.Right, Dialog.DefaultButtonAlignment);
 		}
-		
+
 
 		[Fact]
 		public void TestSerialize_RoundTrip ()
@@ -70,7 +64,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			ConfigurationManager.Reset ();
 
 			var initial = ThemeManager.Themes;
-			
+
 			var serialized = JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (ConfigurationManager.Themes, _jsonOptions);
 			var deserialized = JsonSerializer.Deserialize<IDictionary<string, ThemeScope>> (serialized, _jsonOptions);
 

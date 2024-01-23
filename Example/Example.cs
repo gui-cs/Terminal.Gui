@@ -15,18 +15,18 @@ Application.Shutdown ();
 // Defines a top-level window with border and title
 public class ExampleWindow : Window {
 	public TextField usernameText;
-	
+
 	public ExampleWindow ()
 	{
 		Title = $"Example App ({Application.QuitKey} to quit)";
 
 		// Create input components and labels
-		var usernameLabel = new Label () { 
-			Text = "Username:" 
+		var usernameLabel = new Label () {
+			Text = "Username:"
 		};
 
-		usernameText = new TextField () { 
-Text = "", 
+		usernameText = new TextField () {
+			Text = "",
 			// Position text field adjacent to the label
 			X = Pos.Right (usernameLabel) + 1,
 
@@ -40,8 +40,8 @@ Text = "",
 			Y = Pos.Bottom (usernameLabel) + 1
 		};
 
-		var passwordText = new TextField () { 
-Text = "", 
+		var passwordText = new TextField () {
+			Text = "",
 			Secret = true,
 			// align with the text box above
 			X = Pos.Left (usernameText),
@@ -52,14 +52,14 @@ Text = "",
 		// Create login button
 		var btnLogin = new Button () {
 			Text = "Login",
-			Y = Pos.Bottom(passwordLabel) + 1,
+			Y = Pos.Bottom (passwordLabel) + 1,
 			// center the login button horizontally
 			X = Pos.Center (),
 			IsDefault = true,
 		};
 
 		// When login button is clicked display a message popup
-		btnLogin.Clicked += (s,e) => {
+		btnLogin.Clicked += (s, e) => {
 			if (usernameText.Text == "admin" && passwordText.Text == "password") {
 				MessageBox.Query ("Logging In", "Login Successful", "Ok");
 				Application.RequestStop ();

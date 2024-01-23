@@ -1,7 +1,7 @@
-﻿using System.Text;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -11,7 +11,7 @@ namespace Terminal.Gui {
 	/// </summary>
 	public class TileView : View {
 		TileView parentTileView;
-		
+
 		// TODO: Update to use Key instead of KeyCode
 		/// <summary>
 		/// The keyboard key that the user can press to toggle resizing

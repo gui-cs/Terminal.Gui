@@ -777,8 +777,10 @@ public class DialogTests {
 			btn3.Clicked += (s, e) => RequestStop ();
 			btn2.Clicked += (s, e) => {
 				// Don't test MessageBox in Dialog unit tests!
-				var subBtn = new Button () { 
-Text = "Ok",  IsDefault = true };
+				var subBtn = new Button () {
+					Text = "Ok",
+					IsDefault = true
+				};
 				var subDlg = new Dialog (subBtn) { Text = "ya", Width = 20, Height = 5 };
 				subBtn.Clicked += (s, e) => RequestStop (subDlg);
 				Run (subDlg);
@@ -958,8 +960,8 @@ Text = "Ok",  IsDefault = true };
 			Assert.Equal (16, dlg.Bounds.Width);
 
 			Button btn = null;
-			btn = new Button () { 
-Text = "Ok", 
+			btn = new Button () {
+				Text = "Ok",
 				X = Pos.AnchorEnd () - Pos.Function (Btn_Width)
 			};
 			btn.SetRelativeLayout (dlg.Bounds);
@@ -972,8 +974,8 @@ Text = "Ok",
 			{
 				return btn?.Bounds.Width ?? 0;
 			}
-			var tf = new TextField () { 
-Text = "01234567890123456789", 
+			var tf = new TextField () {
+				Text = "01234567890123456789",
 				// Dim.Fill (1) fills remaining space minus 1
 				// Dim.Function (Btn_Width) is 6
 				Width = Dim.Fill (1) - Dim.Function (Btn_Width)

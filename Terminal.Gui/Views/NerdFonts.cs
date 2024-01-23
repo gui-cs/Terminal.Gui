@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.IO.Abstractions;
-using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui {
 	internal class NerdFonts {
@@ -16,23 +15,20 @@ namespace Terminal.Gui {
 		[SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
 		public static bool Enable { get; set; } = false;
 
-		public char GetNerdIcon(IFileSystemInfo file, bool isOpen)
+		public char GetNerdIcon (IFileSystemInfo file, bool isOpen)
 		{
-			if(FilenameToIcon.ContainsKey(file.Name))
-			{
-				return Glyphs[FilenameToIcon[file.Name]];
+			if (FilenameToIcon.ContainsKey (file.Name)) {
+				return Glyphs [FilenameToIcon [file.Name]];
 			}
 
-			if(ExtensionToIcon.ContainsKey(file.Extension))
-			{
-				return Glyphs[ExtensionToIcon[file.Extension]];
+			if (ExtensionToIcon.ContainsKey (file.Extension)) {
+				return Glyphs [ExtensionToIcon [file.Extension]];
 			}
 
-			if(file is IDirectoryInfo d)
-			{
-				return isOpen ? _nf_cod_folder_opened :_nf_cod_folder;
+			if (file is IDirectoryInfo d) {
+				return isOpen ? _nf_cod_folder_opened : _nf_cod_folder;
 			}
-				
+
 			return _nf_cod_file;
 		}
 		char _nf_cod_folder = '';
@@ -42,7 +38,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// All nerd glyphs used by Terminal.Gui by name.
 		/// </summary>
-		public Dictionary<string,char> Glyphs {get;set;} = new Dictionary<string, char>{
+		public Dictionary<string, char> Glyphs { get; set; } = new Dictionary<string, char>{
 			{"nf-cod-package", ''},
 			{"nf-cod-preview", ''},
 			{"nf-custom-folder_config", ''},
@@ -220,7 +216,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Mapping of file name to <see cref="Glyphs"/> name.
 		/// </summary>
-		public Dictionary<string, string> FilenameToIcon {get;set;} = new Dictionary<string, string> ()
+		public Dictionary<string, string> FilenameToIcon { get; set; } = new Dictionary<string, string> ()
 		{
 			{"docs","nf-oct-repo"},
 			{"documents","nf-oct-repo"},
@@ -368,7 +364,7 @@ namespace Terminal.Gui {
 		/// <summary>
 		/// Mapping of file extension to <see cref="Glyphs"/> name.
 		/// </summary>
-		public Dictionary<string, string> ExtensionToIcon {get;set;} = new Dictionary<string, string> ()
+		public Dictionary<string, string> ExtensionToIcon { get; set; } = new Dictionary<string, string> ()
 		{
 
 			// Archive files

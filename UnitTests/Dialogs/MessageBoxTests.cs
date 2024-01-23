@@ -572,7 +572,7 @@ ffffffffffffffffffff
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
-                │                   { CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
+                │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘", _output);
 					break;
 				default:

@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using Terminal.Gui;
-using Xunit;
-using System.Globalization;
+﻿using Xunit;
 using Xunit.Abstractions;
-using System.Text;
-using static Terminal.Gui.Application;
 
 namespace Terminal.Gui.DialogTests {
 
@@ -47,7 +38,7 @@ namespace Terminal.Gui.DialogTests {
 			string expectedAfter = string.Empty;
 			string expectedDuring = string.Empty;
 			bool cancel = false;
-			r.TitleChanging += (s,args) => {
+			r.TitleChanging += (s, args) => {
 				Assert.Equal (expectedDuring, args.NewTitle);
 				args.Cancel = cancel;
 			};
@@ -73,7 +64,7 @@ namespace Terminal.Gui.DialogTests {
 			Assert.Equal (string.Empty, r.Title);
 
 			string expected = string.Empty;
-			r.TitleChanged += (s,args) => {
+			r.TitleChanged += (s, args) => {
 				Assert.Equal (r.Title, args.NewTitle);
 			};
 
@@ -554,7 +545,7 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			closedFired = false;
-			wizard.Closed += (s,e) => {
+			wizard.Closed += (s, e) => {
 				closedFired = true;
 			};
 
@@ -592,7 +583,7 @@ namespace Terminal.Gui.DialogTests {
 			};
 
 			closedFired = false;
-			wizard.Closed += (s,e) => {
+			wizard.Closed += (s, e) => {
 				closedFired = true;
 			};
 

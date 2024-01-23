@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 
@@ -16,7 +15,7 @@ namespace Terminal.Gui {
 		/// when the state was active.
 		/// </summary>
 		public string Path { get; }
-		
+
 		public FileDialogState (IDirectoryInfo dir, FileDialog parent)
 		{
 			this.Directory = dir;

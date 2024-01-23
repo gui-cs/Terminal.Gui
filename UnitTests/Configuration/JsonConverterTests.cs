@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Unicode;
 using Xunit;
 
-namespace Terminal.Gui.ConfigurationTests; 
+namespace Terminal.Gui.ConfigurationTests;
 
 public class ColorJsonConverterTests {
 	[Theory]

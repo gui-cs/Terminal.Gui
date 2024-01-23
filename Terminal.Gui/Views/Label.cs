@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by newline

@@ -1,6 +1,4 @@
-﻿using System;
-using Terminal.Gui;
-using System.Linq;
+﻿using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "LineCanvas Experiments", Description: "Experiments with LineCanvas")]

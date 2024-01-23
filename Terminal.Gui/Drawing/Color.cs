@@ -1,5 +1,4 @@
-﻿global using Attribute = Terminal.Gui.Attribute;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using Terminal.Gui;
-using System.Linq;
 using System.Globalization;
-using System.Text;
 using System.IO;
+using System.Linq;
+using System.Text;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 
@@ -49,7 +49,7 @@ namespace UICatalog.Scenarios {
 			Win.Title = this.GetName ();
 			Win.Y = 1; // menu
 			Win.Height = Dim.Fill (1); // status bar
-			
+
 			this.tableView = new TableView () {
 				X = 0,
 				Y = 0,
@@ -151,7 +151,7 @@ namespace UICatalog.Scenarios {
 			// if user clicks the mouse in TableView
 			tableView.MouseClick += (s, e) => {
 
-				if(currentTable == null) {
+				if (currentTable == null) {
 					return;
 				}
 
@@ -196,7 +196,7 @@ namespace UICatalog.Scenarios {
 
 		private void SortColumn (int clickedCol, string sort, bool isAsc)
 		{
-			if(currentTable == null) {
+			if (currentTable == null) {
 				return;
 			}
 
@@ -288,7 +288,7 @@ namespace UICatalog.Scenarios {
 
 		private void SetMinAcceptableWidthToOne ()
 		{
-			for(int i =0;i<tableView.Table.Columns;i++) {
+			for (int i = 0; i < tableView.Table.Columns; i++) {
 				var style = tableView.Style.GetOrCreateColumnStyle (i);
 				style.MinAcceptableWidth = 1;
 			}
@@ -388,7 +388,7 @@ namespace UICatalog.Scenarios {
 
 		private void TableViewKeyPress (object sender, Key e)
 		{
-			if(currentTable == null) {
+			if (currentTable == null) {
 				return;
 			}
 

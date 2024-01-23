@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
-using System.Text;
 using System.Linq;
-using System.Reflection.Metadata;
+using System.Text;
 
 namespace Terminal.Gui;
 

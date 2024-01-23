@@ -1,14 +1,9 @@
-﻿using Terminal.Gui;
-using System.Text;
-using System;
-using System.Collections.Generic;
-using System.Xml.Linq;
+﻿using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DrawingTests;
 public class ThicknessTests {

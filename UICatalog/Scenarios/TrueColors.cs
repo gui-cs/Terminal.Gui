@@ -21,8 +21,8 @@ namespace UICatalog.Scenarios {
 			Win.Add (lblDriverName);
 			y++;
 
-			var cbSupportsTrueColor = new CheckBox () { 
-Text = "Driver supports true color ", 
+			var cbSupportsTrueColor = new CheckBox () {
+				Text = "Driver supports true color ",
 				X = x,
 				Y = y++,
 				Checked = canTrueColor,
@@ -30,8 +30,8 @@ Text = "Driver supports true color ",
 			};
 			Win.Add (cbSupportsTrueColor);
 
-			var cbUseTrueColor = new CheckBox () { 
-Text = "Force 16 colors", 
+			var cbUseTrueColor = new CheckBox () {
+				Text = "Force 16 colors",
 				X = x,
 				Y = y++,
 				Checked = Application.Force16Colors,
@@ -51,46 +51,46 @@ Text = "Force 16 colors",
 			SetupGradient ("Cyan gradient", x, ref y, (i) => new Color (0, i, i));
 			SetupGradient ("Gray gradient", x, ref y, (i) => new Color (i, i, i));
 
-			Win.Add (new Label () { 
-Text = "Mouse over to get the gradient view color:", 
+			Win.Add (new Label () {
+				Text = "Mouse over to get the gradient view color:",
 				X = Pos.AnchorEnd (44),
 				Y = 2
 			});
-			Win.Add (new Label () { 
-Text = "Red:", 
+			Win.Add (new Label () {
+				Text = "Red:",
 				X = Pos.AnchorEnd (44),
 				Y = 4
 			});
-			Win.Add (new Label () { 
-Text = "Green:", 
+			Win.Add (new Label () {
+				Text = "Green:",
 				X = Pos.AnchorEnd (44),
 				Y = 5
 			});
-			Win.Add (new Label () { 
-Text = "Blue:", 
+			Win.Add (new Label () {
+				Text = "Blue:",
 				X = Pos.AnchorEnd (44),
 				Y = 6
 			});
 
-			var lblRed = new Label () { 
-Text = "na", 
+			var lblRed = new Label () {
+				Text = "na",
 				X = Pos.AnchorEnd (32),
 				Y = 4
 			};
 			Win.Add (lblRed);
-			var lblGreen = new Label () { 
-Text = "na", 
+			var lblGreen = new Label () {
+				Text = "na",
 				X = Pos.AnchorEnd (32),
 				Y = 5
 			};
 			Win.Add (lblGreen);
-			var lblBlue = new Label () { 
-Text = "na", 
+			var lblBlue = new Label () {
+				Text = "na",
 				X = Pos.AnchorEnd (32),
 				Y = 6
 			};
 			Win.Add (lblBlue);
-			
+
 			Application.MouseEvent += (s, e) => {
 				if (e.MouseEvent.View != null) {
 					var normal = e.MouseEvent.View.GetNormalColor ();
@@ -109,8 +109,8 @@ Text = "na",
 			};
 			Win.Add (gradient);
 			for (int dx = x, i = 0; i <= 256; i += 4) {
-				var l = new Label () { 
-Text = " ", 
+				var l = new Label () {
+					Text = " ",
 					X = dx++,
 					Y = y,
 					ColorScheme = new ColorScheme () {

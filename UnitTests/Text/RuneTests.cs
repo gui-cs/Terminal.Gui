@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Xunit;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui.TextTests;
 
@@ -119,7 +118,7 @@ public class RuneTests {
 
 	//{ 0x72D7, L"\x72D7", CodepointWidth::Wide }, // U+72D7
 	[InlineData (0x72D7, "狗", 2, 1, 3)]
-	
+
 
 	public void GetColumns_With_Single_Code (int code, string str, int columns, int stringLength, int utf8Length)
 	{
@@ -177,8 +176,8 @@ public class RuneTests {
 	[InlineData ("\U0001f9e0", "🧠", 2, 2)] // 🧠 Brain
 	[InlineData ("\U00010421", "𐐡", 1, 2)] // 𐐡 Deseret Capital Letter Er
 	[InlineData ("\U0001f339", "🌹", 2, 2)] // 🌹 Rose
-	//[InlineData ("\uFE20FE21", "", 1, 1)]   // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
-	// Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+						//[InlineData ("\uFE20FE21", "", 1, 1)]   // Combining Ligature Left Half - U+fe20 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
+						// Combining Ligature Right Half - U+fe21 -https://github.com/microsoft/terminal/blob/main/src/types/unicode_width_overrides.xml
 	public void GetColumns_Utf32_Encode (string code, string str, int columns, int stringLength)
 	{
 		var operationStatus = Rune.DecodeFromUtf16 (code, out Rune rune, out int charsConsumed);
@@ -729,8 +728,8 @@ public class RuneTests {
 	public void Rune_GetColumns_Non_Printable (int expectedColumns, int scalar)
 	{
 		var rune = new Rune (scalar);
-		Assert.Equal (expectedColumns, rune.GetColumns());
-		Assert.Equal (0, rune.ToString().GetColumns());
+		Assert.Equal (expectedColumns, rune.GetColumns ());
+		Assert.Equal (0, rune.ToString ().GetColumns ());
 	}
 
 	[Fact]

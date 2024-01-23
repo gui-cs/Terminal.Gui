@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.FileServicesTests; 
+namespace Terminal.Gui.FileServicesTests;
 
 public class FileDialogTests {
 
@@ -16,7 +16,8 @@ public class FileDialogTests {
 
 	public FileDialogTests (ITestOutputHelper output) => _output = output;
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void OnLoad_TextBoxIsFocused ()
 	{
 		var dlg = GetInitializedFileDialog ();
@@ -26,7 +27,8 @@ public class FileDialogTests {
 		Assert.IsType<TextField> (tf);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void DirectTyping_Allowed ()
 	{
 		var dlg = GetInitializedFileDialog ();
@@ -63,7 +65,8 @@ public class FileDialogTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void DirectTyping_AutoComplete ()
 	{
 		var dlg = GetInitializedFileDialog ();
@@ -95,7 +98,8 @@ public class FileDialogTests {
 		Assert.EndsWith ("xx" + Path.DirectorySeparatorChar, dlg.Path);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void DoNotConfirmSelectionWhenFindFocused ()
 	{
 		var dlg = GetInitializedFileDialog ();
@@ -132,7 +136,8 @@ public class FileDialogTests {
 		Assert.False (dlg.Canceled);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true, true)]
 	[InlineData (true, false)]
 	[InlineData (false, true)]
@@ -158,7 +163,8 @@ public class FileDialogTests {
 		AssertIsTheSubfolder (dlg.Path);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true, true)]
 	[InlineData (true, false)]
 	[InlineData (false, true)]
@@ -185,7 +191,8 @@ public class FileDialogTests {
 		AssertIsTheSubfolder (dlg.Path);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void MultiSelectDirectory_CannotToggleDotDot (bool acceptWithEnter)
@@ -233,7 +240,8 @@ public class FileDialogTests {
 		);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void DotDot_MovesToRoot_ThenPressBack ()
 	{
 		var dlg = GetDialog ();
@@ -272,7 +280,8 @@ public class FileDialogTests {
 		Assert.False (selected);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MultiSelectDirectory_EnterOpensFolder ()
 	{
 		var dlg = GetDialog ();
@@ -300,7 +309,8 @@ public class FileDialogTests {
 		Assert.Null (eventMultiSelected);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void MultiSelectDirectory_CanToggleThenAccept (bool acceptWithEnter)
@@ -373,7 +383,8 @@ public class FileDialogTests {
 		}
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestDirectoryContents_Linux ()
 	{
 		if (IsWindows ()) {
@@ -407,7 +418,8 @@ public class FileDialogTests {
 		TestHelpers.AssertDriverContentsAre (expected, _output, ignoreLeadingWhitespace: true);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestDirectoryContents_Windows ()
 	{
 		if (!IsWindows ()) {
@@ -466,7 +478,8 @@ public class FileDialogTests {
 	[InlineData (".Designer.cs", "MyView.cs", false)]
 	public void TestAllowedType_DoubleBarreled (string allowed, string candidate, bool expected) => Assert.Equal (expected, new AllowedType ("Test", allowed).IsAllowed (candidate));
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void CancelSelection (bool cancel)

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// The Padding for a <see cref="View"/>. 
@@ -17,7 +14,7 @@ public class Padding : Adornment {
 
 	/// <inheritdoc />
 	public Padding (View parent) : base (parent) { /* Do nothing; View.CreateAdornment requires a constructor that takes a parent */ }
-	
+
 	/// <summary>
 	/// The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/> scheme.
 	/// color scheme.

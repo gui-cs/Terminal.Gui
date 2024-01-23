@@ -1,9 +1,8 @@
-using System.Text;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 
 namespace Terminal.Gui {
 
@@ -768,7 +767,7 @@ namespace Terminal.Gui {
 				return false;
 			}
 
-		
+
 			if (CollectionNavigator != null &&
 				this.HasFocus &&
 				Table.Rows != 0 &&
@@ -1317,7 +1316,7 @@ namespace Terminal.Gui {
 			if (TableIsNullOrInvisible ()) {
 				return null;
 			}
-				
+
 
 			var viewPort = CalculateViewport (Bounds);
 
@@ -1799,7 +1798,7 @@ namespace Terminal.Gui {
 			return colStyle != null ? colStyle.GetRepresentation (value) : value.ToString ();
 		}
 
-		
+
 
 		/// <summary>
 		/// Describes a desire to render a column at a given horizontal position in the UI

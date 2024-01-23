@@ -285,8 +285,8 @@ namespace Terminal.Gui.ViewsTests {
 		[Fact, AutoInitShutdown]
 		public void Show_Ensures_Display_Inside_The_Container_Without_Overlap_The_Host ()
 		{
-			var view = new View () { 
-Text = "View", 
+			var view = new View () {
+				Text = "View",
 				X = Pos.AnchorEnd (10),
 				Y = Pos.AnchorEnd (1),
 				Width = 10,
@@ -327,8 +327,13 @@ Text = "View",
 		[Fact, AutoInitShutdown]
 		public void Show_Display_Below_The_Bottom_Host_If_Has_Enough_Space ()
 		{
-			var view = new View () { 
-Text = "View",  X = 10, Y = 5, Width = 10, Height = 1 };
+			var view = new View () {
+				Text = "View",
+				X = 10,
+				Y = 5,
+				Width = 10,
+				Height = 1
+			};
 			var cm = new ContextMenu (view,
 				new MenuBarItem (new MenuItem [] {
 					new MenuItem ("One", "", null),
@@ -572,14 +577,14 @@ Text = "View",  X = 10, Y = 5, Width = 10, Height = 1 };
 				new MenuBarItem ("Edit", "", null)
 			});
 
-			var label = new Label () { 
-Text = "Label:", 
+			var label = new Label () {
+				Text = "Label:",
 				X = 2,
 				Y = 3
 			};
 
-			var tf = new TextField () { 
-Text = "TextField", 
+			var tf = new TextField () {
+				Text = "TextField",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 20
@@ -635,14 +640,14 @@ Text = "TextField",
 				new MenuBarItem ("Edit", "", null)
 			});
 
-			var label = new Label () { 
-Text = "Label:", 
+			var label = new Label () {
+				Text = "Label:",
 				X = 2,
 				Y = 3
 			};
 
-			var tf = new TextField () { 
-Text = "TextField", 
+			var tf = new TextField () {
+				Text = "TextField",
 				X = Pos.Right (label) + 1,
 				Y = Pos.Top (label),
 				Width = 20
@@ -943,8 +948,11 @@ Text = "TextField",
 
 			// Don't use Dialog here as it has more layout logic. Use Window instead.
 			var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
-			dialog.Add (new TextField () { 
-Text = "Test",  X = Pos.Center (), Width = 10 });
+			dialog.Add (new TextField () {
+				Text = "Test",
+				X = Pos.Center (),
+				Width = 10
+			});
 			var rs = Application.Begin (dialog);
 
 			Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
@@ -1003,8 +1011,11 @@ Text = "Test",  X = Pos.Center (), Width = 10 });
 
 			// Don't use Dialog here as it has more layout logic. Use Window instead.
 			var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
-			dialog.Add (new TextField () { 
-Text = "Test",  X = Pos.Center (), Width = 10 });
+			dialog.Add (new TextField () {
+				Text = "Test",
+				X = Pos.Center (),
+				Width = 10
+			});
 			var rs = Application.Begin (dialog);
 
 			Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
@@ -1048,8 +1059,11 @@ Text = "Test",  X = Pos.Center (), Width = 10 });
 			TestHelpers.AssertDriverContentsWithFrameAre ("", output);
 
 			var top = new Toplevel () { X = 2, Y = 2, Width = 15, Height = 4 };
-			top.Add (new TextField () { 
-Text = "Test",  X = Pos.Center (), Width = 10 });
+			top.Add (new TextField () {
+				Text = "Test",
+				X = Pos.Center (),
+				Width = 10
+			});
 			var rs = Application.Begin (top);
 
 			Assert.Equal (new Rect (2, 2, 15, 4), top.Frame);

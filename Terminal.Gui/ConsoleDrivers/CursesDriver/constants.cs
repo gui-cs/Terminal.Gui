@@ -54,8 +54,8 @@ namespace Unix.Terminal {
 		public const int COLOR_GRAY = unchecked((int)0x8);
 		public const int KEY_CODE_YES = unchecked((int)0x100);
 		public const int ERR = unchecked((int)0xffffffff);
-		public const int TIOCGWINSZ  = unchecked((int)0x5413);
-		public const int TIOCGWINSZ_MAC  = unchecked((int)0x40087468);
+		public const int TIOCGWINSZ = unchecked((int)0x5413);
+		public const int TIOCGWINSZ_MAC = unchecked((int)0x40087468);
 
 		[Flags]
 		public enum Event : long {

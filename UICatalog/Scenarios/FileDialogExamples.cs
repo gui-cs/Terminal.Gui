@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Terminal.Gui;
-using static Terminal.Gui.OpenDialog;
 
 namespace UICatalog.Scenarios {
 	[ScenarioMetadata (Name: "FileDialog", Description: "Demonstrates how to the FileDialog class")]
@@ -33,32 +30,60 @@ namespace UICatalog.Scenarios {
 			var y = 0;
 			var x = 1;
 
-			cbMustExist = new CheckBox () { 
-Text = "Must Exist",  Checked = true, Y = y++, X = x };
+			cbMustExist = new CheckBox () {
+				Text = "Must Exist",
+				Checked = true,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbMustExist);
 
-			cbUseColors = new CheckBox () { 
-Text = "Use Colors",  Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x };
+			cbUseColors = new CheckBox () {
+				Text = "Use Colors",
+				Checked = FileDialogStyle.DefaultUseColors,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbUseColors);
 
-			cbCaseSensitive = new CheckBox () { 
-Text = "Case Sensitive Search",  Checked = false, Y = y++, X = x };
+			cbCaseSensitive = new CheckBox () {
+				Text = "Case Sensitive Search",
+				Checked = false,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbCaseSensitive);
 
-			cbAllowMultipleSelection = new CheckBox () { 
-Text = "Multiple",  Checked = false, Y = y++, X = x };
+			cbAllowMultipleSelection = new CheckBox () {
+				Text = "Multiple",
+				Checked = false,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbAllowMultipleSelection);
 
-			cbShowTreeBranchLines = new CheckBox () { 
-Text = "Tree Branch Lines",  Checked = true, Y = y++, X = x };
+			cbShowTreeBranchLines = new CheckBox () {
+				Text = "Tree Branch Lines",
+				Checked = true,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbShowTreeBranchLines);
 
-			cbAlwaysTableShowHeaders = new CheckBox () { 
-Text = "Always Show Headers",  Checked = true, Y = y++, X = x };
+			cbAlwaysTableShowHeaders = new CheckBox () {
+				Text = "Always Show Headers",
+				Checked = true,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbAlwaysTableShowHeaders);
 
-			cbDrivesOnlyInTree = new CheckBox () { 
-Text = "Only Show Drives",  Checked = false, Y = y++, X = x };
+			cbDrivesOnlyInTree = new CheckBox () {
+				Text = "Only Show Drives",
+				Checked = false,
+				Y = y++,
+				X = x
+			};
 			Win.Add (cbDrivesOnlyInTree);
 
 			y = 0;
@@ -69,8 +94,11 @@ Text = "Only Show Drives",  Checked = false, Y = y++, X = x };
 				Y = 1,
 				Height = 4
 			});
-			Win.Add (new Label () { 
-Text = "Caption",  X = x++, Y = y++ });
+			Win.Add (new Label () {
+				Text = "Caption",
+				X = x++,
+				Y = y++
+			});
 
 			rgCaption = new RadioGroup { X = x, Y = y };
 			rgCaption.RadioLabels = new string [] { "Ok", "Open", "Save" };
@@ -84,8 +112,11 @@ Text = "Caption",  X = x++, Y = y++ });
 				Y = 1,
 				Height = 4
 			});
-			Win.Add (new Label () { 
-Text = "OpenMode",  X = x++, Y = y++ });
+			Win.Add (new Label () {
+				Text = "OpenMode",
+				X = x++,
+				Y = y++
+			});
 
 			rgOpenMode = new RadioGroup { X = x, Y = y };
 			rgOpenMode.RadioLabels = new string [] { "File", "Directory", "Mixed" };
@@ -99,17 +130,24 @@ Text = "OpenMode",  X = x++, Y = y++ });
 				Y = 1,
 				Height = 4
 			});
-			Win.Add (new Label () { 
-Text = "Icons",  X = x++, Y = y++ });
+			Win.Add (new Label () {
+				Text = "Icons",
+				X = x++,
+				Y = y++
+			});
 
 			rgIcons = new RadioGroup { X = x, Y = y };
 			rgIcons.RadioLabels = new string [] { "None", "Unicode", "Nerd*" };
 			Win.Add (rgIcons);
 
-			Win.Add (new Label () { 
-Text = "* Requires installing Nerd fonts",  Y = Pos.AnchorEnd (2) });
-			Win.Add (new Label () { 
-Text = "  (see: https://github.com/devblackops/Terminal-Icons)",  Y = Pos.AnchorEnd (1) });
+			Win.Add (new Label () {
+				Text = "* Requires installing Nerd fonts",
+				Y = Pos.AnchorEnd (2)
+			});
+			Win.Add (new Label () {
+				Text = "  (see: https://github.com/devblackops/Terminal-Icons)",
+				Y = Pos.AnchorEnd (1)
+			});
 
 			y = 5;
 			x = 24;
@@ -119,8 +157,11 @@ Text = "  (see: https://github.com/devblackops/Terminal-Icons)",  Y = Pos.Anchor
 				Y = y + 1,
 				Height = 4
 			});
-			Win.Add (new Label () { 
-Text = "Allowed",  X = x++, Y = y++ });
+			Win.Add (new Label () {
+				Text = "Allowed",
+				X = x++,
+				Y = y++
+			});
 
 			rgAllowedTypes = new RadioGroup { X = x, Y = y };
 			rgAllowedTypes.RadioLabels = new string [] { "Any", "Csv (Recommended)", "Csv (Strict)" };
@@ -134,19 +175,31 @@ Text = "Allowed",  X = x++, Y = y++ });
 				Y = y + 1,
 				Height = 4
 			});
-			Win.Add (new Label () { 
-Text = "Buttons",  X = x++, Y = y++ });
+			Win.Add (new Label () {
+				Text = "Buttons",
+				X = x++,
+				Y = y++
+			});
 
-			Win.Add (new Label () { 
-Text = "Ok Text:",  X = x, Y = y++ });
+			Win.Add (new Label () {
+				Text = "Ok Text:",
+				X = x,
+				Y = y++
+			});
 			tbOkButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbOkButton);
-			Win.Add (new Label () { 
-Text = "Cancel Text:",  X = x, Y = y++ });
+			Win.Add (new Label () {
+				Text = "Cancel Text:",
+				X = x,
+				Y = y++
+			});
 			tbCancelButton = new TextField () { X = x, Y = y++, Width = 12 };
 			Win.Add (tbCancelButton);
-			cbFlipButtonOrder = new CheckBox () { 
-Text = "Flip Order",  X = x, Y = y++ };
+			cbFlipButtonOrder = new CheckBox () {
+				Text = "Flip Order",
+				X = x,
+				Y = y++
+			};
 			Win.Add (cbFlipButtonOrder);
 
 			var btn = new Button ($"Run Dialog") {

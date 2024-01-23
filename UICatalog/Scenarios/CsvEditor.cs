@@ -11,7 +11,14 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Csv Editor", "Open and edit simple CSV files using the TableView class.")]
-[ScenarioCategory ("TableView")] [ScenarioCategory ("TextView")] [ScenarioCategory ("Controls")] [ScenarioCategory ("Dialogs")] [ScenarioCategory ("Text and Formatting")] [ScenarioCategory ("Dialogs")] [ScenarioCategory ("Top Level Windows")] [ScenarioCategory ("Files and IO")]
+[ScenarioCategory ("TableView")]
+[ScenarioCategory ("TextView")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Dialogs")]
+[ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Dialogs")]
+[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Files and IO")]
 public class CsvEditor : Scenario {
 	TableView tableView;
 	string _currentFile;
@@ -466,9 +473,9 @@ public class CsvEditor : Scenario {
 
 	}
 
-		private void TableViewKeyPress (object sender, Key e)
-		{
-			if (e.KeyCode == KeyCode.Delete) {
+	private void TableViewKeyPress (object sender, Key e)
+	{
+		if (e.KeyCode == KeyCode.Delete) {
 
 			if (tableView.FullRowSelect) {
 				// Delete button deletes all rows when in full row mode

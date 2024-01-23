@@ -20,7 +20,7 @@ namespace Terminal.Gui {
 				return instance;
 			}
 		}
-		
+
 		/// <inheritdoc/>
 		public override ColorScheme Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
@@ -55,7 +55,7 @@ namespace Terminal.Gui {
 				reader.Read ();
 				var attribute = JsonSerializer.Deserialize<Attribute> (ref reader, options);
 
-				switch (propertyName.ToLower()) {
+				switch (propertyName.ToLower ()) {
 				case "normal":
 					normal = attribute;
 					break;

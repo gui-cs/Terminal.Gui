@@ -7,7 +7,9 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("File System Explorer", "Hierarchical file system explorer demonstrating TreeView.")]
-[ScenarioCategory ("Controls")] [ScenarioCategory ("TreeView")] [ScenarioCategory ("Files and IO")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("TreeView")]
+[ScenarioCategory ("Files and IO")]
 public class TreeViewFileSystem : Scenario {
 	/// <summary>
 	/// A tree view where nodes are files and folders

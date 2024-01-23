@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DriverTests; 
+namespace Terminal.Gui.DriverTests;
 
 public class ClipRegionTests {
 	readonly ITestOutputHelper output;

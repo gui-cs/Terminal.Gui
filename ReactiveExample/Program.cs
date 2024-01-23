@@ -1,10 +1,11 @@
-﻿using System.Reactive.Concurrency;
-using ReactiveUI;
+﻿using ReactiveUI;
+using System.Reactive.Concurrency;
 using Terminal.Gui;
 
 namespace ReactiveExample {
 	public static class Program {
-		static void Main (string [] args) {
+		static void Main (string [] args)
+		{
 			Application.Init ();
 			RxApp.MainThreadScheduler = TerminalScheduler.Default;
 			RxApp.TaskpoolScheduler = TaskPoolScheduler.Default;

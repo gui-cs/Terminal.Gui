@@ -136,7 +136,7 @@ public class Adornment : View {
 	/// </summary>
 	/// <returns></returns>
 	public override bool OnRenderLineCanvas () => false;
-	
+
 	/// <summary>
 	/// Redraws the Adornments that comprise the <see cref="Adornment"/>.
 	/// </summary>

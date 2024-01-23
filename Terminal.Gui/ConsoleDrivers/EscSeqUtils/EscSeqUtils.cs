@@ -5,7 +5,6 @@ using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using static Unix.Terminal.Curses;
 
 namespace Terminal.Gui;
 /// <summary>
@@ -260,7 +259,7 @@ public static class EscSeqUtils {
 	/// </summary>
 	/// <param name="code">One of the 16 color codes.</param>
 	/// <returns></returns>
-	public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code+10);
+	public static string CSI_SetBackgroundColor (AnsiColorCode code) => CSI_SetGraphicsRendition ((int)code + 10);
 
 	/// <summary>
 	/// ESC[38;5;{id}m - Set foreground color (256 colors)

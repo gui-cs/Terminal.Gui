@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Terminal.Gui {
 	class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>> {

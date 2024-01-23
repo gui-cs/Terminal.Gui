@@ -5,7 +5,6 @@ using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.TextTests;
 
@@ -85,7 +84,7 @@ public class TextFormatterTests {
 		var tf = new TextFormatter ();
 		Assert.Equal (Size.Empty, tf.Size);
 		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines[0]));
+		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
 
 		tf.Size = new Size (0, 0);
 		Assert.Equal (Size.Empty, tf.Size);

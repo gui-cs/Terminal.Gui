@@ -21,7 +21,7 @@ public class MarginTests {
 		view.Margin.Thickness = new Thickness (1);
 
 		var superView = new View ();
-		
+
 		superView.ColorScheme = new ColorScheme () {
 			Normal = new Attribute (Color.Red, Color.Green),
 			Focus = new Attribute (Color.Green, Color.Red),

@@ -1,6 +1,4 @@
-﻿using static Terminal.Gui.ConfigurationManager;
-using System.Text.Json.Serialization;
-using System.Text;
+﻿using System.Text;
 
 namespace Terminal.Gui {
 	/// <summary>

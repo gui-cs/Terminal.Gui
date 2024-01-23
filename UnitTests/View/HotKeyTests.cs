@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
-using System.Text;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -226,14 +226,14 @@ public class HotKeyTests {
 			Text = "^Hello"
 		};
 		Assert.Equal (KeyCode.H, view.HotKey);
-		
+
 		view.Text = text;
 		Assert.Equal (expectedHotKey, view.HotKey);
 
 	}
 
 	[Theory]
-	[InlineData("^Test")]
+	[InlineData ("^Test")]
 	public void Text_Empty_Sets_HotKey_To_Null (string text)
 	{
 		var view = new View () {
@@ -297,7 +297,7 @@ public class HotKeyTests {
 		view.InvokingKeyBindings += (s, e) => {
 			Assert.Fail ();
 		};
-		
+
 		var superView = new View ();
 		superView.Add (view);
 

@@ -13,7 +13,6 @@ using System.Text.Unicode;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using static Terminal.Gui.SpinnerStyle;
-using static Terminal.Gui.TableView;
 
 namespace UICatalog.Scenarios;
 
@@ -48,19 +47,26 @@ public class CharacterMap : Scenario {
 		};
 		Application.Top.Add (_charMap);
 
-		var jumpLabel = new Label () { 
-Text = "_Jump To Code Point:", 
+		var jumpLabel = new Label () {
+			Text = "_Jump To Code Point:",
 			X = Pos.Right (_charMap) + 1,
 			Y = Pos.Y (_charMap),
 			HotKeySpecifier = (Rune)'_'
 		};
 		Application.Top.Add (jumpLabel);
 		var jumpEdit = new TextField () {
-			X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"
+			X = Pos.Right (jumpLabel) + 1,
+			Y = Pos.Y (_charMap),
+			Width = 10,
+			Caption = "e.g. 01BE3"
 		};
 		Application.Top.Add (jumpEdit);
-		_errorLabel = new Label () { 
-Text = "err",  X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes ["error"] };
+		_errorLabel = new Label () {
+			Text = "err",
+			X = Pos.Right (jumpEdit) + 1,
+			Y = Pos.Y (_charMap),
+			ColorScheme = Colors.ColorSchemes ["error"]
+		};
 		Application.Top.Add (_errorLabel);
 
 		jumpEdit.TextChanged += JumpEdit_TextChanged;
@@ -129,7 +135,7 @@ Text = "err",  X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme =
 			})
 		});
 		Application.Top.Add (menu);
-	
+
 	}
 
 	private void _categoryList_Initialized (object sender, EventArgs e) => _charMap.Width = Dim.Fill () - _categoryList.Width;
@@ -659,8 +665,8 @@ class CharMap : ScrollView {
 				//}
 				decResponse = JsonSerializer.Serialize (document.RootElement, new
 					JsonSerializerOptions {
-						WriteIndented = true
-					});
+					WriteIndented = true
+				});
 			}
 
 			string title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
@@ -870,10 +876,10 @@ class UnicodeRange {
 	public static List<UnicodeRange> GetRanges ()
 	{
 		var ranges = from r in typeof (UnicodeRanges).GetProperties (System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
-				let urange = r.GetValue (null) as System.Text.Unicode.UnicodeRange
-				let name = string.IsNullOrEmpty (r.Name) ? $"U+{urange.FirstCodePoint:x5}-U+{urange.FirstCodePoint + urange.Length:x5}" : r.Name
-				where name != "None" && name != "All"
-				select new UnicodeRange (urange.FirstCodePoint, urange.FirstCodePoint + urange.Length, name);
+			     let urange = r.GetValue (null) as System.Text.Unicode.UnicodeRange
+			     let name = string.IsNullOrEmpty (r.Name) ? $"U+{urange.FirstCodePoint:x5}-U+{urange.FirstCodePoint + urange.Length:x5}" : r.Name
+			     where name != "None" && name != "All"
+			     select new UnicodeRange (urange.FirstCodePoint, urange.FirstCodePoint + urange.Length, name);
 
 		// .NET 8.0 only supports BMP in UnicodeRanges: https://learn.microsoft.com/en-us/dotnet/api/system.text.unicode.unicoderanges?view=net-8.0
 		var nonBmpRanges = new List<UnicodeRange> {

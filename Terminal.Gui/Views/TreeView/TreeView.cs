@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
 /// Interface for all non generic members of <see cref="TreeView{T}"/>.
@@ -1393,7 +1393,7 @@ public class TreeView<T> : View, ITreeView where T : class {
 	/// <param name="model"></param>
 	/// <returns></returns>
 	public bool IsSelected (T model) => Equals (SelectedObject, model) ||
-	                                    MultiSelect && multiSelectedRegions.Any (s => s.Contains (model));
+					    MultiSelect && multiSelectedRegions.Any (s => s.Contains (model));
 
 	/// <summary>
 	/// Returns <see cref="SelectedObject"/> (if not null) and all multi selected objects if

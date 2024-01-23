@@ -2,7 +2,7 @@
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Scrolling", "Demonstrates ScrollView etc...")]
 [ScenarioCategory ("Controls"), ScenarioCategory ("ScrollView"), ScenarioCategory ("Tests")]
@@ -63,7 +63,7 @@ public class Scrolling : Scenario {
 		{
 			// BUGBUG: Replace with ConsoleDriver.Diagnostics ruler
 			horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [..horizontalRuler.Bounds.Width] +
-			                       "\n" + "|         ".Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [..horizontalRuler.Bounds.Width];
+					       "\n" + "|         ".Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [..horizontalRuler.Bounds.Width];
 			verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length)) [..(verticalRuler.Bounds.Height * 2)];
 			Application.Top.Loaded -= Top_Loaded;
 		}

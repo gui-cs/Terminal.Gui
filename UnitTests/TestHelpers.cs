@@ -1,5 +1,4 @@
-﻿using CsvHelper.Configuration.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -147,26 +146,25 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute {
 	}
 }
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-public class TestDateAttribute : Xunit.Sdk.BeforeAfterTestAttribute
-{
-    CultureInfo _currentCulture = CultureInfo.CurrentCulture;
+[AttributeUsage (AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+public class TestDateAttribute : Xunit.Sdk.BeforeAfterTestAttribute {
+	CultureInfo _currentCulture = CultureInfo.CurrentCulture;
 
-    public TestDateAttribute()
-    {
-        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-    }
+	public TestDateAttribute ()
+	{
+		CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+	}
 
-    public override void Before(MethodInfo methodUnderTest)
-    {
-		Assert.Equal(CultureInfo.CurrentCulture, CultureInfo.InvariantCulture);
-    }
+	public override void Before (MethodInfo methodUnderTest)
+	{
+		Assert.Equal (CultureInfo.CurrentCulture, CultureInfo.InvariantCulture);
+	}
 
-    public override void After(MethodInfo methodUnderTest)
-    {
-        CultureInfo.CurrentCulture = _currentCulture;
-        Assert.Equal(CultureInfo.CurrentCulture, _currentCulture);
-    }
+	public override void After (MethodInfo methodUnderTest)
+	{
+		CultureInfo.CurrentCulture = _currentCulture;
+		Assert.Equal (CultureInfo.CurrentCulture, _currentCulture);
+	}
 }
 
 partial class TestHelpers {
@@ -384,9 +382,9 @@ partial class TestHelpers {
 				switch (match.Count) {
 				case 0:
 					throw new Exception ($"{DriverContentsToString (driver)}\n" +
-					                     $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n" +
+							     $"Expected Attribute {val} (PlatformColor = {val.Value.PlatformColor}) at Contents[{line},{c}] {contents [line, c]} ((PlatformColor = {contents [line, c].Attribute.Value.PlatformColor}) was not found.\n" +
 							     $"  Expected: {string.Join (",", expectedAttributes.Select (c => c))}\n" +
-					                     $"  But Was: <not found>");
+							     $"  But Was: <not found>");
 				case > 1:
 					throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
 				}

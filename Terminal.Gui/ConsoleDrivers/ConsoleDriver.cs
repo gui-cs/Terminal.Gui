@@ -1,11 +1,10 @@
 //
 // ConsoleDriver.cs: Base class for Terminal.Gui ConsoleDriver implementations.
 //
-using System.Text;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using Terminal.Gui.ConsoleDrivers;
+using System.Text;
 
 namespace Terminal.Gui;
 

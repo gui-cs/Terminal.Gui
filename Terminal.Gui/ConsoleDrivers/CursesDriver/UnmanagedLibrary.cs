@@ -19,7 +19,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
 
 namespace Unix.Terminal {
 	/// <summary>
@@ -263,7 +262,7 @@ namespace Unix.Terminal {
 			//	 -1 on Unix means self-referencing binary (libcoreclr.so)
 			//	 0 means fallback to CoreCLR's internal resolution
 			// Note: meaning of -1 stay the same even for non-single-file form factors.
-			static CoreCLR() =>  NativeLibrary.SetDllImportResolver(typeof(CoreCLR).Assembly,
+			static CoreCLR () => NativeLibrary.SetDllImportResolver (typeof (CoreCLR).Assembly,
 				(string libraryName, Assembly assembly, DllImportSearchPath? searchPath) =>
 					libraryName == "libcoreclr.so" ? (IntPtr)(-1) : IntPtr.Zero);
 

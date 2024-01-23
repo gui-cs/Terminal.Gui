@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using Terminal.Gui;
-using System.Linq;
-using System.Globalization;
-using static Terminal.Gui.TableView;
 using System.Diagnostics;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
 
@@ -45,7 +41,7 @@ namespace UICatalog.Scenarios {
 			var ro = tableView.RowOffset;
 			var co = tableView.ColumnOffset;
 			tableView.Table = new EnumerableTableSource<Process> (Process.GetProcesses (),
-				new Dictionary<string, Func<Process, object>>() {
+				new Dictionary<string, Func<Process, object>> () {
 					{ "ID",(p)=>p.Id},
 					{ "Name",(p)=>p.ProcessName},
 					{ "Threads",(p)=>p.Threads.Count},

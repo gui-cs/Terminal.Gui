@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// The Margin for a <see cref="View"/>. 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Terminal.Gui;
 
@@ -124,8 +123,10 @@ namespace UICatalog.Scenarios {
 
 		private void Open ()
 		{
-			var d = new OpenDialog () { 
-Text = "Open",  AllowsMultipleSelection = false };
+			var d = new OpenDialog () {
+				Text = "Open",
+				AllowsMultipleSelection = false
+			};
 			Application.Run (d);
 
 			if (!d.Canceled) {
