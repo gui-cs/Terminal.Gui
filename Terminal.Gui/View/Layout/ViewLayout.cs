@@ -553,6 +553,29 @@ public partial class View {
 	/// </remarks>
 	internal void OnResizeNeeded ()
 	{
+		if (this is Adornment) {
+			// Not apply to adornments
+			return;
+		}
+
+		if (!IsInitialized) {
+			// He may still be setting properties in the object's initializer.
+			// So we can't yet definitively process anything until it's fully initialized.
+			// e.g. the AutoSize property may be true in the constructor but in the
+			// object's initializer it may be set as false and, in this case, we shouldn't
+			// call the SetRelativeLayout method because it will process the GetAutoSize method
+			// which will set the _frame in advance and incorrectly. Therefore we only define
+			// the _frame if the X, Y, Width and Height are PosAbsolute and DimAbsolute.
+			int x = _x is Pos.PosAbsolute ? _x.Anchor (0) : 0;
+			int y = _y is Pos.PosAbsolute ? _y.Anchor (0) : 0;
+			int w = Math.Max (_width is Dim.DimAbsolute ? _width.Anchor (0) : 0, 0);
+			int h = Math.Max (_height is Dim.DimAbsolute ? _height.Anchor (0) : 0, 0);
+
+			_frame = new Rect (x, y, w, h);
+
+			return;
+		}
+
 		// TODO: Identify a real-world use-case where this API should be virtual. 
 		// TODO: Until then leave it `internal` and non-virtual
 		// First try SuperView.Bounds, then Application.Top, then Driver.Bounds.
@@ -825,10 +848,10 @@ public partial class View {
 			if (_y is Pos.PosAbsolute) {
 				_y = Frame.Y;
 			}
-			if (_width is Dim.DimAbsolute) {
+			if (_width is Dim.DimAbsolute && (!AutoSize || (AutoSize && _width.Anchor (0) == 0))) {
 				_width = Frame.Width;
 			}
-			if (_height is Dim.DimAbsolute) {
+			if (_height is Dim.DimAbsolute && (!AutoSize || (AutoSize && _height.Anchor (0) == 0))) {
 				_height = Frame.Height;
 			}
 

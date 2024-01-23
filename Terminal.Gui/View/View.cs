@@ -489,7 +489,6 @@ public partial class View : Responder, ISupportInitializeNotification {
 		TabStop = false;
 
 		Text = text == null ? string.Empty : text;
-		Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 
 		AddCommands ();
 

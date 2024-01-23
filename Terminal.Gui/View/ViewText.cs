@@ -119,6 +119,7 @@ public partial class View {
 		set {
 			UpdateTextDirection (value);
 			TextFormatter.Direction = value;
+			OnResizeNeeded ();
 		}
 	}
 
@@ -318,22 +319,20 @@ public partial class View {
 		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 		autoSize = new Size (rect.Size.Width - GetHotKeySpecifierLength (),
 			rect.Size.Height - GetHotKeySpecifierLength (false));
-		return !(ValidatePosDim && (!(Width is Dim.DimAbsolute) || !(Height is Dim.DimAbsolute)) ||
-			 _frame.Size.Width != rect.Size.Width - GetHotKeySpecifierLength () ||
-			 _frame.Size.Height != rect.Size.Height - GetHotKeySpecifierLength (false));
+		return !(ValidatePosDim && IsValidAutoSizeWidth (Width) && IsValidAutoSizeWidth (Height));
 	}
 
 	bool IsValidAutoSizeWidth (Dim width)
 	{
 		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 		var dimValue = width.Anchor (0);
-		return !(ValidatePosDim && !(width is Dim.DimAbsolute) || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
+		return !(ValidatePosDim && width is not Dim.DimAbsolute || dimValue != rect.Size.Width - GetHotKeySpecifierLength ());
 	}
 
 	bool IsValidAutoSizeHeight (Dim height)
 	{
 		var rect = TextFormatter.CalcRect (_frame.X, _frame.Y, TextFormatter.Text, TextDirection);
 		var dimValue = height.Anchor (0);
-		return !(ValidatePosDim && !(height is Dim.DimAbsolute) || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
+		return !(ValidatePosDim && height is not Dim.DimAbsolute || dimValue != rect.Size.Height - GetHotKeySpecifierLength (false));
 	}
 }
