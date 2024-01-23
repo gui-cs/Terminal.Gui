@@ -33,7 +33,7 @@ public readonly partial record struct Color {
 	/// </exception>
 	[Pure]
 	[SkipLocalsInit]
-	public static Color Parse ( string text, IFormatProvider formatProvider = null )
+	public static Color Parse ( string? text, IFormatProvider? formatProvider = null )
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace ( text, nameof ( text ) );
 		if ( text is { Length: < 3 } && formatProvider is null ) {
@@ -69,7 +69,7 @@ public readonly partial record struct Color {
 	/// </exception>
 	[Pure]
 	[SkipLocalsInit]
-	public static Color Parse ( ReadOnlySpan<char> text, IFormatProvider formatProvider = null )
+	public static Color Parse ( ReadOnlySpan<char> text, IFormatProvider? formatProvider = null )
 	{
 		return text switch {
 			// Null string or empty span provided
@@ -159,7 +159,7 @@ public readonly partial record struct Color {
 	/// <inheritdoc />
 	[Pure]
 	[SkipLocalsInit]
-	public static Color Parse ( ReadOnlySpan<byte> utf8Text, IFormatProvider provider )
+	public static Color Parse ( ReadOnlySpan<byte> utf8Text, IFormatProvider? provider )
 	{
 		return Parse ( Encoding.UTF8.GetString ( utf8Text ), provider );
 	}
@@ -224,7 +224,7 @@ public readonly partial record struct Color {
 	///     </list>
 	///   </para>
 	/// </remarks>
-	public string ToString ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string formatString, IFormatProvider formatProvider = null )
+	public string ToString ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string? formatString, IFormatProvider? formatProvider = null )
 	{
 		return ( formatString, formatProvider ) switch {
 			// Null or empty string and null formatProvider - Revert to 'g' case behavior
@@ -245,9 +245,10 @@ public readonly partial record struct Color {
 			(['d'], null) => $"rgb({R:D},{G:D},{B:D})",
 			// D format string and null formatProvider - Output as 32-bit decimal rgba(r,g,b,a) according to invariant culture rules from R, G, B, and A. Non-standard: a is a decimal byte value.
 			(['D'], null) => $"rgba({R:D},{G:D},{B:D},{A:D})",
-			// All other cases (formatString is not null here) - Delegate to formatProvider, first, and otherwise to invariant culture, and try to format the provided string from Argb
-			({ }, _) => string.Format ( formatProvider ?? CultureInfo.InvariantCulture, CompositeFormat.Parse ( formatString ), R, G, B, A )
-		};
+			// All other cases (formatString is not null here) - Delegate to formatProvider, first, and otherwise to invariant culture, and try to format the provided string from the channels
+			({ }, _) => string.Format ( formatProvider ?? CultureInfo.InvariantCulture, CompositeFormat.Parse ( formatString ), R, G, B, A ),
+			_ => throw new InvalidOperationException ( $"Unable to create string from Color with value {Argb}, using format string {formatString}" )
+		} ?? throw new InvalidOperationException ( $"Unable to create string from Color with value {Argb}, using format string {formatString}" );
 	}
 
 	/// <inheritdoc />
@@ -270,7 +271,7 @@ public readonly partial record struct Color {
 	///   </para>
 	/// </remarks>
 	[Pure]
-	public bool TryFormat ( Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider provider )
+	public bool TryFormat ( Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
 	{
 		// TODO: This can probably avoid a string allocation with a little more work
 		try {
@@ -295,7 +296,7 @@ public readonly partial record struct Color {
 	///   Use of this method involves a stack allocation of <paramref name="utf8Destination" />.Length * 2 bytes. Use of the overload taking a char
 	///   span is recommended.
 	/// </remarks>
-	public bool TryFormat ( Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider provider )
+	public bool TryFormat ( Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
 	{
 		Span<char> charDestination = stackalloc char [utf8Destination.Length * 2];
 		if ( TryFormat ( charDestination, out int charsWritten, format, provider ) ) {
@@ -329,7 +330,7 @@ public readonly partial record struct Color {
 	/// </remarks>
 	[Pure]
 	[SkipLocalsInit]
-	public static bool TryParse ( string text, IFormatProvider formatProvider, out Color result )
+	public static bool TryParse ( string? text, IFormatProvider? formatProvider, out Color result )
 	{
 		return TryParse ( text.AsSpan ( ), formatProvider ?? CultureInfo.InvariantCulture, out result );
 	}
@@ -353,7 +354,7 @@ public readonly partial record struct Color {
 	/// </remarks>
 	[Pure]
 	[SkipLocalsInit]
-	public static bool TryParse ( ReadOnlySpan<char> text, IFormatProvider formatProvider, out Color color )
+	public static bool TryParse ( ReadOnlySpan<char> text, IFormatProvider? formatProvider, out Color color )
 	{
 		try {
 			Color c = Parse ( text, formatProvider );
@@ -369,7 +370,7 @@ public readonly partial record struct Color {
 	/// <inheritdoc />
 	[Pure]
 	[SkipLocalsInit]
-	public static bool TryParse ( ReadOnlySpan<byte> utf8Text, IFormatProvider provider, out Color result )
+	public static bool TryParse ( ReadOnlySpan<byte> utf8Text, IFormatProvider? provider, out Color result )
 	{
 		return TryParse ( Encoding.UTF8.GetString ( utf8Text ), provider, out result );
 	}
@@ -390,7 +391,7 @@ public readonly partial record struct Color {
 	{
 		// If Values has an exact match with a named color (in _colorNames), use that.
 		return ColorExtensions.ColorToNameMap.TryGetValue ( this, out ColorName colorName )
-			? Enum.GetName ( typeof ( ColorName ), colorName )
+			? Enum.GetName ( typeof ( ColorName ), colorName ) ?? $"#{R:X2}{G:X2}{B:X2}"
 			: // Otherwise return as an RGB hex value.
 			$"#{R:X2}{G:X2}{B:X2}";
 	}
