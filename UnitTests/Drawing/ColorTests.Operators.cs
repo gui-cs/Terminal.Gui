@@ -48,11 +48,21 @@ public partial class ColorTests {
 	[Theory]
 	[CombinatorialData]
 	[Trait ( "Category", "Operators" )]
-	public void ImplicitOperator_FromInt_ReturnsCorrectColorValue ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
+	public void ImplicitOperator_FromInt32_ReturnsCorrectColorValue ( [CombinatorialRandomData ( Count = 16 )] int expectedValue )
 	{
 		Color color = expectedValue;
 
 		Assert.Equal ( expectedValue, color.Rgba );
+	}
+
+	[Theory]
+	[CombinatorialData]
+	[Trait ( "Category", "Operators" )]
+	public void ImplicitOperator_FromUInt32_ReturnsCorrectColorValue ( [CombinatorialRandomData ( Count = 16 )] uint expectedValue )
+	{
+		Color color = expectedValue;
+
+		Assert.Equal ( expectedValue, color.Argb );
 	}
 
 	[Theory]
