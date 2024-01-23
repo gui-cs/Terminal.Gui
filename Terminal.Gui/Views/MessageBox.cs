@@ -279,10 +279,10 @@ public static class MessageBox {
 		}
 
 		var messageLabel = new Label {
-			AutoSize = wrapMessage ? false : true,
+			AutoSize = !wrapMessage,
 			Text = message,
 			TextAlignment = TextAlignment.Centered,
-			X = 0,
+			X = Pos.Center(),
 			Y = 0
 		};
 
@@ -292,7 +292,7 @@ public static class MessageBox {
 
 		}
 		messageLabel.TextFormatter.WordWrap = wrapMessage;
-		messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
+		messageLabel.TextFormatter.MultiLine = !wrapMessage;
 		d.Add (messageLabel);
 
 		d.Loaded += (s, e) => {

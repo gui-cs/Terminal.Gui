@@ -90,19 +90,8 @@ public partial class View {
 				SetNeedsDisplay ();
 			}
 
-			return OnMouseClick (args);
 		}
-		if (mouseEvent.Flags == MouseFlags.Button2Clicked) {
-			return OnMouseClick (args);
-		}
-		if (mouseEvent.Flags == MouseFlags.Button3Clicked) {
-			return OnMouseClick (args);
-		}
-		if (mouseEvent.Flags == MouseFlags.Button4Clicked) {
-			return OnMouseClick (args);
-		}
-
-		return false;
+		return OnMouseClick (args);
 	}
 
 	/// <summary>

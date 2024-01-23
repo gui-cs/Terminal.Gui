@@ -23,9 +23,7 @@ namespace UICatalog.Scenarios;
 ///   - Illustrates how to use ScrollView to do infinite scrolling
 /// </summary>
 [ScenarioMetadata ("Character Map", "Unicode viewer demonstrating the ScrollView control.")]
-[ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Controls")]
-[ScenarioCategory ("ScrollView")]
+[ScenarioCategory ("Text and Formatting"), ScenarioCategory ("Controls"), ScenarioCategory ("ScrollView")]
 public class CharacterMap : Scenario {
 	CharMap _charMap;
 	public Label _errorLabel;
