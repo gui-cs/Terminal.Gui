@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using System.Reflection;
 namespace Terminal.Gui.DrawingTests;
 
@@ -77,6 +77,20 @@ public partial class ColorTests {
 		Assert.Equal ( g, color.G );
 		Assert.Equal ( b, color.B );
 		Assert.Equal ( byte.MaxValue, color.A );
+	}
+
+	[Theory]
+	[CombinatorialData]
+	[Trait ( "Category", "Operators" )]
+	public void ImplicitOperator_FromVector4_ReturnsCorrectColorValue ( [CombinatorialRange ( 0, 255, 51 )] byte r, [CombinatorialRange ( 0, 255, 51 )] byte g, [CombinatorialRange ( 0, 255, 51 )] byte b, [CombinatorialValues ( 0, 255 )] byte a )
+	{
+		Vector4 vector = new ( r, g, b, a );
+		Color color = vector;
+
+		Assert.Equal ( r, color.R );
+		Assert.Equal ( g, color.G );
+		Assert.Equal ( b, color.B );
+		Assert.Equal ( a, color.A );
 	}
 
 	[Theory]
