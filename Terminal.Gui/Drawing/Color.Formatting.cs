@@ -16,7 +16,7 @@ public readonly partial record struct Color {
 	///   "rgba(r,g,b,a)", and any of the <see cref="Gui.ColorName" /> string values.
 	/// </param>
 	/// <param name="formatProvider">
-	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored.
+	///   If specified and not <see langword="null"/>, will be passed to <see cref="Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.
 	/// </param>
 	/// <returns>
 	///   A <see cref="Color" /> value equivalent to <paramref name="text" />, if parsing was successful.
@@ -163,6 +163,7 @@ public readonly partial record struct Color {
 	{
 		return Parse ( Encoding.UTF8.GetString ( utf8Text ), provider );
 	}
+
 	/// <inheritdoc cref="object.ToString" />
 	/// <summary>
 	///   Returns a <see langword="string" /> representation of the current <see cref="Color" /> value, according to the provided
@@ -293,6 +294,7 @@ public readonly partial record struct Color {
 		charsWritten = 0;
 		return false;
 	}
+
 	/// <inheritdoc />
 	/// <remarks>
 	///   Use of this method involves a stack allocation of <paramref name="utf8Destination" />.Length * 2 bytes. Use of the overload taking a char
@@ -346,7 +348,7 @@ public readonly partial record struct Color {
 	///   "rgba(r,g,b,a)", and any of the <see cref="GetClosestNamedColor" /> string values.
 	/// </param>
 	/// <param name="formatProvider">
-	///   Implemented for compatibility with <see cref="IParsable{TSelf}" />. Will be ignored. Just pass <see langword="null" />.
+	///   If specified and not <see langword="null"/>, will be passed to <see cref="Parse(System.ReadOnlySpan{char},System.IFormatProvider?)"/>.
 	/// </param>
 	/// <param name="color">
 	///   The parsed value, if successful, or <see langword="default" />(<see cref="Color" />), if unsuccessful.
@@ -384,10 +386,10 @@ public readonly partial record struct Color {
 	///     If the color is a named color, the name is returned. Otherwise, the color is returned as a hex string.
 	///   </para>
 	///   <para>
-	///     <see cref="A" /> (Alpha channel) is ignored and the returned string will not include it.
+	///     <see cref="A" /> (Alpha channel) is ignored and the returned string will not include it for this overload.
 	///   </para>
 	/// </remarks>
-	/// <returns></returns>
+	/// <returns>The string representation of this value in #RRGGBB format.</returns>
 	[Pure]
 	[SkipLocalsInit]
 	public override string ToString ( )
@@ -398,6 +400,7 @@ public readonly partial record struct Color {
 			: // Otherwise return as an RGB hex value.
 			$"#{R:X2}{G:X2}{B:X2}";
 	}
+
 	/// <summary>Converts the provided string to a new <see cref="Color" /> instance.</summary>
 	/// <param name="text">
 	///   The text to analyze. Formats supported are "#RGB", "#RRGGBB", "#ARGB", "#AARRGGBB", "rgb(r,g,b)", "rgb(r,g,b,a)", "rgba(r,g,b)",
