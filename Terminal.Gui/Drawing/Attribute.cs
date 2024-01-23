@@ -154,7 +154,7 @@ public readonly struct Attribute : IEquatable<Attribute> {
 	public static bool operator != (Attribute left, Attribute right) => !(left == right);
 
 	/// <inheritdoc/>
-	public override bool Equals (object obj) => obj is Attribute other && Equals (other);
+	public override bool Equals (object? obj) => obj is Attribute other && Equals (other);
 
 	/// <inheritdoc/>
 	public bool Equals (Attribute other) => PlatformColor == other.PlatformColor &&

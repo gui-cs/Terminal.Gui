@@ -16,11 +16,11 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Color? GetColor (IFileSystemInfo file)
 		{
-			if ( FilenameToColor.TryGetValue ( file.Name, out Color nameColor ) ) {
+			if ( FilenameToColor.TryGetValue (file.Name, out Color nameColor) ) {
 				return nameColor;
 			}
 
-			if ( ExtensionToColor.TryGetValue ( file.Extension, out Color extColor ) ) {
+			if ( ExtensionToColor.TryGetValue (file.Extension, out Color extColor) ) {
 				return extColor;
 			}
 
@@ -443,15 +443,15 @@ namespace Terminal.Gui {
 
 		private static Color StringToColor (string str)
 		{
-			if ( !Color.TryParse ( str, out var c ) ) {
-				ThrowFormatException ( str );
+			if ( !Color.TryParse (str, out var c) ) {
+				ThrowFormatException (str);
 			}
 			return c.Value;
 
 			[DoesNotReturn]
-			static void ThrowFormatException ( string s )
+			static void ThrowFormatException (string s)
 			{
-				throw new FormatException ( $"Failed to parse Color from {s}" );
+				throw new FormatException ($"Failed to parse Color from {s}");
 			}
 		}
 	}

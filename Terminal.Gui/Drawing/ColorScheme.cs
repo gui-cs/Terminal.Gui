@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿#nullable enable
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -35,7 +36,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="scheme">The scheme to initialize the new instance with.</param>
 	public ColorScheme (ColorScheme scheme)
 	{
-		if (scheme == null) {
+		if (scheme is null) {
 			throw new ArgumentNullException (nameof (scheme));
 		}
 		_normal = scheme.Normal;
@@ -103,19 +104,19 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	/// <param name="other"></param>
 	/// <returns>true if the two objects are equal</returns>
-	public bool Equals (ColorScheme other) => other != null &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+	public bool Equals (ColorScheme? other) => other is { } &&
+												EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+												EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+												EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+												EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+												EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 
 	/// <summary>
 	/// Compares two <see cref="ColorScheme"/> objects for equality.
 	/// </summary>
 	/// <param name="obj"></param>
 	/// <returns>true if the two objects are equal</returns>
-	public override bool Equals (object obj) => Equals (obj is ColorScheme ? (ColorScheme)obj : default);
+	public override bool Equals (object? obj) => Equals (obj as ColorScheme);
 
 	/// <summary>
 	/// Returns a hashcode for this instance.
@@ -227,13 +228,13 @@ public static class Colors {
 	/// </summary>
 	public static Dictionary<string, ColorScheme> Reset ()
 	{
-		ColorSchemes ??= new Dictionary<string, ColorScheme> ( 5, CultureInfo.InvariantCulture.CompareInfo.GetStringComparer ( CompareOptions.IgnoreCase ) );
-		ColorSchemes.Clear ( );
-		ColorSchemes.Add ( "TopLevel", new ColorScheme ( ) );
-		ColorSchemes.Add ( "Base", new ColorScheme ( ) );
-		ColorSchemes.Add ( "Dialog", new ColorScheme ( ) );
-		ColorSchemes.Add ( "Menu", new ColorScheme ( ) );
-		ColorSchemes.Add ( "Error", new ColorScheme ( ) );
+		ColorSchemes ??= new Dictionary<string, ColorScheme> (5, CultureInfo.InvariantCulture.CompareInfo.GetStringComparer (CompareOptions.IgnoreCase));
+		ColorSchemes.Clear ();
+		ColorSchemes.Add ("TopLevel", new ColorScheme ());
+		ColorSchemes.Add ("Base", new ColorScheme ());
+		ColorSchemes.Add ("Dialog", new ColorScheme ());
+		ColorSchemes.Add ("Menu", new ColorScheme ());
+		ColorSchemes.Add ("Error", new ColorScheme ());
 		return ColorSchemes;
 	}
 
