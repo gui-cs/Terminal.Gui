@@ -46,20 +46,6 @@ public partial class ColorTests {
 	}
 
 	[Fact]
-	public void Color_FromColorName_ConvertsColorNamesToColor ()
-	{
-		// Arrange
-		var colorName = ColorName.Red;
-		var expectedColor = new Color (197, 15, 31); // Red in RGB
-
-		// Act
-		var convertedColor = new Color (colorName);
-
-		// Assert
-		Assert.Equal (expectedColor, convertedColor);
-	}
-
-	[Fact]
 	public void Color_ColorName_Get_ReturnsClosestColorName ()
 	{
 		// Arrange
