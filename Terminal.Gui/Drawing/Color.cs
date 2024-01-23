@@ -171,7 +171,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 	/// Get returns the <see cref="GetClosestNamedColor"/> of the closest 24-bit color value. Set sets the RGB value using a hard-coded
 	/// map.
 	/// </remarks>
-	public AnsiColorCode GetAnsiColorCode ( ) => Drawing.ColorExtensions.ColorNameToAnsiColorMap[ GetClosestNamedColor ( ) ];
+	public AnsiColorCode GetAnsiColorCode ( ) => ColorExtensions.ColorNameToAnsiColorMap[ GetClosestNamedColor ( ) ];
 
     /// <summary>
     /// Gets the "closest" named color to this <see cref="Color"/> value.
