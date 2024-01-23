@@ -130,7 +130,7 @@ public class ListView : View {
 		if (source == null && (Source == null || !(Source is ListWrapper)))
 			Source = null;
 		else {
-			Source = MakeWrapper (source);
+			Source = new ListWrapper (source);
 		}
 	}
 
@@ -147,7 +147,7 @@ public class ListView : View {
 			if (source == null && (Source == null || !(Source is ListWrapper)))
 				Source = null;
 			else
-				Source = MakeWrapper (source);
+				Source = new ListWrapper (source);
 			return source;
 		}, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
 	}
@@ -250,11 +250,6 @@ public class ListView : View {
 			_selected = value;
 			OnSelectedChanged ();
 		}
-	}
-
-	static IListDataSource MakeWrapper (IList source)
-	{
-		return new ListWrapper (source);
 	}
 
 	/// <summary>
