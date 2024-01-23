@@ -6,18 +6,8 @@ public partial class ColorTests {
 
 	[Theory]
 	[Trait ( "Category", "Operators" )]
-	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
-	public void ExplicitOperator_FromColorName_ReturnsCorrectColorValue ( ColorName cname, Color expectedColor )
-	{
-		Color color = cname;
-
-		Assert.Equal ( expectedColor, color );
-	}
-
-	[Theory]
-	[Trait ( "Category", "Operators" )]
-    [CombinatorialData]
-	public void ExplicitOperator_ToVector3_ReturnsCorrectValue ([CombinatorialRange(0,255,51)] byte r, [CombinatorialRange(0,255,51)]byte g, [CombinatorialRange(0,255,51)]byte b, [CombinatorialValues(0,255)] byte a )
+	[CombinatorialData]
+	public void ExplicitOperator_ToVector3_ReturnsCorrectValue ( [CombinatorialRange ( 0, 255, 51 )] byte r, [CombinatorialRange ( 0, 255, 51 )] byte g, [CombinatorialRange ( 0, 255, 51 )] byte b, [CombinatorialValues ( 0, 255 )] byte a )
 	{
 		Color color = new ( r, g, b, a );
 
@@ -43,6 +33,16 @@ public partial class ColorTests {
 			Assert.True ( color1 != color2 );
 			Assert.False ( color1 == color2 );
 		}
+	}
+
+	[Theory]
+	[Trait ( "Category", "Operators" )]
+	[MemberData ( nameof ( ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly ), MemberType = typeof ( ColorTestsTheoryDataGenerators ) )]
+	public void ImplicitOperator_FromColorName_ReturnsCorrectColorValue ( ColorName cname, Color expectedColor )
+	{
+		Color color = cname;
+
+		Assert.Equal ( expectedColor, color );
 	}
 
 	[Theory]
