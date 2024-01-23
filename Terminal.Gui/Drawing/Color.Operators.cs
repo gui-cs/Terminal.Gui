@@ -5,6 +5,24 @@ namespace Terminal.Gui;
 
 public readonly partial record struct Color {
 
+	/// <inheritdoc />
+	/// <returns>
+	///   A <see cref="Color" /> <see langword="struct" /> with all values set to <see cref="byte.MaxValue" />, meaning white.
+	/// </returns>
+	public static Color MaxValue => new ( uint.MaxValue );
+
+	/// <inheritdoc />
+	/// <returns>A <see cref="Color" /> <see langword="struct" /> with all values set to zero.</returns>
+	/// <remarks>
+	///   Though this returns a <see cref="Color" /> with <see cref="A" />, <see cref="R" />, <see cref="G" />, and <see cref="B" /> all set to
+	///   zero, Terminal.Gui will treat it as black, because the alpha channel is not supported.
+	/// </remarks>
+	public static Color MinValue => new ( uint.MinValue );
+
+	/// <inheritdoc />
+	[Pure]
+	public override int GetHashCode ( ) => Rgba.GetHashCode ( );
+
 	/// <summary>
 	///   Implicit conversion from <see cref="Color" /> to <see cref="Vector3" /> via <see cref="Vector3(float,float,float)" /> where (
 	///   <see cref="Vector3.X" />, <see cref="Vector3.Y" />, <see cref="Vector3.Z" />) is (R,G,B).
@@ -68,18 +86,4 @@ public readonly partial record struct Color {
 	/// </summary>
 	[Pure]
 	public static implicit operator Color ( Vector3 v ) => new ( (byte)v.X, (byte)v.Y, (byte)v.Z );
-
-	/// <inheritdoc />
-	[Pure]
-	public override int GetHashCode ( ) => Rgba.GetHashCode ( );
-
-	/// <inheritdoc />
-	/// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to <see cref="byte.MaxValue"/>, meaning white.</returns>
-	public static Color MaxValue => new ( uint.MaxValue );
-
-	/// <inheritdoc />
-	/// <returns>A <see cref="Color"/> <see langword="struct"/> with all values set to zero.</returns>
-	/// <remarks>Though this returns a <see cref="Color"/> with <see cref="A"/>, <see cref="R"/>, <see cref="G"/>, and <see cref="B"/> all set to zero, Terminal.Gui will treat it as black, because the alpha channel is not supported.</remarks>
-	public static Color MinValue => new ( uint.MinValue );
-
 }
