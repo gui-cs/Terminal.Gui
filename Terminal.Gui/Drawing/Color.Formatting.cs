@@ -224,6 +224,7 @@ public readonly partial record struct Color {
 	///     </list>
 	///   </para>
 	/// </remarks>
+	[SkipLocalsInit]
 	public string ToString ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string? formatString, IFormatProvider? formatProvider = null )
 	{
 		return ( formatString, formatProvider ) switch {
@@ -271,6 +272,7 @@ public readonly partial record struct Color {
 	///   </para>
 	/// </remarks>
 	[Pure]
+	[SkipLocalsInit]
 	public bool TryFormat ( Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
 	{
 		// TODO: This can probably avoid a string allocation with a little more work
@@ -296,6 +298,7 @@ public readonly partial record struct Color {
 	///   Use of this method involves a stack allocation of <paramref name="utf8Destination" />.Length * 2 bytes. Use of the overload taking a char
 	///   span is recommended.
 	/// </remarks>
+	[SkipLocalsInit]
 	public bool TryFormat ( Span<byte> utf8Destination, out int bytesWritten, ReadOnlySpan<char> format, IFormatProvider? provider )
 	{
 		Span<char> charDestination = stackalloc char [utf8Destination.Length * 2];
