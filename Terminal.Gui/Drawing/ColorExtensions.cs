@@ -24,7 +24,6 @@ internal static class ColorExtensions {
 			{ ColorName.White, AnsiColorCode.BRIGHT_WHITE }
 		};
 		ColorNameToAnsiColorMap = nameToCodeMap.ToFrozenDictionary ( );
-		AnsiColorToColorNameMap = ColorNameToAnsiColorMap.ToFrozenDictionary ( static kvp => kvp.Value, static kvp => kvp.Key );
 
 		ColorToNameMap = new Dictionary<Color, ColorName> {
 			// using "Windows 10 Console/PowerShell 6" here: https://i.stack.imgur.com/9UVnC.png
@@ -48,12 +47,7 @@ internal static class ColorExtensions {
 		}.ToFrozenDictionary ( );
 	}
 
-	/// <summary>Defines the 16 legacy ANSI color codes and their corresponding names.</summary>
-	/// <seealso cref="ColorNameToAnsiColorMap" />
-	internal static FrozenDictionary<AnsiColorCode, ColorName> AnsiColorToColorNameMap { get; }
-
 	/// <summary>Defines the 16 legacy color names and their corresponding ANSI color codes.</summary>
-	/// <seealso cref="AnsiColorToColorNameMap" />
 	internal static FrozenDictionary<ColorName, AnsiColorCode> ColorNameToAnsiColorMap { get; }
 
 	static FrozenDictionary<Color, ColorName> colorToNameMap;
