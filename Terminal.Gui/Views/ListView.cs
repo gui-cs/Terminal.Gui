@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text;
 
 namespace Terminal.Gui;
+
 /// <summary>
 /// Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.
 /// </summary>
@@ -786,36 +787,36 @@ public class ListView : View {
 /// <see cref="ListView"/> items using <see cref="object.ToString()"/>.
 /// </summary>
 public class ListWrapper : IListDataSource {
-	IList src;
-	BitArray marks;
-	int count, len;
+	IList _source;
+	BitArray _marks;
+	int _count, _length;
 
 	/// <inheritdoc/>
 	public ListWrapper (IList source)
 	{
 		if (source != null) {
-			count = source.Count;
-			marks = new BitArray (count);
-			src = source;
-			len = GetMaxLengthItem ();
+			_count = source.Count;
+			_marks = new BitArray (_count);
+			_source = source;
+			_length = GetMaxLengthItem ();
 		}
 	}
 
 	/// <inheritdoc/>
-	public int Count => src != null ? src.Count : 0;
+	public int Count => _source != null ? _source.Count : 0;
 
 	/// <inheritdoc/>
-	public int Length => len;
+	public int Length => _length;
 
 	int GetMaxLengthItem ()
 	{
-		if (src == null || src?.Count == 0) {
+		if (_source == null || _source?.Count == 0) {
 			return 0;
 		}
 
 		int maxLength = 0;
-		for (int i = 0; i < src.Count; i++) {
-			var t = src [i];
+		for (int i = 0; i < _source.Count; i++) {
+			var t = _source [i];
 			int l;
 			if (t is string u) {
 				l = u.GetColumns ();
@@ -847,7 +848,7 @@ public class ListWrapper : IListDataSource {
 	public void Render (ListView container, ConsoleDriver driver, bool marked, int item, int col, int line, int width, int start = 0)
 	{
 		container.Move (col, line);
-		var t = src? [item];
+		var t = _source? [item];
 		if (t == null) {
 			RenderUstr (driver, "", col, line, width);
 		} else {
@@ -864,33 +865,33 @@ public class ListWrapper : IListDataSource {
 	/// <inheritdoc/>
 	public bool IsMarked (int item)
 	{
-		if (item >= 0 && item < count)
-			return marks [item];
+		if (item >= 0 && item < _count)
+			return _marks [item];
 		return false;
 	}
 
 	/// <inheritdoc/>
 	public void SetMark (int item, bool value)
 	{
-		if (item >= 0 && item < count)
-			marks [item] = value;
+		if (item >= 0 && item < _count)
+			_marks [item] = value;
 	}
 
 	/// <inheritdoc/>
 	public IList ToList ()
 	{
-		return src;
+		return _source;
 	}
 
 	/// <inheritdoc/>
 	public int StartsWith (string search)
 	{
-		if (src == null || src?.Count == 0) {
+		if (_source == null || _source?.Count == 0) {
 			return -1;
 		}
 
-		for (int i = 0; i < src.Count; i++) {
-			var t = src [i];
+		for (int i = 0; i < _source.Count; i++) {
+			var t = _source [i];
 			if (t is string u) {
 				if (u.ToUpper ().StartsWith (search.ToUpperInvariant ())) {
 					return i;
