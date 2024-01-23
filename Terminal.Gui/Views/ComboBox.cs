@@ -242,18 +242,11 @@ public class ComboBox : View {
 
 		Add (_search, _listview);
 
+		Initialized += (s, e) => ProcessLayout ();
+
 		// On resize
 		LayoutComplete += (object sender, LayoutEventArgs a) => {
-			if (Bounds.Height < _minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
-				Height = _minimumHeight;
-			}
-			if (!_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width ||
-			_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width - 1) {
-				_search.Width = _listview.Width = _autoHide ? Bounds.Width - 1 : Bounds.Width;
-				_listview.Height = CalculatetHeight ();
-				_search.SetRelativeLayout (Bounds);
-				_listview.SetRelativeLayout (Bounds);
-			}
+			ProcessLayout ();
 		};
 
 		_listview.SelectedItemChanged += (object sender, ListViewItemEventArgs e) => {
@@ -303,6 +296,20 @@ public class ComboBox : View {
 		KeyBindings.Add (KeyCode.End, Command.BottomEnd);
 		KeyBindings.Add (KeyCode.Esc, Command.Cancel);
 		KeyBindings.Add (KeyCode.U | KeyCode.CtrlMask, Command.UnixEmulation);
+	}
+
+	void ProcessLayout ()
+	{
+		if (Bounds.Height < _minimumHeight && (Height == null || Height is Dim.DimAbsolute)) {
+			Height = _minimumHeight;
+		}
+		if (!_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width ||
+		_autoHide && Bounds.Width > 0 && _search.Frame.Width != Bounds.Width - 1) {
+			_search.Width = _listview.Width = _autoHide ? Bounds.Width - 1 : Bounds.Width;
+			_listview.Height = CalculatetHeight ();
+			_search.SetRelativeLayout (Bounds);
+			_listview.SetRelativeLayout (Bounds);
+		}
 	}
 
 	bool _isShow;

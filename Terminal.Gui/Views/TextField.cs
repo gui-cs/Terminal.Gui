@@ -239,8 +239,6 @@ public class TextField : View {
 		}
 
 		_text = text.Split ("\n") [0].EnumerateRunes ().ToList ();
-		_cursorPosition = text.GetRuneCount ();
-		ScrollOffset = _cursorPosition > w + 1 ? _cursorPosition - w + 1 : 0;
 		CanFocus = true;
 		Used = true;
 		WantMousePositionReports = true;
@@ -456,7 +454,6 @@ public class TextField : View {
 		}
 	}
 
-
 	MenuBarItem BuildContextMenuBarItem () => new (new MenuItem [] {
 		new (Strings.ctxSelectAll, "", () => SelectAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)),
 		new (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
@@ -482,6 +479,10 @@ public class TextField : View {
 
 	void TextField_Initialized (object sender, EventArgs e)
 	{
+		_cursorPosition = Text.GetRuneCount ();
+		if (Bounds.Width > 0) {
+			ScrollOffset = _cursorPosition > Bounds.Width + 1 ? _cursorPosition - Bounds.Width + 1 : 0;
+		}
 		Autocomplete.HostControl = this;
 		Autocomplete.PopupInsideContainer = false;
 	}
@@ -1366,11 +1367,11 @@ public class TextField : View {
 		       cbTxt +
 		       StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
-			_cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
-			ClearAllSelection ();
-			SetNeedsDisplay ();
-			Adjust ();
-		}
+		_cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
+		ClearAllSelection ();
+		SetNeedsDisplay ();
+		Adjust ();
+	}
 
 	/// <summary>
 	/// Virtual method that invoke the <see cref="TextChanging"/> event if it's defined.

@@ -56,6 +56,8 @@ public class Button : View {
 
 		CanFocus = true;
 		AutoSize = true;
+		// Ensures a height of 1 if AutoSize is set to false
+		Height = 1;
 
 		// Override default behavior of View
 		// Command.Default sets focus

@@ -42,6 +42,8 @@ public class CheckBox : View {
 		HotKeySpecifier = (Rune)'_';
 		CanFocus = true;
 		AutoSize = true;
+		// Ensures a height of 1 if AutoSize is set to false
+		Height = 1;
 
 		// Things this view knows how to do
 		AddCommand (Command.ToggleChecked, () => ToggleChecked ());

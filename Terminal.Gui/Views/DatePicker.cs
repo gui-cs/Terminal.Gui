@@ -69,10 +69,11 @@ public class DatePicker : View {
 		Title = "Date Picker";
 		BorderStyle = LineStyle.Single;
 		Date = date;
-		_dateLabel = new Label ("Date: ") {
+		_dateLabel = new Label {
 			X = 0,
 			Y = 0,
 			Height = 1,
+			Text = "Date: "
 		};
 
 		_dateField = new DateField (DateTime.Now) {

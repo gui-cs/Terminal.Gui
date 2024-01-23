@@ -323,7 +323,6 @@ class Menu : View {
 	}
 
 	public Menu (MenuBar host, int x, int y, MenuBarItem barItems, Menu parent = null, LineStyle border = LineStyle.Single)
-		: base (MakeFrame (x, y, barItems?.Children, parent, border))
 	{
 		if (host == null) {
 			throw new ArgumentNullException (nameof (host));
@@ -332,6 +331,8 @@ class Menu : View {
 		if (barItems == null) {
 			throw new ArgumentNullException (nameof (barItems));
 		}
+
+		Frame = MakeFrame (x, y, barItems?.Children, parent, border);
 
 		_host = host;
 		_barItems = barItems;
