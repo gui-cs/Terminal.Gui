@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
-namespace Terminal.Gui.Drawing;
+
+namespace Terminal.Gui;
 
 internal static class ColorExtensions {
 

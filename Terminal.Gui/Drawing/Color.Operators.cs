@@ -1,6 +1,6 @@
 using System.Diagnostics.Contracts;
 using System.Numerics;
-using Terminal.Gui.Drawing;
+
 namespace Terminal.Gui;
 
 public readonly partial record struct Color {
