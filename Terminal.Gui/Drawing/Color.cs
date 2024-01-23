@@ -66,7 +66,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 	/// <param name="colorName">The 16-color value.</param>
 	public Color ( in ColorName colorName )
 	{
-		this = ColorExtensions.ColorToNameMap [ colorName ];
+		this = ColorExtensions.ColorNameToColorMap [ colorName ];
 	}
 
 	/// <summary>
