@@ -23,6 +23,20 @@ public partial class ColorTests {
 
 	[Theory]
 	[CombinatorialData]
+	public void Constructor_WithInt32RGBValues_AllValuesCorrect ( [CombinatorialRandomData ( Count = 4, Minimum = 0, Maximum = 255 )] int r, [CombinatorialRandomData ( Count = 4, Minimum = 0, Maximum = 255 )] int g, [CombinatorialRandomData ( Count = 4, Minimum = 0, Maximum = 255 )] int b )
+	{
+		var color = new Color ( r, g, b );
+
+		Assert.Multiple (
+			( ) => Assert.Equal ( r, color.R ),
+			( ) => Assert.Equal ( g, color.G ),
+			( ) => Assert.Equal ( b, color.B ),
+			( ) => Assert.Equal ( byte.MaxValue, color.A )
+		);
+	}
+
+	[Theory]
+	[CombinatorialData]
 	public void Constructor_WithRGBAValues_AllValuesCorrect ( [CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
 	{
 		var color = new Color ( r, g, b, a );
