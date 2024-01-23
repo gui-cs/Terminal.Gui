@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Buffers.Binary;
 using System.Globalization;
-namespace Terminal.Gui.Drawing.Tests;
+namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
 	[Fact]

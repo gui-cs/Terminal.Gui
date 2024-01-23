@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing.Tests;
+﻿namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
 	[Theory]
