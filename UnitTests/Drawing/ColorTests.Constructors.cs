@@ -106,6 +106,19 @@ public partial class ColorTests {
 
 	[Theory]
 	[CombinatorialData]
+	public void Constructor_WithString_EmptyOrWhitespace_ThrowsArgumentException ( [CombinatorialValues ( "", "\t", " ", "\r", "\r\n", "\n", "   " )] string badString )
+	{
+		Assert.Throws<ArgumentException> ( ( ) => Color.Parse ( badString ) );
+	}
+
+	[Fact]
+	public void Constructor_WithString_Null_ThrowsArgumentNullException ( )
+	{
+		Assert.Throws<ArgumentNullException> ( static  ( ) => Color.Parse ( null ) );
+	}
+
+	[Theory]
+	[CombinatorialData]
 	public void Constructor_WithUInt32_AllChannelsCorrect ( [CombinatorialValues ( 0, 1, 254 )] byte r, [CombinatorialValues ( 0, 1, 253 )] byte g, [CombinatorialValues ( 0, 1, 252 )] byte b, [CombinatorialValues ( 0, 1, 251 )] byte a )
 	{
 		ReadOnlySpan<byte> bytes = [b, g, r, a];
