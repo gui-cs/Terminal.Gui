@@ -116,6 +116,21 @@ public partial class ColorTests {
 
 		Assert.Equal ( expectedValue, colorAsInt32 );
 	}
+
+	[Theory]
+	[CombinatorialData]
+	[Trait ( "Category", "Operators" )]
+	public void ImplicitOperator_ToVector4_ReturnsCorrectVector4Value ( [CombinatorialRange ( 0, 255, 51 )] byte r, [CombinatorialRange ( 0, 255, 51 )] byte g, [CombinatorialRange ( 0, 255, 51 )] byte b, [CombinatorialValues ( 0, 255 )] byte a )
+	{
+		Color color = new ( r, g, b, a );
+		Vector4 vector = color;
+
+		Assert.Equal ( r, vector.X );
+		Assert.Equal ( g, vector.Y );
+		Assert.Equal ( b, vector.Z );
+		Assert.Equal ( a, vector.W );
+	}
+
 }
 public static partial class ColorTestsTheoryDataGenerators {
 
