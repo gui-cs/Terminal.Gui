@@ -120,8 +120,8 @@ public class Adornments : Scenario {
 		public Attribute Color {
 			get => new (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor);
 			set {
-				_foregroundColorPicker.SelectedColor = value.Foreground.GetClosestNamedColor ( );
-				_backgroundColorPicker.SelectedColor = value.Background.GetClosestNamedColor ( );
+				_foregroundColorPicker.SelectedColor = value.Foreground.GetClosestNamedColor ();
+				_backgroundColorPicker.SelectedColor = value.Background.GetClosestNamedColor ();
 			}
 		}
 
@@ -208,7 +208,7 @@ public class Adornments : Scenario {
 			// Foreground ColorPicker.
 			_foregroundColorPicker.X = -1;
 			_foregroundColorPicker.Y = Pos.Bottom (copyTop) + 1;
-			_foregroundColorPicker.SelectedColor = Color.Foreground.GetClosestNamedColor ( );
+			_foregroundColorPicker.SelectedColor = Color.Foreground.GetClosestNamedColor ();
 			_foregroundColorPicker.ColorChanged += (o, a) =>
 				AttributeChanged?.Invoke (this,
 					new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor));
@@ -217,7 +217,7 @@ public class Adornments : Scenario {
 			// Background ColorPicker.
 			_backgroundColorPicker.X = Pos.Right (_foregroundColorPicker) - 1;
 			_backgroundColorPicker.Y = Pos.Top (_foregroundColorPicker);
-			_backgroundColorPicker.SelectedColor = Color.Background.GetClosestNamedColor ( );
+			_backgroundColorPicker.SelectedColor = Color.Background.GetClosestNamedColor ();
 			_backgroundColorPicker.ColorChanged += (o, a) =>
 				AttributeChanged?.Invoke (this,
 					new Attribute (
