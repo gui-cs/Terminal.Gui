@@ -60,7 +60,7 @@ public class BasicColors : Scenario {
 		});
 		Win.Add (new Label { X = Pos.AnchorEnd(35), Y = 2, Text = "Foreground:" });
 
-		var lblForeground = new Label () {
+		var lblForeground = new Label {
 			X = Pos.AnchorEnd (23),
 			Y = 2
 		};
@@ -75,7 +75,7 @@ public class BasicColors : Scenario {
 
 		Win.Add (new Label { X = Pos.AnchorEnd(35), Y = 4, Text = "Background:" });
 
-		var lblBackground = new Label () {
+		var lblBackground = new Label {
 			X = Pos.AnchorEnd (23),
 			Y = 4
 		};

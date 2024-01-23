@@ -21,7 +21,7 @@ public class ExampleWindow : Window {
 		Title = $"Example App ({Application.QuitKey} to quit)";
 
 		// Create input components and labels
-		var usernameLabel = new Label () { 
+		var usernameLabel = new Label { 
 			Text = "Username:" 
 		};
 
@@ -33,7 +33,7 @@ public class ExampleWindow : Window {
 			Width = Dim.Fill (),
 		};
 
-		var passwordLabel = new Label () {
+		var passwordLabel = new Label {
 			Text = "Password:",
 			X = Pos.Left (usernameLabel),
 			Y = Pos.Bottom (usernameLabel) + 1

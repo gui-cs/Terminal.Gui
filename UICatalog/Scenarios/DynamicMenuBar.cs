@@ -149,7 +149,7 @@ public class DynamicMenuBar : Scenario {
 			};
 			_frmMenu.Add (_btnNext);
 
-			var _lblMenuBar = new Label () {
+			var _lblMenuBar = new Label {
 				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_btnPrevious) + 1,
@@ -161,7 +161,7 @@ public class DynamicMenuBar : Scenario {
 			_lblMenuBar.WantMousePositionReports = true;
 			_lblMenuBar.CanFocus = true;
 
-			var _lblParent = new Label () {
+			var _lblParent = new Label {
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_btnPrevious) + 1,
 				Y = Pos.Top (_btnPrevious) + 1,
@@ -676,7 +676,7 @@ public class DynamicMenuBar : Scenario {
 			};
 			Add (_txtTitle);
 
-			var _lblHelp = new Label () { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblTitle) + 1, Text = "Help:" };
+			var _lblHelp = new Label { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblTitle) + 1, Text = "Help:" };
 			Add (_lblHelp);
 
 			_txtHelp = new TextField () {
@@ -686,7 +686,7 @@ public class DynamicMenuBar : Scenario {
 			};
 			Add (_txtHelp);
 
-			var _lblAction = new Label () { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblHelp) + 1, Text = "Action:" };
+			var _lblAction = new Label { X = Pos.Left(_lblTitle), Y = Pos.Bottom(_lblHelp) + 1, Text = "Action:" };
 			Add (_lblAction);
 
 			_txtAction = new TextView () {

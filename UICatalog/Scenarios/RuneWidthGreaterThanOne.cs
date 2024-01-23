@@ -36,7 +36,7 @@ namespace UICatalog.Scenarios {
 				})
 			});
 
-			_label = new Label () {
+			_label = new Label {
 				X = Pos.Center (),
 				Y = 1,
 				ColorScheme = new ColorScheme () {
@@ -52,11 +52,11 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 5
 			};
-			_labelR = new Label () {
+			_labelR = new Label {
 				X = Pos.AnchorEnd (30),
 				Y = 18
 			};
-			_labelV = new Label () {
+			_labelV = new Label {
 				TextDirection = TextDirection.TopBottom_LeftRight,
 				X = Pos.AnchorEnd (30),
 				Y = Pos.Bottom (_labelR)

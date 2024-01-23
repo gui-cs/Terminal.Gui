@@ -118,7 +118,7 @@ namespace UICatalog.Scenarios {
 
 		private void CreateListView ()
 		{
-			var label = new Label () {
+			var label = new Label {
 				Text = "ListView",
 				TextAlignment = TextAlignment.Centered,
 				X = 0,
@@ -149,7 +149,7 @@ namespace UICatalog.Scenarios {
 
 		private void CreateTreeView ()
 		{
-			var label = new Label () {
+			var label = new Label {
 				Text = "TreeView",
 				TextAlignment = TextAlignment.Centered,
 				X = Pos.Right (_listView) + 2,

@@ -885,7 +885,7 @@ public class Editor : Scenario {
 
 		var lblWidth = "Replace:".Length;
 
-		var label = new Label () { Y = 1, Width = lblWidth, TextAlignment = TextAlignment.Right, AutoSize = false, Text = "Find:" };
+		var label = new Label { Y = 1, Width = lblWidth, TextAlignment = TextAlignment.Right, AutoSize = false, Text = "Find:" };
 		d.Add (label);
 
 		SetFindText ();

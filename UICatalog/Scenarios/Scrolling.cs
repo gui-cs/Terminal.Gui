@@ -108,7 +108,7 @@ public class Scrolling : Scenario {
 		Win.Y = 1;
 		Win.Width = Dim.Fill (1);
 		Win.Height = Dim.Fill (1);
-		var label = new Label () {
+		var label = new Label {
 			X = 0,
 			Y = 0
 		};
@@ -130,7 +130,7 @@ public class Scrolling : Scenario {
 
 		const string rule = "0123456789";
 
-		var horizontalRuler = new Label () {
+		var horizontalRuler = new Label {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
@@ -142,7 +142,7 @@ public class Scrolling : Scenario {
 
 		const string vrule = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-		var verticalRuler = new Label () {
+		var verticalRuler = new Label {
 			X = 0,
 			Y = 0,
 			Width = 1,

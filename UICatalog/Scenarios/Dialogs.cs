@@ -18,7 +18,7 @@ public class Dialogs : Scenario {
 			Title = "Dialog Options"
 		};
 
-		var label = new Label () { X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Width:" };
+		var label = new Label { X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Width:" };
 		frame.Add (label);
 
 		var widthEdit = new TextField ("0") {
@@ -118,7 +118,7 @@ public class Dialogs : Scenario {
 		};
 		Win.Add (label);
 
-		var buttonPressedLabel = new Label () { X = Pos.Center(), Y = Pos.Bottom(frame) + 5, Width = 25, Height = 1, ColorScheme = Colors.ColorSchemes["Error"], Text = " " };
+		var buttonPressedLabel = new Label { X = Pos.Center(), Y = Pos.Bottom(frame) + 5, Width = 25, Height = 1, ColorScheme = Colors.ColorSchemes["Error"], Text = " " };
 		// glyphsNotWords
 		// false:var btnText = new [] { "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine" };
 		// true: var btnText = new [] { "0", "\u2780", "➁", "\u2783", "\u2784", "\u2785", "\u2786", "\u2787", "\u2788", "\u2789" };

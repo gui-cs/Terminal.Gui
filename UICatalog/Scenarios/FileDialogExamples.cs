@@ -94,8 +94,8 @@ public class FileDialogExamples : Scenario {
 		rgIcons.RadioLabels = new string [] { "None", "Unicode", "Nerd*" };
 		Win.Add (rgIcons);
 
-		Win.Add (new Label () { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
-		Win.Add (new Label () { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
+		Win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
+		Win.Add (new Label { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
 
 		y = 5;
 		x = 24;

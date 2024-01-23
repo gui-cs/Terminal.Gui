@@ -283,7 +283,7 @@ namespace Terminal.Gui {
 				d.ColorScheme = Colors.ColorSchemes ["Dialog"];
 			}
 
-			var messageLabel = new Label () {
+			var messageLabel = new Label {
 				AutoSize = wrapMessage ? false : true,
 				Text = message,
 				TextAlignment = TextAlignment.Centered,

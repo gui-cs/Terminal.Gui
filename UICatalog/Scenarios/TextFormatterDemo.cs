@@ -25,7 +25,7 @@ public class TextFormatterDemo : Scenario {
 		string text = "Hello world, how are you today? Pretty neat!\nSecond line\n\nFourth Line.";
 		string unicode = "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-		Label blockText = new Label () { ColorScheme = Colors.ColorSchemes ["TopLevel"], X = 0, Y = 0, Height = 10, Width = Dim.Fill (0), AutoSize = false };
+		Label blockText = new Label { ColorScheme = Colors.ColorSchemes ["TopLevel"], X = 0, Y = 0, Height = 10, Width = Dim.Fill (0), AutoSize = false };
 
 		var block = new StringBuilder ();
 		block.AppendLine ("  ▄████  █    ██  ██▓      ▄████▄    ██████ ");

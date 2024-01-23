@@ -17,7 +17,7 @@ namespace UICatalog.Scenarios {
 
 		public override void Setup ()
 		{
-			var containerLabel = new Label () {
+			var containerLabel = new Label {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
@@ -142,7 +142,7 @@ namespace UICatalog.Scenarios {
 
 			view.Add (view5);
 
-			var label = new Label () {
+			var label = new Label {
 				Text = "AutoSize true; 1;1:",
 				AutoSize = true,
 				X = 1,

@@ -78,7 +78,7 @@ namespace UICatalog.Scenarios {
 			cancel.Clicked += (s, e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = title };
 
-			var lbl = new Label () {
+			var lbl = new Label {
 				X = 0,
 				Y = 1,
 				Text = label

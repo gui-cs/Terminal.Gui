@@ -79,14 +79,14 @@ public class SendKeys : Scenario {
 			}
 		};
 
-		var lblShippedKeys = new Label () {
+		var lblShippedKeys = new Label {
 			X = Pos.Center (),
 			Y = Pos.Center () + 3,
 			AutoSize = true
 		};
 		Win.Add (lblShippedKeys);
 
-		var lblShippedControlKeys = new Label () {
+		var lblShippedControlKeys = new Label {
 			X = Pos.Center (),
 			Y = Pos.Center () + 5,
 			AutoSize = true

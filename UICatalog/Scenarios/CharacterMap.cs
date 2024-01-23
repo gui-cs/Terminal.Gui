@@ -599,7 +599,7 @@ class CharMap : ScrollView {
 			Height = 7,
 			Width = 50
 		};
-		var errorLabel = new Label () {
+		var errorLabel = new Label {
 			Text = UcdApiClient.BaseUrl,
 			AutoSize = false,
 			X = 0,
@@ -677,104 +677,104 @@ class CharMap : ScrollView {
 			cancel.Clicked += (s, a) => dlg.RequestStop ();
 
 			var rune = (Rune)SelectedCodePoint;
-			var label = new Label () {
+			var label = new Label {
 				Text = "IsAscii: ",
 				X = 0,
 				Y = 0
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.IsAscii}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = ", Bmp: ",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.IsBmp}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = ", CombiningMark: ",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.IsCombiningMark ()}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = ", SurrogatePair: ",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.IsSurrogatePair ()}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = ", Plane: ",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.Plane}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = "Columns: ",
 				X = 0,
 				Y = Pos.Bottom (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.GetColumns ()}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = ", Utf16SequenceLength: ",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
 
-			label = new Label () {
+			label = new Label {
 				Text = $"{rune.Utf16SequenceLength}",
 				X = Pos.Right (label),
 				Y = Pos.Top (label)
 			};
 			dlg.Add (label);
-			label = new Label () {
+			label = new Label {
 				Text = $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
 				X = 0,
 				Y = Pos.Bottom (label)

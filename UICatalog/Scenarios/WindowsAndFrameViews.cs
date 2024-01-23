@@ -137,7 +137,7 @@ public class WindowsAndFrameViews : Scenario {
 			Title = "This is a FrameView"
 		};
 		frame.ColorScheme = Colors.ColorSchemes ["Dialog"];
-		frame.Add (new Label () {
+		frame.Add (new Label {
 			X = Pos.Center (),
 			Y = 0,
 			ColorScheme = Colors.ColorSchemes ["Error"],

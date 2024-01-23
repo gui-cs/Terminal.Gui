@@ -108,7 +108,7 @@ namespace UICatalog.Scenarios {
 
 			Win.Add (tableView);
 
-			var selectedCellLabel = new Label () {
+			var selectedCellLabel = new Label {
 				X = 0,
 				Y = Pos.Bottom (tableView),
 				Text = "0,0",
@@ -325,7 +325,7 @@ namespace UICatalog.Scenarios {
 
 			var style = tableView.Style.GetOrCreateColumnStyle (col.Value);
 
-			var lbl = new Label () {
+			var lbl = new Label {
 				X = 0,
 				Y = 1,
 				Text = tableView.Table.ColumnNames [col.Value]
@@ -982,7 +982,7 @@ namespace UICatalog.Scenarios {
 			cancel.Clicked += (s, e) => { Application.RequestStop (); };
 			var d = new Dialog (ok, cancel) { Title = title };
 
-			var lbl = new Label () {
+			var lbl = new Label {
 				X = 0,
 				Y = 1,
 				Text = tableView.Table.ColumnNames [e.Col]

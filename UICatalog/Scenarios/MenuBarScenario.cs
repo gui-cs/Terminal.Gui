@@ -67,70 +67,70 @@ public class MenuBarScenario : Scenario {
 		MenuItem mbiCurrent = null;
 		MenuItem miCurrent = null;
 
-		var label = new Label () {
+		var label = new Label {
 			X = 0,
 			Y = 10,
 			Text = "Last Key: "
 		};
 		Application.Top.Add (label);
 
-		_lastKey = new Label () {
+		_lastKey = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 
 		Application.Top.Add (_lastKey);
-		label = new Label () {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Text = "Current MenuBarItem: "
 		};
 		Application.Top.Add (label);
 
-		_currentMenuBarItem = new Label () {
+		_currentMenuBarItem = new Label {
 			X = Pos.Right(label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_currentMenuBarItem);
 
-		label = new Label () {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom(label),
 			Text = "Current MenuItem: "
 		};
 		Application.Top.Add (label);
 
-		_currentMenuItem = new Label () {
+		_currentMenuItem = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_currentMenuItem);
 
-		label = new Label () {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Text = "Last Action: "
 		};
 		Application.Top.Add (label);
 
-		_lastAction = new Label () {
+		_lastAction = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_lastAction);
 		
-		label = new Label () {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Text = "Focused View: "
 		};
 		Application.Top.Add (label);
 
-		_focusedView = new Label () {
+		_focusedView = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""

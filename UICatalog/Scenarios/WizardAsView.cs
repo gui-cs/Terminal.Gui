@@ -69,7 +69,7 @@ namespace UICatalog.Scenarios {
 			wizard.AddStep (secondStep);
 			secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
-			var buttonLbl = new Label () { Text = "Second Step Button: ", X = 0, Y = 0 };
+			var buttonLbl = new Label { Text = "Second Step Button: ", X = 0, Y = 0 };
 			var button = new Button {
 				Text = "Press Me to Rename Step",
 				X = Pos.Right (buttonLbl),
@@ -80,10 +80,10 @@ namespace UICatalog.Scenarios {
 				MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'", "Ok");
 			};
 			secondStep.Add (buttonLbl, button);
-			var lbl = new Label () { Text = "First Name: ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (buttonLbl) };
+			var lbl = new Label { Text = "First Name: ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (buttonLbl) };
 			var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 			secondStep.Add (lbl, firstNameField);
-			lbl = new Label () { Text = "Last Name:  ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (lbl) };
+			lbl = new Label { Text = "Last Name:  ", X = Pos.Left (buttonLbl), Y = Pos.Bottom (lbl) };
 			var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 			secondStep.Add (lbl, lastNameField);
 

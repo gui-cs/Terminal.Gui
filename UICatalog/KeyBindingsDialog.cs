@@ -139,7 +139,7 @@ namespace UICatalog {
 
 			Add (commandsListView);
 
-			keyLabel = new Label () {
+			keyLabel = new Label {
 				Text = "Key: None",
 				Width = Dim.Fill(),
 				X = Pos.Percent(50),
