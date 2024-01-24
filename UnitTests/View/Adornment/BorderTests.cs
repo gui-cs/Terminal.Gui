@@ -716,8 +716,8 @@ public class BorderTests {
 			Focus = new Attribute (Color.Green, Color.Red),
 		};
 		Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
-		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ( ));
-		Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ( ));
+		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
+		Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
 		Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 
 		view.BeginInit ();
