@@ -24,10 +24,21 @@ public class DatePicker : View {
 
 	private DateTime _date = DateTime.Now;
 
+
 	/// <summary>
-	/// Format of date. The default is MM/dd/yyyy.
+	/// CultureInfo for date. The default is CultureInfo.CurrentCulture.
 	/// </summary>
-	public string Format { get; set; } = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+	public CultureInfo Culture {
+		get => CultureInfo.CurrentCulture;
+		set {
+			if (value is not null) {
+				CultureInfo.CurrentCulture = value;
+				Text = Date.ToString (Format);
+			}
+		}
+	}
+
+	private string Format => StandardizeDateFormat (Culture.DateTimeFormat.ShortDatePattern);
 
 	/// <summary>
 	/// Get or set the date.
@@ -53,15 +64,6 @@ public class DatePicker : View {
 		SetInitialProperties (date);
 	}
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date and format.
-	/// </summary>
-	public DatePicker (DateTime date, string format)
-	{
-		Format = format;
-		SetInitialProperties (date);
-	}
-
 	private void SetInitialProperties (DateTime date)
 	{
 		Title = "Date Picker";
@@ -77,7 +79,8 @@ public class DatePicker : View {
 			X = Pos.Right (_dateLabel),
 			Y = 0,
 			Width = Dim.Fill (1),
-			Height = 1
+			Height = 1,
+			Culture = Culture,
 		};
 
 		_calendar = new TableView () {
@@ -146,10 +149,22 @@ public class DatePicker : View {
 
 	private void DateField_DateChanged (object sender, DateTimeEventArgs<DateTime> e)
 	{
+		Date = e.NewValue;
 		if (e.NewValue.Date.Day != _date.Day) {
 			SelectDayOnCalendar (e.NewValue.Day);
 		}
-		Date = e.NewValue;
+
+		if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year) {
+			_previousMonthButton.Enabled = false;
+		} else {
+			_previousMonthButton.Enabled = true;
+		}
+
+		if (_date.Month == DateTime.MaxValue.Month && _date.Year == DateTime.MaxValue.Year) {
+			_nextMonthButton.Enabled = false;
+		} else {
+			_nextMonthButton.Enabled = true;
+		}
 		CreateCalendar ();
 		SelectDayOnCalendar (_date.Day);
 	}
@@ -225,6 +240,38 @@ public class DatePicker : View {
 	private string GetForwardButtonText () => Glyphs.RightArrow.ToString () + Glyphs.RightArrow.ToString ();
 
 	private string GetBackButtonText () => Glyphs.LeftArrow.ToString () + Glyphs.LeftArrow.ToString ();
+
+	private static string StandardizeDateFormat (string format) =>
+	    format switch {
+		    "MM/dd/yyyy" => "MM/dd/yyyy",
+		    "yyyy-MM-dd" => "yyyy-MM-dd",
+		    "yyyy/MM/dd" => "yyyy/MM/dd",
+		    "dd/MM/yyyy" => "dd/MM/yyyy",
+		    "d?/M?/yyyy" => "dd/MM/yyyy",
+		    "dd.MM.yyyy" => "dd.MM.yyyy",
+		    "dd-MM-yyyy" => "dd-MM-yyyy",
+		    "dd/MM yyyy" => "dd/MM/yyyy",
+		    "d. M. yyyy" => "dd.MM.yyyy",
+		    "yyyy.MM.dd" => "yyyy.MM.dd",
+		    "g yyyy/M/d" => "yyyy/MM/dd",
+		    "d/M/yyyy" => "dd/MM/yyyy",
+		    "d?/M?/yyyy g" => "dd/MM/yyyy",
+		    "d-M-yyyy" => "dd-MM-yyyy",
+		    "d.MM.yyyy" => "dd.MM.yyyy",
+		    "d.MM.yyyy '?'." => "dd.MM.yyyy",
+		    "M/d/yyyy" => "MM/dd/yyyy",
+		    "d. M. yyyy." => "dd.MM.yyyy",
+		    "d.M.yyyy." => "dd.MM.yyyy",
+		    "g yyyy-MM-dd" => "yyyy-MM-dd",
+		    "d.M.yyyy" => "dd.MM.yyyy",
+		    "d/MM/yyyy" => "dd/MM/yyyy",
+		    "yyyy/M/d" => "yyyy/MM/dd",
+		    "dd. MM. yyyy." => "dd.MM.yyyy",
+		    "yyyy. MM. dd." => "yyyy.MM.dd",
+		    "yyyy. M. d." => "yyyy.MM.dd",
+		    "d. MM. yyyy" => "dd.MM.yyyy",
+		    _ => "dd/MM/yyyy"
+	    };
 
 	///<inheritdoc/>
 	protected override void Dispose (bool disposing)

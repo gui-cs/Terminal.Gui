@@ -1,7 +1,5 @@
-﻿using System;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace Terminal.Gui {
 	/// <summary>
@@ -28,14 +26,14 @@ namespace Terminal.Gui {
 			// Check if the value is a string
 			if (reader.TokenType == JsonTokenType.String) {
 				// Get the color string
-				var colorString = reader.GetString ();
+				ReadOnlySpan<char> colorString = reader.GetString ();
 
 				// Check if the color string is a color name
 				if (Enum.TryParse (colorString, ignoreCase: true, out ColorName color)) {
 					// Return the parsed color
-					return new Color(color);
+					return new Color(in color);
 				}
-				if (Color.TryParse (colorString, out Color parsedColor)) {
+				if (Color.TryParse(colorString,null, out Color parsedColor)) {
 					return parsedColor;
 				}
 				throw new JsonException ($"Unexpected color name: {colorString}.");
