@@ -68,7 +68,7 @@ internal class WindowsConsole {
 			foreach (ExtendedCharInfo info in charInfoBuffer) {
 				ci [i++] = new CharInfo () {
 					Char = new CharUnion () { UnicodeChar = info.Char },
-					Attributes = (ushort)(((int)info.Attribute.Foreground.ColorName) | ((int)info.Attribute.Background.ColorName << 4))
+					Attributes = (ushort)((int)info.Attribute.Foreground.GetClosestNamedColor () | (int)info.Attribute.Background.GetClosestNamedColor () << 4)
 				};
 			}
 

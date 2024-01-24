@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -14,16 +14,16 @@ namespace Terminal.Gui;
 /// using the <see cref="ColorScheme(ColorScheme)"/> constructor.
 /// </para>
 /// <para>
-/// See also: <see cref="Colors.ColorSchemes"/>.
+/// See also: <see cref="ColorSchemesConfiguration.ColorSchemes"/>.
 /// </para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
 public class ColorScheme : IEquatable<ColorScheme> {
-	readonly Attribute _disabled = Attribute.Default;
-	readonly Attribute _focus = Attribute.Default;
-	readonly Attribute _hotFocus = Attribute.Default;
-	readonly Attribute _hotNormal = Attribute.Default;
-	readonly Attribute _normal = Attribute.Default;
+	readonly Attribute _disabled;
+	readonly Attribute _focus;
+	readonly Attribute _hotFocus;
+	readonly Attribute _hotNormal;
+	readonly Attribute _normal;
 
 	/// <summary>
 	/// Creates a new instance set to the default colors (see <see cref="Attribute.Default"/>).
@@ -36,7 +36,7 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="scheme">The scheme to initialize the new instance with.</param>
 	public ColorScheme (ColorScheme scheme)
 	{
-		if (scheme == null) {
+		if (scheme is null) {
 			throw new ArgumentNullException (nameof (scheme));
 		}
 		_normal = scheme.Normal;
@@ -104,19 +104,19 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// </summary>
 	/// <param name="other"></param>
 	/// <returns>true if the two objects are equal</returns>
-	public bool Equals (ColorScheme other) => other != null &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
-	                                          EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
+	public bool Equals (ColorScheme? other) => other is { } &&
+												EqualityComparer<Attribute>.Default.Equals (_normal, other._normal) &&
+												EqualityComparer<Attribute>.Default.Equals (_focus, other._focus) &&
+												EqualityComparer<Attribute>.Default.Equals (_hotNormal, other._hotNormal) &&
+												EqualityComparer<Attribute>.Default.Equals (_hotFocus, other._hotFocus) &&
+												EqualityComparer<Attribute>.Default.Equals (_disabled, other._disabled);
 
 	/// <summary>
 	/// Compares two <see cref="ColorScheme"/> objects for equality.
 	/// </summary>
 	/// <param name="obj"></param>
 	/// <returns>true if the two objects are equal</returns>
-	public override bool Equals (object obj) => Equals (obj is ColorScheme ? (ColorScheme)obj : default);
+	public override bool Equals (object? obj) => Equals (obj as ColorScheme);
 
 	/// <summary>
 	/// Returns a hashcode for this instance.
@@ -148,6 +148,9 @@ public class ColorScheme : IEquatable<ColorScheme> {
 	/// <param name="right"></param>
 	/// <returns><c>true</c> if the two objects are not equivalent</returns>
 	public static bool operator != (ColorScheme left, ColorScheme right) => !(left == right);
+
+	/// <inheritdoc />
+	public override string ToString ( ) => $"Normal: {Normal}; Focus: {Focus}; HotNormal: {HotNormal}; HotFocus: {HotFocus}; Disabled: {Disabled}";
 }
 
 /// <summary>
@@ -223,14 +226,17 @@ public static class Colors {
 	/// <summary>
 	/// Resets the <see cref="ColorSchemes"/> dictionary to the default values.
 	/// </summary>
-	public static Dictionary<string, ColorScheme> Reset () =>
-		ColorSchemes = new Dictionary<string, ColorScheme> (comparer: new SchemeNameComparerIgnoreCase ()) {
-			{ "TopLevel", new ColorScheme () },
-			{ "Base", new ColorScheme () },
-			{ "Dialog", new ColorScheme () },
-			{ "Menu", new ColorScheme () },
-			{ "Error", new ColorScheme () },
-		};
+	public static Dictionary<string, ColorScheme> Reset ()
+	{
+		ColorSchemes ??= new Dictionary<string, ColorScheme> (5, CultureInfo.InvariantCulture.CompareInfo.GetStringComparer (CompareOptions.IgnoreCase));
+		ColorSchemes.Clear ();
+		ColorSchemes.Add ("TopLevel", new ColorScheme ());
+		ColorSchemes.Add ("Base", new ColorScheme ());
+		ColorSchemes.Add ("Dialog", new ColorScheme ());
+		ColorSchemes.Add ("Menu", new ColorScheme ());
+		ColorSchemes.Add ("Error", new ColorScheme ());
+		return ColorSchemes;
+	}
 
 	class SchemeNameComparerIgnoreCase : IEqualityComparer<string> {
 		public bool Equals (string x, string y)
