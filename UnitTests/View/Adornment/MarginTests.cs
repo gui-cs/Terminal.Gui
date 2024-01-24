@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 public class MarginTests {
@@ -21,15 +20,15 @@ public class MarginTests {
 		view.Margin.Thickness = new Thickness (1);
 
 		var superView = new View ();
-		
+
 		superView.ColorScheme = new ColorScheme () {
 			Normal = new Attribute (Color.Red, Color.Green),
 			Focus = new Attribute (Color.Green, Color.Red),
 		};
 
 		superView.Add (view);
-		Assert.Equal (ColorName.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor ( ));
-		Assert.Equal (ColorName.Red, superView.GetNormalColor ().Foreground.GetClosestNamedColor ( ));
+		Assert.Equal (ColorName.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor ());
+		Assert.Equal (ColorName.Red, superView.GetNormalColor ().Foreground.GetClosestNamedColor ());
 		Assert.Equal (superView.GetNormalColor (), view.Margin.GetNormalColor ());
 		Assert.Equal (superView.GetFocusColor (), view.Margin.GetFocusColor ());
 

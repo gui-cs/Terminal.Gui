@@ -89,7 +89,7 @@ public class ProgressBarStyles : Scenario {
 		};
 		editor.Add (fgColorPickerBtn);
 		fgColorPickerBtn.Clicked += (s, e) => {
-			var newColor = ChooseColor (fgColorPickerBtn.Text, editor.ViewToEdit.ColorScheme.HotNormal.Foreground.GetClosestNamedColor ( ));
+			var newColor = ChooseColor (fgColorPickerBtn.Text, editor.ViewToEdit.ColorScheme.HotNormal.Foreground.GetClosestNamedColor ());
 			var cs = new ColorScheme (editor.ViewToEdit.ColorScheme) {
 				HotNormal = new Attribute (newColor, editor.ViewToEdit.ColorScheme.HotNormal.Background)
 			};
@@ -103,7 +103,7 @@ public class ProgressBarStyles : Scenario {
 		};
 		editor.Add (bgColorPickerBtn);
 		bgColorPickerBtn.Clicked += (s, e) => {
-			var newColor = ChooseColor (fgColorPickerBtn.Text, editor.ViewToEdit.ColorScheme.HotNormal.Background.GetClosestNamedColor ( ));
+			var newColor = ChooseColor (fgColorPickerBtn.Text, editor.ViewToEdit.ColorScheme.HotNormal.Background.GetClosestNamedColor ());
 			var cs = new ColorScheme (editor.ViewToEdit.ColorScheme) {
 				HotNormal = new Attribute (editor.ViewToEdit.ColorScheme.HotNormal.Foreground, newColor)
 			};

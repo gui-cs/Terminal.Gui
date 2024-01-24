@@ -103,10 +103,10 @@ namespace UICatalog.Scenarios {
 				var l = new Label (" ") {
 					X = dx++,
 					Y = y,
-					ColorScheme = new ColorScheme ( ) {
+					ColorScheme = new ColorScheme {
 						Normal = new Attribute (
-							colorFunc ( Math.Clamp ( i, 0, 255 ) ),
-							colorFunc ( Math.Clamp ( i, 0, 255 ) )
+							colorFunc (Math.Clamp (i, 0, 255)),
+							colorFunc (Math.Clamp (i, 0, 255))
 						)
 					}
 				};
