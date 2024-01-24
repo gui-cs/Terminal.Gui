@@ -1,12 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static Terminal.Gui.SpinnerStyle;
-
-namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
 /// Event arguments for the <see cref="Color"/> events.
@@ -18,12 +10,12 @@ public class ColorEventArgs : EventArgs {
 	public ColorEventArgs () { }
 
 	/// <summary>
-	/// The new Thickness.
+	/// The new Color.
 	/// </summary>
 	public Color Color { get; set; }
 
 	/// <summary>
-	/// The previous Thickness.
+	/// The previous Color.
 	/// </summary>
 	public Color PreviousColor { get; set; }
 }
@@ -62,7 +54,29 @@ public enum ColorPickerStyle {
 /// The <see cref="ColorPicker"/> <see cref="View"/> Color picker.
 /// </summary>
 public class ColorPicker : View {
-	Color _selectedColor = new (Color.Black);
+	/// <summary>
+	/// Columns of color boxes
+	/// </summary>
+	readonly int _cols = 8;
+
+	/// <summary>
+	/// Rows of color boxes
+	/// </summary>
+	readonly int _rows = 2;
+
+	int _blueValue = 100;
+
+	int _boxHeight = 2;
+
+	int _boxWidth = 4;
+
+	int _selectColorIndex = (int)Color.Black;
+	Color _selectedColor = new(Color.Black);
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="ColorPicker"/>.
+	/// </summary>
+	public ColorPicker () => SetInitialProperties ();
 
 	/// <summary>
 	/// Gets or sets the style of the color picker.
@@ -70,29 +84,17 @@ public class ColorPicker : View {
 	public ColorPickerStyle Style { get; set; } = ColorPickerStyle.Ansi;
 
 	/// <summary>
-	/// Columns of color boxes
-	/// </summary>
-	int _cols = 8;
-
-	/// <summary>
-	/// Rows of color boxes
-	/// </summary>
-	int _rows = 2;
-
-	/// <summary>
-	/// Width of a color box.
+	/// Width of a color box
 	/// </summary>
 	public int BoxWidth {
 		get => _boxWidth;
 		set {
 			if (_boxWidth != value) {
 				_boxWidth = value;
-				Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+				SetNeedsLayout ();
 			}
 		}
 	}
-
-	int _boxWidth = 4;
 
 	/// <summary>
 	/// Height of a color box
@@ -102,12 +104,10 @@ public class ColorPicker : View {
 		set {
 			if (_boxHeight != value) {
 				_boxHeight = value;
-				Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+				SetNeedsLayout ();
 			}
 		}
 	}
-
-	int _boxHeight = 2;
 
 	/// <summary>
 	/// Cursor for the selected color.
@@ -116,32 +116,29 @@ public class ColorPicker : View {
 		get {
 			switch (Style) {
 			case ColorPickerStyle.Ansi:
-				int index = (int)_selectedColor.ColorName;
+				var index = (int)_selectedColor.GetClosestNamedColor ();
 				return new Point (index % _cols, index / _cols);
 			case ColorPickerStyle.Rgb:
-				int x = (int)(_selectedColor.R * Bounds.Width / 255);
-				int y = (int)(_selectedColor.G * Bounds.Height / 255);
+				var x = _selectedColor.R * Bounds.Width / 255;
+				var y = _selectedColor.G * Bounds.Height / 255;
 				return new Point (x, y);
 			}
+
 			return new Point ();
 		}
 
 		set {
 			switch (Style) {
 			case ColorPickerStyle.Ansi:
-				SelectedColor = (Color)(ColorName)(value.Y * _cols + value.X);
+				SelectedColor = (ColorName)((value.Y * _cols) + value.X);
 				break;
 			case ColorPickerStyle.Rgb:
-				SelectedColor = new Color ((byte)(value.X * 255 / Bounds.Width), (byte)(value.Y * 255 / Bounds.Height), 0);
+				SelectedColor = new Color ((byte)(value.X * 255 / Bounds.Width),
+					(byte)(value.Y * 255 / Bounds.Height));
 				break;
 			}
 		}
 	}
-
-	/// <summary>
-	/// Fired when a color is picked.
-	/// </summary>
-	public event EventHandler<ColorEventArgs> ColorChanged;
 
 	/// <summary>
 	/// Selected color.
@@ -153,16 +150,25 @@ public class ColorPicker : View {
 			if (_selectedColor != value) {
 				var oldColor = _selectedColor;
 				_selectedColor = value;
-				ColorChanged?.Invoke (this, new ColorEventArgs () { Color = _selectedColor, PreviousColor = oldColor });
+				ColorChanged?.Invoke (this,
+					new ColorEventArgs { Color = _selectedColor, PreviousColor = oldColor });
 				SetNeedsDisplay ();
 			}
 		}
 	}
 
+	public int BlueValue {
+		get => _blueValue;
+		set {
+			_blueValue = value;
+			SetNeedsDisplay ();
+		}
+	}
+
 	/// <summary>
-	/// Initializes a new instance of <see cref="ColorPicker"/>.
+	/// Fired when a color is picked.
 	/// </summary>
-	public ColorPicker () => SetInitialProperties ();
+	public event EventHandler<ColorEventArgs> ColorChanged;
 
 	void SetInitialProperties ()
 	{
@@ -176,7 +182,9 @@ public class ColorPicker : View {
 				break;
 			case ColorPickerStyle.Ansi:
 			default:
-				Bounds = new Rect (Bounds.Location, new Size (_cols * BoxWidth, _rows * BoxHeight));
+				var thickness = GetAdornmentsThickness ();
+				Width = (_cols * BoxWidth) + thickness.Vertical;
+				Height = (_rows * BoxHeight) + thickness.Horizontal;
 				break;
 			}
 		};
@@ -211,6 +219,7 @@ public class ColorPicker : View {
 	}
 
 	///<inheritdoc/>
+	///<inheritdoc/>
 	public override void OnDrawContent (Rect contentArea)
 	{
 		base.OnDrawContent (contentArea);
@@ -219,36 +228,25 @@ public class ColorPicker : View {
 
 		switch (Style) {
 		case ColorPickerStyle.Rgb:
-			DrawRgbGraident (contentArea);
+			DrawRgbGradient (contentArea);
 			break;
 		case ColorPickerStyle.Ansi:
 		default:
 			DrawAnsi ();
 			break;
 		}
-
 	}
 
-	int _blueValue = 100;
-
-	public int BlueValue {
-		get => _blueValue;
-		set {
-			_blueValue = value;
-			SetNeedsDisplay ();
-		}
-	}
-
-	void DrawHSLGraident (Rect contentArea)
+	void DrawHSLGradient (Rect contentArea)
 	{
-		for (int x = 0; x < contentArea.Width; x++) {
-			for (int y = 0; y < contentArea.Height; y++) {
-				float ratioX = (float)x / (contentArea.Width - 1);
-				float ratioY = (float)y / (contentArea.Height - 1);
+		for (var x = 0; x < contentArea.Width; x++) {
+			for (var y = 0; y < contentArea.Height; y++) {
+				var ratioX = (float)x / (contentArea.Width - 1);
+				var ratioY = (float)y / (contentArea.Height - 1);
 
-				int red = (int)(255 * ratioX);
-				int green = (int)(255 * ratioY);
-				int blue = _blueValue; // We're displaying a slice of blue value
+				var red = (int)(255 * ratioX);
+				var green = (int)(255 * ratioY);
+				var blue = _blueValue; // We're displaying a slice of blue value
 
 				var color = new Color (red, green, blue);
 
@@ -257,13 +255,13 @@ public class ColorPicker : View {
 		}
 	}
 
-	void DrawRgbGraident (Rect contentArea)
+	void DrawRgbGradient (Rect contentArea)
 	{
-		for (int x = 0; x < Bounds.Width; x++) {
-			for (int y = 0; y < Bounds.Height; y++) {
+		for (var x = 0; x < Bounds.Width; x++) {
+			for (var y = 0; y < Bounds.Height; y++) {
 				// Map x and y to their corresponding RGB values
-				int redValue = MapValue (x, 0, Bounds.Width, 0, 255);
-				int greenValue = MapValue (y, 0, Bounds.Height, 0, 255);
+				var redValue = MapValue (x, 0, Bounds.Width, 0, 255);
+				var greenValue = MapValue (y, 0, Bounds.Height, 0, 255);
 
 				var color = new Color (redValue, greenValue, _blueValue);
 
@@ -272,7 +270,8 @@ public class ColorPicker : View {
 		}
 	}
 
-	int MapValue (int value, int fromLow, int fromHigh, int toLow, int toHigh) => (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+	int MapValue (int value, int fromLow, int fromHigh, int toLow, int toHigh) =>
+		((value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow)) + toLow;
 
 	void DrawBox (int x, int y, Color color)
 	{
@@ -284,13 +283,14 @@ public class ColorPicker : View {
 
 	void DrawAnsi ()
 	{
-		int colorIndex = 0;
+		var colorIndex = 0;
 
-		for (int y = 0; y < Bounds.Height / BoxHeight; y++) {
-			for (int x = 0; x < Bounds.Width / BoxWidth; x++) {
-				int foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
-				Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex, (ColorName)colorIndex));
-				bool selected = x == Cursor.X && y == Cursor.Y;
+		for (var y = 0; y < Bounds.Height / BoxHeight; y++) {
+			for (var x = 0; x < Bounds.Width / BoxWidth; x++) {
+				var foregroundColorIndex = y == 0 ? colorIndex + _cols : colorIndex - _cols;
+				Driver.SetAttribute (new Attribute ((ColorName)foregroundColorIndex,
+					(ColorName)colorIndex));
+				var selected = x == Cursor.X && y == Cursor.Y;
 				DrawColorBox (x, y, selected);
 				colorIndex++;
 			}
@@ -305,11 +305,11 @@ public class ColorPicker : View {
 	/// <param name="selected"></param>
 	void DrawColorBox (int x, int y, bool selected)
 	{
-		int index = 0;
+		var index = 0;
 
-		for (int zoomedY = 0; zoomedY < BoxHeight; zoomedY++) {
-			for (int zoomedX = 0; zoomedX < BoxWidth; zoomedX++) {
-				Move (x * BoxWidth + zoomedX, y * BoxHeight + zoomedY);
+		for (var zoomedY = 0; zoomedY < BoxHeight; zoomedY++) {
+			for (var zoomedX = 0; zoomedX < BoxWidth; zoomedX++) {
+				Move ((x * BoxWidth) + zoomedX, (y * BoxHeight) + zoomedY);
 				Driver.AddRune ((Rune)' ');
 				index++;
 			}
@@ -329,11 +329,14 @@ public class ColorPicker : View {
 			lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 		} else {
 			lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
-			lc.AddLine (new Point (rect.Location.X, rect.Location.Y + rect.Height - 1), rect.Width, Orientation.Horizontal, LineStyle.Dotted);
+			lc.AddLine (new Point (rect.Location.X, rect.Location.Y + rect.Height - 1), rect.Width,
+				Orientation.Horizontal, LineStyle.Dotted);
 
 			lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
-			lc.AddLine (new Point (rect.Location.X + rect.Width - 1, rect.Location.Y), rect.Height, Orientation.Vertical, LineStyle.Dotted);
+			lc.AddLine (new Point (rect.Location.X + rect.Width - 1, rect.Location.Y), rect.Height,
+				Orientation.Vertical, LineStyle.Dotted);
 		}
+
 		foreach (var p in lc.GetMap ()) {
 			AddRune (p.Key.X, p.Key.Y, p.Value);
 		}
@@ -347,15 +350,17 @@ public class ColorPicker : View {
 	{
 		switch (Style) {
 		case ColorPickerStyle.Ansi:
-			int index = (int)SelectedColor.ColorName;
+			var index = (int)SelectedColor.GetClosestNamedColor ();
 			if (index > 0 && index <= 15) {
 				SelectedColor = new Color ((ColorName)(index - 1));
 			}
+
 			return true;
 		case ColorPickerStyle.Rgb:
 			//return MoveLeftRgb ();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -367,15 +372,17 @@ public class ColorPicker : View {
 	{
 		switch (Style) {
 		case ColorPickerStyle.Ansi:
-			int index = (int)SelectedColor.ColorName;
+			var index = (int)SelectedColor.GetClosestNamedColor ();
 			if (index >= 0 && index < 15) {
 				SelectedColor = new Color ((ColorName)(index + 1));
 			}
+
 			return true;
 		case ColorPickerStyle.Rgb:
 			//return MoveLeftRgb ();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -387,15 +394,17 @@ public class ColorPicker : View {
 	{
 		switch (Style) {
 		case ColorPickerStyle.Ansi:
-			int index = (int)SelectedColor.ColorName - _cols;
+			var index = (int)SelectedColor.GetClosestNamedColor () - _cols;
 			if (index >= 0 && index <= 15) {
 				SelectedColor = new Color ((ColorName)index);
 			}
+
 			return true;
 		case ColorPickerStyle.Rgb:
 			//return MoveLeftRgb ();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -407,15 +416,17 @@ public class ColorPicker : View {
 	{
 		switch (Style) {
 		case ColorPickerStyle.Ansi:
-			int index = (int)SelectedColor.ColorName + _cols;
+			var index = (int)SelectedColor.GetClosestNamedColor () + _cols;
 			if (index >= 0 && index <= 15) {
 				SelectedColor = new Color ((ColorName)index);
 			}
+
 			return true;
 		case ColorPickerStyle.Rgb:
 			//return MoveLeftRgb ();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -428,15 +439,16 @@ public class ColorPicker : View {
 	{
 		switch (Style) {
 		case ColorPickerStyle.Ansi:
-			SelectedColor = new Color (Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().First ());
+			SelectedColor = new Color (Enum.GetValues (typeof(ColorName)).Cast<ColorName> ().First ());
 			return true;
 		case ColorPickerStyle.Rgb:
 			//return MoveLeftRgb ();
 			return true;
 		}
+
 		return false;
 	}
-	
+
 	/// <summary>
 	/// Moves the selected item to the last color.
 	/// </summary>
@@ -445,12 +457,13 @@ public class ColorPicker : View {
 	{
 		switch (Style) {
 		case ColorPickerStyle.Ansi:
-			SelectedColor = new Color (Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().Last ());
+			SelectedColor = new Color (Enum.GetValues (typeof(ColorName)).Cast<ColorName> ().Last ());
 			return true;
 		case ColorPickerStyle.Rgb:
 			//return MoveLeftRgb ();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -462,7 +475,7 @@ public class ColorPicker : View {
 		}
 
 		SetFocus ();
-		if (me.X > Bounds.Width || me.Y > Bounds.Height) {
+		if ((me.X > Bounds.Width) || (me.Y > Bounds.Height)) {
 			return true;
 		}
 
@@ -503,19 +516,19 @@ public class GradientView : View {
 	{
 		base.OnDrawContent (contentArea);
 
-		DrawRgbGraident (contentArea);
+		DrawRgbGradient (contentArea);
 	}
 
-	void DrawHSLGraident (Rect contentArea)
+	void DrawHSLGradient (Rect contentArea)
 	{
-		for (int x = 0; x < contentArea.Width; x++) {
-			for (int y = 0; y < contentArea.Height; y++) {
-				float ratioX = (float)x / (contentArea.Width - 1);
-				float ratioY = (float)y / (contentArea.Height - 1);
+		for (var x = 0; x < contentArea.Width; x++) {
+			for (var y = 0; y < contentArea.Height; y++) {
+				var ratioX = (float)x / (contentArea.Width - 1);
+				var ratioY = (float)y / (contentArea.Height - 1);
 
-				int red = (int)(255 * ratioX);
-				int green = (int)(255 * ratioY);
-				int blue = _blueValue; // We're displaying a slice of blue value
+				var red = (int)(255 * ratioX);
+				var green = (int)(255 * ratioY);
+				var blue = _blueValue; // We're displaying a slice of blue value
 
 				var color = new Color (red, green, blue);
 
@@ -524,13 +537,13 @@ public class GradientView : View {
 		}
 	}
 
-	void DrawRgbGraident (Rect contentArea)
+	void DrawRgbGradient (Rect contentArea)
 	{
-		for (int x = 0; x < Bounds.Width; x++) {
-			for (int y = 0; y < Bounds.Height; y++) {
+		for (var x = 0; x < Bounds.Width; x++) {
+			for (var y = 0; y < Bounds.Height; y++) {
 				// Map x and y to their corresponding RGB values
-				int redValue = MapValue (x, 0, Bounds.Width, 0, 255);
-				int greenValue = MapValue (y, 0, Bounds.Height, 0, 255);
+				var redValue = MapValue (x, 0, Bounds.Width, 0, 255);
+				var greenValue = MapValue (y, 0, Bounds.Height, 0, 255);
 
 				var color = new Color (redValue, greenValue, _blueValue);
 
@@ -539,7 +552,8 @@ public class GradientView : View {
 		}
 	}
 
-	int MapValue (int value, int fromLow, int fromHigh, int toLow, int toHigh) => (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+	int MapValue (int value, int fromLow, int fromHigh, int toLow, int toHigh) =>
+		((value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow)) + toLow;
 
 	void DrawBox (int x, int y, Color color)
 	{

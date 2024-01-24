@@ -26,18 +26,6 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = true
 csharp_style_var_elsewhere = true:none
 
 # ReSharper properties
-resharper_align_linq_query = true
-resharper_align_multiline_calls_chain = true
-resharper_align_multiline_extends_list = true
-resharper_align_multiline_parameter = true
-resharper_blank_lines_around_region = 1
-resharper_braces_redundant = true
-resharper_csharp_stick_comment = false
-resharper_force_attribute_style = separate
-resharper_indent_type_constraints = true
-resharper_local_function_body = expression_body
-resharper_remove_blank_lines_near_braces_in_declarations = true
-resharper_use_roslyn_logic_for_evident_types = true
 csharp_space_around_binary_operators = before_and_after
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
@@ -82,7 +70,7 @@ csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
-csharp_style_var_for_built_in_types = false:silent
+csharp_style_var_for_built_in_types = true:none
 
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line

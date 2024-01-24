@@ -32,16 +32,94 @@ namespace Terminal.Gui;
 /// TODO: Flush this out.
 /// </remarks>
 public static partial class Application {
+
+	// IMPORTANT: Ensure all property/fields are reset here. See Init_ResetState_Resets_Properties unit test.
+	// Encapsulate all setting of initial state for Application; Having
+	// this in a function like this ensures we don't make mistakes in
+	// guaranteeing that the state of this singleton is deterministic when Init
+	// starts running and after Shutdown returns.
+	internal static void ResetState ()
+	{
+		// Shutdown is the bookend for Init. As such it needs to clean up all resources
+		// Init created. Apps that do any threading will need to code defensively for this.
+		// e.g. see Issue #537
+		foreach (var t in _topLevels) {
+			t.Running = false;
+			t.Dispose ();
+		}
+		_topLevels.Clear ();
+		Current = null;
+		Top?.Dispose ();
+		Top = null;
+
+		// MainLoop stuff
+		MainLoop?.Dispose ();
+		MainLoop = null;
+		_mainThreadId = -1;
+		Iteration = null;
+		EndAfterFirstIteration = false;
+		
+		// Driver stuff
+		if (Driver != null) {
+			Driver.SizeChanged -= Driver_SizeChanged;
+			Driver.KeyDown -= Driver_KeyDown;
+			Driver.KeyUp -= Driver_KeyUp;
+			Driver.MouseEvent -= Driver_MouseEvent;
+			Driver?.End ();
+			Driver = null;
+		}
+		// Don't reset ForceDriver; it needs to be set before Init is called.
+		//ForceDriver = string.Empty;
+		Force16Colors = false;
+		_forceFakeConsole = false;
+		
+		// Run State stuff
+		NotifyNewRunState = null;
+		NotifyStopRunState = null;
+		MouseGrabView = null;
+		_initialized = false;
+
+		// Mouse
+		_mouseEnteredView = null;
+		WantContinuousButtonPressedView = null;
+		MouseEvent = null;
+		GrabbedMouse = null;
+		UnGrabbingMouse = null;
+		GrabbedMouse = null;
+		UnGrabbedMouse = null;
+
+		// Keyboard
+		AlternateBackwardKey = Key.Empty;
+		AlternateForwardKey = Key.Empty;
+		QuitKey = Key.Empty;
+		KeyDown = null;
+		KeyUp = null;
+		SizeChanging = null;
+
+		Colors.Reset ();
+
+		// Reset synchronization context to allow the user to run async/await,
+		// as the main loop has been ended, the synchronization context from 
+		// gui.cs does no longer process any callbacks. See #1084 for more details:
+		// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
+		SynchronizationContext.SetSynchronizationContext (syncContext: null);
+	}
+
 	/// <summary>
-	/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="UseSystemConsole"/>.
+	/// Gets the <see cref="ConsoleDriver"/> that has been selected. See also <see cref="ForceDriver"/>.
 	/// </summary>
 	public static ConsoleDriver Driver { get; internal set; }
 
 	/// <summary>
-	/// If <see langword="true"/>, forces the use of the System.Console-based (see <see cref="NetDriver"/>) driver. The default is <see langword="false"/>.
+	/// Forces the use of the specified driver (one of "fake", "ansi", "curses", "net", or "windows"). If
+	/// not specified, the driver is selected based on the platform.
 	/// </summary>
+	/// <remarks>
+	/// Note, <see cref="Application.Init(ConsoleDriver, string)"/> will override this configuration setting if
+	/// called with either `driver` or `driverName` specified.
+	/// </remarks>
 	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-	public static bool UseSystemConsole { get; set; } = false;
+	public static string ForceDriver { get; set; } = string.Empty;
 
 	/// <summary>
 	/// Gets or sets whether <see cref="Application.Driver"/> will be forced to output only the 16 colors defined in <see cref="ColorName"/>.
@@ -61,7 +139,7 @@ public static partial class Application {
 	/// </summary>
 	public static List<CultureInfo> SupportedCultures => _cachedSupportedCultures;
 
-	static List<CultureInfo> GetSupportedCultures ()
+	internal static List<CultureInfo> GetSupportedCultures ()
 	{
 		var culture = CultureInfo.GetCultures (CultureTypes.AllCultures);
 
@@ -98,14 +176,13 @@ public static partial class Application {
 	/// </para>
 	/// <para>
 	/// The <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> function 
-	/// combines <see cref="Init(ConsoleDriver)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+	/// combines <see cref="Init(ConsoleDriver, string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
 	/// into a single call. An application cam use <see cref="Run{T}(Func{Exception, bool}, ConsoleDriver)"/> 
-	/// without explicitly calling <see cref="Init(ConsoleDriver)"/>.
+	/// without explicitly calling <see cref="Init(ConsoleDriver, string)"/>.
 	/// </para>
-	/// <param name="driver">
-	/// The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
-	/// platform will be used (see <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, and <see cref="NetDriver"/>).</param>
-	public static void Init (ConsoleDriver driver = null) => InternalInit (() => Toplevel.Create (), driver);
+	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+	/// <param name="driverName">The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are specified the default driver for the platform will be used.</param>
+	public static void Init (ConsoleDriver driver = null, string driverName = null) => InternalInit (() => new Toplevel (), driver, driverName);
 
 	internal static bool _initialized = false;
 	internal static int _mainThreadId = -1;
@@ -119,7 +196,7 @@ public static partial class Application {
 	// Unit Tests - To initialize the app with a custom Toplevel, using the FakeDriver. calledViaRunT will be false, causing all state to be reset.
 	// 
 	// calledViaRunT: If false (default) all state will be reset. If true the state will not be reset.
-	internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, bool calledViaRunT = false)
+	internal static void InternalInit (Func<Toplevel> topLevelFactory, ConsoleDriver driver = null, string driverName = null, bool calledViaRunT = false)
 	{
 		if (_initialized && driver == null) {
 			return;
@@ -147,15 +224,28 @@ public static partial class Application {
 		Load (true);
 		Apply ();
 
-		Driver ??= Environment.OSVersion.Platform switch {
-			_ when _forceFakeConsole => new FakeDriver (), // for unit testing only
-			_ when UseSystemConsole => new NetDriver (),
-			PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows => new WindowsDriver (),
-			_ => new CursesDriver ()
-		};
+		// Ignore Configuration for ForceDriver if driverName is specified
+		if (!string.IsNullOrEmpty (driverName)) {
+			ForceDriver = driverName;
+		}
 
 		if (Driver == null) {
-			throw new InvalidOperationException ("Init could not determine the ConsoleDriver to use.");
+			var p = Environment.OSVersion.Platform;
+			if (string.IsNullOrEmpty (ForceDriver)) {
+				if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows) {
+					Driver = new WindowsDriver ();
+				} else {
+					Driver = new CursesDriver ();
+				}
+			} else {
+				var drivers = GetDriverTypes ();
+				var driverType = drivers.FirstOrDefault (t => t.Name.ToLower () == ForceDriver.ToLower ());
+				if (driverType != null) {
+					Driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+				} else {
+					throw new ArgumentException ($"Invalid driver name: {ForceDriver}. Valid names are {string.Join (", ", drivers.Select (t => t.Name))}");
+				}
+			}
 		}
 
 		try {
@@ -168,15 +258,19 @@ public static partial class Application {
 			throw new InvalidOperationException ("Unable to initialize the console. This can happen if the console is already in use by another process or in unit tests.", ex);
 		}
 
-		Driver.SizeChanged += Driver_SizeChanged;
-		Driver.KeyDown += Driver_KeyDown;
-		Driver.KeyUp += Driver_KeyUp;
-		Driver.MouseEvent += Driver_MouseEvent;
+		Driver.SizeChanged += (s, args) => OnSizeChanging (args);
+		Driver.KeyDown += (s, args) => OnKeyDown (args);
+		Driver.KeyUp += (s, args) => OnKeyUp (args);
+		Driver.MouseEvent += (s, args) => OnMouseEvent (args);
 
 		SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
 
 		Top = topLevelFactory ();
 		Current = Top;
+
+		// Ensure Top's layout is up to date.
+		Current.SetRelativeLayout (Driver.Bounds);
+
 		_cachedSupportedCultures = GetSupportedCultures ();
 		_mainThreadId = Thread.CurrentThread.ManagedThreadId;
 		_initialized = true;
@@ -190,67 +284,35 @@ public static partial class Application {
 
 	static void Driver_MouseEvent (object sender, MouseEventEventArgs e) => OnMouseEvent (e);
 
+	/// <summary>
+	/// Gets of list of <see cref="ConsoleDriver"/> types that are available.
+	/// </summary>
+	/// <returns></returns>
+	public static List<Type> GetDriverTypes ()
+	{
+		// use reflection to get the list of drivers
+		var driverTypes = new List<Type> ();
+		foreach (var asm in AppDomain.CurrentDomain.GetAssemblies ()) {
+			foreach (var type in asm.GetTypes ()) {
+				if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract) {
+					driverTypes.Add (type);
+				}
+			}
+		}
+		return driverTypes;
+	}
 
 	/// <summary>
-	/// Shutdown an application initialized with <see cref="Init(ConsoleDriver)"/>.
+	/// Shutdown an application initialized with <see cref="Init"/>.
 	/// </summary>
 	/// <remarks>
-	/// Shutdown must be called for every call to <see cref="Init(ConsoleDriver)"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
+	/// Shutdown must be called for every call to <see cref="Init"/> or <see cref="Application.Run(Toplevel, Func{Exception, bool})"/>
 	/// to ensure all resources are cleaned up (Disposed) and terminal settings are restored.
 	/// </remarks>
 	public static void Shutdown ()
 	{
 		ResetState ();
 		PrintJsonErrors ();
-	}
-
-	// Encapsulate all setting of initial state for Application; Having
-	// this in a function like this ensures we don't make mistakes in
-	// guaranteeing that the state of this singleton is deterministic when Init
-	// starts running and after Shutdown returns.
-	static void ResetState ()
-	{
-		// Shutdown is the bookend for Init. As such it needs to clean up all resources
-		// Init created. Apps that do any threading will need to code defensively for this.
-		// e.g. see Issue #537
-		foreach (var t in _topLevels) {
-			t.Running = false;
-			t.Dispose ();
-		}
-		_topLevels.Clear ();
-		Current = null;
-		Top?.Dispose ();
-		Top = null;
-
-		// BUGBUG: OverlappedTop is not cleared here, but it should be?
-
-		MainLoop?.Dispose ();
-		MainLoop = null;
-		if (Driver != null) {
-			Driver.SizeChanged -= Driver_SizeChanged;
-			Driver.KeyDown -= Driver_KeyDown;
-			Driver.KeyUp -= Driver_KeyUp;
-			Driver.MouseEvent -= Driver_MouseEvent;
-			Driver?.End ();
-			Driver = null;
-		}
-		Iteration = null;
-		MouseEvent = null;
-		KeyDown = null;
-		KeyUp = null;
-		SizeChanging = null;
-		_mainThreadId = -1;
-		NotifyNewRunState = null;
-		NotifyStopRunState = null;
-		_initialized = false;
-		MouseGrabView = null;
-		_mouseEnteredView = null;
-
-		// Reset synchronization context to allow the user to run async/await,
-		// as the main loop has been ended, the synchronization context from 
-		// gui.cs does no longer process any callbacks. See #1084 for more details:
-		// (https://github.com/gui-cs/Terminal.Gui/issues/1084).
-		SynchronizationContext.SetSynchronizationContext (syncContext: null);
 	}
 	#endregion Initialization (Init/Shutdown)
 
@@ -363,9 +425,9 @@ public static partial class Application {
 			MoveCurrent (Current);
 		}
 
-		if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
-			Toplevel.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
-		}
+		//if (Toplevel.LayoutStyle == LayoutStyle.Computed) {
+		Toplevel.SetRelativeLayout (Driver.Bounds);
+		//}
 		Toplevel.LayoutSubviews ();
 		Toplevel.PositionToplevels ();
 		Toplevel.FocusFirst ();
@@ -394,7 +456,7 @@ public static partial class Application {
 	/// Runs the application by calling <see cref="Run(Toplevel, Func{Exception, bool})"/> 
 	/// with a new instance of the specified <see cref="Toplevel"/>-derived class.
 	/// <para>
-	/// Calling <see cref="Init(ConsoleDriver)"/> first is not needed as this function will initialize the application.
+	/// Calling <see cref="Init"/> first is not needed as this function will initialize the application.
 	/// </para>
 	/// <para>
 	/// <see cref="Shutdown"/> must be called when the application is closing (typically after Run> has 
@@ -407,9 +469,9 @@ public static partial class Application {
 	/// <param name="errorHandler"></param>
 	/// <param name="driver">The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the
 	/// platform will be used (<see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>).
-	/// Must be <see langword="null"/> if <see cref="Init(ConsoleDriver)"/> has already been called. 
+	/// Must be <see langword="null"/> if <see cref="Init"/> has already been called. 
 	/// </param>
-	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new ()
+	public static void Run<T> (Func<Exception, bool> errorHandler = null, ConsoleDriver driver = null) where T : Toplevel, new()
 	{
 		if (_initialized) {
 			if (Driver != null) {
@@ -429,7 +491,7 @@ public static partial class Application {
 			}
 		} else {
 			// Init() has NOT been called.
-			InternalInit (() => new T (), driver, true);
+			InternalInit (() => new T (), driver, null, true);
 			Run (Top, errorHandler);
 		}
 	}
@@ -676,7 +738,7 @@ public static partial class Application {
 					&& (Driver.Cols != state.Toplevel.Frame.Width || Driver.Rows != state.Toplevel.Frame.Height)
 					&& (state.Toplevel.NeedsDisplay || state.Toplevel.SubViewNeedsDisplay || state.Toplevel.LayoutNeeded)) {
 
-			state.Toplevel.Clear (new Rect (Point.Empty, new Size (Driver.Cols, Driver.Rows)));
+			state.Toplevel.Clear (Driver.Bounds);
 		}
 
 		if (state.Toplevel.NeedsDisplay ||
@@ -838,13 +900,12 @@ public static partial class Application {
 	#endregion Run (Begin, Run, End)
 
 	#region Toplevel handling
-
 	/// <summary>
 	/// Holds the stack of TopLevel views.
 	/// </summary>
 	// BUGBUG: Techncally, this is not the full lst of TopLevels. THere be dragons hwre. E.g. see how Toplevel.Id is used. What
 	// about TopLevels that are just a SubView of another View?
-	static readonly Stack<Toplevel> _topLevels = new ();
+	internal static readonly Stack<Toplevel> _topLevels = new Stack<Toplevel> ();
 
 	/// <summary>
 	/// The <see cref="Toplevel"/> object used for the application on startup (<seealso cref="Application.Top"/>)
@@ -1104,7 +1165,7 @@ public static partial class Application {
 	}
 
 	// Used by OnMouseEvent to track the last view that was clicked on.
-	static View _mouseEnteredView;
+	internal static View _mouseEnteredView;
 
 	/// <summary>
 	/// Event fired when a mouse move or click occurs. Coordinates are screen relative.
@@ -1190,7 +1251,7 @@ public static partial class Application {
 			}
 		}
 
-		bool FrameHandledMouseEvent (Frame frame)
+		bool AdornmentHandledMouseEvent(Adornment frame)
 		{
 			if (frame?.Thickness.Contains (frame.FrameToScreen (), a.MouseEvent.X, a.MouseEvent.Y) ?? false) {
 				var boundsPoint = frame.ScreenToBounds (a.MouseEvent.X, a.MouseEvent.Y);
@@ -1211,10 +1272,10 @@ public static partial class Application {
 		if (view != null) {
 			// Work inside-out (Padding, Border, Margin)
 			// TODO: Debate whether inside-out or outside-in is the right strategy
-			if (FrameHandledMouseEvent (view?.Padding)) {
+			if (AdornmentHandledMouseEvent(view?.Padding)) {
 				return;
 			}
-			if (FrameHandledMouseEvent (view?.Border)) {
+			if (AdornmentHandledMouseEvent(view?.Border)) {
 				if (view is Toplevel) {
 					// TODO: This is a temporary hack to work around the fact that 
 					// drag handling is handled in Toplevel (See Issue #2537)
@@ -1253,7 +1314,7 @@ public static partial class Application {
 				return;
 			}
 
-			if (FrameHandledMouseEvent (view?.Margin)) {
+			if (AdornmentHandledMouseEvent(view?.Margin)) {
 				return;
 			}
 
@@ -1296,12 +1357,13 @@ public static partial class Application {
 	#endregion Mouse handling
 
 	#region Keyboard handling
-	static Key _alternateForwardKey = new (KeyCode.PageDown | KeyCode.CtrlMask);
+	static Key _alternateForwardKey = Key.Empty; // Defined in config.json
 
 	/// <summary>
 	/// Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateForwardKey {
 		get => _alternateForwardKey;
 		set {
@@ -1320,12 +1382,13 @@ public static partial class Application {
 		}
 	}
 
-	static Key _alternateBackwardKey = new (KeyCode.PageUp | KeyCode.CtrlMask);
+	static Key _alternateBackwardKey = Key.Empty; // Defined in config.json
 
 	/// <summary>
 	/// Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key AlternateBackwardKey {
 		get => _alternateBackwardKey;
 		set {
@@ -1344,12 +1407,13 @@ public static partial class Application {
 		}
 	}
 
-	static Key _quitKey = new (KeyCode.Q | KeyCode.CtrlMask);
+	static Key _quitKey = Key.Empty; // Defined in config.json
 
 	/// <summary>
 	/// Gets or sets the key to quit the application.
 	/// </summary>
-	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))] [JsonConverter (typeof (KeyJsonConverter))]
+	[SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
+	[JsonConverter (typeof (KeyJsonConverter))]
 	public static Key QuitKey {
 		get => _quitKey;
 		set {
@@ -1481,8 +1545,8 @@ public static partial class Application {
 	}
 	#endregion Keyboard handling
 }
-
 /// <summary>
 /// Event arguments for the <see cref="Application.Iteration"/> event.
 /// </summary>
-public class IterationEventArgs { }
+public class IterationEventArgs {
+}

@@ -36,7 +36,7 @@ public class CharacterMap : Scenario {
 	public override void Init ()
 	{
 		Application.Init ();
-		Application.Top.ColorScheme = Colors.Base;
+		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
 
 	public override void Setup ()
@@ -114,10 +114,9 @@ public class CharacterMap : Scenario {
 		Application.Top.Add (_categoryList);
 
 		_charMap.SelectedCodePoint = 0;
-		//jumpList.Refresh ();
 		_charMap.SetFocus ();
-
-		_charMap.Width = Dim.Fill () - _categoryList.Width;
+		// TODO: Replace this with Dim.Auto when that's ready
+		_categoryList.Initialized += _categoryList_Initialized;
 
 		var menu = new MenuBar (new MenuBarItem [] {
 			new ("_File", new MenuItem [] {
@@ -128,11 +127,10 @@ public class CharacterMap : Scenario {
 			})
 		});
 		Application.Top.Add (menu);
-
-		//_charMap.Hover += (s, a) => {
-		//	_errorLabel.Text = $"U+{a.Item:x5} {(Rune)a.Item}";
-		//};
+	
 	}
+
+	private void _categoryList_Initialized (object sender, EventArgs e) => _charMap.Width = Dim.Fill () - _categoryList.Width;
 
 	MenuItem CreateMenuShowWidth ()
 	{
@@ -232,6 +230,7 @@ public class CharacterMap : Scenario {
 }
 
 class CharMap : ScrollView {
+	const CursorVisibility _cursor = CursorVisibility.Default;
 	/// <summary>
 	/// Specifies the starting offset for the character map. The default is 0x2500 
 	/// which is the Box Drawing characters.
@@ -255,24 +254,26 @@ class CharMap : ScrollView {
 		get => _selected;
 		set {
 			_selected = value;
-			int row = SelectedCodePoint / 16 * _rowHeight;
-			int col = SelectedCodePoint % 16 * COLUMN_WIDTH;
+			if (IsInitialized) {
+				int row = SelectedCodePoint / 16 * _rowHeight;
+				int col = SelectedCodePoint % 16 * COLUMN_WIDTH;
 
-			int height = Bounds.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
-			if (row + ContentOffset.Y < 0) {
-				// Moving up.
-				ContentOffset = new Point (ContentOffset.X, row);
-			} else if (row + ContentOffset.Y >= height) {
-				// Moving down.
-				ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + _rowHeight));
-			}
-			int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
-			if (col + ContentOffset.X < 0) {
-				// Moving left.
-				ContentOffset = new Point (col, ContentOffset.Y);
-			} else if (col + ContentOffset.X >= width) {
-				// Moving right.
-				ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
+				int height = Bounds.Height - (ShowHorizontalScrollIndicator ? 2 : 1);
+				if (row + ContentOffset.Y < 0) {
+					// Moving up.
+					ContentOffset = new Point (ContentOffset.X, row);
+				} else if (row + ContentOffset.Y >= height) {
+					// Moving down.
+					ContentOffset = new Point (ContentOffset.X, Math.Min (row, row - height + _rowHeight));
+				}
+				int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH - (ShowVerticalScrollIndicator ? RowLabelWidth + 1 : RowLabelWidth);
+				if (col + ContentOffset.X < 0) {
+					// Moving left.
+					ContentOffset = new Point (col, ContentOffset.Y);
+				} else if (col + ContentOffset.X >= width) {
+					// Moving right.
+					ContentOffset = new Point (Math.Min (col, col - width + COLUMN_WIDTH), ContentOffset.Y);
+				}
 			}
 			SetNeedsDisplay ();
 			SelectedCodePointChanged?.Invoke (this, new ListViewItemEventArgs (SelectedCodePoint, null));
@@ -296,11 +297,11 @@ class CharMap : ScrollView {
 	public override void PositionCursor ()
 	{
 		if (HasFocus &&
-		Cursor.X >= RowLabelWidth &&
-		Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
-		Cursor.Y > 0 &&
-		Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
-			Driver.SetCursorVisibility (CursorVisibility.Default);
+			Cursor.X >= RowLabelWidth &&
+			Cursor.X < Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0) &&
+			Cursor.Y > 0 &&
+			Cursor.Y < Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0)) {
+			Driver.SetCursorVisibility (_cursor);
 			Move (Cursor.X, Cursor.Y);
 		} else {
 			Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -329,7 +330,7 @@ class CharMap : ScrollView {
 
 	public CharMap ()
 	{
-		ColorScheme = Colors.Dialog;
+		ColorScheme = Colors.ColorSchemes ["Dialog"];
 		CanFocus = true;
 		ContentSize = new Size (RowWidth, (int)((MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight));
 
@@ -807,7 +808,7 @@ class CharMap : ScrollView {
 	public override bool OnEnter (View view)
 	{
 		if (IsInitialized) {
-			Application.Driver.SetCursorVisibility (CursorVisibility.Default);
+			Application.Driver.SetCursorVisibility (_cursor);
 		}
 		return base.OnEnter (view);
 	}

@@ -5,6 +5,7 @@ using System.Text;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Terminal.Gui.ConsoleDrivers;
 
 namespace Terminal.Gui;
 
@@ -31,7 +32,6 @@ public abstract class ConsoleDriver {
 	internal static bool RunningUnitTests { get; set; }
 
 	#region Setup & Teardown
-
 	/// <summary>
 	/// Initializes the driver
 	/// </summary>
@@ -42,7 +42,6 @@ public abstract class ConsoleDriver {
 	/// Ends the execution of the console driver.
 	/// </summary>
 	internal abstract void End ();
-
 	#endregion
 
 	/// <summary>
@@ -59,12 +58,24 @@ public abstract class ConsoleDriver {
 	/// <summary>
 	/// The number of columns visible in the terminal.
 	/// </summary>
-	public virtual int Cols { get; internal set; }
+	public virtual int Cols {
+		get => _cols;
+		internal set {
+			_cols = value;
+			ClearContents ();
+		}
+	}
 
 	/// <summary>
 	/// The number of rows visible in the terminal.
 	/// </summary>
-	public virtual int Rows { get; internal set; }
+	public virtual int Rows {
+		get => _rows;
+		internal set {
+			_rows = value;
+			ClearContents ();
+		}
+	}
 
 	/// <summary>
 	/// The leftmost column in the terminal.
@@ -129,10 +140,7 @@ public abstract class ConsoleDriver {
 	/// <param name="rune"></param>
 	/// <returns><see langword="true"/> if the rune can be properly presented; <see langword="false"/> if the driver
 	/// does not support displaying this rune.</returns>
-	public virtual bool IsRuneSupported (Rune rune)
-	{
-		return Rune.IsValid (rune.Value);
-	}
+	public virtual bool IsRuneSupported (Rune rune) => Rune.IsValid (rune.Value);
 
 	/// <summary>
 	/// Adds the specified rune to the display at the current cursor position. 
@@ -151,16 +159,24 @@ public abstract class ConsoleDriver {
 	public void AddRune (Rune rune)
 	{
 		int runeWidth = -1;
-		var validLocation = IsValidLocation (Col, Row);
+		bool validLocation = IsValidLocation (Col, Row);
 		if (validLocation) {
 			rune = rune.MakePrintable ();
 			runeWidth = rune.GetColumns ();
 			if (runeWidth == 0 && rune.IsCombiningMark ()) {
+				// AtlasEngine does not support NON-NORMALIZED combining marks in a way
+				// compatible with the driver architecture. Any CMs (except in the first col)
+				// are correctly combined with the base char, but are ALSO treated as 1 column
+				// width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+				// 
+				// Until this is addressed (see Issue #), we do our best by 
+				// a) Attempting to normalize any CM with the base char to it's left
+				// b) Ignoring any CMs that don't normalize
 				if (Col > 0) {
 					if (Contents [Row, Col - 1].CombiningMarks.Count > 0) {
 						// Just add this mark to the list
 						Contents [Row, Col - 1].CombiningMarks.Add (rune);
-						// Don't move to next column (let the driver figure out what to do).
+						// Ignore. Don't move to next column (let the driver figure out what to do).
 					} else {
 						// Attempt to normalize the cell to our left combined with this mark
 						string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
@@ -171,11 +187,11 @@ public abstract class ConsoleDriver {
 							// It normalized! We can just set the Cell to the left with the
 							// normalized codepoint 
 							Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-							// Don't move to next column because we're already there
+							// Ignore. Don't move to next column because we're already there
 						} else {
 							// It didn't normalize. Add it to the Cell to left's CM list
 							Contents [Row, Col - 1].CombiningMarks.Add (rune);
-							// Don't move to next column (let the driver figure out what to do).
+							// Ignore. Don't move to next column (let the driver figure out what to do).
 						}
 					}
 					Contents [Row, Col - 1].Attribute = CurrentAttribute;
@@ -275,7 +291,7 @@ public abstract class ConsoleDriver {
 	public void AddStr (string str)
 	{
 		var runes = str.EnumerateRunes ().ToList ();
-		for (var i = 0; i < runes.Count; i++) {
+		for (int i = 0; i < runes.Count; i++) {
 			//if (runes [i].IsCombiningMark()) {
 
 			//	// Attempt to normalize
@@ -361,8 +377,8 @@ public abstract class ConsoleDriver {
 		lock (Contents) {
 			// Can raise an exception while is still resizing.
 			try {
-				for (var row = 0; row < Rows; row++) {
-					for (var c = 0; c < Cols; c++) {
+				for (int row = 0; row < Rows; row++) {
+					for (int c = 0; c < Cols; c++) {
 						Contents [row, c] = new Cell () {
 							Rune = (Rune)' ',
 							Attribute = new Attribute (Color.White, Color.Black),
@@ -381,11 +397,10 @@ public abstract class ConsoleDriver {
 	public abstract void UpdateScreen ();
 
 	#region Color Handling
-
 	/// <summary>
 	/// Gets whether the <see cref="ConsoleDriver"/> supports TrueColor output.
 	/// </summary>
-	public virtual bool SupportsTrueColor { get => true; }
+	public virtual bool SupportsTrueColor => true;
 
 	/// <summary>
 	/// Gets or sets whether the <see cref="ConsoleDriver"/> should use 16 colors instead of the default TrueColors. See <see cref="Application.Force16Colors"/>
@@ -399,10 +414,12 @@ public abstract class ConsoleDriver {
 	/// </remarks>
 	internal virtual bool Force16Colors {
 		get => Application.Force16Colors || !SupportsTrueColor;
-		set => Application.Force16Colors = (value || !SupportsTrueColor);
+		set => Application.Force16Colors = value || !SupportsTrueColor;
 	}
 
 	Attribute _currentAttribute;
+	int _cols;
+	int _rows;
 
 	/// <summary>
 	/// The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/> call.
@@ -447,17 +464,13 @@ public abstract class ConsoleDriver {
 	/// <param name="foreground">The foreground color.</param>
 	/// <param name="background">The background color.</param>
 	/// <returns>The attribute for the foreground and background colors.</returns>
-	public virtual Attribute MakeColor (Color foreground, Color background)
-	{
+	public virtual Attribute MakeColor (Color foreground, Color background) =>
 		// Encode the colors into the int value.
-		return new Attribute (
-			platformColor: 0, // only used by cursesdriver!
-			foreground: foreground,
-			background: background
+		new (
+			-1, // only used by cursesdriver!
+			foreground,
+			background
 		);
-	}
-
-
 	#endregion
 
 	#region Mouse and Keyboard
@@ -509,7 +522,6 @@ public abstract class ConsoleDriver {
 	/// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
 	/// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
 	public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
-
 	#endregion
 
 	/// <summary>
@@ -521,22 +533,29 @@ public abstract class ConsoleDriver {
 		/// All diagnostics off
 		/// </summary>
 		Off = 0b_0000_0000,
+
 		/// <summary>
-		/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
+		/// When enabled, <see cref="View.OnDrawAdornments"/> will draw a 
 		/// ruler in the frame for any side with a padding value greater than 0.
 		/// </summary>
 		FrameRuler = 0b_0000_0001,
+
 		/// <summary>
-		/// When enabled, <see cref="Frame.OnDrawFrames"/> will draw a 
+		/// When enabled, <see cref="View.OnDrawAdornments"/> will draw a 
 		/// 'L', 'R', 'T', and 'B' when clearing <see cref="Thickness"/>'s instead of ' '.
 		/// </summary>
-		FramePadding = 0b_0000_0010,
+		FramePadding = 0b_0000_0010
 	}
 
 	/// <summary>
 	/// Set flags to enable/disable <see cref="ConsoleDriver"/> diagnostics.
 	/// </summary>
 	public static DiagnosticFlags Diagnostics { get; set; }
+
+	/// <summary>
+	/// Gets the dimensions of the terminal.
+	/// </summary>
+	public Rect Bounds => new Rect (0, 0, Cols, Rows);
 
 	/// <summary>
 	/// Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.
@@ -552,8 +571,8 @@ public abstract class ConsoleDriver {
 	/// <param name="rune"></param>
 	public void FillRect (Rect rect, Rune rune = default)
 	{
-		for (var r = rect.Y; r < rect.Y + rect.Height; r++) {
-			for (var c = rect.X; c < rect.X + rect.Width; c++) {
+		for (int r = rect.Y; r < rect.Y + rect.Height; r++) {
+			for (int c = rect.X; c < rect.X + rect.Width; c++) {
 				Application.Driver.Move (c, r);
 				Application.Driver.AddRune (rune == default ? new Rune (' ') : rune);
 			}
@@ -574,7 +593,6 @@ public abstract class ConsoleDriver {
 	/// <returns></returns>
 	public virtual string GetVersionInfo () => GetType ().Name;
 }
-
 
 /// <summary>
 /// Terminal Cursor Visibility settings.
@@ -631,9 +649,8 @@ public enum CursorVisibility {
 	///	Cursor caret is displayed a block ▉
 	/// </summary>
 	/// <remarks>Works under Xterm-like terminal otherwise this is equivalent to <see ref="Block"/></remarks>
-	BoxFix = 0x02020164,
+	BoxFix = 0x02020164
 }
-
 
 /// <summary>
 /// The <see cref="KeyCode"/> enumeration encodes key information from <see cref="ConsoleDriver"/>s and provides a consistent
@@ -671,22 +688,39 @@ public enum CursorVisibility {
 [Flags]
 public enum KeyCode : uint {
 	/// <summary>
-	/// Mask that indicates that this is a character value, values outside this range
-	/// indicate special characters like Alt-key combinations or special keys on the
-	/// keyboard like function keys, arrows keys and so on.
+	/// Mask that indicates that the key is a unicode codepoint. Values outside this range
+	/// indicate the key has shift modifiers or is a special key like function keys, arrows keys and so on.
 	/// </summary>
-	CharMask = 0xfffff,
+	CharMask = 0x_f_ffff,
 
 	/// <summary>
 	/// If the <see cref="SpecialMask"/> is set, then the value is that of the special mask,
 	/// otherwise, the value is in the the lower bits (as extracted by <see cref="CharMask"/>).
 	/// </summary>
-	SpecialMask = 0xfff00000,
+	SpecialMask = 0x_fff0_0000,
 
 	/// <summary>
-	/// The key code representing null or empty
+	/// When this value is set, the Key encodes the sequence Shift-KeyValue.
+	/// The actual value must be extracted by removing the ShiftMask.
 	/// </summary>
-	Null = '\0',
+	ShiftMask = 0x_1000_0000,
+
+	/// <summary>
+	/// When this value is set, the Key encodes the sequence Alt-KeyValue.
+	/// The actual value must be extracted by removing the AltMask.
+	/// </summary>
+	AltMask = 0x_8000_0000,
+
+	/// <summary>
+	/// When this value is set, the Key encodes the sequence Ctrl-KeyValue.
+	/// The actual value must be extracted by removing the CtrlMask.
+	/// </summary>
+	CtrlMask = 0x_4000_0000,
+
+	/// <summary>
+	/// The key code representing an invalid or empty key.
+	/// </summary>
+	Null = 0,
 
 	/// <summary>
 	/// Backspace key.
@@ -701,42 +735,12 @@ public enum KeyCode : uint {
 	/// <summary>
 	/// The key code for the return key.
 	/// </summary>
-	Enter = '\n',
+	Enter = ConsoleKey.Enter,
 
 	/// <summary>
 	/// The key code for the clear key.
 	/// </summary>
 	Clear = 12,
-
-	/// <summary>
-	/// The key code for the Shift key.
-	/// </summary>
-	ShiftKey = 16,
-
-	/// <summary>
-	/// The key code for the Ctrl key.
-	/// </summary>
-	CtrlKey = 17,
-
-	/// <summary>
-	/// The key code for the Alt key.
-	/// </summary>
-	AltKey = 18,
-
-	/// <summary>
-	/// The key code for the CapsLock key.
-	/// </summary>
-	CapsLock = 20,
-
-	///// <summary>
-	///// The key code for the NumLock key.
-	///// </summary>
-	//NumLock = 144,
-
-	///// <summary>
-	///// The key code for the ScrollLock key.
-	///// </summary>
-	//ScrollLock = 145,
 
 	/// <summary>
 	/// The key code for the escape key.
@@ -752,38 +756,47 @@ public enum KeyCode : uint {
 	/// Digit 0.
 	/// </summary>
 	D0 = 48,
+
 	/// <summary>
 	/// Digit 1.
 	/// </summary>
 	D1,
+
 	/// <summary>
 	/// Digit 2.
 	/// </summary>
 	D2,
+
 	/// <summary>
 	/// Digit 3.
 	/// </summary>
 	D3,
+
 	/// <summary>
 	/// Digit 4.
 	/// </summary>
 	D4,
+
 	/// <summary>
 	/// Digit 5.
 	/// </summary>
 	D5,
+
 	/// <summary>
 	/// Digit 6.
 	/// </summary>
 	D6,
+
 	/// <summary>
 	/// Digit 7.
 	/// </summary>
 	D7,
+
 	/// <summary>
 	/// Digit 8.
 	/// </summary>
 	D8,
+
 	/// <summary>
 	/// Digit 9.
 	/// </summary>
@@ -793,271 +806,321 @@ public enum KeyCode : uint {
 	/// The key code for the A key
 	/// </summary>
 	A = 65,
+
 	/// <summary>
 	/// The key code for the B key
 	/// </summary>
 	B,
+
 	/// <summary>
 	/// The key code for the C key
 	/// </summary>
 	C,
+
 	/// <summary>
 	/// The key code for the D key
 	/// </summary>
 	D,
+
 	/// <summary>
 	/// The key code for the E key
 	/// </summary>
 	E,
+
 	/// <summary>
 	/// The key code for the F key
 	/// </summary>
 	F,
+
 	/// <summary>
 	/// The key code for the G key
 	/// </summary>
 	G,
+
 	/// <summary>
 	/// The key code for the H key
 	/// </summary>
 	H,
+
 	/// <summary>
 	/// The key code for the I key
 	/// </summary>
 	I,
+
 	/// <summary>
 	/// The key code for the J key
 	/// </summary>
 	J,
+
 	/// <summary>
 	/// The key code for the K key
 	/// </summary>
 	K,
+
 	/// <summary>
 	/// The key code for the L key
 	/// </summary>
 	L,
+
 	/// <summary>
 	/// The key code for the M key
 	/// </summary>
 	M,
+
 	/// <summary>
 	/// The key code for the N key
 	/// </summary>
 	N,
+
 	/// <summary>
 	/// The key code for the O key
 	/// </summary>
 	O,
+
 	/// <summary>
 	/// The key code for the P key
 	/// </summary>
 	P,
+
 	/// <summary>
 	/// The key code for the Q key
 	/// </summary>
 	Q,
+
 	/// <summary>
 	/// The key code for the R key
 	/// </summary>
 	R,
+
 	/// <summary>
 	/// The key code for the S key
 	/// </summary>
 	S,
+
 	/// <summary>
 	/// The key code for the T key
 	/// </summary>
 	T,
+
 	/// <summary>
 	/// The key code for the U key
 	/// </summary>
 	U,
+
 	/// <summary>
 	/// The key code for the V key
 	/// </summary>
 	V,
+
 	/// <summary>
 	/// The key code for the W key
 	/// </summary>
 	W,
+
 	/// <summary>
 	/// The key code for the X key
 	/// </summary>
 	X,
+
 	/// <summary>
 	/// The key code for the Y key
 	/// </summary>
 	Y,
+
 	/// <summary>
 	/// The key code for the Z key
 	/// </summary>
 	Z,
-	/// <summary>
-	/// The key code for the Delete key.
-	/// </summary>
-	Delete = 127,
+
+	///// <summary>
+	///// The key code for the Delete key.
+	///// </summary>
+	//Delete = 127,
+
+	// --- Special keys ---
+	// The values below are common non-alphanum keys. Their values are 
+	// based on the .NET ConsoleKey values, which, in-turn are based on the
+	// VK_ values from the Windows API. 
+	// We add MaxCodePoint to avoid conflicts with the Unicode values.
 
 	/// <summary>
-	/// When this value is set, the Key encodes the sequence Shift-KeyValue.
+	/// The maximum Unicode codepoint value. Used to encode the non-alphanumeric control
+	/// keys. 
 	/// </summary>
-	ShiftMask = 0x10000000,
-
-	/// <summary>
-	///   When this value is set, the Key encodes the sequence Alt-KeyValue.
-	///   And the actual value must be extracted by removing the AltMask.
-	/// </summary>
-	AltMask = 0x80000000,
-
-	/// <summary>
-	///   When this value is set, the Key encodes the sequence Ctrl-KeyValue.
-	///   And the actual value must be extracted by removing the CtrlMask.
-	/// </summary>
-	CtrlMask = 0x40000000,
+	MaxCodePoint = 0x10FFFF,
 
 	/// <summary>
 	/// Cursor up key
 	/// </summary>
-	CursorUp = 0x100000,
+	CursorUp = MaxCodePoint + ConsoleKey.UpArrow,
+
 	/// <summary>
 	/// Cursor down key.
 	/// </summary>
-	CursorDown,
+	CursorDown = MaxCodePoint + ConsoleKey.DownArrow,
+
 	/// <summary>
 	/// Cursor left key.
 	/// </summary>
-	CursorLeft,
+	CursorLeft = MaxCodePoint + ConsoleKey.LeftArrow,
+
 	/// <summary>
 	/// Cursor right key.
 	/// </summary>
-	CursorRight,
+	CursorRight = MaxCodePoint + ConsoleKey.RightArrow,
+
 	/// <summary>
 	/// Page Up key.
 	/// </summary>
-	PageUp,
+	PageUp = MaxCodePoint + ConsoleKey.PageUp,
+
 	/// <summary>
 	/// Page Down key.
 	/// </summary>
-	PageDown,
+	PageDown = MaxCodePoint + ConsoleKey.PageDown,
+
 	/// <summary>
 	/// Home key.
 	/// </summary>
-	Home,
+	Home = MaxCodePoint + ConsoleKey.Home,
+
 	/// <summary>
 	/// End key.
 	/// </summary>
-	End,
+	End = MaxCodePoint + ConsoleKey.End,
 
 	/// <summary>
-	/// Insert character key.
+	/// Insert (INS) key.
 	/// </summary>
-	InsertChar,
+	Insert = MaxCodePoint + ConsoleKey.Insert,
 
 	/// <summary>
-	/// Delete character key.
+	/// Delete (DEL) key.
 	/// </summary>
-	DeleteChar,
+	Delete = MaxCodePoint + ConsoleKey.Delete,
 
 	/// <summary>
 	/// Print screen character key.
 	/// </summary>
-	PrintScreen,
+	PrintScreen = MaxCodePoint + ConsoleKey.PrintScreen,
 
 	/// <summary>
 	/// F1 key.
 	/// </summary>
-	F1,
+	F1 = MaxCodePoint + ConsoleKey.F1,
+
 	/// <summary>
 	/// F2 key.
 	/// </summary>
-	F2,
+	F2 = MaxCodePoint + ConsoleKey.F2,
+
 	/// <summary>
 	/// F3 key.
 	/// </summary>
-	F3,
+	F3 = MaxCodePoint + ConsoleKey.F3,
+
 	/// <summary>
 	/// F4 key.
 	/// </summary>
-	F4,
+	F4 = MaxCodePoint + ConsoleKey.F4,
+
 	/// <summary>
 	/// F5 key.
 	/// </summary>
-	F5,
+	F5 = MaxCodePoint + ConsoleKey.F5,
+
 	/// <summary>
 	/// F6 key.
 	/// </summary>
-	F6,
+	F6 = MaxCodePoint + ConsoleKey.F6,
+
 	/// <summary>
 	/// F7 key.
 	/// </summary>
-	F7,
+	F7 = MaxCodePoint + ConsoleKey.F7,
+
 	/// <summary>
 	/// F8 key.
 	/// </summary>
-	F8,
+	F8 = MaxCodePoint + ConsoleKey.F8,
+
 	/// <summary>
 	/// F9 key.
 	/// </summary>
-	F9,
+	F9 = MaxCodePoint + ConsoleKey.F9,
+
 	/// <summary>
 	/// F10 key.
 	/// </summary>
-	F10,
+	F10 = MaxCodePoint + ConsoleKey.F10,
+
 	/// <summary>
 	/// F11 key.
 	/// </summary>
-	F11,
+	F11 = MaxCodePoint + ConsoleKey.F11,
+
 	/// <summary>
 	/// F12 key.
 	/// </summary>
-	F12,
+	F12 = MaxCodePoint + ConsoleKey.F12,
+
 	/// <summary>
 	/// F13 key.
 	/// </summary>
-	F13,
+	F13 = MaxCodePoint + ConsoleKey.F13,
+
 	/// <summary>
 	/// F14 key.
 	/// </summary>
-	F14,
+	F14 = MaxCodePoint + ConsoleKey.F14,
+
 	/// <summary>
 	/// F15 key.
 	/// </summary>
-	F15,
+	F15 = MaxCodePoint + ConsoleKey.F15,
+
 	/// <summary>
 	/// F16 key.
 	/// </summary>
-	F16,
+	F16 = MaxCodePoint + ConsoleKey.F16,
+
 	/// <summary>
 	/// F17 key.
 	/// </summary>
-	F17,
+	F17 = MaxCodePoint + ConsoleKey.F17,
+
 	/// <summary>
 	/// F18 key.
 	/// </summary>
-	F18,
+	F18 = MaxCodePoint + ConsoleKey.F18,
+
 	/// <summary>
 	/// F19 key.
 	/// </summary>
-	F19,
+	F19 = MaxCodePoint + ConsoleKey.F19,
+
 	/// <summary>
 	/// F20 key.
 	/// </summary>
-	F20,
+	F20 = MaxCodePoint + ConsoleKey.F20,
+
 	/// <summary>
 	/// F21 key.
 	/// </summary>
-	F21,
+	F21 = MaxCodePoint + ConsoleKey.F21,
+
 	/// <summary>
 	/// F22 key.
 	/// </summary>
-	F22,
+	F22 = MaxCodePoint + ConsoleKey.F22,
+
 	/// <summary>
 	/// F23 key.
 	/// </summary>
-	F23,
+	F23 = MaxCodePoint + ConsoleKey.F23,
+
 	/// <summary>
 	/// F24 key.
 	/// </summary>
-	F24,
+	F24 = MaxCodePoint + ConsoleKey.F24,
 }
-

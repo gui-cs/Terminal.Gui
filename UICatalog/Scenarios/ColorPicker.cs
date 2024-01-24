@@ -1,10 +1,10 @@
-﻿using Terminal.Gui;
-using System;
+﻿using System;
+using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Color Picker", "Illustrates ColorPicker View.")]
-[ScenarioCategory ("Colors")] [ScenarioCategory ("Controls")]
+[ScenarioCategory ("Colors"), ScenarioCategory ("Controls")]
 public class ColorPickers : Scenario {
 	/// <summary>
 	/// Foreground ColorPicker.
@@ -75,7 +75,7 @@ public class ColorPickers : Scenario {
 	void ColorChanged (object sender, EventArgs e)
 	{
 		var color = (Color)((ColorPicker)sender).SelectedColor;
-		((ColorPicker)sender).Title = $"{color} ({(int)color.ColorName}) #{color.R:X2}{color.G:X2}{color.B:X2}";
+		((ColorPicker)sender).Title = $"{color} ({(int)color.GetClosestNamedColor ()}) #{color.R:X2}{color.G:X2}{color.B:X2}";
 		((ColorPicker)sender).ColorScheme = new ColorScheme (new Attribute (GetCompliment (color), color)) {
 			Normal = new Attribute (GetCompliment (color), color),
 			Focus = new Attribute (GetCompliment (color), color)

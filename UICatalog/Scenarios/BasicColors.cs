@@ -37,7 +37,7 @@ namespace UICatalog.Scenarios {
 				foreach (ColorName fg in colors) {
 					var c = new Attribute (fg, bg);
 					var t = x.ToString ();
-					var l = new Label (x, y, t [t.Length - 1].ToString ()) {
+					var l = new Label (x, y, t [^1].ToString ()) {
 						ColorScheme = new ColorScheme () { Normal = c }
 					};
 					Win.Add (l);
@@ -90,10 +90,11 @@ namespace UICatalog.Scenarios {
 				if (e.MouseEvent.View != null) {
 					var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
 					var back = e.MouseEvent.View.GetNormalColor ().Background;
-					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.ColorName} ";
-					viewForeground.ColorScheme.Normal = new Attribute (fore, fore);
-					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.ColorName} ";
-					viewBackground.ColorScheme.Normal = new Attribute (back, back);
+					lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.GetClosestNamedColor ()} ";
+					viewForeground.ColorScheme = new ColorScheme (viewForeground.ColorScheme) { Normal = new Attribute (fore, fore) };
+
+					lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.GetClosestNamedColor ()} ";
+					viewBackground.ColorScheme = new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
 				}
 			};
 		}

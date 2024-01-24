@@ -123,10 +123,10 @@ namespace UICatalog.Scenarios {
 				Y = 8,
 				Width = 25,
 				Height = 10,
-				//ColorScheme = Colors.Error,
+				//ColorScheme = Colors.ColorSchemes ["Error"],
 				SuperViewRendersLineCanvas = true
 			};
-			marginWindow.Margin.ColorScheme = Colors.Dialog;
+			marginWindow.Margin.ColorScheme = Colors.ColorSchemes ["Dialog"];
 			marginWindow.Margin.Thickness = new Thickness (1);
 			marginWindow.Border.Thickness = new Thickness (1,2,1,1);
 

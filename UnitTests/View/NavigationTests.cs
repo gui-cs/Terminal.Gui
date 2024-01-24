@@ -1001,7 +1001,7 @@ namespace Terminal.Gui.ViewTests {
 		{
 			// Arrange
 			Application.Init ();
-			using var top = Toplevel.Create ();
+			using var top = new Toplevel ();
 			using var view = new View (
 				x: 0,
 				y: 1,

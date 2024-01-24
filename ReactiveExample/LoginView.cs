@@ -122,7 +122,7 @@ namespace ReactiveExample {
 				.DisposeWith (_disposable);
 			ViewModel
 				.WhenAnyValue (x => x.IsValid)	
-				.Select (valid => valid ? Colors.Base : Colors.Error)
+				.Select (valid => valid ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"])
 				.BindTo (validationLabel, x => x.ColorScheme)
 				.DisposeWith (_disposable);
 			Add (validationLabel);

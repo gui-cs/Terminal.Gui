@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using System.IO;
-using System.Text;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -14,21 +12,61 @@ public class AllViewsTests {
 
 	public AllViewsTests (ITestOutputHelper output)
 	{
-		this._output = output;
+		_output = output;
 	}
-	
+
+	[Fact]
+	public void AllViews_Center_Properly ()
+	{
+		// See https://github.com/gui-cs/Terminal.Gui/issues/3156
+
+		foreach (var type in GetAllViewClasses ()) {
+			Application.Init (new FakeDriver ());
+			var view = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
+			if (view == null) {
+				_output.WriteLine ($"Ignoring {type} - It's a Generic");
+				Application.Shutdown ();
+				continue;
+			}
+			view.X = Pos.Center ();
+			view.Y = Pos.Center ();
+
+			// Ensure the view has positive dimensions
+			view.Width = 10;
+			view.Height = 10;
+
+			var frame = new View () {
+				X = 0,
+				Y = 0,
+				Width = 50,
+				Height = 50,
+			};
+			frame.Add (view);
+			frame.BeginInit ();
+			frame.EndInit ();
+			frame.LayoutSubviews ();
+
+			// What's the natural width/height?
+			var expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
+			var expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
+
+			Assert.True (view.Frame.Left == expectedX, $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
+			Assert.True (view.Frame.Top == expectedY, $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
+			Application.Shutdown ();
+		}
+	}
+
 	[Fact]
 	public void AllViews_Tests_All_Constructors ()
 	{
 		Application.Init (new FakeDriver ());
 
 		foreach (var type in GetAllViewClasses ()) {
-			Assert.True (Constructors_FullTest (type));
+			Assert.True (Test_All_Constructors_Of_Type (type));
 		}
 
 		Application.Shutdown ();
 	}
-
 
 	[Fact]
 	public void AllViews_Enter_Leave_Events ()
@@ -39,8 +77,9 @@ public class AllViewsTests {
 			Application.Init (new FakeDriver ());
 
 			var top = Application.Top;
-			var vType = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
+			var vType = CreateViewFromType (type, type.GetConstructor (Array.Empty<Type> ()));
 			if (vType == null) {
+				_output.WriteLine ($"Ignoring {type} - It's a Generic");
 				Application.Shutdown ();
 				continue;
 			}
@@ -76,6 +115,10 @@ public class AllViewsTests {
 
 			if (vType is TextView) {
 				top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+			} else if (vType is DatePicker) {
+				for (int i = 0; i < 4; i++) {
+					top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+				}
 			} else {
 				top.NewKeyDownEvent (new (KeyCode.Tab));
 			}
@@ -102,10 +145,10 @@ public class AllViewsTests {
 	//	}
 	//}
 
-	public bool Constructors_FullTest (Type type)	
+	public bool Test_All_Constructors_Of_Type (Type type)
 	{
 		foreach (var ctor in type.GetConstructors ()) {
-			var view = GetTypeInitializer (type, ctor);
+			var view = CreateViewFromType (type, ctor);
 			if (view != null) {
 				Assert.True (type.FullName == view.GetType ().FullName);
 			}
@@ -114,7 +157,7 @@ public class AllViewsTests {
 		return true;
 	}
 
-	private static View GetTypeInitializer (Type type, ConstructorInfo ctor)
+	private static View CreateViewFromType (Type type, ConstructorInfo ctor)
 	{
 		View viewType = null;
 
@@ -166,6 +209,8 @@ public class AllViewsTests {
 		return viewType;
 	}
 
+	// BUGBUG: This is a hack. We should figure out how to dynamically
+	// create the right type of argument for the constructor.
 	private static void AddArguments (Type paramType, List<object> pTypes)
 	{
 		if (paramType == typeof (Rect)) {

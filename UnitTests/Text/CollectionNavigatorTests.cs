@@ -383,22 +383,21 @@ public class CollectionNavigatorTests {
 
 		Assert.Equal (-1, current = n.GetNextMatchingItem (current, "x", true));
 	}
+	
+	[Theory]
+	[InlineData (KeyCode.A, true)]
+	[InlineData (KeyCode.Z, true)]
+	[InlineData (KeyCode.D0, true)]
+	[InlineData (KeyCode.A | KeyCode.ShiftMask, true)]
+	[InlineData (KeyCode.Z | KeyCode.ShiftMask, true)]
+	[InlineData (KeyCode.Space, true)]
 
-	[Fact]
-	public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys ()
-	{
-		// test all Keys
-		foreach (KeyCode key in Enum.GetValues (typeof (KeyCode))) {
-			var ke = new Key (key);
-			_output.WriteLine ($"Testing {key}");
-			if (key == KeyCode.AltMask || key == KeyCode.CtrlMask || key == KeyCode.SpecialMask) {
-				Assert.False (CollectionNavigator.IsCompatibleKey (ke));
-			} else {
-				Assert.True (CollectionNavigator.IsCompatibleKey (ke));
-			}
-		}
-
-		// test Capslock, Numlock and Scrolllock
-		Assert.True (CollectionNavigator.IsCompatibleKey (new (KeyCode.Null)));
-	}
+	[InlineData (KeyCode.Z | KeyCode.CtrlMask, false)]
+	[InlineData (KeyCode.Z | KeyCode.AltMask, false)]
+	[InlineData (KeyCode.F1, false)]
+	[InlineData (KeyCode.Delete, false)]
+	[InlineData (KeyCode.Delete, false)]
+	[InlineData (KeyCode.Esc, false)]
+	[InlineData (KeyCode.ShiftMask, false)]
+	public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys (KeyCode keyCode, bool compatible) => Assert.Equal (compatible, CollectionNavigatorBase.IsCompatibleKey (keyCode));
 }

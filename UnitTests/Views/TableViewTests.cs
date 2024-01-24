@@ -11,6 +11,7 @@ using System.Reflection;
 using Terminal.Gui.ViewTests;
 using System.Collections;
 using static Terminal.Gui.SpinnerStyle;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Terminal.Gui.ViewsTests {
 
@@ -159,7 +160,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Equal (11, "hello there".EnumerateRunes ().Sum (c => c.GetColumns ()));
 
 			// Creates a string with the peculiar (french?) r symbol
-			String surrogate = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+			var surrogate = "Les Mise" + Char.ConvertFromUtf32 (Int32.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
 			// The unicode width of this string is shorter than the string length! 
 			Assert.Equal (14, surrogate.EnumerateRunes ().Sum (c => c.GetColumns ()));
@@ -836,7 +837,7 @@ namespace Terminal.Gui.ViewsTests {
 01000
 ";
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -883,7 +884,7 @@ namespace Terminal.Gui.ViewsTests {
 			var invertFocus = new Attribute (tv.ColorScheme.Focus.Background, tv.ColorScheme.Focus.Foreground);
 			var invertHotNormal = new Attribute (tv.ColorScheme.HotNormal.Background, tv.ColorScheme.HotNormal.Foreground);
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -907,7 +908,7 @@ namespace Terminal.Gui.ViewsTests {
 				Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
 				HotNormal = new Attribute (Color.Green, Color.Blue),
 				Focus = new Attribute (Color.BrightYellow, Color.White),
-				
+
 				// Not used by TableView
 				HotFocus = new Attribute (Color.Cyan, Color.Magenta),
 			};
@@ -938,7 +939,7 @@ namespace Terminal.Gui.ViewsTests {
 21222
 ";
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -971,7 +972,7 @@ namespace Terminal.Gui.ViewsTests {
 			// now we only see 2 colors used (the selected cell color and Normal
 			// rowHighlight should no longer be used because the delegate returned null
 			// (now that the cell value is 5 - which does not match the conditional)
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,
 				// 1
@@ -1000,7 +1001,7 @@ namespace Terminal.Gui.ViewsTests {
 				Normal = new Attribute (Color.BrightCyan, Color.DarkGray),
 				HotNormal = new Attribute (Color.Green, Color.Blue),
 				Focus = new Attribute (Color.Cyan, Color.Magenta),
-				
+
 				// Not used by TableView
 				HotFocus = new Attribute (Color.BrightYellow, Color.White),
 			};
@@ -1030,7 +1031,7 @@ namespace Terminal.Gui.ViewsTests {
 01020
 ";
 
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -1063,7 +1064,7 @@ namespace Terminal.Gui.ViewsTests {
 			// now we only see 2 colors used (the selected cell color and Normal
 			// cellHighlight should no longer be used because the delegate returned null
 			// (now that the cell value is 5 - which does not match the conditional)
-			TestHelpers.AssertDriverColorsAre (expectedColors, driver: Application.Driver, new Attribute [] {
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
 				// 0
 				tv.ColorScheme.Normal,				
 				// 1
@@ -1094,7 +1095,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 			tv.Style.GetOrCreateColumnStyle (1).MaxWidth = 1;
 
-			tv.ColorScheme = Colors.Base;
+			tv.ColorScheme = Colors.ColorSchemes ["Base"];
 			return tv;
 		}
 
@@ -1132,7 +1133,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tableView.LayoutSubviews ();
 
 			// 3 columns are visibile
@@ -1194,7 +1195,7 @@ namespace Terminal.Gui.ViewsTests {
 		{
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -1254,7 +1255,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visible
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -1803,7 +1804,7 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Top.Add (tableView);
 			Application.Begin (Application.Top);
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 25 characters can be printed into table
 			tableView.Bounds = new Rect (0, 0, 25, 5);
@@ -1980,7 +1981,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = new TableView ();
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -2112,7 +2113,7 @@ namespace Terminal.Gui.ViewsTests {
 00000000000000000000
 01111101101111111110
 ";
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, new Attribute [] { tv.ColorScheme.Normal, color });
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, new Attribute [] { tv.ColorScheme.Normal, color });
 
 		}
 
@@ -2123,7 +2124,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = GetABCDEFTableView (out _);
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -2152,7 +2153,7 @@ namespace Terminal.Gui.ViewsTests {
 			var tableView = GetABCDEFTableView (out _);
 			tableView.BeginInit (); tableView.EndInit ();
 
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visibile
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -2216,7 +2217,11 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			var normal = tv.ColorScheme.Normal;
-			var focus = tv.ColorScheme.Focus = new Attribute (Color.Magenta, Color.White);
+			tv.ColorScheme = new ColorScheme (tv.ColorScheme) {
+				Focus = new Attribute (Color.Magenta, Color.White)
+			};
+			var focus = tv.ColorScheme.Focus;
+
 
 			tv.Draw ();
 
@@ -2232,7 +2237,7 @@ namespace Terminal.Gui.ViewsTests {
 0111110
 0000000";
 
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, normal, focus);
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);
 		}
 
 		[Fact, AutoInitShutdown]
@@ -2274,7 +2279,10 @@ namespace Terminal.Gui.ViewsTests {
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			var normal = tv.ColorScheme.Normal;
-			var focus = tv.ColorScheme.Focus = new Attribute (Color.Magenta, Color.White);
+			tv.ColorScheme = new ColorScheme (tv.ColorScheme) {
+				Focus = new Attribute (Color.Magenta, Color.White)
+			};
+			var focus = tv.ColorScheme.Focus;
 
 			tv.Draw ();
 
@@ -2289,11 +2297,11 @@ namespace Terminal.Gui.ViewsTests {
 0101010
 0000000";
 
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, normal, focus);
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TestTableViewCheckboxes_Simple()
+		public void TestTableViewCheckboxes_Simple ()
 		{
 
 			var tv = GetTwoRowSixColumnTable (out var dt);
@@ -2323,7 +2331,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Single (wrapper.CheckedRows, 0);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2339,12 +2347,12 @@ namespace Terminal.Gui.ViewsTests {
 			tv.NewKeyDownEvent (new (KeyCode.Space));
 
 
-			Assert.Contains (0,wrapper.CheckedRows);
-			Assert.Contains (1,wrapper.CheckedRows);
+			Assert.Contains (0, wrapper.CheckedRows);
+			Assert.Contains (1, wrapper.CheckedRows);
 			Assert.Equal (2, wrapper.CheckedRows.Count);
 
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2362,7 +2370,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Single (wrapper.CheckedRows, 1);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2390,7 +2398,7 @@ namespace Terminal.Gui.ViewsTests {
 			tv.NewKeyDownEvent (new (KeyCode.A | KeyCode.CtrlMask));
 			tv.NewKeyDownEvent (new (KeyCode.Space));
 
-			tv.Draw();
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2409,7 +2417,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Untoggle all again
 			tv.NewKeyDownEvent (new (KeyCode.Space));
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2436,7 +2444,7 @@ namespace Terminal.Gui.ViewsTests {
 			wrapper.CheckedRows.Add (0);
 			wrapper.CheckedRows.Add (2);
 
-			tv.Draw();
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2458,7 +2466,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.Contains (2, wrapper.CheckedRows);
 			Assert.Equal (3, wrapper.CheckedRows.Count);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2473,7 +2481,7 @@ namespace Terminal.Gui.ViewsTests {
 			// Untoggle the top 2
 			tv.NewKeyDownEvent (new (KeyCode.Space));
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2494,15 +2502,15 @@ namespace Terminal.Gui.ViewsTests {
 			tv.LayoutSubviews ();
 			var pets = source.Data;
 
-			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet>(
+			var wrapper = new CheckBoxTableSourceWrapperByObject<PickablePet> (
 				tv,
 				source,
-				(p)=>p.IsPicked,
-				(p,b)=>p.IsPicked = b);
+				(p) => p.IsPicked,
+				(p, b) => p.IsPicked = b);
 
 			tv.Table = wrapper;
 
-			tv.Draw();
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2515,13 +2523,13 @@ namespace Terminal.Gui.ViewsTests {
 
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
-			Assert.Empty (pets.Where(p=>p.IsPicked));
+			Assert.Empty (pets.Where (p => p.IsPicked));
 
 			tv.NewKeyDownEvent (new (KeyCode.Space));
-			
+
 			Assert.True (pets.First ().IsPicked);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2538,11 +2546,11 @@ namespace Terminal.Gui.ViewsTests {
 			tv.NewKeyDownEvent (new (KeyCode.CursorDown));
 			tv.NewKeyDownEvent (new (KeyCode.Space));
 
-			Assert.True (pets.ElementAt(0).IsPicked);
+			Assert.True (pets.ElementAt (0).IsPicked);
 			Assert.True (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2564,7 +2572,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2604,7 +2612,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (pets.All (p => p.IsPicked));
 
-			tv.Draw();
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2622,7 +2630,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.Empty (pets.Where (p => p.IsPicked));
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2654,7 +2662,7 @@ namespace Terminal.Gui.ViewsTests {
 			wrapper.UseRadioButtons = true;
 
 			tv.Table = wrapper;
-			tv.Draw();
+			tv.Draw ();
 
 			string expected =
 				@"
@@ -2674,7 +2682,7 @@ namespace Terminal.Gui.ViewsTests {
 
 			Assert.True (pets.First ().IsPicked);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2695,7 +2703,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.True (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2717,7 +2725,7 @@ namespace Terminal.Gui.ViewsTests {
 			Assert.False (pets.ElementAt (1).IsPicked);
 			Assert.False (pets.ElementAt (2).IsPicked);
 
-			tv.Draw();
+			tv.Draw ();
 
 			expected =
 				@"
@@ -2769,8 +2777,8 @@ A B C
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			var normal = tv.ColorScheme.Normal;
-			var focus = tv.ColorScheme.Focus = new Attribute (Color.Magenta, Color.White);
-
+			tv.ColorScheme = new ColorScheme (tv.ColorScheme) { Focus = new Attribute (Color.Magenta, Color.White) };
+			var focus = tv.ColorScheme.Focus;
 			tv.Draw ();
 
 			// Focus color (1) should be used for rendering the selected line
@@ -2784,7 +2792,7 @@ A B C
 000000
 111111";
 
-			TestHelpers.AssertDriverColorsAre (expected, driver: Application.Driver, normal, focus);
+			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);
 		}
 
 		public static DataTableSource BuildTable (int cols, int rows)
@@ -2995,7 +3003,7 @@ A B C
 
 			var tv = new TableView ();
 			//tv.BeginInit (); tv.EndInit ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 25, 4);
 			tv.Style = new () {
 				ShowHeaders = false,
@@ -3063,7 +3071,7 @@ A B C
 		public void TestEnumerableDataSource_BasicTypes ()
 		{
 			var tv = new TableView ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 50, 6);
 
 			tv.Table = new EnumerableTableSource<Type> (
@@ -3093,7 +3101,7 @@ A B C
 		public void Test_CollectionNavigator ()
 		{
 			var tv = new TableView ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 50, 7);
 
 			tv.Table = new EnumerableTableSource<string> (
@@ -3161,7 +3169,7 @@ A B C
 			tv.NewKeyDownEvent (new Key () { KeyCode = KeyCode.CursorRight });
 			Assert.Equal (1, tv.SelectedColumn);
 			Assert.Equal (2, tv.SelectedRow);
-			
+
 			// nothing ends with t so stay where you are
 			tv.NewKeyDownEvent (new Key () { KeyCode = KeyCode.T });
 			Assert.Equal (2, tv.SelectedRow);
@@ -3183,7 +3191,7 @@ A B C
 		private TableView GetTwoRowSixColumnTable (out DataTable dt)
 		{
 			var tableView = new TableView ();
-			tableView.ColorScheme = Colors.TopLevel;
+			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
 			// 3 columns are visible
 			tableView.Bounds = new Rect (0, 0, 7, 5);
@@ -3210,7 +3218,7 @@ A B C
 
 		private class PickablePet {
 			public bool IsPicked { get; set; }
-			public string Name{ get; set; }
+			public string Name { get; set; }
 			public string Kind { get; set; }
 
 			public PickablePet (bool isPicked, string name, string kind)
@@ -3224,7 +3232,7 @@ A B C
 		private TableView GetPetTable (out EnumerableTableSource<PickablePet> source)
 		{
 			var tv = new TableView ();
-			tv.ColorScheme = Colors.TopLevel;
+			tv.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 			tv.Bounds = new Rect (0, 0, 25, 6);
 
 			var pets = new List<PickablePet> {

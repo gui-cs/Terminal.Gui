@@ -273,4 +273,7 @@
   <data name="fdCtxSortDesc" xml:space="preserve">
     <value>{0}で降順ソート (_S)</value>
   </data>
+  <data name="dpTitle" xml:space="preserve">
+    <value>日付ピッカー</value>
+  </data>
 </root>

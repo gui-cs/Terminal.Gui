@@ -102,7 +102,7 @@ public class MouseTests {
 		var mouseEvent = new MouseEvent () {
 			X = clickX,
 			Y = clickY,
-			Flags = MouseFlags.Button1Pressed
+			Flags = MouseFlags.Button1Clicked
 		};
 		var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 
@@ -194,7 +194,7 @@ public class MouseTests {
 		var mouseEvent = new MouseEvent () {
 			X = clickX,
 			Y = clickY,
-			Flags = MouseFlags.Button1Pressed
+			Flags = MouseFlags.Button1Clicked
 		};
 		var mouseEventArgs = new MouseEventEventArgs (mouseEvent);
 

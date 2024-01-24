@@ -8,31 +8,35 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DriverTests {
-	public class ConsoleScrollingTests {
-		readonly ITestOutputHelper output;
+namespace Terminal.Gui.DriverTests; 
 
-		public ConsoleScrollingTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+public class ConsoleScrollingTests {
+	readonly ITestOutputHelper output;
 
-		[Theory]
-		[InlineData (typeof (FakeDriver))]
-		public void Left_And_Top_Is_Always_Zero (Type driverType)
-		{
-			var driver = (FakeDriver)Activator.CreateInstance (driverType);
-			Application.Init (driver);
+	public ConsoleScrollingTests (ITestOutputHelper output)
+	{
+		ConsoleDriver.RunningUnitTests = true;
+		this.output = output;
+	}
 
-			Assert.Equal (0, Console.WindowLeft);
-			Assert.Equal (0, Console.WindowTop);
+	[Theory]
+	[InlineData (typeof (FakeDriver))]
+	//[InlineData (typeof (NetDriver))]
+	//[InlineData (typeof (ANSIDriver))]
+	//[InlineData (typeof (WindowsDriver))]
+	//[InlineData (typeof (CursesDriver))]
+	public void Left_And_Top_Is_Always_Zero (Type driverType)
+	{
+		var driver = (FakeDriver)Activator.CreateInstance (driverType);
+		Application.Init (driver);
 
-			driver.SetWindowPosition (5, 5);
-			Assert.Equal (0, Console.WindowLeft);
-			Assert.Equal (0, Console.WindowTop);
+		Assert.Equal (0, Console.WindowLeft);
+		Assert.Equal (0, Console.WindowTop);
 
-			Application.Shutdown ();
-		}
-		
+		driver.SetWindowPosition (5, 5);
+		Assert.Equal (0, Console.WindowLeft);
+		Assert.Equal (0, Console.WindowTop);
+
+		Application.Shutdown ();
 	}
 }

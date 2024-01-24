@@ -7,20 +7,22 @@ using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.DriverTests;
+
 public class AddRuneTests {
 	readonly ITestOutputHelper _output;
 
 	public AddRuneTests (ITestOutputHelper output)
 	{
 		ConsoleDriver.RunningUnitTests = true;
-		this._output = output;
+		_output = output;
 	}
 
 	[Theory]
 	[InlineData (typeof (FakeDriver))]
 	[InlineData (typeof (NetDriver))]
-	[InlineData (typeof (CursesDriver))]
+	//[InlineData (typeof (ANSIDriver))]
 	[InlineData (typeof (WindowsDriver))]
+	[InlineData (typeof (CursesDriver))]
 	public void AddRune (Type driverType)
 	{
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
@@ -44,8 +46,8 @@ public class AddRuneTests {
 		driver.Move (driver.Cols, driver.Rows);
 		driver.AddRune ('a');
 
-		for (var col = 0; col < driver.Cols; col++) {
-			for (var row = 0; row < driver.Rows; row++) {
+		for (int col = 0; col < driver.Cols; col++) {
+			for (int row = 0; row < driver.Rows; row++) {
 				Assert.Equal ((Rune)' ', driver.Contents [row, col].Rune);
 			}
 		}
@@ -70,7 +72,7 @@ public class AddRuneTests {
 		Assert.Equal (2, driver.Col);
 
 		// Move to the last column of the first row
-		var lastCol = driver.Cols - 1;
+		int lastCol = driver.Cols - 1;
 		driver.Move (lastCol, 0);
 		Assert.Equal (0, driver.Row);
 		Assert.Equal (lastCol, driver.Col);
@@ -83,8 +85,8 @@ public class AddRuneTests {
 		// Add a rune; should succeed but do nothing as it's outside of Contents
 		driver.AddRune ('d');
 		Assert.Equal (lastCol + 2, driver.Col);
-		for (var col = 0; col < driver.Cols; col++) {
-			for (var row = 0; row < driver.Rows; row++) {
+		for (int col = 0; col < driver.Cols; col++) {
+			for (int row = 0; row < driver.Rows; row++) {
 				Assert.NotEqual ((Rune)'d', driver.Contents [row, col].Rune);
 			}
 		}
@@ -99,7 +101,7 @@ public class AddRuneTests {
 		driver.Init ();
 
 		// 🍕 Slice of Pizza "\U0001F355"
-		var operationStatus = Rune.DecodeFromUtf16 ("\U0001F355", out Rune rune, out int charsConsumed);
+		var operationStatus = Rune.DecodeFromUtf16 ("\U0001F355", out var rune, out int charsConsumed);
 		Assert.Equal (OperationStatus.Done, operationStatus);
 		Assert.Equal (charsConsumed, rune.Utf16SequenceLength);
 		Assert.Equal (2, rune.GetColumns ());
@@ -145,7 +147,7 @@ public class AddRuneTests {
 
 		var expected = new Rune ('ắ');
 
-		var text = "\u1eaf";
+		string text = "\u1eaf";
 		driver.AddStr (text);
 		Assert.Equal (expected, driver.Contents [0, 0].Rune);
 		Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);

@@ -111,7 +111,7 @@ public class StatusBar : View {
 			Items = items;
 		}
 		CanFocus = false;
-		ColorScheme = Colors.Menu;
+		ColorScheme = Colors.ColorSchemes ["Menu"];
 		X = 0;
 		Y = Pos.AnchorEnd (1);
 		Width = Dim.Fill ();

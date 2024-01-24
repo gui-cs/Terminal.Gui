@@ -194,7 +194,7 @@ public partial class View {
 		if (TextFormatter == null || HotKeySpecifier == new Rune ('\xFFFF')) {
 			return; // throw new InvalidOperationException ("Can't set HotKey unless a TextFormatter has been created");
 		}
-		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, true, out _, out var hk)) {
+		if (TextFormatter.FindHotKey (_text, HotKeySpecifier, out _, out var hk)) {
 			if (_hotKey.KeyCode != hk) {
 				HotKey = hk;
 			}
@@ -330,6 +330,10 @@ public partial class View {
 		}
 
 		// During (this is what can be cancelled)
+		InvokingKeyBindings?.Invoke (this, keyEvent);
+		if (keyEvent.Handled) {
+			return true;
+		}
 		var handled = OnInvokingKeyBindings (keyEvent);
 		if (handled != null && (bool)handled) {
 			return true;
@@ -553,9 +557,11 @@ public partial class View {
 	{
 		// fire event
 		// BUGBUG: KeyEventArgs doesn't include scope, so the event never sees it.
-		InvokingKeyBindings?.Invoke (this, keyEvent);
-		if (keyEvent.Handled) {
-			return true;
+		if (keyEvent.Scope == KeyBindingScope.Application || keyEvent.Scope == KeyBindingScope.HotKey) {
+			InvokingKeyBindings?.Invoke (this, keyEvent);
+			if (keyEvent.Handled) {
+				return true;
+			}
 		}
 
 		// * If no key binding was found, `InvokeKeyBindings` returns `null`.

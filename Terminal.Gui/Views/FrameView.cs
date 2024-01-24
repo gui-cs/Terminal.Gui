@@ -50,7 +50,7 @@ namespace Terminal.Gui {
 		{
 			this.Title = title;
 			Border.Thickness = new Thickness (1);
-			Border.BorderStyle = DefaultBorderStyle;
+			Border.LineStyle = DefaultBorderStyle;
 			//Border.ColorScheme = ColorScheme;
 			Border.Data = "Border";
 		}

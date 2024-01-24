@@ -55,8 +55,8 @@ namespace UICatalog.Scenarios {
 			private void ToolsView_Initialized (object sender, EventArgs e)
 			{
 				LayoutSubviews ();
-				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetFramesThickness ().Horizontal;
-				Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetFramesThickness ().Vertical;
+				Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
+				Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
 				SuperView.LayoutSubviews ();
 			}
 

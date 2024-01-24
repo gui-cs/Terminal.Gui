@@ -40,7 +40,7 @@ namespace UICatalog.Scenarios {
 				X = Pos.Center (),
 				Y = 1,
 				ColorScheme = new ColorScheme () {
-					Normal = Colors.Base.Focus
+					Normal = Colors.ColorSchemes ["Base"].Focus
 				}
 			};
 			_text = new TextField () {

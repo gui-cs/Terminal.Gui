@@ -23,17 +23,6 @@ namespace Terminal.Gui {
 				WantMousePositionReports = true;
 			}
 
-			public override Rect Frame {
-				get => base.Frame;
-				set {
-					base.Frame = value;
-					X = value.X;
-					Y = value.Y;
-					Width = value.Width;
-					Height = value.Height;
-				}
-			}
-
 			public override void OnDrawContent (Rect contentArea)
 			{
 				if (autocomplete.LastPopupPos == null) {
@@ -135,7 +124,7 @@ namespace Terminal.Gui {
 		public override ColorScheme ColorScheme {
 			get {
 				if (colorScheme == null) {
-					colorScheme = Colors.Menu;
+					colorScheme = Colors.ColorSchemes ["Menu"];
 				}
 				return colorScheme;
 			}

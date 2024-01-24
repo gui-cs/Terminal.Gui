@@ -10,7 +10,7 @@ namespace UICatalog.Scenarios {
 		public override void Init ()
 		{
 			Application.Init ();
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 
 		public override void Setup ()
@@ -21,12 +21,12 @@ namespace UICatalog.Scenarios {
 			//Win.Height = Dim.Fill () - 2;
 			var label = new Label ("ScrollView (new Rect (3, 3, 50, 20)) with a 200, 100 ContentSize...") {
 				X = 0, Y = 0,
-				//ColorScheme = Colors.Dialog
+				//ColorScheme = Colors.ColorSchemes ["Dialog"]
 			};
 			Application.Top.Add (label);
 
 			var scrollView = new ScrollView (new Rect (3, 3, 50, 20));
-			scrollView.ColorScheme = Colors.Menu;
+			scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
 			scrollView.ContentSize = new Size (200, 100);
 			//ContentOffset = new Point (0, 0),
 			//scrollView.ShowVerticalScrollIndicator = true;
@@ -38,7 +38,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Fill (3),
 				Height = Dim.Fill (3),
-				ColorScheme = Colors.Dialog,
+				ColorScheme = Colors.ColorSchemes ["Dialog"],
 				Id = "1"
 			};
 
@@ -48,7 +48,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Fill (3),
 				Height = Dim.Fill (3),
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				Id = "2"
 			};
 			embedded1.Add (embedded2);
@@ -59,7 +59,7 @@ namespace UICatalog.Scenarios {
 				Y = 3,
 				Width = Dim.Fill (3),
 				Height = Dim.Fill (3),
-				ColorScheme = Colors.TopLevel,
+				ColorScheme = Colors.ColorSchemes ["TopLevel"],
 				Id = "3"
 			};
 

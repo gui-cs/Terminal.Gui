@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 				top.Add (statusBar);
 
 				Title = $"Worker started at {start}.{start:fff}";
-				ColorScheme = Colors.Base;
+				ColorScheme = Colors.ColorSchemes ["Base"];
 
 				Add (new ListView (list) {
 					X = 0,

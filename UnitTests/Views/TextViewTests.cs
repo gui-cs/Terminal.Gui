@@ -37,7 +37,7 @@ public class TextViewTests {
 			//         01234567890123456789012345678901=32 (Length)
 			var buff = Encoding.Unicode.GetBytes (txt);
 			var ms = new System.IO.MemoryStream (buff).ToArray ();
-			_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.Base };
+			_textView = new TextView () { Width = 30, Height = 10, ColorScheme = Colors.ColorSchemes ["Base"] };
 			_textView.Text = Encoding.Unicode.GetString (ms);
 		}
 
@@ -293,7 +293,7 @@ public class TextViewTests {
 			};
 
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("0000000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("0000000", driver: Application.Driver, attributes);
 
 		_textView.NewKeyDownEvent (new (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
@@ -301,7 +301,7 @@ public class TextViewTests {
 		Application.RunIteration (ref rs, ref first);
 		Assert.Equal (new Point (4, 0), _textView.CursorPosition);
 		//                                             TAB to jump between text fields.
-		TestHelpers.AssertDriverColorsAre ("1111000", driver: Application.Driver, attributes);
+		TestHelpers.AssertDriverAttributesAre ("1111000", driver: Application.Driver, attributes);
 	}
 
 	[Fact]
@@ -1007,7 +1007,7 @@ public class TextViewTests {
 				Assert.Equal ("This is the first line.", Clipboard.Contents);
 				break;
 			case 1:
-				_textView.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask | KeyCode.ShiftMask));
+				_textView.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask));
 				Assert.Equal (0, _textView.CursorPosition.X);
 				Assert.Equal (0, _textView.CursorPosition.Y);
 				Assert.Equal ("This is the second line.", _textView.Text);
@@ -1085,7 +1085,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask));
+			_textView.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (0, _textView.CursorPosition.X);
@@ -1180,7 +1180,7 @@ public class TextViewTests {
 		bool iterationsFinished = false;
 
 		while (!iterationsFinished) {
-			_textView.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask));
+			_textView.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask));
 			switch (iteration) {
 			case 0:
 				Assert.Equal (0, _textView.CursorPosition.X);
@@ -1541,6 +1541,9 @@ public class TextViewTests {
 	[TextViewTestsAutoInitShutdown]
 	public void TabWidth_Setting_To_Zero_Keeps_AllowsTab ()
 	{
+		Application.Top.Add (_textView);
+		Application.Begin (Application.Top);
+
 		Assert.Equal (4, _textView.TabWidth);
 		Assert.True (_textView.AllowsTab);
 		Assert.True (_textView.AllowsReturn);
@@ -1552,8 +1555,21 @@ public class TextViewTests {
 		Assert.True (_textView.Multiline);
 		_textView.NewKeyDownEvent (new (KeyCode.Tab));
 		Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+TAB to jump between text field", _output);
+
+		_textView.TabWidth = 4;
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+    TAB to jump between text f", _output);
+
 		_textView.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.ShiftMask));
 		Assert.Equal ("TAB to jump between text fields.", _textView.Text);
+		Assert.True (_textView.NeedsDisplay);
+		Application.Refresh ();
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+TAB to jump between text field", _output);
 	}
 
 	[Fact]
@@ -2500,7 +2516,6 @@ line.
 	[Theory]
 	[TextViewTestsAutoInitShutdown]
 	[InlineData (KeyCode.Delete)]
-	[InlineData (KeyCode.DeleteChar)]
 	public void WordWrap_Draw_Typed_Keys_After_Text_Is_Deleted (KeyCode del)
 	{
 		Application.Top.Add (_textView);
@@ -2744,13 +2759,13 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.True (tv.Selecting);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		Assert.Equal ($"his is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2762,7 +2777,7 @@ Line 2.", _output);
 		Assert.True (tv.NewKeyDownEvent (new (KeyCode.End)));
 		Assert.Equal ($"is is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (21, 0), tv.CursorPosition);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Backspace)));
 		Assert.Equal ($"is is the first line{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (20, 0), tv.CursorPosition);
 		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Backspace)));
@@ -2808,7 +2823,7 @@ Line 2.", _output);
 		Assert.False (tv.Selecting);
 		Assert.Equal ("is is the first lin", Clipboard.Contents);
 		tv.CursorPosition = Point.Empty;
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask | KeyCode.ShiftMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -2964,7 +2979,7 @@ Line 2.", _output);
 		Assert.Equal (0, tv.SelectedLength);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.False (tv.Selecting);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ($"This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 		Assert.Equal (0, tv.SelectedLength);
@@ -3020,7 +3035,7 @@ Line 2.", _output);
 		Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ", tv.SelectedText);
 		Assert.True (tv.Selecting);
 		Assert.True (tv.Used);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.InsertChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Insert)));
 		Assert.False (tv.Used);
 		Assert.True (tv.AllowsTab);
 		Assert.Equal (new Point (18, 2), tv.CursorPosition);
@@ -3047,6 +3062,10 @@ Line 2.", _output);
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateForwardKey));
 		Assert.False (tv.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask | KeyCode.ShiftMask)));
 		Assert.False (tv.NewKeyDownEvent (Application.AlternateBackwardKey));
+		
+		Assert.True (tv.NewKeyDownEvent (ContextMenu.DefaultKey));
+		Assert.True (tv.ContextMenu != null && tv.ContextMenu.MenuBar.Visible);
+
 	}
 
 	[Fact]
@@ -4687,7 +4706,7 @@ Line 2.", _output);
 		Assert.False (tv.IsDirty);
 		Assert.False (tv.HasHistoryChanges);
 
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (1, tv.Lines);
@@ -5178,28 +5197,28 @@ Line 2.", _output);
 		var text = "First line.\nSecond line.";
 		var tv = new TextView () { Text = text };
 
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ($"line.{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal ("", tv.SelectedText);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ($"{Environment.NewLine}Second line.", tv.Text);
 		Assert.Equal (2, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ("Second line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ("line.", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
 
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar | KeyCode.CtrlMask)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete | KeyCode.CtrlMask)));
 		Assert.Equal ("", tv.Text);
 		Assert.Equal (1, tv.Lines);
 		Assert.Equal (new Point (0, 0), tv.CursorPosition);
@@ -6181,6 +6200,7 @@ This is the second line.
 ", _output);
 
 		((FakeDriver)Application.Driver).SetBufferSize (6, 25);
+		tv.SetRelativeLayout (Application.Driver.Bounds);
 		tv.Draw ();
 		Assert.Equal (new Point (4, 2), tv.CursorPosition);
 		Assert.Equal (new Point (12, 0), cp);
@@ -6393,7 +6413,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (2, 0);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		tv.Draw ();
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6403,7 +6423,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (22, 0);
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		tv.Draw ();
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6450,7 +6470,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (2, 0);
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		tv.Draw ();
 		Assert.Equal (new Point (2, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -6460,7 +6480,7 @@ This is the second line.
 
 		tv.CursorPosition = new Point (22, 0);
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
-		Assert.True (tv.NewKeyDownEvent (new (KeyCode.DeleteChar)));
+		Assert.True (tv.NewKeyDownEvent (new (KeyCode.Delete)));
 		tv.Draw ();
 		Assert.Equal (new Point (22, 0), tv.CursorPosition);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"

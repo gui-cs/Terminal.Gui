@@ -46,7 +46,7 @@ public class Keys : Scenario {
 			X = Pos.Right (keyPressedLabel) + 1,
 			Y = Pos.Top (keyPressedLabel),
 			TextAlignment = Terminal.Gui.TextAlignment.Centered,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 			AutoSize = true
 		};
 		Win.Add (labelTextViewKeypress);
@@ -62,7 +62,7 @@ public class Keys : Scenario {
 			X = Pos.Right (keyPressedLabel) + 1,
 			Y = Pos.Top (keyPressedLabel),
 			TextAlignment = Terminal.Gui.TextAlignment.Centered,
-			ColorScheme = Colors.Error,
+			ColorScheme = Colors.ColorSchemes ["Error"],
 			AutoSize = true
 		};
 		Win.Add (labelAppKeypress);
@@ -84,7 +84,7 @@ public class Keys : Scenario {
 			Width = "Key Down:".Length + maxKeyString,
 			Height = Dim.Fill (),
 		};
-		keyEventListView.ColorScheme = Colors.TopLevel;
+		keyEventListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		Win.Add (keyEventListView);
 
 		// OnKeyPressed
@@ -101,7 +101,7 @@ public class Keys : Scenario {
 			Width = maxKeyString,
 			Height = Dim.Fill (),
 		};
-		onKeyPressedListView.ColorScheme = Colors.TopLevel;
+		onKeyPressedListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		Win.Add (onKeyPressedListView);
 
 		// OnInvokeKeyBindings
@@ -116,7 +116,7 @@ public class Keys : Scenario {
 			Width = Dim.Fill (1),
 			Height = Dim.Fill (),
 		};
-		onInvokingKeyBindingsListView.ColorScheme = Colors.TopLevel;
+		onInvokingKeyBindingsListView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 		Win.Add (onInvokingKeyBindingsListView);
 
 		//Application.KeyDown += (s, a) => KeyDownPressUp (a, "Down");

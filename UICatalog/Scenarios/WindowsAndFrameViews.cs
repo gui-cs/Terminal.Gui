@@ -31,7 +31,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = Dim.Fill (15),
 				Height = 10,
-				ColorScheme = Colors.Dialog
+				ColorScheme = Colors.ColorSchemes ["Dialog"]
 			};
 			Win.Padding.Thickness = new Thickness (padding);
 			Win.Margin.Thickness = new Thickness (margin);
@@ -39,14 +39,14 @@ namespace UICatalog.Scenarios {
 			var paddingButton = new Button ($"Padding of container is {padding}") {
 				X = Pos.Center (),
 				Y = 0,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 			};
 			paddingButton.Clicked += (s,e) => About ();
 			Win.Add (paddingButton);
 			Win.Add (new Button ("Press ME! (Y = Pos.AnchorEnd(1))") {
 				X = Pos.Center (),
 				Y = Pos.AnchorEnd (1),
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.ColorSchemes ["Error"]
 			});
 			Application.Top.Add (Win);
 			
@@ -71,11 +71,11 @@ namespace UICatalog.Scenarios {
 				};
 				win.Padding.Thickness = new Thickness (pad);
 				
-				win.ColorScheme = Colors.Dialog;
+				win.ColorScheme = Colors.ColorSchemes ["Dialog"];
 				var pressMeButton = new Button ("Press me! (Y = 0)") {
 					X = Pos.Center (),
 					Y = 0,
-					ColorScheme = Colors.Error,
+					ColorScheme = Colors.ColorSchemes ["Error"],
 				};
 				pressMeButton.Clicked += (s,e) =>
 					MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");
@@ -86,12 +86,12 @@ namespace UICatalog.Scenarios {
 					Y = 1,
 					Width = Dim.Percent (50),
 					Height = 5,
-					ColorScheme = Colors.Base,
+					ColorScheme = Colors.ColorSchemes ["Base"],
 					Text = "The Text in the Window",
 				};
 				subWin.Add (new TextField ("Edit me! " + win.Title) {
 					Y = 1,
-					ColorScheme = Colors.Error
+					ColorScheme = Colors.ColorSchemes ["Error"]
 				});
 				win.Add (subWin);
 				var frameView = new FrameView ("This is a Sub-FrameView") {
@@ -99,7 +99,7 @@ namespace UICatalog.Scenarios {
 					Y = 1,
 					Width = Dim.Percent (100, true), // Or Dim.Percent (50)
 					Height = 5,
-					ColorScheme = Colors.Base,
+					ColorScheme = Colors.ColorSchemes ["Base"],
 					Text = "The Text in the FrameView",
 
 				};
@@ -131,11 +131,11 @@ namespace UICatalog.Scenarios {
 				Width = Dim.Fill (margin),
 				Height = contentHeight + 2,  // 2 for default padding
 			};
-			frame.ColorScheme = Colors.Dialog;
+			frame.ColorScheme = Colors.ColorSchemes ["Dialog"];
 			frame.Add (new Label ("This is a Label! (Y = 0)") {
 				X = Pos.Center (),
 				Y = 0,
-				ColorScheme = Colors.Error,
+				ColorScheme = Colors.ColorSchemes ["Error"],
 				//Clicked = () => MessageBox.ErrorQuery (frame.Title, "Neat?", "Yes", "No")
 			});
 			var subWinofFV = new Window () {
@@ -144,11 +144,11 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = Dim.Percent (50),
 				Height = Dim.Fill () - 1,
-				ColorScheme = Colors.Base,
+				ColorScheme = Colors.ColorSchemes ["Base"],
 				Text = "The Text in the Window",
 			};
 			subWinofFV.Add (new TextField ("Edit Me") {
-				ColorScheme = Colors.Error
+				ColorScheme = Colors.ColorSchemes ["Error"]
 			});
 
 			subWinofFV.Add (new CheckBox (0, 1, "Check me"));
@@ -160,7 +160,7 @@ namespace UICatalog.Scenarios {
 				Y = 1,
 				Width = Dim.Percent (100),
 				Height = Dim.Fill () - 1,
-				ColorScheme = Colors.Base,
+				ColorScheme = Colors.ColorSchemes ["Base"],
 				Text = "The Text in the FrameView",
 			};
 			subFrameViewofFV.Add (new TextField (0, 0, 15, "Edit Me"));
@@ -185,7 +185,7 @@ namespace UICatalog.Scenarios {
 			Application.Top.Add (frame);
 			listWin.Add (frame);
 
-			Application.Top.ColorScheme = Colors.Base;
+			Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 		}
 	}
 }

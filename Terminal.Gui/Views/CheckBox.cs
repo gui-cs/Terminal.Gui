@@ -86,8 +86,6 @@ public class CheckBox : View {
 		AutoSize = true;
 		Text = s;
 
-		OnResizeNeeded ();
-
 		// Things this view knows how to do
 		AddCommand (Command.ToggleChecked, () => ToggleChecked ());
 		AddCommand (Command.Accept, () => {

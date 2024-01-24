@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TextTests; 
+namespace Terminal.Gui.TextTests;
 
 public class AppendAutocompleteTests {
 	readonly ITestOutputHelper output;
 
 	public AppendAutocompleteTests (ITestOutputHelper output) => this.output = output;
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_ShowThenAccept_MatchCase ()
 	{
 		var tf = GetTextFieldsInView ();
@@ -26,7 +25,7 @@ public class AppendAutocompleteTests {
 		tf.PositionCursor ();
 		TestHelpers.AssertDriverContentsAre ("", output);
 
-		tf.NewKeyDownEvent (new ('f'));
+		tf.NewKeyDownEvent (new Key ('f'));
 
 		tf.Draw ();
 		tf.PositionCursor ();
@@ -47,7 +46,8 @@ public class AppendAutocompleteTests {
 		Assert.NotSame (tf, Application.Top.Focused);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_ShowThenAccept_CasesDiffer ()
 	{
 		var tf = GetTextFieldsInView ();
@@ -78,7 +78,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("my FISH", tf.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_AfterCloseKey_NoAutocomplete ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");
@@ -93,7 +94,7 @@ public class AppendAutocompleteTests {
 		// When cancelling autocomplete
 		Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
 
-		// Suggestion should disapear
+		// Suggestion should disappear
 		tf.Draw ();
 		TestHelpers.AssertDriverContentsAre ("f", output);
 		Assert.Equal ("f", tf.Text);
@@ -106,8 +107,9 @@ public class AppendAutocompleteTests {
 		Assert.NotSame (tf, Application.Top.Focused);
 	}
 
-	[Fact] [AutoInitShutdown]
-	public void TestAutoAppend_AfterCloseKey_ReapearsOnLetter ()
+	[Fact]
+	[AutoInitShutdown]
+	public void TestAutoAppend_AfterCloseKey_ReappearsOnLetter ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");
 
@@ -119,22 +121,23 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("f", tf.Text);
 
 		// When cancelling autocomplete
-		Application.Driver.SendKeys ('e', ConsoleKey.Escape, false, false, false);
+		Application.Driver.SendKeys ('\0', ConsoleKey.Escape, false, false, false);
 
-		// Suggestion should disapear
+		// Suggestion should disappear
 		tf.Draw ();
 		TestHelpers.AssertDriverContentsAre ("f", output);
 		Assert.Equal ("f", tf.Text);
 
-		// Should reapear when you press next letter
+		// Should reappear when you press next letter
 		Application.Driver.SendKeys ('i', ConsoleKey.I, false, false, false);
 		tf.Draw ();
-		// BUGBUG: v2 - I broke this test and don't have time to figure out why. @tznind - help!
-		//TestHelpers.AssertDriverContentsAre ("fish", output);
+		tf.PositionCursor ();
+		TestHelpers.AssertDriverContentsAre ("fish", output);
 		Assert.Equal ("fi", tf.Text);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData ("ffffffffffffffffffffffffff", "ffffffffff")]
 	[InlineData ("f234567890", "f234567890")]
 	[InlineData ("fisérables", "fisérables")]
@@ -150,7 +153,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("f", tf.Text);
 	}
 
-	[Theory] [AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (ConsoleKey.UpArrow)]
 	[InlineData (ConsoleKey.DownArrow)]
 	public void TestAutoAppend_CycleSelections (ConsoleKey cycleKey)
@@ -180,7 +184,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("f", tf.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_NoRender_WhenNoMatch ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");
@@ -199,7 +204,8 @@ public class AppendAutocompleteTests {
 		Assert.Equal ("fx", tf.Text);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TestAutoAppend_NoRender_WhenCursorNotAtEnd ()
 	{
 		var tf = GetTextFieldsInViewSuggesting ("fish");

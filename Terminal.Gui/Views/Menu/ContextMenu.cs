@@ -99,7 +99,7 @@ public sealed class ContextMenu : IDisposable {
 		}
 		_container = Application.Current;
 		_container.Closing += Container_Closing;
-		var frame = new Rect (0, 0, View.Driver.Cols, View.Driver.Rows);
+		var frame = Application.Driver.Bounds;
 		var position = Position;
 		if (Host != null) {
 			Host.BoundsToScreen (frame.X, frame.Y, out int x, out int y);

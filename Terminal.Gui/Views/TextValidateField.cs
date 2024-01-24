@@ -404,7 +404,7 @@ namespace Terminal.Gui {
 			KeyBindings.Add (KeyCode.End, Command.RightEnd);
 
 			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-			KeyBindings.Add (KeyCode.DeleteChar, Command.DeleteCharRight);
+			KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
 
 			KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
 			KeyBindings.Add (KeyCode.CursorLeft, Command.Left);

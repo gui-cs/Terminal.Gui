@@ -77,6 +77,7 @@ namespace UICatalog.Scenarios {
 				};
 
 				AutoSize = false;
+				//LayoutStyle = LayoutStyle.Absolute;
 
 				var fillText = new System.Text.StringBuilder ();
 				for (int i = 0; i < Bounds.Height; i++) {

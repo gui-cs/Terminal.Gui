@@ -41,7 +41,7 @@ namespace UICatalog.Scenarios {
 			view.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view.Margin.Data = "Margin";
 			view.Border.Thickness = new Thickness (3);
-			view.Border.BorderStyle = LineStyle.Single;
+			view.Border.LineStyle = LineStyle.Single;
 			view.Border.ColorScheme = view.ColorScheme;
 			view.Border.Data = "Border";
 			view.Padding.Thickness = new Thickness (2);
@@ -62,7 +62,7 @@ namespace UICatalog.Scenarios {
 			window1.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			window1.Margin.Data = "Margin";
 			window1.Border.Thickness = new Thickness (1);
-			window1.Border.BorderStyle = LineStyle.Single;
+			window1.Border.LineStyle = LineStyle.Single;
 			window1.Border.ColorScheme = view.ColorScheme;
 			window1.Border.Data = "Border";
 			window1.Padding.Thickness = new Thickness (0);
@@ -86,7 +86,7 @@ namespace UICatalog.Scenarios {
 			window2.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			window2.Margin.Data = "Margin";
 			window2.Border.Thickness = new Thickness (1, 1, 1, 1);
-			window2.Border.BorderStyle = LineStyle.Single;
+			window2.Border.LineStyle = LineStyle.Single;
 			window2.Border.ColorScheme = view.ColorScheme;
 			window2.Border.Data = "Border";
 			window2.Padding.Thickness = new Thickness (1, 1, 0, 0);
@@ -110,7 +110,7 @@ namespace UICatalog.Scenarios {
 			view4.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view4.Margin.Data = "Margin";
 			view4.Border.Thickness = new Thickness (1, 1, 1, 1);
-			view4.Border.BorderStyle = LineStyle.Single;
+			view4.Border.LineStyle = LineStyle.Single;
 			view4.Border.ColorScheme = view.ColorScheme;
 			view4.Border.Data = "Border";
 			view4.Padding.Thickness = new Thickness (0, 0, 1, 1);
@@ -133,7 +133,7 @@ namespace UICatalog.Scenarios {
 			view5.Margin.ColorScheme = Colors.ColorSchemes ["Toplevel"];
 			view5.Margin.Data = "Margin";
 			view5.Border.Thickness = new Thickness (1, 1, 1, 1);
-			view5.Border.BorderStyle = LineStyle.Single;
+			view5.Border.LineStyle = LineStyle.Single;
 			view5.Border.ColorScheme = view.ColorScheme;
 			view5.Border.Data = "Border";
 			view5.Padding.Thickness = new Thickness (0, 0, 0, 0);
@@ -169,23 +169,18 @@ namespace UICatalog.Scenarios {
 			};
 			view.Add (edit);
 
-			edit = new TextField () {
+			var label50 = new View () {
+				Title = "Border Inherit Demo",
 				Text = "Center();50%",
 				X = Pos.Center (),
 				Y = Pos.Percent (50),
 				Width = 30,
-				Height = 1
+				TextAlignment = TextAlignment.Centered,
+				//Height = 1
 			};
-			view.Add (edit);
-
-			edit = new TextField () {
-				Text = "Center() - 1;60%",
-				X = Pos.Center () - 1,
-				Y = Pos.Percent (60),
-				Width = 30,
-				Height = 1
-			};
-			view.Add (edit);
+			label50.Border.Thickness = new Thickness (1, 3, 1, 1);
+			label50.Height = 5;
+			view.Add (label50);
 
 			edit = new TextField () {
 				Text = "0 + Percent(50);70%",
@@ -220,8 +215,8 @@ namespace UICatalog.Scenarios {
 
 			view.X = Pos.Center ();
 
-			var editor = new Frames.FramesEditor () {
-				Title = $"Frames Editor",
+			var editor = new Adornments.AdornmentsEditor () {
+				Title = $"Adornments Editor",
 				X = 0,
 				Y = Pos.Bottom (containerLabel),
 				Width = Dim.Fill (),

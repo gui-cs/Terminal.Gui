@@ -140,7 +140,7 @@ namespace UICatalog.Scenarios {
 				_frmMenu.Add (_btnNext);
 
 				var _lblMenuBar = new Label () {
-					ColorScheme = Colors.Dialog,
+					ColorScheme = Colors.ColorSchemes ["Dialog"],
 					TextAlignment = TextAlignment.Centered,
 					X = Pos.Right (_btnPrevious) + 1,
 					Y = Pos.Top (_btnPrevious),
@@ -166,7 +166,7 @@ namespace UICatalog.Scenarios {
 				_frmMenu.Add (_btnPreviowsParent);
 
 				_lstMenus = new ListView (new List<DynamicMenuItemList> ()) {
-					ColorScheme = Colors.Dialog,
+					ColorScheme = Colors.ColorSchemes ["Dialog"],
 					X = Pos.Right (_btnPrevious) + 1,
 					Y = Pos.Top (_btnPrevious) + 2,
 					Width = _lblMenuBar.Width,

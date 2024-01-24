@@ -225,7 +225,7 @@ public class KeyBindingTests {
 		Assert.Empty (keyBindings.GetCommands (Key.D));
 		Assert.Contains (Command.Default, keyBindings.GetCommands (Key.E));
 	}
-	
+
 	// TryGet
 	[Fact]
 	public void TryGet_Unknown_ReturnsFalse ()

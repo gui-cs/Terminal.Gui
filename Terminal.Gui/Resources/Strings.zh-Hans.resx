@@ -273,4 +273,7 @@
   <data name="fdCtxSortDesc" xml:space="preserve">
     <value>{0}逆序排序 (_S)</value>
   </data>
+  <data name="dpTitle" xml:space="preserve">
+    <value>日期选择器</value>
+  </data>
 </root>

@@ -1253,6 +1253,26 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact]
+		public void Constructors_Defaults ()
+		{
+			var legend = new LegendAnnotation ();
+			Assert.Equal (Rect.Empty, legend.Bounds);
+			Assert.Equal (Rect.Empty, legend.Frame);
+			Assert.Equal (LineStyle.Single, legend.BorderStyle);
+			Assert.False (legend.BeforeSeries);
+
+			var bounds = new Rect (1, 2, 10, 3);
+			legend = new LegendAnnotation (bounds);
+			Assert.Equal (new Rect (0, 0, 8, 1), legend.Bounds);
+			Assert.Equal (bounds, legend.Frame);
+			Assert.Equal (LineStyle.Single, legend.BorderStyle);
+			Assert.False (legend.BeforeSeries);
+			legend.BorderStyle = LineStyle.None;
+			Assert.Equal (new Rect (0, 0, 10, 3), legend.Bounds);
+			Assert.Equal (bounds, legend.Frame);
+		}
+
+		[Fact]
 		public void LegendNormalUsage_WithBorder ()
 		{
 			var gv = GraphViewTests.GetGraph ();
@@ -1286,7 +1306,7 @@ namespace Terminal.Gui.ViewsTests {
 			legend.AddEntry (new GraphCellToRender ((Rune)'B'), "?"); // this will exercise pad
 			legend.AddEntry (new GraphCellToRender ((Rune)'C'), "Cat");
 			legend.AddEntry (new GraphCellToRender ((Rune)'H'), "Hattter"); // not enough space for this oen
-			legend.Border = false;
+			legend.BorderStyle = LineStyle.None;
 
 			gv.Annotations.Add (legend);
 			gv.Draw ();

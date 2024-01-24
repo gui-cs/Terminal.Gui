@@ -53,7 +53,7 @@ public class MenuBarScenario : Scenario {
 	public override void Init ()
 	{
 		Application.Init ();
-		Application.Top.ColorScheme = Colors.Base;
+		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
 
 	Label _currentMenuBarItem;
