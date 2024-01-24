@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -102,28 +102,27 @@ public class TrueColors : Scenario {
 		};
 	}
 
-	private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
-	{
-		var gradient = new Label {
-			X = x,
-			Y = y++,
-			Text = name
-		};
-		Win.Add (gradient);
-		for (int dx = x, i = 0; i <= 256; i += 4) {
-			var l = new Label {
-				X = dx++,
-				Y = y,
-				ColorScheme = new ColorScheme () {
-					Normal = new Terminal.Gui.Attribute (
-					colorFunc (i > 255 ? 255 : i),
-					colorFunc (i > 255 ? 255 : i)
-					)
-				},
-				Text = " "
+		private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
+		{
+			var gradient = new Label (name) {
+				X = x,
+				Y = y++,
 			};
-			Win.Add (l);
+			Win.Add (gradient);
+			for (int dx = x, i = 0; i <= 256; i += 4) {
+				var l = new Label (" ") {
+					X = dx++,
+					Y = y,
+					ColorScheme = new ColorScheme {
+						Normal = new Attribute (
+							colorFunc (Math.Clamp (i, 0, 255)),
+							colorFunc (Math.Clamp (i, 0, 255))
+						)
+					}
+				};
+				Win.Add (l);
+			}
+			y += 2;
 		}
-		y += 2;
 	}
 }
