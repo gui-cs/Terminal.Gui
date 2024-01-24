@@ -1,16 +1,10 @@
 #nullable enable
 
 // TextView.cs: multi-line text editing
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading;
 using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
@@ -19,7 +13,7 @@ namespace Terminal.Gui;
 /// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background
 /// colors.
 /// </summary>
-[DebuggerDisplay ("{DebuggerDisplay}")]
+[DebuggerDisplay ("{ColorSchemeDebuggerDisplay}")]
 public class RuneCell : IEquatable<RuneCell> {
 	/// <summary>
 	/// The glyph to draw.
@@ -33,44 +27,25 @@ public class RuneCell : IEquatable<RuneCell> {
 	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public ColorScheme? ColorScheme { get; set; }
 
-	string DebuggerDisplay {
-		get {
-			var colorSchemeStr = ColorSchemeDebuggerDisplay ();
-			return $"U+{Rune.Value:X4} '{Rune.ToString ()}'; {colorSchemeStr}";
-		}
-	}
-
 	/// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
 	/// <param name="other">An object to compare with this object.</param>
 	/// <returns>
 	/// <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter;
 	/// otherwise, <see langword="false"/>.
 	/// </returns>
-	public bool Equals (RuneCell? other) => other != null &&
-						Rune.Equals (other.Rune) &&
-						ColorScheme == other.ColorScheme;
+	public bool Equals ( RuneCell? other ) => other is {} &&
+											Rune.Equals ( other.Rune ) &&
+											ColorScheme == other.ColorScheme;
 
 	/// <summary>Returns a string that represents the current object.</summary>
 	/// <returns>A string that represents the current object.</returns>
 	public override string ToString ()
 	{
-		var colorSchemeStr = ColorSchemeDebuggerDisplay ();
-		return DebuggerDisplay;
+		var colorSchemeStr = ColorScheme?.ToString () ?? "null";
+		return $"U+{Rune.Value:X4} '{Rune.ToString ()}'; {colorSchemeStr}";
 	}
 
-	string ColorSchemeDebuggerDisplay ()
-	{
-		var colorSchemeStr = "null";
-		if (ColorScheme != null) {
-			colorSchemeStr = $"Normal: {ColorScheme.Normal.Foreground},{ColorScheme.Normal.Background}; " +
-					 $"Focus: {ColorScheme.Focus.Foreground},{ColorScheme.Focus.Background}; " +
-					 $"HotNormal: {ColorScheme.HotNormal.Foreground},{ColorScheme.HotNormal.Background}; " +
-					 $"HotFocus: {ColorScheme.HotFocus.Foreground},{ColorScheme.HotFocus.Background}; " +
-					 $"Disabled: {ColorScheme.Disabled.Foreground},{ColorScheme.Disabled.Background}";
-		}
-
-		return colorSchemeStr;
-	}
+	string ColorSchemeDebuggerDisplay => ToString ();
 }
 
 class TextModel {
@@ -229,9 +204,7 @@ class TextModel {
 	{
 		foreach (var line in _lines) {
 			foreach (var cell in line) {
-				if (cell.ColorScheme == null) {
-					cell.ColorScheme = colorScheme;
-				}
+				cell.ColorScheme ??= colorScheme;
 			}
 		}
 	}

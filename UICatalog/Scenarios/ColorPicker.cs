@@ -87,8 +87,8 @@ public class ColorPickers : Scenario {
 		Win.Add (_demoView);
 
 		// Set default colors.
-		foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.ColorName;
-		backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.ColorName;
+		foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor ();
+		backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor ();
 		Win.Initialized += (s, e) => Win.LayoutSubviews ();
 	}
 

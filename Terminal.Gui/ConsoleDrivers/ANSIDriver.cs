@@ -553,8 +553,8 @@ internal class ANSIDriver : ConsoleDriver {
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
 						if (Force16Colors) {
-							stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.AnsiColorCode));
-							stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.AnsiColorCode));
+							stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+							stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
 						} else {
 							stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
 							stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
@@ -659,7 +659,7 @@ internal class ANSIDriver : ConsoleDriver {
 
 			ResizeScreen ();
 			ClearContents ();
-			OnSizeChanged (new SizeChangedEventArgs(new Size(Cols, Rows)));
+			OnSizeChanged (new SizeChangedEventArgs (new Size (Cols, Rows)));
 			break;
 #endif
 		}
