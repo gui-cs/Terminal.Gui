@@ -1,9 +1,8 @@
 using System;
 using Terminal.Gui;
-
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "True Colors", Description: "Demonstration of true color support.")]
+[ScenarioMetadata ("True Colors", "Demonstration of true color support.")]
 [ScenarioCategory ("Colors")]
 public class TrueColors : Scenario {
 
@@ -44,13 +43,13 @@ public class TrueColors : Scenario {
 		Win.Add (cbUseTrueColor);
 
 		y += 2;
-		SetupGradient ("Red gradient", x, ref y, (i) => new Color (i, 0, 0));
-		SetupGradient ("Green gradient", x, ref y, (i) => new Color (0, i, 0));
-		SetupGradient ("Blue gradient", x, ref y, (i) => new Color (0, 0, i));
-		SetupGradient ("Yellow gradient", x, ref y, (i) => new Color (i, i, 0));
-		SetupGradient ("Magenta gradient", x, ref y, (i) => new Color (i, 0, i));
-		SetupGradient ("Cyan gradient", x, ref y, (i) => new Color (0, i, i));
-		SetupGradient ("Gray gradient", x, ref y, (i) => new Color (i, i, i));
+		SetupGradient ("Red gradient", x, ref y, i => new Color (i, 0));
+		SetupGradient ("Green gradient", x, ref y, i => new Color (0, i));
+		SetupGradient ("Blue gradient", x, ref y, i => new Color (0, 0, i));
+		SetupGradient ("Yellow gradient", x, ref y, i => new Color (i, i));
+		SetupGradient ("Magenta gradient", x, ref y, i => new Color (i, 0, i));
+		SetupGradient ("Cyan gradient", x, ref y, i => new Color (0, i, i));
+		SetupGradient ("Gray gradient", x, ref y, i => new Color (i, i, i));
 
 		Win.Add (new Label {
 			X = Pos.AnchorEnd (44),
@@ -102,27 +101,28 @@ public class TrueColors : Scenario {
 		};
 	}
 
-		private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
-		{
-			var gradient = new Label (name) {
-				X = x,
-				Y = y++,
+	void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc)
+	{
+		var gradient = new Label {
+			X = x,
+			Y = y++,
+			Text = name
+		};
+		Win.Add (gradient);
+		for (int dx = x, i = 0; i <= 256; i += 4) {
+			var l = new Label {
+				X = dx++,
+				Y = y,
+				ColorScheme = new ColorScheme {
+					Normal = new Attribute (
+						colorFunc (Math.Clamp (i, 0, 255)),
+						colorFunc (Math.Clamp (i, 0, 255))
+					)
+				},
+				Text = " "
 			};
-			Win.Add (gradient);
-			for (int dx = x, i = 0; i <= 256; i += 4) {
-				var l = new Label (" ") {
-					X = dx++,
-					Y = y,
-					ColorScheme = new ColorScheme {
-						Normal = new Attribute (
-							colorFunc (Math.Clamp (i, 0, 255)),
-							colorFunc (Math.Clamp (i, 0, 255))
-						)
-					}
-				};
-				Win.Add (l);
-			}
-			y += 2;
+			Win.Add (l);
 		}
+		y += 2;
 	}
 }
