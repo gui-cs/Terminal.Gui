@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
-
 namespace Terminal.Gui.ViewsTests;
 
 public class ScrollBarViewTests {
@@ -27,8 +26,6 @@ public class ScrollBarViewTests {
 		var sbv = new ScrollBarView {
 			Id = "sbv",
 			Size = width * 2,
-			// BUGBUG: ScrollBarView should work if Host is null
-			Host = super,
 			ShowScrollIndicator = true
 		};
 		super.Add (sbv);
@@ -56,8 +53,6 @@ public class ScrollBarViewTests {
 		var sbv = new ScrollBarView {
 			Id = "sbv",
 			Size = height * 2,
-			// BUGBUG: ScrollBarView should work if Host is null
-			Host = super,
 			ShowScrollIndicator = true,
 			IsVertical = true
 		};
@@ -124,8 +119,6 @@ public class ScrollBarViewTests {
 		var horiz = new ScrollBarView {
 			Id = "horiz",
 			Size = width * 2,
-			// BUGBUG: ScrollBarView should work if Host is null
-			Host = super,
 			ShowScrollIndicator = true,
 			IsVertical = true
 		};
@@ -134,8 +127,6 @@ public class ScrollBarViewTests {
 		var vert = new ScrollBarView {
 			Id = "vert",
 			Size = height * 2,
-			// BUGBUG: ScrollBarView should work if Host is null
-			Host = super,
 			ShowScrollIndicator = true,
 			IsVertical = true
 		};
@@ -256,29 +247,17 @@ public class ScrollBarViewTests {
 			() => new ScrollBarView (new View (), false));
 	}
 
-	[Fact]
+	[Theory]
+	[InlineData (true)]
+	[InlineData (false)]
 	[ScrollBarAutoInitShutdown]
-	public void Hosting_Two_Vertical_ScrollBarView_Throws_ArgumentException ()
+	public void Hosting_Two_Equal_IsVertical_ScrollBarView_Throws_ArgumentException (bool isVertical)
 	{
-		var top = new Toplevel ();
+		var top = new View ();
 		var host = new View ();
 		top.Add (host);
-		var v = new ScrollBarView (host, true);
-		var h = new ScrollBarView (host, true);
-
-		Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
-		Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);
-	}
-
-	[Fact]
-	[ScrollBarAutoInitShutdown]
-	public void Hosting_Two_Horizontal_ScrollBarView_Throws_ArgumentException ()
-	{
-		var top = new Toplevel ();
-		var host = new View ();
-		top.Add (host);
-		var v = new ScrollBarView (host, false);
-		var h = new ScrollBarView (host, false);
+		var v = new ScrollBarView (host, isVertical);
+		var h = new ScrollBarView (host, isVertical);
 
 		Assert.Throws<ArgumentException> (() => v.OtherScrollBarView = h);
 		Assert.Throws<ArgumentException> (() => h.OtherScrollBarView = v);

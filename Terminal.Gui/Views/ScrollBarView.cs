@@ -7,20 +7,19 @@
 
 using System;
 using System.Text;
-
 namespace Terminal.Gui;
 
 /// <summary>
-/// ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
+///         ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
 /// </summary>
 /// <remarks>
 ///         <para>
-///         The scrollbar is drawn to be a representation of the Size, assuming that the
-///         scroll position is set at Position.
+///                 The scrollbar is drawn to be a representation of the Size, assuming that the
+///                 scroll position is set at Position.
 ///         </para>
 ///         <para>
-///         If the region to display the scrollbar is larger than three characters,
-///         arrow indicators are drawn.
+///                 If the region to display the scrollbar is larger than three characters,
+///                 arrow indicators are drawn.
 ///         </para>
 /// </remarks>
 public class ScrollBarView : View {
@@ -42,31 +41,31 @@ public class ScrollBarView : View {
 	bool _vertical;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
-	/// layout.
+	///         Initializes a new instance of the <see cref="Gui.ScrollBarView" /> class using
+	///         <see cref="LayoutStyle.Computed" />
+	///         layout.
 	/// </summary>
-	public ScrollBarView () : this (0, 0, false) { }
+	public ScrollBarView ()
+	{
+		WantContinuousButtonPressed = true;
+		ClearOnVisibleFalse = false;
+
+		Added += (s, e) => CreateBottomRightCorner (e.Parent);
+		Initialized += ScrollBarView_Initialized;
+	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
-	/// layout.
-	/// </summary>
-	/// <param name="size">The size that this scrollbar represents.</param>
-	/// <param name="position">The position within this scrollbar.</param>
-	/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
-	public ScrollBarView (int size, int position, bool isVertical) => SetInitialProperties (size, position, isVertical);
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
-	/// layout.
+	///         Initializes a new instance of the <see cref="Gui.ScrollBarView" /> class using
+	///         <see cref="LayoutStyle.Computed" />
+	///         layout.
 	/// </summary>
 	/// <param name="host">The view that will host this scrollbar.</param>
 	/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
 	/// <param name="showBothScrollIndicator">
-	/// If set to <c>true (default)</c> will have the other scrollbar, otherwise will
-	/// have only one.
+	///         If set to <c>true (default)</c> will have the other scrollbar, otherwise will
+	///         have only one.
 	/// </param>
-	public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true) : this (0, 0, isVertical)
+	public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true)
 	{
 		if (host == null) {
 			throw new ArgumentNullException ("The host parameter can't be null.");
@@ -75,6 +74,7 @@ public class ScrollBarView : View {
 			throw new ArgumentNullException ("The host SuperView parameter can't be null.");
 		}
 		_hosted = true;
+		IsVertical = isVertical;
 		ColorScheme = host.ColorScheme;
 		X = isVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 		Y = isVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
@@ -82,14 +82,15 @@ public class ScrollBarView : View {
 		CanFocus = false;
 		Enabled = host.Enabled;
 		Visible = host.Visible;
+		Initialized += ScrollBarView_Initialized;
 		//Host.CanFocusChanged += Host_CanFocusChanged;
 		Host.EnabledChanged += Host_EnabledChanged;
 		Host.VisibleChanged += Host_VisibleChanged;
 		Host.SuperView.Add (this);
 		AutoHideScrollBars = true;
 		if (showBothScrollIndicator) {
-			OtherScrollBarView = new ScrollBarView (0, 0, !isVertical) {
-				Id = "OtherScrollBarView",
+			OtherScrollBarView = new ScrollBarView {
+				IsVertical = !isVertical,
 				ColorScheme = host.ColorScheme,
 				Host = host,
 				CanFocus = false,
@@ -104,14 +105,14 @@ public class ScrollBarView : View {
 			OtherScrollBarView.ShowScrollIndicator = true;
 		}
 		ShowScrollIndicator = true;
-		CreateBottomRightCorner ();
+		CreateBottomRightCorner (Host);
 		ClearOnVisibleFalse = false;
 	}
 
 	bool _showBothScrollIndicator => OtherScrollBarView?._showScrollIndicator == true && _showScrollIndicator;
 
 	/// <summary>
-	/// If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.
+	///         If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.
 	/// </summary>
 	public bool IsVertical {
 		get => _vertical;
@@ -124,12 +125,12 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// The size of content the scrollbar represents.
+	///         The size of content the scrollbar represents.
 	/// </summary>
 	/// <value>The size.</value>
 	/// <remarks>
-	/// The <see cref="Size"/> is typically the size of the virtual content. E.g. when a Scrollbar is
-	/// part of a <see cref="View"/> the Size is set to the appropriate dimension of <see cref="Host"/>.
+	///         The <see cref="Size" /> is typically the size of the virtual content. E.g. when a Scrollbar is
+	///         part of a <see cref="View" /> the Size is set to the appropriate dimension of <see cref="Host" />.
 	/// </remarks>
 	public int Size {
 		get => _size;
@@ -144,7 +145,7 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// The position, relative to <see cref="Size"/>, to set the scrollbar at.
+	///         The position, relative to <see cref="Size" />, to set the scrollbar at.
 	/// </summary>
 	/// <value>The position.</value>
 	public int Position {
@@ -160,12 +161,12 @@ public class ScrollBarView : View {
 
 	// BUGBUG: v2 - for consistency this should be named "Parent" not "Host"
 	/// <summary>
-	/// Get or sets the view that host this <see cref="ScrollBarView"/>
+	///         Get or sets the view that host this <see cref="ScrollBarView" />
 	/// </summary>
 	public View Host { get; internal set; }
 
 	/// <summary>
-	/// Represent a vertical or horizontal ScrollBarView other than this.
+	///         Represent a vertical or horizontal ScrollBarView other than this.
 	/// </summary>
 	public ScrollBarView OtherScrollBarView {
 		get => _otherScrollBarView;
@@ -179,7 +180,7 @@ public class ScrollBarView : View {
 
 	// BUGBUG: v2 - Why can't we get rid of this and just use Visible?
 	/// <summary>
-	/// Gets or sets the visibility for the vertical or horizontal scroll indicator.
+	///         Gets or sets the visibility for the vertical or horizontal scroll indicator.
 	/// </summary>
 	/// <value><c>true</c> if show vertical or horizontal scroll indicator; otherwise, <c>false</c>.</value>
 	public bool ShowScrollIndicator {
@@ -204,7 +205,7 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/>
+	///         Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView" />
 	/// </summary>
 	public bool KeepContentAlwaysInViewport {
 		get => _keepContentAlwaysInViewport;
@@ -232,7 +233,7 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// If true the vertical/horizontal scroll bars won't be showed if it's not needed.
+	///         If true the vertical/horizontal scroll bars won't be showed if it's not needed.
 	/// </summary>
 	public bool AutoHideScrollBars {
 		get => _autoHideScrollBars;
@@ -244,17 +245,28 @@ public class ScrollBarView : View {
 		}
 	}
 
-	void CreateBottomRightCorner ()
+	void ScrollBarView_Initialized (object sender, EventArgs e)
 	{
-		if (Host != null &&
-		    (_contentBottomRightCorner == null && OtherScrollBarView == null ||
-		     _contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner == null)) {
+		SetWidthHeight ();
+		SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
+		if (OtherScrollBarView == null) {
+			// Only do this once if both scrollbars are enabled
+			ShowHideScrollBars ();
+		}
+		SetPosition (Position);
+	}
 
-			_contentBottomRightCorner = new View {
-				Id = "contentBottomRightCorner",
-				Visible = Host.Visible,
-				ClearOnVisibleFalse = false,
-				ColorScheme = ColorScheme
+	void CreateBottomRightCorner (View host)
+	{
+		if (Host is null) {
+			Host = host;
+		}
+		if (Host != null &&
+		(_contentBottomRightCorner == null && OtherScrollBarView == null ||
+		_contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner == null)) {
+
+			_contentBottomRightCorner = new ContentBottomRightCorner {
+				Visible = Host.Visible
 			};
 			if (_hosted) {
 				Host.SuperView.Add (_contentBottomRightCorner);
@@ -266,11 +278,11 @@ public class ScrollBarView : View {
 			_contentBottomRightCorner.Width = 1;
 			_contentBottomRightCorner.Height = 1;
 			_contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
-			_contentBottomRightCorner.DrawContent += _contentBottomRightCorner_DrawContent;
+			_contentBottomRightCorner.DrawContent += ContentBottomRightCorner_DrawContent;
 		}
 	}
 
-	void _contentBottomRightCorner_DrawContent (object sender, DrawEventArgs e) => Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+	void ContentBottomRightCorner_DrawContent (object sender, DrawEventArgs e) => Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 
 	void Host_VisibleChanged (object sender, EventArgs e)
 	{
@@ -305,9 +317,9 @@ public class ScrollBarView : View {
 	void ContentBottomRightCorner_MouseClick (object sender, MouseEventEventArgs me)
 	{
 		if (me.MouseEvent.Flags == MouseFlags.WheeledDown ||
-		    me.MouseEvent.Flags == MouseFlags.WheeledUp ||
-		    me.MouseEvent.Flags == MouseFlags.WheeledRight ||
-		    me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
+		me.MouseEvent.Flags == MouseFlags.WheeledUp ||
+		me.MouseEvent.Flags == MouseFlags.WheeledRight ||
+		me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
 
 			MouseEvent (me.MouseEvent);
 		} else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked) {
@@ -317,31 +329,8 @@ public class ScrollBarView : View {
 		me.Handled = true;
 	}
 
-	void SetInitialProperties (int size, int position, bool isVertical)
-	{
-		Id = "ScrollBarView";
-		_vertical = isVertical;
-		_position = position;
-		_size = size;
-		WantContinuousButtonPressed = true;
-		ClearOnVisibleFalse = false;
-
-		Added += (s, e) => CreateBottomRightCorner ();
-
-		Initialized += (s, e) => {
-			SetWidthHeight ();
-			SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
-			// BUGBUG: We're not supposed to use Id internally!
-			if (Id == "OtherScrollBarView" || OtherScrollBarView == null) {
-				// Only do this once if both scrollbars are enabled
-				ShowHideScrollBars ();
-			}
-			SetPosition (position);
-		};
-	}
-
 	/// <summary>
-	/// This event is raised when the position on the scrollbar has changed.
+	///         This event is raised when the position on the scrollbar has changed.
 	/// </summary>
 	public event EventHandler ChangedPosition;
 
@@ -364,12 +353,12 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// Virtual method to invoke the <see cref="ChangedPosition"/> action event.
+	///         Virtual method to invoke the <see cref="ChangedPosition" /> action event.
 	/// </summary>
 	public virtual void OnChangedPosition () => ChangedPosition?.Invoke (this, EventArgs.Empty);
 
 	/// <summary>
-	/// Only used for a hosted view that will update and redraw the scrollbars.
+	///         Only used for a hosted view that will update and redraw the scrollbars.
 	/// </summary>
 	public virtual void Refresh () => ShowHideScrollBars ();
 
@@ -510,7 +499,7 @@ public class ScrollBarView : View {
 		}
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override void OnDrawContent (Rect contentArea)
 	{
 		if (ColorScheme == null || (!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
@@ -661,18 +650,18 @@ public class ScrollBarView : View {
 		}
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool MouseEvent (MouseEvent mouseEvent)
 	{
 		if (mouseEvent.Flags != MouseFlags.Button1Pressed &&
-		    mouseEvent.Flags != MouseFlags.Button1DoubleClicked &&
-		    !mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
-		    mouseEvent.Flags != MouseFlags.Button1Released &&
-		    mouseEvent.Flags != MouseFlags.WheeledDown &&
-		    mouseEvent.Flags != MouseFlags.WheeledUp &&
-		    mouseEvent.Flags != MouseFlags.WheeledRight &&
-		    mouseEvent.Flags != MouseFlags.WheeledLeft &&
-		    mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
+		mouseEvent.Flags != MouseFlags.Button1DoubleClicked &&
+		!mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition) &&
+		mouseEvent.Flags != MouseFlags.Button1Released &&
+		mouseEvent.Flags != MouseFlags.WheeledDown &&
+		mouseEvent.Flags != MouseFlags.WheeledUp &&
+		mouseEvent.Flags != MouseFlags.WheeledRight &&
+		mouseEvent.Flags != MouseFlags.WheeledLeft &&
+		mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
 
 			return false;
 		}
@@ -699,10 +688,10 @@ public class ScrollBarView : View {
 			return true;
 		}
 		if (_showScrollIndicator &&
-		    (mouseEvent.Flags == MouseFlags.WheeledDown ||
-		     mouseEvent.Flags == MouseFlags.WheeledUp ||
-		     mouseEvent.Flags == MouseFlags.WheeledRight ||
-		     mouseEvent.Flags == MouseFlags.WheeledLeft)) {
+		(mouseEvent.Flags == MouseFlags.WheeledDown ||
+		mouseEvent.Flags == MouseFlags.WheeledUp ||
+		mouseEvent.Flags == MouseFlags.WheeledRight ||
+		mouseEvent.Flags == MouseFlags.WheeledLeft)) {
 
 			return Host.MouseEvent (mouseEvent);
 		}
@@ -801,11 +790,19 @@ public class ScrollBarView : View {
 			KeepContentAlwaysInViewport ? Host.Bounds.Width + (_showBothScrollIndicator ? -2 : -1) : 0;
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnEnter (View view)
 	{
 		Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 		return base.OnEnter (view);
+	}
+
+	internal class ContentBottomRightCorner : View {
+		public ContentBottomRightCorner ()
+		{
+			ClearOnVisibleFalse = false;
+			ColorScheme = ColorScheme;
+		}
 	}
 }
