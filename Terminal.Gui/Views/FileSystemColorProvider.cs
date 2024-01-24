@@ -1,6 +1,6 @@
 // This code is adapted from https://github.com/devblackops/Terminal-Icons (which also uses the MIT license).
 
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
 
 namespace Terminal.Gui {
@@ -16,12 +16,12 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		public Color? GetColor (IFileSystemInfo file)
 		{
-			if (FilenameToColor.ContainsKey (file.Name)) {
-				return FilenameToColor [file.Name];
+			if ( FilenameToColor.TryGetValue (file.Name, out Color nameColor) ) {
+				return nameColor;
 			}
 
-			if (ExtensionToColor.ContainsKey (file.Extension)) {
-				return ExtensionToColor [file.Extension];
+			if ( ExtensionToColor.TryGetValue (file.Extension, out Color extColor) ) {
+				return extColor;
 			}
 
 			return null;
@@ -443,10 +443,16 @@ namespace Terminal.Gui {
 
 		private static Color StringToColor (string str)
 		{
-			if (!Color.TryParse (str, out var c)) {
-				throw new System.Exception ("Failed to parse Color from " + str);
+			if ( !Color.TryParse (str, out var c) ) {
+				ThrowFormatException (str);
 			}
-			return c;
+			return c.Value;
+
+			[DoesNotReturn]
+			static void ThrowFormatException (string s)
+			{
+				throw new FormatException ($"Failed to parse Color from {s}");
+			}
 		}
 	}
 }

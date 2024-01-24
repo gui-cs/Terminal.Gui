@@ -1,4 +1,4 @@
-﻿//
+//
 // TimeField.cs: text entry for time
 //
 // Author: Jörg Preiß
