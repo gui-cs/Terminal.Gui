@@ -1,35 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using Terminal.Gui;
-
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "ASCIICustomButtonTest", Description: "ASCIICustomButton sample")]
+[ScenarioMetadata ("ASCIICustomButtonTest", "ASCIICustomButton sample")]
 [ScenarioCategory ("Controls")]
 public class ASCIICustomButtonTest : Scenario {
-	private static bool _smallerWindow;
-	private ScrollViewTestWindow _scrollViewTestWindow;
-	private MenuItem _miSmallerWindow;
+	static bool _smallerWindow;
+	MenuItem _miSmallerWindow;
+	ScrollViewTestWindow _scrollViewTestWindow;
 
 	public override void Init ()
 	{
 		Application.Init ();
 		_scrollViewTestWindow = new ScrollViewTestWindow ();
-		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem("Window Size", new MenuItem [] {
-					_miSmallerWindow = new MenuItem ("Smaller Window", "", ChangeWindowSize) {
-						CheckType = MenuItemCheckStyle.Checked
-					},
-					null,
-					new MenuItem("Quit", "",() => Application.RequestStop(),null,null, (KeyCode)Application.QuitKey)
-				})
-			});
+		var menu = new MenuBar (new [] {
+			new MenuBarItem ("Window Size", new [] {
+				_miSmallerWindow = new MenuItem ("Smaller Window", "", ChangeWindowSize) {
+					CheckType = MenuItemCheckStyle.Checked
+				},
+				null,
+				new MenuItem ("Quit", "", () => Application.RequestStop (), null, null, (KeyCode)Application.QuitKey)
+			})
+		});
 		Application.Top.Add (menu, _scrollViewTestWindow);
 		Application.Run ();
 	}
 
-	private void ChangeWindowSize ()
+	void ChangeWindowSize ()
 	{
 		_smallerWindow = (bool)(_miSmallerWindow.Checked = !_miSmallerWindow.Checked);
 		_scrollViewTestWindow.Dispose ();
@@ -43,12 +43,12 @@ public class ASCIICustomButtonTest : Scenario {
 	}
 
 	public class ASCIICustomButton : Button {
+		FrameView border;
+
+		Label fill;
 		public string Description => $"Description of: {Id}";
 
 		public event Action<ASCIICustomButton> PointerEnter;
-
-		private Label fill;
-		private FrameView border;
 
 		public void CustomInitialize ()
 		{
@@ -59,12 +59,12 @@ public class ASCIICustomButtonTest : Scenario {
 
 			AutoSize = false;
 
-			var fillText = new System.Text.StringBuilder ();
-			for (int i = 0; i < Bounds.Height; i++) {
+			var fillText = new StringBuilder ();
+			for (var i = 0; i < Bounds.Height; i++) {
 				if (i > 0) {
 					fillText.AppendLine ("");
 				}
-				for (int j = 0; j < Bounds.Width; j++) {
+				for (var j = 0; j < Bounds.Width; j++) {
 					fillText.Append ("█");
 				}
 			}
@@ -88,10 +88,7 @@ public class ASCIICustomButtonTest : Scenario {
 			Add (border, fill, title);
 		}
 
-		private void This_MouseClick (object sender, MouseEventEventArgs obj)
-		{
-			OnMouseEvent (obj.MouseEvent);
-		}
+		void This_MouseClick (object sender, MouseEventEventArgs obj) => OnMouseEvent (obj.MouseEvent);
 
 		public override bool OnMouseEvent (MouseEvent mouseEvent)
 		{
@@ -124,20 +121,21 @@ public class ASCIICustomButtonTest : Scenario {
 		{
 			border.Visible = true;
 			fill.Visible = false;
-			if (view == null)
+			if (view == null) {
 				view = this;
+			}
 			return base.OnLeave (view);
 		}
 	}
 
 	public class ScrollViewTestWindow : Window {
-		private List<Button> buttons;
-		private const int BUTTONS_ON_PAGE = 7;
-		private const int BUTTON_WIDTH = 25;
-		private const int BUTTON_HEIGHT = 3;
+		const int BUTTONS_ON_PAGE = 7;
+		const int BUTTON_WIDTH = 25;
+		const int BUTTON_HEIGHT = 3;
+		readonly List<Button> buttons;
 
-		private ScrollView scrollView;
-		private ASCIICustomButton selected;
+		readonly ScrollView scrollView;
+		ASCIICustomButton selected;
 
 		public ScrollViewTestWindow ()
 		{
@@ -148,7 +146,7 @@ public class ASCIICustomButtonTest : Scenario {
 				Width = 80;
 				Height = 25;
 
-				scrollView = new ScrollView () {
+				scrollView = new ScrollView {
 					X = 3,
 					Y = 1,
 					Width = 24,
@@ -166,7 +164,7 @@ public class ASCIICustomButtonTest : Scenario {
 					Text = "DOCUMENTS"
 				};
 
-				scrollView = new ScrollView () {
+				scrollView = new ScrollView {
 					X = 0,
 					Y = 1,
 					Width = 27,
@@ -180,9 +178,9 @@ public class ASCIICustomButtonTest : Scenario {
 
 			buttons = new List<Button> ();
 			Button prevButton = null;
-			int count = 20;
-			for (int j = 0; j < count; j++) {
-				Pos yPos = prevButton == null ? 0 : Pos.Bottom (prevButton);
+			var count = 20;
+			for (var j = 0; j < count; j++) {
+				var yPos = prevButton == null ? 0 : Pos.Bottom (prevButton);
 				var button = new ASCIICustomButton { Id = j.ToString (), Text = $"section {j}", Y = yPos, Width = BUTTON_WIDTH, Height = BUTTON_HEIGHT };
 				button.CustomInitialize ();
 				button.Clicked += Button_Clicked;
@@ -204,8 +202,9 @@ public class ASCIICustomButtonTest : Scenario {
 			buttons.Add (closeButton);
 
 			var pages = buttons.Count / BUTTONS_ON_PAGE;
-			if (buttons.Count % BUTTONS_ON_PAGE > 0)
+			if (buttons.Count % BUTTONS_ON_PAGE > 0) {
 				pages++;
+			}
 
 			scrollView.ContentSize = new Size (25, pages * BUTTONS_ON_PAGE * BUTTON_HEIGHT);
 			if (_smallerWindow) {
@@ -215,13 +214,13 @@ public class ASCIICustomButtonTest : Scenario {
 			}
 		}
 
-		private void Button_KeyPress (object sender, Key obj)
+		void Button_KeyPress (object sender, Key obj)
 		{
 			switch (obj.KeyCode) {
 			case KeyCode.End:
 				scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
-					 -(scrollView.ContentSize.Height - scrollView.Frame.Height
-					 + (scrollView.ShowHorizontalScrollIndicator ? 1 : 0)));
+					-(scrollView.ContentSize.Height - scrollView.Frame.Height
+					+ (scrollView.ShowHorizontalScrollIndicator ? 1 : 0)));
 				obj.Handled = true;
 				return;
 			case KeyCode.Home:
@@ -230,20 +229,20 @@ public class ASCIICustomButtonTest : Scenario {
 				return;
 			case KeyCode.PageDown:
 				scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
-					 Math.Max (scrollView.ContentOffset.Y - scrollView.Frame.Height,
-					 -(scrollView.ContentSize.Height - scrollView.Frame.Height
-					 + (scrollView.ShowHorizontalScrollIndicator ? 1 : 0))));
+					Math.Max (scrollView.ContentOffset.Y - scrollView.Frame.Height,
+						-(scrollView.ContentSize.Height - scrollView.Frame.Height
+						+ (scrollView.ShowHorizontalScrollIndicator ? 1 : 0))));
 				obj.Handled = true;
 				return;
 			case KeyCode.PageUp:
 				scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
-					 Math.Min (scrollView.ContentOffset.Y + scrollView.Frame.Height, 0));
+					Math.Min (scrollView.ContentOffset.Y + scrollView.Frame.Height, 0));
 				obj.Handled = true;
 				return;
 			}
 		}
 
-		private void Button_MouseClick (object sender, MouseEventEventArgs obj)
+		void Button_MouseClick (object sender, MouseEventEventArgs obj)
 		{
 			if (obj.MouseEvent.Flags == MouseFlags.WheeledDown) {
 				scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
@@ -256,7 +255,7 @@ public class ASCIICustomButtonTest : Scenario {
 			}
 		}
 
-		private void Button_Clicked (object sender, EventArgs e)
+		void Button_Clicked (object sender, EventArgs e)
 		{
 			MessageBox.Query ("Button clicked.", $"'{selected.Text}' clicked!", "Ok");
 			if (selected.Text == "Close") {
@@ -264,7 +263,7 @@ public class ASCIICustomButtonTest : Scenario {
 			}
 		}
 
-		private void Button_PointerEnter (ASCIICustomButton obj)
+		void Button_PointerEnter (ASCIICustomButton obj)
 		{
 			bool? moveDown;
 			if (obj.Frame.Y > selected?.Frame.Y) {
@@ -274,7 +273,7 @@ public class ASCIICustomButtonTest : Scenario {
 			} else {
 				moveDown = null;
 			}
-			var offSet = selected != null ? obj.Frame.Y - selected.Frame.Y + (-scrollView.ContentOffset.Y % BUTTON_HEIGHT) : 0;
+			var offSet = selected != null ? obj.Frame.Y - selected.Frame.Y + -scrollView.ContentOffset.Y % BUTTON_HEIGHT : 0;
 			selected = obj;
 			if (moveDown == true && selected.Frame.Y + scrollView.ContentOffset.Y + BUTTON_HEIGHT >= scrollView.Frame.Height && offSet != BUTTON_HEIGHT) {
 				scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
@@ -290,7 +289,7 @@ public class ASCIICustomButtonTest : Scenario {
 					Math.Max (scrollView.ContentOffset.Y + BUTTON_HEIGHT, selected.Frame.Y));
 			} else if (moveDown == false && selected.Frame.Y + scrollView.ContentOffset.Y > scrollView.Frame.Height) {
 				scrollView.ContentOffset = new Point (scrollView.ContentOffset.X,
-					 -(selected.Frame.Y - scrollView.Frame.Height + BUTTON_HEIGHT));
+					-(selected.Frame.Y - scrollView.Frame.Height + BUTTON_HEIGHT));
 			}
 		}
 	}
