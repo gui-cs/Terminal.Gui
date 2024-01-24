@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios {
@@ -103,10 +103,10 @@ namespace UICatalog.Scenarios {
 				var l = new Label (" ") {
 					X = dx++,
 					Y = y,
-					ColorScheme = new ColorScheme () {
-						Normal = new Terminal.Gui.Attribute (
-						colorFunc (i > 255 ? 255 : i),
-						colorFunc (i > 255 ? 255 : i)
+					ColorScheme = new ColorScheme {
+						Normal = new Attribute (
+							colorFunc (Math.Clamp (i, 0, 255)),
+							colorFunc (Math.Clamp (i, 0, 255))
 						)
 					}
 				};
