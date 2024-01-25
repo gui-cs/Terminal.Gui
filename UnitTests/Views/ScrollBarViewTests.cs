@@ -929,6 +929,9 @@ public class ScrollBarViewTests {
 		Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
 		Assert.True (sbv.Visible);
 		Assert.True (sbv.OtherScrollBarView.Visible);
+		var contentBottomRightCorner = label.SuperView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+		Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
+		Assert.True (contentBottomRightCorner.Visible);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
 This is a tes▲
 This is a tes┬

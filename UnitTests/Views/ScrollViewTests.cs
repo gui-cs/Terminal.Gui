@@ -1,6 +1,6 @@
 ﻿using System.Text;
-using Xunit;
 using Xunit.Abstractions;
+
 namespace Terminal.Gui.ViewsTests;
 
 public class ScrollViewTests {
@@ -342,7 +342,8 @@ public class ScrollViewTests {
 
 	[Fact]
 	[AutoInitShutdown]
-	public void ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
+	public void
+		ContentOffset_ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator ()
 	{
 		var sv = new ScrollView {
 			Width = 10,
@@ -390,6 +391,7 @@ public class ScrollViewTests {
 		for (var i = 0; i < 8; i++) {
 			sv.Add (new CustomButton ("█", $"Button {i}", 20, 3) { Y = i * 3 });
 		}
+
 		Application.Top.Add (sv);
 		Application.Begin (Application.Top);
 
@@ -403,7 +405,7 @@ public class ScrollViewTests {
    ┌────────░
    │     But░
    └────────▼
-   ◄├┤░░░░░►─", _output);
+   ◄├┤░░░░░► ", _output);
 
 		sv.ContentOffset = new Point (5, 5);
 		sv.LayoutSubviews ();
@@ -418,8 +420,9 @@ public class ScrollViewTests {
    ─────────░
    ─────────░
     Button 4▼
-   ◄├─┤░░░░►─", _output);
+   ◄├─┤░░░░► ", _output);
 	}
+
 	// There are still issue with the lower right corner of the scroll view
 	[Fact]
 	[AutoInitShutdown]
@@ -475,7 +478,7 @@ public class ScrollViewTests {
 00000000000010000000000
 00000000000010000000000
 00000000000010000000000
-00011111111100000000000
+00011111111110000000000
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000", null, attributes);
@@ -514,7 +517,7 @@ public class ScrollViewTests {
 00000022222210000000000
 00000022222210000000000
 00000022222210000000000
-00011111111120000000000
+00011111111110000000000
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000", null, attributes);
@@ -552,7 +555,7 @@ public class ScrollViewTests {
 00000000000010000000000
 00000000000010000000000
 00000000000010000000000
-00011111111100000000000
+00011111111110000000000
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000", null, attributes);
@@ -566,7 +569,12 @@ public class ScrollViewTests {
 		var size = new Size (40, 40);
 		var view = new View { Frame = new Rect (Point.Empty, size) };
 		view.Add (new Label { AutoSize = false, Width = Dim.Fill (), Text = rule.Repeat (size.Width / rule.Length) });
-		view.Add (new Label { Height = Dim.Fill (), AutoSize = false, Text = rule.Repeat (size.Height / rule.Length), TextDirection = TextDirection.TopBottom_LeftRight });
+		view.Add (new Label {
+			Height = Dim.Fill (),
+			AutoSize = false,
+			Text = rule.Repeat (size.Height / rule.Length),
+			TextDirection = TextDirection.TopBottom_LeftRight
+		});
 		view.Add (new Label { X = 1, Y = 1, Text = "[ Press me! ]" });
 		var scrollView = new ScrollView {
 			X = 1,
@@ -912,6 +920,84 @@ public class ScrollViewTests {
 		Assert.Equal ("View1", sv.Subviews [0].Subviews [0].Id);
 	}
 
+	[Fact]
+	[SetupFakeDriver]
+	public void ContentBottomRightCorner_Draw ()
+	{
+		((FakeDriver)Application.Driver).SetBufferSize (30, 30);
+
+		var top = new View {
+			Width = 30,
+			Height = 30,
+			ColorScheme = new ColorScheme {
+				Normal = Attribute.Default
+			}
+		};
+
+		var size = new Size { Width = 20, Height = 10 };
+		var sv = new ScrollView {
+			X = 1,
+			Y = 1,
+			Width = 10,
+			Height = 5,
+			ContentSize = size,
+			ColorScheme = new ColorScheme {
+				Normal = new Attribute (Color.Red, Color.Green)
+			}
+		};
+		string text = null;
+		for (var i = 0; i < size.Height; i++) {
+			text += "*".Repeat (size.Width);
+			if (i < size.Height) {
+				text += '\n';
+			}
+		}
+
+		var view = new View {
+			Width = size.Width,
+			Height = size.Height,
+			ColorScheme = new ColorScheme {
+				Normal = new Attribute (Color.Blue, Color.Yellow)
+			},
+			AutoSize = true,
+			Text = text
+		};
+		sv.Add (view);
+
+		top.Add (sv);
+		top.BeginInit ();
+		top.EndInit ();
+
+		top.LayoutSubviews ();
+
+		top.Draw ();
+
+		var contentBottomRightCorner = sv.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+		Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
+		Assert.True (contentBottomRightCorner.Visible);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+ *********▲
+ *********┬
+ *********┴
+ *********▼
+ ◄├──┤░░░► ", _output);
+
+		var attrs = new [] {
+			Attribute.Default, new Attribute (Color.Red, Color.Green),
+			new Attribute (Color.Blue, Color.Yellow)
+		};
+
+		TestHelpers.AssertDriverAttributesAre (@"
+000000000000
+022222222210
+022222222210
+022222222210
+022222222210
+011111111110
+000000000000", null, attrs);
+	}
+
 	class CustomButton : FrameView {
 		readonly Label labelFill;
 		readonly Label labelText;
@@ -928,10 +1014,12 @@ public class ScrollViewTests {
 					if (i > 0) {
 						fillText.AppendLine ("");
 					}
+
 					for (var j = 0; j < labelFill.Bounds.Width; j++) {
 						fillText.Append (fill);
 					}
 				}
+
 				labelFill.Text = fillText.ToString ();
 			};
 
@@ -957,6 +1045,7 @@ public class ScrollViewTests {
 			if (view == null) {
 				view = this;
 			}
+
 			return base.OnLeave (view);
 		}
 	}
