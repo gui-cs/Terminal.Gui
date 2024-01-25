@@ -234,7 +234,7 @@ public class Notepad : Scenario {
 
 	void Open ()
 	{
-		var open = new OpenDialog ("Open") { AllowsMultipleSelection = true };
+		var open = new OpenDialog { Title = "Open", AllowsMultipleSelection = true };
 
 		Application.Run (open);
 

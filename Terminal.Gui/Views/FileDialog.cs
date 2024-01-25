@@ -12,19 +12,17 @@ public class FileDialog : Dialog {
 	/// <summary>
 	///         Gets the Path separators for the operating system
 	/// </summary>
-	internal static char [] Separators = {
+	internal static char [] Separators = [
 		System.IO.Path.AltDirectorySeparatorChar,
 		System.IO.Path.DirectorySeparatorChar
-	};
+	];
 
 	/// <summary>
 	///         Characters to prevent entry into <see cref="_tbPath" />. Note that this is not using
 	///         <see cref="System.IO.Path.GetInvalidFileNameChars" /> because we do want to allow directory
 	///         separators, arrow keys etc.
 	/// </summary>
-	static readonly char [] _badChars = {
-		'"', '<', '>', '|', '*', '?'
-	};
+	static readonly char [] _badChars = ['"', '<', '>', '|', '*', '?'];
 
 	readonly Button _btnBack;
 	readonly Button _btnCancel;
@@ -354,7 +352,7 @@ public class FileDialog : Dialog {
 	///         Defaults to <see cref="OpenMode.Mixed" /> (i.e. <see cref="DirectoryInfo" /> or
 	///         <see cref="FileInfo" />).
 	/// </summary>
-	public OpenMode OpenMode { get; set; } = OpenMode.Mixed;
+	public virtual OpenMode OpenMode { get; set; } = OpenMode.Mixed;
 
 	/// <summary>
 	///         Gets or Sets the selected path in the dialog. This is the result that should
@@ -393,7 +391,7 @@ public class FileDialog : Dialog {
 	///         <see cref="AllowedTypeAny" /> adds the option to select any type (*.*). If this
 	///         collection is empty then any type is supported and no Types drop-down is shown.
 	/// </remarks>
-	public List<IAllowedType> AllowedTypes { get; set; } = new ();
+	public List<IAllowedType> AllowedTypes { get; set; } = [];
 
 	/// <summary>
 	///         Gets a value indicating whether the <see cref="FileDialog" /> was closed
@@ -676,7 +674,7 @@ public class FileDialog : Dialog {
 						}))
 					.ToArray ());
 
-			_allowedTypeMenuBar = new MenuBar (new [] { _allowedTypeMenu }) {
+			_allowedTypeMenuBar = new MenuBar ([_allowedTypeMenu]) {
 				Width = width,
 				Y = 1,
 				X = Pos.AnchorEnd (width),
@@ -724,9 +722,7 @@ public class FileDialog : Dialog {
 	/// </summary>
 	protected virtual string GetDefaultTitle ()
 	{
-		List<string> titleParts = new () {
-			Strings.fdOpen
-		};
+		List<string> titleParts = [Strings.fdOpen];
 		if (MustExist) {
 			titleParts.Add (Strings.fdExisting);
 		}
@@ -1323,13 +1319,13 @@ public class FileDialog : Dialog {
 
 		var contextMenu = new ContextMenu {
 			Position = new Point (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
-			MenuItems = new MenuBarItem (new MenuItem [] {
-				new(
+			MenuItems = new MenuBarItem ([
+				new MenuItem (
 					string.Format (Strings.fdCtxHide,
 						StripArrows (_tableView.Table.ColumnNames [clickedCol])), string.Empty,
 					() => HideColumn (clickedCol)),
-				new(StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
-			})
+				new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
+			])
 		};
 
 		contextMenu.Show ();
@@ -1346,11 +1342,11 @@ public class FileDialog : Dialog {
 
 		var contextMenu = new ContextMenu {
 			Position = new Point (e.MouseEvent.X + 1, e.MouseEvent.Y + 1),
-			MenuItems = new MenuBarItem (new MenuItem [] {
-				new(Strings.fdCtxNew, string.Empty, New),
-				new(Strings.fdCtxRename, string.Empty, Rename),
-				new(Strings.fdCtxDelete, string.Empty, Delete)
-			})
+			MenuItems = new MenuBarItem ([
+				new MenuItem (Strings.fdCtxNew, string.Empty, New),
+				new MenuItem (Strings.fdCtxRename, string.Empty, Rename),
+				new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
+			])
 		};
 
 		_tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
@@ -1371,7 +1367,7 @@ public class FileDialog : Dialog {
 	/// </summary>
 	internal class SearchState : FileDialogState {
 		// TODO: Add thread safe child adding
-		readonly List<FileSystemInfoStats> _found = new ();
+		readonly List<FileSystemInfoStats> _found = [];
 		readonly object _oLockFound = new ();
 		readonly CancellationTokenSource _token = new ();
 		bool _cancel;

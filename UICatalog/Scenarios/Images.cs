@@ -1,15 +1,16 @@
-﻿using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Text;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
 using Color = Terminal.Gui.Color;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Images", Description: "Demonstration of how to render an image with/without true color support.")]
+[ScenarioMetadata ("Images", "Demonstration of how to render an image with/without true color support.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Drawing")]
 public class Images : Scenario {
@@ -48,17 +49,17 @@ public class Images : Scenario {
 		};
 		Win.Add (btnOpenImage);
 
-		var imageView = new ImageView () {
+		var imageView = new ImageView {
 			X = 0,
 			Y = Pos.Bottom (lblDriverName),
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		Win.Add (imageView);
 
 
 		btnOpenImage.Clicked += (_, _) => {
-			var ofd = new OpenDialog ("Open Image") { AllowsMultipleSelection = false, };
+			var ofd = new OpenDialog { Title = "Open Image", AllowsMultipleSelection = false };
 			Application.Run (ofd);
 
 			if (ofd.Path is not null) {
@@ -84,7 +85,6 @@ public class Images : Scenario {
 			try {
 				img = Image.Load<Rgba32> (File.ReadAllBytes (path));
 			} catch (Exception ex) {
-
 				MessageBox.ErrorQuery ("Could not open file", ex.Message, "Ok");
 				return;
 			}
@@ -95,41 +95,41 @@ public class Images : Scenario {
 	}
 
 	class ImageView : View {
+		readonly ConcurrentDictionary<Rgba32, Attribute> _cache = new ();
 
-		private Image<Rgba32> fullResImage;
-		private Image<Rgba32> matchSize;
-
-		ConcurrentDictionary<Rgba32, Attribute> cache = new ConcurrentDictionary<Rgba32, Attribute> ();
+		Image<Rgba32> _fullResImage;
+		Image<Rgba32> _matchSize;
 
 		internal void SetImage (Image<Rgba32> image)
 		{
-			fullResImage = image;
-			this.SetNeedsDisplay ();
+			_fullResImage = image;
+			SetNeedsDisplay ();
 		}
 
 		public override void OnDrawContent (Rect bounds)
 		{
 			base.OnDrawContent (bounds);
 
-			if (fullResImage == null) {
+			if (_fullResImage == null) {
 				return;
 			}
 
 			// if we have not got a cached resized image of this size
-			if (matchSize == null || bounds.Width != matchSize.Width || bounds.Height != matchSize.Height) {
-
+			if (_matchSize == null || bounds.Width != _matchSize.Width ||
+			    bounds.Height != _matchSize.Height) {
 				// generate one
-				matchSize = fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
+				_matchSize = _fullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
 			}
 
-			for (int y = 0; y < bounds.Height; y++) {
-				for (int x = 0; x < bounds.Width; x++) {
-					var rgb = matchSize [x, y];
+			for (var y = 0; y < bounds.Height; y++) {
+				for (var x = 0; x < bounds.Width; x++) {
+					var rgb = _matchSize [x, y];
 
-					var attr = cache.GetOrAdd (rgb, (rgb) => new Attribute (new Color (), new Color (rgb.R, rgb.G, rgb.B)));
+					var attr = _cache.GetOrAdd (rgb,
+						rgb => new Attribute (new Color (), new Color (rgb.R, rgb.G, rgb.B)));
 
 					Driver.SetAttribute (attr);
-					AddRune (x, y, (System.Text.Rune)' ');
+					AddRune (x, y, (Rune)' ');
 				}
 			}
 		}
