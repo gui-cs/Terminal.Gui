@@ -189,35 +189,32 @@ public class AutoSizeFalseTests {
 	}
 
 	[Fact]
-	[AutoInitShutdown]
 	public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized ()
 	{
-		var win = new Window (new Rect (0, 0, 30, 80));
+		var super = new View (new Rect (0, 0, 30, 80));
 		var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-		win.Add (view);
-		Application.Top.Add (win);
-
+		super.Add (view);
 		Assert.False (view.AutoSize);
-		Assert.Equal ("(0,0,80,25)", view.Bounds.ToString ());
 
 		view.Text = "New text\nNew line";
-		Application.Top.LayoutSubviews ();
+		super.LayoutSubviews ();
 
 		Assert.False (view.AutoSize);
-		Assert.Equal ("(0,0,28,78)", view.Bounds.ToString ());
+		Assert.Equal ("(0,0,30,80)", view.Bounds.ToString ());
 		Assert.False (view.IsInitialized);
 
-		var rs = Application.Begin (Application.Top);
+		super.BeginInit ();
+		super.EndInit ();
+
 		Assert.True (view.IsInitialized);
 		Assert.False (view.AutoSize);
-		Assert.Equal ("(0,0,28,78)", view.Bounds.ToString ());
-		Application.End (rs);
+		Assert.Equal ("(0,0,30,80)", view.Bounds.ToString ());
 	}
 
 	[Fact]
-	[AutoInitShutdown]
-	public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Differents_Orders ()
+	public void AutoSize_False_Equal_Before_And_After_IsInitialized_With_Different_Orders ()
 	{
+		var top = new View () { Height = 25, Width = 80 };
 		var view1 = new View { Text = "Say Hello view1 你", AutoSize = false, Width = 10, Height = 5 };
 		var view2 = new View { Text = "Say Hello view2 你", AutoSize = false, Width = 10, Height = 5 };
 		var view3 = new View { AutoSize = false, Width = 10, Height = 5, Text = "Say Hello view3 你" };
@@ -242,7 +239,7 @@ public class AutoSizeFalseTests {
 			TextDirection = TextDirection.TopBottom_LeftRight,
 			Text = "Say Hello view6 你"
 		};
-		Application.Top.Add (view1, view2, view3, view4, view5, view6);
+		top.Add (view1, view2, view3, view4, view5, view6);
 
 		Assert.False (view1.IsInitialized);
 		Assert.False (view2.IsInitialized);
@@ -274,7 +271,8 @@ public class AutoSizeFalseTests {
 		Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 		Assert.Equal ("Absolute(5)", view6.Height.ToString ());
 
-		var rs = Application.Begin (Application.Top);
+		top.BeginInit ();
+		top.EndInit ();
 
 		Assert.True (view1.IsInitialized);
 		Assert.True (view2.IsInitialized);
@@ -305,13 +303,14 @@ public class AutoSizeFalseTests {
 		Assert.Equal (new Rect (0, 0, 10, 5), view6.Frame);
 		Assert.Equal ("Absolute(10)", view6.Width.ToString ());
 		Assert.Equal ("Absolute(5)", view6.Height.ToString ());
-		Application.End (rs);
 	}
 
-	[Fact]
-	[AutoInitShutdown]
+	[Fact, SetupFakeDriver]
 	public void AutoSize_False_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
 	{
+		((FakeDriver)Application.Driver).SetBufferSize (32, 32);
+		var top = new View () { Width = 32, Height = 32 };
+		
 		string text = $"First line{Environment.NewLine}Second line";
 		var horizontalView = new View () {
 			Width = 20,
@@ -333,20 +332,23 @@ public class AutoSizeFalseTests {
 		// Autosize is off, so we have to explicitly set TextFormatter.Size
 		verticalView.TextFormatter.Size = new Size (1, 20);
 
-		var win = new Window () {
+		var frame = new FrameView () {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			Text = "Window"
 		};
-		win.Add (horizontalView, verticalView);
-		Application.Top.Add (win);
-		var rs = Application.Begin (Application.Top);
-		((FakeDriver)Application.Driver).SetBufferSize (32, 32);
-
+		frame.Add (horizontalView, verticalView);
+		top.Add (frame);
+		top.BeginInit ();
+		top.EndInit ();
+		
 		Assert.False (horizontalView.AutoSize);
 		Assert.False (verticalView.AutoSize);
 		Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
 		Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
+
+		top.Draw ();
+
 		string expected = @"
 ┌──────────────────────────────┐
 │First line Second li          │
@@ -392,8 +394,8 @@ public class AutoSizeFalseTests {
 		verticalView.Width = 2;
 		verticalView.TextFormatter.Size = new Size (2, 20);
 		Assert.True (verticalView.TextFormatter.NeedsFormat);
-
-		Application.Top.Draw ();
+		
+		top.Draw ();
 		Assert.Equal (new Rect (0, 3, 2, 20), verticalView.Frame);
 		expected = @"
 ┌──────────────────────────────┐
@@ -431,6 +433,5 @@ public class AutoSizeFalseTests {
 ";
 
 		pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-		Application.End (rs);
 	}
 }

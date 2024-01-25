@@ -519,7 +519,7 @@ public partial class View : Responder, ISupportInitializeNotification {
 	///         Views can opt-in to more sophisticated initialization
 	///         by implementing overrides to <see cref="ISupportInitialize.BeginInit"/> and
 	///         <see cref="ISupportInitialize.EndInit"/> which will be called
-	///         when the view is added to a <see cref="SuperView"/>.
+	///         when the <see cref="SuperView"/> is initialized.
 	///         </para>
 	///         <para>
 	///         If first-run-only initialization is preferred, overrides to <see cref="ISupportInitializeNotification"/>
@@ -532,12 +532,13 @@ public partial class View : Responder, ISupportInitializeNotification {
 	/// </remarks>
 	public virtual void BeginInit ()
 	{
-		if (!IsInitialized) {
-			_oldCanFocus = CanFocus;
-			_oldTabIndex = _tabIndex;
+		if (IsInitialized) {
+			throw new InvalidOperationException ("The view is already initialized.");
 		}
 
-		//throw new InvalidOperationException ("The view is already initialized.");
+		_oldCanFocus = CanFocus;
+		_oldTabIndex = _tabIndex;
+
 		if (_subviews?.Count > 0) {
 			foreach (var view in _subviews) {
 				if (!view.IsInitialized) {
@@ -547,11 +548,23 @@ public partial class View : Responder, ISupportInitializeNotification {
 		}
 	}
 
+	// TODO: Implement logic that allows EndInit to throw if BeginInit has not been called
+	// TODO: See EndInit_Called_Without_BeginInit_Throws test.
+
 	/// <summary>
 	/// Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.
 	/// </summary>
-	public void EndInit ()
+	/// <remarks>
+	/// <para>
+	/// Initializes all Subviews and Invokes the <see cref="Initialized"/> event.
+	/// </para>
+	/// </remarks>
+	public virtual void EndInit ()
 	{
+		if (IsInitialized) {
+			throw new InvalidOperationException ("The view is already initialized.");
+		}
+		
 		IsInitialized = true;
 
 		// TODO: Move these into ViewText.cs as EndInit_Text() to consolodate.

@@ -2117,7 +2117,6 @@ namespace Terminal.Gui.ViewsTests {
 		public void ShowHorizontalBottomLine_WithVerticalCellLines ()
 		{
 			var tableView = GetABCDEFTableView (out _);
-			tableView.BeginInit (); tableView.EndInit ();
 
 			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
@@ -2146,7 +2145,6 @@ namespace Terminal.Gui.ViewsTests {
 		public void ShowHorizontalBottomLine_NoCellLines ()
 		{
 			var tableView = GetABCDEFTableView (out _);
-			tableView.BeginInit (); tableView.EndInit ();
 
 			tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
