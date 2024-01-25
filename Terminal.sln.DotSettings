@@ -120,6 +120,9 @@
 	<s:Int64 x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LIMIT/@EntryValue">160</s:Int64>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LIST_PATTERN/@EntryValue">CHOP_IF_LONG</s:String>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_PARAMETERS_STYLE/@EntryValue">CHOP_IF_LONG</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/XmlDocFormatter/ALLOW_FAR_ALIGNMENT/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/XmlDocFormatter/TagAttributeIndenting/@EntryValue">ByFirstAttr</s:String>
+	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/XmlDocFormatter/USE_INDENT_FROM_VS/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;&#xD;
   &lt;TypePattern DisplayName="Non-reorderable types"&gt;&#xD;
     &lt;TypePattern.Match&gt;&#xD;
