@@ -65,7 +65,7 @@ namespace Terminal.Gui.ViewsTests {
 				ColorScheme = new ColorScheme () { Normal = new Attribute (Color.Red) }
 			};
 			Assert.Equal ("U+0000 '\0'; null", rc1.ToString ());
-			Assert.Equal ("U+0061 'a'; Normal: Red,Red; Focus: White,Black; HotNormal: White,Black; HotFocus: White,Black; Disabled: White,Black", rc2.ToString ());
+			Assert.Equal ("U+0061 'a'; Normal: [Red,Red]; Focus: [White,Black]; HotNormal: [White,Black]; HotFocus: [White,Black]; Disabled: [White,Black]", rc2.ToString ());
 		}
 
 

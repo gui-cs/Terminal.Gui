@@ -150,7 +150,7 @@ namespace Terminal.Gui.ConfigurationTests {
 			((Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue) ["test"] = colorScheme;
 
 			colorSchemes = (Dictionary<string, ColorScheme>)theme ["ColorSchemes"].PropertyValue;
-			Assert.Equal (Colors.ColorSchemes.Count + 1, colorSchemes.Count);
+			Assert.Equal (Colors.ColorSchemes.Count, colorSchemes.Count);
 
 			// Act
 			theme.Update (newTheme);
