@@ -220,11 +220,12 @@ public class Text : Scenario {
 		};
 		Win.Add (netProviderField);
 
-		var labelMirroringNetProviderField = new Label (netProviderField.Text) {
+		var labelMirroringNetProviderField = new Label {
 			X = Pos.Right (netProviderField) + 1,
 			Y = Pos.Top (netProviderField),
 			Width = Dim.Width (netProviderField),
-			Height = Dim.Height (netProviderField)
+			Height = Dim.Height (netProviderField),
+			Text = netProviderField.Text
 		};
 		Win.Add (labelMirroringNetProviderField);
 
@@ -249,11 +250,12 @@ public class Text : Scenario {
 		};
 		Win.Add (regexProviderField);
 
-		var labelMirroringRegexProviderField = new Label (regexProviderField.Text) {
+		var labelMirroringRegexProviderField = new Label {
 			X = Pos.Right (regexProviderField) + 1,
 			Y = Pos.Top (regexProviderField),
 			Width = Dim.Width (regexProviderField),
-			Height = Dim.Height (regexProviderField)
+			Height = Dim.Height (regexProviderField),
+			Text = regexProviderField.Text
 		};
 		Win.Add (labelMirroringRegexProviderField);
 
