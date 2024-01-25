@@ -148,9 +148,33 @@ public static class StringExtensions {
 	/// <returns></returns>
 	public static string ToString (IEnumerable<byte> bytes, Encoding? encoding = null)
 	{
-		if (encoding == null) {
-			encoding = Encoding.UTF8;
-		}
+		encoding ??= Encoding.UTF8;
 		return encoding.GetString (bytes.ToArray ());
+	}
+
+	/// <summary>
+	///   Determines if this <see cref="ReadOnlySpan{T}" /> of <see langword="char" /> is composed entirely of ASCII digits.
+	/// </summary>
+	/// <param name="stringSpan">A <see cref="ReadOnlySpan{T}" /> of <see langword="char" /> to check.</param>
+	/// <returns>
+	///   A <see langword="bool" /> indicating if all elements of the <see cref="ReadOnlySpan{T}" /> are ASCII digits (<see langword="true" />) or
+	///   not (<see langword="false" />
+	/// </returns>
+	public static bool IsAllAsciiDigits (this ReadOnlySpan<char> stringSpan)
+	{
+		return stringSpan.ToString ().All (char.IsAsciiDigit);
+	}
+
+	/// <summary>
+	///   Determines if this <see cref="ReadOnlySpan{T}" /> of <see langword="char" /> is composed entirely of ASCII digits.
+	/// </summary>
+	/// <param name="stringSpan">A <see cref="ReadOnlySpan{T}" /> of <see langword="char" /> to check.</param>
+	/// <returns>
+	///   A <see langword="bool" /> indicating if all elements of the <see cref="ReadOnlySpan{T}" /> are ASCII digits (<see langword="true" />) or
+	///   not (<see langword="false" />
+	/// </returns>
+	public static bool IsAllAsciiHexDigits (this ReadOnlySpan<char> stringSpan)
+	{
+		return stringSpan.ToString ().All (char.IsAsciiHexDigit);
 	}
 }

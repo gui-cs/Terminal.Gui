@@ -134,8 +134,8 @@ public class FakeDriver : ConsoleDriver {
 					// Performance: Only send the escape sequence if the attribute has changed.
 					if (attr != redrawAttr) {
 						redrawAttr = attr;
-						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.ColorName;
-						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.ColorName;
+						FakeConsole.ForegroundColor = (ConsoleColor)attr.Foreground.GetClosestNamedColor ();
+						FakeConsole.BackgroundColor = (ConsoleColor)attr.Background.GetClosestNamedColor ();
 					}
 					outputWidth++;
 					var rune = (Rune)Contents [row, col].Rune;
