@@ -4,14 +4,16 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Notepad", Description: "Multi-tab text editor using the TabView control.")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("TabView"), ScenarioCategory ("TextView")]
+[ScenarioMetadata ("Notepad", "Multi-tab text editor using the TabView control.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("TabView")]
+[ScenarioCategory ("TextView")]
 public class Notepad : Scenario {
-	TabView tabView;
+	TabView _focusedTabView;
+	StatusItem _lenStatusItem;
 
-	private int _numbeOfNewTabs = 1;
-	private TabView _focusedTabView;
-	private StatusItem _lenStatusItem;
+	int _numbeOfNewTabs = 1;
+	TabView _tabView;
 
 	// Don't create a Window, just return the top-level view
 	public override void Init ()
@@ -23,62 +25,63 @@ public class Notepad : Scenario {
 	public override void Setup ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_New", "", () => New(), null, null, KeyCode.N | KeyCode.CtrlMask | KeyCode.AltMask),
-				new MenuItem ("_Open", "", () => Open()),
-				new MenuItem ("_Save", "", () => Save()),
-				new MenuItem ("Save _As", "", () => SaveAs()),
-				new MenuItem ("_Close", "", () => Close()),
-				new MenuItem ("_Quit", "", () => Quit()),
+			new("_File", new MenuItem [] {
+				new("_New", "", () => New (), null, null,
+					KeyCode.N | KeyCode.CtrlMask | KeyCode.AltMask),
+				new("_Open", "", () => Open ()),
+				new("_Save", "", () => Save ()),
+				new("Save _As", "", () => SaveAs ()),
+				new("_Close", "", () => Close ()),
+				new("_Quit", "", () => Quit ())
 			}),
-			new MenuBarItem ("_About", "", () => MessageBox.Query("Notepad", "About Notepad...", "Ok"))
-			});
+			new("_About", "", () => MessageBox.Query ("Notepad", "About Notepad...", "Ok"))
+		});
 		Application.Top.Add (menu);
 
-		tabView = CreateNewTabView ();
+		_tabView = CreateNewTabView ();
 
-		tabView.Style.ShowBorder = true;
-		tabView.ApplyStyleChanges ();
+		_tabView.Style.ShowBorder = true;
+		_tabView.ApplyStyleChanges ();
 
 		// Start with only a single view but support splitting to show side by side
 		var split = new TileView (1) {
 			X = 0,
 			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (1),
+			Height = Dim.Fill (1)
 		};
-		split.Tiles.ElementAt (0).ContentView.Add (tabView);
+		split.Tiles.ElementAt (0).ContentView.Add (_tabView);
 		split.LineStyle = LineStyle.None;
 
 		Application.Top.Add (split);
 
 		_lenStatusItem = new StatusItem (KeyCode.CharMask, "Len: ", null);
-		var statusBar = new StatusBar (new StatusItem [] {
-			new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
+		var statusBar = new StatusBar (new [] {
+			new(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
 
 			// These shortcut keys don't seem to work correctly in linux 
 			//new StatusItem(Key.CtrlMask | Key.N, "~^O~ Open", () => Open()),
 			//new StatusItem(Key.CtrlMask | Key.N, "~^N~ New", () => New()),
 
-			new StatusItem(KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save()),
-			new StatusItem(KeyCode.CtrlMask | KeyCode.W, "~^W~ Close", () => Close()),
-			_lenStatusItem,
+			new(KeyCode.CtrlMask | KeyCode.S, "~^S~ Save", () => Save ()),
+			new(KeyCode.CtrlMask | KeyCode.W, "~^W~ Close", () => Close ()),
+			_lenStatusItem
 		});
-		_focusedTabView = tabView;
-		tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-		tabView.Enter += (s, e) => _focusedTabView = tabView;
+		_focusedTabView = _tabView;
+		_tabView.SelectedTabChanged += TabView_SelectedTabChanged;
+		_tabView.Enter += (s, e) => _focusedTabView = _tabView;
 
 		Application.Top.Add (statusBar);
 		Application.Top.Ready += (s, e) => New ();
 	}
 
-	private void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
+	void TabView_SelectedTabChanged (object sender, TabChangedEventArgs e)
 	{
 		_lenStatusItem.Title = $"Len:{e.NewTab?.View?.Text?.Length ?? 0}";
 		e.NewTab?.View?.SetFocus ();
 	}
 
-	private void TabView_TabClicked (object sender, TabMouseEventArgs e)
+	void TabView_TabClicked (object sender, TabMouseEventArgs e)
 	{
 		// we are only interested in right clicks
 		if (!e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked)) {
@@ -89,54 +92,41 @@ public class Notepad : Scenario {
 
 		if (e.Tab == null) {
 			items = new MenuBarItem (new MenuItem [] {
-				new MenuItem ($"Open", "", () => Open()),
+				new("Open", "", () => Open ())
 			});
-
 		} else {
-
 			var tv = (TabView)sender;
 			var t = (OpenedFile)e.Tab;
 
 			items = new MenuBarItem (new MenuItem [] {
-				new MenuItem ($"Save", "", () => Save(_focusedTabView, e.Tab)),
-				new MenuItem ($"Close", "", () => Close(tv, e.Tab)),
+				new("Save", "", () => Save (_focusedTabView, e.Tab)),
+				new("Close", "", () => Close (tv, e.Tab)),
 				null,
-				new MenuItem ($"Split Up", "", () => SplitUp(tv,t)),
-				new MenuItem ($"Split Down", "", () => SplitDown(tv,t)),
-				new MenuItem ($"Split Right", "", () => SplitRight(tv,t)),
-				new MenuItem ($"Split Left", "", () => SplitLeft(tv,t)),
+				new("Split Up", "", () => SplitUp (tv, t)),
+				new("Split Down", "", () => SplitDown (tv, t)),
+				new("Split Right", "", () => SplitRight (tv, t)),
+				new("Split Left", "", () => SplitLeft (tv, t))
 			});
 		}
 
-	((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY, true);
+		((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out var screenX, out var screenY);
 
-		var contextMenu = new ContextMenu (screenX, screenY, items);
+		var contextMenu = new ContextMenu { Position = new Point (screenX, screenY), MenuItems = items };
 
 		contextMenu.Show ();
 		e.MouseEvent.Handled = true;
 	}
 
-	private void SplitUp (TabView sender, OpenedFile tab)
-	{
-		Split (0, Orientation.Horizontal, sender, tab);
-	}
-	private void SplitDown (TabView sender, OpenedFile tab)
-	{
-		Split (1, Orientation.Horizontal, sender, tab);
+	void SplitUp (TabView sender, OpenedFile tab) => Split (0, Orientation.Horizontal, sender, tab);
 
-	}
-	private void SplitLeft (TabView sender, OpenedFile tab)
-	{
-		Split (0, Orientation.Vertical, sender, tab);
-	}
-	private void SplitRight (TabView sender, OpenedFile tab)
-	{
-		Split (1, Orientation.Vertical, sender, tab);
-	}
+	void SplitDown (TabView sender, OpenedFile tab) => Split (1, Orientation.Horizontal, sender, tab);
 
-	private void Split (int offset, Orientation orientation, TabView sender, OpenedFile tab)
-	{
+	void SplitLeft (TabView sender, OpenedFile tab) => Split (0, Orientation.Vertical, sender, tab);
 
+	void SplitRight (TabView sender, OpenedFile tab) => Split (1, Orientation.Vertical, sender, tab);
+
+	void Split (int offset, Orientation orientation, TabView sender, OpenedFile tab)
+	{
 		var split = (TileView)sender.SuperView.SuperView;
 		var tileIndex = split.IndexOf (sender);
 
@@ -160,13 +150,13 @@ public class Notepad : Scenario {
 		newTabView.FocusNext ();
 	}
 
-	private TabView CreateNewTabView ()
+	TabView CreateNewTabView ()
 	{
-		var tv = new TabView () {
+		var tv = new TabView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 
 		tv.TabClicked += TabView_TabClicked;
@@ -175,16 +165,11 @@ public class Notepad : Scenario {
 		return tv;
 	}
 
-	private void New ()
-	{
-		Open (null, $"new {_numbeOfNewTabs++}");
-	}
+	void New () => Open (null, $"new {_numbeOfNewTabs++}");
 
-	private void Close ()
-	{
-		Close (_focusedTabView, _focusedTabView.SelectedTab);
-	}
-	private void Close (TabView tv, Tab tabToClose)
+	void Close () => Close (_focusedTabView, _focusedTabView.SelectedTab);
+
+	void Close (TabView tv, Tab tabToClose)
 	{
 		var tab = tabToClose as OpenedFile;
 
@@ -195,11 +180,10 @@ public class Notepad : Scenario {
 		_focusedTabView = tv;
 
 		if (tab.UnsavedChanges) {
-
-			int result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.TrimEnd ('*')}", "Yes", "No", "Cancel");
+			var result = MessageBox.Query ("Save Changes", $"Save changes to {tab.Text.TrimEnd ('*')}",
+				"Yes", "No", "Cancel");
 
 			if (result == -1 || result == 2) {
-
 				// user cancelled
 				return;
 			}
@@ -219,7 +203,6 @@ public class Notepad : Scenario {
 		_focusedTabView = tv;
 
 		if (tv.Tabs.Count == 0) {
-
 			var split = (TileView)tv.SuperView.SuperView;
 
 			// if it is the last TabView on screen don't drop it or we will
@@ -249,16 +232,14 @@ public class Notepad : Scenario {
 		}
 	}
 
-	private void Open ()
+	void Open ()
 	{
 		var open = new OpenDialog ("Open") { AllowsMultipleSelection = true };
 
 		Application.Run (open);
 
 		if (!open.Canceled) {
-
 			foreach (var path in open.FilePaths) {
-
 				if (string.IsNullOrEmpty (path) || !File.Exists (path)) {
 					return;
 				}
@@ -270,12 +251,12 @@ public class Notepad : Scenario {
 	}
 
 	/// <summary>
-	/// Creates a new tab with initial text
+	///         Creates a new tab with initial text
 	/// </summary>
 	/// <param name="fileInfo">File that was read or null if a new blank document</param>
-	private void Open (FileInfo fileInfo, string tabName)
+	void Open (FileInfo fileInfo, string tabName)
 	{
-		var tab = new OpenedFile () {
+		var tab = new OpenedFile {
 			DisplayText = tabName,
 			File = fileInfo
 		};
@@ -286,10 +267,8 @@ public class Notepad : Scenario {
 		_focusedTabView.AddTab (tab, true);
 	}
 
-	public void Save ()
-	{
-		Save (_focusedTabView, _focusedTabView.SelectedTab);
-	}
+	public void Save () => Save (_focusedTabView, _focusedTabView.SelectedTab);
+
 	public void Save (TabView tabViewToSave, Tab tabToSave)
 	{
 		var tab = tabToSave as OpenedFile;
@@ -332,11 +311,13 @@ public class Notepad : Scenario {
 		return true;
 	}
 
-	private class OpenedFile : Tab {
+	void Quit () => Application.RequestStop ();
+
+	class OpenedFile : Tab {
 		public FileInfo File { get; set; }
 
 		/// <summary>
-		/// The text of the tab the last time it was saved
+		///         The text of the tab the last time it was saved
 		/// </summary>
 		/// <value></value>
 		public string SavedText { get; set; }
@@ -348,20 +329,16 @@ public class Notepad : Scenario {
 			var textView = (TextView)View;
 			// when user makes changes rename tab to indicate unsaved
 			textView.KeyUp += (s, k) => {
-
 				// if current text doesn't match saved text
-				var areDiff = this.UnsavedChanges;
+				var areDiff = UnsavedChanges;
 
 				if (areDiff) {
 					if (!Text.EndsWith ('*')) {
-
 						Text = Text + '*';
 						parent.SetNeedsDisplay ();
 					}
 				} else {
-
 					if (Text.EndsWith ('*')) {
-
 						Text = Text.TrimEnd ('*');
 						parent.SetNeedsDisplay ();
 					}
@@ -371,25 +348,24 @@ public class Notepad : Scenario {
 
 		public View CreateTextView (FileInfo file)
 		{
-			string initialText = string.Empty;
+			var initialText = string.Empty;
 			if (file != null && file.Exists) {
-
 				initialText = System.IO.File.ReadAllText (file.FullName);
 			}
 
-			return new TextView () {
+			return new TextView {
 				X = 0,
 				Y = 0,
 				Width = Dim.Fill (),
 				Height = Dim.Fill (),
 				Text = initialText,
-				AllowsTab = false,
+				AllowsTab = false
 			};
 		}
 
 		public OpenedFile CloneTo (TabView other)
 		{
-			var newTab = new OpenedFile () { DisplayText = base.Text, File = File };
+			var newTab = new OpenedFile { DisplayText = base.Text, File = File };
 			newTab.View = newTab.CreateTextView (newTab.File);
 			newTab.SavedText = newTab.View.Text;
 			newTab.RegisterTextViewEvents (other);
@@ -410,10 +386,5 @@ public class Notepad : Scenario {
 
 			Text = Text.TrimEnd ('*');
 		}
-	}
-
-	private void Quit ()
-	{
-		Application.RequestStop ();
 	}
 }

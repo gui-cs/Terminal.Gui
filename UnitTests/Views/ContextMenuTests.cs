@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
-using System.Threading;
-using Xunit;
 using Xunit.Abstractions;
+
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 namespace Terminal.Gui.ViewsTests;
@@ -9,10 +8,7 @@ namespace Terminal.Gui.ViewsTests;
 public class ContextMenuTests {
 	readonly ITestOutputHelper _output;
 
-	public ContextMenuTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public ContextMenuTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	[AutoInitShutdown]
@@ -23,42 +19,45 @@ public class ContextMenuTests {
 		Assert.Empty (cm.MenuItems.Children);
 		Assert.Null (cm.Host);
 		cm.Position = new Point (20, 10);
-		cm.MenuItems = new MenuBarItem (new MenuItem [] {
-				new MenuItem ("First", "", null)
-			});
+		cm.MenuItems = new MenuBarItem ([
+			new MenuItem ("First", "", null)
+		]);
 		Assert.Equal (new Point (20, 10), cm.Position);
 		Assert.Single (cm.MenuItems.Children);
 
-		cm = new ContextMenu (5, 10,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
+		cm = new ContextMenu {
+			Position = new Point (5, 10),
+			MenuItems = new MenuBarItem (new [] {
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
 			})
-		);
+		};
 		Assert.Equal (new Point (5, 10), cm.Position);
 		Assert.Equal (2, cm.MenuItems.Children.Length);
 		Assert.Null (cm.Host);
 
-		cm = new ContextMenu (new View () { X = 5, Y = 10 },
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
+		cm = new ContextMenu {
+			Host = new View { X = 5, Y = 10 },
+			Position = new Point (5, 10),
+			MenuItems = new MenuBarItem (new [] {
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
 			})
-		);
+		};
+
 		Assert.Equal (new Point (5, 10), cm.Position);
 		Assert.Equal (2, cm.MenuItems.Children.Length);
 		Assert.NotNull (cm.Host);
 	}
 
-	private ContextMenu Create_ContextMenu_With_Two_MenuItem (int x, int y)
-	{
-		return new ContextMenu (x, y,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
+	ContextMenu Create_ContextMenu_With_Two_MenuItem (int x, int y) =>
+		new () {
+			Position = new Point (x, y),
+			MenuItems = new MenuBarItem (new MenuItem [] {
+				new("One", "", null),
+				new("Two", "", null)
 			})
-		);
-	}
+		};
 
 	[Fact]
 	[AutoInitShutdown]
@@ -94,12 +93,13 @@ public class ContextMenuTests {
 	[AutoInitShutdown]
 	public void Position_Changing ()
 	{
-		var cm = new ContextMenu (10, 5,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (10, 5),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		cm.Show ();
 		Application.Begin (Application.Top);
@@ -126,19 +126,19 @@ public class ContextMenuTests {
 ";
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
-
 	}
 
 	[Fact]
 	[AutoInitShutdown]
 	public void MenuItens_Changing ()
 	{
-		var cm = new ContextMenu (10, 5,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (10, 5),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		cm.Show ();
 		Application.Begin (Application.Top);
@@ -152,11 +152,11 @@ public class ContextMenuTests {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		cm.MenuItems = new MenuBarItem (new MenuItem [] {
-				new MenuItem ("First", "", null),
-				new MenuItem ("Second", "", null),
-				new MenuItem ("Third", "", null)
-			});
+		cm.MenuItems = new MenuBarItem ([
+			new MenuItem ("First", "", null),
+			new MenuItem ("Second", "", null),
+			new MenuItem ("Third", "", null)
+		]);
 
 		cm.Show ();
 		Application.Refresh ();
@@ -170,10 +170,10 @@ public class ContextMenuTests {
 ";
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
-
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Key_Changing ()
 	{
 		var lbl = new Label { Text = "Original" };
@@ -200,7 +200,8 @@ public class ContextMenuTests {
 		Assert.Equal ("Replaced", lbl.Text);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MouseFlags_Changing ()
 	{
 		var lbl = new Label { Text = "Original" };
@@ -218,16 +219,17 @@ public class ContextMenuTests {
 		top.Add (lbl);
 		Application.Begin (top);
 
-		Assert.True (lbl.OnMouseEvent (new MouseEvent () { Flags = cm.MouseFlags }));
+		Assert.True (lbl.OnMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
 		Assert.Equal ("Replaced", lbl.Text);
 
 		lbl.Text = "Original";
 		cm.MouseFlags = MouseFlags.Button2Clicked;
-		Assert.True (lbl.OnMouseEvent (new MouseEvent () { Flags = cm.MouseFlags }));
+		Assert.True (lbl.OnMouseEvent (new MouseEvent { Flags = cm.MouseFlags }));
 		Assert.Equal ("Replaced", lbl.Text);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void KeyChanged_Event ()
 	{
 		var oldKey = KeyCode.Null;
@@ -240,7 +242,8 @@ public class ContextMenuTests {
 		Assert.Equal (KeyCode.F10 | KeyCode.ShiftMask, oldKey);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MouseFlagsChanged_Event ()
 	{
 		var oldMouseFlags = new MouseFlags ();
@@ -253,15 +256,17 @@ public class ContextMenuTests {
 		Assert.Equal (MouseFlags.Button3Clicked, oldMouseFlags);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Show_Ensures_Display_Inside_The_Container_But_Preserves_Position ()
 	{
-		var cm = new ContextMenu (80, 25,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (80, 25),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		Assert.Equal (new Point (80, 25), cm.Position);
 
@@ -283,7 +288,8 @@ public class ContextMenuTests {
 		Assert.Equal (new Point (80, 25), cm.Position);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Show_Ensures_Display_Inside_The_Container_Without_Overlap_The_Host ()
 	{
 		var view = new View ("View") {
@@ -292,18 +298,19 @@ public class ContextMenuTests {
 			Width = 10,
 			Height = 1
 		};
-		var cm = new ContextMenu (view,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Host = view,
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
 		Assert.Equal (new Rect (70, 24, 10, 1), view.Frame);
-		//Assert.Equal (new Point (0, 0), cm.Position);
+		Assert.Equal (Point.Empty, cm.Position);
 
 		cm.Show ();
 		Assert.Equal (new Point (70, 24), cm.Position);
@@ -324,16 +331,19 @@ public class ContextMenuTests {
 		Assert.Equal (new Point (70, 24), cm.Position);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Show_Display_Below_The_Bottom_Host_If_Has_Enough_Space ()
 	{
-		var view = new View ("View") { X = 10, Y = 5, Width = 10, Height = 1 };
-		var cm = new ContextMenu (view,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var view = new View { X = 10, Y = 5, Width = 10, Height = 1, Text = "View" };
+		var cm = new ContextMenu {
+			Host = view,
+			Position = new Point (10, 5),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
@@ -382,17 +392,19 @@ public class ContextMenuTests {
 		Assert.Equal (new Point (5, 12), cm.Position);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Show_Display_At_Zero_If_The_Toplevel_Width_Is_Less_Than_The_Menu_Width ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (5, 25);
 
-		var cm = new ContextMenu (0, 0,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (0, 0),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		Assert.Equal (new Point (0, 0), cm.Position);
 
@@ -413,17 +425,19 @@ public class ContextMenuTests {
 		Assert.Equal (new Point (0, 0), cm.Position);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Show_Display_At_Zero_If_The_Toplevel_Height_Is_Less_Than_The_Menu_Height ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (80, 3);
 
-		var cm = new ContextMenu (0, 0,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (0, 0),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		Assert.Equal (new Point (0, 0), cm.Position);
 
@@ -443,15 +457,17 @@ public class ContextMenuTests {
 		Assert.Equal (new Point (0, 0), cm.Position);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Hide_Is_Invoke_At_Container_Closing ()
 	{
-		var cm = new ContextMenu (80, 25,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (80, 25),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		var top = Application.Top;
 		Application.Begin (top);
@@ -466,15 +482,17 @@ public class ContextMenuTests {
 		Assert.False (ContextMenu.IsShow);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ForceMinimumPosToZero_True_False ()
 	{
-		var cm = new ContextMenu (-1, -2,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (-1, -2),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
 		Assert.Equal (new Point (-1, -2), cm.Position);
 
@@ -507,20 +525,22 @@ public class ContextMenuTests {
 		Assert.Equal (new Rect (1, 0, 7, 3), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ContextMenu_Is_Closed_If_Another_MenuBar_Is_Open_Or_Vice_Versa ()
 	{
-		var cm = new ContextMenu (10, 5,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (10, 5),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null)
+			])
+		};
 
-		var menu = new MenuBar (new MenuBarItem [] {
-					new MenuBarItem ("File", "", null),
-					new MenuBarItem ("Edit", "", null)
-				});
+		var menu = new MenuBar ([
+			new MenuBarItem ("File", "", null),
+			new MenuBarItem ("Edit", "", null)
+		]);
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -551,25 +571,26 @@ public class ContextMenuTests {
 		Assert.True (ContextMenu.IsShow);
 		Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 		Assert.False (menu.IsMenuOpen);
-		Assert.False (menu.MouseEvent (new MouseEvent () { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
+		Assert.False (menu.MouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.ReportMousePosition, View = menu }));
 		Assert.True (ContextMenu.IsShow);
 		Assert.Equal (cm.MenuBar, Application.MouseGrabView);
 		Assert.False (menu.IsMenuOpen);
-		Assert.True (menu.MouseEvent (new MouseEvent () { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
+		Assert.True (menu.MouseEvent (new MouseEvent { X = 1, Flags = MouseFlags.Button1Clicked, View = menu }));
 		Assert.False (ContextMenu.IsShow);
 		Assert.Equal (menu, Application.MouseGrabView);
 		Assert.True (menu.IsMenuOpen);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ContextMenu_On_Toplevel_With_A_MenuBar_TextField_StatusBar ()
 	{
 		Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 
-		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", "", null),
-				new MenuBarItem ("Edit", "", null)
-			});
+		var menu = new MenuBar ([
+			new MenuBarItem ("File", "", null),
+			new MenuBarItem ("Edit", "", null)
+		]);
 
 		var label = new Label {
 			X = 2,
@@ -583,10 +604,10 @@ public class ContextMenuTests {
 			Width = 20
 		};
 
-		var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(KeyCode.F1, "~F1~ Help", null),
-				new StatusItem(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
-			});
+		var statusBar = new StatusBar ([
+			new StatusItem (KeyCode.F1, "~F1~ Help", null),
+			new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
+		]);
 
 		Application.Top.Add (menu, label, tf, statusBar);
 		((FakeDriver)Application.Driver).SetBufferSize (45, 17);
@@ -623,15 +644,16 @@ public class ContextMenuTests {
 		Assert.Equal (new Rect (1, 0, 32, 17), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void ContextMenu_On_Toplevel_With_A_MenuBar_Window_TextField_StatusBar ()
 	{
 		Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 
-		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("File", "", null),
-				new MenuBarItem ("Edit", "", null)
-			});
+		var menu = new MenuBar (new [] {
+			new MenuBarItem ("File", "", null),
+			new MenuBarItem ("Edit", "", null)
+		});
 
 		var label = new Label { X = 2, Y = 3, Text = "Label:" };
 
@@ -644,10 +666,10 @@ public class ContextMenuTests {
 		var win = new Window ();
 		win.Add (label, tf);
 
-		var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem (KeyCode.F1, "~F1~ Help", null),
-				new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
-			});
+		var statusBar = new StatusBar (new [] {
+			new StatusItem (KeyCode.F1, "~F1~ Help", null),
+			new StatusItem (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null)
+		});
 
 		Application.Top.Add (menu, win, statusBar);
 		Application.Begin (Application.Top);
@@ -684,27 +706,29 @@ public class ContextMenuTests {
 		Assert.Equal (new Rect (1, 0, 44, 17), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Menus_And_SubMenus_Always_Try_To_Be_On_Screen ()
 	{
-		var cm = new ContextMenu (-1, -2,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuItem ("Two", "", null),
-					new MenuItem ("Three", "", null),
-					new MenuBarItem ("Four", new MenuItem [] {
-						new MenuItem ("SubMenu1", "", null),
-						new MenuItem ("SubMenu2", "", null),
-						new MenuItem ("SubMenu3", "", null),
-						new MenuItem ("SubMenu4", "", null),
-						new MenuItem ("SubMenu5", "", null),
-						new MenuItem ("SubMenu6", "", null),
-						new MenuItem ("SubMenu7", "", null)
-					}),
-					new MenuItem ("Five", "", null),
-					new MenuItem ("Six", "", null)
-			})
-		);
+		var cm = new ContextMenu {
+			Position = new Point (-1, -2),
+			MenuItems = new MenuBarItem ([
+				new MenuItem ("One", "", null),
+				new MenuItem ("Two", "", null),
+				new MenuItem ("Three", "", null),
+				new MenuBarItem ("Four", [
+					new MenuItem ("SubMenu1", "", null),
+					new MenuItem ("SubMenu2", "", null),
+					new MenuItem ("SubMenu3", "", null),
+					new MenuItem ("SubMenu4", "", null),
+					new MenuItem ("SubMenu5", "", null),
+					new MenuItem ("SubMenu6", "", null),
+					new MenuItem ("SubMenu7", "", null)
+				]),
+				new MenuItem ("Five", "", null),
+				new MenuItem ("Six", "", null)
+			])
+		};
 
 		Assert.Equal (new Point (-1, -2), cm.Position);
 
@@ -894,20 +918,22 @@ public class ContextMenuTests {
 ", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Key_Open_And_Close_The_ContextMenu ()
 	{
 		var tf = new TextField ();
 		Application.Top.Add (tf);
 		Application.Begin (Application.Top);
 
-		Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.F10 | KeyCode.ShiftMask)));
+		Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.F10 | KeyCode.ShiftMask)));
 		Assert.True (tf.ContextMenu.MenuBar.IsMenuOpen);
-		Assert.True (Application.Top.NewKeyDownEvent (new (KeyCode.F10 | KeyCode.ShiftMask)));
+		Assert.True (Application.Top.NewKeyDownEvent (new Key (KeyCode.F10 | KeyCode.ShiftMask)));
 		Assert.Null (tf.ContextMenu.MenuBar);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_A_ContextMenu_Over_A_Dialog ()
 	{
 		var top = Application.Top;
@@ -935,7 +961,7 @@ public class ContextMenuTests {
 └──────────────────┘", _output);
 
 		// Don't use Dialog here as it has more layout logic. Use Window instead.
-		var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
+		var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
 		dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 		var rs = Application.Begin (dialog);
 
@@ -957,7 +983,7 @@ public class ContextMenuTests {
 │                  │
 └──────────────────┘", _output);
 
-		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 9,
 			Y = 3,
 			Flags = MouseFlags.Button3Clicked
@@ -985,7 +1011,8 @@ public class ContextMenuTests {
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_A_ContextMenu_Over_A_Top_Dialog ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (20, 15);
@@ -994,7 +1021,7 @@ public class ContextMenuTests {
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
 		// Don't use Dialog here as it has more layout logic. Use Window instead.
-		var dialog = new Window () { X = 2, Y = 2, Width = 15, Height = 4 };
+		var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
 		dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 		var rs = Application.Begin (dialog);
 
@@ -1006,7 +1033,7 @@ public class ContextMenuTests {
   │             │
   └─────────────┘", _output);
 
-		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 9,
 			Y = 3,
 			Flags = MouseFlags.Button3Clicked
@@ -1030,7 +1057,8 @@ public class ContextMenuTests {
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_A_ContextMenu_Over_A_Borderless_Top ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (20, 15);
@@ -1038,7 +1066,7 @@ public class ContextMenuTests {
 		Assert.Equal (new Rect (0, 0, 20, 15), Application.Driver.Clip);
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
-		var top = new Toplevel () { X = 2, Y = 2, Width = 15, Height = 4 };
+		var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
 		top.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
 		var rs = Application.Begin (top);
 
@@ -1047,7 +1075,7 @@ public class ContextMenuTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
     Test", _output);
 
-		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 8,
 			Y = 2,
 			Flags = MouseFlags.Button3Clicked
@@ -1070,19 +1098,22 @@ public class ContextMenuTests {
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void UseSubMenusSingleFrame_True_By_Mouse ()
 	{
-		var cm = new ContextMenu (5, 10,
-			new MenuBarItem ("Numbers", new MenuItem [] {
-					new MenuItem ("One", "", null),
-					new MenuBarItem ("Two", new MenuItem [] {
+		var cm = new ContextMenu {
+			Position = new Point (5, 10),
+			MenuItems = new MenuBarItem ("Numbers", [
+				new MenuItem ("One", "", null),
+				new MenuBarItem ("Two", [
 					new MenuItem ("Sub-Menu 1", "", null),
 					new MenuItem ("Sub-Menu 2", "", null)
-					}),
-					new MenuItem ("Three", "", null),
-			})
-		) { UseSubMenusSingleFrame = true };
+				]),
+				new MenuItem ("Three", "", null)
+			]),
+			UseSubMenusSingleFrame = true
+		};
 
 		cm.Show ();
 		var rs = Application.Begin (Application.Top);
@@ -1095,7 +1126,7 @@ public class ContextMenuTests {
      │ Three  │
      └────────┘", _output);
 
-		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 5,
 			Y = 13,
 			Flags = MouseFlags.Button1Clicked
@@ -1113,7 +1144,7 @@ public class ContextMenuTests {
      │ Sub-Menu 2  │
      └─────────────┘", _output);
 
-		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+		Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 			X = 5,
 			Y = 12,
 			Flags = MouseFlags.Button1Clicked
@@ -1132,7 +1163,8 @@ public class ContextMenuTests {
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void RequestStop_While_ContextMenu_Is_Open_Does_Not_Throws ()
 	{
 		var cm = Create_ContextMenu_With_Two_MenuItem (10, 5);

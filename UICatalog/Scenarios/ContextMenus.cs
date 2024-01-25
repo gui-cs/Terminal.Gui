@@ -5,24 +5,28 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "ContextMenus", Description: "Context Menu Sample.")]
+[ScenarioMetadata ("ContextMenus", "Context Menu Sample.")]
 [ScenarioCategory ("Menus")]
 public class ContextMenus : Scenario {
-	private ContextMenu _contextMenu = new ContextMenu ();
-	private readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
-	private MenuItem _miForceMinimumPosToZero;
-	private bool _forceMinimumPosToZero = true;
-	private TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
-	private MenuItem _miUseSubMenusSingleFrame;
-	private bool _useSubMenusSingleFrame;
+	readonly List<CultureInfo> _cultureInfos = Application.SupportedCultures;
+	ContextMenu _contextMenu = new ();
+	bool _forceMinimumPosToZero = true;
+	MenuItem _miForceMinimumPosToZero;
+	MenuItem _miUseSubMenusSingleFrame;
+	TextField _tfTopLeft, _tfTopRight, _tfMiddle, _tfBottomLeft, _tfBottomRight;
+	bool _useSubMenusSingleFrame;
 
 	public override void Setup ()
 	{
 		var text = "Context Menu";
 		var width = 20;
-		KeyCode winContextMenuKey = KeyCode.Space | KeyCode.CtrlMask;
+		var winContextMenuKey = KeyCode.Space | KeyCode.CtrlMask;
 
-		var label = new Label { X = Pos.Center(), Y = 1, Text = $"Press '{winContextMenuKey}' to open the Window context menu." };
+		var label = new Label {
+			X = Pos.Center (),
+			Y = 1,
+			Text = $"Press '{winContextMenuKey}' to open the Window context menu."
+		};
 		Win.Add (label);
 		label = new Label {
 			X = Pos.Center (),
@@ -93,32 +97,44 @@ public class ContextMenus : Scenario {
 		};
 	}
 
-	private void ShowContextMenu (int x, int y)
+	void ShowContextMenu (int x, int y)
 	{
-		_contextMenu = new ContextMenu (x, y,
-			new MenuBarItem (new MenuItem [] {
-					new MenuItem ("_Configuration", "Show configuration", () => MessageBox.Query (50, 5, "Info", "This would open settings dialog", "Ok")),
-					new MenuBarItem ("More options", new MenuItem [] {
-						new MenuItem ("_Setup", "Change settings", () => MessageBox.Query (50, 5, "Info", "This would open setup dialog", "Ok"), shortcut: KeyCode.T | KeyCode.CtrlMask),
-						new MenuItem ("_Maintenance", "Maintenance mode", () => MessageBox.Query (50, 5, "Info", "This would open maintenance dialog", "Ok")),
-					}),
-					new MenuBarItem ("_Languages", GetSupportedCultures ()),
-					_miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosToZero", "", () => {
-						_miForceMinimumPosToZero.Checked = _forceMinimumPosToZero = !_forceMinimumPosToZero;
-						_tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-						_tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-						_tfMiddle.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-						_tfBottomLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-						_tfBottomRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-					}) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
-					_miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
-						() => _contextMenu.UseSubMenusSingleFrame = (bool)(_miUseSubMenusSingleFrame.Checked = _useSubMenusSingleFrame = !_useSubMenusSingleFrame)) {
-							CheckType = MenuItemCheckStyle.Checked, Checked = _useSubMenusSingleFrame
-						},
-					null,
-					new MenuItem ("_Quit", "", () => Application.RequestStop ())
-			})
-		) { ForceMinimumPosToZero = _forceMinimumPosToZero, UseSubMenusSingleFrame = _useSubMenusSingleFrame };
+		_contextMenu = new ContextMenu {
+			Position = new Point (x, y),
+			MenuItems = new MenuBarItem (new [] {
+				new("_Configuration", "Show configuration",
+					() => MessageBox.Query (50, 5, "Info", "This would open settings dialog",
+						"Ok")),
+				new MenuBarItem ("More options", new MenuItem [] {
+					new("_Setup", "Change settings",
+						() => MessageBox.Query (50, 5, "Info", "This would open setup dialog",
+							"Ok"), shortcut: KeyCode.T | KeyCode.CtrlMask),
+					new("_Maintenance", "Maintenance mode",
+						() => MessageBox.Query (50, 5, "Info",
+							"This would open maintenance dialog", "Ok"))
+				}),
+				new MenuBarItem ("_Languages", GetSupportedCultures ()),
+				_miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosToZero", "", () => {
+					_miForceMinimumPosToZero.Checked =
+						_forceMinimumPosToZero = !_forceMinimumPosToZero;
+					_tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					_tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					_tfMiddle.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					_tfBottomLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					_tfBottomRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+				}) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
+				_miUseSubMenusSingleFrame = new MenuItem ("Use_SubMenusSingleFrame", "",
+					() => _contextMenu.UseSubMenusSingleFrame =
+						(bool)(_miUseSubMenusSingleFrame.Checked =
+							_useSubMenusSingleFrame = !_useSubMenusSingleFrame)) {
+					CheckType = MenuItemCheckStyle.Checked, Checked = _useSubMenusSingleFrame
+				},
+				null,
+				new("_Quit", "", () => Application.RequestStop ())
+			}),
+			ForceMinimumPosToZero = _forceMinimumPosToZero,
+			UseSubMenusSingleFrame = _useSubMenusSingleFrame
+		};
 
 		_tfTopLeft.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
 		_tfTopRight.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
@@ -129,9 +145,9 @@ public class ContextMenus : Scenario {
 		_contextMenu.Show ();
 	}
 
-	private MenuItem [] GetSupportedCultures ()
+	MenuItem [] GetSupportedCultures ()
 	{
-		List<MenuItem> supportedCultures = new List<MenuItem> ();
+		var supportedCultures = new List<MenuItem> ();
 		var index = -1;
 
 		foreach (var c in _cultureInfos) {
@@ -149,12 +165,14 @@ public class ContextMenus : Scenario {
 					CheckType = MenuItemCheckStyle.Checked
 				};
 			}
+
 			culture.Title = $"_{c.Parent.EnglishName}";
 			culture.Help = c.Name;
 			culture.Checked = Thread.CurrentThread.CurrentUICulture.Name == c.Name;
 			CreateAction (supportedCultures, culture);
 			supportedCultures.Add (culture);
 		}
+
 		return supportedCultures.ToArray ();
 
 		void CreateAction (List<MenuItem> supportedCultures, MenuItem culture)
