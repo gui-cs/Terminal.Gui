@@ -407,7 +407,7 @@ public class Editor : Scenario {
 			new AllowedType ("Text Files", ".txt", ".bin", ".xml"),
 			new AllowedTypeAny ()
 		};
-		var sd = new SaveDialog ("Save file", aTypes);
+		var sd = new SaveDialog { Title = "Save file", AllowedTypes = aTypes };
 
 		sd.Path = Path.Combine (sd.FileName, Win.Title);
 		Application.Run (sd);
