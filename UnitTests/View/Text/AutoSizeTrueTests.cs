@@ -584,7 +584,7 @@ public class AutoSizeTrueTests {
 		Assert.True (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 5, 1), label.Frame);
 		Assert.Equal (new Size (5, 1), label.TextFormatter.Size);
-		Assert.Equal (new List<string> { "Label" }, label.TextFormatter.Lines);
+		Assert.Equal (new List<string> { "Label" }, label.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 		var expected = @"
@@ -605,7 +605,7 @@ public class AutoSizeTrueTests {
 		Assert.True (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 5, 1), label.Frame);
 		Assert.Equal (new Size (5, 1), label.TextFormatter.Size);
-		Assert.Single (label.TextFormatter.Lines);
+		Assert.Single (label.TextFormatter.GetLines ());
 		expected = @"
 ┌────────┐
 │Label   │
@@ -639,7 +639,7 @@ public class AutoSizeTrueTests {
 		Assert.True (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 5, 1), label.Frame);
 		Assert.Equal (new Size (5, 1), label.TextFormatter.Size);
-		Assert.Equal (new List<string> { "Label" }, label.TextFormatter.Lines);
+		Assert.Equal (new List<string> { "Label" }, label.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 		Assert.Equal (new Rect (0, 0, 10, 4), Application.Top.Frame);
 		var expected = @"
@@ -659,7 +659,7 @@ public class AutoSizeTrueTests {
 
 		Assert.Equal (new Rect (0, 0, 5, 1), label.Frame);
 		Assert.Equal (new Size (5, 1), label.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Single (label.TextFormatter.Lines));
+		var exception = Record.Exception (() => Assert.Single (label.TextFormatter.GetLines ()));
 		Assert.Null (exception);
 		expected = @"
 ┌────────┐
@@ -696,7 +696,7 @@ public class AutoSizeTrueTests {
 		Assert.True (view.AutoSize);
 		Assert.Equal (new Rect (0, 0, 1, 5), view.Frame);
 		Assert.Equal (new Size (1, 5), view.TextFormatter.Size);
-		Assert.Equal (new List<string> { "Views" }, view.TextFormatter.Lines);
+		Assert.Equal (new List<string> { "Views" }, view.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 4, 10), win.Frame);
 		Assert.Equal (new Rect (0, 0, 4, 10), Application.Top.Frame);
 		var expected = @"
@@ -722,7 +722,7 @@ public class AutoSizeTrueTests {
 
 		Assert.Equal (new Rect (0, 0, 1, 5), view.Frame);
 		Assert.Equal (new Size (1, 5), view.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Single (view.TextFormatter.Lines));
+		var exception = Record.Exception (() => Assert.Single (view.TextFormatter.GetLines ()));
 		Assert.Null (exception);
 		expected = @"
 ┌──┐
@@ -765,7 +765,7 @@ public class AutoSizeTrueTests {
 		Assert.True (view.AutoSize);
 		Assert.Equal (new Rect (0, 0, 2, 5), view.Frame);
 		Assert.Equal (new Size (2, 5), view.TextFormatter.Size);
-		Assert.Equal (new List<string> { "界View" }, view.TextFormatter.Lines);
+		Assert.Equal (new List<string> { "界View" }, view.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 4, 10), win.Frame);
 		Assert.Equal (new Rect (0, 0, 4, 10), Application.Top.Frame);
 		var expected = @"
@@ -791,7 +791,7 @@ public class AutoSizeTrueTests {
 
 		Assert.Equal (new Rect (0, 0, 2, 5), view.Frame);
 		Assert.Equal (new Size (2, 5), view.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { "界View" }, view.TextFormatter.Lines));
+		var exception = Record.Exception (() => Assert.Equal (new List<string> { "界View" }, view.TextFormatter.GetLines ()));
 		Assert.Null (exception);
 		expected = @"
 ┌──┐
@@ -2942,7 +2942,7 @@ Y
 		Assert.False (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 3, 0), label.Frame);
 		Assert.Equal (new Size (3, 0), label.TextFormatter.Size);
-		Assert.Single (label.TextFormatter.Lines);
+		Assert.Single (label.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 		var expected = @"
 ┌────────┐
@@ -2963,7 +2963,7 @@ Y
 
 		Assert.Equal (new Rect (0, 0, 0, 0), label.Frame);
 		Assert.Equal (new Size (0, 0), label.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines));
+		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.GetLines ()));
 		Assert.Null (exception);
 		expected = @"
 ┌────────┐
@@ -3005,7 +3005,7 @@ Y
 		Assert.False (label.AutoSize);
 		Assert.Equal (new Rect (0, 0, 3, 1), label.Frame);
 		Assert.Equal (new Size (3, 1), label.TextFormatter.Size);
-		Assert.Single (label.TextFormatter.Lines);
+		Assert.Single (label.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 10, 4), win.Frame);
 		var expected = @"
 ┌────────┐
@@ -3026,7 +3026,7 @@ Y
 
 		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
 		Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines));
+		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.GetLines ()));
 		Assert.Null (exception);
 		expected = @"
 ┌────────┐

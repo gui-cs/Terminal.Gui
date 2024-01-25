@@ -331,47 +331,46 @@ public class TextFormatter {
 	/// lines will be returned.
 	/// </para>
 	/// </remarks>
-	public List<string> Lines {
-		get {
-			// With this check, we protect against subclasses with overrides of Text
-			if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0) {
-				_lines = new List<string> {
+	public List<string> GetLines ()
+	{
+		// With this check, we protect against subclasses with overrides of Text
+		if (string.IsNullOrEmpty (Text) || Size.Height == 0 || Size.Width == 0) {
+			_lines = new List<string> {
 					string.Empty
 				};
-				NeedsFormat = false;
-				return _lines;
-			}
-
-			if (NeedsFormat) {
-				var shown_text = _text;
-				if (FindHotKey (_text, HotKeySpecifier, out _hotKeyPos, out var newHotKey)) {
-					HotKey = newHotKey;
-					shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
-					shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
-				}
-
-				if (IsVerticalDirection (Direction)) {
-					var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1, TabWidth);
-					_lines = Format (shown_text, Size.Height, VerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth && WordWrap,
-						PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
-					if (!AutoSize) {
-						colsWidth = GetMaxColsForWidth (_lines, Size.Width, TabWidth);
-						if (_lines.Count > colsWidth) {
-							_lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
-						}
-					}
-				} else {
-					_lines = Format (shown_text, Size.Width, Alignment == TextAlignment.Justified, Size.Height > 1 && WordWrap,
-						PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
-					if (!AutoSize && _lines.Count > Size.Height) {
-						_lines.RemoveRange (Size.Height, _lines.Count - Size.Height);
-					}
-				}
-
-				NeedsFormat = false;
-			}
+			NeedsFormat = false;
 			return _lines;
 		}
+
+		if (NeedsFormat) {
+			var shown_text = _text;
+			if (FindHotKey (_text, HotKeySpecifier, out _hotKeyPos, out var newHotKey)) {
+				HotKey = newHotKey;
+				shown_text = RemoveHotKeySpecifier (Text, _hotKeyPos, HotKeySpecifier);
+				shown_text = ReplaceHotKeyWithTag (shown_text, _hotKeyPos);
+			}
+
+			if (IsVerticalDirection (Direction)) {
+				var colsWidth = GetSumMaxCharWidth (shown_text, 0, 1, TabWidth);
+				_lines = Format (shown_text, Size.Height, VerticalAlignment == VerticalTextAlignment.Justified, Size.Width > colsWidth && WordWrap,
+					PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
+				if (!AutoSize) {
+					colsWidth = GetMaxColsForWidth (_lines, Size.Width, TabWidth);
+					if (_lines.Count > colsWidth) {
+						_lines.RemoveRange (colsWidth, _lines.Count - colsWidth);
+					}
+				}
+			} else {
+				_lines = Format (shown_text, Size.Width, Alignment == TextAlignment.Justified, Size.Height > 1 && WordWrap,
+					PreserveTrailingSpaces, TabWidth, Direction, MultiLine);
+				if (!AutoSize && _lines.Count > Size.Height) {
+					_lines.RemoveRange (Size.Height, _lines.Count - Size.Height);
+				}
+			}
+
+			NeedsFormat = false;
+		}
+		return _lines;
 	}
 
 	/// <summary>
@@ -388,7 +387,7 @@ public class TextFormatter {
 	/// Set to <see langword="true"/> when any of the properties of <see cref="TextFormatter"/> are set.
 	/// </para>
 	/// <para>
-	/// Set to <see langword="false"/> when the text is formatted (if <see cref="Lines"/> is accessed).
+	/// Set to <see langword="false"/> when the text is formatted (if <see cref="GetLines"/> is accessed).
 	/// </para>
 	/// </remarks>
 	public bool NeedsFormat { get; set; }
@@ -424,7 +423,7 @@ public class TextFormatter {
 	{
 		var sb = new StringBuilder ();
 		// Lines_get causes a Format
-		foreach (var line in Lines) {
+		foreach (var line in GetLines ()) {
 			sb.AppendLine (line);
 		}
 		return sb.ToString ().TrimEnd (Environment.NewLine.ToCharArray ());
@@ -443,9 +442,9 @@ public class TextFormatter {
 			return Size.Empty;
 		}
 
-		var lines = Lines;
-		var width = Lines.Max (line => line.GetColumns ());
-		var height = Lines.Count;
+		var lines = GetLines ();
+		var width = GetLines ().Max (line => line.GetColumns ());
+		var height = GetLines ().Count;
 		return new Size (width, height);
 	}
 
@@ -470,7 +469,7 @@ public class TextFormatter {
 	/// Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.
 	/// </summary>
 	/// <remarks>
-	/// Causes the text to be formatted (references <see cref="Lines"/>). Sets <see cref="NeedsFormat"/> to <c>false</c>.
+	/// Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to <c>false</c>.
 	/// </remarks>
 	/// <param name="bounds">Specifies the screen-relative location and maximum size for drawing the text.</param>
 	/// <param name="normalColor">The color to use for all text except the hotkey</param>
@@ -492,7 +491,7 @@ public class TextFormatter {
 
 		// Use "Lines" to ensure a Format (don't use "lines"))
 
-		var linesFormatted = Lines;
+		var linesFormatted = GetLines ();
 		switch (Direction) {
 		case TextDirection.TopBottom_RightLeft:
 		case TextDirection.LeftRight_BottomTop:
@@ -551,7 +550,7 @@ public class TextFormatter {
 			if (_textAlignment == TextAlignment.Right || _textAlignment == TextAlignment.Justified && !IsLeftToRight (Direction)) {
 				if (isVertical) {
 					// BUGBUG: We can use linesFormatted not Lines here
-					var runesWidth = GetSumMaxCharWidth (Lines, line, TabWidth);
+					var runesWidth = GetSumMaxCharWidth (GetLines (), line, TabWidth);
 					x = bounds.Right - runesWidth;
 					CursorPosition = bounds.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 				} else {
@@ -562,7 +561,7 @@ public class TextFormatter {
 			} else if (_textAlignment == TextAlignment.Left || _textAlignment == TextAlignment.Justified) {
 				if (isVertical) {
 					// BUGBUG: We can use linesFormatted not Lines here
-					var runesWidth = line > 0 ? GetSumMaxCharWidth (Lines, 0, line, TabWidth) : 0;
+					var runesWidth = line > 0 ? GetSumMaxCharWidth (GetLines (), 0, line, TabWidth) : 0;
 					x = bounds.Left + runesWidth;
 				} else {
 					x = bounds.Left;
@@ -571,7 +570,7 @@ public class TextFormatter {
 			} else if (_textAlignment == TextAlignment.Centered) {
 				if (isVertical) {
 					// BUGBUG: We can use linesFormatted not Lines here
-					var runesWidth = GetSumMaxCharWidth (Lines, line, TabWidth);
+					var runesWidth = GetSumMaxCharWidth (GetLines (), line, TabWidth);
 					x = bounds.Left + line + (bounds.Width - runesWidth) / 2;
 					CursorPosition = (bounds.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
 				} else {
@@ -589,7 +588,7 @@ public class TextFormatter {
 					y = bounds.Bottom - runes.Length;
 				} else {
 					// BUGBUG: We can use linesFormatted not Lines here
-					y = bounds.Bottom - Lines.Count + line;
+					y = bounds.Bottom - GetLines ().Count + line;
 				}
 			} else if (_textVerticalAlignment == VerticalTextAlignment.Top || _textVerticalAlignment == VerticalTextAlignment.Justified) {
 				if (isVertical) {
@@ -603,7 +602,7 @@ public class TextFormatter {
 					y = bounds.Top + s;
 				} else {
 					// BUGBUG: We can use linesFormatted not Lines here
-					var s = (bounds.Height - Lines.Count) / 2;
+					var s = (bounds.Height - GetLines ().Count) / 2;
 					y = bounds.Top + line + s;
 				}
 			} else {

@@ -318,7 +318,7 @@ public static class MessageBox {
 			if (messageSize.Height == 0) {
 				d.Height = Math.Max (height, 3 + d.GetAdornmentsThickness ().Vertical);
 			} else {
-				var lastLine = messageLabel.TextFormatter.Lines [^1];
+				var lastLine = messageLabel.TextFormatter.GetLines () [^1];
 				d.Height = Math.Max (height, messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) + d.GetAdornmentsThickness ().Vertical);
 			}
 			d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);

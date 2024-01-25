@@ -77,7 +77,7 @@ public class AutoSizeFalseTests {
 		Assert.False (view.AutoSize);
 		Assert.Equal (new Rect (0, 0, 3, 1), view.Frame);
 		Assert.Equal (new Size (3, 1), view.TextFormatter.Size);
-		Assert.Equal (new List<string> { "Vie" }, view.TextFormatter.Lines);
+		Assert.Equal (new List<string> { "Vie" }, view.TextFormatter.GetLines ());
 		Assert.Equal (new Rect (0, 0, 10, 4), frame.Frame);
 
 		frame.LayoutSubviews ();
@@ -103,7 +103,7 @@ public class AutoSizeFalseTests {
 
 		Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
 		Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
-		Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines);
+		Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.GetLines ());
 		expected = @"
 ┌────────┐
 │        │
@@ -130,16 +130,16 @@ public class AutoSizeFalseTests {
 		Assert.True (view.TextFormatter.NeedsFormat);
 		Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
 		Assert.False (view.TextFormatter.NeedsFormat);
-		Assert.Single (view.TextFormatter.Lines);
-		Assert.True (string.IsNullOrEmpty (view.TextFormatter.Lines [0]));
+		Assert.Single (view.TextFormatter.GetLines ());
+		Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines () [0]));
 
 		view.Text = "Views";
 		Assert.True (view.TextFormatter.NeedsFormat);
 		Assert.Equal (new Size (0, 0), view.TextFormatter.Size);
 		Assert.Equal (string.Empty, view.TextFormatter.Format ()); // There's no size, so it returns an empty string
 		Assert.False (view.TextFormatter.NeedsFormat);
-		Assert.Single (view.TextFormatter.Lines);
-		Assert.True (string.IsNullOrEmpty (view.TextFormatter.Lines [0]));
+		Assert.Single (view.TextFormatter.GetLines ());
+		Assert.True (string.IsNullOrEmpty (view.TextFormatter.GetLines () [0]));
 	}
 
 	[Fact]

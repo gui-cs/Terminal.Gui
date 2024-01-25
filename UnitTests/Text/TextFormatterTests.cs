@@ -46,7 +46,7 @@ public class TextFormatterTests {
 		Assert.Equal (expectedSize, tf.Size);
 		tf.Draw (testBounds, new Attribute (), new Attribute ());
 		Assert.Equal (expectedSize, tf.Size);
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 
 		tf.Alignment = TextAlignment.Right;
 		expectedSize = new Size (testText.Length, 1);
@@ -55,7 +55,7 @@ public class TextFormatterTests {
 		Assert.Equal (expectedSize, tf.Size);
 		tf.Draw (testBounds, new Attribute (), new Attribute ());
 		Assert.Equal (expectedSize, tf.Size);
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 
 		tf.Alignment = TextAlignment.Right;
 		expectedSize = new Size (testText.Length * 2, 1);
@@ -65,7 +65,7 @@ public class TextFormatterTests {
 		Assert.Equal (expectedSize, tf.Size);
 		tf.Draw (testBounds, new Attribute (), new Attribute ());
 		Assert.Equal (expectedSize, tf.Size);
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 
 		tf.Alignment = TextAlignment.Centered;
 		expectedSize = new Size (testText.Length * 2, 1);
@@ -75,7 +75,7 @@ public class TextFormatterTests {
 		Assert.Equal (expectedSize, tf.Size);
 		tf.Draw (testBounds, new Attribute (), new Attribute ());
 		Assert.Equal (expectedSize, tf.Size);
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 	}
 
 	[Fact]
@@ -83,38 +83,38 @@ public class TextFormatterTests {
 	{
 		var tf = new TextFormatter ();
 		Assert.Equal (Size.Empty, tf.Size);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Size = new Size (0, 0);
 		Assert.Equal (Size.Empty, tf.Size);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Size = new Size (0, 1);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Size = new Size (1, 0);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Text = "123 456";
 		Assert.Equal (new Size (0, 0), tf.FormatAndGetSize ());
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Size = new Size (0, 0);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Size = new Size (0, 1);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 
 		tf.Size = new Size (1, 0);
-		Assert.Single (tf.Lines);
-		Assert.True (string.IsNullOrEmpty (tf.Lines [0]));
+		Assert.Single (tf.GetLines ());
+		Assert.True (string.IsNullOrEmpty (tf.GetLines () [0]));
 	}
 
 	[Theory]
@@ -294,7 +294,7 @@ public class TextFormatterTests {
 
 		tf.Text = "test";
 		Assert.True (tf.NeedsFormat); // get_Lines causes a Format
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 		Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 		Assert.Equal (testText, tf.Text);
 		tf.Draw (testBounds, new Attribute (), new Attribute ());
@@ -302,12 +302,12 @@ public class TextFormatterTests {
 
 		tf.Size = new Size (1, 1);
 		Assert.True (tf.NeedsFormat);
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 		Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 
 		tf.Alignment = TextAlignment.Centered;
 		Assert.True (tf.NeedsFormat);
-		Assert.NotEmpty (tf.Lines);
+		Assert.NotEmpty (tf.GetLines ());
 		Assert.False (tf.NeedsFormat); // get_Lines causes a Format
 	}
 
