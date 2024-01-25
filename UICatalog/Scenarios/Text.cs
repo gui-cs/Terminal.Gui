@@ -21,8 +21,7 @@ public class Text : Scenario {
 	public override void Setup ()
 	{
 		// TextField is a simple, single-line text input control
-		var textField = new TextField () {
-			Text = "TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!",
+		var textField = new TextField ("TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!") {
 			X = 1,
 			Y = 0,
 			Width = Dim.Percent (50) - 1,
@@ -43,9 +42,7 @@ public class Text : Scenario {
 		}
 		Win.Add (textField);
 
-		var labelMirroringTextField = new Label () {
-			Text = textField.Text,
-			AutoSize = false,
+		var labelMirroringTextField = new Label (textField.Text) {
 			X = Pos.Right (textField) + 1,
 			Y = Pos.Top (textField),
 			Width = Dim.Fill (1) - 1
@@ -76,7 +73,6 @@ public class Text : Scenario {
 		Win.Add (textView);
 
 		var labelMirroringTextView = new Label {
-			AutoSize = false,
 			X = Pos.Right (textView) + 1,
 			Y = Pos.Top (textView),
 			Width = Dim.Fill (1) - 1,
@@ -94,16 +90,14 @@ public class Text : Scenario {
 
 		// By default TextView is a multi-line control. It can be forced to 
 		// single-line mode.
-		var chxMultiline = new CheckBox () {
-			Text = "Multiline",
+		var chxMultiline = new CheckBox ("Multiline") {
 			X = Pos.Left (textView),
 			Y = Pos.Bottom (textView),
 			Checked = textView.Multiline
 		};
 		Win.Add (chxMultiline);
 
-		var chxWordWrap = new CheckBox () {
-			Text = "Word Wrap",
+		var chxWordWrap = new CheckBox ("Word Wrap") {
 			X = Pos.Right (chxMultiline) + 2,
 			Y = Pos.Top (chxMultiline),
 			Checked = textView.WordWrap
@@ -114,8 +108,7 @@ public class Text : Scenario {
 		// TextView captures Tabs (so users can enter /t into text) by default;
 		// This means using Tab to navigate doesn't work by default. This shows
 		// how to turn tab capture off.
-		var chxCaptureTabs = new CheckBox () {
-			Text = "Capture Tabs",
+		var chxCaptureTabs = new CheckBox ("Capture Tabs") {
 			X = Pos.Right (chxWordWrap) + 2,
 			Y = Pos.Top (chxWordWrap),
 			Checked = textView.AllowsTab
@@ -154,7 +147,6 @@ public class Text : Scenario {
 		Win.Add (hexEditor);
 
 		var labelMirroringHexEditor = new Label {
-			AutoSize = false,
 			X = Pos.Right (hexEditor) + 1,
 			Y = Pos.Top (hexEditor),
 			Width = Dim.Fill (1) - 1,
@@ -177,7 +169,6 @@ public class Text : Scenario {
 		Win.Add (dateField);
 
 		var labelMirroringDateField = new Label (dateField.Text) {
-			AutoSize = false,
 			X = Pos.Right (dateField) + 1,
 			Y = Pos.Top (dateField),
 			Width = Dim.Width (dateField),
@@ -198,7 +189,6 @@ public class Text : Scenario {
 		Win.Add (_timeField);
 
 		_labelMirroringTimeField = new Label (_timeField.Text) {
-			AutoSize = false,
 			X = Pos.Right (_timeField) + 1,
 			Y = Pos.Top (_timeField),
 			Width = Dim.Width (_timeField),
@@ -209,50 +199,67 @@ public class Text : Scenario {
 		_timeField.TimeChanged += TimeChanged;
 
 		// MaskedTextProvider - uses .NET MaskedTextProvider
-		var netProviderLabel = new Label () {
-			Text = "NetMaskedTextProvider [ 999 000 LLL >LLL| AAA aaa ]",
+		var netProviderLabel = new Label ("NetMaskedTextProvider [ 999 000 LLL >LLL |AAA aaa ]") {
 			X = Pos.Left (dateField),
 			Y = Pos.Bottom (dateField) + 1
 		};
 		Win.Add (netProviderLabel);
 
-		var netProvider = new NetMaskedTextProvider ("999 000 LLL > LLL | AAA aaa");
+		var netProvider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa");
 
 		var netProviderField = new TextValidateField (netProvider) {
 			X = Pos.Right (netProviderLabel) + 1,
 			Y = Pos.Y (netProviderLabel)
 		};
-
 		Win.Add (netProviderField);
 
+		var labelMirroringNetProviderField = new Label (netProviderField.Text) {
+			X = Pos.Right (netProviderField) + 1,
+			Y = Pos.Top (netProviderField),
+			Width = Dim.Width (netProviderField),
+			Height = Dim.Height (netProviderField)
+		};
+		Win.Add (labelMirroringNetProviderField);
+
+		netProviderField.Provider.TextChanged += (s, prev) => {
+			labelMirroringNetProviderField.Text = netProviderField.Text;
+		};
+
 		// TextRegexProvider - Regex provider implemented by Terminal.Gui
-		var regexProvider = new Label () {
-			Text = "TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]",
+		var regexProvider = new Label ("TextRegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]") {
 			X = Pos.Left (netProviderLabel),
 			Y = Pos.Bottom (netProviderLabel) + 1
 		};
 		Win.Add (regexProvider);
 
-		var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") {
-			ValidateOnInput = false
-		};
+		var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
 		var regexProviderField = new TextValidateField (provider2) {
 			X = Pos.Right (regexProvider) + 1,
 			Y = Pos.Y (regexProvider),
 			Width = 30,
 			TextAlignment = TextAlignment.Centered
 		};
-
 		Win.Add (regexProviderField);
 
-		var labelAppendAutocomplete = new Label () {
-			Text = "Append Autocomplete:",
+		var labelMirroringRegexProviderField = new Label (regexProviderField.Text) {
+			X = Pos.Right (regexProviderField) + 1,
+			Y = Pos.Top (regexProviderField),
+			Width = Dim.Width (regexProviderField),
+			Height = Dim.Height (regexProviderField)
+		};
+		Win.Add (labelMirroringRegexProviderField);
+
+		regexProviderField.Provider.TextChanged += (s, prev) => {
+			labelMirroringRegexProviderField.Text = regexProviderField.Text;
+		};
+
+		var labelAppendAutocomplete = new Label ("Append Autocomplete:") {
 			Y = Pos.Y (regexProviderField) + 2,
 			X = 1
 		};
 		var appendAutocompleteTextField = new TextField {
 			X = Pos.Right (labelAppendAutocomplete),
-			Y = Pos.Bottom (labelAppendAutocomplete),
+			Y = Pos.Top (labelAppendAutocomplete),
 			Width = Dim.Fill ()
 		};
 		appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
