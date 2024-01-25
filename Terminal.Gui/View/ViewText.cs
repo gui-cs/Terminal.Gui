@@ -198,7 +198,7 @@ public partial class View {
 
 			switch (TextFormatter.IsVerticalDirection (TextDirection)) {
 			case true:
-				var colWidth = TextFormatter.GetSumMaxCharWidth (new List<string> { TextFormatter.Text }, 0, 1);
+				var colWidth = TextFormatter.GetWidestLineLength (new List<string> { TextFormatter.Text }, 0, 1);
 				// TODO: v2 - This uses frame.Width; it should only use Bounds
 				if (_frame.Width < colWidth &&
 				    (Width == null ||

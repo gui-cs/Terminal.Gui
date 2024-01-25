@@ -1255,7 +1255,7 @@ public class TextFormatterTests {
 			Assert.Equal (rune, (Rune)tag);
 
 		}
-		var result = tf.ReplaceHotKeyWithTag (text, hotPos);
+		var result = TextFormatter.ReplaceHotKeyWithTag (text, hotPos);
 		Assert.Equal (result, expected);
 		Assert.Equal ((Rune)tag, result.ToRunes () [hotPos]);
 		Assert.Equal (text.GetRuneCount (), runes.Count);
@@ -1633,8 +1633,8 @@ public class TextFormatterTests {
 	[InlineData (new [] { "こんにちは", "世界" }, 4, 1, 1, 2)]
 	public void GetSumMaxCharWidth_List_Simple_And_Wide_Runes (IEnumerable<string> text, int width, int index, int length, int indexWidth)
 	{
-		Assert.Equal (width, TextFormatter.GetSumMaxCharWidth (text.ToList ()));
-		Assert.Equal (indexWidth, TextFormatter.GetSumMaxCharWidth (text.ToList (), index, length));
+		Assert.Equal (width, TextFormatter.GetWidestLineLength (text.ToList ()));
+		Assert.Equal (indexWidth, TextFormatter.GetWidestLineLength (text.ToList (), index, length));
 	}
 
 	[Theory]
@@ -1723,7 +1723,7 @@ public class TextFormatterTests {
 	[Theory]
 	[InlineData ("Single Line 界", 14)]
 	[InlineData ("First Line 界\nSecond Line 界\nThird Line 界\n", 14)]
-	public void MaxWidthLine_With_And_Without_Newlines (string text, int expected) => Assert.Equal (expected, TextFormatter.MaxWidthLine (text));
+	public void MaxWidthLine_With_And_Without_Newlines (string text, int expected) => Assert.Equal (expected, TextFormatter.GetWidestLineLength (text));
 
 	[Theory]
 	[InlineData ("New Test 你", 10, 10, 20320, 20320, 9, "你")]
@@ -1770,7 +1770,7 @@ public class TextFormatterTests {
 	public void GetSumMaxCharWidth_List_With_Combining_Runes ()
 	{
 		var text = new List<string> { "Les Mis", "e\u0328\u0301", "rables" };
-		Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
+		Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
 	}
 
 	[Theory]
