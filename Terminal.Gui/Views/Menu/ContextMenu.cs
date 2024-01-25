@@ -34,7 +34,6 @@ public sealed class ContextMenu : IDisposable {
 	/// <summary>
 	///         Initializes a context menu with no menu items.
 	/// </summary>
-	//public ContextMenu () : this (0, 0, new MenuBarItem ()) { }
 	public ContextMenu ()
 	{
 		if (IsShow) {
