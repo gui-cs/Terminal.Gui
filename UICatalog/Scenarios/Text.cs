@@ -10,11 +10,9 @@ using Terminal.Gui.TextValidateProviders;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Text Input Controls", "Tests all text input controls")]
-[ScenarioCategory ("Controls")]
-[ScenarioCategory ("Mouse and Keyboard")]
-[ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Controls"), ScenarioCategory ("Mouse and Keyboard"), ScenarioCategory ("Text and Formatting")]
 public class Text : Scenario {
-	Label _labelMirroringTimeField;
+	View _labelMirroringTimeField;
 
 	TimeField _timeField;
 
@@ -42,7 +40,7 @@ public class Text : Scenario {
 		}
 		Win.Add (textField);
 
-		var labelMirroringTextField = new Label (textField.Text) {
+		var labelMirroringTextField = new View (textField.Text) {
 			X = Pos.Right (textField) + 1,
 			Y = Pos.Top (textField),
 			Width = Dim.Fill (1) - 1
@@ -72,7 +70,7 @@ public class Text : Scenario {
 		}
 		Win.Add (textView);
 
-		var labelMirroringTextView = new Label {
+		var labelMirroringTextView = new View {
 			X = Pos.Right (textView) + 1,
 			Y = Pos.Top (textView),
 			Width = Dim.Fill (1) - 1,
@@ -146,7 +144,7 @@ public class Text : Scenario {
 		};
 		Win.Add (hexEditor);
 
-		var labelMirroringHexEditor = new Label {
+		var labelMirroringHexEditor = new View {
 			X = Pos.Right (hexEditor) + 1,
 			Y = Pos.Top (hexEditor),
 			Width = Dim.Fill (1) - 1,
@@ -168,7 +166,7 @@ public class Text : Scenario {
 		};
 		Win.Add (dateField);
 
-		var labelMirroringDateField = new Label (dateField.Text) {
+		var labelMirroringDateField = new View (dateField.Text) {
 			X = Pos.Right (dateField) + 1,
 			Y = Pos.Top (dateField),
 			Width = Dim.Width (dateField),
@@ -188,7 +186,7 @@ public class Text : Scenario {
 		};
 		Win.Add (_timeField);
 
-		_labelMirroringTimeField = new Label (_timeField.Text) {
+		_labelMirroringTimeField = new View (_timeField.Text) {
 			X = Pos.Right (_timeField) + 1,
 			Y = Pos.Top (_timeField),
 			Width = Dim.Width (_timeField),
@@ -213,7 +211,7 @@ public class Text : Scenario {
 		};
 		Win.Add (netProviderField);
 
-		var labelMirroringNetProviderField = new Label (netProviderField.Text) {
+		var labelMirroringNetProviderField = new View (netProviderField.Text) {
 			X = Pos.Right (netProviderField) + 1,
 			Y = Pos.Top (netProviderField),
 			Width = Dim.Width (netProviderField),
@@ -241,7 +239,7 @@ public class Text : Scenario {
 		};
 		Win.Add (regexProviderField);
 
-		var labelMirroringRegexProviderField = new Label (regexProviderField.Text) {
+		var labelMirroringRegexProviderField = new View (regexProviderField.Text) {
 			X = Pos.Right (regexProviderField) + 1,
 			Y = Pos.Top (regexProviderField),
 			Width = Dim.Width (regexProviderField),
