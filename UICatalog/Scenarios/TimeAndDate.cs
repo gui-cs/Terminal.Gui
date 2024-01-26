@@ -3,32 +3,35 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Time And Date", Description: "Illustrates TimeField and time & date handling")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("DateTime")]
+[ScenarioMetadata ("Time And Date", "Illustrates TimeField and time & date handling")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("DateTime")]
 public class TimeAndDate : Scenario {
-	Label lblOldTime;
-	Label lblNewTime;
-	Label lblTimeFmt;
-	Label lblOldDate;
-	Label lblNewDate;
-	Label lblDateFmt;
+	Label _lblDateFmt;
+	Label _lblNewDate;
+	Label _lblNewTime;
+	Label _lblOldDate;
+	Label _lblOldTime;
+	Label _lblTimeFmt;
 
 	public override void Setup ()
 	{
-		var longTime = new TimeField (DateTime.Now.TimeOfDay) {
+		var longTime = new TimeField {
 			X = Pos.Center (),
 			Y = 2,
 			IsShortFormat = false,
 			ReadOnly = false,
+			Time = DateTime.Now.TimeOfDay
 		};
 		longTime.TimeChanged += TimeChanged;
 		Win.Add (longTime);
 
-		var shortTime = new TimeField (DateTime.Now.TimeOfDay) {
+		var shortTime = new TimeField {
 			X = Pos.Center (),
 			Y = Pos.Bottom (longTime) + 1,
 			IsShortFormat = true,
 			ReadOnly = false,
+			Time = DateTime.Now.TimeOfDay
 		};
 		shortTime.TimeChanged += TimeChanged;
 		Win.Add (shortTime);
@@ -36,7 +39,7 @@ public class TimeAndDate : Scenario {
 		var shortDate = new DateField (DateTime.Now) {
 			X = Pos.Center (),
 			Y = Pos.Bottom (shortTime) + 1,
-			ReadOnly = true,
+			ReadOnly = true
 		};
 		shortDate.DateChanged += DateChanged;
 		Win.Add (shortDate);
@@ -44,64 +47,64 @@ public class TimeAndDate : Scenario {
 		var longDate = new DateField (DateTime.Now) {
 			X = Pos.Center (),
 			Y = Pos.Bottom (shortDate) + 1,
-			ReadOnly = false,
+			ReadOnly = false
 		};
 		longDate.DateChanged += DateChanged;
 		Win.Add (longDate);
 
-		lblOldTime = new Label {
+		_lblOldTime = new Label {
 			X = Pos.Center (),
 			Y = Pos.Bottom (longDate) + 1,
 			TextAlignment = TextAlignment.Centered,
 			Width = Dim.Fill (),
 			Text = "Old Time: "
 		};
-		Win.Add (lblOldTime);
+		Win.Add (_lblOldTime);
 
-		lblNewTime = new Label {
+		_lblNewTime = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (lblOldTime) + 1,
+			Y = Pos.Bottom (_lblOldTime) + 1,
 			TextAlignment = TextAlignment.Centered,
 			Width = Dim.Fill (),
 			Text = "New Time: "
 		};
-		Win.Add (lblNewTime);
+		Win.Add (_lblNewTime);
 
-		lblTimeFmt = new Label {
+		_lblTimeFmt = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (lblNewTime) + 1,
+			Y = Pos.Bottom (_lblNewTime) + 1,
 			TextAlignment = TextAlignment.Centered,
 			Width = Dim.Fill (),
 			Text = "Time Format: "
 		};
-		Win.Add (lblTimeFmt);
+		Win.Add (_lblTimeFmt);
 
-		lblOldDate = new Label {
+		_lblOldDate = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (lblTimeFmt) + 2,
+			Y = Pos.Bottom (_lblTimeFmt) + 2,
 			TextAlignment = TextAlignment.Centered,
 			Width = Dim.Fill (),
 			Text = "Old Date: "
 		};
-		Win.Add (lblOldDate);
+		Win.Add (_lblOldDate);
 
-		lblNewDate = new Label {
+		_lblNewDate = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (lblOldDate) + 1,
+			Y = Pos.Bottom (_lblOldDate) + 1,
 			TextAlignment = TextAlignment.Centered,
 			Width = Dim.Fill (),
 			Text = "New Date: "
 		};
-		Win.Add (lblNewDate);
+		Win.Add (_lblNewDate);
 
-		lblDateFmt = new Label {
+		_lblDateFmt = new Label {
 			X = Pos.Center (),
-			Y = Pos.Bottom (lblNewDate) + 1,
+			Y = Pos.Bottom (_lblNewDate) + 1,
 			TextAlignment = TextAlignment.Centered,
 			Width = Dim.Fill (),
 			Text = "Date Format: "
 		};
-		Win.Add (lblDateFmt);
+		Win.Add (_lblDateFmt);
 
 		var swapButton = new Button {
 			X = Pos.Center (),
@@ -121,17 +124,17 @@ public class TimeAndDate : Scenario {
 		Win.Add (swapButton);
 	}
 
-	private void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
+	void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e)
 	{
-		lblOldTime.Text = $"Old Time: {e.OldValue}";
-		lblNewTime.Text = $"New Time: {e.NewValue}";
-		lblTimeFmt.Text = $"Time Format: {e.Format}";
+		_lblOldTime.Text = $"Old Time: {e.OldValue}";
+		_lblNewTime.Text = $"New Time: {e.NewValue}";
+		_lblTimeFmt.Text = $"Time Format: {e.Format}";
 	}
 
-	private void DateChanged (object sender, DateTimeEventArgs<DateTime> e)
+	void DateChanged (object sender, DateTimeEventArgs<DateTime> e)
 	{
-		lblOldDate.Text = $"Old Date: {e.OldValue}";
-		lblNewDate.Text = $"New Date: {e.NewValue}";
-		lblDateFmt.Text = $"Date Format: {e.Format}";
+		_lblOldDate.Text = $"Old Date: {e.OldValue}";
+		_lblNewDate.Text = $"New Date: {e.NewValue}";
+		_lblDateFmt.Text = $"Date Format: {e.Format}";
 	}
 }

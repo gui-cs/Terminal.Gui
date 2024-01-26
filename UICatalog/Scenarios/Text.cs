@@ -192,11 +192,12 @@ public class Text : Scenario {
 			labelMirroringDateField.Text = dateField.Text;
 		};
 
-		_timeField = new TimeField (DateTime.Now.TimeOfDay) {
+		_timeField = new TimeField {
 			X = Pos.Right (labelMirroringDateField) + 5,
 			Y = Pos.Bottom (hexEditor) + 1,
 			Width = 20,
-			IsShortFormat = false
+			IsShortFormat = false,
+			Time = DateTime.Now.TimeOfDay
 		};
 		Win.Add (_timeField);
 

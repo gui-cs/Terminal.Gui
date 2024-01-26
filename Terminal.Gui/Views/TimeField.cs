@@ -16,109 +16,25 @@ namespace Terminal.Gui;
 ///         The <see cref="TimeField" /> <see cref="View" /> provides time editing functionality with mouse support.
 /// </remarks>
 public class TimeField : TextField {
-	bool _isShort;
-
 	readonly int _longFieldLen = 8;
-	string _longFormat;
-	string _sepChar;
+	readonly string _longFormat;
+	readonly string _sepChar;
 	readonly int _shortFieldLen = 5;
-	string _shortFormat;
+	readonly string _shortFormat;
+	bool _isShort;
 	TimeSpan _time;
 
 	/// <summary>
-	///         Initializes a new instance of <see cref="TimeField" /> using <see cref="LayoutStyle.Absolute" /> positioning.
-	/// </summary>
-	/// <param name="time">Initial time.</param>
-	/// <param name="isShort">If true, the seconds are hidden. Sets the <see cref="IsShortFormat" /> property.</param>
-	public TimeField (TimeSpan time, bool isShort = false) => SetInitialProperties (time, isShort);
-
-	/// <summary>
 	///         Initializes a new instance of <see cref="TimeField" /> using <see cref="LayoutStyle.Computed" /> positioning.
 	/// </summary>
-	/// <param name="time">Initial time</param>
-	public TimeField (TimeSpan time) => SetInitialProperties (time);
-
-	/// <summary>
-	///         Initializes a new instance of <see cref="TimeField" /> using <see cref="LayoutStyle.Computed" /> positioning.
-	/// </summary>
-	public TimeField () : this (TimeSpan.MinValue) { }
-
-	int _fieldLen => _isShort ? _shortFieldLen : _longFieldLen;
-	string _format => _isShort ? _shortFormat : _longFormat;
-
-	/// <summary>
-	///         Gets or sets the time of the <see cref="TimeField" />.
-	/// </summary>
-	/// <remarks>
-	/// </remarks>
-	public TimeSpan Time {
-		get => _time;
-		set {
-			if (ReadOnly) {
-				return;
-			}
-
-			var oldTime = _time;
-			_time = value;
-			Text = " " + value.ToString (_format.Trim ());
-			var args = new DateTimeEventArgs<TimeSpan> (oldTime, value, _format);
-			if (oldTime != value) {
-				OnTimeChanged (args);
-			}
-		}
-	}
-
-	/// <summary>
-	///         Get or sets whether <see cref="TimeField" /> uses the short or long time format.
-	/// </summary>
-	public bool IsShortFormat {
-		get => _isShort;
-		set {
-			_isShort = value;
-			if (_isShort) {
-				Width = 7;
-			} else {
-				Width = 10;
-			}
-
-			var ro = ReadOnly;
-			if (ro) {
-				ReadOnly = false;
-			}
-
-			SetText (Text);
-			ReadOnly = ro;
-			SetNeedsDisplay ();
-		}
-	}
-
-	/// <inheritdoc />
-	public override int CursorPosition {
-		get => base.CursorPosition;
-		set => base.CursorPosition = Math.Max (Math.Min (value, _fieldLen), 1);
-	}
-
-	/// <summary>
-	///         TimeChanged event, raised when the Date has changed.
-	/// </summary>
-	/// <remarks>
-	///         This event is raised when the <see cref="Time" /> changes.
-	/// </remarks>
-	/// <remarks>
-	///         The passed <see cref="EventArgs" /> is a <see cref="DateTimeEventArgs{T}" /> containing the old value, new
-	///         value, and format string.
-	/// </remarks>
-	public event EventHandler<DateTimeEventArgs<TimeSpan>> TimeChanged;
-
-	void SetInitialProperties (TimeSpan time, bool isShort = false)
+	public TimeField ()
 	{
 		var cultureInfo = CultureInfo.CurrentCulture;
 		_sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
 		_longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
 		_shortFormat = $" hh\\{_sepChar}mm";
-		_isShort = isShort;
-		Width = _fieldLen + 2;
-		Time = time;
+		Width = FieldLength + 2;
+		Time = TimeSpan.MinValue;
 		CursorPosition = 1;
 		TextChanging += TextField_TextChanging;
 
@@ -156,6 +72,119 @@ public class TimeField : TextField {
 		KeyBindings.Add (Key.F.WithCtrl, Command.Right);
 	}
 
+	int FieldLength => _isShort ? _shortFieldLen : _longFieldLen;
+	string Format => _isShort ? _shortFormat : _longFormat;
+
+	/// <summary>
+	///         Gets or sets the time of the <see cref="TimeField" />.
+	/// </summary>
+	/// <remarks>
+	/// </remarks>
+	public TimeSpan Time {
+		get => _time;
+		set {
+			if (ReadOnly) {
+				return;
+			}
+
+			var oldTime = _time;
+			_time = value;
+			Text = " " + value.ToString (Format.Trim ());
+			var args = new DateTimeEventArgs<TimeSpan> (oldTime, value, Format);
+			if (oldTime != value) {
+				OnTimeChanged (args);
+			}
+		}
+	}
+
+	/// <summary>
+	///         Get or sets whether <see cref="TimeField" /> uses the short or long time format.
+	/// </summary>
+	public bool IsShortFormat {
+		get => _isShort;
+		set {
+			_isShort = value;
+			if (_isShort) {
+				Width = 7;
+			} else {
+				Width = 10;
+			}
+
+			var ro = ReadOnly;
+			if (ro) {
+				ReadOnly = false;
+			}
+
+			SetText (Text);
+			ReadOnly = ro;
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <inheritdoc />
+	public override int CursorPosition {
+		get => base.CursorPosition;
+		set => base.CursorPosition = Math.Max (Math.Min (value, FieldLength), 1);
+	}
+
+	/// <summary>
+	///         TimeChanged event, raised when the Date has changed.
+	/// </summary>
+	/// <remarks>
+	///         This event is raised when the <see cref="Time" /> changes.
+	/// </remarks>
+	/// <remarks>
+	///         The passed <see cref="EventArgs" /> is a <see cref="DateTimeEventArgs{T}" /> containing the old value, new
+	///         value, and format string.
+	/// </remarks>
+	public event EventHandler<DateTimeEventArgs<TimeSpan>> TimeChanged;
+
+	//void SetInitialProperties (TimeSpan time, bool isShort = false)
+	//{
+	//	var cultureInfo = CultureInfo.CurrentCulture;
+	//	_sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
+	//	_longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
+	//	_shortFormat = $" hh\\{_sepChar}mm";
+	//	_isShort = isShort;
+	//	Width = _fieldLen + 2;
+	//	Time = time;
+	//	CursorPosition = 1;
+	//	TextChanging += TextField_TextChanging;
+
+	//	// Things this view knows how to do
+	//	AddCommand (Command.DeleteCharRight, () => {
+	//		DeleteCharRight ();
+	//		return true;
+	//	});
+	//	AddCommand (Command.DeleteCharLeft, () => {
+	//		DeleteCharLeft (false);
+	//		return true;
+	//	});
+	//	AddCommand (Command.LeftHome, () => MoveHome ());
+	//	AddCommand (Command.Left, () => MoveLeft ());
+	//	AddCommand (Command.RightEnd, () => MoveEnd ());
+	//	AddCommand (Command.Right, () => MoveRight ());
+
+	//	// Default keybindings for this view
+	//	KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+	//	KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
+
+	//	KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+	//	KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
+
+	//	KeyBindings.Add (Key.Home, Command.LeftHome);
+	//	KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
+
+	//	KeyBindings.Add (Key.CursorLeft, Command.Left);
+	//	KeyBindings.Add (Key.B.WithCtrl, Command.Left);
+
+	//	KeyBindings.Add (Key.End, Command.RightEnd);
+	//	KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
+
+	//	KeyBindings.Add (Key.CursorRight, Command.Right);
+	//	KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+	//}
+
 	void TextField_TextChanging (object sender, TextChangingEventArgs e)
 	{
 		try {
@@ -168,15 +197,15 @@ public class TimeField : TextField {
 				}
 			}
 
-			spaces += _fieldLen;
+			spaces += FieldLength;
 			var trimedText = e.NewText [..spaces];
-			spaces -= _fieldLen;
+			spaces -= FieldLength;
 			trimedText = trimedText.Replace (new string (' ', spaces), " ");
 			if (trimedText != e.NewText) {
 				e.NewText = trimedText;
 			}
 
-			if (!TimeSpan.TryParseExact (e.NewText.Trim (), _format.Trim (), CultureInfo.CurrentCulture,
+			if (!TimeSpan.TryParseExact (e.NewText.Trim (), Format.Trim (), CultureInfo.CurrentCulture,
 				    TimeSpanStyles.None, out var result)) {
 				e.Cancel = true;
 			}
@@ -192,7 +221,7 @@ public class TimeField : TextField {
 		var text = Text.EnumerateRunes ().ToList ();
 		var newText = text.GetRange (0, CursorPosition);
 		newText.Add (key);
-		if (CursorPosition < _fieldLen) {
+		if (CursorPosition < FieldLength) {
 			newText = [
 				.. newText,
 				.. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
@@ -248,7 +277,7 @@ public class TimeField : TextField {
 			? $" {hour,2:00}{_sepChar}{minute,2:00}"
 			: $" {hour,2:00}{_sepChar}{minute,2:00}{_sepChar}{second,2:00}";
 
-		if (!TimeSpan.TryParseExact (t.Trim (), _format.Trim (), CultureInfo.CurrentCulture,
+		if (!TimeSpan.TryParseExact (t.Trim (), Format.Trim (), CultureInfo.CurrentCulture,
 			    TimeSpanStyles.None, out var result) ||
 		    !isValidTime) {
 			return false;
@@ -261,7 +290,7 @@ public class TimeField : TextField {
 	string NormalizeFormat (string text, string fmt = null, string sepChar = null)
 	{
 		if (string.IsNullOrEmpty (fmt)) {
-			fmt = _format;
+			fmt = Format;
 		}
 
 		fmt = fmt.Replace ("\\", "");
@@ -286,8 +315,8 @@ public class TimeField : TextField {
 
 	void IncCursorPosition ()
 	{
-		if (CursorPosition >= _fieldLen) {
-			CursorPosition = _fieldLen;
+		if (CursorPosition >= FieldLength) {
+			CursorPosition = FieldLength;
 			return;
 		}
 
@@ -309,8 +338,8 @@ public class TimeField : TextField {
 	void AdjCursorPosition (int point, bool increment = true)
 	{
 		var newPoint = point;
-		if (point > _fieldLen) {
-			newPoint = _fieldLen;
+		if (point > FieldLength) {
+			newPoint = FieldLength;
 		}
 
 		if (point < 1) {
@@ -357,7 +386,7 @@ public class TimeField : TextField {
 	new bool MoveEnd ()
 	{
 		ClearAllSelection ();
-		CursorPosition = _fieldLen;
+		CursorPosition = FieldLength;
 		return true;
 	}
 
