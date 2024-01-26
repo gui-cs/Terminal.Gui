@@ -1,5 +1,3 @@
-using System;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -43,7 +41,7 @@ public class WindowTests {
 		Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 		// Empty Rect
-		r = new Window () { Title = "title", Frame = Rect.Empty };
+		r = new Window { Title = "title", Frame = Rect.Empty };
 		Assert.NotNull (r);
 		Assert.Equal ("title", r.Title);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
@@ -67,7 +65,7 @@ public class WindowTests {
 		Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 		// Rect with values
-		r = new Window () { X = 1, Y = 2, Width = 3, Height = 4, Title = "title" };
+		r = new Window { X = 1, Y = 2, Width = 3, Height = 4, Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
@@ -98,19 +96,19 @@ public class WindowTests {
 	public void MenuBar_And_StatusBar_Inside_Window ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-			new ("File", new MenuItem [] {
-				new ("Open", "", null),
-				new ("Quit", "", null)
+			new("File", new MenuItem [] {
+				new("Open", "", null),
+				new("Quit", "", null)
 			}),
-			new ("Edit", new MenuItem [] {
-				new ("Copy", "", null)
+			new("Edit", new MenuItem [] {
+				new("Copy", "", null)
 			})
 		});
 
 		var sb = new StatusBar (new StatusItem [] {
-			new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
-			new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
-			new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
+			new(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
+			new(KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+			new(KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
 		});
 
 		var fv = new FrameView {
@@ -201,8 +199,8 @@ public class WindowTests {
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
 		var menu = new MenuBar (new MenuBarItem [] {
-			new ("Child", new MenuItem [] {
-				new ("_Create Child", "", null)
+			new("Child", new MenuItem [] {
+				new("_Create Child", "", null)
 			})
 		});
 		var win = new Window ();

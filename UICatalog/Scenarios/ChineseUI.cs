@@ -10,7 +10,7 @@ public class ChineseUI : Scenario {
 		Application.Init ();
 		var top = Application.Top;
 
-		var win = new Window () {
+		var win = new Window {
 			Title = "Test",
 			X = 0,
 			Y = 0,
@@ -30,7 +30,7 @@ public class ChineseUI : Scenario {
 
 		var btn = new Button { X = 1, Y = 1, Text = "你" }; // v1: A
 		btn.Clicked += (s, e) => {
-			int result = MessageBox.Query ("Confirm",
+			var result = MessageBox.Query ("Confirm",
 				"Are you sure you want to quit ui?", 0,
 				"Yes", "No");
 			if (result == 0) {

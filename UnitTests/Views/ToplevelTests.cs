@@ -115,7 +115,7 @@ public class ToplevelTests {
 			{
 				var top = new Toplevel (Application.Top.Frame);
 				top.Text = "Top2";
-				var win = new Window () { Width = Dim.Fill (), Height = Dim.Fill () };
+				var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
 				var menu = new MenuBar (new MenuBarItem [] {
 					new MenuBarItem ("_Stage", new MenuItem [] {
 						new MenuItem ("_Close", "", () => Application.RequestStop(), null, null, Key.CtrlMask | Key.C)

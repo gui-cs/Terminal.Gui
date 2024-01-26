@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-/// Tests of the  <see cref="View.AutoSize"/> property which auto sizes Views based on <see cref="Text"/>.
+///         Tests of the  <see cref="View.AutoSize" /> property which auto sizes Views based on <see cref="Text" />.
 /// </summary>
 public class AutoSizeTextTests {
-	readonly ITestOutputHelper _output;
-
-	readonly string [] expecteds = new string [21] {
+	readonly string [] expecteds = [
 		@"
 ┌────────────────────┐
 │View with long text │
@@ -328,7 +323,9 @@ public class AutoSizeTextTests {
 │Label 19            │
 │Label 19            │
 └────────────────────┘"
-	};
+	];
+
+	readonly ITestOutputHelper _output;
 
 	public AutoSizeTextTests (ITestOutputHelper output) => _output = output;
 
@@ -791,7 +788,8 @@ public class AutoSizeTextTests {
 
 		Assert.Equal (new Rect (0, 0, 2, 5), view.Frame);
 		Assert.Equal (new Size (2, 5), view.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { "界View" }, view.TextFormatter.Lines));
+		var exception = Record.Exception (() =>
+			Assert.Equal (new List<string> { "界View" }, view.TextFormatter.Lines));
 		Assert.Null (exception);
 		expected = @"
 ┌──┐
@@ -904,7 +902,12 @@ Y
 	[AutoInitShutdown]
 	public void AutoSize_True_Setting_With_Height_Vertical ()
 	{
-		var label = new Label { Width = 2, Height = 10, TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true };
+		var label = new Label {
+			Width = 2,
+			Height = 10,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			ValidatePosDim = true
+		};
 		// BUGBUG: View are now no longer automatically sized by text on startup.
 		// Therefore it is necessary to set AutoSize to true
 		var viewX = new View ("X") { X = Pos.Right (label), AutoSize = true };
@@ -992,8 +995,10 @@ Y
 			for (var i = 0; i < 4; i++) {
 				text += Application.Driver.Contents [0, i].Rune;
 			}
+
 			return text;
 		}
+
 		Application.End (rs);
 	}
 
@@ -1289,6 +1294,7 @@ Y
 					//}
 					count++;
 				}
+
 				Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 			}
 		};
@@ -1367,6 +1373,7 @@ Y
 						field.Text = string.Empty;
 					}
 				}
+
 				Assert.Equal ($"Absolute({count + 1})", view.Height.ToString ());
 			}
 		};
@@ -1402,7 +1409,13 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label { ColorScheme = Colors.ColorSchemes ["Menu"], Width = Dim.Fill (), X = 0, Y = Pos.AnchorEnd (1), Text = "This should be the last line." };
+		var label = new Label {
+			ColorScheme = Colors.ColorSchemes ["Menu"],
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.AnchorEnd (1),
+			Text = "This should be the last line."
+		};
 
 		win.Add (label);
 
@@ -1441,7 +1454,13 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label { ColorScheme = Colors.ColorSchemes ["Menu"], Width = Dim.Fill (), X = 0, Y = Pos.Bottom (win) - 3, Text = "This should be the last line." };
+		var label = new Label {
+			ColorScheme = Colors.ColorSchemes ["Menu"],
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (win) - 3,
+			Text = "This should be the last line."
+		};
 
 		win.Add (label);
 
@@ -1472,7 +1491,6 @@ Y
 	}
 
 
-
 	[Fact]
 	[AutoInitShutdown]
 	public void AutoSize_Bottom_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
@@ -1480,7 +1498,13 @@ Y
 		var win = new Window ();
 
 		// Label is AutoSize == true
-		var label = new Label { ColorScheme = Colors.ColorSchemes ["Menu"], Width = Dim.Fill (), X = 0, Y = Pos.Bottom (win) - 4, Text = "This should be the last line." };
+		var label = new Label {
+			ColorScheme = Colors.ColorSchemes ["Menu"],
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (win) - 4,
+			Text = "This should be the last line."
+		};
 
 		win.Add (label);
 
@@ -1969,7 +1993,7 @@ Y
 	[AutoInitShutdown]
 	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_After_IsAdded_And_IsInitialized ()
 	{
-		var win = new Window () { Width = 30, Height = 50 };
+		var win = new Window { Width = 30, Height = 50 };
 		var label = new Label { Width = Dim.Fill () };
 		win.Add (label);
 		Application.Top.Add (win);
@@ -2025,7 +2049,7 @@ Y
 	[AutoInitShutdown]
 	public void AutoSize_False_SetWidthHeight_With_Dim_Fill_And_Dim_Absolute_With_Initialization ()
 	{
-		var win = new Window () { Width = 30, Height = 80 };
+		var win = new Window { Width = 30, Height = 80 };
 		var label = new Label { Width = Dim.Fill () };
 		win.Add (label);
 		Application.Top.Add (win);
@@ -2550,7 +2574,8 @@ Y
 		Application.End (rs);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void View_Draw_Horizontal_Simple_TextAlignments (bool autoSize)
@@ -2588,6 +2613,7 @@ Y
 			Assert.Equal (new Size (width, 1), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (width, 1), lblRight.TextFormatter.Size);
 		}
+
 		Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
 		Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
 
@@ -2605,7 +2631,8 @@ Y
 		Assert.Equal (new Rect (0, 0, width + 2, 6), pos);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (true)]
 	[InlineData (false)]
 	public void View_Draw_Vertical_Simple_TextAlignments (bool autoSize)
@@ -2613,9 +2640,27 @@ Y
 		var text = "Hello World";
 		var height = 20;
 		var lblLeft = new View (text) { Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
-		var lblCenter = new View (text) { X = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Middle };
-		var lblRight = new View (text) { X = 4, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Bottom };
-		var lblJust = new View (text) { X = 6, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize, VerticalTextAlignment = VerticalTextAlignment.Justified };
+		var lblCenter = new View (text) {
+			X = 2,
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize,
+			VerticalTextAlignment = VerticalTextAlignment.Middle
+		};
+		var lblRight = new View (text) {
+			X = 4,
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize,
+			VerticalTextAlignment = VerticalTextAlignment.Bottom
+		};
+		var lblJust = new View (text) {
+			X = 6,
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize,
+			VerticalTextAlignment = VerticalTextAlignment.Justified
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -2646,6 +2691,7 @@ Y
 			Assert.Equal (new Size (1, height), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (1, height), lblRight.TextFormatter.Size);
 		}
+
 		// BUGBUG: AutoSize is true and the Width is unchanged
 		Assert.Equal (new Size (1, height), lblJust.TextFormatter.Size);
 		Assert.Equal (new Rect (0, 0, 9, height + 2), frame.Frame);

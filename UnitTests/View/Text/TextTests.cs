@@ -1,18 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using System.Text;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 /// <summary>
-/// Tests of the  <see cref="View.Text"/> property with <see cref="View.AutoSize"/> set to false.
+///         Tests of the  <see cref="View.Text" /> property with <see cref="View.AutoSize" /> set to false.
 /// </summary>
 public class TextTests {
 	readonly ITestOutputHelper _output;
 
 	public TextTests (ITestOutputHelper output) => _output = output;
+
+	public static TheoryData<TextDirection, Size> ValidTextDirectionSize =>
+		new () {
+			{ TextDirection.LeftRight_TopBottom, new Size (14, 1) },
+			{ TextDirection.TopBottom_LeftRight, new Size (2, 7) }
+		};
 
 	[Fact]
 	[AutoInitShutdown]
@@ -111,7 +114,8 @@ public class TextTests {
 
 		Assert.Equal (new Rect (0, 0, 0, 1), view.Frame);
 		Assert.Equal (new Size (0, 1), view.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines));
+		var exception = Record.Exception (() =>
+			Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines));
 		Assert.Null (exception);
 		expected = @"
 ┌────────┐
@@ -224,7 +228,8 @@ public class TextTests {
 
 		Assert.Equal (new Rect (0, 0, 0, 1), label.Frame);
 		Assert.Equal (new Size (0, 1), label.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines));
+		var exception = Record.Exception (() =>
+			Assert.Equal (new List<string> { string.Empty }, label.TextFormatter.Lines));
 		Assert.Null (exception);
 		expected = @"
 ┌────────┐
@@ -286,7 +291,8 @@ public class TextTests {
 
 		Assert.Equal (new Rect (0, 0, 1, 0), view.Frame);
 		Assert.Equal (new Size (1, 0), view.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines));
+		var exception = Record.Exception (() =>
+			Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines));
 		Assert.Null (exception);
 		expected = @"
 ┌──┐
@@ -354,7 +360,8 @@ public class TextTests {
 
 		Assert.Equal (new Rect (0, 0, 2, 0), view.Frame);
 		Assert.Equal (new Size (2, 0), view.TextFormatter.Size);
-		var exception = Record.Exception (() => Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines));
+		var exception = Record.Exception (() =>
+			Assert.Equal (new List<string> { string.Empty }, view.TextFormatter.Lines));
 		Assert.Null (exception);
 		expected = @"
 ┌──┐
@@ -545,20 +552,20 @@ public class TextTests {
 	[AutoInitShutdown]
 	public void AutoSize_False_Width_Height_SetMinWidthHeight_Narrow_Wide_Runes ()
 	{
-		string text = $"First line{Environment.NewLine}Second line";
-		var horizontalView = new View () {
+		var text = $"First line{Environment.NewLine}Second line";
+		var horizontalView = new View {
 			Width = 20,
 			Height = 1,
 			Text = text
 		};
-		var verticalView = new View () {
+		var verticalView = new View {
 			Y = 3,
 			Height = 20,
 			Width = 1,
 			Text = text,
 			TextDirection = TextDirection.TopBottom_LeftRight
 		};
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			Text = "Window"
@@ -572,7 +579,7 @@ public class TextTests {
 		Assert.False (verticalView.AutoSize);
 		Assert.Equal (new Rect (0, 0, 20, 1), horizontalView.Frame);
 		Assert.Equal (new Rect (0, 3, 1, 20), verticalView.Frame);
-		string expected = @"
+		var expected = @"
 ┌──────────────────────────────┐
 │First line Second li          │
 │                              │
@@ -666,10 +673,4 @@ public class TextTests {
 		Assert.Equal (8, view.Text.GetRuneCount ());
 		Assert.Equal (size, view.GetAutoSize ());
 	}
-
-	public static TheoryData<TextDirection, Size> ValidTextDirectionSize =>
-		new () {
-			{ TextDirection.LeftRight_TopBottom, new Size (14, 1) },
-			{ TextDirection.TopBottom_LeftRight, new Size (2, 7)}
-		};
 }

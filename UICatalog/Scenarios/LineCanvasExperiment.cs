@@ -2,17 +2,15 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "LineCanvas Experiments", Description: "Experiments with LineCanvas")]
-[ScenarioCategory ("Drawing"), ScenarioCategory ("Borders"), ScenarioCategory ("Proof of Concept")]
+[ScenarioMetadata ("LineCanvas Experiments", "Experiments with LineCanvas")]
+[ScenarioCategory ("Drawing")]
+[ScenarioCategory ("Borders")]
+[ScenarioCategory ("Proof of Concept")]
 public class LineCanvasExperiment : Scenario {
-
-	public override void Init ()
-	{
-		Application.Init ();
-	}
+	public override void Init () => Application.Init ();
 
 	/// <summary>
-	/// Setup the scenario.
+	///         Setup the scenario.
 	/// </summary>
 	public override void Setup ()
 	{
@@ -29,7 +27,7 @@ public class LineCanvasExperiment : Scenario {
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			ColorScheme = Colors.ColorSchemes ["Base"],
+			ColorScheme = Colors.ColorSchemes ["Base"]
 		};
 		frame1.BorderStyle = LineStyle.Double;
 
@@ -37,7 +35,7 @@ public class LineCanvasExperiment : Scenario {
 
 		Application.Top.Add (frame1);
 
-		var win1 = new Window () {
+		var win1 = new Window {
 			AutoSize = false,
 			Title = "win1",
 			Text = "Win1 30%/50% Heavy",
@@ -53,7 +51,7 @@ public class LineCanvasExperiment : Scenario {
 
 		frame1.Add (win1);
 
-		var win2 = new Window () {
+		var win2 = new Window {
 			Title = "win2",
 			Text = "Win2 right of win1, 30%/70% Single.",
 			X = Pos.Right (win1) - 1,
@@ -73,7 +71,7 @@ public class LineCanvasExperiment : Scenario {
 			Y = 0,
 			Width = Dim.Fill (-1),
 			Height = Dim.Fill (-1),
-			SuperViewRendersLineCanvas = true,
+			SuperViewRendersLineCanvas = true
 			//ColorScheme = Colors.ColorSchemes ["Menu"],
 		};
 
@@ -86,13 +84,13 @@ public class LineCanvasExperiment : Scenario {
 			Y = Pos.Bottom (win2) - 1,
 			Width = win2.Width,
 			Height = 5,
-			SuperViewRendersLineCanvas = true,
+			SuperViewRendersLineCanvas = true
 			//ColorScheme = Colors.ColorSchemes ["TopLevel"],
 		};
 
 		frame1.Add (view4);
 
-		var win5 = new Window () {
+		var win5 = new Window {
 			Title = "Win 5",
 			Text = "win5 below View4 view4.Width/5 Double",
 			X = Pos.Left (win2),
@@ -106,7 +104,7 @@ public class LineCanvasExperiment : Scenario {
 
 		frame1.Add (win5);
 
-		var line = new Line () {
+		var line = new Line {
 			X = 1,
 			Y = 1,
 			Width = 10,
@@ -116,7 +114,7 @@ public class LineCanvasExperiment : Scenario {
 		};
 		frame1.Add (line);
 
-		var marginWindow = new Window () {
+		var marginWindow = new Window {
 			Title = "Positive Margin",
 			X = 0,
 			Y = 8,
