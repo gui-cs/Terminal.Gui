@@ -1,15 +1,15 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
 using Terminal.Gui;
-using ReactiveMarbles.ObservableEvents;
 
 namespace ReactiveExample;
 
 public class LoginView : Window, IViewFor<LoginViewModel> {
-	readonly CompositeDisposable _disposable = new CompositeDisposable ();
+	readonly CompositeDisposable _disposable = new ();
 
-	public LoginView (LoginViewModel viewModel) : base ()
+	public LoginView (LoginViewModel viewModel)
 	{
 		Title = "Reactive Extensions Example";
 		ViewModel = viewModel;
@@ -24,6 +24,11 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
 	}
 
 	public LoginViewModel ViewModel { get; set; }
+
+	object IViewFor.ViewModel {
+		get => ViewModel;
+		set => ViewModel = (LoginViewModel)value;
+	}
 
 	protected override void Dispose (bool disposing)
 	{
@@ -40,10 +45,11 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
 
 	TextField UsernameInput (View previous)
 	{
-		var usernameInput = new TextField (ViewModel.Username) {
+		var usernameInput = new TextField {
 			X = Pos.Left (previous),
 			Y = Pos.Top (previous) + 1,
-			Width = 40
+			Width = 40,
+			Text = ViewModel.Username
 		};
 		ViewModel
 			.WhenAnyValue (x => x.Username)
@@ -78,10 +84,11 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
 
 	TextField PasswordInput (View previous)
 	{
-		var passwordInput = new TextField (ViewModel.Password) {
+		var passwordInput = new TextField {
 			X = Pos.Left (previous),
 			Y = Pos.Top (previous) + 1,
-			Width = 40
+			Width = 40,
+			Text = ViewModel.Password
 		};
 		ViewModel
 			.WhenAnyValue (x => x.Password)
@@ -177,7 +184,7 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
 
 	Button ClearButton (View previous)
 	{
-		var clearButton = new Button () {
+		var clearButton = new Button {
 			X = Pos.Left (previous),
 			Y = Pos.Top (previous) + 1,
 			Width = 40,
@@ -190,10 +197,5 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
 			.DisposeWith (_disposable);
 		Add (clearButton);
 		return clearButton;
-	}
-
-	object IViewFor.ViewModel {
-		get => ViewModel;
-		set => ViewModel = (LoginViewModel)value;
 	}
 }

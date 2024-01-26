@@ -1,173 +1,25 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Terminal.Gui;
-using System.Linq;
 
 namespace UICatalog.Scenarios;
+
 // 
 // This would be a great scenario to show of threading (Issue #471)
 //
-[ScenarioMetadata (Name: "Progress", Description: "Shows off ProgressBar and Threading.")]
+[ScenarioMetadata ("Progress", "Shows off ProgressBar and Threading.")]
 [ScenarioCategory ("Controls")]
-[ScenarioCategory ("Threading"), ScenarioCategory ("Progress")]
+[ScenarioCategory ("Threading")]
+[ScenarioCategory ("Progress")]
 public class Progress : Scenario {
+	uint _mainLooopTimeoutTick = 100; // ms
+	object _mainLoopTimeout;
 
-	class ProgressDemo : FrameView {
-		const int _verticalSpace = 1;
+	Timer _systemTimer;
+	uint _systemTimerTick = 100; // ms
 
-		internal FrameView LeftFrame { get; private set; }
-		internal TextField Speed { get; private set; }
-		internal ProgressBar ActivityProgressBar { get; private set; }
-		internal ProgressBar PulseProgressBar { get; private set; }
-		internal SpinnerView Spinner { get; private set; }
-		internal Action StartBtnClick;
-		internal Action StopBtnClick;
-		internal Action PulseBtnClick = null;
-		private Label _startedLabel;
-		internal bool Started {
-			get {
-				return _startedLabel.Text == "Started";
-			}
-			private set {
-				_startedLabel.Text = value ? "Started" : "Stopped";
-			}
-		}
-
-			internal ProgressDemo ()
-			{
-				ColorScheme = Colors.ColorSchemes ["Dialog"];
-
-			LeftFrame = new FrameView {
-				X = 0,
-				Y = 0,
-				Height = Dim.Percent (100),
-				Width = Dim.Percent (25),
-				Title = "Settings"
-			};
-			var lbl = new Label { X = 1, Y = 1, Text = "Tick every (ms):"	 };
-			LeftFrame.Add (lbl);
-			Speed = new TextField ("") {
-				X = Pos.X (lbl),
-				Y = Pos.Bottom (lbl),
-				Width = 7,
-			};
-			LeftFrame.Add (Speed);
-
-			Add (LeftFrame);
-
-			var startButton = new Button {
-				X = Pos.Right (LeftFrame) + 1,
-				Y = 0,
-				Text = "Start Timer"
-			};
-			startButton.Clicked += (s, e) => Start ();
-			var pulseButton = new Button {
-				X = Pos.Right (startButton) + 2,
-				Y = Pos.Y (startButton),
-				Text = "Pulse"
-			};
-			pulseButton.Clicked += (s, e) => Pulse ();
-			var stopbutton = new Button {
-				X = Pos.Right (pulseButton) + 2,
-				Y = Pos.Top (pulseButton),
-				Text = "Stop Timer"
-			};
-			stopbutton.Clicked += (s, e) => Stop ();
-
-			Add (startButton);
-			Add (pulseButton);
-			Add (stopbutton);
-
-				ActivityProgressBar = new ProgressBar () {
-					X = Pos.Right (LeftFrame) + 1,
-					Y = Pos.Bottom (startButton) + 1,
-					Width = Dim.Fill () - 1,
-					Height = 1,
-					Fraction = 0.25F,
-					ColorScheme = Colors.ColorSchemes ["Error"]
-				};
-				Add (ActivityProgressBar);
-
-			Spinner = new SpinnerView () {
-				Style = new SpinnerStyle.Dots2 (),
-				SpinReverse = true,
-				Y = ActivityProgressBar.Y,
-				Visible = false
-			};
-			ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
-			Spinner.X = Pos.Right (ActivityProgressBar);
-
-
-			Add (Spinner);
-
-				PulseProgressBar = new ProgressBar () {
-					X = Pos.Right (LeftFrame) + 1,
-					Y = Pos.Bottom (ActivityProgressBar) + 1,
-					Width = Dim.Fill () - Spinner.Width,
-					Height = 1,
-					ColorScheme = Colors.ColorSchemes ["Error"]
-				};
-				Add (PulseProgressBar);
-
-			_startedLabel = new Label {
-				X = Pos.Right (LeftFrame) + 1,
-				Y = Pos.Bottom (PulseProgressBar),
-				Text = "Stopped"
-			};
-			Add (_startedLabel);
-
-			// TODO: Great use of Dim.Auto
-			Initialized += (s, e) => {
-				// Set height to height of controls + spacing + frame
-				Height = 2 + _verticalSpace + startButton.Frame.Height + _verticalSpace + ActivityProgressBar.Frame.Height + _verticalSpace + PulseProgressBar.Frame.Height + _verticalSpace;
-			};
-		}
-
-		internal void Start ()
-		{
-			Started = true;
-			StartBtnClick?.Invoke ();
-			Application.Invoke (() => {
-				Spinner.Visible = true;
-				ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
-				this.LayoutSubviews ();
-			});
-		}
-
-		internal void Stop ()
-		{
-			Started = false;
-			StopBtnClick?.Invoke ();
-
-			Application.Invoke (() => {
-				Spinner.Visible = false;
-				ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
-				this.LayoutSubviews ();
-			});
-		}
-
-		internal void Pulse ()
-		{
-			Spinner.Visible = true;
-			if (PulseBtnClick != null) {
-				PulseBtnClick?.Invoke ();
-
-			} else {
-				if (ActivityProgressBar.Fraction + 0.01F >= 1) {
-					ActivityProgressBar.Fraction = 0F;
-				} else {
-					ActivityProgressBar.Fraction += 0.01F;
-				}
-				PulseProgressBar.Pulse ();
-				Spinner.AdvanceAnimation ();
-			}
-		}
-	}
-
-	private Timer _systemTimer = null;
-	private uint _systemTimerTick = 100; // ms
-	private object _mainLoopTimeout = null;
-	private uint _mainLooopTimeoutTick = 100; // ms
 	public override void Setup ()
 	{
 		// Demo #1 - Use System.Timer (and threading)
@@ -184,7 +36,7 @@ public class Progress : Scenario {
 			systemTimerDemo.ActivityProgressBar.Fraction = 0F;
 			systemTimerDemo.PulseProgressBar.Fraction = 0F;
 
-			_systemTimer = new Timer ((o) => {
+			_systemTimer = new Timer (o => {
 				// Note the check for Mainloop being valid. System.Timers can run after they are Disposed.
 				// This code must be defensive for that. 
 				Application.Invoke (() => systemTimerDemo.Pulse ());
@@ -201,15 +53,14 @@ public class Progress : Scenario {
 		systemTimerDemo.Speed.Text = $"{_systemTimerTick}";
 		systemTimerDemo.Speed.TextChanged += (s, a) => {
 			uint result;
-			if (uint.TryParse (systemTimerDemo.Speed.Text.ToString (), out result)) {
+			if (uint.TryParse (systemTimerDemo.Speed.Text, out result)) {
 				_systemTimerTick = result;
-				System.Diagnostics.Debug.WriteLine ($"{_systemTimerTick}");
+				Debug.WriteLine ($"{_systemTimerTick}");
 				if (systemTimerDemo.Started) {
 					systemTimerDemo.Start ();
 				}
-
 			} else {
-				System.Diagnostics.Debug.WriteLine ("bad entry");
+				Debug.WriteLine ("bad entry");
 			}
 		};
 		Win.Add (systemTimerDemo);
@@ -227,11 +78,12 @@ public class Progress : Scenario {
 			mainLoopTimeoutDemo.ActivityProgressBar.Fraction = 0F;
 			mainLoopTimeoutDemo.PulseProgressBar.Fraction = 0F;
 
-			_mainLoopTimeout = Application.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick), () => {
-				mainLoopTimeoutDemo.Pulse ();
+			_mainLoopTimeout = Application.AddTimeout (TimeSpan.FromMilliseconds (_mainLooopTimeoutTick),
+				() => {
+					mainLoopTimeoutDemo.Pulse ();
 
-				return true;
-			});
+					return true;
+				});
 		};
 		mainLoopTimeoutDemo.StopBtnClick = () => {
 			if (_mainLoopTimeout != null) {
@@ -272,6 +124,158 @@ public class Progress : Scenario {
 		foreach (var v in Win.Subviews.OfType<ProgressDemo> ()) {
 			v?.StopBtnClick ();
 		}
+
 		base.Dispose (disposing);
+	}
+
+	class ProgressDemo : FrameView {
+		const int VerticalSpace = 1;
+		readonly Label _startedLabel;
+		internal readonly Action PulseBtnClick = null;
+		internal Action StartBtnClick;
+		internal Action StopBtnClick;
+
+		internal ProgressDemo ()
+		{
+			ColorScheme = Colors.ColorSchemes ["Dialog"];
+
+			LeftFrame = new FrameView {
+				X = 0,
+				Y = 0,
+				Height = Dim.Percent (100),
+				Width = Dim.Percent (25),
+				Title = "Settings"
+			};
+			var lbl = new Label { X = 1, Y = 1, Text = "Tick every (ms):" };
+			LeftFrame.Add (lbl);
+			Speed = new TextField {
+				X = Pos.X (lbl),
+				Y = Pos.Bottom (lbl),
+				Width = 7
+			};
+			LeftFrame.Add (Speed);
+
+			Add (LeftFrame);
+
+			var startButton = new Button {
+				X = Pos.Right (LeftFrame) + 1,
+				Y = 0,
+				Text = "Start Timer"
+			};
+			startButton.Clicked += (s, e) => Start ();
+			var pulseButton = new Button {
+				X = Pos.Right (startButton) + 2,
+				Y = Pos.Y (startButton),
+				Text = "Pulse"
+			};
+			pulseButton.Clicked += (s, e) => Pulse ();
+			var stopbutton = new Button {
+				X = Pos.Right (pulseButton) + 2,
+				Y = Pos.Top (pulseButton),
+				Text = "Stop Timer"
+			};
+			stopbutton.Clicked += (s, e) => Stop ();
+
+			Add (startButton);
+			Add (pulseButton);
+			Add (stopbutton);
+
+			ActivityProgressBar = new ProgressBar {
+				X = Pos.Right (LeftFrame) + 1,
+				Y = Pos.Bottom (startButton) + 1,
+				Width = Dim.Fill () - 1,
+				Height = 1,
+				Fraction = 0.25F,
+				ColorScheme = Colors.ColorSchemes ["Error"]
+			};
+			Add (ActivityProgressBar);
+
+			Spinner = new SpinnerView {
+				Style = new SpinnerStyle.Dots2 (),
+				SpinReverse = true,
+				Y = ActivityProgressBar.Y,
+				Visible = false
+			};
+			ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
+			Spinner.X = Pos.Right (ActivityProgressBar);
+
+
+			Add (Spinner);
+
+			PulseProgressBar = new ProgressBar {
+				X = Pos.Right (LeftFrame) + 1,
+				Y = Pos.Bottom (ActivityProgressBar) + 1,
+				Width = Dim.Fill () - Spinner.Width,
+				Height = 1,
+				ColorScheme = Colors.ColorSchemes ["Error"]
+			};
+			Add (PulseProgressBar);
+
+			_startedLabel = new Label {
+				X = Pos.Right (LeftFrame) + 1,
+				Y = Pos.Bottom (PulseProgressBar),
+				Text = "Stopped"
+			};
+			Add (_startedLabel);
+
+			// TODO: Great use of Dim.Auto
+			Initialized += (s, e) => {
+				// Set height to height of controls + spacing + frame
+				Height = 2 + VerticalSpace + startButton.Frame.Height + VerticalSpace +
+					 ActivityProgressBar.Frame.Height + VerticalSpace +
+					 PulseProgressBar.Frame.Height + VerticalSpace;
+			};
+		}
+
+		internal FrameView LeftFrame { get; }
+		internal TextField Speed { get; }
+		internal ProgressBar ActivityProgressBar { get; }
+		internal ProgressBar PulseProgressBar { get; }
+		internal SpinnerView Spinner { get; }
+
+		internal bool Started {
+			get => _startedLabel.Text == "Started";
+			private set => _startedLabel.Text = value ? "Started" : "Stopped";
+		}
+
+		internal void Start ()
+		{
+			Started = true;
+			StartBtnClick?.Invoke ();
+			Application.Invoke (() => {
+				Spinner.Visible = true;
+				ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
+				LayoutSubviews ();
+			});
+		}
+
+		internal void Stop ()
+		{
+			Started = false;
+			StopBtnClick?.Invoke ();
+
+			Application.Invoke (() => {
+				Spinner.Visible = false;
+				ActivityProgressBar.Width = Dim.Fill () - Spinner.Width;
+				LayoutSubviews ();
+			});
+		}
+
+		internal void Pulse ()
+		{
+			Spinner.Visible = true;
+			if (PulseBtnClick != null) {
+				PulseBtnClick?.Invoke ();
+			} else {
+				if (ActivityProgressBar.Fraction + 0.01F >= 1) {
+					ActivityProgressBar.Fraction = 0F;
+				} else {
+					ActivityProgressBar.Fraction += 0.01F;
+				}
+
+				PulseProgressBar.Pulse ();
+				Spinner.AdvanceAnimation ();
+			}
+		}
 	}
 }

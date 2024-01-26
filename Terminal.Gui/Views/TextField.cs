@@ -10,20 +10,20 @@ namespace Terminal.Gui;
 ///         The <see cref="TextField" /> <see cref="View" /> provides editing functionality and mouse support.
 /// </remarks>
 public class TextField : View {
-	readonly HistoryText _historyText = new ();
+	readonly HistoryText _historyText;
+
+	readonly CursorVisibility _savedCursorVisibility;
 	CultureInfo _currentCulture;
 	int _cursorPosition;
 
-	CursorVisibility _desiredCursorVisibility = CursorVisibility.Default;
+	CursorVisibility _desiredCursorVisibility;
 	bool _isButtonPressed;
-	bool _isButtonReleased = true;
+	bool _isButtonReleased;
 
 	bool _isDrawing;
 
 	int _preTextChangedCursorPos;
-
-	CursorVisibility _savedCursorVisibility;
-	int _selectedStart = -1; // -1 represents there is no text selection.
+	int _selectedStart; // -1 represents there is no text selection.
 	string _selectedText;
 
 	int _start;
@@ -35,213 +35,18 @@ public class TextField : View {
 	///         Initializes a new instance of the <see cref="TextField" /> class using <see cref="LayoutStyle.Computed" />
 	///         positioning.
 	/// </summary>
-	public TextField () : this (string.Empty) { }
-
-	/// <summary>
-	///         Initializes a new instance of the <see cref="TextField" /> class using <see cref="LayoutStyle.Computed" />
-	///         positioning.
-	/// </summary>
-	/// <param name="text">Initial text contents.</param>
-	public TextField (string text) : base (text) => SetInitialProperties (text, text.GetRuneCount () + 1);
-
-	/// <summary>
-	///         Gets or sets the text to render in control when no value has
-	///         been entered yet and the <see cref="View" /> does not yet have
-	///         input focus.
-	/// </summary>
-	public string Caption { get; set; }
-
-	/// <summary>
-	///         Gets or sets the foreground <see cref="Color" /> to use when
-	///         rendering <see cref="Caption" />.
-	/// </summary>
-	public Color CaptionColor { get; set; } = new (Color.DarkGray);
-
-	/// <summary>
-	///         Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so
-	///         new input
-	///         should be appended at the cursor position, rather than clearing the entry
-	/// </summary>
-	public bool Used { get; set; }
-
-	/// <summary>
-	///         If set to true its not allow any changes in the text.
-	/// </summary>
-	public bool ReadOnly { get; set; } = false;
-
-	/// <summary>
-	///         Provides autocomplete context menu based on suggestions at the current cursor
-	///         position. Configure <see cref="ISuggestionGenerator" /> to enable this feature.
-	/// </summary>
-	public IAutocomplete Autocomplete { get; set; } = new TextFieldAutocomplete ();
-
-	/// <summary>
-	///         Sets or gets the text held by the view.
-	/// </summary>
-	public new string Text {
-		get => StringExtensions.ToString (_text);
-		set {
-			var oldText = StringExtensions.ToString (_text);
-
-			if (oldText == value) {
-				return;
-			}
-
-			var newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
-			if (newText.Cancel) {
-				if (_cursorPosition > _text.Count) {
-					_cursorPosition = _text.Count;
-				}
-
-				return;
-			}
-
-			ClearAllSelection ();
-			_text = newText.NewText.EnumerateRunes ().ToList ();
-
-			if (!Secret && !_historyText.IsFromHistory) {
-				_historyText.Add (new List<List<RuneCell>> { TextModel.ToRuneCellList (oldText) },
-					new Point (_cursorPosition, 0));
-				_historyText.Add (new List<List<RuneCell>> { TextModel.ToRuneCells (_text) },
-					new Point (_cursorPosition, 0)
-					, HistoryText.LineStatus.Replaced);
-			}
-
-			TextChanged?.Invoke (this, new TextChangedEventArgs (oldText));
-
-			ProcessAutocomplete ();
-
-			if (_cursorPosition > _text.Count) {
-				_cursorPosition = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
-			}
-
-			Adjust ();
-			SetNeedsDisplay ();
-		}
-	}
-
-	/// <summary>
-	///         Sets the secret property.
-	///         <remarks>
-	///                 This makes the text entry suitable for entering passwords.
-	///         </remarks>
-	/// </summary>
-	public bool Secret { get; set; }
-
-	/// <summary>
-	///         Sets or gets the current cursor position.
-	/// </summary>
-	public virtual int CursorPosition {
-		get => _cursorPosition;
-		set {
-			if (value < 0) {
-				_cursorPosition = 0;
-			} else if (value > _text.Count) {
-				_cursorPosition = _text.Count;
-			} else {
-				_cursorPosition = value;
-			}
-
-			PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
-		}
-	}
-
-	/// <summary>
-	///         Gets the left offset position.
-	/// </summary>
-	public int ScrollOffset { get; private set; }
-
-	/// <summary>
-	///         Indicates whatever the text was changed or not.
-	///         <see langword="true" /> if the text was changed <see langword="false" /> otherwise.
-	/// </summary>
-	public bool IsDirty => _historyText.IsDirty (Text);
-
-	/// <summary>
-	///         Indicates whatever the text has history changes or not.
-	///         <see langword="true" /> if the text has history changes <see langword="false" /> otherwise.
-	/// </summary>
-	public bool HasHistoryChanges => _historyText.HasHistoryChanges;
-
-	/// <summary>
-	///         Get the <see cref="ContextMenu" /> for this view.
-	/// </summary>
-	public ContextMenu ContextMenu { get; private set; }
-
-	/// <inheritdoc />
-	public override bool CanFocus {
-		get => base.CanFocus;
-		set => base.CanFocus = value;
-	}
-
-	/// <summary>
-	///         Start position of the selected text.
-	/// </summary>
-	public int SelectedStart {
-		get => _selectedStart;
-		set {
-			if (value < -1) {
-				_selectedStart = -1;
-			} else if (value > _text.Count) {
-				_selectedStart = _text.Count;
-			} else {
-				_selectedStart = value;
-			}
-
-			PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
-		}
-	}
-
-	/// <summary>
-	///         Length of the selected text.
-	/// </summary>
-	public int SelectedLength { get; private set; }
-
-	/// <summary>
-	///         The selected text.
-	/// </summary>
-	public string SelectedText {
-		get => Secret ? null : _selectedText;
-		private set => _selectedText = value;
-	}
-
-	/// <summary>
-	///         Get / Set the wished cursor when the field is focused
-	/// </summary>
-	public CursorVisibility DesiredCursorVisibility {
-		get => _desiredCursorVisibility;
-		set {
-			if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus) {
-				Application.Driver.SetCursorVisibility (value);
-			}
-
-			_desiredCursorVisibility = _visibility = value;
-		}
-	}
-
-	/// <summary>
-	///         Changing event, raised before the <see cref="Text" /> changes and can be canceled or changing the new text.
-	/// </summary>
-	public event EventHandler<TextChangingEventArgs> TextChanging;
-
-	/// <summary>
-	///         Changed event, raised when the text has changed.
-	///         <remarks>
-	///                 This event is raised when the <see cref="Text" /> changes.
-	///                 The passed <see cref="EventArgs" /> is a <see cref="string" /> containing the old value.
-	///         </remarks>
-	/// </summary>
-	public event EventHandler<TextChangedEventArgs> TextChanged;
-
-	void SetInitialProperties (string text, int w)
+	public TextField ()
 	{
+		_historyText = new HistoryText ();
+		_desiredCursorVisibility = CursorVisibility.Default;
+		_isButtonReleased = true;
+		_selectedStart = -1;
+		_text = new List<Rune> ();
+		CaptionColor = new Color (Color.DarkGray);
+		ReadOnly = false;
+		Autocomplete = new TextFieldAutocomplete ();
 		Height = 1;
 
-		if (text == null) {
-			text = "";
-		}
-
-		_text = text.Split ("\n") [0].EnumerateRunes ().ToList ();
 		CanFocus = true;
 		Used = true;
 		WantMousePositionReports = true;
@@ -448,6 +253,195 @@ public class TextField : View {
 
 		KeyBindings.Add (ContextMenu.Key.KeyCode, KeyBindingScope.HotKey, Command.ShowContextMenu);
 	}
+
+	/// <inheritdoc />
+	public sealed override bool CanFocus {
+		get => base.CanFocus;
+		set => base.CanFocus = value;
+	}
+
+	/// <summary>
+	///         Gets or sets the text to render in control when no value has
+	///         been entered yet and the <see cref="View" /> does not yet have
+	///         input focus.
+	/// </summary>
+	public string Caption { get; set; }
+
+	/// <summary>
+	///         Gets or sets the foreground <see cref="Color" /> to use when
+	///         rendering <see cref="Caption" />.
+	/// </summary>
+	public Color CaptionColor { get; set; }
+
+	/// <summary>
+	///         Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so
+	///         new input
+	///         should be appended at the cursor position, rather than clearing the entry
+	/// </summary>
+	public bool Used { get; set; }
+
+	/// <summary>
+	///         If set to true its not allow any changes in the text.
+	/// </summary>
+	public bool ReadOnly { get; set; }
+
+	/// <summary>
+	///         Provides autocomplete context menu based on suggestions at the current cursor
+	///         position. Configure <see cref="ISuggestionGenerator" /> to enable this feature.
+	/// </summary>
+	public IAutocomplete Autocomplete { get; set; }
+
+	/// <summary>
+	///         Sets or gets the text held by the view.
+	/// </summary>
+	public new string Text {
+		get => StringExtensions.ToString (_text);
+		set {
+			var oldText = StringExtensions.ToString (_text);
+
+			if (oldText == value) {
+				return;
+			}
+
+			var newText = OnTextChanging (value.Replace ("\t", "").Split ("\n") [0]);
+			if (newText.Cancel) {
+				if (_cursorPosition > _text.Count) {
+					_cursorPosition = _text.Count;
+				}
+
+				return;
+			}
+
+			ClearAllSelection ();
+			_text = newText.NewText.EnumerateRunes ().ToList ();
+
+			if (!Secret && !_historyText.IsFromHistory) {
+				_historyText.Add (new List<List<RuneCell>> { TextModel.ToRuneCellList (oldText) },
+					new Point (_cursorPosition, 0));
+				_historyText.Add (new List<List<RuneCell>> { TextModel.ToRuneCells (_text) },
+					new Point (_cursorPosition, 0)
+					, HistoryText.LineStatus.Replaced);
+			}
+
+			TextChanged?.Invoke (this, new TextChangedEventArgs (oldText));
+
+			ProcessAutocomplete ();
+
+			if (_cursorPosition > _text.Count) {
+				_cursorPosition = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+			}
+
+			Adjust ();
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <summary>
+	///         Sets the secret property.
+	///         <remarks>
+	///                 This makes the text entry suitable for entering passwords.
+	///         </remarks>
+	/// </summary>
+	public bool Secret { get; set; }
+
+	/// <summary>
+	///         Sets or gets the current cursor position.
+	/// </summary>
+	public virtual int CursorPosition {
+		get => _cursorPosition;
+		set {
+			if (value < 0) {
+				_cursorPosition = 0;
+			} else if (value > _text.Count) {
+				_cursorPosition = _text.Count;
+			} else {
+				_cursorPosition = value;
+			}
+
+			PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+		}
+	}
+
+	/// <summary>
+	///         Gets the left offset position.
+	/// </summary>
+	public int ScrollOffset { get; private set; }
+
+	/// <summary>
+	///         Indicates whatever the text was changed or not.
+	///         <see langword="true" /> if the text was changed <see langword="false" /> otherwise.
+	/// </summary>
+	public bool IsDirty => _historyText.IsDirty (Text);
+
+	/// <summary>
+	///         Indicates whatever the text has history changes or not.
+	///         <see langword="true" /> if the text has history changes <see langword="false" /> otherwise.
+	/// </summary>
+	public bool HasHistoryChanges => _historyText.HasHistoryChanges;
+
+	/// <summary>
+	///         Get the <see cref="ContextMenu" /> for this view.
+	/// </summary>
+	public ContextMenu ContextMenu { get; }
+
+	/// <summary>
+	///         Start position of the selected text.
+	/// </summary>
+	public int SelectedStart {
+		get => _selectedStart;
+		set {
+			if (value < -1) {
+				_selectedStart = -1;
+			} else if (value > _text.Count) {
+				_selectedStart = _text.Count;
+			} else {
+				_selectedStart = value;
+			}
+
+			PrepareSelection (_selectedStart, _cursorPosition - _selectedStart);
+		}
+	}
+
+	/// <summary>
+	///         Length of the selected text.
+	/// </summary>
+	public int SelectedLength { get; private set; }
+
+	/// <summary>
+	///         The selected text.
+	/// </summary>
+	public string SelectedText {
+		get => Secret ? null : _selectedText;
+		private set => _selectedText = value;
+	}
+
+	/// <summary>
+	///         Get / Set the wished cursor when the field is focused
+	/// </summary>
+	public CursorVisibility DesiredCursorVisibility {
+		get => _desiredCursorVisibility;
+		set {
+			if ((_desiredCursorVisibility != value || _visibility != value) && HasFocus) {
+				Application.Driver.SetCursorVisibility (value);
+			}
+
+			_desiredCursorVisibility = _visibility = value;
+		}
+	}
+
+	/// <summary>
+	///         Changing event, raised before the <see cref="Text" /> changes and can be canceled or changing the new text.
+	/// </summary>
+	public event EventHandler<TextChangingEventArgs> TextChanging;
+
+	/// <summary>
+	///         Changed event, raised when the text has changed.
+	///         <remarks>
+	///                 This event is raised when the <see cref="Text" /> changes.
+	///                 The passed <see cref="EventArgs" /> is a <see cref="string" /> containing the old value.
+	///         </remarks>
+	/// </summary>
+	public event EventHandler<TextChangedEventArgs> TextChanged;
 
 	void TextField_LayoutComplete (object sender, LayoutEventArgs e)
 	{

@@ -4,20 +4,20 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Windows & FrameViews", Description: "Stress Tests Windows, sub-Windows, and FrameViews.")]
+[ScenarioMetadata ("Windows & FrameViews", "Stress Tests Windows, sub-Windows, and FrameViews.")]
 [ScenarioCategory ("Layout")]
 public class WindowsAndFrameViews : Scenario {
-
 	public override void Setup ()
 	{
 		static int About ()
 		{
-			return MessageBox.Query ("About UI Catalog", "UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok");
+			return MessageBox.Query ("About UI Catalog",
+				"UI Catalog is a comprehensive sample library for Terminal.Gui", "Ok");
 		}
 
-		int margin = 2;
-		int padding = 1;
-		int contentHeight = 7;
+		var margin = 2;
+		var padding = 1;
+		var contentHeight = 7;
 
 		// list of Windows we create
 		var listWin = new List<View> ();
@@ -26,7 +26,7 @@ public class WindowsAndFrameViews : Scenario {
 		Application.Top.Remove (Win);
 		Win?.Dispose ();
 
-		Win = new Window () {
+		Win = new Window {
 			Title = $"{listWin.Count} - Scenario: {GetName ()}",
 			X = Pos.Center (),
 			Y = 1,
@@ -65,12 +65,12 @@ public class WindowsAndFrameViews : Scenario {
 		// 
 		for (var pad = 0; pad < 3; pad++) {
 			Window win = null;
-			win = new Window () {
+			win = new Window {
 				Title = $"{listWin.Count} - Window Loop - padding = {pad}",
 				X = margin,
-				Y = Pos.Bottom (listWin.Last ()) + (margin),
+				Y = Pos.Bottom (listWin.Last ()) + margin,
 				Width = Dim.Fill (margin),
-				Height = contentHeight + (pad * 2) + 2,
+				Height = contentHeight + (pad * 2) + 2
 			};
 			win.Padding.Thickness = new Thickness (pad);
 
@@ -82,20 +82,21 @@ public class WindowsAndFrameViews : Scenario {
 				Text = "Press me! (Y = 0)"
 			};
 			pressMeButton.Clicked += (s, e) =>
-			    MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");
+				MessageBox.ErrorQuery (win.Title, "Neat?", "Yes", "No");
 			win.Add (pressMeButton);
-			var subWin = new Window () {
+			var subWin = new Window {
 				Title = "Sub Window",
 				X = Pos.Percent (0),
 				Y = 1,
 				Width = Dim.Percent (50),
 				Height = 5,
 				ColorScheme = Colors.ColorSchemes ["Base"],
-				Text = "The Text in the Window",
+				Text = "The Text in the Window"
 			};
-			subWin.Add (new TextField ("Edit me! " + win.Title) {
+			subWin.Add (new TextField {
 				Y = 1,
-				ColorScheme = Colors.ColorSchemes ["Error"]
+				ColorScheme = Colors.ColorSchemes ["Error"],
+				Text = "Edit me! " + win.Title
 			});
 			win.Add (subWin);
 			var frameView = new FrameView {
@@ -107,8 +108,9 @@ public class WindowsAndFrameViews : Scenario {
 				Text = "The Text in the FrameView",
 				Title = "This is a Sub-FrameView"
 			};
-			frameView.Add (new TextField ("Edit Me!") {
+			frameView.Add (new TextField {
 				Y = 1,
+				Text = "Edit Me!"
 			});
 			win.Add (frameView);
 
@@ -133,7 +135,7 @@ public class WindowsAndFrameViews : Scenario {
 			X = margin,
 			Y = Pos.Bottom (listWin.Last ()) + (margin / 2),
 			Width = Dim.Fill (margin),
-			Height = contentHeight + 2,  // 2 for default padding
+			Height = contentHeight + 2, // 2 for default padding
 			Title = "This is a FrameView"
 		};
 		frame.ColorScheme = Colors.ColorSchemes ["Dialog"];
@@ -143,17 +145,18 @@ public class WindowsAndFrameViews : Scenario {
 			ColorScheme = Colors.ColorSchemes ["Error"],
 			Text = "This is a Label! (Y = 0)"
 		});
-		var subWinofFV = new Window () {
+		var subWinofFV = new Window {
 			Title = "This is a Sub-Window",
 			X = Pos.Percent (0),
 			Y = 1,
 			Width = Dim.Percent (50),
 			Height = Dim.Fill () - 1,
 			ColorScheme = Colors.ColorSchemes ["Base"],
-			Text = "The Text in the Window",
+			Text = "The Text in the Window"
 		};
-		subWinofFV.Add (new TextField ("Edit Me") {
-			ColorScheme = Colors.ColorSchemes ["Error"]
+		subWinofFV.Add (new TextField {
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = "Edit Me"
 		});
 
 		subWinofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
@@ -169,7 +172,7 @@ public class WindowsAndFrameViews : Scenario {
 			Text = "The Text in the FrameView",
 			Title = "this is a Sub-FrameView"
 		};
-		subFrameViewofFV.Add (new TextField ("Edit Me") { Width = 15 });
+		subFrameViewofFV.Add (new TextField { Width = 15, Text = "Edit Me" });
 
 		subFrameViewofFV.Add (new CheckBox { Y = 1, Text = "Check me" });
 		// BUGBUG: This checkbox is not shown even though frameViewFV has 3 rows in 
@@ -181,7 +184,7 @@ public class WindowsAndFrameViews : Scenario {
 			Y = Pos.AnchorEnd (1),
 			Text = "Btn1 (Y = Pos.AnchorEnd (1))"
 		});
-		CheckBox c = new CheckBox {
+		var c = new CheckBox {
 			Y = Pos.AnchorEnd (1),
 			Text = "Btn2 (Y = Pos.AnchorEnd (1))"
 		};

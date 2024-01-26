@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using Terminal.Gui;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace UICatalog.Tests;
@@ -31,17 +26,20 @@ public class ScenarioTests {
 			} else {
 				key = (KeyCode)c;
 			}
+
 			FakeConsole.PushMockKeyPress (key);
 		}
+
 		return FakeConsole.MockKeyPresses.Count;
 	}
 
 	/// <summary>
 	///         <para>
-	///         This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.
+	///                 This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run.
 	///         </para>
 	///         <para>
-	///         Should find any Scenarios which crash on load or do not respond to <see cref="Application.RequestStop()"/>.
+	///                 Should find any Scenarios which crash on load or do not respond to
+	///                 <see cref="Application.RequestStop()" />.
 	///         </para>
 	/// </summary>
 	[Fact]
@@ -77,8 +75,10 @@ public class ScenarioTests {
 				if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 					Application.RequestStop ();
 					// See #2474 for why this is commented out
-					Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
+					Assert.Fail (
+						$"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms. Force quit.");
 				}
+
 				return false;
 			};
 			//output.WriteLine ($"  Add timeout to force quit after {abortTime}ms");
@@ -88,7 +88,8 @@ public class ScenarioTests {
 				//output.WriteLine ($"  iteration {++iterations}");
 				if (Application.Top.Running && FakeConsole.MockKeyPresses.Count == 0) {
 					Application.RequestStop ();
-					Assert.Fail ($"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
+					Assert.Fail (
+						$"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey}. Force quit.");
 				}
 			};
 
@@ -113,7 +114,8 @@ public class ScenarioTests {
 		var scenarios = Scenario.GetScenarios ();
 		Assert.NotEmpty (scenarios);
 
-		var item = scenarios.FindIndex (s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
+		var item = scenarios.FindIndex (
+			s => s.GetName ().Equals ("Generic", StringComparison.OrdinalIgnoreCase));
 		var generic = scenarios [item];
 
 		Application.Init (new FakeDriver ());
@@ -138,6 +140,7 @@ public class ScenarioTests {
 				// Timeout only must start at first iteration
 				token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
 			}
+
 			iterations++;
 			_output.WriteLine ($"'Generic' iteration {iterations}");
 			// Stop if we run out of control...
@@ -259,15 +262,15 @@ public class ScenarioTests {
 			X = 0,
 			Y = Pos.Bottom (label)
 		};
-		_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 		_locationFrame.Add (_xText);
 
 		_locationFrame.Add (_xRadioGroup);
 
 		radioItems = new [] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-		label = new Label { X = Pos.Right(_xRadioGroup) + 1, Y = 0, Text = "y:" };
+		label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
 		_locationFrame.Add (label);
-		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 		_locationFrame.Add (_yText);
 		_yRadioGroup = new RadioGroup (radioItems) {
 			X = Pos.X (label),
@@ -290,14 +293,14 @@ public class ScenarioTests {
 			X = 0,
 			Y = Pos.Bottom (label)
 		};
-		_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 		_sizeFrame.Add (_wText);
 		_sizeFrame.Add (_wRadioGroup);
 
 		radioItems = new [] { "Percent(height)", "Fill(height)", "Sized(height)" };
-		label = new Label { X = Pos.Right(_wRadioGroup) + 1, Y = 0, Text = "height:" };
+		label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
 		_sizeFrame.Add (label);
-		_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 		_sizeFrame.Add (_hText);
 
 		_hRadioGroup = new RadioGroup (radioItems) {
@@ -328,6 +331,7 @@ public class ScenarioTests {
 				_curView = null;
 				_hostPane.Clear ();
 			}
+
 			_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 		};
 
@@ -467,6 +471,7 @@ public class ScenarioTests {
 			} catch (Exception e) {
 				MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
 			}
+
 			UpdateTitle (view);
 		}
 
@@ -496,9 +501,12 @@ public class ScenarioTests {
 		{
 			var types = new List<Type> ();
 			foreach (var type in typeof (View).Assembly.GetTypes ()
-				.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
+					 .Where (myType =>
+						 myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
+						 myType.IsSubclassOf (typeof (View)))) {
 				types.Add (type);
 			}
+
 			return types;
 		}
 
@@ -506,7 +514,6 @@ public class ScenarioTests {
 		{
 			// If we are to create a generic Type
 			if (type.IsGenericType) {
-
 				// For each of the <T> arguments
 				var typeArguments = new List<Type> ();
 
@@ -518,6 +525,7 @@ public class ScenarioTests {
 				// And change what type we are instantiating from MyClass<T> to MyClass<object>
 				type = type.MakeGenericType (typeArguments.ToArray ());
 			}
+
 			// Instantiate view
 			var view = (View)Activator.CreateInstance (type);
 
@@ -534,7 +542,8 @@ public class ScenarioTests {
 			// If the view supports a Text property, set it so we have something to look at
 			if (view.GetType ().GetProperty ("Text") != null) {
 				try {
-					view.GetType ().GetProperty ("Text")?.GetSetMethod ()?.Invoke (view, new [] { "Test Text" });
+					view.GetType ().GetProperty ("Text")?.GetSetMethod ()
+						?.Invoke (view, new [] { "Test Text" });
 				} catch (TargetInvocationException e) {
 					MessageBox.ErrorQuery ("Exception", e.InnerException.Message, "Ok");
 					view = null;
@@ -544,16 +553,21 @@ public class ScenarioTests {
 			// If the view supports a Title property, set it so we have something to look at
 			if (view != null && view.GetType ().GetProperty ("Title") != null) {
 				if (view.GetType ().GetProperty ("Title").PropertyType == typeof (string)) {
-					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
+					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()
+						?.Invoke (view, new [] { "Test Title" });
 				} else {
-					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
+					view?.GetType ().GetProperty ("Title")?.GetSetMethod ()
+						?.Invoke (view, new [] { "Test Title" });
 				}
 			}
 
 			// If the view supports a Source property, set it so we have something to look at
-			if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource)) {
-				var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
-				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
+			if (view != null && view.GetType ().GetProperty ("Source") != null &&
+			    view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource)) {
+				var source = new ListWrapper (new List<string>
+					{ "Test Text #1", "Test Text #2", "Test Text #3" });
+				view?.GetType ().GetProperty ("Source")?.GetSetMethod ()
+					?.Invoke (view, new [] { source });
 			}
 
 			// Set Settings

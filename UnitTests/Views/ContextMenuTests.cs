@@ -598,10 +598,11 @@ public class ContextMenuTests {
 			Text = "Label:"
 		};
 
-		var tf = new TextField ("TextField") {
+		var tf = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
-			Width = 20
+			Width = 20,
+			Text = "TextField"
 		};
 
 		var statusBar = new StatusBar ([
@@ -657,10 +658,11 @@ public class ContextMenuTests {
 
 		var label = new Label { X = 2, Y = 3, Text = "Label:" };
 
-		var tf = new TextField ("TextField") {
+		var tf = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
-			Width = 20
+			Width = 20,
+			Text = "TextField"
 		};
 
 		var win = new Window ();
@@ -962,7 +964,7 @@ public class ContextMenuTests {
 
 		// Don't use Dialog here as it has more layout logic. Use Window instead.
 		var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
-		dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
+		dialog.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
 		var rs = Application.Begin (dialog);
 
 		Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
@@ -1022,7 +1024,7 @@ public class ContextMenuTests {
 
 		// Don't use Dialog here as it has more layout logic. Use Window instead.
 		var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
-		dialog.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
+		dialog.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
 		var rs = Application.Begin (dialog);
 
 		Assert.Equal (new Rect (2, 2, 15, 4), dialog.Frame);
@@ -1067,7 +1069,7 @@ public class ContextMenuTests {
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 
 		var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
-		top.Add (new TextField ("Test") { X = Pos.Center (), Width = 10 });
+		top.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
 		var rs = Application.Begin (top);
 
 		Assert.Equal (new Rect (2, 2, 15, 4), top.Frame);

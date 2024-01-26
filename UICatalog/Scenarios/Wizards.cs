@@ -3,8 +3,10 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Wizards", Description: "Demonstrates the Wizard class")]
-[ScenarioCategory ("Dialogs"), ScenarioCategory ("Top Level Windows"), ScenarioCategory ("Wizards")]
+[ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
+[ScenarioCategory ("Dialogs")]
+[ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Wizards")]
 public class Wizards : Scenario {
 	public override void Setup ()
 	{
@@ -22,16 +24,17 @@ public class Wizards : Scenario {
 			Y = 0,
 			Width = 15,
 			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			TextAlignment = TextAlignment.Right,
 			AutoSize = false,
 			Text = "Width:"
 		};
 		frame.Add (label);
-		var widthEdit = new TextField ("80") {
+		var widthEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = 5,
-			Height = 1
+			Height = 1,
+			Text = "80"
 		};
 		frame.Add (widthEdit);
 
@@ -40,16 +43,17 @@ public class Wizards : Scenario {
 			Y = Pos.Bottom (label),
 			Width = Dim.Width (label),
 			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			TextAlignment = TextAlignment.Right,
 			AutoSize = false,
 			Text = "Height:"
 		};
 		frame.Add (label);
-		var heightEdit = new TextField ("20") {
+		var heightEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = 5,
-			Height = 1
+			Height = 1,
+			Text = "20"
 		};
 		frame.Add (heightEdit);
 
@@ -58,16 +62,17 @@ public class Wizards : Scenario {
 			Y = Pos.Bottom (label),
 			Width = Dim.Width (label),
 			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			TextAlignment = TextAlignment.Right,
 			AutoSize = false,
 			Text = "Title:"
 		};
 		frame.Add (label);
-		var titleEdit = new TextField ("Gandolf") {
+		var titleEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = Dim.Fill (),
-			Height = 1
+			Height = 1,
+			Text = "Gandolf"
 		};
 		frame.Add (titleEdit);
 
@@ -76,12 +81,13 @@ public class Wizards : Scenario {
 			frame.Height = widthEdit.Frame.Height + heightEdit.Frame.Height + titleEdit.Frame.Height + 2;
 			Application.Top.Loaded -= Top_Loaded;
 		}
+
 		Application.Top.Loaded += Top_Loaded;
 
 		label = new Label {
 			X = Pos.Center (),
 			Y = Pos.AnchorEnd (1),
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			TextAlignment = TextAlignment.Right,
 			Text = "Action:"
 		};
 		Win.Add (label);
@@ -89,7 +95,7 @@ public class Wizards : Scenario {
 		var actionLabel = new Label {
 			X = Pos.Right (label),
 			Y = Pos.AnchorEnd (1),
-			ColorScheme = Colors.ColorSchemes ["Error"],
+			ColorScheme = Colors.ColorSchemes ["Error"]
 		};
 		Win.Add (actionLabel);
 
@@ -102,19 +108,20 @@ public class Wizards : Scenario {
 
 		showWizardButton.Clicked += (s, e) => {
 			try {
-				int width = 0;
+				var width = 0;
 				int.TryParse (widthEdit.Text, out width);
-				int height = 0;
+				var height = 0;
 				int.TryParse (heightEdit.Text, out height);
 
 				if (width < 1 || height < 1) {
-					MessageBox.ErrorQuery ("Nope", "Height and width must be greater than 0 (much bigger)", "Ok");
+					MessageBox.ErrorQuery ("Nope",
+						"Height and width must be greater than 0 (much bigger)", "Ok");
 					return;
 				}
 
 				actionLabel.Text = string.Empty;
 
-				var wizard = new Wizard () {
+				var wizard = new Wizard {
 					Title = titleEdit.Text,
 					Width = width,
 					Height = height
@@ -141,15 +148,17 @@ public class Wizards : Scenario {
 				};
 
 				// Add 1st step
-				var firstStep = new WizardStep () { Title = "End User License Agreement" };
+				var firstStep = new WizardStep { Title = "End User License Agreement" };
 				firstStep.NextButtonText = "Accept!";
-				firstStep.HelpText = "This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
+				firstStep.HelpText =
+					"This is the End User License Agreement.\n\n\n\n\n\nThis is a test of the emergency broadcast system. This is a test of the emergency broadcast system.\nThis is a test of the emergency broadcast system.\n\n\nThis is a test of the emergency broadcast system.\n\nThis is a test of the emergency broadcast system.\n\n\n\nThe end of the EULA.";
 				wizard.AddStep (firstStep);
 
 				// Add 2nd step
-				var secondStep = new WizardStep () { Title = "Second Step" };
+				var secondStep = new WizardStep { Title = "Second Step" };
 				wizard.AddStep (secondStep);
-				secondStep.HelpText = "This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
+				secondStep.HelpText =
+					"This is the help text for the Second Step.\n\nPress the button to change the Title.\n\nIf First Name is empty the step will prevent moving to the next step.";
 
 				var buttonLbl = new Label { Text = "Second Step Button: ", X = 1, Y = 1 };
 				var button = new Button {
@@ -159,16 +168,22 @@ public class Wizards : Scenario {
 				};
 				button.Clicked += (s, e) => {
 					secondStep.Title = "2nd Step";
-					MessageBox.Query ("Wizard Scenario", "This Wizard Step's title was changed to '2nd Step'");
+					MessageBox.Query ("Wizard Scenario",
+						"This Wizard Step's title was changed to '2nd Step'");
 				};
 				secondStep.Add (buttonLbl, button);
 				var lbl = new Label { Text = "First Name: ", X = 1, Y = Pos.Bottom (buttonLbl) };
-				var firstNameField = new TextField () { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+				var firstNameField = new TextField { Text = "Number", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 				secondStep.Add (lbl, firstNameField);
 				lbl = new Label { Text = "Last Name:  ", X = 1, Y = Pos.Bottom (lbl) };
-				var lastNameField = new TextField () { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
+				var lastNameField = new TextField { Text = "Six", Width = 30, X = Pos.Right (lbl), Y = Pos.Top (lbl) };
 				secondStep.Add (lbl, lastNameField);
-				var thirdStepEnabledCeckBox = new CheckBox { Text = "Enable Step _3", Checked = false, X = Pos.Left (lastNameField), Y = Pos.Bottom (lastNameField) };
+				var thirdStepEnabledCeckBox = new CheckBox {
+					Text = "Enable Step _3",
+					Checked = false,
+					X = Pos.Left (lastNameField),
+					Y = Pos.Bottom (lastNameField)
+				};
 				secondStep.Add (thirdStepEnabledCeckBox);
 
 				// Add a frame 
@@ -179,19 +194,21 @@ public class Wizards : Scenario {
 					Height = 4,
 					Title = "A Broken Frame (by Depeche Mode)"
 				};
-				frame.Add (new TextField ("This is a TextField inside of the frame."));
+				frame.Add (new TextField { Text = "This is a TextField inside of the frame." });
 				secondStep.Add (frame);
 				wizard.StepChanging += (s, args) => {
 					if (args.OldStep == secondStep && string.IsNullOrEmpty (firstNameField.Text)) {
 						args.Cancel = true;
-						var btn = MessageBox.ErrorQuery ("Second Step", "You must enter a First Name to continue", "Ok");
+						var btn = MessageBox.ErrorQuery ("Second Step",
+							"You must enter a First Name to continue", "Ok");
 					}
 				};
 
 				// Add 3rd (optional) step
-				var thirdStep = new WizardStep () { Title = "Third Step (Optional)" };
+				var thirdStep = new WizardStep { Title = "Third Step (Optional)" };
 				wizard.AddStep (thirdStep);
-				thirdStep.HelpText = "This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
+				thirdStep.HelpText =
+					"This is step is optional (WizardStep.Enabled = false). Enable it with the checkbox in Step 2.";
 				var step3Label = new Label {
 					Text = "This step is optional.",
 					X = 0,
@@ -199,7 +216,7 @@ public class Wizards : Scenario {
 				};
 				thirdStep.Add (step3Label);
 				var progLbl = new Label { Text = "Third Step ProgressBar: ", X = 1, Y = 10 };
-				var progressBar = new ProgressBar () {
+				var progressBar = new ProgressBar {
 					X = Pos.Right (progLbl),
 					Y = Pos.Top (progLbl),
 					Width = 40,
@@ -212,10 +229,11 @@ public class Wizards : Scenario {
 				};
 
 				// Add 4th step
-				var fourthStep = new WizardStep () { Title = "Step Four" };
+				var fourthStep = new WizardStep { Title = "Step Four" };
 				wizard.AddStep (fourthStep);
-				var someText = new TextView () {
-					Text = "This step (Step Four) shows how to show/hide the Help pane. The step contains this TextView (but it's hard to tell it's a TextView because of Issue #1800).",
+				var someText = new TextView {
+					Text =
+						"This step (Step Four) shows how to show/hide the Help pane. The step contains this TextView (but it's hard to tell it's a TextView because of Issue #1800).",
 					X = 0,
 					Y = 0,
 					Width = Dim.Fill (),
@@ -247,6 +265,7 @@ public class Wizards : Scenario {
 					if (someText.TopRow != scrollBar.Position) {
 						scrollBar.Position = someText.TopRow;
 					}
+
 					someText.SetNeedsDisplay ();
 				};
 
@@ -265,29 +284,31 @@ public class Wizards : Scenario {
 						scrollBar.OtherScrollBarView.Size = someText.Maxlength;
 						scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
 					}
+
 					scrollBar.LayoutSubviews ();
 					scrollBar.Refresh ();
 				};
 				fourthStep.Add (scrollBar);
 
 				// Add last step
-				var lastStep = new WizardStep () { Title = "The last step" };
+				var lastStep = new WizardStep { Title = "The last step" };
 				wizard.AddStep (lastStep);
-				lastStep.HelpText = "The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
+				lastStep.HelpText =
+					"The wizard is complete!\n\nPress the Finish button to continue.\n\nPressing ESC will cancel the wizard.";
 				var finalFinalStepEnabledCeckBox = new CheckBox { Text = "Enable _Final Final Step", Checked = false, X = 0, Y = 1 };
 				lastStep.Add (finalFinalStepEnabledCeckBox);
 
 				// Add an optional FINAL last step
-				var finalFinalStep = new WizardStep () { Title = "The VERY last step" };
+				var finalFinalStep = new WizardStep { Title = "The VERY last step" };
 				wizard.AddStep (finalFinalStep);
-				finalFinalStep.HelpText = "This step only shows if it was enabled on the other last step.";
+				finalFinalStep.HelpText =
+					"This step only shows if it was enabled on the other last step.";
 				finalFinalStep.Enabled = (bool)thirdStepEnabledCeckBox.Checked;
 				finalFinalStepEnabledCeckBox.Toggled += (s, e) => {
 					finalFinalStep.Enabled = (bool)finalFinalStepEnabledCeckBox.Checked;
 				};
 
 				Application.Run (wizard);
-
 			} catch (FormatException) {
 				actionLabel.Text = "Invalid Options";
 			}

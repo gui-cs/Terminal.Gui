@@ -4,7 +4,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "MessageBoxes", Description: "Demonstrates how to use the MessageBox class.")]
+[ScenarioMetadata ("MessageBoxes", "Demonstrates how to use the MessageBox class.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 public class MessageBoxes : Scenario {
@@ -18,77 +18,132 @@ public class MessageBoxes : Scenario {
 		};
 		Win.Add (frame);
 
-		var label = new Label { X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Width:" };
+		var label = new Label { X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = TextAlignment.Right, Text = "Width:" };
 		frame.Add (label);
-		var widthEdit = new TextField ("0") {
+		var widthEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = 5,
-			Height = 1
+			Height = 1,
+			Text = "0"
 		};
 		frame.Add (widthEdit);
 
-		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Height:" };
+		label = new Label {
+			X = 0,
+			Y = Pos.Bottom (label),
+			Width = Dim.Width (label),
+			Height = 1,
+			TextAlignment = TextAlignment.Right,
+			Text = "Height:"
+		};
 		frame.Add (label);
-		var heightEdit = new TextField ("0") {
+		var heightEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = 5,
-			Height = 1
+			Height = 1,
+			Text = "0"
 		};
 		frame.Add (heightEdit);
 
-		frame.Add (new Label { X = Pos.Right(widthEdit) + 2, Y = Pos.Top(widthEdit), Text = "If height & width are both 0," });
-		frame.Add (new Label { X = Pos.Right(heightEdit) + 2, Y = Pos.Top(heightEdit), Text = "the MessageBox will be sized automatically." });
+		frame.Add (new Label {
+			X = Pos.Right (widthEdit) + 2,
+			Y = Pos.Top (widthEdit),
+			Text = "If height & width are both 0,"
+		});
+		frame.Add (new Label {
+			X = Pos.Right (heightEdit) + 2,
+			Y = Pos.Top (heightEdit),
+			Text = "the MessageBox will be sized automatically."
+		});
 
-		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Title:" };
+		label = new Label {
+			X = 0,
+			Y = Pos.Bottom (label),
+			Width = Dim.Width (label),
+			Height = 1,
+			TextAlignment = TextAlignment.Right,
+			Text = "Title:"
+		};
 		frame.Add (label);
 
-		var titleEdit = new TextField ("Title") {
+		var titleEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = Dim.Fill (),
-			Height = 1
+			Height = 1,
+			Text = "Title"
 		};
 		frame.Add (titleEdit);
 
-		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Message:" };
+		label = new Label {
+			X = 0,
+			Y = Pos.Bottom (label),
+			Width = Dim.Width (label),
+			Height = 1,
+			TextAlignment = TextAlignment.Right,
+			Text = "Message:"
+		};
 		frame.Add (label);
-		var messageEdit = new TextView () {
+		var messageEdit = new TextView {
 			Text = "Message",
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = Dim.Fill (),
-			Height = 5,
+			Height = 5
 		};
 		frame.Add (messageEdit);
 
-		label = new Label { X = 0, Y = Pos.Bottom(messageEdit), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Num Buttons:" };
+		label = new Label {
+			X = 0,
+			Y = Pos.Bottom (messageEdit),
+			Width = Dim.Width (label),
+			Height = 1,
+			TextAlignment = TextAlignment.Right,
+			Text = "Num Buttons:"
+		};
 		frame.Add (label);
-		var numButtonsEdit = new TextField ("3") {
+		var numButtonsEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = 5,
-			Height = 1
+			Height = 1,
+			Text = "3"
 		};
 		frame.Add (numButtonsEdit);
 
-		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Default Button:" };
+		label = new Label {
+			X = 0,
+			Y = Pos.Bottom (label),
+			Width = Dim.Width (label),
+			Height = 1,
+			TextAlignment = TextAlignment.Right,
+			Text = "Default Button:"
+		};
 		frame.Add (label);
-		var defaultButtonEdit = new TextField ("0") {
+		var defaultButtonEdit = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
 			Width = 5,
-			Height = 1
+			Height = 1,
+			Text = "0"
 		};
 		frame.Add (defaultButtonEdit);
 
-		label = new Label { X = 0, Y = Pos.Bottom(label), Width = Dim.Width(label), Height = 1, TextAlignment = Terminal.Gui.TextAlignment.Right, Text = "Style:" };
+		label = new Label {
+			X = 0,
+			Y = Pos.Bottom (label),
+			Width = Dim.Width (label),
+			Height = 1,
+			TextAlignment = TextAlignment.Right,
+			Text = "Style:"
+		};
 		frame.Add (label);
 
-		var styleRadioGroup = new RadioGroup (new string [] { "_Query", "_Error" }) {
+		var styleRadioGroup = new RadioGroup (new [] { "_Query", "_Error" }) {
 			X = Pos.Right (label) + 1,
-			Y = Pos.Top (label),
+			Y = Pos.Top (label)
 		};
 		frame.Add (styleRadioGroup);
 
@@ -101,6 +156,7 @@ public class MessageBoxes : Scenario {
 		frame.Add (ckbWrapMessage);
 
 		frame.ValidatePosDim = true;
+
 		void Top_LayoutComplete (object sender, EventArgs args)
 		{
 			frame.Height =
@@ -115,13 +171,14 @@ public class MessageBoxes : Scenario {
 				frame.GetAdornmentsThickness ().Vertical;
 			Application.Top.Loaded -= Top_LayoutComplete;
 		}
+
 		Application.Top.LayoutComplete += Top_LayoutComplete;
 
 		label = new Label {
 			X = Pos.Center (),
 			Y = Pos.Bottom (frame) + 2,
 			Height = 1,
-			TextAlignment = Terminal.Gui.TextAlignment.Right,
+			TextAlignment = TextAlignment.Right,
 			Text = "Button Pressed:"
 		};
 		Win.Add (label);
@@ -131,7 +188,7 @@ public class MessageBoxes : Scenario {
 			Width = 25,
 			Height = 1,
 			ColorScheme = Colors.ColorSchemes ["Error"],
-			TextAlignment = Terminal.Gui.TextAlignment.Centered,
+			TextAlignment = TextAlignment.Centered,
 			Text = " "
 		};
 
@@ -145,20 +202,23 @@ public class MessageBoxes : Scenario {
 		};
 		showMessageBoxButton.Clicked += (s, e) => {
 			try {
-				int width = int.Parse (widthEdit.Text);
-				int height = int.Parse (heightEdit.Text);
-				int numButtons = int.Parse (numButtonsEdit.Text);
-				int defaultButton = int.Parse (defaultButtonEdit.Text);
+				var width = int.Parse (widthEdit.Text);
+				var height = int.Parse (heightEdit.Text);
+				var numButtons = int.Parse (numButtonsEdit.Text);
+				var defaultButton = int.Parse (defaultButtonEdit.Text);
 
 				var btns = new List<string> ();
-				for (int i = 0; i < numButtons; i++) {
+				for (var i = 0; i < numButtons; i++) {
 					//btns.Add(btnText[i % 10]);
 					btns.Add (NumberToWords.Convert (i));
 				}
+
 				if (styleRadioGroup.SelectedItem == 0) {
-					buttonPressedLabel.Text = $"{MessageBox.Query (width, height, titleEdit.Text, messageEdit.Text, defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+					buttonPressedLabel.Text =
+						$"{MessageBox.Query (width, height, titleEdit.Text, messageEdit.Text, defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 				} else {
-					buttonPressedLabel.Text = $"{MessageBox.ErrorQuery (width, height, titleEdit.Text, messageEdit.Text, defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
+					buttonPressedLabel.Text =
+						$"{MessageBox.ErrorQuery (width, height, titleEdit.Text, messageEdit.Text, defaultButton, (bool)ckbWrapMessage.Checked, btns.ToArray ())}";
 				}
 			} catch (FormatException) {
 				buttonPressedLabel.Text = "Invalid Options";

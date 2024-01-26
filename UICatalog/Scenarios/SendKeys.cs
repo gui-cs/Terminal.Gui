@@ -3,7 +3,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "SendKeys", Description: "SendKeys sample - Send key combinations.")]
+[ScenarioMetadata ("SendKeys", "SendKeys sample - Send key combinations.")]
 [ScenarioCategory ("Mouse and Keyboard")]
 public class SendKeys : Scenario {
 	public override void Setup ()
@@ -15,10 +15,11 @@ public class SendKeys : Scenario {
 		};
 		Win.Add (label);
 
-		var txtInput = new TextField ("MockKeyPresses") {
+		var txtInput = new TextField {
 			X = Pos.Center (),
 			Y = Pos.Center () - 5,
-			Width = 20
+			Width = 20,
+			Text = "MockKeyPresses"
 		};
 		Win.Add (txtInput);
 
@@ -50,10 +51,10 @@ public class SendKeys : Scenario {
 		};
 		Win.Add (label);
 
-		var txtResult = new TextField () {
+		var txtResult = new TextField {
 			X = Pos.Center (),
 			Y = Pos.Center () + 2,
-			Width = 20,
+			Width = 20
 		};
 		Win.Add (txtResult);
 
@@ -69,10 +70,12 @@ public class SendKeys : Scenario {
 				rControlKeys += " Shift ";
 				IsShift = true;
 			}
+
 			if (!IsAlt && e.IsAlt) {
 				rControlKeys += " Alt ";
 				IsAlt = true;
 			}
+
 			if (!IsCtrl && e.IsCtrl) {
 				rControlKeys += " Ctrl ";
 				IsCtrl = true;
@@ -112,10 +115,12 @@ public class SendKeys : Scenario {
 			txtResult.SetFocus ();
 			foreach (var r in txtInput.Text) {
 				var ck = char.IsLetter (r)
-					? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
+					? (ConsoleKey)char.ToUpper (r)
+					: (ConsoleKey)r;
 				Application.Driver.SendKeys (r, ck, (bool)ckbShift.Checked,
 					(bool)ckbAlt.Checked, (bool)ckbControl.Checked);
 			}
+
 			lblShippedKeys.Text = rKeys;
 			lblShippedControlKeys.Text = rControlKeys;
 			txtInput.SetFocus ();

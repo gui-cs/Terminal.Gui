@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -38,7 +37,7 @@ public class DrawTests {
 		Application.Begin (dg);
 		((FakeDriver)Application.Driver).SetBufferSize (30, 10);
 
-		string expected = @"
+		var expected = @"
 ┌────────────────────────────┐
 │これは広いルーンラインです。│
 │�┌────────────┐�ラインです。│
@@ -59,7 +58,7 @@ public class DrawTests {
 	[AutoInitShutdown]
 	public void Non_Bmp_ConsoleWidth_ColumnWidth_Equal_Two ()
 	{
-		string us = "\U0001d539";
+		var us = "\U0001d539";
 		var r = (Rune)0x1d539;
 
 		Assert.Equal ("𝔹", us);
@@ -69,9 +68,9 @@ public class DrawTests {
 		Assert.Equal (1, us.GetColumns ());
 		Assert.Equal (1, r.GetColumns ());
 
-		var win = new Window () { Title = us };
+		var win = new Window { Title = us };
 		var label = new Label { Text = r.ToString () };
-		var tf = new TextField (us) { Y = 1, Width = 3 };
+		var tf = new TextField { Y = 1, Width = 3, Text = us };
 		win.Add (label, tf);
 		var top = Application.Top;
 		top.Add (win);
@@ -79,7 +78,7 @@ public class DrawTests {
 		Application.Begin (top);
 		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-		string expected = @"
+		var expected = @"
 ┌┤𝔹├─────┐
 │𝔹       │
 │𝔹       │
@@ -88,7 +87,7 @@ public class DrawTests {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		var expectedColors = new Attribute [] {
+		var expectedColors = new [] {
 			// 0
 			Colors.ColorSchemes ["Base"].Normal,
 			// 1
@@ -108,7 +107,7 @@ public class DrawTests {
 	[AutoInitShutdown]
 	public void CJK_Compatibility_Ideographs_ConsoleWidth_ColumnWidth_Equal_Two ()
 	{
-		string us = "\U0000f900";
+		var us = "\U0000f900";
 		var r = (Rune)0xf900;
 
 		Assert.Equal ("豈", us);
@@ -118,9 +117,9 @@ public class DrawTests {
 		Assert.Equal (2, us.GetColumns ());
 		Assert.Equal (2, r.GetColumns ());
 
-		var win = new Window () { Title = us };
-		var label = new Label { Text = r.ToString() };
-		var tf = new TextField (us) { Y = 1, Width = 3 };
+		var win = new Window { Title = us };
+		var label = new Label { Text = r.ToString () };
+		var tf = new TextField { Y = 1, Width = 3, Text = us };
 		win.Add (label, tf);
 		var top = Application.Top;
 		top.Add (win);
@@ -128,7 +127,7 @@ public class DrawTests {
 		Application.Begin (top);
 		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 
-		string expected = @"
+		var expected = @"
 ┌┤豈├────┐
 │豈      │
 │豈      │
@@ -137,7 +136,7 @@ public class DrawTests {
 
 		TestHelpers.AssertDriverContentsAre (expected, _output);
 
-		var expectedColors = new Attribute [] {
+		var expectedColors = new [] {
 			// 0
 			Colors.ColorSchemes ["Base"].Normal,
 			// 1
@@ -195,7 +194,7 @@ t     ", _output);
 0
 0
 0
-0", Application.Driver, new Attribute [] { Colors.ColorSchemes ["Base"].Normal });
+0", Application.Driver, Colors.ColorSchemes ["Base"].Normal);
 	}
 
 	[Fact]
@@ -203,18 +202,22 @@ t     ", _output);
 	public void Draw_Negative_Bounds_Horizontal_Without_New_Lines ()
 	{
 		// BUGBUG: This previously assumed the default height of a View was 1. 
-		var subView = new View () { Id = "subView", Y = 1, Width = 7, Height = 1, Text = "subView" };
-		var view = new View () { Id = "view", Width = 20, Height = 2, Text = "01234567890123456789" };
+		var subView = new View { Id = "subView", Y = 1, Width = 7, Height = 1, Text = "subView" };
+		var view = new View { Id = "view", Width = 20, Height = 2, Text = "01234567890123456789" };
 		view.Add (subView);
-		var content = new View () { Id = "content", Width = 20, Height = 20 };
+		var content = new View { Id = "content", Width = 20, Height = 20 };
 		content.Add (view);
-		var container = new View () { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
+		var container = new View { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
 		container.Add (content);
 		var top = Application.Top;
 		top.Add (container);
 		// BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
 
-		void Top_LayoutComplete (object sender, LayoutEventArgs e) => Application.Driver.Clip = container.Frame;
+		void Top_LayoutComplete (object sender, LayoutEventArgs e)
+		{
+			Application.Driver.Clip = container.Frame;
+		}
+
 		top.LayoutComplete += Top_LayoutComplete;
 		Application.Begin (top);
 
@@ -247,12 +250,17 @@ t     ", _output);
 	[AutoInitShutdown]
 	public void Draw_Negative_Bounds_Horizontal_With_New_Lines ()
 	{
-		var subView = new View () { Id = "subView", X = 1, Width = 1, Height = 7, Text = "s\nu\nb\nV\ni\ne\nw" };
-		var view = new View () { Id = "view", Width = 2, Height = 20, Text = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9" };
+		var subView = new View { Id = "subView", X = 1, Width = 1, Height = 7, Text = "s\nu\nb\nV\ni\ne\nw" };
+		var view = new View {
+			Id = "view",
+			Width = 2,
+			Height = 20,
+			Text = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9"
+		};
 		view.Add (subView);
-		var content = new View () { Id = "content", Width = 20, Height = 20 };
+		var content = new View { Id = "content", Width = 20, Height = 20 };
 		content.Add (view);
-		var container = new View () { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
+		var container = new View { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
 		container.Add (content);
 		var top = Application.Top;
 		top.Add (container);
@@ -317,12 +325,25 @@ t     ", _output);
 	[AutoInitShutdown]
 	public void Draw_Negative_Bounds_Vertical ()
 	{
-		var subView = new View () { Id = "subView", X = 1, Width = 1, Height = 7, Text = "subView", TextDirection = TextDirection.TopBottom_LeftRight };
-		var view = new View () { Id = "view", Width = 2, Height = 20, Text = "01234567890123456789", TextDirection = TextDirection.TopBottom_LeftRight };
+		var subView = new View {
+			Id = "subView",
+			X = 1,
+			Width = 1,
+			Height = 7,
+			Text = "subView",
+			TextDirection = TextDirection.TopBottom_LeftRight
+		};
+		var view = new View {
+			Id = "view",
+			Width = 2,
+			Height = 20,
+			Text = "01234567890123456789",
+			TextDirection = TextDirection.TopBottom_LeftRight
+		};
 		view.Add (subView);
-		var content = new View () { Id = "content", Width = 20, Height = 20 };
+		var content = new View { Id = "content", Width = 20, Height = 20 };
 		content.Add (view);
-		var container = new View () { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
+		var container = new View { Id = "container", X = 1, Y = 1, Width = 5, Height = 5 };
 		container.Add (content);
 		var top = Application.Top;
 		top.Add (container);
@@ -383,19 +404,20 @@ t     ", _output);
 		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
 	}
 
-	[Theory, SetupFakeDriver]
+	[Theory]
+	[SetupFakeDriver]
 	[InlineData ("𝔽𝕆𝕆𝔹𝔸R")]
 	[InlineData ("a𐐀b")]
 	void DrawHotString_NonBmp (string expected)
 	{
-		var view = new View () { Width = 10, Height = 1 };
+		var view = new View { Width = 10, Height = 1 };
 		view.DrawHotString (expected, Attribute.Default, Attribute.Default);
 
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds ()
 	{
 		var label = new Label { Width = 2, Height = 2, BorderStyle = LineStyle.Single };
@@ -409,7 +431,8 @@ t     ", _output);
 └┘", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Top ()
 	{
 		var label = new Label { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
@@ -427,7 +450,8 @@ t     ", _output);
 ┌┐", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Bottom ()
 	{
 		var label = new Label { Width = 2, Height = 1, BorderStyle = LineStyle.Single };
@@ -445,7 +469,8 @@ t     ", _output);
 ", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Left ()
 	{
 		var label = new Label { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
@@ -460,7 +485,8 @@ t     ", _output);
 │", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Minimum_Full_Border_With_Empty_Bounds_Without_Right ()
 	{
 		var label = new Label { Width = 1, Height = 2, BorderStyle = LineStyle.Single };
@@ -475,7 +501,8 @@ t     ", _output);
 │", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test_Label_Full_Border ()
 	{
 		var label = new Label { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
@@ -490,7 +517,8 @@ t     ", _output);
 └────┘", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test_Label_Without_Top_Border ()
 	{
 		var label = new Label { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };
@@ -508,7 +536,8 @@ t     ", _output);
 └────┘", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Test_Label_With_Top_Margin_Without_Top_Border ()
 	{
 		var label = new Label { Text = "Test", Width = 6, Height = 3, BorderStyle = LineStyle.Single };

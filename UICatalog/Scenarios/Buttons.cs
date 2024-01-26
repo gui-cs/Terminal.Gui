@@ -3,8 +3,9 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Buttons", Description: "Demonstrates all sorts of Buttons.")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("Layout")]
+[ScenarioMetadata ("Buttons", "Demonstrates all sorts of Buttons.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Layout")]
 public class Buttons : Scenario {
 	public override void Setup ()
 	{
@@ -12,10 +13,10 @@ public class Buttons : Scenario {
 		var editLabel = new Label { X = 0, Y = 0, TabStop = true, Text = "TextField (to demo IsDefault):" };
 		Win.Add (editLabel);
 		// Add a TextField using Absolute layout. 
-		var edit = new TextField ("") {
+		var edit = new TextField {
 			X = 31,
 			Width = 15,
-			HotKey = Key.Y.WithAlt,
+			HotKey = Key.Y.WithAlt
 		};
 		Win.Add (edit);
 
@@ -45,7 +46,7 @@ public class Buttons : Scenario {
 			};
 		}
 
-		var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom(editLabel) + 1, Text = "Color Buttons:" };
+		var colorButtonsLabel = new Label { X = 0, Y = Pos.Bottom (editLabel) + 1, Text = "Color Buttons:" };
 		Win.Add (colorButtonsLabel);
 
 		View prev = colorButtonsLabel;
@@ -71,7 +72,8 @@ public class Buttons : Scenario {
 		Win.Add (button = new Button {
 			X = 2,
 			Y = Pos.Bottom (colorButtonsLabel) + 1,
-			Text = "A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?"
+			Text =
+				"A super l_öng Button that will probably expose a bug in clipping or wrapping of text. Will it?"
 		});
 		DoMessage (button, button.Text);
 
@@ -165,7 +167,8 @@ public class Buttons : Scenario {
 			Text = "Move This Button via Frame"
 		};
 		moveBtnA.Clicked += (s, e) => {
-			moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width, moveBtnA.Frame.Height);
+			moveBtnA.Frame = new Rect (moveBtnA.Frame.X + 5, moveBtnA.Frame.Y, moveBtnA.Frame.Width,
+				moveBtnA.Frame.Height);
 		};
 		absoluteFrame.Add (moveBtnA);
 
@@ -176,7 +179,8 @@ public class Buttons : Scenario {
 			Text = " ~  s  gui.cs   master ↑_10 = Сохранить"
 		};
 		sizeBtnA.Clicked += (s, e) => {
-			sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5, sizeBtnA.Frame.Height);
+			sizeBtnA.Frame = new Rect (sizeBtnA.Frame.X, sizeBtnA.Frame.Y, sizeBtnA.Frame.Width + 5,
+				sizeBtnA.Frame.Height);
 		};
 		absoluteFrame.Add (sizeBtnA);
 
@@ -187,10 +191,10 @@ public class Buttons : Scenario {
 		};
 		Win.Add (label);
 
-		var radioGroup = new RadioGroup (new string [] { "Left", "Right", "Centered", "Justified" }) {
+		var radioGroup = new RadioGroup (new [] { "Left", "Right", "Centered", "Justified" }) {
 			X = 4,
 			Y = Pos.Bottom (label) + 1,
-			SelectedItem = 2,
+			SelectedItem = 2
 		};
 		Win.Add (radioGroup);
 
@@ -201,10 +205,11 @@ public class Buttons : Scenario {
 			var runes = txt.ToRuneList ();
 
 			var i = runes.IndexOf ((Rune)'_');
-			string start = "";
+			var start = "";
 			if (i > -1) {
 				start = StringExtensions.ToString (runes.GetRange (0, i));
 			}
+
 			txt = start + StringExtensions.ToString (runes.GetRange (i + 1, runes.Count - (i + 1)));
 
 			runes = txt.ToRuneList ();
@@ -237,7 +242,8 @@ public class Buttons : Scenario {
 		var moveUnicodeHotKeyBtn = new Button {
 			X = Pos.Left (absoluteFrame) + 1,
 			Y = Pos.Bottom (radioGroup) + 1,
-			Width = Dim.Width (absoluteFrame) - 2, // BUGBUG: Not always the width isn't calculated correctly.
+			Width = Dim.Width (absoluteFrame) -
+				2, // BUGBUG: Not always the width isn't calculated correctly.
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
 			Text = muhkb
 		};

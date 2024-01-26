@@ -21,12 +21,13 @@ public class Text : Scenario {
 	public override void Setup ()
 	{
 		// TextField is a simple, single-line text input control
-		var textField = new TextField ("TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!") {
+		var textField = new TextField {
 			X = 1,
 			Y = 0,
 			Width = Dim.Percent (50) - 1,
 			// Height will be replaced with 1
-			Height = 2
+			Height = 2,
+			Text = "TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!"
 		};
 
 		var singleWordGenerator = new SingleWordSuggestionGenerator ();
@@ -40,6 +41,7 @@ public class Text : Scenario {
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
 		}
+
 		Win.Add (textField);
 
 		var labelMirroringTextField = new Label {
@@ -71,6 +73,7 @@ public class Text : Scenario {
 				.Select (s => s.Value)
 				.Distinct ().ToList ();
 		}
+
 		Win.Add (textView);
 
 		var labelMirroringTextView = new Label {
@@ -123,6 +126,7 @@ public class Text : Scenario {
 			if (!textView.Multiline && (bool)chxWordWrap.Checked) {
 				chxWordWrap.Checked = false;
 			}
+
 			if (!textView.Multiline && (bool)chxCaptureTabs.Checked) {
 				chxCaptureTabs.Checked = false;
 			}
@@ -138,16 +142,19 @@ public class Text : Scenario {
 				textView.KeyBindings.Remove (keyTab);
 				textView.KeyBindings.Remove (keyBackTab);
 			}
+
 			textView.AllowsTab = (bool)e.NewValue;
 		};
 		Win.Add (chxCaptureTabs);
 
-		var hexEditor = new HexView (new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"))) {
-			X = 1,
-			Y = Pos.Bottom (chxMultiline) + 1,
-			Width = Dim.Percent (50) - 1,
-			Height = Dim.Percent (30)
-		};
+		var hexEditor =
+			new HexView (
+				new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!"))) {
+				X = 1,
+				Y = Pos.Bottom (chxMultiline) + 1,
+				Width = Dim.Percent (50) - 1,
+				Height = Dim.Percent (30)
+			};
 		Win.Add (hexEditor);
 
 		var labelMirroringHexEditor = new Label {
@@ -165,7 +172,7 @@ public class Text : Scenario {
 		};
 		Win.Add (labelMirroringHexEditor);
 
-		var dateField = new DateField (System.DateTime.Now) {
+		var dateField = new DateField (DateTime.Now) {
 			X = 1,
 			Y = Pos.Bottom (hexEditor) + 1,
 			Width = 20
@@ -276,8 +283,16 @@ public class Text : Scenario {
 		appendAutocompleteTextField.Autocomplete = new AppendAutocomplete (appendAutocompleteTextField);
 		appendAutocompleteTextField.Autocomplete.SuggestionGenerator = new SingleWordSuggestionGenerator {
 			AllSuggestions = new List<string> {
-				"fish", "flipper", "fin", "fun", "the", "at", "there", "some", "my", "of", "be", "use", "her", "than", "and", "this", "an", "would", "first", "have", "each", "make", "water", "to", "from", "which", "like", "been", "in", "or", "she", "him", "call", "is", "one", "do", "into", "who", "you", "had", "how", "time", "oil", "that", "by", "their", "has", "its", "it", "word", "if", "look", "now", "he", "but", "will", "two", "find", "was", "not", "up", "more", "long", "for", "what", "other", "write",
-				"down", "on", "all", "about", "go", "day", "are", "were", "out", "see", "did", "as", "we", "many", "number", "get", "with", "when", "then", "no", "come", "his", "your", "them", "way", "made", "they", "can", "these", "could", "may", "said", "so", "people", "part"
+				"fish", "flipper", "fin", "fun", "the", "at", "there", "some", "my", "of", "be", "use",
+				"her", "than", "and", "this", "an", "would", "first", "have", "each", "make", "water",
+				"to", "from", "which", "like", "been", "in", "or", "she", "him", "call", "is", "one",
+				"do", "into", "who", "you", "had", "how", "time", "oil", "that", "by", "their", "has",
+				"its", "it", "word", "if", "look", "now", "he", "but", "will", "two", "find", "was",
+				"not", "up", "more", "long", "for", "what", "other", "write",
+				"down", "on", "all", "about", "go", "day", "are", "were", "out", "see", "did", "as",
+				"we", "many", "number", "get", "with", "when", "then", "no", "come", "his", "your",
+				"them", "way", "made", "they", "can", "these", "could", "may", "said", "so", "people",
+				"part"
 			}
 		};
 
@@ -285,5 +300,6 @@ public class Text : Scenario {
 		Win.Add (appendAutocompleteTextField);
 	}
 
-	void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) => _labelMirroringTimeField.Text = _timeField.Text;
+	void TimeChanged (object sender, DateTimeEventArgs<TimeSpan> e) =>
+		_labelMirroringTimeField.Text = _timeField.Text;
 }

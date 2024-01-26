@@ -5,27 +5,22 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "SpinnerView Styles", Description: "Shows the SpinnerView Styles.")]
+[ScenarioMetadata ("SpinnerView Styles", "Shows the SpinnerView Styles.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Progress")]
-
 public class SpinnerViewStyles : Scenario {
-	class Property {
-		public string Name { get; set; }
-	}
-
 	public override void Setup ()
 	{
 		const int DEFAULT_DELAY = 130;
 		const string DEFAULT_CUSTOM = @"-\|/";
 		var styleDict = new Dictionary<int, KeyValuePair<string, Type>> ();
-		int i = 0;
+		var i = 0;
 		foreach (var style in typeof (SpinnerStyle).GetNestedTypes ()) {
 			styleDict.Add (i, new KeyValuePair<string, Type> (style.Name, style));
 			i++;
 		}
 
-		var preview = new View () {
+		var preview = new View {
 			X = Pos.Center (),
 			Y = 0,
 			Width = 22,
@@ -35,7 +30,7 @@ public class SpinnerViewStyles : Scenario {
 		};
 		Win.Add (preview);
 
-		var spinner = new SpinnerView () {
+		var spinner = new SpinnerView {
 			X = Pos.Center (),
 			Y = 0
 		};
@@ -82,15 +77,17 @@ public class SpinnerViewStyles : Scenario {
 			Text = "Delay:"
 		};
 		Win.Add (delayLabel);
-		var delayField = new TextField (DEFAULT_DELAY.ToString ()) {
+		var delayField = new TextField {
 			X = Pos.Right (delayLabel),
 			Y = Pos.Bottom (preview) + 1,
-			Width = 5
+			Width = 5,
+			Text = DEFAULT_DELAY.ToString ()
 		};
 		Win.Add (delayField);
 		delayField.TextChanged += (s, e) => {
-			if (ushort.TryParse (delayField.Text, out var i))
+			if (ushort.TryParse (delayField.Text, out var i)) {
 				spinner.SpinDelay = i;
+			}
 		};
 
 		var customLabel = new Label {
@@ -99,16 +96,18 @@ public class SpinnerViewStyles : Scenario {
 			Text = "Custom:"
 		};
 		Win.Add (customLabel);
-		var customField = new TextField (DEFAULT_CUSTOM) {
+		var customField = new TextField {
 			X = Pos.Right (customLabel),
 			Y = Pos.Bottom (preview) + 1,
-			Width = 12
+			Width = 12,
+			Text = DEFAULT_CUSTOM
 		};
 		Win.Add (customField);
 
 		var styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
-		if (styleArray.Length < 1)
+		if (styleArray.Length < 1) {
 			return;
+		}
 
 		var styles = new ListView {
 			X = Pos.Center (),
@@ -123,18 +122,25 @@ public class SpinnerViewStyles : Scenario {
 
 		customField.TextChanged += (s, e) => {
 			if (customField.Text.Length > 0) {
-				if (styles.SelectedItem != 0)
+				if (styles.SelectedItem != 0) {
 					styles.SelectedItem = 0; // SpinnerStyle.Custom
+				}
+
 				SetCustom ();
 			}
 		};
 
 		styles.SelectedItemChanged += (s, e) => {
-			if (e.Item == 0) { // SpinnerStyle.Custom
-				if (customField.Text.Length < 1)
+			if (e.Item == 0) {
+				// SpinnerStyle.Custom
+				if (customField.Text.Length < 1) {
 					customField.Text = DEFAULT_CUSTOM;
-				if (delayField.Text.Length < 1)
+				}
+
+				if (delayField.Text.Length < 1) {
 					delayField.Text = DEFAULT_DELAY.ToString ();
+				}
+
 				SetCustom ();
 			} else {
 				spinner.Visible = true;
@@ -161,16 +167,18 @@ public class SpinnerViewStyles : Scenario {
 		{
 			if (customField.Text.Length > 0) {
 				spinner.Visible = true;
-				if (ushort.TryParse (delayField.Text, out var d))
+				if (ushort.TryParse (delayField.Text, out var d)) {
 					spinner.SpinDelay = d;
-				else {
+				} else {
 					delayField.Text = DEFAULT_DELAY.ToString ();
 					spinner.SpinDelay = DEFAULT_DELAY;
 				}
+
 				var str = new List<string> ();
 				foreach (var c in customField.Text.ToCharArray ()) {
 					str.Add (c.ToString ());
 				}
+
 				spinner.Sequence = str.ToArray ();
 			} else {
 				spinner.Visible = false;
@@ -183,7 +191,12 @@ public class SpinnerViewStyles : Scenario {
 				spinner.Dispose ();
 				spinner = null;
 			}
+
 			Application.Top.Unloaded -= Top_Unloaded;
 		}
+	}
+
+	class Property {
+		public string Name { get; set; }
 	}
 }

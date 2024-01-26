@@ -6,15 +6,14 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 /// <summary>
-/// This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System. 
-/// [x] - Using Dim.Fill to fill a window
-/// [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control
-/// [ ] - ...
+///         This Scenario demonstrates how to use Termina.gui's Dim and Pos Layout System.
+///         [x] - Using Dim.Fill to fill a window
+///         [x] - Using Dim.Fill and Dim.Pos to automatically align controls based on an initial control
+///         [ ] - ...
 /// </summary>
-[ScenarioMetadata (Name: "Computed Layout", Description: "Demonstrates the Computed (Dim and Pos) Layout System.")]
+[ScenarioMetadata ("Computed Layout", "Demonstrates the Computed (Dim and Pos) Layout System.")]
 [ScenarioCategory ("Layout")]
 public class ComputedLayout : Scenario {
-
 	public override void Init ()
 	{
 		Application.Init ();
@@ -27,7 +26,15 @@ public class ComputedLayout : Scenario {
 	{
 		// Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
 		const string rule = "|123456789";
-		var horizontalRuler = new Label { AutoSize = false, X = 0, Y = 0, Width = Dim.Fill(), Height = 1, ColorScheme = Colors.ColorSchemes["Error"], Text = rule };
+		var horizontalRuler = new Label {
+			AutoSize = false,
+			X = 0,
+			Y = 0,
+			Width = Dim.Fill (),
+			Height = 1,
+			ColorScheme = Colors.ColorSchemes ["Error"],
+			Text = rule
+		};
 
 		Application.Top.Add (horizontalRuler);
 
@@ -45,8 +52,12 @@ public class ComputedLayout : Scenario {
 		};
 
 		Application.Top.LayoutComplete += (s, a) => {
-			horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
-			verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
+			horizontalRuler.Text =
+				rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
+					..horizontalRuler.Bounds.Width];
+			verticalRuler.Text =
+				vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
+					[..(verticalRuler.Bounds.Height * 2)];
 		};
 
 		Application.Top.Add (verticalRuler);
@@ -68,26 +79,55 @@ public class ComputedLayout : Scenario {
 		Application.Top.Add (absoluteButton);
 
 		// Demonstrate using Dim to create a window that fills the parent with a margin
-		int margin = 10;
-		var subWin = new Window () {
+		var margin = 10;
+		var subWin = new Window {
 			X = Pos.Center (),
 			Y = 2,
 			Width = Dim.Fill (margin),
 			Height = 7
 		};
 		subWin.Initialized += (s, a) => {
-			subWin.Title = $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+			subWin.Title =
+				$"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
 		};
 		Application.Top.Add (subWin);
 
-		int i = 1;
-		string txt = "Resize the terminal to see computed layout in action.";
+		var i = 1;
+		var txt = "Resize the terminal to see computed layout in action.";
 		var labelList = new List<Label> ();
-		labelList.Add (new Label { Text = $"The lines below show different TextAlignments" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()), ColorScheme = Colors.ColorSchemes ["Dialog"], Text = $"{i++}-{txt}" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Left,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Right,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Centered,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Justified,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
 		subWin.Add (labelList.ToArray ());
 
 		var frameView = new FrameView {
@@ -98,15 +138,44 @@ public class ComputedLayout : Scenario {
 		};
 		frameView.Initialized += (sender, args) => {
 			var fv = sender as FrameView;
-			fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+			fv.Title =
+				$"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
 		};
 		i = 1;
 		labelList = new List<Label> ();
-		labelList.Add (new Label { Text = $"The lines below show different TextAlignments" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Left, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Right, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Centered, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
-		labelList.Add (new Label { TextAlignment = Terminal.Gui.TextAlignment.Justified, Width = Dim.Fill(), X = 0, Y = Pos.Bottom(labelList.LastOrDefault()), ColorScheme = Colors.ColorSchemes["Dialog"], Text = $"{i++}-{txt}" });
+		labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Left,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Right,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Centered,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
+		labelList.Add (new Label {
+			TextAlignment = TextAlignment.Justified,
+			Width = Dim.Fill (),
+			X = 0,
+			Y = Pos.Bottom (labelList.LastOrDefault ()),
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = $"{i++}-{txt}"
+		});
 		frameView.Add (labelList.ToArray ());
 		Application.Top.Add (frameView);
 
@@ -114,23 +183,25 @@ public class ComputedLayout : Scenario {
 			X = Pos.Right (frameView),
 			Y = Pos.Top (frameView),
 			Width = Dim.Fill (),
-			Height = 7,
+			Height = 7
 		};
 		frameView.Initialized += (sender, args) => {
 			var fv = sender as FrameView;
-			fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+			fv.Title =
+				$"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
 		};
 		Application.Top.Add (frameView);
 
 		// Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
-		var textView = new TextView () {
+		var textView = new TextView {
 			X = Pos.Center (),
 			Y = Pos.Percent (50),
 			Width = Dim.Percent (80),
 			Height = Dim.Percent (10),
-			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			ColorScheme = Colors.ColorSchemes ["TopLevel"]
 		};
-		textView.Text = $"This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
+		textView.Text =
+			"This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
 		Application.Top.Add (textView);
 
 		var oddballButton = new Button {
@@ -141,6 +212,7 @@ public class ComputedLayout : Scenario {
 		Application.Top.Add (oddballButton);
 
 		#region Issue2358
+
 		// Demonstrate odd-ball Combine scenarios
 		// Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
 
@@ -214,6 +286,7 @@ public class ComputedLayout : Scenario {
 		Application.Top.Add (oddballButton);
 
 		#endregion
+
 		// This demonstrates nonsense: Same as At(0)
 		oddballButton = new Button {
 			X = Pos.Center () + Pos.Center () - Pos.Percent (50),
@@ -249,7 +322,7 @@ public class ComputedLayout : Scenario {
 		// Demonstrate AnchorEnd(n) 
 		// This is intentionally convoluted to illustrate potential bugs.
 		var anchorEndLabel1 = new Label {
-			TextAlignment = Terminal.Gui.TextAlignment.Centered,
+			TextAlignment = TextAlignment.Centered,
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			Width = Dim.Fill (5),
 			X = 5,
@@ -260,12 +333,13 @@ public class ComputedLayout : Scenario {
 
 		// Demonstrate DimCombine (via AnchorEnd(n) - 1)
 		// This is intentionally convoluted to illustrate potential bugs.
-		var anchorEndLabel2 = new TextField ("This TextField should be the 3rd to last line (AnchorEnd (2) - 1).") {
-			TextAlignment = Terminal.Gui.TextAlignment.Left,
+		var anchorEndLabel2 = new TextField {
+			TextAlignment = TextAlignment.Left,
 			ColorScheme = Colors.ColorSchemes ["Menu"],
 			Width = Dim.Fill (5),
 			X = 5,
-			Y = Pos.AnchorEnd (2) - 1 // Pos.Combine
+			Y = Pos.AnchorEnd (2) - 1, // Pos.Combine
+			Text = "This TextField should be the 3rd to last line (AnchorEnd (2) - 1)."
 		};
 		Application.Top.Add (anchorEndLabel2);
 
@@ -286,7 +360,7 @@ public class ComputedLayout : Scenario {
 		// show positioning vertically using Pos.AnchorEnd
 		var centerButton = new Button {
 			X = Pos.Center (),
-			Y = Pos.AnchorEnd (1),  // Pos.AnchorEnd(1)
+			Y = Pos.AnchorEnd (1), // Pos.AnchorEnd(1)
 			Text = "Center"
 		};
 		centerButton.Clicked += (s, e) => {

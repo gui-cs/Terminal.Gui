@@ -35,34 +35,39 @@ public class ContextMenus : Scenario {
 		};
 		Win.Add (label);
 
-		_tfTopLeft = new TextField (text) {
-			Width = width
+		_tfTopLeft = new TextField {
+			Width = width,
+			Text = text
 		};
 		Win.Add (_tfTopLeft);
 
-		_tfTopRight = new TextField (text) {
+		_tfTopRight = new TextField {
 			X = Pos.AnchorEnd (width),
-			Width = width
+			Width = width,
+			Text = text
 		};
 		Win.Add (_tfTopRight);
 
-		_tfMiddle = new TextField (text) {
+		_tfMiddle = new TextField {
 			X = Pos.Center (),
 			Y = Pos.Center (),
-			Width = width
+			Width = width,
+			Text = text
 		};
 		Win.Add (_tfMiddle);
 
-		_tfBottomLeft = new TextField (text) {
+		_tfBottomLeft = new TextField {
 			Y = Pos.AnchorEnd (1),
-			Width = width
+			Width = width,
+			Text = text
 		};
 		Win.Add (_tfBottomLeft);
 
-		_tfBottomRight = new TextField (text) {
+		_tfBottomRight = new TextField {
 			X = Pos.AnchorEnd (width),
 			Y = Pos.AnchorEnd (1),
-			Width = width
+			Width = width,
+			Text = text
 		};
 		Win.Add (_tfBottomRight);
 

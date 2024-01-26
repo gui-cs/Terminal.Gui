@@ -809,10 +809,11 @@ public class Editor : Scenario {
 		d.Add (label);
 
 		SetFindText ();
-		var txtToFind = new TextField (_textToFind) {
+		var txtToFind = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
-			Width = 20
+			Width = 20,
+			Text = _textToFind
 		};
 		txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 		d.Add (txtToFind);
@@ -907,10 +908,11 @@ public class Editor : Scenario {
 		d.Add (label);
 
 		SetFindText ();
-		var txtToFind = new TextField (_textToFind) {
+		var txtToFind = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
-			Width = 20
+			Width = 20,
+			Text = _textToFind
 		};
 		txtToFind.Enter += (s, e) => txtToFind.Text = _textToFind;
 		d.Add (txtToFind);
@@ -932,10 +934,11 @@ public class Editor : Scenario {
 		d.Add (label);
 
 		SetFindText ();
-		var txtToReplace = new TextField (_textToReplace) {
+		var txtToReplace = new TextField {
 			X = Pos.Right (label) + 1,
 			Y = Pos.Top (label),
-			Width = 20
+			Width = 20,
+			Text = _textToReplace
 		};
 		txtToReplace.TextChanged += (s, e) => _textToReplace = txtToReplace.Text;
 		d.Add (txtToReplace);

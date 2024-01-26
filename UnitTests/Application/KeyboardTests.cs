@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ApplicationTests;
 
@@ -10,7 +7,7 @@ public class KeyboardTests {
 
 	public KeyboardTests (ITestOutputHelper output)
 	{
-		this._output = output;
+		_output = output;
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -26,18 +23,20 @@ public class KeyboardTests {
 		var input = "Tests";
 
 		// Put a control-q in at the end
-		FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('Q', ConsoleKey.Q, shift: false, alt: false, control: true));
+		FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo ('Q', ConsoleKey.Q, false, false, true));
 		foreach (var c in input.Reverse ()) {
 			if (char.IsLetter (c)) {
-				FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c), shift: char.IsUpper (c), alt: false, control: false));
+				FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)char.ToUpper (c),
+					char.IsUpper (c), false, false));
 			} else {
-				FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, shift: false, alt: false, control: false));
+				FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, false, false,
+					false));
 			}
 		}
 
-		int stackSize = FakeConsole.MockKeyPresses.Count;
+		var stackSize = FakeConsole.MockKeyPresses.Count;
 
-		int iterations = 0;
+		var iterations = 0;
 		Application.Iteration += (s, a) => {
 			iterations++;
 			// Stop if we run out of control...
@@ -46,12 +45,13 @@ public class KeyboardTests {
 			}
 		};
 
-		int keyUps = 0;
+		var keyUps = 0;
 		var output = string.Empty;
-		Application.Top.KeyUp += (object sender, Key args) => {
+		Application.Top.KeyUp += (sender, args) => {
 			if (args.KeyCode != (KeyCode.CtrlMask | KeyCode.Q)) {
 				output += args.AsRune;
 			}
+
 			keyUps++;
 		};
 
@@ -97,62 +97,62 @@ public class KeyboardTests {
 		Application.Iteration += (s, a) => {
 			Assert.True (v1.HasFocus);
 			// Using default keys.
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
+			top.NewKeyDownEvent (new Key (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.Tab));
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageDown));
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageDown));
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageDown));
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageDown));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageDown));
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageUp));
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageUp));
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageUp));
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.PageUp));
+			top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.PageUp));
 			Assert.True (v1.HasFocus);
 
 			// Using another's alternate keys.
 			Application.AlternateForwardKey = KeyCode.F7;
 			Application.AlternateBackwardKey = KeyCode.F6;
 
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (new Key (KeyCode.F7));
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (new Key (KeyCode.F7));
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (new Key (KeyCode.F7));
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F7));
+			top.NewKeyDownEvent (new Key (KeyCode.F7));
 			Assert.True (v1.HasFocus);
 
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (new Key (KeyCode.F6));
 			Assert.True (v4.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (new Key (KeyCode.F6));
 			Assert.True (v3.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (new Key (KeyCode.F6));
 			Assert.True (v2.HasFocus);
-			top.NewKeyDownEvent (new (KeyCode.F6));
+			top.NewKeyDownEvent (new Key (KeyCode.F6));
 			Assert.True (v1.HasFocus);
 
 			Application.RequestStop ();
@@ -215,11 +215,11 @@ public class KeyboardTests {
 	public void EnsuresTopOnFront_CanFocus_True_By_Keyboard_And_Mouse ()
 	{
 		var top = Application.Top;
-		var win = new Window () { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
-		var tf = new TextField () { Width = 10 };
+		var win = new Window { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
+		var tf = new TextField { Width = 10 };
 		win.Add (tf);
-		var win2 = new Window () { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
-		var tf2 = new TextField () { Width = 10 };
+		var win2 = new Window { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
+		var tf2 = new TextField { Width = 10 };
 		win2.Add (tf2);
 		top.Add (win, win2);
 
@@ -231,27 +231,27 @@ public class KeyboardTests {
 		Assert.False (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 		Assert.True (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 		Assert.True (win.CanFocus);
 		Assert.True (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.False (win2.HasFocus);
 		Assert.Equal ("win", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
+		win2.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Pressed });
 		Assert.True (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-		win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
+		win2.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
 		Assert.Null (Toplevel._dragPosition);
 	}
 
@@ -260,11 +260,11 @@ public class KeyboardTests {
 	public void EnsuresTopOnFront_CanFocus_False_By_Keyboard_And_Mouse ()
 	{
 		var top = Application.Top;
-		var win = new Window () { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
-		var tf = new TextField () { Width = 10 };
+		var win = new Window { Title = "win", X = 0, Y = 0, Width = 20, Height = 10 };
+		var tf = new TextField { Width = 10 };
 		win.Add (tf);
-		var win2 = new Window () { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
-		var tf2 = new TextField () { Width = 10 };
+		var win2 = new Window { Title = "win2", X = 22, Y = 0, Width = 20, Height = 10 };
+		var tf2 = new TextField { Width = 10 };
 		win2.Add (tf2);
 		top.Add (win, win2);
 
@@ -283,46 +283,28 @@ public class KeyboardTests {
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 		Assert.True (win2.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		top.NewKeyDownEvent (new (KeyCode.CtrlMask | KeyCode.Tab));
+		top.NewKeyDownEvent (new Key (KeyCode.CtrlMask | KeyCode.Tab));
 		Assert.False (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
 
-		win.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Pressed });
+		win.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Pressed });
 		Assert.False (win.CanFocus);
 		Assert.False (win.HasFocus);
 		Assert.True (win2.CanFocus);
 		Assert.True (win2.HasFocus);
 		Assert.Equal ("win2", ((Window)top.Subviews [top.Subviews.Count - 1]).Title);
-		win2.MouseEvent (new MouseEvent () { Flags = MouseFlags.Button1Released });
+		win2.MouseEvent (new MouseEvent { Flags = MouseFlags.Button1Released });
 		Assert.Null (Toplevel._dragPosition);
-	}
-
-	// test Application key Bindings
-	public class ScopedKeyBindingView : View {
-		public bool ApplicationCommand { get; set; }
-		public bool HotKeyCommand { get; set; }
-		public bool FocusedCommand { get; set; }
-
-		public ScopedKeyBindingView ()
-		{
-			AddCommand (Command.Save, () => ApplicationCommand = true);
-			AddCommand (Command.Default, () => HotKeyCommand = true);
-			AddCommand (Command.Left, () => FocusedCommand = true);
-
-			KeyBindings.Add (KeyCode.A, KeyBindingScope.Application, Command.Save);
-			HotKey = KeyCode.H;
-			KeyBindings.Add (KeyCode.F, KeyBindingScope.Focused, Command.Left);
-		}
 	}
 
 	[Fact]
@@ -336,31 +318,31 @@ public class KeyboardTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (KeyCode.A));
+		Application.OnKeyDown (new Key (KeyCode.A));
 		Assert.True (invoked);
 		Assert.True (view.ApplicationCommand);
 
 		invoked = false;
 		view.ApplicationCommand = false;
 		view.KeyBindings.Remove (KeyCode.A);
-		Application.OnKeyDown (new (KeyCode.A)); // old
+		Application.OnKeyDown (new Key (KeyCode.A)); // old
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		view.KeyBindings.Add (KeyCode.A | KeyCode.CtrlMask, KeyBindingScope.Application, Command.Save);
-		Application.OnKeyDown (new (KeyCode.A)); // old
+		Application.OnKeyDown (new Key (KeyCode.A)); // old
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
-		Application.OnKeyDown (new (KeyCode.A | KeyCode.CtrlMask)); // new
+		Application.OnKeyDown (new Key (KeyCode.A | KeyCode.CtrlMask)); // new
 		Assert.True (invoked);
 		Assert.True (view.ApplicationCommand);
 
 		invoked = false;
-		Application.OnKeyDown (new (KeyCode.H));
+		Application.OnKeyDown (new Key (KeyCode.H));
 		Assert.True (invoked);
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (KeyCode.F));
+		Application.OnKeyDown (new Key (KeyCode.F));
 		Assert.False (invoked);
 
 		Assert.True (view.ApplicationCommand);
@@ -379,7 +361,7 @@ public class KeyboardTests {
 		Application.Top.Add (view);
 		Application.Begin (Application.Top);
 
-		Application.OnKeyDown (new (KeyCode.A | KeyCode.CtrlMask));
+		Application.OnKeyDown (new Key (KeyCode.A | KeyCode.CtrlMask));
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		Assert.False (view.HotKeyCommand);
@@ -387,10 +369,28 @@ public class KeyboardTests {
 
 		invoked = false;
 		Assert.False (view.HasFocus);
-		Application.OnKeyDown (new (KeyCode.Z));
+		Application.OnKeyDown (new Key (KeyCode.Z));
 		Assert.False (invoked);
 		Assert.False (view.ApplicationCommand);
 		Assert.False (view.HotKeyCommand);
 		Assert.False (view.FocusedCommand);
+	}
+
+	// test Application key Bindings
+	public class ScopedKeyBindingView : View {
+		public ScopedKeyBindingView ()
+		{
+			AddCommand (Command.Save, () => ApplicationCommand = true);
+			AddCommand (Command.Default, () => HotKeyCommand = true);
+			AddCommand (Command.Left, () => FocusedCommand = true);
+
+			KeyBindings.Add (KeyCode.A, KeyBindingScope.Application, Command.Save);
+			HotKey = KeyCode.H;
+			KeyBindings.Add (KeyCode.F, KeyBindingScope.Focused, Command.Left);
+		}
+
+		public bool ApplicationCommand { get; set; }
+		public bool HotKeyCommand { get; set; }
+		public bool FocusedCommand { get; set; }
 	}
 }

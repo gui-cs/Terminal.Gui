@@ -7,89 +7,53 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Class Explorer", Description: "Tree view explorer for classes by namespace based on TreeView.")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
+[ScenarioMetadata ("Class Explorer", "Tree view explorer for classes by namespace based on TreeView.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("TreeView")]
 public class ClassExplorer : Scenario {
-	private TreeView<object> _treeView;
-	private TextView _textView;
-	private MenuItem _miShowPrivate;
-
-	private enum Showable {
-		Properties,
-		Fields,
-		Events,
-		Constructors,
-		Methods,
-	}
-
-	private class ShowForType {
-		public ShowForType (Showable toShow, Type type)
-		{
-			ToShow = toShow;
-			Type = type;
-		}
-
-		public Type Type { get; set; }
-		public Showable ToShow { get; set; }
-
-		// Make sure to implement Equals methods on your objects if you intend to return new instances every time in ChildGetter
-		public override bool Equals (object obj)
-		{
-			return obj is ShowForType type &&
-			       EqualityComparer<Type>.Default.Equals (Type, type.Type) &&
-			       ToShow == type.ToShow;
-		}
-
-		public override int GetHashCode ()
-		{
-			return HashCode.Combine (Type, ToShow);
-		}
-
-		public override string ToString ()
-		{
-			return ToShow.ToString ();
-		}
-	}
-
-	MenuItem highlightModelTextOnly;
+	MenuItem _highlightModelTextOnly;
+	MenuItem _miShowPrivate;
+	TextView _textView;
+	TreeView<object> _treeView;
 
 	public override void Setup ()
 	{
-		Win.Title = this.GetName ();
+		Win.Title = GetName ();
 		Win.Y = 1; // menu
 		Win.Height = Dim.Fill (1); // status bar
 
 		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Quit()),
-				}),
-				new MenuBarItem ("_View", new MenuItem [] {
-					_miShowPrivate = new MenuItem ("_Include Private", "", () => ShowPrivate()){
-						Checked = false,
-						CheckType = MenuItemCheckStyle.Checked
-					},
-					new MenuItem ("_Expand All", "", () => _treeView.ExpandAll()),
-					new MenuItem ("_Collapse All", "", () => _treeView.CollapseAll())
-				}),
-				new MenuBarItem ("_Style", new MenuItem [] {
-					highlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "", () => OnCheckHighlightModelTextOnly()) {
-						CheckType = MenuItemCheckStyle.Checked
-					},
-				})
-			});
+			new("_File", new MenuItem [] {
+				new("_Quit", "", () => Quit ())
+			}),
+			new("_View", new [] {
+				_miShowPrivate = new MenuItem ("_Include Private", "", () => ShowPrivate ()) {
+					Checked = false,
+					CheckType = MenuItemCheckStyle.Checked
+				},
+				new("_Expand All", "", () => _treeView.ExpandAll ()),
+				new("_Collapse All", "", () => _treeView.CollapseAll ())
+			}),
+			new("_Style", new [] {
+				_highlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "",
+					() => OnCheckHighlightModelTextOnly ()) {
+					CheckType = MenuItemCheckStyle.Checked
+				}
+			})
+		});
 		Application.Top.Add (menu);
 
-		_treeView = new TreeView<object> () {
+		_treeView = new TreeView<object> {
 			X = 0,
 			Y = 1,
 			Width = Dim.Percent (50),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 
 		var lblSearch = new Label { Text = "Search" };
-		var tfSearch = new TextField () {
+		var tfSearch = new TextField {
 			Width = 20,
-			X = Pos.Right (lblSearch),
+			X = Pos.Right (lblSearch)
 		};
 
 		Win.Add (lblSearch);
@@ -98,7 +62,7 @@ public class ClassExplorer : Scenario {
 		var filter = new TreeViewTextFilter<object> (_treeView);
 		_treeView.Filter = filter;
 		tfSearch.TextChanged += (s, e) => {
-			filter.Text = tfSearch.Text.ToString ();
+			filter.Text = tfSearch.Text;
 			if (_treeView.SelectedObject != null) {
 				_treeView.EnsureVisible (_treeView.SelectedObject);
 			}
@@ -111,7 +75,7 @@ public class ClassExplorer : Scenario {
 
 		Win.Add (_treeView);
 
-		_textView = new TextView () {
+		_textView = new TextView {
 			X = Pos.Right (_treeView),
 			Y = 0,
 			Width = Dim.Fill (),
@@ -121,30 +85,31 @@ public class ClassExplorer : Scenario {
 		Win.Add (_textView);
 	}
 
-	private void OnCheckHighlightModelTextOnly ()
+	void OnCheckHighlightModelTextOnly ()
 	{
 		_treeView.Style.HighlightModelTextOnly = !_treeView.Style.HighlightModelTextOnly;
-		highlightModelTextOnly.Checked = _treeView.Style.HighlightModelTextOnly;
+		_highlightModelTextOnly.Checked = _treeView.Style.HighlightModelTextOnly;
 		_treeView.SetNeedsDisplay ();
 	}
 
-	private void ShowPrivate ()
+	void ShowPrivate ()
 	{
 		_miShowPrivate.Checked = !_miShowPrivate.Checked;
 		_treeView.RebuildTree ();
 		_treeView.SetFocus ();
 	}
 
-	private BindingFlags GetFlags ()
+	BindingFlags GetFlags ()
 	{
 		if (_miShowPrivate.Checked == true) {
-			return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+			return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+			       BindingFlags.NonPublic;
 		}
 
 		return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 	}
 
-	private void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
+	void TreeView_SelectionChanged (object sender, SelectionChangedEventArgs<object> e)
 	{
 		var val = e.NewValue;
 		var all = _treeView.GetAllSelectedObjects ().ToArray ();
@@ -154,12 +119,10 @@ public class ClassExplorer : Scenario {
 		}
 
 		try {
-
 			if (all.Length > 1) {
-
 				_textView.Text = all.Length + " Objects";
 			} else {
-				StringBuilder sb = new StringBuilder ();
+				var sb = new StringBuilder ();
 
 				// tell the user about the currently selected tree node
 				sb.AppendLine (e.NewValue.GetType ().Name);
@@ -183,8 +146,9 @@ public class ClassExplorer : Scenario {
 
 				if (val is EventInfo ev) {
 					sb.AppendLine ($"Name:{ev.Name}");
-					sb.AppendLine ($"Parameters:");
-					foreach (var parameter in ev.EventHandlerType.GetMethod ("Invoke").GetParameters ()) {
+					sb.AppendLine ("Parameters:");
+					foreach (var parameter in ev.EventHandlerType.GetMethod ("Invoke")
+							 .GetParameters ()) {
 						sb.AppendLine ($"  {parameter.ParameterType} {parameter.Name}");
 					}
 				}
@@ -209,20 +173,16 @@ public class ClassExplorer : Scenario {
 
 				_textView.Text = sb.ToString ().Replace ("\r\n", "\n");
 			}
-
 		} catch (Exception ex) {
-
 			_textView.Text = ex.Message;
 		}
+
 		_textView.SetNeedsDisplay ();
 	}
 
-	private bool CanExpand (object arg)
-	{
-		return arg is Assembly || arg is Type || arg is ShowForType;
-	}
+	bool CanExpand (object arg) => arg is Assembly || arg is Type || arg is ShowForType;
 
-	private IEnumerable<object> ChildGetter (object arg)
+	IEnumerable<object> ChildGetter (object arg)
 	{
 		try {
 			if (arg is Assembly a) {
@@ -251,14 +211,14 @@ public class ClassExplorer : Scenario {
 					return show.Type.GetMethods (GetFlags ());
 				}
 			}
-
 		} catch (Exception) {
 			return Enumerable.Empty<object> ();
 		}
+
 		return Enumerable.Empty<object> ();
 	}
 
-	private string GetRepresentation (object model)
+	string GetRepresentation (object model)
 	{
 		try {
 			if (model is Assembly ass) {
@@ -276,17 +236,41 @@ public class ClassExplorer : Scenario {
 			if (model is EventInfo ei) {
 				return ei.Name;
 			}
-
-
 		} catch (Exception ex) {
-
 			return ex.Message;
 		}
 
 		return model.ToString ();
 	}
-	private void Quit ()
-	{
-		Application.RequestStop ();
+
+	void Quit () => Application.RequestStop ();
+
+	enum Showable {
+		Properties,
+		Fields,
+		Events,
+		Constructors,
+		Methods
+	}
+
+	class ShowForType {
+		public ShowForType (Showable toShow, Type type)
+		{
+			ToShow = toShow;
+			Type = type;
+		}
+
+		public Type Type { get; }
+		public Showable ToShow { get; }
+
+		// Make sure to implement Equals methods on your objects if you intend to return new instances every time in ChildGetter
+		public override bool Equals (object obj) =>
+			obj is ShowForType type &&
+			EqualityComparer<Type>.Default.Equals (Type, type.Type) &&
+			ToShow == type.ToShow;
+
+		public override int GetHashCode () => HashCode.Combine (Type, ToShow);
+
+		public override string ToString () => ToShow.ToString ();
 	}
 }

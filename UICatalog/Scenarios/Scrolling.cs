@@ -4,103 +4,11 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Scrolling", Description: "Demonstrates ScrollView etc...")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("ScrollView"), ScenarioCategory ("Tests")]
+[ScenarioMetadata ("Scrolling", "Demonstrates ScrollView etc...")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("ScrollView")]
+[ScenarioCategory ("Tests")]
 public class Scrolling : Scenario {
-	class Box10x : View {
-		int w = 40;
-		int h = 50;
-
-		public bool WantCursorPosition { get; set; } = false;
-
-		public Box10x (int x, int y) : base (new Rect (x, y, 20, 10))
-		{
-		}
-
-		public Size GetContentSize ()
-		{
-			return new Size (w, h);
-		}
-
-		public void SetCursorPosition (Point pos)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public override void OnDrawContent (Rect contentArea)
-		{
-			//Point pos = new Point (region.X, region.Y);
-			Driver.SetAttribute (ColorScheme.Focus);
-
-			for (int y = 0; y < h; y++) {
-				Move (0, y);
-				Driver.AddStr (y.ToString ());
-				for (int x = 0; x < w - y.ToString ().Length; x++) {
-					//Driver.AddRune ((Rune)('0' + (x + y) % 10));
-					if (y.ToString ().Length < w)
-						Driver.AddStr (" ");
-				}
-			}
-			//Move (pos.X, pos.Y);
-		}
-	}
-
-	class Filler : View {
-		int w = 40;
-		int h = 50;
-
-		public Filler (Rect rect) : base (rect)
-		{
-			w = rect.Width;
-			h = rect.Height;
-		}
-
-		public Size GetContentSize ()
-		{
-			return new Size (w, h);
-		}
-
-		public override void OnDrawContent (Rect contentArea)
-		{
-			Driver.SetAttribute (ColorScheme.Focus);
-			var f = Frame;
-			w = 0;
-			h = 0;
-
-			for (int y = 0; y < f.Width; y++) {
-				Move (0, y);
-				var nw = 0;
-				for (int x = 0; x < f.Height; x++) {
-					Rune r;
-					switch (x % 3) {
-					case 0:
-						var er = y.ToString ().ToCharArray (0, 1) [0];
-						nw += er.ToString ().Length;
-						Driver.AddRune ((Rune)er);
-						if (y > 9) {
-							er = y.ToString ().ToCharArray (1, 1) [0];
-							nw += er.ToString ().Length;
-							Driver.AddRune ((Rune)er);
-						}
-						r = (Rune)'.';
-						break;
-					case 1:
-						r = (Rune)'o';
-						break;
-					default:
-						r = (Rune)'O';
-						break;
-					}
-					Driver.AddRune (r);
-					nw += r.Utf8SequenceLength;
-				}
-				if (nw > w)
-					w = nw;
-				h = y + 1;
-			}
-		}
-	}
-
 	public override void Setup ()
 	{
 		// Offset Win to stress clipping
@@ -124,9 +32,10 @@ public class Scrolling : Scenario {
 			ContentSize = new Size (200, 100),
 			//ContentOffset = new Point (0, 0),
 			ShowVerticalScrollIndicator = true,
-			ShowHorizontalScrollIndicator = true,
+			ShowHorizontalScrollIndicator = true
 		};
-		label.Text = $"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
+		label.Text =
+			$"{scrollView}\nContentSize: {scrollView.ContentSize}\nContentOffset: {scrollView.ContentOffset}";
 
 		const string rule = "0123456789";
 
@@ -154,11 +63,18 @@ public class Scrolling : Scenario {
 
 		void Top_Loaded (object sender, EventArgs args)
 		{
-			horizontalRuler.Text = rule.Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)] +
-				"\n" + "|         ".Repeat ((int)Math.Ceiling ((double)(horizontalRuler.Bounds.Width) / (double)rule.Length)) [0..(horizontalRuler.Bounds.Width)];
-			verticalRuler.Text = vrule.Repeat ((int)Math.Ceiling ((double)(verticalRuler.Bounds.Height * 2) / (double)rule.Length)) [0..(verticalRuler.Bounds.Height * 2)];
+			horizontalRuler.Text =
+				rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
+					..horizontalRuler.Bounds.Width] +
+				"\n" + "|         ".Repeat (
+					(int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length)) [
+					..horizontalRuler.Bounds.Width];
+			verticalRuler.Text =
+				vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
+					[..(verticalRuler.Bounds.Height * 2)];
 			Application.Top.Loaded -= Top_Loaded;
 		}
+
 		Application.Top.Loaded += Top_Loaded;
 
 		var pressMeButton = new Button {
@@ -178,25 +94,28 @@ public class Scrolling : Scenario {
 		aLongButton.Clicked += (s, e) => MessageBox.Query (20, 7, "MessageBox", "Neat?", "Yes", "No");
 		scrollView.Add (aLongButton);
 
-		scrollView.Add (new TextField ("This is a test of...") {
+		scrollView.Add (new TextField {
 			X = 3,
 			Y = 5,
 			Width = 50,
-			ColorScheme = Colors.ColorSchemes ["Dialog"]
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = "This is a test of..."
 		});
 
-		scrollView.Add (new TextField ("... the emergency broadcast system.") {
+		scrollView.Add (new TextField {
 			X = 3,
 			Y = 10,
 			Width = 50,
-			ColorScheme = Colors.ColorSchemes ["Dialog"]
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = "... the emergency broadcast system."
 		});
 
-		scrollView.Add (new TextField ("Last line") {
+		scrollView.Add (new TextField {
 			X = 3,
 			Y = 99,
 			Width = 50,
-			ColorScheme = Colors.ColorSchemes ["Dialog"]
+			ColorScheme = Colors.ColorSchemes ["Dialog"],
+			Text = "Last line"
 		});
 
 		// Demonstrate AnchorEnd - Button is anchored to bottom/right
@@ -296,7 +215,7 @@ public class Scrolling : Scenario {
 		//scrollView3.Add (new Box10x (0, 0));
 		//Win.Add (scrollView3);
 
-		int count = 0;
+		var count = 0;
 		var mousePos = new Label {
 			X = Pos.Right (scrollView) + 1,
 			Y = Pos.AnchorEnd (1),
@@ -315,12 +234,14 @@ public class Scrolling : Scenario {
 		};
 		Win.Add (progress);
 
-		bool pulsing = true;
+		var pulsing = true;
+
 		bool timer ()
 		{
 			progress.Pulse ();
 			return pulsing;
 		}
+
 		Application.AddTimeout (TimeSpan.FromMilliseconds (300), timer);
 
 		void Top_Unloaded (object sender, EventArgs args)
@@ -328,6 +249,98 @@ public class Scrolling : Scenario {
 			pulsing = false;
 			Application.Top.Unloaded -= Top_Unloaded;
 		}
+
 		Application.Top.Unloaded += Top_Unloaded;
+	}
+
+	class Box10x : View {
+		readonly int _h = 50;
+		readonly int _w = 40;
+
+		public Box10x (int x, int y) : base (new Rect (x, y, 20, 10))
+		{
+		}
+
+		public bool WantCursorPosition { get; set; } = false;
+
+		public Size GetContentSize () => new (_w, _h);
+
+		public void SetCursorPosition (Point pos) => throw new NotImplementedException ();
+
+		public override void OnDrawContent (Rect contentArea)
+		{
+			//Point pos = new Point (region.X, region.Y);
+			Driver.SetAttribute (ColorScheme.Focus);
+
+			for (var y = 0; y < _h; y++) {
+				Move (0, y);
+				Driver.AddStr (y.ToString ());
+				for (var x = 0; x < _w - y.ToString ().Length; x++) {
+					//Driver.AddRune ((Rune)('0' + (x + y) % 10));
+					if (y.ToString ().Length < _w) {
+						Driver.AddStr (" ");
+					}
+				}
+			}
+			//Move (pos.X, pos.Y);
+		}
+	}
+
+	class Filler : View {
+		int _h = 50;
+		int _w = 40;
+
+		public Filler (Rect rect) : base (rect)
+		{
+			_w = rect.Width;
+			_h = rect.Height;
+		}
+
+		public Size GetContentSize () => new (_w, _h);
+
+		public override void OnDrawContent (Rect contentArea)
+		{
+			Driver.SetAttribute (ColorScheme.Focus);
+			var f = Frame;
+			_w = 0;
+			_h = 0;
+
+			for (var y = 0; y < f.Width; y++) {
+				Move (0, y);
+				var nw = 0;
+				for (var x = 0; x < f.Height; x++) {
+					Rune r;
+					switch (x % 3) {
+					case 0:
+						var er = y.ToString ().ToCharArray (0, 1) [0];
+						nw += er.ToString ().Length;
+						Driver.AddRune ((Rune)er);
+						if (y > 9) {
+							er = y.ToString ().ToCharArray (1, 1) [0];
+							nw += er.ToString ().Length;
+							Driver.AddRune ((Rune)er);
+						}
+
+						r = (Rune)'.';
+						break;
+					case 1:
+						r = (Rune)'o';
+						break;
+					default:
+						r = (Rune)'O';
+						break;
+					}
+
+					Driver.AddRune (r);
+					nw += r.Utf8SequenceLength;
+				}
+
+				if (nw > _w) {
+					_w = nw;
+				}
+
+				_h = y + 1;
+			}
+		}
 	}
 }
