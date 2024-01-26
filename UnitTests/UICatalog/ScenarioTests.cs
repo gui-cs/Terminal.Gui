@@ -258,9 +258,10 @@ public class ScenarioTests {
 
 		var label = new Label { X = 0, Y = 0, Text = "x:" };
 		_locationFrame.Add (label);
-		_xRadioGroup = new RadioGroup (radioItems) {
+		_xRadioGroup = new RadioGroup {
 			X = 0,
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 		_locationFrame.Add (_xText);
@@ -272,9 +273,10 @@ public class ScenarioTests {
 		_locationFrame.Add (label);
 		_yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 		_locationFrame.Add (_yText);
-		_yRadioGroup = new RadioGroup (radioItems) {
+		_yRadioGroup = new RadioGroup {
 			X = Pos.X (label),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_locationFrame.Add (_yRadioGroup);
 
@@ -289,9 +291,10 @@ public class ScenarioTests {
 		radioItems = new [] { "Percent(width)", "Fill(width)", "Sized(width)" };
 		label = new Label { X = 0, Y = 0, Text = "width:" };
 		_sizeFrame.Add (label);
-		_wRadioGroup = new RadioGroup (radioItems) {
+		_wRadioGroup = new RadioGroup {
 			X = 0,
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 		_sizeFrame.Add (_wText);
@@ -303,9 +306,10 @@ public class ScenarioTests {
 		_hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 		_sizeFrame.Add (_hText);
 
-		_hRadioGroup = new RadioGroup (radioItems) {
+		_hRadioGroup = new RadioGroup {
 			X = Pos.X (label),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_sizeFrame.Add (_hRadioGroup);
 

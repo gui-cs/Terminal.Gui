@@ -135,9 +135,10 @@ public class AllViewsTester : Scenario {
 
 		var label = new Label { X = 0, Y = 0, Text = "X:" };
 		_locationFrame.Add (label);
-		_xRadioGroup = new RadioGroup (radioItems) {
+		_xRadioGroup = new RadioGroup {
 			X = 0,
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
@@ -162,9 +163,10 @@ public class AllViewsTester : Scenario {
 			} catch { }
 		};
 		_locationFrame.Add (_yText);
-		_yRadioGroup = new RadioGroup (radioItems) {
+		_yRadioGroup = new RadioGroup {
 			X = Pos.X (label),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_locationFrame.Add (_yRadioGroup);
@@ -180,9 +182,10 @@ public class AllViewsTester : Scenario {
 		radioItems = new [] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
 		label = new Label { X = 0, Y = 0, Text = "Width:" };
 		_sizeFrame.Add (label);
-		_wRadioGroup = new RadioGroup (radioItems) {
+		_wRadioGroup = new RadioGroup {
 			X = 0,
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
@@ -225,9 +228,10 @@ public class AllViewsTester : Scenario {
 		};
 		_sizeFrame.Add (_hText);
 
-		_hRadioGroup = new RadioGroup (radioItems) {
+		_hRadioGroup = new RadioGroup {
 			X = Pos.X (label),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_sizeFrame.Add (_hRadioGroup);

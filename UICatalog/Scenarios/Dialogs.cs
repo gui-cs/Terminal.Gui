@@ -115,9 +115,10 @@ public class Dialogs : Scenario {
 		};
 		frame.Add (label);
 
-		var styleRadioGroup = new RadioGroup (new [] { "_Center", "_Justify", "_Left", "_Right" }) {
+		var styleRadioGroup = new RadioGroup {
 			X = Pos.Right (label) + 1,
-			Y = Pos.Top (label)
+			Y = Pos.Top (label),
+			RadioLabels = new [] { "_Center", "_Justify", "_Left", "_Right" }
 		};
 		frame.Add (styleRadioGroup);
 

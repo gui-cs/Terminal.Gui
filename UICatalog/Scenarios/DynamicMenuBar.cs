@@ -765,9 +765,10 @@ public class DynamicMenuBar : Scenario {
 			Add (CkbNullCheck);
 
 			var _rChkLabels = new [] { "NoCheck", "Checked", "Radio" };
-			RbChkStyle = new RadioGroup (_rChkLabels) {
+			RbChkStyle = new RadioGroup {
 				X = Pos.Left (_lblTitle),
-				Y = Pos.Bottom (CkbSubMenu) + 1
+				Y = Pos.Bottom (CkbSubMenu) + 1,
+				RadioLabels = _rChkLabels
 			};
 			Add (RbChkStyle);
 

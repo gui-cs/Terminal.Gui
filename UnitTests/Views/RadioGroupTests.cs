@@ -16,26 +16,28 @@ public class RadioGroupTests {
 		Assert.Equal (Rect.Empty, rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (new [] { "Test" });
+		rg = new RadioGroup { RadioLabels = new [] { "Test" } };
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
 		Assert.Equal (new Rect (0, 0, 0, 0), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (new [] { "Test" }) {
+		rg = new RadioGroup {
 			X = 1,
 			Y = 2,
 			Width = 20,
-			Height = 5
+			Height = 5,
+			RadioLabels = new [] { "Test" }
 		};
 		Assert.True (rg.CanFocus);
 		Assert.Single (rg.RadioLabels);
 		Assert.Equal (new Rect (1, 2, 20, 5), rg.Frame);
 		Assert.Equal (0, rg.SelectedItem);
 
-		rg = new RadioGroup (new [] { "Test" }) {
+		rg = new RadioGroup {
 			X = 1,
-			Y = 2
+			Y = 2,
+			RadioLabels = new [] { "Test" }
 		};
 
 		var view = new View {
@@ -56,7 +58,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void Initialize_SelectedItem_With_Minus_One ()
 	{
-		var rg = new RadioGroup (new [] { "Test" }, -1);
+		var rg = new RadioGroup { RadioLabels = new [] { "Test" }, SelectedItem = -1 };
 		Assert.Equal (-1, rg.SelectedItem);
 		Assert.True (rg.NewKeyDownEvent (new Key (KeyCode.Space)));
 		Assert.Equal (0, rg.SelectedItem);
@@ -66,7 +68,7 @@ public class RadioGroupTests {
 	[AutoInitShutdown]
 	public void Orientation_Width_Height_Vertical_Horizontal_Space ()
 	{
-		var rg = new RadioGroup (new [] { "Test", "New Test 你" });
+		var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test 你" } };
 		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -141,7 +143,7 @@ public class RadioGroupTests {
 	{
 		var previousSelectedItem = -1;
 		var selectedItem = -1;
-		var rg = new RadioGroup (new [] { "Test", "New Test" });
+		var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
 		rg.SelectedItemChanged += (s, e) => {
 			previousSelectedItem = e.PreviousSelectedItem;
 			selectedItem = e.SelectedItem;
@@ -155,7 +157,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_Command ()
 	{
-		var rg = new RadioGroup (new [] { "Test", "New Test" });
+		var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
 
 		Assert.True (rg.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
 		Assert.True (rg.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
@@ -168,7 +170,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_Are_Added_Correctly ()
 	{
-		var rg = new RadioGroup (new [] { "_Left", "_Right" });
+		var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right" } };
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.R));
 
@@ -182,7 +184,7 @@ public class RadioGroupTests {
 	[Fact]
 	public void KeyBindings_HotKeys ()
 	{
-		var rg = new RadioGroup (new [] { "_Left", "_Right", "Cen_tered", "_Justified" });
+		var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
 		Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));

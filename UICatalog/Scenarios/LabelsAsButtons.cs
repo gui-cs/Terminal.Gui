@@ -217,10 +217,11 @@ public class LabelsAsLabels : Scenario {
 		};
 		Win.Add (label);
 
-		var radioGroup = new RadioGroup (new [] { "Left", "Right", "Centered", "Justified" }) {
+		var radioGroup = new RadioGroup {
 			X = 4,
 			Y = Pos.Bottom (label) + 1,
-			SelectedItem = 2
+			SelectedItem = 2,
+			RadioLabels = new [] { "Left", "Right", "Centered", "Justified" }
 		};
 		Win.Add (radioGroup);
 

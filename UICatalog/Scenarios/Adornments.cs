@@ -325,14 +325,15 @@ public class Adornments : Scenario {
 
 
 				var borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
-				var rbBorderStyle = new RadioGroup (borderStyleEnum.Select (
-					e => e.ToString ()).ToArray ()) {
+				var rbBorderStyle = new RadioGroup {
 					X = Pos.Right (_borderEditor) - 1,
 					Y = Pos.Top (_borderEditor),
 					SelectedItem = (int)_viewToEdit.Border.LineStyle,
 					BorderStyle = LineStyle.Double,
 					Title = "Border Style",
-					SuperViewRendersLineCanvas = true
+					SuperViewRendersLineCanvas = true,
+					RadioLabels = borderStyleEnum.Select (
+						e => e.ToString ()).ToArray ()
 				};
 				Add (rbBorderStyle);
 
