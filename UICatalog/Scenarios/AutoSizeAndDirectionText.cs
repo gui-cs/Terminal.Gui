@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Text Direction and AutoSize", Description: "Demos TextFormatter Direction and View AutoSize.")]
+[ScenarioMetadata ("Text Direction and AutoSize", "Demos TextFormatter Direction and View AutoSize.")]
 [ScenarioCategory ("Text and Formatting")]
 public class AutoSizeAndDirectionText : Scenario {
 	public override void Setup ()
@@ -33,7 +33,7 @@ public class AutoSizeAndDirectionText : Scenario {
 		};
 		Win.Add (labelV);
 
-		var editText = new TextView () {
+		var editText = new TextView {
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Width = 20,
@@ -77,7 +77,8 @@ public class AutoSizeAndDirectionText : Scenario {
 			Text = "Preserve Trailing Spaces"
 		};
 		ckbPreserveTrailingSpaces.Toggled += (s, e) =>
-				labelH.PreserveTrailingSpaces = labelV.PreserveTrailingSpaces = (bool)ckbPreserveTrailingSpaces.Checked;
+			labelH.PreserveTrailingSpaces =
+				labelV.PreserveTrailingSpaces = (bool)ckbPreserveTrailingSpaces.Checked;
 		Win.Add (ckbPreserveTrailingSpaces);
 
 		var ckbWideText = new CheckBox {

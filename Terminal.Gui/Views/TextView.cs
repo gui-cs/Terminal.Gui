@@ -10,32 +10,35 @@ using Terminal.Gui.Resources;
 namespace Terminal.Gui;
 
 /// <summary>
-/// Represents a single row/column within the <see cref="TextView"/>. Includes the glyph and the foreground/background
-/// colors.
+///         Represents a single row/column within the <see cref="TextView" />. Includes the glyph and the
+///         foreground/background
+///         colors.
 /// </summary>
 [DebuggerDisplay ("{ColorSchemeDebuggerDisplay}")]
 public class RuneCell : IEquatable<RuneCell> {
 	/// <summary>
-	/// The glyph to draw.
+	///         The glyph to draw.
 	/// </summary>
 	[JsonConverter (typeof (RuneJsonConverter))]
 	public Rune Rune { get; set; }
 
 	/// <summary>
-	/// The <see cref="Terminal.Gui.ColorScheme"/> color sets to draw the glyph with.
+	///         The <see cref="Terminal.Gui.ColorScheme" /> color sets to draw the glyph with.
 	/// </summary>
 	[JsonConverter (typeof (ColorSchemeJsonConverter))]
 	public ColorScheme? ColorScheme { get; set; }
 
+	string ColorSchemeDebuggerDisplay => ToString ();
+
 	/// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
 	/// <param name="other">An object to compare with this object.</param>
 	/// <returns>
-	/// <see langword="true"/> if the current object is equal to the <paramref name="other"/> parameter;
-	/// otherwise, <see langword="false"/>.
+	///         <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter;
+	///         otherwise, <see langword="false" />.
 	/// </returns>
-	public bool Equals ( RuneCell? other ) => other is {} &&
-											Rune.Equals ( other.Rune ) &&
-											ColorScheme == other.ColorScheme;
+	public bool Equals (RuneCell? other) => other is not null &&
+						Rune.Equals (other.Rune) &&
+						ColorScheme == other.ColorScheme;
 
 	/// <summary>Returns a string that represents the current object.</summary>
 	/// <returns>A string that represents the current object.</returns>
@@ -44,8 +47,6 @@ public class RuneCell : IEquatable<RuneCell> {
 		var colorSchemeStr = ColorScheme?.ToString () ?? "null";
 		return $"U+{Rune.Value:X4} '{Rune.ToString ()}'; {colorSchemeStr}";
 	}
-
-	string ColorSchemeDebuggerDisplay => ToString ();
 }
 
 class TextModel {
@@ -56,7 +57,7 @@ class TextModel {
 	public string? FilePath { get; set; }
 
 	/// <summary>
-	/// The number of text lines in the model
+	///         The number of text lines in the model
 	/// </summary>
 	public int Count => _lines.Count;
 
@@ -91,6 +92,7 @@ class TextModel {
 		foreach (var rune in str.ToRunes ()) {
 			cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
 		}
+
 		return cells;
 	}
 
@@ -100,6 +102,7 @@ class TextModel {
 		foreach (var rune in runes) {
 			cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
 		}
+
 		return cells;
 	}
 
@@ -108,7 +111,8 @@ class TextModel {
 	// Splits a string into a List that contains a List<RuneCell> for each line
 	public static List<List<RuneCell>> StringToLinesOfRuneCells (string content, ColorScheme? colorScheme = null)
 	{
-		var cells = content.EnumerateRunes ().Select (x => new RuneCell { Rune = x, ColorScheme = colorScheme }).ToList ();
+		var cells = content.EnumerateRunes ().Select (x => new RuneCell { Rune = x, ColorScheme = colorScheme })
+			.ToList ();
 
 		return SplitNewLines (cells);
 	}
@@ -125,19 +129,23 @@ class TextModel {
 				hasCR = true;
 				continue;
 			}
+
 			if (cells [i].Rune.Value == 10) {
 				if (i - start > 0) {
 					lines.Add (cells.GetRange (start, hasCR ? i - 1 - start : i - start));
 				} else {
 					lines.Add (StringToRuneCells (string.Empty));
 				}
+
 				start = i + 1;
 				hasCR = false;
 			}
 		}
+
 		if (i - start >= 0) {
 			lines.Add (cells.GetRange (start, i - start));
 		}
+
 		return lines;
 	}
 
@@ -162,18 +170,22 @@ class TextModel {
 			if (v == 13) {
 				continue;
 			}
+
 			if (v == 10) {
 				Append (line);
 				line.Clear ();
 				wasNewLine = true;
 				continue;
 			}
+
 			line.Add ((byte)v);
 			wasNewLine = false;
 		}
+
 		if (line.Count > 0 || wasNewLine) {
 			Append (line);
 		}
+
 		buff.Dispose ();
 
 		OnLinesLoaded ();
@@ -220,11 +232,12 @@ class TextModel {
 				sb.AppendLine ();
 			}
 		}
+
 		return sb.ToString ();
 	}
 
 	/// <summary>
-	/// Returns the specified line as a List of Rune
+	///         Returns the specified line as a List of Rune
 	/// </summary>
 	/// <returns>The line.</returns>
 	/// <param name="line">Line number to retrieve.</param>
@@ -234,8 +247,10 @@ class TextModel {
 			if (line < Count) {
 				return _lines [line];
 			}
+
 			return _lines [Count - 1];
 		}
+
 		_lines.Add (new List<RuneCell> ());
 		return _lines [0];
 	}
@@ -243,14 +258,14 @@ class TextModel {
 	public List<List<RuneCell>> GetAllLines () => _lines;
 
 	/// <summary>
-	/// Adds a line to the model at the specified position.
+	///         Adds a line to the model at the specified position.
 	/// </summary>
 	/// <param name="pos">Line number where the line will be inserted.</param>
 	/// <param name="cells">The line of text and color, as a List of RuneCell.</param>
 	public void AddLine (int pos, List<RuneCell> cells) => _lines.Insert (pos, cells);
 
 	/// <summary>
-	/// Removes the line at the specified position
+	///         Removes the line at the specified position
 	/// </summary>
 	/// <param name="pos">Position.</param>
 	public void RemoveLine (int pos)
@@ -259,6 +274,7 @@ class TextModel {
 			if (_lines.Count == 1 && _lines [0].Count == 0) {
 				return;
 			}
+
 			_lines.RemoveAt (pos);
 		}
 	}
@@ -267,13 +283,13 @@ class TextModel {
 	{
 		if (_lines.Count > 0 && pos < _lines.Count) {
 			_lines [pos] = new List<RuneCell> (runes);
-		} else if (_lines.Count == 0 || _lines.Count > 0 && pos >= _lines.Count) {
+		} else if (_lines.Count == 0 || (_lines.Count > 0 && pos >= _lines.Count)) {
 			_lines.Add (runes);
 		}
 	}
 
 	/// <summary>
-	/// Returns the maximum line length of the visible lines.
+	///         Returns the maximum line length of the visible lines.
 	/// </summary>
 	/// <param name="first">The first line.</param>
 	/// <param name="last">The last line.</param>
@@ -310,6 +326,7 @@ class TextModel {
 		foreach (var cell in t) {
 			runes.Add (cell.Rune);
 		}
+
 		return GetColFromX (runes, start, x, tabWidth);
 	}
 
@@ -318,6 +335,7 @@ class TextModel {
 		if (x < 0) {
 			return x;
 		}
+
 		var size = start;
 		var pX = x + start;
 		for (var i = start; i < t.Count; i++) {
@@ -326,36 +344,40 @@ class TextModel {
 			if (r.Value == '\t') {
 				size += tabWidth + 1;
 			}
+
 			if (i == pX || size > pX) {
 				return i - start;
 			}
 		}
+
 		return t.Count - start;
 	}
 
 	internal static (int size, int length) DisplaySize (List<RuneCell> t,
-							    int start = -1,
-							    int end = -1,
-							    bool checkNextRune = true,
-							    int tabWidth = 0)
+		int start = -1,
+		int end = -1,
+		bool checkNextRune = true,
+		int tabWidth = 0)
 	{
 		var runes = new List<Rune> ();
 		foreach (var cell in t) {
 			runes.Add (cell.Rune);
 		}
+
 		return DisplaySize (runes, start, end, checkNextRune, tabWidth);
 	}
 
 	// Returns the size and length in a range of the string.
 	internal static (int size, int length) DisplaySize (List<Rune> t,
-							    int start = -1,
-							    int end = -1,
-							    bool checkNextRune = true,
-							    int tabWidth = 0)
+		int start = -1,
+		int end = -1,
+		bool checkNextRune = true,
+		int tabWidth = 0)
 	{
 		if (t == null || t.Count == 0) {
 			return (0, 0);
 		}
+
 		var size = 0;
 		var len = 0;
 		var tcount = end == -1 ? t.Count : end > t.Count ? t.Count : end;
@@ -368,7 +390,9 @@ class TextModel {
 				size += tabWidth + 1;
 				len += tabWidth - 1;
 			}
-			if (checkNextRune && i == tcount - 1 && t.Count > tcount && IsWideRune (t [i + 1], tabWidth, out var s, out var l)) {
+
+			if (checkNextRune && i == tcount - 1 && t.Count > tcount &&
+			    IsWideRune (t [i + 1], tabWidth, out var s, out var l)) {
 				size += s;
 				len += l;
 			}
@@ -395,6 +419,7 @@ class TextModel {
 		foreach (var cell in t) {
 			runes.Add (cell.Rune);
 		}
+
 		return CalculateLeftColumn (runes, start, end, width, tabWidth);
 	}
 
@@ -404,6 +429,7 @@ class TextModel {
 		if (t == null || t.Count == 0) {
 			return 0;
 		}
+
 		var size = 0;
 		var tcount = end > t.Count - 1 ? t.Count - 1 : end;
 		var col = 0;
@@ -414,22 +440,27 @@ class TextModel {
 			if (rune.Value == '\t') {
 				size += tabWidth + 1;
 			}
+
 			if (size > width) {
 				if (col + width == end) {
 					col++;
 				}
+
 				break;
 			}
-			if (end < t.Count && col > 0 && start < end && col == start || end - col == width - 1) {
+
+			if ((end < t.Count && col > 0 && start < end && col == start) || end - col == width - 1) {
 				break;
 			}
+
 			col = i;
 		}
 
 		return col;
 	}
 
-	internal (Point current, bool found) FindNextText (string text, out bool gaveFullTurn, bool matchCase = false, bool matchWholeWord = false)
+	internal (Point current, bool found) FindNextText (string text, out bool gaveFullTurn, bool matchCase = false,
+		bool matchWholeWord = false)
 	{
 		if (text == null || _lines.Count == 0) {
 			gaveFullTurn = false;
@@ -439,16 +470,21 @@ class TextModel {
 		if (_toFind.found) {
 			_toFind.currentPointToFind.X++;
 		}
-		var foundPos = GetFoundNextTextPoint (text, _lines.Count, matchCase, matchWholeWord, _toFind.currentPointToFind);
+
+		var foundPos = GetFoundNextTextPoint (text, _lines.Count, matchCase, matchWholeWord,
+			_toFind.currentPointToFind);
 		if (!foundPos.found && _toFind.currentPointToFind != _toFind.startPointToFind) {
-			foundPos = GetFoundNextTextPoint (text, _toFind.startPointToFind.Y + 1, matchCase, matchWholeWord, Point.Empty);
+			foundPos = GetFoundNextTextPoint (text, _toFind.startPointToFind.Y + 1, matchCase,
+				matchWholeWord, Point.Empty);
 		}
+
 		gaveFullTurn = ApplyToFind (foundPos);
 
 		return foundPos;
 	}
 
-	internal (Point current, bool found) FindPreviousText (string text, out bool gaveFullTurn, bool matchCase = false, bool matchWholeWord = false)
+	internal (Point current, bool found) FindPreviousText (string text, out bool gaveFullTurn,
+		bool matchCase = false, bool matchWholeWord = false)
 	{
 		if (text == null || _lines.Count == 0) {
 			gaveFullTurn = false;
@@ -458,18 +494,22 @@ class TextModel {
 		if (_toFind.found) {
 			_toFind.currentPointToFind.X++;
 		}
+
 		var linesCount = _toFind.currentPointToFind.IsEmpty ? _lines.Count - 1 : _toFind.currentPointToFind.Y;
-		var foundPos = GetFoundPreviousTextPoint (text, linesCount, matchCase, matchWholeWord, _toFind.currentPointToFind);
+		var foundPos = GetFoundPreviousTextPoint (text, linesCount, matchCase, matchWholeWord,
+			_toFind.currentPointToFind);
 		if (!foundPos.found && _toFind.currentPointToFind != _toFind.startPointToFind) {
 			foundPos = GetFoundPreviousTextPoint (text, _lines.Count - 1, matchCase, matchWholeWord,
 				new Point (_lines [_lines.Count - 1].Count, _lines.Count));
 		}
+
 		gaveFullTurn = ApplyToFind (foundPos);
 
 		return foundPos;
 	}
 
-	internal (Point current, bool found) ReplaceAllText (string text, bool matchCase = false, bool matchWholeWord = false, string? textToReplace = null)
+	internal (Point current, bool found) ReplaceAllText (string text, bool matchCase = false,
+		bool matchWholeWord = false, string? textToReplace = null)
 	{
 		var found = false;
 		var pos = Point.Empty;
@@ -484,22 +524,27 @@ class TextModel {
 					if (col + 1 > txt.Length) {
 						break;
 					}
+
 					col = txt.IndexOf (matchText, col + 1);
 					continue;
 				}
+
 				if (col > -1) {
 					if (!found) {
 						found = true;
 					}
+
 					_lines [i] = ToRuneCellList (ReplaceText (x, textToReplace!, matchText, col));
 					x = _lines [i];
 					txt = GetText (x);
 					pos = new Point (col, i);
 					col += textToReplace!.Length - matchText.Length;
 				}
+
 				if (col < 0 || col + 1 > txt.Length) {
 					break;
 				}
+
 				col = txt.IndexOf (matchText, col + 1);
 			}
 		}
@@ -510,6 +555,7 @@ class TextModel {
 			if (!matchCase) {
 				txt = txt.ToUpper ();
 			}
+
 			return txt;
 		}
 
@@ -519,9 +565,9 @@ class TextModel {
 	string ReplaceText (List<RuneCell> source, string textToReplace, string matchText, int col)
 	{
 		var origTxt = ToString (source);
-		(var _, var len) = DisplaySize (source, 0, col, false);
-		(var _, var len2) = DisplaySize (source, col, col + matchText.Length, false);
-		(var _, var len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
+		var (_, len) = DisplaySize (source, 0, col, false);
+		var (_, len2) = DisplaySize (source, col, col + matchText.Length, false);
+		var (_, len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
 
 		return origTxt [..len] +
 		       textToReplace +
@@ -536,6 +582,7 @@ class TextModel {
 			if (_toFind.found && _toFind.currentPointToFind == _toFind.startPointToFind) {
 				gaveFullTurn = true;
 			}
+
 			if (!_toFind.found) {
 				_toFind.startPointToFind = _toFind.currentPointToFind = foundPos.current;
 				_toFind.found = foundPos.found;
@@ -545,7 +592,8 @@ class TextModel {
 		return gaveFullTurn;
 	}
 
-	(Point current, bool found) GetFoundNextTextPoint (string text, int linesCount, bool matchCase, bool matchWholeWord, Point start)
+	(Point current, bool found) GetFoundNextTextPoint (string text, int linesCount, bool matchCase,
+		bool matchWholeWord, Point start)
 	{
 		for (var i = start.Y; i < linesCount; i++) {
 			var x = _lines [i];
@@ -553,14 +601,17 @@ class TextModel {
 			if (!matchCase) {
 				txt = txt.ToUpper ();
 			}
+
 			var matchText = !matchCase ? text.ToUpper () : text;
 			var col = txt.IndexOf (matchText, Math.Min (start.X, txt.Length));
 			if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 				continue;
 			}
-			if (col > -1 && (i == start.Y && col >= start.X || i > start.Y) && txt.Contains (matchText)) {
+
+			if (col > -1 && ((i == start.Y && col >= start.X) || i > start.Y) && txt.Contains (matchText)) {
 				return (new Point (col, i), true);
 			}
+
 			if (col == -1 && start.X > 0) {
 				start.X = 0;
 			}
@@ -569,7 +620,8 @@ class TextModel {
 		return (Point.Empty, false);
 	}
 
-	(Point current, bool found) GetFoundPreviousTextPoint (string text, int linesCount, bool matchCase, bool matchWholeWord, Point start)
+	(Point current, bool found) GetFoundPreviousTextPoint (string text, int linesCount, bool matchCase,
+		bool matchWholeWord, Point start)
 	{
 		for (var i = linesCount; i >= 0; i--) {
 			var x = _lines [i];
@@ -577,15 +629,19 @@ class TextModel {
 			if (!matchCase) {
 				txt = txt.ToUpper ();
 			}
+
 			if (start.Y != i) {
 				start.X = Math.Max (x.Count - 1, 0);
 			}
+
 			var matchText = !matchCase ? text.ToUpper () : text;
 			var col = txt.LastIndexOf (matchText, _toFind.found ? start.X - 1 : start.X);
 			if (col > -1 && matchWholeWord && !MatchWholeWord (txt, matchText, col)) {
 				continue;
 			}
-			if (col > -1 && (i <= linesCount && col <= start.X || i < start.Y) && txt.Contains (matchText)) {
+
+			if (col > -1 && ((i <= linesCount && col <= start.X) || i < start.Y) &&
+			    txt.Contains (matchText)) {
 				return (new Point (col, i), true);
 			}
 		}
@@ -603,7 +659,8 @@ class TextModel {
 		var start = index > 0 ? index - 1 : 0;
 		var end = index + txt.Length;
 
-		if ((start == 0 || Rune.IsWhiteSpace ((Rune)source [start])) && (end == source.Length || Rune.IsWhiteSpace ((Rune)source [end]))) {
+		if ((start == 0 || Rune.IsWhiteSpace ((Rune)source [start])) &&
+		    (end == source.Length || Rune.IsWhiteSpace ((Rune)source [end]))) {
 			return true;
 		}
 
@@ -611,7 +668,7 @@ class TextModel {
 	}
 
 	/// <summary>
-	/// Redefine column and line tracking.
+	///         Redefine column and line tracking.
 	/// </summary>
 	/// <param name="point">Contains the column and line.</param>
 	internal void ResetContinuousFind (Point point)
@@ -626,6 +683,7 @@ class TextModel {
 		if (line.Count > 0) {
 			return line [col > line.Count - 1 ? line.Count - 1 : col];
 		}
+
 		return default!;
 	}
 
@@ -635,14 +693,18 @@ class TextModel {
 		if (col + 1 < line.Count) {
 			col++;
 			rune = line [col].Rune;
-			if (col + 1 == line.Count && !Rune.IsLetterOrDigit (rune) && !Rune.IsWhiteSpace (line [col - 1].Rune)) {
+			if (col + 1 == line.Count && !Rune.IsLetterOrDigit (rune) &&
+			    !Rune.IsWhiteSpace (line [col - 1].Rune)) {
 				col++;
 			}
+
 			return true;
 		}
+
 		if (col + 1 == line.Count) {
 			col++;
 		}
+
 		while (row + 1 < Count) {
 			col = 0;
 			row++;
@@ -652,6 +714,7 @@ class TextModel {
 				return true;
 			}
 		}
+
 		rune = default;
 		return false;
 	}
@@ -665,10 +728,12 @@ class TextModel {
 			rune = line [col].Rune;
 			return true;
 		}
+
 		if (row == 0) {
 			rune = default;
 			return false;
 		}
+
 		while (row > 0) {
 			row--;
 			line = GetLine (row);
@@ -678,6 +743,7 @@ class TextModel {
 				return true;
 			}
 		}
+
 		rune = default;
 		return false;
 	}
@@ -687,15 +753,19 @@ class TextModel {
 		if (Rune.IsSymbol (rune)) {
 			return RuneType.IsSymbol;
 		}
+
 		if (Rune.IsWhiteSpace (rune)) {
 			return RuneType.IsWhiteSpace;
 		}
+
 		if (Rune.IsLetterOrDigit (rune)) {
 			return RuneType.IsLetterOrDigit;
 		}
+
 		if (Rune.IsPunctuation (rune)) {
 			return RuneType.IsPunctuation;
 		}
+
 		return RuneType.IsUnknow;
 	}
 
@@ -716,33 +786,50 @@ class TextModel {
 		try {
 			var rune = RuneAt (col, row).Rune;
 			var runeType = GetRuneType (rune);
-			var lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
+			var lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) ||
+									       Rune.IsPunctuation (rune) ||
+									       Rune.IsSymbol (rune))
+				? col
+				: -1;
 
 			void ProcMoveNext (ref int nCol, ref int nRow, Rune nRune)
 			{
 				if (Rune.IsWhiteSpace (nRune)) {
 					while (MoveNext (ref nCol, ref nRow, out nRune)) {
-						if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)) {
+						if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) ||
+						    Rune.IsSymbol (nRune)) {
 							lastValidCol = nCol;
 							return;
 						}
 					}
-					if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))) {
+
+					if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) ||
+								Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))) {
 						if (lastValidCol > -1) {
 							nCol = lastValidCol;
 						}
+
 						return;
 					}
+
 					while (MoveNext (ref nCol, ref nRow, out nRune)) {
-						if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune)) {
+						if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) &&
+						    !Rune.IsSymbol (nRune)) {
 							break;
 						}
+
 						if (nRow != fromRow) {
 							break;
 						}
-						lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol
-							: lastValidCol;
+
+						lastValidCol =
+							(IsSameRuneType (nRune, runeType) &&
+							 Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) ||
+							Rune.IsSymbol (nRune)
+								? nCol
+								: lastValidCol;
 					}
+
 					if (lastValidCol > -1) {
 						nCol = lastValidCol;
 						nRow = fromRow;
@@ -751,18 +838,28 @@ class TextModel {
 					if (!MoveNext (ref nCol, ref nRow, out nRune)) {
 						return;
 					}
+
 					if (!IsSameRuneType (nRune, runeType) && !Rune.IsWhiteSpace (nRune)) {
 						return;
 					}
+
 					var line = GetLine (nRow);
-					if (nCol == line.Count && nRow == fromRow && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune))) {
+					if (nCol == line.Count && nRow == fromRow &&
+					    (Rune.IsLetterOrDigit (line [0].Rune) ||
+					     Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune))) {
 						return;
 					}
-					lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
+
+					lastValidCol =
+						(IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) ||
+						Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+							? nCol
+							: lastValidCol;
 					if (fromRow != nRow) {
 						nCol = 0;
 						return;
 					}
+
 					ProcMoveNext (ref nCol, ref nRow, nRune);
 				}
 			}
@@ -772,6 +869,7 @@ class TextModel {
 			if (fromCol != col || fromRow != row) {
 				return (col, row);
 			}
+
 			return null;
 		} catch (Exception) {
 			return null;
@@ -795,44 +893,66 @@ class TextModel {
 				if (col > 0) {
 					return (col, row);
 				}
+
 				if (col == 0 && row > 0) {
 					row--;
 					var line = GetLine (row);
 					return (line.Count, row);
 				}
+
 				return null;
 			}
+
 			var runeType = GetRuneType (rune);
-			var lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) || Rune.IsPunctuation (rune) || Rune.IsSymbol (rune)) ? col : -1;
+			var lastValidCol = IsSameRuneType (rune, runeType) && (Rune.IsLetterOrDigit (rune) ||
+									       Rune.IsPunctuation (rune) ||
+									       Rune.IsSymbol (rune))
+				? col
+				: -1;
 
 			void ProcMovePrev (ref int nCol, ref int nRow, Rune nRune)
 			{
 				if (Rune.IsWhiteSpace (nRune)) {
 					while (MovePrev (ref nCol, ref nRow, out nRune)) {
-						if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)) {
+						if (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) ||
+						    Rune.IsSymbol (nRune)) {
 							lastValidCol = nCol;
-							if (runeType == RuneType.IsWhiteSpace || runeType == RuneType.IsUnknow) {
+							if (runeType == RuneType.IsWhiteSpace ||
+							    runeType == RuneType.IsUnknow) {
 								runeType = GetRuneType (nRune);
 							}
+
 							break;
 						}
 					}
-					if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))) {
+
+					if (nRow != fromRow && (Rune.IsLetterOrDigit (nRune) ||
+								Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune))) {
 						if (lastValidCol > -1) {
 							nCol = lastValidCol;
 						}
+
 						return;
 					}
+
 					while (MovePrev (ref nCol, ref nRow, out nRune)) {
-						if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) && !Rune.IsSymbol (nRune)) {
+						if (!Rune.IsLetterOrDigit (nRune) && !Rune.IsPunctuation (nRune) &&
+						    !Rune.IsSymbol (nRune)) {
 							break;
 						}
+
 						if (nRow != fromRow) {
 							break;
 						}
-						lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol
-							: lastValidCol;
+
+						lastValidCol =
+							(IsSameRuneType (nRune, runeType) &&
+							 Rune.IsLetterOrDigit (nRune)) || Rune.IsPunctuation (nRune) ||
+							Rune.IsSymbol (nRune)
+								? nCol
+								: lastValidCol;
 					}
+
 					if (lastValidCol > -1) {
 						nCol = lastValidCol;
 						nRow = fromRow;
@@ -843,18 +963,27 @@ class TextModel {
 					}
 
 					var line = GetLine (nRow);
-					if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0].Rune) || Rune.IsPunctuation (line [0].Rune) || Rune.IsSymbol (line [0].Rune))) {
+					if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (line [0].Rune) ||
+									     Rune.IsPunctuation (line [0].Rune) ||
+									     Rune.IsSymbol (line [0].Rune))) {
 						return;
 					}
-					lastValidCol = IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune) || Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune) ? nCol : lastValidCol;
+
+					lastValidCol =
+						(IsSameRuneType (nRune, runeType) && Rune.IsLetterOrDigit (nRune)) ||
+						Rune.IsPunctuation (nRune) || Rune.IsSymbol (nRune)
+							? nCol
+							: lastValidCol;
 					if (lastValidCol > -1 && Rune.IsWhiteSpace (nRune)) {
 						nCol = lastValidCol;
 						return;
 					}
+
 					if (fromRow != nRow) {
 						nCol = line.Count;
 						return;
 					}
+
 					ProcMovePrev (ref nCol, ref nRow, nRune);
 				}
 			}
@@ -864,6 +993,7 @@ class TextModel {
 			if (fromCol != col || fromRow != row) {
 				return (col, row);
 			}
+
 			return null;
 		} catch (Exception) {
 			return null;
@@ -871,10 +1001,10 @@ class TextModel {
 	}
 
 	/// <summary>
-	/// Converts the string into a <see cref="List{RuneCell}"/>.
+	///         Converts the string into a <see cref="List{RuneCell}" />.
 	/// </summary>
 	/// <param name="str">The string to convert.</param>
-	/// <param name="colorScheme">The <see cref="ColorScheme"/> to use.</param>
+	/// <param name="colorScheme">The <see cref="ColorScheme" /> to use.</param>
 	/// <returns></returns>
 	public static List<RuneCell> ToRuneCellList (string str, ColorScheme? colorScheme = null)
 	{
@@ -882,11 +1012,12 @@ class TextModel {
 		foreach (var rune in str.EnumerateRunes ()) {
 			cells.Add (new RuneCell { Rune = rune, ColorScheme = colorScheme });
 		}
+
 		return cells;
 	}
 
 	/// <summary>
-	/// Converts a <see cref="RuneCell"/> generic collection into a string.
+	///         Converts a <see cref="RuneCell" /> generic collection into a string.
 	/// </summary>
 	/// <param name="cells">The enumerable cell to convert.</param>
 	/// <returns></returns>
@@ -930,10 +1061,13 @@ partial class HistoryText {
 
 	public void Add (List<List<RuneCell>> lines, Point curPos, LineStatus lineStatus = LineStatus.Original)
 	{
-		if (lineStatus == LineStatus.Original && _historyTextItems.Count > 0 && _historyTextItems.Last ().LineStatus == LineStatus.Original) {
+		if (lineStatus == LineStatus.Original && _historyTextItems.Count > 0 &&
+		    _historyTextItems.Last ().LineStatus == LineStatus.Original) {
 			return;
 		}
-		if (lineStatus == LineStatus.Replaced && _historyTextItems.Count > 0 && _historyTextItems.Last ().LineStatus == LineStatus.Replaced) {
+
+		if (lineStatus == LineStatus.Replaced && _historyTextItems.Count > 0 &&
+		    _historyTextItems.Last ().LineStatus == LineStatus.Replaced) {
 			return;
 		}
 
@@ -942,7 +1076,8 @@ partial class HistoryText {
 		}
 
 		if (_idxHistoryText >= 0 && _idxHistoryText + 1 < _historyTextItems.Count) {
-			_historyTextItems.RemoveRange (_idxHistoryText + 1, _historyTextItems.Count - _idxHistoryText - 1);
+			_historyTextItems.RemoveRange (_idxHistoryText + 1,
+				_historyTextItems.Count - _idxHistoryText - 1);
 		}
 
 		_historyTextItems.Add (new HistoryTextItem (lines, curPos, lineStatus));
@@ -998,44 +1133,55 @@ partial class HistoryText {
 			if (_idxHistoryText - 1 > -1 &&
 			    (_historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Added ||
 			     _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed ||
-			     historyTextItem.LineStatus == LineStatus.Replaced &&
-			     _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original)) {
-
+			     (historyTextItem.LineStatus == LineStatus.Replaced &&
+			      _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original))) {
 				_idxHistoryText--;
 
-				while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
-
+				while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added &&
+				       _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
 					_idxHistoryText--;
 				}
+
 				historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]);
 				historyTextItem.IsUndoing = true;
 				historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
 			}
 
-			if (historyTextItem.LineStatus == LineStatus.Removed && _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Added) {
-				historyTextItem.RemovedOnAdded = new HistoryTextItem (_historyTextItems [_idxHistoryText + 1]);
+			if (historyTextItem.LineStatus == LineStatus.Removed &&
+			    _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Added) {
+				historyTextItem.RemovedOnAdded =
+					new HistoryTextItem (_historyTextItems [_idxHistoryText + 1]);
 			}
 
-			if (historyTextItem.LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original ||
-			    historyTextItem.LineStatus == LineStatus.Removed && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original ||
-			    historyTextItem.LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
-
-				if (!historyTextItem.Lines [0].SequenceEqual (_historyTextItems [_idxHistoryText - 1].Lines [0]) &&
-				    historyTextItem.CursorPosition == _historyTextItems [_idxHistoryText - 1].CursorPosition) {
-					historyTextItem.Lines [0] = new List<RuneCell> (_historyTextItems [_idxHistoryText - 1].Lines [0]);
+			if ((historyTextItem.LineStatus == LineStatus.Added &&
+			     _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original) ||
+			    (historyTextItem.LineStatus == LineStatus.Removed &&
+			     _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Original) ||
+			    (historyTextItem.LineStatus == LineStatus.Added &&
+			     _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed)) {
+				if (!historyTextItem.Lines [0]
+					    .SequenceEqual (_historyTextItems [_idxHistoryText - 1].Lines [0]) &&
+				    historyTextItem.CursorPosition ==
+				    _historyTextItems [_idxHistoryText - 1].CursorPosition) {
+					historyTextItem.Lines [0] =
+						new List<RuneCell> (_historyTextItems [_idxHistoryText - 1].Lines [0]);
 				}
-				if (historyTextItem.LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
-					historyTextItem.FinalCursorPosition = _historyTextItems [_idxHistoryText - 2].CursorPosition;
+
+				if (historyTextItem.LineStatus == LineStatus.Added &&
+				    _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
+					historyTextItem.FinalCursorPosition =
+						_historyTextItems [_idxHistoryText - 2].CursorPosition;
 				} else {
-					historyTextItem.FinalCursorPosition = _historyTextItems [_idxHistoryText - 1].CursorPosition;
+					historyTextItem.FinalCursorPosition =
+						_historyTextItems [_idxHistoryText - 1].CursorPosition;
 				}
 			} else {
 				historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
 			}
 
 			OnChangeText (historyTextItem);
-			while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed || _historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added) {
-
+			while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed ||
+			       _historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added) {
 				_idxHistoryText--;
 			}
 		} else if (!historyTextItem.IsUndoing) {
@@ -1043,32 +1189,39 @@ partial class HistoryText {
 			    (historyTextItem.LineStatus == LineStatus.Original ||
 			     _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Added ||
 			     _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Removed)) {
-
 				_idxHistoryText++;
 				historyTextItem = new HistoryTextItem (_historyTextItems [_idxHistoryText]);
 				historyTextItem.IsUndoing = false;
 				historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
 			}
 
-			if (historyTextItem.LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
-				historyTextItem.RemovedOnAdded = new HistoryTextItem (_historyTextItems [_idxHistoryText - 1]);
+			if (historyTextItem.LineStatus == LineStatus.Added &&
+			    _historyTextItems [_idxHistoryText - 1].LineStatus == LineStatus.Removed) {
+				historyTextItem.RemovedOnAdded =
+					new HistoryTextItem (_historyTextItems [_idxHistoryText - 1]);
 			}
 
-			if (historyTextItem.LineStatus == LineStatus.Removed && _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Replaced ||
-			    historyTextItem.LineStatus == LineStatus.Removed && _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Original ||
-			    historyTextItem.LineStatus == LineStatus.Added && _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Replaced) {
-
-				if (historyTextItem.LineStatus == LineStatus.Removed && !historyTextItem.Lines [0].SequenceEqual (_historyTextItems [_idxHistoryText + 1].Lines [0])) {
-					historyTextItem.Lines [0] = new List<RuneCell> (_historyTextItems [_idxHistoryText + 1].Lines [0]);
+			if ((historyTextItem.LineStatus == LineStatus.Removed &&
+			     _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Replaced) ||
+			    (historyTextItem.LineStatus == LineStatus.Removed &&
+			     _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Original) ||
+			    (historyTextItem.LineStatus == LineStatus.Added &&
+			     _historyTextItems [_idxHistoryText + 1].LineStatus == LineStatus.Replaced)) {
+				if (historyTextItem.LineStatus == LineStatus.Removed && !historyTextItem.Lines [0]
+					    .SequenceEqual (_historyTextItems [_idxHistoryText + 1].Lines [0])) {
+					historyTextItem.Lines [0] =
+						new List<RuneCell> (_historyTextItems [_idxHistoryText + 1].Lines [0]);
 				}
-				historyTextItem.FinalCursorPosition = _historyTextItems [_idxHistoryText + 1].CursorPosition;
+
+				historyTextItem.FinalCursorPosition =
+					_historyTextItems [_idxHistoryText + 1].CursorPosition;
 			} else {
 				historyTextItem.FinalCursorPosition = historyTextItem.CursorPosition;
 			}
 
 			OnChangeText (historyTextItem);
-			while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed || _historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added) {
-
+			while (_historyTextItems [_idxHistoryText].LineStatus == LineStatus.Removed ||
+			       _historyTextItems [_idxHistoryText].LineStatus == LineStatus.Added) {
 				_idxHistoryText++;
 			}
 		}
@@ -1098,23 +1251,24 @@ class WordWrapManager {
 	public TextModel Model { get; private set; }
 
 	public TextModel WrapModel (int width,
-				    out int nRow,
-				    out int nCol,
-				    out int nStartRow,
-				    out int nStartCol,
-				    int row = 0,
-				    int col = 0,
-				    int startRow = 0,
-				    int startCol = 0,
-				    int tabWidth = 0,
-				    bool preserveTrailingSpaces = true)
+		out int nRow,
+		out int nCol,
+		out int nStartRow,
+		out int nStartCol,
+		int row = 0,
+		int col = 0,
+		int startRow = 0,
+		int startCol = 0,
+		int tabWidth = 0,
+		bool preserveTrailingSpaces = true)
 	{
 		_frameWidth = width;
 
 		var modelRow = _isWrapModelRefreshing ? row : GetModelLineFromWrappedLines (row);
 		var modelCol = _isWrapModelRefreshing ? col : GetModelColFromWrappedLines (row, col);
 		var modelStartRow = _isWrapModelRefreshing ? startRow : GetModelLineFromWrappedLines (startRow);
-		var modelStartCol = _isWrapModelRefreshing ? startCol : GetModelColFromWrappedLines (startRow, startCol);
+		var modelStartCol =
+			_isWrapModelRefreshing ? startCol : GetModelColFromWrappedLines (startRow, startCol);
 		var wrappedModel = new TextModel ();
 		var lines = 0;
 		nRow = 0;
@@ -1128,7 +1282,8 @@ class WordWrapManager {
 		for (var i = 0; i < Model.Count; i++) {
 			var line = Model.GetLine (i);
 			var wrappedLines = ToListRune (
-				TextFormatter.Format (TextModel.ToString (line), width, TextAlignment.Left, true, preserveTrailingSpaces, tabWidth));
+				TextFormatter.Format (TextModel.ToString (line), width, TextAlignment.Left, true,
+					preserveTrailingSpaces, tabWidth));
 			var sumColWidth = 0;
 			for (var j = 0; j < wrappedLines.Count; j++) {
 				var wrapLine = wrappedLines [j];
@@ -1150,6 +1305,7 @@ class WordWrapManager {
 						isRowAndColSetted = true;
 					}
 				}
+
 				if (!isStartRowAndColSetted && modelStartRow == i) {
 					if (nStartCol + wrapLine.Count <= modelStartCol) {
 						nStartCol += wrapLine.Count;
@@ -1168,9 +1324,11 @@ class WordWrapManager {
 						isStartRowAndColSetted = true;
 					}
 				}
+
 				for (var k = j; k < wrapLine.Count; k++) {
 					wrapLine [k].ColorScheme = line [k].ColorScheme;
 				}
+
 				wrappedModel.AddLine (lines, wrapLine);
 				sumColWidth += wrapLine.Count;
 				var wrappedLine = new WrappedLine {
@@ -1183,6 +1341,7 @@ class WordWrapManager {
 				lines++;
 			}
 		}
+
 		_wrappedModelLines = wModelLines;
 
 		return wrappedModel;
@@ -1249,6 +1408,7 @@ class WordWrapManager {
 		if (line.Count > _frameWidth) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -1263,10 +1423,13 @@ class WordWrapManager {
 			RemoveAt (row, 0);
 			return false;
 		}
+
 		if (modelCol < line.Count) {
 			line.RemoveAt (modelCol);
 		}
-		if (line.Count > _frameWidth || row + 1 < _wrappedModelLines.Count && _wrappedModelLines [row + 1].ModelLine == modelRow) {
+
+		if (line.Count > _frameWidth || (row + 1 < _wrappedModelLines.Count &&
+						 _wrappedModelLines [row + 1].ModelLine == modelRow)) {
 			return true;
 		}
 
@@ -1284,16 +1447,19 @@ class WordWrapManager {
 			Model.RemoveLine (modelRow);
 			return false;
 		}
+
 		if (modelCol < line.Count) {
 			if (forward) {
 				line.RemoveAt (modelCol);
 				return true;
 			}
+
 			if (modelCol - 1 > -1) {
 				line.RemoveAt (modelCol - 1);
 				return true;
 			}
 		}
+
 		lineRemoved = true;
 		if (forward) {
 			if (modelRow + 1 == Model.Count) {
@@ -1338,19 +1504,20 @@ class WordWrapManager {
 	}
 
 	public void UpdateModel (TextModel model,
-				 out int nRow,
-				 out int nCol,
-				 out int nStartRow,
-				 out int nStartCol,
-				 int row,
-				 int col,
-				 int startRow,
-				 int startCol,
-				 bool preserveTrailingSpaces)
+		out int nRow,
+		out int nCol,
+		out int nStartRow,
+		out int nStartCol,
+		int row,
+		int col,
+		int startRow,
+		int startCol,
+		bool preserveTrailingSpaces)
 	{
 		_isWrapModelRefreshing = true;
 		Model = model;
-		WrapModel (_frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol, 0, preserveTrailingSpaces);
+		WrapModel (_frameWidth, out nRow, out nCol, out nStartRow, out nStartCol, row, col, startRow, startCol,
+			0, preserveTrailingSpaces);
 		_isWrapModelRefreshing = false;
 	}
 
@@ -1380,6 +1547,7 @@ class WordWrapManager {
 			if (modelCol > col) {
 				modelCol += col - modelCol;
 			}
+
 			i++;
 		}
 
@@ -1395,12 +1563,12 @@ class WordWrapManager {
 }
 
 /// <summary>
-/// Multi-line text editing <see cref="View"/>.
+///         Multi-line text editing <see cref="View" />.
 /// </summary>
 /// <remarks>
 ///         <para>
-///         <see cref="TextView"/> provides a multi-line text editor. Users interact
-///         with it with the standard Windows, Mac, and Linux (Emacs) commands.
+///                 <see cref="TextView" /> provides a multi-line text editor. Users interact
+///                 with it with the standard Windows, Mac, and Linux (Emacs) commands.
 ///         </para>
 ///         <list type="table">
 ///                 <listheader>
@@ -1410,106 +1578,107 @@ class WordWrapManager {
 ///                 <item>
 ///                         <term>Left cursor, Control-b</term>
 ///                         <description>
-///                         Moves the editing point left.
+///                                 Moves the editing point left.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Right cursor, Control-f</term>
 ///                         <description>
-///                         Moves the editing point right.
+///                                 Moves the editing point right.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Alt-b</term>
 ///                         <description>
-///                         Moves one word back.
+///                                 Moves one word back.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Alt-f</term>
 ///                         <description>
-///                         Moves one word forward.
+///                                 Moves one word forward.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Up cursor, Control-p</term>
 ///                         <description>
-///                         Moves the editing point one line up.
+///                                 Moves the editing point one line up.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Down cursor, Control-n</term>
 ///                         <description>
-///                         Moves the editing point one line down
+///                                 Moves the editing point one line down
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Home key, Control-a</term>
 ///                         <description>
-///                         Moves the cursor to the beginning of the line.
+///                                 Moves the cursor to the beginning of the line.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>End key, Control-e</term>
 ///                         <description>
-///                         Moves the cursor to the end of the line.
+///                                 Moves the cursor to the end of the line.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Control-Home</term>
 ///                         <description>
-///                         Scrolls to the first line and moves the cursor there.
+///                                 Scrolls to the first line and moves the cursor there.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Control-End</term>
 ///                         <description>
-///                         Scrolls to the last line and moves the cursor there.
+///                                 Scrolls to the last line and moves the cursor there.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Delete, Control-d</term>
 ///                         <description>
-///                         Deletes the character in front of the cursor.
+///                                 Deletes the character in front of the cursor.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Backspace</term>
 ///                         <description>
-///                         Deletes the character behind the cursor.
+///                                 Deletes the character behind the cursor.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Control-k</term>
 ///                         <description>
-///                         Deletes the text until the end of the line and replaces the kill buffer
-///                         with the deleted text. You can paste this text in a different place by
-///                         using Control-y.
+///                                 Deletes the text until the end of the line and replaces the kill buffer
+///                                 with the deleted text. You can paste this text in a different place by
+///                                 using Control-y.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Control-y</term>
 ///                         <description>
-///                         Pastes the content of the kill ring into the current position.
+///                                 Pastes the content of the kill ring into the current position.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Alt-d</term>
 ///                         <description>
-///                         Deletes the word above the cursor and adds it to the kill ring. You
-///                         can paste the contents of the kill ring with Control-y.
+///                                 Deletes the word above the cursor and adds it to the kill ring. You
+///                                 can paste the contents of the kill ring with Control-y.
 ///                         </description>
 ///                 </item>
 ///                 <item>
 ///                         <term>Control-q</term>
 ///                         <description>
-///                         Quotes the next input character, to prevent the normal processing of
-///                         key handling to take place.
+///                                 Quotes the next input character, to prevent the normal processing of
+///                                 key handling to take place.
 ///                         </description>
 ///                 </item>
 ///         </list>
 /// </remarks>
 public class TextView : View {
+	readonly HistoryText _historyText = new ();
 	bool _allowsReturn = true;
 	bool _allowsTab = true;
 	int _bottomOffset, _rightOffset;
@@ -1525,7 +1694,6 @@ public class TextView : View {
 	CultureInfo? _currentCulture;
 
 	CursorVisibility _desiredCursorVisibility = CursorVisibility.Default;
-	readonly HistoryText _historyText = new ();
 
 	bool _isButtonShift;
 	bool _isDrawing;
@@ -1537,6 +1705,8 @@ public class TextView : View {
 	bool _multiline = true;
 
 	CursorVisibility _savedCursorVisibility;
+
+	Dim? _savedHeight;
 	int _selectionStartColumn, _selectionStartRow;
 	bool _shiftSelecting;
 	int _tabWidth = 4;
@@ -1545,433 +1715,11 @@ public class TextView : View {
 	WordWrapManager? _wrapManager;
 	bool _wrapNeeded;
 
-	Dim? savedHeight;
-
 	/// <summary>
-	/// Initializes a <see cref="TextView"/> on the specified area, with absolute position and size.
+	///         Initializes a <see cref="TextView" /> on the specified area,
+	///         with dimensions controlled with the X, Y, Width and Height properties.
 	/// </summary>
-	/// <remarks>
-	/// </remarks>
-	public TextView (Rect frame) : base (frame) => SetInitialProperties ();
-
-	/// <summary>
-	/// Initializes a <see cref="TextView"/> on the specified area,
-	/// with dimensions controlled with the X, Y, Width and Height properties.
-	/// </summary>
-	public TextView () => SetInitialProperties ();
-
-	/// <summary>
-	/// Provides autocomplete context menu based on suggestions at the current cursor
-	/// position. Configure <see cref="IAutocomplete.SuggestionGenerator"/> to enable this feature
-	/// </summary>
-	public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
-
-	/// <summary>
-	/// Tracks whether the text view should be considered "used", that is, that the user has moved in the entry,
-	/// so new input should be appended at the cursor position, rather than clearing the entry
-	/// </summary>
-	public bool Used { get; set; }
-
-	/// <summary>
-	/// Sets or gets the text in the <see cref="TextView"/>.
-	/// </summary>
-	/// <remarks>
-	/// The <see cref="TextChanged"/> event is fired whenever this property is set. Note, however,
-	/// that Text is not set by <see cref="TextView"/> as the user types.
-	/// </remarks>
-	public override string Text {
-		get {
-			if (_wordWrap) {
-				return _wrapManager!.Model.ToString ();
-			}
-			return _model.ToString ();
-		}
-
-		set {
-			ResetPosition ();
-			_model.LoadString (value);
-			if (_wordWrap) {
-				_wrapManager = new WordWrapManager (_model);
-				_model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
-			}
-			TextChanged?.Invoke (this, EventArgs.Empty);
-			SetNeedsDisplay ();
-
-			_historyText.Clear (Text);
-		}
-	}
-
-	int _frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
-
-	/// <summary>
-	/// Gets or sets the top row.
-	/// </summary>
-	public int TopRow { get => _topRow; set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0); }
-
-	/// <summary>
-	/// Gets or sets the left column.
-	/// </summary>
-	public int LeftColumn {
-		get => _leftColumn;
-		set {
-			if (value > 0 && _wordWrap) {
-				return;
-			}
-			_leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
-		}
-	}
-
-	/// <summary>
-	/// Gets the maximum visible length line.
-	/// </summary>
-	public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height, TabWidth);
-
-	/// <summary>
-	/// Gets the number of lines.
-	/// </summary>
-	public int Lines => _model.Count;
-
-	/// <summary>
-	/// Sets or gets the current cursor position.
-	/// </summary>
-	public Point CursorPosition {
-		get => new (CurrentColumn, CurrentRow);
-		set {
-			var line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
-			CurrentColumn = value.X < 0 ? 0 : value.X > line.Count ? line.Count : value.X;
-			CurrentRow = value.Y < 0 ? 0 : value.Y > _model.Count - 1
-				? Math.Max (_model.Count - 1, 0) : value.Y;
-			SetNeedsDisplay ();
-			Adjust ();
-		}
-	}
-
-	/// <summary>
-	/// Start column position of the selected text.
-	/// </summary>
-	public int SelectionStartColumn {
-		get => _selectionStartColumn;
-		set {
-			var line = _model.GetLine (_selectionStartRow);
-			_selectionStartColumn = value < 0 ? 0 : value > line.Count ? line.Count : value;
-			Selecting = true;
-			SetNeedsDisplay ();
-			Adjust ();
-		}
-	}
-
-	/// <summary>
-	/// Start row position of the selected text.
-	/// </summary>
-	public int SelectionStartRow {
-		get => _selectionStartRow;
-		set {
-			_selectionStartRow = value < 0 ? 0 : value > _model.Count - 1
-				? Math.Max (_model.Count - 1, 0) : value;
-			Selecting = true;
-			SetNeedsDisplay ();
-			Adjust ();
-		}
-	}
-
-	/// <summary>
-	/// The selected text.
-	/// </summary>
-	public string SelectedText {
-		get {
-			if (!Selecting || _model.Count == 1 && _model.GetLine (0).Count == 0) {
-				return string.Empty;
-			}
-
-			return GetSelectedRegion ();
-		}
-	}
-
-	/// <summary>
-	/// Length of the selected text.
-	/// </summary>
-	public int SelectedLength => GetSelectedLength ();
-
-	/// <summary>
-	/// Get or sets the selecting.
-	/// </summary>
-	public bool Selecting { get; set; }
-
-	/// <summary>
-	/// Allows word wrap the to fit the available container width.
-	/// </summary>
-	public bool WordWrap {
-		get => _wordWrap;
-		set {
-			if (value == _wordWrap) {
-				return;
-			}
-			if (value && !_multiline) {
-				return;
-			}
-			_wordWrap = value;
-			ResetPosition ();
-			if (_wordWrap) {
-				_wrapManager = new WordWrapManager (_model);
-				_model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
-			} else if (!_wordWrap && _wrapManager != null) {
-				_model = _wrapManager.Model;
-			}
-			SetNeedsDisplay ();
-		}
-	}
-
-	/// <summary>
-	/// The bottom offset needed to use a horizontal scrollbar or for another reason.
-	/// This is only needed with the keyboard navigation.
-	/// </summary>
-	public int BottomOffset {
-		get => _bottomOffset;
-		set {
-			if (CurrentRow == Lines - 1 && _bottomOffset > 0 && value == 0) {
-				_topRow = Math.Max (_topRow - _bottomOffset, 0);
-			}
-			_bottomOffset = value;
-			Adjust ();
-		}
-	}
-
-	/// <summary>
-	/// The right offset needed to use a vertical scrollbar or for another reason.
-	/// This is only needed with the keyboard navigation.
-	/// </summary>
-	public int RightOffset {
-		get => _rightOffset;
-		set {
-			if (!_wordWrap && CurrentColumn == GetCurrentLine ().Count && _rightOffset > 0 && value == 0) {
-				_leftColumn = Math.Max (_leftColumn - _rightOffset, 0);
-			}
-			_rightOffset = value;
-			Adjust ();
-		}
-	}
-
-	/// <summary>
-	/// Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView"/>
-	/// creates a new line of text in the view or activates the default button for the Toplevel.
-	/// </summary>
-	public bool AllowsReturn {
-		get => _allowsReturn;
-		set {
-			_allowsReturn = value;
-			if (_allowsReturn && !_multiline) {
-				Multiline = true;
-			}
-			if (!_allowsReturn && _multiline) {
-				Multiline = false;
-				AllowsTab = false;
-			}
-			SetNeedsDisplay ();
-		}
-	}
-
-	/// <summary>
-	/// Gets or sets whether the <see cref="TextView"/> inserts a tab character into the text or ignores
-	/// tab input. If set to `false` and the user presses the tab key (or shift-tab) the focus will move to the
-	/// next view (or previous with shift-tab). The default is `true`; if the user presses the tab key, a tab
-	/// character will be inserted into the text.
-	/// </summary>
-	public bool AllowsTab {
-		get => _allowsTab;
-		set {
-			_allowsTab = value;
-			if (_allowsTab && _tabWidth == 0) {
-				_tabWidth = 4;
-			}
-			if (_allowsTab && !_multiline) {
-				Multiline = true;
-			}
-			if (!_allowsTab && _tabWidth > 0) {
-				_tabWidth = 0;
-			}
-			SetNeedsDisplay ();
-		}
-	}
-
-	/// <summary>
-	/// Gets or sets a value indicating the number of whitespace when pressing the TAB key.
-	/// </summary>
-	public int TabWidth {
-		get => _tabWidth;
-		set {
-			_tabWidth = Math.Max (value, 0);
-			if (_tabWidth > 0 && !AllowsTab) {
-				AllowsTab = true;
-			}
-			SetNeedsDisplay ();
-		}
-	}
-
-	/// <summary>
-	/// Gets or sets a value indicating whether this <see cref="TextView"/> is a multiline text view.
-	/// </summary>
-	public bool Multiline {
-		get => _multiline;
-		set {
-			_multiline = value;
-			if (_multiline && !_allowsTab) {
-				AllowsTab = true;
-			}
-			if (_multiline && !_allowsReturn) {
-				AllowsReturn = true;
-			}
-
-			if (!_multiline) {
-				AllowsReturn = false;
-				AllowsTab = false;
-				WordWrap = false;
-				CurrentColumn = 0;
-				CurrentRow = 0;
-				savedHeight = Height;
-				//var prevLayoutStyle = LayoutStyle;
-				//if (LayoutStyle == LayoutStyle.Computed) {
-				//	LayoutStyle = LayoutStyle.Absolute;
-				//}
-				Height = 1;
-				//LayoutStyle = prevLayoutStyle;
-				if (!IsInitialized) {
-					_model.LoadString (Text);
-				}
-				SetNeedsDisplay ();
-			} else if (_multiline && savedHeight != null) {
-				//var lyout = LayoutStyle;
-				//if (LayoutStyle == LayoutStyle.Computed) {
-				//	LayoutStyle = LayoutStyle.Absolute;
-				//}
-				Height = savedHeight;
-				//LayoutStyle = lyout;
-				SetNeedsDisplay ();
-			}
-		}
-	}
-
-	/// <summary>
-	/// Indicates whatever the text was changed or not.
-	/// <see langword="true"/> if the text was changed <see langword="false"/> otherwise.
-	/// </summary>
-	public bool IsDirty {
-		get => _historyText.IsDirty (Text);
-		set => _historyText.Clear (Text);
-	}
-
-	/// <summary>
-	/// Indicates whatever the text has history changes or not.
-	/// <see langword="true"/> if the text has history changes <see langword="false"/> otherwise.
-	/// </summary>
-	public bool HasHistoryChanges => _historyText.HasHistoryChanges;
-
-	/// <summary>
-	/// Get the <see cref="ContextMenu"/> for this view.
-	/// </summary>
-	public ContextMenu? ContextMenu { get; private set; }
-
-	/// <summary>
-	/// If <see langword="true"/> and the current <see cref="RuneCell.ColorScheme"/> is null
-	/// will inherit from the previous, otherwise if <see langword="false"/> (default) do nothing.
-	/// If the text is load with <see cref="Load(List{RuneCell})"/> this
-	/// property is automatically sets to <see langword="true"/>.
-	/// </summary>
-	public bool InheritsPreviousColorScheme { get; set; }
-
-	/// <summary>
-	/// Gets the current cursor row.
-	/// </summary>
-	public int CurrentRow { get; private set; }
-
-	/// <summary>
-	/// Gets the cursor column.
-	/// </summary>
-	/// <value>The cursor column.</value>
-	public int CurrentColumn { get; private set; }
-
-	/// <summary>
-	/// Gets or sets whether the <see cref="TextView"/> is in read-only mode or not
-	/// </summary>
-	/// <value>Boolean value(Default false)</value>
-	public bool ReadOnly {
-		get => _isReadOnly;
-		set {
-			if (value != _isReadOnly) {
-				_isReadOnly = value;
-
-				SetNeedsDisplay ();
-				Adjust ();
-			}
-		}
-	}
-
-	/// <summary>
-	/// Get / Set the wished cursor when the field is focused
-	/// </summary>
-	public CursorVisibility DesiredCursorVisibility {
-		get => _desiredCursorVisibility;
-		set {
-			if (HasFocus) {
-				Application.Driver.SetCursorVisibility (value);
-			}
-
-			_desiredCursorVisibility = value;
-			SetNeedsDisplay ();
-		}
-	}
-
-	///<inheritdoc/>
-	public override bool CanFocus {
-		get => base.CanFocus;
-		set => base.CanFocus = value;
-	}
-
-	/// <summary>
-	/// Raised when the <see cref="Text"/> property of the <see cref="TextView"/> changes.
-	/// </summary>
-	/// <remarks>
-	/// The <see cref="Text"/> property of <see cref="TextView"/> only changes when it is explicitly
-	/// set, not as the user types. To be notified as the user changes the contents of the TextView
-	/// see <see cref="IsDirty"/>.
-	/// </remarks>
-	public event EventHandler? TextChanged;
-
-	/// <summary>
-	/// Raised when the contents of the <see cref="TextView"/> are changed.
-	/// </summary>
-	/// <remarks>
-	/// Unlike the <see cref="TextChanged"/> event, this event is raised whenever the user types or
-	/// otherwise changes the contents of the <see cref="TextView"/>.
-	/// </remarks>
-	public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
-
-	/// <summary>
-	/// Invoked with the unwrapped <see cref="CursorPosition"/>.
-	/// </summary>
-	public event EventHandler<PointEventArgs>? UnwrappedCursorPosition;
-
-	/// <summary>
-	/// Invoked when the normal color is drawn.
-	/// </summary>
-	public event EventHandler<RuneCellEventArgs>? DrawNormalColor;
-
-	/// <summary>
-	/// Invoked when the selection color is drawn.
-	/// </summary>
-	public event EventHandler<RuneCellEventArgs>? DrawSelectionColor;
-
-	/// <summary>
-	/// Invoked when the ready only color is drawn.
-	/// </summary>
-	public event EventHandler<RuneCellEventArgs>? DrawReadOnlyColor;
-
-	/// <summary>
-	/// Invoked when the used color is drawn. The Used Color is used to indicate
-	/// if the <see cref="Key.InsertChar"/> was pressed and enabled.
-	/// </summary>
-	public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
-
-	void SetInitialProperties ()
+	public TextView ()
 	{
 		CanFocus = true;
 		Used = true;
@@ -2148,7 +1896,8 @@ public class TextView : View {
 			return true;
 		});
 		AddCommand (Command.ShowContextMenu, () => {
-			ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2, CursorPosition.Y - _topRow + 2);
+			ContextMenu!.Position = new Point (CursorPosition.X - _leftColumn + 2,
+				CursorPosition.Y - _topRow + 2);
 			ShowContextMenu ();
 			return true;
 		});
@@ -2200,10 +1949,12 @@ public class TextView : View {
 		KeyBindings.Add (KeyCode.End | KeyCode.ShiftMask, Command.EndOfLineExtend);
 
 		KeyBindings.Add (KeyCode.K | KeyCode.CtrlMask, Command.CutToEndLine); // kill-to-end
-		KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToEndLine); // kill-to-end
+		KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.ShiftMask,
+			Command.CutToEndLine); // kill-to-end
 
 		KeyBindings.Add (KeyCode.K | KeyCode.AltMask, Command.CutToStartLine); // kill-to-start
-		KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.CutToStartLine); // kill-to-start
+		KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask | KeyCode.ShiftMask,
+			Command.CutToStartLine); // kill-to-start
 
 		KeyBindings.Add (KeyCode.Y | KeyCode.CtrlMask, Command.Paste); // Control-y, yank
 		KeyBindings.Add (KeyCode.Space | KeyCode.CtrlMask, Command.ToggleExtend);
@@ -2224,8 +1975,9 @@ public class TextView : View {
 		KeyBindings.Add ('F' + KeyCode.AltMask, Command.WordRight);
 
 		KeyBindings.Add (KeyCode.CursorRight | KeyCode.CtrlMask | KeyCode.ShiftMask, Command.WordRightExtend);
-		KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards);  // kill-word-forwards
-		KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask, Command.KillWordBackwards); // kill-word-backwards
+		KeyBindings.Add (KeyCode.Delete | KeyCode.CtrlMask, Command.KillWordForwards); // kill-word-forwards
+		KeyBindings.Add (KeyCode.Backspace | KeyCode.CtrlMask,
+			Command.KillWordBackwards); // kill-word-backwards
 
 		// BUGBUG: If AllowsReturn is false, Key.Enter should not be bound (so that Toplevel can cause Command.Accept).
 		KeyBindings.Add (KeyCode.Enter, Command.NewLine);
@@ -2258,6 +2010,439 @@ public class TextView : View {
 		KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.ShowContextMenu);
 	}
 
+	/// <summary>
+	///         Provides autocomplete context menu based on suggestions at the current cursor
+	///         position. Configure <see cref="IAutocomplete.SuggestionGenerator" /> to enable this feature
+	/// </summary>
+	public IAutocomplete Autocomplete { get; protected set; } = new TextViewAutocomplete ();
+
+	/// <summary>
+	///         Tracks whether the text view should be considered "used", that is, that the user has moved in the entry,
+	///         so new input should be appended at the cursor position, rather than clearing the entry
+	/// </summary>
+	public bool Used { get; set; }
+
+	/// <summary>
+	///         Sets or gets the text in the <see cref="TextView" />.
+	/// </summary>
+	/// <remarks>
+	///         The <see cref="TextChanged" /> event is fired whenever this property is set. Note, however,
+	///         that Text is not set by <see cref="TextView" /> as the user types.
+	/// </remarks>
+	public override string Text {
+		get {
+			if (_wordWrap) {
+				return _wrapManager!.Model.ToString ();
+			}
+
+			return _model.ToString ();
+		}
+
+		set {
+			ResetPosition ();
+			_model.LoadString (value);
+			if (_wordWrap) {
+				_wrapManager = new WordWrapManager (_model);
+				_model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
+			}
+
+			TextChanged?.Invoke (this, EventArgs.Empty);
+			SetNeedsDisplay ();
+
+			_historyText.Clear (Text);
+		}
+	}
+
+	int _frameWidth => Math.Max (Frame.Width - (RightOffset != 0 ? 2 : 1), 0);
+
+	/// <summary>
+	///         Gets or sets the top row.
+	/// </summary>
+	public int TopRow { get => _topRow; set => _topRow = Math.Max (Math.Min (value, Lines - 1), 0); }
+
+	/// <summary>
+	///         Gets or sets the left column.
+	/// </summary>
+	public int LeftColumn {
+		get => _leftColumn;
+		set {
+			if (value > 0 && _wordWrap) {
+				return;
+			}
+
+			_leftColumn = Math.Max (Math.Min (value, Maxlength - 1), 0);
+		}
+	}
+
+	/// <summary>
+	///         Gets the maximum visible length line.
+	/// </summary>
+	public int Maxlength => _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height, TabWidth);
+
+	/// <summary>
+	///         Gets the number of lines.
+	/// </summary>
+	public int Lines => _model.Count;
+
+	/// <summary>
+	///         Sets or gets the current cursor position.
+	/// </summary>
+	public Point CursorPosition {
+		get => new (CurrentColumn, CurrentRow);
+		set {
+			var line = _model.GetLine (Math.Max (Math.Min (value.Y, _model.Count - 1), 0));
+			CurrentColumn = value.X < 0 ? 0 : value.X > line.Count ? line.Count : value.X;
+			CurrentRow = value.Y < 0
+				? 0
+				: value.Y > _model.Count - 1
+					? Math.Max (_model.Count - 1, 0)
+					: value.Y;
+			SetNeedsDisplay ();
+			Adjust ();
+		}
+	}
+
+	/// <summary>
+	///         Start column position of the selected text.
+	/// </summary>
+	public int SelectionStartColumn {
+		get => _selectionStartColumn;
+		set {
+			var line = _model.GetLine (_selectionStartRow);
+			_selectionStartColumn = value < 0 ? 0 : value > line.Count ? line.Count : value;
+			Selecting = true;
+			SetNeedsDisplay ();
+			Adjust ();
+		}
+	}
+
+	/// <summary>
+	///         Start row position of the selected text.
+	/// </summary>
+	public int SelectionStartRow {
+		get => _selectionStartRow;
+		set {
+			_selectionStartRow = value < 0
+				? 0
+				: value > _model.Count - 1
+					? Math.Max (_model.Count - 1, 0)
+					: value;
+			Selecting = true;
+			SetNeedsDisplay ();
+			Adjust ();
+		}
+	}
+
+	/// <summary>
+	///         The selected text.
+	/// </summary>
+	public string SelectedText {
+		get {
+			if (!Selecting || (_model.Count == 1 && _model.GetLine (0).Count == 0)) {
+				return string.Empty;
+			}
+
+			return GetSelectedRegion ();
+		}
+	}
+
+	/// <summary>
+	///         Length of the selected text.
+	/// </summary>
+	public int SelectedLength => GetSelectedLength ();
+
+	/// <summary>
+	///         Get or sets the selecting.
+	/// </summary>
+	public bool Selecting { get; set; }
+
+	/// <summary>
+	///         Allows word wrap the to fit the available container width.
+	/// </summary>
+	public bool WordWrap {
+		get => _wordWrap;
+		set {
+			if (value == _wordWrap) {
+				return;
+			}
+
+			if (value && !_multiline) {
+				return;
+			}
+
+			_wordWrap = value;
+			ResetPosition ();
+			if (_wordWrap) {
+				_wrapManager = new WordWrapManager (_model);
+				_model = _wrapManager.WrapModel (_frameWidth, out _, out _, out _, out _);
+			} else if (!_wordWrap && _wrapManager != null) {
+				_model = _wrapManager.Model;
+			}
+
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <summary>
+	///         The bottom offset needed to use a horizontal scrollbar or for another reason.
+	///         This is only needed with the keyboard navigation.
+	/// </summary>
+	public int BottomOffset {
+		get => _bottomOffset;
+		set {
+			if (CurrentRow == Lines - 1 && _bottomOffset > 0 && value == 0) {
+				_topRow = Math.Max (_topRow - _bottomOffset, 0);
+			}
+
+			_bottomOffset = value;
+			Adjust ();
+		}
+	}
+
+	/// <summary>
+	///         The right offset needed to use a vertical scrollbar or for another reason.
+	///         This is only needed with the keyboard navigation.
+	/// </summary>
+	public int RightOffset {
+		get => _rightOffset;
+		set {
+			if (!_wordWrap && CurrentColumn == GetCurrentLine ().Count && _rightOffset > 0 && value == 0) {
+				_leftColumn = Math.Max (_leftColumn - _rightOffset, 0);
+			}
+
+			_rightOffset = value;
+			Adjust ();
+		}
+	}
+
+	/// <summary>
+	///         Gets or sets a value indicating whether pressing ENTER in a <see cref="TextView" />
+	///         creates a new line of text in the view or activates the default button for the Toplevel.
+	/// </summary>
+	public bool AllowsReturn {
+		get => _allowsReturn;
+		set {
+			_allowsReturn = value;
+			if (_allowsReturn && !_multiline) {
+				Multiline = true;
+			}
+
+			if (!_allowsReturn && _multiline) {
+				Multiline = false;
+				AllowsTab = false;
+			}
+
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <summary>
+	///         Gets or sets whether the <see cref="TextView" /> inserts a tab character into the text or ignores
+	///         tab input. If set to `false` and the user presses the tab key (or shift-tab) the focus will move to the
+	///         next view (or previous with shift-tab). The default is `true`; if the user presses the tab key, a tab
+	///         character will be inserted into the text.
+	/// </summary>
+	public bool AllowsTab {
+		get => _allowsTab;
+		set {
+			_allowsTab = value;
+			if (_allowsTab && _tabWidth == 0) {
+				_tabWidth = 4;
+			}
+
+			if (_allowsTab && !_multiline) {
+				Multiline = true;
+			}
+
+			if (!_allowsTab && _tabWidth > 0) {
+				_tabWidth = 0;
+			}
+
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <summary>
+	///         Gets or sets a value indicating the number of whitespace when pressing the TAB key.
+	/// </summary>
+	public int TabWidth {
+		get => _tabWidth;
+		set {
+			_tabWidth = Math.Max (value, 0);
+			if (_tabWidth > 0 && !AllowsTab) {
+				AllowsTab = true;
+			}
+
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <summary>
+	///         Gets or sets a value indicating whether this <see cref="TextView" /> is a multiline text view.
+	/// </summary>
+	public bool Multiline {
+		get => _multiline;
+		set {
+			_multiline = value;
+			if (_multiline && !_allowsTab) {
+				AllowsTab = true;
+			}
+
+			if (_multiline && !_allowsReturn) {
+				AllowsReturn = true;
+			}
+
+			if (!_multiline) {
+				AllowsReturn = false;
+				AllowsTab = false;
+				WordWrap = false;
+				CurrentColumn = 0;
+				CurrentRow = 0;
+				_savedHeight = Height;
+				//var prevLayoutStyle = LayoutStyle;
+				//if (LayoutStyle == LayoutStyle.Computed) {
+				//	LayoutStyle = LayoutStyle.Absolute;
+				//}
+				Height = 1;
+				//LayoutStyle = prevLayoutStyle;
+				if (!IsInitialized) {
+					_model.LoadString (Text);
+				}
+
+				SetNeedsDisplay ();
+			} else if (_multiline && _savedHeight != null) {
+				//var lyout = LayoutStyle;
+				//if (LayoutStyle == LayoutStyle.Computed) {
+				//	LayoutStyle = LayoutStyle.Absolute;
+				//}
+				Height = _savedHeight;
+				//LayoutStyle = lyout;
+				SetNeedsDisplay ();
+			}
+		}
+	}
+
+	/// <summary>
+	///         Indicates whatever the text was changed or not.
+	///         <see langword="true" /> if the text was changed <see langword="false" /> otherwise.
+	/// </summary>
+	public bool IsDirty {
+		get => _historyText.IsDirty (Text);
+		set => _historyText.Clear (Text);
+	}
+
+	/// <summary>
+	///         Indicates whatever the text has history changes or not.
+	///         <see langword="true" /> if the text has history changes <see langword="false" /> otherwise.
+	/// </summary>
+	public bool HasHistoryChanges => _historyText.HasHistoryChanges;
+
+	/// <summary>
+	///         Get the <see cref="ContextMenu" /> for this view.
+	/// </summary>
+	public ContextMenu? ContextMenu { get; }
+
+	/// <summary>
+	///         If <see langword="true" /> and the current <see cref="RuneCell.ColorScheme" /> is null
+	///         will inherit from the previous, otherwise if <see langword="false" /> (default) do nothing.
+	///         If the text is load with <see cref="Load(List{RuneCell})" /> this
+	///         property is automatically sets to <see langword="true" />.
+	/// </summary>
+	public bool InheritsPreviousColorScheme { get; set; }
+
+	/// <summary>
+	///         Gets the current cursor row.
+	/// </summary>
+	public int CurrentRow { get; private set; }
+
+	/// <summary>
+	///         Gets the cursor column.
+	/// </summary>
+	/// <value>The cursor column.</value>
+	public int CurrentColumn { get; private set; }
+
+	/// <summary>
+	///         Gets or sets whether the <see cref="TextView" /> is in read-only mode or not
+	/// </summary>
+	/// <value>Boolean value(Default false)</value>
+	public bool ReadOnly {
+		get => _isReadOnly;
+		set {
+			if (value != _isReadOnly) {
+				_isReadOnly = value;
+
+				SetNeedsDisplay ();
+				Adjust ();
+			}
+		}
+	}
+
+	/// <summary>
+	///         Get / Set the wished cursor when the field is focused
+	/// </summary>
+	public CursorVisibility DesiredCursorVisibility {
+		get => _desiredCursorVisibility;
+		set {
+			if (HasFocus) {
+				Application.Driver.SetCursorVisibility (value);
+			}
+
+			_desiredCursorVisibility = value;
+			SetNeedsDisplay ();
+		}
+	}
+
+	/// <inheritdoc />
+	public override bool CanFocus {
+		get => base.CanFocus;
+		set => base.CanFocus = value;
+	}
+
+	/// <summary>
+	///         Raised when the <see cref="Text" /> property of the <see cref="TextView" /> changes.
+	/// </summary>
+	/// <remarks>
+	///         The <see cref="Text" /> property of <see cref="TextView" /> only changes when it is explicitly
+	///         set, not as the user types. To be notified as the user changes the contents of the TextView
+	///         see <see cref="IsDirty" />.
+	/// </remarks>
+	public event EventHandler? TextChanged;
+
+	/// <summary>
+	///         Raised when the contents of the <see cref="TextView" /> are changed.
+	/// </summary>
+	/// <remarks>
+	///         Unlike the <see cref="TextChanged" /> event, this event is raised whenever the user types or
+	///         otherwise changes the contents of the <see cref="TextView" />.
+	/// </remarks>
+	public event EventHandler<ContentsChangedEventArgs>? ContentsChanged;
+
+	/// <summary>
+	///         Invoked with the unwrapped <see cref="CursorPosition" />.
+	/// </summary>
+	public event EventHandler<PointEventArgs>? UnwrappedCursorPosition;
+
+	/// <summary>
+	///         Invoked when the normal color is drawn.
+	/// </summary>
+	public event EventHandler<RuneCellEventArgs>? DrawNormalColor;
+
+	/// <summary>
+	///         Invoked when the selection color is drawn.
+	/// </summary>
+	public event EventHandler<RuneCellEventArgs>? DrawSelectionColor;
+
+	/// <summary>
+	///         Invoked when the ready only color is drawn.
+	/// </summary>
+	public event EventHandler<RuneCellEventArgs>? DrawReadOnlyColor;
+
+	/// <summary>
+	///         Invoked when the used color is drawn. The Used Color is used to indicate
+	///         if the <see cref="Key.InsertChar" /> was pressed and enabled.
+	/// </summary>
+	public event EventHandler<RuneCellEventArgs>? DrawUsedColor;
+
 	void TextView_LayoutComplete (object? sender, LayoutEventArgs e)
 	{
 		WrapTextModel ();
@@ -2265,16 +2450,19 @@ public class TextView : View {
 	}
 
 	MenuBarItem BuildContextMenuBarItem () => new (new MenuItem [] {
-		new (Strings.ctxSelectAll, "", () => SelectAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)),
-		new (Strings.ctxDeleteAll, "", () => DeleteAll (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
-		new (Strings.ctxCopy, "", () => Copy (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Copy)),
-		new (Strings.ctxCut, "", () => Cut (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Cut)),
-		new (Strings.ctxPaste, "", () => Paste (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Paste)),
-		new (Strings.ctxUndo, "", () => Undo (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Undo)),
-		new (Strings.ctxRedo, "", () => Redo (), null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo))
+		new(Strings.ctxSelectAll, "", SelectAll, null, null,
+			(KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)),
+		new(Strings.ctxDeleteAll, "", DeleteAll, null, null,
+			(KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)),
+		new(Strings.ctxCopy, "", Copy, null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Copy)),
+		new(Strings.ctxCut, "", Cut, null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Cut)),
+		new(Strings.ctxPaste, "", Paste, null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Paste)),
+		new(Strings.ctxUndo, "", Undo, null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Undo)),
+		new(Strings.ctxRedo, "", Redo, null, null, (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo))
 	});
 
-	void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) => KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+	void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) =>
+		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 
 	void Model_LinesLoaded (object sender, EventArgs e)
 	{
@@ -2305,6 +2493,7 @@ public class TextView : View {
 				} else {
 					offset = obj.RemovedOnAdded.Lines.Count - 1;
 				}
+
 				for (var i = 0; i < offset; i++) {
 					if (Lines > obj.RemovedOnAdded.CursorPosition.Y) {
 						_model.RemoveLine (obj.RemovedOnAdded.CursorPosition.Y);
@@ -2317,11 +2506,13 @@ public class TextView : View {
 			for (var i = 0; i < obj.Lines.Count; i++) {
 				if (i == 0) {
 					_model.ReplaceLine (startLine, obj.Lines [i]);
-				} else if (obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed || !obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added) {
+				} else if ((obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Removed) ||
+					   (!obj.IsUndoing && obj.LineStatus == HistoryText.LineStatus.Added)) {
 					_model.AddLine (startLine, obj.Lines [i]);
 				} else if (Lines > obj.CursorPosition.Y + 1) {
 					_model.RemoveLine (obj.CursorPosition.Y + 1);
 				}
+
 				startLine++;
 			}
 
@@ -2341,12 +2532,15 @@ public class TextView : View {
 			Application.Top.AlternateForwardKeyChanged += Top_AlternateForwardKeyChanged!;
 			Application.Top.AlternateBackwardKeyChanged += Top_AlternateBackwardKeyChanged!;
 		}
+
 		OnContentsChanged ();
 	}
 
-	void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) => KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+	void Top_AlternateBackwardKeyChanged (object sender, KeyChangedEventArgs e) =>
+		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 
-	void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) => KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
+	void Top_AlternateForwardKeyChanged (object sender, KeyChangedEventArgs e) =>
+		KeyBindings.Replace ((KeyCode)e.OldKey, (KeyCode)e.NewKey);
 
 	void ResetPosition ()
 	{
@@ -2380,6 +2574,7 @@ public class TextView : View {
 			if (_savedCursorVisibility == 0) {
 				_savedCursorVisibility = _desiredCursorVisibility;
 			}
+
 			DesiredCursorVisibility = CursorVisibility.Invisible;
 		}
 	}
@@ -2393,7 +2588,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Loads the contents of the file into the <see cref="TextView"/>.
+	///         Loads the contents of the file into the <see cref="TextView" />.
 	/// </summary>
 	/// <returns><c>true</c>, if file was loaded, <c>false</c> otherwise.</returns>
 	/// <param name="path">Path to the file to load.</param>
@@ -2411,12 +2606,13 @@ public class TextView : View {
 			SetNeedsDisplay ();
 			Adjust ();
 		}
+
 		UpdateWrapModel ();
 		return res;
 	}
 
 	/// <summary>
-	/// Loads the contents of the stream into the <see cref="TextView"/>.
+	///         Loads the contents of the stream into the <see cref="TextView" />.
 	/// </summary>
 	/// <returns><c>true</c>, if stream was loaded, <c>false</c> otherwise.</returns>
 	/// <param name="stream">Stream to load the contents from.</param>
@@ -2431,7 +2627,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Loads the contents of the <see cref="RuneCell"/> list into the <see cref="TextView"/>.
+	///         Loads the contents of the <see cref="RuneCell" /> list into the <see cref="TextView" />.
 	/// </summary>
 	/// <param name="cells">Rune cells list to load the contents from.</param>
 	public void Load (List<RuneCell> cells)
@@ -2446,7 +2642,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Loads the contents of the list of <see cref="RuneCell"/> list into the <see cref="TextView"/>.
+	///         Loads the contents of the list of <see cref="RuneCell" /> list into the <see cref="TextView" />.
 	/// </summary>
 	/// <param name="cellsList">List of rune cells list to load the contents from.</param>
 	public void Load (List<List<RuneCell>> cellsList)
@@ -2461,7 +2657,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Closes the contents of the stream into the <see cref="TextView"/>.
+	///         Closes the contents of the stream into the <see cref="TextView" />.
 	/// </summary>
 	/// <returns><c>true</c>, if stream was closed, <c>false</c> otherwise.</returns>
 	public bool CloseFile ()
@@ -2475,7 +2671,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Positions the cursor on the current row and column
+	///         Positions the cursor on the current row and column
 	/// </summary>
 	public override void PositionCursor ()
 	{
@@ -2492,6 +2688,7 @@ public class TextView : View {
 			//SetNeedsDisplay (new Rect (0, minRow, Frame.Width, maxRow));
 			SetNeedsDisplay ();
 		}
+
 		var line = _model.GetLine (CurrentRow);
 		var col = 0;
 		if (line.Count > 0) {
@@ -2499,19 +2696,23 @@ public class TextView : View {
 				if (idx >= CurrentColumn) {
 					break;
 				}
+
 				var cols = line [idx].Rune.GetColumns ();
 				if (line [idx].Rune.Value == '\t') {
 					cols += TabWidth + 1;
 				}
+
 				if (!TextModel.SetCol (ref col, Frame.Width, cols)) {
 					col = CurrentColumn;
 					break;
 				}
 			}
 		}
+
 		var posX = CurrentColumn - _leftColumn;
 		var posY = CurrentRow - _topRow;
-		if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset && _topRow <= CurrentRow && posY < Frame.Height - BottomOffset) {
+		if (posX > -1 && col >= posX && posX < Frame.Width - RightOffset && _topRow <= CurrentRow &&
+		    posY < Frame.Height - BottomOffset) {
 			ResetCursorVisibility ();
 			Move (col, CurrentRow - _topRow);
 		} else {
@@ -2529,27 +2730,29 @@ public class TextView : View {
 		}
 	}
 
-	/// <inheritdoc/>
+	/// <inheritdoc />
 	public override Attribute GetNormalColor ()
 	{
 		var cs = ColorScheme;
 		if (ColorScheme == null) {
 			cs = new ColorScheme ();
 		}
+
 		return Enabled ? cs.Focus : cs.Disabled;
 	}
 
 	/// <summary>
-	/// Sets the driver to the default color for the control where no text is being rendered. Defaults to
-	/// <see cref="ColorScheme.Normal"/>.
+	///         Sets the driver to the default color for the control where no text is being rendered. Defaults to
+	///         <see cref="ColorScheme.Normal" />.
 	/// </summary>
 	protected virtual void SetNormalColor () => Driver.SetAttribute (GetNormalColor ());
 
 	/// <summary>
-	/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
-	/// current <paramref name="line"/>. Override to provide custom coloring by calling
-	/// <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
-	/// Defaults to <see cref="ColorScheme.Normal"/>.
+	///         Sets the <see cref="View.Driver" /> to an appropriate color for rendering the given <paramref name="idxCol" />
+	///         of the
+	///         current <paramref name="line" />. Override to provide custom coloring by calling
+	///         <see cref="ConsoleDriver.SetAttribute(Attribute)" />
+	///         Defaults to <see cref="ColorScheme.Normal" />.
 	/// </summary>
 	/// <param name="line">The line.</param>
 	/// <param name="idxCol">The col index.</param>
@@ -2569,10 +2772,11 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
-	/// current <paramref name="line"/>. Override to provide custom coloring by calling
-	/// <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
-	/// Defaults to <see cref="ColorScheme.Focus"/>.
+	///         Sets the <see cref="View.Driver" /> to an appropriate color for rendering the given <paramref name="idxCol" />
+	///         of the
+	///         current <paramref name="line" />. Override to provide custom coloring by calling
+	///         <see cref="ConsoleDriver.SetAttribute(Attribute)" />
+	///         Defaults to <see cref="ColorScheme.Focus" />.
 	/// </summary>
 	/// <param name="line">The line.</param>
 	/// <param name="idxCol">The col index.</param>
@@ -2586,17 +2790,20 @@ public class TextView : View {
 
 		if (line [idxCol].ColorScheme != null) {
 			var colorScheme = line [idxCol].ColorScheme;
-			Driver.SetAttribute (new Attribute (colorScheme!.Focus.Background, colorScheme.Focus.Foreground));
+			Driver.SetAttribute (
+				new Attribute (colorScheme!.Focus.Background, colorScheme.Focus.Foreground));
 		} else {
-			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground));
+			Driver.SetAttribute (new Attribute (ColorScheme.Focus.Background,
+				ColorScheme.Focus.Foreground));
 		}
 	}
 
 	/// <summary>
-	/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
-	/// current <paramref name="line"/>. Override to provide custom coloring by calling
-	/// <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
-	/// Defaults to <see cref="ColorScheme.Focus"/>.
+	///         Sets the <see cref="View.Driver" /> to an appropriate color for rendering the given <paramref name="idxCol" />
+	///         of the
+	///         current <paramref name="line" />. Override to provide custom coloring by calling
+	///         <see cref="ConsoleDriver.SetAttribute(Attribute)" />
+	///         Defaults to <see cref="ColorScheme.Focus" />.
 	/// </summary>
 	/// <param name="line">The line.</param>
 	/// <param name="idxCol">The col index.</param>
@@ -2615,14 +2822,16 @@ public class TextView : View {
 		} else {
 			attribute = new Attribute (colorScheme.Disabled.Foreground, colorScheme.Focus.Background);
 		}
+
 		Driver.SetAttribute (attribute);
 	}
 
 	/// <summary>
-	/// Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/> of the
-	/// current <paramref name="line"/>. Override to provide custom coloring by calling
-	/// <see cref="ConsoleDriver.SetAttribute(Attribute)"/>
-	/// Defaults to <see cref="ColorScheme.HotFocus"/>.
+	///         Sets the <see cref="View.Driver" /> to an appropriate color for rendering the given <paramref name="idxCol" />
+	///         of the
+	///         current <paramref name="line" />. Override to provide custom coloring by calling
+	///         <see cref="ConsoleDriver.SetAttribute(Attribute)" />
+	///         Defaults to <see cref="ColorScheme.HotFocus" />.
 	/// </summary>
 	/// <param name="line">The line.</param>
 	/// <param name="idxCol">The col index.</param>
@@ -2647,7 +2856,7 @@ public class TextView : View {
 		//if ((colorScheme!.HotNormal.Foreground & colorScheme.Focus.Background) == colorScheme.Focus.Foreground) {
 		Driver.SetAttribute (new Attribute (colorScheme.Focus.Background, colorScheme.Focus.Foreground));
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnEnter (View view)
 	{
 		//TODO: Improve it by handling read only mode of the text field
@@ -2656,7 +2865,7 @@ public class TextView : View {
 		return base.OnEnter (view);
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnLeave (View view)
 	{
 		if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
@@ -2668,21 +2877,22 @@ public class TextView : View {
 
 	// Returns an encoded region start..end (top 32 bits are the row, low32 the column)
 	void GetEncodedRegionBounds (out long start,
-				     out long end,
-				     int? startRow = null,
-				     int? startCol = null,
-				     int? cRow = null,
-				     int? cCol = null)
+		out long end,
+		int? startRow = null,
+		int? startCol = null,
+		int? cRow = null,
+		int? cCol = null)
 	{
 		long selection;
 		long point;
 		if (startRow == null || startCol == null || cRow == null || cCol == null) {
-			selection = (long)(uint)_selectionStartRow << 32 | (uint)_selectionStartColumn;
-			point = (long)(uint)CurrentRow << 32 | (uint)CurrentColumn;
+			selection = ((long)(uint)_selectionStartRow << 32) | (uint)_selectionStartColumn;
+			point = ((long)(uint)CurrentRow << 32) | (uint)CurrentColumn;
 		} else {
-			selection = (long)(uint)startRow << 32 | (uint)startCol;
-			point = (long)(uint)cRow << 32 | (uint)cCol;
+			selection = ((long)(uint)startRow << 32) | (uint)startCol;
+			point = ((long)(uint)cRow << 32) | (uint)cCol;
 		}
+
 		if (selection > point) {
 			start = point;
 			end = selection;
@@ -2696,7 +2906,7 @@ public class TextView : View {
 	{
 		long start, end;
 		GetEncodedRegionBounds (out start, out end);
-		var q = (long)(uint)row << 32 | (uint)col;
+		var q = ((long)(uint)row << 32) | (uint)col;
 		return q >= start && q <= end - 1;
 	}
 
@@ -2704,13 +2914,15 @@ public class TextView : View {
 	// Returns a string with the text in the selected 
 	// region.
 	//
-	string GetRegion (int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null, TextModel? model = null)
+	string GetRegion (int? sRow = null, int? sCol = null, int? cRow = null, int? cCol = null,
+		TextModel? model = null)
 	{
 		long start, end;
 		GetEncodedRegionBounds (out start, out end, sRow, sCol, cRow, cCol);
 		if (start == end) {
 			return string.Empty;
 		}
+
 		var startRow = (int)(start >> 32);
 		var maxrow = (int)(end >> 32);
 		var startCol = (int)(start & 0xffffffff);
@@ -2727,8 +2939,10 @@ public class TextView : View {
 			res = res +
 			      Environment.NewLine +
 			      StringFromRunes (model == null
-				      ? _model.GetLine (row) : model.GetLine (row));
+				      ? _model.GetLine (row)
+				      : model.GetLine (row));
 		}
+
 		line = model == null ? _model.GetLine (maxrow) : model.GetLine (maxrow);
 		res = res + Environment.NewLine + StringFromRunes (line.GetRange (0, endCol));
 		return res;
@@ -2742,7 +2956,7 @@ public class TextView : View {
 		SetWrapModel ();
 
 		long start, end;
-		var currentEncoded = (long)(uint)CurrentRow << 32 | (uint)CurrentColumn;
+		var currentEncoded = ((long)(uint)CurrentRow << 32) | (uint)CurrentColumn;
 		GetEncodedRegionBounds (out start, out end);
 		var startRow = (int)(start >> 32);
 		var maxrow = (int)(end >> 32);
@@ -2767,7 +2981,8 @@ public class TextView : View {
 				SetNeedsDisplay ();
 			}
 
-			_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition, HistoryText.LineStatus.Removed);
+			_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition,
+				HistoryText.LineStatus.Removed);
 
 			UpdateWrapModel ();
 
@@ -2780,14 +2995,15 @@ public class TextView : View {
 		var line2 = _model.GetLine (maxrow);
 		line.AddRange (line2.Skip (endCol));
 		for (var row = startRow + 1; row <= maxrow; row++) {
-
 			removedLines.Add (new List<RuneCell> (_model.GetLine (startRow + 1)));
 
 			_model.RemoveLine (startRow + 1);
 		}
+
 		if (currentEncoded == end) {
 			CurrentRow -= maxrow - startRow;
 		}
+
 		CurrentColumn = startCol;
 
 		_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition,
@@ -2799,7 +3015,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Select all text.
+	///         Select all text.
 	/// </summary>
 	public void SelectAll ()
 	{
@@ -2816,7 +3032,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Find the next text based on the match case with the option to replace it.
+	///         Find the next text based on the match case with the option to replace it.
 	/// </summary>
 	/// <param name="textToFind">The text to find.</param>
 	/// <param name="gaveFullTurn"><c>true</c>If all the text was forward searched.<c>false</c>otherwise.</param>
@@ -2826,11 +3042,11 @@ public class TextView : View {
 	/// <param name="replace"><c>true</c>If is replacing.<c>false</c>otherwise.</param>
 	/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 	public bool FindNextText (string textToFind,
-				  out bool gaveFullTurn,
-				  bool matchCase = false,
-				  bool matchWholeWord = false,
-				  string? textToReplace = null,
-				  bool replace = false)
+		out bool gaveFullTurn,
+		bool matchCase = false,
+		bool matchWholeWord = false,
+		string? textToReplace = null,
+		bool replace = false)
 	{
 		if (_model.Count == 0) {
 			gaveFullTurn = false;
@@ -2845,7 +3061,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Find the previous text based on the match case with the option to replace it.
+	///         Find the previous text based on the match case with the option to replace it.
 	/// </summary>
 	/// <param name="textToFind">The text to find.</param>
 	/// <param name="gaveFullTurn"><c>true</c>If all the text was backward searched.<c>false</c>otherwise.</param>
@@ -2855,11 +3071,11 @@ public class TextView : View {
 	/// <param name="replace"><c>true</c>If the text was found.<c>false</c>otherwise.</param>
 	/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 	public bool FindPreviousText (string textToFind,
-				      out bool gaveFullTurn,
-				      bool matchCase = false,
-				      bool matchWholeWord = false,
-				      string? textToReplace = null,
-				      bool replace = false)
+		out bool gaveFullTurn,
+		bool matchCase = false,
+		bool matchWholeWord = false,
+		string? textToReplace = null,
+		bool replace = false)
 	{
 		if (_model.Count == 0) {
 			gaveFullTurn = false;
@@ -2874,12 +3090,12 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Reset the flag to stop continuous find.
+	///         Reset the flag to stop continuous find.
 	/// </summary>
 	public void FindTextChanged () => _continuousFind = false;
 
 	/// <summary>
-	/// Replaces all the text based on the match case.
+	///         Replaces all the text based on the match case.
 	/// </summary>
 	/// <param name="textToFind">The text to find.</param>
 	/// <param name="matchCase">The match case setting.</param>
@@ -2887,9 +3103,9 @@ public class TextView : View {
 	/// <param name="textToReplace">The text to replace.</param>
 	/// <returns><c>true</c>If the text was found.<c>false</c>otherwise.</returns>
 	public bool ReplaceAllText (string textToFind,
-				    bool matchCase = false,
-				    bool matchWholeWord = false,
-				    string? textToReplace = null)
+		bool matchCase = false,
+		bool matchWholeWord = false,
+		string? textToReplace = null)
 	{
 		if (_isReadOnly || _model.Count == 0) {
 			return false;
@@ -2903,10 +3119,10 @@ public class TextView : View {
 	}
 
 	bool SetFoundText (string text,
-			   (Point current, bool found) foundPos,
-			   string? textToReplace = null,
-			   bool replace = false,
-			   bool replaceAll = false)
+		(Point current, bool found) foundPos,
+		string? textToReplace = null,
+		bool replace = false,
+		bool replaceAll = false)
 	{
 		if (foundPos.found) {
 			StartSelecting ();
@@ -2917,6 +3133,7 @@ public class TextView : View {
 			} else {
 				CurrentColumn = _selectionStartColumn + textToReplace!.GetRuneCount ();
 			}
+
 			CurrentRow = foundPos.current.Y;
 			if (!_isReadOnly && replace) {
 				Adjust ();
@@ -2929,9 +3146,11 @@ public class TextView : View {
 				SetNeedsDisplay ();
 				Adjust ();
 			}
+
 			_continuousFind = true;
 			return foundPos.found;
 		}
+
 		UpdateWrapModel ();
 		_continuousFind = false;
 
@@ -2948,7 +3167,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Restore from original model.
+	///         Restore from original model.
 	/// </summary>
 	void SetWrapModel ([CallerMemberName] string? caller = null)
 	{
@@ -2961,14 +3180,15 @@ public class TextView : View {
 
 			CurrentColumn = _wrapManager!.GetModelColFromWrappedLines (CurrentRow, CurrentColumn);
 			CurrentRow = _wrapManager.GetModelLineFromWrappedLines (CurrentRow);
-			_selectionStartColumn = _wrapManager.GetModelColFromWrappedLines (_selectionStartRow, _selectionStartColumn);
+			_selectionStartColumn =
+				_wrapManager.GetModelColFromWrappedLines (_selectionStartRow, _selectionStartColumn);
 			_selectionStartRow = _wrapManager.GetModelLineFromWrappedLines (_selectionStartRow);
 			_model = _wrapManager.Model;
 		}
 	}
 
 	/// <summary>
-	/// Update the original model.
+	///         Update the original model.
 	/// </summary>
 	void UpdateWrapModel ([CallerMemberName] string? caller = null)
 	{
@@ -2991,13 +3211,15 @@ public class TextView : View {
 
 			SetNeedsDisplay ();
 		}
+
 		if (_currentCaller != null) {
-			throw new InvalidOperationException ($"WordWrap settings was changed after the {_currentCaller} call.");
+			throw new InvalidOperationException (
+				$"WordWrap settings was changed after the {_currentCaller} call.");
 		}
 	}
 
 	/// <summary>
-	/// Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.
+	///         Invoke the <see cref="UnwrappedCursorPosition" /> event with the unwrapped <see cref="CursorPosition" />.
 	/// </summary>
 	public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
 	{
@@ -3007,6 +3229,7 @@ public class TextView : View {
 			row = _wrapManager!.GetModelLineFromWrappedLines (CurrentRow);
 			col = _wrapManager.GetModelColFromWrappedLines (CurrentRow, CurrentColumn);
 		}
+
 		UnwrappedCursorPosition?.Invoke (this, new PointEventArgs (new Point ((int)col, (int)row)));
 	}
 
@@ -3024,11 +3247,12 @@ public class TextView : View {
 			startCol = _wrapManager.GetModelColFromWrappedLines (_selectionStartRow, _selectionStartColumn);
 			model = _wrapManager.Model;
 		}
+
 		OnUnwrappedCursorPosition (cRow, cCol);
 		return GetRegion (startRow, startCol, cRow, cCol, model);
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override void OnDrawContent (Rect contentArea)
 	{
 		_isDrawing = true;
@@ -3050,7 +3274,8 @@ public class TextView : View {
 				var cols = rune.GetColumns ();
 				if (idxCol < line.Count && Selecting && PointInSelection (idxCol, idxRow)) {
 					OnDrawSelectionColor (line, idxCol, idxRow);
-				} else if (idxCol == CurrentColumn && idxRow == CurrentRow && !Selecting && !Used && HasFocus && idxCol < lineRuneCount) {
+				} else if (idxCol == CurrentColumn && idxRow == CurrentRow && !Selecting && !Used &&
+					   HasFocus && idxCol < lineRuneCount) {
 					OnDrawUsedColor (line, idxCol, idxRow);
 				} else if (ReadOnly) {
 					OnDrawReadOnlyColor (line, idxCol, idxRow);
@@ -3063,6 +3288,7 @@ public class TextView : View {
 					if (col + cols > right) {
 						cols = right - col;
 					}
+
 					for (var i = 0; i < cols; i++) {
 						if (col + i < right) {
 							AddRune (col + i, row, (Rune)' ');
@@ -3071,19 +3297,24 @@ public class TextView : View {
 				} else {
 					AddRune (col, row, rune);
 				}
+
 				if (!TextModel.SetCol (ref col, contentArea.Right, cols)) {
 					break;
 				}
+
 				if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Rune.GetColumns () > right) {
 					break;
 				}
 			}
+
 			if (col < right) {
 				SetNormalColor ();
 				ClearRegion (col, row, right, row + 1);
 			}
+
 			row++;
 		}
+
 		if (row < bottom) {
 			SetNormalColor ();
 			ClearRegion (contentArea.Left, row, right, bottom);
@@ -3097,8 +3328,10 @@ public class TextView : View {
 	(int Row, int Col) GetUnwrappedPosition (int line, int col)
 	{
 		if (WordWrap) {
-			return new ValueTuple<int, int> (_wrapManager!.GetModelLineFromWrappedLines (line), _wrapManager.GetModelColFromWrappedLines (line, col));
+			return new ValueTuple<int, int> (_wrapManager!.GetModelLineFromWrappedLines (line),
+				_wrapManager.GetModelColFromWrappedLines (line, col));
 		}
+
 		return new ValueTuple<int, int> (line, col);
 	}
 
@@ -3107,10 +3340,12 @@ public class TextView : View {
 		if (_isDrawing) {
 			return;
 		}
+
 		if (_clickWithSelecting) {
 			_clickWithSelecting = false;
 			return;
 		}
+
 		if (SelectedLength > 0) {
 			return;
 		}
@@ -3147,18 +3382,19 @@ public class TextView : View {
 	void AppendClipboard (string text) => Clipboard.Contents += text;
 
 	/// <summary>
-	/// Inserts the given <paramref name="toAdd"/> text at the current cursor position
-	/// exactly as if the user had just typed it
+	///         Inserts the given <paramref name="toAdd" /> text at the current cursor position
+	///         exactly as if the user had just typed it
 	/// </summary>
 	/// <param name="toAdd">Text to add</param>
 	public void InsertText (string toAdd)
 	{
-		foreach (char ch in toAdd) {
+		foreach (var ch in toAdd) {
 			Key key;
 			try {
 				key = new Key (ch);
 			} catch (Exception) {
-				throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
+				throw new ArgumentException (
+					$"Cannot insert character '{ch}' because it does not map to a Key");
 			}
 
 			InsertText (key);
@@ -3180,8 +3416,10 @@ public class TextView : View {
 			if (CurrentColumn < line.Count) {
 				line.RemoveAt (CurrentColumn);
 			}
+
 			line.Insert (Math.Min (CurrentColumn, line.Count), cell);
 		}
+
 		var prow = CurrentRow - _topRow;
 		if (!_wrapNeeded) {
 			// BUGBUG: customized rect aren't supported now because the Redraw isn't using the Intersect method.
@@ -3195,35 +3433,38 @@ public class TextView : View {
 		if (cells == null) {
 			throw new ArgumentNullException (nameof (cells));
 		}
+
 		var size = 0;
 		foreach (var cell in cells) {
 			size += cell.Rune.GetEncodingLength ();
 		}
+
 		var encoded = new byte [size];
 		var offset = 0;
 		foreach (var cell in cells) {
 			offset += cell.Rune.Encode (encoded, offset);
 		}
+
 		return StringExtensions.ToString (encoded);
 	}
 
 	/// <summary>
-	/// Returns the characters on the current line (where the cursor is positioned).
-	/// Use <see cref="CurrentColumn"/> to determine the position of the cursor within
-	/// that line
+	///         Returns the characters on the current line (where the cursor is positioned).
+	///         Use <see cref="CurrentColumn" /> to determine the position of the cursor within
+	///         that line
 	/// </summary>
 	/// <returns></returns>
 	public List<RuneCell> GetCurrentLine () => _model.GetLine (CurrentRow);
 
 	/// <summary>
-	/// Returns the characters on the <paramref name="line"/>.
+	///         Returns the characters on the <paramref name="line" />.
 	/// </summary>
 	/// <param name="line">The intended line.</param>
 	/// <returns></returns>
 	public List<RuneCell> GetLine (int line) => _model.GetLine (line);
 
 	/// <summary>
-	/// Gets all lines of characters.
+	///         Gets all lines of characters.
 	/// </summary>
 	/// <returns></returns>
 	public List<List<RuneCell>> GetAllLines () => _model.GetAllLines ();
@@ -3257,6 +3498,7 @@ public class TextView : View {
 			if (!_wordWrap && CurrentColumn - _leftColumn > Frame.Width) {
 				_leftColumn = Math.Max (CurrentColumn - Frame.Width + 1, 0);
 			}
+
 			if (_wordWrap) {
 				SetNeedsDisplay ();
 			} else {
@@ -3328,6 +3570,7 @@ public class TextView : View {
 		} else if (CurrentColumn > line.Count) {
 			CurrentColumn = line.Count;
 		}
+
 		Adjust ();
 	}
 
@@ -3341,11 +3584,13 @@ public class TextView : View {
 		if (!_wordWrap && CurrentColumn < _leftColumn) {
 			_leftColumn = CurrentColumn;
 			need = true;
-		} else if (!_wordWrap && (CurrentColumn - _leftColumn + RightOffset > Frame.Width + offB.width || dSize.size + RightOffset >= Frame.Width + offB.width)) {
+		} else if (!_wordWrap && (CurrentColumn - _leftColumn + RightOffset > Frame.Width + offB.width ||
+					  dSize.size + RightOffset >= Frame.Width + offB.width)) {
 			_leftColumn = TextModel.CalculateLeftColumn (line, _leftColumn, CurrentColumn,
 				Frame.Width + offB.width - RightOffset, TabWidth);
 			need = true;
-		} else if (_wordWrap && _leftColumn > 0 || dSize.size + RightOffset < Frame.Width + offB.width && tSize.size + RightOffset < Frame.Width + offB.width) {
+		} else if ((_wordWrap && _leftColumn > 0) || (dSize.size + RightOffset < Frame.Width + offB.width &&
+							      tSize.size + RightOffset < Frame.Width + offB.width)) {
 			if (_leftColumn > 0) {
 				_leftColumn = 0;
 				need = true;
@@ -3362,11 +3607,13 @@ public class TextView : View {
 			_topRow = Math.Max (_topRow - 1, 0);
 			need = true;
 		}
+
 		if (need) {
 			if (_wrapNeeded) {
 				WrapTextModel ();
 				_wrapNeeded = false;
 			}
+
 			SetNeedsDisplay ();
 		} else {
 			PositionCursor ();
@@ -3376,8 +3623,8 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Called when the contents of the TextView change. E.g. when the user types text or deletes text. Raises
-	/// the <see cref="ContentsChanged"/> event.
+	///         Called when the contents of the TextView change. E.g. when the user types text or deletes text. Raises
+	///         the <see cref="ContentsChanged" /> event.
 	/// </summary>
 	public virtual void OnContentsChanged ()
 	{
@@ -3392,7 +3639,7 @@ public class TextView : View {
 	// the very most previous valid color scheme.
 	void ProcessInheritsPreviousColorScheme (int row, int col)
 	{
-		if (!InheritsPreviousColorScheme || Lines == 1 && GetLine (Lines).Count == 0) {
+		if (!InheritsPreviousColorScheme || (Lines == 1 && GetLine (Lines).Count == 0)) {
 			return;
 		}
 
@@ -3402,10 +3649,12 @@ public class TextView : View {
 			if (row == 0 && line.Count == 0) {
 				return;
 			}
+
 			row--;
 			line = GetLine (row);
 			lineToSet = line;
 		}
+
 		var colWithColor = Math.Max (Math.Min (col - 2, line.Count - 1), 0);
 		var cell = line [colWithColor];
 		var colWithoutColor = Math.Max (col - 1, 0);
@@ -3421,12 +3670,15 @@ public class TextView : View {
 					}
 				}
 			}
+
 			return;
 		}
+
 		if (cell.ColorScheme == null) {
 			for (var r = row; r > -1; r--) {
 				var l = GetLine (r);
-				colWithColor = l.FindLastIndex (colWithColor > -1 ? colWithColor : l.Count - 1, rc => rc.ColorScheme != null);
+				colWithColor = l.FindLastIndex (colWithColor > -1 ? colWithColor : l.Count - 1,
+					rc => rc.ColorScheme != null);
 				if (colWithColor > -1 && l [colWithColor].ColorScheme != null) {
 					cell = l [colWithColor];
 					break;
@@ -3444,7 +3696,9 @@ public class TextView : View {
 				}
 			}
 		}
-		if (cell.ColorScheme != null && colWithColor > -1 && colWithoutColor < lineToSet.Count && lineToSet [colWithoutColor].ColorScheme == null) {
+
+		if (cell.ColorScheme != null && colWithColor > -1 && colWithoutColor < lineToSet.Count &&
+		    lineToSet [colWithoutColor].ColorScheme == null) {
 			while (lineToSet [colWithoutColor].ColorScheme == null) {
 				lineToSet [colWithoutColor].ColorScheme = cell.ColorScheme;
 				colWithoutColor--;
@@ -3463,56 +3717,64 @@ public class TextView : View {
 		if (SuperView?.Frame.Right - Frame.Right < 0) {
 			w = SuperView!.Frame.Right - Frame.Right - 1;
 		}
+
 		if (SuperView?.Frame.Bottom - Frame.Bottom < 0) {
 			h = SuperView!.Frame.Bottom - Frame.Bottom - 1;
 		}
+
 		return (w, h);
 	}
 
 	/// <summary>
-	/// Will scroll the <see cref="TextView"/> to display the specified row at the top if <paramref name="isRow"/> is true or
-	/// will scroll the <see cref="TextView"/> to display the specified column at the left if <paramref name="isRow"/> is
-	/// false.
+	///         Will scroll the <see cref="TextView" /> to display the specified row at the top if <paramref name="isRow" /> is
+	///         true or
+	///         will scroll the <see cref="TextView" /> to display the specified column at the left if
+	///         <paramref name="isRow" /> is
+	///         false.
 	/// </summary>
 	/// <param name="idx">
-	/// Row that should be displayed at the top or Column that should be displayed at the left,
-	/// if the value is negative it will be reset to zero
+	///         Row that should be displayed at the top or Column that should be displayed at the left,
+	///         if the value is negative it will be reset to zero
 	/// </param>
-	/// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
+	/// <param name="isRow">If true (default) the <paramref name="idx" /> is a row, column otherwise.</param>
 	public void ScrollTo (int idx, bool isRow = true)
 	{
 		if (idx < 0) {
 			idx = 0;
 		}
+
 		if (isRow) {
 			_topRow = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0);
 		} else if (!_wordWrap) {
-			var maxlength = _model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height + RightOffset, TabWidth);
+			var maxlength =
+				_model.GetMaxVisibleLine (_topRow, _topRow + Frame.Height + RightOffset, TabWidth);
 			_leftColumn = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0);
 		}
+
 		SetNeedsDisplay ();
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool? OnInvokingKeyBindings (Key a)
 	{
 		if (!a.IsValid) {
 			return false;
 		}
+
 		// Give autocomplete first opportunity to respond to key presses
 		if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (a)) {
 			return true;
 		}
+
 		return base.OnInvokingKeyBindings (a);
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnProcessKeyDown (Key a)
 	{
 		if (!CanFocus) {
 			return true;
 		}
-
 
 
 		ResetColumnTrack ();
@@ -3529,7 +3791,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Redoes the latest changes.
+	///         Redoes the latest changes.
 	/// </summary>
 	public void Redo ()
 	{
@@ -3541,7 +3803,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Undoes the latest changes.
+	///         Undoes the latest changes.
 	/// </summary>
 	public void Undo ()
 	{
@@ -3589,6 +3851,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveHome ();
 	}
 
@@ -3605,6 +3868,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveEnd ();
 	}
 
@@ -3633,6 +3897,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveWordForward ();
 	}
 
@@ -3649,6 +3914,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveWordBackward ();
 	}
 
@@ -3678,6 +3944,7 @@ public class TextView : View {
 		if (_isReadOnly) {
 			return;
 		}
+
 		Paste ();
 	}
 
@@ -3694,6 +3961,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveEndOfLine ();
 	}
 
@@ -3716,6 +3984,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveStartOfLine ();
 	}
 
@@ -3744,6 +4013,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveLeft ();
 		return true;
 	}
@@ -3771,6 +4041,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveRight ();
 		return true;
 	}
@@ -3788,6 +4059,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveUp ();
 	}
 
@@ -3804,6 +4076,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MoveDown ();
 	}
 
@@ -3820,6 +4093,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MovePageUp ();
 	}
 
@@ -3836,6 +4110,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			StopSelecting ();
 		}
+
 		MovePageDown ();
 	}
 
@@ -3864,12 +4139,12 @@ public class TextView : View {
 		if (!AllowsTab || _isReadOnly) {
 			return ProcessMovePreviousView ();
 		}
+
 		if (CurrentColumn > 0) {
 			SetWrapModel ();
 
 			var currentLine = GetCurrentLine ();
 			if (currentLine.Count > 0 && currentLine [CurrentColumn - 1].Rune.Value == '\t') {
-
 				_historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition);
 
 				currentLine.RemoveAt (CurrentColumn - 1);
@@ -3883,6 +4158,7 @@ public class TextView : View {
 
 			UpdateWrapModel ();
 		}
+
 		DoNeededAction ();
 		return true;
 	}
@@ -3894,6 +4170,7 @@ public class TextView : View {
 		if (!AllowsTab || _isReadOnly) {
 			return ProcessMoveNextView ();
 		}
+
 		InsertText (new Key ((KeyCode)'\t'));
 		DoNeededAction ();
 		return true;
@@ -3924,6 +4201,7 @@ public class TextView : View {
 			ClearSelectedRegion ();
 			currentLine = GetCurrentLine ();
 		}
+
 		var restCount = currentLine.Count - CurrentColumn;
 		var rest = currentLine.GetRange (CurrentColumn, restCount);
 		currentLine.RemoveRange (CurrentColumn, restCount);
@@ -3943,6 +4221,7 @@ public class TextView : View {
 			_topRow++;
 			fullNeedsDisplay = true;
 		}
+
 		CurrentColumn = 0;
 
 		_historyText.Add (new List<List<RuneCell>> { new (GetCurrentLine ()) }, CursorPosition,
@@ -3990,6 +4269,7 @@ public class TextView : View {
 
 			return;
 		}
+
 		var newPos = _model.WordBackward (CurrentColumn, CurrentRow);
 		if (newPos.HasValue && CurrentRow == newPos.Value.row) {
 			var restCount = CurrentColumn - newPos.Value.col;
@@ -3997,6 +4277,7 @@ public class TextView : View {
 			if (_wordWrap) {
 				_wrapNeeded = true;
 			}
+
 			CurrentColumn = newPos.Value.col;
 		} else if (newPos.HasValue) {
 			var restCount = currentLine.Count - CurrentColumn;
@@ -4004,6 +4285,7 @@ public class TextView : View {
 			if (_wordWrap) {
 				_wrapNeeded = true;
 			}
+
 			CurrentColumn = newPos.Value.col;
 			CurrentRow = newPos.Value.row;
 		}
@@ -4039,6 +4321,7 @@ public class TextView : View {
 
 			return;
 		}
+
 		var newPos = _model.WordForward (CurrentColumn, CurrentRow);
 		var restCount = 0;
 		if (newPos.HasValue && CurrentRow == newPos.Value.row) {
@@ -4048,6 +4331,7 @@ public class TextView : View {
 			restCount = currentLine.Count - CurrentColumn;
 			currentLine.RemoveRange (CurrentColumn, restCount);
 		}
+
 		if (_wordWrap) {
 			_wrapNeeded = true;
 		}
@@ -4068,6 +4352,7 @@ public class TextView : View {
 			CurrentColumn = newPos.Value.col;
 			CurrentRow = newPos.Value.row;
 		}
+
 		Adjust ();
 		DoNeededAction ();
 	}
@@ -4079,6 +4364,7 @@ public class TextView : View {
 			CurrentColumn = newPos.Value.col;
 			CurrentRow = newPos.Value.row;
 		}
+
 		Adjust ();
 		DoNeededAction ();
 	}
@@ -4088,6 +4374,7 @@ public class TextView : View {
 		if (_isReadOnly) {
 			return;
 		}
+
 		if (_model.Count == 1 && GetCurrentLine ().Count == 0) {
 			// Prevents from adding line feeds if there is no more lines.
 			return;
@@ -4118,6 +4405,7 @@ public class TextView : View {
 						SetClipboard (val);
 					}
 				}
+
 				if (_model.Count == 0) {
 					// Prevents from adding line feeds if there is no more lines.
 					setLastWasKill = false;
@@ -4130,7 +4418,8 @@ public class TextView : View {
 
 				removedLine.Add (new List<RuneCell> ());
 
-				_historyText.Add (new List<List<RuneCell>> (removedLine), CursorPosition, HistoryText.LineStatus.Removed);
+				_historyText.Add (new List<List<RuneCell>> (removedLine), CursorPosition,
+					HistoryText.LineStatus.Removed);
 
 				CurrentColumn = currentLine.Count;
 			}
@@ -4144,6 +4433,7 @@ public class TextView : View {
 			} else {
 				SetClipboard (val);
 			}
+
 			currentLine.RemoveRange (0, restCount);
 			CurrentColumn = 0;
 		}
@@ -4164,6 +4454,7 @@ public class TextView : View {
 		if (_isReadOnly) {
 			return;
 		}
+
 		if (_model.Count == 1 && GetCurrentLine ().Count == 0) {
 			// Prevents from adding line feeds if there is no more lines.
 			return;
@@ -4193,6 +4484,7 @@ public class TextView : View {
 				_historyText.Add (new List<List<RuneCell>> (removedLines), CursorPosition,
 					HistoryText.LineStatus.Removed);
 			}
+
 			if (_model.Count > 0 || _lastWasKill) {
 				var val = Environment.NewLine;
 				if (_lastWasKill) {
@@ -4201,6 +4493,7 @@ public class TextView : View {
 					SetClipboard (val);
 				}
 			}
+
 			if (_model.Count == 0) {
 				// Prevents from adding line feeds if there is no more lines.
 				setLastWasKill = false;
@@ -4215,6 +4508,7 @@ public class TextView : View {
 			} else {
 				SetClipboard (val);
 			}
+
 			currentLine.RemoveRange (CurrentColumn, restCount);
 		}
 
@@ -4242,6 +4536,7 @@ public class TextView : View {
 		if (_leftColumn > 0) {
 			SetNeedsDisplay ();
 		}
+
 		CurrentColumn = 0;
 		_leftColumn = 0;
 		Adjust ();
@@ -4249,7 +4544,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Deletes all the selected or a single character at right from the position of the cursor.
+	///         Deletes all the selected or a single character at right from the position of the cursor.
 	/// </summary>
 	public void DeleteCharRight ()
 	{
@@ -4274,6 +4569,7 @@ public class TextView : View {
 
 			return;
 		}
+
 		if (DeleteTextForwards ()) {
 			UpdateWrapModel ();
 			OnContentsChanged ();
@@ -4288,7 +4584,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Deletes all the selected or a single character at left from the position of the cursor.
+	///         Deletes all the selected or a single character at left from the position of the cursor.
 	/// </summary>
 	public void DeleteCharLeft ()
 	{
@@ -4313,6 +4609,7 @@ public class TextView : View {
 
 			return;
 		}
+
 		if (DeleteTextBackwards ()) {
 			UpdateWrapModel ();
 			OnContentsChanged ();
@@ -4337,10 +4634,12 @@ public class TextView : View {
 					_topRow--;
 					SetNeedsDisplay ();
 				}
+
 				var currentLine = GetCurrentLine ();
 				CurrentColumn = currentLine.Count;
 			}
 		}
+
 		Adjust ();
 		DoNeededAction ();
 	}
@@ -4360,6 +4659,7 @@ public class TextView : View {
 				}
 			}
 		}
+
 		Adjust ();
 		DoNeededAction ();
 	}
@@ -4371,14 +4671,17 @@ public class TextView : View {
 			if (_columnTrack == -1) {
 				_columnTrack = CurrentColumn;
 			}
+
 			CurrentRow = CurrentRow - nPageUpShift < 0 ? 0 : CurrentRow - nPageUpShift;
 			if (CurrentRow < _topRow) {
 				_topRow = _topRow - nPageUpShift < 0 ? 0 : _topRow - nPageUpShift;
 				SetNeedsDisplay ();
 			}
+
 			TrackColumn ();
 			PositionCursor ();
 		}
+
 		DoNeededAction ();
 	}
 
@@ -4389,16 +4692,21 @@ public class TextView : View {
 			if (_columnTrack == -1) {
 				_columnTrack = CurrentColumn;
 			}
+
 			CurrentRow = CurrentRow + nPageDnShift > _model.Count
 				? _model.Count > 0 ? _model.Count - 1 : 0
 				: CurrentRow + nPageDnShift;
 			if (_topRow < CurrentRow - nPageDnShift) {
-				_topRow = CurrentRow >= _model.Count ? CurrentRow - nPageDnShift : _topRow + nPageDnShift;
+				_topRow = CurrentRow >= _model.Count
+					? CurrentRow - nPageDnShift
+					: _topRow + nPageDnShift;
 				SetNeedsDisplay ();
 			}
+
 			TrackColumn ();
 			PositionCursor ();
 		}
+
 		DoNeededAction ();
 	}
 
@@ -4441,6 +4749,7 @@ public class TextView : View {
 		if (Selecting) {
 			ClearSelectedRegion ();
 		}
+
 		if ((uint)a.KeyCode == '\n') {
 			_model.AddLine (CurrentRow + 1, new List<RuneCell> ());
 			CurrentRow++;
@@ -4473,16 +4782,16 @@ public class TextView : View {
 	void ShowContextMenu ()
 	{
 		if (_currentCulture != Thread.CurrentThread.CurrentUICulture) {
-
 			_currentCulture = Thread.CurrentThread.CurrentUICulture;
 
 			ContextMenu!.MenuItems = BuildContextMenuBarItem ();
 		}
+
 		ContextMenu!.Show ();
 	}
 
 	/// <summary>
-	/// Deletes all text.
+	///         Deletes all text.
 	/// </summary>
 	public void DeleteAll ()
 	{
@@ -4497,7 +4806,7 @@ public class TextView : View {
 		SetNeedsDisplay ();
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnKeyUp (Key a)
 	{
 		switch (a.KeyCode) {
@@ -4548,6 +4857,7 @@ public class TextView : View {
 			if (_wordWrap) {
 				_wrapNeeded = true;
 			}
+
 			DoSetNeedsDisplay (new Rect (0, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
 		} else {
 			_historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition);
@@ -4561,7 +4871,8 @@ public class TextView : View {
 				_wrapNeeded = true;
 			}
 
-			DoSetNeedsDisplay (new Rect (CurrentColumn - _leftColumn, CurrentRow - _topRow, Frame.Width, CurrentRow - _topRow + 1));
+			DoSetNeedsDisplay (new Rect (CurrentColumn - _leftColumn, CurrentRow - _topRow, Frame.Width,
+				CurrentRow - _topRow + 1));
 		}
 
 		UpdateWrapModel ();
@@ -4594,6 +4905,7 @@ public class TextView : View {
 			if (_wordWrap) {
 				_wrapNeeded = true;
 			}
+
 			CurrentColumn--;
 
 			_historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition,
@@ -4612,6 +4924,7 @@ public class TextView : View {
 			if (CurrentRow == 0) {
 				return true;
 			}
+
 			var prowIdx = CurrentRow - 1;
 			var prevRow = _model.GetLine (prowIdx);
 
@@ -4630,9 +4943,11 @@ public class TextView : View {
 			if (_wordWrap) {
 				_wrapNeeded = true;
 			}
+
 			CurrentRow--;
 
-			_historyText.Add (new List<List<RuneCell>> { GetCurrentLine () }, new Point (CurrentColumn, prowIdx),
+			_historyText.Add (new List<List<RuneCell>> { GetCurrentLine () },
+				new Point (CurrentColumn, prowIdx),
 				HistoryText.LineStatus.Replaced);
 
 			CurrentColumn = prevCount;
@@ -4645,7 +4960,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Copy the selected text to the clipboard contents.
+	///         Copy the selected text to the clipboard contents.
 	/// </summary>
 	public void Copy ()
 	{
@@ -4658,12 +4973,13 @@ public class TextView : View {
 			SetClipboard (TextModel.ToString (currentLine));
 			_copyWithoutSelection = true;
 		}
+
 		UpdateWrapModel ();
 		DoNeededAction ();
 	}
 
 	/// <summary>
-	/// Cut the selected text to the clipboard contents.
+	///         Cut the selected text to the clipboard contents.
 	/// </summary>
 	public void Cut ()
 	{
@@ -4675,6 +4991,7 @@ public class TextView : View {
 			_historyText.Add (new List<List<RuneCell>> { new (GetCurrentLine ()) }, CursorPosition,
 				HistoryText.LineStatus.Replaced);
 		}
+
 		UpdateWrapModel ();
 		Selecting = false;
 		DoNeededAction ();
@@ -4682,7 +4999,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Paste the clipboard contents into the current selected position.
+	///         Paste the clipboard contents into the current selected position.
 	/// </summary>
 	public void Paste ()
 	{
@@ -4699,11 +5016,12 @@ public class TextView : View {
 			_historyText.Add (new List<List<RuneCell>> { new (currentLine) }, CursorPosition);
 
 			var addedLine = new List<List<RuneCell>> {
-				new (currentLine),
+				new(currentLine),
 				runeList
 			};
 
-			_historyText.Add (new List<List<RuneCell>> (addedLine), CursorPosition, HistoryText.LineStatus.Added);
+			_historyText.Add (new List<List<RuneCell>> (addedLine), CursorPosition,
+				HistoryText.LineStatus.Added);
 
 			_model.AddLine (CurrentRow, runeList);
 			CurrentRow++;
@@ -4717,16 +5035,19 @@ public class TextView : View {
 			if (Selecting) {
 				ClearRegion ();
 			}
+
 			_copyWithoutSelection = false;
 			InsertAllText (contents);
 
 			if (Selecting) {
-				_historyText.ReplaceLast (new List<List<RuneCell>> { new (GetCurrentLine ()) }, CursorPosition,
+				_historyText.ReplaceLast (new List<List<RuneCell>> { new (GetCurrentLine ()) },
+					CursorPosition,
 					HistoryText.LineStatus.Original);
 			}
 
 			SetNeedsDisplay ();
 		}
+
 		UpdateWrapModel ();
 		Selecting = false;
 		DoNeededAction ();
@@ -4737,6 +5058,7 @@ public class TextView : View {
 		if (_shiftSelecting && Selecting) {
 			return;
 		}
+
 		_shiftSelecting = true;
 		Selecting = true;
 		_selectionStartColumn = CurrentColumn;
@@ -4756,6 +5078,7 @@ public class TextView : View {
 		if (!_isReadOnly) {
 			ClearRegion ();
 		}
+
 		UpdateWrapModel ();
 		Selecting = false;
 		DoNeededAction ();
@@ -4767,14 +5090,17 @@ public class TextView : View {
 			if (_columnTrack == -1) {
 				_columnTrack = CurrentColumn;
 			}
+
 			CurrentRow--;
 			if (CurrentRow < _topRow) {
 				_topRow--;
 				SetNeedsDisplay ();
 			}
+
 			TrackColumn ();
 			PositionCursor ();
 		}
+
 		DoNeededAction ();
 	}
 
@@ -4784,16 +5110,19 @@ public class TextView : View {
 			if (_columnTrack == -1) {
 				_columnTrack = CurrentColumn;
 			}
+
 			CurrentRow++;
 			if (CurrentRow + BottomOffset >= _topRow + Frame.Height) {
 				_topRow++;
 				SetNeedsDisplay ();
 			}
+
 			TrackColumn ();
 			PositionCursor ();
 		} else if (CurrentRow > Frame.Height) {
 			Adjust ();
 		}
+
 		DoNeededAction ();
 	}
 
@@ -4802,9 +5131,11 @@ public class TextView : View {
 		if (col < 0 || row < 0) {
 			yield break;
 		}
+
 		if (row >= _model.Count) {
 			yield break;
 		}
+
 		var line = GetCurrentLine ();
 		if (col >= line.Count) {
 			yield break;
@@ -4814,6 +5145,7 @@ public class TextView : View {
 			for (var c = col; c < line.Count; c++) {
 				yield return (c, row, line [c]);
 			}
+
 			col = 0;
 			row++;
 			line = GetCurrentLine ();
@@ -4821,7 +5153,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Will scroll the <see cref="TextView"/> to the last line and position the cursor there.
+	///         Will scroll the <see cref="TextView" /> to the last line and position the cursor there.
 	/// </summary>
 	public void MoveEnd ()
 	{
@@ -4833,7 +5165,7 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Will scroll the <see cref="TextView"/> to the first line and position the cursor there.
+	///         Will scroll the <see cref="TextView" /> to the first line and position the cursor there.
 	/// </summary>
 	public void MoveHome ()
 	{
@@ -4846,7 +5178,7 @@ public class TextView : View {
 		SetNeedsDisplay ();
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool MouseEvent (MouseEvent ev)
 	{
 		if (!ev.Flags.HasFlag (MouseFlags.Button1Clicked) &&
@@ -4882,12 +5214,14 @@ public class TextView : View {
 			if (_shiftSelecting && !_isButtonShift) {
 				StopSelecting ();
 			}
+
 			ProcessMouseClick (ev, out _);
 			if (Used) {
 				PositionCursor ();
 			} else {
 				SetNeedsDisplay ();
 			}
+
 			_lastWasKill = false;
 			_columnTrack = CurrentColumn;
 		} else if (ev.Flags == MouseFlags.WheeledDown) {
@@ -4910,7 +5244,8 @@ public class TextView : View {
 			ProcessMouseClick (ev, out var line);
 			PositionCursor ();
 			if (_model.Count > 0 && _shiftSelecting && Selecting) {
-				if (CurrentRow - _topRow + BottomOffset >= Frame.Height - 1 && _model.Count + BottomOffset > _topRow + CurrentRow) {
+				if (CurrentRow - _topRow + BottomOffset >= Frame.Height - 1 &&
+				    _model.Count + BottomOffset > _topRow + CurrentRow) {
 					ScrollTo (_topRow + Frame.Height);
 				} else if (_topRow > 0 && CurrentRow <= _topRow) {
 					ScrollTo (_topRow - Frame.Height);
@@ -4919,7 +5254,9 @@ public class TextView : View {
 				} else if (ev.Y < 0 && _topRow > 0) {
 					ScrollTo (0);
 				}
-				if (CurrentColumn - _leftColumn + RightOffset >= Frame.Width - 1 && line.Count + RightOffset > _leftColumn + CurrentColumn) {
+
+				if (CurrentColumn - _leftColumn + RightOffset >= Frame.Width - 1 &&
+				    line.Count + RightOffset > _leftColumn + CurrentColumn) {
 					ScrollTo (_leftColumn + Frame.Width, false);
 				} else if (_leftColumn > 0 && CurrentColumn <= _leftColumn) {
 					ScrollTo (_leftColumn - Frame.Width, false);
@@ -4929,6 +5266,7 @@ public class TextView : View {
 					ScrollTo (0, false);
 				}
 			}
+
 			_lastWasKill = false;
 			_columnTrack = CurrentColumn;
 		} else if (ev.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ButtonShift)) {
@@ -4936,6 +5274,7 @@ public class TextView : View {
 				_isButtonShift = true;
 				StartSelecting ();
 			}
+
 			ProcessMouseClick (ev, out _);
 			PositionCursor ();
 			_lastWasKill = false;
@@ -4945,11 +5284,13 @@ public class TextView : View {
 				_clickWithSelecting = true;
 				StopSelecting ();
 			}
+
 			ProcessMouseClick (ev, out _);
 			PositionCursor ();
 			if (!Selecting) {
 				StartSelecting ();
 			}
+
 			_lastWasKill = false;
 			_columnTrack = CurrentColumn;
 			if (Application.MouseGrabView == null) {
@@ -4965,22 +5306,27 @@ public class TextView : View {
 			} else if (Selecting) {
 				StopSelecting ();
 			}
+
 			ProcessMouseClick (ev, out var line);
 			(int col, int row)? newPos;
-			if (CurrentColumn == line.Count || CurrentColumn > 0 && (line [CurrentColumn - 1].Rune.Value != ' ' || line [CurrentColumn].Rune.Value == ' ')) {
-
+			if (CurrentColumn == line.Count || (CurrentColumn > 0 &&
+							    (line [CurrentColumn - 1].Rune.Value != ' ' ||
+							     line [CurrentColumn].Rune.Value == ' '))) {
 				newPos = _model.WordBackward (CurrentColumn, CurrentRow);
 				if (newPos.HasValue) {
 					CurrentColumn = CurrentRow == newPos.Value.row ? newPos.Value.col : 0;
 				}
 			}
+
 			if (!Selecting) {
 				StartSelecting ();
 			}
+
 			newPos = _model.WordForward (CurrentColumn, CurrentRow);
 			if (newPos != null && newPos.HasValue) {
 				CurrentColumn = CurrentRow == newPos.Value.row ? newPos.Value.col : line.Count;
 			}
+
 			PositionCursor ();
 			_lastWasKill = false;
 			_columnTrack = CurrentColumn;
@@ -4988,11 +5334,13 @@ public class TextView : View {
 			if (Selecting) {
 				StopSelecting ();
 			}
+
 			ProcessMouseClick (ev, out var line);
 			CurrentColumn = 0;
 			if (!Selecting) {
 				StartSelecting ();
 			}
+
 			CurrentColumn = line.Count;
 			PositionCursor ();
 			_lastWasKill = false;
@@ -5015,6 +5363,7 @@ public class TextView : View {
 			} else {
 				CurrentRow = Math.Max (ev.Y + _topRow, 0);
 			}
+
 			r = GetCurrentLine ();
 			var idx = TextModel.GetColFromX (r, _leftColumn, Math.Max (ev.X, 0), TabWidth);
 			if (idx - _leftColumn >= r.Count + RightOffset) {
@@ -5028,23 +5377,24 @@ public class TextView : View {
 	}
 
 	/// <summary>
-	/// Allows clearing the <see cref="HistoryText.HistoryTextItem"/> items updating the original text.
+	///         Allows clearing the <see cref="HistoryText.HistoryTextItem" /> items updating the original text.
 	/// </summary>
 	public void ClearHistoryChanges () => _historyText?.Clear (Text);
 }
 
 /// <summary>
-/// Renders an overlay on another view at a given point that allows selecting
-/// from a range of 'autocomplete' options.
-/// An implementation on a TextView.
+///         Renders an overlay on another view at a given point that allows selecting
+///         from a range of 'autocomplete' options.
+///         An implementation on a TextView.
 /// </summary>
 public class TextViewAutocomplete : PopupAutocomplete {
-	/// <inheritdoc/>
+	/// <inheritdoc />
 	protected override void DeleteTextBackwards () => ((TextView)HostControl).DeleteCharLeft ();
 
-	/// <inheritdoc/>
+	/// <inheritdoc />
 	protected override void InsertText (string accepted) => ((TextView)HostControl).InsertText (accepted);
 
-	/// <inheritdoc/>
-	protected override void SetCursorPosition (int column) => ((TextView)HostControl).CursorPosition = new Point (column, ((TextView)HostControl).CurrentRow);
+	/// <inheritdoc />
+	protected override void SetCursorPosition (int column) => ((TextView)HostControl).CursorPosition =
+		new Point (column, ((TextView)HostControl).CurrentRow);
 }
