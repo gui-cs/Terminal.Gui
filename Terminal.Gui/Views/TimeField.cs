@@ -104,11 +104,7 @@ public class TimeField : TextField {
 		get => _isShort;
 		set {
 			_isShort = value;
-			if (_isShort) {
-				Width = 7;
-			} else {
-				Width = 10;
-			}
+			Width = FieldLength + 2;
 
 			var ro = ReadOnly;
 			if (ro) {
@@ -138,52 +134,6 @@ public class TimeField : TextField {
 	///         value, and format string.
 	/// </remarks>
 	public event EventHandler<DateTimeEventArgs<TimeSpan>> TimeChanged;
-
-	//void SetInitialProperties (TimeSpan time, bool isShort = false)
-	//{
-	//	var cultureInfo = CultureInfo.CurrentCulture;
-	//	_sepChar = cultureInfo.DateTimeFormat.TimeSeparator;
-	//	_longFormat = $" hh\\{_sepChar}mm\\{_sepChar}ss";
-	//	_shortFormat = $" hh\\{_sepChar}mm";
-	//	_isShort = isShort;
-	//	Width = _fieldLen + 2;
-	//	Time = time;
-	//	CursorPosition = 1;
-	//	TextChanging += TextField_TextChanging;
-
-	//	// Things this view knows how to do
-	//	AddCommand (Command.DeleteCharRight, () => {
-	//		DeleteCharRight ();
-	//		return true;
-	//	});
-	//	AddCommand (Command.DeleteCharLeft, () => {
-	//		DeleteCharLeft (false);
-	//		return true;
-	//	});
-	//	AddCommand (Command.LeftHome, () => MoveHome ());
-	//	AddCommand (Command.Left, () => MoveLeft ());
-	//	AddCommand (Command.RightEnd, () => MoveEnd ());
-	//	AddCommand (Command.Right, () => MoveRight ());
-
-	//	// Default keybindings for this view
-	//	KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-	//	KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
-
-	//	KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-	//	KeyBindings.Add (Key.D.WithAlt, Command.DeleteCharLeft);
-
-	//	KeyBindings.Add (Key.Home, Command.LeftHome);
-	//	KeyBindings.Add (Key.A.WithCtrl, Command.LeftHome);
-
-	//	KeyBindings.Add (Key.CursorLeft, Command.Left);
-	//	KeyBindings.Add (Key.B.WithCtrl, Command.Left);
-
-	//	KeyBindings.Add (Key.End, Command.RightEnd);
-	//	KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
-
-	//	KeyBindings.Add (Key.CursorRight, Command.Right);
-	//	KeyBindings.Add (Key.F.WithCtrl, Command.Right);
-	//}
 
 	void TextField_TextChanging (object sender, TextChangingEventArgs e)
 	{
@@ -283,7 +233,10 @@ public class TimeField : TextField {
 			return false;
 		}
 
-		Time = result;
+		if (IsInitialized) {
+			Time = result;
+		}
+
 		return true;
 	}
 

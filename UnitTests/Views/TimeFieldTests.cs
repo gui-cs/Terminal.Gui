@@ -74,6 +74,9 @@ public class TimeFieldTests {
 		Assert.Equal (0, tf.SelectedLength);
 		Assert.Equal (8, tf.CursorPosition);
 		Assert.False (tf.IsShortFormat);
+		Assert.False (tf.IsInitialized);
+		tf.BeginInit ();
+		tf.EndInit ();
 		tf.IsShortFormat = true;
 		Assert.Equal (5, tf.CursorPosition);
 		// Start selection
@@ -91,6 +94,10 @@ public class TimeFieldTests {
 	public void KeyBindings_Command ()
 	{
 		var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
+		tf.BeginInit ();
+		tf.EndInit ();
+		Assert.Equal (9, tf.CursorPosition);
+		tf.CursorPosition = 1;
 		tf.ReadOnly = true;
 		Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
 		Assert.Equal (" 12:12:19", tf.Text);
