@@ -95,15 +95,17 @@ public class WindowTests {
 	[AutoInitShutdown]
 	public void MenuBar_And_StatusBar_Inside_Window ()
 	{
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("File", new MenuItem [] {
-				new("Open", "", null),
-				new("Quit", "", null)
-			}),
-			new("Edit", new MenuItem [] {
-				new("Copy", "", null)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("File", new MenuItem [] {
+					new("Open", "", null),
+					new("Quit", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new("Copy", "", null)
+				})
+			]
+		};
 
 		var sb = new StatusBar (new StatusItem [] {
 			new(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
@@ -198,11 +200,13 @@ public class WindowTests {
 	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("Child", new MenuItem [] {
-				new("_Create Child", "", null)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("Child", new MenuItem [] {
+					new("_Create Child", "", null)
+				})
+			]
+		};
 		var win = new Window ();
 		win.Add (menu);
 		Application.Top.Add (win);

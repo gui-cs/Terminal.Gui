@@ -24,18 +24,21 @@ public class Notepad : Scenario {
 
 	public override void Setup ()
 	{
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_New", "", () => New (), null, null,
-					KeyCode.N | KeyCode.CtrlMask | KeyCode.AltMask),
-				new("_Open", "", () => Open ()),
-				new("_Save", "", () => Save ()),
-				new("Save _As", "", () => SaveAs ()),
-				new("_Close", "", () => Close ()),
-				new("_Quit", "", () => Quit ())
-			}),
-			new("_About", "", () => MessageBox.Query ("Notepad", "About Notepad...", "Ok"))
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_New", "", () => New (), null, null,
+						KeyCode.N | KeyCode.CtrlMask | KeyCode.AltMask),
+					new("_Open", "", () => Open ()),
+					new("_Save", "", () => Save ()),
+					new("Save _As", "", () => SaveAs ()),
+					new("_Close", "", () => Close ()),
+					new("_Quit", "", () => Quit ())
+				}),
+				new MenuBarItem ("_About", "",
+					() => MessageBox.Query ("Notepad", "About Notepad...", "Ok"))
+			]
+		};
 		Application.Top.Add (menu);
 
 		_tabView = CreateNewTabView ();

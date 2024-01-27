@@ -200,93 +200,106 @@ public class TableEditor : Scenario {
 			Height = Dim.Fill (1)
 		};
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_OpenBigExample", "", () => OpenExample (true)),
-				new("_OpenSmallExample", "", () => OpenExample (false)),
-				new("OpenCharacter_Map", "", () => OpenUnicodeMap ()),
-				new("OpenTreeExample", "", () => OpenTreeExample ()),
-				new("_CloseExample", "", () => CloseExample ()),
-				new("_Quit", "", () => Quit ())
-			}),
-			new("_View", new [] {
-				_miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders ()) {
-					Checked = _tableView.Style.ShowHeaders, CheckType = MenuItemCheckStyle.Checked
-				},
-				_miAlwaysShowHeaders =
-					new MenuItem ("_AlwaysShowHeaders", "", () => ToggleAlwaysShowHeaders ()) {
-						Checked = _tableView.Style.AlwaysShowHeaders,
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_OpenBigExample", "", () => OpenExample (true)),
+					new("_OpenSmallExample", "", () => OpenExample (false)),
+					new("OpenCharacter_Map", "", () => OpenUnicodeMap ()),
+					new("OpenTreeExample", "", () => OpenTreeExample ()),
+					new("_CloseExample", "", () => CloseExample ()),
+					new("_Quit", "", () => Quit ())
+				}),
+				new MenuBarItem ("_View", new [] {
+					_miShowHeaders = new MenuItem ("_ShowHeaders", "", () => ToggleShowHeaders ()) {
+						Checked = _tableView.Style.ShowHeaders,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				_miHeaderOverline = new MenuItem ("_HeaderOverLine", "", () => ToggleOverline ()) {
-					Checked = _tableView.Style.ShowHorizontalHeaderOverline,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miHeaderMidline = new MenuItem ("_HeaderMidLine", "", () => ToggleHeaderMidline ()) {
-					Checked = _tableView.Style.ShowVerticalHeaderLines,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "", () => ToggleUnderline ()) {
-					Checked = _tableView.Style.ShowHorizontalHeaderUnderline,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline ()) {
-					Checked = _tableView.Style.ShowHorizontalBottomline,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miShowHorizontalScrollIndicators =
-					new MenuItem ("_HorizontalScrollIndicators", "",
-						() => ToggleHorizontalScrollIndicators ()) {
-						Checked = _tableView.Style.ShowHorizontalScrollIndicators,
+					_miAlwaysShowHeaders =
+						new MenuItem ("_AlwaysShowHeaders", "",
+							() => ToggleAlwaysShowHeaders ()) {
+							Checked = _tableView.Style.AlwaysShowHeaders,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					_miHeaderOverline =
+						new MenuItem ("_HeaderOverLine", "", () => ToggleOverline ()) {
+							Checked = _tableView.Style.ShowHorizontalHeaderOverline,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					_miHeaderMidline = new MenuItem ("_HeaderMidLine", "",
+						() => ToggleHeaderMidline ()) {
+						Checked = _tableView.Style.ShowVerticalHeaderLines,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				_miFullRowSelect = new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect ())
-					{ Checked = _tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
-				_miCellLines = new MenuItem ("_CellLines", "", () => ToggleCellLines ()) {
-					Checked = _tableView.Style.ShowVerticalCellLines,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miExpandLastColumn =
-					new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn ()) {
-						Checked = _tableView.Style.ExpandLastColumn,
+					_miHeaderUnderline = new MenuItem ("_HeaderUnderLine", "",
+						() => ToggleUnderline ()) {
+						Checked = _tableView.Style.ShowHorizontalHeaderUnderline,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				_miAlwaysUseNormalColorForVerticalCellLines =
-					new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "",
-						() => ToggleAlwaysUseNormalColorForVerticalCellLines ()) {
-						Checked = _tableView.Style.AlwaysUseNormalColorForVerticalCellLines,
+					_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline ()) {
+						Checked = _tableView.Style.ShowHorizontalBottomline,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				_miSmoothScrolling =
-					new MenuItem ("_SmoothHorizontalScrolling", "", () => ToggleSmoothScrolling ()) {
-						Checked = _tableView.Style.SmoothHorizontalScrolling,
+					_miShowHorizontalScrollIndicators =
+						new MenuItem ("_HorizontalScrollIndicators", "",
+							() => ToggleHorizontalScrollIndicators ()) {
+							Checked = _tableView.Style.ShowHorizontalScrollIndicators,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					_miFullRowSelect = new MenuItem ("_FullRowSelect", "",
+						() => ToggleFullRowSelect ()) {
+						Checked = _tableView.FullRowSelect,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				new("_AllLines", "", () => ToggleAllCellLines ()),
-				new("_NoLines", "", () => ToggleNoCellLines ()),
-				_miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes (false))
-					{ Checked = false, CheckType = MenuItemCheckStyle.Checked },
-				_miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes (true))
-					{ Checked = false, CheckType = MenuItemCheckStyle.Checked },
-				_miAlternatingColors =
-					new MenuItem ("Alternating Colors", "", () => ToggleAlternatingColors ())
-						{ CheckType = MenuItemCheckStyle.Checked },
-				_miCursor =
-					new MenuItem ("Invert Selected Cell First Character", "",
-						() => ToggleInvertSelectedCellFirstCharacter ()) {
-						Checked = _tableView.Style.InvertSelectedCellFirstCharacter,
+					_miCellLines = new MenuItem ("_CellLines", "", () => ToggleCellLines ()) {
+						Checked = _tableView.Style.ShowVerticalCellLines,
 						CheckType = MenuItemCheckStyle.Checked
 					},
-				new("_ClearColumnStyles", "", () => ClearColumnStyles ()),
-				new("Sho_w All Columns", "", () => ShowAllColumns ())
-			}),
-			new("_Column", new MenuItem [] {
-				new("_Set Max Width", "", SetMaxWidth),
-				new("_Set Min Width", "", SetMinWidth),
-				new("_Set MinAcceptableWidth", "", SetMinAcceptableWidth),
-				new("_Set All MinAcceptableWidth=1", "", SetMinAcceptableWidthToOne)
-			})
-		});
+					_miExpandLastColumn =
+						new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn ()) {
+							Checked = _tableView.Style.ExpandLastColumn,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					_miAlwaysUseNormalColorForVerticalCellLines =
+						new MenuItem ("_AlwaysUseNormalColorForVerticalCellLines", "",
+							() => ToggleAlwaysUseNormalColorForVerticalCellLines ()) {
+							Checked = _tableView.Style
+								.AlwaysUseNormalColorForVerticalCellLines,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					_miSmoothScrolling =
+						new MenuItem ("_SmoothHorizontalScrolling", "",
+							() => ToggleSmoothScrolling ()) {
+							Checked = _tableView.Style.SmoothHorizontalScrolling,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					new("_AllLines", "", () => ToggleAllCellLines ()),
+					new("_NoLines", "", () => ToggleNoCellLines ()),
+					_miCheckboxes = new MenuItem ("_Checkboxes", "", () => ToggleCheckboxes (false))
+						{ Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					_miRadioboxes = new MenuItem ("_Radioboxes", "", () => ToggleCheckboxes (true))
+						{ Checked = false, CheckType = MenuItemCheckStyle.Checked },
+					_miAlternatingColors =
+						new MenuItem ("Alternating Colors", "",
+								() => ToggleAlternatingColors ())
+							{ CheckType = MenuItemCheckStyle.Checked },
+					_miCursor =
+						new MenuItem ("Invert Selected Cell First Character", "",
+							() => ToggleInvertSelectedCellFirstCharacter ()) {
+							Checked = _tableView.Style.InvertSelectedCellFirstCharacter,
+							CheckType = MenuItemCheckStyle.Checked
+						},
+					new("_ClearColumnStyles", "", () => ClearColumnStyles ()),
+					new("Sho_w All Columns", "", () => ShowAllColumns ())
+				}),
+				new MenuBarItem ("_Column", new MenuItem [] {
+					new("_Set Max Width", "", SetMaxWidth),
+					new("_Set Min Width", "", SetMinWidth),
+					new("_Set MinAcceptableWidth", "", SetMinAcceptableWidth),
+					new("_Set All MinAcceptableWidth=1", "", SetMinAcceptableWidthToOne)
+				})
+			]
+		};
 
 		Application.Top.Add (menu);
 

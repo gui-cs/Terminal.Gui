@@ -26,11 +26,13 @@ public class MultiColouredTable : Scenario {
 			Height = Dim.Fill (1)
 		};
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_Quit", "", () => Quit ())
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Quit", "", () => Quit ())
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		var statusBar = new StatusBar (new StatusItem [] {

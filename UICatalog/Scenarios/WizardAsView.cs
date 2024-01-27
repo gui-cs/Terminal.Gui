@@ -9,21 +9,25 @@ public class WizardAsView : Scenario {
 	{
 		Application.Init ();
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_Restart Configuration...", "",
-					() => MessageBox.Query ("Wizaard",
-						"Are you sure you want to reset the Wizard and start over?", "Ok",
-						"Cancel")),
-				new("Re_boot Server...", "",
-					() => MessageBox.Query ("Wizaard",
-						"Are you sure you want to reboot the server start over?", "Ok",
-						"Cancel")),
-				new("_Shutdown Server...", "",
-					() => MessageBox.Query ("Wizaard",
-						"Are you sure you want to cancel setup and shutdown?", "Ok", "Cancel"))
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Restart Configuration...", "",
+						() => MessageBox.Query ("Wizaard",
+							"Are you sure you want to reset the Wizard and start over?",
+							"Ok",
+							"Cancel")),
+					new("Re_boot Server...", "",
+						() => MessageBox.Query ("Wizaard",
+							"Are you sure you want to reboot the server start over?", "Ok",
+							"Cancel")),
+					new("_Shutdown Server...", "",
+						() => MessageBox.Query ("Wizaard",
+							"Are you sure you want to cancel setup and shutdown?", "Ok",
+							"Cancel"))
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		// No need for a Title because the border is disabled

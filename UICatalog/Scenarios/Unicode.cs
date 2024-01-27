@@ -17,19 +17,21 @@ public class UnicodeInMenu : Scenario {
 		var gitString =
 			$"gui.cs 糊 (hú) {CM.Glyphs.IdenticalTo} {CM.Glyphs.DownArrow}18 {CM.Glyphs.UpArrow}10 {CM.Glyphs.VerticalFourDots}1 {CM.Glyphs.HorizontalEllipsis}";
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_Файл", new MenuItem [] {
-				new("_Создать", "Creates new file", null),
-				new("_Открыть", "", null),
-				new("Со_хранить", "", null),
-				new("_Выход", "", () => Application.RequestStop ())
-			}),
-			new("_Edit", new MenuItem [] {
-				new("_Copy", "", null),
-				new("C_ut", "", null),
-				new("_糊", "hú (Paste)", null)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_Файл", new MenuItem [] {
+					new("_Создать", "Creates new file", null),
+					new("_Открыть", "", null),
+					new("Со_хранить", "", null),
+					new("_Выход", "", () => Application.RequestStop ())
+				}),
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new("_Copy", "", null),
+					new("C_ut", "", null),
+					new("_糊", "hú (Paste)", null)
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		var statusBar = new StatusBar (new StatusItem [] {

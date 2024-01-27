@@ -22,33 +22,35 @@ public class TabViewExample : Scenario {
 		Win.Y = 1; // menu
 		Win.Height = Dim.Fill (1); // status bar
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_Add Blank Tab", "", AddBlankTab),
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Add Blank Tab", "", AddBlankTab),
 
-				new("_Clear SelectedTab", "", () => _tabView.SelectedTab = null),
-				new("_Quit", "", Quit)
-			}),
-			new("_View", new [] {
-				_miShowTopLine = new MenuItem ("_Show Top Line", "", ShowTopLine) {
-					Checked = true,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miShowBorder = new MenuItem ("_Show Border", "", ShowBorder) {
-					Checked = true,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miTabsOnBottom = new MenuItem ("_Tabs On Bottom", "", SetTabsOnBottom) {
-					Checked = false,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miShowTabViewBorder =
-					new MenuItem ("_Show TabView Border", "", ShowTabViewBorder) {
+					new("_Clear SelectedTab", "", () => _tabView.SelectedTab = null),
+					new("_Quit", "", Quit)
+				}),
+				new MenuBarItem ("_View", new [] {
+					_miShowTopLine = new MenuItem ("_Show Top Line", "", ShowTopLine) {
 						Checked = true,
 						CheckType = MenuItemCheckStyle.Checked
-					}
-			})
-		});
+					},
+					_miShowBorder = new MenuItem ("_Show Border", "", ShowBorder) {
+						Checked = true,
+						CheckType = MenuItemCheckStyle.Checked
+					},
+					_miTabsOnBottom = new MenuItem ("_Tabs On Bottom", "", SetTabsOnBottom) {
+						Checked = false,
+						CheckType = MenuItemCheckStyle.Checked
+					},
+					_miShowTabViewBorder =
+						new MenuItem ("_Show TabView Border", "", ShowTabViewBorder) {
+							Checked = true,
+							CheckType = MenuItemCheckStyle.Checked
+						}
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		_tabView = new TabView {

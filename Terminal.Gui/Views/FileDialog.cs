@@ -674,7 +674,7 @@ public class FileDialog : Dialog {
 						}))
 					.ToArray ());
 
-			_allowedTypeMenuBar = new MenuBar ([_allowedTypeMenu]) {
+			_allowedTypeMenuBar = new MenuBar {
 				Width = width,
 				Y = 1,
 				X = Pos.AnchorEnd (width),
@@ -682,7 +682,8 @@ public class FileDialog : Dialog {
 				// TODO: Does not work, if this worked then we could tab to it instead
 				// of having to hit F9
 				CanFocus = true,
-				TabStop = true
+				TabStop = true,
+				Menus = [_allowedTypeMenu]
 			};
 			AllowedTypeMenuClicked (0);
 

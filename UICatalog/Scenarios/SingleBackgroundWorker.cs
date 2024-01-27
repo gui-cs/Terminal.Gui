@@ -27,15 +27,17 @@ public class SingleBackgroundWorker : Scenario {
 
 		public MainApp ()
 		{
-			var menu = new MenuBar (new MenuBarItem [] {
-				new("_Options", new MenuItem [] {
-					new("_Run Worker", "", () => RunWorker (), null, null,
-						KeyCode.CtrlMask | KeyCode.R),
-					null,
-					new("_Quit", "", () => Application.RequestStop (), null, null,
-						KeyCode.CtrlMask | KeyCode.Q)
-				})
-			});
+			var menu = new MenuBar {
+				Menus = [
+					new MenuBarItem ("_Options", new MenuItem [] {
+						new("_Run Worker", "", () => RunWorker (), null, null,
+							KeyCode.CtrlMask | KeyCode.R),
+						null,
+						new("_Quit", "", () => Application.RequestStop (), null, null,
+							KeyCode.CtrlMask | KeyCode.Q)
+					})
+				]
+			};
 			Add (menu);
 
 			var statusBar = new StatusBar (new [] {
@@ -162,13 +164,15 @@ public class SingleBackgroundWorker : Scenario {
 				return n == 0;
 			}
 
-			var menu = new MenuBar (new MenuBarItem [] {
-				new("_Stage", new MenuItem [] {
-					new("_Close", "", () => {
-						if (Close ()) { Application.RequestStop (); }
-					}, null, null, KeyCode.CtrlMask | KeyCode.C)
-				})
-			});
+			var menu = new MenuBar {
+				Menus = [
+					new MenuBarItem ("_Stage", new MenuItem [] {
+						new("_Close", "", () => {
+							if (Close ()) { Application.RequestStop (); }
+						}, null, null, KeyCode.CtrlMask | KeyCode.C)
+					})
+				]
+			};
 			_top.Add (menu);
 
 			var statusBar = new StatusBar (new [] {

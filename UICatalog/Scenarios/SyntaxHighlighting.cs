@@ -16,9 +16,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("TextView")]
 public class SyntaxHighlighting : Scenario {
-	ColorScheme _blue;
-	ColorScheme _green;
-
 	readonly HashSet<string> _keywords = new (StringComparer.CurrentCultureIgnoreCase) {
 		"select",
 		"distinct",
@@ -86,9 +83,12 @@ public class SyntaxHighlighting : Scenario {
 		"exists"
 	};
 
+	readonly string _path = "RuneCells.rce";
+	ColorScheme _blue;
+	ColorScheme _green;
+
 	ColorScheme _magenta;
 	MenuItem _miWrap;
-	readonly string _path = "RuneCells.rce";
 
 	TextView _textView;
 	ColorScheme _white;
@@ -97,19 +97,21 @@ public class SyntaxHighlighting : Scenario {
 	{
 		Win.Title = GetName ();
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_TextView", new [] {
-				_miWrap = new MenuItem ("_Word Wrap", "", () => WordWrap ())
-					{ CheckType = MenuItemCheckStyle.Checked },
-				null,
-				new("_Syntax Highlighting", "", () => ApplySyntaxHighlighting ()),
-				null,
-				new("_Load Rune Cells", "", () => ApplyLoadRuneCells ()),
-				new("_Save Rune Cells", "", () => SaveRuneCells ()),
-				null,
-				new("_Quit", "", () => Quit ())
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_TextView", new [] {
+					_miWrap = new MenuItem ("_Word Wrap", "", () => WordWrap ())
+						{ CheckType = MenuItemCheckStyle.Checked },
+					null,
+					new("_Syntax Highlighting", "", () => ApplySyntaxHighlighting ()),
+					null,
+					new("_Load Rune Cells", "", () => ApplyLoadRuneCells ()),
+					new("_Save Rune Cells", "", () => SaveRuneCells ()),
+					null,
+					new("_Quit", "", () => Quit ())
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		_textView = new TextView {
@@ -282,7 +284,8 @@ public class SyntaxHighlighting : Scenario {
 	///                 other classes.
 	///         </para>
 	///         <para>
-	///                 If there are public properties/variables that you do not want written to the file, decorate them with the
+	///                 If there are public properties/variables that you do not want written to the file, decorate them with
+	///                 the
 	///                 [JsonIgnore] attribute.
 	///         </para>
 	/// </summary>

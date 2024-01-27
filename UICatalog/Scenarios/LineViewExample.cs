@@ -3,28 +3,31 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Line View", Description: "Demonstrates drawing lines using the LineView control.")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("LineView"), ScenarioCategory ("Borders")]
+[ScenarioMetadata ("Line View", "Demonstrates drawing lines using the LineView control.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("LineView")]
+[ScenarioCategory ("Borders")]
 public class LineViewExample : Scenario {
-
 	public override void Setup ()
 	{
-		Win.Title = this.GetName ();
+		Win.Title = GetName ();
 		Win.Y = 1; // menu
 		Win.Height = Dim.Fill (1); // status bar
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_Quit", "", () => Quit()),
-			})
-			});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Quit", "", () => Quit ())
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		Win.Add (new Label { Y = 0, Text = "Regular Line" });
 
 		// creates a horizontal line
-		var line = new LineView () {
-			Y = 1,
+		var line = new LineView {
+			Y = 1
 		};
 
 		Win.Add (line);
@@ -32,7 +35,7 @@ public class LineViewExample : Scenario {
 		Win.Add (new Label { Y = 2, Text = "Double Width Line" });
 
 		// creates a horizontal line
-		var doubleLine = new LineView () {
+		var doubleLine = new LineView {
 			Y = 3,
 			LineRune = (Rune)'\u2550'
 		};
@@ -42,7 +45,7 @@ public class LineViewExample : Scenario {
 		Win.Add (new Label { Y = 4, Text = "Short Line" });
 
 		// creates a horizontal line
-		var shortLine = new LineView () {
+		var shortLine = new LineView {
 			Y = 5,
 			Width = 10
 		};
@@ -52,7 +55,7 @@ public class LineViewExample : Scenario {
 		Win.Add (new Label { Y = 6, Text = "Arrow Line" });
 
 		// creates a horizontal line
-		var arrowLine = new LineView () {
+		var arrowLine = new LineView {
 			Y = 7,
 			Width = 10,
 			StartingAnchor = CM.Glyphs.LeftTee,
@@ -65,7 +68,7 @@ public class LineViewExample : Scenario {
 
 		// creates a horizontal line
 		var verticalLine = new LineView (Orientation.Vertical) {
-			X = 25,
+			X = 25
 		};
 
 		Win.Add (verticalLine);
@@ -82,14 +85,10 @@ public class LineViewExample : Scenario {
 		Win.Add (verticalArrow);
 
 		var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-			});
+			new(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ())
+		});
 		Application.Top.Add (statusBar);
-
 	}
 
-	private void Quit ()
-	{
-		Application.RequestStop ();
-	}
+	void Quit () => Application.RequestStop ();
 }

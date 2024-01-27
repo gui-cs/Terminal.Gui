@@ -7,7 +7,7 @@ namespace Terminal.Gui.ViewTests;
 ///         Tests of the  <see cref="View.AutoSize" /> property which auto sizes Views based on <see cref="Text" />.
 /// </summary>
 public class AutoSizeTextTests {
-	readonly string [] expecteds = [
+	readonly string [] _expecteds = [
 		@"
 ┌────────────────────┐
 │View with long text │
@@ -1274,7 +1274,7 @@ Y
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
 				((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-				var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
+				var pos = TestHelpers.AssertDriverContentsWithFrameAre (_expecteds [count], _output);
 				Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
 
 				if (count < 20) {
@@ -1356,7 +1356,7 @@ Y
 		field.KeyDown += (s, k) => {
 			if (k.KeyCode == KeyCode.Enter) {
 				((FakeDriver)Application.Driver).SetBufferSize (22, count + 4);
-				var pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], _output);
+				var pos = TestHelpers.AssertDriverContentsWithFrameAre (_expecteds [count], _output);
 				Assert.Equal (new Rect (0, 0, 22, count + 4), pos);
 
 				if (count > 0) {
@@ -1508,7 +1508,7 @@ Y
 
 		win.Add (label);
 
-		var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
+		var menu = new MenuBar { Menus = [new MenuBarItem ("Menu", "", null)] };
 		var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
 		var top = Application.Top;
 		top.Add (win, menu, status);
@@ -1569,7 +1569,7 @@ Y
 
 		win.Add (label);
 
-		var menu = new MenuBar (new MenuBarItem [] { new ("Menu", "", null) });
+		var menu = new MenuBar { Menus = [new MenuBarItem ("Menu", "", null)] };
 		var status = new StatusBar (new StatusItem [] { new (KeyCode.F1, "~F1~ Help", null) });
 		var top = Application.Top;
 		top.Add (win, menu, status);

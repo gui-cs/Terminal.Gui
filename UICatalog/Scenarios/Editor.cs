@@ -66,58 +66,61 @@ public class Editor : Scenario {
 
 		Win.Add (_textView);
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_New", "", () => New ()),
-				new("_Open", "", () => Open ()),
-				new("_Save", "", () => Save ()),
-				new("_Save As", "", () => SaveAs ()),
-				new("_Close", "", () => CloseFile ()),
-				null,
-				new("_Quit", "", () => Quit ())
-			}),
-			new("_Edit", new MenuItem [] {
-				new("_Copy", "", () => Copy (), null, null, KeyCode.CtrlMask | KeyCode.C),
-				new("C_ut", "", () => Cut (), null, null, KeyCode.CtrlMask | KeyCode.W),
-				new("_Paste", "", () => Paste (), null, null, KeyCode.CtrlMask | KeyCode.Y),
-				null,
-				new("_Find", "", () => Find (), null, null, KeyCode.CtrlMask | KeyCode.S),
-				new("Find _Next", "", () => FindNext (), null, null,
-					KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.S),
-				new("Find P_revious", "", () => FindPrevious (), null, null,
-					KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.S),
-				new("_Replace", "", () => Replace (), null, null, KeyCode.CtrlMask | KeyCode.R),
-				new("Replace Ne_xt", "", () => ReplaceNext (), null, null,
-					KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.R),
-				new("Replace Pre_vious", "", () => ReplacePrevious (), null, null,
-					KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.R),
-				new("Replace _All", "", () => ReplaceAll (), null, null,
-					KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.A),
-				null,
-				new("_Select All", "", () => SelectAll (), null, null, KeyCode.CtrlMask | KeyCode.T)
-			}),
-			new("_ScrollBarView", CreateKeepChecked ()),
-			new("_Cursor", CreateCursorRadio ()),
-			new("Forma_t", new [] {
-				CreateWrapChecked (),
-				CreateAutocomplete (),
-				CreateAllowsTabChecked (),
-				CreateReadOnlyChecked ()
-			}),
-			new("_Responder", new [] {
-				CreateCanFocusChecked (),
-				CreateEnabledChecked (),
-				CreateVisibleChecked ()
-			}),
-			new("Conte_xtMenu", new [] {
-				_miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
-					_miForceMinimumPosToZero.Checked =
-						_forceMinimumPosToZero = !_forceMinimumPosToZero;
-					_textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-				}) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
-				new MenuBarItem ("_Languages", GetSupportedCultures ())
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_New", "", () => New ()),
+					new("_Open", "", () => Open ()),
+					new("_Save", "", () => Save ()),
+					new("_Save As", "", () => SaveAs ()),
+					new("_Close", "", () => CloseFile ()),
+					null,
+					new("_Quit", "", () => Quit ())
+				}),
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new("_Copy", "", () => Copy (), null, null, KeyCode.CtrlMask | KeyCode.C),
+					new("C_ut", "", () => Cut (), null, null, KeyCode.CtrlMask | KeyCode.W),
+					new("_Paste", "", () => Paste (), null, null, KeyCode.CtrlMask | KeyCode.Y),
+					null,
+					new("_Find", "", () => Find (), null, null, KeyCode.CtrlMask | KeyCode.S),
+					new("Find _Next", "", () => FindNext (), null, null,
+						KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.S),
+					new("Find P_revious", "", () => FindPrevious (), null, null,
+						KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.S),
+					new("_Replace", "", () => Replace (), null, null, KeyCode.CtrlMask | KeyCode.R),
+					new("Replace Ne_xt", "", () => ReplaceNext (), null, null,
+						KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.R),
+					new("Replace Pre_vious", "", () => ReplacePrevious (), null, null,
+						KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.R),
+					new("Replace _All", "", () => ReplaceAll (), null, null,
+						KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.A),
+					null,
+					new("_Select All", "", () => SelectAll (), null, null,
+						KeyCode.CtrlMask | KeyCode.T)
+				}),
+				new MenuBarItem ("_ScrollBarView", CreateKeepChecked ()),
+				new MenuBarItem ("_Cursor", CreateCursorRadio ()),
+				new MenuBarItem ("Forma_t", new [] {
+					CreateWrapChecked (),
+					CreateAutocomplete (),
+					CreateAllowsTabChecked (),
+					CreateReadOnlyChecked ()
+				}),
+				new MenuBarItem ("_Responder", new [] {
+					CreateCanFocusChecked (),
+					CreateEnabledChecked (),
+					CreateVisibleChecked ()
+				}),
+				new MenuBarItem ("Conte_xtMenu", new [] {
+					_miForceMinimumPosToZero = new MenuItem ("ForceMinimumPosTo_Zero", "", () => {
+						_miForceMinimumPosToZero.Checked =
+							_forceMinimumPosToZero = !_forceMinimumPosToZero;
+						_textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+					}) { CheckType = MenuItemCheckStyle.Checked, Checked = _forceMinimumPosToZero },
+					new MenuBarItem ("_Languages", GetSupportedCultures ())
+				})
+			]
+		};
 
 		Application.Top.Add (menu);
 

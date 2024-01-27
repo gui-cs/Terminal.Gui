@@ -1,16 +1,77 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "Collection Navigator", Description: "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator).")]
-[ScenarioCategory ("Controls"),
-	ScenarioCategory ("ListView"),
-	ScenarioCategory ("TreeView"),
-	ScenarioCategory ("Text and Formatting"),
-	ScenarioCategory ("Mouse and Keyboard")]
+[ScenarioMetadata ("Collection Navigator",
+	"Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator).")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("ListView")]
+[ScenarioCategory ("TreeView")]
+[ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Mouse and Keyboard")]
 public class CollectionNavigatorTester : Scenario {
+	readonly List<string> _items = new [] {
+		"a",
+		"b",
+		"bb",
+		"c",
+		"ccc",
+		"ccc",
+		"cccc",
+		"ddd",
+		"dddd",
+		"dddd",
+		"ddddd",
+		"dddddd",
+		"ddddddd",
+		"this",
+		"this is a test",
+		"this was a test",
+		"this and",
+		"that and that",
+		"the",
+		"think",
+		"thunk",
+		"thunks",
+		"zip",
+		"zap",
+		"zoo",
+		"@jack",
+		"@sign",
+		"@at",
+		"@ateme",
+		"n@",
+		"n@brown",
+		".net",
+		"$100.00",
+		"$101.00",
+		"$101.10",
+		"$101.11",
+		"$200.00",
+		"$210.99",
+		"$$",
+		"appricot",
+		"arm",
+		"丗丙业丞",
+		"丗丙丛",
+		"text",
+		"egg",
+		"candle",
+		" <- space",
+		"\t<- tab",
+		"\n<- newline",
+		"\r<- formfeed",
+		"q",
+		"quit",
+		"quitter"
+	}.ToList ();
+
+	ListView _listView;
+
+	TreeView _treeView;
 
 	// Don't create a Window, just return the top-level view
 	public override void Init ()
@@ -18,62 +79,6 @@ public class CollectionNavigatorTester : Scenario {
 		Application.Init ();
 		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
-
-	System.Collections.Generic.List<string> _items = new string [] {
-				"a",
-				"b",
-				"bb",
-				"c",
-				"ccc",
-				"ccc",
-				"cccc",
-				"ddd",
-				"dddd",
-				"dddd",
-				"ddddd",
-				"dddddd",
-				"ddddddd",
-				"this",
-				"this is a test",
-				"this was a test",
-				"this and",
-				"that and that",
-				"the",
-				"think",
-				"thunk",
-				"thunks",
-				"zip",
-				"zap",
-				"zoo",
-				"@jack",
-				"@sign",
-				"@at",
-				"@ateme",
-				"n@",
-				"n@brown",
-				".net",
-				"$100.00",
-				"$101.00",
-				"$101.10",
-				"$101.11",
-				"$200.00",
-				"$210.99",
-				"$$",
-				"appricot",
-				"arm",
-				"丗丙业丞",
-				"丗丙丛",
-				"text",
-				"egg",
-				"candle",
-				" <- space",
-				"\t<- tab",
-				"\n<- newline",
-				"\r<- formfeed",
-				"q",
-				"quit",
-				"quitter"
-			}.ToList<string> ();
 
 	public override void Setup ()
 	{
@@ -87,18 +92,23 @@ public class CollectionNavigatorTester : Scenario {
 			CheckType = MenuItemCheckStyle.Checked,
 			Checked = false
 		};
-		allowMultiSelection.Action = () => allowMultiSelection.Checked = _listView.AllowsMultipleSelection = !_listView.AllowsMultipleSelection;
+		allowMultiSelection.Action = () =>
+			allowMultiSelection.Checked =
+				_listView.AllowsMultipleSelection = !_listView.AllowsMultipleSelection;
 		allowMultiSelection.CanExecute = () => (bool)allowMarking.Checked;
 
-		var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_Configure", new MenuItem [] {
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_Configure", new [] {
 					allowMarking,
 					allowMultiSelection,
 					null,
-					new MenuItem ("_Quit", $"{Application.QuitKey}", () => Quit(), null, null, (KeyCode)Application.QuitKey),
+					new("_Quit", $"{Application.QuitKey}", () => Quit (), null, null,
+						(KeyCode)Application.QuitKey)
 				}),
-				new MenuBarItem("_Quit", $"{Application.QuitKey}", () => Quit()),
-			});
+				new MenuBarItem ("_Quit", $"{Application.QuitKey}", () => Quit ())
+			]
+		};
 
 		Application.Top.Add (menu);
 
@@ -114,9 +124,7 @@ public class CollectionNavigatorTester : Scenario {
 		CreateTreeView ();
 	}
 
-	ListView _listView = null;
-
-	private void CreateListView ()
+	void CreateListView ()
 	{
 		var label = new Label {
 			Text = "ListView",
@@ -124,7 +132,7 @@ public class CollectionNavigatorTester : Scenario {
 			X = 0,
 			Y = 1, // for menu
 			Width = Dim.Percent (50),
-			Height = 1,
+			Height = 1
 		};
 		Application.Top.Add (label);
 
@@ -134,7 +142,7 @@ public class CollectionNavigatorTester : Scenario {
 			Width = Dim.Percent (50) - 1,
 			Height = Dim.Fill (),
 			AllowsMarking = false,
-			AllowsMultipleSelection = false,
+			AllowsMultipleSelection = false
 		};
 		Application.Top.Add (_listView);
 
@@ -145,9 +153,7 @@ public class CollectionNavigatorTester : Scenario {
 		};
 	}
 
-	TreeView _treeView = null;
-
-	private void CreateTreeView ()
+	void CreateTreeView ()
 	{
 		var label = new Label {
 			Text = "TreeView",
@@ -155,11 +161,11 @@ public class CollectionNavigatorTester : Scenario {
 			X = Pos.Right (_listView) + 2,
 			Y = 1, // for menu
 			Width = Dim.Percent (50),
-			Height = 1,
+			Height = 1
 		};
 		Application.Top.Add (label);
 
-		_treeView = new TreeView () {
+		_treeView = new TreeView {
 			X = Pos.Right (_listView) + 1,
 			Y = Pos.Bottom (label),
 			Width = Dim.Fill (),
@@ -169,10 +175,12 @@ public class CollectionNavigatorTester : Scenario {
 		Application.Top.Add (_treeView);
 
 		var root = new TreeNode ("IsLetterOrDigit examples");
-		root.Children = _items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
+		root.Children = _items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i))
+			.Cast<ITreeNode> ().ToList ();
 		_treeView.AddObject (root);
 		root = new TreeNode ("Non-IsLetterOrDigit examples");
-		root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i)).Cast<ITreeNode> ().ToList ();
+		root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode (i))
+			.Cast<ITreeNode> ().ToList ();
 		_treeView.AddObject (root);
 		_treeView.ExpandAll ();
 		_treeView.GoToFirst ();
@@ -182,8 +190,5 @@ public class CollectionNavigatorTester : Scenario {
 		};
 	}
 
-	private void Quit ()
-	{
-		Application.RequestStop ();
-	}
+	void Quit () => Application.RequestStop ();
 }

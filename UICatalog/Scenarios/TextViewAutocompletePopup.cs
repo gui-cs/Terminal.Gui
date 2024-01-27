@@ -28,15 +28,17 @@ public class TextViewAutocompletePopup : Scenario {
 		var text = " jamp jemp jimp jomp jump";
 
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new [] {
-				_miMultiline = new MenuItem ("_Multiline", "", () => Multiline ())
-					{ CheckType = MenuItemCheckStyle.Checked },
-				_miWrap = new MenuItem ("_Word Wrap", "", () => WordWrap ())
-					{ CheckType = MenuItemCheckStyle.Checked },
-				new("_Quit", "", () => Quit ())
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new [] {
+					_miMultiline = new MenuItem ("_Multiline", "", () => Multiline ())
+						{ CheckType = MenuItemCheckStyle.Checked },
+					_miWrap = new MenuItem ("_Word Wrap", "", () => WordWrap ())
+						{ CheckType = MenuItemCheckStyle.Checked },
+					new("_Quit", "", () => Quit ())
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		_textViewTopLeft = new TextView {

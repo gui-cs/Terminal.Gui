@@ -15,11 +15,13 @@ public class InteractiveTree : Scenario {
 		Win.Y = 1; // menu
 		Win.Height = Dim.Fill (1); // status bar
 
-		var menu = new MenuBar ([
+		var menu = new MenuBar {
+			Menus = [
 			new MenuBarItem ("_File", new MenuItem [] {
 				new("_Quit", "", Quit)
 			})
-		]);
+		]
+		};
 		Application.Top.Add (menu);
 
 		_treeView = new TreeView {

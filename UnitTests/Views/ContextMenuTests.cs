@@ -537,10 +537,12 @@ public class ContextMenuTests {
 			])
 		};
 
-		var menu = new MenuBar ([
-			new MenuBarItem ("File", "", null),
-			new MenuBarItem ("Edit", "", null)
-		]);
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("File", "", null),
+				new MenuBarItem ("Edit", "", null)
+			]
+		};
 
 		Application.Top.Add (menu);
 		Application.Begin (Application.Top);
@@ -587,10 +589,12 @@ public class ContextMenuTests {
 	{
 		Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 
-		var menu = new MenuBar ([
-			new MenuBarItem ("File", "", null),
-			new MenuBarItem ("Edit", "", null)
-		]);
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("File", "", null),
+				new MenuBarItem ("Edit", "", null)
+			]
+		};
 
 		var label = new Label {
 			X = 2,
@@ -651,10 +655,12 @@ public class ContextMenuTests {
 	{
 		Thread.CurrentThread.CurrentUICulture = new CultureInfo ("en-US");
 
-		var menu = new MenuBar (new [] {
-			new MenuBarItem ("File", "", null),
-			new MenuBarItem ("Edit", "", null)
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("File", "", null),
+				new MenuBarItem ("Edit", "", null)
+			]
+		};
 
 		var label = new Label { X = 2, Y = 3, Text = "Label:" };
 

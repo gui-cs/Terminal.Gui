@@ -1574,11 +1574,13 @@ public class ToplevelTests {
 	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("Child", new MenuItem [] {
-				new("_Create Child", "", null)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("Child", new MenuItem [] {
+					new("_Create Child", "", null)
+				})
+			]
+		};
 		var topChild = new Toplevel ();
 		topChild.Add (menu);
 		Application.Top.Add (topChild);

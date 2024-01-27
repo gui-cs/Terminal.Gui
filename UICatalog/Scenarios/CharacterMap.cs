@@ -127,14 +127,16 @@ public class CharacterMap : Scenario {
 		// TODO: Replace this with Dim.Auto when that's ready
 		_categoryList.Initialized += _categoryList_Initialized;
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_Quit", $"{Application.QuitKey}", () => Application.RequestStop ())
-			}),
-			new("_Options", new [] {
-				CreateMenuShowWidth ()
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Quit", $"{Application.QuitKey}", () => Application.RequestStop ())
+				}),
+				new MenuBarItem ("_Options", new [] {
+					CreateMenuShowWidth ()
+				})
+			]
+		};
 		Application.Top.Add (menu);
 	}
 

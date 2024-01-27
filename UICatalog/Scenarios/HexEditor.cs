@@ -35,24 +35,27 @@ public class HexEditor : Scenario {
 		_hexView.PositionChanged += _hexView_PositionChanged;
 		Win.Add (_hexView);
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_New", "", () => New ()),
-				new("_Open", "", () => Open ()),
-				new("_Save", "", () => Save ()),
-				null,
-				new("_Quit", "", () => Quit ())
-			}),
-			new("_Edit", new MenuItem [] {
-				new("_Copy", "", () => Copy ()),
-				new("C_ut", "", () => Cut ()),
-				new("_Paste", "", () => Paste ())
-			}),
-			new("_Options", new [] {
-				_miAllowEdits = new MenuItem ("_AllowEdits", "", () => ToggleAllowEdits ())
-					{ Checked = _hexView.AllowEdits, CheckType = MenuItemCheckStyle.Checked }
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_New", "", () => New ()),
+					new("_Open", "", () => Open ()),
+					new("_Save", "", () => Save ()),
+					null,
+					new("_Quit", "", () => Quit ())
+				}),
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new("_Copy", "", () => Copy ()),
+					new("C_ut", "", () => Cut ()),
+					new("_Paste", "", () => Paste ())
+				}),
+				new MenuBarItem ("_Options", new [] {
+					_miAllowEdits = new MenuItem ("_AllowEdits", "", () => ToggleAllowEdits ()) {
+						Checked = _hexView.AllowEdits, CheckType = MenuItemCheckStyle.Checked
+					}
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		_statusBar = new StatusBar (new [] {

@@ -47,28 +47,30 @@ public class CsvEditor : Scenario {
 			new("_Quit", "Quits The App", () => Quit ())
 		});
 		//fileMenu.Help = "Help";
-		var menu = new MenuBar (new [] {
-			fileMenu,
-			new("_Edit", new MenuItem [] {
-				new("_New Column", "", () => AddColumn ()),
-				new("_New Row", "", () => AddRow ()),
-				new("_Rename Column", "", () => RenameColumn ()),
-				new("_Delete Column", "", () => DeleteColum ()),
-				new("_Move Column", "", () => MoveColumn ()),
-				new("_Move Row", "", () => MoveRow ()),
-				new("_Sort Asc", "", () => Sort (true)),
-				new("_Sort Desc", "", () => Sort (false))
-			}),
-			new("_View", new [] {
-				_miLeft = new MenuItem ("_Align Left", "", () => Align (TextAlignment.Left)),
-				_miRight = new MenuItem ("_Align Right", "", () => Align (TextAlignment.Right)),
-				_miCentered = new MenuItem ("_Align Centered", "",
-					() => Align (TextAlignment.Centered)),
+		var menu = new MenuBar {
+			Menus = [
+				fileMenu,
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new("_New Column", "", () => AddColumn ()),
+					new("_New Row", "", () => AddRow ()),
+					new("_Rename Column", "", () => RenameColumn ()),
+					new("_Delete Column", "", () => DeleteColum ()),
+					new("_Move Column", "", () => MoveColumn ()),
+					new("_Move Row", "", () => MoveRow ()),
+					new("_Sort Asc", "", () => Sort (true)),
+					new("_Sort Desc", "", () => Sort (false))
+				}),
+				new MenuBarItem ("_View", new [] {
+					_miLeft = new MenuItem ("_Align Left", "", () => Align (TextAlignment.Left)),
+					_miRight = new MenuItem ("_Align Right", "", () => Align (TextAlignment.Right)),
+					_miCentered = new MenuItem ("_Align Centered", "",
+						() => Align (TextAlignment.Centered)),
 
-				// Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
-				_miCentered = new MenuItem ("_Set Format Pattern", "", () => SetFormat ())
-			})
-		});
+					// Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
+					_miCentered = new MenuItem ("_Set Format Pattern", "", () => SetFormat ())
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		var statusBar = new StatusBar (new StatusItem [] {

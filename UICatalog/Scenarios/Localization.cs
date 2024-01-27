@@ -33,13 +33,15 @@ public class Localization : Scenario {
 				}
 			)
 			.ToArray ();
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new MenuBarItem ("_Language", languageMenus),
-				null,
-				new("_Quit", "", Quit)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new MenuBarItem ("_Language", languageMenus),
+					null,
+					new("_Quit", "", Quit)
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		var selectLanguageLabel = new Label { X = 2, Y = 1, Width = Dim.Fill (2), AutoSize = true, Text = "Please select a language." };

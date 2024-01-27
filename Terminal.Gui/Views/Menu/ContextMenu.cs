@@ -188,13 +188,14 @@ public sealed class ContextMenu : IDisposable {
 			position.Y = 0;
 		}
 
-		_menuBar = new MenuBar (new [] { MenuItems }) {
+		_menuBar = new MenuBar {
 			X = position.X,
 			Y = position.Y,
 			Width = 0,
 			Height = 0,
 			UseSubMenusSingleFrame = UseSubMenusSingleFrame,
-			Key = Key
+			Key = Key,
+			Menus = [MenuItems]
 		};
 
 		_menuBar._isContextMenuLoading = true;

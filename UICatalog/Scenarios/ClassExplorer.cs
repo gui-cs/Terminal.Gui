@@ -22,25 +22,27 @@ public class ClassExplorer : Scenario {
 		Win.Y = 1; // menu
 		Win.Height = Dim.Fill (1); // status bar
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new("_File", new MenuItem [] {
-				new("_Quit", "", () => Quit ())
-			}),
-			new("_View", new [] {
-				_miShowPrivate = new MenuItem ("_Include Private", "", () => ShowPrivate ()) {
-					Checked = false,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				new("_Expand All", "", () => _treeView.ExpandAll ()),
-				new("_Collapse All", "", () => _treeView.CollapseAll ())
-			}),
-			new("_Style", new [] {
-				_highlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "",
-					() => OnCheckHighlightModelTextOnly ()) {
-					CheckType = MenuItemCheckStyle.Checked
-				}
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Quit", "", () => Quit ())
+				}),
+				new MenuBarItem ("_View", new [] {
+					_miShowPrivate = new MenuItem ("_Include Private", "", () => ShowPrivate ()) {
+						Checked = false,
+						CheckType = MenuItemCheckStyle.Checked
+					},
+					new("_Expand All", "", () => _treeView.ExpandAll ()),
+					new("_Collapse All", "", () => _treeView.CollapseAll ())
+				}),
+				new MenuBarItem ("_Style", new [] {
+					_highlightModelTextOnly = new MenuItem ("_Highlight Model Text Only", "",
+						() => OnCheckHighlightModelTextOnly ()) {
+						CheckType = MenuItemCheckStyle.Checked
+					}
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		_treeView = new TreeView<object> {
