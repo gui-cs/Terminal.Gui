@@ -1,17 +1,12 @@
-﻿using System;
-using Xunit;
+﻿using System.Text;
 using Xunit.Abstractions;
-using System.Text;
 
 namespace Terminal.Gui.ViewTests;
 
 public class HotKeyTests {
 	readonly ITestOutputHelper _output;
 
-	public HotKeyTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public HotKeyTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void Defaults ()
@@ -32,7 +27,7 @@ public class HotKeyTests {
 	[InlineData (KeyCode.D1)]
 	[InlineData (KeyCode.D1 | KeyCode.ShiftMask)]
 	[InlineData ((KeyCode)'!')]
-	[InlineData ((KeyCode)'х')]  // Cyrillic x
+	[InlineData ((KeyCode)'х')] // Cyrillic x
 	[InlineData ((KeyCode)'你')] // Chinese ni
 	[InlineData ((KeyCode)'ö')] // German o umlaut
 	[InlineData (KeyCode.Null)]
@@ -48,20 +43,20 @@ public class HotKeyTests {
 	[InlineData (KeyCode.A | KeyCode.ShiftMask)]
 	[InlineData (KeyCode.D1)]
 	[InlineData (KeyCode.D1 | KeyCode.ShiftMask)] // '!'
-	[InlineData ((KeyCode)'х')]  // Cyrillic x
+	[InlineData ((KeyCode)'х')] // Cyrillic x
 	[InlineData ((KeyCode)'你')] // Chinese ni
 	[InlineData ((KeyCode)'ö')] // German o umlaut
 	public void Set_SetsKeyBindings (KeyCode key)
 	{
 		var view = new View ();
-		view.HotKey = (Key)key;
+		view.HotKey = key;
 		Assert.Equal (string.Empty, view.Title);
-		Assert.Equal ((Key)key, view.HotKey);
+		Assert.Equal (key, view.HotKey);
 
 		// Verify key bindings were set
 
 		// As passed
-		var commands = view.KeyBindings.GetCommands ((Key)key);
+		var commands = view.KeyBindings.GetCommands (key);
 		Assert.Contains (Command.Accept, commands);
 
 		var baseKey = ((Key)key).NoShift;
@@ -133,12 +128,14 @@ public class HotKeyTests {
 		// A..Z must be naked (Alt is assumed)
 		view.HotKey = KeyCode.A | KeyCode.AltMask;
 		Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.A | KeyCode.CtrlMask);
-		Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
+		Assert.Throws<ArgumentException> (() =>
+			view.HotKey = KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
 
 		// All others must not have Ctrl (Alt is assumed)
 		view.HotKey = KeyCode.D1 | KeyCode.AltMask;
 		Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.D1 | KeyCode.CtrlMask);
-		Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
+		Assert.Throws<ArgumentException> (() =>
+			view.HotKey = KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
 
 		// Shift is ok (e.g. this is '!')
 		view.HotKey = KeyCode.D1 | KeyCode.ShiftMask;
@@ -149,7 +146,7 @@ public class HotKeyTests {
 	[InlineData (KeyCode.A | KeyCode.ShiftMask)]
 	[InlineData (KeyCode.D1)]
 	[InlineData (KeyCode.D1 | KeyCode.ShiftMask)] // '!'
-	[InlineData ((KeyCode)'х')]  // Cyrillic x
+	[InlineData ((KeyCode)'х')] // Cyrillic x
 	[InlineData ((KeyCode)'你')] // Chinese ni
 	public void AddKeyBindingsForHotKey_Sets (KeyCode key)
 	{
@@ -177,7 +174,7 @@ public class HotKeyTests {
 			Assert.Contains (Command.Accept, commands);
 			commands = view.KeyBindings.GetCommands (key | KeyCode.AltMask);
 			Assert.Contains (Command.Accept, commands);
-			commands = view.KeyBindings.GetCommands (key & ~KeyCode.ShiftMask | KeyCode.AltMask);
+			commands = view.KeyBindings.GetCommands ((key & ~KeyCode.ShiftMask) | KeyCode.AltMask);
 			Assert.Contains (Command.Accept, commands);
 		} else {
 			// Non A..Z keys should not have shift bindings
@@ -221,22 +218,21 @@ public class HotKeyTests {
 	//[InlineData ("Test^!", (Key)'!')]
 	public void Text_Change_Sets_HotKey (string text, KeyCode expectedHotKey)
 	{
-		var view = new View () {
+		var view = new View {
 			HotKeySpecifier = new Rune ('^'),
 			Text = "^Hello"
 		};
 		Assert.Equal (KeyCode.H, view.HotKey);
-		
+
 		view.Text = text;
 		Assert.Equal (expectedHotKey, view.HotKey);
-
 	}
 
 	[Theory]
-	[InlineData("^Test")]
+	[InlineData ("^Test")]
 	public void Text_Empty_Sets_HotKey_To_Null (string text)
 	{
-		var view = new View () {
+		var view = new View {
 			HotKeySpecifier = (Rune)'^',
 			Text = text
 		};
@@ -258,20 +254,20 @@ public class HotKeyTests {
 	[InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, false)]
 	public void KeyPress_Runs_Default_HotKey_Command (KeyCode mask, bool expected)
 	{
-		var view = new View () {
+		var view = new View {
 			HotKeySpecifier = (Rune)'^',
 			Text = "^Test"
 		};
 		view.CanFocus = true;
 		Assert.False (view.HasFocus);
-		view.NewKeyDownEvent (new (KeyCode.T | mask));
+		view.NewKeyDownEvent (new Key (KeyCode.T | mask));
 		Assert.Equal (expected, view.HasFocus);
 	}
 
 	[Fact]
 	public void ProcessKeyDown_Invokes_HotKey_Command_With_SuperView ()
 	{
-		var view = new View () {
+		var view = new View {
 			HotKeySpecifier = (Rune)'^',
 			Text = "^Test"
 		};
@@ -285,7 +281,6 @@ public class HotKeyTests {
 		var ke = new Key (KeyCode.T);
 		superView.NewKeyDownEvent (ke);
 		Assert.True (view.HasFocus);
-
 	}
 
 
@@ -297,7 +292,7 @@ public class HotKeyTests {
 		view.InvokingKeyBindings += (s, e) => {
 			Assert.Fail ();
 		};
-		
+
 		var superView = new View ();
 		superView.Add (view);
 

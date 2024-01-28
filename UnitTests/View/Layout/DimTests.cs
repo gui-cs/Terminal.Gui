@@ -96,9 +96,9 @@ public class DimTests {
 	public void Width_Equals ()
 	{
 		var testRect1 = Rect.Empty;
-		var view1 = new View (testRect1);
+		var view1 = new View { Frame = testRect1 };
 		var testRect2 = Rect.Empty;
-		var view2 = new View (testRect2);
+		var view2 = new View { Frame = testRect2 };
 
 		var dim1 = Dim.Width (view1);
 		var dim2 = Dim.Width (view1);
@@ -109,7 +109,7 @@ public class DimTests {
 		Assert.NotEqual (dim1, dim2);
 
 		testRect1 = new Rect (0, 1, 2, 3);
-		view1 = new View (testRect1);
+		view1 = new View { Frame = testRect1 };
 		testRect2 = new Rect (0, 1, 2, 3);
 		dim1 = Dim.Width (view1);
 		dim2 = Dim.Width (view1);
@@ -117,7 +117,7 @@ public class DimTests {
 		Assert.Equal (dim1, dim2);
 
 		testRect1 = new Rect (0, -1, 2, 3);
-		view1 = new View (testRect1);
+		view1 = new View { Frame = testRect1 };
 		testRect2 = new Rect (0, -1, 2, 3);
 		dim1 = Dim.Width (view1);
 		dim2 = Dim.Width (view1);
@@ -125,9 +125,9 @@ public class DimTests {
 		Assert.Equal (dim1, dim2);
 
 		testRect1 = new Rect (0, -1, 2, 3);
-		view1 = new View (testRect1);
+		view1 = new View { Frame = testRect1 };
 		testRect2 = Rect.Empty;
-		view2 = new View (testRect2);
+		view2 = new View { Frame = testRect2 };
 		dim1 = Dim.Width (view1);
 		dim2 = Dim.Width (view2);
 		Assert.NotEqual (dim1, dim2);
@@ -267,7 +267,7 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Null ()
 	{
-		var t = new View ("top") { Width = 80, Height = 25 };
+		var t = new View { Width = 80, Height = 25, Text = "top" };
 
 		var w = new Window { X = 1, Y = 2, Width = 4, Height = 5, Title = "w" };
 		t.Add (w);
@@ -285,15 +285,16 @@ public class DimTests {
 	public void
 		Dim_Validation_Do_Not_Throws_If_NewValue_Is_DimAbsolute_And_OldValue_Is_Another_Type_After_Sets_To_LayoutStyle_Absolute ()
 	{
-		var t = new View ("top") { Width = 80, Height = 25 };
+		var t = new View { Width = 80, Height = 25, Text = "top" };
 
 		var w = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Sized (10)
 		};
-		var v = new View ("v") {
+		var v = new View {
 			Width = Dim.Width (w) - 2,
-			Height = Dim.Percent (10)
+			Height = Dim.Percent (10),
+			Text = "v"
 		};
 
 		w.Add (v);
@@ -602,7 +603,7 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void DimCombine_ObtuseScenario_Does_Not_Throw_If_Two_SubViews_Refs_The_Same_SuperView ()
 	{
-		var t = new View ("top") { Width = 80, Height = 25 };
+		var t = new View { Width = 80, Height = 25, Text = "top" };
 
 		var w = new Window {
 			Width = Dim.Width (t) - 2, // 78
@@ -887,13 +888,15 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_Referencing_SuperView_Does_Not_Throw ()
 	{
-		var super = new View ("super") {
+		var super = new View {
 			Width = 10,
-			Height = 10
+			Height = 10,
+			Text = "super"
 		};
-		var view = new View ("view") {
+		var view = new View {
 			Width = Dim.Width (super), // this is allowed
-			Height = Dim.Height (super) // this is allowed
+			Height = Dim.Height (super), // this is allowed
+			Text = "view"
 		};
 
 		super.Add (view);
@@ -911,17 +914,20 @@ public class DimTests {
 	[TestRespondersDisposed]
 	public void Dim_SyperView_Referencing_SubView_Throws ()
 	{
-		var super = new View ("super") {
+		var super = new View {
 			Width = 10,
-			Height = 10
+			Height = 10,
+			Text = "super"
 		};
-		var view2 = new View ("view2") {
+		var view2 = new View {
 			Width = 10,
-			Height = 10
+			Height = 10,
+			Text = "view2"
 		};
-		var view = new View ("view") {
+		var view = new View {
 			Width = Dim.Width (view2), // this is not allowed
-			Height = Dim.Height (view2) // this is not allowed
+			Height = Dim.Height (view2), // this is not allowed
+			Text = "view"
 		};
 
 		view.Add (view2);

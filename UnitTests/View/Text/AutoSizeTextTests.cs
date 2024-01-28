@@ -862,8 +862,8 @@ public class AutoSizeTextTests {
 		var label = new Label { Width = 10, Height = 2, ValidatePosDim = true, Text = "Hello" };
 		// BUGBUG: View are now no longer automatically sized by text on startup.
 		// Therefore it is necessary to set AutoSize to true
-		var viewX = new View ("X") { X = Pos.Right (label), AutoSize = true };
-		var viewY = new View ("Y") { Y = Pos.Bottom (label), AutoSize = true };
+		var viewX = new View { X = Pos.Right (label), AutoSize = true, Text = "X" };
+		var viewY = new View { Y = Pos.Bottom (label), AutoSize = true, Text = "Y" };
 
 		Application.Top.Add (label, viewX, viewY);
 		var rs = Application.Begin (Application.Top);
@@ -910,8 +910,8 @@ Y
 		};
 		// BUGBUG: View are now no longer automatically sized by text on startup.
 		// Therefore it is necessary to set AutoSize to true
-		var viewX = new View ("X") { X = Pos.Right (label), AutoSize = true };
-		var viewY = new View ("Y") { Y = Pos.Bottom (label), AutoSize = true };
+		var viewX = new View { X = Pos.Right (label), AutoSize = true, Text = "X" };
+		var viewY = new View { Y = Pos.Bottom (label), AutoSize = true, Text = "Y" };
 
 		Application.Top.Add (label, viewX, viewY);
 		var rs = Application.Begin (Application.Top);
@@ -1156,10 +1156,11 @@ Y
 			Text = "Say Hello view1 你",
 			AutoSize = true
 		};
-		var viewTopBottom_LeftRight = new View (new Rect (0, 0, 0, 10)) {
+		var viewTopBottom_LeftRight = new View {
 			Text = "Say Hello view2 你",
 			AutoSize = true,
-			TextDirection = TextDirection.TopBottom_LeftRight
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			Frame = new Rect (0, 0, 0, 10)
 		};
 		Application.Top.Add (view1, viewTopBottom_LeftRight);
 
@@ -1181,8 +1182,11 @@ Y
 		Assert.Equal ("Absolute(0)", viewTopBottom_LeftRight.X.ToString ());
 		Assert.Equal ("Absolute(0)", viewTopBottom_LeftRight.Y.ToString ());
 		Assert.Equal ("Absolute(2)", viewTopBottom_LeftRight.Width.ToString ());
-		// BUGBUG: AutoSize is true and the Height 17 is unchanged
-		Assert.Equal ("Absolute(17)", viewTopBottom_LeftRight.Height.ToString ());
+		// BUGBUG: Before: AutoSize is true and the Height 17 is unchanged
+		// BUGBUG: AutoSize is true and the Height 10 is unchanged set by Frame - new Rect (0, 0, 0, 10)
+		Assert.Equal ("Absolute(10)", viewTopBottom_LeftRight.Height.ToString ());
+		Assert.Equal ("(0,0,2,17)", viewTopBottom_LeftRight.Frame.ToString ());
+		Assert.Equal ("(0,0,2,17)", viewTopBottom_LeftRight.Bounds.ToString ());
 
 		view1.Frame = new Rect (0, 0, 25, 4);
 		var firstIteration = false;
@@ -1265,7 +1269,7 @@ Y
 	{
 		var top = Application.Top;
 
-		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
+		var view = new View { X = 0, Y = 0, Width = 20, Height = 1, Text = "View with long text" };
 		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
 		var count = 0;
 		// Label is AutoSize == true
@@ -1328,7 +1332,7 @@ Y
 	public void AutoSize_Dim_Subtract_Operator_With_Text ()
 	{
 		var top = Application.Top;
-		var view = new View ("View with long text") { X = 0, Y = 0, Width = 20, Height = 1 };
+		var view = new View { X = 0, Y = 0, Width = 20, Height = 1, Text = "View with long text" };
 		var field = new TextField { X = 0, Y = Pos.Bottom (view), Width = 20 };
 		var count = 20;
 		// Label is AutoSize == true
@@ -2582,10 +2586,22 @@ Y
 	{
 		var text = "Hello World";
 		var width = 20;
-		var lblLeft = new View (text) { Width = width, AutoSize = autoSize };
-		var lblCenter = new View (text) { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize };
-		var lblRight = new View (text) { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize };
-		var lblJust = new View (text) { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize };
+		var lblLeft = new View { Width = width, AutoSize = autoSize, Text = text };
+		var lblCenter = new View {
+			Y = 1,
+			Width = width,
+			TextAlignment = TextAlignment.Centered,
+			AutoSize = autoSize,
+			Text = text
+		};
+		var lblRight = new View { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize, Text = text };
+		var lblJust = new View {
+			Y = 3,
+			Width = width,
+			TextAlignment = TextAlignment.Justified,
+			AutoSize = autoSize,
+			Text = text
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
 		Application.Top.Add (frame);
@@ -2639,27 +2655,35 @@ Y
 	{
 		var text = "Hello World";
 		var height = 20;
-		var lblLeft = new View (text) { Height = height, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
-		var lblCenter = new View (text) {
+		var lblLeft = new View {
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize,
+			Text = text
+		};
+		var lblCenter = new View {
 			X = 2,
 			Height = height,
 			TextDirection = TextDirection.TopBottom_LeftRight,
 			AutoSize = autoSize,
-			VerticalTextAlignment = VerticalTextAlignment.Middle
+			VerticalTextAlignment = VerticalTextAlignment.Middle,
+			Text = text
 		};
-		var lblRight = new View (text) {
+		var lblRight = new View {
 			X = 4,
 			Height = height,
 			TextDirection = TextDirection.TopBottom_LeftRight,
 			AutoSize = autoSize,
-			VerticalTextAlignment = VerticalTextAlignment.Bottom
+			VerticalTextAlignment = VerticalTextAlignment.Bottom,
+			Text = text
 		};
-		var lblJust = new View (text) {
+		var lblJust = new View {
 			X = 6,
 			Height = height,
 			TextDirection = TextDirection.TopBottom_LeftRight,
 			AutoSize = autoSize,
-			VerticalTextAlignment = VerticalTextAlignment.Justified
+			VerticalTextAlignment = VerticalTextAlignment.Justified,
+			Text = text
 		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 

@@ -257,9 +257,7 @@ public class Scrolling : Scenario {
 		readonly int _h = 50;
 		readonly int _w = 40;
 
-		public Box10x (int x, int y) : base (new Rect (x, y, 20, 10))
-		{
-		}
+		public Box10x (int x, int y) => Frame = new Rect (x, y, 20, 10);
 
 		public bool WantCursorPosition { get; set; } = false;
 
@@ -290,10 +288,11 @@ public class Scrolling : Scenario {
 		int _h = 50;
 		int _w = 40;
 
-		public Filler (Rect rect) : base (rect)
+		public Filler (Rect rect)
 		{
 			_w = rect.Width;
 			_h = rect.Height;
+			Frame = rect;
 		}
 
 		public Size GetContentSize () => new (_w, _h);

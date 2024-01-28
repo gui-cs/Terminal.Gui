@@ -292,11 +292,12 @@ public class ContextMenuTests {
 	[AutoInitShutdown]
 	public void Show_Ensures_Display_Inside_The_Container_Without_Overlap_The_Host ()
 	{
-		var view = new View ("View") {
+		var view = new View {
 			X = Pos.AnchorEnd (10),
 			Y = Pos.AnchorEnd (1),
 			Width = 10,
-			Height = 1
+			Height = 1,
+			Text = "View"
 		};
 		var cm = new ContextMenu {
 			Host = view,

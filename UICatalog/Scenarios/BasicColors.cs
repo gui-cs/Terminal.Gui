@@ -1,5 +1,6 @@
 ﻿using System;
 using Terminal.Gui;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Basic Colors", "Show all basic colors.")]
@@ -50,6 +51,7 @@ public class BasicColors : Scenario {
 				Win.Add (l);
 				x++;
 			}
+
 			x = 30;
 			y++;
 		}
@@ -66,10 +68,11 @@ public class BasicColors : Scenario {
 		};
 		Win.Add (lblForeground);
 
-		var viewForeground = new View ("  ") {
+		var viewForeground = new View {
 			X = Pos.AnchorEnd (2),
 			Y = 2,
-			ColorScheme = new ColorScheme ()
+			ColorScheme = new ColorScheme (),
+			Text = "  "
 		};
 		Win.Add (viewForeground);
 
@@ -81,10 +84,11 @@ public class BasicColors : Scenario {
 		};
 		Win.Add (lblBackground);
 
-		var viewBackground = new View ("  ") {
+		var viewBackground = new View {
 			X = Pos.AnchorEnd (2),
 			Y = 4,
-			ColorScheme = new ColorScheme ()
+			ColorScheme = new ColorScheme (),
+			Text = "  "
 		};
 		Win.Add (viewBackground);
 
@@ -92,10 +96,12 @@ public class BasicColors : Scenario {
 			if (e.MouseEvent.View != null) {
 				var fore = e.MouseEvent.View.GetNormalColor ().Foreground;
 				var back = e.MouseEvent.View.GetNormalColor ().Background;
-				lblForeground.Text = $"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.GetClosestNamedColor ()} ";
+				lblForeground.Text =
+					$"#{fore.R:X2}{fore.G:X2}{fore.B:X2} {fore.GetClosestNamedColor ()} ";
 				viewForeground.ColorScheme = new ColorScheme (viewForeground.ColorScheme) { Normal = new Attribute (fore, fore) };
 
-				lblBackground.Text = $"#{back.R:X2}{back.G:X2}{back.B:X2} {back.GetClosestNamedColor ()} ";
+				lblBackground.Text =
+					$"#{back.R:X2}{back.G:X2}{back.B:X2} {back.GetClosestNamedColor ()} ";
 				viewBackground.ColorScheme = new ColorScheme (viewBackground.ColorScheme) { Normal = new Attribute (back, back) };
 			}
 		};

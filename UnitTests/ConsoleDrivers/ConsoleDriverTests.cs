@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-using Xunit.Abstractions;
-
+﻿using Xunit.Abstractions;
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DriverTests; 
+namespace Terminal.Gui.DriverTests;
 
 public class ConsoleDriverTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
 	public ConsoleDriverTests (ITestOutputHelper output)
 	{
 		ConsoleDriver.RunningUnitTests = true;
-		this.output = output;
+		_output = output;
 	}
 
 	[Theory]
@@ -60,11 +54,11 @@ public class ConsoleDriverTests {
 		Application.Init (driver);
 
 		var top = Application.Top;
-		var view = new View () {
+		var view = new View {
 			CanFocus = true
 		};
-		int count = 0;
-		bool wasKeyPressed = false;
+		var count = 0;
+		var wasKeyPressed = false;
 
 		view.KeyDown += (s, e) => {
 			wasKeyPressed = true;
@@ -93,21 +87,22 @@ public class ConsoleDriverTests {
 		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
 		Application.Init (driver);
 
-		string text = "MockKeyPresses";
+		var text = "MockKeyPresses";
 		var mKeys = new Stack<ConsoleKeyInfo> ();
-		foreach (char r in text.Reverse ()) {
+		foreach (var r in text.Reverse ()) {
 			var ck = char.IsLetter (r) ? (ConsoleKey)char.ToUpper (r) : (ConsoleKey)r;
 			var cki = new ConsoleKeyInfo (r, ck, false, false, false);
 			mKeys.Push (cki);
 		}
+
 		Console.MockKeyPresses = mKeys;
 
 		var top = Application.Top;
-		var view = new View () {
+		var view = new View {
 			CanFocus = true
 		};
-		string rText = "";
-		int idx = 0;
+		var rText = "";
+		var idx = 0;
 
 		view.KeyDown += (s, e) => {
 			Assert.Equal (text [idx], (char)e.KeyCode);
@@ -201,7 +196,7 @@ public class ConsoleDriverTests {
 		driver.Cols = 80;
 		driver.Rows = 25;
 
-		bool wasTerminalResized = false;
+		var wasTerminalResized = false;
 		driver.SizeChanged += (s, e) => {
 			wasTerminalResized = true;
 			Assert.Equal (120, e.Size.Width);

@@ -385,15 +385,12 @@ public class TextTests {
 	public void AutoSize_False_If_Text_Empty ()
 	{
 		var view1 = new View ();
-		var view2 = new View ("");
-		var view3 = new View { Text = "" };
+		var view2 = new View { Text = "" };
 
 		Assert.False (view1.AutoSize);
 		Assert.False (view2.AutoSize);
-		Assert.False (view3.AutoSize);
 		view1.Dispose ();
 		view2.Dispose ();
-		view3.Dispose ();
 	}
 
 	[Fact]
@@ -401,15 +398,12 @@ public class TextTests {
 	{
 		var view1 = new View ();
 		view1.Text = "Hello World";
-		var view2 = new View ("Hello World");
-		var view3 = new View { Text = "Hello World" };
+		var view2 = new View { Text = "Hello World" };
 
 		Assert.False (view1.AutoSize);
 		Assert.False (view2.AutoSize);
-		Assert.False (view3.AutoSize);
 		view1.Dispose ();
 		view2.Dispose ();
-		view3.Dispose ();
 	}
 
 	[Fact]

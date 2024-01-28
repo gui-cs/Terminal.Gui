@@ -1,4 +1,5 @@
 ﻿using Xunit.Abstractions;
+
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.ViewTests;
@@ -628,10 +629,11 @@ public class LayoutTests {
 
 		var top = Application.Top;
 
-		var view = new View ("view") {
+		var view = new View {
 			Y = -2,
 			Height = 10,
-			TextDirection = TextDirection.TopBottom_LeftRight
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			Text = "view"
 		};
 		top.Add (view);
 
@@ -660,7 +662,7 @@ public class LayoutTests {
 
 		var top = Application.Top;
 
-		var view = new View ("view") { X = -2 };
+		var view = new View { X = -2, Text = "view" };
 		top.Add (view);
 
 		Application.Iteration += (s, a) => {

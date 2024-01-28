@@ -787,17 +787,20 @@ public class PosTests {
 	[Fact]
 	public void PosCombine_Referencing_Same_View ()
 	{
-		var super = new View ("super") {
+		var super = new View {
 			Width = 10,
-			Height = 10
+			Height = 10,
+			Text = "super"
 		};
-		var view1 = new View ("view1") {
+		var view1 = new View {
 			Width = 2,
-			Height = 2
+			Height = 2,
+			Text = "view1"
 		};
-		var view2 = new View ("view2") {
+		var view2 = new View {
 			Width = 2,
-			Height = 2
+			Height = 2,
+			Text = "view2"
 		};
 		view2.X = Pos.AnchorEnd () - (Pos.Right (view2) - Pos.Left (view2));
 

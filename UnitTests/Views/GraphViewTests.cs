@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-using System.Text;
+﻿using System.Text;
 using Xunit.Abstractions;
-
 
 namespace Terminal.Gui.ViewsTests;
 
 #region Helper Classes
-class FakeHAxis : HorizontalAxis {
 
-	public List<Point> DrawAxisLinePoints = new List<Point> ();
-	public List<int> LabelPoints = new List<int> ();
+class FakeHAxis : HorizontalAxis {
+	public List<Point> DrawAxisLinePoints = new ();
+	public List<int> LabelPoints = new ();
 
 	protected override void DrawAxisLine (GraphView graph, int x, int y)
 	{
@@ -28,25 +23,25 @@ class FakeHAxis : HorizontalAxis {
 }
 
 class FakeVAxis : VerticalAxis {
-
-	public List<Point> DrawAxisLinePoints = new List<Point> ();
-	public List<int> LabelPoints = new List<int> ();
+	public List<Point> DrawAxisLinePoints = new ();
+	public List<int> LabelPoints = new ();
 
 	protected override void DrawAxisLine (GraphView graph, int x, int y)
 	{
 		base.DrawAxisLine (graph, x, y);
 		DrawAxisLinePoints.Add (new Point (x, y));
 	}
+
 	public override void DrawAxisLabel (GraphView graph, int screenPosition, string text)
 	{
 		base.DrawAxisLabel (graph, screenPosition, text);
 		LabelPoints.Add (screenPosition);
 	}
 }
+
 #endregion
 
 public class GraphViewTests {
-
 	static string LastInitFakeDriver;
 
 	public static FakeDriver InitFakeDriver ()
@@ -55,14 +50,14 @@ public class GraphViewTests {
 		try {
 			Application.Init (driver);
 		} catch (InvalidOperationException) {
-
 			// close it so that we don't get a thousand of these errors in a row
 			Application.Shutdown ();
 
 			// but still report a failure and name the test that didn't shut down.  Note
 			// that the test that didn't shutdown won't be the one currently running it will
 			// be the last one
-			throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver);
+			throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" +
+					     LastInitFakeDriver);
 		}
 
 		driver.Init ();
@@ -72,15 +67,16 @@ public class GraphViewTests {
 	}
 
 	/// <summary>
-	/// Returns a basic very small graph (10 x 5)
+	///         Returns a basic very small graph (10 x 5)
 	/// </summary>
 	/// <returns></returns>
 	public static GraphView GetGraph ()
 	{
-		GraphViewTests.InitFakeDriver ();
+		InitFakeDriver ();
 
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.ColorScheme = new ColorScheme ();
 		gv.MarginBottom = 1;
@@ -90,13 +86,96 @@ public class GraphViewTests {
 		return gv;
 	}
 
+	/// <summary>
+	///         A cell size of 0 would result in mapping all graph space into the
+	///         same cell of the console.  Since <see cref="GraphView.CellSize" />
+	///         is mutable a sensible place to check this is in redraw.
+	/// </summary>
+	[Fact]
+	public void CellSizeZero ()
+	{
+		InitFakeDriver ();
+
+		var gv = new GraphView ();
+		gv.BeginInit ();
+		gv.EndInit ();
+
+		gv.ColorScheme = new ColorScheme ();
+		gv.Bounds = new Rect (0, 0, 50, 30);
+		gv.Series.Add (new ScatterSeries { Points = new List<PointF> { new (1, 1) } });
+		gv.CellSize = new PointF (0, 5);
+		var ex = Assert.Throws<Exception> (() => gv.Draw ());
+
+		Assert.Equal ("CellSize cannot be 0", ex.Message);
+
+		// Shutdown must be called to safely clean up Application if Init has been called
+		Application.Shutdown ();
+	}
+
+
+	/// <summary>
+	///         Tests that each point in the screen space maps to a rectangle of
+	///         (float) graph space and that each corner of that rectangle of graph
+	///         space maps back to the same row/col of the graph that was fed in
+	/// </summary>
+	[Fact]
+	public void TestReversing_ScreenToGraphSpace ()
+	{
+		var gv = new GraphView ();
+		gv.BeginInit ();
+		gv.EndInit ();
+		gv.Bounds = new Rect (0, 0, 50, 30);
+
+		// How much graph space each cell of the console depicts
+		gv.CellSize = new PointF (0.1f, 0.25f);
+		gv.AxisX.Increment = 1;
+		gv.AxisX.ShowLabelsEvery = 1;
+
+		gv.AxisY.Increment = 1;
+		gv.AxisY.ShowLabelsEvery = 1;
+
+		// Start the graph at 80
+		gv.ScrollOffset = new PointF (0, 80);
+
+		for (var x = 0; x < gv.Bounds.Width; x++) {
+			for (var y = 0; y < gv.Bounds.Height; y++) {
+				var graphSpace = gv.ScreenToGraphSpace (x, y);
+
+				// See 
+				// https://en.wikipedia.org/wiki/Machine_epsilon
+				var epsilon = 0.0001f;
+
+				var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon,
+					graphSpace.Top + epsilon));
+				Assert.Equal (x, p.X);
+				Assert.Equal (y, p.Y);
+
+				p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon,
+					graphSpace.Top + epsilon));
+				Assert.Equal (x, p.X);
+				Assert.Equal (y, p.Y);
+
+				p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon,
+					graphSpace.Bottom - epsilon));
+				Assert.Equal (x, p.X);
+				Assert.Equal (y, p.Y);
+
+				p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon,
+					graphSpace.Bottom - epsilon));
+				Assert.Equal (x, p.X);
+				Assert.Equal (y, p.Y);
+			}
+		}
+	}
+
 	#region Screen to Graph Tests
 
 	[Fact]
 	public void ScreenToGraphSpace_DefaultCellSize ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -112,11 +191,13 @@ public class GraphViewTests {
 		Assert.Equal (1, up2along1.X);
 		Assert.Equal (2, up2along1.Y);
 	}
+
 	[Fact]
 	public void ScreenToGraphSpace_DefaultCellSize_WithMargin ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -148,11 +229,13 @@ public class GraphViewTests {
 		Assert.Equal (1, botLeft.Width);
 		Assert.Equal (1, botLeft.Height);
 	}
+
 	[Fact]
 	public void ScreenToGraphSpace_CustomCellSize ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -183,7 +266,8 @@ public class GraphViewTests {
 	public void GraphSpaceToScreen_DefaultCellSize ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -202,7 +286,8 @@ public class GraphViewTests {
 	public void GraphSpaceToScreen_DefaultCellSize_WithMargin ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -231,7 +316,8 @@ public class GraphViewTests {
 	public void GraphSpaceToScreen_ScrollOffset ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -248,11 +334,13 @@ public class GraphViewTests {
 		Assert.Equal (7, along2up1.X);
 		Assert.Equal (3, along2up1.Y);
 	}
+
 	[Fact]
 	public void GraphSpaceToScreen_CustomCellSize ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -291,7 +379,8 @@ public class GraphViewTests {
 	public void GraphSpaceToScreen_CustomCellSize_WithScrollOffset ()
 	{
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 
 		gv.Bounds = new Rect (0, 0, 20, 10);
 
@@ -322,102 +411,27 @@ public class GraphViewTests {
 	}
 
 	#endregion
-
-	/// <summary>
-	/// A cell size of 0 would result in mapping all graph space into the
-	/// same cell of the console.  Since <see cref="GraphView.CellSize"/>
-	/// is mutable a sensible place to check this is in redraw.
-	/// </summary>
-	[Fact]
-	public void CellSizeZero ()
-	{
-		InitFakeDriver ();
-
-		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
-
-		gv.ColorScheme = new ColorScheme ();
-		gv.Bounds = new Rect (0, 0, 50, 30);
-		gv.Series.Add (new ScatterSeries () { Points = new List<PointF> { new PointF (1, 1) } });
-		gv.CellSize = new PointF (0, 5);
-		var ex = Assert.Throws<Exception> (() => gv.Draw ());
-
-		Assert.Equal ("CellSize cannot be 0", ex.Message);
-
-		// Shutdown must be called to safely clean up Application if Init has been called
-		Application.Shutdown ();
-	}
-
-
-	/// <summary>
-	/// Tests that each point in the screen space maps to a rectangle of
-	/// (float) graph space and that each corner of that rectangle of graph
-	/// space maps back to the same row/col of the graph that was fed in
-	/// </summary>
-	[Fact]
-	public void TestReversing_ScreenToGraphSpace ()
-	{
-		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
-		gv.Bounds = new Rect (0, 0, 50, 30);
-
-		// How much graph space each cell of the console depicts
-		gv.CellSize = new PointF (0.1f, 0.25f);
-		gv.AxisX.Increment = 1;
-		gv.AxisX.ShowLabelsEvery = 1;
-
-		gv.AxisY.Increment = 1;
-		gv.AxisY.ShowLabelsEvery = 1;
-
-		// Start the graph at 80
-		gv.ScrollOffset = new PointF (0, 80);
-
-		for (int x = 0; x < gv.Bounds.Width; x++) {
-			for (int y = 0; y < gv.Bounds.Height; y++) {
-
-				var graphSpace = gv.ScreenToGraphSpace (x, y);
-
-				// See 
-				// https://en.wikipedia.org/wiki/Machine_epsilon
-				float epsilon = 0.0001f;
-
-				var p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Top + epsilon));
-				Assert.Equal (x, p.X);
-				Assert.Equal (y, p.Y);
-
-				p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon, graphSpace.Top + epsilon));
-				Assert.Equal (x, p.X);
-				Assert.Equal (y, p.Y);
-
-				p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Bottom - epsilon));
-				Assert.Equal (x, p.X);
-				Assert.Equal (y, p.Y);
-
-				p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon, graphSpace.Bottom - epsilon));
-				Assert.Equal (x, p.X);
-				Assert.Equal (y, p.Y);
-
-			}
-		}
-	}
 }
 
 public class SeriesTests {
-
 	[Fact]
 	public void Series_GetsPassedCorrectBounds_AllAtOnce ()
 	{
 		GraphViewTests.InitFakeDriver ();
 
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 		gv.ColorScheme = new ColorScheme ();
 		gv.Bounds = new Rect (0, 0, 50, 30);
 
-		RectangleF fullGraphBounds = RectangleF.Empty;
-		Rect graphScreenBounds = Rect.Empty;
+		var fullGraphBounds = RectangleF.Empty;
+		var graphScreenBounds = Rect.Empty;
 
-		var series = new FakeSeries ((v, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
+		var series = new FakeSeries ((v, s, g) => {
+			graphScreenBounds = s;
+			fullGraphBounds = g;
+		});
 		gv.Series.Add (series);
 
 		gv.LayoutSubviews ();
@@ -446,10 +460,10 @@ public class SeriesTests {
 	}
 
 	/// <summary>
-	/// Tests that the bounds passed to the ISeries for drawing into are 
-	/// correct even when the <see cref="GraphView.CellSize"/> results in
-	/// multiple units of graph space being condensed into each cell of
-	/// console
+	///         Tests that the bounds passed to the ISeries for drawing into are
+	///         correct even when the <see cref="GraphView.CellSize" /> results in
+	///         multiple units of graph space being condensed into each cell of
+	///         console
 	/// </summary>
 	[Fact]
 	public void Series_GetsPassedCorrectBounds_AllAtOnce_LargeCellSize ()
@@ -457,17 +471,21 @@ public class SeriesTests {
 		GraphViewTests.InitFakeDriver ();
 
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 		gv.ColorScheme = new ColorScheme ();
 		gv.Bounds = new Rect (0, 0, 50, 30);
 
 		// the larger the cell size the more condensed (smaller) the graph space is
 		gv.CellSize = new PointF (2, 5);
 
-		RectangleF fullGraphBounds = RectangleF.Empty;
-		Rect graphScreenBounds = Rect.Empty;
+		var fullGraphBounds = RectangleF.Empty;
+		var graphScreenBounds = Rect.Empty;
 
-		var series = new FakeSeries ((v, s, g) => { graphScreenBounds = s; fullGraphBounds = g; });
+		var series = new FakeSeries ((v, s, g) => {
+			graphScreenBounds = s;
+			fullGraphBounds = g;
+		});
 
 		gv.Series.Add (series);
 
@@ -497,37 +515,27 @@ public class SeriesTests {
 		Application.Shutdown ();
 	}
 
-	private class FakeSeries : ISeries {
-
-		readonly Action<GraphView, Rect, RectangleF> drawSeries;
+	class FakeSeries : ISeries {
+		readonly Action<GraphView, Rect, RectangleF> _drawSeries;
 
 		public FakeSeries (
 			Action<GraphView, Rect, RectangleF> drawSeries
-			)
-		{
-			this.drawSeries = drawSeries;
-		}
+		) =>
+			_drawSeries = drawSeries;
 
-		public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds)
-		{
-			drawSeries (graph, bounds, graphBounds);
-		}
+		public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) =>
+			_drawSeries (graph, bounds, graphBounds);
 	}
 }
 
 public class MultiBarSeriesTests {
+	readonly ITestOutputHelper _output;
 
-	readonly ITestOutputHelper output;
-
-	public MultiBarSeriesTests (ITestOutputHelper output)
-	{
-		this.output = output;
-	}
+	public MultiBarSeriesTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void MultiBarSeries_BarSpacing ()
 	{
-
 		// Creates clusters of 5 adjacent bars with 2 spaces between clusters
 		var series = new MultiBarSeries (5, 7, 1);
 
@@ -543,13 +551,14 @@ public class MultiBarSeriesTests {
 	[Fact]
 	public void MultiBarSeriesColors_WrongNumber ()
 	{
-		var colors = new []{
-				new Attribute (Color.Green,Color.Black)
-			};
+		var colors = new [] {
+			new Attribute (Color.Green, Color.Black)
+		};
 
 		// user passes 1 color only but asks for 5 bars
 		var ex = Assert.Throws<ArgumentException> (() => new MultiBarSeries (5, 7, 1, colors));
-		Assert.Equal ("Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')", ex.Message);
+		Assert.Equal ("Number of colors must match the number of bars (Parameter 'numberOfBarsPerCategory')",
+			ex.Message);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -558,11 +567,11 @@ public class MultiBarSeriesTests {
 	[Fact]
 	public void MultiBarSeriesColors_RightNumber ()
 	{
-		var colors = new []{
-				new Attribute (Color.Green,Color.Black),
-				new Attribute (Color.Green,Color.White),
-				new Attribute (Color.BrightYellow,Color.White)
-			};
+		var colors = new [] {
+			new Attribute (Color.Green, Color.Black),
+			new Attribute (Color.Green, Color.White),
+			new Attribute (Color.BrightYellow, Color.White)
+		};
 
 		// user passes 3 colors and asks for 3 bars
 		var series = new MultiBarSeries (3, 7, 1, colors);
@@ -578,20 +587,19 @@ public class MultiBarSeriesTests {
 	[Fact]
 	public void MultiBarSeriesAddValues_WrongNumber ()
 	{
-
 		// user asks for 3 bars per category
 		var series = new MultiBarSeries (3, 7, 1);
 
 		var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", (Rune)'#', 1));
 
-		Assert.Equal ("Number of values must match the number of bars per category (Parameter 'values')", ex.Message);
+		Assert.Equal ("Number of values must match the number of bars per category (Parameter 'values')",
+			ex.Message);
 	}
 
 
 	[Fact]
 	public void TestRendering_MultibarSeries ()
 	{
-
 		GraphViewTests.InitFakeDriver ();
 
 		var gv = new GraphView ();
@@ -617,8 +625,8 @@ public class MultiBarSeriesTests {
 
 		// don't show axis labels that means any labels
 		// that appear are explicitly from the bars
-		gv.AxisX = fakeXAxis = new FakeHAxis () { Increment = 0 };
-		gv.AxisY = new FakeVAxis () { Increment = 0 };
+		gv.AxisX = fakeXAxis = new FakeHAxis { Increment = 0 };
+		gv.AxisY = new FakeVAxis { Increment = 0 };
 
 		gv.LayoutSubviews ();
 		gv.Draw ();
@@ -644,8 +652,8 @@ public class MultiBarSeriesTests {
 		Assert.Equal (8, fakeXAxis.LabelPoints [1]);
 		Assert.Equal (12, fakeXAxis.LabelPoints [2]);
 
-		string looksLike =
-@" 
+		var looksLike =
+			@" 
  │          MM
  │       M  MM
  │       M  MM
@@ -656,7 +664,7 @@ public class MultiBarSeriesTests {
  │  MM  MM  MM
  ┼──┬M──┬M──┬M──────
    heytherebob  ";
-		TestHelpers.AssertDriverContentsAre (looksLike, output);
+		TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -664,13 +672,13 @@ public class MultiBarSeriesTests {
 }
 
 public class BarSeriesTests {
-
-	private GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
+	GraphView GetGraph (out FakeBarSeries series, out FakeHAxis axisX, out FakeVAxis axisY)
 	{
 		GraphViewTests.InitFakeDriver ();
 
 		var gv = new GraphView ();
-		gv.BeginInit (); gv.EndInit ();
+		gv.BeginInit ();
+		gv.EndInit ();
 		gv.ColorScheme = new ColorScheme ();
 
 		// y axis goes from 0.1 to 1 across 10 console rows
@@ -682,8 +690,8 @@ public class BarSeriesTests {
 
 		// don't show axis labels that means any labels
 		// that appaer are explicitly from the bars
-		gv.AxisX = axisX = new FakeHAxis () { Increment = 0 };
-		gv.AxisY = axisY = new FakeVAxis () { Increment = 0 };
+		gv.AxisX = axisX = new FakeHAxis { Increment = 0 };
+		gv.AxisY = axisY = new FakeVAxis { Increment = 0 };
 
 		return gv;
 	}
@@ -691,8 +699,7 @@ public class BarSeriesTests {
 	[Fact]
 	public void TestZeroHeightBar_WithName ()
 	{
-
-		var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+		var graph = GetGraph (out var barSeries, out var axisX, out var axisY);
 		graph.Draw ();
 
 		// no bars
@@ -725,8 +732,7 @@ public class BarSeriesTests {
 	[Fact]
 	public void TestTwoTallBars_WithOffset ()
 	{
-
-		var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+		var graph = GetGraph (out var barSeries, out var axisX, out var axisY);
 		graph.Draw ();
 
 		// no bars
@@ -778,8 +784,7 @@ public class BarSeriesTests {
 	[Fact]
 	public void TestOneLongOneShortHorizontalBars_WithOffset ()
 	{
-
-		var graph = GetGraph (out FakeBarSeries barSeries, out FakeHAxis axisX, out FakeVAxis axisY);
+		var graph = GetGraph (out var barSeries, out var axisX, out var axisY);
 		graph.Draw ();
 
 		// no bars
@@ -839,16 +844,14 @@ public class BarSeriesTests {
 		Application.Shutdown ();
 	}
 
-	private class FakeBarSeries : BarSeries {
+	class FakeBarSeries : BarSeries {
 		public GraphCellToRender FinalColor { get; private set; }
 
-		public List<Point> BarScreenStarts { get; private set; } = new List<Point> ();
-		public List<Point> BarScreenEnds { get; private set; } = new List<Point> ();
+		public List<Point> BarScreenStarts { get; } = new ();
+		public List<Point> BarScreenEnds { get; } = new ();
 
-		protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender)
-		{
-			return FinalColor = base.AdjustColor (graphCellToRender);
-		}
+		protected override GraphCellToRender AdjustColor (GraphCellToRender graphCellToRender) =>
+			FinalColor = base.AdjustColor (graphCellToRender);
 
 		protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
 		{
@@ -857,21 +860,15 @@ public class BarSeriesTests {
 			BarScreenStarts.Add (start);
 			BarScreenEnds.Add (end);
 		}
-
 	}
 }
 
 public class AxisTests {
+	GraphView GetGraph (out FakeHAxis axis) => GetGraph (out axis, out _);
 
-	private GraphView GetGraph (out FakeHAxis axis)
-	{
-		return GetGraph (out axis, out _);
-	}
-	private GraphView GetGraph (out FakeVAxis axis)
-	{
-		return GetGraph (out _, out axis);
-	}
-	private GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
+	GraphView GetGraph (out FakeVAxis axis) => GetGraph (out _, out axis);
+
+	GraphView GetGraph (out FakeHAxis axisX, out FakeVAxis axisY)
 	{
 		GraphViewTests.InitFakeDriver ();
 
@@ -892,8 +889,8 @@ public class AxisTests {
 	#region HorizontalAxis Tests
 
 	/// <summary>
-	/// Tests that the horizontal axis is computed correctly and does not over spill
-	/// it's bounds
+	///         Tests that the horizontal axis is computed correctly and does not over spill
+	///         it's bounds
 	/// </summary>
 	[Fact]
 	public void TestHAxisLocation_NoMargin ()
@@ -971,8 +968,8 @@ public class AxisTests {
 	#region VerticalAxisTests
 
 	/// <summary>
-	/// Tests that the horizontal axis is computed correctly and does not over spill
-	/// it's bounds
+	///         Tests that the horizontal axis is computed correctly and does not over spill
+	///         it's bounds
 	/// </summary>
 	[Fact]
 	public void TestVAxisLocation_NoMargin ()
@@ -1050,19 +1047,16 @@ public class AxisTests {
 }
 
 public class TextAnnotationTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public TextAnnotationTests (ITestOutputHelper output)
-	{
-		this.output = output;
-	}
+	public TextAnnotationTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void TestTextAnnotation_ScreenUnits ()
 	{
 		var gv = GraphViewTests.GetGraph ();
 
-		gv.Annotations.Add (new TextAnnotation () {
+		gv.Annotations.Add (new TextAnnotation {
 			Text = "hey!",
 			ScreenPosition = new Point (3, 1)
 		});
@@ -1070,14 +1064,14 @@ public class TextAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
  │
  ┤ hey!
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// user scrolls up one unit of graph space
 		gv.ScrollOffset = new PointF (0, 1f);
@@ -1087,14 +1081,14 @@ public class TextAnnotationTests {
 		// this is because screen units are constant and do not change as the viewport into
 		// graph space scrolls to different areas of the graph
 		expected =
-@"
+			@"
  │
  ┤ hey!
  ┤
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1105,7 +1099,7 @@ public class TextAnnotationTests {
 	{
 		var gv = GraphViewTests.GetGraph ();
 
-		gv.Annotations.Add (new TextAnnotation () {
+		gv.Annotations.Add (new TextAnnotation {
 			Text = "hey!",
 			GraphPosition = new PointF (2, 2)
 		});
@@ -1114,14 +1108,14 @@ public class TextAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
  │
  ┤ hey!
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// user scrolls up one unit of graph space
 		gv.ScrollOffset = new PointF (0, 1f);
@@ -1132,14 +1126,14 @@ public class TextAnnotationTests {
 		// lower down in the view.  Note the 1 on the axis too, our viewport
 		// (excluding margins) now shows y of 1 to 4 (previously 0 to 5)
 		expected =
-@"
+			@"
  │
  ┤ 
  ┤ hey!
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1150,7 +1144,7 @@ public class TextAnnotationTests {
 	{
 		var gv = GraphViewTests.GetGraph ();
 
-		gv.Annotations.Add (new TextAnnotation () {
+		gv.Annotations.Add (new TextAnnotation {
 			Text = "hey there partner hows it going boy its great",
 			GraphPosition = new PointF (2, 2)
 		});
@@ -1163,14 +1157,14 @@ public class TextAnnotationTests {
 		// the GraphPosition of the anntation is 2
 		// Leaving 7 characters of the annotation renderable (including space)
 		var expected =
-@"
+			@"
  │
  ┤ hey the
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1181,7 +1175,7 @@ public class TextAnnotationTests {
 	{
 		var gv = GraphViewTests.GetGraph ();
 
-		gv.Annotations.Add (new TextAnnotation () {
+		gv.Annotations.Add (new TextAnnotation {
 			Text = "hey there partner hows it going boy its great",
 			GraphPosition = new PointF (9, 2)
 		});
@@ -1191,14 +1185,14 @@ public class TextAnnotationTests {
 
 		// Text is off the screen (graph x axis runs to 8 not 9)
 		var expected =
-@"
+			@"
  │
  ┤
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1212,7 +1206,7 @@ public class TextAnnotationTests {
 	{
 		var gv = GraphViewTests.GetGraph ();
 
-		gv.Annotations.Add (new TextAnnotation () {
+		gv.Annotations.Add (new TextAnnotation {
 			Text = whitespace,
 			GraphPosition = new PointF (4, 2)
 		});
@@ -1226,14 +1220,14 @@ public class TextAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@$"
+			@$"
  │
  ┤      {CM.Glyphs.Dot}
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1241,12 +1235,9 @@ public class TextAnnotationTests {
 }
 
 public class LegendTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public LegendTests (ITestOutputHelper output)
-	{
-		this.output = output;
-	}
+	public LegendTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void Constructors_Defaults ()
@@ -1280,14 +1271,14 @@ public class LegendTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
  │┌───┐
  ┤│AAn│
  ┤└───┘
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1308,14 +1299,14 @@ public class LegendTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
  │AAnt
  ┤B?
  ┤CCat
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1323,12 +1314,9 @@ public class LegendTests {
 }
 
 public class PathAnnotationTests {
-	readonly ITestOutputHelper output;
+	readonly ITestOutputHelper _output;
 
-	public PathAnnotationTests (ITestOutputHelper output)
-	{
-		this.output = output;
-	}
+	public PathAnnotationTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void PathAnnotation_Box ()
@@ -1350,14 +1338,14 @@ public class PathAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
  │......
  ┤.    .
  ┤......
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1388,7 +1376,7 @@ public class PathAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@$"
+			@$"
  │
 1┤{CM.Glyphs.Dot}
  │ 
@@ -1396,7 +1384,7 @@ public class PathAnnotationTests {
  0    5   
           
           ";
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1427,7 +1415,7 @@ public class PathAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@$"
+			@$"
    │
   2┤
    │
@@ -1437,7 +1425,7 @@ public class PathAnnotationTests {
    0    5
          
           ";
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1458,15 +1446,16 @@ public class PathAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
          
          
           ";
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
 	}
+
 	[Fact]
 	public void MarginLeft_BiggerThanWidth_ExpectBlankGraph ()
 	{
@@ -1482,11 +1471,11 @@ public class PathAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
          
          
           ";
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1512,14 +1501,14 @@ public class PathAnnotationTests {
 		gv.Draw ();
 
 		var expected =
-@"
+			@"
  │  ..
  ┤..  ..
  ┤ ...
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-		TestHelpers.AssertDriverContentsAre (expected, output);
+		TestHelpers.AssertDriverContentsAre (expected, _output);
 
 		// Shutdown must be called to safely clean up Application if Init has been called
 		Application.Shutdown ();
@@ -1535,7 +1524,7 @@ public class PathAnnotationTests {
 		driver.Init ();
 
 		// create a wide window
-		var mount = new View () {
+		var mount = new View {
 			Width = 100,
 			Height = 100
 		};
@@ -1573,7 +1562,6 @@ public class PathAnnotationTests {
 
 			// should have the new text rendered
 			TestHelpers.AssertDriverContentsAre ("ff1234", null);
-
 		} finally {
 			Application.Shutdown ();
 		}

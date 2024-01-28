@@ -15,15 +15,17 @@ public class NavigationTests {
 		var top = new Toplevel ();
 
 		var win = new Window ();
-		var winSubview = new View ("WindowSubview") {
-			CanFocus = true
+		var winSubview = new View {
+			CanFocus = true,
+			Text = "WindowSubview"
 		};
 		win.Add (winSubview);
 		top.Add (win);
 
 		var frm = new FrameView ();
-		var frmSubview = new View ("FrameSubview") {
-			CanFocus = true
+		var frmSubview = new View {
+			CanFocus = true,
+			Text = "FrameSubview"
 		};
 		frm.Add (frmSubview);
 		top.Add (frm);
@@ -408,9 +410,9 @@ public class NavigationTests {
 	public void CanFocus_Set_Changes_TabIndex_And_TabStop ()
 	{
 		var r = new View ();
-		var v1 = new View ("1");
-		var v2 = new View ("2");
-		var v3 = new View ("3");
+		var v1 = new View { Text = "1" };
+		var v2 = new View { Text = "2" };
+		var v3 = new View { Text = "3" };
 
 		r.Add (v1, v2, v3);
 
@@ -996,10 +998,7 @@ public class NavigationTests {
 		// Arrange
 		Application.Init ();
 		using var top = new Toplevel ();
-		using var view = new View (
-			0,
-			1,
-			nameof (WindowDispose_CanFocusProblem));
+		using var view = new View { X = 0, Y = 1, Text = nameof (WindowDispose_CanFocusProblem) };
 		using var window = new Window ();
 		top.Add (window);
 		window.Add (view);
