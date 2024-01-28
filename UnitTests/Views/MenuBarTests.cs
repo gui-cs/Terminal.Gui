@@ -17,7 +17,11 @@ public class MenuBarTests {
 	{
 		var menuBar = new MenuBar ();
 		Assert.Equal (KeyCode.F9, menuBar.Key);
-		var menu = new Menu (menuBar, 0, 0, new MenuBarItem (), null, menuBar.MenusBorderStyle);
+		var menu = new Menu { Host = menuBar, X = 0, Y = 0, BarItems = new MenuBarItem () };
+		Assert.Null (menu.ColorScheme);
+		Assert.False (menu.IsInitialized);
+		menu.BeginInit ();
+		menu.EndInit ();
 		Assert.Equal (Colors.ColorSchemes ["Menu"], menu.ColorScheme);
 		Assert.True (menu.CanFocus);
 		Assert.False (menu.WantContinuousButtonPressed);
@@ -253,9 +257,10 @@ Edit
 		// open the menu
 		Assert.True (menu.NewKeyDownEvent (menu.Key));
 		Assert.True (menu.IsMenuOpen);
-		// The _New doc isn't enabled because it can't execute and so can't be selected
-		Assert.Equal ("_File", miCurrent.Parent.Title);
-		Assert.Equal ("_New", miCurrent.Title);
+		// BUGBUG: This is wrong -> The _New doc isn't enabled because it can't execute and so can't be selected
+		// The _New doc is enabled but the sub-menu isn't enabled. Is show but can't be selected and executed
+		Assert.Equal ("_New", miCurrent.Parent.Title);
+		Assert.Equal ("_New doc", miCurrent.Title);
 
 		Assert.True (mCurrent.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
 		Assert.True (menu.IsMenuOpen);
@@ -297,6 +302,7 @@ Edit
 			mCurrent = menu.openCurrentMenu;
 		};
 		Application.Top.Add (menu);
+		Application.Begin (Application.Top);
 
 		Assert.True (menu.MouseEvent (new MouseEvent {
 			X = 10,
@@ -1076,10 +1082,10 @@ Edit
 					new("2", "", null)
 				}),
 				new MenuBarItem ("3", new MenuItem [] {
-					new MenuItem ("2", "", null)
+					new("2", "", null)
 				}),
 				new MenuBarItem ("Last one", new MenuItem [] {
-					new MenuItem ("Test", "", null)
+					new("Test", "", null)
 				})
 			]
 		};
@@ -1426,6 +1432,9 @@ Edit
 		Assert.True (menu._openMenu.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
 		Assert.True (menu.IsMenuOpen);
 		Assert.False (tf.HasFocus);
+		Assert.Equal (1, menu._selected);
+		Assert.Equal (-1, menu._selectedSub);
+		Assert.Null (menu._openSubMenu);
 		Application.Top.Draw ();
 		TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), _output);
 

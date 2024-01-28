@@ -1,6 +1,4 @@
-﻿using System;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 //using static Terminal.Gui.ViewTests.MenuTests;
 
@@ -9,22 +7,19 @@ namespace Terminal.Gui.ViewsTests;
 public class MenuTests {
 	readonly ITestOutputHelper _output;
 
-	public MenuTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+	public MenuTests (ITestOutputHelper output) => _output = output;
 
 	// TODO: Create more low-level unit tests for Menu and MenuItem
 
 	[Fact]
 	public void Menu_Constructors_Defaults ()
 	{
-		Assert.Throws<ArgumentNullException> (() => new Menu (null, 0, 0, null));
+		Assert.Throws<ArgumentNullException> (() => new Menu { Host = null, BarItems = new MenuBarItem () });
+		Assert.Throws<ArgumentNullException> (() => new Menu { Host = new MenuBar (), BarItems = null });
 
-		var menu = new Menu (new MenuBar (), 0, 0, new MenuBarItem ());
+		var menu = new Menu { Host = new MenuBar (), X = 0, Y = 0, BarItems = new MenuBarItem () };
 		Assert.Empty (menu.Title);
 		Assert.Empty (menu.Text);
-
 	}
 
 	[Fact]

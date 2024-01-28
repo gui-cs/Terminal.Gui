@@ -595,16 +595,16 @@ public class MenuBar : View {
 		MenuItem mi = null;
 		MenuBarItem parent;
 
-		if (openCurrentMenu._barItems.Children != null && openCurrentMenu._barItems.Children.Length > 0
-							       && openCurrentMenu?._currentChild > -1) {
-			parent = openCurrentMenu._barItems;
+		if (openCurrentMenu.BarItems.Children != null && openCurrentMenu.BarItems!.Children.Length > 0
+							      && openCurrentMenu?._currentChild > -1) {
+			parent = openCurrentMenu.BarItems;
 			mi = parent.Children [openCurrentMenu._currentChild];
-		} else if (openCurrentMenu._barItems.IsTopLevel) {
+		} else if (openCurrentMenu!.BarItems.IsTopLevel) {
 			parent = null;
-			mi = openCurrentMenu._barItems;
+			mi = openCurrentMenu.BarItems;
 		} else {
-			parent = _openMenu._barItems;
-			mi = parent.Children [_openMenu._currentChild];
+			parent = _openMenu.BarItems;
+			mi = parent.Children?.Length > 0 ? parent.Children [_openMenu._currentChild] : null;
 		}
 
 		MenuOpened?.Invoke (this, new MenuOpenedEventArgs (parent, mi));
@@ -675,8 +675,13 @@ public class MenuBar : View {
 				locationOffset.Y += SuperView.Border.Thickness.Top;
 			}
 
-			_openMenu = new Menu (this, Frame.X + pos + locationOffset.X, Frame.Y + 1 + locationOffset.Y,
-				Menus [index], null, MenusBorderStyle);
+			_openMenu = new Menu {
+				Host = this,
+				X = Frame.X + pos + locationOffset.X,
+				Y = Frame.Y + 1 + locationOffset.Y,
+				BarItems = Menus [index],
+				Parent = null
+			};
 			openCurrentMenu = _openMenu;
 			openCurrentMenu._previousSubFocused = _openMenu;
 
@@ -695,10 +700,13 @@ public class MenuBar : View {
 				var last = _openSubMenu.Count > 0 ? _openSubMenu.Last () : _openMenu;
 				if (!UseSubMenusSingleFrame) {
 					locationOffset = GetLocationOffset ();
-					openCurrentMenu = new Menu (this,
-						last.Frame.Left + last.Frame.Width + locationOffset.X,
-						last.Frame.Top + locationOffset.Y + last._currentChild, subMenu, last,
-						MenusBorderStyle);
+					openCurrentMenu = new Menu {
+						Host = this,
+						X = last.Frame.Left + last.Frame.Width + locationOffset.X,
+						Y = last.Frame.Top + locationOffset.Y + last._currentChild,
+						BarItems = subMenu,
+						Parent = last
+					};
 				} else {
 					var first = _openSubMenu.Count > 0 ? _openSubMenu.First () : _openMenu;
 					// 2 is for the parent and the separator
@@ -710,8 +718,12 @@ public class MenuBar : View {
 					}
 
 					var newSubMenu = new MenuBarItem (mbi) { Parent = subMenu };
-					openCurrentMenu = new Menu (this, first.Frame.Left, first.Frame.Top, newSubMenu,
-						null, MenusBorderStyle);
+					openCurrentMenu = new Menu {
+						Host = this,
+						X = first.Frame.Left,
+						Y = first.Frame.Top,
+						BarItems = newSubMenu
+					};
 					last.Visible = false;
 					Application.GrabMouse (openCurrentMenu);
 				}
@@ -722,7 +734,7 @@ public class MenuBar : View {
 			}
 
 			_selectedSub = _openSubMenu.Count - 1;
-			if (_selectedSub > -1 && SelectEnabledItem (openCurrentMenu._barItems.Children,
+			if (_selectedSub > -1 && SelectEnabledItem (openCurrentMenu.BarItems.Children,
 				    openCurrentMenu._currentChild, out openCurrentMenu._currentChild)) {
 				openCurrentMenu.SetFocus ();
 			}
@@ -762,7 +774,7 @@ public class MenuBar : View {
 
 		_previousFocused = SuperView == null ? Application.Current.Focused : SuperView.Focused;
 		OpenMenu (_selected);
-		if (!SelectEnabledItem (openCurrentMenu._barItems.Children, openCurrentMenu._currentChild,
+		if (!SelectEnabledItem (openCurrentMenu.BarItems.Children, openCurrentMenu._currentChild,
 			    out openCurrentMenu._currentChild) && !CloseMenu (false)) {
 			return;
 		}
@@ -845,7 +857,7 @@ public class MenuBar : View {
 
 	internal bool CloseMenu (bool reopen = false, bool isSubMenu = false, bool ignoreUseSubMenusSingleFrame = false)
 	{
-		var mbi = isSubMenu ? openCurrentMenu._barItems : _openMenu?._barItems;
+		var mbi = isSubMenu ? openCurrentMenu.BarItems : _openMenu?.BarItems;
 		if (UseSubMenusSingleFrame && mbi != null &&
 		    !ignoreUseSubMenusSingleFrame && mbi.Parent != null) {
 			return false;
@@ -992,6 +1004,10 @@ public class MenuBar : View {
 			Application.UngrabMouse ();
 		}
 
+		if (openCurrentMenu != null) {
+			openCurrentMenu = null;
+		}
+
 		IsMenuOpen = false;
 		_openedByAltKey = false;
 		_openedByHotKey = false;
@@ -1013,7 +1029,7 @@ public class MenuBar : View {
 			}
 
 			OpenMenu (_selected);
-			if (!SelectEnabledItem (openCurrentMenu._barItems.Children, openCurrentMenu._currentChild,
+			if (!SelectEnabledItem (openCurrentMenu.BarItems.Children, openCurrentMenu._currentChild,
 				    out openCurrentMenu._currentChild, false)) {
 				openCurrentMenu._currentChild = 0;
 			}
@@ -1049,7 +1065,7 @@ public class MenuBar : View {
 			}
 
 			OpenMenu (_selected);
-			SelectEnabledItem (openCurrentMenu._barItems.Children, openCurrentMenu._currentChild,
+			SelectEnabledItem (openCurrentMenu.BarItems.Children, openCurrentMenu._currentChild,
 				out openCurrentMenu._currentChild);
 			break;
 		case true:
@@ -1059,9 +1075,9 @@ public class MenuBar : View {
 				}
 			} else {
 				var subMenu = openCurrentMenu._currentChild > -1 &&
-					      openCurrentMenu._barItems.Children.Length > 0
-					? openCurrentMenu._barItems.SubMenu (
-						openCurrentMenu._barItems.Children [openCurrentMenu._currentChild])
+					      openCurrentMenu.BarItems.Children.Length > 0
+					? openCurrentMenu.BarItems.SubMenu (
+						openCurrentMenu.BarItems.Children [openCurrentMenu._currentChild])
 					: null;
 				if ((_selectedSub == -1 || _openSubMenu == null ||
 				     _openSubMenu?.Count - 1 == _selectedSub) && subMenu == null) {
@@ -1071,7 +1087,7 @@ public class MenuBar : View {
 
 					NextMenu (false, ignoreUseSubMenusSingleFrame);
 				} else if (subMenu != null || (openCurrentMenu._currentChild > -1
-							       && !openCurrentMenu._barItems
+							       && !openCurrentMenu.BarItems
 								       .Children [openCurrentMenu._currentChild]
 								       .IsFromSubMenu)) {
 					_selectedSub++;
@@ -1102,14 +1118,14 @@ public class MenuBar : View {
 
 		if (mi.IsTopLevel) {
 			BoundsToScreen (i, 0, out var rx, out var ry);
-			var menu = new Menu (this, rx, ry, mi, null, MenusBorderStyle);
+			var menu = new Menu { Host = this, X = rx, Y = ry, BarItems = mi };
 			menu.Run (mi.Action);
 			menu.Dispose ();
 		} else {
 			Application.GrabMouse (this);
 			_selected = i;
 			OpenMenu (i);
-			if (!SelectEnabledItem (openCurrentMenu._barItems.Children, openCurrentMenu._currentChild,
+			if (!SelectEnabledItem (openCurrentMenu.BarItems.Children, openCurrentMenu._currentChild,
 				    out openCurrentMenu._currentChild) && !CloseMenu (false)) {
 				return;
 			}
@@ -1429,8 +1445,7 @@ public class MenuBar : View {
 					if (me.Flags == MouseFlags.Button1Clicked) {
 						if (Menus [i].IsTopLevel) {
 							BoundsToScreen (i, 0, out var rx, out var ry);
-							var menu = new Menu (this, rx, ry, Menus [i], null,
-								MenusBorderStyle);
+							var menu = new Menu { Host = this, X = rx, Y = ry, BarItems = Menus [i] };
 							menu.Run (Menus [i].Action);
 							menu.Dispose ();
 						} else if (!IsMenuOpen) {
@@ -1458,8 +1473,8 @@ public class MenuBar : View {
 					} else if (IsMenuOpen) {
 						if (!UseSubMenusSingleFrame || (UseSubMenusSingleFrame &&
 							    openCurrentMenu != null
-							    && openCurrentMenu._barItems.Parent != null &&
-							    openCurrentMenu._barItems.Parent.Parent != Menus [i])) {
+							    && openCurrentMenu.BarItems.Parent != null &&
+							    openCurrentMenu.BarItems.Parent.Parent != Menus [i])) {
 							Activate (i);
 						}
 					}
@@ -1570,7 +1585,7 @@ public class MenuBar : View {
 		if (view is MenuBar) {
 			hostView = (MenuBar)view;
 		} else if (view is Menu) {
-			hostView = ((Menu)view)._host;
+			hostView = ((Menu)view).Host;
 		}
 
 		var grabView = Application.MouseGrabView;
@@ -1578,7 +1593,7 @@ public class MenuBar : View {
 		if (grabView is MenuBar) {
 			hostGrabView = (MenuBar)grabView;
 		} else if (grabView is Menu) {
-			hostGrabView = ((Menu)grabView)._host;
+			hostGrabView = ((Menu)grabView).Host;
 		}
 
 		return hostView != hostGrabView ? hostGrabView : null;
