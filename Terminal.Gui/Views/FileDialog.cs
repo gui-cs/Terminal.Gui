@@ -71,7 +71,7 @@ public class FileDialog : Dialog {
 	///         a custom <see cref="IFileSystem" />.
 	/// </summary>
 	/// <remarks>This overload is mainly useful for testing.</remarks>
-	public FileDialog (IFileSystem fileSystem)
+	internal FileDialog (IFileSystem fileSystem)
 	{
 		_fileSystem = fileSystem;
 		Style = new FileDialogStyle (fileSystem);
