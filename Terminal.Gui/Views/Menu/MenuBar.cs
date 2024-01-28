@@ -753,7 +753,7 @@ public class MenuBar : View {
 			mbar.CleanUp ();
 		}
 
-		if (_openMenu != null) {
+		if (!Enabled || _openMenu != null) {
 			return;
 		}
 

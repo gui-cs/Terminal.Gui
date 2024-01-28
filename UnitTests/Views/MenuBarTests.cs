@@ -2820,6 +2820,30 @@ wo
 		Assert.Equal (Dim.Fill (), menuBars [1].Width);
 	}
 
+	[Fact]
+	[AutoInitShutdown]
+	public void Disabled_MenuBar_Is_Never_Opened ()
+	{
+		var top = Application.Top;
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("File", new MenuItem [] {
+					new("New", "", null)
+				})
+			]
+		};
+		top.Add (menu);
+		Application.Begin (top);
+		Assert.True (menu.Enabled);
+		menu.OpenMenu ();
+		Assert.True (menu.IsMenuOpen);
+
+		menu.Enabled = false;
+		menu.CloseAllMenus ();
+		menu.OpenMenu ();
+		Assert.False (menu.IsMenuOpen);
+	}
+
 	// Defines the expected strings for a Menu. Currently supports 
 	//   - MenuBar with any number of MenuItems 
 	//   - Each top-level MenuItem can have a SINGLE sub-menu
