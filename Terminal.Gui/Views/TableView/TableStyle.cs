@@ -119,13 +119,15 @@ public class TableStyle {
 
 	/// <summary>
 	/// The symbol to add after each header value to visually seperate values (if not using vertical gridlines)
+	/// <remarks>CM.Glyphs.VLine can be used to emulate vertical grindlines that highlight with <see cref="TableView.FullRowSelect"/></remarks>
 	/// </summary>
-	public Rune HeaderSeparatorSymbol { get; set; } = (Rune)' '; //CM.Glyphs.VLine;
+	public Rune HeaderSeparatorSymbol { get; set; } = (Rune)' ';
 
 	/// <summary>
 	/// The symbol to add after each cell value to visually seperate values (if not using vertical gridlines)
+	/// <remarks>CM.Glyphs.VLine can be used to emulate vertical grindlines that highlight with <see cref="TableView.FullRowSelect"/></remarks>
 	/// </summary>
-	public Rune SeparatorSymbol { get; set; } = (Rune)' '; //CM.Glyphs.VLine;
+	public Rune SeparatorSymbol { get; set; } = (Rune)' ';
 
 	/// <summary>
 	/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
