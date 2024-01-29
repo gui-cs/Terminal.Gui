@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Linq;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "ListView & ComboBox", Description: "Demonstrates a ListView populating a ComboBox that acts as a filter.")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("ListView"), ScenarioCategory ("ComboBox")]
+[ScenarioMetadata ("ListView & ComboBox", "Demonstrates a ListView populating a ComboBox that acts as a filter.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("ListView")]
+[ScenarioCategory ("ComboBox")]
 public class ListsAndCombos : Scenario {
-
 	public override void Setup ()
 	{
 		//TODO: Duplicated code in Demo.cs Consider moving to shared assembly
 		var items = new List<string> ();
-		foreach (var dir in new [] { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
+		foreach (var dir in new []
+				 { "/etc", @$"{Environment.GetEnvironmentVariable ("SystemRoot")}\System32" }) {
 			if (Directory.Exists (dir)) {
 				items = Directory.GetFiles (dir).Union (Directory.GetDirectories (dir))
 					.Select (Path.GetFileName)
@@ -24,7 +26,12 @@ public class ListsAndCombos : Scenario {
 		}
 
 		// ListView
-		var lbListView = new Label { ColorScheme = Colors.ColorSchemes["TopLevel"], X = 0, Width = Dim.Percent(40), Text = "Listview" };
+		var lbListView = new Label {
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			X = 0,
+			Width = Dim.Percent (40),
+			Text = "Listview"
+		};
 
 		var listview = new ListView {
 			X = 0,
@@ -33,7 +40,7 @@ public class ListsAndCombos : Scenario {
 			Width = Dim.Percent (40),
 			Source = new ListWrapper (items)
 		};
-		listview.SelectedItemChanged += (object s, ListViewItemEventArgs e) => lbListView.Text = items [listview.SelectedItem];
+		listview.SelectedItemChanged += (s, e) => lbListView.Text = items [listview.SelectedItem];
 		Win.Add (lbListView, listview);
 
 		var scrollBar = new ScrollBarView (listview, true);
@@ -43,6 +50,7 @@ public class ListsAndCombos : Scenario {
 			if (listview.TopItem != scrollBar.Position) {
 				scrollBar.Position = listview.TopItem;
 			}
+
 			listview.SetNeedsDisplay ();
 		};
 
@@ -51,6 +59,7 @@ public class ListsAndCombos : Scenario {
 			if (listview.LeftItem != scrollBar.OtherScrollBarView.Position) {
 				scrollBar.OtherScrollBarView.Position = listview.LeftItem;
 			}
+
 			listview.SetNeedsDisplay ();
 		};
 
@@ -78,7 +87,7 @@ public class ListsAndCombos : Scenario {
 		};
 		comboBox.SetSource (items);
 
-		comboBox.SelectedItemChanged += (object s, ListViewItemEventArgs text) => lbComboBox.Text = text.Value.ToString ();
+		comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
 		Win.Add (lbComboBox, comboBox);
 
 		var scrollBarCbx = new ScrollBarView (comboBox.Subviews [1], true);
@@ -88,6 +97,7 @@ public class ListsAndCombos : Scenario {
 			if (((ListView)comboBox.Subviews [1]).TopItem != scrollBarCbx.Position) {
 				scrollBarCbx.Position = ((ListView)comboBox.Subviews [1]).TopItem;
 			}
+
 			comboBox.SetNeedsDisplay ();
 		};
 
@@ -96,6 +106,7 @@ public class ListsAndCombos : Scenario {
 			if (((ListView)comboBox.Subviews [1]).LeftItem != scrollBarCbx.OtherScrollBarView.Position) {
 				scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.Subviews [1]).LeftItem;
 			}
+
 			comboBox.SetNeedsDisplay ();
 		};
 

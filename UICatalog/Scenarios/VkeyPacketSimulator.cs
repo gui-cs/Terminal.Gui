@@ -10,10 +10,10 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("VkeyPacketSimulator", "Simulates the Virtual Key Packet")]
 [ScenarioCategory ("Mouse and Keyboard")]
 public class VkeyPacketSimulator : Scenario {
-	List<KeyCode> _keyboardStrokes = new ();
-	bool _outputStarted = false;
-	bool _wasUnknown = false;
-	static ManualResetEventSlim _stopOutput = new (false);
+	static readonly ManualResetEventSlim _stopOutput = new (false);
+	readonly List<KeyCode> _keyboardStrokes = new ();
+	bool _outputStarted;
+	bool _wasUnknown;
 
 	public override void Setup ()
 	{
@@ -113,10 +113,13 @@ public class VkeyPacketSimulator : Scenario {
 				var handled = tvOutput.OnInvokingKeyBindings (e);
 				if (handled == null || handled == false) {
 					if (!tvOutput.OnProcessKeyDown (e)) {
-						Application.Invoke (() => MessageBox.Query ("Keys", $"'{Key.ToString (e.KeyCode, MenuBar.ShortcutDelimiter)}' pressed!", "Ok"));
+						Application.Invoke (() => MessageBox.Query ("Keys",
+							$"'{Key.ToString (e.KeyCode, MenuBar.ShortcutDelimiter)}' pressed!",
+							"Ok"));
 					}
 				}
 			}
+
 			e.Handled = true;
 			_stopOutput.Set ();
 		};
@@ -163,10 +166,20 @@ public class VkeyPacketSimulator : Scenario {
 								if (_keyboardStrokes [0] == KeyCode.Null) {
 									continue;
 								}
-								var consoleKeyInfo = ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (_keyboardStrokes [0]);
-								var keyChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
-								Application.Driver.SendKeys (keyChar, ConsoleKey.Packet, consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift),
-									consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt), consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
+
+								var consoleKeyInfo =
+									ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (
+										_keyboardStrokes [0]);
+								var keyChar =
+									ConsoleKeyMapping.EncodeKeyCharForVKPacket (
+										consoleKeyInfo);
+								Application.Driver.SendKeys (keyChar, ConsoleKey.Packet,
+									consoleKeyInfo.Modifiers.HasFlag (
+										ConsoleModifiers.Shift),
+									consoleKeyInfo.Modifiers.HasFlag (
+										ConsoleModifiers.Alt),
+									consoleKeyInfo.Modifiers.HasFlag (
+										ConsoleModifiers.Control));
 
 								_stopOutput.Wait ();
 								_stopOutput.Reset ();
@@ -176,11 +189,12 @@ public class VkeyPacketSimulator : Scenario {
 									tvInput.SetFocus ();
 								});
 							}
-							_outputStarted = false;
 
+							_outputStarted = false;
 						} catch (Exception) {
 							Application.Invoke (() => {
-								MessageBox.ErrorQuery ("Error", "Couldn't send the keystrokes!", "Ok");
+								MessageBox.ErrorQuery ("Error",
+									"Couldn't send the keystrokes!", "Ok");
 								Application.RequestStop ();
 							});
 						}
@@ -206,10 +220,19 @@ public class VkeyPacketSimulator : Scenario {
 
 		void Win_LayoutComplete (object sender, LayoutEventArgs obj)
 		{
-			inputHorizontalRuler.Text = outputHorizontalRuler.Text = ruler.Repeat ((int)Math.Ceiling ((double)inputHorizontalRuler.Bounds.Width / (double)ruler.Length)) [0..inputHorizontalRuler.Bounds.Width];
+			inputHorizontalRuler.Text = outputHorizontalRuler.Text =
+				ruler.Repeat (
+					(int)Math.Ceiling (inputHorizontalRuler.Bounds.Width / (double)ruler.Length)) [
+					..inputHorizontalRuler.Bounds.Width];
 			inputVerticalRuler.Height = tvInput.Frame.Height + 1;
-			inputVerticalRuler.Text = ruler.Repeat ((int)Math.Ceiling ((double)inputVerticalRuler.Bounds.Height / (double)ruler.Length)) [0..inputVerticalRuler.Bounds.Height];
-			outputVerticalRuler.Text = ruler.Repeat ((int)Math.Ceiling ((double)outputVerticalRuler.Bounds.Height / (double)ruler.Length)) [0..outputVerticalRuler.Bounds.Height];
+			inputVerticalRuler.Text =
+				ruler.Repeat (
+					(int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
+					..inputVerticalRuler.Bounds.Height];
+			outputVerticalRuler.Text =
+				ruler.Repeat (
+					(int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length)) [
+					..outputVerticalRuler.Bounds.Height];
 		}
 
 		Win.LayoutComplete += Win_LayoutComplete;

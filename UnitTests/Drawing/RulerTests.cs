@@ -1,22 +1,16 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 //using GraphViewTests = Terminal.Gui.Views.GraphViewTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
-using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.DrawingTests;
 
 public class RulerTests {
+	readonly ITestOutputHelper _output;
 
-	readonly ITestOutputHelper output;
+	public RulerTests (ITestOutputHelper output) => _output = output;
 
-	public RulerTests (ITestOutputHelper output)
-	{
-		this.output = output;
-	}
-
-	[Fact ()]
+	[Fact]
 	public void Constructor_Defaults ()
 	{
 		var r = new Ruler ();
@@ -24,7 +18,7 @@ public class RulerTests {
 		Assert.Equal (Orientation.Horizontal, r.Orientation);
 	}
 
-	[Fact ()]
+	[Fact]
 	public void Orientation_set ()
 	{
 		var r = new Ruler ();
@@ -33,7 +27,7 @@ public class RulerTests {
 		Assert.Equal (Orientation.Vertical, r.Orientation);
 	}
 
-	[Fact ()]
+	[Fact]
 	public void Length_set ()
 	{
 		var r = new Ruler ();
@@ -42,7 +36,7 @@ public class RulerTests {
 		Assert.Equal (42, r.Length);
 	}
 
-	[Fact ()]
+	[Fact]
 	public void Attribute_set ()
 	{
 		var newAttribute = new Attribute (Color.Red, Color.Green);
@@ -52,17 +46,19 @@ public class RulerTests {
 		Assert.Equal (newAttribute, r.Attribute);
 	}
 
-	[Fact (), AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Default ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (25, 25);
 
 		var r = new Ruler ();
 		r.Draw (new Point (0, 0));
-		TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+		TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 	}
 
-	[Fact (), AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Horizontal ()
 	{
 		var len = 15;
@@ -72,7 +68,7 @@ public class RulerTests {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		Application.Top.Add (f);
 		Application.Begin (Application.Top);
@@ -89,7 +85,7 @@ public class RulerTests {
 │                  │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
 		// Postive offset
 		Application.Refresh ();
@@ -99,7 +95,7 @@ public class RulerTests {
 │|123456789|1234   │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
 		// Negative offset
 		Application.Refresh ();
@@ -109,7 +105,7 @@ public class RulerTests {
 123456789|1234     │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
 		// Clip
 		Application.Refresh ();
@@ -119,10 +115,11 @@ public class RulerTests {
 │         |123456789
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 	}
 
-	[Fact (), AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Horizontal_Start ()
 	{
 		var len = 15;
@@ -132,7 +129,7 @@ public class RulerTests {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 		Application.Top.Add (f);
 		Application.Begin (Application.Top);
@@ -149,7 +146,7 @@ public class RulerTests {
 │                  │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 
 		Application.Refresh ();
 		r.Length = len;
@@ -159,10 +156,11 @@ public class RulerTests {
 │                  │
 │                  │
 │                  │
-└──────────────────┘", output);
+└──────────────────┘", _output);
 	}
 
-	[Fact (), AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Vertical ()
 	{
 		var len = 15;
@@ -172,7 +170,7 @@ public class RulerTests {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 
 		Application.Top.Add (f);
@@ -204,7 +202,7 @@ public class RulerTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
 		// Postive offset
 		Application.Refresh ();
@@ -229,7 +227,7 @@ public class RulerTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
 		// Negative offset
 		Application.Refresh ();
@@ -254,7 +252,7 @@ public class RulerTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
 		// Clip
 		Application.Refresh ();
@@ -279,10 +277,11 @@ public class RulerTests {
 │6  │
 │7  │
 │8  │
-└9──┘", output);
+└9──┘", _output);
 	}
 
-	[Fact (), AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Vertical_Start ()
 	{
 		var len = 15;
@@ -292,7 +291,7 @@ public class RulerTests {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (),
+			Height = Dim.Fill ()
 		};
 
 		Application.Top.Add (f);
@@ -324,7 +323,7 @@ public class RulerTests {
 │   │
 │   │
 │   │
-└───┘", output);
+└───┘", _output);
 
 		Application.Refresh ();
 		r.Length = len;
@@ -349,7 +348,6 @@ public class RulerTests {
 │   │
 │   │
 │   │
-└───┘", output);
-
+└───┘", _output);
 	}
 }

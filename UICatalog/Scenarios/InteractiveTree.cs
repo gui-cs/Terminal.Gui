@@ -17,10 +17,10 @@ public class InteractiveTree : Scenario {
 
 		var menu = new MenuBar {
 			Menus = [
-			new MenuBarItem ("_File", new MenuItem [] {
-				new("_Quit", "", Quit)
-			})
-		]
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_Quit", "", Quit)
+				})
+			]
 		};
 		Application.Top.Add (menu);
 

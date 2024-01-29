@@ -11,8 +11,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 [ScenarioCategory ("Files and IO")]
 public class TreeViewFileSystem : Scenario {
-	DetailsFrame _detailsFrame;
 	readonly FileSystemIconProvider _iconProvider = new ();
+	DetailsFrame _detailsFrame;
 	MenuItem _miArrowSymbols;
 
 	MenuItem _miBasicIcons;

@@ -1,7 +1,7 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
+
 public class FrameViewTests {
 	readonly ITestOutputHelper _output;
 
@@ -29,7 +29,8 @@ public class FrameViewTests {
 		Assert.Equal (new Rect (1, 2, 10, 20), fv.Frame);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Draw_Defaults ()
 	{
 		((FakeDriver)Application.Driver).SetBufferSize (10, 10);

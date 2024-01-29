@@ -10,6 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Drawing")]
 public class GraphViewExample : Scenario {
+	readonly Thickness _thickness = new (1, 1, 1, 1);
 	TextView _about;
 
 	int _currentGraph;
@@ -18,7 +19,6 @@ public class GraphViewExample : Scenario {
 	GraphView _graphView;
 	MenuItem _miDiags;
 	MenuItem _miShowBorder;
-	readonly Thickness _thickness = new (1, 1, 1, 1);
 
 	public override void Setup ()
 	{

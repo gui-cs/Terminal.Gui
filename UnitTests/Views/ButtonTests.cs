@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -8,7 +7,8 @@ public class ButtonTests {
 
 	public ButtonTests (ITestOutputHelper output) => _output = output;
 
-	[Fact] [SetupFakeDriver]
+	[Fact]
+	[SetupFakeDriver]
 	public void Constructors_Defaults ()
 	{
 		var btn = new Button ();
@@ -48,7 +48,9 @@ public class ButtonTests {
 		Assert.Equal (Key.T, btn.HotKey);
 		Assert.Equal ("_Test", btn.Text);
 
-		Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Format ());
+		Assert.Equal (
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
+			btn.TextFormatter.Format ());
 		Assert.True (btn.IsDefault);
 		Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 		Assert.True (btn.CanFocus);
@@ -62,7 +64,9 @@ public class ButtonTests {
 		Assert.Equal ("_abc", btn.Text);
 		Assert.Equal (Key.A, btn.HotKey);
 
-		Assert.Equal ($"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}", btn.TextFormatter.Format ());
+		Assert.Equal (
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
+			btn.TextFormatter.Format ());
 		Assert.True (btn.IsDefault);
 		Assert.Equal (TextAlignment.Centered, btn.TextAlignment);
 		Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -171,8 +175,8 @@ public class ButtonTests {
 	}
 
 	/// <summary>
-	/// This test demonstrates how to change the activation key for Button
-	/// as described in the README.md keyboard handling section
+	///         This test demonstrates how to change the activation key for Button
+	///         as described in the README.md keyboard handling section
 	/// </summary>
 	[Fact]
 	[AutoInitShutdown]
@@ -261,7 +265,8 @@ public class ButtonTests {
 		Assert.Equal (KeyCode.S, btn.HotKey);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Update_Only_On_Or_After_Initialize ()
 	{
 		var btn = new Button {
@@ -301,7 +306,8 @@ public class ButtonTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Update_Parameterless_Only_On_Or_After_Initialize ()
 	{
 		var btn = new Button {
@@ -341,7 +347,8 @@ public class ButtonTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_With_EmptyText ()
 	{
 		var btn = new Button {
@@ -379,7 +386,8 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_Center ()
 	{
 		var btn = new Button {
@@ -425,7 +433,8 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_AnchorEnd ()
 	{
 		var btn = new Button {
@@ -476,7 +485,8 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_False_With_Fixed_Width ()
 	{
 		var tab = new View ();
@@ -583,7 +593,8 @@ public class ButtonTests {
 		Assert.Equal (new Rect (30, 4, 20, 1), btnCancel.Frame);
 		Assert.Equal (new Rect (0, 3, 12, 1), ckbMatchCase.Frame);
 		Assert.Equal (new Rect (0, 4, 18, 1), ckbMatchWholeWord.Frame);
-		var btn1 = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Find Next {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+		var btn1 =
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Find Next {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 		var btn2 = $"{CM.Glyphs.LeftBracket} Find Previous {CM.Glyphs.RightBracket}";
 		var btn3 = $"{CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}";
 		var expected = @$"
@@ -603,7 +614,8 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_True ()
 	{
 		var button = new Button {
@@ -623,7 +635,8 @@ public class ButtonTests {
 		((FakeDriver)Application.Driver).SetBufferSize (30, 5);
 		Assert.True (button.AutoSize);
 		Assert.Equal (new Rect (5, 1, 18, 1), button.Frame);
-		var btn = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Process keys {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+		var btn =
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Process keys {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
 		var expected = @$"
 ┌────────────────────────────┐
@@ -636,7 +649,8 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
 		var button = new Button {
@@ -669,7 +683,8 @@ public class ButtonTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Button_HotKeyChanged_EventFires ()
 	{
 		var btn = new Button { Text = "_Yar" };
@@ -697,7 +712,8 @@ public class ButtonTests {
 		Assert.Equal (KeyCode.R, args.NewKey);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Button_HotKeyChanged_EventFires_WithNone ()
 	{
 		var btn = new Button ();
@@ -708,7 +724,6 @@ public class ButtonTests {
 		btn.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
-
 		};
 
 		btn.HotKey = KeyCode.R;

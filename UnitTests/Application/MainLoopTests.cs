@@ -1,28 +1,57 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
+using System.Diagnostics;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.ApplicationTests;
+
 /// <summary>
-/// Tests MainLoop using the FakeMainLoop.
+///         Tests MainLoop using the FakeMainLoop.
 /// </summary>
 public class MainLoopTests {
+	// TODO: EventsPending tests
+	// - wait = true
+	// - wait = false
+
+	// TODO: Add IMainLoop tests
+
+	static volatile int tbCounter;
+	static readonly ManualResetEventSlim _wakeUp = new (false);
+
+	static int total;
+	static Button btn;
+	static string clickMe;
+	static string cancel;
+	static string pewPew;
+	static int zero;
+	static int one;
+	static int two;
+	static int three;
+	static int four;
+	static bool taskCompleted;
+
+	public static IEnumerable<object []> TestAddIdle {
+		get {
+			// Goes fine
+			var a1 = StartWindow;
+			yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+
+			// Also goes fine
+			var a2 = () => Application.Invoke (StartWindow);
+			yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+		}
+	}
 
 	// See Also ConsoleDRivers/MainLoopDriverTests.cs for tests of the MainLoopDriver
-	
-	
+
+
 	// Idle Handler tests
 	[Fact]
 	public void AddIdle_Adds_And_Removes ()
 	{
 		var ml = new MainLoop (new FakeMainLoop ());
 
-		Func<bool> fnTrue = () => true;
-		Func<bool> fnFalse = () => false;
+		var fnTrue = () => true;
+		var fnFalse = () => false;
 
 		ml.AddIdle (fnTrue);
 		ml.AddIdle (fnFalse);
@@ -76,7 +105,7 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn = () => {
+		var fn = () => {
 			functionCalled++;
 			return true;
 		};
@@ -92,7 +121,7 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn = () => {
+		var fn = () => {
 			functionCalled++;
 			return true;
 		};
@@ -108,7 +137,7 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn = () => {
+		var fn = () => {
 			functionCalled++;
 			return true;
 		};
@@ -125,7 +154,7 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn = () => {
+		var fn = () => {
 			functionCalled++;
 			return true;
 		};
@@ -156,17 +185,23 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn1 = () => {
+		var fn1 = () => {
 			functionCalled++;
-			if (functionCalled == 10) return false;
+			if (functionCalled == 10) {
+				return false;
+			}
+
 			return true;
 		};
 
 		// Force stop if 20 iterations
 		var stopCount = 0;
-		Func<bool> fnStop = () => {
+		var fnStop = () => {
 			stopCount++;
-			if (stopCount == 20) ml.Stop ();
+			if (stopCount == 20) {
+				ml.Stop ();
+			}
+
 			return true;
 		};
 
@@ -186,16 +221,19 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn1 = () => {
+		var fn1 = () => {
 			functionCalled++;
 			return false;
 		};
 
 		// Force stop if 10 iterations
 		var stopCount = 0;
-		Func<bool> fnStop = () => {
+		var fnStop = () => {
 			stopCount++;
-			if (stopCount == 10) ml.Stop ();
+			if (stopCount == 10) {
+				ml.Stop ();
+			}
+
 			return true;
 		};
 
@@ -216,11 +254,12 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 
 		var functionCalled = 0;
-		Func<bool> fn = () => {
+		var fn = () => {
 			functionCalled++;
 			if (functionCalled == 10) {
 				ml.Stop ();
 			}
+
 			return true;
 		};
 
@@ -239,7 +278,7 @@ public class MainLoopTests {
 		var ms = 100;
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
 			return true;
 		};
@@ -263,7 +302,7 @@ public class MainLoopTests {
 		var originTicks = DateTime.UtcNow.Ticks;
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
 			return true;
 		};
@@ -280,8 +319,8 @@ public class MainLoopTests {
 		Assert.Same (ml, sender);
 		Assert.NotNull (args.Timeout);
 		Assert.True (args.Ticks - originTicks >= 100 * TimeSpan.TicksPerMillisecond);
-
 	}
+
 	[Fact]
 	public void AddTimer_Run_Called ()
 	{
@@ -289,7 +328,7 @@ public class MainLoopTests {
 		var ms = 100;
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
 			ml.Stop ();
 			return true;
@@ -310,9 +349,12 @@ public class MainLoopTests {
 		object token1 = null, token2 = null;
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
-			if (callbackCount == 2) ml.Stop ();
+			if (callbackCount == 2) {
+				ml.Stop ();
+			}
+
 			return true;
 		};
 
@@ -340,9 +382,12 @@ public class MainLoopTests {
 		object token1 = null, token2 = null;
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
-			if (callbackCount == 2) ml.Stop ();
+			if (callbackCount == 2) {
+				ml.Stop ();
+			}
+
 			return true;
 		};
 
@@ -359,22 +404,15 @@ public class MainLoopTests {
 		Assert.Equal (2, callbackCount);
 	}
 
-	class MillisecondTolerance : IEqualityComparer<TimeSpan> {
-		int _tolerance = 0;
-		public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
-		public bool Equals (TimeSpan x, TimeSpan y) => Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance;
-		public int GetHashCode (TimeSpan obj) => obj.GetHashCode ();
-	}
-
 	[Fact]
 	public void AddTimer_Run_CalledAtApproximatelyRightTime ()
 	{
 		var ml = new MainLoop (new FakeMainLoop ());
 		var ms = TimeSpan.FromMilliseconds (50);
-		var watch = new System.Diagnostics.Stopwatch ();
+		var watch = new Stopwatch ();
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			watch.Stop ();
 			callbackCount++;
 			ml.Stop ();
@@ -397,15 +435,16 @@ public class MainLoopTests {
 	{
 		var ml = new MainLoop (new FakeMainLoop ());
 		var ms = TimeSpan.FromMilliseconds (50);
-		var watch = new System.Diagnostics.Stopwatch ();
+		var watch = new Stopwatch ();
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
 			if (callbackCount == 2) {
 				watch.Stop ();
 				ml.Stop ();
 			}
+
 			return true;
 		};
 
@@ -428,15 +467,18 @@ public class MainLoopTests {
 
 		// Force stop if 10 iterations
 		var stopCount = 0;
-		Func<bool> fnStop = () => {
+		var fnStop = () => {
 			stopCount++;
-			if (stopCount == 10) ml.Stop ();
+			if (stopCount == 10) {
+				ml.Stop ();
+			}
+
 			return true;
 		};
 		ml.AddIdle (fnStop);
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
 			return true;
 		};
@@ -455,16 +497,19 @@ public class MainLoopTests {
 
 		// Force stop if 10 iterations
 		var stopCount = 0;
-		Func<bool> fnStop = () => {
+		var fnStop = () => {
 			Thread.Sleep (10); // Sleep to enable timer to fire
 			stopCount++;
-			if (stopCount == 10) ml.Stop ();
+			if (stopCount == 10) {
+				ml.Stop ();
+			}
+
 			return true;
 		};
 		ml.AddIdle (fnStop);
 
 		var callbackCount = 0;
-		Func<bool> callback = () => {
+		var callback = () => {
 			callbackCount++;
 			return false;
 		};
@@ -489,7 +534,7 @@ public class MainLoopTests {
 	public void CheckTimersAndIdleHandlers_NoTimers_WithIdle_Returns_True ()
 	{
 		var ml = new MainLoop (new FakeMainLoop ());
-		Func<bool> fnTrue = () => true;
+		var fnTrue = () => true;
 
 		ml.AddIdle (fnTrue);
 		var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
@@ -503,14 +548,17 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 		var ms = TimeSpan.FromMilliseconds (50);
 
-		static bool Callback () => false;
+		static bool Callback ()
+		{
+			return false;
+		}
 
 		_ = ml.AddTimeout (ms, Callback);
 		var retVal = ml.CheckTimersAndIdleHandlers (out var waitTimeOut);
 
 		Assert.True (retVal);
 		// It should take < 10ms to execute to here
-		Assert.True (ms.TotalMilliseconds <= (waitTimeOut + 10));
+		Assert.True (ms.TotalMilliseconds <= waitTimeOut + 10);
 	}
 
 	[Fact]
@@ -519,7 +567,10 @@ public class MainLoopTests {
 		var ml = new MainLoop (new FakeMainLoop ());
 		var ms = TimeSpan.FromMilliseconds (50);
 
-		static bool Callback () => false;
+		static bool Callback ()
+		{
+			return false;
+		}
 
 		_ = ml.AddTimeout (ms, Callback);
 		_ = ml.AddTimeout (ms, Callback);
@@ -527,7 +578,7 @@ public class MainLoopTests {
 
 		Assert.True (retVal);
 		// It should take < 10ms to execute to here
-		Assert.True (ms.TotalMilliseconds <= (waitTimeOut + 10));
+		Assert.True (ms.TotalMilliseconds <= waitTimeOut + 10);
 	}
 
 	[Fact]
@@ -537,51 +588,13 @@ public class MainLoopTests {
 		var mainloop = new MainLoop (testMainloop);
 		Assert.Empty (mainloop._timeouts);
 		Assert.Empty (mainloop._idleHandlers);
-		Assert.NotNull (new Timeout () {
+		Assert.NotNull (new Timeout {
 			Span = new TimeSpan (),
 			Callback = () => true
 		});
 	}
 
-	private class TestMainloop : IMainLoopDriver {
-		private MainLoop mainLoop;
-
-		public bool EventsPending ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		public void Iteration ()
-		{
-			throw new NotImplementedException ();
-		}
-		public void TearDown ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		public void Setup (MainLoop mainLoop)
-		{
-			this.mainLoop = mainLoop;
-		}
-
-		public void Wakeup ()
-		{
-			throw new NotImplementedException ();
-		}
-	}
-
-	// TODO: EventsPending tests
-	// - wait = true
-	// - wait = false
-
-	// TODO: Add IMainLoop tests
-
-	volatile static int tbCounter = 0;
-	static ManualResetEventSlim _wakeUp = new ManualResetEventSlim (false);
-
-	private static void Launch (Random r, TextField tf, int target)
-	{
+	static void Launch (Random r, TextField tf, int target) =>
 		Task.Run (() => {
 			Thread.Sleep (r.Next (2, 4));
 			Application.Invoke (() => {
@@ -593,14 +606,14 @@ public class MainLoopTests {
 				}
 			});
 		});
-	}
 
-	private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
+	static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
 	{
-		for (int j = 0; j < numPasses; j++) {
-
+		for (var j = 0; j < numPasses; j++) {
 			_wakeUp.Reset ();
-			for (var i = 0; i < numIncrements; i++) Launch (r, tf, (j + 1) * numIncrements);
+			for (var i = 0; i < numIncrements; i++) {
+				Launch (r, tf, (j + 1) * numIncrements);
+			}
 
 			while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
 			{
@@ -613,8 +626,11 @@ public class MainLoopTests {
 						$"Timeout: Increment lost. tbCounter ({tbCounter}) didn't " +
 						$"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}");
 				}
-			};
+			}
+
+			;
 		}
+
 		Application.Invoke (() => Application.RequestStop ());
 	}
 
@@ -640,21 +656,11 @@ public class MainLoopTests {
 		Assert.Equal (numIncrements * numPasses, tbCounter);
 	}
 
-	private static int total;
-	private static Button btn;
-	private static string clickMe;
-	private static string cancel;
-	private static string pewPew;
-	private static int zero;
-	private static int one;
-	private static int two;
-	private static int three;
-	private static int four;
-	private static bool taskCompleted;
-
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[MemberData (nameof (TestAddIdle))]
-	public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (Action action, string pclickMe, string pcancel, string ppewPew, int pzero, int pone, int ptwo, int pthree, int pfour)
+	public void Mainloop_Invoke_Or_AddIdle_Can_Be_Used_For_Events_Or_Actions (Action action, string pclickMe,
+		string pcancel, string ppewPew, int pzero, int pone, int ptwo, int pthree, int pfour)
 	{
 		total = 0;
 		btn = null;
@@ -681,7 +687,7 @@ public class MainLoopTests {
 			if (iterations == 0) {
 				Assert.Null (btn);
 				Assert.Equal (zero, total);
-				Assert.True (btnLaunch.NewKeyDownEvent (new (KeyCode.Space)));
+				Assert.True (btnLaunch.NewKeyDownEvent (new Key (KeyCode.Space)));
 				if (btn == null) {
 					Assert.Null (btn);
 					Assert.Equal (zero, total);
@@ -692,7 +698,7 @@ public class MainLoopTests {
 			} else if (iterations == 1) {
 				Assert.Equal (clickMe, btn.Text);
 				Assert.Equal (zero, total);
-				Assert.True (btn.NewKeyDownEvent (new (KeyCode.Space)));
+				Assert.True (btn.NewKeyDownEvent (new Key (KeyCode.Space)));
 				Assert.Equal (cancel, btn.Text);
 				Assert.Equal (one, total);
 			} else if (taskCompleted) {
@@ -707,19 +713,7 @@ public class MainLoopTests {
 		Assert.Equal (four, total);
 	}
 
-	public static IEnumerable<object []> TestAddIdle {
-		get {
-			// Goes fine
-			Action a1 = StartWindow;
-			yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
-
-			// Also goes fine
-			Action a2 = () => Application.Invoke (StartWindow);
-			yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
-		}
-	}
-
-	private static void StartWindow ()
+	static void StartWindow ()
 	{
 		var startWindow = new Window {
 			Modal = true
@@ -751,7 +745,7 @@ public class MainLoopTests {
 		Application.RequestStop ();
 	}
 
-	private static async void RunAsyncTest (object sender, EventArgs e)
+	static async void RunAsyncTest (object sender, EventArgs e)
 	{
 		Assert.Equal (clickMe, btn.Text);
 		Assert.Equal (zero, total);
@@ -770,7 +764,6 @@ public class MainLoopTests {
 				SetReadyToRun ();
 			}
 		}).ContinueWith (async (s, e) => {
-
 			await Task.Delay (1000);
 			Assert.Equal (clickMe, btn.Text);
 			Assert.Equal (three, total);
@@ -781,11 +774,10 @@ public class MainLoopTests {
 			Assert.Equal (four, total);
 
 			taskCompleted = true;
-
 		}, TaskScheduler.FromCurrentSynchronizationContext ());
 	}
 
-	private static void RunSql ()
+	static void RunSql ()
 	{
 		Thread.Sleep (100);
 		Assert.Equal (cancel, btn.Text);
@@ -798,7 +790,7 @@ public class MainLoopTests {
 		});
 	}
 
-	private static void SetReadyToRun ()
+	static void SetReadyToRun ()
 	{
 		Thread.Sleep (100);
 		Assert.Equal (pewPew, btn.Text);
@@ -809,5 +801,26 @@ public class MainLoopTests {
 			Interlocked.Increment (ref total);
 			btn.SetNeedsDisplay ();
 		});
+	}
+
+	class MillisecondTolerance : IEqualityComparer<TimeSpan> {
+		readonly int _tolerance;
+		public MillisecondTolerance (int tolerance) => _tolerance = tolerance;
+		public bool Equals (TimeSpan x, TimeSpan y) => Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance;
+		public int GetHashCode (TimeSpan obj) => obj.GetHashCode ();
+	}
+
+	class TestMainloop : IMainLoopDriver {
+		MainLoop mainLoop;
+
+		public bool EventsPending () => throw new NotImplementedException ();
+
+		public void Iteration () => throw new NotImplementedException ();
+
+		public void TearDown () => throw new NotImplementedException ();
+
+		public void Setup (MainLoop mainLoop) => this.mainLoop = mainLoop;
+
+		public void Wakeup () => throw new NotImplementedException ();
 	}
 }

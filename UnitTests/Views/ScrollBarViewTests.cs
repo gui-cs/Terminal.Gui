@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Xunit;
+﻿using System.Reflection;
 using Xunit.Abstractions;
+
 namespace Terminal.Gui.ViewsTests;
 
 public class ScrollBarViewTests {
@@ -37,7 +35,6 @@ public class ScrollBarViewTests {
 │◄├────────────────┤░░░░░░░░░░░░░░░░░░►│
 └──────────────────────────────────────┘";
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
 	}
 
 	[Fact]
@@ -103,7 +100,6 @@ public class ScrollBarViewTests {
 │▼│
 └─┘";
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
 	}
 
 	[Fact]
@@ -177,7 +173,6 @@ public class ScrollBarViewTests {
 │▼│
 └─┘";
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-
 	}
 
 	void AddHandlers ()
@@ -187,6 +182,7 @@ public class ScrollBarViewTests {
 			_scrollBar.ChangedPosition += _scrollBar_ChangedPosition;
 			_scrollBar.OtherScrollBarView.ChangedPosition += _scrollBar_OtherScrollBarView_ChangedPosition;
 		}
+
 		_added = true;
 	}
 
@@ -197,6 +193,7 @@ public class ScrollBarViewTests {
 			_scrollBar.ChangedPosition -= _scrollBar_ChangedPosition;
 			_scrollBar.OtherScrollBarView.ChangedPosition -= _scrollBar_OtherScrollBarView_ChangedPosition;
 		}
+
 		_added = false;
 	}
 
@@ -215,6 +212,7 @@ public class ScrollBarViewTests {
 		if (_hostView.Top != _scrollBar.Position) {
 			_scrollBar.Position = _hostView.Top;
 		}
+
 		_hostView.SetNeedsDisplay ();
 	}
 
@@ -224,6 +222,7 @@ public class ScrollBarViewTests {
 		if (_hostView.Left != _scrollBar.OtherScrollBarView.Position) {
 			_scrollBar.OtherScrollBarView.Position = _hostView.Left;
 		}
+
 		_hostView.SetNeedsDisplay ();
 	}
 
@@ -329,6 +328,7 @@ public class ScrollBarViewTests {
 			_scrollBar.Position += 1;
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
 		}
+
 		for (var i = _scrollBar.Size - 1; i >= 0; i--) {
 			_scrollBar.Position -= 1;
 			Assert.Equal (_scrollBar.Position, _hostView.Top);
@@ -338,6 +338,7 @@ public class ScrollBarViewTests {
 			_scrollBar.OtherScrollBarView.Position += i;
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		}
+
 		for (var i = _scrollBar.OtherScrollBarView.Size - 1; i >= 0; i--) {
 			_scrollBar.OtherScrollBarView.Position -= 1;
 			Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
@@ -433,7 +434,8 @@ public class ScrollBarViewTests {
 		Assert.True (_scrollBar.OtherScrollBarView.Visible);
 
 		_scrollBar.OtherScrollBarView.Position = 150;
-		Assert.Equal (_scrollBar.OtherScrollBarView.Position, _scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.Bounds.Width);
+		Assert.Equal (_scrollBar.OtherScrollBarView.Position,
+			_scrollBar.OtherScrollBarView.Size - _scrollBar.OtherScrollBarView.Bounds.Width);
 		Assert.Equal (_scrollBar.OtherScrollBarView.Position, _hostView.Left);
 		Assert.Equal (21, _scrollBar.OtherScrollBarView.Position);
 		Assert.Equal (21, _hostView.Left);
@@ -559,7 +561,8 @@ public class ScrollBarViewTests {
 	}
 
 	[Fact]
-	public void Constructor_ShowBothScrollIndicator_False_And_IsVertical_True_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
+	public void
+		Constructor_ShowBothScrollIndicator_False_And_IsVertical_True_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
 	{
 		var exception = Record.Exception (() => {
 			Application.Init (new FakeDriver ());
@@ -574,6 +577,7 @@ public class ScrollBarViewTests {
 			for (var i = 0; i < 50; i++) {
 				source.Add ($"item {i}");
 			}
+
 			var listView = new ListView {
 				X = 0,
 				Y = 0,
@@ -591,6 +595,7 @@ public class ScrollBarViewTests {
 				if (listView.TopItem != newScrollBarView.Position) {
 					newScrollBarView.Position = listView.TopItem;
 				}
+
 				Assert.Equal (newScrollBarView.Position, listView.TopItem);
 				listView.SetNeedsDisplay ();
 			};
@@ -603,7 +608,9 @@ public class ScrollBarViewTests {
 			};
 			top.Ready += (s, e) => {
 				newScrollBarView.Position = 45;
-				Assert.Equal (newScrollBarView.Position, newScrollBarView.Size - listView.TopItem + (listView.TopItem - listView.Bounds.Height));
+				Assert.Equal (newScrollBarView.Position,
+					newScrollBarView.Size - listView.TopItem +
+					(listView.TopItem - listView.Bounds.Height));
 				Assert.Equal (newScrollBarView.Position, listView.TopItem);
 				Assert.Equal (27, newScrollBarView.Position);
 				Assert.Equal (27, listView.TopItem);
@@ -618,7 +625,8 @@ public class ScrollBarViewTests {
 	}
 
 	[Fact]
-	public void Constructor_ShowBothScrollIndicator_False_And_IsVertical_False_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
+	public void
+		Constructor_ShowBothScrollIndicator_False_And_IsVertical_False_Refresh_Does_Not_Throws_An_Object_Null_Exception ()
 	{
 		// BUGBUG: v2 - Tig broke these tests; @bdisp help?
 		//var exception = Record.Exception (() => {
@@ -641,6 +649,7 @@ public class ScrollBarViewTests {
 				var col = j.ToString ();
 				text += col.Length == 1 ? col [0] : col [1];
 			}
+
 			source.Add (text);
 		}
 
@@ -663,6 +672,7 @@ public class ScrollBarViewTests {
 			if (listView.LeftItem != newScrollBarView.Position) {
 				newScrollBarView.Position = listView.LeftItem;
 			}
+
 			Assert.Equal (newScrollBarView.Position, listView.LeftItem);
 			listView.SetNeedsDisplay ();
 		};
@@ -753,7 +763,8 @@ public class ScrollBarViewTests {
 		var textView = new TextView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			Text = "This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
+			Text =
+				"This is the help text for the Second Step.\n\nPress the button to see a message box.\n\nEnter name too."
 		};
 		var win = new Window {
 			Width = Dim.Fill (),
@@ -768,6 +779,7 @@ public class ScrollBarViewTests {
 			if (textView.TopRow != scrollBar.Position) {
 				scrollBar.Position = textView.TopRow;
 			}
+
 			textView.SetNeedsDisplay ();
 		};
 
@@ -776,6 +788,7 @@ public class ScrollBarViewTests {
 			if (textView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
 				scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
 			}
+
 			textView.SetNeedsDisplay ();
 		};
 
@@ -802,6 +815,7 @@ public class ScrollBarViewTests {
 				scrollBar.OtherScrollBarView.Size = textView.Maxlength;
 				scrollBar.OtherScrollBarView.Position = textView.LeftColumn;
 			}
+
 			scrollBar.LayoutSubviews ();
 			scrollBar.Refresh ();
 		};
@@ -913,7 +927,8 @@ public class ScrollBarViewTests {
 	[AutoInitShutdown]
 	public void ContentBottomRightCorner_Not_Redraw_If_Both_Size_Equal_To_Zero ()
 	{
-		var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+		var text =
+			"This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 		var label = new Label { Text = text };
 		Application.Top.Add (label);
 
@@ -929,7 +944,8 @@ public class ScrollBarViewTests {
 		Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
 		Assert.True (sbv.Visible);
 		Assert.True (sbv.OtherScrollBarView.Visible);
-		var contentBottomRightCorner = label.SuperView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+		var contentBottomRightCorner =
+			label.SuperView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
 		Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
 		Assert.True (contentBottomRightCorner.Visible);
 		TestHelpers.AssertDriverContentsWithFrameAre (@"
@@ -976,14 +992,14 @@ This is a tes░
 This is a tes▼
 ◄├──┤░░░░░░░► 
 ", _output);
-
 	}
 
 	[Fact]
 	[AutoInitShutdown]
 	public void ContentBottomRightCorner_Not_Redraw_If_One_Size_Equal_To_Zero ()
 	{
-		var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+		var text =
+			"This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 		var label = new Label { Text = text };
 		Application.Top.Add (label);
 
@@ -1088,7 +1104,8 @@ This is a test             ", _output);
 	[AutoInitShutdown]
 	public void ClearOnVisibleFalse_Gets_Sets ()
 	{
-		var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+		var text =
+			"This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
 		var label = new Label { Text = text };
 		Application.Top.Add (label);
 

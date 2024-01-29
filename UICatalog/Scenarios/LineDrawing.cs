@@ -96,12 +96,12 @@ public class LineDrawing : Scenario {
 	}
 
 	class DrawingArea : View {
-		Color _currentColor = new (Color.White);
-		LineCanvas _currentLayer;
-		StraightLine _currentLine;
 		readonly List<LineCanvas> _layers = new ();
 
 		readonly Stack<StraightLine> _undoHistory = new ();
+		Color _currentColor = new (Color.White);
+		LineCanvas _currentLayer;
+		StraightLine _currentLine;
 
 		public DrawingArea () => AddLayer ();
 

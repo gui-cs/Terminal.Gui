@@ -1,10 +1,10 @@
 ﻿using Terminal.Gui;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Clipping", "Used to test that things clip correctly")]
 [ScenarioCategory ("Tests")]
 public class Clipping : Scenario {
-
 	public override void Init ()
 	{
 		Application.Init ();

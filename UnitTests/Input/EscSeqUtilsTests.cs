@@ -416,9 +416,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		expectedCki = default;
 		EscSeqUtils.DecodeEscSeq (_escSeqReqProc, ref _newConsoleKeyInfo, ref _key, _cki, ref _mod,
@@ -450,9 +450,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('m', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('m', 0, false, false, false)
 		};
 		expectedCki = default;
 		EscSeqUtils.DecodeEscSeq (_escSeqReqProc, ref _newConsoleKeyInfo, ref _key, _cki, ref _mod,
@@ -486,9 +486,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		expectedCki = default;
 		EscSeqUtils.DecodeEscSeq (_escSeqReqProc, ref _newConsoleKeyInfo, ref _key, _cki, ref _mod,
@@ -518,9 +518,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		expectedCki = default;
 		EscSeqUtils.DecodeEscSeq (_escSeqReqProc, ref _newConsoleKeyInfo, ref _key, _cki, ref _mod,
@@ -564,9 +564,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		expectedCki = default;
 		EscSeqUtils.DecodeEscSeq (_escSeqReqProc, ref _newConsoleKeyInfo, ref _key, _cki, ref _mod,
@@ -617,9 +617,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('m', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('m', 0, false, false, false)
 		};
 		expectedCki = default;
 		EscSeqUtils.DecodeEscSeq (_escSeqReqProc, ref _newConsoleKeyInfo, ref _key, _cki, ref _mod,
@@ -656,10 +656,10 @@ public class EscSeqUtilsTests {
 			new(';', 0, false, false, false),
 			new('1', 0, false, false, false),
 			new('0', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('2', 0, false, false, false),
-			new ConsoleKeyInfo ('0', 0, false, false, false),
-			new ConsoleKeyInfo ('t', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('2', 0, false, false, false),
+			new('0', 0, false, false, false),
+			new('t', 0, false, false, false)
 		};
 		expectedCki = default;
 		Assert.Single (_escSeqReqProc.Statuses);
@@ -803,7 +803,7 @@ public class EscSeqUtilsTests {
 			new(';', 0, false, false, false),
 			new('1', 0, false, false, false),
 			new('0', 0, false, false, false),
-			new ConsoleKeyInfo ('r', 0, false, false, false)
+			new('r', 0, false, false, false)
 		};
 
 		Assert.Equal (new [] { '\u001b', '[', '5', ';', '1', '0', 'r' }, EscSeqUtils.GetKeyCharArray (cki));
@@ -820,9 +820,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		EscSeqUtils.GetMouse (cki, out var mouseFlags, out var pos, ProcessContinuousButtonPressed);
 		Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Pressed }, mouseFlags);
@@ -835,9 +835,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('m', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('m', 0, false, false, false)
 		};
 		EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
 		Assert.Equal (2, mouseFlags.Count);
@@ -852,9 +852,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
 		Assert.Equal (new List<MouseFlags> { MouseFlags.Button1DoubleClicked }, mouseFlags);
@@ -867,9 +867,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('M', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('M', 0, false, false, false)
 		};
 		EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
 		Assert.Equal (new List<MouseFlags> { MouseFlags.Button1TripleClicked }, mouseFlags);
@@ -882,9 +882,9 @@ public class EscSeqUtilsTests {
 			new('0', 0, false, false, false),
 			new(';', 0, false, false, false),
 			new('2', 0, false, false, false),
-			new ConsoleKeyInfo (';', 0, false, false, false),
-			new ConsoleKeyInfo ('3', 0, false, false, false),
-			new ConsoleKeyInfo ('m', 0, false, false, false)
+			new(';', 0, false, false, false),
+			new('3', 0, false, false, false),
+			new('m', 0, false, false, false)
 		};
 		EscSeqUtils.GetMouse (cki, out mouseFlags, out pos, ProcessContinuousButtonPressed);
 		Assert.Equal (new List<MouseFlags> { MouseFlags.Button1Released }, mouseFlags);

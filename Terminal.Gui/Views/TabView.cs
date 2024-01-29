@@ -15,15 +15,16 @@ public class TabView : View {
 	/// </summary>
 	readonly View _contentView;
 
-	Tab _selectedTab;
-
-	TabToRender [] _tabLocations;
 	readonly List<Tab> _tabs = new ();
 
 	/// <summary>
 	///         This sub view is the 2 or 3 line control that represents the actual tabs themselves.
 	/// </summary>
 	readonly TabRowView _tabsBar;
+
+	Tab _selectedTab;
+
+	TabToRender [] _tabLocations;
 
 	int _tabScrollOffset;
 

@@ -3,12 +3,13 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (Name: "ComboBoxIteration", Description: "ComboBox iteration.")]
-[ScenarioCategory ("Controls"), ScenarioCategory ("ComboBox")]
+[ScenarioMetadata ("ComboBoxIteration", "ComboBox iteration.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("ComboBox")]
 public class ComboBoxIteration : Scenario {
 	public override void Setup ()
 	{
-		var items = new List<string> () { "one", "two", "three" };
+		var items = new List<string> { "one", "two", "three" };
 
 		var lbListView = new Label {
 			AutoSize = false,
@@ -45,7 +46,7 @@ public class ComboBoxIteration : Scenario {
 			comboBox.SelectedItem = e.Item;
 		};
 
-		comboBox.SelectedItemChanged += (object sender, ListViewItemEventArgs text) => {
+		comboBox.SelectedItemChanged += (sender, text) => {
 			if (text.Item != -1) {
 				lbComboBox.Text = text.Value.ToString ();
 				listview.SelectedItem = text.Item;
@@ -59,7 +60,7 @@ public class ComboBoxIteration : Scenario {
 			Text = "Two"
 		};
 		btnTwo.Clicked += (s, e) => {
-			items = new List<string> () { "one", "two" };
+			items = new List<string> { "one", "two" };
 			comboBox.SetSource (items);
 			listview.SetSource (items);
 			listview.SelectedItem = 0;
@@ -72,7 +73,7 @@ public class ComboBoxIteration : Scenario {
 			Text = "Three"
 		};
 		btnThree.Clicked += (s, e) => {
-			items = new List<string> () { "one", "two", "three" };
+			items = new List<string> { "one", "two", "three" };
 			comboBox.SetSource (items);
 			listview.SetSource (items);
 			listview.SelectedItem = 0;

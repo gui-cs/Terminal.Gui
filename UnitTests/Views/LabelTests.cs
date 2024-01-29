@@ -1,13 +1,11 @@
-﻿using System;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
 public class LabelTests {
 	readonly ITestOutputHelper _output;
 
-	public LabelTests (ITestOutputHelper output) => this._output = output;
+	public LabelTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	[AutoInitShutdown]
@@ -302,7 +300,14 @@ Test
 	[AutoInitShutdown]
 	public void Pos_Center_Layout_AutoSize_False ()
 	{
-		var Label = new Label { X = Pos.Center (), Y = Pos.Center (), AutoSize = false, Width = 20, TextAlignment = TextAlignment.Centered, Text = "012345678901" };
+		var Label = new Label {
+			X = Pos.Center (),
+			Y = Pos.Center (),
+			AutoSize = false,
+			Width = 20,
+			TextAlignment = TextAlignment.Centered,
+			Text = "012345678901"
+		};
 		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -357,7 +362,6 @@ Test
 		label.HotKeyChanged += (s, e) => {
 			sender = s;
 			args = e;
-
 		};
 
 		label.HotKey = KeyCode.R;
@@ -378,6 +382,7 @@ Test
 		foreach (var line in wrappedLines) {
 			breakLines += $"{line}{Environment.NewLine}";
 		}
+
 		var label = new Label { Width = Dim.Fill (), Height = Dim.Fill (), Text = breakLines };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -417,9 +422,16 @@ Test
 		var wrappedLines = TextFormatter.WordWrapText (text, height, true);
 		var breakLines = "";
 		for (var i = 0; i < wrappedLines.Count; i++) {
-			breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
+			breakLines +=
+				$"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 		}
-		var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Width = Dim.Fill (), Height = Dim.Fill (), Text = breakLines };
+
+		var label = new Label {
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+			Text = breakLines
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (label);
@@ -457,6 +469,7 @@ Test
 		foreach (var line in wrappedLines) {
 			breakLines += $"{line}{Environment.NewLine}";
 		}
+
 		var label = new Label { Width = Dim.Fill (), Height = Dim.Fill (), AutoSize = autoSize, Text = breakLines };
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
@@ -472,6 +485,7 @@ Test
 		} else {
 			Assert.Equal (new Size (78, 23), label.TextFormatter.Size);
 		}
+
 		((FakeDriver)Application.Driver).SetBufferSize (width + 2, height + 2);
 
 		Assert.Equal (new Rect (0, 0, width, height), label.Frame);
@@ -480,6 +494,7 @@ Test
 		} else {
 			Assert.Equal (new Size (width, height), label.TextFormatter.Size);
 		}
+
 		Assert.Equal (new Rect (0, 0, width + 2, height + 2), frame.Frame);
 
 		var expected = @"
@@ -509,9 +524,16 @@ Test
 		var wrappedLines = TextFormatter.WordWrapText (text, width, true);
 		var breakLines = "";
 		for (var i = 0; i < wrappedLines.Count; i++) {
-			breakLines += $"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
+			breakLines +=
+				$"{wrappedLines [i]}{(i < wrappedLines.Count - 1 ? Environment.NewLine : string.Empty)}";
 		}
-		var label = new Label { TextDirection = TextDirection.TopBottom_LeftRight, Width = Dim.Fill (), Height = Dim.Fill (), Text = breakLines };
+
+		var label = new Label {
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			Width = Dim.Fill (),
+			Height = Dim.Fill (),
+			Text = breakLines
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (label);
@@ -662,7 +684,13 @@ e
 	[AutoInitShutdown]
 	public void Label_Draw_Vertical_Wide_Runes_With_ForceValidatePosDim ()
 	{
-		var label = new Label { Width = Dim.Fill (), Height = Dim.Percent (50f), TextDirection = TextDirection.TopBottom_LeftRight, ValidatePosDim = true, Text = "デモエムポンズ" };
+		var label = new Label {
+			Width = Dim.Fill (),
+			Height = Dim.Percent (50f),
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			ValidatePosDim = true,
+			Text = "デモエムポンズ"
+		};
 		Application.Top.Add (label);
 		Application.Begin (Application.Top);
 
@@ -692,9 +720,21 @@ e
 		var text = "Hello World";
 		var width = 20;
 		var lblLeft = new Label { Width = width, AutoSize = autoSize, Text = text };
-		var lblCenter = new Label { Y = 1, Width = width, TextAlignment = TextAlignment.Centered, AutoSize = autoSize, Text = text };
+		var lblCenter = new Label {
+			Y = 1,
+			Width = width,
+			TextAlignment = TextAlignment.Centered,
+			AutoSize = autoSize,
+			Text = text
+		};
 		var lblRight = new Label { Y = 2, Width = width, TextAlignment = TextAlignment.Right, AutoSize = autoSize, Text = text };
-		var lblJust = new Label { Y = 3, Width = width, TextAlignment = TextAlignment.Justified, AutoSize = autoSize, Text = text };
+		var lblJust = new Label {
+			Y = 3,
+			Width = width,
+			TextAlignment = TextAlignment.Justified,
+			AutoSize = autoSize,
+			Text = text
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -723,6 +763,7 @@ e
 			Assert.Equal (new Size (width, 1), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (width, 1), lblRight.TextFormatter.Size);
 		}
+
 		Assert.Equal (new Size (width, 1), lblJust.TextFormatter.Size);
 		Assert.Equal (new Rect (0, 0, width + 2, 6), frame.Frame);
 
@@ -747,10 +788,36 @@ e
 	{
 		var text = "Hello World";
 		var height = 20;
-		var lblLeft = new Label { Height = height, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
-		var lblCenter = new Label { X = 2, Height = height, VerticalTextAlignment = VerticalTextAlignment.Middle, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
-		var lblRight = new Label { X = 4, Height = height, VerticalTextAlignment = VerticalTextAlignment.Bottom, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
-		var lblJust = new Label { X = 6, Height = height, VerticalTextAlignment = VerticalTextAlignment.Justified, Text = text, TextDirection = TextDirection.TopBottom_LeftRight, AutoSize = autoSize };
+		var lblLeft = new Label {
+			Height = height,
+			Text = text,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize
+		};
+		var lblCenter = new Label {
+			X = 2,
+			Height = height,
+			VerticalTextAlignment = VerticalTextAlignment.Middle,
+			Text = text,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize
+		};
+		var lblRight = new Label {
+			X = 4,
+			Height = height,
+			VerticalTextAlignment = VerticalTextAlignment.Bottom,
+			Text = text,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize
+		};
+		var lblJust = new Label {
+			X = 6,
+			Height = height,
+			VerticalTextAlignment = VerticalTextAlignment.Justified,
+			Text = text,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			AutoSize = autoSize
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -779,6 +846,7 @@ e
 			Assert.Equal (new Size (1, height), lblCenter.TextFormatter.Size);
 			Assert.Equal (new Size (1, height), lblRight.TextFormatter.Size);
 		}
+
 		Assert.Equal (new Size (1, height), lblJust.TextFormatter.Size);
 		Assert.Equal (new Rect (0, 0, 9, height + 2), frame.Frame);
 
@@ -858,9 +926,30 @@ e
 		var text = "こんにちは 世界";
 		var height = 23;
 		var lblLeft = new Label { Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, Text = text };
-		var lblCenter = new Label { X = 3, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Middle, Text = text };
-		var lblRight = new Label { X = 6, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Bottom, Text = text };
-		var lblJust = new Label { X = 9, Width = 2, Height = height, TextDirection = TextDirection.TopBottom_LeftRight, VerticalTextAlignment = VerticalTextAlignment.Justified, Text = text };
+		var lblCenter = new Label {
+			X = 3,
+			Width = 2,
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			VerticalTextAlignment = VerticalTextAlignment.Middle,
+			Text = text
+		};
+		var lblRight = new Label {
+			X = 6,
+			Width = 2,
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			VerticalTextAlignment = VerticalTextAlignment.Bottom,
+			Text = text
+		};
+		var lblJust = new Label {
+			X = 9,
+			Width = 2,
+			Height = height,
+			TextDirection = TextDirection.TopBottom_LeftRight,
+			VerticalTextAlignment = VerticalTextAlignment.Justified,
+			Text = text
+		};
 		var frame = new FrameView { Width = Dim.Fill (), Height = Dim.Fill () };
 
 		frame.Add (lblLeft, lblCenter, lblRight, lblJust);
@@ -911,7 +1000,8 @@ e
 		Assert.Equal (new Rect (0, 0, 13, height + 2), pos);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Label_Draw_Fill_Remaining_AutoSize_True ()
 	{
 		var label = new Label { Text = "This label needs to be cleared before rewritten." };
@@ -929,7 +1019,8 @@ e
 
 		Assert.True (label.AutoSize);
 
-		tf1.Draw (new Rect (new Point (0, 1), tf1Size), label.GetNormalColor (), label.ColorScheme.HotNormal, default, false);
+		tf1.Draw (new Rect (new Point (0, 1), tf1Size), label.GetNormalColor (), label.ColorScheme.HotNormal,
+			default, false);
 
 		tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
@@ -943,7 +1034,8 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
 		label.Draw ();
 
 		tf1.Text = "This TextFormatter (tf1) is rewritten.";
-		tf1.Draw (new Rect (new Point (0, 1), tf1Size), label.GetNormalColor (), label.ColorScheme.HotNormal, default, false);
+		tf1.Draw (new Rect (new Point (0, 1), tf1Size), label.GetNormalColor (), label.ColorScheme.HotNormal,
+			default, false);
 
 		tf2.Text = "This TextFormatter (tf2) is rewritten.";
 		tf2.Draw (new Rect (new Point (0, 2), tf2Size), label.GetNormalColor (), label.ColorScheme.HotNormal);
@@ -955,7 +1047,8 @@ This TextFormatter (tf2) is rewritten.
 ", _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void View_Draw_Fill_Remaining_AutoSize_False ()
 	{
 		var view = new View { Text = "This view needs to be cleared before rewritten.", Width = Dim.Fill () };
@@ -973,7 +1066,8 @@ This TextFormatter (tf2) is rewritten.
 
 		Assert.False (view.AutoSize);
 
-		tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal, default, false);
+		tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal,
+			default, false);
 
 		tf2.Draw (new Rect (new Point (0, 2), tf2Size), view.GetNormalColor (), view.ColorScheme.HotNormal);
 
@@ -987,7 +1081,8 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.
 		view.Draw ();
 
 		tf1.Text = "This TextFormatter (tf1) is rewritten.";
-		tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal, default, false);
+		tf1.Draw (new Rect (new Point (0, 1), tf1Size), view.GetNormalColor (), view.ColorScheme.HotNormal,
+			default, false);
 
 		tf2.Text = "This TextFormatter (tf2) is rewritten.";
 		tf2.Draw (new Rect (new Point (0, 2), tf2Size), view.GetNormalColor (), view.ColorScheme.HotNormal);

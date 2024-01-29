@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Xunit;
+﻿using System.Collections;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -9,10 +6,7 @@ namespace Terminal.Gui.ViewsTests;
 public class ListViewTests {
 	readonly ITestOutputHelper _output;
 
-	public ListViewTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public ListViewTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void Constructors_Defaults ()
@@ -22,7 +16,7 @@ public class ListViewTests {
 		Assert.True (lv.CanFocus);
 		Assert.Equal (-1, lv.SelectedItem);
 
-		lv = new ListView { Source = new ListWrapper(new List<string>() { "One", "Two", "Three" }) };
+		lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
 		Assert.NotNull (lv.Source);
 		Assert.Equal (-1, lv.SelectedItem);
 
@@ -30,7 +24,12 @@ public class ListViewTests {
 		Assert.NotNull (lv.Source);
 		Assert.Equal (-1, lv.SelectedItem);
 
-		lv = new ListView { Y = 1, Width = 10, Height = 20, Source = new ListWrapper (new List<string> () { "One", "Two", "Three" }) };
+		lv = new ListView {
+			Y = 1,
+			Width = 10,
+			Height = 20,
+			Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
+		};
 		Assert.NotNull (lv.Source);
 		Assert.Equal (-1, lv.SelectedItem);
 		Assert.Equal (new Rect (0, 1, 10, 20), lv.Frame);
@@ -44,7 +43,7 @@ public class ListViewTests {
 	[Fact]
 	public void ListViewSelectThenDown ()
 	{
-		var lv = new ListView { Source = new ListWrapper(new List<string>() { "One", "Two", "Three" }) };
+		var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
 		lv.AllowsMarking = true;
 
 		Assert.NotNull (lv.Source);
@@ -104,21 +103,22 @@ public class ListViewTests {
 		Assert.True (lv.Source.IsMarked (1));
 		Assert.False (lv.Source.IsMarked (2)); // untoggle toggle marked
 	}
+
 	[Fact]
 	public void SettingEmptyKeybindingThrows ()
 	{
-		var lv = new ListView { Source = new ListWrapper(new List<string>() { "One", "Two", "Three" }) };
+		var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three" }) };
 		Assert.Throws<ArgumentException> (() => lv.KeyBindings.Add (KeyCode.Space));
 	}
 
 	/// <summary>
-	/// Tests that when none of the Commands in a chained keybinding are possible
-	/// the <see cref="View.NewKeyDownEvent"/> returns the appropriate result
+	///         Tests that when none of the Commands in a chained keybinding are possible
+	///         the <see cref="View.NewKeyDownEvent" /> returns the appropriate result
 	/// </summary>
 	[Fact]
 	public void ListViewProcessKeyReturnValue_WithMultipleCommands ()
 	{
-		var lv = new ListView { Source = new ListWrapper(new List<string>() { "One", "Two", "Three", "Four" }) };
+		var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two", "Three", "Four" }) };
 
 		Assert.NotNull (lv.Source);
 
@@ -142,59 +142,34 @@ public class ListViewTests {
 		Assert.False (lv.NewKeyDownEvent (ev), "We cannot move down so will not respond to this");
 	}
 
-	private class NewListDataSource : IListDataSource {
-		public int Count => throw new NotImplementedException ();
-
-		public int Length => throw new NotImplementedException ();
-
-		public bool IsMarked (int item)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width, int start = 0)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public void SetMark (int item, bool value)
-		{
-			throw new NotImplementedException ();
-		}
-
-		public IList ToList ()
-		{
-			return new List<string> () { "One", "Two", "Three" };
-		}
-	}
-
 	[Fact]
 	public void KeyBindings_Command ()
 	{
-		List<string> source = new List<string> () { "One", "Two", "Three" };
-		ListView lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
-		lv.BeginInit (); lv.EndInit ();
+		var source = new List<string> { "One", "Two", "Three" };
+		var lv = new ListView { Height = 2, AllowsMarking = true, Source = new ListWrapper (source) };
+		lv.BeginInit ();
+		lv.EndInit ();
 		Assert.Equal (-1, lv.SelectedItem);
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.CursorDown)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorDown)));
 		Assert.Equal (0, lv.SelectedItem);
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.CursorUp)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.CursorUp)));
 		Assert.Equal (0, lv.SelectedItem);
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.PageDown)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageDown)));
 		Assert.Equal (2, lv.SelectedItem);
 		Assert.Equal (2, lv.TopItem);
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.PageUp)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.PageUp)));
 		Assert.Equal (0, lv.SelectedItem);
 		Assert.Equal (0, lv.TopItem);
 		Assert.False (lv.Source.IsMarked (lv.SelectedItem));
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.Space)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Space)));
 		Assert.True (lv.Source.IsMarked (lv.SelectedItem));
 		var opened = false;
 		lv.OpenSelectedItem += (s, _) => opened = true;
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.Enter)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Enter)));
 		Assert.True (opened);
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.End)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.End)));
 		Assert.Equal (2, lv.SelectedItem);
-		Assert.True (lv.NewKeyDownEvent (new (KeyCode.Home)));
+		Assert.True (lv.NewKeyDownEvent (new Key (KeyCode.Home)));
 		Assert.Equal (0, lv.SelectedItem);
 	}
 
@@ -203,7 +178,7 @@ public class ListViewTests {
 	public void RowRender_Event ()
 	{
 		var rendered = false;
-		var source = new List<string> () { "one", "two", "three" };
+		var source = new List<string> { "one", "two", "three" };
 		var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
 		lv.RowRender += (s, _) => rendered = true;
 		Application.Top.Add (lv);
@@ -219,27 +194,28 @@ public class ListViewTests {
 	[AutoInitShutdown]
 	public void EnsureSelectedItemVisible_Top ()
 	{
-		var source = new List<string> () { "First", "Second" };
-		ListView lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
+		var source = new List<string> { "First", "Second" };
+		var lv = new ListView { Width = Dim.Fill (), Height = 1, Source = new ListWrapper (source) };
 		lv.SelectedItem = 1;
 		Application.Top.Add (lv);
 		Application.Begin (Application.Top);
 
 		Assert.Equal ("Second ", GetContents (0));
-		Assert.Equal (new (' ', 7), GetContents (1));
+		Assert.Equal (new string (' ', 7), GetContents (1));
 
 		lv.MoveUp ();
 		lv.Draw ();
 
 		Assert.Equal ("First  ", GetContents (0));
-		Assert.Equal (new (' ', 7), GetContents (1));
+		Assert.Equal (new string (' ', 7), GetContents (1));
 
 		string GetContents (int line)
 		{
 			var item = "";
-			for (int i = 0; i < 7; i++) {
+			for (var i = 0; i < 7; i++) {
 				item += Application.Driver.Contents [line, i].Rune;
 			}
+
 			return item;
 		}
 	}
@@ -249,9 +225,10 @@ public class ListViewTests {
 	public void Ensures_Visibility_SelectedItem_On_MoveDown_And_MoveUp ()
 	{
 		var source = new List<string> ();
-		for (int i = 0; i < 20; i++) {
+		for (var i = 0; i < 20; i++) {
 			source.Add ($"Line{i}");
 		}
+
 		var lv = new ListView { Width = Dim.Fill (), Height = Dim.Fill (), Source = new ListWrapper (source) };
 		var win = new Window ();
 		win.Add (lv);
@@ -449,7 +426,7 @@ public class ListViewTests {
 	[Fact]
 	public void SetSource_Preserves_ListWrapper_Instance_If_Not_Null ()
 	{
-		var lv = new ListView { Source = new ListWrapper(new List<string> { "One", "Two" }) };
+		var lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
 
 		Assert.NotNull (lv.Source);
 
@@ -459,7 +436,7 @@ public class ListViewTests {
 		lv.Source = null;
 		Assert.Null (lv.Source);
 
-		lv = new ListView { Source = new ListWrapper(new List<string> { "One", "Two" }) };
+		lv = new ListView { Source = new ListWrapper (new List<string> { "One", "Two" }) };
 		Assert.NotNull (lv.Source);
 
 		lv.SetSourceAsync (null);
@@ -488,13 +465,15 @@ public class ListViewTests {
 		Assert.Equal (2, lw.StartsWith ("TH"));
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void EnsureSelectedItemVisible_SelectedItem ()
 	{
 		var source = new List<string> ();
-		for (int i = 0; i < 10; i++) {
+		for (var i = 0; i < 10; i++) {
 			source.Add ($"Item {i}");
 		}
+
 		var lv = new ListView {
 			Width = 10,
 			Height = 5,
@@ -539,6 +518,21 @@ Item 6", _output);
 		top.Add (lv);
 		var exception = Record.Exception (lv.SetFocus);
 		Assert.Null (exception);
+	}
+
+	class NewListDataSource : IListDataSource {
+		public int Count => throw new NotImplementedException ();
+
+		public int Length => throw new NotImplementedException ();
+
+		public bool IsMarked (int item) => throw new NotImplementedException ();
+
+		public void Render (ListView container, ConsoleDriver driver, bool selected, int item, int col,
+			int line, int width, int start = 0) => throw new NotImplementedException ();
+
+		public void SetMark (int item, bool value) => throw new NotImplementedException ();
+
+		public IList ToList () => new List<string> { "One", "Two", "Three" };
 	}
 
 	// No longer needed given PR #2920

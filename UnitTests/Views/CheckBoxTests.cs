@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -115,7 +114,8 @@ public class CheckBoxTests {
 		Assert.Equal (new Rect (0, 0, 6, 1), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_StaysVisible ()
 	{
 		var checkBox = new CheckBox {
@@ -193,7 +193,8 @@ public class CheckBoxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Left ()
 	{
 		var checkBox = new CheckBox {
@@ -243,7 +244,8 @@ public class CheckBoxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Centered ()
 	{
 		var checkBox = new CheckBox {
@@ -295,7 +297,8 @@ public class CheckBoxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Justified ()
 	{
 		var checkBox1 = new CheckBox {
@@ -364,7 +367,8 @@ public class CheckBoxTests {
 		Assert.Equal (new Rect (0, 0, 30, 6), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void TextAlignment_Right ()
 	{
 		var checkBox = new CheckBox {
@@ -416,14 +420,16 @@ public class CheckBoxTests {
 		Assert.Equal (new Rect (0, 0, 30, 5), pos);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_AnchorEnd_Without_HotKeySpecifier ()
 	{
 		var checkBox = new CheckBox {
 			Y = Pos.Center (),
 			Text = "Check this out 你"
 		};
-		checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
+		checkBox.X = Pos.AnchorEnd () -
+			     Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
 
 		var win = new Window {
 			Width = Dim.Fill (),
@@ -462,14 +468,16 @@ public class CheckBoxTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AutoSize_Stays_True_AnchorEnd_With_HotKeySpecifier ()
 	{
 		var checkBox = new CheckBox {
 			Y = Pos.Center (),
 			Text = "C_heck this out 你"
 		};
-		checkBox.X = Pos.AnchorEnd () - Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
+		checkBox.X = Pos.AnchorEnd () -
+			     Pos.Function (() => checkBox.GetSizeNeededForTextWithoutHotKey ().Width);
 
 		var win = new Window {
 			Width = Dim.Fill (),
@@ -508,7 +516,8 @@ public class CheckBoxTests {
 		TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact] [AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void AllowNullChecked_Get_Set ()
 	{
 		var checkBox = new CheckBox { Text = "Check this out 你" };

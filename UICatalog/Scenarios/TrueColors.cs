@@ -1,11 +1,11 @@
 using System;
 using Terminal.Gui;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("True Colors", "Demonstration of true color support.")]
 [ScenarioCategory ("Colors")]
 public class TrueColors : Scenario {
-
 	public override void Setup ()
 	{
 		var x = 2;
@@ -123,6 +123,7 @@ public class TrueColors : Scenario {
 			};
 			Win.Add (l);
 		}
+
 		y += 2;
 	}
 }

@@ -1,25 +1,22 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.DialogTests;
 
 public class WizardTests {
 	readonly ITestOutputHelper _output;
 
-	public WizardTests (ITestOutputHelper output)
-	{
-		this._output = output;
-	}
+	public WizardTests (ITestOutputHelper output) => _output = output;
 
-	private void RunButtonTestWizard (string title, int width, int height)
+	void RunButtonTestWizard (string title, int width, int height)
 	{
-		var wizard = new Wizard () { Title = title, Width = width, Height = height };
+		var wizard = new Wizard { Title = title, Width = width, Height = height };
 		Application.End (Application.Begin (wizard));
 	}
 
 	// =========== WizardStep Tests
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void WizardStep_ButtonText ()
 	{
 		// Verify default button text
@@ -35,9 +32,9 @@ public class WizardTests {
 		var r = new Window ();
 		Assert.Equal (string.Empty, r.Title);
 
-		string expectedAfter = string.Empty;
-		string expectedDuring = string.Empty;
-		bool cancel = false;
+		var expectedAfter = string.Empty;
+		var expectedDuring = string.Empty;
+		var cancel = false;
 		r.TitleChanging += (s, args) => {
 			Assert.Equal (expectedDuring, args.NewTitle);
 			args.Cancel = cancel;
@@ -54,7 +51,6 @@ public class WizardTests {
 		r.Title = expectedDuring = "title";
 		Assert.Equal (expectedAfter, r.Title);
 		r.Dispose ();
-
 	}
 
 	[Fact]
@@ -63,7 +59,7 @@ public class WizardTests {
 		var r = new Window ();
 		Assert.Equal (string.Empty, r.Title);
 
-		string expected = string.Empty;
+		var expected = string.Empty;
 		r.TitleChanged += (s, args) => {
 			Assert.Equal (r.Title, args.NewTitle);
 		};
@@ -76,11 +72,11 @@ public class WizardTests {
 		r.Title = expected;
 		Assert.Equal (expected, r.Title);
 		r.Dispose ();
-
 	}
 
 	// =========== Wizard Tests
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void DefaultConstructor_SizedProperly ()
 	{
 		var d = (FakeDriver)Application.Driver;
@@ -90,7 +86,8 @@ public class WizardTests {
 		Assert.NotEqual (0, wizard.Height);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	// Verify a zero-step wizard doesn't crash and shows a blank wizard
 	// and that the title is correct
 	public void ZeroStepWizard_Shows ()
@@ -100,29 +97,36 @@ public class WizardTests {
 		var title = "1234";
 		var stepTitle = "";
 
-		int width = 30;
-		int height = 6;
+		var width = 30;
+		var height = 6;
 		d.SetBufferSize (width, height);
 
 		var btnBackText = "Back";
 		var btnBack = $"{CM.Glyphs.LeftBracket} {btnBackText} {CM.Glyphs.RightBracket}";
 		var btnNextText = "Finish";
-		var btnNext = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+		var btnNext =
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-		var topRow = $"{CM.Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)}{CM.Glyphs.URCornerDbl}";
+		var topRow =
+			$"{CM.Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)}{CM.Glyphs.URCornerDbl}";
 		var row2 = $"{CM.Glyphs.VLineDbl}{new string (' ', width - 2)}{CM.Glyphs.VLineDbl}";
 		var row3 = row2;
-		var separatorRow = $"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
-		var buttonRow = $"{CM.Glyphs.VLineDbl}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
-		var bottomRow = $"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString () [0], width - 2)}{CM.Glyphs.LRCornerDbl}";
+		var separatorRow =
+			$"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
+		var buttonRow =
+			$"{CM.Glyphs.VLineDbl}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
+		var bottomRow =
+			$"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString () [0], width - 2)}{CM.Glyphs.LRCornerDbl}";
 
-		var wizard = new Wizard () { Title = title, Width = width, Height = height };
+		var wizard = new Wizard { Title = title, Width = width, Height = height };
 		var runstate = Application.Begin (wizard);
-		TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", _output);
+		TestHelpers.AssertDriverContentsWithFrameAre (
+			$"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}", _output);
 		Application.End (runstate);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	// This test verifies that a single step wizard shows the correct buttons
 	// and that the title is correct
 	public void OneStepWizard_Shows ()
@@ -132,35 +136,42 @@ public class WizardTests {
 		var title = "1234";
 		var stepTitle = "ABCD";
 
-		int width = 30;
-		int height = 7;
+		var width = 30;
+		var height = 7;
 		d.SetBufferSize (width, height);
 
 		//	var btnBackText = "Back";
 		var btnBack = string.Empty; // $"{CM.Glyphs.LeftBracket} {btnBackText} {CM.Glyphs.RightBracket}";
 		var btnNextText = "Finish"; // "Next";
-		var btnNext = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+		var btnNext =
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-		var topRow = $"{CM.Glyphs.ULCornerDbl}╡{title} - {stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 7)}{CM.Glyphs.URCornerDbl}";
+		var topRow =
+			$"{CM.Glyphs.ULCornerDbl}╡{title} - {stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 7)}{CM.Glyphs.URCornerDbl}";
 		var row2 = $"{CM.Glyphs.VLineDbl}{new string (' ', width - 2)}{CM.Glyphs.VLineDbl}";
 		var row3 = row2;
 		var row4 = row3;
-		var separatorRow = $"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
-		var buttonRow = $"{CM.Glyphs.VLineDbl}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
-		var bottomRow = $"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString () [0], width - 2)}{CM.Glyphs.LRCornerDbl}";
+		var separatorRow =
+			$"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
+		var buttonRow =
+			$"{CM.Glyphs.VLineDbl}{btnBack}{new string (' ', width - btnBack.Length - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
+		var bottomRow =
+			$"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString () [0], width - 2)}{CM.Glyphs.LRCornerDbl}";
 
-		var wizard = new Wizard () { Title = title, Width = width, Height = height };
-		wizard.AddStep (new WizardStep () { Title = stepTitle });
+		var wizard = new Wizard { Title = title, Width = width, Height = height };
+		wizard.AddStep (new WizardStep { Title = stepTitle });
 		//wizard.LayoutSubviews ();
 		var firstIteration = false;
 		var runstate = Application.Begin (wizard);
 		Application.RunIteration (ref runstate, ref firstIteration);
 
-		TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}", _output);
+		TestHelpers.AssertDriverContentsWithFrameAre (
+			$"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}", _output);
 		Application.End (runstate);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	// This test verifies that the 2nd step in a wizard with 2 steps 
 	// shows the correct buttons on both steps
 	// and that the title is correct
@@ -177,13 +188,13 @@ public class WizardTests {
 		// verify step one again
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	// This test verifies that the 2nd step in a wizard with more than 2 steps 
 	// shows the correct buttons on all steps
 	// and that the title is correct
 	public void ThreeStepWizard_Next_Shows_Steps ()
 	{
-
 		// verify step one
 
 		// Next
@@ -195,7 +206,8 @@ public class WizardTests {
 		// verify step one again
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	// this test is needed because Wizard overrides Dialog's title behavior ("Title - StepTitle")
 	public void Setting_Title_Works ()
 	{
@@ -204,29 +216,36 @@ public class WizardTests {
 		var title = "1234";
 		var stepTitle = " - ABCD";
 
-		int width = 40;
-		int height = 4;
+		var width = 40;
+		var height = 4;
 		d.SetBufferSize (width, height);
 
 		var btnNextText = "Finish";
-		var btnNext = $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+		var btnNext =
+			$"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} {btnNextText} {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
 
-		var topRow = $"{CM.Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)}{CM.Glyphs.URCornerDbl}";
-		var separatorRow = $"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
+		var topRow =
+			$"{CM.Glyphs.ULCornerDbl}╡{title}{stepTitle}╞{new string (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)}{CM.Glyphs.URCornerDbl}";
+		var separatorRow =
+			$"{CM.Glyphs.VLineDbl}{new string (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
 
 		// Once this is fixed, revert to commented out line: https://github.com/gui-cs/Terminal.Gui/issues/1791
-		var buttonRow = $"{CM.Glyphs.VLineDbl}{new string (' ', width - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
+		var buttonRow =
+			$"{CM.Glyphs.VLineDbl}{new string (' ', width - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
 		//var buttonRow = $"{CM.Glyphs.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VDLine}";
-		var bottomRow = $"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString () [0], width - 2)}{CM.Glyphs.LRCornerDbl}";
+		var bottomRow =
+			$"{CM.Glyphs.LLCornerDbl}{new string (CM.Glyphs.HLineDbl.ToString () [0], width - 2)}{CM.Glyphs.LRCornerDbl}";
 
-		var wizard = new Wizard () { Title = title, Width = width, Height = height };
-		wizard.AddStep (new WizardStep () { Title = "ABCD" });
+		var wizard = new Wizard { Title = title, Width = width, Height = height };
+		wizard.AddStep (new WizardStep { Title = "ABCD" });
 
 		Application.End (Application.Begin (wizard));
-		TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", _output);
+		TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
+			_output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Navigate_GetPreviousStep_Correct ()
 	{
 		var wizard = new Wizard ();
@@ -234,7 +253,7 @@ public class WizardTests {
 		// If no steps should be null
 		Assert.Null (wizard.GetPreviousStep ());
 
-		var step1 = new WizardStep () { Title = "step1" };
+		var step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
 
 		// If no current step, should be last step
@@ -249,7 +268,7 @@ public class WizardTests {
 		Assert.Null (wizard.GetPreviousStep ());
 
 		// If two steps and at 2 and step 1 is `Enabled = true`should be step1
-		var step2 = new WizardStep () { Title = "step2" };
+		var step2 = new WizardStep { Title = "step2" };
 		wizard.AddStep (step2);
 		wizard.CurrentStep = step2;
 		step1.Enabled = true;
@@ -263,7 +282,7 @@ public class WizardTests {
 		//   At step 1 should be null
 		//   At step 2 should be step 1
 		//   At step 3 should be step 2
-		var step3 = new WizardStep () { Title = "step3" };
+		var step3 = new WizardStep { Title = "step3" };
 		wizard.AddStep (step3);
 		step1.Enabled = true;
 		wizard.CurrentStep = step1;
@@ -317,7 +336,8 @@ public class WizardTests {
 		Assert.Equal (step1.Title, wizard.GetPreviousStep ().Title);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Navigate_GetNextStep_Correct ()
 	{
 		var wizard = new Wizard ();
@@ -325,7 +345,7 @@ public class WizardTests {
 		// If no steps should be null
 		Assert.Null (wizard.GetNextStep ());
 
-		var step1 = new WizardStep () { Title = "step1" };
+		var step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
 
 		// If no current step, should be first step
@@ -340,7 +360,7 @@ public class WizardTests {
 		Assert.Null (wizard.GetNextStep ());
 
 		// If two steps and at 1 and step 2 is `Enabled = true`should be step 2
-		var step2 = new WizardStep () { Title = "step2" };
+		var step2 = new WizardStep { Title = "step2" };
 		wizard.AddStep (step2);
 		Assert.Equal (step2.Title, wizard.GetNextStep ().Title);
 
@@ -354,7 +374,7 @@ public class WizardTests {
 		//   At step 1 should be step 2
 		//   At step 2 should be step 3
 		//   At step 3 should be null
-		var step3 = new WizardStep () { Title = "step3" };
+		var step3 = new WizardStep { Title = "step3" };
 		wizard.AddStep (step3);
 		step1.Enabled = true;
 		wizard.CurrentStep = step1;
@@ -413,7 +433,8 @@ public class WizardTests {
 		Assert.Equal (step1.Title, wizard.GetNextStep ().Title);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Navigate_GoNext_Works ()
 	{
 		// If zero steps do nothing
@@ -427,7 +448,8 @@ public class WizardTests {
 		//    If current is 2 does nothing
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Navigate_GoBack_Works ()
 	{
 		// If zero steps do nothing
@@ -441,22 +463,23 @@ public class WizardTests {
 		//        If 1 is disabled 1 stays current
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Navigate_GetFirstStep_Works ()
 	{
 		var wizard = new Wizard ();
 
 		Assert.Null (wizard.GetFirstStep ());
 
-		var step1 = new WizardStep () { Title = "step1" };
+		var step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
 		Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
-		var step2 = new WizardStep () { Title = "step2" };
+		var step2 = new WizardStep { Title = "step2" };
 		wizard.AddStep (step2);
 		Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
-		var step3 = new WizardStep () { Title = "step3" };
+		var step3 = new WizardStep { Title = "step3" };
 		wizard.AddStep (step3);
 		Assert.Equal (step1.Title, wizard.GetFirstStep ().Title);
 
@@ -471,22 +494,23 @@ public class WizardTests {
 		Assert.Equal (step3.Title, wizard.GetFirstStep ().Title);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Navigate_GetLastStep_Works ()
 	{
 		var wizard = new Wizard ();
 
 		Assert.Null (wizard.GetLastStep ());
 
-		var step1 = new WizardStep () { Title = "step1" };
+		var step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
 		Assert.Equal (step1.Title, wizard.GetLastStep ().Title);
 
-		var step2 = new WizardStep () { Title = "step2" };
+		var step2 = new WizardStep { Title = "step2" };
 		wizard.AddStep (step2);
 		Assert.Equal (step2.Title, wizard.GetLastStep ().Title);
 
-		var step3 = new WizardStep () { Title = "step3" };
+		var step3 = new WizardStep { Title = "step3" };
 		wizard.AddStep (step3);
 		Assert.Equal (step3.Title, wizard.GetLastStep ().Title);
 
@@ -501,12 +525,13 @@ public class WizardTests {
 		Assert.Equal (step1.Title, wizard.GetLastStep ().Title);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void Finish_Button_Closes ()
 	{
 		// https://github.com/gui-cs/Terminal.Gui/issues/1833
 		var wizard = new Wizard ();
-		var step1 = new WizardStep () { Title = "step1" };
+		var step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
 
 		var finishedFired = false;
@@ -534,9 +559,9 @@ public class WizardTests {
 		// Same test, but with two steps
 		wizard = new Wizard ();
 		firstIteration = false;
-		step1 = new WizardStep () { Title = "step1" };
+		step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
-		var step2 = new WizardStep () { Title = "step2" };
+		var step2 = new WizardStep { Title = "step2" };
 		wizard.AddStep (step2);
 
 		finishedFired = false;
@@ -571,9 +596,9 @@ public class WizardTests {
 		// Same test, but with two steps but the 1st one disabled
 		wizard = new Wizard ();
 		firstIteration = false;
-		step1 = new WizardStep () { Title = "step1" };
+		step1 = new WizardStep { Title = "step1" };
 		wizard.AddStep (step1);
-		step2 = new WizardStep () { Title = "step2" };
+		step2 = new WizardStep { Title = "step2" };
 		wizard.AddStep (step2);
 		step1.Enabled = false;
 
@@ -596,6 +621,5 @@ public class WizardTests {
 		Application.End (runstate);
 		Assert.True (finishedFired);
 		Assert.True (closedFired);
-
 	}
 }

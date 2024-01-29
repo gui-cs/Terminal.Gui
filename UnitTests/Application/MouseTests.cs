@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -18,6 +17,7 @@ public class MouseTests {
 	}
 
 	#region mouse coordinate tests
+
 	// test Application.MouseEvent - ensure coordinates are screen relative
 	[Theory]
 	// inside tests
@@ -31,7 +31,8 @@ public class MouseTests {
 	[InlineData (-1, -1, -1, -1, true)]
 	[InlineData (0, -1, 0, -1, true)]
 	[InlineData (-1, 0, -1, 0, true)]
-	public void MouseEventCoordinatesAreScreenRelative (int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
+	public void MouseEventCoordinatesAreScreenRelative (int clickX, int clickY, int expectedX, int expectedY,
+		bool expectedClicked)
 	{
 		var mouseEvent = new MouseEvent {
 			X = clickX,
@@ -47,6 +48,7 @@ public class MouseTests {
 			Assert.Equal (expectedY, e.MouseEvent.Y);
 			clicked = true;
 		}
+
 		Application.MouseEvent += OnApplicationOnMouseEvent;
 
 		Application.OnMouseEvent (mouseEventArgs);
@@ -88,7 +90,8 @@ public class MouseTests {
 	[InlineData (1, 0, 1, 0, 0, false)]
 	[InlineData (1, 9, 0, 0, 0, false)]
 	[InlineData (1, 0, 9, 0, 0, false)]
-	public void MouseCoordinatesTest_NoFrames (int offset, int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
+	public void MouseCoordinatesTest_NoFrames (int offset, int clickX, int clickY, int expectedX, int expectedY,
+		bool expectedClicked)
 	{
 		var size = new Size (10, 10);
 		var pos = new Point (offset, offset);
@@ -168,7 +171,8 @@ public class MouseTests {
 	//01234567890123456789
 	// |12345678|
 	// |xxxxxxxx
-	public void MouseCoordinatesTest_Border (int offset, int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
+	public void MouseCoordinatesTest_Border (int offset, int clickX, int clickY, int expectedX, int expectedY,
+		bool expectedClicked)
 	{
 		var size = new Size (10, 10);
 		var pos = new Point (offset, offset);
@@ -210,9 +214,11 @@ public class MouseTests {
 		Application.OnMouseEvent (mouseEventArgs);
 		Assert.Equal (expectedClicked, clicked);
 	}
+
 	#endregion mouse coordinate tests
 
 	#region mouse grab tests
+
 	[Fact]
 	[AutoInitShutdown]
 	public void MouseGrabView_WithNullMouseEventView ()
@@ -344,10 +350,12 @@ public class MouseTests {
 				Assert.Equal (view2, e.View);
 				Assert.Equal (grabView, e.View);
 			}
+
 			count++;
 
 			Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
 		}
 	}
+
 	#endregion
 }
