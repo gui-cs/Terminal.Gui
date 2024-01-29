@@ -556,12 +556,13 @@ namespace Terminal.Gui.ViewsTests {
 		}
 
 		[Fact, AutoInitShutdown]
-		public void TableView_ExpandLastColumn_False ()
+		public void TableView_ExpandLastColumn_False_AddEmptyColumn_False ()
 		{
 			var tv = SetUpMiniTable ();
 
 			// the thing we are testing
 			tv.Style.ExpandLastColumn = false;
+			tv.Style.AddEmptyColumn = false;
 
 			tv.Draw ();
 
@@ -571,13 +572,29 @@ namespace Terminal.Gui.ViewsTests {
 ├─┼─┤
 │1│2│
 ";
-// TODO: Which one should be the correct behavior?
-			/*string expected = @"
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Shutdown must be called to safely clean up Application if Init has been called
+			Application.Shutdown ();
+		}
+
+		[Fact, AutoInitShutdown]
+		public void TableView_ExpandLastColumn_False_AddEmptyColumn_True ()
+		{
+			var tv = SetUpMiniTable ();
+
+			// the thing we are testing
+			tv.Style.ExpandLastColumn = false;
+			tv.Style.AddEmptyColumn = true;
+
+			tv.Draw ();
+
+			string expected = @"
 ┌─┬─┬────┐
 │A│B│    │
 ├─┼─┼────┤
 │1│2│    │
-";*/
+";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// Shutdown must be called to safely clean up Application if Init has been called
@@ -857,6 +874,137 @@ namespace Terminal.Gui.ViewsTests {
 			Application.Shutdown ();
 		}
 
+		[Fact, AutoInitShutdown]
+		public void TableView_NullSymbol_Is_EmptyString ()
+		{
+			var tv = new TableView () {
+				Width = 20,
+				Height = 4
+			};
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("C1");
+			dt.Columns.Add ("C2");
+			dt.Columns.Add ("C3");
+
+			dt.Rows.Add ("Hello", DBNull.Value, "f");
+
+			tv.Table = new DataTableSource (dt);
+			tv.Style.NullSymbol = string.Empty;
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);
+
+			tv.Draw ();
+
+			var expected =
+@"
+┌─────┬──┬─────────┐
+│C1   │C2│C3       │
+├─────┼──┼─────────┤
+│Hello│  │f        │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			Application.Shutdown ();
+		}
+
+		[Theory, AutoInitShutdown]
+		[InlineData (false)]
+		[InlineData (true)]
+		public void TableView_ColorTests_InvertSelectedCell_and_InvertSelectedCellFirstCharacter (bool focused)
+		{
+			var tv = new TableView () {
+				Width = 20,
+				Height = 4
+			};
+
+			var dt = new DataTable ();
+			dt.Columns.Add ("C1");
+			dt.Columns.Add ("C2");
+			dt.Columns.Add ("C3");
+
+			dt.Rows.Add ("Hello", DBNull.Value, "f");
+
+			tv.Table = new DataTableSource (dt);
+			tv.Style.NullSymbol = "-";
+
+			Application.Top.Add (tv);
+			Application.Begin (Application.Top);                    
+			
+			// private method for forcing the view to be focused/not focused
+			var setFocusMethod = typeof (View).GetMethod ("SetHasFocus", BindingFlags.Instance | BindingFlags.NonPublic);
+
+			// when the view is/isn't focused 
+			setFocusMethod.Invoke (tv, new object [] { focused, tv, true });
+
+			tv.Draw ();
+
+			var expected =
+@"
+┌─────┬──┬─────────┐
+│C1   │C2│C3       │
+├─────┼──┼─────────┤
+│Hello│- │f        │
+";
+
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			// Now the thing we really want to test are the styles
+			// InvertSelectedCell and InvertSelectedCellFirstCharacter!
+
+			tv.FullRowSelect = true;
+			tv.Style.InvertSelectedCell = true;
+
+			tv.Draw ();
+			string expectedColors =
+@"
+00000000000000000000
+00000000000000000000
+00000000000000000000
+02222011011111111110
+";
+			var invertFocus = new Attribute (tv.ColorScheme.Focus.Background, tv.ColorScheme.Focus.Foreground);
+			var invertHotFocus = new Attribute (tv.ColorScheme.HotFocus.Background, tv.ColorScheme.HotFocus.Foreground);
+			var testColors = new Attribute [] {
+				// 0
+				tv.ColorScheme.Normal,				
+				// 1
+				focused? tv.ColorScheme.Focus : tv.ColorScheme.HotFocus,
+				// 2
+				focused? invertFocus : invertHotFocus};
+
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, testColors);
+
+			tv.Style.InvertSelectedCell = false;
+			tv.Style.InvertSelectedCellFirstCharacter = true;
+
+			tv.Draw ();
+			expectedColors =
+@"
+00000000000000000000
+00000000000000000000
+00000000000000000000
+02111011011111111110
+";
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, testColors);
+
+			tv.Style.ShowVerticalCellLines = false;
+
+			tv.Draw ();
+			expectedColors =
+@"
+00000000000000000000
+00000000000000000000
+00000000000000000000
+12111111111111111111
+";
+			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, testColors);
+
+			Application.Shutdown ();
+		}
+
 		[Theory, AutoInitShutdown]
 		[InlineData (false)]
 		[InlineData (true)]
@@ -947,7 +1095,7 @@ namespace Terminal.Gui.ViewsTests {
 00000
 00000
 00000
-21222
+01020
 ";
 
 			TestHelpers.AssertDriverAttributesAre (expectedColors, driver: Application.Driver, new Attribute [] {
@@ -1965,19 +2113,24 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 			expected =
 @"
+│A  │B  │Very Long │    │
+├───┼───┼──────────┼────┤
+│1  │2  │aaaaaaaaaa│    │
+│1  │2  │aaa       │    │
+";
+			TestHelpers.AssertDriverContentsAre (expected, output);
+
+			tableView.Style.AddEmptyColumn = false;
+
+			tableView.LayoutSubviews ();
+			tableView.Draw ();
+			expected =
+@"
 │A  │B  │Very Long │
 ├───┼───┼──────────┤
 │1  │2  │aaaaaaaaaa│
 │1  │2  │aaa       │
 ";
-// TODO: Which one should be the correct behavior?
-			/*expected =
-@"
-│A  │B  │Very Long │    │
-├───┼───┼──────────┼────┤
-│1  │2  │aaaaaaaaaa│    │
-│1  │2  │aaa       │    │
-";*/
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
 			// MaxCellWidth limits MinCellWidth
@@ -1988,10 +2141,10 @@ namespace Terminal.Gui.ViewsTests {
 			tableView.Draw ();
 			expected =
 @"
-│A    │B    │Very │     │
-├─────┼─────┼─────┼─────┤
-│1    │2    │aaaaa│     │
-│1    │2    │aaa  │     │
+│A    │B    │Very │
+├─────┼─────┼─────┤
+│1    │2    │aaaaa│
+│1    │2    │aaa  │
 ";
 			TestHelpers.AssertDriverContentsAre (expected, output);
 
@@ -2260,7 +2413,7 @@ namespace Terminal.Gui.ViewsTests {
 0000000
 0000000
 0000000
-0111110
+0101010
 0000000";
 
 			TestHelpers.AssertDriverAttributesAre (expected, driver: Application.Driver, normal, focus);

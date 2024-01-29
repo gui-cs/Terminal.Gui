@@ -299,29 +299,30 @@ namespace Terminal.Gui {
 				bg = Style.BorderColor.Background;
 			}
 			Driver.SetAttribute (new Attribute(fg, bg));
-			RenderCellLines (width, Table.Rows, columnsToRender);
+
+			var lineWidth = width;
+
+			if (!Style.ExpandLastColumn && Style.AddEmptyColumn) {
+				lineWidth = contentArea.Width;
+			}
+			RenderCellLines (lineWidth, Table.Rows, columnsToRender);
 
 			foreach (var p in grid.GetMap (Bounds)) {
 				this.AddRune (p.Key.X, p.Key.Y, p.Value);
 			}
 
-			// render arrows
-			scrollRightPoint = null;
-			scrollLeftPoint = null;
 			int hh = GetHeaderHeightIfAny ();
+
+			// render arrows
 			if (Style.ShowHorizontalScrollIndicators) {
 				if (hh > 0 && MoreColumnsToLeft ()) {
 					scrollLeftPoint = new Point (0, hh);
+					AddRuneAt (Driver, 0, scrollLeftPoint.Value.Y - 1, CM.Glyphs.LeftArrow);
 				}
 				if (hh > 0 && MoreColumnsToRight (columnsToRender)) {
-					scrollRightPoint = new Point (width - 1, hh);
+					scrollRightPoint = new Point (lineWidth - 1, hh);
+					AddRuneAt (Driver, scrollRightPoint.Value.X, scrollRightPoint.Value.Y - 1, CM.Glyphs.RightArrow);
 				}
-			}
-			if (scrollLeftPoint != null) {
-				AddRuneAt (Driver, 0, scrollLeftPoint.Value.Y - 1, CM.Glyphs.LeftArrow);
-			}
-			if (scrollRightPoint != null) {
-				AddRuneAt (Driver, scrollRightPoint.Value.X, scrollRightPoint.Value.Y - 1, CM.Glyphs.RightArrow);
 			}
 
 			// render the header contents
@@ -340,17 +341,15 @@ namespace Terminal.Gui {
 					var colStyle = Style.GetColumnStyleIfAny (current.Column);
 					var colName = table.ColumnNames [current.Column];
 
-					/*
-					if (!Style.ShowVerticalHeaderLines && current.X - 1 >= 0) {
-						AddRune (current.X - 1, yh, (Rune)Style.SeparatorSymbol);
+					if (!Style.ShowVerticalHeaderLines && current.X > 0) {
+						AddRune (current.X - 1, yh, (Rune)Style.HeaderSeparatorSymbol);
 					}
-					*/
 
 					Move (current.X, yh);
 
-					if (current.Width - colName.Length > 0 &&
-						Style.ShowHorizontalHeaderThroughline &&
-						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
+					if (current.Width - colName.Length > 0
+						&& Style.ShowHorizontalHeaderThroughline
+						&& (!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
 
 						if (colName.Sum (c => ((Rune)c).GetColumns ()) < current.Width) {
 							Driver.AddStr (colName);
@@ -361,20 +360,28 @@ namespace Terminal.Gui {
 						Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle, padChar));
 					}
 
+					if (!Style.ShowVerticalHeaderLines
+						&& current.Column == columnsToRender.First().Column + columnsToRender.Length - 1
+						&& current.X + current.Width - 1 <= lineWidth) {
+						AddRune (current.X + current.Width - 1, yh, (Rune)Style.HeaderSeparatorSymbol);
+					}
+
 					if (!Style.ExpandLastColumn) {
-						/*
-						if (!Style.ShowVerticalHeaderLines && current.IsVeryLast) {
-							AddRune (current.X + current.Width - 1, yh, (Rune)Style.SeparatorSymbol);
-						}
-						*/
-						if (i == columnsToRender.Length - 1) {
-							for (int j = current.X + current.Width; j < Bounds.Width; j++) {
-								Driver.SetAttribute (GetNormalColor ());
-								AddRune (j, yh, (Rune)Style.BackgroundSymbol);
-								if (Style.ShowHorizontalHeaderUnderline) {
-									AddRune (j, yh + 1, (Rune)Style.BackgroundSymbol);
+						if (!Style.AddEmptyColumn) {
+							if (i == columnsToRender.Length - 1) {
+								for (int j = current.X + current.Width; j < Bounds.Width; j++) {
+									Driver.SetAttribute (GetNormalColor ());
+									AddRune (j, yh, (Rune)Style.BackgroundSymbol);
+									if (Style.ShowHorizontalHeaderOverline) {
+										AddRune (j, yh - 1, (Rune)Style.BackgroundSymbol);
+									}
+									if (Style.ShowHorizontalHeaderUnderline) {
+										AddRune (j, yh + 1, (Rune)Style.BackgroundSymbol);
+									}
 								}
 							}
+						} else if (!Style.ShowVerticalHeaderLines) {
+							AddRune (Bounds.Width - 1, yh, (Rune)Style.HeaderSeparatorSymbol);
 						}
 					}
 				}
@@ -394,11 +401,16 @@ namespace Terminal.Gui {
 
 				// No more data
 				if (rowToRender >= Table.Rows) {
-					/*
-					if (rowToRender == Table.Rows.Count && Style.ShowHorizontalBottomline) {
-						RenderBottomLine (line, width, columnsToRender);
+					if (rowToRender == Table.Rows
+						&& Style.ShowHorizontalBottomline
+						&& !Style.ExpandLastColumn
+						&& !Style.AddEmptyColumn) {
+						var start = columnsToRender [^1];
+						for (int i = start.X + start.Width; i < Bounds.Width; i++) {
+							AddRune (i, Table.Rows + hh, (Rune)Style.BackgroundSymbol);
+						}
 					}
-					*/
+
 					continue;
 				}
 
@@ -468,7 +480,16 @@ namespace Terminal.Gui {
 							lineStyle = Style.OuterHeaderBorderStyle;
 						}
 						grid.AddLine (new Point (col.X - 1, 0), row, Orientation.Vertical, lineStyle);
+
+						// left side of empty column
+						if (col.Column == columnsToRender.First().Column + columnsToRender.Length - 1
+							&& !Style.ExpandLastColumn
+							&& Style.AddEmptyColumn) {
+							grid.AddLine (new Point (col.X + col.Width - 1, 0), row, Orientation.Vertical, lineStyle);
+						}
 					}
+
+					// right side
 					grid.AddLine (new Point (width - 1, 0), row, Orientation.Vertical, Style.OuterHeaderBorderStyle);
 				}
 			}
@@ -485,6 +506,13 @@ namespace Terminal.Gui {
 						lineStyle = Style.OuterBorderStyle;
 					}
 					grid.AddLine (new Point (col.X - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, lineStyle);
+
+					// left side of empty column
+					if (col.Column == columnsToRender.First().Column + columnsToRender.Length - 1
+						&& !Style.ExpandLastColumn
+						&& Style.AddEmptyColumn) {
+						grid.AddLine (new Point (col.X + col.Width - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, lineStyle);
+					}
 				}
 				grid.AddLine (new Point (width - 1, row - 1), height - RowOffset + 1, Orientation.Vertical, Style.OuterBorderStyle);
 			}
@@ -596,9 +624,23 @@ namespace Terminal.Gui {
 				RenderCell (cellColor, render, isPrimaryCell);
 
 				// Style.AlwaysUseNormalColorForVerticalCellLines is no longer possible after switch to LineCanvas
-				// except when cell lines are disabled and Style.SeparatorSymbol is used
+				// except when vertical cell lines are disabled (though a Style.SeparatorSymbol could be used)
 
 				if (!Style.ShowVerticalCellLines) {
+					if (isSelectedCell && FullRowSelect) {
+						color = focused ? rowScheme.Focus : rowScheme.HotNormal;
+					} else {
+						color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+					}
+					Driver.SetAttribute (color);
+
+					if (current.X > 0) {
+						AddRune (current.X - 1, row, (Rune)Style.SeparatorSymbol);
+					}
+					if (current.X + current.Width - 1 < Bounds.Width) {
+						AddRune (current.X + current.Width - 1, row, (Rune)Style.SeparatorSymbol);
+					}
+
 					if (isSelectedCell) {
 						color = focused ? rowScheme.Focus : rowScheme.HotNormal;
 					} else {
@@ -607,10 +649,17 @@ namespace Terminal.Gui {
 					Driver.SetAttribute (color);
 				}
 
-				if (!Style.ExpandLastColumn && i == columnsToRender.Length - 1) {
-					for (int j = current.X + current.Width; j < Bounds.Width; j++) {
-						Driver.SetAttribute (GetNormalColor ());
-						AddRune (j, row, (Rune)Style.BackgroundSymbol);
+				if (!Style.ExpandLastColumn) {
+					if (!Style.AddEmptyColumn) {
+						if (i == columnsToRender.Length - 1) {
+							for (int j = current.X + current.Width; j < Bounds.Width; j++) {
+								Driver.SetAttribute (GetNormalColor ());
+								AddRune (j, row, (Rune)Style.BackgroundSymbol);
+							}
+						}
+					} else if (!Style.ShowVerticalCellLines) {
+						Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
+						AddRune (Bounds.Width - 1, row, (Rune)Style.SeparatorSymbol);
 					}
 				}
 			}
@@ -631,7 +680,7 @@ namespace Terminal.Gui {
 			// If the cell is the selected col/row then draw the first rune in inverted colors
 			// this allows the user to track which cell is the active one during a multi cell
 			// selection or in full row select mode
-			if (Style.InvertSelectedCellFirstCharacter && isPrimaryCell) {
+			if ((Style.InvertSelectedCell || Style.InvertSelectedCellFirstCharacter) && isPrimaryCell) {
 
 				if (render.Length > 0) {
 					// invert the color of the current cell for the first character
@@ -639,8 +688,10 @@ namespace Terminal.Gui {
 					Driver.AddRune ((Rune)render [0]);
 
 					if (render.Length > 1) {
-						Driver.SetAttribute (cellColor);
-						Driver.AddStr (render.Substring (1));
+						if (!Style.InvertSelectedCell) {
+							Driver.SetAttribute (cellColor);
+						}
+						Driver.AddStr (render[1..]);
 					}
 				}
 			} else {
@@ -1728,7 +1779,7 @@ namespace Terminal.Gui {
 		/// <returns></returns>
 		private string GetRepresentation (object value, ColumnStyle colStyle)
 		{
-			if (value == null || value == DBNull.Value) {
+			if (value is null || value == DBNull.Value) {
 				return string.IsNullOrEmpty(Style.NullSymbol) ? " " : Style.NullSymbol;
 			}
 

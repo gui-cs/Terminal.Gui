@@ -66,7 +66,7 @@ public class TableStyle {
 	/// <summary>
 	/// True to render a solid line through the headers (only when Overline and/or Underline are <see langword="false"/>)
 	/// </summary>
-	public bool ShowHorizontalHeaderThroughline { get; set; } = true;
+	public bool ShowHorizontalHeaderThroughline { get; set; } = false;
 
 	/// <summary>
 	/// True to render a solid line vertical line between cells
@@ -94,13 +94,23 @@ public class TableStyle {
 	public bool ShowHorizontalBottomline { get; set; } = false;
 
 	/// <summary>
+	/// True to invert the colors of the entire selected cell in the <see cref="TableView"/>.
+	/// Helpful for when <see cref="TableView.FullRowSelect"/> is on, especially when the <see cref="ConsoleDriver"/> doesn't show
+	/// the cursor
+	/// </summary>
+	public bool InvertSelectedCell { get; set; } = false;
+
+	/// <summary>
 	/// True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>.
 	/// This gives the appearance of a cursor for when the <see cref="ConsoleDriver"/> doesn't otherwise show
 	/// this
 	/// </summary>
 	public bool InvertSelectedCellFirstCharacter { get; set; } = false;
 
-	// TODO: Fix this, or just remove it [and SeparatorSymbol]?
+	// NOTE: This is equivalent to True by default after change to LineCanvas borders and can't be turned off
+	// without disabling ShowVerticalCellLines, however  SeparatorSymbol and HeaderSeparatorSymbol could be
+	// used to approximate the previous default behavior with FullRowSelect
+	// TODO: Explore ways of changing this without a workaround
 	/// <summary>
 	/// Gets or sets a flag indicating whether to force <see cref="ColorScheme.Normal"/> use when rendering
 	/// vertical cell lines (even when <see cref="TableView.FullRowSelect"/> is on).
@@ -108,9 +118,14 @@ public class TableStyle {
 	//public bool AlwaysUseNormalColorForVerticalCellLines { get; set; } = false;
 
 	/// <summary>
-	/// The symbol to add after each cell value and header value to visually seperate values (if not using vertical gridlines)
+	/// The symbol to add after each header value to visually seperate values (if not using vertical gridlines)
 	/// </summary>
-	//public char SeparatorSymbol { get; set; } = ' ';
+	public char HeaderSeparatorSymbol { get; set; } = ' ';
+
+	/// <summary>
+	/// The symbol to add after each cell value to visually seperate values (if not using vertical gridlines)
+	/// </summary>
+	public char SeparatorSymbol { get; set; } = ' ';
 
 	/// <summary>
 	/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
@@ -128,7 +143,8 @@ public class TableStyle {
 	public char CellPaddingSymbol { get; set; } = ' ';
 
 	/// <summary>
-	/// The symbol to pad outside table (if Style.ExpandLastColumn is false)
+	/// The symbol to pad outside table (if both <see cref="ExpandLastColumn"/> and <see cref="AddEmptyColumn"/>
+	/// are False)
 	/// </summary>
 	public char BackgroundSymbol { get; set; } = ' ';
 
@@ -144,14 +160,24 @@ public class TableStyle {
 	public RowColorGetterDelegate RowColorGetter { get; set; }
 
 	/// <summary>
-	/// Determines rendering when the last column in the table is visible but it's
+	/// Determines rendering when the last column in the table is visible but its
 	/// content or <see cref="ColumnStyle.MaxWidth"/> is less than the remaining 
 	/// space in the control.  True (the default) will expand the column to fill
-	/// the remaining bounds of the control.  False will draw a column ending line
-	/// and leave a blank column that cannot be selected in the remaining space.  
+	/// the remaining bounds of the control.  If false, <see cref="AddEmptyColumn"/>
+	/// determines the behavior of the remaining space.
 	/// </summary>
 	/// <value></value>
 	public bool ExpandLastColumn { get; set; } = true;
+
+	/// <summary>
+	/// Determines rendering when the last column in the table is visible but its
+	/// content or <see cref="ColumnStyle.MaxWidth"/> is less than the remaining 
+	/// space in the control *and* <see cref="ExpandLastColumn"/> is False.  True (the default)
+	/// will add a blank column that cannot be selected in the remaining space.
+	/// False will fill the remaining space with <see cref="BackgroundSymbol"/>.
+	/// </summary>
+	/// <value></value>
+	public bool AddEmptyColumn { get; set; } = true;
 
 	/// <summary>
 	/// <para>

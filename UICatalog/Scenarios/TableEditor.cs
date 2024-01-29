@@ -29,9 +29,11 @@ namespace UICatalog.Scenarios {
 		private MenuItem _miCellLines;
 		private MenuItem _miFullRowSelect;
 		private MenuItem _miExpandLastColumn;
+		private MenuItem _miAddEmptyColumn;
 		//private MenuItem _miAlwaysUseNormalColorForVerticalCellLines;
 		private MenuItem _miSmoothScrolling;
 		private MenuItem _miAlternatingColors;
+		private MenuItem _miInvert;
 		private MenuItem _miCursor;
 		private MenuItem _miBottomline;
 		private MenuItem _miCheckboxes;
@@ -85,15 +87,17 @@ namespace UICatalog.Scenarios {
 					_miBottomline = new MenuItem ("_BottomLine", "", () => ToggleBottomline()){Checked = tableView.Style.ShowHorizontalBottomline, CheckType = MenuItemCheckStyle.Checked },
 					_miShowHorizontalScrollIndicators = new MenuItem ("Horizontal_ScrollIndicators", "", () => ToggleHorizontalScrollIndicators()){Checked = tableView.Style.ShowHorizontalScrollIndicators, CheckType = MenuItemCheckStyle.Checked },
 					_miFullRowSelect =new MenuItem ("_FullRowSelect", "", () => ToggleFullRowSelect()){Checked = tableView.FullRowSelect, CheckType = MenuItemCheckStyle.Checked },
-					_miCellLines =new MenuItem ("_CellLines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
+					_miCellLines =new MenuItem ("Cell_Lines", "", () => ToggleCellLines()){Checked = tableView.Style.ShowVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					//_miAlwaysUseNormalColorForVerticalCellLines = new MenuItem ("AlwaysUse_NormalColorForVerticalCellLines", "", () => ToggleAlwaysUseNormalColorForVerticalCellLines()){Checked = tableView.Style.AlwaysUseNormalColorForVerticalCellLines, CheckType = MenuItemCheckStyle.Checked },
 					new MenuItem ("_BorderStyles", "", () => SetBorderStyles()),
 					new MenuItem ("_BorderColor", "", () => SetBorderColor()),
 					new MenuItem ("AllBorders", "", () => ToggleAllCellLines()),
 					new MenuItem ("NoBorders", "", () => ToggleNoCellLines()),
 					_miExpandLastColumn = new MenuItem ("_ExpandLastColumn", "", () => ToggleExpandLastColumn()){Checked = tableView.Style.ExpandLastColumn, CheckType = MenuItemCheckStyle.Checked },
+					_miAddEmptyColumn = new MenuItem ("A_ddEmptyColumn", "", () => ToggleAddEmptyColumn()){Checked = tableView.Style.AddEmptyColumn, CheckType = MenuItemCheckStyle.Checked },
 					_miSmoothScrolling = new MenuItem ("S_moothHorizontalScrolling", "", () => ToggleSmoothScrolling()){Checked = tableView.Style.SmoothHorizontalScrolling, CheckType = MenuItemCheckStyle.Checked },
 					_miAlternatingColors = new MenuItem ("Alte_rnatingColors", "", () => ToggleAlternatingColors()){CheckType = MenuItemCheckStyle.Checked},
+					_miInvert = new MenuItem ("InvertSelectedCell", "", () => ToggleInvertSelectedCell()){Checked = tableView.Style.InvertSelectedCell,CheckType = MenuItemCheckStyle.Checked},
 					_miCursor = new MenuItem ("_InvertSelectedCellFirstCharacter", "", () => ToggleInvertSelectedCellFirstCharacter()){Checked = tableView.Style.InvertSelectedCellFirstCharacter,CheckType = MenuItemCheckStyle.Checked},
 					new MenuItem ("ClearColumnSt_yles", "", () => ClearColumnStyles()),
 					new MenuItem ("Sho_wAllColumns", "", ()=>ShowAllColumns()),
@@ -288,11 +292,13 @@ namespace UICatalog.Scenarios {
 
 		private int? GetColumn ()
 		{
-			if (tableView.Table == null)
+			if (tableView.Table == null) {
 				return null;
+			}
 
-			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns)
+			if (tableView.SelectedColumn < 0 || tableView.SelectedColumn > tableView.Table.Columns) {
 				return null;
+			}
 
 			return tableView.SelectedColumn;
 		}
@@ -502,10 +508,14 @@ namespace UICatalog.Scenarios {
 			};
 
 			rbBorderForeground.SelectedItemChanged += (s, e) => {
-				Color.TryParse (colorEnum [e.SelectedItem], out var c); chosenForeground = c;
+				if (Color.TryParse (colorEnum [e.SelectedItem], out var c)) {
+					chosenForeground = (Color)c;
+				}
 			};
 			rbBorderBackground.SelectedItemChanged += (s, e) => {
-				Color.TryParse (colorEnum [e.SelectedItem], out var c); chosenBackground = c;
+				if (Color.TryParse (colorEnum [e.SelectedItem], out var c)) {
+					chosenBackground = (Color)c;
+				}
 			};
 
 			d.Add (rbBorderFgTitle, rbBorderForeground, rbBorderBgTitle, rbBorderBackground);
@@ -648,7 +658,14 @@ namespace UICatalog.Scenarios {
 		{
 			_miExpandLastColumn.Checked = !_miExpandLastColumn.Checked;
 			tableView.Style.ExpandLastColumn = (bool)_miExpandLastColumn.Checked;
+			tableView.Update ();
 
+		}
+
+		private void ToggleAddEmptyColumn ()
+		{
+			_miAddEmptyColumn.Checked = !_miAddEmptyColumn.Checked;
+			tableView.Style.AddEmptyColumn = (bool)_miAddEmptyColumn.Checked;
 			tableView.Update ();
 
 		}
@@ -739,12 +756,14 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowHorizontalHeaderUnderline = true;
 			tableView.Style.ShowVerticalHeaderLines = true;
 			tableView.Style.ShowVerticalCellLines = true;
+			tableView.Style.ShowHorizontalBottomline = true;
 
 			_miHeaderOverline.Checked = true;
 			_miHeaderThruline.Checked = true;
 			_miHeaderUnderline.Checked = true;
 			_miHeaderVertline.Checked = true;
 			_miCellLines.Checked = true;
+			_miBottomline.Checked = true;
 
 			tableView.Update ();
 		}
@@ -755,12 +774,14 @@ namespace UICatalog.Scenarios {
 			tableView.Style.ShowHorizontalHeaderUnderline = false;
 			tableView.Style.ShowVerticalHeaderLines = false;
 			tableView.Style.ShowVerticalCellLines = false;
+			tableView.Style.ShowHorizontalBottomline = false;
 
 			_miHeaderOverline.Checked = false;
 			_miHeaderThruline.Checked = false;
 			_miHeaderUnderline.Checked = false;
 			_miHeaderVertline.Checked = false;
 			_miCellLines.Checked = false;
+			_miBottomline.Checked = false;
 
 			tableView.Update ();
 		}
@@ -778,6 +799,13 @@ namespace UICatalog.Scenarios {
 			tableView.SetNeedsDisplay ();
 		}
 
+		private void ToggleInvertSelectedCell ()
+		{
+			//toggle menu item
+			_miInvert.Checked = !_miInvert.Checked;
+			tableView.Style.InvertSelectedCell = (bool)_miInvert.Checked;
+			tableView.SetNeedsDisplay ();
+		}
 		private void ToggleInvertSelectedCellFirstCharacter ()
 		{
 			//toggle menu item
