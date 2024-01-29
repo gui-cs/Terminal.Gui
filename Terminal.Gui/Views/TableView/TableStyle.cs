@@ -120,12 +120,12 @@ public class TableStyle {
 	/// <summary>
 	/// The symbol to add after each header value to visually seperate values (if not using vertical gridlines)
 	/// </summary>
-	public char HeaderSeparatorSymbol { get; set; } = ' ';
+	public Rune HeaderSeparatorSymbol { get; set; } = (Rune)' '; //CM.Glyphs.VLine;
 
 	/// <summary>
 	/// The symbol to add after each cell value to visually seperate values (if not using vertical gridlines)
 	/// </summary>
-	public char SeparatorSymbol { get; set; } = ' ';
+	public Rune SeparatorSymbol { get; set; } = (Rune)' '; //CM.Glyphs.VLine;
 
 	/// <summary>
 	/// The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/>
@@ -146,7 +146,7 @@ public class TableStyle {
 	/// The symbol to pad outside table (if both <see cref="ExpandLastColumn"/> and <see cref="AddEmptyColumn"/>
 	/// are False)
 	/// </summary>
-	public char BackgroundSymbol { get; set; } = ' ';
+	public Rune BackgroundSymbol { get; set; } = (Rune)' ';
 
 	/// <summary>
 	/// Collection of columns for which you want special rendering (e.g. custom column lengths, text alignment etc)
