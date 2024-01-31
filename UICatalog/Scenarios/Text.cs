@@ -222,9 +222,10 @@ public class Text : Scenario {
 
 		var netProvider = new NetMaskedTextProvider ("999 000 LLL >LLL |AAA aaa");
 
-		var netProviderField = new TextValidateField (netProvider) {
+		var netProviderField = new TextValidateField {
 			X = Pos.Right (netProviderLabel) + 1,
-			Y = Pos.Y (netProviderLabel)
+			Y = Pos.Y (netProviderLabel),
+			Provider = netProvider
 		};
 		Win.Add (netProviderField);
 
@@ -250,11 +251,12 @@ public class Text : Scenario {
 		Win.Add (regexProvider);
 
 		var provider2 = new TextRegexProvider ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
-		var regexProviderField = new TextValidateField (provider2) {
+		var regexProviderField = new TextValidateField {
 			X = Pos.Right (regexProvider) + 1,
 			Y = Pos.Y (regexProvider),
 			Width = 30,
-			TextAlignment = TextAlignment.Centered
+			TextAlignment = TextAlignment.Centered,
+			Provider = provider2
 		};
 		Win.Add (regexProviderField);
 
