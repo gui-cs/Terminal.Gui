@@ -3,10 +3,13 @@
 //
 // Author: Maciej Winnik
 //
-using System;
+
+#region
+
 using System.Data;
 using System.Globalization;
-using System.Linq;
+
+#endregion
 
 namespace Terminal.Gui;
 
@@ -14,274 +17,264 @@ namespace Terminal.Gui;
 /// The <see cref="DatePicker"/> <see cref="View"/> Date Picker.
 /// </summary>
 public class DatePicker : View {
+    private DateField _dateField;
+    private Label _dateLabel;
+    private TableView _calendar;
+    private DataTable _table;
+    private Button _nextMonthButton;
+    private Button _previousMonthButton;
+    private DateTime _date = DateTime.Now;
 
-	private DateField _dateField;
-	private Label _dateLabel;
-	private TableView _calendar;
-	private DataTable _table;
-	private Button _nextMonthButton;
-	private Button _previousMonthButton;
+    /// <summary>
+    /// CultureInfo for date. The default is CultureInfo.CurrentCulture.
+    /// </summary>
+    public CultureInfo Culture {
+        get => CultureInfo.CurrentCulture;
+        set {
+            if (value is not null) {
+                CultureInfo.CurrentCulture = value;
+                Text = Date.ToString (Format);
+            }
+        }
+    }
 
-	private DateTime _date = DateTime.Now;
+    private string Format => StandardizeDateFormat (Culture.DateTimeFormat.ShortDatePattern);
 
+    /// <summary>
+    /// Get or set the date.
+    /// </summary>
+    public DateTime Date {
+        get => _date;
+        set {
+            _date = value;
+            Text = _date.ToString (Format);
+        }
+    }
 
-	/// <summary>
-	/// CultureInfo for date. The default is CultureInfo.CurrentCulture.
-	/// </summary>
-	public CultureInfo Culture {
-		get => CultureInfo.CurrentCulture;
-		set {
-			if (value is not null) {
-				CultureInfo.CurrentCulture = value;
-				Text = Date.ToString (Format);
-			}
-		}
-	}
+    /// <summary>
+    /// Initializes a new instance of <see cref="DatePicker"/>.
+    /// </summary>
+    public DatePicker () => SetInitialProperties (_date);
 
-	private string Format => StandardizeDateFormat (Culture.DateTimeFormat.ShortDatePattern);
+    /// <summary>
+    /// Initializes a new instance of <see cref="DatePicker"/> with the specified date.
+    /// </summary>
+    public DatePicker (DateTime date) { SetInitialProperties (date); }
 
-	/// <summary>
-	/// Get or set the date.
-	/// </summary>
-	public DateTime Date {
-		get => _date;
-		set {
-			_date = value;
-			Text = _date.ToString (Format);
-		}
-	}
+    private void SetInitialProperties (DateTime date) {
+        Title = "Date Picker";
+        BorderStyle = LineStyle.Single;
+        Date = date;
+        _dateLabel = new Label ("Date: ") {
+                                              X = 0,
+                                              Y = 0,
+                                              Height = 1,
+                                          };
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="DatePicker"/>.
-	/// </summary>
-	public DatePicker () => SetInitialProperties (_date);
+        _dateField = new DateField (DateTime.Now) {
+                                                      X = Pos.Right (_dateLabel),
+                                                      Y = 0,
+                                                      Width = Dim.Fill (1),
+                                                      Height = 1,
+                                                      Culture = Culture,
+                                                  };
 
-	/// <summary>
-	/// Initializes a new instance of <see cref="DatePicker"/> with the specified date.
-	/// </summary>
-	public DatePicker (DateTime date)
-	{
-		SetInitialProperties (date);
-	}
+        _calendar = new TableView () {
+                                         X = 0,
+                                         Y = Pos.Bottom (_dateLabel),
+                                         Height = 11,
+                                         Style = new TableStyle {
+                                                                    ShowHeaders = true,
+                                                                    ShowHorizontalBottomline = true,
+                                                                    ShowVerticalCellLines = true,
+                                                                    ExpandLastColumn = true,
+                                                                }
+                                     };
 
-	private void SetInitialProperties (DateTime date)
-	{
-		Title = "Date Picker";
-		BorderStyle = LineStyle.Single;
-		Date = date;
-		_dateLabel = new Label ("Date: ") {
-			X = 0,
-			Y = 0,
-			Height = 1,
-		};
+        _previousMonthButton = new Button (GetBackButtonText ()) {
+                                                                     X = Pos.Center () - 4,
+                                                                     Y = Pos.Bottom (_calendar) - 1,
+                                                                     Height = 1,
+                                                                     Width = CalculateCalendarWidth () / 2
+                                                                 };
 
-		_dateField = new DateField (DateTime.Now) {
-			X = Pos.Right (_dateLabel),
-			Y = 0,
-			Width = Dim.Fill (1),
-			Height = 1,
-			Culture = Culture,
-		};
+        _previousMonthButton.Clicked += (sender, e) => {
+            Date = _date.AddMonths (-1);
+            CreateCalendar ();
+            _dateField.Date = Date;
+        };
 
-		_calendar = new TableView () {
-			X = 0,
-			Y = Pos.Bottom (_dateLabel),
-			Height = 11,
-			Style = new TableStyle {
-				ShowHeaders = true,
-				ShowHorizontalBottomline = true,
-				ShowVerticalCellLines = true,
-				ExpandLastColumn = true,
-			}
-		};
+        _nextMonthButton = new Button (GetForwardButtonText ()) {
+                                                                    X = Pos.Right (_previousMonthButton) + 2,
+                                                                    Y = Pos.Bottom (_calendar) - 1,
+                                                                    Height = 1,
+                                                                    Width = CalculateCalendarWidth () / 2
+                                                                };
 
-		_previousMonthButton = new Button (GetBackButtonText ()) {
-			X = Pos.Center () - 4,
-			Y = Pos.Bottom (_calendar) - 1,
-			Height = 1,
-			Width = CalculateCalendarWidth () / 2
-		};
+        _nextMonthButton.Clicked += (sender, e) => {
+            Date = _date.AddMonths (1);
+            CreateCalendar ();
+            _dateField.Date = Date;
+        };
 
-		_previousMonthButton.Clicked += (sender, e) => {
-			Date = _date.AddMonths (-1);
-			CreateCalendar ();
-			_dateField.Date = Date;
-		};
+        CreateCalendar ();
+        SelectDayOnCalendar (_date.Day);
 
-		_nextMonthButton = new Button (GetForwardButtonText ()) {
-			X = Pos.Right (_previousMonthButton) + 2,
-			Y = Pos.Bottom (_calendar) - 1,
-			Height = 1,
-			Width = CalculateCalendarWidth () / 2
-		};
+        _calendar.CellActivated += (sender, e) => {
+            var dayValue = _table.Rows[e.Row][e.Col];
+            if (dayValue is null) {
+                return;
+            }
 
-		_nextMonthButton.Clicked += (sender, e) => {
-			Date = _date.AddMonths (1);
-			CreateCalendar ();
-			_dateField.Date = Date;
-		};
+            bool isDay = int.TryParse (dayValue.ToString (), out int day);
+            if (!isDay) {
+                return;
+            }
 
-		CreateCalendar ();
-		SelectDayOnCalendar (_date.Day);
+            ChangeDayDate (day);
+            SelectDayOnCalendar (day);
+            Text = _date.ToString (Format);
+        };
 
-		_calendar.CellActivated += (sender, e) => {
-			var dayValue = _table.Rows [e.Row] [e.Col];
-			if (dayValue is null) {
-				return;
-			}
-			bool isDay = int.TryParse (dayValue.ToString (), out int day);
-			if (!isDay) {
-				return;
-			}
-			ChangeDayDate (day);
-			SelectDayOnCalendar (day);
-			Text = _date.ToString (Format);
+        Width = CalculateCalendarWidth () + 2;
+        Height = _calendar.Height + 3;
 
-		};
+        _dateField.DateChanged += DateField_DateChanged;
 
-		Width = CalculateCalendarWidth () + 2;
-		Height = _calendar.Height + 3;
+        Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
+    }
 
-		_dateField.DateChanged += DateField_DateChanged;
+    private void DateField_DateChanged (object sender, DateTimeEventArgs<DateTime> e) {
+        Date = e.NewValue;
+        if (e.NewValue.Date.Day != _date.Day) {
+            SelectDayOnCalendar (e.NewValue.Day);
+        }
 
-		Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
-	}
+        if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year) {
+            _previousMonthButton.Enabled = false;
+        } else {
+            _previousMonthButton.Enabled = true;
+        }
 
-	private void DateField_DateChanged (object sender, DateTimeEventArgs<DateTime> e)
-	{
-		Date = e.NewValue;
-		if (e.NewValue.Date.Day != _date.Day) {
-			SelectDayOnCalendar (e.NewValue.Day);
-		}
+        if (_date.Month == DateTime.MaxValue.Month && _date.Year == DateTime.MaxValue.Year) {
+            _nextMonthButton.Enabled = false;
+        } else {
+            _nextMonthButton.Enabled = true;
+        }
 
-		if (_date.Month == DateTime.MinValue.Month && _date.Year == DateTime.MinValue.Year) {
-			_previousMonthButton.Enabled = false;
-		} else {
-			_previousMonthButton.Enabled = true;
-		}
+        CreateCalendar ();
+        SelectDayOnCalendar (_date.Day);
+    }
 
-		if (_date.Month == DateTime.MaxValue.Month && _date.Year == DateTime.MaxValue.Year) {
-			_nextMonthButton.Enabled = false;
-		} else {
-			_nextMonthButton.Enabled = true;
-		}
-		CreateCalendar ();
-		SelectDayOnCalendar (_date.Day);
-	}
+    private void CreateCalendar () {
+        _calendar.Table = new DataTableSource (_table = CreateDataTable (_date.Month, _date.Year));
+    }
 
-	private void CreateCalendar ()
-	{
-		_calendar.Table = new DataTableSource (_table = CreateDataTable (_date.Month, _date.Year));
-	}
+    private void ChangeDayDate (int day) {
+        _date = new DateTime (_date.Year, _date.Month, day);
+        _dateField.Date = _date;
+        CreateCalendar ();
+    }
 
-	private void ChangeDayDate (int day)
-	{
-		_date = new DateTime (_date.Year, _date.Month, day);
-		_dateField.Date = _date;
-		CreateCalendar ();
-	}
+    private DataTable CreateDataTable (int month, int year) {
+        _table = new DataTable ();
+        GenerateCalendarLabels ();
+        int amountOfDaysInMonth = DateTime.DaysInMonth (year, month);
+        DateTime dateValue = new DateTime (year, month, 1);
+        var dayOfWeek = dateValue.DayOfWeek;
 
-	private DataTable CreateDataTable (int month, int year)
-	{
-		_table = new DataTable ();
-		GenerateCalendarLabels ();
-		int amountOfDaysInMonth = DateTime.DaysInMonth (year, month);
-		DateTime dateValue = new DateTime (year, month, 1);
-		var dayOfWeek = dateValue.DayOfWeek;
+        _table.Rows.Add (new object [6]);
+        for (int i = 1; i <= amountOfDaysInMonth; i++) {
+            _table.Rows[^1][(int)dayOfWeek] = i;
+            if (dayOfWeek == DayOfWeek.Saturday && i != amountOfDaysInMonth) {
+                _table.Rows.Add (new object [7]);
+            }
 
-		_table.Rows.Add (new object [6]);
-		for (int i = 1; i <= amountOfDaysInMonth; i++) {
-			_table.Rows [^1] [(int)dayOfWeek] = i;
-			if (dayOfWeek == DayOfWeek.Saturday && i != amountOfDaysInMonth) {
-				_table.Rows.Add (new object [7]);
-			}
-			dayOfWeek = dayOfWeek == DayOfWeek.Saturday ? DayOfWeek.Sunday : dayOfWeek + 1;
-		}
-		int missingRows = 6 - _table.Rows.Count;
-		for (int i = 0; i < missingRows; i++) {
-			_table.Rows.Add (new object [7]);
-		}
+            dayOfWeek = dayOfWeek == DayOfWeek.Saturday ? DayOfWeek.Sunday : dayOfWeek + 1;
+        }
 
-		return _table;
-	}
+        int missingRows = 6 - _table.Rows.Count;
+        for (int i = 0; i < missingRows; i++) {
+            _table.Rows.Add (new object [7]);
+        }
 
-	private void GenerateCalendarLabels ()
-	{
-		_calendar.Style.ColumnStyles.Clear ();
-		for (int i = 0; i < 7; i++) {
-			var abbreviatedDayName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i);
-			_calendar.Style.ColumnStyles.Add (i, new ColumnStyle () {
-				MaxWidth = abbreviatedDayName.Length,
-				MinWidth = abbreviatedDayName.Length,
-				MinAcceptableWidth = abbreviatedDayName.Length
-			});
-			_table.Columns.Add (abbreviatedDayName);
-		}
-		_calendar.Width = CalculateCalendarWidth ();
-	}
+        return _table;
+    }
 
-	private int CalculateCalendarWidth ()
-	{
-		return _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7;
-	}
+    private void GenerateCalendarLabels () {
+        _calendar.Style.ColumnStyles.Clear ();
+        for (int i = 0; i < 7; i++) {
+            var abbreviatedDayName = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName ((DayOfWeek)i);
+            _calendar.Style.ColumnStyles.Add (
+                                              i,
+                                              new ColumnStyle () {
+                                                                     MaxWidth = abbreviatedDayName.Length,
+                                                                     MinWidth = abbreviatedDayName.Length,
+                                                                     MinAcceptableWidth = abbreviatedDayName.Length
+                                                                 });
+            _table.Columns.Add (abbreviatedDayName);
+        }
 
-	private void SelectDayOnCalendar (int day)
-	{
-		for (int i = 0; i < _table.Rows.Count; i++) {
-			for (int j = 0; j < _table.Columns.Count; j++) {
-				if (_table.Rows [i] [j].ToString () == day.ToString ()) {
-					_calendar.SetSelection (j, i, false);
-					return;
-				}
-			}
-		}
-	}
+        _calendar.Width = CalculateCalendarWidth ();
+    }
 
-	private string GetForwardButtonText () => Glyphs.RightArrow.ToString () + Glyphs.RightArrow.ToString ();
+    private int CalculateCalendarWidth () { return _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 7; }
 
-	private string GetBackButtonText () => Glyphs.LeftArrow.ToString () + Glyphs.LeftArrow.ToString ();
+    private void SelectDayOnCalendar (int day) {
+        for (int i = 0; i < _table.Rows.Count; i++) {
+            for (int j = 0; j < _table.Columns.Count; j++) {
+                if (_table.Rows[i][j].ToString () == day.ToString ()) {
+                    _calendar.SetSelection (j, i, false);
 
-	private static string StandardizeDateFormat (string format) =>
-	    format switch {
-		    "MM/dd/yyyy" => "MM/dd/yyyy",
-		    "yyyy-MM-dd" => "yyyy-MM-dd",
-		    "yyyy/MM/dd" => "yyyy/MM/dd",
-		    "dd/MM/yyyy" => "dd/MM/yyyy",
-		    "d?/M?/yyyy" => "dd/MM/yyyy",
-		    "dd.MM.yyyy" => "dd.MM.yyyy",
-		    "dd-MM-yyyy" => "dd-MM-yyyy",
-		    "dd/MM yyyy" => "dd/MM/yyyy",
-		    "d. M. yyyy" => "dd.MM.yyyy",
-		    "yyyy.MM.dd" => "yyyy.MM.dd",
-		    "g yyyy/M/d" => "yyyy/MM/dd",
-		    "d/M/yyyy" => "dd/MM/yyyy",
-		    "d?/M?/yyyy g" => "dd/MM/yyyy",
-		    "d-M-yyyy" => "dd-MM-yyyy",
-		    "d.MM.yyyy" => "dd.MM.yyyy",
-		    "d.MM.yyyy '?'." => "dd.MM.yyyy",
-		    "M/d/yyyy" => "MM/dd/yyyy",
-		    "d. M. yyyy." => "dd.MM.yyyy",
-		    "d.M.yyyy." => "dd.MM.yyyy",
-		    "g yyyy-MM-dd" => "yyyy-MM-dd",
-		    "d.M.yyyy" => "dd.MM.yyyy",
-		    "d/MM/yyyy" => "dd/MM/yyyy",
-		    "yyyy/M/d" => "yyyy/MM/dd",
-		    "dd. MM. yyyy." => "dd.MM.yyyy",
-		    "yyyy. MM. dd." => "yyyy.MM.dd",
-		    "yyyy. M. d." => "yyyy.MM.dd",
-		    "d. MM. yyyy" => "dd.MM.yyyy",
-		    _ => "dd/MM/yyyy"
-	    };
+                    return;
+                }
+            }
+        }
+    }
 
-	///<inheritdoc/>
-	protected override void Dispose (bool disposing)
-	{
-		_dateLabel.Dispose ();
-		_calendar.Dispose ();
-		_dateField.Dispose ();
-		_table.Dispose ();
-		_previousMonthButton.Dispose ();
-		_nextMonthButton.Dispose ();
-		base.Dispose (disposing);
-	}
+    private string GetForwardButtonText () => Glyphs.RightArrow.ToString () + Glyphs.RightArrow.ToString ();
+    private string GetBackButtonText () => Glyphs.LeftArrow.ToString () + Glyphs.LeftArrow.ToString ();
+
+    private static string StandardizeDateFormat (string format) =>
+        format switch {
+            "MM/dd/yyyy" => "MM/dd/yyyy",
+            "yyyy-MM-dd" => "yyyy-MM-dd",
+            "yyyy/MM/dd" => "yyyy/MM/dd",
+            "dd/MM/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy" => "dd/MM/yyyy",
+            "dd.MM.yyyy" => "dd.MM.yyyy",
+            "dd-MM-yyyy" => "dd-MM-yyyy",
+            "dd/MM yyyy" => "dd/MM/yyyy",
+            "d. M. yyyy" => "dd.MM.yyyy",
+            "yyyy.MM.dd" => "yyyy.MM.dd",
+            "g yyyy/M/d" => "yyyy/MM/dd",
+            "d/M/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy g" => "dd/MM/yyyy",
+            "d-M-yyyy" => "dd-MM-yyyy",
+            "d.MM.yyyy" => "dd.MM.yyyy",
+            "d.MM.yyyy '?'." => "dd.MM.yyyy",
+            "M/d/yyyy" => "MM/dd/yyyy",
+            "d. M. yyyy." => "dd.MM.yyyy",
+            "d.M.yyyy." => "dd.MM.yyyy",
+            "g yyyy-MM-dd" => "yyyy-MM-dd",
+            "d.M.yyyy" => "dd.MM.yyyy",
+            "d/MM/yyyy" => "dd/MM/yyyy",
+            "yyyy/M/d" => "yyyy/MM/dd",
+            "dd. MM. yyyy." => "dd.MM.yyyy",
+            "yyyy. MM. dd." => "yyyy.MM.dd",
+            "yyyy. M. d." => "yyyy.MM.dd",
+            "d. MM. yyyy" => "dd.MM.yyyy",
+            _ => "dd/MM/yyyy"
+        };
+
+    ///<inheritdoc/>
+    protected override void Dispose (bool disposing) {
+        _dateLabel.Dispose ();
+        _calendar.Dispose ();
+        _dateField.Dispose ();
+        _table.Dispose ();
+        _previousMonthButton.Dispose ();
+        _nextMonthButton.Dispose ();
+        base.Dispose (disposing);
+    }
 }

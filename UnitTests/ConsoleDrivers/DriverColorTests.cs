@@ -1,72 +1,72 @@
-﻿using System;
-using Xunit;
+﻿#region
 
 // Alias Console to MockConsole so we don't accidentally use Console
 using Console = Terminal.Gui.FakeConsole;
 
-namespace Terminal.Gui.DriverTests; 
+#endregion
+
+namespace Terminal.Gui.DriverTests;
 
 public class DriverColorTests {
-	public DriverColorTests () => ConsoleDriver.RunningUnitTests = true;
+    public DriverColorTests () => ConsoleDriver.RunningUnitTests = true;
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void SetColors_Changes_Colors (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
 
-		Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
-		Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
+    //[InlineData (typeof (ANSIDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void SetColors_Changes_Colors (Type driverType) {
+        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
 
-		Console.ForegroundColor = ConsoleColor.Red;
-		Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
+        Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
+        Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
 
-		Console.BackgroundColor = ConsoleColor.Green;
-		Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
+        Console.ForegroundColor = ConsoleColor.Red;
+        Assert.Equal (ConsoleColor.Red, Console.ForegroundColor);
 
-		Console.ResetColor ();
-		Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
-		Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
+        Console.BackgroundColor = ConsoleColor.Green;
+        Assert.Equal (ConsoleColor.Green, Console.BackgroundColor);
 
-		driver.End ();
-	}
+        Console.ResetColor ();
+        Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
+        Assert.Equal (ConsoleColor.Black, Console.BackgroundColor);
 
+        driver.End ();
+    }
 
-	[Theory]
-	[InlineData (typeof (FakeDriver), false)]
-	[InlineData (typeof (NetDriver), true)]
-	//[InlineData (typeof (ANSIDriver), true)]
-	[InlineData (typeof (WindowsDriver), true)]
-	[InlineData (typeof (CursesDriver), false)]
-	public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+    [Theory]
+    [InlineData (typeof (FakeDriver), false)]
+    [InlineData (typeof (NetDriver), true)]
 
-		Assert.Equal (expectedSetting, driver.SupportsTrueColor);
+    //[InlineData (typeof (ANSIDriver), true)]
+    [InlineData (typeof (WindowsDriver), true)]
+    [InlineData (typeof (CursesDriver), false)]
+    public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting) {
+        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
 
-		driver.End ();
-	}
+        Assert.Equal (expectedSetting, driver.SupportsTrueColor);
 
-	[Theory]
-	[InlineData (typeof (FakeDriver))]
-	[InlineData (typeof (NetDriver))]
-	//[InlineData (typeof (ANSIDriver))]
-	[InlineData (typeof (WindowsDriver))]
-	[InlineData (typeof (CursesDriver))]
-	public void Force16Colors_Sets (Type driverType)
-	{
-		var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
-		driver.Init ();
+        driver.End ();
+    }
 
-		driver.Force16Colors = true;
-		Assert.True (driver.Force16Colors);
+    [Theory]
+    [InlineData (typeof (FakeDriver))]
+    [InlineData (typeof (NetDriver))]
 
-		driver.End ();
-	}
+    //[InlineData (typeof (ANSIDriver))]
+    [InlineData (typeof (WindowsDriver))]
+    [InlineData (typeof (CursesDriver))]
+    public void Force16Colors_Sets (Type driverType) {
+        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        driver.Init ();
+
+        driver.Force16Colors = true;
+        Assert.True (driver.Force16Colors);
+
+        driver.End ();
+    }
 }

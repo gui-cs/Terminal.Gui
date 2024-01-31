@@ -1,1 +1,5 @@
-﻿global using CM = Terminal.Gui.ConfigurationManager;
+﻿#region
+
+global using CM = Terminal.Gui.ConfigurationManager;
+
+#endregion

@@ -1,6 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿#nullable enable
 
-#nullable enable
+#region
+
+using System.Text.Json.Serialization;
+
+#endregion
 
 namespace Terminal.Gui;
 
@@ -9,10 +13,11 @@ namespace Terminal.Gui;
 /// as a group.
 /// </summary>
 /// <remarks>
-/// <para>
-/// </para>
+///     <para>
+///     </para>
 /// </remarks>
-/// <example><code>
+/// <example>
+///     <code>
 /// 	"Default": {
 /// 		"ColorSchemes": [
 /// 		{
@@ -41,7 +46,7 @@ namespace Terminal.Gui;
 /// 
 /// 		}
 /// 	}
-/// </code></example> 
+/// </code>
+/// </example>
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
-public class ThemeScope : Scope<ThemeScope> {
-}
+public class ThemeScope : Scope<ThemeScope> { }

@@ -1,112 +1,104 @@
-﻿using System.Threading.Tasks;
-using Terminal.Gui;
-using Xunit;
+﻿#region
+
 using Xunit.Abstractions;
 
+#endregion
+
 namespace Terminal.Gui.ViewsTests {
-	public class SpinnerViewTests {
+    public class SpinnerViewTests {
+        readonly ITestOutputHelper output;
+        public SpinnerViewTests (ITestOutputHelper output) { this.output = output; }
 
-		readonly ITestOutputHelper output;
+        [Theory, AutoInitShutdown]
+        [InlineData (true)]
+        [InlineData (false)]
+        public void TestSpinnerView_AutoSpin (bool callStop) {
+            var view = GetSpinnerView ();
 
-		public SpinnerViewTests (ITestOutputHelper output)
-		{
-			this.output = output;
-		}
+            Assert.Empty (Application.MainLoop._timeouts);
+            view.AutoSpin = true;
+            Assert.NotEmpty (Application.MainLoop._timeouts);
+            Assert.True (view.AutoSpin);
 
-		[Theory, AutoInitShutdown]
-		[InlineData (true)]
-		[InlineData (false)]
-		public void TestSpinnerView_AutoSpin (bool callStop)
-		{
-			var view = GetSpinnerView ();
+            //More calls to AutoSpin do not add more timeouts
+            Assert.Single (Application.MainLoop._timeouts);
+            view.AutoSpin = true;
+            view.AutoSpin = true;
+            view.AutoSpin = true;
+            Assert.True (view.AutoSpin);
+            Assert.Single (Application.MainLoop._timeouts);
 
-			Assert.Empty (Application.MainLoop._timeouts);
-			view.AutoSpin = true;
-			Assert.NotEmpty (Application.MainLoop._timeouts);
-			Assert.True (view.AutoSpin);
+            if (callStop) {
+                view.AutoSpin = false;
+                Assert.Empty (Application.MainLoop._timeouts);
+                Assert.False (view.AutoSpin);
+            } else {
+                Assert.NotEmpty (Application.MainLoop._timeouts);
+            }
 
-			//More calls to AutoSpin do not add more timeouts
-			Assert.Single (Application.MainLoop._timeouts);
-			view.AutoSpin = true;
-			view.AutoSpin = true;
-			view.AutoSpin = true;
-			Assert.True (view.AutoSpin);
-			Assert.Single (Application.MainLoop._timeouts);
+            // Dispose clears timeout
+            view.Dispose ();
+            Assert.Empty (Application.MainLoop._timeouts);
+        }
 
-			if (callStop) {
-				view.AutoSpin = false;
-				Assert.Empty (Application.MainLoop._timeouts);
-				Assert.False (view.AutoSpin);
-			} else {
-				Assert.NotEmpty (Application.MainLoop._timeouts);
-			}
+        [Fact, AutoInitShutdown]
+        public void TestSpinnerView_ThrottlesAnimation () {
+            var view = GetSpinnerView ();
+            view.Draw ();
 
-			// Dispose clears timeout
-			view.Dispose ();
-			Assert.Empty (Application.MainLoop._timeouts);
-		}
+            var expected = @"\";
+            TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-		[Fact, AutoInitShutdown]
-		public void TestSpinnerView_ThrottlesAnimation ()
-		{
-			var view = GetSpinnerView ();
-			view.Draw ();
+            view.AdvanceAnimation ();
+            view.Draw ();
 
-			var expected = @"\";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+            expected = @"\";
+            TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.AdvanceAnimation ();
-			view.Draw ();
+            view.AdvanceAnimation ();
+            view.Draw ();
 
-			expected = @"\";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+            expected = @"\";
+            TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			view.AdvanceAnimation ();
-			view.Draw ();
+            // BUGBUG: Disabled due to xunit error
+            //Task.Delay (400).Wait ();
 
-			expected = @"\";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+            //view.AdvanceAnimation ();
+            //view.Draw ();
 
-			// BUGBUG: Disabled due to xunit error
-			//Task.Delay (400).Wait ();
+            //expected = "|";
+            //TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        }
 
-			//view.AdvanceAnimation ();
-			//view.Draw ();
+        [Fact, AutoInitShutdown]
+        public void TestSpinnerView_NoThrottle () {
+            var view = GetSpinnerView ();
+            view.SpinDelay = 0;
 
-			//expected = "|";
-			//TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-		}
-		
-		[Fact, AutoInitShutdown]
-		public void TestSpinnerView_NoThrottle ()
-		{
-			var view = GetSpinnerView ();
-			view.SpinDelay = 0;
+            view.AdvanceAnimation ();
+            view.Draw ();
 
-			view.AdvanceAnimation ();
-			view.Draw ();
+            var expected = "|";
+            TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
-			var expected = "|";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+            view.AdvanceAnimation ();
+            view.Draw ();
 
-			view.AdvanceAnimation ();
-			view.Draw ();
+            expected = "/";
+            TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        }
 
-			expected = "/";
-			TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
-		}
+        private SpinnerView GetSpinnerView () {
+            var view = new SpinnerView ();
 
-		private SpinnerView GetSpinnerView ()
-		{
-			var view = new SpinnerView ();
+            Application.Top.Add (view);
+            Application.Begin (Application.Top);
 
-			Application.Top.Add (view);
-			Application.Begin (Application.Top);
+            Assert.Equal (1, view.Width);
+            Assert.Equal (1, view.Height);
 
-			Assert.Equal (1, view.Width);
-			Assert.Equal (1, view.Height);
-
-			return view;
-		}
-	}
+            return view;
+        }
+    }
 }
