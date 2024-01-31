@@ -225,9 +225,10 @@ public class Dialogs : Scenario {
 
 			// This tests dynamically adding buttons; ensuring the dialog resizes if needed and 
 			// the buttons are laid out correctly
-			dialog = new Dialog (buttons.ToArray ()) {
+			dialog = new Dialog {
 				Title = titleEdit.Text,
-				ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem
+				ButtonAlignment = (Dialog.ButtonAlignments)styleRadioGroup.SelectedItem,
+				Buttons = buttons.ToArray ()
 			};
 			if (height != 0 || width != 0) {
 				dialog.Height = height;

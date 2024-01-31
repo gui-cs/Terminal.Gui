@@ -276,11 +276,12 @@ public static class MessageBox {
 		}
 
 		Dialog d;
-		d = new Dialog (buttonList.ToArray ()) {
+		d = new Dialog {
 			Title = title,
 			BorderStyle = DefaultBorderStyle,
 			Width = Dim.Percent (60),
-			Height = 5 // Border + one line of text + vspace + buttons
+			Height = 5, // Border + one line of text + vspace + buttons
+			Buttons = buttonList.ToArray ()
 		};
 
 		if (width != 0) {
@@ -329,7 +330,7 @@ public static class MessageBox {
 			// Ensure the width fits the text + buttons
 			var newWidth = Math.Max (width,
 				Math.Max (messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
-					d.GetButtonsWidth () + d.buttons.Count +
+					d.GetButtonsWidth () + d.Buttons.Length +
 					d.GetAdornmentsThickness ().Horizontal));
 			if (newWidth > d.Frame.Width) {
 				d.Width = newWidth;

@@ -88,7 +88,10 @@ public class SingleBackgroundWorker : Scenario {
 			_log.Add ($"Worker is started at {_startStaging}.{_startStaging:fff}");
 			_listLog.SetNeedsDisplay ();
 
-			var md = new Dialog (cancel) { Title = $"Running Worker started at {_startStaging}.{_startStaging:fff}" };
+			var md = new Dialog {
+				Title = $"Running Worker started at {_startStaging}.{_startStaging:fff}",
+				Buttons = [cancel]
+			};
 			md.Add (new Label {
 				X = Pos.Center (),
 				Y = Pos.Center (),

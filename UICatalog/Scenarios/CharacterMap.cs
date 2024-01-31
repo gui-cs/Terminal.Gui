@@ -642,12 +642,13 @@ class CharMap : ScrollView {
 		var client = new UcdApiClient ();
 		var decResponse = string.Empty;
 
-		var waitIndicator = new Dialog (new Button { Text = "Cancel" }) {
+		var waitIndicator = new Dialog {
 			Title = "Getting Code Point Information",
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Height = 7,
-			Width = 50
+			Width = 50,
+			Buttons = [new Button { Text = "Cancel" }]
 		};
 		var errorLabel = new Label {
 			Text = UcdApiClient.BaseUrl,
@@ -712,8 +713,9 @@ class CharMap : ScrollView {
 			var copyCP = new Button { Text = "Copy Code _Point" };
 			var cancel = new Button { Text = "Cancel" };
 
-			var dlg = new Dialog (copyGlyph, copyCP, cancel) {
-				Title = title
+			var dlg = new Dialog {
+				Title = title,
+				Buttons = [copyGlyph, copyCP, cancel]
 			};
 
 			copyGlyph.Clicked += (s, a) => {

@@ -78,7 +78,7 @@ public class MultiColouredTable : Scenario {
 		};
 		var cancel = new Button { Text = "Cancel" };
 		cancel.Clicked += (s, e) => { Application.RequestStop (); };
-		var d = new Dialog (ok, cancel) { Title = title };
+		var d = new Dialog { Title = title, Buttons = [ok, cancel] };
 
 		var lbl = new Label {
 			X = 0,

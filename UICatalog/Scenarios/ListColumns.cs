@@ -314,7 +314,7 @@ public class ListColumns : Scenario {
 		};
 		var cancel = new Button { Text = "Cancel" };
 		cancel.Clicked += (s, e) => { Application.RequestStop (); };
-		var d = new Dialog (ok, cancel) { Title = prompt };
+		var d = new Dialog { Title = prompt, Buttons = [ok, cancel] };
 
 		var tf = new TextField {
 			Text = getter (_listColView).ToString (),

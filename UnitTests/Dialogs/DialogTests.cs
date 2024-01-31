@@ -11,13 +11,14 @@ public class DialogTests {
 	(RunState, Dialog) RunButtonTestDialog (string title, int width, Dialog.ButtonAlignments align,
 		params Button [] btns)
 	{
-		var dlg = new Dialog (btns) {
+		var dlg = new Dialog {
 			Title = title,
 			X = 0,
 			Y = 0,
 			Width = width,
 			Height = 1,
-			ButtonAlignment = align
+			ButtonAlignment = align,
+			Buttons = btns
 		};
 		// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 		dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
@@ -744,7 +745,13 @@ public class DialogTests {
 		d.SetBufferSize (width, 1);
 
 		// Default (center)
-		var dlg = new Dialog (new Button { Text = btn1Text }) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Center };
+		var dlg = new Dialog {
+			Title = title,
+			Width = width,
+			Height = 1,
+			ButtonAlignment = Dialog.ButtonAlignments.Center,
+			Buttons = [new Button { Text = btn1Text }]
+		};
 		// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 		dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 		runstate = Begin (dlg);
@@ -760,7 +767,13 @@ public class DialogTests {
 		End (runstate);
 
 		// Justify
-		dlg = new Dialog (new Button { Text = btn1Text }) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Justify };
+		dlg = new Dialog {
+			Title = title,
+			Width = width,
+			Height = 1,
+			ButtonAlignment = Dialog.ButtonAlignments.Justify,
+			Buttons = [new Button { Text = btn1Text }]
+		};
 		// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 		dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 		runstate = Begin (dlg);
@@ -776,7 +789,13 @@ public class DialogTests {
 		End (runstate);
 
 		// Right
-		dlg = new Dialog (new Button { Text = btn1Text }) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Right };
+		dlg = new Dialog {
+			Title = title,
+			Width = width,
+			Height = 1,
+			ButtonAlignment = Dialog.ButtonAlignments.Right,
+			Buttons = [new Button { Text = btn1Text }]
+		};
 		// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 		dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 		runstate = Begin (dlg);
@@ -792,7 +811,13 @@ public class DialogTests {
 		End (runstate);
 
 		// Left
-		dlg = new Dialog (new Button { Text = btn1Text }) { Title = title, Width = width, Height = 1, ButtonAlignment = Dialog.ButtonAlignments.Left };
+		dlg = new Dialog {
+			Title = title,
+			Width = width,
+			Height = 1,
+			ButtonAlignment = Dialog.ButtonAlignments.Left,
+			Buttons = [new Button { Text = btn1Text }]
+		};
 		// Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
 		dlg.Border.Thickness = new Thickness (1, 0, 1, 0);
 		runstate = Begin (dlg);
@@ -836,11 +861,11 @@ public class DialogTests {
 			btn2.Clicked += (s, e) => {
 				// Don't test MessageBox in Dialog unit tests!
 				var subBtn = new Button { Text = "Ok", IsDefault = true };
-				var subDlg = new Dialog (subBtn) { Text = "ya", Width = 20, Height = 5 };
+				var subDlg = new Dialog { Text = "ya", Width = 20, Height = 5, Buttons = [subBtn] };
 				subBtn.Clicked += (s, e) => RequestStop (subDlg);
 				Run (subDlg);
 			};
-			var dlg = new Dialog (btn2, btn3);
+			var dlg = new Dialog { Buttons = [btn2, btn3] };
 
 			Run (dlg);
 		};
@@ -911,7 +936,7 @@ public class DialogTests {
 		var btn = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
 
 		win.Loaded += (s, a) => {
-			var dlg = new Dialog (new Button { Text = "Ok" }) { Width = 18, Height = 3 };
+			var dlg = new Dialog { Width = 18, Height = 3, Buttons = [new Button { Text = "Ok" }] };
 
 			dlg.Loaded += (s, a) => {
 				Refresh ();
@@ -980,7 +1005,7 @@ public class DialogTests {
 		Iteration += (s, a) => {
 			iterations++;
 			if (iterations == 0) {
-				var dlg = new Dialog (new Button { Text = "Ok" });
+				var dlg = new Dialog { Buttons = [new Button { Text = "Ok" }] };
 				Run (dlg);
 			} else if (iterations == 1) {
 				// BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
