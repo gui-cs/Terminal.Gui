@@ -347,9 +347,7 @@ namespace Terminal.Gui {
 
 					Move (current.X, yh);
 
-					if (current.Width - colName.Length > 0
-						&& Style.ShowHorizontalHeaderThroughline
-						&& (!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
+					if (current.Width > colName.Length && Style.ShowHorizontalHeaderThroughline) {
 
 						if (colName.Sum (c => ((Rune)c).GetColumns ()) < current.Width) {
 							Driver.AddStr (colName);
@@ -462,8 +460,7 @@ namespace Terminal.Gui {
 					row++;
 				}
 				if (Style.ShowHeaders) {
-					if (Style.ShowHorizontalHeaderThroughline &&
-						(!Style.ShowHorizontalHeaderOverline || !Style.ShowHorizontalHeaderUnderline)) {
+					if (Style.ShowHorizontalHeaderThroughline) {
 						grid.AddLine (new Point (0, row), width, Orientation.Horizontal, Style.InnerHeaderBorderStyle);
 					}
 					row++;
