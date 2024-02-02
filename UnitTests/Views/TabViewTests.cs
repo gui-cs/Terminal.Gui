@@ -1102,7 +1102,7 @@ public class TabViewTests {
 		Assert.Equal (tv, top.Focused);
 		Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
-		// Press the cursor down key to focused the selected tab view hosting
+		// Press the cursor down key to focus the selected tab view hosting
 		args = new Key (Key.CursorDown);
 		Application.OnKeyDown (args);
 		Application.Refresh ();
@@ -1112,6 +1112,22 @@ public class TabViewTests {
 		// The tab view hosting is a label which can't be focused
 		// and the View container is the focused one
 		Assert.Equal (tv.Subviews [1], top.Focused.MostFocused);
+
+		// Press the cursor down key again will focus next view in the toplevel
+		Application.OnKeyDown (args);
+		Application.Refresh ();
+		Assert.Equal (tab2, tv.SelectedTab);
+		Assert.Equal (btn, top.Focused);
+		Assert.Null (tv.MostFocused);
+		Assert.Null (top.Focused.MostFocused);
+
+		// Press the cursor up key to focus the selected tab view hosting again
+		args = new Key (Key.CursorUp);
+		Application.OnKeyDown (args);
+		Application.Refresh ();
+		Assert.Equal (tab2, tv.SelectedTab);
+		Assert.Equal (tv, top.Focused);
+		Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
 		// Press the cursor up key to focus the selected tab
 		args = new Key (Key.CursorUp);

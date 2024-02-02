@@ -62,8 +62,12 @@ public class TabView : View {
 			return true;
 		});
 		AddCommand (Command.NextView, () => {
-			_contentView.SetFocus ();
-			return true;
+			if (_contentView is { HasFocus: false }) {
+				_contentView.SetFocus ();
+				return true;
+			}
+
+			return false;
 		});
 		AddCommand (Command.PreviousView, () => {
 			SuperView?.FocusPrev ();
