@@ -33,7 +33,6 @@ public class MyScenario : Scenario {
 		// `Scenario.Run` which calls `Application.Run`. Example:
 
 		var button = new Button {
-			AutoSize = false,
 			X = Pos.Center (),
 			Y = Pos.Center (),
 			Text = "Press me!"

@@ -731,4 +731,59 @@ public class ButtonTests {
 		Assert.Equal (KeyCode.Null, args.OldKey);
 		Assert.Equal (KeyCode.R, args.NewKey);
 	}
+
+	[Fact]
+	[SetupFakeDriver]
+	public void Button_AutoSize_False_Does_Not_Draw ()
+	{
+		var btn = new Button {
+			AutoSize = false,
+			X = Pos.Center (),
+			Y = Pos.Center (),
+			Text = "Press me!"
+		};
+		Assert.Equal ("Press me!", btn.Text);
+		btn.BeginInit ();
+		btn.EndInit ();
+		btn.Draw ();
+
+		Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+		Assert.Equal ("{Width=0, Height=1}", btn.TextFormatter.Size.ToString ());
+		TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+	}
+
+	[Fact]
+	[SetupFakeDriver]
+	public void Button_AutoSize_False_With_Fixed_Width ()
+	{
+		((FakeDriver)Application.Driver).SetBufferSize (20, 5);
+
+		var top = new View { Width = 20, Height = 5 };
+		var btn1 = new Button {
+			AutoSize = false,
+			X = Pos.Center (),
+			Y = Pos.Center (),
+			Width = 16,
+			Height = 1,
+			Text = "Open me!"
+		};
+		var btn2 = new Button {
+			AutoSize = false,
+			X = Pos.Center (),
+			Y = Pos.Center () + 1,
+			Width = 16,
+			Height = 1,
+			Text = "Close me!"
+		};
+		top.Add (btn1, btn2);
+		top.BeginInit ();
+		top.EndInit ();
+		top.Draw ();
+
+		Assert.Equal ("{Width=16, Height=1}", btn1.TextFormatter.Size.ToString ());
+		Assert.Equal ("{Width=16, Height=1}", btn2.TextFormatter.Size.ToString ());
+		TestHelpers.AssertDriverContentsWithFrameAre (@$"
+    {CM.Glyphs.LeftBracket} {btn1.Text} {CM.Glyphs.RightBracket}
+   {CM.Glyphs.LeftBracket} {btn2.Text} {CM.Glyphs.RightBracket}", _output);
+	}
 }
