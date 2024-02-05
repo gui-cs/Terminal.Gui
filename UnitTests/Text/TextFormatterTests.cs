@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
+
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.TextTests;
@@ -2164,5 +2165,44 @@ ssb
 		var splitLines = tf.Lines;
 		Assert.Equal (splitLines.Count, resultLines.Count ());
 		Assert.Equal (splitLines, resultLines);
+	}
+
+	[Fact]
+	[SetupFakeDriver]
+	public void FillRemaining_True_False ()
+	{
+		((FakeDriver)Application.Driver).SetBufferSize (22, 5);
+
+		var attrs = new [] {
+			Attribute.Default, new Attribute (ColorName.Green, ColorName.BrightMagenta),
+			new Attribute (ColorName.Blue, ColorName.Cyan)
+		};
+		var tf = new TextFormatter { Size = new Size (14, 3), Text = "Test\nTest long\nTest long long\n", MultiLine = true };
+		tf.Draw (new Rect (1, 1, 19, 3), attrs [1], attrs [2],
+			default, tf.FillRemaining);
+
+		Assert.False (tf.FillRemaining);
+
+		TestHelpers.AssertDriverContentsWithFrameAre (@"
+ Test          
+ Test long     
+ Test long long", _output);
+
+		TestHelpers.AssertDriverAttributesAre (@"
+000000000000000000000
+011110000000000000000
+011111111100000000000
+011111111111111000000
+000000000000000000000", null, attrs);
+
+		tf.FillRemaining = true;
+		tf.Draw (new Rect (1, 1, 19, 3), attrs [1], attrs [2],
+			default, tf.FillRemaining);
+		TestHelpers.AssertDriverAttributesAre (@"
+000000000000000000000
+011111111111111111110
+011111111111111111110
+011111111111111111110
+000000000000000000000", null, attrs);
 	}
 }

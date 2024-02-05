@@ -409,6 +409,13 @@ public class TextFormatter {
 	}
 
 	/// <summary>
+	///         Determines if the bounds width will be used or only the text width will be used,
+	///         If <see langword="true" /> all the bounds area will be filled with whitespaces and the same background color
+	///         showing a perfect rectangle.
+	/// </summary>
+	public bool FillRemaining { get; set; }
+
+	/// <summary>
 	///         Event invoked when the <see cref="HotKey" /> is changed.
 	/// </summary>
 	public event EventHandler<KeyChangedEventArgs> HotKeyChanged;
@@ -526,9 +533,7 @@ public class TextFormatter {
 			return;
 		}
 
-		if (driver == null) {
-			driver = Application.Driver;
-		}
+		driver ??= Application.Driver;
 
 		driver?.SetAttribute (normalColor);
 
