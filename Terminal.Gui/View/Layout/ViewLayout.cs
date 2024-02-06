@@ -4,15 +4,32 @@ using System.Diagnostics;
 namespace Terminal.Gui;
 
 /// <summary>
-/// <para>Indicates the LayoutStyle for the <see cref="View"/>.</para>
-/// <para>If Absolute, the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> objects are all absolute values and are not relative. The position and size of the view is described by <see cref="View.Frame"/>.</para>
-/// <para>If Computed, one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.</para>
+///     <para>Indicates the LayoutStyle for the <see cref="View"/>.</para>
+///     <para>
+///         If Absolute, the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and
+///         <see cref="View.Height"/> objects are all absolute values and are not relative. The position and size of the
+///         view is described by <see cref="View.Frame"/>.
+///     </para>
+///     <para>
+///         If Computed, one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
+///         <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout
+///         time.
+///     </para>
 /// </summary>
 public enum LayoutStyle {
-    /// <summary>Indicates the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and <see cref="View.Height"/> objects are all absolute values and are not relative. The position and size of the view is described by <see cref="View.Frame"/>.</summary>
+    /// <summary>
+    ///     Indicates the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, and
+    ///     <see cref="View.Height"/> objects are all absolute values and are not relative. The position and size of the view
+    ///     is described by <see cref="View.Frame"/>.
+    /// </summary>
     Absolute,
 
-    /// <summary>Indicates one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.  The position and size of the view will be computed based on these objects at layout time. <see cref="View.Frame"/> will provide the absolute computed values.</summary>
+    /// <summary>
+    ///     Indicates one or more of the <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or
+    ///     <see cref="View.Height"/> objects are relative to the <see cref="View.SuperView"/> and are computed at layout time.
+    ///     The position and size of the view will be computed based on these objects at layout time. <see cref="View.Frame"/>
+    ///     will provide the absolute computed values.
+    /// </summary>
     Computed
 }
 
@@ -24,19 +41,26 @@ public partial class View {
     private Pos _x = Pos.At (0);
     private Pos _y = Pos.At (0);
 
-    /// <summary>Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/> within <see cref="Bounds"/>.
-    /// <para>The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can fit; if <see cref="Text"/> won't fit the view will be resized as needed.</para>
-    /// <para>If <see cref="AutoSize"/> is set to <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be changed to <see cref="Dim.DimAbsolute"/> if they are not already.</para>
-    /// <para>If <see cref="AutoSize"/> is set to <see langword="false"/> then <see cref="Width"/> and <see cref="Height"/> will left unchanged.</para>
+    /// <summary>
+    ///     Gets or sets a flag that determines whether the View will be automatically resized to fit the <see cref="Text"/>
+    ///     within <see cref="Bounds"/>.
+    ///     <para>
+    ///         The default is <see langword="false"/>. Set to <see langword="true"/> to turn on AutoSize. If
+    ///         <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/> will be used if <see cref="Text"/> can
+    ///         fit; if <see cref="Text"/> won't fit the view will be resized as needed.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="AutoSize"/> is set to <see langword="true"/> then <see cref="Width"/> and <see cref="Height"/>
+    ///         will be changed to <see cref="Dim.DimAbsolute"/> if they are not already.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="AutoSize"/> is set to <see langword="false"/> then <see cref="Width"/> and <see cref="Height"/>
+    ///         will left unchanged.
+    ///     </para>
     /// </summary>
     public virtual bool AutoSize {
         get => _autoSize;
         set {
-            if (Width != Dim.Sized (0) && Height != Dim.Sized (0)) {
-                Debug.WriteLine (
-                                 $@"WARNING: {GetType ().Name} - Setting {nameof (AutoSize)} invalidates {nameof (Width)} and {nameof (Height)}.");
-            }
-
             bool v = ResizeView (value);
             TextFormatter.AutoSize = v;
             if (_autoSize != v) {
@@ -48,19 +72,38 @@ public partial class View {
         }
     }
 
-    /// <summary>The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the <see cref="Margin"/>. The Border provides the space for a visual border (drawn using line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the border and title will take up the first row and the second row will be filled with spaces.</summary>
+    /// <summary>
+    ///     The adornment (specified as a <see cref="Thickness"/>) inside of the view that offsets the
+    ///     <see cref="Bounds"/> from the <see cref="Margin"/>. The Border provides the space for a visual border (drawn using
+    ///     line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2` the
+    ///     border and title will take up the first row and the second row will be filled with spaces.
+    /// </summary>
     /// <remarks>
-    /// <para><see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.</para>
-    /// <para>The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content and are not clipped by the View's Clip Area.</para>
-    /// <para>Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the <see cref="SuperView"/> and its <see cref="Subviews"/>.</para>
+    ///     <para><see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.</para>
+    ///     <para>
+    ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
+    ///         View's content and are not clipped by the View's Clip Area.
+    ///     </para>
+    ///     <para>
+    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+    ///     </para>
     /// </remarks>
     public Border Border { get; private set; }
 
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
     /// <remarks>
-    /// <para>This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.</para>
-    /// <para>Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.</para>
-    /// <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
+    ///     <para>
+    ///         This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
+    ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
+    ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
+    ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
+    ///     </para>
+    ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>
     public LineStyle BorderStyle {
         get => Border.LineStyle;
@@ -77,13 +120,30 @@ public partial class View {
         }
     }
 
-    /// <summary>The bounds represent the View-relative rectangle used for this view; the area inside of the view where subviews and content are presented.</summary>
+    /// <summary>
+    ///     The bounds represent the View-relative rectangle used for this view; the area inside of the view where
+    ///     subviews and content are presented.
+    /// </summary>
     /// <value>The rectangle describing the location and size of the area where the views' subviews and content are drawn.</value>
     /// <remarks>
-    /// <para>If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Bounds is indeterminate until the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been called.</para>
-    /// <para>Updates to the Bounds updates <see cref="Frame"/>, and has the same effect as updating the <see cref="Frame"/>.</para>
-    /// <para>Altering the Bounds will eventually (when the view is next laid out) cause the <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.</para>
-    /// <para>Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the coordinates of the upper-left corner of the rectangle returned by this property are (0,0). Use this property to obtain the size of the area of the view for tasks such as drawing the view's contents.</para>
+    ///     <para>
+    ///         If <see cref="LayoutStyle"/> is <see cref="LayoutStyle.Computed"/> the value of Bounds is indeterminate until
+    ///         the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="LayoutSubviews"/> has been
+    ///         called.
+    ///     </para>
+    ///     <para>
+    ///         Updates to the Bounds updates <see cref="Frame"/>, and has the same effect as updating the
+    ///         <see cref="Frame"/>.
+    ///     </para>
+    ///     <para>
+    ///         Altering the Bounds will eventually (when the view is next laid out) cause the
+    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///     </para>
+    ///     <para>
+    ///         Because <see cref="Bounds"/> coordinates are relative to the upper-left corner of the <see cref="View"/>, the
+    ///         coordinates of the upper-left corner of the rectangle returned by this property are (0,0). Use this property to
+    ///         obtain the size of the area of the view for tasks such as drawing the view's contents.
+    ///     </para>
     /// </remarks>
     public virtual Rect Bounds {
         get {
@@ -132,12 +192,22 @@ public partial class View {
     }
 
     /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
-    /// <value>The rectangle describing absolute location and dimension of the view, in coordinates relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</value>
+    /// <value>
+    ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
+    ///     <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    /// </value>
     /// <remarks>
-    /// <para>Frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</para>
-    /// <para>Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the values of the corresponding properties of the <paramref name="value"/> parameter.</para>
-    /// <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
-    /// <para>Altering the Frame will eventually (when the view hierarchy is next laid out via  see cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.</para>
+    ///     <para>Frame is relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</para>
+    ///     <para>
+    ///         Setting Frame will set <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> to the
+    ///         values of the corresponding properties of the <paramref name="value"/> parameter.
+    ///     </para>
+    ///     <para>This causes <see cref="LayoutStyle"/> to be <see cref="LayoutStyle.Absolute"/>.</para>
+    ///     <para>
+    ///         Altering the Frame will eventually (when the view hierarchy is next laid out via  see
+    ///         cref="LayoutSubviews"/>) cause <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/>
+    ///         methods to be called.
+    ///     </para>
     /// </remarks>
     public Rect Frame {
         get => _frame;
@@ -164,37 +234,57 @@ public partial class View {
     /// <summary>Gets or sets the height dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
-    /// <para>If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.</para>
-    /// <para>Changing this property will eventually (when the view is next drawn) cause the <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.</para>
-    /// <para>Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type <see cref="Dim.DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.</para>
-    /// <para>The default value is <c>Dim.Sized (0)</c>.</para>
+    ///     <para>
+    ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
+    ///         been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+    ///         called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will eventually (when the view is next drawn) cause the
+    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
+    ///         <see cref="Dim.DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///     </para>
+    ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
     public Dim Height {
         get => VerifyIsInitialized (_height, nameof (Height));
         set {
             _height = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Height)} cannot be null");
 
-            if (AutoSize) {
-                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Height)}.");
+            if (ValidatePosDim) {
+                bool isValidNewAutSize = AutoSize && IsValidAutoSizeHeight (_height);
+
+                if (IsAdded && AutoSize && !isValidNewAutSize) {
+                    throw new InvalidOperationException ("Must set AutoSize to false before setting the Height.");
+                }
             }
 
-            //if (ValidatePosDim) {
-            bool isValidNewAutoSize = AutoSize && IsValidAutoSizeHeight (_height);
-
-            if (IsAdded && AutoSize && !isValidNewAutoSize) {
-                throw new InvalidOperationException (
-                                                     @$"Must set AutoSize to false before setting the {nameof (Height)}.");
-            }
-
-            //}
             OnResizeNeeded ();
         }
     }
 
-    /// <summary>Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is set to <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using the <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties.</summary>
+    /// <summary>
+    ///     Controls how the View's <see cref="Frame"/> is computed during <see cref="LayoutSubviews"/>. If the style is
+    ///     set to <see cref="LayoutStyle.Absolute"/>, LayoutSubviews does not change the <see cref="Frame"/>. If the style is
+    ///     <see cref="LayoutStyle.Computed"/> the <see cref="Frame"/> is updated using the <see cref="X"/>, <see cref="Y"/>,
+    ///     <see cref="Width"/>, and <see cref="Height"/> properties.
+    /// </summary>
     /// <remarks>
-    /// <para>Setting this property to <see cref="LayoutStyle.Absolute"/> will cause <see cref="Frame"/> to determine the size and position of the view. <see cref="X"/> and <see cref="Y"/> will be set to <see cref="Dim.DimAbsolute"/> using <see cref="Frame"/>.</para>
-    /// <para>Setting this property to <see cref="LayoutStyle.Computed"/> will cause the view to use the <see cref="LayoutSubviews"/> method to size and position of the view. If either of the <see cref="X"/> and <see cref="Y"/> properties are `null` they will be set to <see cref="Pos.PosAbsolute"/> using the current value of <see cref="Frame"/>. If either of the <see cref="Width"/> and <see cref="Height"/> properties are `null` they will be set to <see cref="Dim.DimAbsolute"/> using <see cref="Frame"/>.</para>
+    ///     <para>
+    ///         Setting this property to <see cref="LayoutStyle.Absolute"/> will cause <see cref="Frame"/> to determine the
+    ///         size and position of the view. <see cref="X"/> and <see cref="Y"/> will be set to <see cref="Dim.DimAbsolute"/>
+    ///         using <see cref="Frame"/>.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see cref="LayoutStyle.Computed"/> will cause the view to use the
+    ///         <see cref="LayoutSubviews"/> method to size and position of the view. If either of the <see cref="X"/> and
+    ///         <see cref="Y"/> properties are `null` they will be set to <see cref="Pos.PosAbsolute"/> using the current value
+    ///         of <see cref="Frame"/>. If either of the <see cref="Width"/> and <see cref="Height"/> properties are `null`
+    ///         they will be set to <see cref="Dim.DimAbsolute"/> using <see cref="Frame"/>.
+    ///     </para>
     /// </remarks>
     /// <value>The layout style.</value>
     public LayoutStyle LayoutStyle {
@@ -208,49 +298,80 @@ public partial class View {
         }
     }
 
-    /// <summary>The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.</summary>
+    /// <summary>
+    ///     The frame (specified as a <see cref="Thickness"/>) that separates a View from other SubViews of the same
+    ///     SuperView. The margin offsets the <see cref="Bounds"/> from the <see cref="Frame"/>.
+    /// </summary>
     /// <remarks>
-    /// <para>The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content and are not clipped by the View's Clip Area.</para>
-    /// <para>Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will change the size of <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the <see cref="SuperView"/> and its <see cref="Subviews"/>.</para>
+    ///     <para>
+    ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
+    ///         View's content and are not clipped by the View's Clip Area.
+    ///     </para>
+    ///     <para>
+    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+    ///     </para>
     /// </remarks>
     public Margin Margin { get; private set; }
 
-    /// <summary>The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/> from the <see cref="Border"/>.</summary>
+    /// <summary>
+    ///     The frame (specified as a <see cref="Thickness"/>) inside of the view that offsets the <see cref="Bounds"/>
+    ///     from the <see cref="Border"/>.
+    /// </summary>
     /// <remarks>
-    /// <para>The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the View's content and are not clipped by the View's Clip Area.</para>
-    /// <para>Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the <see cref="SuperView"/> and its <see cref="Subviews"/>.</para>
+    ///     <para>
+    ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
+    ///         View's content and are not clipped by the View's Clip Area.
+    ///     </para>
+    ///     <para>
+    ///         Changing the size of a frame (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
+    ///         change the size of the <see cref="Frame"/> and trigger <see cref="LayoutSubviews"/> to update the layout of the
+    ///         <see cref="SuperView"/> and its <see cref="Subviews"/>.
+    ///     </para>
     /// </remarks>
     public Padding Padding { get; private set; }
 
     /// <summary>Gets or sets whether validation of <see cref="Pos"/> and <see cref="Dim"/> occurs.</summary>
-    /// <remarks>Setting this to <see langword="true"/> will enable validation of <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> during set operations and in <see cref="LayoutSubviews"/>. If invalid settings are discovered exceptions will be thrown indicating the error. This will impose a performance penalty and thus should only be used for debugging.</remarks>
+    /// <remarks>
+    ///     Setting this to <see langword="true"/> will enable validation of <see cref="X"/>, <see cref="Y"/>,
+    ///     <see cref="Width"/>, and <see cref="Height"/> during set operations and in <see cref="LayoutSubviews"/>. If invalid
+    ///     settings are discovered exceptions will be thrown indicating the error. This will impose a performance penalty and
+    ///     thus should only be used for debugging.
+    /// </remarks>
     public bool ValidatePosDim { get; set; }
 
     /// <summary>Gets or sets the width dimension of the view.</summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
-    /// <para>If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.</para>
-    /// <para>Changing this property will eventually (when the view is next drawn) cause the <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.</para>
-    /// <para>Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type <see cref="Dim.DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.</para>
-    /// <para>The default value is <c>Dim.Sized (0)</c>.</para>
+    ///     <para>
+    ///         If set to a relative value (e.g. <see cref="Dim.Fill(int)"/>) the value is indeterminate until the view has
+    ///         been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been
+    ///         called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will eventually (when the view is next drawn) cause the
+    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
+    ///         <see cref="Dim.DimAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///     </para>
+    ///     <para>The default value is <c>Dim.Sized (0)</c>.</para>
     /// </remarks>
     public Dim Width {
         get => VerifyIsInitialized (_width, nameof (Width));
         set {
             _width = value ?? throw new ArgumentNullException (nameof (value), @$"{nameof (Width)} cannot be null");
 
-            if (AutoSize) {
-                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
+            if (ValidatePosDim) {
+                bool isValidNewAutSize = AutoSize && IsValidAutoSizeWidth (_width);
+
+                if (IsAdded && AutoSize && !isValidNewAutSize) {
+                    throw new InvalidOperationException ("Must set AutoSize to false before set the Width.");
+                }
             }
 
-            //if (ValidatePosDim) {
-            bool isValidNewAutoSize = AutoSize && IsValidAutoSizeWidth (_width);
-
-            if (IsAdded && AutoSize && !isValidNewAutoSize) {
-                throw new InvalidOperationException (@$"Must set AutoSize to false before setting {nameof (Width)}.");
-            }
-
-            //}
             OnResizeNeeded ();
         }
     }
@@ -258,10 +379,19 @@ public partial class View {
     /// <summary>Gets or sets the X position for the view (the column).</summary>
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
-    /// <para>If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.</para>
-    /// <para>Changing this property will eventually (when the view is next drawn) cause the <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.</para>
-    /// <para>Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type <see cref="Pos.PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.</para>
-    /// <para>The default value is <c>Pos.At (0)</c>.</para>
+    ///     <para>
+    ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
+    ///         initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will eventually (when the view is next drawn) cause the
+    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
+    ///         <see cref="Pos.PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///     </para>
+    ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
     public Pos X {
         get => VerifyIsInitialized (_x, nameof (X));
@@ -274,10 +404,19 @@ public partial class View {
     /// <summary>Gets or sets the Y position for the view (the row).</summary>
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
-    /// <para>If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.</para>
-    /// <para>Changing this property will eventually (when the view is next drawn) cause the <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.</para>
-    /// <para>Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type <see cref="Pos.PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.</para>
-    /// <para>The default value is <c>Pos.At (0)</c>.</para>
+    ///     <para>
+    ///         If set to a relative value (e.g. <see cref="Pos.Center"/>) the value is indeterminate until the view has been
+    ///         initialized (<see cref="IsInitialized"/> is true) and <see cref="SetRelativeLayout(Rect)"/> has been called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will eventually (when the view is next drawn) cause the
+    ///         <see cref="LayoutSubview(View, Rect)"/> and <see cref="OnDrawContent(Rect)"/> methods to be called.
+    ///     </para>
+    ///     <para>
+    ///         Changing this property will cause <see cref="Frame"/> to be updated. If the new value is not of type
+    ///         <see cref="Pos.PosAbsolute"/> the <see cref="LayoutStyle"/> will change to <see cref="LayoutStyle.Computed"/>.
+    ///     </para>
+    ///     <para>The default value is <c>Pos.At (0)</c>.</para>
     /// </remarks>
     public Pos Y {
         get => VerifyIsInitialized (_y, nameof (Y));
@@ -289,15 +428,26 @@ public partial class View {
 
     internal bool LayoutNeeded { get; private set; } = true;
 
-    /// <summary>Event called only once when the <see cref="View"/> is being initialized for the first time. Allows configurations and assignments to be performed before the <see cref="View"/> being shown. This derived from <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.</summary>
+    /// <summary>
+    ///     Event called only once when the <see cref="View"/> is being initialized for the first time. Allows
+    ///     configurations and assignments to be performed before the <see cref="View"/> being shown. This derived from
+    ///     <see cref="ISupportInitializeNotification"/> to allow notify all the views that are being initialized.
+    /// </summary>
     public event EventHandler Initialized;
 
-    /// <summary>Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally clamped to the screen dimensions.</summary>
+    /// <summary>
+    ///     Converts a <see cref="Bounds"/>-relative coordinate to a screen-relative coordinate. The output is optionally
+    ///     clamped to the screen dimensions.
+    /// </summary>
     /// <param name="x"><see cref="Bounds"/>-relative column.</param>
     /// <param name="y"><see cref="Bounds"/>-relative row.</param>
     /// <param name="rx">Absolute column; screen-relative.</param>
     /// <param name="ry">Absolute row; screen-relative.</param>
-    /// <param name="clamped">If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and <see cref="ConsoleDriver.Rows"/>, respectively.</param>
+    /// <param name="clamped">
+    ///     If <see langword="true"/>, <paramref name="rx"/> and <paramref name="ry"/> will be clamped to the
+    ///     screen dimensions (will never be negative and will always be less than <see cref="ConsoleDriver.Cols"/> and
+    ///     <see cref="ConsoleDriver.Rows"/>, respectively.
+    /// </param>
     public virtual void BoundsToScreen (int x, int y, out int rx, out int ry, bool clamped = true) {
         Point boundsOffset = GetBoundsOffset ();
         rx = x + Frame.X + boundsOffset.X;
@@ -331,7 +481,10 @@ public partial class View {
     /// <param name="y">The row location in the superview.</param>
     /// <param name="resx">The found view screen relative column location.</param>
     /// <param name="resy">The found view screen relative row location.</param>
-    /// <returns>The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates. <see langword="null"/> if no view was found.</returns>
+    /// <returns>
+    ///     The view that was found at the <praramref name="x"/> and <praramref name="y"/> coordinates.
+    ///     <see langword="null"/> if no view was found.
+    /// </returns>
     public static View FindDeepestView (View start, int x, int y, out int resx, out int resy) {
         resy = resx = 0;
         if ((start == null) || !start.Frame.Contains (x, y)) {
@@ -381,7 +534,7 @@ public partial class View {
     }
 
     /// <summary>
-    /// <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
+    ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
     /// </summary>
     /// <returns>A thickness that describes the sum of the Adornments' thicknesses.</returns>
     public Thickness GetAdornmentsThickness () {
@@ -393,7 +546,10 @@ public partial class View {
         return new Thickness (left, top, right, bottom);
     }
 
-    /// <summary>Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.</summary>
+    /// <summary>
+    ///     Helper to get the X and Y offset of the Bounds from the Frame. This is the sum of the Left and Top properties
+    ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
+    /// </summary>
     public Point GetBoundsOffset () {
         return new Point (
                           Padding?.Thickness.GetInside (Padding.Frame).X ?? 0,
@@ -401,17 +557,29 @@ public partial class View {
     }
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
-    /// <remarks>Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.</remarks>
+    /// <remarks>
+    ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has
+    ///     otherwise changed.
+    /// </remarks>
     public event EventHandler<LayoutEventArgs> LayoutComplete;
 
     /// <summary>Fired after the View's <see cref="LayoutSubviews"/> method has completed.</summary>
-    /// <remarks>Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has otherwise changed.</remarks>
+    /// <remarks>
+    ///     Subscribe to this event to perform tasks when the <see cref="View"/> has been resized or the layout has
+    ///     otherwise changed.
+    /// </remarks>
     public event EventHandler<LayoutEventArgs> LayoutStarted;
 
-    /// <summary>Invoked when a view starts executing or when the dimensions of the view have changed, for example in response to the container view or terminal resizing.</summary>
+    /// <summary>
+    ///     Invoked when a view starts executing or when the dimensions of the view have changed, for example in response
+    ///     to the container view or terminal resizing.
+    /// </summary>
     /// <remarks>
-    /// <para>The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.</para>
-    /// <para>Raises the <see cref="LayoutComplete"/> event) before it returns.</para>
+    ///     <para>
+    ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the
+    ///         behavior of this method is indeterminate if <see cref="IsInitialized"/> is <see langword="false"/>.
+    ///     </para>
+    ///     <para>Raises the <see cref="LayoutComplete"/> event) before it returns.</para>
     /// </remarks>
     public virtual void LayoutSubviews () {
         if (!IsInitialized) {
@@ -463,7 +631,10 @@ public partial class View {
         return new Point (screen.X - boundsOffset.X, screen.Y - boundsOffset.Y);
     }
 
-    /// <summary>Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means relative to the View's <see cref="SuperView"/>'s <see cref="Bounds"/>.</summary>
+    /// <summary>
+    ///     Converts a screen-relative coordinate to a Frame-relative coordinate. Frame-relative means relative to the
+    ///     View's <see cref="SuperView"/>'s <see cref="Bounds"/>.
+    /// </summary>
     /// <returns>The coordinate relative to the <see cref="SuperView"/>'s <see cref="Bounds"/>.</returns>
     /// <param name="x">Screen-relative column.</param>
     /// <param name="y">Screen-relative row.</param>
@@ -536,7 +707,10 @@ public partial class View {
         }
     }
 
-    /// <summary>This internal method is overridden by Adornment to do nothing to prevent recursion during View construction. And, because Adornments don't have Adornments. It's internal to support unit tests.</summary>
+    /// <summary>
+    ///     This internal method is overridden by Adornment to do nothing to prevent recursion during View construction.
+    ///     And, because Adornments don't have Adornments. It's internal to support unit tests.
+    /// </summary>
     /// <param name="adornmentType"></param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
@@ -597,15 +771,27 @@ public partial class View {
         }
     }
 
-    /// <summary>Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views have been laid out.</summary>
+    /// <summary>
+    ///     Raises the <see cref="LayoutComplete"/> event. Called from  <see cref="LayoutSubviews"/> before all sub-views
+    ///     have been laid out.
+    /// </summary>
     internal virtual void OnLayoutComplete (LayoutEventArgs args) { LayoutComplete?.Invoke (this, args); }
 
-    /// <summary>Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews have been laid out.</summary>
+    /// <summary>
+    ///     Raises the <see cref="LayoutStarted"/> event. Called from  <see cref="LayoutSubviews"/> before any subviews
+    ///     have been laid out.
+    /// </summary>
     internal virtual void OnLayoutStarted (LayoutEventArgs args) { LayoutStarted?.Invoke (this, args); }
 
-    /// <summary>Called whenever the view needs to be resized. This is called whenever <see cref="Frame"/>, <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> changes.</summary>
+    /// <summary>
+    ///     Called whenever the view needs to be resized. This is called whenever <see cref="Frame"/>,
+    ///     <see cref="View.X"/>, <see cref="View.Y"/>, <see cref="View.Width"/>, or <see cref="View.Height"/> changes.
+    /// </summary>
     /// <remarks>
-    /// <para>Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls <see cref="SetRelativeLayout(Rect)"/> to update the view.</para>
+    ///     <para>
+    ///         Determines the relative bounds of the <see cref="View"/> and its <see cref="Frame"/>s, and then calls
+    ///         <see cref="SetRelativeLayout(Rect)"/> to update the view.
+    ///     </para>
     /// </remarks>
     internal void OnResizeNeeded () {
         // TODO: Identify a real-world use-case where this API should be virtual. 
@@ -620,18 +806,18 @@ public partial class View {
 
         // TODO: Determine what, if any of the below is actually needed here.
         if (IsInitialized) {
-            if (AutoSize) {
-                SetFrameToFitText ();
-                SetTextFormatterSize ();
-            }
-
+            SetFrameToFitText ();
             LayoutAdornments ();
+            SetTextFormatterSize ();
             SetNeedsLayout ();
             SetNeedsDisplay ();
         }
     }
 
-    /// <summary>Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView. The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="LayoutNeeded"/> set.</summary>
+    /// <summary>
+    ///     Sets the internal <see cref="LayoutNeeded"/> flag for this View and all of it's subviews and it's SuperView.
+    ///     The main loop will call SetRelativeLayout and LayoutSubviews for any view with <see cref="LayoutNeeded"/> set.
+    /// </summary>
     internal void SetNeedsLayout () {
         if (LayoutNeeded) {
             return;
@@ -646,8 +832,15 @@ public partial class View {
         SuperView?.SetNeedsLayout ();
     }
 
-    /// <summary>Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and <see cref="Height"/>) to <see cref="Frame"/>, given a rectangle describing the SuperView's Bounds (nominally the same as <c>this.SuperView.Bounds</c>).</summary>
-    /// <param name="superviewBounds">The rectangle describing the SuperView's Bounds (nominally the same as <c>this.SuperView.Bounds</c>).</param>
+    /// <summary>
+    ///     Applies the view's position (<see cref="X"/>, <see cref="Y"/>) and dimension (<see cref="Width"/>, and
+    ///     <see cref="Height"/>) to <see cref="Frame"/>, given a rectangle describing the SuperView's Bounds (nominally the
+    ///     same as <c>this.SuperView.Bounds</c>).
+    /// </summary>
+    /// <param name="superviewBounds">
+    ///     The rectangle describing the SuperView's Bounds (nominally the same as
+    ///     <c>this.SuperView.Bounds</c>).
+    /// </param>
     internal void SetRelativeLayout (Rect superviewBounds) {
         Debug.Assert (_x != null);
         Debug.Assert (_y != null);
@@ -708,10 +901,8 @@ public partial class View {
                         break;
 
                     case Dim.DimAbsolute:
-                        // DimAbsolute.Anchor (int width) ignores width and returns n
+                        // DimAbsoulte.Anchor (int width) ignores width and returns n
                         newDimension = Math.Max (d.Anchor (0), 0);
-
-                        // BUGBUG: AutoSize does two things: makes text fit AND changes the view's dimensions
                         newDimension = AutoSize && autosize > newDimension ? autosize : newDimension;
 
                         break;
@@ -790,7 +981,6 @@ public partial class View {
             // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
             // the view LayoutStyle.Absolute.
             _frame = r;
-
             if (_x is Pos.PosAbsolute) {
                 _x = Frame.X;
             }
@@ -807,28 +997,16 @@ public partial class View {
                 _height = Frame.Height;
             }
 
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
-        }
-
-        if (AutoSize) {
-            if ((autosize.Width == 0) || (autosize.Height == 0)) {
-                // Set the frame. Do NOT use `Frame` as it overwrites X, Y, Width, and Height, making
-                // the view LayoutStyle.Absolute.
-                _frame = new Rect (Frame.Location, autosize);
-                if (autosize.Width == 0) {
-                    _width = 0;
-                }
-
-                if (autosize.Height == 0) {
-                    _height = 0;
-                }
-            } else if (!SetFrameToFitText ()) {
+            if (IsInitialized) {
+                // TODO: Figure out what really is needed here. All unit tests (except AutoSize) pass as-is
                 SetTextFormatterSize ();
+                SetNeedsLayout ();
             }
 
-            SetNeedsLayout ();
-            SetNeedsDisplay ();
+            // BUGBUG: Why is this AFTER setting Frame? Seems duplicative.
+            if (!SetFrameToFitText ()) {
+                SetTextFormatterSize ();
+            }
         }
     }
 
@@ -909,10 +1087,15 @@ public partial class View {
     } // TopologicalSort
 
     /// <summary>Determines if the View's <see cref="Height"/> can be set to a new value.</summary>
-    /// <remarks>TrySetHidth can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="desiredHeight"></param>
-    /// <param name="resultHeight">Contains the width that would result if <see cref="Height"/> were set to <paramref name="desiredHeight"/>"/></param>
-    /// <returns><see langword="true"/> if the View's <see cref="Height"/> can be changed to the specified value. False otherwise.</returns>
+    /// <param name="resultHeight">
+    ///     Contains the width that would result if <see cref="Height"/> were set to
+    ///     <paramref name="desiredHeight"/>"/>
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if the View's <see cref="Height"/> can be changed to the specified value. False
+    ///     otherwise.
+    /// </returns>
     internal bool TrySetHeight (int desiredHeight, out int resultHeight) {
         int h = desiredHeight;
         bool canSetHeight;
@@ -948,10 +1131,15 @@ public partial class View {
     }
 
     /// <summary>Determines if the View's <see cref="Width"/> can be set to a new value.</summary>
-    /// <remarks>TrySetWidth can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="desiredWidth"></param>
-    /// <param name="resultWidth">Contains the width that would result if <see cref="Width"/> were set to <paramref name="desiredWidth"/>"/></param>
-    /// <returns><see langword="true"/> if the View's <see cref="Width"/> can be changed to the specified value. False otherwise.</returns>
+    /// <param name="resultWidth">
+    ///     Contains the width that would result if <see cref="Width"/> were set to
+    ///     <paramref name="desiredWidth"/>"/>
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if the View's <see cref="Width"/> can be changed to the specified value. False
+    ///     otherwise.
+    /// </returns>
     internal bool TrySetWidth (int desiredWidth, out int resultWidth) {
         int w = desiredWidth;
         bool canSetWidth;
@@ -997,14 +1185,9 @@ public partial class View {
     }
 
     /// <summary>Resizes the View to fit the specified size. Factors in the HotKey.</summary>
-    /// <remarks>ResizeBoundsToFit can only be called when AutoSize is true (or being set to true).</remarks>
     /// <param name="size"></param>
     /// <returns>whether the Bounds was changed or not</returns>
     private bool ResizeBoundsToFit (Size size) {
-        //if (AutoSize == false) {
-        //	throw new InvalidOperationException ("ResizeBoundsToFit can only be called when AutoSize is true");
-        //}
-
         var boundsChanged = false;
         bool canSizeW = TrySetWidth (size.Width - GetHotKeySpecifierLength (), out int rW);
         bool canSizeH = TrySetHeight (size.Height - GetHotKeySpecifierLength (false), out int rH);
@@ -1025,9 +1208,6 @@ public partial class View {
         return boundsChanged;
     }
 
-    /// <summary>If <paramref name="autoSize"/> is true, resizes the view.</summary>
-    /// <param name="autoSize"></param>
-    /// <returns></returns>
     private bool ResizeView (bool autoSize) {
         if (!autoSize) {
             return false;
