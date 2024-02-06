@@ -7,21 +7,23 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("All Views Tester", "Provides a test UI for all classes derived from View.")]
-[ScenarioCategory ("Layout")] [ScenarioCategory ("Tests")] [ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Tests")]
+[ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario {
+	readonly List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
+
+	// TODO: This is missing some
+	readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
 	ListView _classListView;
 	CheckBox _computedCheckBox;
 	View _curView;
-	readonly List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
 	FrameView _hostPane;
 	RadioGroup _hRadioGroup;
 	TextField _hText;
 	int _hVal;
 	FrameView _leftPane;
 	FrameView _locationFrame;
-
-	// TODO: This is missing some
-	readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
 
 	// Settings
 	FrameView _settingsPane;
@@ -50,12 +52,12 @@ public class AllViewsTester : Scenario {
 	public override void Setup ()
 	{
 		var statusBar = new StatusBar (new StatusItem [] {
-			new (Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
-			new (KeyCode.F2, "~F2~ Toggle Frame Ruler", () => {
+			new(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
+			new(KeyCode.F2, "~F2~ Toggle Frame Ruler", () => {
 				ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FrameRuler;
 				Application.Top.SetNeedsDisplay ();
 			}),
-			new (KeyCode.F3, "~F3~ Toggle Frame Padding", () => {
+			new(KeyCode.F3, "~F3~ Toggle Frame Padding", () => {
 				ConsoleDriver.Diagnostics ^= ConsoleDriver.DiagnosticFlags.FramePadding;
 				Application.Top.SetNeedsDisplay ();
 			})
@@ -67,23 +69,25 @@ public class AllViewsTester : Scenario {
 			.Select (t => new KeyValuePair<string, Type> (t.Name, t))
 			.ToDictionary (t => t.Key, t => t.Value);
 
-		_leftPane = new FrameView ("Classes") {
+		_leftPane = new FrameView {
 			X = 0,
 			Y = 0,
 			Width = 15,
 			Height = Dim.Fill (1), // for status bar
 			CanFocus = false,
-			ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Title = "Classes"
 		};
 
-		_classListView = new ListView (_viewClasses.Keys.ToList ()) {
+		_classListView = new ListView {
 			X = 0,
 			Y = 0,
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			AllowsMarking = false,
 			ColorScheme = Colors.ColorSchemes ["TopLevel"],
-			SelectedItem = 0
+			SelectedItem = 0,
+			Source = new ListWrapper (_viewClasses.Keys.ToList ())
 		};
 		_classListView.OpenSelectedItem += (s, a) => {
 			_settingsPane.SetFocus ();
@@ -97,19 +101,21 @@ public class AllViewsTester : Scenario {
 				_curView = null;
 				_hostPane.Clear ();
 			}
+
 			_curView = CreateClass (_viewClasses.Values.ToArray () [_classListView.SelectedItem]);
 		};
 		_leftPane.Add (_classListView);
 
-		_settingsPane = new FrameView ("Settings") {
+		_settingsPane = new FrameView {
 			X = Pos.Right (_leftPane),
 			Y = 0, // for menu
 			Width = Dim.Fill (),
 			Height = 10,
 			CanFocus = false,
-			ColorScheme = Colors.ColorSchemes ["TopLevel"]
+			ColorScheme = Colors.ColorSchemes ["TopLevel"],
+			Title = "Settings"
 		};
-		_computedCheckBox = new CheckBox ("_Computed Layout", true) { X = 0, Y = 0 };
+		_computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "_Computed Layout", Checked = true };
 		_computedCheckBox.Toggled += (s, e) => {
 			if (_curView != null) {
 				_hostPane.LayoutSubviews ();
@@ -118,22 +124,24 @@ public class AllViewsTester : Scenario {
 		_settingsPane.Add (_computedCheckBox);
 
 		string [] radioItems = { "_Percent(x)", "_AnchorEnd(x)", "_Center", "A_t(x)" };
-		_locationFrame = new FrameView ("Location (Pos)") {
+		_locationFrame = new FrameView {
 			X = Pos.Left (_computedCheckBox),
 			Y = Pos.Bottom (_computedCheckBox),
 			Height = 3 + radioItems.Length,
-			Width = 36
+			Width = 36,
+			Title = "Location (Pos)"
 		};
 		_settingsPane.Add (_locationFrame);
 
-		var label = new Label ("X:") { X = 0, Y = 0 };
+		var label = new Label { X = 0, Y = 0, Text = "X:" };
 		_locationFrame.Add (label);
-		_xRadioGroup = new RadioGroup (radioItems) {
+		_xRadioGroup = new RadioGroup {
 			X = 0,
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
-		_xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
 		_xText.TextChanged += (s, args) => {
 			try {
 				_xVal = int.Parse (_xText.Text);
@@ -145,9 +153,9 @@ public class AllViewsTester : Scenario {
 		_locationFrame.Add (_xRadioGroup);
 
 		radioItems = new [] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
-		label = new Label ("Y:") { X = Pos.Right (_xRadioGroup) + 1, Y = 0 };
+		label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "Y:" };
 		_locationFrame.Add (label);
-		_yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
 		_yText.TextChanged += (s, args) => {
 			try {
 				_yVal = int.Parse (_yText.Text);
@@ -155,29 +163,32 @@ public class AllViewsTester : Scenario {
 			} catch { }
 		};
 		_locationFrame.Add (_yText);
-		_yRadioGroup = new RadioGroup (radioItems) {
+		_yRadioGroup = new RadioGroup {
 			X = Pos.X (label),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_locationFrame.Add (_yRadioGroup);
 
-		_sizeFrame = new FrameView ("Size (Dim)") {
+		_sizeFrame = new FrameView {
 			X = Pos.Right (_locationFrame),
 			Y = Pos.Y (_locationFrame),
 			Height = 3 + radioItems.Length,
-			Width = 40
+			Width = 40,
+			Title = "Size (Dim)"
 		};
 
 		radioItems = new [] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
-		label = new Label ("Width:") { X = 0, Y = 0 };
+		label = new Label { X = 0, Y = 0, Text = "Width:" };
 		_sizeFrame.Add (label);
-		_wRadioGroup = new RadioGroup (radioItems) {
+		_wRadioGroup = new RadioGroup {
 			X = 0,
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
-		_wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
 		_wText.TextChanged += (s, args) => {
 			try {
 				switch (_wRadioGroup.SelectedItem) {
@@ -189,6 +200,7 @@ public class AllViewsTester : Scenario {
 					_wVal = int.Parse (_wText.Text);
 					break;
 				}
+
 				DimPosChanged (_curView);
 			} catch { }
 		};
@@ -196,9 +208,9 @@ public class AllViewsTester : Scenario {
 		_sizeFrame.Add (_wRadioGroup);
 
 		radioItems = new [] { "P_ercent(height)", "F_ill(height)", "Si_zed(height)" };
-		label = new Label ("Height:") { X = Pos.Right (_wRadioGroup) + 1, Y = 0 };
+		label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "Height:" };
 		_sizeFrame.Add (label);
-		_hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+		_hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
 		_hText.TextChanged += (s, args) => {
 			try {
 				switch (_hRadioGroup.SelectedItem) {
@@ -210,21 +222,23 @@ public class AllViewsTester : Scenario {
 					_hVal = int.Parse (_hText.Text);
 					break;
 				}
+
 				DimPosChanged (_curView);
 			} catch { }
 		};
 		_sizeFrame.Add (_hText);
 
-		_hRadioGroup = new RadioGroup (radioItems) {
+		_hRadioGroup = new RadioGroup {
 			X = Pos.X (label),
-			Y = Pos.Bottom (label)
+			Y = Pos.Bottom (label),
+			RadioLabels = radioItems
 		};
 		_hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
 		_sizeFrame.Add (_hRadioGroup);
 
 		_settingsPane.Add (_sizeFrame);
 
-		_hostPane = new FrameView ("") {
+		_hostPane = new FrameView {
 			X = Pos.Right (_leftPane),
 			Y = Pos.Bottom (_settingsPane),
 			Width = Dim.Fill (),
@@ -280,6 +294,7 @@ public class AllViewsTester : Scenario {
 		} catch (Exception e) {
 			MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
 		}
+
 		UpdateTitle (view);
 	}
 
@@ -300,15 +315,19 @@ public class AllViewsTester : Scenario {
 		_hText.Text = $"{view.Frame.Height}";
 	}
 
-	void UpdateTitle (View view) => _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
+	void UpdateTitle (View view) =>
+		_hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
 
 	List<Type> GetAllViewClassesCollection ()
 	{
 		var types = new List<Type> ();
 		foreach (var type in typeof (View).Assembly.GetTypes ()
-			.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))) {
+				 .Where (myType =>
+					 myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
+					 myType.IsSubclassOf (typeof (View)))) {
 			types.Add (type);
 		}
+
 		types.Add (typeof (View));
 		return types;
 	}
@@ -318,7 +337,6 @@ public class AllViewsTester : Scenario {
 	{
 		// If we are to create a generic Type
 		if (type.IsGenericType) {
-
 			// For each of the <T> arguments
 			var typeArguments = new List<Type> ();
 
@@ -330,6 +348,7 @@ public class AllViewsTester : Scenario {
 			// And change what type we are instantiating from MyClass<T> to MyClass<object>
 			type = type.MakeGenericType (typeArguments.ToArray ());
 		}
+
 		// Instantiate view
 		var view = (View)Activator.CreateInstance (type);
 
@@ -341,7 +360,8 @@ public class AllViewsTester : Scenario {
 		// If the view supports a Text property, set it so we have something to look at
 		if (view.GetType ().GetProperty ("Text") != null) {
 			try {
-				view.GetType ().GetProperty ("Text")?.GetSetMethod ()?.Invoke (view, new [] { "Test Text" });
+				view.GetType ().GetProperty ("Text")?.GetSetMethod ()
+					?.Invoke (view, new [] { "Test Text" });
 			} catch (TargetInvocationException e) {
 				MessageBox.ErrorQuery ("Exception", e.InnerException.Message, "Ok");
 				view = null;
@@ -351,15 +371,19 @@ public class AllViewsTester : Scenario {
 		// If the view supports a Title property, set it so we have something to look at
 		if (view != null && view.GetType ().GetProperty ("Title") != null) {
 			if (view.GetType ().GetProperty ("Title").PropertyType == typeof (string)) {
-				view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
+				view?.GetType ().GetProperty ("Title")?.GetSetMethod ()
+					?.Invoke (view, new [] { "Test Title" });
 			} else {
-				view?.GetType ().GetProperty ("Title")?.GetSetMethod ()?.Invoke (view, new [] { "Test Title" });
+				view?.GetType ().GetProperty ("Title")?.GetSetMethod ()
+					?.Invoke (view, new [] { "Test Title" });
 			}
 		}
 
 		// If the view supports a Source property, set it so we have something to look at
-		if (view != null && view.GetType ().GetProperty ("Source") != null && view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource)) {
-			var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
+		if (view != null && view.GetType ().GetProperty ("Source") != null &&
+		    view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource)) {
+			var source = new ListWrapper (new List<string>
+				{ "Test Text #1", "Test Text #2", "Test Text #3" });
 			view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new [] { source });
 		}
 
@@ -384,9 +408,11 @@ public class AllViewsTester : Scenario {
 		if (view.Width == null || view.Frame.Width == 0) {
 			view.Width = Dim.Fill ();
 		}
+
 		if (view.Height == null || view.Frame.Height == 0) {
 			view.Height = Dim.Fill ();
 		}
+
 		UpdateSettings (view);
 		UpdateTitle (view);
 	}

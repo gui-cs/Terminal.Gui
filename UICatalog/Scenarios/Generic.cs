@@ -1,7 +1,8 @@
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
-[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
+
+[ScenarioMetadata ("Generic", "Generic sample - A template for creating new Scenarios")]
 [ScenarioCategory ("Controls")]
 public class MyScenario : Scenario {
 	public override void Init ()
@@ -31,10 +32,10 @@ public class MyScenario : Scenario {
 		// With a Scenario, after UI Catalog calls `Scenario.Setup` it calls
 		// `Scenario.Run` which calls `Application.Run`. Example:
 
-		var button = new Button ("Press me!") {
-			AutoSize = false,
+		var button = new Button {
 			X = Pos.Center (),
 			Y = Pos.Center (),
+			Text = "Press me!"
 		};
 		Application.Top.Add (button);
 	}

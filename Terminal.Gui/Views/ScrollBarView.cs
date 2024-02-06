@@ -5,22 +5,19 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
-using System;
-using System.Text;
-
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>
-/// ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
+///         ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical
 /// </summary>
 /// <remarks>
 ///         <para>
-///         The scrollbar is drawn to be a representation of the Size, assuming that the
-///         scroll position is set at Position.
+///                 The scrollbar is drawn to be a representation of the Size, assuming that the
+///                 scroll position is set at Position.
 ///         </para>
 ///         <para>
-///         If the region to display the scrollbar is larger than three characters,
-///         arrow indicators are drawn.
+///                 If the region to display the scrollbar is larger than three characters,
+///                 arrow indicators are drawn.
 ///         </para>
 /// </remarks>
 public class ScrollBarView : View {
@@ -42,59 +39,42 @@ public class ScrollBarView : View {
 	bool _vertical;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/>
-	/// layout.
+	///         Initializes a new instance of the <see cref="Gui.ScrollBarView" /> class using
+	///         <see cref="LayoutStyle.Computed" />
+	///         layout.
 	/// </summary>
-	/// <param name="rect">Frame for the scrollbar.</param>
-	public ScrollBarView (Rect rect) : this (rect, 0, 0, false) { }
+	public ScrollBarView ()
+	{
+		WantContinuousButtonPressed = true;
+		ClearOnVisibleFalse = false;
+
+		Added += (s, e) => CreateBottomRightCorner (e.Parent);
+		Initialized += ScrollBarView_Initialized;
+	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Absolute"/>
-	/// layout.
-	/// </summary>
-	/// <param name="rect">Frame for the scrollbar.</param>
-	/// <param name="size">The size that this scrollbar represents. Sets the <see cref="Size"/> property.</param>
-	/// <param name="position">The position within this scrollbar. Sets the <see cref="Position"/> property.</param>
-	/// <param name="isVertical">
-	/// If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal. Sets the
-	/// <see cref="IsVertical"/> property.
-	/// </param>
-	public ScrollBarView (Rect rect, int size, int position, bool isVertical) : base (rect) => SetInitialProperties (size, position, isVertical);
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
-	/// layout.
-	/// </summary>
-	public ScrollBarView () : this (0, 0, false) { }
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
-	/// layout.
-	/// </summary>
-	/// <param name="size">The size that this scrollbar represents.</param>
-	/// <param name="position">The position within this scrollbar.</param>
-	/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
-	public ScrollBarView (int size, int position, bool isVertical) => SetInitialProperties (size, position, isVertical);
-
-	/// <summary>
-	/// Initializes a new instance of the <see cref="Gui.ScrollBarView"/> class using <see cref="LayoutStyle.Computed"/>
-	/// layout.
+	///         Initializes a new instance of the <see cref="Gui.ScrollBarView" /> class using
+	///         <see cref="LayoutStyle.Computed" />
+	///         layout.
 	/// </summary>
 	/// <param name="host">The view that will host this scrollbar.</param>
 	/// <param name="isVertical">If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.</param>
 	/// <param name="showBothScrollIndicator">
-	/// If set to <c>true (default)</c> will have the other scrollbar, otherwise will
-	/// have only one.
+	///         If set to <c>true (default)</c> will have the other scrollbar, otherwise will
+	///         have only one.
 	/// </param>
-	public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true) : this (0, 0, isVertical)
+	public ScrollBarView (View host, bool isVertical, bool showBothScrollIndicator = true)
 	{
 		if (host == null) {
 			throw new ArgumentNullException ("The host parameter can't be null.");
 		}
+
 		if (host.SuperView == null) {
 			throw new ArgumentNullException ("The host SuperView parameter can't be null.");
 		}
+
 		_hosted = true;
+		IsVertical = isVertical;
 		ColorScheme = host.ColorScheme;
 		X = isVertical ? Pos.Right (host) - 1 : Pos.Left (host);
 		Y = isVertical ? Pos.Top (host) : Pos.Bottom (host) - 1;
@@ -102,14 +82,15 @@ public class ScrollBarView : View {
 		CanFocus = false;
 		Enabled = host.Enabled;
 		Visible = host.Visible;
+		Initialized += ScrollBarView_Initialized;
 		//Host.CanFocusChanged += Host_CanFocusChanged;
 		Host.EnabledChanged += Host_EnabledChanged;
 		Host.VisibleChanged += Host_VisibleChanged;
 		Host.SuperView.Add (this);
 		AutoHideScrollBars = true;
 		if (showBothScrollIndicator) {
-			OtherScrollBarView = new ScrollBarView (0, 0, !isVertical) {
-				Id = "OtherScrollBarView",
+			OtherScrollBarView = new ScrollBarView {
+				IsVertical = !isVertical,
 				ColorScheme = host.ColorScheme,
 				Host = host,
 				CanFocus = false,
@@ -123,15 +104,16 @@ public class ScrollBarView : View {
 			OtherScrollBarView.Host.SuperView.Add (OtherScrollBarView);
 			OtherScrollBarView.ShowScrollIndicator = true;
 		}
+
 		ShowScrollIndicator = true;
-		CreateBottomRightCorner ();
+		CreateBottomRightCorner (Host);
 		ClearOnVisibleFalse = false;
 	}
 
 	bool _showBothScrollIndicator => OtherScrollBarView?._showScrollIndicator == true && _showScrollIndicator;
 
 	/// <summary>
-	/// If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.
+	///         If set to <c>true</c> this is a vertical scrollbar, otherwise, the scrollbar is horizontal.
 	/// </summary>
 	public bool IsVertical {
 		get => _vertical;
@@ -144,12 +126,12 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// The size of content the scrollbar represents.
+	///         The size of content the scrollbar represents.
 	/// </summary>
 	/// <value>The size.</value>
 	/// <remarks>
-	/// The <see cref="Size"/> is typically the size of the virtual content. E.g. when a Scrollbar is
-	/// part of a <see cref="View"/> the Size is set to the appropriate dimension of <see cref="Host"/>.
+	///         The <see cref="Size" /> is typically the size of the virtual content. E.g. when a Scrollbar is
+	///         part of a <see cref="View" /> the Size is set to the appropriate dimension of <see cref="Host" />.
 	/// </remarks>
 	public int Size {
 		get => _size;
@@ -164,7 +146,7 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// The position, relative to <see cref="Size"/>, to set the scrollbar at.
+	///         The position, relative to <see cref="Size" />, to set the scrollbar at.
 	/// </summary>
 	/// <value>The position.</value>
 	public int Position {
@@ -180,26 +162,28 @@ public class ScrollBarView : View {
 
 	// BUGBUG: v2 - for consistency this should be named "Parent" not "Host"
 	/// <summary>
-	/// Get or sets the view that host this <see cref="ScrollBarView"/>
+	///         Get or sets the view that host this <see cref="ScrollBarView" />
 	/// </summary>
 	public View Host { get; internal set; }
 
 	/// <summary>
-	/// Represent a vertical or horizontal ScrollBarView other than this.
+	///         Represent a vertical or horizontal ScrollBarView other than this.
 	/// </summary>
 	public ScrollBarView OtherScrollBarView {
 		get => _otherScrollBarView;
 		set {
-			if (value != null && (value.IsVertical && _vertical || !value.IsVertical && !_vertical)) {
-				throw new ArgumentException ($"There is already a {(_vertical ? "vertical" : "horizontal")} ScrollBarView.");
+			if (value != null && ((value.IsVertical && _vertical) || (!value.IsVertical && !_vertical))) {
+				throw new ArgumentException (
+					$"There is already a {(_vertical ? "vertical" : "horizontal")} ScrollBarView.");
 			}
+
 			_otherScrollBarView = value;
 		}
 	}
 
 	// BUGBUG: v2 - Why can't we get rid of this and just use Visible?
 	/// <summary>
-	/// Gets or sets the visibility for the vertical or horizontal scroll indicator.
+	///         Gets or sets the visibility for the vertical or horizontal scroll indicator.
 	/// </summary>
 	/// <value><c>true</c> if show vertical or horizontal scroll indicator; otherwise, <c>false</c>.</value>
 	public bool ShowScrollIndicator {
@@ -218,13 +202,14 @@ public class ScrollBarView : View {
 					Visible = false;
 					Position = 0;
 				}
+
 				SetWidthHeight ();
 			}
 		}
 	}
 
 	/// <summary>
-	/// Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView"/>
+	///         Get or sets if the view-port is kept always visible in the area of this <see cref="ScrollBarView" />
 	/// </summary>
 	public bool KeepContentAlwaysInViewport {
 		get => _keepContentAlwaysInViewport;
@@ -235,15 +220,20 @@ public class ScrollBarView : View {
 				if (value && !_vertical && _position + Host.Bounds.Width > _size) {
 					pos = _size - Host.Bounds.Width + (_showBothScrollIndicator ? 1 : 0);
 				}
+
 				if (value && _vertical && _position + Host.Bounds.Height > _size) {
 					pos = _size - Host.Bounds.Height + (_showBothScrollIndicator ? 1 : 0);
 				}
+
 				if (pos != 0) {
 					Position = pos;
 				}
-				if (OtherScrollBarView != null && OtherScrollBarView._keepContentAlwaysInViewport != value) {
+
+				if (OtherScrollBarView != null &&
+				    OtherScrollBarView._keepContentAlwaysInViewport != value) {
 					OtherScrollBarView.KeepContentAlwaysInViewport = value;
 				}
+
 				if (pos == 0) {
 					Refresh ();
 				}
@@ -252,7 +242,7 @@ public class ScrollBarView : View {
 	}
 
 	/// <summary>
-	/// If true the vertical/horizontal scroll bars won't be showed if it's not needed.
+	///         If true the vertical/horizontal scroll bars won't be showed if it's not needed.
 	/// </summary>
 	public bool AutoHideScrollBars {
 		get => _autoHideScrollBars;
@@ -264,33 +254,56 @@ public class ScrollBarView : View {
 		}
 	}
 
-	void CreateBottomRightCorner ()
+	void ScrollBarView_Initialized (object sender, EventArgs e)
 	{
-		if (Host != null &&
-		    (_contentBottomRightCorner == null && OtherScrollBarView == null ||
-		     _contentBottomRightCorner == null && OtherScrollBarView != null && OtherScrollBarView._contentBottomRightCorner == null)) {
+		SetWidthHeight ();
+		SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
+		if (OtherScrollBarView == null) {
+			// Only do this once if both scrollbars are enabled
+			ShowHideScrollBars ();
+		}
 
-			_contentBottomRightCorner = new View {
-				Id = "contentBottomRightCorner",
-				Visible = Host.Visible,
-				ClearOnVisibleFalse = false,
-				ColorScheme = ColorScheme
+		SetPosition (Position);
+	}
+
+	void CreateBottomRightCorner (View host)
+	{
+		if (Host is null) {
+			Host = host;
+		}
+
+		if (Host != null &&
+		    ((_contentBottomRightCorner == null && OtherScrollBarView == null) ||
+		     (_contentBottomRightCorner == null && OtherScrollBarView != null &&
+		      OtherScrollBarView._contentBottomRightCorner == null))) {
+			_contentBottomRightCorner = new ContentBottomRightCorner {
+				Visible = Host.Visible
 			};
 			if (_hosted) {
 				Host.SuperView.Add (_contentBottomRightCorner);
+				_contentBottomRightCorner.X = Pos.Right (Host) - 1;
+				_contentBottomRightCorner.Y = Pos.Bottom (Host) - 1;
 			} else {
 				Host.Add (_contentBottomRightCorner);
+				_contentBottomRightCorner.X = Pos.AnchorEnd (1);
+				_contentBottomRightCorner.Y = Pos.AnchorEnd (1);
 			}
-			_contentBottomRightCorner.X = Pos.Right (Host) - 1;
-			_contentBottomRightCorner.Y = Pos.Bottom (Host) - 1;
+
 			_contentBottomRightCorner.Width = 1;
 			_contentBottomRightCorner.Height = 1;
 			_contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
-			_contentBottomRightCorner.DrawContent += _contentBottomRightCorner_DrawContent;
+			_contentBottomRightCorner.DrawContent += ContentBottomRightCorner_DrawContent;
 		}
 	}
 
-	void _contentBottomRightCorner_DrawContent (object sender, DrawEventArgs e) => Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+	void ContentBottomRightCorner_DrawContent (object sender, DrawEventArgs e)
+	{
+		Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+		// I'm forced to do this here because the Clear method is
+		// changing the color attribute and is different of this one
+		Driver.FillRect (Driver.Clip);
+		e.Cancel = true;
+	}
 
 	void Host_VisibleChanged (object sender, EventArgs e)
 	{
@@ -299,6 +312,7 @@ public class ScrollBarView : View {
 			if (_otherScrollBarView != null) {
 				_otherScrollBarView.Visible = Visible;
 			}
+
 			_contentBottomRightCorner.Visible = Visible;
 		} else {
 			ShowHideScrollBars ();
@@ -311,6 +325,7 @@ public class ScrollBarView : View {
 		if (_otherScrollBarView != null) {
 			_otherScrollBarView.Enabled = Enabled;
 		}
+
 		_contentBottomRightCorner.Enabled = Enabled;
 	}
 
@@ -328,7 +343,6 @@ public class ScrollBarView : View {
 		    me.MouseEvent.Flags == MouseFlags.WheeledUp ||
 		    me.MouseEvent.Flags == MouseFlags.WheeledRight ||
 		    me.MouseEvent.Flags == MouseFlags.WheeledLeft) {
-
 			MouseEvent (me.MouseEvent);
 		} else if (me.MouseEvent.Flags == MouseFlags.Button1Clicked) {
 			Host.SetFocus ();
@@ -337,31 +351,8 @@ public class ScrollBarView : View {
 		me.Handled = true;
 	}
 
-	void SetInitialProperties (int size, int position, bool isVertical)
-	{
-		Id = "ScrollBarView";
-		_vertical = isVertical;
-		_position = position;
-		_size = size;
-		WantContinuousButtonPressed = true;
-		ClearOnVisibleFalse = false;
-
-		Added += (s, e) => CreateBottomRightCorner ();
-
-		Initialized += (s, e) => {
-			SetWidthHeight ();
-			SetRelativeLayout (SuperView?.Frame ?? Host?.Frame ?? Frame);
-			// BUGBUG: We're not supposed to use Id internally!
-			if (Id == "OtherScrollBarView" || OtherScrollBarView == null) {
-				// Only do this once if both scrollbars are enabled
-				ShowHideScrollBars ();
-			}
-			SetPosition (position);
-		};
-	}
-
 	/// <summary>
-	/// This event is raised when the position on the scrollbar has changed.
+	///         This event is raised when the position on the scrollbar has changed.
 	/// </summary>
 	public event EventHandler ChangedPosition;
 
@@ -379,28 +370,32 @@ public class ScrollBarView : View {
 		} else {
 			_position = Math.Max (newPosition, 0);
 		}
+
 		OnChangedPosition ();
 		SetNeedsDisplay ();
 	}
 
 	/// <summary>
-	/// Virtual method to invoke the <see cref="ChangedPosition"/> action event.
+	///         Virtual method to invoke the <see cref="ChangedPosition" /> action event.
 	/// </summary>
 	public virtual void OnChangedPosition () => ChangedPosition?.Invoke (this, EventArgs.Empty);
 
 	/// <summary>
-	/// Only used for a hosted view that will update and redraw the scrollbars.
+	///         Only used for a hosted view that will update and redraw the scrollbars.
 	/// </summary>
 	public virtual void Refresh () => ShowHideScrollBars ();
 
 	void ShowHideScrollBars (bool redraw = true)
 	{
-		if (!_hosted || _hosted && !_autoHideScrollBars) {
+		if (!_hosted || (_hosted && !_autoHideScrollBars)) {
 			if (_contentBottomRightCorner != null && _contentBottomRightCorner.Visible) {
 				_contentBottomRightCorner.Visible = false;
-			} else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null && _otherScrollBarView._contentBottomRightCorner.Visible) {
+			} else if (_otherScrollBarView != null &&
+				   _otherScrollBarView._contentBottomRightCorner != null &&
+				   _otherScrollBarView._contentBottomRightCorner.Visible) {
 				_otherScrollBarView._contentBottomRightCorner.Visible = false;
 			}
+
 			return;
 		}
 
@@ -418,15 +413,18 @@ public class ScrollBarView : View {
 		if (_showBothScrollIndicator) {
 			if (_contentBottomRightCorner != null) {
 				_contentBottomRightCorner.Visible = true;
-			} else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null) {
+			} else if (_otherScrollBarView != null &&
+				   _otherScrollBarView._contentBottomRightCorner != null) {
 				_otherScrollBarView._contentBottomRightCorner.Visible = true;
 			}
 		} else if (!_showScrollIndicator) {
 			if (_contentBottomRightCorner != null) {
 				_contentBottomRightCorner.Visible = false;
-			} else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null) {
+			} else if (_otherScrollBarView != null &&
+				   _otherScrollBarView._contentBottomRightCorner != null) {
 				_otherScrollBarView._contentBottomRightCorner.Visible = false;
 			}
+
 			if (Application.MouseGrabView != null && Application.MouseGrabView == this) {
 				Application.UngrabMouse ();
 			}
@@ -435,10 +433,13 @@ public class ScrollBarView : View {
 		} else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null) {
 			_otherScrollBarView._contentBottomRightCorner.Visible = false;
 		}
+
 		if (Host?.Visible == true && _showScrollIndicator && !Visible) {
 			Visible = true;
 		}
-		if (Host?.Visible == true && _otherScrollBarView?._showScrollIndicator == true && !_otherScrollBarView.Visible) {
+
+		if (Host?.Visible == true && _otherScrollBarView?._showScrollIndicator == true &&
+		    !_otherScrollBarView.Visible) {
 			_otherScrollBarView.Visible = true;
 		}
 
@@ -449,12 +450,15 @@ public class ScrollBarView : View {
 		if (_showScrollIndicator) {
 			Draw ();
 		}
+
 		if (_otherScrollBarView != null && _otherScrollBarView._showScrollIndicator) {
 			_otherScrollBarView.Draw ();
 		}
+
 		if (_contentBottomRightCorner != null && _contentBottomRightCorner.Visible) {
 			_contentBottomRightCorner.Draw ();
-		} else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null && _otherScrollBarView._contentBottomRightCorner.Visible) {
+		} else if (_otherScrollBarView != null && _otherScrollBarView._contentBottomRightCorner != null &&
+			   _otherScrollBarView._contentBottomRightCorner.Visible) {
 			_otherScrollBarView._contentBottomRightCorner.Draw ();
 		}
 	}
@@ -467,19 +471,24 @@ public class ScrollBarView : View {
 			if (scrollBarView._showScrollIndicator) {
 				scrollBarView.ShowScrollIndicator = false;
 			}
+
 			if (scrollBarView.Visible) {
 				scrollBarView.Visible = false;
 			}
-		} else if (barsize > 0 && barsize == scrollBarView._size && scrollBarView.OtherScrollBarView != null && pending) {
+		} else if (barsize > 0 && barsize == scrollBarView._size && scrollBarView.OtherScrollBarView != null &&
+			   pending) {
 			if (scrollBarView._showScrollIndicator) {
 				scrollBarView.ShowScrollIndicator = false;
 			}
+
 			if (scrollBarView.Visible) {
 				scrollBarView.Visible = false;
 			}
+
 			if (scrollBarView.OtherScrollBarView != null && scrollBarView._showBothScrollIndicator) {
 				scrollBarView.OtherScrollBarView.ShowScrollIndicator = false;
 			}
+
 			if (scrollBarView.OtherScrollBarView.Visible) {
 				scrollBarView.OtherScrollBarView.Visible = false;
 			}
@@ -490,13 +499,16 @@ public class ScrollBarView : View {
 				if (!scrollBarView._showBothScrollIndicator) {
 					scrollBarView.OtherScrollBarView.ShowScrollIndicator = true;
 				}
+
 				if (!scrollBarView.OtherScrollBarView.Visible) {
 					scrollBarView.OtherScrollBarView.Visible = true;
 				}
 			}
+
 			if (!scrollBarView._showScrollIndicator) {
 				scrollBarView.ShowScrollIndicator = true;
 			}
+
 			if (!scrollBarView.Visible) {
 				scrollBarView.Visible = true;
 			}
@@ -519,28 +531,35 @@ public class ScrollBarView : View {
 			Width = _vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
 			Height = _vertical ? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1 : 1;
 
-			_otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 : Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
-			_otherScrollBarView.Height = _otherScrollBarView._vertical ? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1 : 1;
+			_otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
+				Host != SuperView ? Dim.Width (Host) - 1 : Dim.Fill () - 1;
+			_otherScrollBarView.Height = _otherScrollBarView._vertical
+				? Host != SuperView ? Dim.Height (Host) - 1 : Dim.Fill () - 1
+				: 1;
 		} else if (_showScrollIndicator) {
 			Width = _vertical ? 1 : Host != SuperView ? Dim.Width (Host) : Dim.Fill ();
 			Height = _vertical ? Host != SuperView ? Dim.Height (Host) : Dim.Fill () : 1;
 		} else if (_otherScrollBarView?._showScrollIndicator == true) {
-			_otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 : Host != SuperView ? Dim.Width (Host) : Dim.Fill () - 0;
-			_otherScrollBarView.Height = _otherScrollBarView._vertical ? Host != SuperView ? Dim.Height (Host) : Dim.Fill () - 0 : 1;
+			_otherScrollBarView.Width = _otherScrollBarView._vertical ? 1 :
+				Host != SuperView ? Dim.Width (Host) : Dim.Fill () - 0;
+			_otherScrollBarView.Height = _otherScrollBarView._vertical
+				? Host != SuperView ? Dim.Height (Host) : Dim.Fill () - 0
+				: 1;
 		}
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override void OnDrawContent (Rect contentArea)
 	{
-		if (ColorScheme == null || (!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
+		if (ColorScheme == null || ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible)) {
 			if ((!_showScrollIndicator || Size == 0) && AutoHideScrollBars && Visible) {
 				ShowHideScrollBars (false);
 			}
+
 			return;
 		}
 
-		if (Size == 0 || _vertical && Bounds.Height == 0 || !_vertical && Bounds.Width == 0) {
+		if (Size == 0 || (_vertical && Bounds.Height == 0) || (!_vertical && Bounds.Width == 0)) {
 			return;
 		}
 
@@ -565,18 +584,24 @@ public class ScrollBarView : View {
 				} else {
 					Driver.AddRune (Glyphs.UpArrow);
 				}
+
 				if (Bounds.Height == 3) {
 					Move (col, 1);
 					Driver.AddRune (Glyphs.Diamond);
 				}
+
 				if (Bounds.Height > 1) {
 					Move (col, Bounds.Height - 1);
 					Driver.AddRune (Glyphs.DownArrow);
 				}
 			} else {
 				bh -= 2;
-				var by1 = KeepContentAlwaysInViewport ? _position * bh / Size : _position * bh / (Size + bh);
-				var by2 = KeepContentAlwaysInViewport ? Math.Min ((_position + bh) * bh / Size + 1, bh - 1) : (_position + bh) * bh / (Size + bh);
+				var by1 = KeepContentAlwaysInViewport
+					? _position * bh / Size
+					: _position * bh / (Size + bh);
+				var by2 = KeepContentAlwaysInViewport
+					? Math.Min (((_position + bh) * bh / Size) + 1, bh - 1)
+					: (_position + bh) * bh / (Size + bh);
 				if (KeepContentAlwaysInViewport && by1 == by2) {
 					by1 = Math.Max (by1 - 1, 0);
 				}
@@ -589,10 +614,12 @@ public class ScrollBarView : View {
 				var hasBottomTee = false;
 				for (var y = 0; y < bh; y++) {
 					Move (col, y + 1);
-					if ((y < by1 || y > by2) && (_position > 0 && !hasTopTee || hasTopTee && hasBottomTee)) {
+					if ((y < by1 || y > by2) &&
+					    ((_position > 0 && !hasTopTee) || (hasTopTee && hasBottomTee))) {
 						special = Glyphs.Stipple;
 					} else {
-						if (y != by2 && y > 1 && by2 - by1 == 0 && by1 < bh - 1 && hasTopTee && !hasDiamond) {
+						if (y != by2 && y > 1 && by2 - by1 == 0 && by1 < bh - 1 && hasTopTee &&
+						    !hasDiamond) {
 							hasDiamond = true;
 							special = Glyphs.Diamond;
 						} else {
@@ -600,7 +627,8 @@ public class ScrollBarView : View {
 								hasTopTee = true;
 								_posTopTee = y;
 								special = Glyphs.TopTee;
-							} else if ((_position == 0 && y == bh - 1 || y >= by2 || by2 == 0) && !hasBottomTee) {
+							} else if (((_position == 0 && y == bh - 1) || y >= by2 ||
+								    by2 == 0) && !hasBottomTee) {
 								hasBottomTee = true;
 								_posBottomTee = y;
 								special = Glyphs.BottomTee;
@@ -609,12 +637,15 @@ public class ScrollBarView : View {
 							}
 						}
 					}
+
 					Driver.AddRune (special);
 				}
+
 				if (!hasTopTee) {
 					Move (col, Bounds.Height - 2);
 					Driver.AddRune (Glyphs.TopTee);
 				}
+
 				Move (col, Bounds.Height - 1);
 				Driver.AddRune (Glyphs.DownArrow);
 			}
@@ -636,8 +667,12 @@ public class ScrollBarView : View {
 				Driver.AddRune (Glyphs.RightArrow);
 			} else {
 				bw -= 2;
-				var bx1 = KeepContentAlwaysInViewport ? _position * bw / Size : _position * bw / (Size + bw);
-				var bx2 = KeepContentAlwaysInViewport ? Math.Min ((_position + bw) * bw / Size + 1, bw - 1) : (_position + bw) * bw / (Size + bw);
+				var bx1 = KeepContentAlwaysInViewport
+					? _position * bw / Size
+					: _position * bw / (Size + bw);
+				var bx2 = KeepContentAlwaysInViewport
+					? Math.Min (((_position + bw) * bw / Size) + 1, bw - 1)
+					: (_position + bw) * bw / (Size + bw);
 				if (KeepContentAlwaysInViewport && bx1 == bx2) {
 					bx1 = Math.Max (bx1 - 1, 0);
 				}
@@ -649,10 +684,12 @@ public class ScrollBarView : View {
 				var hasDiamond = false;
 				var hasRightTee = false;
 				for (var x = 0; x < bw; x++) {
-					if ((x < bx1 || x >= bx2 + 1) && (_position > 0 && !hasLeftTee || hasLeftTee && hasRightTee)) {
+					if ((x < bx1 || x >= bx2 + 1) && ((_position > 0 && !hasLeftTee) ||
+									  (hasLeftTee && hasRightTee))) {
 						special = Glyphs.Stipple;
 					} else {
-						if (x != bx2 && x > 1 && bx2 - bx1 == 0 && bx1 < bw - 1 && hasLeftTee && !hasDiamond) {
+						if (x != bx2 && x > 1 && bx2 - bx1 == 0 && bx1 < bw - 1 && hasLeftTee &&
+						    !hasDiamond) {
 							hasDiamond = true;
 							special = Glyphs.Diamond;
 						} else {
@@ -660,7 +697,8 @@ public class ScrollBarView : View {
 								hasLeftTee = true;
 								_posLeftTee = x;
 								special = Glyphs.LeftTee;
-							} else if ((_position == 0 && x == bw - 1 || x >= bx2 || bx2 == 0) && !hasRightTee) {
+							} else if (((_position == 0 && x == bw - 1) || x >= bx2 ||
+								    bx2 == 0) && !hasRightTee) {
 								hasRightTee = true;
 								_posRightTee = x;
 								special = Glyphs.RightTee;
@@ -669,8 +707,10 @@ public class ScrollBarView : View {
 							}
 						}
 					}
+
 					Driver.AddRune (special);
 				}
+
 				if (!hasLeftTee) {
 					Move (Bounds.Width - 2, row);
 					Driver.AddRune (Glyphs.LeftTee);
@@ -681,7 +721,7 @@ public class ScrollBarView : View {
 		}
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool MouseEvent (MouseEvent mouseEvent)
 	{
 		if (mouseEvent.Flags != MouseFlags.Button1Pressed &&
@@ -693,13 +733,13 @@ public class ScrollBarView : View {
 		    mouseEvent.Flags != MouseFlags.WheeledRight &&
 		    mouseEvent.Flags != MouseFlags.WheeledLeft &&
 		    mouseEvent.Flags != MouseFlags.Button1TripleClicked) {
-
 			return false;
 		}
 
 		if (!Host.CanFocus) {
 			return true;
 		}
+
 		if (Host?.HasFocus == false) {
 			Host.SetFocus ();
 		}
@@ -711,19 +751,21 @@ public class ScrollBarView : View {
 		barsize -= 2;
 		var pos = Position;
 
-		if (mouseEvent.Flags != MouseFlags.Button1Released && (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
+		if (mouseEvent.Flags != MouseFlags.Button1Released &&
+		    (Application.MouseGrabView == null || Application.MouseGrabView != this)) {
 			Application.GrabMouse (this);
-		} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null && Application.MouseGrabView == this) {
+		} else if (mouseEvent.Flags == MouseFlags.Button1Released && Application.MouseGrabView != null &&
+			   Application.MouseGrabView == this) {
 			_lastLocation = -1;
 			Application.UngrabMouse ();
 			return true;
 		}
+
 		if (_showScrollIndicator &&
 		    (mouseEvent.Flags == MouseFlags.WheeledDown ||
 		     mouseEvent.Flags == MouseFlags.WheeledUp ||
 		     mouseEvent.Flags == MouseFlags.WheeledRight ||
 		     mouseEvent.Flags == MouseFlags.WheeledLeft)) {
-
 			return Host.MouseEvent (mouseEvent);
 		}
 
@@ -744,16 +786,21 @@ public class ScrollBarView : View {
 			//	b1 = Math.Max (b1 - 1, 0);
 			//}
 
-			if (_lastLocation > -1 || location >= posTopLeftTee && location <= posBottomRightTee && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) {
+			if (_lastLocation > -1 || (location >= posTopLeftTee && location <= posBottomRightTee &&
+						   mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed |
+									     MouseFlags.ReportMousePosition))) {
 				if (_lastLocation == -1) {
 					_lastLocation = location;
-					_posBarOffset = _keepContentAlwaysInViewport ? Math.Max (location - posTopLeftTee, 1) : 0;
+					_posBarOffset = _keepContentAlwaysInViewport
+						? Math.Max (location - posTopLeftTee, 1)
+						: 0;
 					return true;
 				}
 
 				if (location > _lastLocation) {
 					if (location - _posBarOffset < barsize) {
-						var np = (location - _posBarOffset) * Size / barsize + Size / barsize;
+						var np = ((location - _posBarOffset) * Size / barsize) +
+							 (Size / barsize);
 						if (CanScroll (np - pos, out var nv, _vertical)) {
 							Position = pos + nv;
 						}
@@ -762,16 +809,21 @@ public class ScrollBarView : View {
 					}
 				} else if (location < _lastLocation) {
 					if (location - _posBarOffset > 0) {
-						var np = (location - _posBarOffset) * Size / barsize - Size / barsize;
+						var np = ((location - _posBarOffset) * Size / barsize) -
+							 (Size / barsize);
 						if (CanScroll (np - pos, out var nv, _vertical)) {
 							Position = pos + nv;
 						}
 					} else {
 						Position = 0;
 					}
-				} else if (location - _posBarOffset >= barsize && posBottomRightTee - posTopLeftTee >= 3 && CanScroll (Size - pos, out var nv, _vertical)) {
+				} else if (location - _posBarOffset >= barsize &&
+					   posBottomRightTee - posTopLeftTee >= 3 &&
+					   CanScroll (Size - pos, out var nv, _vertical)) {
 					Position = Math.Min (pos + nv, Size);
-				} else if (location - _posBarOffset >= barsize - 1 && posBottomRightTee - posTopLeftTee <= 3 && CanScroll (Size - pos, out nv, _vertical)) {
+				} else if (location - _posBarOffset >= barsize - 1 &&
+					   posBottomRightTee - posTopLeftTee <= 3 &&
+					   CanScroll (Size - pos, out nv, _vertical)) {
 					Position = Math.Min (pos + nv, Size);
 				} else if (location - _posBarOffset <= 0 && posBottomRightTee - posTopLeftTee <= 3) {
 					Position = 0;
@@ -802,12 +854,14 @@ public class ScrollBarView : View {
 			max = 0;
 			return false;
 		}
+
 		var s = GetBarsize (isVertical);
 		var newSize = Math.Max (Math.Min (_size - s, _position + n), 0);
 		max = _size > s + newSize ? newSize == 0 ? -_position : n : _size - (s + _position) - 1;
 		if (_size >= s + newSize && max != 0) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -816,16 +870,26 @@ public class ScrollBarView : View {
 		if (Host?.Bounds.IsEmpty != false) {
 			return 0;
 		}
-		return isVertical ?
-			KeepContentAlwaysInViewport ? Host.Bounds.Height + (_showBothScrollIndicator ? -2 : -1) : 0 :
+
+		return isVertical ? KeepContentAlwaysInViewport
+				? Host.Bounds.Height + (_showBothScrollIndicator ? -2 : -1)
+				: 0 :
 			KeepContentAlwaysInViewport ? Host.Bounds.Width + (_showBothScrollIndicator ? -2 : -1) : 0;
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnEnter (View view)
 	{
 		Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
 		return base.OnEnter (view);
+	}
+
+	internal class ContentBottomRightCorner : View {
+		public ContentBottomRightCorner ()
+		{
+			ClearOnVisibleFalse = false;
+			ColorScheme = ColorScheme;
+		}
 	}
 }

@@ -1,40 +1,22 @@
-﻿using System;
-
-namespace Terminal.Gui; 
+﻿namespace Terminal.Gui;
 
 /// <summary>
-/// The Label <see cref="View"/> displays a string at a given position and supports multiple lines separated by newline
-/// characters.
-/// Multi-line Labels support word wrap.
+///         The Label <see cref="View" /> displays a string at a given position and supports multiple lines separated by
+///         newline
+///         characters.
+///         Multi-line Labels support word wrap.
 /// </summary>
 /// <remarks>
-/// The <see cref="Label"/> view is functionality identical to <see cref="View"/> and is included for API backwards
-/// compatibility.
+///         The <see cref="Label" /> view is functionality identical to <see cref="View" /> and is included for API
+///         backwards
+///         compatibility.
 /// </remarks>
 public class Label : View {
-	/// <inheritdoc/>
-	public Label () => SetInitialProperties ();
-
-	/// <inheritdoc/>
-	public Label (Rect frame, bool autosize = false) : base (frame) => SetInitialProperties (autosize);
-
-	/// <inheritdoc/>
-	public Label (string text, bool autosize = true) : base (text) => SetInitialProperties (autosize);
-
-	/// <inheritdoc/>
-	public Label (Rect rect, string text, bool autosize = false) : base (rect, text) => SetInitialProperties (autosize);
-
-	/// <inheritdoc/>
-	public Label (int x, int y, string text, bool autosize = true) : base (x, y, text) => SetInitialProperties (autosize);
-
-	/// <inheritdoc/>
-	public Label (string text, TextDirection direction, bool autosize = true)
-		: base (text, direction) => SetInitialProperties (autosize);
-
-	void SetInitialProperties (bool autosize = true)
+	/// <inheritdoc />
+	public Label ()
 	{
-		Height   = 1;
-		AutoSize = autosize;
+		Height = 1;
+		AutoSize = true;
 		// Things this view knows how to do
 		AddCommand (Command.Default, () => {
 			// BUGBUG: This is a hack, but it does work.
@@ -56,23 +38,24 @@ public class Label : View {
 		if (!HasFocus) {
 			SetFocus ();
 		}
+
 		OnClicked ();
 		return true;
 	}
 
 	/// <summary>
-	/// The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View"/>
-	/// or if the user presses the action key while this view is focused. (TODO: IsDefault)
+	///         The event fired when the user clicks the primary mouse button within the Bounds of this <see cref="View" />
+	///         or if the user presses the action key while this view is focused. (TODO: IsDefault)
 	/// </summary>
 	/// <remarks>
-	/// Client code can hook up to this event, it is
-	/// raised when the button is activated either with
-	/// the mouse or the keyboard.
+	///         Client code can hook up to this event, it is
+	///         raised when the button is activated either with
+	///         the mouse or the keyboard.
 	/// </remarks>
 	public event EventHandler Clicked;
 
 	/// <summary>
-	/// Method invoked when a mouse event is generated
+	///         Method invoked when a mouse event is generated
 	/// </summary>
 	/// <param name="mouseEvent"></param>
 	/// <returns><c>true</c>, if the event was handled, <c>false</c> otherwise.</returns>
@@ -82,6 +65,7 @@ public class Label : View {
 		if (OnMouseClick (args)) {
 			return true;
 		}
+
 		if (MouseEvent (mouseEvent)) {
 			return true;
 		}
@@ -91,6 +75,7 @@ public class Label : View {
 				if (!SuperView.HasFocus) {
 					SuperView.SetFocus ();
 				}
+
 				SetFocus ();
 				SetNeedsDisplay ();
 			}
@@ -98,10 +83,11 @@ public class Label : View {
 			OnClicked ();
 			return true;
 		}
+
 		return false;
 	}
 
-	///<inheritdoc/>
+	/// <inheritdoc />
 	public override bool OnEnter (View view)
 	{
 		Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
@@ -110,7 +96,7 @@ public class Label : View {
 	}
 
 	/// <summary>
-	/// Virtual method to invoke the <see cref="Clicked"/> event.
+	///         Virtual method to invoke the <see cref="Clicked" /> event.
 	/// </summary>
 	public virtual void OnClicked () => Clicked?.Invoke (this, EventArgs.Empty);
 }

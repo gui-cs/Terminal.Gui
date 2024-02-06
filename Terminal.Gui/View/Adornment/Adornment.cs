@@ -1,48 +1,52 @@
-﻿using System;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 // TODO: v2 - Missing 3D effect - 3D effects will be drawn by a mechanism separate from Adornments
 // TODO: v2 - If a Adornment has focus, navigation keys (e.g Command.NextView) should cycle through SubViews of the Adornments
 // QUESTION: How does a user navigate out of an Adornment to another Adornment, or back into the Parent's SubViews?
 
 /// <summary>
-/// Adornments are a special form of <see cref="View"/> that appear outside of the <see cref="View.Bounds"/>:
-/// <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>. They are defined using the <see cref="Thickness"/>
-/// class, which specifies the thickness of the sides of a rectangle. 
+///         Adornments are a special form of <see cref="View" /> that appear outside of the <see cref="View.Bounds" />:
+///         <see cref="Margin" />, <see cref="Border" />, and <see cref="Padding" />. They are defined using the
+///         <see cref="Thickness" />
+///         class, which specifies the thickness of the sides of a rectangle.
 /// </summary>
 /// <remarsk>
-/// <para>
-/// There is no prevision for creating additional subclasses of Adornment. It is not abstract to enable unit testing.
-/// </para>
-/// <para>
-/// Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> can be customized.
-/// </para>
+///         <para>
+///                 There is no prevision for creating additional subclasses of Adornment. It is not abstract to enable
+///                 unit testing.
+///         </para>
+///         <para>
+///                 Each of <see cref="Margin" />, <see cref="Border" />, and <see cref="Padding" /> can be customized.
+///         </para>
 /// </remarsk>
 public class Adornment : View {
+	Thickness _thickness = Thickness.Empty;
+
 	/// <inheritdoc />
-	public Adornment () { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */ }
+	public Adornment ()
+	{
+		/* Do nothing; A parameter-less constructor is required to support all views unit tests. */
+	}
 
 	/// <summary>
-	/// Constructs a new adornment for the view specified by <paramref name="parent"/>.
+	///         Constructs a new adornment for the view specified by <paramref name="parent" />.
 	/// </summary>
 	/// <param name="parent"></param>
 	public Adornment (View parent) => Parent = parent;
 
-	Thickness _thickness = Thickness.Empty;
-
 	/// <summary>
-	/// The Parent of this Adornment (the View this Adornment surrounds).
+	///         The Parent of this Adornment (the View this Adornment surrounds).
 	/// </summary>
 	/// <remarks>
-	/// Adornments are distinguished from typical View classes in that they are not sub-views,
-	/// but have a parent/child relationship with their containing View.
+	///         Adornments are distinguished from typical View classes in that they are not sub-views,
+	///         but have a parent/child relationship with their containing View.
 	/// </remarks>
 	public View Parent { get; set; }
 
 	/// <summary>
-	/// Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an <see cref="InvalidOperationException"/>.
-	/// TODO: Are we sure?
+	///         Adornments cannot be used as sub-views (see <see cref="Parent" />); this method always throws an
+	///         <see cref="InvalidOperationException" />.
+	///         TODO: Are we sure?
 	/// </summary>
 	public override View SuperView {
 		get => null;
@@ -50,8 +54,8 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas,
-	/// so setting this property throws an <see cref="InvalidOperationException"/>.
+	///         Adornments only render to their <see cref="Parent" />'s or Parent's SuperView's LineCanvas,
+	///         so setting this property throws an <see cref="InvalidOperationException" />.
 	/// </summary>
 	public override bool SuperViewRendersLineCanvas {
 		get => false; // throw new NotImplementedException ();
@@ -59,7 +63,7 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Defines the rectangle that the <see cref="Adornment"/> will use to draw its content.
+	///         Defines the rectangle that the <see cref="Adornment" /> will use to draw its content.
 	/// </summary>
 	public Thickness Thickness {
 		get => _thickness;
@@ -67,34 +71,30 @@ public class Adornment : View {
 			var prev = _thickness;
 			_thickness = value;
 			if (prev != _thickness) {
-
 				Parent?.LayoutAdornments ();
 				OnThicknessChanged (prev);
 			}
-
 		}
 	}
 
 	/// <summary>
-	/// Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
+	///         Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).
 	/// </summary>
 	public override Rect Bounds {
 		get => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
 		set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
 	}
 
-	internal override Adornment CreateAdornment (Type adornmentType)
-	{
+	internal override Adornment CreateAdornment (Type adornmentType) =>
 		/* Do nothing - Adornments do not have Adornments */
-		return null;
-	}
+		null;
 
 	internal override void LayoutAdornments ()
 	{
 		/* Do nothing - Adornments do not have Adornments */
 	}
 
-	/// <inheritdoc/>
+	/// <inheritdoc />
 	public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true)
 	{
 		// Adornments are *Children* of a View, not SubViews. Thus View.BoundsToScreen will not work.
@@ -109,7 +109,7 @@ public class Adornment : View {
 		Parent?.SuperView?.BoundsToScreen (rcol, rrow, out rcol, out rrow, clipped);
 	}
 
-	/// <inheritdoc/>
+	/// <inheritdoc />
 	public override Rect FrameToScreen ()
 	{
 		// Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
@@ -126,19 +126,19 @@ public class Adornment : View {
 	}
 
 	/// <summary>
-	/// Does nothing for Adornment
+	///         Does nothing for Adornment
 	/// </summary>
 	/// <returns></returns>
 	public override bool OnDrawAdornments () => false;
 
 	/// <summary>
-	/// Does nothing for Adornment
+	///         Does nothing for Adornment
 	/// </summary>
 	/// <returns></returns>
 	public override bool OnRenderLineCanvas () => false;
-	
+
 	/// <summary>
-	/// Redraws the Adornments that comprise the <see cref="Adornment"/>.
+	///         Redraws the Adornments that comprise the <see cref="Adornment" />.
 	/// </summary>
 	public override void OnDrawContent (Rect contentArea)
 	{
@@ -148,7 +148,7 @@ public class Adornment : View {
 
 		var screenBounds = BoundsToScreen (Frame);
 
-		Attribute normalAttr = GetNormalColor ();
+		var normalAttr = GetNormalColor ();
 
 		// This just draws/clears the thickness, not the insides.
 		Driver.SetAttribute (normalAttr);
@@ -161,17 +161,18 @@ public class Adornment : View {
 			}
 		}
 
-		TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rect.Empty, false);
+		TextFormatter?.Draw (screenBounds, normalAttr, normalAttr, Rect.Empty, TextFormatter.FillRemaining);
 		//base.OnDrawContent (contentArea);
 	}
 
 	/// <summary>
-	/// Called whenever the <see cref="Thickness"/> property changes.
+	///         Called whenever the <see cref="Thickness" /> property changes.
 	/// </summary>
-	public virtual void OnThicknessChanged (Thickness previousThickness) => ThicknessChanged?.Invoke (this, new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness });
+	public virtual void OnThicknessChanged (Thickness previousThickness) => ThicknessChanged?.Invoke (this,
+		new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness });
 
 	/// <summary>
-	/// Fired whenever the <see cref="Thickness"/> property changes.
+	///         Fired whenever the <see cref="Thickness" /> property changes.
 	/// </summary>
 	public event EventHandler<ThicknessEventArgs> ThicknessChanged;
 }

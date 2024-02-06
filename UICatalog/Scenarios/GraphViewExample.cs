@@ -10,6 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Drawing")]
 public class GraphViewExample : Scenario {
+	readonly Thickness _thickness = new (1, 1, 1, 1);
 	TextView _about;
 
 	int _currentGraph;
@@ -18,7 +19,6 @@ public class GraphViewExample : Scenario {
 	GraphView _graphView;
 	MenuItem _miDiags;
 	MenuItem _miShowBorder;
-	Thickness _thickness = new Thickness (1, 1, 1, 1);
 
 	public override void Setup ()
 	{
@@ -37,35 +37,40 @@ public class GraphViewExample : Scenario {
 			() => MultiBarGraph () //7
 		};
 
-		var menu = new MenuBar (new MenuBarItem [] {
-			new ("_File", new MenuItem [] {
-				new ("Scatter _Plot", "", () => _graphs [_currentGraph = 0] ()),
-				new ("_V Bar Graph", "", () => _graphs [_currentGraph = 1] ()),
-				new ("_H Bar Graph", "", () => _graphs [_currentGraph = 2] ()),
-				new ("P_opulation Pyramid", "", () => _graphs [_currentGraph = 3] ()),
-				new ("_Line Graph", "", () => _graphs [_currentGraph = 4] ()),
-				new ("Sine _Wave", "", () => _graphs [_currentGraph = 5] ()),
-				new ("Silent _Disco", "", () => _graphs [_currentGraph = 6] ()),
-				new ("_Multi Bar Graph", "", () => _graphs [_currentGraph = 7] ()),
-				new ("_Quit", "", () => Quit ())
-			}),
-			new ("_View", new [] {
-				new ("Zoom _In", "", () => Zoom (0.5f)),
-				new ("Zoom _Out", "", () => Zoom (2f)),
-				new ("MarginLeft++", "", () => Margin (true, true)),
-				new ("MarginLeft--", "", () => Margin (true, false)),
-				new ("MarginBottom++", "", () => Margin (false, true)),
-				new ("MarginBottom--", "", () => Margin (false, false)),
-				_miShowBorder = new MenuItem ("_Enable Margin, Border, and Padding", "", () => ShowBorder ()) {
-					Checked = true,
-					CheckType = MenuItemCheckStyle.Checked
-				},
-				_miDiags = new MenuItem ("Dri_ver Diagnostics", "", () => EnableDiagnostics ()) {
-					Checked = ConsoleDriver.Diagnostics == (ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler),
-					CheckType = MenuItemCheckStyle.Checked
-				}
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("Scatter _Plot", "", () => _graphs [_currentGraph = 0] ()),
+					new("_V Bar Graph", "", () => _graphs [_currentGraph = 1] ()),
+					new("_H Bar Graph", "", () => _graphs [_currentGraph = 2] ()),
+					new("P_opulation Pyramid", "", () => _graphs [_currentGraph = 3] ()),
+					new("_Line Graph", "", () => _graphs [_currentGraph = 4] ()),
+					new("Sine _Wave", "", () => _graphs [_currentGraph = 5] ()),
+					new("Silent _Disco", "", () => _graphs [_currentGraph = 6] ()),
+					new("_Multi Bar Graph", "", () => _graphs [_currentGraph = 7] ()),
+					new("_Quit", "", () => Quit ())
+				}),
+				new MenuBarItem ("_View", new [] {
+					new("Zoom _In", "", () => Zoom (0.5f)),
+					new("Zoom _Out", "", () => Zoom (2f)),
+					new("MarginLeft++", "", () => Margin (true, true)),
+					new("MarginLeft--", "", () => Margin (true, false)),
+					new("MarginBottom++", "", () => Margin (false, true)),
+					new("MarginBottom--", "", () => Margin (false, false)),
+					_miShowBorder = new MenuItem ("_Enable Margin, Border, and Padding", "",
+						() => ShowBorder ()) {
+						Checked = true,
+						CheckType = MenuItemCheckStyle.Checked
+					},
+					_miDiags = new MenuItem ("Dri_ver Diagnostics", "", () => EnableDiagnostics ()) {
+						Checked = ConsoleDriver.Diagnostics ==
+							  (ConsoleDriver.DiagnosticFlags.FramePadding |
+							   ConsoleDriver.DiagnosticFlags.FrameRuler),
+						CheckType = MenuItemCheckStyle.Checked
+					}
+				})
+			]
+		};
 		Application.Top.Add (menu);
 
 		_graphView = new GraphView {
@@ -81,11 +86,12 @@ public class GraphViewExample : Scenario {
 
 		Win.Add (_graphView);
 
-		var frameRight = new FrameView ("About") {
+		var frameRight = new FrameView {
 			X = Pos.Right (_graphView) + 1,
 			Y = 0,
 			Width = Dim.Fill (),
-			Height = Dim.Fill ()
+			Height = Dim.Fill (),
+			Title = "About"
 		};
 
 		frameRight.Add (_about = new TextView {
@@ -96,8 +102,9 @@ public class GraphViewExample : Scenario {
 		Win.Add (frameRight);
 
 		var statusBar = new StatusBar (new StatusItem [] {
-			new (Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
-			new (KeyCode.CtrlMask | KeyCode.G, "~^G~ Next", () => _graphs [_currentGraph++ % _graphs.Length] ())
+			new(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit ()),
+			new(KeyCode.CtrlMask | KeyCode.G, "~^G~ Next",
+				() => _graphs [_currentGraph++ % _graphs.Length] ())
 		});
 		Application.Top.Add (statusBar);
 	}
@@ -116,14 +123,15 @@ public class GraphViewExample : Scenario {
 			_graphView.Margin.Thickness = Thickness.Empty;
 			_graphView.Padding.Thickness = Thickness.Empty;
 		}
-
 	}
 
 	void EnableDiagnostics ()
 	{
 		_miDiags.Checked = !_miDiags.Checked;
 
-		ConsoleDriver.Diagnostics = _miDiags.Checked == true ? ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler : ConsoleDriver.DiagnosticFlags.Off;
+		ConsoleDriver.Diagnostics = _miDiags.Checked == true
+			? ConsoleDriver.DiagnosticFlags.FramePadding | ConsoleDriver.DiagnosticFlags.FrameRuler
+			: ConsoleDriver.DiagnosticFlags.Off;
 		Application.Refresh ();
 	}
 
@@ -135,7 +143,9 @@ public class GraphViewExample : Scenario {
 
 		_about.Text = "Housing Expenditures by income thirds 1996-2003";
 
-		var fore = _graphView.ColorScheme.Normal.Foreground == new Color (ColorName.Black) ? new Color (ColorName.White) : _graphView.ColorScheme.Normal.Foreground;
+		var fore = _graphView.ColorScheme.Normal.Foreground == new Color (ColorName.Black)
+			? new Color (ColorName.White)
+			: _graphView.ColorScheme.Normal.Foreground;
 		var black = new Attribute (fore, Color.Black);
 		var cyan = new Attribute (Color.BrightCyan, Color.Black);
 		var magenta = new Attribute (Color.BrightMagenta, Color.Black);
@@ -173,9 +183,12 @@ public class GraphViewExample : Scenario {
 		_graphView.AxisY.Minimum = 0;
 
 		var legend = new LegendAnnotation (new Rect (_graphView.Bounds.Width - 20, 0, 20, 5));
-		legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor), "Lower Third");
-		legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor), "Middle Third");
-		legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor), "Upper Third");
+		legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (0).OverrideBarColor),
+			"Lower Third");
+		legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (1).OverrideBarColor),
+			"Middle Third");
+		legend.AddEntry (new GraphCellToRender (stiple, series.SubSeries.ElementAt (2).OverrideBarColor),
+			"Upper Third");
 		_graphView.Annotations.Add (legend);
 	}
 
@@ -252,7 +265,7 @@ public class GraphViewExample : Scenario {
 		_graphView.AxisY.Text = "↑Y";
 
 		var max = line.Points.Union (line2.Points).OrderByDescending (p => p.Y).First ();
-		_graphView.Annotations.Add (new TextAnnotation { Text = "(Max)", GraphPosition = new PointF (max.X + 2 * _graphView.CellSize.X, max.Y) });
+		_graphView.Annotations.Add (new TextAnnotation { Text = "(Max)", GraphPosition = new PointF (max.X + (2 * _graphView.CellSize.X), max.Y) });
 
 		_graphView.SetNeedsDisplay ();
 	}
@@ -348,30 +361,29 @@ public class GraphViewExample : Scenario {
 
 		var barSeries = new BarSeries {
 			Bars = new List<BarSeriesBar> {
-				new ("Switzerland", softStiple, 83.4f),
-				new ("South Korea", !verticalBars ? mediumStiple : softStiple, 83.3f),
-				new ("Singapore", softStiple, 83.2f),
-				new ("Spain", !verticalBars ? mediumStiple : softStiple, 83.2f),
-				new ("Cyprus", softStiple, 83.1f),
-				new ("Australia", !verticalBars ? mediumStiple : softStiple, 83),
-				new ("Italy", softStiple, 83),
-				new ("Norway", !verticalBars ? mediumStiple : softStiple, 83),
-				new ("Israel", softStiple, 82.6f),
-				new ("France", !verticalBars ? mediumStiple : softStiple, 82.5f),
-				new ("Luxembourg", softStiple, 82.4f),
-				new ("Sweden", !verticalBars ? mediumStiple : softStiple, 82.4f),
-				new ("Iceland", softStiple, 82.3f),
-				new ("Canada", !verticalBars ? mediumStiple : softStiple, 82.2f),
-				new ("New Zealand", softStiple, 82),
-				new ("Malta", !verticalBars ? mediumStiple : softStiple, 81.9f),
-				new ("Ireland", softStiple, 81.8f)
+				new("Switzerland", softStiple, 83.4f),
+				new("South Korea", !verticalBars ? mediumStiple : softStiple, 83.3f),
+				new("Singapore", softStiple, 83.2f),
+				new("Spain", !verticalBars ? mediumStiple : softStiple, 83.2f),
+				new("Cyprus", softStiple, 83.1f),
+				new("Australia", !verticalBars ? mediumStiple : softStiple, 83),
+				new("Italy", softStiple, 83),
+				new("Norway", !verticalBars ? mediumStiple : softStiple, 83),
+				new("Israel", softStiple, 82.6f),
+				new("France", !verticalBars ? mediumStiple : softStiple, 82.5f),
+				new("Luxembourg", softStiple, 82.4f),
+				new("Sweden", !verticalBars ? mediumStiple : softStiple, 82.4f),
+				new("Iceland", softStiple, 82.3f),
+				new("Canada", !verticalBars ? mediumStiple : softStiple, 82.2f),
+				new("New Zealand", softStiple, 82),
+				new("Malta", !verticalBars ? mediumStiple : softStiple, 81.9f),
+				new("Ireland", softStiple, 81.8f)
 			}
 		};
 
 		_graphView.Series.Add (barSeries);
 
 		if (verticalBars) {
-
 			barSeries.Orientation = Orientation.Vertical;
 
 			// How much graph space each cell of the console depicts
@@ -393,7 +405,6 @@ public class GraphViewExample : Scenario {
 
 			// Start the graph at 80 years because that is where most of our data is
 			_graphView.ScrollOffset = new PointF (0, 80);
-
 		} else {
 			barSeries.Orientation = Orientation.Horizontal;
 
@@ -484,28 +495,27 @@ public class GraphViewExample : Scenario {
 		var malesSeries = new BarSeries {
 			Orientation = Orientation.Horizontal,
 			Bars = new List<BarSeriesBar> {
-				new ("0-4", stiple, -2009363),
-				new ("5-9", stiple, -2108550),
-				new ("10-14", stiple, -2022370),
-				new ("15-19", stiple, -1880611),
-				new ("20-24", stiple, -2072674),
-				new ("25-29", stiple, -2275138),
-				new ("30-34", stiple, -2361054),
-				new ("35-39", stiple, -2279836),
-				new ("40-44", stiple, -2148253),
-				new ("45-49", stiple, -2128343),
-				new ("50-54", stiple, -2281421),
-				new ("55-59", stiple, -2232388),
-				new ("60-64", stiple, -1919839),
-				new ("65-69", stiple, -1647391),
-				new ("70-74", stiple, -1624635),
-				new ("75-79", stiple, -1137438),
-				new ("80-84", stiple, -766956),
-				new ("85-89", stiple, -438663),
-				new ("90-94", stiple, -169952),
-				new ("95-99", stiple, -34524),
-				new ("100+", stiple, -3016)
-
+				new("0-4", stiple, -2009363),
+				new("5-9", stiple, -2108550),
+				new("10-14", stiple, -2022370),
+				new("15-19", stiple, -1880611),
+				new("20-24", stiple, -2072674),
+				new("25-29", stiple, -2275138),
+				new("30-34", stiple, -2361054),
+				new("35-39", stiple, -2279836),
+				new("40-44", stiple, -2148253),
+				new("45-49", stiple, -2128343),
+				new("50-54", stiple, -2281421),
+				new("55-59", stiple, -2232388),
+				new("60-64", stiple, -1919839),
+				new("65-69", stiple, -1647391),
+				new("70-74", stiple, -1624635),
+				new("75-79", stiple, -1137438),
+				new("80-84", stiple, -766956),
+				new("85-89", stiple, -438663),
+				new("90-94", stiple, -169952),
+				new("95-99", stiple, -34524),
+				new("100+", stiple, -3016)
 			}
 		};
 		_graphView.Series.Add (malesSeries);
@@ -514,27 +524,27 @@ public class GraphViewExample : Scenario {
 		var femalesSeries = new BarSeries {
 			Orientation = Orientation.Horizontal,
 			Bars = new List<BarSeriesBar> {
-				new ("0-4", stiple, 1915127),
-				new ("5-9", stiple, 2011016),
-				new ("10-14", stiple, 1933970),
-				new ("15-19", stiple, 1805522),
-				new ("20-24", stiple, 2001966),
-				new ("25-29", stiple, 2208929),
-				new ("30-34", stiple, 2345774),
-				new ("35-39", stiple, 2308360),
-				new ("40-44", stiple, 2159877),
-				new ("45-49", stiple, 2167778),
-				new ("50-54", stiple, 2353119),
-				new ("55-59", stiple, 2306537),
-				new ("60-64", stiple, 1985177),
-				new ("65-69", stiple, 1734370),
-				new ("70-74", stiple, 1763853),
-				new ("75-79", stiple, 1304709),
-				new ("80-84", stiple, 969611),
-				new ("85-89", stiple, 638892),
-				new ("90-94", stiple, 320625),
-				new ("95-99", stiple, 95559),
-				new ("100+", stiple, 12818)
+				new("0-4", stiple, 1915127),
+				new("5-9", stiple, 2011016),
+				new("10-14", stiple, 1933970),
+				new("15-19", stiple, 1805522),
+				new("20-24", stiple, 2001966),
+				new("25-29", stiple, 2208929),
+				new("30-34", stiple, 2345774),
+				new("35-39", stiple, 2308360),
+				new("40-44", stiple, 2159877),
+				new("45-49", stiple, 2167778),
+				new("50-54", stiple, 2353119),
+				new("55-59", stiple, 2306537),
+				new("60-64", stiple, 1985177),
+				new("65-69", stiple, 1734370),
+				new("70-74", stiple, 1763853),
+				new("75-79", stiple, 1304709),
+				new("80-84", stiple, 969611),
+				new("85-89", stiple, 638892),
+				new("90-94", stiple, 320625),
+				new("95-99", stiple, 95559),
+				new("100+", stiple, 12818)
 			}
 		};
 
@@ -552,7 +562,6 @@ public class GraphViewExample : Scenario {
 		_graphView.Annotations.Add (new TextAnnotation { Text = "F", ScreenPosition = new Point (_graphView.Bounds.Width - 1, 10) });
 
 		_graphView.SetNeedsDisplay ();
-
 	}
 
 	void SetupDisco ()
@@ -572,7 +581,6 @@ public class GraphViewExample : Scenario {
 		var bars = new List<BarSeriesBar> ();
 
 		var genSample = () => {
-
 			bars.Clear ();
 			// generate an imaginary sample
 			for (var i = 0; i < 31; i++) {
@@ -581,6 +589,7 @@ public class GraphViewExample : Scenario {
 						//ColorGetter = colorDelegate
 					});
 			}
+
 			_graphView.SetNeedsDisplay ();
 
 			// while the equaliser is showing
@@ -610,31 +619,50 @@ public class GraphViewExample : Scenario {
 
 		_graphView.Title = "Scatter Plot";
 
-		_about.Text = "This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
+		_about.Text =
+			"This graph shows the atomic weight of each element in the periodic table.\nStarting with Hydrogen (atomic Number 1 with a weight of 1.007)";
 
 		//AtomicNumber and AtomicMass of all elements in the periodic table
 		_graphView.Series.Add (
 			new ScatterSeries {
 				Points = new List<PointF> {
-					new (1, 1.007f), new (2, 4.002f), new (3, 6.941f), new (4, 9.012f), new (5, 10.811f), new (6, 12.011f),
-					new (7, 14.007f), new (8, 15.999f), new (9, 18.998f), new (10, 20.18f), new (11, 22.99f), new (12, 24.305f),
-					new (13, 26.982f), new (14, 28.086f), new (15, 30.974f), new (16, 32.065f), new (17, 35.453f), new (18, 39.948f),
-					new (19, 39.098f), new (20, 40.078f), new (21, 44.956f), new (22, 47.867f), new (23, 50.942f), new (24, 51.996f),
-					new (25, 54.938f), new (26, 55.845f), new (27, 58.933f), new (28, 58.693f), new (29, 63.546f), new (30, 65.38f),
-					new (31, 69.723f), new (32, 72.64f), new (33, 74.922f), new (34, 78.96f), new (35, 79.904f), new (36, 83.798f),
-					new (37, 85.468f), new (38, 87.62f), new (39, 88.906f), new (40, 91.224f), new (41, 92.906f), new (42, 95.96f),
-					new (43, 98f), new (44, 101.07f), new (45, 102.906f), new (46, 106.42f), new (47, 107.868f), new (48, 112.411f),
-					new (49, 114.818f), new (50, 118.71f), new (51, 121.76f), new (52, 127.6f), new (53, 126.904f), new (54, 131.293f),
-					new (55, 132.905f), new (56, 137.327f), new (57, 138.905f), new (58, 140.116f), new (59, 140.908f), new (60, 144.242f),
-					new (61, 145), new (62, 150.36f), new (63, 151.964f), new (64, 157.25f), new (65, 158.925f), new (66, 162.5f),
-					new (67, 164.93f), new (68, 167.259f), new (69, 168.934f), new (70, 173.054f), new (71, 174.967f), new (72, 178.49f),
-					new (73, 180.948f), new (74, 183.84f), new (75, 186.207f), new (76, 190.23f), new (77, 192.217f), new (78, 195.084f),
-					new (79, 196.967f), new (80, 200.59f), new (81, 204.383f), new (82, 207.2f), new (83, 208.98f), new (84, 210),
-					new (85, 210), new (86, 222), new (87, 223), new (88, 226), new (89, 227), new (90, 232.038f), new (91, 231.036f),
-					new (92, 238.029f), new (93, 237), new (94, 244), new (95, 243), new (96, 247), new (97, 247), new (98, 251),
-					new (99, 252), new (100, 257), new (101, 258), new (102, 259), new (103, 262), new (104, 261), new (105, 262),
-					new (106, 266), new (107, 264), new (108, 267), new (109, 268), new (113, 284), new (114, 289), new (115, 288),
-					new (116, 292), new (117, 295), new (118, 294)
+					new(1, 1.007f), new(2, 4.002f), new(3, 6.941f), new(4, 9.012f), new(5, 10.811f),
+					new(6, 12.011f),
+					new(7, 14.007f), new(8, 15.999f), new(9, 18.998f), new(10, 20.18f),
+					new(11, 22.99f), new(12, 24.305f),
+					new(13, 26.982f), new(14, 28.086f), new(15, 30.974f), new(16, 32.065f),
+					new(17, 35.453f), new(18, 39.948f),
+					new(19, 39.098f), new(20, 40.078f), new(21, 44.956f), new(22, 47.867f),
+					new(23, 50.942f), new(24, 51.996f),
+					new(25, 54.938f), new(26, 55.845f), new(27, 58.933f), new(28, 58.693f),
+					new(29, 63.546f), new(30, 65.38f),
+					new(31, 69.723f), new(32, 72.64f), new(33, 74.922f), new(34, 78.96f),
+					new(35, 79.904f), new(36, 83.798f),
+					new(37, 85.468f), new(38, 87.62f), new(39, 88.906f), new(40, 91.224f),
+					new(41, 92.906f), new(42, 95.96f),
+					new(43, 98f), new(44, 101.07f), new(45, 102.906f), new(46, 106.42f),
+					new(47, 107.868f), new(48, 112.411f),
+					new(49, 114.818f), new(50, 118.71f), new(51, 121.76f), new(52, 127.6f),
+					new(53, 126.904f), new(54, 131.293f),
+					new(55, 132.905f), new(56, 137.327f), new(57, 138.905f), new(58, 140.116f),
+					new(59, 140.908f), new(60, 144.242f),
+					new(61, 145), new(62, 150.36f), new(63, 151.964f), new(64, 157.25f),
+					new(65, 158.925f), new(66, 162.5f),
+					new(67, 164.93f), new(68, 167.259f), new(69, 168.934f), new(70, 173.054f),
+					new(71, 174.967f), new(72, 178.49f),
+					new(73, 180.948f), new(74, 183.84f), new(75, 186.207f), new(76, 190.23f),
+					new(77, 192.217f), new(78, 195.084f),
+					new(79, 196.967f), new(80, 200.59f), new(81, 204.383f), new(82, 207.2f),
+					new(83, 208.98f), new(84, 210),
+					new(85, 210), new(86, 222), new(87, 223), new(88, 226), new(89, 227),
+					new(90, 232.038f), new(91, 231.036f),
+					new(92, 238.029f), new(93, 237), new(94, 244), new(95, 243), new(96, 247),
+					new(97, 247), new(98, 251),
+					new(99, 252), new(100, 257), new(101, 258), new(102, 259), new(103, 262),
+					new(104, 261), new(105, 262),
+					new(106, 266), new(107, 264), new(108, 267), new(109, 268), new(113, 284),
+					new(114, 289), new(115, 288),
+					new(116, 292), new(117, 295), new(118, 294)
 				}
 			});
 
@@ -686,20 +714,19 @@ public class GraphViewExample : Scenario {
 	void Quit () => Application.RequestStop ();
 
 	class DiscoBarSeries : BarSeries {
-		readonly Attribute brightgreen;
-		readonly Attribute brightred;
-		readonly Attribute brightyellow;
-		readonly Attribute green;
-		readonly Attribute red;
+		readonly Attribute _brightgreen;
+		readonly Attribute _brightred;
+		readonly Attribute _brightyellow;
+		readonly Attribute _green;
+		readonly Attribute _red;
 
 		public DiscoBarSeries ()
 		{
-
-			green = new Attribute (Color.BrightGreen, Color.Black);
-			brightgreen = new Attribute (Color.Green, Color.Black);
-			brightyellow = new Attribute (Color.BrightYellow, Color.Black);
-			red = new Attribute (Color.Red, Color.Black);
-			brightred = new Attribute (Color.BrightRed, Color.Black);
+			_green = new Attribute (Color.BrightGreen, Color.Black);
+			_brightgreen = new Attribute (Color.Green, Color.Black);
+			_brightyellow = new Attribute (Color.BrightYellow, Color.Black);
+			_red = new Attribute (Color.Red, Color.Black);
+			_brightred = new Attribute (Color.BrightRed, Color.Black);
 		}
 
 		protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
@@ -708,19 +735,18 @@ public class GraphViewExample : Scenario {
 
 			var x = start.X;
 			for (var y = end.Y; y <= start.Y; y++) {
-
 				var height = graph.ScreenToGraphSpace (x, y).Y;
 
 				if (height >= 85) {
-					driver.SetAttribute (red);
+					driver.SetAttribute (_red);
 				} else if (height >= 66) {
-					driver.SetAttribute (brightred);
+					driver.SetAttribute (_brightred);
 				} else if (height >= 45) {
-					driver.SetAttribute (brightyellow);
+					driver.SetAttribute (_brightyellow);
 				} else if (height >= 25) {
-					driver.SetAttribute (brightgreen);
+					driver.SetAttribute (_brightgreen);
 				} else {
-					driver.SetAttribute (green);
+					driver.SetAttribute (_green);
 				}
 
 				graph.AddRune (x, y, beingDrawn.Fill.Rune);

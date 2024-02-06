@@ -1,14 +1,11 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
+
 public class BorderTests {
 	readonly ITestOutputHelper _output;
 
-	public BorderTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+	public BorderTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void View_BorderStyle_Defaults ()
@@ -37,21 +34,22 @@ public class BorderTests {
 		view.Dispose ();
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (0)]
 	[InlineData (1)]
 	[InlineData (2)]
 	[InlineData (3)]
 	public void Border_With_Title_Size_Height (int height)
 	{
-		var win = new Window () {
+		var win = new Window {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
 
 		var rs = Application.Begin (win);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (20, height);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -84,11 +82,13 @@ public class BorderTests {
 ";
 			break;
 		}
+
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (0)]
 	[InlineData (1)]
 	[InlineData (2)]
@@ -102,14 +102,14 @@ public class BorderTests {
 	[InlineData (10)]
 	public void Border_With_Title_Size_Width (int width)
 	{
-		var win = new Window () {
+		var win = new Window {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
 
 		var rs = Application.Begin (win);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (width, 3);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -188,19 +188,21 @@ public class BorderTests {
 └────────┘";
 			break;
 		}
+
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void NoSuperView ()
 	{
-		var win = new Window () {
+		var win = new Window {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
 
 		var rs = Application.Begin (win);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (3, 3);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -212,19 +214,20 @@ public class BorderTests {
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void HasSuperView ()
 	{
 		Application.Top.BorderStyle = LineStyle.Double;
 
-		var frame = new FrameView () {
+		var frame = new FrameView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
 		};
 
 		Application.Top.Add (frame);
 		var rs = Application.Begin (Application.Top);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (5, 5);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -239,12 +242,13 @@ public class BorderTests {
 		Application.End (rs);
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void HasSuperView_Title ()
 	{
 		Application.Top.BorderStyle = LineStyle.Double;
 
-		var frame = new FrameView () {
+		var frame = new FrameView {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill ()
@@ -252,7 +256,7 @@ public class BorderTests {
 
 		Application.Top.Add (frame);
 		var rs = Application.Begin (Application.Top);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (10, 4);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -275,9 +279,10 @@ public class BorderTests {
 	[InlineData (1, 0, 1, 2, 3)]
 	[InlineData (1, 1, 1, 3, 3)]
 	[InlineData (1, 10, 10, 12, 12)]
-	public void FrameToScreen_SuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
+	public void FrameToScreen_SuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX,
+		int expectedScreenY)
 	{
-		var super = new View () {
+		var super = new View {
 			X = superOffset,
 			Y = superOffset,
 			Width = 20,
@@ -285,7 +290,7 @@ public class BorderTests {
 			BorderStyle = LineStyle.Single
 		};
 
-		var view = new View () {
+		var view = new View {
 			X = frameX,
 			Y = frameY,
 			Width = 10,
@@ -305,9 +310,10 @@ public class BorderTests {
 	[InlineData (1, 0, 1, 4, 5)]
 	[InlineData (1, 1, 1, 5, 5)]
 	[InlineData (1, 10, 10, 14, 14)]
-	public void FrameToScreen_NestedSuperView_WithBorder (int superOffset, int frameX, int frameY, int expectedScreenX, int expectedScreenY)
+	public void FrameToScreen_NestedSuperView_WithBorder (int superOffset, int frameX, int frameY,
+		int expectedScreenX, int expectedScreenY)
 	{
-		var superSuper = new View () {
+		var superSuper = new View {
 			X = superOffset,
 			Y = superOffset,
 			Width = 30,
@@ -315,7 +321,7 @@ public class BorderTests {
 			BorderStyle = LineStyle.Single
 		};
 
-		var super = new View () {
+		var super = new View {
 			X = superOffset,
 			Y = superOffset,
 			Width = 20,
@@ -324,7 +330,7 @@ public class BorderTests {
 		};
 		superSuper.Add (super);
 
-		var view = new View () {
+		var view = new View {
 			X = frameX,
 			Y = frameY,
 			Width = 10,
@@ -337,7 +343,8 @@ public class BorderTests {
 	}
 
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (0)]
 	[InlineData (1)]
 	[InlineData (2)]
@@ -351,16 +358,16 @@ public class BorderTests {
 	[InlineData (10)]
 	public void Border_With_Title_Border_Double_Thickness_Top_Two_Size_Width (int width)
 	{
-		var win = new Window () {
+		var win = new Window {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			BorderStyle = LineStyle.Double,
+			BorderStyle = LineStyle.Double
 		};
 		win.Border.Thickness.Top = 2;
 
 		var rs = Application.Begin (win);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (width, 4);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -445,11 +452,13 @@ public class BorderTests {
 ╚════════╝";
 			break;
 		}
+
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (0)]
 	[InlineData (1)]
 	[InlineData (2)]
@@ -463,16 +472,16 @@ public class BorderTests {
 	[InlineData (10)]
 	public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width)
 	{
-		var win = new Window () {
+		var win = new Window {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			BorderStyle = LineStyle.Double,
+			BorderStyle = LineStyle.Double
 		};
 		win.Border.Thickness.Top = 3;
 
 		var rs = Application.Begin (win);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (width, 4);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -557,11 +566,13 @@ public class BorderTests {
 ╚════════╝";
 			break;
 		}
+
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
 
-	[Theory, AutoInitShutdown]
+	[Theory]
+	[AutoInitShutdown]
 	[InlineData (0)]
 	[InlineData (1)]
 	[InlineData (2)]
@@ -575,16 +586,16 @@ public class BorderTests {
 	[InlineData (10)]
 	public void Border_With_Title_Border_Double_Thickness_Top_Four_Size_Width (int width)
 	{
-		var win = new Window () {
+		var win = new Window {
 			Title = "1234",
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
-			BorderStyle = LineStyle.Double,
+			BorderStyle = LineStyle.Double
 		};
 		win.Border.Thickness.Top = 4;
 
 		var rs = Application.Begin (win);
-		bool firstIteration = false;
+		var firstIteration = false;
 
 		((FakeDriver)Application.Driver).SetBufferSize (width, 5);
 		Application.RunIteration (ref rs, ref firstIteration);
@@ -669,27 +680,29 @@ public class BorderTests {
 ╚════════╝";
 			break;
 		}
+
 		_ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 		Application.End (rs);
 	}
 
-	[Fact, SetupFakeDriver]
+	[Fact]
+	[SetupFakeDriver]
 	public void Border_Uses_Parent_ColorScheme ()
 	{
-		var view = new View () {
+		var view = new View {
 			Title = "A",
 			Height = 2,
 			Width = 5
 		};
 		view.Border.Thickness = new Thickness (0, 1, 0, 0);
 		view.Border.LineStyle = LineStyle.Single;
-		view.ColorScheme = new ColorScheme () {
+		view.ColorScheme = new ColorScheme {
 			Normal = new Attribute (Color.Red, Color.Green),
-			Focus = new Attribute (Color.Green, Color.Red),
+			Focus = new Attribute (Color.Green, Color.Red)
 		};
 		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());
 		Assert.Equal (ColorName.Green, view.Border.GetFocusColor ().Foreground.GetClosestNamedColor ());
-		Assert.Equal (view.GetNormalColor(), view.Border.GetNormalColor ());
+		Assert.Equal (view.GetNormalColor (), view.Border.GetNormalColor ());
 		Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
 
 		view.BeginInit ();
@@ -701,19 +714,20 @@ public class BorderTests {
 		TestHelpers.AssertDriverAttributesAre ("00000", null, view.ColorScheme.Normal);
 	}
 
-	[Fact, SetupFakeDriver]
+	[Fact]
+	[SetupFakeDriver]
 	public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
 	{
-		var view = new View () {
+		var view = new View {
 			Title = "A",
 			Height = 2,
 			Width = 5
 		};
 		view.Border.Thickness = new Thickness (0, 1, 0, 0);
 		view.Border.LineStyle = LineStyle.Single;
-		view.ColorScheme = new ColorScheme () {
+		view.ColorScheme = new ColorScheme {
 			Normal = new Attribute (Color.Red, Color.Green),
-			Focus = new Attribute (Color.Green, Color.Red),
+			Focus = new Attribute (Color.Green, Color.Red)
 		};
 		Assert.NotEqual (view.ColorScheme.Normal.Foreground, view.ColorScheme.Focus.Foreground);
 		Assert.Equal (ColorName.Red, view.Border.GetNormalColor ().Foreground.GetClosestNamedColor ());

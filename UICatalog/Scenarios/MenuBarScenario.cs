@@ -1,48 +1,69 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MenuBar", "Demonstrates the MenuBar using the same menu used in unit tests.")]
-[ScenarioCategory ("Controls")] [ScenarioCategory ("Menu")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Menu")]
 public class MenuBarScenario : Scenario {
+	Label _currentMenuBarItem;
+	Label _currentMenuItem;
+	Label _focusedView;
+	Label _lastAction;
+	Label _lastKey;
+
 	/// <summary>
-	/// This method creates at test menu bar. It is called by the MenuBar unit tests so
-	/// it's possible to do both unit testing and user-experience testing with the same setup.
+	///         This method creates at test menu bar. It is called by the MenuBar unit tests so
+	///         it's possible to do both unit testing and user-experience testing with the same setup.
 	/// </summary>
 	/// <param name="actionFn"></param>
 	/// <returns></returns>
 	public static MenuBar CreateTestMenu (Func<string, bool> actionFn)
 	{
-		var mb = new MenuBar (new MenuBarItem [] {
-			new MenuBarItem ("_File", new MenuItem [] {
-				new MenuItem ("_New", "", () => actionFn ("New"), null, null, KeyCode.CtrlMask | KeyCode.N),
-				new MenuItem ("_Open", "", () => actionFn ("Open"), null, null, KeyCode.CtrlMask | KeyCode.O),
-				new MenuItem ("_Save", "", () => actionFn ("Save"), null, null, KeyCode.CtrlMask | KeyCode.S),
-				null,
-				// Don't use Ctrl-Q so we can disambiguate between quitting and closing the toplevel
-				new MenuItem ("_Quit", "", () => actionFn ("Quit"), null, null, KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Q)
-			}),
-			new MenuBarItem ("_Edit", new MenuItem [] {
-				new MenuItem ("_Copy", "", () => actionFn ("Copy"), null, null, KeyCode.CtrlMask | KeyCode.C),
-				new MenuItem ("C_ut", "", () => actionFn ("Cut"), null, null, KeyCode.CtrlMask | KeyCode.X),
-				new MenuItem ("_Paste", "", () => actionFn ("Paste"), null, null, KeyCode.CtrlMask | KeyCode.V),
-				new MenuBarItem ("_Find and Replace", new MenuItem [] {
-					new MenuItem ("F_ind", "", () => actionFn ("Find"), null, null, KeyCode.CtrlMask | KeyCode.F),
-					new MenuItem ("_Replace", "", () => actionFn ("Replace"), null, null, KeyCode.CtrlMask | KeyCode.H),
-					new MenuBarItem ("_3rd Level", new MenuItem [] {
-						new MenuItem ("_1st", "", () => actionFn ("1"), null, null, KeyCode.F1),
-						new MenuItem ("_2nd", "", () => actionFn ("2"), null, null, KeyCode.F2),
-					}),
-					new MenuBarItem ("_4th Level", new MenuItem [] {
-						new MenuItem ("_5th", "", () => actionFn ("5"), null, null, KeyCode.CtrlMask | KeyCode.D5),
-						new MenuItem ("_6th", "", () => actionFn ("6"), null, null, KeyCode.CtrlMask | KeyCode.D6),
-					}),
+		var mb = new MenuBar {
+			Menus = [
+				new MenuBarItem ("_File", new MenuItem [] {
+					new("_New", "", () => actionFn ("New"), null, null,
+						KeyCode.CtrlMask | KeyCode.N),
+					new("_Open", "", () => actionFn ("Open"), null, null,
+						KeyCode.CtrlMask | KeyCode.O),
+					new("_Save", "", () => actionFn ("Save"), null, null,
+						KeyCode.CtrlMask | KeyCode.S),
+					null,
+					// Don't use Ctrl-Q so we can disambiguate between quitting and closing the toplevel
+					new("_Quit", "", () => actionFn ("Quit"), null, null,
+						KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Q)
 				}),
-				new MenuItem ("_Select All", "", () => actionFn ("Select All"), null, null, KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.S),
-			}),
-			new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"), null, null),
-		});
+				new MenuBarItem ("_Edit", new MenuItem [] {
+					new("_Copy", "", () => actionFn ("Copy"), null, null,
+						KeyCode.CtrlMask | KeyCode.C),
+					new("C_ut", "", () => actionFn ("Cut"), null, null,
+						KeyCode.CtrlMask | KeyCode.X),
+					new("_Paste", "", () => actionFn ("Paste"), null, null,
+						KeyCode.CtrlMask | KeyCode.V),
+					new MenuBarItem ("_Find and Replace", new MenuItem [] {
+						new("F_ind", "", () => actionFn ("Find"), null, null,
+							KeyCode.CtrlMask | KeyCode.F),
+						new("_Replace", "", () => actionFn ("Replace"), null, null,
+							KeyCode.CtrlMask | KeyCode.H),
+						new MenuBarItem ("_3rd Level", new MenuItem [] {
+							new("_1st", "", () => actionFn ("1"), null, null, KeyCode.F1),
+							new("_2nd", "", () => actionFn ("2"), null, null, KeyCode.F2)
+						}),
+						new MenuBarItem ("_4th Level", new MenuItem [] {
+							new("_5th", "", () => actionFn ("5"), null, null,
+								KeyCode.CtrlMask | KeyCode.D5),
+							new("_6th", "", () => actionFn ("6"), null, null,
+								KeyCode.CtrlMask | KeyCode.D6)
+						})
+					}),
+					new("_Select All", "", () => actionFn ("Select All"), null, null,
+						KeyCode.CtrlMask | KeyCode.ShiftMask | KeyCode.S)
+				}),
+				new MenuBarItem ("_About", "Top-Level", () => actionFn ("About"))
+			]
+		};
 		mb.UseKeysUpDownAsKeysLeftRight = true;
 		mb.Key = KeyCode.F9;
 		mb.Title = "TestMenuBar";
@@ -56,88 +77,82 @@ public class MenuBarScenario : Scenario {
 		Application.Top.ColorScheme = Colors.ColorSchemes ["Base"];
 	}
 
-	Label _currentMenuBarItem;
-	Label _currentMenuItem;
-	Label _lastAction;
-	Label _focusedView;
-	Label _lastKey;
-
 	public override void Setup ()
 	{
 		MenuItem mbiCurrent = null;
 		MenuItem miCurrent = null;
 
-		var label = new Label () {
+		var label = new Label {
 			X = 0,
 			Y = 10,
 			Text = "Last Key: "
 		};
 		Application.Top.Add (label);
 
-		_lastKey = new Label () {
+		_lastKey = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 
 		Application.Top.Add (_lastKey);
-		label = new Label () {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Text = "Current MenuBarItem: "
 		};
 		Application.Top.Add (label);
 
-		_currentMenuBarItem = new Label () {
-			X = Pos.Right(label),
+		_currentMenuBarItem = new Label {
+			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_currentMenuBarItem);
 
-		label = new Label () {
+		label = new Label {
 			X = 0,
-			Y = Pos.Bottom(label),
+			Y = Pos.Bottom (label),
 			Text = "Current MenuItem: "
 		};
 		Application.Top.Add (label);
 
-		_currentMenuItem = new Label () {
+		_currentMenuItem = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_currentMenuItem);
 
-		label = new Label () {
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Text = "Last Action: "
 		};
 		Application.Top.Add (label);
 
-		_lastAction = new Label () {
+		_lastAction = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_lastAction);
-		
-		label = new Label () {
+
+		label = new Label {
 			X = 0,
 			Y = Pos.Bottom (label),
 			Text = "Focused View: "
 		};
 		Application.Top.Add (label);
 
-		_focusedView = new Label () {
+		_focusedView = new Label {
 			X = Pos.Right (label),
 			Y = Pos.Top (label),
 			Text = ""
 		};
 		Application.Top.Add (_focusedView);
 
-		var menuBar = CreateTestMenu ((s) => {
+		var menuBar = CreateTestMenu (s => {
 			_lastAction.Text = s;
 			return true;
 		});
@@ -164,13 +179,13 @@ public class MenuBarScenario : Scenario {
 			_lastAction.Text = string.Empty;
 			_lastKey.Text = e.ToString ();
 		};
-		
+
 		// There's no focus change event, so this is a bit of a hack.
 		menuBar.LayoutComplete += (s, e) => {
-			_focusedView.Text = Application.Top.MostFocused?.ToString() ?? "None";
+			_focusedView.Text = Application.Top.MostFocused?.ToString () ?? "None";
 		};
 
-		var openBtn = new Button () {
+		var openBtn = new Button {
 			X = Pos.Center (),
 			Y = 4,
 			Text = "_Open Menu",
@@ -181,20 +196,20 @@ public class MenuBarScenario : Scenario {
 		};
 		Application.Top.Add (openBtn);
 
-		var hideBtn = new Button () {
+		var hideBtn = new Button {
 			X = Pos.Center (),
-			Y = Pos.Bottom(openBtn),
-			Text = "Toggle Menu._Visible",
+			Y = Pos.Bottom (openBtn),
+			Text = "Toggle Menu._Visible"
 		};
 		hideBtn.Clicked += (s, e) => {
 			menuBar.Visible = !menuBar.Visible;
 		};
 		Application.Top.Add (hideBtn);
 
-		var enableBtn = new Button () {
+		var enableBtn = new Button {
 			X = Pos.Center (),
 			Y = Pos.Bottom (hideBtn),
-			Text = "_Toggle Menu.Enable",
+			Text = "_Toggle Menu.Enable"
 		};
 		enableBtn.Clicked += (s, e) => {
 			menuBar.Enabled = !menuBar.Enabled;
@@ -204,14 +219,7 @@ public class MenuBarScenario : Scenario {
 		Application.Top.Add (menuBar);
 	}
 
-	void SetCurrentMenuBarItem (MenuItem mbi)
-	{
-		_currentMenuBarItem.Text = mbi != null ? mbi.Title : "Closed";
-	}
+	void SetCurrentMenuBarItem (MenuItem mbi) => _currentMenuBarItem.Text = mbi != null ? mbi.Title : "Closed";
 
-	void SetCurrentMenuItem (MenuItem mi)
-	{
-		_currentMenuItem.Text = mi != null ? mi.Title : "None";
-	}
-
+	void SetCurrentMenuItem (MenuItem mi) => _currentMenuItem.Text = mi != null ? mi.Title : "None";
 }

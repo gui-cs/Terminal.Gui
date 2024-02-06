@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -10,7 +9,7 @@ public class MouseTests {
 
 	public MouseTests (ITestOutputHelper output)
 	{
-		this._output = output;
+		_output = output;
 #if DEBUG_IDISPOSABLE
 		Responder.Instances.Clear ();
 		RunState.Instances.Clear ();
@@ -18,6 +17,7 @@ public class MouseTests {
 	}
 
 	#region mouse coordinate tests
+
 	// test Application.MouseEvent - ensure coordinates are screen relative
 	[Theory]
 	// inside tests
@@ -31,9 +31,10 @@ public class MouseTests {
 	[InlineData (-1, -1, -1, -1, true)]
 	[InlineData (0, -1, 0, -1, true)]
 	[InlineData (-1, 0, -1, 0, true)]
-	public void MouseEventCoordinatesAreScreenRelative (int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
+	public void MouseEventCoordinatesAreScreenRelative (int clickX, int clickY, int expectedX, int expectedY,
+		bool expectedClicked)
 	{
-		var mouseEvent = new MouseEvent () {
+		var mouseEvent = new MouseEvent {
 			X = clickX,
 			Y = clickY,
 			Flags = MouseFlags.Button1Pressed
@@ -47,6 +48,7 @@ public class MouseTests {
 			Assert.Equal (expectedY, e.MouseEvent.Y);
 			clicked = true;
 		}
+
 		Application.MouseEvent += OnApplicationOnMouseEvent;
 
 		Application.OnMouseEvent (mouseEventArgs);
@@ -55,8 +57,8 @@ public class MouseTests {
 	}
 
 	/// <summary>
-	/// Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked.
-	/// No frames; Frame == Bounds
+	///         Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked.
+	///         No frames; Frame == Bounds
 	/// </summary>
 	[AutoInitShutdown]
 	[Theory]
@@ -88,7 +90,8 @@ public class MouseTests {
 	[InlineData (1, 0, 1, 0, 0, false)]
 	[InlineData (1, 9, 0, 0, 0, false)]
 	[InlineData (1, 0, 9, 0, 0, false)]
-	public void MouseCoordinatesTest_NoFrames (int offset, int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
+	public void MouseCoordinatesTest_NoFrames (int offset, int clickX, int clickY, int expectedX, int expectedY,
+		bool expectedClicked)
 	{
 		var size = new Size (10, 10);
 		var pos = new Point (offset, offset);
@@ -99,7 +102,9 @@ public class MouseTests {
 		Application.Top.Width = size.Width;
 		Application.Top.Height = size.Height;
 
-		var mouseEvent = new MouseEvent () {
+		Application.Begin (Application.Top);
+
+		var mouseEvent = new MouseEvent {
 			X = clickX,
 			Y = clickY,
 			Flags = MouseFlags.Button1Clicked
@@ -117,8 +122,8 @@ public class MouseTests {
 	}
 
 	/// <summary>
-	/// Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked.
-	/// With Frames; Frame != Bounds
+	///         Tests that the mouse coordinates passed to the focused view are correct when the mouse is clicked.
+	///         With Frames; Frame != Bounds
 	/// </summary>
 	[AutoInitShutdown]
 	[Theory]
@@ -166,7 +171,8 @@ public class MouseTests {
 	//01234567890123456789
 	// |12345678|
 	// |xxxxxxxx
-	public void MouseCoordinatesTest_Border (int offset, int clickX, int clickY, int expectedX, int expectedY, bool expectedClicked)
+	public void MouseCoordinatesTest_Border (int offset, int clickX, int clickY, int expectedX, int expectedY,
+		bool expectedClicked)
 	{
 		var size = new Size (10, 10);
 		var pos = new Point (offset, offset);
@@ -179,7 +185,7 @@ public class MouseTests {
 		Application.Top.Height = size.Height * 2;
 		Application.Top.BorderStyle = LineStyle.None;
 
-		var view = new View () {
+		var view = new View {
 			X = pos.X,
 			Y = pos.Y,
 			Width = size.Width,
@@ -191,7 +197,8 @@ public class MouseTests {
 		view.CanFocus = true;
 
 		Application.Top.Add (view);
-		var mouseEvent = new MouseEvent () {
+		Application.Begin (Application.Top);
+		var mouseEvent = new MouseEvent {
 			X = clickX,
 			Y = clickY,
 			Flags = MouseFlags.Button1Clicked
@@ -207,14 +214,17 @@ public class MouseTests {
 		Application.OnMouseEvent (mouseEventArgs);
 		Assert.Equal (expectedClicked, clicked);
 	}
-	#endregion mouse coordinate tests 
+
+	#endregion mouse coordinate tests
 
 	#region mouse grab tests
-	[Fact, AutoInitShutdown]
+
+	[Fact]
+	[AutoInitShutdown]
 	public void MouseGrabView_WithNullMouseEventView ()
 	{
-		var tf = new TextField () { Width = 10 };
-		var sv = new ScrollView () {
+		var tf = new TextField { Width = 10 };
+		var sv = new ScrollView {
 			Width = Dim.Fill (),
 			Height = Dim.Fill (),
 			ContentSize = new Size (100, 100)
@@ -231,7 +241,7 @@ public class MouseTests {
 				Assert.True (tf.HasFocus);
 				Assert.Null (Application.MouseGrabView);
 
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 					X = 5,
 					Y = 5,
 					Flags = MouseFlags.ReportMousePosition
@@ -247,7 +257,7 @@ public class MouseTests {
 				// another toplevel (Dialog) was opened
 				Assert.Null (Application.MouseGrabView);
 
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 					X = 5,
 					Y = 5,
 					Flags = MouseFlags.ReportMousePosition
@@ -255,7 +265,7 @@ public class MouseTests {
 
 				Assert.Null (Application.MouseGrabView);
 
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 					X = 40,
 					Y = 12,
 					Flags = MouseFlags.ReportMousePosition
@@ -263,7 +273,7 @@ public class MouseTests {
 
 				Assert.Null (Application.MouseGrabView);
 
-				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent () {
+				Application.OnMouseEvent (new MouseEventEventArgs (new MouseEvent {
 					X = 0,
 					Y = 0,
 					Flags = MouseFlags.Button1Pressed
@@ -282,7 +292,8 @@ public class MouseTests {
 		Application.Run ();
 	}
 
-	[Fact, AutoInitShutdown]
+	[Fact]
+	[AutoInitShutdown]
 	public void MouseGrabView_GrabbedMouse_UnGrabbedMouse ()
 	{
 		View grabView = null;
@@ -339,10 +350,12 @@ public class MouseTests {
 				Assert.Equal (view2, e.View);
 				Assert.Equal (grabView, e.View);
 			}
+
 			count++;
 
 			Application.UnGrabbedMouse -= Application_UnGrabbedMouse;
 		}
 	}
+
 	#endregion
 }

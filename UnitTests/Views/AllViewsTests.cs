@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using Xunit;
+﻿using System.Reflection;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
+
 public class AllViewsTests {
 	readonly ITestOutputHelper _output;
 
-	public AllViewsTests (ITestOutputHelper output)
-	{
-		_output = output;
-	}
+	public AllViewsTests (ITestOutputHelper output) => _output = output;
 
 	[Fact]
 	public void AllViews_Center_Properly ()
@@ -28,6 +21,7 @@ public class AllViewsTests {
 				Application.Shutdown ();
 				continue;
 			}
+
 			view.X = Pos.Center ();
 			view.Y = Pos.Center ();
 
@@ -35,11 +29,11 @@ public class AllViewsTests {
 			view.Width = 10;
 			view.Height = 10;
 
-			var frame = new View () {
+			var frame = new View {
 				X = 0,
 				Y = 0,
 				Width = 50,
-				Height = 50,
+				Height = 50
 			};
 			frame.Add (view);
 			frame.BeginInit ();
@@ -50,8 +44,10 @@ public class AllViewsTests {
 			var expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
 			var expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
 
-			Assert.True (view.Frame.Left == expectedX, $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
-			Assert.True (view.Frame.Top == expectedY, $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
+			Assert.True (view.Frame.Left == expectedX,
+				$"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
+			Assert.True (view.Frame.Top == expectedY,
+				$"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
 			Application.Shutdown ();
 		}
 	}
@@ -83,12 +79,13 @@ public class AllViewsTests {
 				Application.Shutdown ();
 				continue;
 			}
+
 			vType.X = 0;
 			vType.Y = 0;
 			vType.Width = 10;
 			vType.Height = 1;
 
-			var view = new View () {
+			var view = new View {
 				X = 0,
 				Y = 1,
 				Width = 10,
@@ -114,15 +111,16 @@ public class AllViewsTests {
 			}
 
 			if (vType is TextView) {
-				top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+				top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask));
 			} else if (vType is DatePicker) {
-				for (int i = 0; i < 4; i++) {
-					top.NewKeyDownEvent (new (KeyCode.Tab | KeyCode.CtrlMask));
+				for (var i = 0; i < 4; i++) {
+					top.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask));
 				}
 			} else {
-				top.NewKeyDownEvent (new (KeyCode.Tab));
+				top.NewKeyDownEvent (new Key (KeyCode.Tab));
 			}
-			top.NewKeyDownEvent (new (KeyCode.Tab));
+
+			top.NewKeyDownEvent (new Key (KeyCode.Tab));
 
 			Assert.Equal (2, vTypeEnter);
 			Assert.Equal (1, vTypeLeave);
@@ -157,24 +155,24 @@ public class AllViewsTests {
 		return true;
 	}
 
-	private static View CreateViewFromType (Type type, ConstructorInfo ctor)
+	static View CreateViewFromType (Type type, ConstructorInfo ctor)
 	{
 		View viewType = null;
 
 		if (type.IsGenericType && type.IsTypeDefinition) {
-			List<Type> gTypes = new List<Type> ();
+			var gTypes = new List<Type> ();
 
 			foreach (var args in type.GetGenericArguments ()) {
 				gTypes.Add (typeof (object));
 			}
+
 			type = type.MakeGenericType (gTypes.ToArray ());
 
 			Assert.IsType (type, (View)Activator.CreateInstance (type));
-
 		} else {
-			ParameterInfo [] paramsInfo = ctor.GetParameters ();
+			var paramsInfo = ctor.GetParameters ();
 			Type paramType;
-			List<object> pTypes = new List<object> ();
+			var pTypes = new List<object> ();
 
 			if (type.IsGenericType) {
 				foreach (var args in type.GetGenericArguments ()) {
@@ -194,7 +192,6 @@ public class AllViewsTests {
 				} else {
 					AddArguments (paramType, pTypes);
 				}
-
 			}
 
 			if (type.IsGenericType && !type.IsTypeDefinition) {
@@ -211,7 +208,7 @@ public class AllViewsTests {
 
 	// BUGBUG: This is a hack. We should figure out how to dynamically
 	// create the right type of argument for the constructor.
-	private static void AddArguments (Type paramType, List<object> pTypes)
+	static void AddArguments (Type paramType, List<object> pTypes)
 	{
 		if (paramType == typeof (Rect)) {
 			pTypes.Add (Rect.Empty);
@@ -241,10 +238,10 @@ public class AllViewsTests {
 		}
 	}
 
-	public static List<Type> GetAllViewClasses ()
-	{
-		return typeof (View).Assembly.GetTypes ()
-			.Where (myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic && myType.IsSubclassOf (typeof (View)))
+	public static List<Type> GetAllViewClasses () =>
+		typeof (View).Assembly.GetTypes ()
+			.Where (myType =>
+				myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
+				myType.IsSubclassOf (typeof (View)))
 			.ToList ();
-	}
 }

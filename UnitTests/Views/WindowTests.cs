@@ -1,5 +1,3 @@
-using System;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -19,6 +17,10 @@ public class WindowTests {
 		// Toplevels have Width/Height set to Dim.Fill
 		Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 		// If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
+		// BUGBUG: IsInitialized is false and no size was provided
+		Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
+		r.BeginInit ();
+		r.EndInit ();
 		Assert.Equal ("Window()(0,0,2147483647,2147483647)", r.ToString ());
 		Assert.True (r.CanFocus);
 		Assert.False (r.HasFocus);
@@ -39,10 +41,8 @@ public class WindowTests {
 		Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 		// Empty Rect
-		r = new Window (Rect.Empty) { Title = "title" };
+		r = new Window { Title = "title", Frame = Rect.Empty };
 		Assert.NotNull (r);
-		Assert.Equal ("title", r.Title);
-		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("title", r.Title);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
 		Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
@@ -65,7 +65,7 @@ public class WindowTests {
 		Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
 		// Rect with values
-		r = new Window (new Rect (1, 2, 3, 4)) { Title = "title" };
+		r = new Window { X = 1, Y = 2, Width = 3, Height = 4, Title = "title" };
 		Assert.Equal ("title", r.Title);
 		Assert.NotNull (r);
 		Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
@@ -95,26 +95,29 @@ public class WindowTests {
 	[AutoInitShutdown]
 	public void MenuBar_And_StatusBar_Inside_Window ()
 	{
-		var menu = new MenuBar (new MenuBarItem [] {
-			new ("File", new MenuItem [] {
-				new ("Open", "", null),
-				new ("Quit", "", null)
-			}),
-			new ("Edit", new MenuItem [] {
-				new ("Copy", "", null)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("File", new MenuItem [] {
+					new("Open", "", null),
+					new("Quit", "", null)
+				}),
+				new MenuBarItem ("Edit", new MenuItem [] {
+					new("Copy", "", null)
+				})
+			]
+		};
 
 		var sb = new StatusBar (new StatusItem [] {
-			new (KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
-			new (KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
-			new (KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
+			new(KeyCode.CtrlMask | KeyCode.Q, "~^Q~ Quit", null),
+			new(KeyCode.CtrlMask | KeyCode.O, "~^O~ Open", null),
+			new(KeyCode.CtrlMask | KeyCode.C, "~^C~ Copy", null)
 		});
 
-		var fv = new FrameView ("Frame View") {
+		var fv = new FrameView {
 			Y = 1,
 			Width = Dim.Fill (),
-			Height = Dim.Fill (1)
+			Height = Dim.Fill (1),
+			Title = "Frame View"
 		};
 		var win = new Window ();
 		win.Add (menu, sb, fv);
@@ -197,11 +200,13 @@ public class WindowTests {
 	[AutoInitShutdown]
 	public void Activating_MenuBar_By_Alt_Key_Does_Not_Throw ()
 	{
-		var menu = new MenuBar (new MenuBarItem [] {
-			new ("Child", new MenuItem [] {
-				new ("_Create Child", "", null)
-			})
-		});
+		var menu = new MenuBar {
+			Menus = [
+				new MenuBarItem ("Child", new MenuItem [] {
+					new("_Create Child", "", null)
+				})
+			]
+		};
 		var win = new Window ();
 		win.Add (menu);
 		Application.Top.Add (win);

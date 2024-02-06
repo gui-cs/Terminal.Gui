@@ -1,28 +1,27 @@
-﻿using System;
-
-namespace Terminal.Gui;
+﻿namespace Terminal.Gui;
 
 /// <summary>
-/// Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
-/// relative to the ending dimension. Integer values are implicitly convertible to
-/// an absolute <see cref="Pos"/>. These objects are created using the static methods Percent,
-/// AnchorEnd, and Center. The <see cref="Pos"/> objects can be combined with the addition and
-/// subtraction operators.
+///         Describes the position of a <see cref="View" /> which can be an absolute value, a percentage, centered, or
+///         relative to the ending dimension. Integer values are implicitly convertible to
+///         an absolute <see cref="Pos" />. These objects are created using the static methods Percent,
+///         AnchorEnd, and Center. The <see cref="Pos" /> objects can be combined with the addition and
+///         subtraction operators.
 /// </summary>
 /// <remarks>
 ///         <para>
-///         Use the <see cref="Pos"/> objects on the X or Y properties of a view to control the position.
+///                 Use the <see cref="Pos" /> objects on the X or Y properties of a view to control the position.
 ///         </para>
 ///         <para>
-///         These can be used to set the absolute position, when merely assigning an
-///         integer value (via the implicit integer to <see cref="Pos"/> conversion), and they can be combined
-///         to produce more useful layouts, like: Pos.Center - 3, which would shift the position
-///         of the <see cref="View"/> 3 characters to the left after centering for example.
+///                 These can be used to set the absolute position, when merely assigning an
+///                 integer value (via the implicit integer to <see cref="Pos" /> conversion), and they can be combined
+///                 to produce more useful layouts, like: Pos.Center - 3, which would shift the position
+///                 of the <see cref="View" /> 3 characters to the left after centering for example.
 ///         </para>
 ///         <para>
-///         Reference coordinates of another view by using the methods Left(View), Right(View), Bottom(View), Top(View).
-///         The X(View) and Y(View) are
-///         aliases to Left(View) and Top(View) respectively.
+///                 Reference coordinates of another view by using the methods Left(View), Right(View), Bottom(View),
+///                 Top(View).
+///                 The X(View) and Y(View) are
+///                 aliases to Left(View) and Top(View) respectively.
 ///         </para>
 ///         <para>
 ///                 <list type="table">
@@ -32,104 +31,114 @@ namespace Terminal.Gui;
 ///                         </listheader>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Function(Func{int})"/>
+///                                         <see cref="Pos.Function(Func{int})" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that computes the position by executing the provided
-///                                 function. The function will be called every time the position is needed.
+///                                         Creates a <see cref="Pos" /> object that computes the position by executing the
+///                                         provided
+///                                         function. The function will be called every time the position is needed.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Percent(float)"/>
+///                                         <see cref="Pos.Percent(float)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that is a percentage of the width or height of the
-///                                 SuperView.
+///                                         Creates a <see cref="Pos" /> object that is a percentage of the width or height
+///                                         of the
+///                                         SuperView.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Anchor(int)"/>
+///                                         <see cref="Pos.Anchor(int)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom)
-///                                 of the dimension,
-///                                 useful to flush the layout from the right or bottom.
+///                                         Creates a <see cref="Pos" /> object that is anchored to the end (right side or
+///                                         bottom)
+///                                         of the dimension,
+///                                         useful to flush the layout from the right or bottom.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Center"/>
+///                                         <see cref="Pos.Center" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.
+///                                         Creates a <see cref="Pos" /> object that can be used to center the
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.At(int)"/>
+///                                         <see cref="Pos.At(int)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that is an absolute position based on the specified
-///                                 integer value.
+///                                         Creates a <see cref="Pos" /> object that is an absolute position based on the
+///                                         specified
+///                                         integer value.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Left"/>
+///                                         <see cref="Pos.Left" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified
-///                                 <see cref="View"/>.
+///                                         Creates a <see cref="Pos" /> object that tracks the Left (X) position of the
+///                                         specified
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.X(View)"/>
+///                                         <see cref="Pos.X(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified
-///                                 <see cref="View"/>.
+///                                         Creates a <see cref="Pos" /> object that tracks the Left (X) position of the
+///                                         specified
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Top(View)"/>
+///                                         <see cref="Pos.Top(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified
-///                                 <see cref="View"/>.
+///                                         Creates a <see cref="Pos" /> object that tracks the Top (Y) position of the
+///                                         specified
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Y(View)"/>
+///                                         <see cref="Pos.Y(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified
-///                                 <see cref="View"/>.
+///                                         Creates a <see cref="Pos" /> object that tracks the Top (Y) position of the
+///                                         specified
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Right(View)"/>
+///                                         <see cref="Pos.Right(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the
-///                                 specified <see cref="View"/>.
+///                                         Creates a <see cref="Pos" /> object that tracks the Right (X+Width) coordinate
+///                                         of the
+///                                         specified <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Pos.Bottom(View)"/>
+///                                         <see cref="Pos.Bottom(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the
-///                                 specified <see cref="View"/>
+///                                         Creates a <see cref="Pos" /> object that tracks the Bottom (Y+Height)
+///                                         coordinate of the
+///                                         specified <see cref="View" />
 ///                                 </description>
 ///                         </item>
-/// 
 ///                 </list>
 ///         </para>
 /// </remarks>
@@ -137,23 +146,24 @@ public class Pos {
 	internal virtual int Anchor (int width) => 0;
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that computes the position by executing the provided function. The function will be
-	/// called every time the position is needed.
+	///         Creates a <see cref="Pos" /> object that computes the position by executing the provided function. The function
+	///         will be
+	///         called every time the position is needed.
 	/// </summary>
 	/// <param name="function">The function to be executed.</param>
-	/// <returns>The <see cref="Pos"/> returned from the function.</returns>
+	/// <returns>The <see cref="Pos" /> returned from the function.</returns>
 	public static Pos Function (Func<int> function) => new PosFunc (function);
 
 	/// <summary>
-	/// Creates a percentage <see cref="Pos"/> object
+	///         Creates a percentage <see cref="Pos" /> object
 	/// </summary>
-	/// <returns>The percent <see cref="Pos"/> object.</returns>
+	/// <returns>The percent <see cref="Pos" /> object.</returns>
 	/// <param name="n">A value between 0 and 100 representing the percentage.</param>
 	/// <example>
-	/// This creates a <see cref="TextField"/>that is centered horizontally, is 50% of the way down,
-	/// is 30% the height, and is 80% the width of the <see cref="View"/> it added to.
-	/// <code>
-	///  var textView = new TextView () {
+	///         This creates a <see cref="TextField" />that is centered horizontally, is 50% of the way down,
+	///         is 30% the height, and is 80% the width of the <see cref="View" /> it added to.
+	///         <code>
+	///  var textView = new TextView {
 	/// 	X = Pos.Center (),
 	/// 	Y = Pos.Percent (50),
 	/// 	Width = Dim.Percent (80),
@@ -171,14 +181,14 @@ public class Pos {
 	}
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that is anchored to the end (right side or bottom) of the dimension,
-	/// useful to flush the layout from the right or bottom.
+	///         Creates a <see cref="Pos" /> object that is anchored to the end (right side or bottom) of the dimension,
+	///         useful to flush the layout from the right or bottom.
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> object anchored to the end (the bottom or the right side).</returns>
+	/// <returns>The <see cref="Pos" /> object anchored to the end (the bottom or the right side).</returns>
 	/// <param name="offset">The view will be shifted left or up by the amount specified.</param>
 	/// <example>
-	/// This sample shows how align a <see cref="Button"/> to the bottom-right of a <see cref="View"/>.
-	/// <code>
+	///         This sample shows how align a <see cref="Button" /> to the bottom-right of a <see cref="View" />.
+	///         <code>
 	/// // See Issue #502 
 	/// anchorButton.X = Pos.AnchorEnd () - (Pos.Right (anchorButton) - Pos.Left (anchorButton));
 	/// anchorButton.Y = Pos.AnchorEnd (1);
@@ -194,14 +204,14 @@ public class Pos {
 	}
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.
+	///         Creates a <see cref="Pos" /> object that can be used to center the <see cref="View" />.
 	/// </summary>
 	/// <returns>The center Pos.</returns>
 	/// <example>
-	/// This creates a <see cref="TextField"/>that is centered horizontally, is 50% of the way down,
-	/// is 30% the height, and is 80% the width of the <see cref="View"/> it added to.
-	/// <code>
-	///  var textView = new TextView () {
+	///         This creates a <see cref="TextField" />that is centered horizontally, is 50% of the way down,
+	///         is 30% the height, and is 80% the width of the <see cref="View" /> it added to.
+	///         <code>
+	///  var textView = new TextView {
 	/// 	X = Pos.Center (),
 	/// 	Y = Pos.Percent (50),
 	/// 	Width = Dim.Percent (80),
@@ -212,46 +222,49 @@ public class Pos {
 	public static Pos Center () => new PosCenter ();
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that is an absolute position based on the specified integer value.
+	///         Creates a <see cref="Pos" /> object that is an absolute position based on the specified integer value.
 	/// </summary>
-	/// <returns>The Absolute <see cref="Pos"/>.</returns>
-	/// <param name="n">The value to convert to the <see cref="Pos"/>.</param>
+	/// <returns>The Absolute <see cref="Pos" />.</returns>
+	/// <param name="n">The value to convert to the <see cref="Pos" />.</param>
 	public static Pos At (int n) => new PosAbsolute (n);
 
 	/// <summary>
-	/// Creates an Absolute <see cref="Pos"/> from the specified integer value.
+	///         Creates an Absolute <see cref="Pos" /> from the specified integer value.
 	/// </summary>
-	/// <returns>The Absolute <see cref="Pos"/>.</returns>
-	/// <param name="n">The value to convert to the <see cref="Pos"/> .</param>
+	/// <returns>The Absolute <see cref="Pos" />.</returns>
+	/// <param name="n">The value to convert to the <see cref="Pos" /> .</param>
 	public static implicit operator Pos (int n) => new PosAbsolute (n);
 
 	/// <summary>
-	/// Adds a <see cref="Terminal.Gui.Pos"/> to a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
+	///         Adds a <see cref="Terminal.Gui.Pos" /> to a <see cref="Terminal.Gui.Pos" />, yielding a new <see cref="Pos" />.
 	/// </summary>
-	/// <param name="left">The first <see cref="Terminal.Gui.Pos"/> to add.</param>
-	/// <param name="right">The second <see cref="Terminal.Gui.Pos"/> to add.</param>
-	/// <returns>The <see cref="Pos"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+	/// <param name="left">The first <see cref="Terminal.Gui.Pos" /> to add.</param>
+	/// <param name="right">The second <see cref="Terminal.Gui.Pos" /> to add.</param>
+	/// <returns>The <see cref="Pos" /> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 	public static Pos operator + (Pos left, Pos right)
 	{
 		if (left is PosAbsolute && right is PosAbsolute) {
 			return new PosAbsolute (left.Anchor (0) + right.Anchor (0));
 		}
+
 		var newPos = new PosCombine (true, left, right);
 		SetPosCombine (left, newPos);
 		return newPos;
 	}
 
 	/// <summary>
-	/// Subtracts a <see cref="Terminal.Gui.Pos"/> from a <see cref="Terminal.Gui.Pos"/>, yielding a new <see cref="Pos"/>.
+	///         Subtracts a <see cref="Terminal.Gui.Pos" /> from a <see cref="Terminal.Gui.Pos" />, yielding a new
+	///         <see cref="Pos" />.
 	/// </summary>
-	/// <param name="left">The <see cref="Terminal.Gui.Pos"/> to subtract from (the minuend).</param>
-	/// <param name="right">The <see cref="Terminal.Gui.Pos"/> to subtract (the subtrahend).</param>
-	/// <returns>The <see cref="Pos"/> that is the <c>left</c> minus <c>right</c>.</returns>
+	/// <param name="left">The <see cref="Terminal.Gui.Pos" /> to subtract from (the minuend).</param>
+	/// <param name="right">The <see cref="Terminal.Gui.Pos" /> to subtract (the subtrahend).</param>
+	/// <returns>The <see cref="Pos" /> that is the <c>left</c> minus <c>right</c>.</returns>
 	public static Pos operator - (Pos left, Pos right)
 	{
 		if (left is PosAbsolute && right is PosAbsolute) {
 			return new PosAbsolute (left.Anchor (0) - right.Anchor (0));
 		}
+
 		var newPos = new PosCombine (false, left, right);
 		SetPosCombine (left, newPos);
 		return newPos;
@@ -266,45 +279,47 @@ public class Pos {
 	}
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
+	///         Creates a <see cref="Pos" /> object that tracks the Left (X) position of the specified <see cref="View" />.
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+	/// <returns>The <see cref="Pos" /> that depends on the other view.</returns>
+	/// <param name="view">The <see cref="View" />  that will be tracked.</param>
 	public static Pos Left (View view) => new PosView (view, 0);
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Left (X) position of the specified <see cref="View"/>.
+	///         Creates a <see cref="Pos" /> object that tracks the Left (X) position of the specified <see cref="View" />.
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+	/// <returns>The <see cref="Pos" /> that depends on the other view.</returns>
+	/// <param name="view">The <see cref="View" />  that will be tracked.</param>
 	public static Pos X (View view) => new PosView (view, 0);
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.
+	///         Creates a <see cref="Pos" /> object that tracks the Top (Y) position of the specified <see cref="View" />.
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+	/// <returns>The <see cref="Pos" /> that depends on the other view.</returns>
+	/// <param name="view">The <see cref="View" />  that will be tracked.</param>
 	public static Pos Top (View view) => new PosView (view, 1);
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Top (Y) position of the specified <see cref="View"/>.
+	///         Creates a <see cref="Pos" /> object that tracks the Top (Y) position of the specified <see cref="View" />.
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+	/// <returns>The <see cref="Pos" /> that depends on the other view.</returns>
+	/// <param name="view">The <see cref="View" />  that will be tracked.</param>
 	public static Pos Y (View view) => new PosView (view, 1);
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Right (X+Width) coordinate of the specified <see cref="View"/>.
+	///         Creates a <see cref="Pos" /> object that tracks the Right (X+Width) coordinate of the specified
+	///         <see cref="View" />.
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+	/// <returns>The <see cref="Pos" /> that depends on the other view.</returns>
+	/// <param name="view">The <see cref="View" />  that will be tracked.</param>
 	public static Pos Right (View view) => new PosView (view, 2);
 
 	/// <summary>
-	/// Creates a <see cref="Pos"/> object that tracks the Bottom (Y+Height) coordinate of the specified <see cref="View"/>
+	///         Creates a <see cref="Pos" /> object that tracks the Bottom (Y+Height) coordinate of the specified
+	///         <see cref="View" />
 	/// </summary>
-	/// <returns>The <see cref="Pos"/> that depends on the other view.</returns>
-	/// <param name="view">The <see cref="View"/>  that will be tracked.</param>
+	/// <returns>The <see cref="Pos" /> that depends on the other view.</returns>
+	/// <param name="view">The <see cref="View" />  that will be tracked.</param>
 	public static Pos Bottom (View view) => new PosView (view, 3);
 
 	/// <summary>Serves as the default hash function. </summary>
@@ -314,7 +329,8 @@ public class Pos {
 	/// <summary>Determines whether the specified object is equal to the current object.</summary>
 	/// <param name="other">The object to compare with the current object. </param>
 	/// <returns>
-	/// <see langword="true"/> if the specified object  is equal to the current object; otherwise, <see langword="false"/>.
+	///         <see langword="true" /> if the specified object  is equal to the current object; otherwise,
+	///         <see langword="false" />.
 	/// </returns>
 	public override bool Equals (object other) => other is Pos abs && abs == this;
 
@@ -358,7 +374,8 @@ public class Pos {
 
 		public override int GetHashCode () => _offset.GetHashCode ();
 
-		public override bool Equals (object other) => other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset;
+		public override bool Equals (object other) =>
+			other is PosAnchorEnd anchorEnd && anchorEnd._offset == _offset;
 	}
 
 	internal class PosAbsolute : Pos {
@@ -398,6 +415,7 @@ public class Pos {
 			if (_add) {
 				return la + ra;
 			}
+
 			return la - ra;
 		}
 
@@ -405,18 +423,18 @@ public class Pos {
 	}
 
 	internal class PosView : Pos {
-		readonly int side;
+		readonly int _side;
 		public readonly View Target;
 
 		public PosView (View view, int side)
 		{
 			Target = view;
-			this.side = side;
+			_side = side;
 		}
 
 		internal override int Anchor (int width)
 		{
-			switch (side) {
+			switch (_side) {
 			case 0: return Target.Frame.X;
 			case 1: return Target.Frame.Y;
 			case 2: return Target.Frame.Right;
@@ -429,7 +447,7 @@ public class Pos {
 		public override string ToString ()
 		{
 			string tside;
-			switch (side) {
+			switch (_side) {
 			case 0:
 				tside = "x";
 				break;
@@ -446,9 +464,11 @@ public class Pos {
 				tside = "unknown";
 				break;
 			}
+
 			if (Target == null) {
 				throw new NullReferenceException (nameof (Target));
 			}
+
 			return $"View(side={tside},target={Target})";
 		}
 
@@ -460,16 +480,18 @@ public class Pos {
 
 /// <summary>
 ///         <para>
-///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the <see cref="View.Width"/>
-///         and
-///         <see cref="View.Height"/> properties of <see cref="View"/>. Dim objects enable Computed Layout (see
-///         <see cref="LayoutStyle.Computed"/>)
-///         to automatically manage the dimensions of a view.
+///                 A Dim object describes the dimensions of a <see cref="View" />. Dim is the type of the
+///                 <see cref="View.Width" />
+///                 and
+///                 <see cref="View.Height" /> properties of <see cref="View" />. Dim objects enable Computed Layout (see
+///                 <see cref="LayoutStyle.Computed" />)
+///                 to automatically manage the dimensions of a view.
 ///         </para>
 ///         <para>
-///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using the
-///         static methods described below.
-///         The <see cref="Dim"/> objects can be combined with the addition and subtraction operators.
+///                 Integer values are implicitly convertible to an absolute <see cref="Dim" />. These objects are created
+///                 using the
+///                 static methods described below.
+///                 The <see cref="Dim" /> objects can be combined with the addition and subtraction operators.
 ///         </para>
 /// </summary>
 /// <remarks>
@@ -481,47 +503,51 @@ public class Pos {
 ///                         </listheader>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Dim.Function(Func{int})"/>
+///                                         <see cref="Dim.Function(Func{int})" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Dim"/> object that computes the dimension by executing the
-///                                 provided function. The function will be called every time the dimension is needed.
+///                                         Creates a <see cref="Dim" /> object that computes the dimension by executing
+///                                         the
+///                                         provided function. The function will be called every time the dimension is
+///                                         needed.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Dim.Percent(float, bool)"/>
+///                                         <see cref="Dim.Percent(float, bool)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Dim"/> object that is a percentage of the width or height of the
-///                                 SuperView.
+///                                         Creates a <see cref="Dim" /> object that is a percentage of the width or height
+///                                         of the
+///                                         SuperView.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Dim.Fill(int)"/>
+///                                         <see cref="Dim.Fill(int)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified
-///                                 number of columns for a margin.
+///                                         Creates a <see cref="Dim" /> object that fills the dimension, leaving the
+///                                         specified
+///                                         number of columns for a margin.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Dim.Width(View)"/>
+///                                         <see cref="Dim.Width(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Dim"/> object that tracks the Width of the specified
-///                                 <see cref="View"/>.
+///                                         Creates a <see cref="Dim" /> object that tracks the Width of the specified
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                         <item>
 ///                                 <term>
-///                                         <see cref="Dim.Height(View)"/>
+///                                         <see cref="Dim.Height(View)" />
 ///                                 </term>
 ///                                 <description>
-///                                 Creates a <see cref="Dim"/> object that tracks the Height of the specified
-///                                 <see cref="View"/>.
+///                                         Creates a <see cref="Dim" /> object that tracks the Height of the specified
+///                                         <see cref="View" />.
 ///                                 </description>
 ///                         </item>
 ///                 </list>
@@ -533,27 +559,27 @@ public class Dim {
 	internal virtual int Anchor (int width) => 0;
 
 	/// <summary>
-	/// Creates a function <see cref="Dim"/> object that computes the dimension by executing the provided function.
-	/// The function will be called every time the dimension is needed.
+	///         Creates a function <see cref="Dim" /> object that computes the dimension by executing the provided function.
+	///         The function will be called every time the dimension is needed.
 	/// </summary>
 	/// <param name="function">The function to be executed.</param>
-	/// <returns>The <see cref="Dim"/> returned from the function.</returns>
+	/// <returns>The <see cref="Dim" /> returned from the function.</returns>
 	public static Dim Function (Func<int> function) => new DimFunc (function);
 
 	/// <summary>
-	/// Creates a percentage <see cref="Dim"/> object that is a percentage of the width or height of the SuperView.
+	///         Creates a percentage <see cref="Dim" /> object that is a percentage of the width or height of the SuperView.
 	/// </summary>
-	/// <returns>The percent <see cref="Dim"/> object.</returns>
+	/// <returns>The percent <see cref="Dim" /> object.</returns>
 	/// <param name="n">A value between 0 and 100 representing the percentage.</param>
 	/// <param name="r">
-	/// If <c>true</c> the Percent is computed based on the remaining space after the X/Y anchor positions.
-	/// If <c>false</c> is computed based on the whole original space.
+	///         If <c>true</c> the Percent is computed based on the remaining space after the X/Y anchor positions.
+	///         If <c>false</c> is computed based on the whole original space.
 	/// </param>
 	/// <example>
-	/// This initializes a <see cref="TextField"/>that is centered horizontally, is 50% of the way down,
-	/// is 30% the height, and is 80% the width of the <see cref="View"/> it added to.
-	/// <code>
-	///  var textView = new TextView () {
+	///         This initializes a <see cref="TextView" />that is centered horizontally, is 50% of the way down,
+	///         is 30% the height, and is 80% the width of the <see cref="View" /> it added to.
+	///         <code>
+	///  var textView = new TextView {
 	/// 	X = Pos.Center (),
 	/// 	Y = Pos.Percent (50),
 	/// 	Width = Dim.Percent (80),
@@ -571,53 +597,57 @@ public class Dim {
 	}
 
 	/// <summary>
-	/// Creates a <see cref="Dim"/> object that fills the dimension, leaving the specified number of columns for a margin.
+	///         Creates a <see cref="Dim" /> object that fills the dimension, leaving the specified number of columns for a
+	///         margin.
 	/// </summary>
 	/// <returns>The Fill dimension.</returns>
 	/// <param name="margin">Margin to use.</param>
 	public static Dim Fill (int margin = 0) => new DimFill (margin);
 
 	/// <summary>
-	/// Creates an Absolute <see cref="Dim"/> from the specified integer value.
+	///         Creates an Absolute <see cref="Dim" /> from the specified integer value.
 	/// </summary>
-	/// <returns>The Absolute <see cref="Dim"/>.</returns>
+	/// <returns>The Absolute <see cref="Dim" />.</returns>
 	/// <param name="n">The value to convert to the pos.</param>
 	public static implicit operator Dim (int n) => new DimAbsolute (n);
 
 	/// <summary>
-	/// Creates an Absolute <see cref="Dim"/> from the specified integer value.
+	///         Creates an Absolute <see cref="Dim" /> from the specified integer value.
 	/// </summary>
-	/// <returns>The Absolute <see cref="Dim"/>.</returns>
-	/// <param name="n">The value to convert to the <see cref="Dim"/>.</param>
+	/// <returns>The Absolute <see cref="Dim" />.</returns>
+	/// <param name="n">The value to convert to the <see cref="Dim" />.</param>
 	public static Dim Sized (int n) => new DimAbsolute (n);
 
 	/// <summary>
-	/// Adds a <see cref="Terminal.Gui.Dim"/> to a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
+	///         Adds a <see cref="Terminal.Gui.Dim" /> to a <see cref="Terminal.Gui.Dim" />, yielding a new <see cref="Dim" />.
 	/// </summary>
-	/// <param name="left">The first <see cref="Terminal.Gui.Dim"/> to add.</param>
-	/// <param name="right">The second <see cref="Terminal.Gui.Dim"/> to add.</param>
-	/// <returns>The <see cref="Dim"/> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
+	/// <param name="left">The first <see cref="Terminal.Gui.Dim" /> to add.</param>
+	/// <param name="right">The second <see cref="Terminal.Gui.Dim" /> to add.</param>
+	/// <returns>The <see cref="Dim" /> that is the sum of the values of <c>left</c> and <c>right</c>.</returns>
 	public static Dim operator + (Dim left, Dim right)
 	{
 		if (left is DimAbsolute && right is DimAbsolute) {
 			return new DimAbsolute (left.Anchor (0) + right.Anchor (0));
 		}
+
 		var newDim = new DimCombine (true, left, right);
 		SetDimCombine (left, newDim);
 		return newDim;
 	}
 
 	/// <summary>
-	/// Subtracts a <see cref="Terminal.Gui.Dim"/> from a <see cref="Terminal.Gui.Dim"/>, yielding a new <see cref="Dim"/>.
+	///         Subtracts a <see cref="Terminal.Gui.Dim" /> from a <see cref="Terminal.Gui.Dim" />, yielding a new
+	///         <see cref="Dim" />.
 	/// </summary>
-	/// <param name="left">The <see cref="Terminal.Gui.Dim"/> to subtract from (the minuend).</param>
-	/// <param name="right">The <see cref="Terminal.Gui.Dim"/> to subtract (the subtrahend).</param>
-	/// <returns>The <see cref="Dim"/> that is the <c>left</c> minus <c>right</c>.</returns>
+	/// <param name="left">The <see cref="Terminal.Gui.Dim" /> to subtract from (the minuend).</param>
+	/// <param name="right">The <see cref="Terminal.Gui.Dim" /> to subtract (the subtrahend).</param>
+	/// <returns>The <see cref="Dim" /> that is the <c>left</c> minus <c>right</c>.</returns>
 	public static Dim operator - (Dim left, Dim right)
 	{
 		if (left is DimAbsolute && right is DimAbsolute) {
 			return new DimAbsolute (left.Anchor (0) - right.Anchor (0));
 		}
+
 		var newDim = new DimCombine (false, left, right);
 		SetDimCombine (left, newDim);
 		return newDim;
@@ -627,16 +657,16 @@ public class Dim {
 	static void SetDimCombine (Dim left, DimCombine newPos) => (left as DimView)?.Target.SetNeedsLayout ();
 
 	/// <summary>
-	/// Creates a <see cref="Dim"/> object that tracks the Width of the specified <see cref="View"/>.
+	///         Creates a <see cref="Dim" /> object that tracks the Width of the specified <see cref="View" />.
 	/// </summary>
-	/// <returns>The width <see cref="Dim"/> of the other <see cref="View"/>.</returns>
+	/// <returns>The width <see cref="Dim" /> of the other <see cref="View" />.</returns>
 	/// <param name="view">The view that will be tracked.</param>
 	public static Dim Width (View view) => new DimView (view, 1);
 
 	/// <summary>
-	/// Creates a <see cref="Dim"/> object that tracks the Height of the specified <see cref="View"/>.
+	///         Creates a <see cref="Dim" /> object that tracks the Height of the specified <see cref="View" />.
 	/// </summary>
-	/// <returns>The height <see cref="Dim"/> of the other <see cref="View"/>.</returns>
+	/// <returns>The height <see cref="Dim" /> of the other <see cref="View" />.</returns>
 	/// <param name="view">The view that will be tracked.</param>
 	public static Dim Height (View view) => new DimView (view, 0);
 
@@ -647,7 +677,8 @@ public class Dim {
 	/// <summary>Determines whether the specified object is equal to the current object.</summary>
 	/// <param name="other">The object to compare with the current object. </param>
 	/// <returns>
-	/// <see langword="true"/> if the specified object  is equal to the current object; otherwise, <see langword="false"/>.
+	///         <see langword="true" /> if the specified object  is equal to the current object; otherwise,
+	///         <see langword="false" />.
 	/// </returns>
 	public override bool Equals (object other) => other is Dim abs && abs == this;
 
@@ -684,7 +715,8 @@ public class Dim {
 
 		public override int GetHashCode () => _factor.GetHashCode ();
 
-		public override bool Equals (object other) => other is DimFactor f && f._factor == _factor && f._remaining == _remaining;
+		public override bool Equals (object other) =>
+			other is DimFactor f && f._factor == _factor && f._remaining == _remaining;
 	}
 
 
@@ -732,6 +764,7 @@ public class Dim {
 			if (_add) {
 				return la + ra;
 			}
+
 			return la - ra;
 		}
 
@@ -760,6 +793,7 @@ public class Dim {
 			if (Target == null) {
 				throw new NullReferenceException ();
 			}
+
 			var tside = _side switch {
 				0 => "Height",
 				1 => "Width",
