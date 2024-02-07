@@ -130,10 +130,6 @@ public class WindowTests {
         Assert.Equal (LayoutStyle.Computed, r.LayoutStyle);
 
         // If there's no SuperView, Top, or Driver, the default Fill width is int.MaxValue
-        // BUGBUG: IsInitialized is false and no size was provided
-        Assert.Equal ("Window()(0,0,0,0)", r.ToString ());
-        r.BeginInit ();
-        r.EndInit ();
         Assert.Equal ("Window()(0,0,2147483647,2147483647)", r.ToString ());
         Assert.True (r.CanFocus);
         Assert.False (r.HasFocus);
@@ -154,8 +150,10 @@ public class WindowTests {
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
         // Empty Rect
-        r = new Window { Title = "title", Frame = Rect.Empty };
+        r = new Window { Frame = Rect.Empty, Title = "title" };
         Assert.NotNull (r);
+        Assert.Equal ("title", r.Title);
+        Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ("title", r.Title);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
         Assert.Equal ("Window(title)(0,0,0,0)", r.ToString ());
@@ -178,7 +176,7 @@ public class WindowTests {
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
 
         // Rect with values
-        r = new Window { X = 1, Y = 2, Width = 3, Height = 4, Title = "title" };
+        r = new Window { Frame = new Rect (1, 2, 3, 4), Title = "title" };
         Assert.Equal ("title", r.Title);
         Assert.NotNull (r);
         Assert.Equal (LayoutStyle.Absolute, r.LayoutStyle);
@@ -203,7 +201,7 @@ public class WindowTests {
         Assert.Equal (TextDirection.LeftRight_TopBottom, r.TextDirection);
         r.Dispose ();
     }
-
+    
     [Fact]
     [AutoInitShutdown]
     public void OnCanFocusChanged_Only_Must_ContentView_Forces_SetFocus_After_IsInitialized_Is_True () {

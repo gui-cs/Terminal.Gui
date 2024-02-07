@@ -812,44 +812,16 @@ public class DialogTests {
 
         win.Loaded += (s, a) => {
             var dlg = new Dialog { Width = 18, Height = 3 };
-
-            // BUGBUG: Only PosAbsolute and DimAbsolute are available before IsInitialized
-            Assert.Equal ("(0,0,18,3)", dlg.Frame.ToString ());
-            Assert.Equal ("(0,0,16,1)", dlg.Bounds.ToString ());
+            Assert.Equal (16, dlg.Bounds.Width);
 
             Button btn = null;
             btn = new Button {
-                                 X = Pos.AnchorEnd () - Pos.Function (Btn_Width),
-                                 Text = "Ok"
-                             };
-            dlg.SetRelativeLayout (new Rect (0, 0, Driver.Cols, Driver.Rows));
-
-            // Now dlg Pos/Dim was calculated
-            Assert.Equal (16, dlg.Bounds.Width);
-            Assert.Equal (1, dlg.Bounds.Height);
-            Assert.Equal (18, dlg.Frame.Width);
-            Assert.Equal (3, dlg.Frame.Height);
-            Assert.Equal (1, dlg.Frame.X);
-            Assert.Equal (1, dlg.Frame.Y);
-            btn.SetRelativeLayout (dlg.Bounds);
-
-            // BUGBUG: IsInitialized is false
-            // and thus the btn.Bounds.Width is 0
-            // on the Btn_Width method
-            // calculating the wrong value
-            // dlg.Bounds.Width (16) - btn.Bounds.Width (0) = 16
-            Assert.False (btn.IsInitialized);
-            Assert.Equal (16, btn.Frame.X);
-
-            // Now btn.Bounds.Width has
-            // the correct value of 6
-            Assert.Equal (6, btn.Bounds.Width);
-            btn.BeginInit ();
-            btn.EndInit ();
+                Text = "Ok",
+                X = Pos.AnchorEnd () - Pos.Function (Btn_Width)
+            };
             btn.SetRelativeLayout (dlg.Bounds);
             Assert.Equal (6, btn.Bounds.Width);
-            Assert.Equal (6, btn.Frame.Width);
-            Assert.Equal (10, btn.Frame.X); // dlg.Bounds.Width (16) - btn.Bounds.Width (6) = 10
+            Assert.Equal (10, btn.Frame.X); // dlg.Bounds.Width (16) - btn.Frame.Width (6) = 10
             Assert.Equal (0, btn.Frame.Y);
             Assert.Equal (6, btn.Frame.Width);
             Assert.Equal (1, btn.Frame.Height);
@@ -857,15 +829,14 @@ public class DialogTests {
             int Btn_Width () { return btn?.Bounds.Width ?? 0; }
 
             var tf = new TextField {
-                                       // Dim.Fill (1) fills remaining space minus 1
-                                       // Dim.Function (Btn_Width) is 6
-                                       Width = Dim.Fill (1) - Dim.Function (Btn_Width),
-                                       Text = "01234567890123456789"
-                                   };
+                Text = "01234567890123456789",
+
+                // Dim.Fill (1) fills remaining space minus 1
+                // Dim.Function (Btn_Width) is 6
+                Width = Dim.Fill (1) - Dim.Function (Btn_Width)
+            };
             tf.SetRelativeLayout (dlg.Bounds);
-            Assert.Equal (
-                          9,
-                          tf.Bounds.Width); // dlg.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
+            Assert.Equal (9, tf.Bounds.Width); // dlg.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
             Assert.Equal (0, tf.Frame.X);
             Assert.Equal (0, tf.Frame.Y);
             Assert.Equal (9, tf.Frame.Width);
@@ -879,7 +850,7 @@ public class DialogTests {
                 var expected = @"
 ┌──────────────────┐
 │┌────────────────┐│
-││23456789  ⟦ Ok ⟧││
+││012345678 ⟦ Ok ⟧││
 │└────────────────┘│
 └──────────────────┘";
 
@@ -893,7 +864,7 @@ public class DialogTests {
                 expected = @"
 ┌──────────────────┐
 │┌────────────────┐│
-││23456789  ⟦ Ok ⟧││
+││012345678 ⟦ Ok ⟧││
 │└────────────────┘│
 └──────────────────┘";
                 _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
@@ -965,7 +936,9 @@ public class DialogTests {
         Iteration += (s, a) => {
             iterations++;
             if (iterations == 0) {
-                var dlg = new Dialog { Buttons =  [new Button { Text = "Ok" }] };
+                var dlg = new Dialog {
+                                         Buttons = [new Button () { Text = "Ok" }]
+                };
                 Run (dlg);
             } else if (iterations == 1) {
                 // BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No

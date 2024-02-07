@@ -138,15 +138,7 @@ public static class MessageBox {
         bool wrapMessagge = true,
         params string[] buttons
     ) {
-        return QueryFull (
-                          true,
-                          width,
-                          height,
-                          title,
-                          message,
-                          defaultButton,
-                          wrapMessagge,
-                          buttons);
+        return QueryFull (true, width, height, title, message, defaultButton, wrapMessagge, buttons);
     }
 
     /// <summary>
@@ -275,15 +267,7 @@ public static class MessageBox {
         bool wrapMessagge = true,
         params string[] buttons
     ) {
-        return QueryFull (
-                          false,
-                          width,
-                          height,
-                          title,
-                          message,
-                          defaultButton,
-                          wrapMessagge,
-                          buttons);
+        return QueryFull (false, width, height, title, message, defaultButton, wrapMessagge, buttons);
     }
 
     /// <summary>
@@ -341,12 +325,12 @@ public static class MessageBox {
 
         Dialog d;
         d = new Dialog {
-                           Title = title,
-                           BorderStyle = DefaultBorderStyle,
-                           Width = Dim.Percent (60),
-                           Height = 5, // Border + one line of text + vspace + buttons
-                           Buttons = buttonList.ToArray ()
-                       };
+            Buttons = buttonList.ToArray (),
+            Title = title,
+            BorderStyle = DefaultBorderStyle,
+            Width = Dim.Percent (60),
+            Height = 5 // Border + one line of text + vspace + buttons
+        };
 
         if (width != 0) {
             d.Width = width;
@@ -363,16 +347,20 @@ public static class MessageBox {
         }
 
         var messageLabel = new Label {
-                                         AutoSize = wrapMessage ? false : true,
-                                         Text = message,
-                                         TextAlignment = TextAlignment.Centered,
-                                         X = 0,
-                                         Y = 0,
-                                         Width = Dim.Fill (),
-                                         Height = Dim.Fill (1)
-                                     };
+            AutoSize = !wrapMessage,
+            Text = message,
+            TextAlignment = TextAlignment.Centered,
+            X = Pos.Center (),
+            Y = 0
+        };
+
+        if (!messageLabel.AutoSize) {
+            messageLabel.Width = Dim.Fill ();
+            messageLabel.Height = Dim.Fill (1);
+        }
+
         messageLabel.TextFormatter.WordWrap = wrapMessage;
-        messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
+        messageLabel.TextFormatter.MultiLine = !wrapMessage;
         d.Add (messageLabel);
 
         d.Loaded += (s, e) => {
@@ -398,18 +386,23 @@ public static class MessageBox {
                                      width,
                                      Math.Max (
                                                messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
-                                               d.GetButtonsWidth () + d.Buttons.Length +
-                                               d.GetAdornmentsThickness ().Horizontal));
+                                               d.GetButtonsWidth () + d.Buttons.Length + d.GetAdornmentsThickness ().Horizontal));
             if (newWidth > d.Frame.Width) {
                 d.Width = newWidth;
             }
 
             // Ensure height fits the text + vspace + buttons
-            string lastLine = messageLabel.TextFormatter.GetLines ()[^1];
-            d.Height = Math.Max (
-                                 height,
-                                 messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) +
-                                 d.GetAdornmentsThickness ().Vertical);
+            if (messageSize.Height == 0) {
+                d.Height = Math.Max (height, 3 + d.GetAdornmentsThickness ().Vertical);
+            } else {
+                string lastLine = messageLabel.TextFormatter.GetLines ()[^1];
+                d.Height = Math.Max (
+                                     height,
+                                     messageSize.Height
+                                     + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
+                                     + d.GetAdornmentsThickness ().Vertical);
+            }
+
             d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
         };
 

@@ -9,13 +9,8 @@ public class ScrollViewTests {
 
     [Fact]
     public void Adding_Views () {
-        var sv = new ScrollView {
-                                    Width = 20,
-                                    Height = 10,
-                                    ContentSize = new Size (30, 20)
-                                };
-        sv.Add (
-                new View { Width = 10, Height = 5 },
+        var sv = new ScrollView { Width = 20, Height = 10, ContentSize = new Size (30, 20) };
+        sv.Add (new View { Width = 10, Height = 5 },
                 new View { X = 12, Y = 7, Width = 10, Height = 5 });
 
         Assert.Equal (new Size (30, 20), sv.ContentSize);
@@ -25,11 +20,7 @@ public class ScrollViewTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoHideScrollBars_False_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator () {
-        var sv = new ScrollView {
-                                    Width = 10,
-                                    Height = 10,
-                                    AutoHideScrollBars = false
-                                };
+        var sv = new ScrollView { Width = 10, Height = 10, AutoHideScrollBars = false };
 
         sv.ShowHorizontalScrollIndicator = true;
         sv.ShowVerticalScrollIndicator = true;
@@ -43,8 +34,7 @@ public class ScrollViewTests {
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);
         sv.Draw ();
-        TestHelpers.AssertDriverContentsAre (
-                                             @"
+        TestHelpers.AssertDriverContentsAre (@"
          ▲
          ┬
          │
@@ -67,8 +57,7 @@ public class ScrollViewTests {
         Assert.False (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);
         sv.Draw ();
-        TestHelpers.AssertDriverContentsAre (
-                                             @"
+        TestHelpers.AssertDriverContentsAre (@"
          ▲
          ┬
          │
@@ -89,8 +78,7 @@ public class ScrollViewTests {
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.False (sv.ShowVerticalScrollIndicator);
         sv.Draw ();
-        TestHelpers.AssertDriverContentsAre (
-                                             @"
+        TestHelpers.AssertDriverContentsAre (@"
          
          
          
@@ -111,8 +99,7 @@ public class ScrollViewTests {
         Assert.False (sv.ShowHorizontalScrollIndicator);
         Assert.False (sv.ShowVerticalScrollIndicator);
         sv.Draw ();
-        TestHelpers.AssertDriverContentsAre (
-                                             @"
+        TestHelpers.AssertDriverContentsAre (@"
          
          
          
@@ -130,10 +117,7 @@ public class ScrollViewTests {
     [Fact]
     [AutoInitShutdown]
     public void AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator () {
-        var sv = new ScrollView {
-                                    Width = 10,
-                                    Height = 10
-                                };
+        var sv = new ScrollView { Width = 10, Height = 10 };
 
         Application.Top.Add (sv);
         Application.Begin (Application.Top);
@@ -148,8 +132,7 @@ public class ScrollViewTests {
         sv.ShowVerticalScrollIndicator = true;
         sv.LayoutSubviews ();
         sv.Draw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
          ▲
          ┬
          │
@@ -181,8 +164,7 @@ public class ScrollViewTests {
         Application.Top.Add (topLabel, sv, bottomLabel);
         Application.Begin (Application.Top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
                At 15,0 
                        
                        
@@ -201,14 +183,13 @@ public class ScrollViewTests {
                At 15,15",
                                                       _output);
 
-        Attribute[] attributes = new[] {
-                                           Colors.ColorSchemes["TopLevel"].Normal,
-                                           Colors.ColorSchemes["TopLevel"].Focus,
-                                           Colors.ColorSchemes["Base"].Normal
-                                       };
+        Attribute[] attributes = {
+                                     Colors.ColorSchemes["TopLevel"].Normal,
+                                     Colors.ColorSchemes["TopLevel"].Focus,
+                                     Colors.ColorSchemes["Base"].Normal
+                                 };
 
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
+        TestHelpers.AssertDriverAttributesAre (@"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -231,8 +212,7 @@ public class ScrollViewTests {
         sv.Add (new Window { X = 3, Y = 3, Width = 20, Height = 20 });
 
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
                At 15,0 
                        
                        
@@ -251,8 +231,7 @@ public class ScrollViewTests {
                At 15,15",
                                                       _output);
 
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
+        TestHelpers.AssertDriverAttributesAre (@"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -274,8 +253,7 @@ public class ScrollViewTests {
 
         sv.ContentOffset = new Point (20, 20);
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
                At 15,0 
                        
                        
@@ -294,8 +272,7 @@ public class ScrollViewTests {
                At 15,15",
                                                       _output);
 
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
+        TestHelpers.AssertDriverAttributesAre (@"
 00000000000000000000000
 00000000000000000000000
 00000000000000000000000
@@ -343,13 +320,7 @@ public class ScrollViewTests {
     public void ContentBottomRightCorner_Draw () {
         ((FakeDriver)Application.Driver).SetBufferSize (30, 30);
 
-        var top = new View {
-                               Width = 30,
-                               Height = 30,
-                               ColorScheme = new ColorScheme {
-                                                                 Normal = Attribute.Default
-                                                             }
-                           };
+        var top = new View { Width = 30, Height = 30, ColorScheme = new ColorScheme { Normal = Attribute.Default } };
 
         var size = new Size { Width = 20, Height = 10 };
         var sv = new ScrollView {
@@ -358,9 +329,7 @@ public class ScrollViewTests {
                                     Width = 10,
                                     Height = 5,
                                     ContentSize = size,
-                                    ColorScheme = new ColorScheme {
-                                                                      Normal = new Attribute (Color.Red, Color.Green)
-                                                                  }
+                                    ColorScheme = new ColorScheme { Normal = new Attribute (Color.Red, Color.Green) }
                                 };
         string text = null;
         for (var i = 0; i < size.Height; i++) {
@@ -373,9 +342,7 @@ public class ScrollViewTests {
         var view = new View {
                                 Width = size.Width,
                                 Height = size.Height,
-                                ColorScheme = new ColorScheme {
-                                                                  Normal = new Attribute (Color.Blue, Color.Yellow)
-                                                              },
+                                ColorScheme = new ColorScheme { Normal = new Attribute (Color.Blue, Color.Yellow) },
                                 AutoSize = true,
                                 Text = text
                             };
@@ -393,8 +360,7 @@ public class ScrollViewTests {
         Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
         Assert.True (contentBottomRightCorner.Visible);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
  *********▲
  *********┬
  *********┴
@@ -402,13 +368,13 @@ public class ScrollViewTests {
  ◄├──┤░░░► ",
                                                       _output);
 
-        Attribute[] attrs = new[] {
-                                      Attribute.Default, new Attribute (Color.Red, Color.Green),
-                                      new Attribute (Color.Blue, Color.Yellow)
-                                  };
+        Attribute[] attrs = {
+                                Attribute.Default,
+                                new Attribute (Color.Red, Color.Green),
+                                new Attribute (Color.Blue, Color.Yellow)
+                            };
 
-        TestHelpers.AssertDriverAttributesAre (
-                                               @"
+        TestHelpers.AssertDriverAttributesAre (@"
 000000000000
 022222222210
 022222222210
@@ -441,8 +407,7 @@ public class ScrollViewTests {
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
          ▲
          ░
          ░
@@ -460,11 +425,7 @@ public class ScrollViewTests {
     [Fact]
     [AutoInitShutdown]
     public void ContentSize_AutoHideScrollBars_ShowHorizontalScrollIndicator_ShowVerticalScrollIndicator () {
-        var sv = new ScrollView {
-                                    Width = 10,
-                                    Height = 10,
-                                    ContentSize = new Size (50, 50)
-                                };
+        var sv = new ScrollView { Width = 10, Height = 10, ContentSize = new Size (50, 50) };
 
         Application.Top.Add (sv);
         Application.Begin (Application.Top);
@@ -474,8 +435,7 @@ public class ScrollViewTests {
         Assert.True (sv.AutoHideScrollBars);
         Assert.True (sv.ShowHorizontalScrollIndicator);
         Assert.True (sv.ShowVerticalScrollIndicator);
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
          ▲
          ┬
          ┴
@@ -496,11 +456,11 @@ public class ScrollViewTests {
         var rule = "0123456789";
         var size = new Size (40, 40);
         var view = new View { Frame = new Rect (Point.Empty, size) };
-        view.Add (new Label { AutoSize = false, Width = Dim.Fill (), Text = rule.Repeat (size.Width / rule.Length) });
-        view.Add (
-                  new Label {
-                                Height = Dim.Fill (),
+        view.Add (new Label { AutoSize = false, Width = Dim.Fill (), Height =1, Text = rule.Repeat (size.Width / rule.Length) });
+        view.Add (new Label {
                                 AutoSize = false,
+                                Height = Dim.Fill (),
+                                Width = 1,
                                 Text = rule.Repeat (size.Height / rule.Length),
                                 TextDirection = TextDirection.TopBottom_LeftRight
                             });
@@ -843,8 +803,7 @@ public class ScrollViewTests {
         Application.Top.Add (sv);
         Application.Begin (Application.Top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
    █████████▲
    ██████But┬
    █████████┴
@@ -860,8 +819,7 @@ public class ScrollViewTests {
         sv.ContentOffset = new Point (5, 5);
         sv.LayoutSubviews ();
         Application.Refresh ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        TestHelpers.AssertDriverContentsWithFrameAre (@"
    ─────────▲
    ─────────┬
     Button 2│
@@ -877,13 +835,8 @@ public class ScrollViewTests {
 
     [Fact]
     public void KeyBindings_Command () {
-        var sv = new ScrollView {
-                                    Width = 20,
-                                    Height = 10,
-                                    ContentSize = new Size (40, 20)
-                                };
-        sv.Add (
-                new View { Width = 20, Height = 5 },
+        var sv = new ScrollView { Width = 20, Height = 10, ContentSize = new Size (40, 20) };
+        sv.Add (new View { Width = 20, Height = 5 },
                 new View { X = 22, Y = 7, Width = 10, Height = 5 });
 
         sv.BeginInit ();
@@ -1006,13 +959,8 @@ public class ScrollViewTests {
     [Fact]
     [AutoInitShutdown]
     public void Remove_Added_View_Is_Allowed () {
-        var sv = new ScrollView {
-                                    Width = 20,
-                                    Height = 20,
-                                    ContentSize = new Size (100, 100)
-                                };
-        sv.Add (
-                new View { Width = Dim.Fill (), Height = Dim.Fill (50), Id = "View1" },
+        var sv = new ScrollView { Width = 20, Height = 20, ContentSize = new Size (100, 100) };
+        sv.Add (new View { Width = Dim.Fill (), Height = Dim.Fill (50), Id = "View1" },
                 new View { Y = 51, Width = Dim.Fill (), Height = Dim.Fill (), Id = "View2" });
 
         Application.Top.Add (sv);

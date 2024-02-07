@@ -2290,25 +2290,25 @@ public class TileViewTests {
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label {
-                                                 Width = Dim.Fill (), Height = 1, AutoSize = false,
+                                               AutoSize = false,Width = Dim.Fill (), Height = 1,
                                                  Text = new string ('1', 100)
                                              });
         container.Tiles.ElementAt (0)
                  .ContentView.Add (
                                    new Label {
-                                                 Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1,
+                                                 AutoSize = false, Width = Dim.Fill (), Height = 1, Y = 1,
                                                  Text = new string ('1', 100)
                                              });
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label {
-                                                 Width = Dim.Fill (), Height = 1, AutoSize = false,
+                                                 AutoSize = false, Width = Dim.Fill (), Height = 1,
                                                  Text = new string ('2', 100)
                                              });
         container.Tiles.ElementAt (1)
                  .ContentView.Add (
                                    new Label {
-                                                 Width = Dim.Fill (), Height = 1, AutoSize = false, Y = 1,
+                                                 AutoSize = false, Width = Dim.Fill (), Height = 1,  Y = 1,
                                                  Text = new string ('2', 100)
                                              });
 

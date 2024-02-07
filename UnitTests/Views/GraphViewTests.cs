@@ -1306,7 +1306,7 @@ public class PathAnnotationTests {
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
-    public void LabelChangeText_RendersCorrectly (bool useFill) {
+    public void ViewChangeText_RendersCorrectly (bool useFill) {
         var driver = new FakeDriver ();
         Application.Init (driver);
         driver.Init ();
@@ -1318,18 +1318,18 @@ public class PathAnnotationTests {
                              };
 
         try {
-            // Create a label with a short text 
-            var lbl1 = new Label { Text = "ff" };
+            // Create a view with a short text 
+            var view = new View { Text = "ff", Width = 2, Height = 1 };
 
             // Specify that the label should be very wide
             if (useFill) {
-                lbl1.Width = Dim.Fill ();
+                view.Width = Dim.Fill ();
             } else {
-                lbl1.Width = 100;
+                view.Width = 100;
             }
 
             //put label into view
-            mount.Add (lbl1);
+            mount.Add (view);
 
             //putting mount into Toplevel since changing size
             //also change AutoSize to false
@@ -1337,15 +1337,15 @@ public class PathAnnotationTests {
             Application.Begin (Application.Top);
 
             // render view
-            lbl1.ColorScheme = new ColorScheme ();
-            Assert.Equal (1, lbl1.Height);
+            view.ColorScheme = new ColorScheme ();
+            Assert.Equal (1, view.Height);
             mount.Draw ();
 
             // should have the initial text
             TestHelpers.AssertDriverContentsAre ("ff", null);
 
             // change the text and redraw
-            lbl1.Text = "ff1234";
+            view.Text = "ff1234";
             mount.Draw ();
 
             // should have the new text rendered

@@ -10,14 +10,18 @@ public class TextFormatterTests {
     public TextFormatterTests (ITestOutputHelper output) { _output = output; }
 
     public static IEnumerable<object[]> CMGlyphs =>
-        new List<object[]> {
-                               new object[] { $"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}", 16, 15 }
-                           };
+        new List<object[]> { new object[] { $"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}", 16, 15 } };
 
     public static IEnumerable<object[]> FormatEnvironmentNewLine =>
         new List<object[]> {
                                new object[] {
-                                                $"Line1{Environment.NewLine}Line2{Environment.NewLine}Line3{Environment.NewLine}",
+                                                $"Line1{
+                                                    Environment.NewLine
+                                                }Line2{
+                                                    Environment.NewLine
+                                                }Line3{
+                                                    Environment.NewLine
+                                                }",
                                                 60,
                                                 new[] { "Line1", "Line2", "Line3" }
                                             }
@@ -26,11 +30,21 @@ public class TextFormatterTests {
     public static IEnumerable<object[]> SplitEnvironmentNewLine =>
         new List<object[]> {
                                new object[] {
-                                                $"First Line 界{Environment.NewLine}Second Line 界{Environment.NewLine}Third Line 界",
+                                                $"First Line 界{
+                                                    Environment.NewLine
+                                                }Second Line 界{
+                                                    Environment.NewLine
+                                                }Third Line 界",
                                                 new[] { "First Line 界", "Second Line 界", "Third Line 界" }
                                             },
                                new object[] {
-                                                $"First Line 界{Environment.NewLine}Second Line 界{Environment.NewLine}Third Line 界{Environment.NewLine}",
+                                                $"First Line 界{
+                                                    Environment.NewLine
+                                                }Second Line 界{
+                                                    Environment.NewLine
+                                                }Third Line 界{
+                                                    Environment.NewLine
+                                                }",
                                                 new[] { "First Line 界", "Second Line 界", "Third Line 界", "" }
                                             }
                            };
@@ -114,9 +128,7 @@ public class TextFormatterTests {
         }
 
         Assert.Equal (new Rect (0, 0, maxWidth, expectedLines), TextFormatter.CalcRect (0, 0, text));
-        Assert.Equal (
-                      new Rect (
-                                0,
+        Assert.Equal (new Rect (0,
                                 0,
                                 lines[lineWider].ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 0)),
                                 expectedLines),
@@ -147,8 +159,7 @@ public class TextFormatterTests {
         string expected = string.IsNullOrEmpty (text) ? text : "";
         Assert.Equal (expected, TextFormatter.ClipAndJustify (text, 0, TextAlignment.Left));
         Assert.Equal (expected, TextFormatter.ClipAndJustify (text, 0, TextAlignment.Left));
-        Assert.Throws<ArgumentOutOfRangeException> (
-                                                    () =>
+        Assert.Throws<ArgumentOutOfRangeException> (() =>
                                                         TextFormatter.ClipAndJustify (text, -1, TextAlignment.Left));
     }
 
@@ -174,22 +185,18 @@ public class TextFormatterTests {
         var textDirection = TextDirection.LeftRight_TopBottom;
         var tabWidth = 1;
 
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
         Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
-        Assert.Equal (
-                      expectedClippedWidth,
+        Assert.Equal (expectedClippedWidth,
                       justifiedText.ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 1)));
         Assert.True (expectedClippedWidth <= maxWidth);
-        Assert.Equal (
-                      StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
+        Assert.Equal (StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
                       justifiedText);
     }
 
@@ -199,19 +206,17 @@ public class TextFormatterTests {
     [InlineData ("test", "test", int.MaxValue)] // This doesn't throw because it only create a word with length 1
     [InlineData ("A sentence has words.", "A  sentence has words.", 22)] // should fit
     [InlineData ("A sentence has words.", "A sentence has words.", 21)] // should fit
-    [InlineData (
-                    "A sentence has words.",
-                    "A                                                                                                                                                                 sentence                                                                                                                                                                 has                                                                                                                                                                words.",
-                    500)] // should fit
+    [InlineData ("A sentence has words.",
+                 "A                                                                                                                                                                 sentence                                                                                                                                                                 has                                                                                                                                                                words.",
+                 500)] // should fit
     [InlineData ("A sentence has words.", "A sentence has words", 20)] // Should not fit
     [InlineData ("A sentence has words.", "A sentence", 10)] // Should not fit
     // Now throw System.OutOfMemoryException. See https://stackoverflow.com/questions/20672920/maxcapacity-of-stringbuilder
     //[InlineData ("A\tsentence\thas\twords.", "A sentence has words.", int.MaxValue)]
     [InlineData ("A\tsentence\thas\twords.", "A sentence", 10)]
-    [InlineData (
-                    "line1\nline2\nline3long!",
-                    "line1\nline2\nline3long!",
-                    int.MaxValue)] // This doesn't throw because it only create a line with length 1
+    [InlineData ("line1\nline2\nline3long!",
+                 "line1\nline2\nline3long!",
+                 int.MaxValue)] // This doesn't throw because it only create a line with length 1
     [InlineData ("line1\nline2\nline3long!", "line1\nline", 10)]
     [InlineData (" ~  s  gui.cs   master ↑10", " ~  s  ", 10)] // Unicode
     [InlineData ("Ð ÑÐ", "Ð  ÑÐ", 5)] // should fit
@@ -222,22 +227,18 @@ public class TextFormatterTests {
         var textDirection = TextDirection.LeftRight_TopBottom;
         var tabWidth = 1;
 
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
         Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
-        Assert.Equal (
-                      expectedClippedWidth,
+        Assert.Equal (expectedClippedWidth,
                       justifiedText.ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 1)));
         Assert.True (expectedClippedWidth <= maxWidth);
-        Assert.Equal (
-                      StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
+        Assert.Equal (StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
                       justifiedText);
 
         // see Justify_ tests below
@@ -265,22 +266,18 @@ public class TextFormatterTests {
         var textDirection = TextDirection.LeftRight_BottomTop;
         var tabWidth = 1;
 
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
         Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
-        Assert.Equal (
-                      expectedClippedWidth,
+        Assert.Equal (expectedClippedWidth,
                       justifiedText.ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 1)));
         Assert.True (expectedClippedWidth <= maxWidth);
-        Assert.Equal (
-                      StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
+        Assert.Equal (StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
                       justifiedText);
     }
 
@@ -306,33 +303,28 @@ public class TextFormatterTests {
         var textDirection = TextDirection.LeftRight_BottomTop;
         var tabWidth = 1;
 
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         int expectedClippedWidth = Math.Min (justifiedText.GetRuneCount (), maxWidth);
-        Assert.Equal (
-                      justifiedText,
+        Assert.Equal (justifiedText,
                       TextFormatter.ClipAndJustify (text, maxWidth, align, textDirection, tabWidth));
         Assert.True (justifiedText.GetRuneCount () <= maxWidth);
         Assert.True (justifiedText.GetColumns () <= maxWidth);
         Assert.Equal (expectedClippedWidth, justifiedText.GetRuneCount ());
-        Assert.Equal (
-                      expectedClippedWidth,
+        Assert.Equal (expectedClippedWidth,
                       justifiedText.ToRuneList ().Sum (r => Math.Max (r.GetColumns (), 1)));
         Assert.True (expectedClippedWidth <= maxWidth);
-        Assert.Equal (
-                      StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
+        Assert.Equal (StringExtensions.ToString (justifiedText.ToRunes ()[..expectedClippedWidth]),
                       justifiedText);
     }
 
     [Theory]
     [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
     [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
-    [InlineData (
-                    4,
-                    4,
-                    TextDirection.TopBottom_LeftRight,
-                    @"
+    [InlineData (4,
+                 4,
+                 TextDirection.TopBottom_LeftRight,
+                 @"
 LMre
 eias
 ssb 
@@ -355,8 +347,7 @@ ssb
             tf.Size = new Size (width, height);
         }
 
-        tf.Draw (
-                 new Rect (0, 0, width, height),
+        tf.Draw (new Rect (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
@@ -389,8 +380,7 @@ ssb
     ) {
         var hotKeySpecifier = (Rune)'_';
 
-        bool result = TextFormatter.FindHotKey (
-                                                text,
+        bool result = TextFormatter.FindHotKey (text,
                                                 hotKeySpecifier,
                                                 out int hotPos,
                                                 out Key hotKey,
@@ -428,8 +418,7 @@ ssb
     ) {
         var hotKeySpecifier = (Rune)'_';
 
-        bool result = TextFormatter.FindHotKey (
-                                                text,
+        bool result = TextFormatter.FindHotKey (text,
                                                 hotKeySpecifier,
                                                 out int hotPos,
                                                 out Key hotKey,
@@ -458,8 +447,7 @@ ssb
         Key hotKey = KeyCode.Null;
         var result = false;
 
-        result = TextFormatter.FindHotKey (
-                                           text,
+        result = TextFormatter.FindHotKey (text,
                                            hotKeySpecifier,
                                            out hotPos,
                                            out hotKey,
@@ -483,8 +471,7 @@ ssb
 
         var hotKeySpecifier = (Rune)0;
 
-        bool result = TextFormatter.FindHotKey (
-                                                text,
+        bool result = TextFormatter.FindHotKey (text,
                                                 hotKeySpecifier,
                                                 out int hotPos,
                                                 out Key hotKey,
@@ -510,8 +497,7 @@ ssb
 
         var hotKeySpecifier = (Rune)0;
 
-        bool result = TextFormatter.FindHotKey (
-                                                text,
+        bool result = TextFormatter.FindHotKey (text,
                                                 hotKeySpecifier,
                                                 out int hotPos,
                                                 out Key hotKey,
@@ -547,8 +533,7 @@ ssb
     ) {
         var hotKeySpecifier = (Rune)'_';
 
-        bool result = TextFormatter.FindHotKey (
-                                                text,
+        bool result = TextFormatter.FindHotKey (text,
                                                 hotKeySpecifier,
                                                 out int hotPos,
                                                 out Key hotKey,
@@ -569,10 +554,9 @@ ssb
     [InlineData ("\"_k before", true, KeyCode.K)]
     [InlineData ("_`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", true, (KeyCode)'`')]
     [InlineData ("`_~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", true, (KeyCode)'~')]
-    [InlineData (
-                    "`~!@#$%^&*()-__=+[{]}\\|;:'\",<.>/?",
-                    true,
-                    (KeyCode)'=')] // BUGBUG: Not sure why this fails. Ignore the first and consider the second
+    [InlineData ("`~!@#$%^&*()-__=+[{]}\\|;:'\",<.>/?",
+                 true,
+                 (KeyCode)'=')] // BUGBUG: Not sure why this fails. Ignore the first and consider the second
     [InlineData ("_ ~  s  gui.cs   master ↑10", true, (KeyCode)'')] // ~IsLetterOrDigit + Unicode
     [InlineData (" ~  s  gui.cs  _ master ↑10", true, (KeyCode)'')] // ~IsLetterOrDigit + Unicode
     [InlineData ("non-english: _кдать", true, (KeyCode)'к')] // Lower case Cryllic K (к)
@@ -586,10 +570,8 @@ ssb
 
     [Fact]
     public void Format_Dont_Throw_ArgumentException_With_WordWrap_As_False_And_Keep_End_Spaces_As_True () {
-        Exception exception = Record.Exception (
-                                                () =>
-                                                    TextFormatter.Format (
-                                                                          "Some text",
+        Exception exception = Record.Exception (() =>
+                                                    TextFormatter.Format ("Some text",
                                                                           4,
                                                                           TextAlignment.Left,
                                                                           false,
@@ -598,11 +580,10 @@ ssb
     }
 
     [Theory]
-    [InlineData (
-                    "Hello world, how are you today? Pretty neat!",
-                    44,
-                    80,
-                    "Hello      world,      how      are      you      today?      Pretty      neat!")]
+    [InlineData ("Hello world, how are you today? Pretty neat!",
+                 44,
+                 80,
+                 "Hello      world,      how      are      you      today?      Pretty      neat!")]
     public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Horizontal (
         string text,
         int runeCount,
@@ -623,11 +604,10 @@ ssb
     }
 
     [Theory]
-    [InlineData (
-                    "Hello world, how are you today? Pretty neat!",
-                    44,
-                    80,
-                    "Hello      world,      how      are      you      today?      Pretty      neat!")]
+    [InlineData ("Hello world, how are you today? Pretty neat!",
+                 44,
+                 80,
+                 "Hello      world,      how      are      you      today?      Pretty      neat!")]
     public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Vertical (
         string text,
         int runeCount,
@@ -638,8 +618,7 @@ ssb
 
         var fmtText = string.Empty;
         for (int i = text.GetRuneCount (); i < maxWidth; i++) {
-            fmtText = TextFormatter.Format (
-                                            text,
+            fmtText = TextFormatter.Format (text,
                                             i,
                                             TextAlignment.Justified,
                                             false,
@@ -679,31 +658,53 @@ ssb
     }
 
     [Theory]
-    [InlineData (
-                    " A sentence has words. \n This is the second Line - 2. ",
-                    4,
-                    -50,
-                    TextAlignment.Left,
-                    true,
-                    false,
-                    new[] {
-                              " A", "sent", "ence", "has", "word", "s. ", " Thi", "s is", "the", "seco", "nd", "Line",
-                              "- 2."
-                          },
-                    " Asentencehaswords.  This isthesecondLine- 2.")]
-    [InlineData (
-                    " A sentence has words. \n This is the second Line - 2. ",
-                    4,
-                    -50,
-                    TextAlignment.Left,
-                    true,
-                    true,
-                    new[] {
-                              " A ", "sent", "ence", " ", "has ", "word", "s. ", " ", "This", " is ", "the ", "seco",
-                              "nd ",
-                              "Line", " - ", "2. "
-                          },
-                    " A sentence has words.  This is the second Line - 2. ")]
+    [InlineData (" A sentence has words. \n This is the second Line - 2. ",
+                 4,
+                 -50,
+                 TextAlignment.Left,
+                 true,
+                 false,
+                 new[] {
+                           " A",
+                           "sent",
+                           "ence",
+                           "has",
+                           "word",
+                           "s. ",
+                           " Thi",
+                           "s is",
+                           "the",
+                           "seco",
+                           "nd",
+                           "Line",
+                           "- 2."
+                       },
+                 " Asentencehaswords.  This isthesecondLine- 2.")]
+    [InlineData (" A sentence has words. \n This is the second Line - 2. ",
+                 4,
+                 -50,
+                 TextAlignment.Left,
+                 true,
+                 true,
+                 new[] {
+                           " A ",
+                           "sent",
+                           "ence",
+                           " ",
+                           "has ",
+                           "word",
+                           "s. ",
+                           " ",
+                           "This",
+                           " is ",
+                           "the ",
+                           "seco",
+                           "nd ",
+                           "Line",
+                           " - ",
+                           "2. "
+                       },
+                 " A sentence has words.  This is the second Line - 2. ")]
     public void Format_WordWrap_PreserveTrailingSpaces (
         string text,
         int maxWidth,
@@ -778,14 +779,14 @@ ssb
 
     [Fact]
     public void GetMaxColsForWidth_With_Combining_Runes () {
-        List<string> text = new() { "Les Mis", "e\u0328\u0301", "rables" };
+        List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
         Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
     }
 
     [Theory]
     [InlineData (new[] { "Hello", "World" }, 2, 1, 1, 1)]
     [InlineData (new[] { "こんにちは", "世界" }, 4, 1, 1, 2)]
-    public void GetSumMaxCharWidth_List_Simple_And_Wide_Runes (
+    public void GetWidestLineLength_List_Simple_And_Wide_Runes (
         IEnumerable<string> text,
         int width,
         int index,
@@ -797,27 +798,13 @@ ssb
     }
 
     [Fact]
-    public void GetSumMaxCharWidth_List_With_Combining_Runes () {
-        List<string> text = new() { "Les Mis", "e\u0328\u0301", "rables" };
+    public void GetWidestLineLength_List_With_Combining_Runes () {
+        List<string> text = new () { "Les Mis", "e\u0328\u0301", "rables" };
         Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
     }
 
-    [Theory]
-    [InlineData ("Hello World", 11, 6, 1, 1)]
-    [InlineData ("こんにちは 世界", 15, 6, 1, 2)]
-    public void GetSumMaxCharWidth_Simple_And_Wide_Runes (
-        string text,
-        int width,
-        int index,
-        int length,
-        int indexWidth
-    ) {
-        Assert.Equal (width, TextFormatter.GetWidestLineLength (text));
-        Assert.Equal (indexWidth, TextFormatter.GetWidestLineLength (text, index, length));
-    }
-
     [Fact]
-    public void GetSumMaxCharWidth_With_Combining_Runes () {
+    public void GetWidestLineLength_With_Combining_Runes () {
         var text = "Les Mise\u0328\u0301rables";
         Assert.Equal (1, TextFormatter.GetWidestLineLength (text, 1, 1));
     }
@@ -940,55 +927,47 @@ ssb
     }
 
     [Theory]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    0,
-                    false,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    1,
-                    false,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    1,
-                    0,
-                    false,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    0,
-                    true,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    1,
-                    true,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    1,
-                    0,
-                    true,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    6,
-                    5,
-                    false,
-                    new[] { "First " })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 0,
+                 false,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 1,
+                 false,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 1,
+                 0,
+                 false,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 0,
+                 true,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 1,
+                 true,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 1,
+                 0,
+                 true,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 6,
+                 5,
+                 false,
+                 new[] { "First " })]
     [InlineData ("1\n2\n3\n4\n5\n6", 6, 5, false, new[] { "1 2 3 " })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    6,
-                    5,
-                    true,
-                    new[] { "First ", "Second", "Third ", "Forty ", "Fiftee" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 6,
+                 5,
+                 true,
+                 new[] { "First ", "Second", "Third ", "Forty ", "Fiftee" })]
     [InlineData ("第一行\n第二行\n第三行\n四十行\n第十五行\n七十行", 5, 5, false, new[] { "第一" })]
     [InlineData ("第一行\n第二行\n第三行\n四十行\n第十五行\n七十行", 5, 5, true, new[] { "第一", "第二", "第三", "四十", "第十" })]
     public void MultiLine_WordWrap_False_Horizontal_Direction (
@@ -998,8 +977,12 @@ ssb
         bool multiLine,
         IEnumerable<string> resultLines
     ) {
-        var tf = new TextFormatter
-                 { Text = text, Size = new Size (maxWidth, maxHeight), WordWrap = false, MultiLine = multiLine };
+        var tf = new TextFormatter {
+                                       Text = text,
+                                       Size = new Size (maxWidth, maxHeight),
+                                       WordWrap = false,
+                                       MultiLine = multiLine
+                                   };
 
         Assert.False (tf.AutoSize);
         Assert.False (tf.WordWrap);
@@ -1012,55 +995,47 @@ ssb
     }
 
     [Theory]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    0,
-                    false,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    1,
-                    false,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    1,
-                    0,
-                    false,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    0,
-                    true,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    0,
-                    1,
-                    true,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    1,
-                    0,
-                    true,
-                    new[] { "" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    6,
-                    5,
-                    false,
-                    new[] { "First" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 0,
+                 false,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 1,
+                 false,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 1,
+                 0,
+                 false,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 0,
+                 true,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 0,
+                 1,
+                 true,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 1,
+                 0,
+                 true,
+                 new[] { "" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 6,
+                 5,
+                 false,
+                 new[] { "First" })]
     [InlineData ("1\n2\n3\n4\n5\n6", 6, 5, false, new[] { "1 2 3" })]
-    [InlineData (
-                    "First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
-                    6,
-                    5,
-                    true,
-                    new[] { "First", "Secon", "Third", "Forty", "Fifte", "Seven" })]
+    [InlineData ("First Line\nSecond Line\nThird Line\nForty Line\nFifteenth Line\nSeventy Line",
+                 6,
+                 5,
+                 true,
+                 new[] { "First", "Secon", "Third", "Forty", "Fifte", "Seven" })]
     [InlineData ("第一行\n第二行\n第三行\n四十行\n第十五行\n七十行", 5, 5, false, new[] { "第一行 第" })]
     [InlineData ("第一行\n第二行\n第三行\n四十行\n第十五行\n七十行", 5, 5, true, new[] { "第一行", "第二行" })]
     public void MultiLine_WordWrap_False_Vertical_Direction (
@@ -1121,8 +1096,7 @@ ssb
     [InlineData ("", 0, TextAlignment.Left, true, 1)]
     public void Reformat_Invalid (string text, int maxWidth, TextAlignment textAlignment, bool wrap, int linesCount) {
         if (maxWidth < 0) {
-            Assert.Throws<ArgumentOutOfRangeException> (
-                                                        () =>
+            Assert.Throws<ArgumentOutOfRangeException> (() =>
                                                             TextFormatter.Format (text, maxWidth, textAlignment, wrap));
         } else {
             List<string> list = TextFormatter.Format (text, maxWidth, textAlignment, wrap);
@@ -1169,13 +1143,11 @@ ssb
         }
 
         if (text.Contains ("\r\n") && maxWidth > 0) {
-            Assert.Equal (
-                          StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth])
+            Assert.Equal (StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth])
                                           .Replace ("\r\n", " "),
                           list[0]);
         } else if (text.Contains ('\n') && maxWidth > 0) {
-            Assert.Equal (
-                          StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth])
+            Assert.Equal (StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth])
                                           .Replace ("\n", " "),
                           list[0]);
         } else {
@@ -1185,98 +1157,88 @@ ssb
 
     [Theory]
     [InlineData ("A sentence has words.\nLine 2.", 0, -29, TextAlignment.Left, false, 1, true, new[] { "" })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    1,
-                    -28,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A", "L" })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    5,
-                    -24,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sen", "Line " })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    28,
-                    -1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 1,
+                 -28,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A", "L" })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 5,
+                 -24,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sen", "Line " })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 28,
+                 -1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
     //// no clip
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    29,
-                    0,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    30,
-                    1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 29,
+                 0,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 30,
+                 1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
     [InlineData ("A sentence has words.\r\nLine 2.", 0, -30, TextAlignment.Left, false, 1, true, new[] { "" })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    1,
-                    -29,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A", "L" })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    5,
-                    -25,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sen", "Line " })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    29,
-                    -1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    30,
-                    0,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    31,
-                    1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 1,
+                 -29,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A", "L" })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 5,
+                 -25,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sen", "Line " })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 29,
+                 -1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 30,
+                 0,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 31,
+                 1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
     public void Reformat_NoWordrap_NewLines_MultiLine_True (
         string text,
         int maxWidth,
@@ -1288,8 +1250,7 @@ ssb
         IEnumerable<string> resultLines
     ) {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
-        List<string> list = TextFormatter.Format (
-                                                  text,
+        List<string> list = TextFormatter.Format (text,
                                                   maxWidth,
                                                   textAlignment,
                                                   wrap,
@@ -1310,98 +1271,88 @@ ssb
 
     [Theory]
     [InlineData ("A sentence has words.\nLine 2.", 0, -29, TextAlignment.Left, false, 1, true, new[] { "" })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    1,
-                    -28,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A", "L" })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    5,
-                    -24,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sen", "Line " })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    28,
-                    -1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 1,
+                 -28,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A", "L" })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 5,
+                 -24,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sen", "Line " })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 28,
+                 -1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
     //// no clip
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    29,
-                    0,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
-    [InlineData (
-                    "A sentence has words.\nLine 2.",
-                    30,
-                    1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 29,
+                 0,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\nLine 2.",
+                 30,
+                 1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
     [InlineData ("A sentence has words.\r\nLine 2.", 0, -30, TextAlignment.Left, false, 1, true, new[] { "" })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    1,
-                    -29,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A", "L" })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    5,
-                    -25,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sen", "Line " })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    29,
-                    -1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    30,
-                    0,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
-    [InlineData (
-                    "A sentence has words.\r\nLine 2.",
-                    31,
-                    1,
-                    TextAlignment.Left,
-                    false,
-                    2,
-                    false,
-                    new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 1,
+                 -29,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A", "L" })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 5,
+                 -25,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sen", "Line " })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 29,
+                 -1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 30,
+                 0,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
+    [InlineData ("A sentence has words.\r\nLine 2.",
+                 31,
+                 1,
+                 TextAlignment.Left,
+                 false,
+                 2,
+                 false,
+                 new[] { "A sentence has words.", "Line 2." })]
     public void Reformat_NoWordrap_NewLines_MultiLine_True_Vertical (
         string text,
         int maxWidth,
@@ -1413,8 +1364,7 @@ ssb
         IEnumerable<string> resultLines
     ) {
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
-        List<string> list = TextFormatter.Format (
-                                                  text,
+        List<string> list = TextFormatter.Format (text,
                                                   maxWidth,
                                                   textAlignment,
                                                   wrap,
@@ -1470,32 +1420,29 @@ ssb
     [Theory]
 
     // Unicode
-    [InlineData (
-                    "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
-                    8,
-                    -1,
-                    TextAlignment.Left,
-                    true,
-                    false,
-                    new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
+    [InlineData ("\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
+                 8,
+                 -1,
+                 TextAlignment.Left,
+                 true,
+                 false,
+                 new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
 
     // no clip
-    [InlineData (
-                    "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
-                    9,
-                    0,
-                    TextAlignment.Left,
-                    true,
-                    false,
-                    new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
-    [InlineData (
-                    "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
-                    10,
-                    1,
-                    TextAlignment.Left,
-                    true,
-                    false,
-                    new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
+    [InlineData ("\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
+                 9,
+                 0,
+                 TextAlignment.Left,
+                 true,
+                 false,
+                 new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
+    [InlineData ("\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
+                 10,
+                 1,
+                 TextAlignment.Left,
+                 true,
+                 false,
+                 new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
     public void Reformat_Unicode_Wrap_Spaces_NewLines (
         string text,
         int maxWidth,
@@ -1550,16 +1497,15 @@ ssb
     // Even # of spaces
     //            0123456789
     [InlineData ("012 456 89", 0, -10, TextAlignment.Left, true, true, true, new[] { "" })]
-    [InlineData (
-                    "012 456 89",
-                    1,
-                    -9,
-                    TextAlignment.Left,
-                    true,
-                    true,
-                    false,
-                    new[] { "0", "1", "2", " ", "4", "5", "6", " ", "8", "9" },
-                    "01245689")]
+    [InlineData ("012 456 89",
+                 1,
+                 -9,
+                 TextAlignment.Left,
+                 true,
+                 true,
+                 false,
+                 new[] { "0", "1", "2", " ", "4", "5", "6", " ", "8", "9" },
+                 "01245689")]
     [InlineData ("012 456 89", 5, -5, TextAlignment.Left, true, true, false, new[] { "012 ", "456 ", "89" })]
     [InlineData ("012 456 89", 9, -1, TextAlignment.Left, true, true, false, new[] { "012 456 ", "89" })]
 
@@ -1603,8 +1549,7 @@ ssb
             if (maxWidth < 5) {
                 expectedClippedWidth = text.GetRuneCount () - text.Sum (r => r == ' ' ? 1 : 0);
             } else {
-                expectedClippedWidth = Math.Min (
-                                                 text.GetRuneCount (),
+                expectedClippedWidth = Math.Min (text.GetRuneCount (),
                                                  maxWidth - text.Sum (r => r == ' ' ? 1 : 0));
             }
 
@@ -1615,8 +1560,7 @@ ssb
             }
 
             if (maxWidth > 1 && maxWidth < 10) {
-                Assert.Equal (
-                              StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth]),
+                Assert.Equal (StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth]),
                               list[0]);
             }
         }
@@ -1699,18 +1643,16 @@ ssb
     }
 
     [Theory]
-    [InlineData (
-                    "First Line 界\nSecond Line 界\nThird Line 界\n",
-                    new[] { "First Line 界", "Second Line 界", "Third Line 界", "" })]
+    [InlineData ("First Line 界\nSecond Line 界\nThird Line 界\n",
+                 new[] { "First Line 界", "Second Line 界", "Third Line 界", "" })]
     public void SplitNewLine_Ending_With_NewLine_Only_LF (string text, IEnumerable<string> expected) {
         List<string> splited = TextFormatter.SplitNewLine (text);
         Assert.Equal (expected, splited);
     }
 
     [Theory]
-    [InlineData (
-                    "First Line 界\nSecond Line 界\nThird Line 界",
-                    new[] { "First Line 界", "Second Line 界", "Third Line 界" })]
+    [InlineData ("First Line 界\nSecond Line 界\nThird Line 界",
+                 new[] { "First Line 界", "Second Line 界", "Third Line 界" })]
     public void SplitNewLine_Ending_Without_NewLine_Only_LF (string text, IEnumerable<string> expected) {
         List<string> splited = TextFormatter.SplitNewLine (text);
         Assert.Equal (expected, splited);
@@ -1767,8 +1709,7 @@ ssb
         Assert.True (tf.WordWrap);
         Assert.False (tf.PreserveTrailingSpaces);
         Assert.Equal (new Size (width, height), tf.Size);
-        tf.Draw (
-                 new Rect (0, 0, width, height),
+        tf.Draw (new Rect (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
@@ -1803,8 +1744,7 @@ ssb
 
         Assert.True (tf.WordWrap);
         Assert.Equal (new Size (width, height), tf.Size);
-        tf.Draw (
-                 new Rect (0, 0, width, height),
+        tf.Draw (new Rect (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
@@ -1839,8 +1779,7 @@ ssb
 
         Assert.False (tf.PreserveTrailingSpaces);
         Assert.Equal (new Size (width, height), tf.Size);
-        tf.Draw (
-                 new Rect (0, 0, width, height),
+        tf.Draw (new Rect (0, 0, width, height),
                  new Attribute (ColorName.White, ColorName.Black),
                  new Attribute (ColorName.Blue, ColorName.Black),
                  default (Rect),
@@ -2080,16 +2019,14 @@ ssb
 
     [Theory]
     [InlineData ("A sentence has words.", 3, -18, new[] { "A", "sen", "ten", "ce", "has", "wor", "ds." })]
-    [InlineData (
-                    "A sentence has words.",
-                    2,
-                    -19,
-                    new[] { "A", "se", "nt", "en", "ce", "ha", "s", "wo", "rd", "s." })]
-    [InlineData (
-                    "A sentence has words.",
-                    1,
-                    -20,
-                    new[] { "A", "s", "e", "n", "t", "e", "n", "c", "e", "h", "a", "s", "w", "o", "r", "d", "s", "." })]
+    [InlineData ("A sentence has words.",
+                 2,
+                 -19,
+                 new[] { "A", "se", "nt", "en", "ce", "ha", "s", "wo", "rd", "s." })]
+    [InlineData ("A sentence has words.",
+                 1,
+                 -20,
+                 new[] { "A", "s", "e", "n", "t", "e", "n", "c", "e", "h", "a", "s", "w", "o", "r", "d", "s", "." })]
     public void WordWrap_Narrow_Default (
         string text,
         int maxWidth,
@@ -2103,11 +2040,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2120,36 +2055,30 @@ ssb
     [InlineData ("A sentence has words.", 13, -8, new[] { "A sentence", "has words." })]
 
     // Unicode 
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
-                    42,
-                    0,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
-                    41,
-                    -1,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", "words." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
-                    36,
-                    -6,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", "words." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
-                    35,
-                    -7,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", "words." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
-                    34,
-                    -8,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ)", "has words." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
-                    25,
-                    -17,
-                    new[] { "A Unicode sentence", "(Ð¿ÑÐ¸Ð²ÐµÑ) has words." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
+                 42,
+                 0,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
+                 41,
+                 -1,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", "words." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
+                 36,
+                 -6,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", "words." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
+                 35,
+                 -7,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has", "words." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
+                 34,
+                 -8,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ)", "has words." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.",
+                 25,
+                 -17,
+                 new[] { "A Unicode sentence", "(Ð¿ÑÐ¸Ð²ÐµÑ) has words." })]
     public void WordWrap_NoNewLines_Default (
         string text,
         int maxWidth,
@@ -2163,11 +2092,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2186,11 +2113,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2199,11 +2124,10 @@ ssb
     [InlineData ("文に は言葉 があり ます。", 14, 0, new[] { "文に は言葉", "があり ます。" })]
     [InlineData ("文に は言葉 があり ます。", 3, -11, new[] { "文", "に", "は", "言", "葉", "が", "あ", "り", "ま", "す", "。" })]
     [InlineData ("文に は言葉 があり ます。", 2, -12, new[] { "文", "に", "は", "言", "葉", "が", "あ", "り", "ま", "す", "。" })]
-    [InlineData (
-                    "文に は言葉 があり ます。",
-                    1,
-                    -13,
-                    new[] { " ", " ", " " })] // Just Spaces; should result in a single space for each line
+    [InlineData ("文に は言葉 があり ます。",
+                 1,
+                 -13,
+                 new[] { " ", " ", " " })] // Just Spaces; should result in a single space for each line
     public void WordWrap_PreserveTrailingSpaces_False_Wide_Runes (
         string text,
         int maxWidth,
@@ -2216,11 +2140,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2240,24 +2162,40 @@ ssb
     [InlineData ("12 456", 1, new[] { "1", "2", "4", "5", "6" })] // Single Spaces
     [InlineData (" 2 456", 1, new[] { " ", "2", "4", "5", "6" })] // Leading spaces should be preserved.
     [InlineData (" 2 456 8", 1, new[] { " ", "2", "4", "5", "6", "8" })]
-    [InlineData (
-                    "A sentence has words. ",
-                    1,
-                    new[] {
-                              "A", "s", "e", "n", "t", "e", "n", "c", "e", "h", "a", "s", "w", "o", "r", "d", "s", "."
-                          })] // Complex example
+    [InlineData ("A sentence has words. ",
+                 1,
+                 new[] {
+                           "A", "s", "e", "n", "t", "e", "n", "c", "e", "h", "a", "s", "w", "o", "r", "d", "s", "."
+                       })] // Complex example
     [InlineData ("12  567", 1, new[] { "1", "2", " ", "5", "6", "7" })] // Double Spaces
     [InlineData ("  3 567", 1, new[] { " ", "3", "5", "6", "7" })] // Double Leading spaces should be preserved.
     [InlineData ("  3  678  1", 1, new[] { " ", "3", " ", "6", "7", "8", " ", "1" })]
     [InlineData ("1  456", 1, new[] { "1", " ", "4", "5", "6" })]
-    [InlineData (
-                    "A  sentence   has words.  ",
-                    1,
-                    new[] {
-                              "A", " ", "s", "e", "n", "t", "e", "n", "c", "e", " ", "h", "a", "s", "w", "o", "r", "d",
-                              "s",
-                              ".", " "
-                          })] // Double space Complex example
+    [InlineData ("A  sentence   has words.  ",
+                 1,
+                 new[] {
+                           "A",
+                           " ",
+                           "s",
+                           "e",
+                           "n",
+                           "t",
+                           "e",
+                           "n",
+                           "c",
+                           "e",
+                           " ",
+                           "h",
+                           "a",
+                           "s",
+                           "w",
+                           "o",
+                           "r",
+                           "d",
+                           "s",
+                           ".",
+                           " "
+                       })] // Double space Complex example
     public void WordWrap_PreserveTrailingSpaces_False_With_Simple_Runes_Width_1 (
         string text,
         int width,
@@ -2294,20 +2232,16 @@ ssb
     [InlineData ("12 456", 3, new[] { "12", "456" })] // Single Spaces
     [InlineData (" 2 456", 3, new[] { " 2", "456" })] // Leading spaces should be preserved.
     [InlineData (" 2 456 8", 3, new[] { " 2", "456", "8" })]
-    [InlineData (
-                    "A sentence has words. ",
-                    3,
-                    new[] { "A", "sen", "ten", "ce", "has", "wor", "ds." })] // Complex example
+    [InlineData ("A sentence has words. ",
+                 3,
+                 new[] { "A", "sen", "ten", "ce", "has", "wor", "ds." })] // Complex example
     [InlineData ("12  567", 3, new[] { "12 ", "567" })] // Double Spaces
     [InlineData ("  3 567", 3, new[] { "  3", "567" })] // Double Leading spaces should be preserved.
     [InlineData ("  3  678  1", 3, new[] { "  3", " 67", "8 ", "1" })]
     [InlineData ("1  456", 3, new[] { "1 ", "456" })]
-    [InlineData (
-                    "A  sentence      has words.  ",
-                    3,
-                    new[] {
-                              "A ", "sen", "ten", "ce ", "   ", "has", "wor", "ds.", " "
-                          })] // Double space Complex example
+    [InlineData ("A  sentence      has words.  ",
+                 3,
+                 new[] { "A ", "sen", "ten", "ce ", "   ", "has", "wor", "ds.", " " })] // Double space Complex example
     public void WordWrap_PreserveTrailingSpaces_False_With_Simple_Runes_Width_3 (
         string text,
         int width,
@@ -2348,10 +2282,9 @@ ssb
     [InlineData ("  3 567", 50, new[] { "  3 567" })] // Double Leading spaces should be preserved.
     [InlineData ("  3  678  1", 50, new[] { "  3  678  1" })]
     [InlineData ("1  456", 50, new[] { "1  456" })]
-    [InlineData (
-                    "A  sentence      has words.  ",
-                    50,
-                    new[] { "A  sentence      has words.  " })] // Double space Complex example
+    [InlineData ("A  sentence      has words.  ",
+                 50,
+                 new[] { "A  sentence      has words.  " })] // Double space Complex example
     public void WordWrap_PreserveTrailingSpaces_False_With_Simple_Runes_Width_50 (
         string text,
         int width,
@@ -2378,20 +2311,36 @@ ssb
     [InlineData ("A sentence has words.", 8, -13, new[] { "A ", "sentence", " has ", "words." })]
     [InlineData ("A sentence has words.", 6, -15, new[] { "A ", "senten", "ce ", "has ", "words." })]
     [InlineData ("A sentence has words.", 3, -18, new[] { "A ", "sen", "ten", "ce ", "has", " ", "wor", "ds." })]
-    [InlineData (
-                    "A sentence has words.",
-                    2,
-                    -19,
-                    new[] { "A ", "se", "nt", "en", "ce", " ", "ha", "s ", "wo", "rd", "s." })]
-    [InlineData (
-                    "A sentence has words.",
-                    1,
-                    -20,
-                    new[] {
-                              "A", " ", "s", "e", "n", "t", "e", "n", "c", "e", " ", "h", "a", "s", " ", "w", "o", "r",
-                              "d",
-                              "s", "."
-                          })]
+    [InlineData ("A sentence has words.",
+                 2,
+                 -19,
+                 new[] { "A ", "se", "nt", "en", "ce", " ", "ha", "s ", "wo", "rd", "s." })]
+    [InlineData ("A sentence has words.",
+                 1,
+                 -20,
+                 new[] {
+                           "A",
+                           " ",
+                           "s",
+                           "e",
+                           "n",
+                           "t",
+                           "e",
+                           "n",
+                           "c",
+                           "e",
+                           " ",
+                           "h",
+                           "a",
+                           "s",
+                           " ",
+                           "w",
+                           "o",
+                           "r",
+                           "d",
+                           "s",
+                           "."
+                       })]
     public void WordWrap_PreserveTrailingSpaces_True (
         string text,
         int maxWidth,
@@ -2404,11 +2353,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2416,11 +2363,10 @@ ssb
     [Theory]
     [InlineData ("文に は言葉 があり ます。", 14, 0, new[] { "文に は言葉 ", "があり ます。" })]
     [InlineData ("文に は言葉 があり ます。", 3, -11, new[] { "文", "に ", "は", "言", "葉 ", "が", "あ", "り ", "ま", "す", "。" })]
-    [InlineData (
-                    "文に は言葉 があり ます。",
-                    2,
-                    -12,
-                    new[] { "文", "に", " ", "は", "言", "葉", " ", "が", "あ", "り", " ", "ま", "す", "。" })]
+    [InlineData ("文に は言葉 があり ます。",
+                 2,
+                 -12,
+                 new[] { "文", "に", " ", "は", "言", "葉", " ", "が", "あ", "り", " ", "ま", "す", "。" })]
     [InlineData ("文に は言葉 があり ます。", 1, -13, new string[] { })]
     public void WordWrap_PreserveTrailingSpaces_True_Wide_Runes (
         string text,
@@ -2434,21 +2380,18 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
 
     [Theory]
     [InlineData ("A sentence has words. ", 3, new[] { "A ", "sen", "ten", "ce ", "has", " ", "wor", "ds.", " " })]
-    [InlineData (
-                    "A   sentence          has  words.  ",
-                    3,
-                    new[] { "A  ", " ", "sen", "ten", "ce ", "   ", "   ", "   ", "has", "  ", "wor", "ds.", "  " })]
+    [InlineData ("A   sentence          has  words.  ",
+                 3,
+                 new[] { "A  ", " ", "sen", "ten", "ce ", "   ", "   ", "   ", "has", "  ", "wor", "ds.", "  " })]
     public void WordWrap_PreserveTrailingSpaces_True_With_Simple_Runes_Width_3 (
         string text,
         int width,
@@ -2494,30 +2437,47 @@ ssb
 
     [Theory]
     [InlineData ("A sentence\t\t\t has words.", 14, -10, new[] { "A sentence\t", "\t\t has ", "words." })]
-    [InlineData (
-                    "A sentence\t\t\t has words.",
-                    8,
-                    -16,
-                    new[] { "A ", "sentence", "\t\t", "\t ", "has ", "words." })]
-    [InlineData (
-                    "A sentence\t\t\t has words.",
-                    3,
-                    -21,
-                    new[] { "A ", "sen", "ten", "ce", "\t", "\t", "\t", " ", "has", " ", "wor", "ds." })]
-    [InlineData (
-                    "A sentence\t\t\t has words.",
-                    2,
-                    -22,
-                    new[] { "A ", "se", "nt", "en", "ce", "\t", "\t", "\t", " ", "ha", "s ", "wo", "rd", "s." })]
-    [InlineData (
-                    "A sentence\t\t\t has words.",
-                    1,
-                    -23,
-                    new[] {
-                              "A", " ", "s", "e", "n", "t", "e", "n", "c", "e", "\t", "\t", "\t", " ", "h", "a", "s",
-                              " ",
-                              "w", "o", "r", "d", "s", "."
-                          })]
+    [InlineData ("A sentence\t\t\t has words.",
+                 8,
+                 -16,
+                 new[] { "A ", "sentence", "\t\t", "\t ", "has ", "words." })]
+    [InlineData ("A sentence\t\t\t has words.",
+                 3,
+                 -21,
+                 new[] { "A ", "sen", "ten", "ce", "\t", "\t", "\t", " ", "has", " ", "wor", "ds." })]
+    [InlineData ("A sentence\t\t\t has words.",
+                 2,
+                 -22,
+                 new[] { "A ", "se", "nt", "en", "ce", "\t", "\t", "\t", " ", "ha", "s ", "wo", "rd", "s." })]
+    [InlineData ("A sentence\t\t\t has words.",
+                 1,
+                 -23,
+                 new[] {
+                           "A",
+                           " ",
+                           "s",
+                           "e",
+                           "n",
+                           "t",
+                           "e",
+                           "n",
+                           "c",
+                           "e",
+                           "\t",
+                           "\t",
+                           "\t",
+                           " ",
+                           "h",
+                           "a",
+                           "s",
+                           " ",
+                           "w",
+                           "o",
+                           "r",
+                           "d",
+                           "s",
+                           "."
+                       })]
     public void WordWrap_PreserveTrailingSpaces_True_With_Tab (
         string text,
         int maxWidth,
@@ -2531,11 +2491,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2547,11 +2505,10 @@ ssb
     [InlineData ("Constantinople", 7, -7, new[] { "Constan", "tinople" })]
     [InlineData ("Constantinople", 5, -9, new[] { "Const", "antin", "ople" })]
     [InlineData ("Constantinople", 4, -10, new[] { "Cons", "tant", "inop", "le" })]
-    [InlineData (
-                    "Constantinople",
-                    1,
-                    -13,
-                    new[] { "C", "o", "n", "s", "t", "a", "n", "t", "i", "n", "o", "p", "l", "e" })]
+    [InlineData ("Constantinople",
+                 1,
+                 -13,
+                 new[] { "C", "o", "n", "s", "t", "a", "n", "t", "i", "n", "o", "p", "l", "e" })]
     public void WordWrap_SingleWordLine (
         string text,
         int maxWidth,
@@ -2564,11 +2521,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2576,11 +2531,10 @@ ssb
     [Theory]
     [InlineData ("This\u00A0is\n\u00A0a\u00A0sentence.", 20, 0, new[] { "This\u00A0is\u00A0a\u00A0sentence." })]
     [InlineData ("This\u00A0is\n\u00A0a\u00A0sentence.", 19, -1, new[] { "This\u00A0is\u00A0a\u00A0sentence." })]
-    [InlineData (
-                    "\u00A0\u00A0\u00A0\u00A0\u00A0test\u00A0sentence.",
-                    19,
-                    0,
-                    new[] { "\u00A0\u00A0\u00A0\u00A0\u00A0test\u00A0sentence." })]
+    [InlineData ("\u00A0\u00A0\u00A0\u00A0\u00A0test\u00A0sentence.",
+                 19,
+                 0,
+                 new[] { "\u00A0\u00A0\u00A0\u00A0\u00A0test\u00A0sentence." })]
     public void WordWrap_Unicode_2LinesWithNonBreakingSpace (
         string text,
         int maxWidth,
@@ -2593,11 +2547,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
@@ -2608,25 +2560,38 @@ ssb
     [InlineData ("This\u00A0is\u00A0a\u00A0sentence.", 17, -2, new[] { "This\u00A0is\u00A0a\u00A0sentenc", "e." })]
     [InlineData ("This\u00A0is\u00A0a\u00A0sentence.", 14, -5, new[] { "This\u00A0is\u00A0a\u00A0sent", "ence." })]
     [InlineData ("This\u00A0is\u00A0a\u00A0sentence.", 10, -9, new[] { "This\u00A0is\u00A0a\u00A0", "sentence." })]
-    [InlineData (
-                    "This\u00A0is\u00A0a\u00A0sentence.",
-                    7,
-                    -12,
-                    new[] { "This\u00A0is", "\u00A0a\u00A0sent", "ence." })]
-    [InlineData (
-                    "This\u00A0is\u00A0a\u00A0sentence.",
-                    5,
-                    -14,
-                    new[] { "This\u00A0", "is\u00A0a\u00A0", "sente", "nce." })]
-    [InlineData (
-                    "This\u00A0is\u00A0a\u00A0sentence.",
-                    1,
-                    -18,
-                    new[] {
-                              "T", "h", "i", "s", "\u00A0", "i", "s", "\u00A0", "a", "\u00A0", "s", "e", "n", "t", "e",
-                              "n",
-                              "c", "e", "."
-                          })]
+    [InlineData ("This\u00A0is\u00A0a\u00A0sentence.",
+                 7,
+                 -12,
+                 new[] { "This\u00A0is", "\u00A0a\u00A0sent", "ence." })]
+    [InlineData ("This\u00A0is\u00A0a\u00A0sentence.",
+                 5,
+                 -14,
+                 new[] { "This\u00A0", "is\u00A0a\u00A0", "sente", "nce." })]
+    [InlineData ("This\u00A0is\u00A0a\u00A0sentence.",
+                 1,
+                 -18,
+                 new[] {
+                           "T",
+                           "h",
+                           "i",
+                           "s",
+                           "\u00A0",
+                           "i",
+                           "s",
+                           "\u00A0",
+                           "a",
+                           "\u00A0",
+                           "s",
+                           "e",
+                           "n",
+                           "t",
+                           "e",
+                           "n",
+                           "c",
+                           "e",
+                           "."
+                       })]
     public void WordWrap_Unicode_LineWithNonBreakingSpace (
         string text,
         int maxWidth,
@@ -2639,56 +2604,93 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
 
     [Theory]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    51,
-                    0,
-                    new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    50,
-                    -1,
-                    new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    46,
-                    -5,
-                    new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮ", "ฯะัาำ" })]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    26,
-                    -25,
-                    new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบ", "ปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    17,
-                    -34,
-                    new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑ", "ฒณดตถทธนบปผฝพฟภมย", "รฤลฦวศษสหฬอฮฯะัาำ" })]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    13,
-                    -38,
-                    new[] { "กขฃคฅฆงจฉชซฌญ", "ฎฏฐฑฒณดตถทธนบ", "ปผฝพฟภมยรฤลฦว", "ศษสหฬอฮฯะัาำ" })]
-    [InlineData (
-                    "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
-                    1,
-                    -50,
-                    new[] {
-                              "ก", "ข", "ฃ", "ค", "ฅ", "ฆ", "ง", "จ", "ฉ", "ช", "ซ", "ฌ", "ญ", "ฎ", "ฏ", "ฐ", "ฑ", "ฒ",
-                              "ณ",
-                              "ด", "ต", "ถ", "ท", "ธ", "น", "บ", "ป", "ผ", "ฝ", "พ", "ฟ", "ภ", "ม", "ย", "ร",
-                              "ฤ", "ล", "ฦ", "ว", "ศ", "ษ", "ส", "ห", "ฬ", "อ", "ฮ", "ฯ", "ะั", "า", "ำ"
-                          })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 51,
+                 0,
+                 new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 50,
+                 -1,
+                 new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 46,
+                 -5,
+                 new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮ", "ฯะัาำ" })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 26,
+                 -25,
+                 new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบ", "ปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ" })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 17,
+                 -34,
+                 new[] { "กขฃคฅฆงจฉชซฌญฎฏฐฑ", "ฒณดตถทธนบปผฝพฟภมย", "รฤลฦวศษสหฬอฮฯะัาำ" })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 13,
+                 -38,
+                 new[] { "กขฃคฅฆงจฉชซฌญ", "ฎฏฐฑฒณดตถทธนบ", "ปผฝพฟภมยรฤลฦว", "ศษสหฬอฮฯะัาำ" })]
+    [InlineData ("กขฃคฅฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรฤลฦวศษสหฬอฮฯะัาำ",
+                 1,
+                 -50,
+                 new[] {
+                           "ก",
+                           "ข",
+                           "ฃ",
+                           "ค",
+                           "ฅ",
+                           "ฆ",
+                           "ง",
+                           "จ",
+                           "ฉ",
+                           "ช",
+                           "ซ",
+                           "ฌ",
+                           "ญ",
+                           "ฎ",
+                           "ฏ",
+                           "ฐ",
+                           "ฑ",
+                           "ฒ",
+                           "ณ",
+                           "ด",
+                           "ต",
+                           "ถ",
+                           "ท",
+                           "ธ",
+                           "น",
+                           "บ",
+                           "ป",
+                           "ผ",
+                           "ฝ",
+                           "พ",
+                           "ฟ",
+                           "ภ",
+                           "ม",
+                           "ย",
+                           "ร",
+                           "ฤ",
+                           "ล",
+                           "ฦ",
+                           "ว",
+                           "ศ",
+                           "ษ",
+                           "ส",
+                           "ห",
+                           "ฬ",
+                           "อ",
+                           "ฮ",
+                           "ฯ",
+                           "ะั",
+                           "า",
+                           "ำ"
+                       })]
     public void WordWrap_Unicode_SingleWordLine (
         string text,
         int maxWidth,
@@ -2704,72 +2706,59 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >= (wrappedLines.Count > 0
-                                                  ? wrappedLines.Max (
-                                                                      l => l.GetRuneCount () + zeroWidth.Count () - 1
+        Assert.True (expectedClippedWidth >= (wrappedLines.Count > 0
+                                                  ? wrappedLines.Max (l => l.GetRuneCount () + zeroWidth.Count () - 1
                                                                            + widthOffset)
                                                   : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
 
     /// <summary>WordWrap strips CRLF</summary>
     [Theory]
-    [InlineData (
-                    "A sentence has words.\nA paragraph has lines.",
-                    44,
-                    0,
-                    new[] { "A sentence has words.A paragraph has lines." })]
-    [InlineData (
-                    "A sentence has words.\nA paragraph has lines.",
-                    43,
-                    -1,
-                    new[] { "A sentence has words.A paragraph has lines." })]
-    [InlineData (
-                    "A sentence has words.\nA paragraph has lines.",
-                    38,
-                    -6,
-                    new[] { "A sentence has words.A paragraph has", "lines." })]
-    [InlineData (
-                    "A sentence has words.\nA paragraph has lines.",
-                    34,
-                    -10,
-                    new[] { "A sentence has words.A paragraph", "has lines." })]
-    [InlineData (
-                    "A sentence has words.\nA paragraph has lines.",
-                    27,
-                    -17,
-                    new[] { "A sentence has words.A", "paragraph has lines." })]
+    [InlineData ("A sentence has words.\nA paragraph has lines.",
+                 44,
+                 0,
+                 new[] { "A sentence has words.A paragraph has lines." })]
+    [InlineData ("A sentence has words.\nA paragraph has lines.",
+                 43,
+                 -1,
+                 new[] { "A sentence has words.A paragraph has lines." })]
+    [InlineData ("A sentence has words.\nA paragraph has lines.",
+                 38,
+                 -6,
+                 new[] { "A sentence has words.A paragraph has", "lines." })]
+    [InlineData ("A sentence has words.\nA paragraph has lines.",
+                 34,
+                 -10,
+                 new[] { "A sentence has words.A paragraph", "has lines." })]
+    [InlineData ("A sentence has words.\nA paragraph has lines.",
+                 27,
+                 -17,
+                 new[] { "A sentence has words.A", "paragraph has lines." })]
 
     // Unicode 
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
-                    69,
-                    0,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
-                    68,
-                    -1,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
-                    63,
-                    -6,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", "Линии." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
-                    59,
-                    -10,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт", "has Линии." })]
-    [InlineData (
-                    "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
-                    52,
-                    -17,
-                    new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode", "Пункт has Линии." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
+                 69,
+                 0,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
+                 68,
+                 -1,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has Линии." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
+                 63,
+                 -6,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт has", "Линии." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
+                 59,
+                 -10,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode Пункт", "has Линии." })]
+    [InlineData ("A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.\nA Unicode Пункт has Линии.",
+                 52,
+                 -17,
+                 new[] { "A Unicode sentence (Ð¿ÑÐ¸Ð²ÐµÑ) has words.A Unicode", "Пункт has Линии." })]
     public void WordWrap_WithNewLines (string text, int maxWidth, int widthOffset, IEnumerable<string> resultLines) {
         List<string> wrappedLines;
 
@@ -2777,11 +2766,9 @@ ssb
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
         wrappedLines = TextFormatter.WordWrapText (text, maxWidth);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetRuneCount ()) : 0));
-        Assert.True (
-                     expectedClippedWidth >=
+        Assert.True (expectedClippedWidth >=
                      (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0));
         Assert.Equal (resultLines, wrappedLines);
     }
