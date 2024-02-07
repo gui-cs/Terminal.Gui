@@ -11,7 +11,6 @@ namespace Terminal.Gui;
 ///         ColorScheme, create a new one with the desired values, using the <see cref="ColorScheme(ColorScheme)"/>
 ///         constructor.
 ///     </para>
-///     <para>See also: <see cref="ColorSchemesConfiguration.ColorSchemes"/>.</para>
 /// </remarks>
 [JsonConverter (typeof (ColorSchemeJsonConverter))]
 public class ColorScheme : IEquatable<ColorScheme> {

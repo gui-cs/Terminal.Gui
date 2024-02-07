@@ -141,7 +141,6 @@ public class CollectionNavigatorTests {
     [InlineData (KeyCode.Z | KeyCode.AltMask, false)]
     [InlineData (KeyCode.F1, false)]
     [InlineData (KeyCode.Delete, false)]
-    [InlineData (KeyCode.Delete, false)]
     [InlineData (KeyCode.Esc, false)]
     [InlineData (KeyCode.ShiftMask, false)]
     public void IsCompatibleKey_Does_Not_Allow_Alt_And_Ctrl_Keys (KeyCode keyCode, bool compatible) {

@@ -76,7 +76,7 @@ public partial class ColorTests {
     [MemberData (
                     nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_False_For_Invalid_Inputs),
                     MemberType = typeof (ColorTestsTheoryDataGenerators))]
-    public void TryParse_string_Returns_False_For_Invalid_Inputs (string input) {
+    public void TryParse_string_Returns_False_For_Invalid_Inputs (string? input) {
         bool tryParseStatus = Color.TryParse (input, out Color? color);
         Assert.False (tryParseStatus);
         Assert.Null (color);

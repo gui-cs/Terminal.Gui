@@ -153,7 +153,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor"/> of the closest 24-bit color value. Set sets the RGB value
+    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB value
     ///     using a hard-coded map.
     /// </remarks>
     public AnsiColorCode GetAnsiColorCode () {
@@ -165,7 +165,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     will return the closest 16 color match to the true color when no exact value is found.
     /// </summary>
     /// <remarks>
-    ///     Get returns the <see cref="GetClosestNamedColor"/> of the closest 24-bit color value. Set sets the RGB value
+    ///     Get returns the <see cref="GetClosestNamedColor (Color)"/> of the closest 24-bit color value. Set sets the RGB value
     ///     using a hard-coded map.
     /// </remarks>
     public ColorName GetClosestNamedColor () { return GetClosestNamedColor (this); }
@@ -175,7 +175,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor"/> to check if this <see cref="Color"/> is closer to than
+    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer to than
     ///     any other configured named color.
     /// </param>
     /// <returns>
@@ -195,11 +195,11 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <paramref name="namedColor"/>.
     /// </summary>
     /// <param name="color">
-    ///     The color to test against the <see cref="GetClosestNamedColor"/> value in
+    ///     The color to test against the <see cref="GetClosestNamedColor (Color)"/> value in
     ///     <paramref name="namedColor"/>.
     /// </param>
     /// <param name="namedColor">
-    ///     The <see cref="GetClosestNamedColor"/> to check if this <see cref="Color"/> is closer to than
+    ///     The <see cref="GetClosestNamedColor (Color)"/> to check if this <see cref="Color"/> is closer to than
     ///     any other configured named color.
     /// </param>
     /// <returns>

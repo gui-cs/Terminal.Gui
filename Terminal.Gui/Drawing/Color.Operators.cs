@@ -66,7 +66,7 @@ public readonly partial record struct Color {
     public static implicit operator uint (Color color) { return color.Argb; }
 
     /// <summary>
-    ///     Implicit conversion from <see cref="GetClosestNamedColor"/> to <see cref="Color"/> via lookup from
+    ///     Implicit conversion from <see cref="GetClosestNamedColor (Color)"/> to <see cref="Color"/> via lookup from
     ///     <see cref="ColorExtensions.ColorNameToColorMap"/>.
     /// </summary>
     [Pure]
