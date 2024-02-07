@@ -497,30 +497,21 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void FocusDirection_Sets () {
-        var view = new View ();
-
-        Assert.Equal (View.NavigationDirection.Forward, view.FocusDirection);
-        view.FocusDirection = View.NavigationDirection.Backward;
-        Assert.Equal (View.NavigationDirection.Backward, view.FocusDirection);
-    }
-
-    [Fact]
     public void FocusNearestView_Ensure_Focus_Ordered () {
         var top = new Toplevel ();
 
         var win = new Window ();
         var winSubview = new View {
-                                      Text = "WindowSubview",
-                                      CanFocus = true
+                                      CanFocus = true,
+                                      Text = "WindowSubview"
                                   };
         win.Add (winSubview);
         top.Add (win);
 
         var frm = new FrameView ();
         var frmSubview = new View {
-                                      Text = "FrameSubview",
-                                      CanFocus = true
+                                      CanFocus = true,
+                                      Text = "FrameSubview"
                                   };
         frm.Add (frmSubview);
         top.Add (frm);
@@ -579,7 +570,8 @@ public class NavigationTests {
         Assert.True (removed);
         Assert.NotNull (view3);
 
-        Exception exception = Record.Exception (() => top1.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
+        Exception exception =
+            Record.Exception (() => top1.NewKeyDownEvent (new Key (KeyCode.Tab | KeyCode.CtrlMask)));
         Assert.Null (exception);
         Assert.True (removed);
         Assert.Null (view3);
@@ -713,13 +705,6 @@ public class NavigationTests {
     }
 
     [Fact]
-    public void NavigationDirection_Has_Correct_Values () {
-        Assert.Equal (
-                      new[] { View.NavigationDirection.Forward, View.NavigationDirection.Backward },
-                      Enum.GetValues (typeof (View.NavigationDirection)));
-    }
-
-    [Fact]
     [AutoInitShutdown]
     public void Remove_Does_Not_Change_Focus () {
         Assert.True (Application.Top.CanFocus);
@@ -791,7 +776,7 @@ public class NavigationTests {
 
         // top
         Assert.Equal (Point.Empty, top.ScreenToFrame (0, 0));
-        top.Margin.BoundsToScreen (0, 0, out int col, out int row);
+        top.Margin.BoundsToScreen (0, 0, out var col, out var row);
         Assert.Equal (0, col);
         Assert.Equal (0, row);
         top.Border.BoundsToScreen (0, 0, out col, out row);
@@ -921,7 +906,7 @@ public class NavigationTests {
 
         // top
         Assert.Equal (new Point (-3, -2), top.ScreenToFrame (0, 0));
-        top.Margin.BoundsToScreen (-3, -2, out int col, out int row);
+        top.Margin.BoundsToScreen (-3, -2, out var col, out var row);
         Assert.Equal (0, col);
         Assert.Equal (0, row);
         top.Border.BoundsToScreen (-3, -2, out col, out row);
@@ -1371,10 +1356,7 @@ public class NavigationTests {
         // Arrange
         Application.Init ();
         using var top = new Toplevel ();
-        using var view = new View (
-                                   0,
-                                   1,
-                                   nameof (WindowDispose_CanFocusProblem));
+        using var view = new View { X = 0, Y = 1, Text = nameof (WindowDispose_CanFocusProblem) };
         using var window = new Window ();
         top.Add (window);
         window.Add (view);

@@ -4,14 +4,6 @@ using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
-
-[ScenarioMetadata ("Simple Text Alignment", "Demonstrates horizontal text alignment")]
-[ScenarioCategory ("Text and Formatting")]
-public class TextAlignments : Scenario {
-    public override void Setup () {
-        Win.X = 10;
-        Win.Width = Dim.Fill (10);
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Simple Text Alignment", "Demonstrates horizontal text alignment")]
@@ -53,28 +45,6 @@ public class TextAlignments : Scenario {
 
         // Add a label & text field so we can demo IsDefault
         var editLabel = new Label {
-                                      Text = "Text:",
-                                      X = 0,
-                                      Y = 0
-                                  };
-        Win.Add (editLabel);
-        var edit = new TextView {
-                                    X = Pos.Right (editLabel) + 1,
-                                    Y = Pos.Y (editLabel),
-                                    Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
-                                    Height = 4,
-                                    ColorScheme = Colors.ColorSchemes["TopLevel"],
-                                    Text = txt
-                                };
-        edit.TextChanged += (s, e) => {
-            foreach (TextAlignment alignment in alignments) {
-                singleLines[(int)alignment].Text = edit.Text;
-                multipleLines[(int)alignment].Text = edit.Text;
-            }
-        };
-        Win.Add (edit);
-        // Add a label & text field so we can demo IsDefault
-        var editLabel = new Label {
                                       X = 0,
                                       Y = 0,
                                       Text = "Text:"
@@ -97,13 +67,6 @@ public class TextAlignments : Scenario {
         Win.Add (edit);
 
         var unicodeSample = new Button {
-                                           Text = "Unicode Sample",
-                                           X = Pos.Right (edit) + 1,
-                                           Y = 0
-                                       };
-        unicodeSample.Clicked += (s, e) => { edit.Text = unicodeSampleText; };
-        Win.Add (unicodeSample);
-        var unicodeSample = new Button {
                                            X = Pos.Right (edit) + 1,
                                            Y = 0,
                                            Text = "Unicode Sample"
@@ -111,18 +74,6 @@ public class TextAlignments : Scenario {
         unicodeSample.Clicked += (s, e) => { edit.Text = unicodeSampleText; };
         Win.Add (unicodeSample);
 
-        var update = new Button {
-                                    Text = "_Update",
-                                    X = Pos.Right (edit) + 1,
-                                    Y = Pos.Bottom (edit) - 1
-                                };
-        update.Clicked += (s, e) => {
-            foreach (TextAlignment alignment in alignments) {
-                singleLines[(int)alignment].Text = edit.Text;
-                multipleLines[(int)alignment].Text = edit.Text;
-            }
-        };
-        Win.Add (update);
         var update = new Button {
                                     X = Pos.Right (edit) + 1,
                                     Y = Pos.Bottom (edit) - 1,

@@ -52,7 +52,7 @@ public class TextTests {
         var view = new View ();
         view.TextFormatter.Text = "Hello World";
 
-        Assert.Empty (view.Text);
+        Assert.True (string.IsNullOrEmpty (view.Text));
     }
 
     // Setting Text updates TextFormatter

@@ -277,9 +277,9 @@ public partial class View : Responder, ISupportInitializeNotification {
             subview.Dispose ();
         }
 
-		base.Dispose (disposing);
-		Debug.Assert (InternalSubviews.Count == 0);
-	}
+        base.Dispose (disposing);
+        Debug.Assert (InternalSubviews.Count == 0);
+    }
 
     private bool CanBeVisible (View view) {
         if (!view.Visible) {
@@ -295,32 +295,26 @@ public partial class View : Responder, ISupportInitializeNotification {
         return true;
     }
 
-	#region Constructors and Initialization
-	/// <summary>
-	/// Initializes a new instance of <see cref="View"/>.
-	/// </summary>
-	/// <remarks>
-	///         <para>
-	///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-	///         control the size and location of the view.
-	///         The <see cref="View"/> will be created using <see cref="LayoutStyle.Absolute"/>
-	///         coordinates. The initial size (<see cref="View.Frame"/>) will be
-	///         adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
-	///         </para>
-	///         <para>
-	///         If <see cref="Height"/> is greater than one, word wrapping is provided.
-	///         </para>
-	///         <para>
-	///         This constructor initialize a View with a <see cref="LayoutStyle"/> of
-	///         <see cref="LayoutStyle.Absolute"/>.
-	///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-	///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
-	///         </para>
-	/// </remarks>
-	public View () {
-		TextFormatter = new TextFormatter ();
-		TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
-		TextDirection = direction;
+    #region Constructors and Initialization
+
+    /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+    ///         control the size and location of the view. The <see cref="View"/> will be created using
+    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size (<see cref="View.Frame"/>) will be adjusted to
+    ///         fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
+    ///     </para>
+    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
+    ///     <para>
+    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
+    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+    ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
+    ///     </para>
+    /// </remarks>
+    public View () {
+
+        TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
 
         CanFocus = false;
         TabIndex = -1;

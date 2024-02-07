@@ -103,14 +103,11 @@ public class AutoSizeFalseTests {
     [Fact]
     public void AutoSize_False_If_Text_Empty () {
         var view1 = new View ();
-        var view2 = new View ("");
         var view3 = new View { Text = "" };
 
         Assert.False (view1.AutoSize);
-        Assert.False (view2.AutoSize);
         Assert.False (view3.AutoSize);
         view1.Dispose ();
-        view2.Dispose ();
         view3.Dispose ();
     }
 
@@ -118,14 +115,11 @@ public class AutoSizeFalseTests {
     public void AutoSize_False_If_Text_Is_Not_Empty () {
         var view1 = new View ();
         view1.Text = "Hello World";
-        var view2 = new View ("Hello World");
         var view3 = new View { Text = "Hello World" };
 
         Assert.False (view1.AutoSize);
-        Assert.False (view2.AutoSize);
         Assert.False (view3.AutoSize);
         view1.Dispose ();
-        view2.Dispose ();
         view3.Dispose ();
     }
 
@@ -145,7 +139,7 @@ public class AutoSizeFalseTests {
 
     [Fact]
     public void AutoSize_False_ResizeView_With_Dim_Fill_After_IsInitialized () {
-        var super = new View (new Rect (0, 0, 30, 80));
+        var super = new View {Frame = new Rect (0, 0, 30, 80)};
         var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
         super.Add (view);
         Assert.False (view.AutoSize);

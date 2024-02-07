@@ -11,7 +11,7 @@ public class LayoutTests {
     [Fact]
     public void Constructor_Sets_Correct_Layout_Properties () {
         var rect = new Rect (1, 1, 10, 1);
-        var view = new View (rect);
+        var view = new View { Frame = rect };
 
         Assert.Equal (new Rect (0, 0, 10, 1), view.Bounds);
         Assert.Equal (rect, view.Frame);
@@ -42,16 +42,16 @@ public class LayoutTests {
     [InlineData (10)]
     public void Dim_CenteredSubView_85_Percent_Height (int height) {
         var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
 
         var subview = new Window {
-                                     X = Pos.Center (),
-                                     Y = Pos.Center (),
-                                     Width = Dim.Percent (85),
-                                     Height = Dim.Percent (85)
-                                 };
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = Dim.Percent (85),
+            Height = Dim.Percent (85)
+        };
 
         win.Add (subview);
 
@@ -190,16 +190,16 @@ public class LayoutTests {
     [InlineData (10)]
     public void Dim_CenteredSubView_85_Percent_Width (int width) {
         var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
 
         var subview = new Window {
-                                     X = Pos.Center (),
-                                     Y = Pos.Center (),
-                                     Width = Dim.Percent (85),
-                                     Height = Dim.Percent (85)
-                                 };
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = Dim.Percent (85),
+            Height = Dim.Percent (85)
+        };
 
         win.Add (subview);
 
@@ -341,10 +341,10 @@ public class LayoutTests {
     [AutoInitShutdown]
     public void DimFill_SizedCorrectly () {
         var view = new View {
-                                Width = Dim.Fill (),
-                                Height = Dim.Fill (),
-                                BorderStyle = LineStyle.Single
-                            };
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Single
+        };
         Application.Top.Add (view);
         RunState rs = Application.Begin (Application.Top);
         ((FakeDriver)Application.Driver).SetBufferSize (32, 5);
@@ -365,9 +365,9 @@ public class LayoutTests {
         Toplevel top = Application.Top;
 
         var view = new View {
-                                Text = "view",
-                                X = -2
-                            };
+            Text = "view",
+            X = -2
+        };
         top.Add (view);
 
         Application.Iteration += (s, a) => {
@@ -396,11 +396,11 @@ public class LayoutTests {
         Toplevel top = Application.Top;
 
         var view = new View {
-                                Text = "view",
-                                Y = -2,
-                                Height = 10,
-                                TextDirection = TextDirection.TopBottom_LeftRight
-                            };
+            Text = "view",
+            Y = -2,
+            Height = 10,
+            TextDirection = TextDirection.TopBottom_LeftRight
+        };
         top.Add (view);
 
         Application.Iteration += (s, a) => {
@@ -499,14 +499,14 @@ public class LayoutTests {
         Toplevel t = Application.Top;
 
         var w = new Window {
-                               X = Pos.Left (t) + 2,
-                               Y = Pos.At (2)
-                           };
+            X = Pos.Left (t) + 2,
+            Y = Pos.At (2)
+        };
 
         var v = new View {
-                             X = Pos.Center (),
-                             Y = Pos.Percent (10)
-                         };
+            X = Pos.Center (),
+            Y = Pos.Percent (10)
+        };
 
         w.Add (v);
         t.Add (w);
@@ -529,7 +529,7 @@ public class LayoutTests {
         var clicked = false;
         Toplevel top = Application.Top;
         var win1 = new Window { Id = "win1", Width = 20, Height = 10 };
-        var view1 = new View ("view1");
+        var view1 = new View { Text = "view1" };
         var win2 = new Window { Id = "win2", Y = Pos.Bottom (view1) + 1, Width = 10, Height = 3 };
         var view2 = new View { Id = "view2", Width = Dim.Fill (), Height = 1, CanFocus = true };
         view2.MouseClick += (sender, e) => clicked = true;
@@ -566,10 +566,10 @@ public class LayoutTests {
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
                                                            new MouseEvent {
-                                                                              X = 9,
-                                                                              Y = 4,
-                                                                              Flags = MouseFlags.Button1Clicked
-                                                                          }));
+                                                               X = 9,
+                                                               Y = 4,
+                                                               Flags = MouseFlags.Button1Clicked
+                                                           }));
         Assert.True (clicked);
 
         Application.End (rs);
@@ -580,18 +580,18 @@ public class LayoutTests {
         Application.Init (new FakeDriver ());
 
         var w = new Window {
-                               X = Pos.Left (Application.Top) + 2,
-                               Y = Pos.Top (Application.Top) + 2
-                           };
+            X = Pos.Left (Application.Top) + 2,
+            Y = Pos.Top (Application.Top) + 2
+        };
         var f = new FrameView ();
         var v1 = new View {
-                              X = Pos.Left (w) + 2,
-                              Y = Pos.Top (w) + 2
-                          };
+            X = Pos.Left (w) + 2,
+            Y = Pos.Top (w) + 2
+        };
         var v2 = new View {
-                              X = Pos.Left (v1) + 2,
-                              Y = Pos.Top (v1) + 2
-                          };
+            X = Pos.Left (v1) + 2,
+            Y = Pos.Top (v1) + 2
+        };
 
         f.Add (v1, v2);
         w.Add (f);

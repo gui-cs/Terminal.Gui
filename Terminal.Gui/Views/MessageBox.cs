@@ -391,7 +391,7 @@ public static class MessageBox {
             }
 
             string msg = messageLabel.TextFormatter.Format ();
-            Size messageSize = messageLabel.TextFormatter.GetFormattedSize ();
+            Size messageSize = messageLabel.TextFormatter.FormatAndGetSize ();
 
             // Ensure the width fits the text + buttons
             int newWidth = Math.Max (
@@ -405,7 +405,7 @@ public static class MessageBox {
             }
 
             // Ensure height fits the text + vspace + buttons
-            string lastLine = messageLabel.TextFormatter.Lines[^1];
+            string lastLine = messageLabel.TextFormatter.GetLines ()[^1];
             d.Height = Math.Max (
                                  height,
                                  messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) +

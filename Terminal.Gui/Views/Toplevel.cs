@@ -197,108 +197,200 @@ public partial class Toplevel : View {
     /// <summary>Invoked when the Toplevel's <see cref="RunState"/> is closed by <see cref="Application.End(RunState)"/>.</summary>
     public event EventHandler<ToplevelEventArgs> Closed;
 
-	
     /// <summary>
-	/// Invoked when the <see cref="Application.QuitKey"/> is changed.
-	/// </summary>
-	public event EventHandler<KeyChangedEventArgs> QuitKeyChanged;
+    ///     Invoked when the Toplevel's <see cref="RunState"/> is being closed by
+    ///     <see cref="Application.RequestStop(Toplevel)"/>.
+    /// </summary>
+    public event EventHandler<ToplevelClosingEventArgs> Closing;
 
-	/// <summary>
-	/// Virtual method to invoke the <see cref="QuitKeyChanged"/> event.
-	/// </summary>
-	/// <param name="e"></param>
-	public virtual void OnQuitKeyChanged (KeyChangedEventArgs e)
-	{
-		KeyBindings.Replace (e.OldKey, e.NewKey);
-		QuitKeyChanged?.Invoke (this, e);
-	}
+    /// <summary>Invoked when the Toplevel<see cref="RunState"/> ceases to be the <see cref="Application.Current"/> Toplevel.</summary>
+    public event EventHandler<ToplevelEventArgs> Deactivate;
 
-	void MovePreviousViewOrTop ()
-	{
-		if (Application.OverlappedTop == null) {
-			var top = Modal ? this : Application.Top;
-			top.FocusPrev ();
-			if (top.Focused == null) {
-				top.FocusPrev ();
-			}
-			top.SetNeedsDisplay ();
-			Application.BringOverlappedTopToFront ();
-		} else {
-			Application.OverlappedMovePrevious ();
-		}
-	}
+    /// <summary>
+    ///     Invoked when the <see cref="Toplevel"/> <see cref="RunState"/> has begun to be loaded. A Loaded event handler
+    ///     is a good place to finalize initialization before calling <see cref="Application.RunLoop(RunState)"/>.
+    /// </summary>
+    public event EventHandler Loaded;
 
-	void MoveNextViewOrTop ()
-	{
-		if (Application.OverlappedTop == null) {
-			var top = Modal ? this : Application.Top;
-			top.FocusNext ();
-			if (top.Focused == null) {
-				top.FocusNext ();
-			}
-			top.SetNeedsDisplay ();
-			Application.BringOverlappedTopToFront ();
-		} else {
-			Application.OverlappedMoveNext ();
-		}
-	}
+    /// <inheritdoc/>
+    public override bool MouseEvent (MouseEvent mouseEvent) {
+        if (!CanFocus) {
+            return true;
+        }
 
-	void MovePreviousView ()
-	{
-		var old = GetDeepestFocusedSubview (Focused);
-		if (!FocusPrev ()) {
-			FocusPrev ();
-		}
-		if (old != Focused && old != Focused?.Focused) {
-			old?.SetNeedsDisplay ();
-			Focused?.SetNeedsDisplay ();
-		} else {
-			FocusNearestView (SuperView?.TabIndexes?.Reverse (), Direction.Backward);
-		}
-	}
+        //System.Diagnostics.Debug.WriteLine ($"dragPosition before: {dragPosition.HasValue}");
 
-	void MoveNextView ()
-	{
-		var old = GetDeepestFocusedSubview (Focused);
-		if (!FocusNext ()) {
-			FocusNext ();
-		}
-		if (old != Focused && old != Focused?.Focused) {
-			old?.SetNeedsDisplay ();
-			Focused?.SetNeedsDisplay ();
-		} else {
-			FocusNearestView (SuperView?.TabIndexes, Direction.Forward);
-		}
-	}
+        int nx, ny;
+        if (!_dragPosition.HasValue && ((mouseEvent.Flags == MouseFlags.Button1Pressed)
+                                        || (mouseEvent.Flags == MouseFlags.Button2Pressed)
+                                        || (mouseEvent.Flags == MouseFlags.Button3Pressed))) {
+            SetFocus ();
+            Application.BringOverlappedTopToFront ();
 
-	void QuitToplevel ()
-	{
-		if (Application.OverlappedTop != null) {
-			Application.OverlappedTop.RequestStop ();
-		} else {
-			Application.RequestStop ();
-		}
-	}
+            // Only start grabbing if the user clicks on the title bar.
+            // BUGBUG: Assumes Frame == Border and Title is always at Y == 0
+            if (mouseEvent.Y == 0 && mouseEvent.Flags == MouseFlags.Button1Pressed) {
+                _startGrabPoint = new Point (mouseEvent.X, mouseEvent.Y);
+                _dragPosition = new Point ();
+                nx = mouseEvent.X - mouseEvent.OfX;
+                ny = mouseEvent.Y - mouseEvent.OfY;
+                _dragPosition = new Point (nx, ny);
+                Application.GrabMouse (this);
+            }
 
-	View GetDeepestFocusedSubview (View view)
-	{
-		if (view == null) {
-			return null;
-		}
+            //System.Diagnostics.Debug.WriteLine ($"Starting at {dragPosition}");
+            return true;
+        }
 
-		foreach (var v in view.Subviews) {
-			if (v.HasFocus) {
-				return GetDeepestFocusedSubview (v);
-			}
-		}
-		return view;
-	}
+        if ((mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition)) ||
+            (mouseEvent.Flags == MouseFlags.Button3Pressed)) {
+            if (_dragPosition.HasValue) {
+                if (SuperView == null) {
+                    // Redraw the entire app window using just our Frame. Since we are 
+                    // Application.Top, and our Frame always == our Bounds (Location is always (0,0))
+                    // our Frame is actually view-relative (which is what Redraw takes).
+                    // We need to pass all the view bounds because since the windows was 
+                    // moved around, we don't know exactly what was the affected region.
+                    Application.Top.SetNeedsDisplay ();
+                } else {
+                    SuperView.SetNeedsDisplay ();
+                }
 
-	void FocusNearestView (IEnumerable<View> views, Direction direction)
-	{
-		if (views == null) {
-			return;
-		}
+                // BUGBUG: Assumes Frame == Border?
+                GetLocationThatFits (
+                                     this,
+                                     mouseEvent.X + (SuperView == null
+                                                         ? mouseEvent.OfX - _startGrabPoint.X
+                                                         : Frame.X - _startGrabPoint.X),
+                                     mouseEvent.Y + (SuperView == null
+                                                         ? mouseEvent.OfY - _startGrabPoint.Y
+                                                         : Frame.Y - _startGrabPoint.Y),
+                                     out nx,
+                                     out ny,
+                                     out _,
+                                     out _);
+
+                _dragPosition = new Point (nx, ny);
+                X = nx;
+                Y = ny;
+
+                //System.Diagnostics.Debug.WriteLine ($"Drag: nx:{nx},ny:{ny}");
+
+                SetNeedsDisplay ();
+
+                return true;
+            }
+        }
+
+        if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Released) && _dragPosition.HasValue) {
+            _dragPosition = null;
+            Application.UngrabMouse ();
+        }
+
+        //System.Diagnostics.Debug.WriteLine ($"dragPosition after: {dragPosition.HasValue}");
+        //System.Diagnostics.Debug.WriteLine ($"Toplevel: {mouseEvent}");
+        return false;
+    }
+
+    /// <summary>Virtual method to invoke the <see cref="AlternateBackwardKeyChanged"/> event.</summary>
+    /// <param name="e"></param>
+    public virtual void OnAlternateBackwardKeyChanged (KeyChangedEventArgs e) {
+        KeyBindings.Replace (e.OldKey, e.NewKey);
+        AlternateBackwardKeyChanged?.Invoke (this, e);
+    }
+
+    /// <summary>Virtual method to invoke the <see cref="AlternateForwardKeyChanged"/> event.</summary>
+    /// <param name="e"></param>
+    public virtual void OnAlternateForwardKeyChanged (KeyChangedEventArgs e) {
+        KeyBindings.Replace (e.OldKey, e.NewKey);
+        AlternateForwardKeyChanged?.Invoke (this, e);
+    }
+
+    /// <inheritdoc/>
+    public override void OnDrawContent (Rect contentArea) {
+        if (!Visible) {
+            return;
+        }
+
+        if (NeedsDisplay || SubViewNeedsDisplay || LayoutNeeded) {
+            //Driver.SetAttribute (GetNormalColor ());
+            // TODO: It's bad practice for views to always clear. Defeats the purpose of clipping etc...
+            Clear ();
+            LayoutSubviews ();
+            PositionToplevels ();
+
+            if (this == Application.OverlappedTop) {
+                foreach (Toplevel top in Application.OverlappedChildren.AsEnumerable ().Reverse ()) {
+                    if (top.Frame.IntersectsWith (Bounds)) {
+                        if (top != this && !top.IsCurrentTop && !OutsideTopFrame (top) &&
+                            top.Visible) {
+                            top.SetNeedsLayout ();
+                            top.SetNeedsDisplay (top.Bounds);
+                            top.Draw ();
+                            top.OnRenderLineCanvas ();
+                        }
+                    }
+                }
+            }
+
+            // This should not be here, but in base
+            foreach (View view in Subviews) {
+                if (view.Frame.IntersectsWith (Bounds) && !OutsideTopFrame (this)) {
+                    //view.SetNeedsLayout ();
+                    view.SetNeedsDisplay (view.Bounds);
+                    view.SetSubViewNeedsDisplay ();
+                }
+            }
+
+            base.OnDrawContent (contentArea);
+
+            // This is causing the menus drawn incorrectly if UseSubMenusSingleFrame is true
+            //if (this.MenuBar != null && this.MenuBar.IsMenuOpen && this.MenuBar.openMenu != null) {
+            //	// TODO: Hack until we can get compositing working right.
+            //	this.MenuBar.openMenu.Redraw (this.MenuBar.openMenu.Bounds);
+            //}
+        }
+    }
+
+    /// <inheritdoc/>
+    public override bool OnEnter (View view) { return MostFocused?.OnEnter (view) ?? base.OnEnter (view); }
+
+    /// <inheritdoc/>
+    public override bool OnLeave (View view) { return MostFocused?.OnLeave (view) ?? base.OnLeave (view); }
+
+    /// <summary>
+    ///     Called from <see cref="Application.Begin(Toplevel)"/> before the <see cref="Toplevel"/> redraws for the first
+    ///     time.
+    /// </summary>
+    public virtual void OnLoaded () {
+        IsLoaded = true;
+        foreach (Toplevel tl in Subviews.Where (v => v is Toplevel)) {
+            tl.OnLoaded ();
+        }
+
+        Loaded?.Invoke (this, EventArgs.Empty);
+    }
+
+    /// <summary>Virtual method to invoke the <see cref="QuitKeyChanged"/> event.</summary>
+    /// <param name="e"></param>
+    public virtual void OnQuitKeyChanged (KeyChangedEventArgs e) {
+        KeyBindings.Replace (e.OldKey, e.NewKey);
+        QuitKeyChanged?.Invoke (this, e);
+    }
+
+    /// <inheritdoc/>
+    public override void PositionCursor () {
+        if (!IsOverlappedContainer) {
+            base.PositionCursor ();
+            if (Focused == null) {
+                EnsureFocus ();
+                if (Focused == null) {
+                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
+                }
+            }
+
+            return;
+        }
 
         if (Focused == null) {
             foreach (Toplevel top in Application.OverlappedChildren) {
@@ -806,94 +898,6 @@ public partial class Toplevel : View {
         } else {
             Application.RequestStop ();
         }
-    }
-
-    private void SetInitialProperties () {
-        ColorScheme = Colors.ColorSchemes["TopLevel"];
-
-        Application.GrabbingMouse += Application_GrabbingMouse;
-        Application.UnGrabbingMouse += Application_UnGrabbingMouse;
-
-        // TODO: v2 - ALL Views (Responders??!?!) should support the commands related to 
-        //    - Focus
-        //  Move the appropriate AddCommand calls to `Responder`
-
-        // Things this view knows how to do
-        AddCommand (
-                    Command.QuitToplevel,
-                    () => {
-                        QuitToplevel ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.Suspend,
-                    () => {
-                        Driver.Suspend ();
-                        ;
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.NextView,
-                    () => {
-                        MoveNextView ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.PreviousView,
-                    () => {
-                        MovePreviousView ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.NextViewOrTop,
-                    () => {
-                        MoveNextViewOrTop ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.PreviousViewOrTop,
-                    () => {
-                        MovePreviousViewOrTop ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.Refresh,
-                    () => {
-                        Application.Refresh ();
-
-                        return true;
-                    });
-
-        // Default keybindings for this view
-        KeyBindings.Add (Application.QuitKey, Command.QuitToplevel);
-
-        KeyBindings.Add (Key.CursorRight, Command.NextView);
-        KeyBindings.Add (Key.CursorDown, Command.NextView);
-        KeyBindings.Add (Key.CursorLeft, Command.PreviousView);
-        KeyBindings.Add (Key.CursorUp, Command.PreviousView);
-
-        KeyBindings.Add (Key.Tab, Command.NextView);
-        KeyBindings.Add (Key.Tab.WithShift, Command.PreviousView);
-        KeyBindings.Add (Key.Tab.WithCtrl, Command.NextViewOrTop);
-        KeyBindings.Add (Key.Tab.WithShift.WithCtrl, Command.PreviousViewOrTop);
-
-        KeyBindings.Add (Key.F5, Command.Refresh);
-        KeyBindings.Add (Application.AlternateForwardKey, Command.NextViewOrTop); // Needed on Unix
-        KeyBindings.Add (Application.AlternateBackwardKey, Command.PreviousViewOrTop); // Needed on Unix
-
-#if UNIX_KEY_BINDINGS
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Suspend);
-        KeyBindings.Add (Key.L.WithCtrl, Command.Refresh); // Unix
-        KeyBindings.Add (Key.F.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.I.WithCtrl, Command.NextView); // Unix
-        KeyBindings.Add (Key.B.WithCtrl, Command.PreviousView); // Unix
-#endif
     }
 }
 

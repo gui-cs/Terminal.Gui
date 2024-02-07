@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
-
-namespace Terminal.Gui.ConfigurationTests; 
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests; 
 

@@ -1,6 +1,5 @@
 // Alias Console to MockConsole so we don't accidentally use Console
-
-namespace Terminal.Gui.ApplicationTests; 
+using Console = Terminal.Gui.FakeConsole;
 
 namespace Terminal.Gui.ApplicationTests; 
 

@@ -1183,7 +1183,7 @@ public class TextAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);

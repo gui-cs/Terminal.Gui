@@ -535,7 +535,6 @@ e
 │    d d│
 └───────┘
 ";
-        }
 
         Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 9, height + 2), pos);

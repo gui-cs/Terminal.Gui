@@ -5,10 +5,10 @@ namespace Terminal.Gui.ViewsTests;
 
 public class ScrollBarViewTests {
     private static HostView _hostView;
-    private readonly ITestOutputHelper output;
+    private readonly ITestOutputHelper _output;
     private bool _added;
     private ScrollBarView _scrollBar;
-    public ScrollBarViewTests (ITestOutputHelper output) { this.output = output; }
+    public ScrollBarViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [ScrollBarAutoInitShutdown]
@@ -187,7 +187,7 @@ public class ScrollBarViewTests {
 │░│
 │▼│
 └─┘";
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
     [Fact]
@@ -773,7 +773,7 @@ This is a test
 └───────────────────────────────────────────┘
 ";
 
-        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rect pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 45, 20), pos);
 
         textView.WordWrap = true;
@@ -810,7 +810,7 @@ This is a test
 └────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 26, 20), pos);
 
         ((FakeDriver)Application.Driver).SetBufferSize (10, 10);
@@ -837,7 +837,7 @@ This is a test
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 10, 10), pos);
     }
 
