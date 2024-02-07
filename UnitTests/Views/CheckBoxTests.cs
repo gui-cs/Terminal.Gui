@@ -213,7 +213,7 @@ public class CheckBoxTests {
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new Rect (0, 0, 30, 5), pos);
     }
-
+    
     [Fact]
     public void Constructors_Defaults () {
         var ckb = new CheckBox ();
@@ -223,47 +223,33 @@ public class CheckBoxTests {
         Assert.Equal (string.Empty, ckb.Text);
         Assert.Equal ($"{CM.Glyphs.UnChecked} ", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-
-        // BUGBUG: IsInitialized is false and
-        // the AutoSize wasn't calculated yet
-        Assert.False (ckb.IsInitialized);
-        Assert.Equal (new Rect (0, 0, 0, 1), ckb.Frame);
-        ckb.BeginInit ();
-        ckb.EndInit ();
-        Assert.True (ckb.IsInitialized);
         Assert.Equal (new Rect (0, 0, 2, 1), ckb.Frame);
 
-        ckb = new CheckBox { Text = "Test", Checked = true };
+        ckb = new CheckBox {Text = "Test", Checked = true };
         Assert.True (ckb.AutoSize);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
         Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        ckb.BeginInit ();
-        ckb.EndInit ();
         Assert.Equal (new Rect (0, 0, 6, 1), ckb.Frame);
 
-        ckb = new CheckBox { X = 1, Y = 2, Text = "Test" };
+        ckb = new CheckBox {Text = "Test", X = 1, Y = 2 };
         Assert.True (ckb.AutoSize);
         Assert.False (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
         Assert.Equal ($"{CM.Glyphs.UnChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        ckb.BeginInit ();
-        ckb.EndInit ();
         Assert.Equal (new Rect (1, 2, 6, 1), ckb.Frame);
 
-        ckb = new CheckBox { X = 3, Y = 4, Text = "Test", Checked = true };
+        ckb = new CheckBox { Text = "Test", X = 3, Y = 4, Checked = true };
         Assert.True (ckb.AutoSize);
         Assert.True (ckb.Checked);
         Assert.False (ckb.AllowNullChecked);
         Assert.Equal ("Test", ckb.Text);
         Assert.Equal ($"{CM.Glyphs.Checked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
-        ckb.BeginInit ();
-        ckb.EndInit ();
         Assert.Equal (new Rect (3, 4, 6, 1), ckb.Frame);
     }
 

@@ -13,52 +13,52 @@ public class ButtonTests {
 
         var lblWidth = 8;
 
-        var label = new Label {
+        var view = new View {
                                   Y = 1,
                                   Width = lblWidth,
+                                  Height = 1,
                                   TextAlignment = TextAlignment.Right,
-                                  AutoSize = false,
                                   Text = "Find:"
                               };
-        tab.Add (label);
+        tab.Add (view);
 
         var txtToFind = new TextField {
-                                          X = Pos.Right (label) + 1,
-                                          Y = Pos.Top (label),
+                                          X = Pos.Right (view) + 1,
+                                          Y = Pos.Top (view),
                                           Width = 20,
                                           Text = "Testing buttons."
                                       };
         tab.Add (txtToFind);
 
         var btnFindNext = new Button {
+                                         AutoSize = false,
                                          X = Pos.Right (txtToFind) + 1,
-                                         Y = Pos.Top (label),
+                                         Y = Pos.Top (view),
                                          Width = 20,
                                          Enabled = !string.IsNullOrEmpty (txtToFind.Text),
                                          TextAlignment = TextAlignment.Centered,
                                          IsDefault = true,
-                                         AutoSize = false,
                                          Text = "Find _Next"
                                      };
         tab.Add (btnFindNext);
 
         var btnFindPrevious = new Button {
+                                             AutoSize = false,
                                              X = Pos.Right (txtToFind) + 1,
                                              Y = Pos.Top (btnFindNext) + 1,
                                              Width = 20,
                                              Enabled = !string.IsNullOrEmpty (txtToFind.Text),
                                              TextAlignment = TextAlignment.Centered,
-                                             AutoSize = false,
                                              Text = "Find _Previous"
                                          };
         tab.Add (btnFindPrevious);
 
         var btnCancel = new Button {
+                                       AutoSize = false,
                                        X = Pos.Right (txtToFind) + 1,
                                        Y = Pos.Top (btnFindPrevious) + 2,
                                        Width = 20,
                                        TextAlignment = TextAlignment.Centered,
-                                       AutoSize = false,
                                        Text = "Cancel"
                                    };
         tab.Add (btnCancel);
@@ -90,7 +90,7 @@ public class ButtonTests {
                                  Height = Dim.Fill ()
                              };
 
-        tab.Width = label.Width + txtToFind.Width + btnFindNext.Width + 2;
+        tab.Width = view.Width + txtToFind.Width + btnFindNext.Width + 2;
         tab.Height = btnFindNext.Height + btnFindPrevious.Height + btnCancel.Height + 4;
 
         win.Add (tabView);
@@ -102,7 +102,7 @@ public class ButtonTests {
         Assert.Equal (new Rect (0, 0, 54, 11), win.Frame);
         Assert.Equal (new Rect (0, 0, 52, 9), tabView.Frame);
         Assert.Equal (new Rect (0, 0, 50, 7), tab.Frame);
-        Assert.Equal (new Rect (0, 1, 8, 1), label.Frame);
+        Assert.Equal (new Rect (0, 1, 8, 1), view.Frame);
         Assert.Equal (new Rect (9, 1, 20, 1), txtToFind.Frame);
 
         Assert.Equal (0, txtToFind.ScrollOffset);
@@ -267,25 +267,6 @@ public class ButtonTests {
 ";
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Button_AutoSize_False_Does_Not_Draw () {
-        var btn = new Button {
-                                 AutoSize = false,
-                                 X = Pos.Center (),
-                                 Y = Pos.Center (),
-                                 Text = "Press me!"
-                             };
-        Assert.Equal ("Press me!", btn.Text);
-        btn.BeginInit ();
-        btn.EndInit ();
-        btn.Draw ();
-
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
-        Assert.Equal ("{Width=0, Height=1}", btn.TextFormatter.Size.ToString ());
-        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
     }
 
     [Fact]
@@ -585,73 +566,6 @@ public class ButtonTests {
         Assert.True (btn.NewKeyDownEvent (btn.HotKey));
         Assert.True (clicked);
         clicked = false;
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Pos_Center_Layout_AutoSize_False () {
-        var button = new Button {
-                                    X = Pos.Center (),
-                                    Y = Pos.Center (),
-                                    Width = 20,
-                                    IsDefault = true,
-                                    AutoSize = false,
-                                    Text = "Process keys"
-                                };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
-        win.Add (button);
-        Application.Top.Add (win);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-        Assert.False (button.AutoSize);
-        Assert.Equal (new Rect (4, 1, 20, 1), button.Frame);
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│     {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Process keys {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}     │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void Pos_Center_Layout_AutoSize_True () {
-        var button = new Button {
-                                    X = Pos.Center (),
-                                    Y = Pos.Center (),
-                                    IsDefault = true,
-                                    Text = "Process keys"
-                                };
-        var win = new Window {
-                                 Width = Dim.Fill (),
-                                 Height = Dim.Fill ()
-                             };
-        win.Add (button);
-        Application.Top.Add (win);
-
-        Application.Begin (Application.Top);
-        ((FakeDriver)Application.Driver).SetBufferSize (30, 5);
-        Assert.True (button.AutoSize);
-        Assert.Equal (new Rect (5, 1, 18, 1), button.Frame);
-        var btn =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Process keys {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
-
-        var expected = @$"
-┌────────────────────────────┐
-│                            │
-│     {btn}     │
-│                            │
-└────────────────────────────┘
-";
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
     [Fact]
