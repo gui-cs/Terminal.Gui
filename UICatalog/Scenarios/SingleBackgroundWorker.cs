@@ -4,180 +4,230 @@ using System.ComponentModel;
 using System.Threading;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Single BackgroundWorker", Description: "A single BackgroundWorker threading opening another Toplevel")]
-	[ScenarioCategory ("Threading")]
-	[ScenarioCategory ("Top Level Windows")]
-	public class SingleBackgroundWorker : Scenario {
-		public override void Run ()
-		{
-			Application.Top.Dispose ();
+namespace UICatalog.Scenarios; 
 
-			Application.Run<MainApp> ();
+[ScenarioMetadata ("Single BackgroundWorker", "A single BackgroundWorker threading opening another Toplevel")]
+[ScenarioCategory ("Threading")]
+[ScenarioCategory ("Top Level Windows")]
+public class SingleBackgroundWorker : Scenario {
+    public override void Run () {
+        Application.Top.Dispose ();
 
-			Application.Top.Dispose ();
-		}
+        Application.Run<MainApp> ();
 
-		public class MainApp : Toplevel {
-			private BackgroundWorker worker;
-			private List<string> log = new List<string> ();
-			private DateTime? startStaging;
-			private ListView listLog;
+        Application.Top.Dispose ();
+    }
 
-			public MainApp ()
-			{
-				var menu = new MenuBar (new MenuBarItem [] {
-					new MenuBarItem ("_Options", new MenuItem [] {
-						new MenuItem ("_Run Worker", "", () => RunWorker(), null, null, KeyCode.CtrlMask | KeyCode.R),
-						null,
-						new MenuItem ("_Quit", "", () => Application.RequestStop(), null, null, KeyCode.CtrlMask | KeyCode.Q)
-					})
-				});
-				Add (menu);
+    public class MainApp : Toplevel {
+        private readonly ListView listLog;
+        private readonly List<string> log = new ();
+        private DateTime? startStaging;
+        private BackgroundWorker worker;
 
-				var statusBar = new StatusBar (new [] {
-					new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Application.RequestStop()),
-					new StatusItem(KeyCode.CtrlMask | KeyCode.P, "~^R~ Run Worker", () => RunWorker())
-				});
-				Add (statusBar);
+        public MainApp () {
+            var menu = new MenuBar (
+                                    new MenuBarItem[] {
+                                                          new (
+                                                               "_Options",
+                                                               new MenuItem[] {
+                                                                                  new (
+                                                                                   "_Run Worker",
+                                                                                   "",
+                                                                                   () => RunWorker (),
+                                                                                   null,
+                                                                                   null,
+                                                                                   KeyCode.CtrlMask | KeyCode.R),
+                                                                                  null,
+                                                                                  new (
+                                                                                   "_Quit",
+                                                                                   "",
+                                                                                   () => Application.RequestStop (),
+                                                                                   null,
+                                                                                   null,
+                                                                                   KeyCode.CtrlMask | KeyCode.Q)
+                                                                              })
+                                                      });
+            Add (menu);
 
-				var top = new Toplevel ();
+            var statusBar = new StatusBar (
+                                           new[] {
+                                                     new StatusItem (
+                                                                     Application.QuitKey,
+                                                                     $"{Application.QuitKey} to Quit",
+                                                                     () => Application.RequestStop ()),
+                                                     new StatusItem (
+                                                                     KeyCode.CtrlMask | KeyCode.P,
+                                                                     "~^R~ Run Worker",
+                                                                     () => RunWorker ())
+                                                 });
+            Add (statusBar);
 
-				top.Add (new Label () {
-					Text = "Worker Log",
-					X = Pos.Center (),
-					Y = 0
-				});
+            var top = new Toplevel ();
 
-				listLog = new ListView (log) {
-					X = 0,
-					Y = 2,
-					Width = Dim.Fill (),
-					Height = Dim.Fill ()
-				};
-				top.Add (listLog);
-				Add (top);
-			}
+            top.Add (
+                     new Label {
+                                   Text = "Worker Log",
+                                   X = Pos.Center (),
+                                   Y = 0
+                               });
 
-			private void RunWorker ()
-			{
-				worker = new BackgroundWorker () { WorkerSupportsCancellation = true };
+            listLog = new ListView (log) {
+                                             X = 0,
+                                             Y = 2,
+                                             Width = Dim.Fill (),
+                                             Height = Dim.Fill ()
+                                         };
+            top.Add (listLog);
+            Add (top);
+        }
 
-				var cancel = new Button ("Cancel Worker");
-				cancel.Clicked += (s, e) => {
-					if (worker == null) {
-						log.Add ($"Worker is not running at {DateTime.Now}!");
-						listLog.SetNeedsDisplay ();
-						return;
-					}
+        private void RunWorker () {
+            worker = new BackgroundWorker { WorkerSupportsCancellation = true };
 
-					log.Add ($"Worker {startStaging}.{startStaging:fff} is canceling at {DateTime.Now}!");
-					listLog.SetNeedsDisplay ();
-					worker.CancelAsync ();
-				};
+            var cancel = new Button ("Cancel Worker");
+            cancel.Clicked += (s, e) => {
+                if (worker == null) {
+                    log.Add ($"Worker is not running at {DateTime.Now}!");
+                    listLog.SetNeedsDisplay ();
 
-				startStaging = DateTime.Now;
-				log.Add ($"Worker is started at {startStaging}.{startStaging:fff}");
-				listLog.SetNeedsDisplay ();
+                    return;
+                }
 
-				var md = new Dialog (cancel) { Title = $"Running Worker started at {startStaging}.{startStaging:fff}" };
-				md.Add (new Label () {
-					Text = "Wait for worker to finish...",
-					X = Pos.Center (),
-					Y = Pos.Center ()
-				});
+                log.Add ($"Worker {startStaging}.{startStaging:fff} is canceling at {DateTime.Now}!");
+                listLog.SetNeedsDisplay ();
+                worker.CancelAsync ();
+            };
 
-				worker.DoWork += (s, e) => {
-					var stageResult = new List<string> ();
-					for (int i = 0; i < 500; i++) {
-						stageResult.Add ($"Worker {i} started at {DateTime.Now}");
-						e.Result = stageResult;
-						Thread.Sleep (1);
-						if (worker.CancellationPending) {
-							e.Cancel = true;
-							return;
-						}
-					}
-				};
+            startStaging = DateTime.Now;
+            log.Add ($"Worker is started at {startStaging}.{startStaging:fff}");
+            listLog.SetNeedsDisplay ();
 
-				worker.RunWorkerCompleted += (s, e) => {
-					if (md.IsCurrentTop) {
-						//Close the dialog
-						Application.RequestStop ();
-					}
+            var md = new Dialog (cancel) { Title = $"Running Worker started at {startStaging}.{startStaging:fff}" };
+            md.Add (
+                    new Label {
+                                  Text = "Wait for worker to finish...",
+                                  X = Pos.Center (),
+                                  Y = Pos.Center ()
+                              });
 
-					if (e.Error != null) {
-						// Failed
-						log.Add ($"Exception occurred {e.Error.Message} on Worker {startStaging}.{startStaging:fff} at {DateTime.Now}");
-						listLog.SetNeedsDisplay ();
-					} else if (e.Cancelled) {
-						// Canceled
-						log.Add ($"Worker {startStaging}.{startStaging:fff} was canceled at {DateTime.Now}!");
-						listLog.SetNeedsDisplay ();
-					} else {
-						// Passed
-						log.Add ($"Worker {startStaging}.{startStaging:fff} was completed at {DateTime.Now}.");
-						listLog.SetNeedsDisplay ();
-						Application.Refresh ();
-						var builderUI = new StagingUIController (startStaging, e.Result as List<string>);
-						builderUI.Load ();
-					}
-					worker = null;
-				};
-				worker.RunWorkerAsync ();
-				Application.Run (md);
-			}
-		}
+            worker.DoWork += (s, e) => {
+                List<string> stageResult = new ();
+                for (var i = 0; i < 500; i++) {
+                    stageResult.Add ($"Worker {i} started at {DateTime.Now}");
+                    e.Result = stageResult;
+                    Thread.Sleep (1);
+                    if (worker.CancellationPending) {
+                        e.Cancel = true;
 
-		public class StagingUIController : Window {
-			Toplevel top;
+                        return;
+                    }
+                }
+            };
 
-			public StagingUIController (DateTime? start, List<string> list)
-			{
-				top = new Toplevel (Application.Top.Frame);
-				top.KeyDown += (s, e) => {
-					// Prevents Ctrl+Q from closing this.
-					// Only Ctrl+C is allowed.
-					if (e == Application.QuitKey) {
-						e.Handled = true;
-					}
-				};
+            worker.RunWorkerCompleted += (s, e) => {
+                if (md.IsCurrentTop) {
+                    //Close the dialog
+                    Application.RequestStop ();
+                }
 
-				bool Close ()
-				{
-					var n = MessageBox.Query (50, 7, "Close Window.", "Are you sure you want to close this window?", "Yes", "No");
-					return n == 0;
-				}
+                if (e.Error != null) {
+                    // Failed
+                    log.Add (
+                             $"Exception occurred {e.Error.Message} on Worker {startStaging}.{startStaging:fff} at {DateTime.Now}");
+                    listLog.SetNeedsDisplay ();
+                } else if (e.Cancelled) {
+                    // Canceled
+                    log.Add ($"Worker {startStaging}.{startStaging:fff} was canceled at {DateTime.Now}!");
+                    listLog.SetNeedsDisplay ();
+                } else {
+                    // Passed
+                    log.Add ($"Worker {startStaging}.{startStaging:fff} was completed at {DateTime.Now}.");
+                    listLog.SetNeedsDisplay ();
+                    Application.Refresh ();
+                    var builderUI = new StagingUIController (startStaging, e.Result as List<string>);
+                    builderUI.Load ();
+                }
 
-				var menu = new MenuBar (new MenuBarItem [] {
-					new MenuBarItem ("_Stage", new MenuItem [] {
-						new MenuItem ("_Close", "", () => { if (Close()) { Application.RequestStop(); } }, null, null, KeyCode.CtrlMask | KeyCode.C)
-					})
-				});
-				top.Add (menu);
+                worker = null;
+            };
+            worker.RunWorkerAsync ();
+            Application.Run (md);
+        }
+    }
 
-				var statusBar = new StatusBar (new [] {
-					new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Close", () => { if (Close()) { Application.RequestStop(); } }),
-				});
-				top.Add (statusBar);
+    public class StagingUIController : Window {
+        private readonly Toplevel top;
 
-				Title = $"Worker started at {start}.{start:fff}";
-				ColorScheme = Colors.ColorSchemes ["Base"];
+        public StagingUIController (DateTime? start, List<string> list) {
+            top = new Toplevel (Application.Top.Frame);
+            top.KeyDown += (s, e) => {
+                // Prevents Ctrl+Q from closing this.
+                // Only Ctrl+C is allowed.
+                if (e == Application.QuitKey) {
+                    e.Handled = true;
+                }
+            };
 
-				Add (new ListView (list) {
-					X = 0,
-					Y = 0,
-					Width = Dim.Fill (),
-					Height = Dim.Fill ()
-				});
+            bool Close () {
+                int n = MessageBox.Query (
+                                          50,
+                                          7,
+                                          "Close Window.",
+                                          "Are you sure you want to close this window?",
+                                          "Yes",
+                                          "No");
 
-				top.Add (this);
-			}
+                return n == 0;
+            }
 
-			public void Load ()
-			{
-				Application.Run (top);
-			}
-		}
-	}
+            var menu = new MenuBar (
+                                    new MenuBarItem[] {
+                                                          new (
+                                                               "_Stage",
+                                                               new MenuItem[] {
+                                                                                  new (
+                                                                                   "_Close",
+                                                                                   "",
+                                                                                   () => {
+                                                                                       if (Close ()) {
+                                                                                           Application
+                                                                                               .RequestStop ();
+                                                                                       }
+                                                                                   },
+                                                                                   null,
+                                                                                   null,
+                                                                                   KeyCode.CtrlMask | KeyCode.C)
+                                                                              })
+                                                      });
+            top.Add (menu);
+
+            var statusBar = new StatusBar (
+                                           new[] {
+                                                     new StatusItem (
+                                                                     KeyCode.CtrlMask | KeyCode.C,
+                                                                     "~^C~ Close",
+                                                                     () => {
+                                                                         if (Close ()) {
+                                                                             Application.RequestStop ();
+                                                                         }
+                                                                     })
+                                                 });
+            top.Add (statusBar);
+
+            Title = $"Worker started at {start}.{start:fff}";
+            ColorScheme = Colors.ColorSchemes["Base"];
+
+            Add (
+                 new ListView (list) {
+                                         X = 0,
+                                         Y = 0,
+                                         Width = Dim.Fill (),
+                                         Height = Dim.Fill ()
+                                     });
+
+            top.Add (this);
+        }
+
+        public void Load () { Application.Run (top); }
+    }
 }

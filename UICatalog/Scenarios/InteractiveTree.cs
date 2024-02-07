@@ -1,145 +1,152 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
+namespace UICatalog.Scenarios; 
 
-	[ScenarioMetadata (Name: "Interactive Tree", Description: "Create nodes and child nodes in TreeView.")]
-	[ScenarioCategory ("Controls"), ScenarioCategory ("TreeView")]
-	public class InteractiveTree : Scenario {
+[ScenarioMetadata ("Interactive Tree", "Create nodes and child nodes in TreeView.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("TreeView")]
+public class InteractiveTree : Scenario {
+    private TreeView treeView;
 
-		TreeView treeView;
+    public override void Setup () {
+        Win.Title = GetName ();
+        Win.Y = 1; // menu
+        Win.Height = Dim.Fill (1); // status bar
 
-		public override void Setup ()
-		{
-			Win.Title = this.GetName ();
-			Win.Y = 1; // menu
-			Win.Height = Dim.Fill (1); // status bar
+        var menu = new MenuBar (
+                                new MenuBarItem[] {
+                                                      new (
+                                                           "_File",
+                                                           new MenuItem[] {
+                                                                              new ("_Quit", "", () => Quit ())
+                                                                          })
+                                                  });
+        Application.Top.Add (menu);
 
-			var menu = new MenuBar (new MenuBarItem [] {
-				new MenuBarItem ("_File", new MenuItem [] {
-					new MenuItem ("_Quit", "", () => Quit()),
-				})
-				});
-			Application.Top.Add (menu);
+        treeView = new TreeView {
+                                    X = 0,
+                                    Y = 0,
+                                    Width = Dim.Fill (),
+                                    Height = Dim.Fill (1)
+                                };
+        treeView.KeyDown += TreeView_KeyPress;
 
-			treeView = new TreeView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
-			};
-			treeView.KeyDown += TreeView_KeyPress;
+        Win.Add (treeView);
 
-			Win.Add (treeView);
+        var statusBar = new StatusBar (
+                                       new StatusItem[] {
+                                                            new (
+                                                                 Application.QuitKey,
+                                                                 $"{Application.QuitKey} to Quit",
+                                                                 () => Quit ()),
+                                                            new (
+                                                                 KeyCode.CtrlMask | KeyCode.C,
+                                                                 "~^C~ Add Child",
+                                                                 () => AddChildNode ()),
+                                                            new (
+                                                                 KeyCode.CtrlMask | KeyCode.T,
+                                                                 "~^T~ Add Root",
+                                                                 () => AddRootNode ()),
+                                                            new (
+                                                                 KeyCode.CtrlMask | KeyCode.R,
+                                                                 "~^R~ Rename Node",
+                                                                 () => RenameNode ())
+                                                        });
+        Application.Top.Add (statusBar);
+    }
 
-			var statusBar = new StatusBar (new StatusItem [] {
-				new StatusItem(Application.QuitKey, $"{Application.QuitKey} to Quit", () => Quit()),
-				new StatusItem(KeyCode.CtrlMask | KeyCode.C, "~^C~ Add Child", () => AddChildNode()),
-				new StatusItem(KeyCode.CtrlMask | KeyCode.T, "~^T~ Add Root", () => AddRootNode()),
-				new StatusItem(KeyCode.CtrlMask | KeyCode.R, "~^R~ Rename Node", () => RenameNode()),
-			});
-			Application.Top.Add (statusBar);
+    private void AddChildNode () {
+        ITreeNode node = treeView.SelectedObject;
 
-		}
+        if (node != null) {
+            if (GetText ("Text", "Enter text for node:", "", out string entered)) {
+                node.Children.Add (new TreeNode (entered));
+                treeView.RefreshObject (node);
+            }
+        }
+    }
 
-		private void TreeView_KeyPress (object sender, Key obj)
-		{
-			if (obj.KeyCode == KeyCode.Delete) {
+    private void AddRootNode () {
+        if (GetText ("Text", "Enter text for node:", "", out string entered)) {
+            treeView.AddObject (new TreeNode (entered));
+        }
+    }
 
-				var toDelete = treeView.SelectedObject;
+    private bool GetText (string title, string label, string initialText, out string enteredText) {
+        var okPressed = false;
 
-				if (toDelete == null) {
-					return;
-				}
+        var ok = new Button ("Ok", true);
+        ok.Clicked += (s, e) => {
+            okPressed = true;
+            Application.RequestStop ();
+        };
+        var cancel = new Button ("Cancel");
+        cancel.Clicked += (s, e) => { Application.RequestStop (); };
+        var d = new Dialog (ok, cancel) { Title = title };
 
-				obj.Handled = true;
+        var lbl = new Label {
+                                X = 0,
+                                Y = 1,
+                                Text = label
+                            };
 
-				// if it is a root object remove it
-				if (treeView.Objects.Contains (toDelete)) {
-					treeView.Remove (toDelete);
-				} else {
-					var parent = treeView.GetParent (toDelete);
+        var tf = new TextField {
+                                   Text = initialText,
+                                   X = 0,
+                                   Y = 2,
+                                   Width = Dim.Fill ()
+                               };
 
-					if (parent == null) {
-						MessageBox.ErrorQuery ("Could not delete", $"Parent of '{toDelete}' was unexpectedly null", "Ok");
-					} else {
-						//update the model
-						parent.Children.Remove (toDelete);
+        d.Add (lbl, tf);
+        tf.SetFocus ();
 
-						//refresh the tree
-						treeView.RefreshObject (parent);
-					}
-				}
-			}
-		}
+        Application.Run (d);
 
-		private void RenameNode ()
-		{
-			var node = treeView.SelectedObject;
+        enteredText = okPressed ? tf.Text : null;
 
-			if (node != null) {
-				if (GetText ("Text", "Enter text for node:", node.Text, out string entered)) {
-					node.Text = entered;
-					treeView.RefreshObject (node);
-				}
-			}
-		}
+        return okPressed;
+    }
 
-		private void AddRootNode ()
-		{
-			if (GetText ("Text", "Enter text for node:", "", out string entered)) {
-				treeView.AddObject (new TreeNode (entered));
-			}
-		}
+    private void Quit () { Application.RequestStop (); }
 
-		private void AddChildNode ()
-		{
-			var node = treeView.SelectedObject;
+    private void RenameNode () {
+        ITreeNode node = treeView.SelectedObject;
 
-			if (node != null) {
-				if (GetText ("Text", "Enter text for node:", "", out string entered)) {
-					node.Children.Add (new TreeNode (entered));
-					treeView.RefreshObject (node);
-				}
-			}
-		}
+        if (node != null) {
+            if (GetText ("Text", "Enter text for node:", node.Text, out string entered)) {
+                node.Text = entered;
+                treeView.RefreshObject (node);
+            }
+        }
+    }
 
-		private bool GetText (string title, string label, string initialText, out string enteredText)
-		{
-			bool okPressed = false;
+    private void TreeView_KeyPress (object sender, Key obj) {
+        if (obj.KeyCode == KeyCode.Delete) {
+            ITreeNode toDelete = treeView.SelectedObject;
 
-			var ok = new Button ("Ok", is_default: true);
-			ok.Clicked += (s, e) => { okPressed = true; Application.RequestStop (); };
-			var cancel = new Button ("Cancel");
-			cancel.Clicked += (s, e) => { Application.RequestStop (); };
-			var d = new Dialog (ok, cancel) { Title = title };
+            if (toDelete == null) {
+                return;
+            }
 
-			var lbl = new Label () {
-				X = 0,
-				Y = 1,
-				Text = label
-			};
+            obj.Handled = true;
 
-			var tf = new TextField () {
-				Text = initialText,
-				X = 0,
-				Y = 2,
-				Width = Dim.Fill ()
-			};
+            // if it is a root object remove it
+            if (treeView.Objects.Contains (toDelete)) {
+                treeView.Remove (toDelete);
+            } else {
+                ITreeNode parent = treeView.GetParent (toDelete);
 
-			d.Add (lbl, tf);
-			tf.SetFocus ();
+                if (parent == null) {
+                    MessageBox.ErrorQuery ("Could not delete", $"Parent of '{toDelete}' was unexpectedly null", "Ok");
+                } else {
+                    //update the model
+                    parent.Children.Remove (toDelete);
 
-			Application.Run (d);
-
-			enteredText = okPressed ? tf.Text : null;
-			return okPressed;
-		}
-
-		private void Quit ()
-		{
-			Application.RequestStop ();
-		}
-	}
+                    //refresh the tree
+                    treeView.RefreshObject (parent);
+                }
+            }
+        }
+    }
 }

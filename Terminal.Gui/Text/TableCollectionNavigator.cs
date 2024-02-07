@@ -1,35 +1,22 @@
+namespace Terminal.Gui; 
 
+/// <summary>Collection navigator for cycling selections in a <see cref="TableView"/>.</summary>
+public class TableCollectionNavigator : CollectionNavigatorBase {
+    private readonly TableView tableView;
 
-namespace Terminal.Gui {
+    /// <summary>Creates a new instance for navigating the data in the wrapped <paramref name="tableView"/>.</summary>
+    public TableCollectionNavigator (TableView tableView) { this.tableView = tableView; }
 
-	/// <summary>
-	/// Collection navigator for cycling selections in a <see cref="TableView"/>.
-	/// </summary>
-	public class TableCollectionNavigator : CollectionNavigatorBase {
-		readonly TableView tableView;
+    /// <inheritdoc/>
+    protected override object ElementAt (int idx) {
+        int col = tableView.SelectedColumn;
+        object rawValue = tableView.Table[idx, col];
 
-		/// <summary>
-		/// Creates a new instance for navigating the data in the wrapped <paramref name="tableView"/>.
-		/// </summary>
-		public TableCollectionNavigator (TableView tableView)
-		{
-			this.tableView = tableView;
-		}
+        ColumnStyle style = tableView.Style.GetColumnStyleIfAny (col);
 
-		/// <inheritdoc/>
-		protected override object ElementAt (int idx)
-		{
-			var col = tableView.SelectedColumn;
-			var rawValue = tableView.Table [idx, col];
+        return style?.RepresentationGetter?.Invoke (rawValue) ?? rawValue;
+    }
 
-			var style = this.tableView.Style.GetColumnStyleIfAny (col);
-			return style?.RepresentationGetter?.Invoke (rawValue) ?? rawValue;
-		}
-
-		/// <inheritdoc/>
-		protected override int GetCollectionLength ()
-		{
-			return tableView.Table.Rows;
-		}
-	}
+    /// <inheritdoc/>
+    protected override int GetCollectionLength () { return tableView.Table.Rows; }
 }

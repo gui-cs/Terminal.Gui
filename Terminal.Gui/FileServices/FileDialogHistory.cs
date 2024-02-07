@@ -1,110 +1,80 @@
-﻿using System.Collections.Generic;
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 
-namespace Terminal.Gui {
+namespace Terminal.Gui; 
 
-	internal class FileDialogHistory {
-		private Stack<FileDialogState> back = new Stack<FileDialogState> ();
-		private Stack<FileDialogState> forward = new Stack<FileDialogState> ();
-		private FileDialog dlg;
+class FileDialogHistory {
+    private readonly Stack<FileDialogState> back = new ();
+    private readonly FileDialog dlg;
+    private readonly Stack<FileDialogState> forward = new ();
+    public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
 
-		public FileDialogHistory (FileDialog dlg)
-		{
-			this.dlg = dlg;
-		}
+    public bool Back () {
+        IDirectoryInfo goTo = null;
+        FileSystemInfoStats restoreSelection = null;
+        string restorePath = null;
 
-		public bool Back ()
-		{
+        if (CanBack ()) {
+            FileDialogState backTo = back.Pop ();
+            goTo = backTo.Directory;
+            restoreSelection = backTo.Selected;
+            restorePath = backTo.Path;
+        } else if (CanUp ()) {
+            goTo = dlg.State?.Directory.Parent;
+        }
 
-			IDirectoryInfo goTo = null;
-			FileSystemInfoStats restoreSelection = null;
-			string restorePath = null;
+        // nowhere to go
+        if (goTo == null) {
+            return false;
+        }
 
-			if (this.CanBack ()) {
+        forward.Push (dlg.State);
+        dlg.PushState (goTo, false, true, false, restorePath);
 
-				var backTo = this.back.Pop ();
-				goTo = backTo.Directory;
-				restoreSelection = backTo.Selected;
-				restorePath = backTo.Path;
+        if (restoreSelection != null) {
+            dlg.RestoreSelection (restoreSelection.FileSystemInfo);
+        }
 
-			} else if (this.CanUp ()) {
-				goTo = this.dlg.State?.Directory.Parent;
-			}
+        return true;
+    }
 
-			// nowhere to go
-			if (goTo == null) {
-				return false;
-			}
+    internal bool CanBack () { return back.Count > 0; }
+    internal bool CanForward () { return forward.Count > 0; }
+    internal bool CanUp () { return dlg.State?.Directory.Parent != null; }
+    internal void ClearForward () { forward.Clear (); }
 
-			this.forward.Push (this.dlg.State);
-			this.dlg.PushState (goTo, false, true, false, restorePath);
+    internal bool Forward () {
+        if (forward.Count > 0) {
+            dlg.PushState (forward.Pop ().Directory, true, true, false);
 
+            return true;
+        }
 
-			if (restoreSelection != null) {
-				this.dlg.RestoreSelection (restoreSelection.FileSystemInfo);
-			}
+        return false;
+    }
 
-			return true;
-		}
+    internal void Push (FileDialogState state, bool clearForward) {
+        if (state == null) {
+            return;
+        }
 
-		internal bool CanBack ()
-		{
-			return this.back.Count > 0;
-		}
+        // if changing to a new directory push onto the Back history
+        if ((back.Count == 0) || (back.Peek ().Directory.FullName != state.Directory.FullName)) {
+            back.Push (state);
+            if (clearForward) {
+                ClearForward ();
+            }
+        }
+    }
 
-		internal bool Forward ()
-		{
-			if (this.forward.Count > 0) {
+    internal bool Up () {
+        IDirectoryInfo parent = dlg.State?.Directory.Parent;
+        if (parent != null) {
+            back.Push (new FileDialogState (parent, dlg));
+            dlg.PushState (parent, false);
 
-				this.dlg.PushState (this.forward.Pop ().Directory, true, true, false);
-				return true;
-			}
+            return true;
+        }
 
-			return false;
-		}
-
-		internal bool Up ()
-		{
-			var parent = this.dlg.State?.Directory.Parent;
-			if (parent != null) {
-
-				this.back.Push (new FileDialogState (parent, this.dlg));
-				this.dlg.PushState (parent, false);
-				return true;
-			}
-
-			return false;
-		}
-
-		internal bool CanUp ()
-		{
-			return this.dlg.State?.Directory.Parent != null;
-		}
-
-		internal void Push (FileDialogState state, bool clearForward)
-		{
-			if (state == null) {
-				return;
-			}
-
-			// if changing to a new directory push onto the Back history
-			if (this.back.Count == 0 || this.back.Peek ().Directory.FullName != state.Directory.FullName) {
-
-				this.back.Push (state);
-				if (clearForward) {
-					this.ClearForward ();
-				}
-			}
-		}
-
-		internal bool CanForward ()
-		{
-			return this.forward.Count > 0;
-		}
-
-		internal void ClearForward ()
-		{
-			this.forward.Clear ();
-		}
-	}
+        return false;
+    }
 }

@@ -1,114 +1,121 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
-	[ScenarioMetadata (Name: "Simple Text Alignment", Description: "Demonstrates horizontal text alignment")]
-	[ScenarioCategory ("Text and Formatting")]
-	public class TextAlignments : Scenario {
-		public override void Setup ()
-		{
-			Win.X = 10;
-			Win.Width = Dim.Fill (10);
+namespace UICatalog.Scenarios; 
 
-			string txt = "Hello world, how are you today? Pretty neat!";
-			string unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
+[ScenarioMetadata ("Simple Text Alignment", "Demonstrates horizontal text alignment")]
+[ScenarioCategory ("Text and Formatting")]
+public class TextAlignments : Scenario {
+    public override void Setup () {
+        Win.X = 10;
+        Win.Width = Dim.Fill (10);
 
-			var alignments = Enum.GetValues (typeof (Terminal.Gui.TextAlignment)).Cast<Terminal.Gui.TextAlignment> ().ToList ();
-			var singleLines = new Label [alignments.Count];
-			var multipleLines = new Label [alignments.Count];
+        var txt = "Hello world, how are you today? Pretty neat!";
+        var unicodeSampleText = "A Unicode sentence (Ð¿ÑÐ Ð²ÐµÑ) has words.";
 
-			var multiLineHeight = 5;
+        List<TextAlignment> alignments = Enum.GetValues (typeof (TextAlignment)).Cast<TextAlignment> ().ToList ();
+        Label[] singleLines = new Label [alignments.Count];
+        Label[] multipleLines = new Label [alignments.Count];
 
-			foreach (var alignment in alignments) {
-				singleLines [(int)alignment] = new Label (txt) { AutoSize = false, TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = 1, ColorScheme = Colors.ColorSchemes ["Dialog"] };
-				multipleLines [(int)alignment] = new Label (txt) { AutoSize = false, TextAlignment = alignment, X = 1, Width = Dim.Fill (1), Height = multiLineHeight, ColorScheme = Colors.ColorSchemes ["Dialog"] };
-			}
+        var multiLineHeight = 5;
 
-			// Add a label & text field so we can demo IsDefault
-			var editLabel = new Label () {
-				Text = "Text:",
-				X = 0,
-				Y = 0,
-			};
-			Win.Add (editLabel);
-			var edit = new TextView () {
-				X = Pos.Right (editLabel) + 1,
-				Y = Pos.Y (editLabel),
-				Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
-				Height = 4,
-				ColorScheme = Colors.ColorSchemes ["TopLevel"],
-				Text = txt,
-			};
-			edit.TextChanged += (s, e) => {
-				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].Text = edit.Text;
-					multipleLines [(int)alignment].Text = edit.Text;
-				}
-			};
-			Win.Add (edit);
+        foreach (TextAlignment alignment in alignments) {
+            singleLines[(int)alignment] = new Label (txt) {
+                                                              AutoSize = false, TextAlignment = alignment, X = 1,
+                                                              Width = Dim.Fill (1),
+                                                              Height = 1, ColorScheme = Colors.ColorSchemes["Dialog"]
+                                                          };
+            multipleLines[(int)alignment] = new Label (txt) {
+                                                                AutoSize = false, TextAlignment = alignment, X = 1,
+                                                                Width = Dim.Fill (1), Height = multiLineHeight,
+                                                                ColorScheme = Colors.ColorSchemes["Dialog"]
+                                                            };
+        }
 
-			var unicodeSample = new Button () {
-				Text = "Unicode Sample",
-				X = Pos.Right (edit) + 1,
-				Y = 0,
-			};
-			unicodeSample.Clicked += (s, e) => {
-				edit.Text = unicodeSampleText;
-			};
-			Win.Add (unicodeSample);
+        // Add a label & text field so we can demo IsDefault
+        var editLabel = new Label {
+                                      Text = "Text:",
+                                      X = 0,
+                                      Y = 0
+                                  };
+        Win.Add (editLabel);
+        var edit = new TextView {
+                                    X = Pos.Right (editLabel) + 1,
+                                    Y = Pos.Y (editLabel),
+                                    Width = Dim.Fill ("Text:".Length + "  Unicode Sample".Length + 2),
+                                    Height = 4,
+                                    ColorScheme = Colors.ColorSchemes["TopLevel"],
+                                    Text = txt
+                                };
+        edit.TextChanged += (s, e) => {
+            foreach (TextAlignment alignment in alignments) {
+                singleLines[(int)alignment].Text = edit.Text;
+                multipleLines[(int)alignment].Text = edit.Text;
+            }
+        };
+        Win.Add (edit);
 
-			var update = new Button () {
-				Text = "_Update",
-				X = Pos.Right (edit) + 1,
-				Y = Pos.Bottom (edit) - 1,
+        var unicodeSample = new Button {
+                                           Text = "Unicode Sample",
+                                           X = Pos.Right (edit) + 1,
+                                           Y = 0
+                                       };
+        unicodeSample.Clicked += (s, e) => { edit.Text = unicodeSampleText; };
+        Win.Add (unicodeSample);
 
-			};
-			update.Clicked += (s, e) => {
-				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].Text = edit.Text;
-					multipleLines [(int)alignment].Text = edit.Text;
-				}
-			};
-			Win.Add (update);
+        var update = new Button {
+                                    Text = "_Update",
+                                    X = Pos.Right (edit) + 1,
+                                    Y = Pos.Bottom (edit) - 1
+                                };
+        update.Clicked += (s, e) => {
+            foreach (TextAlignment alignment in alignments) {
+                singleLines[(int)alignment].Text = edit.Text;
+                multipleLines[(int)alignment].Text = edit.Text;
+            }
+        };
+        Win.Add (update);
 
-			var enableHotKeyCheckBox = new CheckBox ("Enable Hotkey (_)", false) {
-				X = 0,
-				Y = Pos.Bottom (edit),
-			};
+        var enableHotKeyCheckBox = new CheckBox ("Enable Hotkey (_)") {
+                                                                          X = 0,
+                                                                          Y = Pos.Bottom (edit)
+                                                                      };
 
-			Win.Add (enableHotKeyCheckBox);
+        Win.Add (enableHotKeyCheckBox);
 
-			var label = new Label ($"Demonstrating single-line (should clip):") { Y = Pos.Bottom (enableHotKeyCheckBox) + 1 };
-			Win.Add (label);
-			foreach (var alignment in alignments) {
-				label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
-				Win.Add (label);
-				singleLines [(int)alignment].Y = Pos.Bottom (label);
-				Win.Add (singleLines [(int)alignment]);
-				label = singleLines [(int)alignment];
-			}
+        var label = new Label ("Demonstrating single-line (should clip):")
+                    { Y = Pos.Bottom (enableHotKeyCheckBox) + 1 };
+        Win.Add (label);
+        foreach (TextAlignment alignment in alignments) {
+            label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
+            Win.Add (label);
+            singleLines[(int)alignment].Y = Pos.Bottom (label);
+            Win.Add (singleLines[(int)alignment]);
+            label = singleLines[(int)alignment];
+        }
 
-			txt += "\nSecond line\n\nFourth Line.";
-			label = new Label ($"Demonstrating multi-line and word wrap:") { Y = Pos.Bottom (label) };
-			Win.Add (label);
-			foreach (var alignment in alignments) {
-				label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
-				Win.Add (label);
-				multipleLines [(int)alignment].Y = Pos.Bottom (label);
-				Win.Add (multipleLines [(int)alignment]);
-				label = multipleLines [(int)alignment];
-			}
+        txt += "\nSecond line\n\nFourth Line.";
+        label = new Label ("Demonstrating multi-line and word wrap:") { Y = Pos.Bottom (label) };
+        Win.Add (label);
+        foreach (TextAlignment alignment in alignments) {
+            label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
+            Win.Add (label);
+            multipleLines[(int)alignment].Y = Pos.Bottom (label);
+            Win.Add (multipleLines[(int)alignment]);
+            label = multipleLines[(int)alignment];
+        }
 
-			enableHotKeyCheckBox.Toggled += (s, e) => {
-				foreach (var alignment in alignments) {
-					singleLines [(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
-					multipleLines [(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
-				}
-				Win.SetNeedsDisplay ();
-				Win.LayoutSubviews ();
-			};
-		}
-	}
+        enableHotKeyCheckBox.Toggled += (s, e) => {
+            foreach (TextAlignment alignment in alignments) {
+                singleLines[(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
+                multipleLines[(int)alignment].HotKeySpecifier = e.OldValue == true ? (Rune)0xffff : (Rune)'_';
+            }
+
+            Win.SetNeedsDisplay ();
+            Win.LayoutSubviews ();
+        };
+    }
 }

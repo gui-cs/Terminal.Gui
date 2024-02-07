@@ -1,436 +1,425 @@
-﻿using Xunit;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 public class SetRelativeLayoutTests {
-	readonly ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output;
+    public SetRelativeLayoutTests (ITestOutputHelper output) { _output = output; }
 
-	public SetRelativeLayoutTests (ITestOutputHelper output) => _output = output;
+    [Fact]
+    public void AbsolutePosDim_DontChange () {
+        var screen = new Rect (0, 0, 10, 15);
+        var view = new View {
+                                X = 1, // outside of screen +10
+                                Y = 2, // outside of screen -10
+                                Width = 3,
+                                Height = 4
+                            };
 
+        // Layout is Absolute. So the X and Y are not changed.
+        view.SetRelativeLayout (screen);
+        Assert.Equal (1, view.Frame.X);
+        Assert.Equal (2, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (4, view.Frame.Height);
+    }
 
-	[Fact]
-	public void DimFill_Is_Honored ()
-	{
-		var view = new View () {
-			X = 1,
-			Y = 1,
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-		};
+    [Fact]
+    public void ComputedPosDim_StayComputed () {
+        var screen = new Rect (0, 0, 10, 15);
+        var view = new View {
+                                X = 1,
+                                Y = 2,
+                                Width = Dim.Fill (),
+                                Height = Dim.Fill ()
+                            };
 
-		view.SetRelativeLayout (new Rect (0, 0, 80, 25));
-		Assert.Equal ("Fill(0)", view.Width.ToString ());
-		Assert.Equal (1, view.Frame.X);
-		Assert.Equal (1, view.Frame.Y);
-		Assert.Equal (79, view.Frame.Width);
-		Assert.Equal (24, view.Frame.Height);
-		Assert.Equal (0, view.Bounds.X);
-		Assert.Equal (0, view.Bounds.Y);
-		Assert.Equal (79, view.Bounds.Width);
-		Assert.Equal (24, view.Bounds.Height);
+        Assert.Equal ("Absolute(1)", view.X.ToString ());
+        Assert.Equal ("Absolute(2)", view.Y.ToString ());
+        Assert.Equal ("Fill(0)", view.Width.ToString ());
+        Assert.Equal ("Fill(0)", view.Height.ToString ());
+        view.SetRelativeLayout (screen);
+        Assert.Equal ("Fill(0)", view.Width.ToString ());
+        Assert.Equal ("Fill(0)", view.Height.ToString ());
+    }
 
-		view.X = 0;
-		view.Y = 0;
-		Assert.Equal ("Absolute(0)", view.X.ToString ());
-		Assert.Equal ("Fill(0)", view.Width.ToString ());
-		view.SetRelativeLayout (new Rect (0, 0, 80, 25));
-		Assert.Equal (0, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (80, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
-		Assert.Equal (0, view.Bounds.X);
-		Assert.Equal (0, view.Bounds.Y);
-		Assert.Equal (80, view.Bounds.Width);
-		Assert.Equal (25, view.Bounds.Height);
-	}
-	[Fact]
-	public void ComputedPosDim_StayComputed ()
-	{
-		var screen = new Rect (0, 0, 10, 15);
-		var view = new View {
-			X = 1,
-			Y = 2,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+    [Fact]
+    public void DimFill_Is_Honored () {
+        var view = new View {
+                                X = 1,
+                                Y = 1,
+                                Width = Dim.Fill (),
+                                Height = Dim.Fill ()
+                            };
 
-		Assert.Equal ("Absolute(1)", view.X.ToString ());
-		Assert.Equal ("Absolute(2)", view.Y.ToString ());
-		Assert.Equal ("Fill(0)", view.Width.ToString ());
-		Assert.Equal ("Fill(0)", view.Height.ToString ());
-		view.SetRelativeLayout (screen);
-		Assert.Equal ("Fill(0)", view.Width.ToString ());
-		Assert.Equal ("Fill(0)", view.Height.ToString ());
-	}
+        view.SetRelativeLayout (new Rect (0, 0, 80, 25));
+        Assert.Equal ("Fill(0)", view.Width.ToString ());
+        Assert.Equal (1, view.Frame.X);
+        Assert.Equal (1, view.Frame.Y);
+        Assert.Equal (79, view.Frame.Width);
+        Assert.Equal (24, view.Frame.Height);
+        Assert.Equal (0, view.Bounds.X);
+        Assert.Equal (0, view.Bounds.Y);
+        Assert.Equal (79, view.Bounds.Width);
+        Assert.Equal (24, view.Bounds.Height);
 
-	[Fact]
-	public void AbsolutePosDim_DontChange ()
-	{
-		var screen = new Rect (0, 0, 10, 15);
-		var view = new View {
-			X = 1, // outside of screen +10
-			Y = 2, // outside of screen -10
-			Width = 3,
-			Height = 4
-		};
+        view.X = 0;
+        view.Y = 0;
+        Assert.Equal ("Absolute(0)", view.X.ToString ());
+        Assert.Equal ("Fill(0)", view.Width.ToString ());
+        view.SetRelativeLayout (new Rect (0, 0, 80, 25));
+        Assert.Equal (0, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (80, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
+        Assert.Equal (0, view.Bounds.X);
+        Assert.Equal (0, view.Bounds.Y);
+        Assert.Equal (80, view.Bounds.Width);
+        Assert.Equal (25, view.Bounds.Height);
+    }
 
-		// Layout is Absolute. So the X and Y are not changed.
-		view.SetRelativeLayout (screen);
-		Assert.Equal (1, view.Frame.X);
-		Assert.Equal (2, view.Frame.Y);
-		Assert.Equal (3, view.Frame.Width);
-		Assert.Equal (4, view.Frame.Height);
-	}
+    [Fact]
+    public void Fill_And_PosCenter () {
+        var screen = new Rect (0, 0, 80, 25);
+        var view = new View {
+                                X = Pos.Center (),
+                                Y = Pos.Center (),
+                                Width = Dim.Fill (),
+                                Height = Dim.Fill ()
+                            };
 
-	[Fact]
-	public void Fill_Pos_Within_Bounds ()
-	{
-		var screen = new Rect (0, 0, 80, 25);
-		var view = new View {
-			X = 1,
-			Y = 1,
-			Width = 5,
-			Height = 4
-		};
+        view.SetRelativeLayout (screen);
+        Assert.Equal (0, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (80, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		view.SetRelativeLayout (screen);
-		Assert.Equal (1, view.Frame.X);
-		Assert.Equal (1, view.Frame.Y);
-		Assert.Equal (5, view.Frame.Width);
-		Assert.Equal (4, view.Frame.Height);
+        view.X = Pos.Center () + 1;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (1, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (79, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		view.Width = 80;
-		view.Height = 25;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (1, view.Frame.X);
-		Assert.Equal (1, view.Frame.Y);
-		Assert.Equal (80, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        view.X = Pos.Center () + 79;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (79, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (1, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		view.Width = Dim.Fill ();
-		view.Height = Dim.Fill ();
-		view.SetRelativeLayout (screen);
-		Assert.Equal (1, view.Frame.X);
-		Assert.Equal (1, view.Frame.Y);
-		Assert.Equal (79, view.Frame.Width); // proof (80 - 1)
-		Assert.Equal (24, view.Frame.Height); // proof (25 - 1)
+        view.X = Pos.Center () + 80;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (80, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (0, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		view.X = 79;
-		view.Width = Dim.Fill ();
-		view.Height = Dim.Fill ();
-		view.SetRelativeLayout (screen);
-		Assert.Equal (79, view.Frame.X);
-		Assert.Equal (1, view.Frame.Y);
-		Assert.Equal (1, view.Frame.Width); // proof (80 - 79)
-		Assert.Equal (24, view.Frame.Height);
+        view.X = Pos.Center () - 1;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-1, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (81, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		view.X = 80;
-		view.Width = Dim.Fill ();
-		view.Height = Dim.Fill ();
-		view.SetRelativeLayout (screen);
-		Assert.Equal (80, view.Frame.X);
-		Assert.Equal (1, view.Frame.Y);
-		Assert.Equal (0, view.Frame.Width); // proof (80 - 80)
-		Assert.Equal (24, view.Frame.Height);
-	}
+        view.X = Pos.Center ()
+                 - 2; // Fill means all the way to right. So width will be 82. (dim gets calc'd before pos).
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-2, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (82, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-	[Fact]
-	public void Fill_Pos_Outside_Bounds ()
-	{
-		var screen = new Rect (0, 0, 80, 25);
-		var view = new View {
-			X = 90, // outside of screen +10
-			Y = -10, // outside of screen -10
-			Width = 15,
-			Height = 15
-		};
+        view.X = Pos.Center ()
+                 - 3; // Fill means all the way to right. So width will be 83. (dim gets calc'd before pos).
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-3, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (83, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		// Layout is Absolute. So the X and Y are not changed.
-		view.SetRelativeLayout (screen);
-		Assert.Equal (90, view.Frame.X);
-		Assert.Equal (-10, view.Frame.Y);
-		Assert.Equal (15, view.Frame.Width);
-		Assert.Equal (15, view.Frame.Height);
+        view.X = Pos.Center ()
+                 - 41; // Fill means all the way to right. So width will be . (dim gets calc'd before pos).
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-41, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (121, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
+    }
 
-		// prove Width=Height= same as screen size
-		view.Width = 80;
-		view.Height = 25;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (90, view.Frame.X);
-		Assert.Equal (-10, view.Frame.Y);
-		Assert.Equal (80, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+    [Fact]
+    public void Fill_Pos_Outside_Bounds () {
+        var screen = new Rect (0, 0, 80, 25);
+        var view = new View {
+                                X = 90, // outside of screen +10
+                                Y = -10, // outside of screen -10
+                                Width = 15,
+                                Height = 15
+                            };
 
-		view.Width = Dim.Fill ();
-		view.Height = Dim.Fill ();
-		view.SetRelativeLayout (screen);
-		Assert.Equal (90, view.Frame.X);
-		Assert.Equal (-10, view.Frame.Y);
-		Assert.Equal (0, view.Frame.Width); // proof: 15x15 view is placed beyond right side of screen, so fill width is 0
-		Assert.Equal (35, view.Frame.Height); // proof: 15x15 view is placed beyond top of screen 10 rows, screen is 25 rows. so fill height is 25 + 10 = 35
-	}
+        // Layout is Absolute. So the X and Y are not changed.
+        view.SetRelativeLayout (screen);
+        Assert.Equal (90, view.Frame.X);
+        Assert.Equal (-10, view.Frame.Y);
+        Assert.Equal (15, view.Frame.Width);
+        Assert.Equal (15, view.Frame.Height);
 
-	[Fact]
-	public void PosCombine_PosCenter_Minus_Absolute ()
-	{
-		// This test used to be in ViewTests.cs Internal_Tests. It was moved here because it is testing
-		// SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
-		// because in v1 Pos.Center was broken in this regard!
+        // prove Width=Height= same as screen size
+        view.Width = 80;
+        view.Height = 25;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (90, view.Frame.X);
+        Assert.Equal (-10, view.Frame.Y);
+        Assert.Equal (80, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		var screen = new Rect (0, 0, 80, 25);
-		var view = new View {
-			X = Pos.Center () - 41, // -2 off left edge of screen
-			Y = Pos.Center () - 13, // -1 off top edge of screen
-			Width = 1,
-			Height = 1
-		};
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+        view.SetRelativeLayout (screen);
+        Assert.Equal (90, view.Frame.X);
+        Assert.Equal (-10, view.Frame.Y);
+        Assert.Equal (
+                      0,
+                      view.Frame.Width); // proof: 15x15 view is placed beyond right side of screen, so fill width is 0
+        Assert.Equal (
+                      35,
+                      view.Frame
+                          .Height); // proof: 15x15 view is placed beyond top of screen 10 rows, screen is 25 rows. so fill height is 25 + 10 = 35
+    }
 
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-2, view.Frame.X); // proof: 1x1 view centered in 80x25 screen has x of 39, so -41 is -2
-		Assert.Equal (-1, view.Frame.Y); // proof: 1x1 view centered in 80x25 screen has y of 12, so -13 is -1
+    [Fact]
+    public void Fill_Pos_Within_Bounds () {
+        var screen = new Rect (0, 0, 80, 25);
+        var view = new View {
+                                X = 1,
+                                Y = 1,
+                                Width = 5,
+                                Height = 4
+                            };
 
-		view.Width = 80;
-		view.Height = 25;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-41, view.Frame.X);
-		Assert.Equal (-13, view.Frame.Y);
-		Assert.Equal (80, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        view.SetRelativeLayout (screen);
+        Assert.Equal (1, view.Frame.X);
+        Assert.Equal (1, view.Frame.Y);
+        Assert.Equal (5, view.Frame.Width);
+        Assert.Equal (4, view.Frame.Height);
 
-		view.Width = Dim.Fill ();
-		view.Height = Dim.Fill ();
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-41, view.Frame.X);
-		Assert.Equal (-13, view.Frame.Y);
-		Assert.Equal (121, view.Frame.Width); // 121 = screen.Width - (-Center - 41)
-		Assert.Equal (38, view.Frame.Height);
-	}
+        view.Width = 80;
+        view.Height = 25;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (1, view.Frame.X);
+        Assert.Equal (1, view.Frame.Y);
+        Assert.Equal (80, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-	[Fact]
-	public void Fill_And_PosCenter ()
-	{
-		var screen = new Rect (0, 0, 80, 25);
-		var view = new View {
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+        view.SetRelativeLayout (screen);
+        Assert.Equal (1, view.Frame.X);
+        Assert.Equal (1, view.Frame.Y);
+        Assert.Equal (79, view.Frame.Width); // proof (80 - 1)
+        Assert.Equal (24, view.Frame.Height); // proof (25 - 1)
 
-		view.SetRelativeLayout (screen);
-		Assert.Equal (0, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (80, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        view.X = 79;
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+        view.SetRelativeLayout (screen);
+        Assert.Equal (79, view.Frame.X);
+        Assert.Equal (1, view.Frame.Y);
+        Assert.Equal (1, view.Frame.Width); // proof (80 - 79)
+        Assert.Equal (24, view.Frame.Height);
 
-		view.X = Pos.Center () + 1;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (1, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (79, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        view.X = 80;
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+        view.SetRelativeLayout (screen);
+        Assert.Equal (80, view.Frame.X);
+        Assert.Equal (1, view.Frame.Y);
+        Assert.Equal (0, view.Frame.Width); // proof (80 - 80)
+        Assert.Equal (24, view.Frame.Height);
+    }
 
-		view.X = Pos.Center () + 79;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (79, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (1, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+    [Fact]
+    [TestRespondersDisposed]
+    public void PosCombine_Plus_Absolute () {
+        var superView = new View {
+                                     AutoSize = false,
+                                     Width = 10,
+                                     Height = 10
+                                 };
 
-		view.X = Pos.Center () + 80;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (80, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (0, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        var testView = new View {
+                                    AutoSize = false,
+                                    X = Pos.Center (),
+                                    Y = Pos.Center (),
+                                    Width = 1,
+                                    Height = 1
+                                };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (4, testView.Frame.X);
+        Assert.Equal (4, testView.Frame.Y);
 
-		view.X = Pos.Center () - 1;
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-1, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (81, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        testView = new View {
+                                AutoSize = false,
+                                X = Pos.Center () + 1, // ((10 / 2) - (1 / 2)) + 1 = 5 - 1 + 1 = 5
+                                Y = Pos.Center () + 1,
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (5, testView.Frame.X);
+        Assert.Equal (5, testView.Frame.Y);
 
-		view.X = Pos.Center () - 2; // Fill means all the way to right. So width will be 82. (dim gets calc'd before pos).
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-2, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (82, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        testView = new View {
+                                AutoSize = false,
+                                X = 1 + Pos.Center (),
+                                Y = 1 + Pos.Center (),
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (5, testView.Frame.X);
+        Assert.Equal (5, testView.Frame.Y);
 
-		view.X = Pos.Center () - 3; // Fill means all the way to right. So width will be 83. (dim gets calc'd before pos).
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-3, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (83, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        testView = new View {
+                                AutoSize = false,
+                                X = 1 + Pos.Percent (50),
+                                Y = Pos.Percent (50) + 1,
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (6, testView.Frame.X);
+        Assert.Equal (6, testView.Frame.Y);
 
-		view.X = Pos.Center () - 41; // Fill means all the way to right. So width will be . (dim gets calc'd before pos).
-		view.SetRelativeLayout (screen);
-		Assert.Equal (-41, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (121, view.Frame.Width);
-		Assert.Equal (25, view.Frame.Height);
+        testView = new View {
+                                AutoSize = false,
+                                X = Pos.Percent (10) + Pos.Percent (40),
+                                Y = Pos.Percent (10) + Pos.Percent (40),
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (5, testView.Frame.X);
+        Assert.Equal (5, testView.Frame.Y);
 
-	}
+        testView = new View {
+                                AutoSize = false,
+                                X = 1 + Pos.Percent (10) + Pos.Percent (40) - 1,
+                                Y = 5 + Pos.Percent (10) + Pos.Percent (40) - 5,
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (5, testView.Frame.X);
+        Assert.Equal (5, testView.Frame.Y);
 
-	[Fact]
-	public void PosCombine_PosCenter_Plus_Absolute ()
-	{
-		var screen = new Rect (0, 0, 80, 25);
-		var view = new View {
-			X = Pos.Center () + 41, // ((80 / 2) - (5 / 2)) + 41 = (40 - 3 + 41) = 78
-			Y = Pos.Center () + 13, // ((25 / 2) - (4 / 2)) + 13 = (12 - 2 + 13) = 23
-			Width = 5,
-			Height = 4
-		};
+        testView = new View {
+                                AutoSize = false,
+                                X = Pos.Left (testView),
+                                Y = Pos.Left (testView),
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (5, testView.Frame.X);
+        Assert.Equal (5, testView.Frame.Y);
 
-		view.SetRelativeLayout (screen);
-		Assert.Equal (78, view.Frame.X);
-		Assert.Equal (23, view.Frame.Y);
-	}
+        testView = new View {
+                                AutoSize = false,
+                                X = 1 + Pos.Left (testView),
+                                Y = Pos.Top (testView) + 1,
+                                Width = 1,
+                                Height = 1
+                            };
+        superView.Add (testView);
+        testView.SetRelativeLayout (superView.Frame);
+        Assert.Equal (6, testView.Frame.X);
+        Assert.Equal (6, testView.Frame.Y);
 
-	[Fact]
-	[TestRespondersDisposed]
-	public void PosCombine_Plus_Absolute ()
-	{
-		var superView = new View {
-			AutoSize = false,
-			Width = 10,
-			Height = 10
-		};
+        superView.Dispose ();
+    }
 
-		var testView = new View {
-			AutoSize = false,
-			X = Pos.Center (),
-			Y = Pos.Center (),
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (4, testView.Frame.X);
-		Assert.Equal (4, testView.Frame.Y);
+    [Fact]
+    public void PosCombine_PosCenter_Minus_Absolute () {
+        // This test used to be in ViewTests.cs Internal_Tests. It was moved here because it is testing
+        // SetRelativeLayout. In addition, the old test was bogus because it was testing the wrong thing (and 
+        // because in v1 Pos.Center was broken in this regard!
 
-		testView = new View {
-			AutoSize = false,
-			X = Pos.Center () + 1, // ((10 / 2) - (1 / 2)) + 1 = 5 - 1 + 1 = 5
-			Y = Pos.Center () + 1,
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (5, testView.Frame.X);
-		Assert.Equal (5, testView.Frame.Y);
+        var screen = new Rect (0, 0, 80, 25);
+        var view = new View {
+                                X = Pos.Center () - 41, // -2 off left edge of screen
+                                Y = Pos.Center () - 13, // -1 off top edge of screen
+                                Width = 1,
+                                Height = 1
+                            };
 
-		testView = new View {
-			AutoSize = false,
-			X = 1 + Pos.Center (),
-			Y = 1 + Pos.Center (),
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (5, testView.Frame.X);
-		Assert.Equal (5, testView.Frame.Y);
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-2, view.Frame.X); // proof: 1x1 view centered in 80x25 screen has x of 39, so -41 is -2
+        Assert.Equal (-1, view.Frame.Y); // proof: 1x1 view centered in 80x25 screen has y of 12, so -13 is -1
 
-		testView = new View {
-			AutoSize = false,
-			X = 1 + Pos.Percent (50),
-			Y = Pos.Percent (50) + 1,
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (6, testView.Frame.X);
-		Assert.Equal (6, testView.Frame.Y);
+        view.Width = 80;
+        view.Height = 25;
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-41, view.Frame.X);
+        Assert.Equal (-13, view.Frame.Y);
+        Assert.Equal (80, view.Frame.Width);
+        Assert.Equal (25, view.Frame.Height);
 
-		testView = new View {
-			AutoSize = false,
-			X = Pos.Percent (10) + Pos.Percent (40),
-			Y = Pos.Percent (10) + Pos.Percent (40),
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (5, testView.Frame.X);
-		Assert.Equal (5, testView.Frame.Y);
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+        view.SetRelativeLayout (screen);
+        Assert.Equal (-41, view.Frame.X);
+        Assert.Equal (-13, view.Frame.Y);
+        Assert.Equal (121, view.Frame.Width); // 121 = screen.Width - (-Center - 41)
+        Assert.Equal (38, view.Frame.Height);
+    }
 
-		testView = new View {
-			AutoSize = false,
-			X = 1 + Pos.Percent (10) + Pos.Percent (40) - 1,
-			Y = 5 + Pos.Percent (10) + Pos.Percent (40) - 5,
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (5, testView.Frame.X);
-		Assert.Equal (5, testView.Frame.Y);
+    [Fact]
+    public void PosCombine_PosCenter_Plus_Absolute () {
+        var screen = new Rect (0, 0, 80, 25);
+        var view = new View {
+                                X = Pos.Center () + 41, // ((80 / 2) - (5 / 2)) + 41 = (40 - 3 + 41) = 78
+                                Y = Pos.Center () + 13, // ((25 / 2) - (4 / 2)) + 13 = (12 - 2 + 13) = 23
+                                Width = 5,
+                                Height = 4
+                            };
 
-		testView = new View {
-			AutoSize = false,
-			X = Pos.Left (testView),
-			Y = Pos.Left (testView),
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (5, testView.Frame.X);
-		Assert.Equal (5, testView.Frame.Y);
+        view.SetRelativeLayout (screen);
+        Assert.Equal (78, view.Frame.X);
+        Assert.Equal (23, view.Frame.Y);
+    }
 
-		testView = new View {
-			AutoSize = false,
-			X = 1 + Pos.Left (testView),
-			Y = Pos.Top (testView) + 1,
-			Width = 1,
-			Height = 1
-		};
-		superView.Add (testView);
-		testView.SetRelativeLayout (superView.Frame);
-		Assert.Equal (6, testView.Frame.X);
-		Assert.Equal (6, testView.Frame.Y);
+    [Fact]
+    public void PosDimFunction () {
+        var screen = new Rect (0, 0, 30, 1);
+        var view = new View ("abc");
+        view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
 
-		superView.Dispose ();
+        int GetViewWidth () { return view.Frame.Width; }
 
-	}
+        // view will be 3 chars wide. It's X will be 27 (30 - 3).
+        view.SetRelativeLayout (screen);
+        Assert.Equal (27, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (3, view.Frame.Width);
+        Assert.Equal (1, view.Frame.Height);
 
+        var tf = new TextField ("01234567890123456789");
+        tf.Width = Dim.Fill (1) - Dim.Function (GetViewWidth);
 
-	[Fact]
-	public void PosDimFunction ()
-	{
-		var screen = new Rect (0, 0, 30, 1);
-		var view = new View ("abc");
-		view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
-
-		int GetViewWidth ()
-		{
-			return view.Frame.Width;
-		}
-
-		// view will be 3 chars wide. It's X will be 27 (30 - 3).
-		view.SetRelativeLayout (screen);
-		Assert.Equal (27, view.Frame.X);
-		Assert.Equal (0, view.Frame.Y);
-		Assert.Equal (3, view.Frame.Width);
-		Assert.Equal (1, view.Frame.Height);
-
-		var tf = new TextField ("01234567890123456789");
-		tf.Width = Dim.Fill (1) - Dim.Function (GetViewWidth);
-
-		// tf will fill the screen minus 1 minus the width of view (3).
-		// so it's width will be 26 (30 - 1 - 3).
-		tf.SetRelativeLayout (screen);
-		Assert.Equal (0, tf.Frame.X);
-		Assert.Equal (0, tf.Frame.Y);
-		Assert.Equal (26, tf.Frame.Width);
-		Assert.Equal (1, tf.Frame.Height);
-
-	}
+        // tf will fill the screen minus 1 minus the width of view (3).
+        // so it's width will be 26 (30 - 1 - 3).
+        tf.SetRelativeLayout (screen);
+        Assert.Equal (0, tf.Frame.X);
+        Assert.Equal (0, tf.Frame.Y);
+        Assert.Equal (26, tf.Frame.Width);
+        Assert.Equal (1, tf.Frame.Height);
+    }
 }
