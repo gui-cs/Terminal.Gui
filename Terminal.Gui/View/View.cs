@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Terminal.Gui;
 
@@ -315,6 +316,8 @@ public partial class View : Responder, ISupportInitializeNotification {
     public View () {
 
         TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
+        TextDirection = TextDirection.LeftRight_TopBottom;
+        Text = string.Empty;
 
         CanFocus = false;
         TabIndex = -1;

@@ -48,10 +48,10 @@ public class Adornments : Scenario {
         var tf2 = new Button {
                                  X = Pos.AnchorEnd (10),
                                  Y = Pos.AnchorEnd (1),
-                                 Width = 10,
                                  Text = "Button"
                              };
         var tv = new Label {
+                               AutoSize = false,
                                Y = Pos.AnchorEnd (3),
                                Width = 25,
                                Height = Dim.Fill (),
@@ -375,7 +375,7 @@ public class Adornments : Scenario {
                                                 BorderStyle = LineStyle.Double,
                                                 X = Pos.Left (_borderEditor),
                                                 Y = Pos.Bottom (_borderEditor) - 1,
-                                                Width = Dim.Width (_borderEditor),
+                                                //Width = Dim.Width (_borderEditor),
                                                 Checked = true,
                                                 SuperViewRendersLineCanvas = true,
                                                 Text = "Show Title"

@@ -17,11 +17,12 @@ public class CheckBox : View {
         _charChecked = Glyphs.Checked;
         _charUnChecked = Glyphs.UnChecked;
         HotKeySpecifier = (Rune)'_';
-        CanFocus = true;
-        AutoSize = true;
 
         // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
+        
+        CanFocus = true;
+        AutoSize = true;
 
         // Things this view knows how to do
         AddCommand (Command.ToggleChecked, () => ToggleChecked ());

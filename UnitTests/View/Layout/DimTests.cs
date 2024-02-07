@@ -34,7 +34,7 @@ public class DimTests {
         field.KeyDown += (s, k) => {
             if (k.KeyCode == KeyCode.Enter) {
                 field.Text = $"Label {count}";
-                var label = new Label { X = 0, Y = view.Bounds.Height, Width = 20, Text = field.Text };
+                var label = new Label { X = 0, Y = view.Bounds.Height, /*Width = 20,*/ Text = field.Text };
                 view.Add (label);
                 Assert.Equal ($"Label {count}", label.Text);
                 Assert.Equal ($"Absolute({count})", label.Y.ToString ());
@@ -104,7 +104,7 @@ public class DimTests {
 
         for (var i = 0; i < count; i++) {
             field.Text = $"Label {i}";
-            var label = new Label { X = 0, Y = view.Bounds.Height, Width = 20, Text = field.Text };
+            var label = new Label { X = 0, Y = view.Bounds.Height, /*Width = 20,*/ Text = field.Text };
             view.Add (label);
             Assert.Equal ($"Label {i}", label.Text);
             Assert.Equal ($"Absolute({i})", label.Y.ToString ());
@@ -358,6 +358,7 @@ public class DimTests {
                                  };
 
         var label = new Label {
+                                  AutoSize = false,
                                   X = testHorizontal ? startingDistance : 0,
                                   Y = testHorizontal ? 0 : startingDistance,
                                   Width = testHorizontal ? Dim.Percent (50) + 1 : 1,

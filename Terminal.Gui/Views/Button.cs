@@ -41,11 +41,11 @@ public class Button : View {
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
-        CanFocus = true;
-        AutoSize = true;
-
         // Ensures a height of 1 if AutoSize is set to false
         Height = 1;
+
+        CanFocus = true;
+        AutoSize = true;
 
         // Override default behavior of View
         // Command.Default sets focus
