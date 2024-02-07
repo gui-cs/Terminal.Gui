@@ -604,6 +604,7 @@ public class TableEditor : Scenario {
                                               X = 0,
                                               Y = Pos.Bottom (_tableView),
                                               Text = "0,0",
+                                              AutoSize = false,
                                               Width = Dim.Fill (),
                                               TextAlignment = TextAlignment.Right
                                           };

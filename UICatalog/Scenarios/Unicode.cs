@@ -54,7 +54,8 @@ public class UnicodeInMenu : Scenario {
 
         var label = new Label { X = 0, Y = 1, Text = "Label:" };
         Win.Add (label);
-        var testlabel = new Label { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), Text = gitString };
+        var testlabel = new Label { X = 20, Y = Pos.Y (label), AutoSize = false,
+                                      Width = Dim.Percent (50), Text = gitString };
         Win.Add (testlabel);
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
@@ -66,6 +67,7 @@ public class UnicodeInMenu : Scenario {
         testlabel = new Label {
                                   X = 20,
                                   Y = Pos.Y (label),
+                                  AutoSize = false,
                                   Width = Dim.Percent (50),
                                   CanFocus = true,
                                   HotKeySpecifier = new Rune ('&'),
@@ -79,11 +81,14 @@ public class UnicodeInMenu : Scenario {
 
         label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
         Win.Add (label);
-        var checkBox = new CheckBox { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), Text = gitString };
+        var checkBox = new CheckBox { X = 20, Y = Pos.Y (label), AutoSize = false,
+                                        Width = Dim.Percent (50), Height = 1,Text = gitString };
         var checkBoxRight = new CheckBox {
                                              X = 20,
                                              Y = Pos.Bottom (checkBox),
+                                             AutoSize = false,
                                              Width = Dim.Percent (50),
+                                             Height =1,
                                              TextAlignment = TextAlignment.Right,
                                              Text = $"Align Right - {gitString}"
                                          };

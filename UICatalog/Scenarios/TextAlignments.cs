@@ -26,19 +26,19 @@ public class TextAlignments : Scenario {
             singleLines[(int)alignment] = new Label {
                                                         TextAlignment = alignment,
                                                         X = 1,
+                                                        AutoSize = false,
                                                         Width = Dim.Fill (1),
                                                         Height = 1,
                                                         ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                        AutoSize = false,
                                                         Text = txt
                                                     };
             multipleLines[(int)alignment] = new Label {
                                                           TextAlignment = alignment,
                                                           X = 1,
+                                                          AutoSize = false,
                                                           Width = Dim.Fill (1),
                                                           Height = multiLineHeight,
                                                           ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                          AutoSize = false,
                                                           Text = txt
                                                       };
         }

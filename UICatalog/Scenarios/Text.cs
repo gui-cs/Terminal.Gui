@@ -46,6 +46,7 @@ public class Text : Scenario {
         var labelMirroringTextField = new Label {
                                                     X = Pos.Right (textField) + 1,
                                                     Y = Pos.Top (textField),
+                                                    AutoSize = false,
                                                     Width = Dim.Fill (1) - 1,
                                                     Text = textField.Text
                                                 };
@@ -76,6 +77,7 @@ public class Text : Scenario {
         var labelMirroringTextView = new Label {
                                                    X = Pos.Right (textView) + 1,
                                                    Y = Pos.Top (textView),
+                                                   AutoSize = false,
                                                    Width = Dim.Fill (1) - 1,
                                                    Height = Dim.Height (textView) - 1
                                                };
@@ -157,6 +159,7 @@ public class Text : Scenario {
         var labelMirroringHexEditor = new Label {
                                                     X = Pos.Right (hexEditor) + 1,
                                                     Y = Pos.Top (hexEditor),
+                                                    AutoSize = false,
                                                     Width = Dim.Fill (1) - 1,
                                                     Height = Dim.Height (hexEditor) - 1
                                                 };
@@ -179,6 +182,7 @@ public class Text : Scenario {
         var labelMirroringDateField = new Label {
                                                     X = Pos.Right (dateField) + 1,
                                                     Y = Pos.Top (dateField),
+                                                    AutoSize = false,
                                                     Width = Dim.Width (dateField),
                                                     Height = Dim.Height (dateField),
                                                     Text = dateField.Text
@@ -199,6 +203,7 @@ public class Text : Scenario {
         _labelMirroringTimeField = new Label {
                                                  X = Pos.Right (_timeField) + 1,
                                                  Y = Pos.Top (_timeField),
+                                                 AutoSize = false,
                                                  Width = Dim.Width (_timeField),
                                                  Height = Dim.Height (_timeField),
                                                  Text = _timeField.Text
@@ -227,6 +232,7 @@ public class Text : Scenario {
         var labelMirroringNetProviderField = new Label {
                                                            X = Pos.Right (netProviderField) + 1,
                                                            Y = Pos.Top (netProviderField),
+                                                           AutoSize = false,
                                                            Width = Dim.Width (netProviderField),
                                                            Height = Dim.Height (netProviderField),
                                                            Text = netProviderField.Text
@@ -258,6 +264,7 @@ public class Text : Scenario {
         var labelMirroringRegexProviderField = new Label {
                                                              X = Pos.Right (regexProviderField) + 1,
                                                              Y = Pos.Top (regexProviderField),
+                                                             AutoSize = false,
                                                              Width = Dim.Width (regexProviderField),
                                                              Height = Dim.Height (regexProviderField),
                                                              Text = regexProviderField.Text

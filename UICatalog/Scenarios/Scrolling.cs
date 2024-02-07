@@ -42,10 +42,10 @@ public class Scrolling : Scenario {
         var horizontalRuler = new Label {
                                             X = 0,
                                             Y = 0,
+                                            AutoSize = false,
                                             Width = Dim.Fill (),
                                             Height = 2,
                                             ColorScheme = Colors.ColorSchemes["Error"],
-                                            AutoSize = false
                                         };
         scrollView.Add (horizontalRuler);
 
@@ -54,10 +54,10 @@ public class Scrolling : Scenario {
         var verticalRuler = new Label {
                                           X = 0,
                                           Y = 0,
+                                          AutoSize = false,
                                           Width = 1,
                                           Height = Dim.Fill (),
                                           ColorScheme = Colors.ColorSchemes["Error"],
-                                          AutoSize = false
                                       };
         scrollView.Add (verticalRuler);
 
@@ -87,6 +87,7 @@ public class Scrolling : Scenario {
         var aLongButton = new Button {
                                          X = 3,
                                          Y = 4,
+                                         AutoSize = false,
                                          Width = Dim.Fill (3),
                                          Text = "A very long button. Should be wide enough to demo clipping!"
                                      };
@@ -222,6 +223,7 @@ public class Scrolling : Scenario {
         var mousePos = new Label {
                                      X = Pos.Right (scrollView) + 1,
                                      Y = Pos.AnchorEnd (1),
+                                     AutoSize = false,
                                      Width = 50,
                                      Text = "Mouse: "
                                  };

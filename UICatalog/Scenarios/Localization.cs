@@ -84,7 +84,6 @@ public class Localization : Scenario {
                                              Width = _cultureInfoNameSource.Select (cn => cn.Length + 3).Max (),
                                              Height = _cultureInfoNameSource.Length + 1,
                                              HideDropdownListOnClick = true,
-                                             AutoSize = true,
                                              Source = new ListWrapper (_cultureInfoNameSource),
                                              SelectedItem = _cultureInfoNameSource.Length - 1
                                          };

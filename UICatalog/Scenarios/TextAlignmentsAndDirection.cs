@@ -25,6 +25,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelHL = new Label {
                                     X = 1,
                                     Y = 1,
+                                    AutoSize = false,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
@@ -34,6 +35,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelHC = new Label {
                                     X = 1,
                                     Y = 2,
+                                    AutoSize = false,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
@@ -43,6 +45,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelHR = new Label {
                                     X = 1,
                                     Y = 3,
+                                    AutoSize = false,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
@@ -52,6 +55,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelHJ = new Label {
                                     X = 1,
                                     Y = 4,
+                                    AutoSize = false,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
@@ -62,6 +66,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelHL = new Label {
                                        X = Pos.Right (labelHL) + 1,
                                        Y = Pos.Y (labelHL),
+                                       AutoSize = false,
                                        Width = Dim.Fill (1) - 9,
                                        Height = 1,
                                        ColorScheme = color1,
@@ -71,6 +76,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelHC = new Label {
                                        X = Pos.Right (labelHC) + 1,
                                        Y = Pos.Y (labelHC),
+                                       AutoSize = false,
                                        Width = Dim.Fill (1) - 9,
                                        Height = 1,
                                        ColorScheme = color2,
@@ -80,6 +86,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelHR = new Label {
                                        X = Pos.Right (labelHR) + 1,
                                        Y = Pos.Y (labelHR),
+                                       AutoSize = false,
                                        Width = Dim.Fill (1) - 9,
                                        Height = 1,
                                        ColorScheme = color1,
@@ -89,6 +96,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelHJ = new Label {
                                        X = Pos.Right (labelHJ) + 1,
                                        Y = Pos.Y (labelHJ),
+                                       AutoSize = false,
                                        Width = Dim.Fill (1) - 9,
                                        Height = 1,
                                        ColorScheme = color2,
@@ -115,6 +123,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelVT = new Label {
                                     X = Pos.AnchorEnd (8),
                                     Y = 1,
+                                    AutoSize = false,
                                     Width = 2,
                                     Height = 9,
                                     ColorScheme = color1,
@@ -125,6 +134,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelVM = new Label {
                                     X = Pos.AnchorEnd (6),
                                     Y = 1,
+                                    AutoSize = false,
                                     Width = 2,
                                     Height = 9,
                                     ColorScheme = color1,
@@ -135,6 +145,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelVB = new Label {
                                     X = Pos.AnchorEnd (4),
                                     Y = 1,
+                                    AutoSize = false,
                                     Width = 2,
                                     Height = 9,
                                     ColorScheme = color1,
@@ -145,6 +156,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var labelVJ = new Label {
                                     X = Pos.AnchorEnd (2),
                                     Y = 1,
+                                    AutoSize = false,
                                     Width = 1,
                                     Height = 9,
                                     ColorScheme = color1,
@@ -156,6 +168,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelVT = new Label {
                                        X = Pos.X (labelVT),
                                        Y = Pos.Bottom (labelVT) + 1,
+                                       AutoSize = false,
                                        Width = 1,
                                        Height = Dim.Fill (1),
                                        ColorScheme = color1,
@@ -166,6 +179,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelVM = new Label {
                                        X = Pos.X (labelVM),
                                        Y = Pos.Bottom (labelVM) + 1,
+                                       AutoSize = false,
                                        Width = 1,
                                        Height = Dim.Fill (1),
                                        ColorScheme = color2,
@@ -176,6 +190,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelVB = new Label {
                                        X = Pos.X (labelVB),
                                        Y = Pos.Bottom (labelVB) + 1,
+                                       AutoSize = false,
                                        Width = 1,
                                        Height = Dim.Fill (1),
                                        ColorScheme = color1,
@@ -186,6 +201,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelVJ = new Label {
                                        X = Pos.X (labelVJ),
                                        Y = Pos.Bottom (labelVJ) + 1,
+            AutoSize = false,
                                        Width = 1,
                                        Height = Dim.Fill (1),
                                        ColorScheme = color2,
@@ -221,6 +237,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelTL = new Label {
                                        X = 1 /*                    */,
                                        Y = 1,
+                                       AutoSize = false,
                                        Width = Dim.Percent (100f / 3f),
                                        Height = Dim.Percent (100f / 3f),
                                        TextAlignment = TextAlignment.Left,
@@ -231,6 +248,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelTC = new Label {
                                        X = Pos.Right (txtLabelTL) + 2,
                                        Y = 1,
+                                       AutoSize = false,
                                        Width = Dim.Percent (100f / 3f),
                                        Height = Dim.Percent (100f / 3f),
                                        TextAlignment = TextAlignment.Centered,
@@ -241,6 +259,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelTR = new Label {
                                        X = Pos.Right (txtLabelTC) + 2,
                                        Y = 1,
+                                       AutoSize = false,
                                        Width = Dim.Percent (100f, true),
                                        Height = Dim.Percent (100f / 3f),
                                        TextAlignment = TextAlignment.Right,
@@ -252,6 +271,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelML = new Label {
                                        X = Pos.X (txtLabelTL),
                                        Y = Pos.Bottom (txtLabelTL) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Width (txtLabelTL),
                                        Height = Dim.Percent (100f / 3f),
                                        TextAlignment = TextAlignment.Left,
@@ -262,6 +282,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelMC = new Label {
                                        X = Pos.X (txtLabelTC),
                                        Y = Pos.Bottom (txtLabelTC) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Width (txtLabelTC),
                                        Height = Dim.Percent (100f / 3f),
                                        TextAlignment = TextAlignment.Centered,
@@ -272,6 +293,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelMR = new Label {
                                        X = Pos.X (txtLabelTR),
                                        Y = Pos.Bottom (txtLabelTR) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Percent (100f, true),
                                        Height = Dim.Percent (100f / 3f),
                                        TextAlignment = TextAlignment.Right,
@@ -283,6 +305,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelBL = new Label {
                                        X = Pos.X (txtLabelML),
                                        Y = Pos.Bottom (txtLabelML) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Width (txtLabelML),
                                        Height = Dim.Percent (100f, true),
                                        TextAlignment = TextAlignment.Left,
@@ -293,6 +316,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelBC = new Label {
                                        X = Pos.X (txtLabelMC),
                                        Y = Pos.Bottom (txtLabelMC) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Width (txtLabelMC),
                                        Height = Dim.Percent (100f, true),
                                        TextAlignment = TextAlignment.Centered,
@@ -303,6 +327,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var txtLabelBR = new Label {
                                        X = Pos.X (txtLabelMR),
                                        Y = Pos.Bottom (txtLabelMR) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Percent (100f, true),
                                        Height = Dim.Percent (100f, true),
                                        TextAlignment = TextAlignment.Right,
@@ -380,6 +405,7 @@ public class TextAlignmentsAndDirections : Scenario {
         var justifyCheckbox = new CheckBox {
                                                X = Pos.Right (container) + 1,
                                                Y = Pos.Y (container) + 1,
+                                               AutoSize = false,
                                                Width = Dim.Fill (10),
                                                Height = 1,
                                                Text = "Justify"

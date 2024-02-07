@@ -21,10 +21,7 @@ public class Wizards : Scenario {
         var label = new Label {
                                   X = 0,
                                   Y = 0,
-                                  Width = 15,
-                                  Height = 1,
                                   TextAlignment = TextAlignment.Right,
-                                  AutoSize = false,
                                   Text = "Width:"
                               };
         frame.Add (label);
@@ -40,10 +37,10 @@ public class Wizards : Scenario {
         label = new Label {
                               X = 0,
                               Y = Pos.Bottom (label),
+                              AutoSize = false,
                               Width = Dim.Width (label),
                               Height = 1,
                               TextAlignment = TextAlignment.Right,
-                              AutoSize = false,
                               Text = "Height:"
                           };
         frame.Add (label);
@@ -59,10 +56,10 @@ public class Wizards : Scenario {
         label = new Label {
                               X = 0,
                               Y = Pos.Bottom (label),
+                              AutoSize = false,
                               Width = Dim.Width (label),
                               Height = 1,
                               TextAlignment = TextAlignment.Right,
-                              AutoSize = false,
                               Text = "Title:"
                           };
         frame.Add (label);

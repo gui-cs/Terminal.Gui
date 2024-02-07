@@ -19,6 +19,7 @@ public class ViewExperiments : Scenario {
         var containerLabel = new Label {
                                            X = 0,
                                            Y = 0,
+                                           AutoSize = false,
                                            Width = Dim.Fill (),
                                            Height = 3
                                        };
@@ -144,7 +145,6 @@ public class ViewExperiments : Scenario {
 
         var label = new Label {
                                   Text = "AutoSize true; 1;1:",
-                                  AutoSize = true,
                                   X = 1,
                                   Y = 1
                               };
@@ -175,8 +175,6 @@ public class ViewExperiments : Scenario {
                                    Y = Pos.Percent (50),
                                    Width = 30,
                                    TextAlignment = TextAlignment.Centered
-
-                                   //Height = 1
                                };
         label50.Border.Thickness = new Thickness (1, 3, 1, 1);
         label50.Height = 5;

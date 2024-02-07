@@ -16,33 +16,27 @@ public class VkeyPacketSimulator : Scenario {
     private bool _wasUnknown;
 
     public override void Setup () {
-        var label = new Label {
-                                  X = Pos.Center (),
-                                  Text = "Input"
-                              };
+        var label = new Label { X = Pos.Center (), Text = "Input" };
         Win.Add (label);
 
-        var btnInput = new Button {
-                                      X = Pos.AnchorEnd (16),
-                                      Text = "Select Input"
-                                  };
+        var btnInput = new Button { X = Pos.AnchorEnd (16), Text = "Select Input" };
         Win.Add (btnInput);
 
         const string ruler = "|123456789";
 
         var inputHorizontalRuler = new Label {
                                                  Y = Pos.Bottom (btnInput),
+                                                 AutoSize = false,
                                                  Width = Dim.Fill (),
-                                                 ColorScheme = Colors.ColorSchemes["Error"],
-                                                 AutoSize = false
+                                                 ColorScheme = Colors.ColorSchemes["Error"]
                                              };
         Win.Add (inputHorizontalRuler);
 
         var inputVerticalRuler = new Label {
                                                Y = Pos.Bottom (btnInput),
+                                               AutoSize = false,
                                                Width = 1,
                                                ColorScheme = Colors.ColorSchemes["Error"],
-                                               AutoSize = false,
                                                TextDirection = TextDirection.TopBottom_LeftRight
                                            };
         Win.Add (inputVerticalRuler);
@@ -56,34 +50,26 @@ public class VkeyPacketSimulator : Scenario {
                                    };
         Win.Add (tvInput);
 
-        label = new Label {
-                              X = Pos.Center (),
-                              Y = Pos.Bottom (tvInput),
-                              Text = "Output"
-                          };
+        label = new Label { X = Pos.Center (), Y = Pos.Bottom (tvInput), Text = "Output" };
         Win.Add (label);
 
-        var btnOutput = new Button {
-                                       X = Pos.AnchorEnd (17),
-                                       Y = Pos.Top (label),
-                                       Text = "Select Output"
-                                   };
+        var btnOutput = new Button { X = Pos.AnchorEnd (17), Y = Pos.Top (label), Text = "Select Output" };
         Win.Add (btnOutput);
 
         var outputHorizontalRuler = new Label {
                                                   Y = Pos.Bottom (btnOutput),
+                                                  AutoSize = false,
                                                   Width = Dim.Fill (),
-                                                  ColorScheme = Colors.ColorSchemes["Error"],
-                                                  AutoSize = false
+                                                  ColorScheme = Colors.ColorSchemes["Error"]
                                               };
         Win.Add (outputHorizontalRuler);
 
         var outputVerticalRuler = new Label {
                                                 Y = Pos.Bottom (btnOutput),
+                                                AutoSize = false,
                                                 Width = 1,
                                                 Height = Dim.Fill (),
                                                 ColorScheme = Colors.ColorSchemes["Error"],
-                                                AutoSize = false,
                                                 TextDirection = TextDirection.TopBottom_LeftRight
                                             };
         Win.Add (outputVerticalRuler);
@@ -113,10 +99,11 @@ public class VkeyPacketSimulator : Scenario {
                 bool? handled = tvOutput.OnInvokingKeyBindings (e);
                 if ((handled == null) || (handled == false)) {
                     if (!tvOutput.OnProcessKeyDown (e)) {
-                        Application.Invoke (
-                                            () => MessageBox.Query (
-                                                                    "Keys",
-                                                                    $"'{Key.ToString (e.KeyCode, MenuBar.ShortcutDelimiter)}' pressed!",
+                        Application.Invoke (() => MessageBox.Query ("Keys",
+                                                                    $"'{
+                                                                        Key.ToString (e.KeyCode,
+                                                                            MenuBar.ShortcutDelimiter)
+                                                                    }' pressed!",
                                                                     "Ok"));
                     }
                 }
@@ -163,57 +150,48 @@ public class VkeyPacketSimulator : Scenario {
                 tvOutput.SetFocus ();
                 tvOutput.SetNeedsDisplay ();
 
-                Task.Run (
-                          () => {
-                              while (_outputStarted) {
-                                  try {
-                                      while (_keyboardStrokes.Count > 0) {
-                                          if (_keyboardStrokes[0] == KeyCode.Null) {
-                                              continue;
-                                          }
+                Task.Run (() => {
+                    while (_outputStarted) {
+                        try {
+                            while (_keyboardStrokes.Count > 0) {
+                                if (_keyboardStrokes[0] == KeyCode.Null) {
+                                    continue;
+                                }
 
-                                          ConsoleKeyInfo consoleKeyInfo =
-                                              ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (
-                                               _keyboardStrokes[0]);
-                                          char keyChar =
-                                              ConsoleKeyMapping.EncodeKeyCharForVKPacket (
-                                               consoleKeyInfo);
-                                          Application.Driver.SendKeys (
-                                                                       keyChar,
-                                                                       ConsoleKey.Packet,
-                                                                       consoleKeyInfo.Modifiers.HasFlag (
-                                                                        ConsoleModifiers.Shift),
-                                                                       consoleKeyInfo.Modifiers.HasFlag (
-                                                                        ConsoleModifiers.Alt),
-                                                                       consoleKeyInfo.Modifiers.HasFlag (
-                                                                        ConsoleModifiers.Control));
+                                ConsoleKeyInfo consoleKeyInfo =
+                                    ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (_keyboardStrokes[0]);
+                                char keyChar =
+                                    ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
+                                Application.Driver.SendKeys (keyChar,
+                                                             ConsoleKey.Packet,
+                                                             consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Shift),
+                                                             consoleKeyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt),
+                                                             consoleKeyInfo.Modifiers
+                                                                           .HasFlag (ConsoleModifiers.Control));
 
-                                          _stopOutput.Wait ();
-                                          _stopOutput.Reset ();
-                                          _keyboardStrokes.RemoveAt (0);
-                                          Application.Invoke (
-                                                              () => {
-                                                                  tvOutput.ReadOnly = true;
-                                                                  tvInput.SetFocus ();
-                                                              });
-                                      }
+                                _stopOutput.Wait ();
+                                _stopOutput.Reset ();
+                                _keyboardStrokes.RemoveAt (0);
+                                Application.Invoke (() => {
+                                    tvOutput.ReadOnly = true;
+                                    tvInput.SetFocus ();
+                                });
+                            }
 
-                                      _outputStarted = false;
-                                  }
-                                  catch (Exception) {
-                                      Application.Invoke (
-                                                          () => {
-                                                              MessageBox.ErrorQuery (
-                                                               "Error",
-                                                               "Couldn't send the keystrokes!",
-                                                               "Ok");
-                                                              Application.RequestStop ();
-                                                          });
-                                  }
-                              }
+                            _outputStarted = false;
+                        }
+                        catch (Exception) {
+                            Application.Invoke (() => {
+                                MessageBox.ErrorQuery ("Error",
+                                                       "Couldn't send the keystrokes!",
+                                                       "Ok");
+                                Application.RequestStop ();
+                            });
+                        }
+                    }
 
-                              //System.Diagnostics.Debug.WriteLine ($"_outputStarted: {_outputStarted}");
-                          });
+                    //System.Diagnostics.Debug.WriteLine ($"_outputStarted: {_outputStarted}");
+                });
             }
         };
 
@@ -233,19 +211,15 @@ public class VkeyPacketSimulator : Scenario {
 
         void Win_LayoutComplete (object sender, LayoutEventArgs obj) {
             inputHorizontalRuler.Text = outputHorizontalRuler.Text =
-                                            ruler.Repeat (
-                                                          (int)Math.Ceiling (
-                                                                             inputHorizontalRuler.Bounds.Width
+                                            ruler.Repeat ((int)Math.Ceiling (inputHorizontalRuler.Bounds.Width
                                                                              / (double)ruler.Length))[
                                              ..inputHorizontalRuler.Bounds.Width];
             inputVerticalRuler.Height = tvInput.Frame.Height + 1;
             inputVerticalRuler.Text =
-                ruler.Repeat (
-                              (int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length))[
+                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length))[
                  ..inputVerticalRuler.Bounds.Height];
             outputVerticalRuler.Text =
-                ruler.Repeat (
-                              (int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length))[
+                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length))[
                  ..outputVerticalRuler.Bounds.Height];
         }
 

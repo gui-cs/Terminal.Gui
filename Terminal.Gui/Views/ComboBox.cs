@@ -34,10 +34,11 @@ public class ComboBox : View {
 
         Add (_search, _listview);
 
+        // BUGBUG: This should not be needed; LayoutComplete will handle
         Initialized += (s, e) => ProcessLayout ();
 
         // On resize
-        LayoutComplete += (sender, a) => { ProcessLayout (); };
+        LayoutComplete += (sender, a) => ProcessLayout ();;
 
         _listview.SelectedItemChanged += (sender, e) => {
             if (!HideDropdownListOnClick && _searchset.Count > 0) {

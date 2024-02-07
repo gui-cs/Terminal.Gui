@@ -29,9 +29,9 @@ public class TextFormatterDemo : Scenario {
                                       ColorScheme = Colors.ColorSchemes["TopLevel"],
                                       X = 0,
                                       Y = 0,
+                                      AutoSize = false,
                                       Height = 10,
                                       Width = Dim.Fill (),
-                                      AutoSize = false
                                   };
 
         var block = new StringBuilder ();
@@ -67,19 +67,19 @@ public class TextFormatterDemo : Scenario {
             singleLines[(int)alignment] = new Label {
                                                         TextAlignment = alignment,
                                                         X = 0,
+                                                        AutoSize = false,
                                                         Width = Dim.Fill (),
                                                         Height = 1,
                                                         ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                        AutoSize = false,
                                                         Text = text
                                                     };
             multipleLines[(int)alignment] = new Label {
                                                           TextAlignment = alignment,
                                                           X = 0,
+                                                          AutoSize = false,
                                                           Width = Dim.Fill (),
                                                           Height = multiLineHeight,
                                                           ColorScheme = Colors.ColorSchemes["Dialog"],
-                                                          AutoSize = false,
                                                           Text = text
                                                       };
         }
