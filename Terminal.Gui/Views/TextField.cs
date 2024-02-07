@@ -596,7 +596,14 @@ public class TextField : View {
     }
 
     /// <inheritdoc/>
-    public override Attribute GetNormalColor () { return Enabled ? ColorScheme.Focus : ColorScheme.Disabled; }
+    public override Attribute GetNormalColor () {
+        ColorScheme cs = ColorScheme;
+        if (ColorScheme == null) {
+            cs = new ColorScheme ();
+        }
+
+        return Enabled ? cs.Focus : cs.Disabled;
+    }
 
     /// <summary>
     ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
@@ -760,10 +767,10 @@ public class TextField : View {
     public override void OnDrawContent (Rect contentArea) {
         _isDrawing = true;
 
-        var selColor = new Attribute (ColorScheme.Focus.Background, ColorScheme.Focus.Foreground);
+        var selColor = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
         SetSelectedStartSelectedLength ();
 
-        Driver.SetAttribute (GetNormalColor ());
+        Driver?.SetAttribute (GetNormalColor ());
         Move (0, 0);
 
         int p = ScrollOffset;
@@ -775,25 +782,25 @@ public class TextField : View {
             Rune rune = _text[idx];
             int cols = rune.GetColumns ();
             if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly) {
-                Driver.SetAttribute (selColor);
+                Driver?.SetAttribute (selColor);
             } else if (ReadOnly) {
-                Driver.SetAttribute (
+                Driver?.SetAttribute (
                                      idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
                                          ? selColor
                                          : roc);
             } else if (!HasFocus && Enabled) {
-                Driver.SetAttribute (ColorScheme.Focus);
+                Driver?.SetAttribute (GetFocusColor ());
             } else if (!Enabled) {
-                Driver.SetAttribute (roc);
+                Driver?.SetAttribute (roc);
             } else {
-                Driver.SetAttribute (
+                Driver?.SetAttribute (
                                      idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
                                          ? selColor
                                          : ColorScheme.Focus);
             }
 
             if (col + cols <= width) {
-                Driver.AddRune (Secret ? Glyphs.Dot : rune);
+                Driver?.AddRune (Secret ? Glyphs.Dot : rune);
             }
 
             if (!TextModel.SetCol (ref col, width, cols)) {
@@ -805,7 +812,7 @@ public class TextField : View {
             }
         }
 
-        Driver.SetAttribute (ColorScheme.Focus);
+        Driver.SetAttribute (GetFocusColor ());
         for (int i = col; i < width; i++) {
             Driver.AddRune ((Rune)' ');
         }
@@ -1149,11 +1156,16 @@ public class TextField : View {
     }
 
     private Attribute GetReadOnlyColor () {
-        if (ColorScheme.Disabled.Foreground == ColorScheme.Focus.Background) {
-            return new Attribute (ColorScheme.Focus.Foreground, ColorScheme.Focus.Background);
+        ColorScheme cs = ColorScheme;
+        if (ColorScheme == null) {
+            cs = new ColorScheme ();
         }
 
-        return new Attribute (ColorScheme.Disabled.Foreground, ColorScheme.Focus.Background);
+        if (cs.Disabled.Foreground == cs.Focus.Background) {
+            return new Attribute (cs.Focus.Foreground, cs.Focus.Background);
+        }
+
+        return new Attribute (cs.Disabled.Foreground, cs.Focus.Background);
     }
 
     private void HideCursorVisibility () {

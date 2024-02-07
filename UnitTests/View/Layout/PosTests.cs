@@ -102,6 +102,58 @@ public class PosTests {
         Assert.Equal ($"AnchorEnd({n})", pos.ToString ());
     }
 
+    // This test used to be Dialog_In_Window_With_TextField_And_Button_AnchorEnd in DialogTests.
+    [Fact]
+    [SetupFakeDriver]
+    public void AnchorEnd_View_And_Button () {
+        ((FakeDriver)Application.Driver).SetBufferSize (20, 5);
+
+        var b = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
+
+        var frame = new FrameView { Width = 18, Height = 3 };
+        Assert.Equal (16, frame.Bounds.Width);
+
+        Button btn = null;
+        int Btn_Width () { return btn?.Bounds.Width ?? 0; }
+
+        btn = new Button { Text = "Ok", X = Pos.AnchorEnd () - Pos.Function (Btn_Width) };
+
+        var view = new View {
+                                Text = "0123456789abcdefghij",
+
+                                // Dim.Fill (1) fills remaining space minus 1 (16 - 1 = 15)
+                                // Dim.Function (Btn_Width) is 6
+                                // Width should be 15 - 6 = 9
+                                Width = Dim.Fill (1) - Dim.Function (Btn_Width),
+                                Height = 1
+                            };
+
+        frame.Add (btn, view);
+        frame.BeginInit ();
+        frame.EndInit ();
+        frame.Draw ();
+
+        Assert.Equal (6, btn.Bounds.Width);
+        Assert.Equal (10, btn.Frame.X); // frame.Bounds.Width (16) - btn.Frame.Width (6) = 10
+        Assert.Equal (0, btn.Frame.Y);
+        Assert.Equal (6, btn.Frame.Width);
+        Assert.Equal (1, btn.Frame.Height);
+
+        Assert.Equal (9, view.Bounds.Width); // frame.Bounds.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
+        Assert.Equal (0, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (9, view.Frame.Width);
+        Assert.Equal (1, view.Frame.Height);
+
+        var expected = $@"
+┌────────────────┐
+│012345678 {b}│
+└────────────────┘
+";
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+    }
+
+
     [Fact]
     public void At_Equal () {
         var n1 = 0;
