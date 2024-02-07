@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using Terminal.Gui;
 
@@ -7,7 +8,23 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Buttons", "Demonstrates all sorts of Buttons.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Layout")]
+
+[ScenarioMetadata ("Buttons", "Demonstrates all sorts of Buttons.")]
+[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Layout")]
 public class Buttons : Scenario {
+    public override void Setup () {
+        // Add a label & text field so we can demo IsDefault
+        var editLabel = new Label { X = 0, Y = 0, TabStop = true, Text = "TextField (to demo IsDefault):" };
+        Win.Add (editLabel);
+
+        // Add a TextField using Absolute layout. 
+        var edit = new TextField {
+                                     X = 31,
+                                     Width = 15,
+                                     HotKey = Key.Y.WithAlt
+                                 };
+        Win.Add (edit);
     public override void Setup () {
         // Add a label & text field so we can demo IsDefault
         var editLabel = new Label {
@@ -44,6 +61,12 @@ public class Buttons : Scenario {
         };
         Win.Add (swapButton);
 
+        static void DoMessage (Button button, string txt) {
+            button.Clicked += (s, e) => {
+                string btnText = button.Text;
+                MessageBox.Query ("Message", $"Did you click {txt}?", "Yes", "No");
+            };
+        }
         static void DoMessage (Button button, string txt) {
             button.Clicked += (s, e) => {
                 string btnText = button.Text;
@@ -124,6 +147,8 @@ public class Buttons : Scenario {
             // Now this throw a InvalidOperationException on the TopologicalSort method as is expected.
             //Win.Remove (removeButton);
 
+            removeButton.Visible = false;
+        };
             removeButton.Visible = false;
         };
 
@@ -224,7 +249,18 @@ public class Buttons : Scenario {
         string MoveHotkey (string txt) {
             // Remove the '_'
             List<Rune> runes = txt.ToRuneList ();
+        // Demo changing hotkey
+        string MoveHotkey (string txt) {
+            // Remove the '_'
+            List<Rune> runes = txt.ToRuneList ();
 
+            int i = runes.IndexOf ((Rune)'_');
+            var start = "";
+            if (i > -1) {
+                start = StringExtensions.ToString (runes.GetRange (0, i));
+            }
+
+            txt = start + StringExtensions.ToString (runes.GetRange (i + 1, runes.Count - (i + 1)));
             int i = runes.IndexOf ((Rune)'_');
             var start = "";
             if (i > -1) {
@@ -234,13 +270,24 @@ public class Buttons : Scenario {
             txt = start + StringExtensions.ToString (runes.GetRange (i + 1, runes.Count - (i + 1)));
 
             runes = txt.ToRuneList ();
+            runes = txt.ToRuneList ();
 
             // Move over one or go to start
             i++;
             if (i >= runes.Count) {
                 i = 0;
             }
+            // Move over one or go to start
+            i++;
+            if (i >= runes.Count) {
+                i = 0;
+            }
 
+            // Slip in the '_'
+            start = StringExtensions.ToString (runes.GetRange (0, i));
+
+            return start + '_' + StringExtensions.ToString (runes.GetRange (i, runes.Count - i));
+        }
             // Slip in the '_'
             start = StringExtensions.ToString (runes.GetRange (0, i));
 
@@ -314,7 +361,49 @@ public class Buttons : Scenario {
                     break;
             }
         };
+        radioGroup.SelectedItemChanged += (s, args) => {
+            switch (args.SelectedItem) {
+                case 0:
+                    moveBtn.TextAlignment = TextAlignment.Left;
+                    sizeBtn.TextAlignment = TextAlignment.Left;
+                    moveBtnA.TextAlignment = TextAlignment.Left;
+                    sizeBtnA.TextAlignment = TextAlignment.Left;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Left;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Left;
 
+                    break;
+                case 1:
+                    moveBtn.TextAlignment = TextAlignment.Right;
+                    sizeBtn.TextAlignment = TextAlignment.Right;
+                    moveBtnA.TextAlignment = TextAlignment.Right;
+                    sizeBtnA.TextAlignment = TextAlignment.Right;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Right;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Right;
+
+                    break;
+                case 2:
+                    moveBtn.TextAlignment = TextAlignment.Centered;
+                    sizeBtn.TextAlignment = TextAlignment.Centered;
+                    moveBtnA.TextAlignment = TextAlignment.Centered;
+                    sizeBtnA.TextAlignment = TextAlignment.Centered;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Centered;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Centered;
+
+                    break;
+                case 3:
+                    moveBtn.TextAlignment = TextAlignment.Justified;
+                    sizeBtn.TextAlignment = TextAlignment.Justified;
+                    moveBtnA.TextAlignment = TextAlignment.Justified;
+                    sizeBtnA.TextAlignment = TextAlignment.Justified;
+                    moveHotKeyBtn.TextAlignment = TextAlignment.Justified;
+                    moveUnicodeHotKeyBtn.TextAlignment = TextAlignment.Justified;
+
+                    break;
+            }
+        };
+
+        Application.Top.Ready += (s, e) => radioGroup.Refresh ();
+    }
         Application.Top.Ready += (s, e) => radioGroup.Refresh ();
     }
 }

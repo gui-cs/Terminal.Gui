@@ -2,6 +2,8 @@
 
 namespace Terminal.Gui.ConfigurationTests; 
 
+namespace Terminal.Gui.ConfigurationTests; 
+
 public class AppScopeTests {
     public static readonly JsonSerializerOptions _jsonOptions = new () {
                                                                            Converters = {
@@ -13,22 +15,22 @@ public class AppScopeTests {
     [Fact]
     [AutoInitShutdown]
     public void Apply_ShouldApplyUpdatedProperties () {
-        ConfigurationManager.Reset ();
+        Reset ();
         Assert.Null (AppSettingsTestClass.TestProperty);
-        Assert.NotEmpty (ConfigurationManager.AppSettings);
-        Assert.Null (ConfigurationManager.AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue);
+        Assert.NotEmpty (AppSettings);
+        Assert.Null (AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue);
 
         AppSettingsTestClass.TestProperty = true;
-        ConfigurationManager.Reset ();
+        Reset ();
         Assert.True (AppSettingsTestClass.TestProperty);
-        Assert.NotEmpty (ConfigurationManager.AppSettings);
-        Assert.Null (ConfigurationManager.AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        Assert.NotEmpty (AppSettings);
+        Assert.Null (AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
 
-        ConfigurationManager.AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue = false;
-        Assert.False (ConfigurationManager.AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
+        AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue = false;
+        Assert.False (AppSettings["AppSettingsTestClass.TestProperty"].PropertyValue as bool?);
 
         // ConfigurationManager.Settings should NOT apply theme settings
-        ConfigurationManager.Settings.Apply ();
+        Settings.Apply ();
         Assert.True (AppSettingsTestClass.TestProperty);
 
         // ConfigurationManager.Themes should NOT apply theme settings
@@ -36,7 +38,7 @@ public class AppScopeTests {
         Assert.True (AppSettingsTestClass.TestProperty);
 
         // ConfigurationManager.AppSettings should NOT apply theme settings
-        ConfigurationManager.AppSettings.Apply ();
+        AppSettings.Apply ();
         Assert.False (AppSettingsTestClass.TestProperty);
     }
 
@@ -45,26 +47,26 @@ public class AppScopeTests {
         AppSettingsTestClass.TestProperty = null;
         Assert.Null (AppSettingsTestClass.TestProperty);
 
-        ConfigurationManager.Initialize ();
-        ConfigurationManager.GetHardCodedDefaults ();
-        ConfigurationManager.Apply ();
+        Initialize ();
+        GetHardCodedDefaults ();
+        Apply ();
         Assert.Null (AppSettingsTestClass.TestProperty);
 
         AppSettingsTestClass.TestProperty = true;
-        ConfigurationManager.Initialize ();
-        ConfigurationManager.GetHardCodedDefaults ();
+        Initialize ();
+        GetHardCodedDefaults ();
         Assert.NotNull (AppSettingsTestClass.TestProperty);
-        ConfigurationManager.Apply ();
+        Apply ();
         Assert.NotNull (AppSettingsTestClass.TestProperty);
     }
 
     [Fact]
     public void TestSerialize_RoundTrip () {
-        ConfigurationManager.Reset ();
+        Reset ();
 
-        AppScope initial = ConfigurationManager.AppSettings;
+        AppScope initial = AppSettings;
 
-        string serialized = JsonSerializer.Serialize (ConfigurationManager.AppSettings, _jsonOptions);
+        string serialized = JsonSerializer.Serialize (AppSettings, _jsonOptions);
         var deserialized = JsonSerializer.Deserialize<AppScope> (serialized, _jsonOptions);
 
         Assert.NotEqual (initial, deserialized);

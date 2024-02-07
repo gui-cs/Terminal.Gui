@@ -221,16 +221,17 @@ public class HotKeyTests {
         view.HotKey = KeyCode.A | KeyCode.AltMask;
         Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.A | KeyCode.CtrlMask);
         Assert.Throws<ArgumentException> (
-                                          () => view.HotKey =
-                                                    KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
+                                          () =>
+                                              view.HotKey =
+                                                  KeyCode.A | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
 
         // All others must not have Ctrl (Alt is assumed)
         view.HotKey = KeyCode.D1 | KeyCode.AltMask;
         Assert.Throws<ArgumentException> (() => view.HotKey = KeyCode.D1 | KeyCode.CtrlMask);
         Assert.Throws<ArgumentException> (
-                                          () => view.HotKey =
-                                                    KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask
-                                                    | KeyCode.CtrlMask);
+                                          () =>
+                                              view.HotKey =
+                                                  KeyCode.D1 | KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask);
 
         // Shift is ok (e.g. this is '!')
         view.HotKey = KeyCode.D1 | KeyCode.ShiftMask;

@@ -17,22 +17,21 @@ public class ComboBoxIteration : Scenario {
                                    };
         Win.Add (lbListView);
 
-        var listview = new ListView (items) {
-                                                Y = Pos.Bottom (lbListView) + 1,
-                                                Width = 10,
-                                                Height = Dim.Fill (2)
-                                            };
+        var listview = new ListView {
+                                        Y = Pos.Bottom (lbListView) + 1,
+                                        Width = 10,
+                                        Height = Dim.Fill (2),
+                                        Source = new ListWrapper (items)
+                                    };
         Win.Add (listview);
 
         var lbComboBox = new Label {
-                                       AutoSize = false,
                                        ColorScheme = Colors.ColorSchemes["TopLevel"],
                                        X = Pos.Right (lbListView) + 1,
                                        Width = Dim.Percent (40)
                                    };
 
         var comboBox = new ComboBox {
-                                        AutoSize = false,
                                         X = Pos.Right (listview) + 1,
                                         Y = Pos.Bottom (lbListView) + 1,
                                         Height = Dim.Fill (2),
@@ -56,8 +55,8 @@ public class ComboBoxIteration : Scenario {
         Win.Add (new TextField { X = Pos.Right (listview) + 1, Y = Pos.Top (comboBox) + 3, Height = 1, Width = 20 });
 
         var btnTwo = new Button {
-                                    Text = "Two",
-                                    X = Pos.Right (comboBox) + 1
+                                    X = Pos.Right (comboBox) + 1,
+                                    Text = "Two"
                                 };
         btnTwo.Clicked += (s, e) => {
             items = new List<string> { "one", "two" };
@@ -68,9 +67,9 @@ public class ComboBoxIteration : Scenario {
         Win.Add (btnTwo);
 
         var btnThree = new Button {
-                                      Text = "Three",
                                       X = Pos.Right (comboBox) + 1,
-                                      Y = Pos.Top (comboBox)
+                                      Y = Pos.Top (comboBox),
+                                      Text = "Three"
                                   };
         btnThree.Clicked += (s, e) => {
             items = new List<string> { "one", "two", "three" };

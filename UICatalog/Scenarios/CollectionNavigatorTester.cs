@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata (
                       "Collection Navigator",
@@ -91,27 +91,27 @@ public class CollectionNavigatorTester : Scenario {
                                       Checked = false
                                   };
         allowMultiSelection.Action = () =>
-            allowMultiSelection.Checked = _listView.AllowsMultipleSelection = !_listView.AllowsMultipleSelection;
+            allowMultiSelection.Checked =
+                _listView.AllowsMultipleSelection = !_listView.AllowsMultipleSelection;
         allowMultiSelection.CanExecute = () => (bool)allowMarking.Checked;
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_Configure",
-                                                           new[] {
-                                                                     allowMarking,
-                                                                     allowMultiSelection,
-                                                                     null,
-                                                                     new (
-                                                                          "_Quit",
-                                                                          $"{Application.QuitKey}",
-                                                                          () => Quit (),
-                                                                          null,
-                                                                          null,
-                                                                          (KeyCode)Application.QuitKey)
-                                                                 }),
-                                                      new ("_Quit", $"{Application.QuitKey}", () => Quit ())
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_Configure", new[] {
+                                                                            allowMarking,
+                                                                            allowMultiSelection,
+                                                                            null,
+                                                                            new (
+                                                                             "_Quit",
+                                                                             $"{Application.QuitKey}",
+                                                                             () => Quit (),
+                                                                             null,
+                                                                             null,
+                                                                             (KeyCode)Application.QuitKey)
+                                                                        }),
+                                   new MenuBarItem ("_Quit", $"{Application.QuitKey}", () => Quit ())
+                                       ]
+                               };
 
         Application.Top.Add (menu);
 
@@ -130,7 +130,6 @@ public class CollectionNavigatorTester : Scenario {
     private void CreateListView () {
         var label = new Label {
                                   Text = "ListView",
-                                  AutoSize = false,
                                   TextAlignment = TextAlignment.Centered,
                                   X = 0,
                                   Y = 1, // for menu
@@ -157,7 +156,6 @@ public class CollectionNavigatorTester : Scenario {
     private void CreateTreeView () {
         var label = new Label {
                                   Text = "TreeView",
-                                  AutoSize = false,
                                   TextAlignment = TextAlignment.Centered,
                                   X = Pos.Right (_listView) + 2,
                                   Y = 1, // for menu

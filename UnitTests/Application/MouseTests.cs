@@ -111,6 +111,8 @@ public class MouseTests {
         Application.Top.Width = size.Width;
         Application.Top.Height = size.Height;
 
+        Application.Begin (Application.Top);
+
         var mouseEvent = new MouseEvent {
                                             X = clickX,
                                             Y = clickY,
@@ -211,6 +213,7 @@ public class MouseTests {
         view.CanFocus = true;
 
         Application.Top.Add (view);
+        Application.Begin (Application.Top);
         var mouseEvent = new MouseEvent {
                                             X = clickX,
                                             Y = clickY,

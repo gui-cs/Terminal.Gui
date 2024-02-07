@@ -17,34 +17,34 @@ public class VkeyPacketSimulator : Scenario {
 
     public override void Setup () {
         var label = new Label {
-                                  Text = "Input",
-                                  X = Pos.Center ()
+                                  X = Pos.Center (),
+                                  Text = "Input"
                               };
         Win.Add (label);
 
         var btnInput = new Button {
-                                      Text = "Select Input",
-                                      X = Pos.AnchorEnd (16)
+                                      X = Pos.AnchorEnd (16),
+                                      Text = "Select Input"
                                   };
         Win.Add (btnInput);
 
         const string ruler = "|123456789";
 
         var inputHorizontalRuler = new Label {
-                                                 Text = "",
-                                                 AutoSize = false,
                                                  Y = Pos.Bottom (btnInput),
                                                  Width = Dim.Fill (),
-                                                 ColorScheme = Colors.ColorSchemes["Error"]
+                                                 ColorScheme = Colors.ColorSchemes["Error"],
+                                                 AutoSize = false
                                              };
         Win.Add (inputHorizontalRuler);
 
-        var inputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
-                                     AutoSize = false,
-                                     Y = Pos.Bottom (btnInput),
-                                     Width = 1,
-                                     ColorScheme = Colors.ColorSchemes["Error"]
-                                 };
+        var inputVerticalRuler = new Label {
+                                               Y = Pos.Bottom (btnInput),
+                                               Width = 1,
+                                               ColorScheme = Colors.ColorSchemes["Error"],
+                                               AutoSize = false,
+                                               TextDirection = TextDirection.TopBottom_LeftRight
+                                           };
         Win.Add (inputVerticalRuler);
 
         var tvInput = new TextView {
@@ -57,35 +57,35 @@ public class VkeyPacketSimulator : Scenario {
         Win.Add (tvInput);
 
         label = new Label {
-                              Text = "Output",
                               X = Pos.Center (),
-                              Y = Pos.Bottom (tvInput)
+                              Y = Pos.Bottom (tvInput),
+                              Text = "Output"
                           };
         Win.Add (label);
 
         var btnOutput = new Button {
-                                       Text = "Select Output",
                                        X = Pos.AnchorEnd (17),
-                                       Y = Pos.Top (label)
+                                       Y = Pos.Top (label),
+                                       Text = "Select Output"
                                    };
         Win.Add (btnOutput);
 
         var outputHorizontalRuler = new Label {
-                                                  Text = "",
-                                                  AutoSize = false,
                                                   Y = Pos.Bottom (btnOutput),
                                                   Width = Dim.Fill (),
-                                                  ColorScheme = Colors.ColorSchemes["Error"]
+                                                  ColorScheme = Colors.ColorSchemes["Error"],
+                                                  AutoSize = false
                                               };
         Win.Add (outputHorizontalRuler);
 
-        var outputVerticalRuler = new Label ("", TextDirection.TopBottom_LeftRight) {
-                                      AutoSize = false,
-                                      Y = Pos.Bottom (btnOutput),
-                                      Width = 1,
-                                      Height = Dim.Fill (),
-                                      ColorScheme = Colors.ColorSchemes["Error"]
-                                  };
+        var outputVerticalRuler = new Label {
+                                                Y = Pos.Bottom (btnOutput),
+                                                Width = 1,
+                                                Height = Dim.Fill (),
+                                                ColorScheme = Colors.ColorSchemes["Error"],
+                                                AutoSize = false,
+                                                TextDirection = TextDirection.TopBottom_LeftRight
+                                            };
         Win.Add (outputVerticalRuler);
 
         var tvOutput = new TextView {
@@ -173,8 +173,11 @@ public class VkeyPacketSimulator : Scenario {
                                           }
 
                                           ConsoleKeyInfo consoleKeyInfo =
-                                              ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (_keyboardStrokes[0]);
-                                          char keyChar = ConsoleKeyMapping.EncodeKeyCharForVKPacket (consoleKeyInfo);
+                                              ConsoleKeyMapping.GetConsoleKeyInfoFromKeyCode (
+                                               _keyboardStrokes[0]);
+                                          char keyChar =
+                                              ConsoleKeyMapping.EncodeKeyCharForVKPacket (
+                                               consoleKeyInfo);
                                           Application.Driver.SendKeys (
                                                                        keyChar,
                                                                        ConsoleKey.Packet,
@@ -233,15 +236,17 @@ public class VkeyPacketSimulator : Scenario {
                                             ruler.Repeat (
                                                           (int)Math.Ceiling (
                                                                              inputHorizontalRuler.Bounds.Width
-                                                                             / (double)ruler.Length))
-                                                [..inputHorizontalRuler.Bounds.Width];
+                                                                             / (double)ruler.Length))[
+                                             ..inputHorizontalRuler.Bounds.Width];
             inputVerticalRuler.Height = tvInput.Frame.Height + 1;
             inputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length))
-                    [..inputVerticalRuler.Bounds.Height];
+                ruler.Repeat (
+                              (int)Math.Ceiling (inputVerticalRuler.Bounds.Height / (double)ruler.Length))[
+                 ..inputVerticalRuler.Bounds.Height];
             outputVerticalRuler.Text =
-                ruler.Repeat ((int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length))
-                    [..outputVerticalRuler.Bounds.Height];
+                ruler.Repeat (
+                              (int)Math.Ceiling (outputVerticalRuler.Bounds.Height / (double)ruler.Length))[
+                 ..outputVerticalRuler.Bounds.Height];
         }
 
         Win.LayoutComplete += Win_LayoutComplete;

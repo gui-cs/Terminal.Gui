@@ -22,50 +22,42 @@ namespace Terminal.Gui;
 ///     </para>
 /// </remarks>
 public class Button : View {
+    private readonly Rune _leftBracket;
+    private readonly Rune _leftDefault;
+    private readonly Rune _rightBracket;
+    private readonly Rune _rightDefault;
     private bool _isDefault;
-    private Rune _leftBracket;
-    private Rune _leftDefault;
-    private Rune _rightBracket;
-    private Rune _rightDefault;
 
     /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
-    public Button () : this (string.Empty) { }
+    public Button () {
+        TextAlignment = TextAlignment.Centered;
+        VerticalTextAlignment = VerticalTextAlignment.Middle;
 
-    /// <summary>Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
-    /// <param name="text">The button's text</param>
-    /// <param name="is_default">
-    ///     If <c>true</c>, a special decoration is used, and the user pressing the enter key in a
-    ///     <see cref="Dialog"/> will implicitly activate this button.
-    /// </param>
-    public Button (string text, bool is_default = false) : base (text) { SetInitialProperties (text, is_default); }
+        HotKeySpecifier = new Rune ('_');
 
-    /// <summary>
-    ///     Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on
-    ///     the given text
-    /// </summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
-    /// <param name="x">X position where the button will be shown.</param>
-    /// <param name="y">Y position where the button will be shown.</param>
-    /// <param name="text">The button's text</param>
-    public Button (int x, int y, string text) : this (x, y, text, false) { }
+        _leftBracket = Glyphs.LeftBracket;
+        _rightBracket = Glyphs.RightBracket;
+        _leftDefault = Glyphs.LeftDefaultIndicator;
+        _rightDefault = Glyphs.RightDefaultIndicator;
 
-    /// <summary>
-    ///     Initializes a new instance of <see cref="Button"/> using <see cref="LayoutStyle.Absolute"/> layout, based on
-    ///     the given text.
-    /// </summary>
-    /// <remarks>The width of the <see cref="Button"/> is computed based on the text length. The height will always be 1.</remarks>
-    /// <param name="x">X position where the button will be shown.</param>
-    /// <param name="y">Y position where the button will be shown.</param>
-    /// <param name="text">The button's text</param>
-    /// <param name="is_default">
-    ///     If <c>true</c>, a special decoration is used, and the user pressing the enter key in a
-    ///     <see cref="Dialog"/> will implicitly activate this button.
-    /// </param>
-    public Button (int x, int y, string text, bool is_default)
-        : base (new Rect (x, y, text.GetRuneCount () + 4 + (is_default ? 2 : 0), 1), text) {
-        SetInitialProperties (text, is_default);
+        CanFocus = true;
+        AutoSize = true;
+
+        // Ensures a height of 1 if AutoSize is set to false
+        Height = 1;
+
+        // Override default behavior of View
+        // Command.Default sets focus
+        AddCommand (
+                    Command.Accept,
+                    () => {
+                        OnClicked ();
+
+                        return true;
+                    });
+        KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
+        KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
     }
 
     /// <summary>Gets or sets whether the <see cref="Button"/> is the default action to activate in a dialog.</summary>
@@ -95,7 +87,7 @@ public class Button : View {
     /// </remarks>
     public event EventHandler Clicked;
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override bool MouseEvent (MouseEvent me) {
         if (me.Flags == MouseFlags.Button1Clicked) {
             if (CanFocus && Enabled) {
@@ -117,14 +109,14 @@ public class Button : View {
     /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
     public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override bool OnEnter (View view) {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
         return base.OnEnter (view);
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override void PositionCursor () {
         if (HotKey.IsValid && Text != "") {
             for (var i = 0; i < TextFormatter.Text.GetRuneCount (); i++) {
@@ -152,38 +144,5 @@ public class Button : View {
                 TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
             }
         }
-    }
-
-    // TODO: v2 - Remove constructors with parameters
-    /// <summary>Private helper to set the initial properties of the View that were provided via constructors.</summary>
-    /// <param name="text"></param>
-    /// <param name="is_default"></param>
-    private void SetInitialProperties (string text, bool is_default) {
-        TextAlignment = TextAlignment.Centered;
-        VerticalTextAlignment = VerticalTextAlignment.Middle;
-
-        HotKeySpecifier = new Rune ('_');
-
-        _leftBracket = Glyphs.LeftBracket;
-        _rightBracket = Glyphs.RightBracket;
-        _leftDefault = Glyphs.LeftDefaultIndicator;
-        _rightDefault = Glyphs.RightDefaultIndicator;
-
-        CanFocus = true;
-        AutoSize = true;
-        _isDefault = is_default;
-        Text = text ?? string.Empty;
-
-        // Override default behavior of View
-        // Command.Default sets focus
-        AddCommand (
-                    Command.Accept,
-                    () => {
-                        OnClicked ();
-
-                        return true;
-                    });
-        KeyBindings.Add (Key.Space, Command.Default, Command.Accept);
-        KeyBindings.Add (Key.Enter, Command.Default, Command.Accept);
     }
 }

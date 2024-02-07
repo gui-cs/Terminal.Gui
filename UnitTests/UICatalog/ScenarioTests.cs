@@ -135,111 +135,99 @@ public class ScenarioTests {
                                    ColorScheme = Colors.ColorSchemes["TopLevel"]
                                };
 
-        _classListView = new ListView (_viewClasses.Keys.ToList ()) {
-                                                                        X = 0,
-                                                                        Y = 0,
-                                                                        Width = Dim.Fill (),
-                                                                        Height = Dim.Fill (),
-                                                                        AllowsMarking = false,
-                                                                        ColorScheme = Colors.ColorSchemes["TopLevel"]
-                                                                    };
+        _classListView = new ListView {
+                                          X = 0,
+                                          Y = 0,
+                                          Width = Dim.Fill (),
+                                          Height = Dim.Fill (),
+                                          AllowsMarking = false,
+                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
+                                          Source = new ListWrapper (_viewClasses.Keys.ToList ())
+                                      };
         _leftPane.Add (_classListView);
 
         _settingsPane = new FrameView {
-                                          Title = "Settings",
                                           X = Pos.Right (_leftPane),
                                           Y = 0, // for menu
                                           Width = Dim.Fill (),
                                           Height = 10,
                                           CanFocus = false,
-                                          ColorScheme = Colors.ColorSchemes["TopLevel"]
+                                          ColorScheme = Colors.ColorSchemes["TopLevel"],
+                                          Title = "Settings"
                                       };
-        _computedCheckBox = new CheckBox ("Computed Layout", true) { X = 0, Y = 0 };
+        _computedCheckBox = new CheckBox { X = 0, Y = 0, Text = "Computed Layout", Checked = true };
         _settingsPane.Add (_computedCheckBox);
 
         var radioItems = new[] { "Percent(x)", "AnchorEnd(x)", "Center", "At(x)" };
         _locationFrame = new FrameView {
-                                           Title = "Location (Pos)",
                                            X = Pos.Left (_computedCheckBox),
                                            Y = Pos.Bottom (_computedCheckBox),
                                            Height = 3 + radioItems.Length,
-                                           Width = 36
+                                           Width = 36,
+                                           Title = "Location (Pos)"
                                        };
         _settingsPane.Add (_locationFrame);
 
-        var label = new Label {
-                                  Text = "x:",
-                                  X = 0,
-                                  Y = 0
-                              };
+        var label = new Label { X = 0, Y = 0, Text = "x:" };
         _locationFrame.Add (label);
-        _xRadioGroup = new RadioGroup (radioItems) {
-                                                       X = 0,
-                                                       Y = Pos.Bottom (label)
-                                                   };
-        _xText = new TextField ($"{_xVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+        _xRadioGroup = new RadioGroup {
+                                          X = 0,
+                                          Y = Pos.Bottom (label),
+                                          RadioLabels = radioItems
+                                      };
+        _xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
         _locationFrame.Add (_xText);
 
         _locationFrame.Add (_xRadioGroup);
 
         radioItems = new[] { "Percent(y)", "AnchorEnd(y)", "Center", "At(y)" };
-        label = new Label {
-                              Text = "y:",
-                              X = Pos.Right (_xRadioGroup) + 1,
-                              Y = 0
-                          };
+        label = new Label { X = Pos.Right (_xRadioGroup) + 1, Y = 0, Text = "y:" };
         _locationFrame.Add (label);
-        _yText = new TextField ($"{_yVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+        _yText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_yVal}" };
         _locationFrame.Add (_yText);
-        _yRadioGroup = new RadioGroup (radioItems) {
-                                                       X = Pos.X (label),
-                                                       Y = Pos.Bottom (label)
-                                                   };
+        _yRadioGroup = new RadioGroup {
+                                          X = Pos.X (label),
+                                          Y = Pos.Bottom (label),
+                                          RadioLabels = radioItems
+                                      };
         _locationFrame.Add (_yRadioGroup);
 
         _sizeFrame = new FrameView {
-                                       Title = "Size (Dim)",
                                        X = Pos.Right (_locationFrame),
                                        Y = Pos.Y (_locationFrame),
                                        Height = 3 + radioItems.Length,
-                                       Width = 40
+                                       Width = 40,
+                                       Title = "Size (Dim)"
                                    };
 
         radioItems = new[] { "Percent(width)", "Fill(width)", "Sized(width)" };
-        label = new Label {
-                              Text = "width:",
-                              X = 0,
-                              Y = 0
-                          };
+        label = new Label { X = 0, Y = 0, Text = "width:" };
         _sizeFrame.Add (label);
-        _wRadioGroup = new RadioGroup (radioItems) {
-                                                       X = 0,
-                                                       Y = Pos.Bottom (label)
-                                                   };
-        _wText = new TextField ($"{_wVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+        _wRadioGroup = new RadioGroup {
+                                          X = 0,
+                                          Y = Pos.Bottom (label),
+                                          RadioLabels = radioItems
+                                      };
+        _wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
         _sizeFrame.Add (_wText);
         _sizeFrame.Add (_wRadioGroup);
 
         radioItems = new[] { "Percent(height)", "Fill(height)", "Sized(height)" };
-        label = new Label {
-                              Text = "height:",
-                              X = Pos.Right (_wRadioGroup) + 1,
-                              Y = 0
-                          };
+        label = new Label { X = Pos.Right (_wRadioGroup) + 1, Y = 0, Text = "height:" };
         _sizeFrame.Add (label);
-        _hText = new TextField ($"{_hVal}") { X = Pos.Right (label) + 1, Y = 0, Width = 4 };
+        _hText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_hVal}" };
         _sizeFrame.Add (_hText);
 
-        _hRadioGroup = new RadioGroup (radioItems) {
-                                                       X = Pos.X (label),
-                                                       Y = Pos.Bottom (label)
-                                                   };
+        _hRadioGroup = new RadioGroup {
+                                          X = Pos.X (label),
+                                          Y = Pos.Bottom (label),
+                                          RadioLabels = radioItems
+                                      };
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
 
         _hostPane = new FrameView {
-                                      Title = "",
                                       X = Pos.Right (_leftPane),
                                       Y = Pos.Bottom (_settingsPane),
                                       Width = Dim.Fill (),
@@ -444,8 +432,9 @@ public class ScenarioTests {
             List<Type> types = new ();
             foreach (Type type in typeof (View).Assembly.GetTypes ()
                                                .Where (
-                                                       myType => myType.IsClass && !myType.IsAbstract && myType.IsPublic
-                                                                 && myType.IsSubclassOf (typeof (View)))) {
+                                                       myType =>
+                                                           myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
+                                                           myType.IsSubclassOf (typeof (View)))) {
                 types.Add (type);
             }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("SpinnerView Styles", "Shows the SpinnerView Styles.")]
 [ScenarioCategory ("Controls")]
@@ -37,47 +37,52 @@ public class SpinnerViewStyles : Scenario {
         preview.Add (spinner);
         spinner.AutoSpin = true;
 
-        var ckbAscii = new CheckBox ("Ascii Only") {
-                                                       X = Pos.Center () - 7,
-                                                       Y = Pos.Bottom (preview),
-                                                       Enabled = false,
-                                                       Checked = true
-                                                   };
+        var ckbAscii = new CheckBox {
+                                        X = Pos.Center () - 7,
+                                        Y = Pos.Bottom (preview),
+                                        Enabled = false,
+                                        Checked = true,
+                                        Text = "Ascii Only"
+                                    };
         Win.Add (ckbAscii);
 
-        var ckbNoSpecial = new CheckBox ("No Special") {
-                                                           X = Pos.Center () + 7,
-                                                           Y = Pos.Bottom (preview),
-                                                           Enabled = false,
-                                                           Checked = true
-                                                       };
+        var ckbNoSpecial = new CheckBox {
+                                            X = Pos.Center () + 7,
+                                            Y = Pos.Bottom (preview),
+                                            Enabled = false,
+                                            Checked = true,
+                                            Text = "No Special"
+                                        };
         Win.Add (ckbNoSpecial);
 
-        var ckbReverse = new CheckBox ("Reverse") {
-                                                      X = Pos.Center () - 22,
-                                                      Y = Pos.Bottom (preview) + 1,
-                                                      Checked = false
-                                                  };
+        var ckbReverse = new CheckBox {
+                                          X = Pos.Center () - 22,
+                                          Y = Pos.Bottom (preview) + 1,
+                                          Checked = false,
+                                          Text = "Reverse"
+                                      };
         Win.Add (ckbReverse);
 
-        var ckbBounce = new CheckBox ("Bounce") {
-                                                    X = Pos.Right (ckbReverse) + 2,
-                                                    Y = Pos.Bottom (preview) + 1,
-                                                    Checked = false
-                                                };
+        var ckbBounce = new CheckBox {
+                                         X = Pos.Right (ckbReverse) + 2,
+                                         Y = Pos.Bottom (preview) + 1,
+                                         Checked = false,
+                                         Text = "Bounce"
+                                     };
         Win.Add (ckbBounce);
 
         var delayLabel = new Label {
-                                       Text = "Delay:",
                                        X = Pos.Right (ckbBounce) + 2,
-                                       Y = Pos.Bottom (preview) + 1
+                                       Y = Pos.Bottom (preview) + 1,
+                                       Text = "Delay:"
                                    };
         Win.Add (delayLabel);
-        var delayField = new TextField (DEFAULT_DELAY.ToString ()) {
-                                                                       X = Pos.Right (delayLabel),
-                                                                       Y = Pos.Bottom (preview) + 1,
-                                                                       Width = 5
-                                                                   };
+        var delayField = new TextField {
+                                           X = Pos.Right (delayLabel),
+                                           Y = Pos.Bottom (preview) + 1,
+                                           Width = 5,
+                                           Text = DEFAULT_DELAY.ToString ()
+                                       };
         Win.Add (delayField);
         delayField.TextChanged += (s, e) => {
             if (ushort.TryParse (delayField.Text, out ushort i)) {
@@ -86,16 +91,17 @@ public class SpinnerViewStyles : Scenario {
         };
 
         var customLabel = new Label {
-                                        Text = "Custom:",
                                         X = Pos.Right (delayField) + 2,
-                                        Y = Pos.Bottom (preview) + 1
+                                        Y = Pos.Bottom (preview) + 1,
+                                        Text = "Custom:"
                                     };
         Win.Add (customLabel);
-        var customField = new TextField (DEFAULT_CUSTOM) {
-                                                             X = Pos.Right (customLabel),
-                                                             Y = Pos.Bottom (preview) + 1,
-                                                             Width = 12
-                                                         };
+        var customField = new TextField {
+                                            X = Pos.Right (customLabel),
+                                            Y = Pos.Bottom (preview) + 1,
+                                            Width = 12,
+                                            Text = DEFAULT_CUSTOM
+                                        };
         Win.Add (customField);
 
         string[] styleArray = styleDict.Select (e => e.Value.Key).ToArray ();
@@ -125,7 +131,8 @@ public class SpinnerViewStyles : Scenario {
         };
 
         styles.SelectedItemChanged += (s, e) => {
-            if (e.Item == 0) { // SpinnerStyle.Custom
+            if (e.Item == 0) {
+                // SpinnerStyle.Custom
                 if (customField.Text.Length < 1) {
                     customField.Text = DEFAULT_CUSTOM;
                 }

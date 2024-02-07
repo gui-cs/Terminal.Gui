@@ -1,7 +1,7 @@
 using System;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("True Colors", "Demonstration of true color support.")]
 [ScenarioCategory ("Colors")]
@@ -12,28 +12,29 @@ public class TrueColors : Scenario {
 
         bool canTrueColor = Application.Driver.SupportsTrueColor;
 
-        var lblDriverName = new Label ($"Current driver is {Application.Driver.GetType ().Name}") {
-                                X = x,
-                                Y = y++
-                            };
+        var lblDriverName = new Label {
+                                          X = x,
+                                          Y = y++,
+                                          Text = $"Current driver is {Application.Driver.GetType ().Name}"
+                                      };
         Win.Add (lblDriverName);
         y++;
 
         var cbSupportsTrueColor = new CheckBox {
-                                                   Text = "Driver supports true color ",
                                                    X = x,
                                                    Y = y++,
                                                    Checked = canTrueColor,
-                                                   CanFocus = false
+                                                   CanFocus = false,
+                                                   Text = "Driver supports true color "
                                                };
         Win.Add (cbSupportsTrueColor);
 
         var cbUseTrueColor = new CheckBox {
-                                              Text = "Force 16 colors",
                                               X = x,
                                               Y = y++,
                                               Checked = Application.Force16Colors,
-                                              Enabled = canTrueColor
+                                              Enabled = canTrueColor,
+                                              Text = "Force 16 colors"
                                           };
         cbUseTrueColor.Toggled += (_, evt) => { Application.Force16Colors = evt.NewValue ?? false; };
         Win.Add (cbUseTrueColor);
@@ -49,45 +50,45 @@ public class TrueColors : Scenario {
 
         Win.Add (
                  new Label {
-                               Text = "Mouse over to get the gradient view color:",
                                X = Pos.AnchorEnd (44),
-                               Y = 2
+                               Y = 2,
+                               Text = "Mouse over to get the gradient view color:"
                            });
         Win.Add (
                  new Label {
-                               Text = "Red:",
                                X = Pos.AnchorEnd (44),
-                               Y = 4
+                               Y = 4,
+                               Text = "Red:"
                            });
         Win.Add (
                  new Label {
-                               Text = "Green:",
                                X = Pos.AnchorEnd (44),
-                               Y = 5
+                               Y = 5,
+                               Text = "Green:"
                            });
         Win.Add (
                  new Label {
-                               Text = "Blue:",
                                X = Pos.AnchorEnd (44),
-                               Y = 6
+                               Y = 6,
+                               Text = "Blue:"
                            });
 
         var lblRed = new Label {
-                                   Text = "na",
                                    X = Pos.AnchorEnd (32),
-                                   Y = 4
+                                   Y = 4,
+                                   Text = "na"
                                };
         Win.Add (lblRed);
         var lblGreen = new Label {
-                                     Text = "na",
                                      X = Pos.AnchorEnd (32),
-                                     Y = 5
+                                     Y = 5,
+                                     Text = "na"
                                  };
         Win.Add (lblGreen);
         var lblBlue = new Label {
-                                    Text = "na",
                                     X = Pos.AnchorEnd (32),
-                                    Y = 6
+                                    Y = 6,
+                                    Text = "na"
                                 };
         Win.Add (lblBlue);
 
@@ -102,14 +103,14 @@ public class TrueColors : Scenario {
     }
 
     private void SetupGradient (string name, int x, ref int y, Func<int, Color> colorFunc) {
-        var gradient = new Label (name) {
-                                            X = x,
-                                            Y = y++
-                                        };
+        var gradient = new Label {
+                                     X = x,
+                                     Y = y++,
+                                     Text = name
+                                 };
         Win.Add (gradient);
         for (int dx = x, i = 0; i <= 256; i += 4) {
             var l = new Label {
-                                  Text = " ",
                                   X = dx++,
                                   Y = y,
                                   ColorScheme = new ColorScheme {
@@ -117,7 +118,8 @@ public class TrueColors : Scenario {
                                                                          colorFunc (Math.Clamp (i, 0, 255)),
                                                                          colorFunc (Math.Clamp (i, 0, 255))
                                                                         )
-                                                                }
+                                                                },
+                                  Text = " "
                               };
             Win.Add (l);
         }

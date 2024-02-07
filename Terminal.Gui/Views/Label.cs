@@ -10,28 +10,27 @@
 /// </remarks>
 public class Label : View {
     /// <inheritdoc/>
-    public Label () { SetInitialProperties (); }
+    public Label () {
+        Height = 1;
+        AutoSize = true;
 
-    /// <inheritdoc/>
-    public Label (Rect frame, bool autosize = false) : base (frame) { SetInitialProperties (autosize); }
+        // Things this view knows how to do
+        AddCommand (
+                    Command.Default,
+                    () => {
+                        // BUGBUG: This is a hack, but it does work.
+                        bool can = CanFocus;
+                        CanFocus = true;
+                        SetFocus ();
+                        SuperView.FocusNext ();
+                        CanFocus = can;
 
-    /// <inheritdoc/>
-    public Label (string text, bool autosize = true) : base (text) { SetInitialProperties (autosize); }
+                        return true;
+                    });
+        AddCommand (Command.Accept, () => AcceptKey ());
 
-    /// <inheritdoc/>
-    public Label (Rect rect, string text, bool autosize = false) : base (rect, text) {
-        SetInitialProperties (autosize);
-    }
-
-    /// <inheritdoc/>
-    public Label (int x, int y, string text, bool autosize = true) : base (x, y, text) {
-        SetInitialProperties (autosize);
-    }
-
-    /// <inheritdoc/>
-    public Label (string text, TextDirection direction, bool autosize = true)
-        : base (text, direction) {
-        SetInitialProperties (autosize);
+        // Default key bindings for this view
+        KeyBindings.Add (KeyCode.Space, Command.Accept);
     }
 
     /// <summary>
@@ -47,7 +46,7 @@ public class Label : View {
     /// <summary>Virtual method to invoke the <see cref="Clicked"/> event.</summary>
     public virtual void OnClicked () { Clicked?.Invoke (this, EventArgs.Empty); }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override bool OnEnter (View view) {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
@@ -93,27 +92,5 @@ public class Label : View {
         OnClicked ();
 
         return true;
-    }
-
-    private void SetInitialProperties (bool autosize = true) {
-        AutoSize = autosize;
-
-        // Things this view knows how to do
-        AddCommand (
-                    Command.Default,
-                    () => {
-                        // BUGBUG: This is a hack, but it does work.
-                        bool can = CanFocus;
-                        CanFocus = true;
-                        SetFocus ();
-                        SuperView.FocusNext ();
-                        CanFocus = can;
-
-                        return true;
-                    });
-        AddCommand (Command.Accept, () => AcceptKey ());
-
-        // Default key bindings for this view
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
     }
 }

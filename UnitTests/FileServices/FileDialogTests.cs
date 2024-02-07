@@ -3,11 +3,11 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.FileServicesTests;
+namespace Terminal.Gui.FileServicesTests; 
 
 public class FileDialogTests {
-    private readonly ITestOutputHelper _output;
-    public FileDialogTests (ITestOutputHelper output) { _output = output; }
+    private readonly ITestOutputHelper output;
+    public FileDialogTests (ITestOutputHelper output) { this.output = output; }
 
     [Theory]
     [AutoInitShutdown]
@@ -408,7 +408,7 @@ public class FileDialogTests {
 │{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
-        TestHelpers.AssertDriverContentsAre (expected, _output, ignoreLeadingWhitespace: true);
+        TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
     }
 
     [Fact]
@@ -443,7 +443,7 @@ public class FileDialogTests {
 │{CM.Glyphs.LeftBracket} ►► {CM.Glyphs.RightBracket} Enter Search                                 {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} OK {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Cancel {CM.Glyphs.RightBracket}  │
 └─────────────────────────────────────────────────────────────────────────┘
 ";
-        TestHelpers.AssertDriverContentsAre (expected, _output, ignoreLeadingWhitespace: true);
+        TestHelpers.AssertDriverContentsAre (expected, output, ignoreLeadingWhitespace: true);
     }
 
     private void AssertIsTheRootDirectory (string path) {
@@ -492,15 +492,11 @@ public class FileDialogTests {
 
         fileSystem.AddFile (
                             @"/myfile.txt",
-                            new MockFileData ("Testing is meh.") {
-                                                                     LastWriteTime =
-                                                                         new DateTime (2001, 01, 01, 11, 12, 11)
-                                                                 });
+                            new MockFileData ("Testing is meh.")
+                            { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
         fileSystem.AddFile (
                             @"/demo/jQuery.js",
-                            new MockFileData ("some js") {
-                                                             LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42)
-                                                         });
+                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
         fileSystem.AddFile (
                             @"/demo/image.gif",
                             new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 })
@@ -532,20 +528,14 @@ public class FileDialogTests {
 
         fileSystem.AddFile (
                             @"c:\myfile.txt",
-                            new MockFileData ("Testing is meh.") {
-                                                                     LastWriteTime =
-                                                                         new DateTime (2001, 01, 01, 11, 12, 11)
-                                                                 });
+                            new MockFileData ("Testing is meh.")
+                            { LastWriteTime = new DateTime (2001, 01, 01, 11, 12, 11) });
         fileSystem.AddFile (
                             @"c:\demo\jQuery.js",
-                            new MockFileData ("some js") {
-                                                             LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42)
-                                                         });
+                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
         fileSystem.AddFile (
                             @"c:\demo\mybinary.exe",
-                            new MockFileData ("some js") {
-                                                             LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42)
-                                                         });
+                            new MockFileData ("some js") { LastWriteTime = new DateTime (2001, 01, 01, 11, 44, 42) });
         fileSystem.AddFile (
                             @"c:\demo\image.gif",
                             new MockFileData (new byte[] { 0x12, 0x34, 0x56, 0xd2 })

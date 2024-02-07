@@ -12,8 +12,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 [ScenarioCategory ("Files and IO")]
 public class TreeViewFileSystem : Scenario {
-    private DetailsFrame _detailsFrame;
     private readonly FileSystemIconProvider _iconProvider = new ();
+    private DetailsFrame _detailsFrame;
     private MenuItem _miArrowSymbols;
     private MenuItem _miBasicIcons;
     private MenuItem _miColoredSymbols;
@@ -38,154 +38,140 @@ public class TreeViewFileSystem : Scenario {
         Win.Y = 1; // menu
         Win.Height = Dim.Fill ();
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new (
-                                                                               "_Quit",
-                                                                               $"{Application.QuitKey}",
-                                                                               () => Quit ())
-                                                                          }),
-                                                      new (
-                                                           "_View",
-                                                           new[] {
-                                                                     _miFullPaths =
-                                                                         new MenuItem (
-                                                                          "_Full Paths",
-                                                                          "",
-                                                                          () => SetFullName ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miMultiSelect =
-                                                                         new MenuItem (
-                                                                          "_Multi Select",
-                                                                          "",
-                                                                          () => SetMultiSelect ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         }
-                                                                 }),
-                                                      new (
-                                                           "_Style",
-                                                           new[] {
-                                                                     _miShowLines =
-                                                                         new MenuItem (
-                                                                          "_Show Lines",
-                                                                          "",
-                                                                          () => ShowLines ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     null /*separator*/,
-                                                                     _miPlusMinus =
-                                                                         new MenuItem (
-                                                                          "_Plus Minus Symbols",
-                                                                          "+ -",
-                                                                          () => SetExpandableSymbols (
-                                                                           (Rune)'+',
-                                                                           (Rune)'-')) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Radio
-                                                                         },
-                                                                     _miArrowSymbols =
-                                                                         new MenuItem (
-                                                                          "_Arrow Symbols",
-                                                                          "> v",
-                                                                          () => SetExpandableSymbols (
-                                                                           (Rune)'>',
-                                                                           (Rune)'v')) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Radio
-                                                                         },
-                                                                     _miNoSymbols =
-                                                                         new MenuItem (
-                                                                          "_No Symbols",
-                                                                          "",
-                                                                          () => SetExpandableSymbols (
-                                                                           default (Rune),
-                                                                           null)) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Radio
-                                                                         },
-                                                                     null /*separator*/,
-                                                                     _miColoredSymbols =
-                                                                         new MenuItem (
-                                                                          "_Colored Symbols",
-                                                                          "",
-                                                                          () => ShowColoredExpandableSymbols ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miInvertSymbols =
-                                                                         new MenuItem (
-                                                                          "_Invert Symbols",
-                                                                          "",
-                                                                          () => InvertExpandableSymbols ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     null /*separator*/,
-                                                                     _miBasicIcons =
-                                                                         new MenuItem ("_Basic Icons", null, SetNoIcons) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Radio
-                                                                         },
-                                                                     _miUnicodeIcons =
-                                                                         new MenuItem (
-                                                                          "_Unicode Icons",
-                                                                          null,
-                                                                          SetUnicodeIcons) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Radio
-                                                                         },
-                                                                     _miNerdIcons =
-                                                                         new MenuItem (
-                                                                          "_Nerd Icons",
-                                                                          null,
-                                                                          SetNerdIcons) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Radio
-                                                                         },
-                                                                     null /*separator*/,
-                                                                     _miLeaveLastRow =
-                                                                         new MenuItem (
-                                                                          "_Leave Last Row",
-                                                                          "",
-                                                                          () => SetLeaveLastRow ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miHighlightModelTextOnly =
-                                                                         new MenuItem (
-                                                                          "_Highlight Model Text Only",
-                                                                          "",
-                                                                          () => SetCheckHighlightModelTextOnly ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     null /*separator*/,
-                                                                     _miCustomColors =
-                                                                         new MenuItem (
-                                                                          "C_ustom Colors Hidden Files",
-                                                                          "Yellow/Red",
-                                                                          () => SetCustomColors ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     null /*separator*/,
-                                                                     _miCursor =
-                                                                         new MenuItem (
-                                                                          "Curs_or (MultiSelect only)",
-                                                                          "",
-                                                                          () => SetCursor ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         }
-                                                                 })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new (
+                                                                                 "_Quit",
+                                                                                 $"{Application.QuitKey}",
+                                                                                 () => Quit ())
+                                                                            }),
+                                   new MenuBarItem (
+                                                    "_View",
+                                                    new[] {
+                                                              _miFullPaths =
+                                                                  new MenuItem ("_Full Paths", "", () => SetFullName ()) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              _miMultiSelect = new MenuItem (
+                                                                                "_Multi Select",
+                                                                                "",
+                                                                                () => SetMultiSelect ()) {
+                                                                                   Checked = true,
+                                                                                   CheckType = MenuItemCheckStyle
+                                                                                       .Checked
+                                                                               }
+                                                          }),
+                                   new MenuBarItem (
+                                                    "_Style",
+                                                    new[] {
+                                                              _miShowLines =
+                                                                  new MenuItem ("_Show Lines", "", () => ShowLines ()) {
+                                                                      Checked = true,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              null /*separator*/,
+                                                              _miPlusMinus =
+                                                                  new MenuItem (
+                                                                                "_Plus Minus Symbols",
+                                                                                "+ -",
+                                                                                () => SetExpandableSymbols (
+                                                                                 (Rune)'+',
+                                                                                 (Rune)'-')) {
+                                                                      Checked = true,
+                                                                      CheckType = MenuItemCheckStyle.Radio
+                                                                  },
+                                                              _miArrowSymbols =
+                                                                  new MenuItem (
+                                                                                "_Arrow Symbols",
+                                                                                "> v",
+                                                                                () => SetExpandableSymbols (
+                                                                                 (Rune)'>',
+                                                                                 (Rune)'v')) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Radio
+                                                                  },
+                                                              _miNoSymbols =
+                                                                  new MenuItem (
+                                                                                "_No Symbols",
+                                                                                "",
+                                                                                () => SetExpandableSymbols (
+                                                                                 default (Rune),
+                                                                                 null)) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Radio
+                                                                  },
+                                                              null /*separator*/,
+                                                              _miColoredSymbols =
+                                                                  new MenuItem (
+                                                                                "_Colored Symbols",
+                                                                                "",
+                                                                                () => ShowColoredExpandableSymbols ()) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              _miInvertSymbols =
+                                                                  new MenuItem (
+                                                                                "_Invert Symbols",
+                                                                                "",
+                                                                                () => InvertExpandableSymbols ()) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              null /*separator*/,
+                                                              _miBasicIcons =
+                                                                  new MenuItem ("_Basic Icons", null, SetNoIcons) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Radio
+                                                                  },
+                                                              _miUnicodeIcons =
+                                                                  new MenuItem ("_Unicode Icons", null, SetUnicodeIcons) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Radio
+                                                                  },
+                                                              _miNerdIcons =
+                                                                  new MenuItem ("_Nerd Icons", null, SetNerdIcons) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Radio
+                                                                  },
+                                                              null /*separator*/,
+                                                              _miLeaveLastRow =
+                                                                  new MenuItem (
+                                                                                "_Leave Last Row",
+                                                                                "",
+                                                                                () => SetLeaveLastRow ()) {
+                                                                      Checked = true,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              _miHighlightModelTextOnly =
+                                                                  new MenuItem (
+                                                                                "_Highlight Model Text Only",
+                                                                                "",
+                                                                                () => SetCheckHighlightModelTextOnly ()) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              null /*separator*/,
+                                                              _miCustomColors =
+                                                                  new MenuItem (
+                                                                                "C_ustom Colors Hidden Files",
+                                                                                "Yellow/Red",
+                                                                                () => SetCustomColors ()) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              null /*separator*/,
+                                                              _miCursor = new MenuItem (
+                                                                           "Curs_or (MultiSelect only)",
+                                                                           "",
+                                                                           () => SetCursor ()) {
+                                                                              Checked = false,
+                                                                              CheckType = MenuItemCheckStyle.Checked
+                                                                          }
+                                                          })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         _treeViewFiles = new TreeView<IFileSystemInfo> {
@@ -392,8 +378,9 @@ public class TreeViewFileSystem : Scenario {
         var menu = new ContextMenu ();
         menu.Position = screenPoint;
 
-        menu.MenuItems =
-            new MenuBarItem (new[] { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) });
+        menu.MenuItems = new MenuBarItem (
+                                          new[]
+                                          { new MenuItem ("Properties", null, () => ShowPropertiesOf (forObject)) });
 
         Application.Invoke (menu.Show);
     }
@@ -478,7 +465,7 @@ public class TreeViewFileSystem : Scenario {
 
     private class DetailsFrame : FrameView {
         private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo fileInfo;
+        private IFileSystemInfo _fileInfo;
 
         public DetailsFrame (FileSystemIconProvider iconProvider) {
             Title = "Details";
@@ -488,12 +475,12 @@ public class TreeViewFileSystem : Scenario {
         }
 
         public IFileSystemInfo FileInfo {
-            get => fileInfo;
+            get => _fileInfo;
             set {
-                fileInfo = value;
+                _fileInfo = value;
                 StringBuilder sb = null;
 
-                if (fileInfo is IFileInfo f) {
+                if (_fileInfo is IFileInfo f) {
                     Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
                     sb = new StringBuilder ();
                     sb.AppendLine ($"Path:\n {f.FullName}\n");
@@ -502,7 +489,7 @@ public class TreeViewFileSystem : Scenario {
                     sb.AppendLine ($"Created:\n {f.CreationTime}");
                 }
 
-                if (fileInfo is IDirectoryInfo dir) {
+                if (_fileInfo is IDirectoryInfo dir) {
                     Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
                     sb = new StringBuilder ();
                     sb.AppendLine ($"Path:\n {dir?.FullName}\n");

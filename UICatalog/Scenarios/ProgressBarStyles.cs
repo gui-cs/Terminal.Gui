@@ -42,8 +42,10 @@ public class ProgressBarStyles : Scenario {
                                       BorderStyle = LineStyle.Single
                                   };
         pbList.SelectedItemChanged += (sender, e) => {
-            editor.ViewToEdit =
-                editor.Subviews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == (string)e.Value);
+            editor.ViewToEdit = editor.Subviews.First (
+                                                       v =>
+                                                           v.GetType () == typeof (ProgressBar)
+                                                           && v.Title == (string)e.Value);
         };
         editor.Add (pbList);
         pbList.SelectedItem = 0;
@@ -124,18 +126,19 @@ public class ProgressBarStyles : Scenario {
 
         List<ProgressBarFormat> pbFormatEnum =
             Enum.GetValues (typeof (ProgressBarFormat)).Cast<ProgressBarFormat> ().ToList ();
-        var rbPBFormat = new RadioGroup (pbFormatEnum.Select (e => e.ToString ()).ToArray ()) {
-                             BorderStyle = LineStyle.Single,
-                             Title = "ProgressBarFormat",
-                             X = Pos.Left (pbList),
-                             Y = Pos.Bottom (bgColorPickerBtn) + 1
-                         };
+        var rbPBFormat = new RadioGroup {
+                                            BorderStyle = LineStyle.Single,
+                                            Title = "ProgressBarFormat",
+                                            X = Pos.Left (pbList),
+                                            Y = Pos.Bottom (bgColorPickerBtn) + 1,
+                                            RadioLabels = pbFormatEnum.Select (e => e.ToString ()).ToArray ()
+                                        };
         editor.Add (rbPBFormat);
 
         var button = new Button {
-                                    Text = "Start timer",
                                     X = Pos.Center (),
-                                    Y = Pos.Bottom (rbPBFormat) + 1
+                                    Y = Pos.Bottom (rbPBFormat) + 1,
+                                    Text = "Start timer"
                                 };
 
         editor.Add (button);
@@ -185,10 +188,12 @@ public class ProgressBarStyles : Scenario {
             }
         };
 
-        var ckbBidirectional = new CheckBox ("BidirectionalMarquee", true) {
-                                                                               X = Pos.Center (),
-                                                                               Y = Pos.Bottom (continuousPB) + 1
-                                                                           };
+        var ckbBidirectional = new CheckBox {
+                                                X = Pos.Center (),
+                                                Y = Pos.Bottom (continuousPB) + 1,
+                                                Text = "BidirectionalMarquee",
+                                                Checked = true
+                                            };
         editor.Add (ckbBidirectional);
 
         var marqueesBlocksPB = new ProgressBar {

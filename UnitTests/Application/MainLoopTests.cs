@@ -590,7 +590,7 @@ public class MainLoopTests {
         four = pfour;
         taskCompleted = false;
 
-        var btnLaunch = new Button ("Open Window");
+        var btnLaunch = new Button { Text = "Open Window" };
 
         btnLaunch.Clicked += (s, e) => action ();
 

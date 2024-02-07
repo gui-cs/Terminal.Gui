@@ -22,33 +22,35 @@ public class ComputedLayout : Scenario {
     public override void Setup () {
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
         const string rule = "|123456789";
-        var horizontalRuler = new Label (rule, false) {
-                                                          AutoSize = false,
-                                                          X = 0,
-                                                          Y = 0,
-                                                          Width = Dim.Fill (),
-                                                          Height = 1,
-                                                          ColorScheme = Colors.ColorSchemes["Error"]
-                                                      };
+        var horizontalRuler = new Label {
+                                            AutoSize = false,
+                                            X = 0,
+                                            Y = 0,
+                                            Width = Dim.Fill (),
+                                            Height = 1,
+                                            ColorScheme = Colors.ColorSchemes["Error"],
+                                            Text = rule
+                                        };
 
         Application.Top.Add (horizontalRuler);
 
         // Demonstrate using Dim to create a vertical ruler that always measures the parent window's height
         const string vrule = "|\n1\n2\n3\n4\n5\n6\n7\n8\n9\n";
 
-        var verticalRuler = new Label (vrule, false) {
-                                                         AutoSize = false,
-                                                         X = 0,
-                                                         Y = 0,
-                                                         Width = 1,
-                                                         Height = Dim.Fill (),
-                                                         ColorScheme = Colors.ColorSchemes["Error"]
-                                                     };
+        var verticalRuler = new Label {
+                                          AutoSize = false,
+                                          X = 0,
+                                          Y = 0,
+                                          Width = 1,
+                                          Height = Dim.Fill (),
+                                          ColorScheme = Colors.ColorSchemes["Error"],
+                                          Text = vrule
+                                      };
 
         Application.Top.LayoutComplete += (s, a) => {
             horizontalRuler.Text =
-                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length))
-                    [..horizontalRuler.Bounds.Width];
+                rule.Repeat ((int)Math.Ceiling (horizontalRuler.Bounds.Width / (double)rule.Length))[
+                 ..horizontalRuler.Bounds.Width];
             verticalRuler.Text =
                 vrule.Repeat ((int)Math.Ceiling (verticalRuler.Bounds.Height * 2 / (double)rule.Length))
                     [..(verticalRuler.Bounds.Height * 2)];
@@ -89,30 +91,42 @@ public class ComputedLayout : Scenario {
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
-        labelList.Add (new Label ("The lines below show different TextAlignments"));
+        labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Left,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Left,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Right,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Right,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Centered,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Centered,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Justified,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Justified,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         subWin.Add (labelList.ToArray ());
 
@@ -124,34 +138,47 @@ public class ComputedLayout : Scenario {
                                       };
         frameView.Initialized += (sender, args) => {
             var fv = sender as FrameView;
-            fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+            fv.Title =
+                $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
         };
         i = 1;
         labelList = new List<Label> ();
-        labelList.Add (new Label ("The lines below show different TextAlignments"));
+        labelList.Add (new Label { Text = "The lines below show different TextAlignments" });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Left,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Left,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Right,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Right,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Centered,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Centered,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         labelList.Add (
                        new Label {
-                                     Text = $"{i++}-{txt}", AutoSize = false, TextAlignment = TextAlignment.Justified,
-                                     Width = Dim.Fill (), X = 0, Y = Pos.Bottom (labelList.LastOrDefault ()),
-                                     ColorScheme = Colors.ColorSchemes["Dialog"]
+                                     TextAlignment = TextAlignment.Justified,
+                                     Width = Dim.Fill (),
+                                     X = 0,
+                                     Y = Pos.Bottom (labelList.LastOrDefault ()),
+                                     ColorScheme = Colors.ColorSchemes["Dialog"],
+                                     Text = $"{i++}-{txt}"
                                  });
         frameView.Add (labelList.ToArray ());
         Application.Top.Add (frameView);
@@ -164,7 +191,8 @@ public class ComputedLayout : Scenario {
                                   };
         frameView.Initialized += (sender, args) => {
             var fv = sender as FrameView;
-            fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+            fv.Title =
+                $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
         };
         Application.Top.Add (frameView);
 

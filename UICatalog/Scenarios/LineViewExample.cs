@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Line View", "Demonstrates drawing lines using the LineView control.")]
 [ScenarioCategory ("Controls")]
@@ -13,21 +13,16 @@ public class LineViewExample : Scenario {
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
-        Win.Add (
-                 new Label {
-                               Text = "Regular Line",
-                               Y = 0
-                           });
+        Win.Add (new Label { Y = 0, Text = "Regular Line" });
 
         // creates a horizontal line
         var line = new LineView {
@@ -36,11 +31,7 @@ public class LineViewExample : Scenario {
 
         Win.Add (line);
 
-        Win.Add (
-                 new Label {
-                               Text = "Double Width Line",
-                               Y = 2
-                           });
+        Win.Add (new Label { Y = 2, Text = "Double Width Line" });
 
         // creates a horizontal line
         var doubleLine = new LineView {
@@ -50,11 +41,7 @@ public class LineViewExample : Scenario {
 
         Win.Add (doubleLine);
 
-        Win.Add (
-                 new Label {
-                               Text = "Short Line",
-                               Y = 4
-                           });
+        Win.Add (new Label { Y = 4, Text = "Short Line" });
 
         // creates a horizontal line
         var shortLine = new LineView {
@@ -64,11 +51,7 @@ public class LineViewExample : Scenario {
 
         Win.Add (shortLine);
 
-        Win.Add (
-                 new Label {
-                               Text = "Arrow Line",
-                               Y = 6
-                           });
+        Win.Add (new Label { Y = 6, Text = "Arrow Line" });
 
         // creates a horizontal line
         var arrowLine = new LineView {
@@ -80,12 +63,7 @@ public class LineViewExample : Scenario {
 
         Win.Add (arrowLine);
 
-        Win.Add (
-                 new Label {
-                               Text = "Vertical Line",
-                               Y = 9,
-                               X = 11
-                           });
+        Win.Add (new Label { Y = 9, X = 11, Text = "Vertical Line" });
 
         // creates a horizontal line
         var verticalLine = new LineView (Orientation.Vertical) {
@@ -94,12 +72,7 @@ public class LineViewExample : Scenario {
 
         Win.Add (verticalLine);
 
-        Win.Add (
-                 new Label {
-                               Text = "Vertical Arrow",
-                               Y = 11,
-                               X = 28
-                           });
+        Win.Add (new Label { Y = 11, X = 28, Text = "Vertical Arrow" });
 
         // creates a horizontal line
         var verticalArrow = new LineView (Orientation.Vertical) {

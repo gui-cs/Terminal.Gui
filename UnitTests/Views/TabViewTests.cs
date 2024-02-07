@@ -32,8 +32,8 @@ public class TabViewTests {
         var tv = new TabView ();
         Tab tab1;
         Tab tab2;
-        tv.AddTab (tab1 = new Tab { DisplayText = "Tab1", View = new TextField ("hi") }, false);
-        tv.AddTab (tab2 = new Tab { DisplayText = "Tab1", View = new Label ("hi2") }, true);
+        tv.AddTab (tab1 = new Tab { DisplayText = "Tab1", View = new TextField { Text = "hi" } }, false);
+        tv.AddTab (tab2 = new Tab { DisplayText = "Tab1", View = new Label { Text = "hi2" } }, true);
 
         Assert.Equal (2, tv.Tabs.Count);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -395,12 +395,7 @@ public class TabViewTests {
         tv.Width = 7;
         tv.Height = 5;
 
-        var btn = new Button {
-                                 Text = "Ok",
-                                 AutoSize = false,
-                                 Y = Pos.Bottom (tv) + 1,
-                                 Width = 7
-                             };
+        var btn = new Button { Y = Pos.Bottom (tv) + 1, Width = 7, Text = "Ok" };
 
         Toplevel top = Application.Top;
         top.Add (tv, btn);
@@ -440,7 +435,7 @@ public class TabViewTests {
         Assert.Equal (tv, top.Focused);
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
-        // Press the cursor down key to focused the selected tab view hosting
+        // Press the cursor down key to focus the selected tab view hosting
         args = new Key (Key.CursorDown);
         Application.OnKeyDown (args);
         Application.Refresh ();
@@ -451,6 +446,22 @@ public class TabViewTests {
         // The tab view hosting is a label which can't be focused
         // and the View container is the focused one
         Assert.Equal (tv.Subviews[1], top.Focused.MostFocused);
+
+        // Press the cursor down key again will focus next view in the toplevel
+        Application.OnKeyDown (args);
+        Application.Refresh ();
+        Assert.Equal (tab2, tv.SelectedTab);
+        Assert.Equal (btn, top.Focused);
+        Assert.Null (tv.MostFocused);
+        Assert.Null (top.Focused.MostFocused);
+
+        // Press the cursor up key to focus the selected tab view hosting again
+        args = new Key (Key.CursorUp);
+        Application.OnKeyDown (args);
+        Application.Refresh ();
+        Assert.Equal (tab2, tv.SelectedTab);
+        Assert.Equal (tv, top.Focused);
+        Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
         args = new Key (Key.CursorUp);
@@ -979,7 +990,8 @@ public class TabViewTests {
         tv.LayoutSubviews ();
 
         tab1.DisplayText = "Tab0";
-        tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+        tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) +
+                           "rables";
 
         tv.Draw ();
 
@@ -1133,7 +1145,8 @@ public class TabViewTests {
         tv.LayoutSubviews ();
 
         tab1.DisplayText = "Tab0";
-        tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+        tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) +
+                           "rables";
 
         tv.Draw ();
 
@@ -1224,8 +1237,10 @@ public class TabViewTests {
         tv.BeginInit ();
         tv.EndInit ();
         tv.ColorScheme = new ColorScheme ();
-        tv.AddTab (tab1 = new Tab { DisplayText = "Tab1", View = new TextField ("hi") { Width = 2 } }, false);
-        tv.AddTab (tab2 = new Tab { DisplayText = "Tab2", View = new Label ("hi2") }, false);
+        tv.AddTab (
+                   tab1 = new Tab { DisplayText = "Tab1", View = new TextField { Width = 2, Text = "hi" } },
+                   false);
+        tv.AddTab (tab2 = new Tab { DisplayText = "Tab2", View = new Label { Text = "hi2" } }, false);
 
         return tv;
     }

@@ -17,13 +17,29 @@ public class Window : Toplevel {
     ///     Initializes a new instance of the <see cref="Window"/> class using <see cref="LayoutStyle.Computed"/>
     ///     positioning.
     /// </summary>
-    public Window () { SetInitialProperties (); }
+    public Window () {
+        CanFocus = true;
+        ColorScheme = Colors.ColorSchemes["Base"]; // TODO: make this a theme property
+        BorderStyle = DefaultBorderStyle;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="Window"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     positioning.
-    /// </summary>
-    public Window (Rect frame) : base (frame) { SetInitialProperties (); }
+        // This enables the default button to be activated by the Enter key.
+        AddCommand (
+                    Command.Accept,
+                    () => {
+                        // TODO: Perhaps all views should support the concept of being default?
+                        // ReSharper disable once InvertIf
+                        if (Subviews.FirstOrDefault (v => v is Button { IsDefault: true, Enabled: true }) is Button
+                            defaultBtn) {
+                            defaultBtn.InvokeCommand (Command.Accept);
+
+                            return true;
+                        }
+
+                        return false;
+                    });
+
+        KeyBindings.Add (Key.Enter, Command.Accept);
+    }
 
     // TODO: enable this
     ///// <summary>
@@ -46,27 +62,4 @@ public class Window : Toplevel {
     [SerializableConfigurationProperty (Scope = typeof (ThemeScope))]
     [JsonConverter (typeof (JsonStringEnumConverter))]
     public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
-
-    private void SetInitialProperties () {
-        CanFocus = true;
-        ColorScheme = Colors.ColorSchemes["Base"]; // TODO: make this a theme property
-        BorderStyle = DefaultBorderStyle;
-
-        // This enables the default button to be activated by the Enter key.
-        AddCommand (
-                    Command.Accept,
-                    () => {
-                        // TODO: Perhaps all views should support the concept of being default?
-                        if (Subviews.FirstOrDefault (v => v is Button { IsDefault: true, Enabled: true }) is Button
-                            defaultBtn) {
-                            defaultBtn.InvokeCommand (Command.Accept);
-
-                            return true;
-                        }
-
-                        return false;
-                    });
-
-        KeyBindings.Add (Key.Enter, Command.Accept);
-    }
 }

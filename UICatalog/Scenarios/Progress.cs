@@ -21,11 +21,12 @@ public class Progress : Scenario {
 
     public override void Setup () {
         // Demo #1 - Use System.Timer (and threading)
-        var systemTimerDemo = new ProgressDemo ("System.Timer (threads)") {
-                                                                              X = 0,
-                                                                              Y = 0,
-                                                                              Width = Dim.Percent (100)
-                                                                          };
+        var systemTimerDemo = new ProgressDemo {
+                                                   X = 0,
+                                                   Y = 0,
+                                                   Width = Dim.Percent (100),
+                                                   Title = "System.Timer (threads)"
+                                               };
         systemTimerDemo.StartBtnClick = () => {
             _systemTimer?.Dispose ();
             _systemTimer = null;
@@ -67,11 +68,12 @@ public class Progress : Scenario {
         Win.Add (systemTimerDemo);
 
         // Demo #2 - Use Application.AddTimeout (no threads)
-        var mainLoopTimeoutDemo = new ProgressDemo ("Application.AddTimer (no threads)") {
-                                      X = 0,
-                                      Y = Pos.Bottom (systemTimerDemo),
-                                      Width = Dim.Percent (100)
-                                  };
+        var mainLoopTimeoutDemo = new ProgressDemo {
+                                                       X = 0,
+                                                       Y = Pos.Bottom (systemTimerDemo),
+                                                       Width = Dim.Percent (100),
+                                                       Title = "Application.AddTimer (no threads)"
+                                                   };
         mainLoopTimeoutDemo.StartBtnClick = () => {
             mainLoopTimeoutDemo.StopBtnClick ();
 
@@ -109,9 +111,9 @@ public class Progress : Scenario {
         Win.Add (mainLoopTimeoutDemo);
 
         var startBoth = new Button {
-                                       Text = "Start Both",
                                        X = Pos.Center (),
-                                       Y = Pos.Bottom (mainLoopTimeoutDemo) + 1
+                                       Y = Pos.Bottom (mainLoopTimeoutDemo) + 1,
+                                       Text = "Start Both"
                                    };
         startBoth.Clicked += (s, e) => {
             systemTimerDemo.Start ();
@@ -129,26 +131,25 @@ public class Progress : Scenario {
     }
 
     private class ProgressDemo : FrameView {
-        private const int _verticalSpace = 1;
+        private const int VerticalSpace = 1;
         private readonly Label _startedLabel;
         internal readonly Action PulseBtnClick = null;
         internal Action StartBtnClick;
         internal Action StopBtnClick;
 
-        internal ProgressDemo (string title) : base (title) {
+        internal ProgressDemo () {
             ColorScheme = Colors.ColorSchemes["Dialog"];
 
             LeftFrame = new FrameView {
-                                          Title = "Settings",
                                           X = 0,
                                           Y = 0,
                                           Height = Dim.Percent (100),
-                                          Width = Dim.Percent (25)
+                                          Width = Dim.Percent (25),
+                                          Title = "Settings"
                                       };
-            var lbl = new Label (1, 1, "Tick every (ms):");
+            var lbl = new Label { X = 1, Y = 1, Text = "Tick every (ms):" };
             LeftFrame.Add (lbl);
             Speed = new TextField {
-                                      Text = "",
                                       X = Pos.X (lbl),
                                       Y = Pos.Bottom (lbl),
                                       Width = 7
@@ -158,21 +159,21 @@ public class Progress : Scenario {
             Add (LeftFrame);
 
             var startButton = new Button {
-                                             Text = "Start Timer",
                                              X = Pos.Right (LeftFrame) + 1,
-                                             Y = 0
+                                             Y = 0,
+                                             Text = "Start Timer"
                                          };
             startButton.Clicked += (s, e) => Start ();
             var pulseButton = new Button {
-                                             Text = "Pulse",
                                              X = Pos.Right (startButton) + 2,
-                                             Y = Pos.Y (startButton)
+                                             Y = Pos.Y (startButton),
+                                             Text = "Pulse"
                                          };
             pulseButton.Clicked += (s, e) => Pulse ();
             var stopbutton = new Button {
-                                            Text = "Stop Timer",
                                             X = Pos.Right (pulseButton) + 2,
-                                            Y = Pos.Top (pulseButton)
+                                            Y = Pos.Top (pulseButton),
+                                            Text = "Stop Timer"
                                         };
             stopbutton.Clicked += (s, e) => Stop ();
 
@@ -211,18 +212,18 @@ public class Progress : Scenario {
             Add (PulseProgressBar);
 
             _startedLabel = new Label {
-                                          Text = "Stopped",
                                           X = Pos.Right (LeftFrame) + 1,
-                                          Y = Pos.Bottom (PulseProgressBar)
+                                          Y = Pos.Bottom (PulseProgressBar),
+                                          Text = "Stopped"
                                       };
             Add (_startedLabel);
 
             // TODO: Great use of Dim.Auto
             Initialized += (s, e) => {
                 // Set height to height of controls + spacing + frame
-                Height = 2 + _verticalSpace + startButton.Frame.Height + _verticalSpace
-                         + ActivityProgressBar.Frame.Height + _verticalSpace + PulseProgressBar.Frame.Height
-                         + _verticalSpace;
+                Height = 2 + VerticalSpace + startButton.Frame.Height + VerticalSpace +
+                         ActivityProgressBar.Frame.Height + VerticalSpace +
+                         PulseProgressBar.Frame.Height + VerticalSpace;
             };
         }
 

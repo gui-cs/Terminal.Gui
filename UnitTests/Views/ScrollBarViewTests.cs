@@ -251,8 +251,9 @@ public class ScrollBarViewTests {
     [Fact]
     [AutoInitShutdown]
     public void ClearOnVisibleFalse_Gets_Sets () {
-        var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-        var label = new Label (text);
+        var text =
+            "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+        var label = new Label { Text = text };
         Application.Top.Add (label);
 
         var sbv = new ScrollBarView (label, true, false) {
@@ -271,7 +272,7 @@ This is a tes░
 This is a tes░
 This is a tes▼
 ",
-                                                      output);
+                                                      _output);
 
         sbv.Visible = false;
         Assert.False (sbv.Visible);
@@ -285,7 +286,7 @@ This is a test
 This is a test
 This is a test
 ",
-                                                      output);
+                                                      _output);
 
         sbv.Visible = true;
         Assert.True (sbv.Visible);
@@ -299,7 +300,7 @@ This is a tes░
 This is a tes░
 This is a tes▼
 ",
-                                                      output);
+                                                      _output);
 
         sbv.ClearOnVisibleFalse = true;
         sbv.Visible = false;
@@ -313,7 +314,7 @@ This is a tes
 This is a tes
 This is a tes
 ",
-                                                      output);
+                                                      _output);
     }
 
     [Fact]
@@ -344,12 +345,13 @@ This is a tes
             source.Add (text);
         }
 
-        var listView = new ListView (source) {
-                                                 X = 0,
-                                                 Y = 0,
-                                                 Width = Dim.Fill (),
-                                                 Height = Dim.Fill ()
-                                             };
+        var listView = new ListView {
+                                        X = 0,
+                                        Y = 0,
+                                        Width = Dim.Fill (),
+                                        Height = Dim.Fill (),
+                                        Source = new ListWrapper (source)
+                                    };
         win.Add (listView);
 
         var newScrollBarView = new ScrollBarView (listView, false, false) {
@@ -368,8 +370,8 @@ This is a tes
         };
 
         listView.DrawContent += (s, e) => {
-            newScrollBarView.Size = listView.Maxlength;
-            Assert.Equal (newScrollBarView.Size, listView.Maxlength);
+            newScrollBarView.Size = listView.MaxLength;
+            Assert.Equal (newScrollBarView.Size, listView.MaxLength);
             newScrollBarView.Position = listView.LeftItem;
             Assert.Equal (newScrollBarView.Position, listView.LeftItem);
             newScrollBarView.Refresh ();
@@ -415,11 +417,12 @@ This is a tes
                                                         source.Add ($"item {i}");
                                                     }
 
-                                                    var listView = new ListView (source) {
+                                                    var listView = new ListView {
                                                                        X = 0,
                                                                        Y = 0,
                                                                        Width = Dim.Fill (),
-                                                                       Height = Dim.Fill ()
+                                                                       Height = Dim.Fill (),
+                                                                       Source = new ListWrapper (source)
                                                                    };
                                                     win.Add (listView);
                                                     var newScrollBarView = new ScrollBarView (listView, true, false) {
@@ -446,8 +449,8 @@ This is a tes
                                                         newScrollBarView.Position = 45;
                                                         Assert.Equal (
                                                                       newScrollBarView.Position,
-                                                                      newScrollBarView.Size - listView.TopItem
-                                                                      + (listView.TopItem - listView.Bounds.Height));
+                                                                      newScrollBarView.Size - listView.TopItem +
+                                                                      (listView.TopItem - listView.Bounds.Height));
                                                         Assert.Equal (newScrollBarView.Position, listView.TopItem);
                                                         Assert.Equal (27, newScrollBarView.Position);
                                                         Assert.Equal (27, listView.TopItem);
@@ -464,8 +467,9 @@ This is a tes
     [Fact]
     [AutoInitShutdown]
     public void ContentBottomRightCorner_Not_Redraw_If_Both_Size_Equal_To_Zero () {
-        var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-        var label = new Label (text);
+        var text =
+            "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+        var label = new Label { Text = text };
         Application.Top.Add (label);
 
         var sbv = new ScrollBarView (label, true) {
@@ -480,6 +484,10 @@ This is a tes
         Assert.True (sbv.OtherScrollBarView.ShowScrollIndicator);
         Assert.True (sbv.Visible);
         Assert.True (sbv.OtherScrollBarView.Visible);
+        View contentBottomRightCorner =
+            label.SuperView.Subviews.First (v => v is ScrollBarView.ContentBottomRightCorner);
+        Assert.True (contentBottomRightCorner is ScrollBarView.ContentBottomRightCorner);
+        Assert.True (contentBottomRightCorner.Visible);
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This is a tes▲
@@ -489,7 +497,7 @@ This is a tes░
 This is a tes▼
 ◄├─┤░░░░░░░░► 
 ",
-                                                      output);
+                                                      _output);
 
         sbv.Size = 0;
         sbv.OtherScrollBarView.Size = 0;
@@ -509,7 +517,7 @@ This is a test
 This is a test
 This is a test
 ",
-                                                      output);
+                                                      _output);
 
         sbv.Size = 50;
         sbv.OtherScrollBarView.Size = 50;
@@ -529,14 +537,15 @@ This is a tes░
 This is a tes▼
 ◄├──┤░░░░░░░► 
 ",
-                                                      output);
+                                                      _output);
     }
 
     [Fact]
     [AutoInitShutdown]
     public void ContentBottomRightCorner_Not_Redraw_If_One_Size_Equal_To_Zero () {
-        var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-        var label = new Label (text);
+        var text =
+            "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
+        var label = new Label { Text = text };
         Application.Top.Add (label);
 
         var sbv = new ScrollBarView (label, true, false) {
@@ -557,7 +566,7 @@ This is a tes░
 This is a tes░
 This is a tes▼
 ",
-                                                      output);
+                                                      _output);
 
         sbv.Size = 0;
         Assert.Equal (0, sbv.Size);
@@ -573,7 +582,7 @@ This is a test
 This is a test
 This is a test
 ",
-                                                      output);
+                                                      _output);
     }
 
     [Fact]
@@ -604,9 +613,6 @@ This is a test
         var sbv = new ScrollBarView {
                                         Id = "sbv",
                                         Size = width * 2,
-
-                                        // BUGBUG: ScrollBarView should work if Host is null
-                                        Host = super,
                                         ShowScrollIndicator = true
                                     };
         super.Add (sbv);
@@ -617,7 +623,7 @@ This is a test
 ┌──────────────────────────────────────┐
 │◄├────────────────┤░░░░░░░░░░░░░░░░░░►│
 └──────────────────────────────────────┘";
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
     [Fact]
@@ -1012,8 +1018,8 @@ This is a test
     public void ShowScrollIndicator_False_Must_Also_Set_Visible_To_False_To_Not_Respond_To_Events () {
         var clicked = false;
         var text = "This is a test\nThis is a test\nThis is a test\nThis is a test\nThis is a test";
-        var label = new Label (text) { AutoSize = false, Width = 14, Height = 5 };
-        var btn = new Button (14, 0, "Click Me!");
+        var label = new Label { Width = 14, Height = 5, Text = text };
+        var btn = new Button { X = 14, Text = "Click Me!" };
         btn.Clicked += (s, e) => clicked = true;
         Application.Top.Add (label, btn);
 
@@ -1033,7 +1039,7 @@ This is a test
 This is a test             
 This is a test             
 This is a test             ",
-                                                      output);
+                                                      _output);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1061,7 +1067,7 @@ This is a test
 This is a test             
 This is a test             
 This is a test             ",
-                                                      output);
+                                                      _output);
 
         Application.OnMouseEvent (
                                   new MouseEventEventArgs (
@@ -1142,7 +1148,7 @@ This is a test             ",
 │░│
 │▼│
 └─┘";
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
     }
 
     private void _hostView_DrawContent (object sender, DrawEventArgs e) {

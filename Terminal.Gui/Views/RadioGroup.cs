@@ -6,38 +6,62 @@ public class RadioGroup : View {
     private List<(int pos, int length)> _horizontal;
     private int _horizontalSpace = 2;
     private Orientation _orientation = Orientation.Vertical;
-    private List<string> _radioLabels = new ();
-    private int _selected = -1;
+    private List<string> _radioLabels = 
+    private int _selected;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/>
     ///     layout.
     /// </summary>
-    public RadioGroup () : this (new string[] { }) { }
+    public RadioGroup () {
+        HotKeySpecifier = new Rune ('_');
+        CanFocus = true;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Computed"/>
-    ///     layout.
-    /// </summary>
-    /// <param name="radioLabels">
-    ///     The radio labels; an array of strings that can contain hotkeys using an underscore before the
-    ///     letter.
-    /// </param>
-    /// <param name="selected">The index of the item to be selected, the value is clamped to the number of items.</param>
-    public RadioGroup (string[] radioLabels, int selected = 0) { SetInitialProperties (radioLabels, selected); }
+        // Things this view knows how to do
+        AddCommand (
+                    Command.LineUp,
+                    () => {
+                        MoveUp ();
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RadioGroup"/> class using <see cref="LayoutStyle.Absolute"/>
-    ///     layout.
-    /// </summary>
-    /// <param name="rect">Boundaries for the radio group.</param>
-    /// <param name="radioLabels">
-    ///     The radio labels; an array of strings that can contain hotkeys using an underscore before the
-    ///     letter.
-    /// </param>
-    /// <param name="selected">The index of item to be selected, the value is clamped to the number of items.</param>
-    public RadioGroup (Rect rect, string[] radioLabels, int selected = 0) : base (rect) {
-        SetInitialProperties (radioLabels, selected);
+                        return true;
+                    });
+        AddCommand (
+                    Command.LineDown,
+                    () => {
+                        MoveDown ();
+
+                        return true;
+                    });
+        AddCommand (
+                    Command.TopHome,
+                    () => {
+                        MoveHome ();
+
+                        return true;
+                    });
+        AddCommand (
+                    Command.BottomEnd,
+                    () => {
+                        MoveEnd ();
+
+                        return true;
+                    });
+        AddCommand (
+                    Command.Accept,
+                    () => {
+                        SelectItem ();
+
+                        return true;
+                    });
+
+        // Default keybindings for this view
+        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
+        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
+        KeyBindings.Add (KeyCode.Home, Command.TopHome);
+        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
+        KeyBindings.Add (KeyCode.Space, Command.Accept);
+
+        LayoutStarted += RadioGroup_LayoutStarted;
     }
 
     /// <summary>
@@ -90,7 +114,6 @@ public class RadioGroup : View {
             }
 
             SelectedItem = 0;
-            _cursor = 0;
             SetNeedsDisplay ();
         }
     }
@@ -101,12 +124,12 @@ public class RadioGroup : View {
         get => _selected;
         set {
             OnSelectedItemChanged (value, SelectedItem);
-            _cursor = _selected;
+            _cursor = Math.Max (_selected, 0);
             SetNeedsDisplay ();
         }
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override bool MouseEvent (MouseEvent me) {
         if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)) {
             return false;
@@ -139,7 +162,7 @@ public class RadioGroup : View {
         return true;
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea) {
         base.OnDrawContent (contentArea);
 
@@ -165,7 +188,10 @@ public class RadioGroup : View {
                 for (var j = 0; j < rlRunes.Length; j++) {
                     Rune rune = rlRunes[j];
                     if (j == hotPos && i == _cursor) {
-                        Application.Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : GetHotNormalColor ());
+                        Application.Driver.SetAttribute (
+                                                         HasFocus
+                                                             ? ColorScheme.HotFocus
+                                                             : GetHotNormalColor ());
                     } else if (j == hotPos && i != _cursor) {
                         Application.Driver.SetAttribute (GetHotNormalColor ());
                     } else if (HasFocus && i == _cursor) {
@@ -176,7 +202,10 @@ public class RadioGroup : View {
                         j++;
                         rune = rlRunes[j];
                         if (i == _cursor) {
-                            Application.Driver.SetAttribute (HasFocus ? ColorScheme.HotFocus : GetHotNormalColor ());
+                            Application.Driver.SetAttribute (
+                                                             HasFocus
+                                                                 ? ColorScheme.HotFocus
+                                                                 : GetHotNormalColor ());
                         } else if (i != _cursor) {
                             Application.Driver.SetAttribute (GetHotNormalColor ());
                         }
@@ -191,7 +220,7 @@ public class RadioGroup : View {
         }
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override bool OnEnter (View view) {
         Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
@@ -209,7 +238,12 @@ public class RadioGroup : View {
         if (KeyBindings.TryGet (key, out _)) {
             // Search RadioLabels 
             for (var i = 0; i < _radioLabels.Count; i++) {
-                if (TextFormatter.FindHotKey (_radioLabels[i], HotKeySpecifier, out _, out Key hotKey, true)
+                if (TextFormatter.FindHotKey (
+                                              _radioLabels[i],
+                                              HotKeySpecifier,
+                                              out _,
+                                              out Key hotKey,
+                                              true)
                     && key.NoAlt.NoCtrl.NoShift == hotKey) {
                     SelectedItem = i;
                     keyEvent.Scope = KeyBindingScope.HotKey;
@@ -250,7 +284,7 @@ public class RadioGroup : View {
     /// </summary>
     public event EventHandler<OrientationEventArgs> OrientationChanged;
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override void PositionCursor () {
         switch (Orientation) {
             case Orientation.Vertical:
@@ -270,6 +304,8 @@ public class RadioGroup : View {
     /// <summary>Invoked when the selected radio label has changed.</summary>
     public event EventHandler<SelectedItemChangedArgs> SelectedItemChanged;
 
+    [];
+
     private void CalculateHorizontalPositions () {
         if (_orientation == Orientation.Horizontal) {
             _horizontal = new List<(int pos, int length)> ();
@@ -277,7 +313,8 @@ public class RadioGroup : View {
             var length = 0;
             for (var i = 0; i < _radioLabels.Count; i++) {
                 start += length;
-                length = _radioLabels[i].GetColumns () + 2 + (i < _radioLabels.Count - 1 ? _horizontalSpace : 0);
+                length = _radioLabels[i].GetColumns () + 2 +
+                         (i < _radioLabels.Count - 1 ? _horizontalSpace : 0);
                 _horizontal.Add ((start, length));
             }
         }
@@ -322,63 +359,6 @@ public class RadioGroup : View {
 
     private void RadioGroup_LayoutStarted (object sender, EventArgs e) { SetWidthHeight (_radioLabels); }
     private void SelectItem () { SelectedItem = _cursor; }
-
-    private void SetInitialProperties (string[] radioLabels, int selected) {
-        HotKeySpecifier = new Rune ('_');
-
-        if (radioLabels != null) {
-            RadioLabels = radioLabels;
-        }
-
-        _selected = selected;
-        CanFocus = true;
-
-        // Things this view knows how to do
-        AddCommand (
-                    Command.LineUp,
-                    () => {
-                        MoveUp ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.LineDown,
-                    () => {
-                        MoveDown ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.TopHome,
-                    () => {
-                        MoveHome ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.BottomEnd,
-                    () => {
-                        MoveEnd ();
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.Accept,
-                    () => {
-                        SelectItem ();
-
-                        return true;
-                    });
-
-        // Default keybindings for this view
-        KeyBindings.Add (KeyCode.CursorUp, Command.LineUp);
-        KeyBindings.Add (KeyCode.CursorDown, Command.LineDown);
-        KeyBindings.Add (KeyCode.Home, Command.TopHome);
-        KeyBindings.Add (KeyCode.End, Command.BottomEnd);
-        KeyBindings.Add (KeyCode.Space, Command.Accept);
-
-        LayoutStarted += RadioGroup_LayoutStarted;
-    }
 
     private void SetWidthHeight (List<string> radioLabels) {
         switch (_orientation) {

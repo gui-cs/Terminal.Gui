@@ -2,6 +2,8 @@
 
 namespace Terminal.Gui.ConfigurationTests; 
 
+namespace Terminal.Gui.ConfigurationTests; 
+
 public class ThemeScopeTests {
     public static readonly JsonSerializerOptions _jsonOptions = new () {
                                                                            Converters = {
@@ -12,21 +14,20 @@ public class ThemeScopeTests {
 
     [Fact]
     public void AllThemesPresent () {
-        ConfigurationManager.Reset ();
-        Assert.True (ConfigurationManager.Themes.ContainsKey ("Default"));
-        Assert.True (ConfigurationManager.Themes.ContainsKey ("Dark"));
-        Assert.True (ConfigurationManager.Themes.ContainsKey ("Light"));
+        Reset ();
+        Assert.True (Themes.ContainsKey ("Default"));
+        Assert.True (Themes.ContainsKey ("Dark"));
+        Assert.True (Themes.ContainsKey ("Light"));
     }
 
     [Fact]
     [AutoInitShutdown]
     public void Apply_ShouldApplyUpdatedProperties () {
-        ConfigurationManager.Reset ();
-        Assert.NotEmpty (ConfigurationManager.Themes);
+        Reset ();
+        Assert.NotEmpty (Themes);
         Assert.Equal (Dialog.ButtonAlignments.Center, Dialog.DefaultButtonAlignment);
 
-        ConfigurationManager.Themes["Default"]["Dialog.DefaultButtonAlignment"].PropertyValue =
-            Dialog.ButtonAlignments.Right;
+        Themes["Default"]["Dialog.DefaultButtonAlignment"].PropertyValue = Dialog.ButtonAlignments.Right;
 
         ThemeManager.Themes![ThemeManager.SelectedTheme]!.Apply ();
         Assert.Equal (Dialog.ButtonAlignments.Right, Dialog.DefaultButtonAlignment);
@@ -34,20 +35,19 @@ public class ThemeScopeTests {
 
     [Fact]
     public void GetHardCodedDefaults_ShouldSetProperties () {
-        ConfigurationManager.Reset ();
-        ConfigurationManager.GetHardCodedDefaults ();
-        Assert.NotEmpty (ConfigurationManager.Themes);
-        Assert.Equal ("Default", ConfigurationManager.Themes.Theme);
+        Reset ();
+        GetHardCodedDefaults ();
+        Assert.NotEmpty (Themes);
+        Assert.Equal ("Default", Themes.Theme);
     }
 
     [Fact]
     public void TestSerialize_RoundTrip () {
-        ConfigurationManager.Reset ();
+        Reset ();
 
         Dictionary<string, ThemeScope> initial = ThemeManager.Themes;
 
-        string serialized =
-            JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (ConfigurationManager.Themes, _jsonOptions);
+        string serialized = JsonSerializer.Serialize<IDictionary<string, ThemeScope>> (Themes, _jsonOptions);
         IDictionary<string, ThemeScope> deserialized =
             JsonSerializer.Deserialize<IDictionary<string, ThemeScope>> (serialized, _jsonOptions);
 
@@ -57,8 +57,8 @@ public class ThemeScopeTests {
 
     [Fact]
     public void ThemeManager_ClassMethodsWork () {
-        ConfigurationManager.Reset ();
-        Assert.Equal (ThemeManager.Instance, ConfigurationManager.Themes);
+        Reset ();
+        Assert.Equal (ThemeManager.Instance, Themes);
         Assert.NotEmpty (ThemeManager.Themes);
 
         ThemeManager.SelectedTheme = "foo";

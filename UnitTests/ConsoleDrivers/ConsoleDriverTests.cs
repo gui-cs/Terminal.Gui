@@ -6,11 +6,11 @@ using Console = Terminal.Gui.FakeConsole;
 namespace Terminal.Gui.DriverTests;
 
 public class ConsoleDriverTests {
-    private readonly ITestOutputHelper output;
+    private readonly ITestOutputHelper _output;
 
     public ConsoleDriverTests (ITestOutputHelper output) {
         ConsoleDriver.RunningUnitTests = true;
-        this.output = output;
+        _output = output;
     }
 
     [Theory]
@@ -223,8 +223,7 @@ public class ConsoleDriverTests {
     //			System.Threading.Tasks.Task.Run (() => {
     //				System.Threading.Tasks.Task.Delay (500).Wait ();
     //				Application.Invoke (() => {
-    //					var lbl = new Label () { 
-    // Text = "Hello World",  X = Pos.Center () };
+    //					var lbl = new Label ("Hello World") { X = Pos.Center () };
     //					var dlg = new Dialog ();
     //					dlg.Add (lbl);
     //					Application.Begin (dlg);

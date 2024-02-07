@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -61,50 +60,46 @@ public class Localization : Scenario {
                                                                       }
                                                       )
                                               .ToArray ();
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new MenuBarItem (
-                                                                               "_Language",
-                                                                               languageMenus),
-                                                                              null,
-                                                                              new ("_Quit", "", Quit)
-                                                                          })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new MenuBarItem (
+                                                                                 "_Language",
+                                                                                 languageMenus),
+                                                                                null,
+                                                                                new ("_Quit", "", Quit)
+                                                                            })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         var selectLanguageLabel = new Label {
-                                                Text = "Please select a language.",
-                                                AutoSize = false,
-                                                X = 2,
-                                                Y = 1,
-                                                Width = Dim.Fill (2)
+                                                X = 2, Y = 1, Width = Dim.Fill (2), AutoSize = true,
+                                                Text = "Please select a language."
                                             };
         Win.Add (selectLanguageLabel);
 
-        _languageComboBox = new ComboBox (_cultureInfoNameSource) {
-                                                                      AutoSize = false,
-                                                                      X = 2,
-                                                                      Y = Pos.Bottom (selectLanguageLabel) + 1,
-                                                                      Width = _cultureInfoNameSource
-                                                                              .Select (cn => cn.Length + 3)
-                                                                              .Max (),
-                                                                      Height = _cultureInfoNameSource.Length + 1,
-                                                                      HideDropdownListOnClick = true,
-                                                                      SelectedItem = _cultureInfoNameSource.Length - 1
-                                                                  };
+        _languageComboBox = new ComboBox {
+                                             X = 2,
+                                             Y = Pos.Bottom (selectLanguageLabel) + 1,
+                                             Width = _cultureInfoNameSource.Select (cn => cn.Length + 3).Max (),
+                                             Height = _cultureInfoNameSource.Length + 1,
+                                             HideDropdownListOnClick = true,
+                                             AutoSize = true,
+                                             Source = new ListWrapper (_cultureInfoNameSource),
+                                             SelectedItem = _cultureInfoNameSource.Length - 1
+                                         };
+        _languageComboBox.SetSource (_cultureInfoNameSource);
         _languageComboBox.SelectedItemChanged += LanguageComboBox_SelectChanged;
         Win.Add (_languageComboBox);
 
         var textAndFileDialogLabel = new Label {
-                                                   Text =
-                                                       "Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked.",
-                                                   AutoSize = false,
                                                    X = 2,
                                                    Y = Pos.Top (_languageComboBox) + 3,
-                                                   Width = Dim.Fill (2)
+                                                   Width = Dim.Fill (2),
+                                                   AutoSize = true,
+                                                   Text =
+                                                       "Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked."
                                                };
         Win.Add (textAndFileDialogLabel);
 
@@ -125,34 +120,34 @@ public class Localization : Scenario {
         Win.Add (_allowAnyCheckBox);
 
         var openDialogButton = new Button {
-                                              Text = "Open",
                                               X = Pos.Right (_allowAnyCheckBox) + 1,
-                                              Y = Pos.Bottom (textAndFileDialogLabel) + 1
+                                              Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+                                              Text = "Open"
                                           };
         openDialogButton.Clicked += (sender, e) => ShowFileDialog (false);
         Win.Add (openDialogButton);
 
         var saveDialogButton = new Button {
-                                              Text = "Save",
                                               X = Pos.Right (openDialogButton) + 1,
-                                              Y = Pos.Bottom (textAndFileDialogLabel) + 1
+                                              Y = Pos.Bottom (textAndFileDialogLabel) + 1,
+                                              Text = "Save"
                                           };
         saveDialogButton.Clicked += (sender, e) => ShowFileDialog (true);
         Win.Add (saveDialogButton);
 
         var wizardLabel = new Label {
-                                        Text = "Click the button to open a wizard.",
-                                        AutoSize = false,
                                         X = 2,
                                         Y = Pos.Bottom (textField) + 1,
-                                        Width = Dim.Fill (2)
+                                        Width = Dim.Fill (2),
+                                        AutoSize = true,
+                                        Text = "Click the button to open a wizard."
                                     };
         Win.Add (wizardLabel);
 
         var wizardButton = new Button {
-                                          Text = "Open _wizard",
                                           X = 2,
-                                          Y = Pos.Bottom (wizardLabel) + 1
+                                          Y = Pos.Bottom (wizardLabel) + 1,
+                                          Text = "Open _wizard"
                                       };
         wizardButton.Clicked += (sender, e) => ShowWizard ();
         Win.Add (wizardButton);
@@ -161,15 +156,17 @@ public class Localization : Scenario {
     }
 
     public void ShowFileDialog (bool isSaveFile) {
-        FileDialog dialog = isSaveFile ? new SaveDialog () : new OpenDialog ("", null, _currentOpenMode);
-        dialog.AllowedTypes = new List<IAllowedType> {
-                                                         _allowAnyCheckBox.Checked ?? false
-                                                             ? new AllowedTypeAny ()
-                                                             : new AllowedType ("Dynamic link library", ".dll"),
-                                                         new AllowedType ("Json", ".json"),
-                                                         new AllowedType ("Text", ".txt"),
-                                                         new AllowedType ("Yaml", ".yml", ".yaml")
-                                                     };
+        FileDialog dialog = isSaveFile ? new SaveDialog () : new OpenDialog { OpenMode = _currentOpenMode };
+        dialog.AllowedTypes =  [
+            _allowAnyCheckBox.Checked ??
+
+        false
+            ? new AllowedTypeAny ()
+            : new AllowedType ("Dynamic link library", ".dll"),
+        new AllowedType ("Json", ".json"),
+        new AllowedType ("Text", ".txt"),
+        new AllowedType ("Yaml", ".yml", ".yaml")
+            ];
         dialog.MustExist = !isSaveFile;
         dialog.AllowsMultipleSelection = !isSaveFile;
         _currentOpenMode++;

@@ -24,7 +24,7 @@ public class AdornmentTests {
         Assert.Equal (new Rect (0, 0, 10, 10), parent.Margin.Bounds);
 
         Assert.Null (parent.Margin.SuperView);
-        Rect boundsAsScreen = parent.Margin.BoundsToScreen (new Rect (1, 2, 5, 5));
+        var boundsAsScreen = parent.Margin.BoundsToScreen (new Rect (1, 2, 5, 5));
         Assert.Equal (new Rect (2, 4, 5, 5), boundsAsScreen);
     }
 

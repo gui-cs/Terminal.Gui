@@ -151,7 +151,11 @@ public class MessageBoxTests {
     [InlineData ("\n", false, 1)]
     [InlineData (" \n", true, 1)]
     [InlineData (" \n", false, 2)]
-    public void Message_Empty_Or_A_NewLine_WrapMessage_True_Or_False (string message, bool wrapMessage, int numLines) {
+    public void Message_Empty_Or_A_NewLline_WrapMessagge_True_Or_False (
+        string message,
+        bool wrapMessage,
+        int linesLength
+    ) {
         int iterations = -1;
         Application.Begin (Application.Top);
 
@@ -164,30 +168,25 @@ public class MessageBoxTests {
                 Application.RequestStop ();
             } else if (iterations == 1) {
                 Application.Refresh ();
-                switch (numLines) {
-                    case 1:
-                        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                      @$"
+                if (linesLength == 1) {
+                    TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                  @$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
                 │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘",
-                                                                      _output);
-
-                        break;
-                    default:
-                        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                      @$"
+                                                                  _output);
+                } else {
+                    TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                  @$"
                 ┌──────────────────────────────────────────────┐
                 │                                              │
                 │                                              │
                 │                                              │
                 │                   {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}                   │
                 └──────────────────────────────────────────────┘",
-                                                                      _output);
-
-                        break;
+                                                                  _output);
                 }
 
                 Application.RequestStop ();

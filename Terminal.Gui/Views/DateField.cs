@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 /// <summary>Simple Date editing <see cref="View"/></summary>
 /// <remarks>The <see cref="DateField"/> <see cref="View"/> provides date editing functionality with mouse support.</remarks>
 public class DateField : TextField {
-    private const string RIGHT_TO_LEFT_MARK = "\u200f";
+    private const string RightToLeftMark = "\u200f";
     private readonly int _dateFieldLength = 12;
     private DateTime _date;
     private string _format;
@@ -24,7 +24,7 @@ public class DateField : TextField {
 
     /// <summary>Initializes a new instance of <see cref="DateField"/> using <see cref="LayoutStyle.Computed"/> layout.</summary>
     /// <param name="date"></param>
-    public DateField (DateTime date) : base ("") {
+    public DateField (DateTime date) {
         Width = _dateFieldLength;
         SetInitialProperties (date);
     }
@@ -37,7 +37,7 @@ public class DateField : TextField {
                 CultureInfo.CurrentCulture = value;
                 _separator = GetDataSeparator (value.DateTimeFormat.DateSeparator);
                 _format = " " + StandardizeDateFormat (value.DateTimeFormat.ShortDatePattern);
-                Text = Date.ToString (_format).Replace (RIGHT_TO_LEFT_MARK, "");
+                Text = Date.ToString (_format).Replace (RightToLeftMark, "");
             }
         }
     }
@@ -60,7 +60,7 @@ public class DateField : TextField {
             DateTime oldData = _date;
             _date = value;
             Text = value.ToString (" " + StandardizeDateFormat (_format.Trim ()))
-                        .Replace (RIGHT_TO_LEFT_MARK, "");
+                        .Replace (RightToLeftMark, "");
             DateTimeEventArgs<DateTime> args = new DateTimeEventArgs<DateTime> (oldData, value, _format);
             if (oldData != value) {
                 OnDateChanged (args);
@@ -168,7 +168,7 @@ public class DateField : TextField {
             trimedText = trimedText.Replace (new string (' ', spaces), " ");
             var date = Convert.ToDateTime (trimedText).ToString (_format.Trim ());
             if ($" {date}" != e.NewText) {
-                e.NewText = $" {date}".Replace (RIGHT_TO_LEFT_MARK, "");
+                e.NewText = $" {date}".Replace (RightToLeftMark, "");
             }
 
             AdjCursorPosition (CursorPosition);
@@ -191,8 +191,8 @@ public class DateField : TextField {
 
     private string GetDataSeparator (string separator) {
         string sepChar = separator.Trim ();
-        if (sepChar.Length > 1 && sepChar.Contains (RIGHT_TO_LEFT_MARK)) {
-            sepChar = sepChar.Replace (RIGHT_TO_LEFT_MARK, "");
+        if (sepChar.Length > 1 && sepChar.Contains (RightToLeftMark)) {
+            sepChar = sepChar.Replace (RightToLeftMark, "");
         }
 
         return sepChar;
@@ -360,7 +360,9 @@ public class DateField : TextField {
         if (CursorPosition < FormatLength) {
             newText =  [
 
-            .. newText, .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))];
+            .. newText,
+            .. text.GetRange (CursorPosition + 1, text.Count - (CursorPosition + 1))
+                ];
         }
 
         return SetText (StringExtensions.ToString (newText));
@@ -374,8 +376,8 @@ public class DateField : TextField {
         text = NormalizeFormat (text);
         string[] vals = text.Split (_separator);
         for (var i = 0; i < vals.Length; i++) {
-            if (vals[i].Contains (RIGHT_TO_LEFT_MARK)) {
-                vals[i] = vals[i].Replace (RIGHT_TO_LEFT_MARK, "");
+            if (vals[i].Contains (RightToLeftMark)) {
+                vals[i] = vals[i].Replace (RightToLeftMark, "");
             }
         }
 

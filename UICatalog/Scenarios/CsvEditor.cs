@@ -26,19 +26,19 @@ public class CsvEditor : Scenario {
     private MenuItem _miLeft;
     private MenuItem _miRight;
     private TextField _selectedCellLabel;
-    private TableView tableView;
+    private TableView _tableView;
 
     public override void Setup () {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        tableView = new TableView {
-                                      X = 0,
-                                      Y = 0,
-                                      Width = Dim.Fill (),
-                                      Height = Dim.Fill (1)
-                                  };
+        _tableView = new TableView {
+                                       X = 0,
+                                       Y = 0,
+                                       Width = Dim.Fill (),
+                                       Height = Dim.Fill (1)
+                                   };
 
         var fileMenu = new MenuBarItem (
                                         "_File",
@@ -49,44 +49,48 @@ public class CsvEditor : Scenario {
                                                        });
 
         //fileMenu.Help = "Help";
-        var menu = new MenuBar (
-                                new[] {
-                                          fileMenu,
-                                          new (
-                                               "_Edit",
-                                               new MenuItem[] {
-                                                                  new ("_New Column", "", () => AddColumn ()),
-                                                                  new ("_New Row", "", () => AddRow ()),
-                                                                  new ("_Rename Column", "", () => RenameColumn ()),
-                                                                  new ("_Delete Column", "", () => DeleteColum ()),
-                                                                  new ("_Move Column", "", () => MoveColumn ()),
-                                                                  new ("_Move Row", "", () => MoveRow ()),
-                                                                  new ("_Sort Asc", "", () => Sort (true)),
-                                                                  new ("_Sort Desc", "", () => Sort (false))
-                                                              }),
-                                          new (
-                                               "_View",
-                                               new[] {
-                                                         _miLeft = new MenuItem (
-                                                          "_Align Left",
-                                                          "",
-                                                          () => Align (TextAlignment.Left)),
-                                                         _miRight = new MenuItem (
-                                                          "_Align Right",
-                                                          "",
-                                                          () => Align (TextAlignment.Right)),
-                                                         _miCentered = new MenuItem (
-                                                          "_Align Centered",
-                                                          "",
-                                                          () => Align (TextAlignment.Centered)),
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   fileMenu,
+                                   new MenuBarItem (
+                                                    "_Edit",
+                                                    new MenuItem[] {
+                                                                       new ("_New Column", "", () => AddColumn ()),
+                                                                       new ("_New Row", "", () => AddRow ()),
+                                                                       new (
+                                                                            "_Rename Column",
+                                                                            "",
+                                                                            () => RenameColumn ()),
+                                                                       new ("_Delete Column", "", () => DeleteColum ()),
+                                                                       new ("_Move Column", "", () => MoveColumn ()),
+                                                                       new ("_Move Row", "", () => MoveRow ()),
+                                                                       new ("_Sort Asc", "", () => Sort (true)),
+                                                                       new ("_Sort Desc", "", () => Sort (false))
+                                                                   }),
+                                   new MenuBarItem (
+                                                    "_View",
+                                                    new[] {
+                                                              _miLeft = new MenuItem (
+                                                               "_Align Left",
+                                                               "",
+                                                               () => Align (TextAlignment.Left)),
+                                                              _miRight = new MenuItem (
+                                                               "_Align Right",
+                                                               "",
+                                                               () => Align (TextAlignment.Right)),
+                                                              _miCentered = new MenuItem (
+                                                               "_Align Centered",
+                                                               "",
+                                                               () => Align (TextAlignment.Centered)),
 
-                                                         // Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
-                                                         _miCentered = new MenuItem (
-                                                          "_Set Format Pattern",
-                                                          "",
-                                                          () => SetFormat ())
-                                                     })
-                                      });
+                                                              // Format requires hard typed data table, when we read a CSV everything is untyped (string) so this only works for new columns in this demo
+                                                              _miCentered = new MenuItem (
+                                                               "_Set Format Pattern",
+                                                               "",
+                                                               () => SetFormat ())
+                                                          })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         var statusBar = new StatusBar (
@@ -106,11 +110,11 @@ public class CsvEditor : Scenario {
                                                         });
         Application.Top.Add (statusBar);
 
-        Win.Add (tableView);
+        Win.Add (_tableView);
 
         _selectedCellLabel = new TextField {
                                                X = 0,
-                                               Y = Pos.Bottom (tableView),
+                                               Y = Pos.Bottom (_tableView),
                                                Text = "0,0",
                                                Width = Dim.Fill (),
                                                TextAlignment = TextAlignment.Right
@@ -119,9 +123,9 @@ public class CsvEditor : Scenario {
 
         Win.Add (_selectedCellLabel);
 
-        tableView.SelectedCellChanged += OnSelectedCellChanged;
-        tableView.CellActivated += EditCurrentCell;
-        tableView.KeyDown += TableViewKeyPress;
+        _tableView.SelectedCellChanged += OnSelectedCellChanged;
+        _tableView.CellActivated += EditCurrentCell;
+        _tableView.KeyDown += TableViewKeyPress;
 
         SetupScrollBar ();
     }
@@ -134,7 +138,9 @@ public class CsvEditor : Scenario {
         if (GetText ("Enter column name", "Name:", "", out string colName)) {
             var col = new DataColumn (colName);
 
-            int newColIdx = Math.Min (Math.Max (0, tableView.SelectedColumn + 1), tableView.Table.Columns);
+            int newColIdx = Math.Min (
+                                      Math.Max (0, _tableView.SelectedColumn + 1),
+                                      _tableView.Table.Columns);
 
             int result = MessageBox.Query (
                                            "Column Type",
@@ -170,7 +176,7 @@ public class CsvEditor : Scenario {
 
             _currentTable.Columns.Add (col);
             col.SetOrdinal (newColIdx);
-            tableView.Update ();
+            _tableView.Update ();
         }
     }
 
@@ -181,10 +187,10 @@ public class CsvEditor : Scenario {
 
         DataRow newRow = _currentTable.NewRow ();
 
-        int newRowIdx = Math.Min (Math.Max (0, tableView.SelectedRow + 1), tableView.Table.Rows);
+        int newRowIdx = Math.Min (Math.Max (0, _tableView.SelectedRow + 1), _tableView.Table.Rows);
 
         _currentTable.Rows.InsertAt (newRow, newRowIdx);
-        tableView.Update ();
+        _tableView.Update ();
     }
 
     private void Align (TextAlignment newAlignment) {
@@ -192,37 +198,37 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        ColumnStyle style = tableView.Style.GetOrCreateColumnStyle (tableView.SelectedColumn);
+        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.SelectedColumn);
         style.Alignment = newAlignment;
 
         _miLeft.Checked = style.Alignment == TextAlignment.Left;
         _miRight.Checked = style.Alignment == TextAlignment.Right;
         _miCentered.Checked = style.Alignment == TextAlignment.Centered;
 
-        tableView.Update ();
+        _tableView.Update ();
     }
 
     private void ClearColumnStyles () {
-        tableView.Style.ColumnStyles.Clear ();
-        tableView.Update ();
+        _tableView.Style.ColumnStyles.Clear ();
+        _tableView.Update ();
     }
 
-    private void CloseExample () { tableView.Table = null; }
+    private void CloseExample () { _tableView.Table = null; }
 
     private void DeleteColum () {
         if (NoTableLoaded ()) {
             return;
         }
 
-        if (tableView.SelectedColumn == -1) {
+        if (_tableView.SelectedColumn == -1) {
             MessageBox.ErrorQuery ("No Column", "No column selected", "Ok");
 
             return;
         }
 
         try {
-            _currentTable.Columns.RemoveAt (tableView.SelectedColumn);
-            tableView.Update ();
+            _currentTable.Columns.RemoveAt (_tableView.SelectedColumn);
+            _tableView.Update ();
         }
         catch (Exception ex) {
             MessageBox.ErrorQuery ("Could not remove column", ex.Message, "Ok");
@@ -238,27 +244,28 @@ public class CsvEditor : Scenario {
 
         if (GetText ("Enter new value", _currentTable.Columns[e.Col].ColumnName, oldValue, out string newText)) {
             try {
-                _currentTable.Rows[e.Row][e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
+                _currentTable.Rows[e.Row][e.Col] =
+                    string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
             }
             catch (Exception ex) {
                 MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
-            tableView.Update ();
+            _tableView.Update ();
         }
     }
 
     private bool GetText (string title, string label, string initialText, out string enteredText) {
         var okPressed = false;
 
-        var ok = new Button ("Ok", true);
+        var ok = new Button { Text = "Ok", IsDefault = true };
         ok.Clicked += (s, e) => {
             okPressed = true;
             Application.RequestStop ();
         };
-        var cancel = new Button ("Cancel");
+        var cancel = new Button { Text = "Cancel" };
         cancel.Clicked += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog (ok, cancel) { Title = title };
+        var d = new Dialog { Title = title, Buttons =  [ok, cancel] };
 
         var lbl = new Label {
                                 X = 0,
@@ -288,23 +295,25 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        if (tableView.SelectedColumn == -1) {
+        if (_tableView.SelectedColumn == -1) {
             MessageBox.ErrorQuery ("No Column", "No column selected", "Ok");
 
             return;
         }
 
         try {
-            DataColumn currentCol = _currentTable.Columns[tableView.SelectedColumn];
+            DataColumn currentCol = _currentTable.Columns[_tableView.SelectedColumn];
 
             if (GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal)) {
-                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), tableView.Table.Columns - 1);
+                int newIdx = Math.Min (
+                                       Math.Max (0, int.Parse (newOrdinal)),
+                                       _tableView.Table.Columns - 1);
 
                 currentCol.SetOrdinal (newIdx);
 
-                tableView.SetSelection (newIdx, tableView.SelectedRow, false);
-                tableView.EnsureSelectedCellIsVisible ();
-                tableView.SetNeedsDisplay ();
+                _tableView.SetSelection (newIdx, _tableView.SelectedRow, false);
+                _tableView.EnsureSelectedCellIsVisible ();
+                _tableView.SetNeedsDisplay ();
             }
         }
         catch (Exception ex) {
@@ -317,19 +326,19 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        if (tableView.SelectedRow == -1) {
+        if (_tableView.SelectedRow == -1) {
             MessageBox.ErrorQuery ("No Rows", "No row selected", "Ok");
 
             return;
         }
 
         try {
-            int oldIdx = tableView.SelectedRow;
+            int oldIdx = _tableView.SelectedRow;
 
             DataRow currentRow = _currentTable.Rows[oldIdx];
 
             if (GetText ("Move Row", "New Row:", oldIdx.ToString (), out string newOrdinal)) {
-                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), tableView.Table.Rows - 1);
+                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table.Rows - 1);
 
                 if (newIdx == oldIdx) {
                     return;
@@ -344,9 +353,9 @@ public class CsvEditor : Scenario {
 
                 _currentTable.Rows.InsertAt (newRow, newIdx);
 
-                tableView.SetSelection (tableView.SelectedColumn, newIdx, false);
-                tableView.EnsureSelectedCellIsVisible ();
-                tableView.SetNeedsDisplay ();
+                _tableView.SetSelection (_tableView.SelectedColumn, newIdx, false);
+                _tableView.EnsureSelectedCellIsVisible ();
+                _tableView.SetNeedsDisplay ();
             }
         }
         catch (Exception ex) {
@@ -355,7 +364,7 @@ public class CsvEditor : Scenario {
     }
 
     private bool NoTableLoaded () {
-        if (tableView.Table == null) {
+        if (_tableView.Table == null) {
             MessageBox.ErrorQuery ("No Table Loaded", "No table has currently be opened", "Ok");
 
             return true;
@@ -367,14 +376,14 @@ public class CsvEditor : Scenario {
     private void OnSelectedCellChanged (object sender, SelectedCellChangedEventArgs e) {
         // only update the text box if the user is not manually editing it
         if (!_selectedCellLabel.HasFocus) {
-            _selectedCellLabel.Text = $"{tableView.SelectedRow},{tableView.SelectedColumn}";
+            _selectedCellLabel.Text = $"{_tableView.SelectedRow},{_tableView.SelectedColumn}";
         }
 
-        if ((tableView.Table == null) || (tableView.SelectedColumn == -1)) {
+        if ((_tableView.Table == null) || (_tableView.SelectedColumn == -1)) {
             return;
         }
 
-        ColumnStyle style = tableView.Style.GetColumnStyleIfAny (tableView.SelectedColumn);
+        ColumnStyle style = _tableView.Style.GetColumnStyleIfAny (_tableView.SelectedColumn);
 
         _miLeft.Checked = style?.Alignment == TextAlignment.Left;
         _miRight.Checked = style?.Alignment == TextAlignment.Right;
@@ -428,7 +437,10 @@ public class CsvEditor : Scenario {
             Win.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
         }
         catch (Exception ex) {
-            MessageBox.ErrorQuery ("Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
+            MessageBox.ErrorQuery (
+                                   "Open Failed",
+                                   $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}",
+                                   "Ok");
         }
     }
 
@@ -439,16 +451,16 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        DataColumn currentCol = _currentTable.Columns[tableView.SelectedColumn];
+        DataColumn currentCol = _currentTable.Columns[_tableView.SelectedColumn];
 
         if (GetText ("Rename Column", "Name:", currentCol.ColumnName, out string newName)) {
             currentCol.ColumnName = newName;
-            tableView.Update ();
+            _tableView.Update ();
         }
     }
 
     private void Save () {
-        if ((tableView.Table == null) || string.IsNullOrWhiteSpace (_currentFile)) {
+        if ((_tableView.Table == null) || string.IsNullOrWhiteSpace (_currentFile)) {
             MessageBox.ErrorQuery ("No file loaded", "No file is currently loaded", "Ok");
 
             return;
@@ -482,8 +494,8 @@ public class CsvEditor : Scenario {
         // change selected cell to the one the user has typed into the box
         Match match = Regex.Match (_selectedCellLabel.Text, "^(\\d+),(\\d+)$");
         if (match.Success) {
-            tableView.SelectedColumn = int.Parse (match.Groups[1].Value);
-            tableView.SelectedRow = int.Parse (match.Groups[2].Value);
+            _tableView.SelectedColumn = int.Parse (match.Groups[1].Value);
+            _tableView.SelectedRow = int.Parse (match.Groups[2].Value);
         }
     }
 
@@ -492,7 +504,7 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        DataColumn col = _currentTable.Columns[tableView.SelectedColumn];
+        DataColumn col = _currentTable.Columns[_tableView.SelectedColumn];
 
         if (col.DataType == typeof (string)) {
             MessageBox.ErrorQuery (
@@ -503,26 +515,26 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        ColumnStyle style = tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
+        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
 
         if (GetText ("Format", "Pattern:", style.Format ?? "", out string newPattern)) {
             style.Format = newPattern;
-            tableView.Update ();
+            _tableView.Update ();
         }
     }
 
-    private void SetTable (DataTable dataTable) { tableView.Table = new DataTableSource (_currentTable = dataTable); }
+    private void SetTable (DataTable dataTable) { _tableView.Table = new DataTableSource (_currentTable = dataTable); }
 
     private void SetupScrollBar () {
-        var scrollBar = new ScrollBarView (tableView, true);
+        var scrollBar = new ScrollBarView (_tableView, true);
 
         scrollBar.ChangedPosition += (s, e) => {
-            tableView.RowOffset = scrollBar.Position;
-            if (tableView.RowOffset != scrollBar.Position) {
-                scrollBar.Position = tableView.RowOffset;
+            _tableView.RowOffset = scrollBar.Position;
+            if (_tableView.RowOffset != scrollBar.Position) {
+                scrollBar.Position = _tableView.RowOffset;
             }
 
-            tableView.SetNeedsDisplay ();
+            _tableView.SetNeedsDisplay ();
         };
         /*
         scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
@@ -533,9 +545,9 @@ public class CsvEditor : Scenario {
             tableView.SetNeedsDisplay ();
         };*/
 
-        tableView.DrawContent += (s, e) => {
-            scrollBar.Size = tableView.Table?.Rows ?? 0;
-            scrollBar.Position = tableView.RowOffset;
+        _tableView.DrawContent += (s, e) => {
+            scrollBar.Size = _tableView.Table?.Rows ?? 0;
+            scrollBar.Position = _tableView.RowOffset;
 
             //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
             //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
@@ -548,13 +560,13 @@ public class CsvEditor : Scenario {
             return;
         }
 
-        if (tableView.SelectedColumn == -1) {
+        if (_tableView.SelectedColumn == -1) {
             MessageBox.ErrorQuery ("No Column", "No column selected", "Ok");
 
             return;
         }
 
-        string colName = tableView.Table.ColumnNames[tableView.SelectedColumn];
+        string colName = _tableView.Table.ColumnNames[_tableView.SelectedColumn];
 
         _currentTable.DefaultView.Sort = colName + (asc ? " asc" : " desc");
         SetTable (_currentTable.DefaultView.ToTable ());
@@ -562,22 +574,22 @@ public class CsvEditor : Scenario {
 
     private void TableViewKeyPress (object sender, Key e) {
         if (e.KeyCode == KeyCode.Delete) {
-            if (tableView.FullRowSelect) {
+            if (_tableView.FullRowSelect) {
                 // Delete button deletes all rows when in full row mode
-                foreach (int toRemove in tableView.GetAllSelectedCells ()
-                                                  .Select (p => p.Y)
-                                                  .Distinct ()
-                                                  .OrderByDescending (i => i)) {
+                foreach (int toRemove in _tableView.GetAllSelectedCells ()
+                                                   .Select (p => p.Y)
+                                                   .Distinct ()
+                                                   .OrderByDescending (i => i)) {
                     _currentTable.Rows.RemoveAt (toRemove);
                 }
             } else {
                 // otherwise set all selected cells to null
-                foreach (Point pt in tableView.GetAllSelectedCells ()) {
+                foreach (Point pt in _tableView.GetAllSelectedCells ()) {
                     _currentTable.Rows[pt.Y][pt.X] = DBNull.Value;
                 }
             }
 
-            tableView.Update ();
+            _tableView.Update ();
             e.Handled = true;
         }
     }

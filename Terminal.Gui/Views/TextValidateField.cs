@@ -84,15 +84,15 @@ namespace Terminal.Gui {
         ///     .Net MaskedTextProvider Provider for TextValidateField.
         ///     <para></para>
         ///     <para>
-        ///         <a href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.maskedtextprovider?view=net-5.0">
-        ///             Wrapper
-        ///             around MaskedTextProvider
+        ///         <a
+        ///             href="https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.maskedtextprovider?view=net-5.0">
+        ///             Wrapper around MaskedTextProvider
         ///         </a>
         ///     </para>
         ///     <para>
-        ///         <a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.maskedtextbox.mask?view=net-5.0">
-        ///             Masking
-        ///             elements
+        ///         <a
+        ///             href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.maskedtextbox.mask?view=net-5.0">
+        ///             Masking elements
         ///         </a>
         ///     </para>
         /// </summary>
@@ -106,7 +106,9 @@ namespace Terminal.Gui {
             public string Mask {
                 get => _provider?.Mask;
                 set {
-                    string current = _provider != null ? _provider.ToString (false, false) : string.Empty;
+                    string current = _provider != null
+                                         ? _provider.ToString (false, false)
+                                         : string.Empty;
                     _provider = new MaskedTextProvider (value == string.Empty ? "&&&&&&" : value);
                     if (!string.IsNullOrEmpty (current)) {
                         _provider.Set (current);
@@ -117,19 +119,19 @@ namespace Terminal.Gui {
             /// <inheritdoc/>
             public event EventHandler<TextChangedEventArgs> TextChanged;
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public string Text { get => _provider.ToString (); set => _provider.Set (value); }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool IsValid => _provider.MaskCompleted;
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool Fixed => true;
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public string DisplayText => _provider.ToDisplayString ();
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int Cursor (int pos) {
                 if (pos < 0) {
                     return CursorStart ();
@@ -147,37 +149,35 @@ namespace Terminal.Gui {
                 return p;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorStart () {
-                return
-                    _provider.IsEditPosition (0)
-                        ? 0
-                        : _provider.FindEditPositionFrom (0, true);
+                return _provider.IsEditPosition (0)
+                           ? 0
+                           : _provider.FindEditPositionFrom (0, true);
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorEnd () {
-                return
-                    _provider.IsEditPosition (_provider.Length - 1)
-                        ? _provider.Length - 1
-                        : _provider.FindEditPositionFrom (_provider.Length, false);
+                return _provider.IsEditPosition (_provider.Length - 1)
+                           ? _provider.Length - 1
+                           : _provider.FindEditPositionFrom (_provider.Length, false);
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorLeft (int pos) {
                 int c = _provider.FindEditPositionFrom (pos - 1, false);
 
                 return c == -1 ? pos : c;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorRight (int pos) {
                 int c = _provider.FindEditPositionFrom (pos + 1, true);
 
                 return c == -1 ? pos : c;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool Delete (int pos) {
                 string oldValue = Text;
                 bool result = _provider.Replace (' ', pos); // .RemoveAt (pos);
@@ -188,7 +188,7 @@ namespace Terminal.Gui {
                 return result;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool InsertAt (char ch, int pos) {
                 string oldValue = Text;
                 bool result = _provider.Replace (ch, pos);
@@ -232,7 +232,7 @@ namespace Terminal.Gui {
             /// <inheritdoc/>
             public event EventHandler<TextChangedEventArgs> TextChanged;
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public string Text {
                 get => StringExtensions.ToString (_text);
                 set {
@@ -241,16 +241,16 @@ namespace Terminal.Gui {
                 }
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public string DisplayText => Text;
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool IsValid => Validate (_text);
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool Fixed => false;
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int Cursor (int pos) {
                 if (pos < 0) {
                     return CursorStart ();
@@ -263,13 +263,13 @@ namespace Terminal.Gui {
                 return pos;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorStart () { return 0; }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorEnd () { return _text.Count; }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorLeft (int pos) {
                 if (pos > 0) {
                     return pos - 1;
@@ -278,7 +278,7 @@ namespace Terminal.Gui {
                 return pos;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public int CursorRight (int pos) {
                 if (pos < _text.Count) {
                     return pos + 1;
@@ -287,7 +287,7 @@ namespace Terminal.Gui {
                 return pos;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool Delete (int pos) {
                 if (_text.Count > 0 && pos < _text.Count) {
                     string oldValue = Text;
@@ -298,7 +298,7 @@ namespace Terminal.Gui {
                 return true;
             }
 
-            ///<inheritdoc/>
+            /// <inheritdoc/>
             public bool InsertAt (char ch, int pos) {
                 List<Rune> aux = _text.ToList ();
                 aux.Insert (pos, (Rune)ch);
@@ -341,26 +341,72 @@ namespace Terminal.Gui {
 
     /// <summary>Text field that validates input through a  <see cref="ITextValidateProvider"/></summary>
     public class TextValidateField : View {
-        private int _cursorPosition;
         private readonly int _defaultLength = 10;
+        private int _cursorPosition;
         private ITextValidateProvider _provider;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
         ///     <see cref="LayoutStyle.Computed"/> positioning.
         /// </summary>
-        public TextValidateField () : this (null) { }
+        public TextValidateField () {
+            Height = 1;
+            CanFocus = true;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="TextValidateField"/> class using
-        ///     <see cref="LayoutStyle.Computed"/> positioning.
-        /// </summary>
-        public TextValidateField (ITextValidateProvider provider) {
-            if (provider != null) {
-                Provider = provider;
-            }
+            // Things this view knows how to do
+            AddCommand (
+                        Command.LeftHome,
+                        () => {
+                            HomeKeyHandler ();
 
-            SetInitialProperties ();
+                            return true;
+                        });
+            AddCommand (
+                        Command.RightEnd,
+                        () => {
+                            EndKeyHandler ();
+
+                            return true;
+                        });
+            AddCommand (
+                        Command.DeleteCharRight,
+                        () => {
+                            DeleteKeyHandler ();
+
+                            return true;
+                        });
+            AddCommand (
+                        Command.DeleteCharLeft,
+                        () => {
+                            BackspaceKeyHandler ();
+
+                            return true;
+                        });
+            AddCommand (
+                        Command.Left,
+                        () => {
+                            CursorLeft ();
+
+                            return true;
+                        });
+            AddCommand (
+                        Command.Right,
+                        () => {
+                            CursorRight ();
+
+                            return true;
+                        });
+
+            // Default keybindings for this view
+            KeyBindings.Add (KeyCode.Home, Command.LeftHome);
+            KeyBindings.Add (KeyCode.End, Command.RightEnd);
+
+            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
+
+            KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
+            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
+            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
         }
 
         /// <summary>This property returns true if the input is valid.</summary>
@@ -380,7 +426,9 @@ namespace Terminal.Gui {
             set {
                 _provider = value;
                 if (_provider.Fixed) {
-                    Width = _provider.DisplayText == string.Empty ? _defaultLength : _provider.DisplayText.Length;
+                    Width = _provider.DisplayText == string.Empty
+                                ? _defaultLength
+                                : _provider.DisplayText.Length;
                 }
 
                 // HomeKeyHandler already call SetNeedsDisplay
@@ -408,11 +456,12 @@ namespace Terminal.Gui {
             }
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override bool MouseEvent (MouseEvent mouseEvent) {
             if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)) {
                 int c = _provider.Cursor (mouseEvent.X - GetMargins (Bounds.Width).left);
-                if (_provider.Fixed == false && TextAlignment == TextAlignment.Right && Text.Length > 0) {
+                if (_provider.Fixed == false && TextAlignment == TextAlignment.Right &&
+                    Text.Length > 0) {
                     c++;
                 }
 
@@ -426,7 +475,7 @@ namespace Terminal.Gui {
             return false;
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override void OnDrawContent (Rect contentArea) {
             if (_provider == null) {
                 Move (0, 0);
@@ -463,21 +512,21 @@ namespace Terminal.Gui {
             }
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override bool OnEnter (View view) {
             Application.Driver.SetCursorVisibility (CursorVisibility.Default);
 
             return base.OnEnter (view);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override bool OnLeave (View view) {
             Application.Driver.SetCursorVisibility (CursorVisibility.Invisible);
 
             return base.OnLeave (view);
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override bool OnProcessKeyDown (Key a) {
             if (_provider == null) {
                 return false;
@@ -498,7 +547,7 @@ namespace Terminal.Gui {
             return false;
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override void PositionCursor () {
             (int left, _) = GetMargins (Bounds.Width);
 
@@ -602,66 +651,6 @@ namespace Terminal.Gui {
             SetNeedsDisplay ();
 
             return true;
-        }
-
-        private void SetInitialProperties () {
-            Height = 1;
-            CanFocus = true;
-
-            // Things this view knows how to do
-            AddCommand (
-                        Command.LeftHome,
-                        () => {
-                            HomeKeyHandler ();
-
-                            return true;
-                        });
-            AddCommand (
-                        Command.RightEnd,
-                        () => {
-                            EndKeyHandler ();
-
-                            return true;
-                        });
-            AddCommand (
-                        Command.DeleteCharRight,
-                        () => {
-                            DeleteKeyHandler ();
-
-                            return true;
-                        });
-            AddCommand (
-                        Command.DeleteCharLeft,
-                        () => {
-                            BackspaceKeyHandler ();
-
-                            return true;
-                        });
-            AddCommand (
-                        Command.Left,
-                        () => {
-                            CursorLeft ();
-
-                            return true;
-                        });
-            AddCommand (
-                        Command.Right,
-                        () => {
-                            CursorRight ();
-
-                            return true;
-                        });
-
-            // Default keybindings for this view
-            KeyBindings.Add (KeyCode.Home, Command.LeftHome);
-            KeyBindings.Add (KeyCode.End, Command.RightEnd);
-
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-            KeyBindings.Add (KeyCode.Delete, Command.DeleteCharRight);
-
-            KeyBindings.Add (KeyCode.Backspace, Command.DeleteCharLeft);
-            KeyBindings.Add (KeyCode.CursorLeft, Command.Left);
-            KeyBindings.Add (KeyCode.CursorRight, Command.Right);
         }
     }
 }

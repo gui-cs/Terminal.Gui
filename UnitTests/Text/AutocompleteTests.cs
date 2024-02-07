@@ -1,11 +1,11 @@
 ﻿using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.TextTests; 
+namespace Terminal.Gui.TextTests;
 
 public class AutocompleteTests {
-    private readonly ITestOutputHelper output;
-    public AutocompleteTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public AutocompleteTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
@@ -32,14 +32,14 @@ public class AutocompleteTests {
                 TestHelpers.AssertDriverContentsWithFrameAre (
                                                               @"
 This a long line and against TextView.",
-                                                              output);
+                                                              _output);
             } else {
                 TestHelpers.AssertDriverContentsWithFrameAre (
                                                               @"
 This a long line and against TextView.
      and                              
      against                          ",
-                                                              output);
+                                                              _output);
             }
         }
 
@@ -56,7 +56,7 @@ This a long line and against TextView.
 This a long line and against TextView.
      and                              
      against                          ",
-                                                      output);
+                                                      _output);
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.G)));
         Application.Refresh ();
@@ -64,7 +64,7 @@ This a long line and against TextView.
                                                       @"
 This ag long line and against TextView.
      against                           ",
-                                                      output);
+                                                      _output);
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
         Application.Refresh ();
@@ -72,7 +72,7 @@ This ag long line and against TextView.
                                                       @"
 This ag long line and against TextView.
      against                           ",
-                                                      output);
+                                                      _output);
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
         Application.Refresh ();
@@ -80,14 +80,14 @@ This ag long line and against TextView.
                                                       @"
 This ag long line and against TextView.
      against                           ",
-                                                      output);
+                                                      _output);
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorLeft)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This ag long line and against TextView.",
-                                                      output);
+                                                      _output);
 
         for (var i = 0; i < 3; i++) {
             Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
@@ -96,7 +96,7 @@ This ag long line and against TextView.",
                                                           @"
 This ag long line and against TextView.
      against                           ",
-                                                          output);
+                                                          _output);
         }
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.Backspace)));
@@ -106,7 +106,7 @@ This ag long line and against TextView.
 This a long line and against TextView.
      and                              
      against                          ",
-                                                      output);
+                                                      _output);
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.N)));
         Application.Refresh ();
@@ -114,14 +114,14 @@ This a long line and against TextView.
                                                       @"
 This an long line and against TextView.
      and                               ",
-                                                      output);
+                                                      _output);
 
         Assert.True (tv.NewKeyDownEvent (new Key (KeyCode.CursorRight)));
         Application.Refresh ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 This an long line and against TextView.",
-                                                      output);
+                                                      _output);
     }
 
     [Fact]

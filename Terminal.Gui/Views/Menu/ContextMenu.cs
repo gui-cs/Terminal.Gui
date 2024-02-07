@@ -27,21 +27,7 @@ public sealed class ContextMenu : IDisposable {
     private MouseFlags _mouseFlags = MouseFlags.Button3Clicked;
 
     /// <summary>Initializes a context menu with no menu items.</summary>
-    public ContextMenu () : this (0, 0, new MenuBarItem ()) { }
-
-    /// <summary>Initializes a context menu, with a <see cref="View"/> specifying the parent/host of the menu.</summary>
-    /// <param name="host">The host view.</param>
-    /// <param name="menuItems">The menu items for the context menu.</param>
-    public ContextMenu (View host, MenuBarItem menuItems) :
-        this (host.Frame.X, host.Frame.Y, menuItems) {
-        Host = host;
-    }
-
-    /// <summary>Initializes a context menu with menu items at a specific screen location.</summary>
-    /// <param name="x">The left position (screen relative).</param>
-    /// <param name="y">The top position (screen relative).</param>
-    /// <param name="menuItems">The menu items.</param>
-    public ContextMenu (int x, int y, MenuBarItem menuItems) {
+    public ContextMenu () {
         if (IsShow) {
             if (_menuBar.SuperView != null) {
                 Hide ();
@@ -50,8 +36,7 @@ public sealed class ContextMenu : IDisposable {
             IsShow = false;
         }
 
-        MenuItems = menuItems;
-        Position = new Point (x, y);
+        MenuItems = new MenuBarItem ();
     }
 
     /// <summary>The default shortcut key for activating the context menu.</summary>
@@ -180,14 +165,15 @@ public sealed class ContextMenu : IDisposable {
             position.Y = 0;
         }
 
-        _menuBar = new MenuBar (new[] { MenuItems }) {
-                                                         X = position.X,
-                                                         Y = position.Y,
-                                                         Width = 0,
-                                                         Height = 0,
-                                                         UseSubMenusSingleFrame = UseSubMenusSingleFrame,
-                                                         Key = Key
-                                                     };
+        _menuBar = new MenuBar {
+                                   X = position.X,
+                                   Y = position.Y,
+                                   Width = 0,
+                                   Height = 0,
+                                   UseSubMenusSingleFrame = UseSubMenusSingleFrame,
+                                   Key = Key,
+                                   Menus =  [MenuItems]
+                               };
 
         _menuBar._isContextMenuLoading = true;
         _menuBar.MenuAllClosed += MenuBar_MenuAllClosed;

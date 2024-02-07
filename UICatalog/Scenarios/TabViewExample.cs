@@ -19,59 +19,46 @@ public class TabViewExample : Scenario {
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new (
-                                                                               "_Add Blank Tab",
-                                                                               "",
-                                                                               () => AddBlankTab ()),
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new ("_Add Blank Tab", "", AddBlankTab),
 
-                                                                              new (
-                                                                               "_Clear SelectedTab",
-                                                                               "",
-                                                                               () => _tabView.SelectedTab = null),
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          }),
-                                                      new (
-                                                           "_View",
-                                                           new[] {
-                                                                     _miShowTopLine =
-                                                                         new MenuItem (
-                                                                          "_Show Top Line",
-                                                                          "",
-                                                                          () => ShowTopLine ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miShowBorder =
-                                                                         new MenuItem (
-                                                                          "_Show Border",
-                                                                          "",
-                                                                          () => ShowBorder ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miTabsOnBottom =
-                                                                         new MenuItem (
-                                                                          "_Tabs On Bottom",
-                                                                          "",
-                                                                          () => SetTabsOnBottom ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miShowTabViewBorder =
-                                                                         new MenuItem (
-                                                                          "_Show TabView Border",
-                                                                          "",
-                                                                          () => ShowTabViewBorder ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         }
-                                                                 })
-                                                  });
+                                                                                new (
+                                                                                 "_Clear SelectedTab",
+                                                                                 "",
+                                                                                 () => _tabView.SelectedTab = null),
+                                                                                new ("_Quit", "", Quit)
+                                                                            }),
+                                   new MenuBarItem (
+                                                    "_View",
+                                                    new[] {
+                                                              _miShowTopLine =
+                                                                  new MenuItem ("_Show Top Line", "", ShowTopLine) {
+                                                                      Checked = true,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              _miShowBorder =
+                                                                  new MenuItem ("_Show Border", "", ShowBorder) {
+                                                                      Checked = true,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              _miTabsOnBottom =
+                                                                  new MenuItem ("_Tabs On Bottom", "", SetTabsOnBottom) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              _miShowTabViewBorder =
+                                                                  new MenuItem (
+                                                                                "_Show TabView Border",
+                                                                                "",
+                                                                                ShowTabViewBorder) {
+                                                                      Checked = true,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  }
+                                                          })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         _tabView = new TabView {
@@ -82,33 +69,39 @@ public class TabViewExample : Scenario {
                                    BorderStyle = LineStyle.Single
                                };
 
-        _tabView.AddTab (new Tab { DisplayText = "Tab1", View = new Label ("hodor!") }, false);
-        _tabView.AddTab (new Tab { DisplayText = "Tab2", View = new TextField ("durdur") }, false);
+        _tabView.AddTab (new Tab { DisplayText = "Tab1", View = new Label { Text = "hodor!" } }, false);
+        _tabView.AddTab (new Tab { DisplayText = "Tab2", View = new TextField { Text = "durdur" } }, false);
         _tabView.AddTab (new Tab { DisplayText = "Interactive Tab", View = GetInteractiveTab () }, false);
         _tabView.AddTab (new Tab { DisplayText = "Big Text", View = GetBigTextFileTab () }, false);
         _tabView.AddTab (
                          new Tab {
                                      DisplayText =
                                          "Long name Tab, I mean seriously long.  Like you would not believe how long this tab's name is its just too much really woooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooowwww thats long",
-                                     View = new Label (
-                                                       "This tab has a very long name which should be truncated.  See TabView.MaxTabTextWidth")
+                                     View = new Label {
+                                                          Text =
+                                                              "This tab has a very long name which should be truncated.  See TabView.MaxTabTextWidth"
+                                                      }
                                  },
                          false);
         _tabView.AddTab (
                          new Tab {
                                      DisplayText = "Les Mise" + '\u0301' + "rables",
-                                     View = new Label ("This tab name is unicode")
+                                     View = new Label { Text = "This tab name is unicode" }
                                  },
                          false);
         _tabView.AddTab (
                          new Tab {
                                      DisplayText = "Les Mise" + '\u0328' + '\u0301' + "rables",
-                                     View = new Label (
-                                                       "This tab name has two combining marks. Only one will show due to Issue #2616.")
+                                     View = new Label {
+                                                          Text =
+                                                              "This tab name has two combining marks. Only one will show due to Issue #2616."
+                                                      }
                                  },
                          false);
         for (var i = 0; i < 100; i++) {
-            _tabView.AddTab (new Tab { DisplayText = $"Tab{i}", View = new Label ($"Welcome to tab {i}") }, false);
+            _tabView.AddTab (
+                             new Tab { DisplayText = $"Tab{i}", View = new Label { Text = $"Welcome to tab {i}" } },
+                             false);
         }
 
         _tabView.SelectedTab = _tabView.Tabs.First ();
@@ -116,11 +109,11 @@ public class TabViewExample : Scenario {
         Win.Add (_tabView);
 
         var frameRight = new FrameView {
-                                           Title = "About",
                                            X = Pos.Right (_tabView),
                                            Y = 0,
                                            Width = Dim.Fill (),
-                                           Height = Dim.Fill ()
+                                           Height = Dim.Fill (),
+                                           Title = "About"
                                        };
 
         frameRight.Add (
@@ -133,11 +126,11 @@ public class TabViewExample : Scenario {
         Win.Add (frameRight);
 
         var frameBelow = new FrameView {
-                                           Title = "Bottom Frame",
                                            X = 0,
                                            Y = Pos.Bottom (_tabView),
                                            Width = _tabView.Width,
-                                           Height = Dim.Fill ()
+                                           Height = Dim.Fill (),
+                                           Title = "Bottom Frame"
                                        };
 
         frameBelow.Add (
@@ -155,7 +148,7 @@ public class TabViewExample : Scenario {
                                                             new (
                                                                  Application.QuitKey,
                                                                  $"{Application.QuitKey} to Quit",
-                                                                 () => Quit ())
+                                                                 Quit)
                                                         });
         Application.Top.Add (statusBar);
     }
@@ -188,7 +181,7 @@ public class TabViewExample : Scenario {
                                           Width = Dim.Fill (),
                                           Height = Dim.Fill ()
                                       };
-        var lblName = new Label ("Name:");
+        var lblName = new Label { Text = "Name:" };
         interactiveTab.Add (lblName);
 
         var tbName = new TextField {
@@ -198,8 +191,8 @@ public class TabViewExample : Scenario {
         interactiveTab.Add (tbName);
 
         var lblAddr = new Label {
-                                    Text = "Address:",
-                                    Y = 1
+                                    Y = 1,
+                                    Text = "Address:"
                                 };
         interactiveTab.Add (lblAddr);
 

@@ -10,13 +10,13 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Drawing")]
 public class GraphViewExample : Scenario {
+    private readonly Thickness _thickness = new (1, 1, 1, 1);
     private TextView _about;
     private int _currentGraph;
     private Action[] _graphs;
     private GraphView _graphView;
     private MenuItem _miDiags;
     private MenuItem _miShowBorder;
-    private readonly Thickness _thickness = new (1, 1, 1, 1);
 
     public override void Setup () {
         Win.Title = GetName ();
@@ -34,88 +34,83 @@ public class GraphViewExample : Scenario {
                             () => MultiBarGraph () //7
                         };
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new (
-                                                                               "Scatter _Plot",
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new (
+                                                                                 "Scatter _Plot",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     0] ()),
+                                                                                new (
+                                                                                 "_V Bar Graph",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     1] ()),
+                                                                                new (
+                                                                                 "_H Bar Graph",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     2] ()),
+                                                                                new (
+                                                                                 "P_opulation Pyramid",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     3] ()),
+                                                                                new (
+                                                                                 "_Line Graph",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     4] ()),
+                                                                                new (
+                                                                                 "Sine _Wave",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     5] ()),
+                                                                                new (
+                                                                                 "Silent _Disco",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     6] ()),
+                                                                                new (
+                                                                                 "_Multi Bar Graph",
+                                                                                 "",
+                                                                                 () => _graphs[_currentGraph =
+                                                                                     7] ()),
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            }),
+                                   new MenuBarItem (
+                                                    "_View",
+                                                    new[] {
+                                                              new ("Zoom _In", "", () => Zoom (0.5f)),
+                                                              new ("Zoom _Out", "", () => Zoom (2f)),
+                                                              new ("MarginLeft++", "", () => Margin (true, true)),
+                                                              new ("MarginLeft--", "", () => Margin (true, false)),
+                                                              new ("MarginBottom++", "", () => Margin (false, true)),
+                                                              new ("MarginBottom--", "", () => Margin (false, false)),
+                                                              _miShowBorder = new MenuItem (
+                                                                               "_Enable Margin, Border, and Padding",
                                                                                "",
-                                                                               () => _graphs[_currentGraph = 0] ()),
-                                                                              new (
-                                                                               "_V Bar Graph",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 1] ()),
-                                                                              new (
-                                                                               "_H Bar Graph",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 2] ()),
-                                                                              new (
-                                                                               "P_opulation Pyramid",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 3] ()),
-                                                                              new (
-                                                                               "_Line Graph",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 4] ()),
-                                                                              new (
-                                                                               "Sine _Wave",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 5] ()),
-                                                                              new (
-                                                                               "Silent _Disco",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 6] ()),
-                                                                              new (
-                                                                               "_Multi Bar Graph",
-                                                                               "",
-                                                                               () => _graphs[_currentGraph = 7] ()),
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          }),
-                                                      new (
-                                                           "_View",
-                                                           new[] {
-                                                                     new ("Zoom _In", "", () => Zoom (0.5f)),
-                                                                     new ("Zoom _Out", "", () => Zoom (2f)),
-                                                                     new (
-                                                                          "MarginLeft++",
+                                                                               () => ShowBorder ()) {
+                                                                                  Checked = true,
+                                                                                  CheckType = MenuItemCheckStyle
+                                                                                      .Checked
+                                                                              },
+                                                              _miDiags = new MenuItem (
+                                                                          "Dri_ver Diagnostics",
                                                                           "",
-                                                                          () => Margin (true, true)),
-                                                                     new (
-                                                                          "MarginLeft--",
-                                                                          "",
-                                                                          () => Margin (true, false)),
-                                                                     new (
-                                                                          "MarginBottom++",
-                                                                          "",
-                                                                          () => Margin (false, true)),
-                                                                     new (
-                                                                          "MarginBottom--",
-                                                                          "",
-                                                                          () => Margin (false, false)),
-                                                                     _miShowBorder =
-                                                                         new MenuItem (
-                                                                          "_Enable Margin, Border, and Padding",
-                                                                          "",
-                                                                          () => ShowBorder ()) {
-                                                                             Checked = true,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     _miDiags = new MenuItem (
-                                                                      "Dri_ver Diagnostics",
-                                                                      "",
-                                                                      () => EnableDiagnostics ()) {
-                                                                         Checked = ConsoleDriver.Diagnostics
-                                                                             == (ConsoleDriver.DiagnosticFlags
-                                                                                             .FramePadding
-                                                                                         | ConsoleDriver
+                                                                          () => EnableDiagnostics ()) {
+                                                                             Checked = ConsoleDriver.Diagnostics ==
+                                                                                 (ConsoleDriver.DiagnosticFlags
+                                                                                             .FramePadding |
+                                                                                         ConsoleDriver
                                                                                              .DiagnosticFlags
                                                                                              .FrameRuler),
-                                                                         CheckType = MenuItemCheckStyle.Checked
-                                                                     }
-                                                                 })
-                                                  });
+                                                                             CheckType = MenuItemCheckStyle.Checked
+                                                                         }
+                                                          })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         _graphView = new GraphView {
@@ -132,11 +127,11 @@ public class GraphViewExample : Scenario {
         Win.Add (_graphView);
 
         var frameRight = new FrameView {
-                                           Title = "About",
                                            X = Pos.Right (_graphView) + 1,
                                            Y = 0,
                                            Width = Dim.Fill (),
-                                           Height = Dim.Fill ()
+                                           Height = Dim.Fill (),
+                                           Title = "About"
                                        };
 
         frameRight.Add (
@@ -546,7 +541,8 @@ public class GraphViewExample : Scenario {
                                                      Points = new List<PointF> {
                                                                                    new (1, 1.007f), new (2, 4.002f),
                                                                                    new (3, 6.941f), new (4, 9.012f),
-                                                                                   new (5, 10.811f), new (6, 12.011f),
+                                                                                   new (5, 10.811f),
+                                                                                   new (6, 12.011f),
                                                                                    new (7, 14.007f), new (8, 15.999f),
                                                                                    new (9, 18.998f), new (10, 20.18f),
                                                                                    new (11, 22.99f), new (12, 24.305f),
@@ -572,7 +568,8 @@ public class GraphViewExample : Scenario {
                                                                                    new (48, 112.411f),
                                                                                    new (49, 114.818f),
                                                                                    new (50, 118.71f), new (51, 121.76f),
-                                                                                   new (52, 127.6f), new (53, 126.904f),
+                                                                                   new (52, 127.6f),
+                                                                                   new (53, 126.904f),
                                                                                    new (54, 131.293f),
                                                                                    new (55, 132.905f),
                                                                                    new (56, 137.327f),
@@ -602,20 +599,21 @@ public class GraphViewExample : Scenario {
                                                                                    new (83, 208.98f), new (84, 210),
                                                                                    new (85, 210), new (86, 222),
                                                                                    new (87, 223), new (88, 226),
-                                                                                   new (89, 227), new (90, 232.038f),
+                                                                                   new (89, 227),
+                                                                                   new (90, 232.038f),
                                                                                    new (91, 231.036f),
                                                                                    new (92, 238.029f), new (93, 237),
                                                                                    new (94, 244), new (95, 243),
-                                                                                   new (96, 247), new (97, 247),
-                                                                                   new (98, 251),
+                                                                                   new (96, 247),
+                                                                                   new (97, 247), new (98, 251),
                                                                                    new (99, 252), new (100, 257),
                                                                                    new (101, 258), new (102, 259),
-                                                                                   new (103, 262), new (104, 261),
-                                                                                   new (105, 262),
+                                                                                   new (103, 262),
+                                                                                   new (104, 261), new (105, 262),
                                                                                    new (106, 266), new (107, 264),
                                                                                    new (108, 267), new (109, 268),
-                                                                                   new (113, 284), new (114, 289),
-                                                                                   new (115, 288),
+                                                                                   new (113, 284),
+                                                                                   new (114, 289), new (115, 288),
                                                                                    new (116, 292), new (117, 295),
                                                                                    new (118, 294)
                                                                                }
@@ -847,18 +845,18 @@ public class GraphViewExample : Scenario {
     }
 
     private class DiscoBarSeries : BarSeries {
-        private readonly Attribute brightgreen;
-        private readonly Attribute brightred;
-        private readonly Attribute brightyellow;
-        private readonly Attribute green;
-        private readonly Attribute red;
+        private readonly Attribute _brightgreen;
+        private readonly Attribute _brightred;
+        private readonly Attribute _brightyellow;
+        private readonly Attribute _green;
+        private readonly Attribute _red;
 
         public DiscoBarSeries () {
-            green = new Attribute (Color.BrightGreen, Color.Black);
-            brightgreen = new Attribute (Color.Green, Color.Black);
-            brightyellow = new Attribute (Color.BrightYellow, Color.Black);
-            red = new Attribute (Color.Red, Color.Black);
-            brightred = new Attribute (Color.BrightRed, Color.Black);
+            _green = new Attribute (Color.BrightGreen, Color.Black);
+            _brightgreen = new Attribute (Color.Green, Color.Black);
+            _brightyellow = new Attribute (Color.BrightYellow, Color.Black);
+            _red = new Attribute (Color.Red, Color.Black);
+            _brightred = new Attribute (Color.BrightRed, Color.Black);
         }
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn) {
@@ -869,15 +867,15 @@ public class GraphViewExample : Scenario {
                 float height = graph.ScreenToGraphSpace (x, y).Y;
 
                 if (height >= 85) {
-                    driver.SetAttribute (red);
+                    driver.SetAttribute (_red);
                 } else if (height >= 66) {
-                    driver.SetAttribute (brightred);
+                    driver.SetAttribute (_brightred);
                 } else if (height >= 45) {
-                    driver.SetAttribute (brightyellow);
+                    driver.SetAttribute (_brightyellow);
                 } else if (height >= 25) {
-                    driver.SetAttribute (brightgreen);
+                    driver.SetAttribute (_brightgreen);
                 } else {
-                    driver.SetAttribute (green);
+                    driver.SetAttribute (_green);
                 }
 
                 graph.AddRune (x, y, beingDrawn.Fill.Rune);

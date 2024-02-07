@@ -12,7 +12,7 @@
 using System.Collections.ObjectModel;
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>Determine which <see cref="System.IO"/> type to open.</summary>
 public enum OpenMode {
@@ -42,26 +42,21 @@ public enum OpenMode {
 /// </remarks>
 public class OpenDialog : FileDialog {
     /// <summary>Initializes a new <see cref="OpenDialog"/>.</summary>
-    public OpenDialog () : this (string.Empty) { }
-
-    /// <summary>Initializes a new <see cref="OpenDialog"/>.</summary>
-    /// <param name="title">The title.</param>
-    /// <param name="allowedTypes">The allowed types.</param>
-    /// <param name="openMode">The open mode.</param>
-    public OpenDialog (string title, List<IAllowedType> allowedTypes = null, OpenMode openMode = OpenMode.File) {
-        OpenMode = openMode;
-        Title = title;
-        Style.OkButtonText = openMode == OpenMode.File ? Strings.btnOpen :
-                             openMode == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
-
-        if (allowedTypes != null) {
-            AllowedTypes = allowedTypes;
-        }
-    }
+    public OpenDialog () { }
 
     /// <summary>Returns the selected files, or an empty list if nothing has been selected</summary>
     /// <value>The file paths.</value>
     public IReadOnlyList<string> FilePaths =>
         Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly ()
         : AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new[] { Path });
+
+    /// <inheritdoc/>
+    public override OpenMode OpenMode {
+        get => base.OpenMode;
+        set {
+            base.OpenMode = value;
+            Style.OkButtonText = value == OpenMode.File ? Strings.btnOpen :
+                                 value == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
+        }
+    }
 }

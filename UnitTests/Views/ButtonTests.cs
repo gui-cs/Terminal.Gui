@@ -6,7 +6,6 @@ public class ButtonTests {
     private readonly ITestOutputHelper _output;
     public ButtonTests (ITestOutputHelper output) { _output = output; }
 
-    // TODO: Refactor this test to not depend on anything but Button
     [Fact]
     [AutoInitShutdown]
     public void AutoSize_False_With_Fixed_Width () {
@@ -15,68 +14,68 @@ public class ButtonTests {
         var lblWidth = 8;
 
         var label = new Label {
-                                  Text = "Find:",
-                                  AutoSize = false,
                                   Y = 1,
                                   Width = lblWidth,
-                                  TextAlignment = TextAlignment.Right
+                                  TextAlignment = TextAlignment.Right,
+                                  AutoSize = false,
+                                  Text = "Find:"
                               };
         tab.Add (label);
 
         var txtToFind = new TextField {
-                                          Text = "Testing buttons.",
                                           X = Pos.Right (label) + 1,
                                           Y = Pos.Top (label),
-                                          Width = 20
+                                          Width = 20,
+                                          Text = "Testing buttons."
                                       };
         tab.Add (txtToFind);
 
         var btnFindNext = new Button {
-                                         Text = "Find _Next",
-                                         AutoSize = false,
                                          X = Pos.Right (txtToFind) + 1,
                                          Y = Pos.Top (label),
                                          Width = 20,
                                          Enabled = !string.IsNullOrEmpty (txtToFind.Text),
                                          TextAlignment = TextAlignment.Centered,
-                                         IsDefault = true
+                                         IsDefault = true,
+                                         AutoSize = false,
+                                         Text = "Find _Next"
                                      };
         tab.Add (btnFindNext);
 
         var btnFindPrevious = new Button {
-                                             Text = "Find _Previous",
-                                             AutoSize = false,
                                              X = Pos.Right (txtToFind) + 1,
                                              Y = Pos.Top (btnFindNext) + 1,
                                              Width = 20,
                                              Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-                                             TextAlignment = TextAlignment.Centered
+                                             TextAlignment = TextAlignment.Centered,
+                                             AutoSize = false,
+                                             Text = "Find _Previous"
                                          };
         tab.Add (btnFindPrevious);
 
         var btnCancel = new Button {
-                                       Text = "Cancel",
-                                       AutoSize = false,
                                        X = Pos.Right (txtToFind) + 1,
                                        Y = Pos.Top (btnFindPrevious) + 2,
                                        Width = 20,
-                                       TextAlignment = TextAlignment.Centered
+                                       TextAlignment = TextAlignment.Centered,
+                                       AutoSize = false,
+                                       Text = "Cancel"
                                    };
         tab.Add (btnCancel);
 
         var ckbMatchCase = new CheckBox {
-                                            Text = "Match c_ase",
                                             X = 0,
                                             Y = Pos.Top (txtToFind) + 2,
-                                            Checked = true
+                                            Checked = true,
+                                            Text = "Match c_ase"
                                         };
         tab.Add (ckbMatchCase);
 
         var ckbMatchWholeWord = new CheckBox {
-                                                 Text = "Match _whole word",
                                                  X = 0,
                                                  Y = Pos.Top (ckbMatchCase) + 1,
-                                                 Checked = false
+                                                 Checked = false,
+                                                 Text = "Match _whole word"
                                              };
         tab.Add (ckbMatchWholeWord);
 
@@ -107,8 +106,7 @@ public class ButtonTests {
         Assert.Equal (new Rect (9, 1, 20, 1), txtToFind.Frame);
 
         Assert.Equal (0, txtToFind.ScrollOffset);
-
-        //Assert.Equal (16, txtToFind.CursorPosition);
+        Assert.Equal (16, txtToFind.CursorPosition);
 
         Assert.Equal (new Rect (30, 1, 20, 1), btnFindNext.Frame);
         Assert.Equal (new Rect (30, 2, 20, 1), btnFindPrevious.Frame);
@@ -272,9 +270,64 @@ public class ButtonTests {
     }
 
     [Fact]
+    [SetupFakeDriver]
+    public void Button_AutoSize_False_Does_Not_Draw () {
+        var btn = new Button {
+                                 AutoSize = false,
+                                 X = Pos.Center (),
+                                 Y = Pos.Center (),
+                                 Text = "Press me!"
+                             };
+        Assert.Equal ("Press me!", btn.Text);
+        btn.BeginInit ();
+        btn.EndInit ();
+        btn.Draw ();
+
+        Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+        Assert.Equal ("{Width=0, Height=1}", btn.TextFormatter.Size.ToString ());
+        TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Button_AutoSize_False_With_Fixed_Width () {
+        ((FakeDriver)Application.Driver).SetBufferSize (20, 5);
+
+        var top = new View { Width = 20, Height = 5 };
+        var btn1 = new Button {
+                                  AutoSize = false,
+                                  X = Pos.Center (),
+                                  Y = Pos.Center (),
+                                  Width = 16,
+                                  Height = 1,
+                                  Text = "Open me!"
+                              };
+        var btn2 = new Button {
+                                  AutoSize = false,
+                                  X = Pos.Center (),
+                                  Y = Pos.Center () + 1,
+                                  Width = 16,
+                                  Height = 1,
+                                  Text = "Close me!"
+                              };
+        top.Add (btn1, btn2);
+        top.BeginInit ();
+        top.EndInit ();
+        top.Draw ();
+
+        Assert.Equal ("{Width=16, Height=1}", btn1.TextFormatter.Size.ToString ());
+        Assert.Equal ("{Width=16, Height=1}", btn2.TextFormatter.Size.ToString ());
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @$"
+    {CM.Glyphs.LeftBracket} {btn1.Text} {CM.Glyphs.RightBracket}
+   {CM.Glyphs.LeftBracket} {btn2.Text} {CM.Glyphs.RightBracket}",
+                                                      _output);
+    }
+
+    [Fact]
     [AutoInitShutdown]
     public void Button_HotKeyChanged_EventFires () {
-        var btn = new Button ("_Yar");
+        var btn = new Button { Text = "_Yar" };
 
         object sender = null;
         KeyChangedEventArgs args = null;
@@ -282,10 +335,11 @@ public class ButtonTests {
         btn.HotKeyChanged += (s, e) => {
             sender = s;
             args = e;
-            btn.HotKeyChanged += (s, e) => {
-                sender = s;
-                args = e;
-            };
+        };
+
+        btn.HotKeyChanged += (s, e) => {
+            sender = s;
+            args = e;
         };
 
         btn.HotKey = KeyCode.R;
@@ -350,7 +404,7 @@ public class ButtonTests {
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        btn = new Button ("ARGS", true) { Text = "_Test" };
+        btn = new Button { Text = "_Test", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -367,7 +421,7 @@ public class ButtonTests {
         Assert.Equal (new Rect (0, 0, 10, 1), btn.Frame);
         Assert.Equal (KeyCode.T, btn.HotKey);
 
-        btn = new Button (1, 2, "_abc", true);
+        btn = new Button { X = 1, Y = 2, Text = "_abc", IsDefault = true };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);
@@ -389,15 +443,15 @@ public class ButtonTests {
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-        Assert.Equal (new Rect (0, 0, 10, 1), btn.Bounds);
-        Assert.Equal (new Rect (1, 2, 10, 1), btn.Frame);
+        Assert.Equal (new Rect (0, 0, 9, 1), btn.Bounds);
+        Assert.Equal (new Rect (1, 2, 9, 1), btn.Frame);
     }
 
     [Fact]
     [AutoInitShutdown]
     public void HotKeyChange_Works () {
         var clicked = false;
-        var btn = new Button ("_Test");
+        var btn = new Button { Text = "_Test" };
         btn.Clicked += (s, e) => clicked = true;
         Application.Top.Add (btn);
         Application.Begin (Application.Top);
@@ -424,7 +478,7 @@ public class ButtonTests {
     [AutoInitShutdown]
     public void KeyBindingExample () {
         var pressed = 0;
-        var btn = new Button ("Press Me");
+        var btn = new Button { Text = "Press Me" };
 
         btn.Clicked += (s, e) => pressed++;
 
@@ -472,7 +526,7 @@ public class ButtonTests {
     [AutoInitShutdown]
     public void KeyBindings_Command () {
         var clicked = false;
-        var btn = new Button ("_Test");
+        var btn = new Button { Text = "_Test" };
         btn.Clicked += (s, e) => clicked = true;
         Application.Top.Add (btn);
         Application.Begin (Application.Top);
@@ -537,12 +591,12 @@ public class ButtonTests {
     [AutoInitShutdown]
     public void Pos_Center_Layout_AutoSize_False () {
         var button = new Button {
-                                    Text = "Process keys",
-                                    AutoSize = false,
                                     X = Pos.Center (),
                                     Y = Pos.Center (),
                                     Width = 20,
-                                    IsDefault = true
+                                    IsDefault = true,
+                                    AutoSize = false,
+                                    Text = "Process keys"
                                 };
         var win = new Window {
                                  Width = Dim.Fill (),
@@ -570,10 +624,10 @@ public class ButtonTests {
     [AutoInitShutdown]
     public void Pos_Center_Layout_AutoSize_True () {
         var button = new Button {
-                                    Text = "Process keys",
                                     X = Pos.Center (),
                                     Y = Pos.Center (),
-                                    IsDefault = true
+                                    IsDefault = true,
+                                    Text = "Process keys"
                                 };
         var win = new Window {
                                  Width = Dim.Fill (),
@@ -603,7 +657,7 @@ public class ButtonTests {
     [Fact]
     public void Setting_Empty_Text_Sets_HoKey_To_KeyNull () {
         var super = new View ();
-        var btn = new Button ("_Test");
+        var btn = new Button { Text = "_Test" };
         super.Add (btn);
         super.BeginInit ();
         super.EndInit ();
@@ -640,9 +694,9 @@ public class ButtonTests {
     [AutoInitShutdown]
     public void Update_Only_On_Or_After_Initialize () {
         var btn = new Button {
-                                 Text = "Say Hello 你",
                                  X = Pos.Center (),
-                                 Y = Pos.Center ()
+                                 Y = Pos.Center (),
+                                 Text = "Say Hello 你"
                              };
         var win = new Window {
                                  Width = Dim.Fill (),

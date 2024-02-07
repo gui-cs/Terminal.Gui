@@ -8,13 +8,13 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Animation", "Demonstration of how to render animated images with threading.")]
 [ScenarioCategory ("Threading")]
 [ScenarioCategory ("Drawing")]
 public class Animation : Scenario {
-    private bool isDisposed;
+    private bool _isDisposed;
 
     public override void Setup () {
         base.Setup ();
@@ -26,15 +26,12 @@ public class Animation : Scenario {
 
         Win.Add (imageView);
 
-        var lbl = new Label {
-                                Text = "Image by Wikiscient",
-                                Y = Pos.AnchorEnd (2)
-                            };
+        var lbl = new Label { Y = Pos.AnchorEnd (2), Text = "Image by Wikiscient" };
         Win.Add (lbl);
 
         var lbl2 = new Label {
-                                 Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif",
-                                 Y = Pos.AnchorEnd (1)
+                                 Y = Pos.AnchorEnd (1),
+                                 Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
                              };
         Win.Add (lbl2);
 
@@ -60,7 +57,7 @@ public class Animation : Scenario {
 
         Task.Run (
                   () => {
-                      while (!isDisposed) {
+                      while (!_isDisposed) {
                           // When updating from a Thread/Task always use Invoke
                           Application.Invoke (
                                               () => {
@@ -74,7 +71,7 @@ public class Animation : Scenario {
     }
 
     protected override void Dispose (bool disposing) {
-        isDisposed = true;
+        _isDisposed = true;
         base.Dispose (disposing);
     }
 
@@ -118,7 +115,8 @@ public class Animation : Scenario {
                         for (var charY = 0; charY < CHAR_HEIGHT; charY++) {
                             int bitmapX = baseX + charX;
                             int bitmapY = baseY + charY;
-                            bool pixelExists = bitmapX < WidthPixels && bitmapY < HeightPixels;
+                            bool pixelExists = bitmapX < WidthPixels &&
+                                               bitmapY < HeightPixels;
 
                             if (pixelExists && PixelIsLit (bitmapX, bitmapY)) {
                                 charIndex += value;

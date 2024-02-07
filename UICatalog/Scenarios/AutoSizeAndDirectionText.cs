@@ -10,24 +10,26 @@ public class AutoSizeAndDirectionText : Scenario {
         var wideText = "Hello World 你";
         ColorScheme color = Colors.ColorSchemes["Dialog"];
 
-        var labelH = new Label (text, TextDirection.LeftRight_TopBottom) {
-                                                                             X = 1,
-                                                                             Y = 1,
-
-                                                                             //Width = 11,
-                                                                             //Height = 1,
-                                                                             ColorScheme = color
-                                                                         };
+        var labelH = new Label {
+                                   X = 1,
+                                   Y = 1,
+                                //    Width = 11,
+                                //    Height = 1,
+                                   ColorScheme = color,
+                                   Text = text,
+                                   TextDirection = TextDirection.LeftRight_TopBottom
+                               };
         Win.Add (labelH);
 
-        var labelV = new Label (text, TextDirection.TopBottom_LeftRight) {
-                                                                             X = 70,
-                                                                             Y = 1,
-
-                                                                             //Width = 1,
-                                                                             //Height = 11,
-                                                                             ColorScheme = color
-                                                                         };
+        var labelV = new Label {
+                                   X = 70,
+                                   Y = 1,
+                                //    Width = 1,
+                                //    Height = 11,
+                                   ColorScheme = color,
+                                   Text = text,
+                                   TextDirection = TextDirection.TopBottom_LeftRight
+                               };
         Win.Add (labelV);
 
         var editText = new TextView {

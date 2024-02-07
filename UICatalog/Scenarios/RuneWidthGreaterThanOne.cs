@@ -1,7 +1,7 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("RuneWidthGreaterThanOne", "Test rune width greater than one")]
 [ScenarioCategory ("Controls")]
@@ -19,44 +19,41 @@ public class RuneWidthGreaterThanOne : Scenario {
     public override void Init () {
         Application.Init ();
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "Padding",
-                                                           new MenuItem[] {
-                                                                              new (
-                                                                               "With Padding",
-                                                                               "",
-                                                                               () => _win.Padding.Thickness =
-                                                                                   new Thickness (1)),
-                                                                              new (
-                                                                               "Without Padding",
-                                                                               "",
-                                                                               () => _win.Padding.Thickness =
-                                                                                   new Thickness (0))
-                                                                          }),
-                                                      new (
-                                                           "BorderStyle",
-                                                           new MenuItem[] {
-                                                                              new (
-                                                                               "Single",
-                                                                               "",
-                                                                               () => _win.BorderStyle =
-                                                                                   LineStyle.Single),
-                                                                              new (
-                                                                               "None",
-                                                                               "",
-                                                                               () => _win.BorderStyle =
-                                                                                   LineStyle.None)
-                                                                          }),
-                                                      new (
-                                                           "Runes length",
-                                                           new MenuItem[] {
-                                                                              new ("Wide", "", WideRunes),
-                                                                              new ("Narrow", "", NarrowRunes),
-                                                                              new ("Mixed", "", MixedRunes)
-                                                                          })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("Padding", new MenuItem[] {
+                                                                                  new (
+                                                                                   "With Padding",
+                                                                                   "",
+                                                                                   () => _win.Padding.Thickness =
+                                                                                       new Thickness (1)),
+                                                                                  new (
+                                                                                   "Without Padding",
+                                                                                   "",
+                                                                                   () => _win.Padding.Thickness =
+                                                                                       new Thickness (0))
+                                                                              }),
+                                   new MenuBarItem (
+                                                    "BorderStyle",
+                                                    new MenuItem[] {
+                                                                       new (
+                                                                            "Single",
+                                                                            "",
+                                                                            () => _win.BorderStyle = LineStyle.Single),
+                                                                       new (
+                                                                            "None",
+                                                                            "",
+                                                                            () => _win.BorderStyle = LineStyle.None)
+                                                                   }),
+                                   new MenuBarItem (
+                                                    "Runes length",
+                                                    new MenuItem[] {
+                                                                       new ("Wide", "", WideRunes),
+                                                                       new ("Narrow", "", NarrowRunes),
+                                                                       new ("Mixed", "", MixedRunes)
+                                                                   })
+                                       ]
+                               };
 
         _label = new Label {
                                X = Pos.Center (),

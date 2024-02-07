@@ -11,7 +11,7 @@
 
 using Terminal.Gui.Resources;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
 /// <summary>The <see cref="SaveDialog"/> provides an interactive dialog box for users to pick a file to save.</summary>
 /// <remarks>
@@ -23,42 +23,21 @@ namespace Terminal.Gui;
 /// </remarks>
 public class SaveDialog : FileDialog {
     /// <summary>Initializes a new <see cref="SaveDialog"/>.</summary>
-    public SaveDialog () : this (string.Empty) { }
-
-    /// <summary>Initializes a new <see cref="SaveDialog"/>.</summary>
-    /// <param name="title">The title.</param>
-    /// <param name="allowedTypes">The allowed types.</param>
-    public SaveDialog (string title, List<IAllowedType> allowedTypes = null) {
-        //: base (title, prompt: Strings.fdSave, nameFieldLabel: $"{Strings.fdSaveAs}:", message: message, allowedTypes) { }
-        Title = title;
-        Style.OkButtonText = Strings.btnSave;
-
-        if (allowedTypes != null) {
-            AllowedTypes = allowedTypes;
-        }
-    }
+    public SaveDialog () { Style.OkButtonText = Strings.btnSave; }
 
     /// <summary>
     ///     Gets the name of the file the user selected for saving, or null if the user canceled the
     ///     <see cref="SaveDialog"/>.
     /// </summary>
     /// <value>The name of the file.</value>
-    public string FileName {
-        get {
-            if (Canceled) {
-                return null;
-            }
-
-            return Path;
-        }
-    }
+    public string FileName => Canceled ? null : Path;
 
     /// <summary>Gets the default title for the <see cref="SaveDialog"/>.</summary>
     /// <returns></returns>
     protected override string GetDefaultTitle () {
-        List<string> titleParts = new () {
-                                             Strings.fdSave
-                                         };
+        List<string> titleParts =  [Strings.fdSave]
+
+        ;
         if (MustExist) {
             titleParts.Add (Strings.fdExisting);
         }

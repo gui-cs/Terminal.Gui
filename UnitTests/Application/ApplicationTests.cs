@@ -222,9 +222,10 @@ public class ApplicationTests {
 
         Toplevel topLevel = null;
         Assert.Throws<InvalidOperationException> (
-                                                  () => Application.InternalInit (
-                                                   () => topLevel = new TestToplevel (),
-                                                   new FakeDriver ()));
+                                                  () =>
+                                                      Application.InternalInit (
+                                                                                () => topLevel = new TestToplevel (),
+                                                                                new FakeDriver ()));
         Shutdown ();
 
         Assert.Null (Application.Top);

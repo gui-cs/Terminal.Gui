@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Run<T> Example", "Illustrates using Application.Run<T> to run a custom class")]
 [ScenarioCategory ("Top Level Windows")]
@@ -12,7 +12,7 @@ public class RunTExample : Scenario {
     }
 
     public class ExampleWindow : Window {
-        public TextField usernameText;
+        private readonly TextField _usernameText;
 
         public ExampleWindow () {
             Title = $"Example App ({Application.QuitKey} to quit)";
@@ -22,15 +22,13 @@ public class RunTExample : Scenario {
                                               Text = "Username:"
                                           };
 
-            usernameText = new TextField {
-                                             Text = "",
+            _usernameText = new TextField {
+                                              // Position text field adjacent to the label
+                                              X = Pos.Right (usernameLabel) + 1,
 
-                                             // Position text field adjacent to the label
-                                             X = Pos.Right (usernameLabel) + 1,
-
-                                             // Fill remaining horizontal space
-                                             Width = Dim.Fill ()
-                                         };
+                                              // Fill remaining horizontal space
+                                              Width = Dim.Fill ()
+                                          };
 
             var passwordLabel = new Label {
                                               Text = "Password:",
@@ -39,11 +37,10 @@ public class RunTExample : Scenario {
                                           };
 
             var passwordText = new TextField {
-                                                 Text = "",
                                                  Secret = true,
 
                                                  // align with the text box above
-                                                 X = Pos.Left (usernameText),
+                                                 X = Pos.Left (_usernameText),
                                                  Y = Pos.Top (passwordLabel),
                                                  Width = Dim.Fill ()
                                              };
@@ -60,8 +57,8 @@ public class RunTExample : Scenario {
 
             // When login button is clicked display a message popup
             btnLogin.Clicked += (s, e) => {
-                if (usernameText.Text == "admin" && passwordText.Text == "password") {
-                    MessageBox.Query ("Login Successful", $"Username: {usernameText.Text}", "Ok");
+                if (_usernameText.Text == "admin" && passwordText.Text == "password") {
+                    MessageBox.Query ("Login Successful", $"Username: {_usernameText.Text}", "Ok");
                     Application.RequestStop ();
                 } else {
                     MessageBox.ErrorQuery (
@@ -72,7 +69,7 @@ public class RunTExample : Scenario {
             };
 
             // Add the views to the Window
-            Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
+            Add (usernameLabel, _usernameText, passwordLabel, passwordText, btnLogin);
         }
     }
 }

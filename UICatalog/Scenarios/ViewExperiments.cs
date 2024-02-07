@@ -17,7 +17,6 @@ public class ViewExperiments : Scenario {
 
     public override void Setup () {
         var containerLabel = new Label {
-                                           AutoSize = false,
                                            X = 0,
                                            Y = 0,
                                            Width = Dim.Fill (),

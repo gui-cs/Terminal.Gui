@@ -19,32 +19,35 @@ public class ListViewWithSelection : Scenario {
         _scenarios = GetScenarios ();
 
         _customRenderCB = new CheckBox {
-                                           Text = "Use custom rendering",
                                            X = 0,
-                                           Y = 0
+                                           Y = 0,
+                                           Height = 1,
+                                           Text = "Use custom rendering"
                                        };
         Win.Add (_customRenderCB);
         _customRenderCB.Toggled += _customRenderCB_Toggled;
 
         _allowMarkingCB = new CheckBox {
-                                           Text = "Allow Marking",
                                            X = Pos.Right (_customRenderCB) + 1,
-                                           Y = 0
+                                           Y = 0,
+                                           Height = 1,
+                                           Text = "Allow Marking",
+                                           AllowNullChecked = false
                                        };
         Win.Add (_allowMarkingCB);
         _allowMarkingCB.Toggled += AllowMarkingCB_Toggled;
 
         _allowMultipleCB = new CheckBox {
-                                            Text = "Allow Multi-Select",
                                             X = Pos.Right (_allowMarkingCB) + 1,
                                             Y = 0,
-                                            Visible = (bool)_allowMarkingCB.Checked
+                                            Height = 1,
+                                            Visible = (bool)_allowMarkingCB.Checked,
+                                            Text = "Allow Multi-Select"
                                         };
         Win.Add (_allowMultipleCB);
         _allowMultipleCB.Toggled += AllowMultipleCB_Toggled;
 
         _listView = new ListView {
-                                     AutoSize = false,
                                      X = 1,
                                      Y = 2,
                                      Height = Dim.Fill (),
@@ -80,7 +83,7 @@ public class ListViewWithSelection : Scenario {
         _listView.DrawContent += (s, e) => {
             scrollBar.Size = _listView.Source.Count - 1;
             scrollBar.Position = _listView.TopItem;
-            scrollBar.OtherScrollBarView.Size = _listView.Maxlength - 1;
+            scrollBar.OtherScrollBarView.Size = _listView.MaxLength - 1;
             scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
             scrollBar.Refresh ();
         };
@@ -88,10 +91,12 @@ public class ListViewWithSelection : Scenario {
         _listView.SetSource (_scenarios);
 
         var k = "Keep Content Always In Viewport";
-        var keepCheckBox = new CheckBox (k, scrollBar.AutoHideScrollBars) {
-                                                                              X = Pos.AnchorEnd (k.Length + 3),
-                                                                              Y = 0
-                                                                          };
+        var keepCheckBox = new CheckBox {
+                                            X = Pos.AnchorEnd (k.Length + 3),
+                                            Y = 0,
+                                            Text = k,
+                                            Checked = scrollBar.AutoHideScrollBars
+                                        };
         keepCheckBox.Toggled += (s, e) => scrollBar.KeepContentAlwaysInViewport = (bool)keepCheckBox.Checked;
         Win.Add (keepCheckBox);
     }
@@ -180,7 +185,9 @@ public class ListViewWithSelection : Scenario {
             container.Move (col, line);
 
             // Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-            string s = string.Format (string.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios[item].GetName ());
+            string s = string.Format (
+                                      string.Format ("{{0,{0}}}", -_nameColumnWidth),
+                                      Scenarios[item].GetName ());
             RenderUstr (driver, $"{s} ({Scenarios[item].GetDescription ()})", col, line, width, start);
         }
 
@@ -199,7 +206,9 @@ public class ListViewWithSelection : Scenario {
 
             var maxLength = 0;
             for (var i = 0; i < scenarios.Count; i++) {
-                string s = string.Format (string.Format ("{{0,{0}}}", -_nameColumnWidth), Scenarios[i].GetName ());
+                string s = string.Format (
+                                          string.Format ("{{0,{0}}}", -_nameColumnWidth),
+                                          Scenarios[i].GetName ());
                 var sc = $"{s}  {Scenarios[i].GetDescription ()}";
                 int l = sc.Length;
                 if (l > maxLength) {

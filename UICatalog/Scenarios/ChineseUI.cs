@@ -27,7 +27,7 @@ public class ChineseUI : Scenario {
                                         };
         win.Add (buttonPanel);
 
-        var btn = new Button (1, 1, "你", true); // v1: A
+        var btn = new Button { X = 1, Y = 1, Text = "你" }; // v1: A
         btn.Clicked += (s, e) => {
             int result = MessageBox.Query (
                                            "Confirm",
@@ -42,8 +42,8 @@ public class ChineseUI : Scenario {
 
         buttonPanel.Add (
                          btn,
-                         new Button (12, 1, "好"), // v1: B
-                         new Button (22, 1, "呀") // v1: C
+                         new Button { X = 12, Y = 1, Text = "好" }, // v1: B
+                         new Button { X = 22, Y = 1, Text = "呀" } // v1: C
                         );
 
         Application.Run ();

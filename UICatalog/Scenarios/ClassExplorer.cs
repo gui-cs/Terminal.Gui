@@ -5,61 +5,53 @@ using System.Reflection;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Class Explorer", "Tree view explorer for classes by namespace based on TreeView.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("TreeView")]
 public class ClassExplorer : Scenario {
+    private MenuItem _highlightModelTextOnly;
     private MenuItem _miShowPrivate;
     private TextView _textView;
     private TreeView<object> _treeView;
-    private MenuItem highlightModelTextOnly;
 
     public override void Setup () {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          }),
-                                                      new (
-                                                           "_View",
-                                                           new[] {
-                                                                     _miShowPrivate =
-                                                                         new MenuItem (
-                                                                          "_Include Private",
-                                                                          "",
-                                                                          () => ShowPrivate ()) {
-                                                                             Checked = false,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         },
-                                                                     new (
-                                                                          "_Expand All",
-                                                                          "",
-                                                                          () => _treeView.ExpandAll ()),
-                                                                     new (
-                                                                          "_Collapse All",
-                                                                          "",
-                                                                          () => _treeView.CollapseAll ())
-                                                                 }),
-                                                      new (
-                                                           "_Style",
-                                                           new[] {
-                                                                     highlightModelTextOnly =
-                                                                         new MenuItem (
-                                                                          "_Highlight Model Text Only",
-                                                                          "",
-                                                                          () => OnCheckHighlightModelTextOnly ()) {
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         }
-                                                                 })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            }),
+                                   new MenuBarItem (
+                                                    "_View",
+                                                    new[] {
+                                                              _miShowPrivate =
+                                                                  new MenuItem (
+                                                                                "_Include Private",
+                                                                                "",
+                                                                                () => ShowPrivate ()) {
+                                                                      Checked = false,
+                                                                      CheckType = MenuItemCheckStyle.Checked
+                                                                  },
+                                                              new ("_Expand All", "", () => _treeView.ExpandAll ()),
+                                                              new ("_Collapse All", "", () => _treeView.CollapseAll ())
+                                                          }),
+                                   new MenuBarItem (
+                                                    "_Style",
+                                                    new[] {
+                                                              _highlightModelTextOnly = new MenuItem (
+                                                               "_Highlight Model Text Only",
+                                                               "",
+                                                               () => OnCheckHighlightModelTextOnly ()) {
+                                                                  CheckType = MenuItemCheckStyle.Checked
+                                                              }
+                                                          })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         _treeView = new TreeView<object> {
@@ -69,7 +61,7 @@ public class ClassExplorer : Scenario {
                                              Height = Dim.Fill ()
                                          };
 
-        var lblSearch = new Label ("Search");
+        var lblSearch = new Label { Text = "Search" };
         var tfSearch = new TextField {
                                          Width = 20,
                                          X = Pos.Right (lblSearch)
@@ -78,7 +70,7 @@ public class ClassExplorer : Scenario {
         Win.Add (lblSearch);
         Win.Add (tfSearch);
 
-        TreeViewTextFilter<object> filter = new (_treeView);
+        TreeViewTextFilter<object> filter = new TreeViewTextFilter<object> (_treeView);
         _treeView.Filter = filter;
         tfSearch.TextChanged += (s, e) => {
             filter.Text = tfSearch.Text;
@@ -145,7 +137,8 @@ public class ClassExplorer : Scenario {
 
     private BindingFlags GetFlags () {
         if (_miShowPrivate.Checked == true) {
-            return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+            return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+                   BindingFlags.NonPublic;
         }
 
         return BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
@@ -178,7 +171,7 @@ public class ClassExplorer : Scenario {
 
     private void OnCheckHighlightModelTextOnly () {
         _treeView.Style.HighlightModelTextOnly = !_treeView.Style.HighlightModelTextOnly;
-        highlightModelTextOnly.Checked = _treeView.Style.HighlightModelTextOnly;
+        _highlightModelTextOnly.Checked = _treeView.Style.HighlightModelTextOnly;
         _treeView.SetNeedsDisplay ();
     }
 
@@ -227,7 +220,8 @@ public class ClassExplorer : Scenario {
                 if (val is EventInfo ev) {
                     sb.AppendLine ($"Name:{ev.Name}");
                     sb.AppendLine ("Parameters:");
-                    foreach (ParameterInfo parameter in ev.EventHandlerType.GetMethod ("Invoke").GetParameters ()) {
+                    foreach (ParameterInfo parameter in ev.EventHandlerType.GetMethod ("Invoke")
+                                                          .GetParameters ()) {
                         sb.AppendLine ($"  {parameter.ParameterType} {parameter.Name}");
                     }
                 }

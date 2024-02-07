@@ -12,7 +12,7 @@ public class Notepad : Scenario {
     private TabView _focusedTabView;
     private StatusItem _lenStatusItem;
     private int _numbeOfNewTabs = 1;
-    private TabView tabView;
+    private TabView _tabView;
 
     // Don't create a Window, just return the top-level view
     public override void Init () {
@@ -63,36 +63,35 @@ public class Notepad : Scenario {
     }
 
     public override void Setup () {
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new (
-                                                                               "_New",
-                                                                               "",
-                                                                               () => New (),
-                                                                               null,
-                                                                               null,
-                                                                               KeyCode.N | KeyCode.CtrlMask
-                                                                               | KeyCode.AltMask),
-                                                                              new ("_Open", "", () => Open ()),
-                                                                              new ("_Save", "", () => Save ()),
-                                                                              new ("Save _As", "", () => SaveAs ()),
-                                                                              new ("_Close", "", () => Close ()),
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          }),
-                                                      new (
-                                                           "_About",
-                                                           "",
-                                                           () => MessageBox.Query ("Notepad", "About Notepad...", "Ok"))
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new (
+                                                                                 "_New",
+                                                                                 "",
+                                                                                 () => New (),
+                                                                                 null,
+                                                                                 null,
+                                                                                 KeyCode.N | KeyCode.CtrlMask
+                                                                                 | KeyCode.AltMask),
+                                                                                new ("_Open", "", () => Open ()),
+                                                                                new ("_Save", "", () => Save ()),
+                                                                                new ("Save _As", "", () => SaveAs ()),
+                                                                                new ("_Close", "", () => Close ()),
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            }),
+                                   new MenuBarItem (
+                                                    "_About",
+                                                    "",
+                                                    () => MessageBox.Query ("Notepad", "About Notepad...", "Ok"))
+                                       ]
+                               };
         Application.Top.Add (menu);
 
-        tabView = CreateNewTabView ();
+        _tabView = CreateNewTabView ();
 
-        tabView.Style.ShowBorder = true;
-        tabView.ApplyStyleChanges ();
+        _tabView.Style.ShowBorder = true;
+        _tabView.ApplyStyleChanges ();
 
         // Start with only a single view but support splitting to show side by side
         var split = new TileView (1) {
@@ -101,7 +100,7 @@ public class Notepad : Scenario {
                                          Width = Dim.Fill (),
                                          Height = Dim.Fill (1)
                                      };
-        split.Tiles.ElementAt (0).ContentView.Add (tabView);
+        split.Tiles.ElementAt (0).ContentView.Add (_tabView);
         split.LineStyle = LineStyle.None;
 
         Application.Top.Add (split);
@@ -122,9 +121,9 @@ public class Notepad : Scenario {
                                                  new (KeyCode.CtrlMask | KeyCode.W, "~^W~ Close", () => Close ()),
                                                  _lenStatusItem
                                              });
-        _focusedTabView = tabView;
-        tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-        tabView.Enter += (s, e) => _focusedTabView = tabView;
+        _focusedTabView = _tabView;
+        _tabView.SelectedTabChanged += TabView_SelectedTabChanged;
+        _tabView.Enter += (s, e) => _focusedTabView = _tabView;
 
         Application.Top.Add (statusBar);
         Application.Top.Ready += (s, e) => New ();
@@ -216,10 +215,7 @@ public class Notepad : Scenario {
     private void New () { Open (null, $"new {_numbeOfNewTabs++}"); }
 
     private void Open () {
-        var open = new OpenDialog {
-                                      Text = "Open",
-                                      AllowsMultipleSelection = true
-                                  };
+        var open = new OpenDialog { Title = "Open", AllowsMultipleSelection = true };
 
         Application.Run (open);
 
@@ -316,7 +312,7 @@ public class Notepad : Scenario {
 
         ((View)sender).BoundsToScreen (e.MouseEvent.X, e.MouseEvent.Y, out int screenX, out int screenY);
 
-        var contextMenu = new ContextMenu (screenX, screenY, items);
+        var contextMenu = new ContextMenu { Position = new Point (screenX, screenY), MenuItems = items };
 
         contextMenu.Show ();
         e.MouseEvent.Handled = true;

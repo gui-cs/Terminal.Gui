@@ -12,9 +12,10 @@ public class MenuTests {
 
     [Fact]
     public void Menu_Constructors_Defaults () {
-        Assert.Throws<ArgumentNullException> (() => new Menu (null, 0, 0, null));
+        Assert.Throws<ArgumentNullException> (() => new Menu { Host = null, BarItems = new MenuBarItem () });
+        Assert.Throws<ArgumentNullException> (() => new Menu { Host = new MenuBar (), BarItems = null });
 
-        var menu = new Menu (new MenuBar (), 0, 0, new MenuBarItem ());
+        var menu = new Menu { Host = new MenuBar (), X = 0, Y = 0, BarItems = new MenuBarItem () };
         Assert.Empty (menu.Title);
         Assert.Empty (menu.Text);
     }

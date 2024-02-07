@@ -1,10 +1,10 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.DialogTests; 
+namespace Terminal.Gui.DialogTests;
 
 public class WizardTests {
-    private readonly ITestOutputHelper output;
-    public WizardTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public WizardTests (ITestOutputHelper output) { _output = output; }
 
     // =========== Wizard Tests
     [Fact]
@@ -422,7 +422,7 @@ public class WizardTests {
 
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       $"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
-                                                      output);
+                                                      _output);
         Application.End (runstate);
     }
 
@@ -461,7 +461,9 @@ public class WizardTests {
         wizard.AddStep (new WizardStep { Title = "ABCD" });
 
         Application.End (Application.Begin (wizard));
-        TestHelpers.AssertDriverContentsWithFrameAre ($"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}", output);
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      $"{topRow}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
+                                                      _output);
     }
 
     [Fact]
@@ -592,7 +594,7 @@ public class WizardTests {
         RunState runstate = Application.Begin (wizard);
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       $"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
-                                                      output);
+                                                      _output);
         Application.End (runstate);
     }
 

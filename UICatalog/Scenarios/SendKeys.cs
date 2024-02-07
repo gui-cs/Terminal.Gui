@@ -1,52 +1,52 @@
 ﻿using System;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("SendKeys", "SendKeys sample - Send key combinations.")]
 [ScenarioCategory ("Mouse and Keyboard")]
 public class SendKeys : Scenario {
     public override void Setup () {
         var label = new Label {
-                                  Text = "Insert the text to send:",
                                   X = Pos.Center (),
-                                  Y = Pos.Center () - 6
+                                  Y = Pos.Center () - 6,
+                                  Text = "Insert the text to send:"
                               };
         Win.Add (label);
 
         var txtInput = new TextField {
-                                         Text = "MockKeyPresses",
                                          X = Pos.Center (),
                                          Y = Pos.Center () - 5,
-                                         Width = 20
+                                         Width = 20,
+                                         Text = "MockKeyPresses"
                                      };
         Win.Add (txtInput);
 
         var ckbShift = new CheckBox {
-                                        Text = "Shift",
                                         X = Pos.Center (),
-                                        Y = Pos.Center () - 4
+                                        Y = Pos.Center () - 4,
+                                        Text = "Shift"
                                     };
         Win.Add (ckbShift);
 
         var ckbAlt = new CheckBox {
-                                      Text = "Alt",
                                       X = Pos.Center (),
-                                      Y = Pos.Center () - 3
+                                      Y = Pos.Center () - 3,
+                                      Text = "Alt"
                                   };
         Win.Add (ckbAlt);
 
         var ckbControl = new CheckBox {
-                                          Text = "Control",
                                           X = Pos.Center (),
-                                          Y = Pos.Center () - 2
+                                          Y = Pos.Center () - 2,
+                                          Text = "Control"
                                       };
         Win.Add (ckbControl);
 
         label = new Label {
-                              Text = "Result keys:",
                               X = Pos.Center (),
-                              Y = Pos.Center () + 1
+                              Y = Pos.Center () + 1,
+                              Text = "Result keys:"
                           };
         Win.Add (label);
 
@@ -96,10 +96,10 @@ public class SendKeys : Scenario {
         Win.Add (lblShippedControlKeys);
 
         var button = new Button {
-                                    Text = "Process keys",
                                     X = Pos.Center (),
                                     Y = Pos.Center () + 7,
-                                    IsDefault = true
+                                    IsDefault = true,
+                                    Text = "Process keys"
                                 };
         Win.Add (button);
 

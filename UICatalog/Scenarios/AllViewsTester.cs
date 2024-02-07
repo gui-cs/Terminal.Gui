@@ -10,9 +10,24 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Tests")]
 [ScenarioCategory ("Top Level Windows")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Tests")]
+[ScenarioCategory ("Top Level Windows")]
 public class AllViewsTester : Scenario {
     private readonly List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
+    private readonly List<string> _dimNames = new () { "Factor", "Fill", "Absolute" };
 
+    // TODO: This is missing some
+    private readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
+    private ListView _classListView;
+    private CheckBox _computedCheckBox;
+    private View _curView;
+    private FrameView _hostPane;
+    private RadioGroup _hRadioGroup;
+    private TextField _hText;
+    private int _hVal;
+    private FrameView _leftPane;
+    private FrameView _locationFrame;
     // TODO: This is missing some
     private readonly List<string> _posNames = new () { "Factor", "AnchorEnd", "Center", "Absolute" };
     private ListView _classListView;
@@ -38,7 +53,27 @@ public class AllViewsTester : Scenario {
     private RadioGroup _yRadioGroup;
     private TextField _yText;
     private int _yVal;
+    // Settings
+    private FrameView _settingsPane;
+    private FrameView _sizeFrame;
+    private Dictionary<string, Type> _viewClasses;
+    private RadioGroup _wRadioGroup;
+    private TextField _wText;
+    private int _wVal;
+    private RadioGroup _xRadioGroup;
+    private TextField _xText;
+    private int _xVal;
+    private RadioGroup _yRadioGroup;
+    private TextField _yText;
+    private int _yVal;
 
+    public override void Init () {
+        // Don't create a sub-win (Scenario.Win); just use Application.Top
+        Application.Init ();
+        ConfigurationManager.Themes.Theme = Theme;
+        ConfigurationManager.Apply ();
+        Application.Top.ColorScheme = Colors.ColorSchemes[TopLevelColorScheme];
+    }
     public override void Init () {
         // Don't create a sub-win (Scenario.Win); just use Application.Top
         Application.Init ();
@@ -72,7 +107,36 @@ public class AllViewsTester : Scenario {
                                                                  })
                                                         });
         Application.Top.Add (statusBar);
+    public override void Setup () {
+        var statusBar = new StatusBar (
+                                       new StatusItem[] {
+                                                            new (
+                                                                 Application.QuitKey,
+                                                                 $"{Application.QuitKey} to Quit",
+                                                                 () => Quit ()),
+                                                            new (
+                                                                 KeyCode.F2,
+                                                                 "~F2~ Toggle Frame Ruler",
+                                                                 () => {
+                                                                     ConsoleDriver.Diagnostics ^=
+                                                                         ConsoleDriver.DiagnosticFlags.FrameRuler;
+                                                                     Application.Top.SetNeedsDisplay ();
+                                                                 }),
+                                                            new (
+                                                                 KeyCode.F3,
+                                                                 "~F3~ Toggle Frame Padding",
+                                                                 () => {
+                                                                     ConsoleDriver.Diagnostics ^=
+                                                                         ConsoleDriver.DiagnosticFlags.FramePadding;
+                                                                     Application.Top.SetNeedsDisplay ();
+                                                                 })
+                                                        });
+        Application.Top.Add (statusBar);
 
+        _viewClasses = GetAllViewClassesCollection ()
+                       .OrderBy (t => t.Name)
+                       .Select (t => new KeyValuePair<string, Type> (t.Name, t))
+                       .ToDictionary (t => t.Key, t => t.Value);
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
                        .Select (t => new KeyValuePair<string, Type> (t.Name, t))
@@ -160,6 +224,7 @@ public class AllViewsTester : Scenario {
         };
         _locationFrame.Add (_xText);
 
+        _locationFrame.Add (_xRadioGroup);
         _locationFrame.Add (_xRadioGroup);
 
         radioItems = new[] { "P_ercent(y)", "A_nchorEnd(y)", "C_enter", "At(_y)" };
@@ -263,6 +328,7 @@ public class AllViewsTester : Scenario {
         _sizeFrame.Add (_hRadioGroup);
 
         _settingsPane.Add (_sizeFrame);
+        _settingsPane.Add (_sizeFrame);
 
         _hostPane = new FrameView {
                                       Title = "",
@@ -274,7 +340,10 @@ public class AllViewsTester : Scenario {
                                   };
 
         Application.Top.Add (_leftPane, _settingsPane, _hostPane);
+        Application.Top.Add (_leftPane, _settingsPane, _hostPane);
 
+        _curView = CreateClass (_viewClasses.First ().Value);
+    }
         _curView = CreateClass (_viewClasses.First ().Value);
     }
 
@@ -347,10 +416,20 @@ public class AllViewsTester : Scenario {
         }
 
         LayoutStyle layout = view.LayoutStyle;
+        LayoutStyle layout = view.LayoutStyle;
 
         try {
             //view.LayoutStyle = LayoutStyle.Absolute;
+        try {
+            //view.LayoutStyle = LayoutStyle.Absolute;
 
+            view.X = _xRadioGroup.SelectedItem switch {
+                         0 => Pos.Percent (_xVal),
+                         1 => Pos.AnchorEnd (_xVal),
+                         2 => Pos.Center (),
+                         3 => Pos.At (_xVal),
+                         _ => view.X
+                     };
             view.X = _xRadioGroup.SelectedItem switch {
                          0 => Pos.Percent (_xVal),
                          1 => Pos.AnchorEnd (_xVal),
@@ -366,6 +445,13 @@ public class AllViewsTester : Scenario {
                          3 => Pos.At (_yVal),
                          _ => view.Y
                      };
+            view.Y = _yRadioGroup.SelectedItem switch {
+                         0 => Pos.Percent (_yVal),
+                         1 => Pos.AnchorEnd (_yVal),
+                         2 => Pos.Center (),
+                         3 => Pos.At (_yVal),
+                         _ => view.Y
+                     };
 
             view.Width = _wRadioGroup.SelectedItem switch {
                              0 => Dim.Percent (_wVal),
@@ -373,7 +459,26 @@ public class AllViewsTester : Scenario {
                              2 => Dim.Sized (_wVal),
                              _ => view.Width
                          };
+            view.Width = _wRadioGroup.SelectedItem switch {
+                             0 => Dim.Percent (_wVal),
+                             1 => Dim.Fill (_wVal),
+                             2 => Dim.Sized (_wVal),
+                             _ => view.Width
+                         };
 
+            view.Height = _hRadioGroup.SelectedItem switch {
+                              0 => Dim.Percent (_hVal),
+                              1 => Dim.Fill (_hVal),
+                              2 => Dim.Sized (_hVal),
+                              _ => view.Height
+                          };
+        }
+        catch (Exception e) {
+            MessageBox.ErrorQuery ("Exception", e.Message, "Ok");
+        }
+
+        UpdateTitle (view);
+    }
             view.Height = _hRadioGroup.SelectedItem switch {
                               0 => Dim.Percent (_hVal),
                               1 => Dim.Fill (_hVal),
@@ -424,6 +529,13 @@ public class AllViewsTester : Scenario {
         _wText.Text = $"{view.Frame.Width}";
         _hText.Text = $"{view.Frame.Height}";
     }
+        var w = view.Width.ToString ();
+        var h = view.Height.ToString ();
+        _wRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => w.Contains (s)).First ());
+        _hRadioGroup.SelectedItem = _dimNames.IndexOf (_dimNames.Where (s => h.Contains (s)).First ());
+        _wText.Text = $"{view.Frame.Width}";
+        _hText.Text = $"{view.Frame.Height}";
+    }
 
     private void UpdateTitle (View view) {
         _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
@@ -431,7 +543,27 @@ public class AllViewsTester : Scenario {
 
     private void View_Initialized (object sender, EventArgs e) {
         var view = sender as View;
+    private void UpdateTitle (View view) {
+        _hostPane.Title = $"{view.GetType ().Name} - {view.X}, {view.Y}, {view.Width}, {view.Height}";
+    }
 
+    private void View_Initialized (object sender, EventArgs e) {
+        var view = sender as View;
+
+        //view.X = Pos.Center ();
+        //view.Y = Pos.Center ();
+        if ((view.Width == null) || (view.Frame.Width == 0)) {
+            view.Width = Dim.Fill ();
+        }
+
+        if ((view.Height == null) || (view.Frame.Height == 0)) {
+            view.Height = Dim.Fill ();
+        }
+
+        UpdateSettings (view);
+        UpdateTitle (view);
+    }
+}
         //view.X = Pos.Center ();
         //view.Y = Pos.Center ();
         if ((view.Width == null) || (view.Frame.Width == 0)) {

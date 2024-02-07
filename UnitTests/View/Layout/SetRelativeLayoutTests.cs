@@ -43,7 +43,7 @@ public class SetRelativeLayoutTests {
         Assert.Equal ("Fill(0)", view.Height.ToString ());
     }
 
-    [Fact]
+[Fact]
     public void DimFill_Is_Honored () {
         var view = new View {
                                 X = 1,
@@ -122,24 +122,24 @@ public class SetRelativeLayoutTests {
         Assert.Equal (81, view.Frame.Width);
         Assert.Equal (25, view.Frame.Height);
 
-        view.X = Pos.Center ()
-                 - 2; // Fill means all the way to right. So width will be 82. (dim gets calc'd before pos).
+        view.X = Pos.Center () -
+                 2; // Fill means all the way to right. So width will be 82. (dim gets calc'd before pos).
         view.SetRelativeLayout (screen);
         Assert.Equal (-2, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (82, view.Frame.Width);
         Assert.Equal (25, view.Frame.Height);
 
-        view.X = Pos.Center ()
-                 - 3; // Fill means all the way to right. So width will be 83. (dim gets calc'd before pos).
+        view.X = Pos.Center () -
+                 3; // Fill means all the way to right. So width will be 83. (dim gets calc'd before pos).
         view.SetRelativeLayout (screen);
         Assert.Equal (-3, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (83, view.Frame.Width);
         Assert.Equal (25, view.Frame.Height);
 
-        view.X = Pos.Center ()
-                 - 41; // Fill means all the way to right. So width will be . (dim gets calc'd before pos).
+        view.X = Pos.Center () -
+                 41; // Fill means all the way to right. So width will be . (dim gets calc'd before pos).
         view.SetRelativeLayout (screen);
         Assert.Equal (-41, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
@@ -180,7 +180,8 @@ public class SetRelativeLayoutTests {
         Assert.Equal (-10, view.Frame.Y);
         Assert.Equal (
                       0,
-                      view.Frame.Width); // proof: 15x15 view is placed beyond right side of screen, so fill width is 0
+                      view.Frame
+                          .Width); // proof: 15x15 view is placed beyond right side of screen, so fill width is 0
         Assert.Equal (
                       35,
                       view.Frame
@@ -399,19 +400,22 @@ public class SetRelativeLayoutTests {
     [Fact]
     public void PosDimFunction () {
         var screen = new Rect (0, 0, 30, 1);
-        var view = new View ("abc");
+        var view = new View { Text = "abc", AutoSize = true }; // BUGBUG: AutoSize or Width must be set
         view.X = Pos.AnchorEnd () - Pos.Function (GetViewWidth);
 
         int GetViewWidth () { return view.Frame.Width; }
 
         // view will be 3 chars wide. It's X will be 27 (30 - 3).
+        // BUGBUG: IsInitialized need to be true before calculate
+        view.BeginInit ();
+        view.EndInit ();
         view.SetRelativeLayout (screen);
         Assert.Equal (27, view.Frame.X);
         Assert.Equal (0, view.Frame.Y);
         Assert.Equal (3, view.Frame.Width);
         Assert.Equal (1, view.Frame.Height);
 
-        var tf = new TextField ("01234567890123456789");
+        var tf = new TextField { Text = "01234567890123456789" };
         tf.Width = Dim.Fill (1) - Dim.Function (GetViewWidth);
 
         // tf will fill the screen minus 1 minus the width of view (3).

@@ -3,36 +3,35 @@ using System.Data;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MultiColouredTable", "Demonstrates how to multi color cell contents.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("TableView")]
 public class MultiColouredTable : Scenario {
-    private DataTable table;
-    private TableViewColors tableView;
+    private DataTable _table;
+    private TableViewColors _tableView;
 
     public override void Setup () {
         Win.Title = GetName ();
         Win.Y = 1; // menu
         Win.Height = Dim.Fill (1); // status bar
 
-        tableView = new TableViewColors {
-                                            X = 0,
-                                            Y = 0,
-                                            Width = Dim.Fill (),
-                                            Height = Dim.Fill (1)
-                                        };
+        _tableView = new TableViewColors {
+                                             X = 0,
+                                             Y = 0,
+                                             Width = Dim.Fill (),
+                                             Height = Dim.Fill (1)
+                                         };
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         var statusBar = new StatusBar (
@@ -44,9 +43,9 @@ public class MultiColouredTable : Scenario {
                                                         });
         Application.Top.Add (statusBar);
 
-        Win.Add (tableView);
+        Win.Add (_tableView);
 
-        tableView.CellActivated += EditCurrentCell;
+        _tableView.CellActivated += EditCurrentCell;
 
         var dt = new DataTable ();
         dt.Columns.Add ("Col1");
@@ -59,14 +58,14 @@ public class MultiColouredTable : Scenario {
         dt.Rows.Add (DBNull.Value, DBNull.Value);
         dt.Rows.Add (DBNull.Value, DBNull.Value);
 
-        tableView.ColorScheme = new ColorScheme {
-                                                    Disabled = Win.ColorScheme.Disabled,
-                                                    HotFocus = Win.ColorScheme.HotFocus,
-                                                    Focus = Win.ColorScheme.Focus,
-                                                    Normal = new Attribute (Color.DarkGray, Color.Black)
-                                                };
+        _tableView.ColorScheme = new ColorScheme {
+                                                     Disabled = Win.ColorScheme.Disabled,
+                                                     HotFocus = Win.ColorScheme.HotFocus,
+                                                     Focus = Win.ColorScheme.Focus,
+                                                     Normal = new Attribute (Color.DarkGray, Color.Black)
+                                                 };
 
-        tableView.Table = new DataTableSource (table = dt);
+        _tableView.Table = new DataTableSource (_table = dt);
     }
 
     private void EditCurrentCell (object sender, CellActivatedEventArgs e) {
@@ -78,27 +77,28 @@ public class MultiColouredTable : Scenario {
 
         if (GetText ("Enter new value", e.Table.ColumnNames[e.Col], oldValue, out string newText)) {
             try {
-                table.Rows[e.Row][e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
+                _table.Rows[e.Row][e.Col] =
+                    string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
             }
             catch (Exception ex) {
                 MessageBox.ErrorQuery (60, 20, "Failed to set text", ex.Message, "Ok");
             }
 
-            tableView.Update ();
+            _tableView.Update ();
         }
     }
 
     private bool GetText (string title, string label, string initialText, out string enteredText) {
         var okPressed = false;
 
-        var ok = new Button ("Ok", true);
+        var ok = new Button { Text = "Ok", IsDefault = true };
         ok.Clicked += (s, e) => {
             okPressed = true;
             Application.RequestStop ();
         };
-        var cancel = new Button ("Cancel");
+        var cancel = new Button { Text = "Cancel" };
         cancel.Clicked += (s, e) => { Application.RequestStop (); };
-        var d = new Dialog (ok, cancel) { Title = title };
+        var d = new Dialog { Title = title, Buttons =  [ok, cancel] };
 
         var lbl = new Label {
                                 X = 0,
@@ -143,11 +143,17 @@ public class MultiColouredTable : Scenario {
 
                             break;
                         case 1:
-                            Driver.SetAttribute (new Attribute (Color.BrightRed, cellColor.Background));
+                            Driver.SetAttribute (
+                                                 new Attribute (
+                                                                Color.BrightRed,
+                                                                cellColor.Background));
 
                             break;
                         case 2:
-                            Driver.SetAttribute (new Attribute (Color.BrightYellow, cellColor.Background));
+                            Driver.SetAttribute (
+                                                 new Attribute (
+                                                                Color.BrightYellow,
+                                                                cellColor.Background));
 
                             break;
                         case 3:
@@ -155,15 +161,24 @@ public class MultiColouredTable : Scenario {
 
                             break;
                         case 4:
-                            Driver.SetAttribute (new Attribute (Color.BrightGreen, cellColor.Background));
+                            Driver.SetAttribute (
+                                                 new Attribute (
+                                                                Color.BrightGreen,
+                                                                cellColor.Background));
 
                             break;
                         case 5:
-                            Driver.SetAttribute (new Attribute (Color.BrightBlue, cellColor.Background));
+                            Driver.SetAttribute (
+                                                 new Attribute (
+                                                                Color.BrightBlue,
+                                                                cellColor.Background));
 
                             break;
                         case 6:
-                            Driver.SetAttribute (new Attribute (Color.BrightCyan, cellColor.Background));
+                            Driver.SetAttribute (
+                                                 new Attribute (
+                                                                Color.BrightCyan,
+                                                                cellColor.Background));
 
                             break;
                         case 7:

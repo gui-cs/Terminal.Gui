@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Line Drawing", "Demonstrates LineCanvas.")]
 [ScenarioCategory ("Controls")]
@@ -34,11 +34,11 @@ public class LineDrawing : Scenario {
     }
 
     private class DrawingArea : View {
+        private readonly List<LineCanvas> _layers = new ();
+        private readonly Stack<StraightLine> _undoHistory = new ();
         private Color _currentColor = new (Color.White);
         private LineCanvas _currentLayer;
         private StraightLine _currentLine;
-        private readonly List<LineCanvas> _layers = new ();
-        private readonly Stack<StraightLine> undoHistory = new ();
         public DrawingArea () { AddLayer (); }
 
         public LineStyle LineStyle { get; set; }
@@ -61,7 +61,7 @@ public class LineDrawing : Scenario {
             if (e.KeyCode == (KeyCode.Z | KeyCode.CtrlMask)) {
                 StraightLine pop = _currentLayer.RemoveLastLine ();
                 if (pop != null) {
-                    undoHistory.Push (pop);
+                    _undoHistory.Push (pop);
                     SetNeedsDisplay ();
 
                     return true;
@@ -69,8 +69,8 @@ public class LineDrawing : Scenario {
             }
 
             if (e.KeyCode == (KeyCode.Y | KeyCode.CtrlMask)) {
-                if (undoHistory.Any ()) {
-                    StraightLine pop = undoHistory.Pop ();
+                if (_undoHistory.Any ()) {
+                    StraightLine pop = _undoHistory.Pop ();
                     _currentLayer.AddLine (pop);
                     SetNeedsDisplay ();
 
@@ -140,7 +140,7 @@ public class LineDrawing : Scenario {
                     }
 
                     _currentLine = null;
-                    undoHistory.Clear ();
+                    _undoHistory.Clear ();
                     SetNeedsDisplay ();
                 }
             }
@@ -181,10 +181,11 @@ public class LineDrawing : Scenario {
 
             _colorPicker.ColorChanged += (s, a) => ColorChanged?.Invoke (a.Color);
 
-            _stylePicker = new RadioGroup (Enum.GetNames (typeof (LineStyle)).ToArray ()) {
-                               X = 0,
-                               Y = Pos.Bottom (_colorPicker)
-                           };
+            _stylePicker = new RadioGroup {
+                                              X = 0,
+                                              Y = Pos.Bottom (_colorPicker),
+                                              RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
+                                          };
             _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
             _stylePicker.SelectedItem = 1;
 
@@ -204,10 +205,10 @@ public class LineDrawing : Scenario {
 
         private void ToolsView_Initialized (object sender, EventArgs e) {
             LayoutSubviews ();
-            Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width)
-                    + GetAdornmentsThickness ().Horizontal;
-            Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height
-                     + GetAdornmentsThickness ().Vertical;
+            Width = Math.Max (_colorPicker.Frame.Width, _stylePicker.Frame.Width) +
+                    GetAdornmentsThickness ().Horizontal;
+            Height = _colorPicker.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height +
+                     GetAdornmentsThickness ().Vertical;
             SuperView.LayoutSubviews ();
         }
     }

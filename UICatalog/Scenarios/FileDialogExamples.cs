@@ -4,86 +4,51 @@ using System.IO.Abstractions;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("FileDialog", "Demonstrates how to the FileDialog class")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Files and IO")]
 public class FileDialogExamples : Scenario {
-    private CheckBox cbAllowMultipleSelection;
-    private CheckBox cbAlwaysTableShowHeaders;
-    private CheckBox cbCaseSensitive;
-    private CheckBox cbDrivesOnlyInTree;
-    private CheckBox cbFlipButtonOrder;
-    private CheckBox cbMustExist;
-    private CheckBox cbShowTreeBranchLines;
-    private CheckBox cbUseColors;
-    private RadioGroup rgAllowedTypes;
-    private RadioGroup rgCaption;
-    private RadioGroup rgIcons;
-    private RadioGroup rgOpenMode;
-    private TextField tbCancelButton;
-    private TextField tbOkButton;
+    private CheckBox _cbAllowMultipleSelection;
+    private CheckBox _cbAlwaysTableShowHeaders;
+    private CheckBox _cbCaseSensitive;
+    private CheckBox _cbDrivesOnlyInTree;
+    private CheckBox _cbFlipButtonOrder;
+    private CheckBox _cbMustExist;
+    private CheckBox _cbShowTreeBranchLines;
+    private CheckBox _cbUseColors;
+    private RadioGroup _rgAllowedTypes;
+    private RadioGroup _rgCaption;
+    private RadioGroup _rgIcons;
+    private RadioGroup _rgOpenMode;
+    private TextField _tbCancelButton;
+    private TextField _tbOkButton;
 
     public override void Setup () {
         var y = 0;
         var x = 1;
 
-        cbMustExist = new CheckBox {
-                                       Text = "Must Exist",
-                                       Checked = true,
-                                       Y = y++,
-                                       X = x
-                                   };
-        Win.Add (cbMustExist);
+        _cbMustExist = new CheckBox { Checked = true, Y = y++, X = x, Text = "Must Exist" };
+        Win.Add (_cbMustExist);
 
-        cbUseColors = new CheckBox {
-                                       Text = "Use Colors",
-                                       Checked = FileDialogStyle.DefaultUseColors,
-                                       Y = y++,
-                                       X = x
-                                   };
-        Win.Add (cbUseColors);
+        _cbUseColors = new CheckBox { Checked = FileDialogStyle.DefaultUseColors, Y = y++, X = x, Text = "Use Colors" };
+        Win.Add (_cbUseColors);
 
-        cbCaseSensitive = new CheckBox {
-                                           Text = "Case Sensitive Search",
-                                           Checked = false,
-                                           Y = y++,
-                                           X = x
-                                       };
-        Win.Add (cbCaseSensitive);
+        _cbCaseSensitive = new CheckBox { Checked = false, Y = y++, X = x, Text = "Case Sensitive Search" };
+        Win.Add (_cbCaseSensitive);
 
-        cbAllowMultipleSelection = new CheckBox {
-                                                    Text = "Multiple",
-                                                    Checked = false,
-                                                    Y = y++,
-                                                    X = x
-                                                };
-        Win.Add (cbAllowMultipleSelection);
+        _cbAllowMultipleSelection = new CheckBox { Checked = false, Y = y++, X = x, Text = "Multiple" };
+        Win.Add (_cbAllowMultipleSelection);
 
-        cbShowTreeBranchLines = new CheckBox {
-                                                 Text = "Tree Branch Lines",
-                                                 Checked = true,
-                                                 Y = y++,
-                                                 X = x
-                                             };
-        Win.Add (cbShowTreeBranchLines);
+        _cbShowTreeBranchLines = new CheckBox { Checked = true, Y = y++, X = x, Text = "Tree Branch Lines" };
+        Win.Add (_cbShowTreeBranchLines);
 
-        cbAlwaysTableShowHeaders = new CheckBox {
-                                                    Text = "Always Show Headers",
-                                                    Checked = true,
-                                                    Y = y++,
-                                                    X = x
-                                                };
-        Win.Add (cbAlwaysTableShowHeaders);
+        _cbAlwaysTableShowHeaders = new CheckBox { Checked = true, Y = y++, X = x, Text = "Always Show Headers" };
+        Win.Add (_cbAlwaysTableShowHeaders);
 
-        cbDrivesOnlyInTree = new CheckBox {
-                                              Text = "Only Show Drives",
-                                              Checked = false,
-                                              Y = y++,
-                                              X = x
-                                          };
-        Win.Add (cbDrivesOnlyInTree);
+        _cbDrivesOnlyInTree = new CheckBox { Checked = false, Y = y++, X = x, Text = "Only Show Drives" };
+        Win.Add (_cbDrivesOnlyInTree);
 
         y = 0;
         x = 24;
@@ -94,16 +59,11 @@ public class FileDialogExamples : Scenario {
                                                          Y = 1,
                                                          Height = 4
                                                      });
-        Win.Add (
-                 new Label {
-                               Text = "Caption",
-                               X = x++,
-                               Y = y++
-                           });
+        Win.Add (new Label { X = x++, Y = y++, Text = "Caption" });
 
-        rgCaption = new RadioGroup { X = x, Y = y };
-        rgCaption.RadioLabels = new[] { "Ok", "Open", "Save" };
-        Win.Add (rgCaption);
+        _rgCaption = new RadioGroup { X = x, Y = y };
+        _rgCaption.RadioLabels = new[] { "Ok", "Open", "Save" };
+        Win.Add (_rgCaption);
 
         y = 0;
         x = 34;
@@ -114,16 +74,11 @@ public class FileDialogExamples : Scenario {
                                                          Y = 1,
                                                          Height = 4
                                                      });
-        Win.Add (
-                 new Label {
-                               Text = "OpenMode",
-                               X = x++,
-                               Y = y++
-                           });
+        Win.Add (new Label { X = x++, Y = y++, Text = "OpenMode" });
 
-        rgOpenMode = new RadioGroup { X = x, Y = y };
-        rgOpenMode.RadioLabels = new[] { "File", "Directory", "Mixed" };
-        Win.Add (rgOpenMode);
+        _rgOpenMode = new RadioGroup { X = x, Y = y };
+        _rgOpenMode.RadioLabels = new[] { "File", "Directory", "Mixed" };
+        Win.Add (_rgOpenMode);
 
         y = 0;
         x = 48;
@@ -134,27 +89,14 @@ public class FileDialogExamples : Scenario {
                                                          Y = 1,
                                                          Height = 4
                                                      });
-        Win.Add (
-                 new Label {
-                               Text = "Icons",
-                               X = x++,
-                               Y = y++
-                           });
+        Win.Add (new Label { X = x++, Y = y++, Text = "Icons" });
 
-        rgIcons = new RadioGroup { X = x, Y = y };
-        rgIcons.RadioLabels = new[] { "None", "Unicode", "Nerd*" };
-        Win.Add (rgIcons);
+        _rgIcons = new RadioGroup { X = x, Y = y };
+        _rgIcons.RadioLabels = new[] { "None", "Unicode", "Nerd*" };
+        Win.Add (_rgIcons);
 
-        Win.Add (
-                 new Label {
-                               Text = "* Requires installing Nerd fonts",
-                               Y = Pos.AnchorEnd (2)
-                           });
-        Win.Add (
-                 new Label {
-                               Text = "  (see: https://github.com/devblackops/Terminal-Icons)",
-                               Y = Pos.AnchorEnd (1)
-                           });
+        Win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
+        Win.Add (new Label { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
 
         y = 5;
         x = 24;
@@ -165,16 +107,11 @@ public class FileDialogExamples : Scenario {
                                                          Y = y + 1,
                                                          Height = 4
                                                      });
-        Win.Add (
-                 new Label {
-                               Text = "Allowed",
-                               X = x++,
-                               Y = y++
-                           });
+        Win.Add (new Label { X = x++, Y = y++, Text = "Allowed" });
 
-        rgAllowedTypes = new RadioGroup { X = x, Y = y };
-        rgAllowedTypes.RadioLabels = new[] { "Any", "Csv (Recommended)", "Csv (Strict)" };
-        Win.Add (rgAllowedTypes);
+        _rgAllowedTypes = new RadioGroup { X = x, Y = y };
+        _rgAllowedTypes.RadioLabels = new[] { "Any", "Csv (Recommended)", "Csv (Strict)" };
+        Win.Add (_rgAllowedTypes);
 
         y = 5;
         x = 45;
@@ -185,40 +122,22 @@ public class FileDialogExamples : Scenario {
                                                          Y = y + 1,
                                                          Height = 4
                                                      });
-        Win.Add (
-                 new Label {
-                               Text = "Buttons",
-                               X = x++,
-                               Y = y++
-                           });
+        Win.Add (new Label { X = x++, Y = y++, Text = "Buttons" });
 
-        Win.Add (
-                 new Label {
-                               Text = "Ok Text:",
-                               X = x,
-                               Y = y++
-                           });
-        tbOkButton = new TextField { X = x, Y = y++, Width = 12 };
-        Win.Add (tbOkButton);
-        Win.Add (
-                 new Label {
-                               Text = "Cancel Text:",
-                               X = x,
-                               Y = y++
-                           });
-        tbCancelButton = new TextField { X = x, Y = y++, Width = 12 };
-        Win.Add (tbCancelButton);
-        cbFlipButtonOrder = new CheckBox {
-                                             Text = "Flip Order",
-                                             X = x,
-                                             Y = y++
-                                         };
-        Win.Add (cbFlipButtonOrder);
+        Win.Add (new Label { X = x, Y = y++, Text = "Ok Text:" });
+        _tbOkButton = new TextField { X = x, Y = y++, Width = 12 };
+        Win.Add (_tbOkButton);
+        Win.Add (new Label { X = x, Y = y++, Text = "Cancel Text:" });
+        _tbCancelButton = new TextField { X = x, Y = y++, Width = 12 };
+        Win.Add (_tbCancelButton);
+        _cbFlipButtonOrder = new CheckBox { X = x, Y = y++, Text = "Flip Order" };
+        Win.Add (_cbFlipButtonOrder);
 
-        var btn = new Button ("Run Dialog") {
-                                                X = 1,
-                                                Y = 9
-                                            };
+        var btn = new Button {
+                                 X = 1,
+                                 Y = 9,
+                                 Text = "Run Dialog"
+                             };
 
         SetupHandler (btn);
         Win.Add (btn);
@@ -236,55 +155,55 @@ public class FileDialogExamples : Scenario {
     private void CreateDialog () {
         var fd = new FileDialog {
                                     OpenMode = Enum.Parse<OpenMode> (
-                                                                     rgOpenMode.RadioLabels[rgOpenMode.SelectedItem]),
-                                    MustExist = cbMustExist.Checked ?? false,
-                                    AllowsMultipleSelection = cbAllowMultipleSelection.Checked ?? false
+                                                                     _rgOpenMode.RadioLabels[_rgOpenMode.SelectedItem]),
+                                    MustExist = _cbMustExist.Checked ?? false,
+                                    AllowsMultipleSelection = _cbAllowMultipleSelection.Checked ?? false
                                 };
 
-        fd.Style.OkButtonText = rgCaption.RadioLabels[rgCaption.SelectedItem];
+        fd.Style.OkButtonText = _rgCaption.RadioLabels[_rgCaption.SelectedItem];
 
         // If Save style dialog then give them an overwrite prompt
-        if (rgCaption.SelectedItem == 2) {
+        if (_rgCaption.SelectedItem == 2) {
             fd.FilesSelected += ConfirmOverwrite;
         }
 
-        fd.Style.IconProvider.UseUnicodeCharacters = rgIcons.SelectedItem == 1;
-        fd.Style.IconProvider.UseNerdIcons = rgIcons.SelectedItem == 2;
+        fd.Style.IconProvider.UseUnicodeCharacters = _rgIcons.SelectedItem == 1;
+        fd.Style.IconProvider.UseNerdIcons = _rgIcons.SelectedItem == 2;
 
-        if (cbCaseSensitive.Checked ?? false) {
+        if (_cbCaseSensitive.Checked ?? false) {
             fd.SearchMatcher = new CaseSensitiveSearchMatcher ();
         }
 
-        fd.Style.UseColors = cbUseColors.Checked ?? false;
+        fd.Style.UseColors = _cbUseColors.Checked ?? false;
 
-        fd.Style.TreeStyle.ShowBranchLines = cbShowTreeBranchLines.Checked ?? false;
-        fd.Style.TableStyle.AlwaysShowHeaders = cbAlwaysTableShowHeaders.Checked ?? false;
+        fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.Checked ?? false;
+        fd.Style.TableStyle.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.Checked ?? false;
 
         IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
 
-        if (cbDrivesOnlyInTree.Checked ?? false) {
+        if (_cbDrivesOnlyInTree.Checked ?? false) {
             fd.Style.TreeRootGetter = () => {
                 return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k);
             };
         }
 
-        if (rgAllowedTypes.SelectedItem > 0) {
+        if (_rgAllowedTypes.SelectedItem > 0) {
             fd.AllowedTypes.Add (new AllowedType ("Data File", ".csv", ".tsv"));
 
-            if (rgAllowedTypes.SelectedItem == 1) {
+            if (_rgAllowedTypes.SelectedItem == 1) {
                 fd.AllowedTypes.Insert (1, new AllowedTypeAny ());
             }
         }
 
-        if (!string.IsNullOrWhiteSpace (tbOkButton.Text)) {
-            fd.Style.OkButtonText = tbOkButton.Text;
+        if (!string.IsNullOrWhiteSpace (_tbOkButton.Text)) {
+            fd.Style.OkButtonText = _tbOkButton.Text;
         }
 
-        if (!string.IsNullOrWhiteSpace (tbCancelButton.Text)) {
-            fd.Style.CancelButtonText = tbCancelButton.Text;
+        if (!string.IsNullOrWhiteSpace (_tbCancelButton.Text)) {
+            fd.Style.CancelButtonText = _tbCancelButton.Text;
         }
 
-        if (cbFlipButtonOrder.Checked ?? false) {
+        if (_cbFlipButtonOrder.Checked ?? false) {
             fd.Style.FlipOkCancelButtonLayoutOrder = true;
         }
 
@@ -295,7 +214,7 @@ public class FileDialogExamples : Scenario {
                               "Canceled",
                               "You canceled navigation and did not pick anything",
                               "Ok");
-        } else if (cbAllowMultipleSelection.Checked ?? false) {
+        } else if (_cbAllowMultipleSelection.Checked ?? false) {
             MessageBox.Query (
                               "Chosen!",
                               "You chose:" + Environment.NewLine +
@@ -321,8 +240,8 @@ public class FileDialogExamples : Scenario {
     }
 
     private class CaseSensitiveSearchMatcher : ISearchMatcher {
-        private string terms;
-        public void Initialize (string terms) { this.terms = terms; }
-        public bool IsMatch (IFileSystemInfo f) { return f.Name.Contains (terms, StringComparison.CurrentCulture); }
+        private string _terms;
+        public void Initialize (string terms) { _terms = terms; }
+        public bool IsMatch (IFileSystemInfo f) { return f.Name.Contains (_terms, StringComparison.CurrentCulture); }
     }
 }

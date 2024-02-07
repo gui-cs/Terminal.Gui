@@ -138,7 +138,15 @@ public static class MessageBox {
         bool wrapMessagge = true,
         params string[] buttons
     ) {
-        return QueryFull (true, width, height, title, message, defaultButton, wrapMessagge, buttons);
+        return QueryFull (
+                          true,
+                          width,
+                          height,
+                          title,
+                          message,
+                          defaultButton,
+                          wrapMessagge,
+                          buttons);
     }
 
     /// <summary>
@@ -267,7 +275,15 @@ public static class MessageBox {
         bool wrapMessagge = true,
         params string[] buttons
     ) {
-        return QueryFull (false, width, height, title, message, defaultButton, wrapMessagge, buttons);
+        return QueryFull (
+                          false,
+                          width,
+                          height,
+                          title,
+                          message,
+                          defaultButton,
+                          wrapMessagge,
+                          buttons);
     }
 
     /// <summary>
@@ -313,7 +329,7 @@ public static class MessageBox {
             }
 
             foreach (string s in buttons) {
-                var b = new Button (s);
+                var b = new Button { Text = s };
                 if (count == defaultButton) {
                     b.IsDefault = true;
                 }
@@ -324,12 +340,13 @@ public static class MessageBox {
         }
 
         Dialog d;
-        d = new Dialog (buttonList.ToArray ()) {
-                                                   Title = title,
-                                                   BorderStyle = DefaultBorderStyle,
-                                                   Width = Dim.Percent (60),
-                                                   Height = 5 // Border + one line of text + vspace + buttons
-                                               };
+        d = new Dialog {
+                           Title = title,
+                           BorderStyle = DefaultBorderStyle,
+                           Width = Dim.Percent (60),
+                           Height = 5, // Border + one line of text + vspace + buttons
+                           Buttons = buttonList.ToArray ()
+                       };
 
         if (width != 0) {
             d.Width = width;
@@ -346,20 +363,16 @@ public static class MessageBox {
         }
 
         var messageLabel = new Label {
-                                         AutoSize = !wrapMessage,
+                                         AutoSize = wrapMessage ? false : true,
                                          Text = message,
                                          TextAlignment = TextAlignment.Centered,
-                                         X = Pos.Center (),
-                                         Y = 0
+                                         X = 0,
+                                         Y = 0,
+                                         Width = Dim.Fill (),
+                                         Height = Dim.Fill (1)
                                      };
-
-        if (!messageLabel.AutoSize) {
-            messageLabel.Width = Dim.Fill ();
-            messageLabel.Height = Dim.Fill (1);
-        }
-
         messageLabel.TextFormatter.WordWrap = wrapMessage;
-        messageLabel.TextFormatter.MultiLine = !wrapMessage;
+        messageLabel.TextFormatter.MultiLine = wrapMessage ? false : true;
         d.Add (messageLabel);
 
         d.Loaded += (s, e) => {
@@ -378,31 +391,25 @@ public static class MessageBox {
             }
 
             string msg = messageLabel.TextFormatter.Format ();
-            Size messageSize = messageLabel.TextFormatter.FormatAndGetSize ();
+            Size messageSize = messageLabel.TextFormatter.GetFormattedSize ();
 
             // Ensure the width fits the text + buttons
             int newWidth = Math.Max (
                                      width,
                                      Math.Max (
                                                messageSize.Width + d.GetAdornmentsThickness ().Horizontal,
-                                               d.GetButtonsWidth () + d.buttons.Count
-                                                                    + d.GetAdornmentsThickness ().Horizontal));
+                                               d.GetButtonsWidth () + d.Buttons.Length +
+                                               d.GetAdornmentsThickness ().Horizontal));
             if (newWidth > d.Frame.Width) {
                 d.Width = newWidth;
             }
 
             // Ensure height fits the text + vspace + buttons
-            if (messageSize.Height == 0) {
-                d.Height = Math.Max (height, 3 + d.GetAdornmentsThickness ().Vertical);
-            } else {
-                string lastLine = messageLabel.TextFormatter.GetLines ()[^1];
-                d.Height = Math.Max (
-                                     height,
-                                     messageSize.Height
-                                     + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2)
-                                     + d.GetAdornmentsThickness ().Vertical);
-            }
-
+            string lastLine = messageLabel.TextFormatter.Lines[^1];
+            d.Height = Math.Max (
+                                 height,
+                                 messageSize.Height + (lastLine.EndsWith ("\r\n") || lastLine.EndsWith ('\n') ? 1 : 2) +
+                                 d.GetAdornmentsThickness ().Vertical);
             d.SetRelativeLayout (d.SuperView?.Frame ?? Application.Top.Frame);
         };
 

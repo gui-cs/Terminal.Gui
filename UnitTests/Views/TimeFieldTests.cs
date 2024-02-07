@@ -10,19 +10,19 @@ public class TimeFieldTests {
         Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
 
         TimeSpan time = DateTime.Now.TimeOfDay;
-        tf = new TimeField (time);
+        tf = new TimeField { Time = time };
         Assert.False (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
         Assert.Equal (new Rect (0, 0, 10, 1), tf.Frame);
 
-        tf = new TimeField (1, 2, time);
+        tf = new TimeField { X = 1, Y = 2, Time = time };
         Assert.False (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
         Assert.Equal (new Rect (1, 2, 10, 1), tf.Frame);
 
-        tf = new TimeField (3, 4, time, true);
+        tf = new TimeField { X = 3, Y = 4, Time = time, IsShortFormat = true };
         Assert.True (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
@@ -36,8 +36,8 @@ public class TimeFieldTests {
     [Fact]
     [AutoInitShutdown]
     public void Copy_Paste () {
-        var tf1 = new TimeField (TimeSpan.Parse ("12:12:19"));
-        var tf2 = new TimeField (TimeSpan.Parse ("12:59:01"));
+        var tf1 = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
+        var tf2 = new TimeField { Time = TimeSpan.Parse ("12:59:01") };
 
         // Select all text
         Assert.True (tf2.NewKeyDownEvent (new Key (KeyCode.End | KeyCode.ShiftMask)));
@@ -94,6 +94,9 @@ public class TimeFieldTests {
         Assert.Equal (0, tf.SelectedLength);
         Assert.Equal (8, tf.CursorPosition);
         Assert.False (tf.IsShortFormat);
+        Assert.False (tf.IsInitialized);
+        tf.BeginInit ();
+        tf.EndInit ();
         tf.IsShortFormat = true;
         Assert.Equal (5, tf.CursorPosition);
 
@@ -110,7 +113,11 @@ public class TimeFieldTests {
 
     [Fact]
     public void KeyBindings_Command () {
-        var tf = new TimeField (TimeSpan.Parse ("12:12:19"));
+        var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
+        tf.BeginInit ();
+        tf.EndInit ();
+        Assert.Equal (9, tf.CursorPosition);
+        tf.CursorPosition = 1;
         tf.ReadOnly = true;
         Assert.True (tf.NewKeyDownEvent (new Key (KeyCode.Delete)));
         Assert.Equal (" 12:12:19", tf.Text);
@@ -153,7 +160,7 @@ public class TimeFieldTests {
 
     [Fact]
     public void Typing_With_Selection_Normalize_Format () {
-        var tf = new TimeField (TimeSpan.Parse ("12:12:19"));
+        var tf = new TimeField { Time = TimeSpan.Parse ("12:12:19") };
 
         // Start selection at before the first separator :
         tf.CursorPosition = 2;

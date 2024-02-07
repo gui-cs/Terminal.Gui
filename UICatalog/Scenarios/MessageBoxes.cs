@@ -10,92 +10,84 @@ namespace UICatalog.Scenarios;
 public class MessageBoxes : Scenario {
     public override void Setup () {
         var frame = new FrameView {
-                                      Title = "MessageBox Options",
                                       X = Pos.Center (),
                                       Y = 1,
-                                      Width = Dim.Percent (75)
+                                      Width = Dim.Percent (75),
+                                      Title = "MessageBox Options"
                                   };
         Win.Add (frame);
 
         var label = new Label {
-                                  Text = "Width:",
-                                  AutoSize = false,
-                                  X = 0,
-                                  Y = 0,
-                                  Width = 15,
-                                  Height = 1,
-                                  TextAlignment = TextAlignment.Right
+                                  X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = TextAlignment.Right,
+                                  Text = "Width:"
                               };
         frame.Add (label);
         var widthEdit = new TextField {
-                                          Text = "0",
                                           X = Pos.Right (label) + 1,
                                           Y = Pos.Top (label),
                                           Width = 5,
-                                          Height = 1
+                                          Height = 1,
+                                          Text = "0"
                                       };
         frame.Add (widthEdit);
 
         label = new Label {
-                              Text = "Height:",
-                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
                               Height = 1,
-                              TextAlignment = TextAlignment.Right
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Height:"
                           };
         frame.Add (label);
         var heightEdit = new TextField {
-                                           Text = "0",
                                            X = Pos.Right (label) + 1,
                                            Y = Pos.Top (label),
                                            Width = 5,
-                                           Height = 1
+                                           Height = 1,
+                                           Text = "0"
                                        };
         frame.Add (heightEdit);
 
         frame.Add (
                    new Label {
-                                 Text = "If height & width are both 0,",
                                  X = Pos.Right (widthEdit) + 2,
-                                 Y = Pos.Top (widthEdit)
+                                 Y = Pos.Top (widthEdit),
+                                 Text = "If height & width are both 0,"
                              });
         frame.Add (
                    new Label {
-                                 Text = "the MessageBox will be sized automatically.",
                                  X = Pos.Right (heightEdit) + 2,
-                                 Y = Pos.Top (heightEdit)
+                                 Y = Pos.Top (heightEdit),
+                                 Text = "the MessageBox will be sized automatically."
                              });
 
         label = new Label {
-                              Text = "Title:",
-                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
                               Height = 1,
-                              TextAlignment = TextAlignment.Right
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Title:"
                           };
         frame.Add (label);
 
         var titleEdit = new TextField {
-                                          Text = "Title",
                                           X = Pos.Right (label) + 1,
                                           Y = Pos.Top (label),
                                           Width = Dim.Fill (),
-                                          Height = 1
+                                          Height = 1,
+                                          Text = "Title"
                                       };
         frame.Add (titleEdit);
 
         label = new Label {
-                              Text = "Message:",
-                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
                               Height = 1,
-                              TextAlignment = TextAlignment.Right
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Message:"
                           };
         frame.Add (label);
         var messageEdit = new TextView {
@@ -108,64 +100,64 @@ public class MessageBoxes : Scenario {
         frame.Add (messageEdit);
 
         label = new Label {
-                              Text = "Num Buttons:",
-                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (messageEdit),
                               Width = Dim.Width (label),
                               Height = 1,
-                              TextAlignment = TextAlignment.Right
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Num Buttons:"
                           };
         frame.Add (label);
         var numButtonsEdit = new TextField {
-                                               Text = "3",
                                                X = Pos.Right (label) + 1,
                                                Y = Pos.Top (label),
                                                Width = 5,
-                                               Height = 1
+                                               Height = 1,
+                                               Text = "3"
                                            };
         frame.Add (numButtonsEdit);
 
         label = new Label {
-                              Text = "Default Button:",
-                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
                               Height = 1,
-                              TextAlignment = TextAlignment.Right
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Default Button:"
                           };
         frame.Add (label);
         var defaultButtonEdit = new TextField {
-                                                  Text = "0",
                                                   X = Pos.Right (label) + 1,
                                                   Y = Pos.Top (label),
                                                   Width = 5,
-                                                  Height = 1
+                                                  Height = 1,
+                                                  Text = "0"
                                               };
         frame.Add (defaultButtonEdit);
 
         label = new Label {
-                              Text = "Style:",
-                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
                               Height = 1,
-                              TextAlignment = TextAlignment.Right
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Style:"
                           };
         frame.Add (label);
 
-        var styleRadioGroup = new RadioGroup (new[] { "_Query", "_Error" }) {
-                                                                                X = Pos.Right (label) + 1,
-                                                                                Y = Pos.Top (label)
-                                                                            };
+        var styleRadioGroup = new RadioGroup {
+                                                 X = Pos.Right (label) + 1,
+                                                 Y = Pos.Top (label),
+                                                 RadioLabels = new[] { "_Query", "_Error" }
+                                             };
         frame.Add (styleRadioGroup);
 
-        var ckbWrapMessage = new CheckBox ("_Wrap Message", true) {
-                                                                      X = Pos.Right (label) + 1,
-                                                                      Y = Pos.Bottom (styleRadioGroup)
-                                                                  };
+        var ckbWrapMessage = new CheckBox {
+                                              X = Pos.Right (label) + 1,
+                                              Y = Pos.Bottom (styleRadioGroup),
+                                              Text = "_Wrap Message",
+                                              Checked = true
+                                          };
         frame.Add (ckbWrapMessage);
 
         frame.ValidatePosDim = true;
@@ -187,30 +179,30 @@ public class MessageBoxes : Scenario {
         Application.Top.LayoutComplete += Top_LayoutComplete;
 
         label = new Label {
-                              Text = "Button Pressed:",
                               X = Pos.Center (),
                               Y = Pos.Bottom (frame) + 2,
-                              TextAlignment = TextAlignment.Right
+                              Height = 1,
+                              TextAlignment = TextAlignment.Right,
+                              Text = "Button Pressed:"
                           };
         Win.Add (label);
         var buttonPressedLabel = new Label {
-                                               Text = " ",
-                                               AutoSize = false,
                                                X = Pos.Center (),
                                                Y = Pos.Bottom (label) + 1,
                                                Width = 25,
                                                Height = 1,
                                                ColorScheme = Colors.ColorSchemes["Error"],
-                                               TextAlignment = TextAlignment.Centered
+                                               TextAlignment = TextAlignment.Centered,
+                                               Text = " "
                                            };
 
         //var btnText = new [] { "_Zero", "_One", "T_wo", "_Three", "_Four", "Fi_ve", "Si_x", "_Seven", "_Eight", "_Nine" };
 
         var showMessageBoxButton = new Button {
-                                                  Text = "_Show MessageBox",
                                                   X = Pos.Center (),
                                                   Y = Pos.Bottom (frame) + 2,
-                                                  IsDefault = true
+                                                  IsDefault = true,
+                                                  Text = "_Show MessageBox"
                                               };
         showMessageBoxButton.Clicked += (s, e) => {
             try {

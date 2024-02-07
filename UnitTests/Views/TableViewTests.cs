@@ -923,6 +923,8 @@ public class TableViewTests {
     [AutoInitShutdown]
     public void ShowHorizontalBottomLine_NoCellLines () {
         TableView tableView = GetABCDEFTableView (out _);
+        tableView.BeginInit ();
+        tableView.EndInit ();
 
         tableView.ColorScheme = Colors.ColorSchemes["TopLevel"];
 
@@ -953,6 +955,8 @@ public class TableViewTests {
     [AutoInitShutdown]
     public void ShowHorizontalBottomLine_WithVerticalCellLines () {
         TableView tableView = GetABCDEFTableView (out _);
+        tableView.BeginInit ();
+        tableView.EndInit ();
 
         tableView.ColorScheme = Colors.ColorSchemes["TopLevel"];
 

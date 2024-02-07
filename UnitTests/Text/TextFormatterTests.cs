@@ -1,11 +1,19 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
+
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace Terminal.Gui.TextTests;
 
 public class TextFormatterTests {
+    private readonly ITestOutputHelper _output;
+    public TextFormatterTests (ITestOutputHelper output) { _output = output; }
+
+    public static IEnumerable<object[]> CMGlyphs =>
+        new List<object[]> {
+                               new object[] { $"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}", 16, 15 }
+                           };
     private readonly ITestOutputHelper _output;
     public TextFormatterTests (ITestOutputHelper output) { _output = output; }
 
@@ -33,7 +41,24 @@ public class TextFormatterTests {
                                                 new[] { "First Line 界", "Second Line 界", "Third Line 界", "" }
                                             }
                            };
+    public static IEnumerable<object[]> SplitEnvironmentNewLine =>
+        new List<object[]> {
+                               new object[] {
+                                                $"First Line 界{Environment.NewLine}Second Line 界{Environment.NewLine}Third Line 界",
+                                                new[] { "First Line 界", "Second Line 界", "Third Line 界" }
+                                            },
+                               new object[] {
+                                                $"First Line 界{Environment.NewLine}Second Line 界{Environment.NewLine}Third Line 界{Environment.NewLine}",
+                                                new[] { "First Line 界", "Second Line 界", "Third Line 界", "" }
+                                            }
+                           };
 
+    [Fact]
+    public void Basic_Usage () {
+        var testText = "test";
+        var expectedSize = new Size ();
+        var testBounds = new Rect (0, 0, 100, 1);
+        var tf = new TextFormatter ();
     [Fact]
     public void Basic_Usage () {
         var testText = "test";
@@ -370,6 +395,44 @@ ssb
         Assert.Equal (expectedHotPos, hotPos);
         Assert.Equal (expectedKey, hotKey);
     }
+    [Theory]
+    [InlineData ("_k Before", true, 0, (KeyCode)'K')] // lower case should return uppercase Hotkey
+    [InlineData ("a_k Second", true, 1, (KeyCode)'K')]
+    [InlineData ("Last _k", true, 5, (KeyCode)'K')]
+    [InlineData ("After k_", false, -1, KeyCode.Null)]
+    [InlineData ("Multiple _k and _R", true, 9, (KeyCode)'K')]
+    [InlineData ("Non-english: _кдать", true, 13, (KeyCode)'к')] // Lower case Cryllic K (к)
+    [InlineData ("_k Before", true, 0, (KeyCode)'K', true)] // Turn on FirstUpperCase and verify same results
+    [InlineData ("a_k Second", true, 1, (KeyCode)'K', true)]
+    [InlineData ("Last _k", true, 5, (KeyCode)'K', true)]
+    [InlineData ("After k_", false, -1, KeyCode.Null, true)]
+    [InlineData ("Multiple _k and _r", true, 9, (KeyCode)'K', true)]
+    [InlineData ("Non-english: _кдать", true, 13, (KeyCode)'к', true)] // Cryllic K (К)
+    public void FindHotKey_AlphaLowerCase_Succeeds (
+        string text,
+        bool expectedResult,
+        int expectedHotPos,
+        KeyCode expectedKey,
+        bool supportFirstUpperCase = false
+    ) {
+        var hotKeySpecifier = (Rune)'_';
+
+        bool result = TextFormatter.FindHotKey (
+                                                text,
+                                                hotKeySpecifier,
+                                                out int hotPos,
+                                                out Key hotKey,
+                                                supportFirstUpperCase);
+        if (expectedResult) {
+            Assert.True (result);
+        } else {
+            Assert.False (result);
+        }
+
+        Assert.Equal (expectedResult, result);
+        Assert.Equal (expectedHotPos, hotPos);
+        Assert.Equal (expectedKey, hotKey);
+    }
 
     [Theory]
     [InlineData ("_K Before", true, 0, (KeyCode)'K')]
@@ -392,7 +455,44 @@ ssb
         bool supportFirstUpperCase = false
     ) {
         var hotKeySpecifier = (Rune)'_';
+    [Theory]
+    [InlineData ("_K Before", true, 0, (KeyCode)'K')]
+    [InlineData ("a_K Second", true, 1, (KeyCode)'K')]
+    [InlineData ("Last _K", true, 5, (KeyCode)'K')]
+    [InlineData ("After K_", false, -1, KeyCode.Null)]
+    [InlineData ("Multiple _K and _R", true, 9, (KeyCode)'K')]
+    [InlineData ("Non-english: _Кдать", true, 13, (KeyCode)'К')] // Cryllic K (К)
+    [InlineData ("_K Before", true, 0, (KeyCode)'K', true)] // Turn on FirstUpperCase and verify same results
+    [InlineData ("a_K Second", true, 1, (KeyCode)'K', true)]
+    [InlineData ("Last _K", true, 5, (KeyCode)'K', true)]
+    [InlineData ("After K_", false, -1, KeyCode.Null, true)]
+    [InlineData ("Multiple _K and _R", true, 9, (KeyCode)'K', true)]
+    [InlineData ("Non-english: _Кдать", true, 13, (KeyCode)'К', true)] // Cryllic K (К)
+    public void FindHotKey_AlphaUpperCase_Succeeds (
+        string text,
+        bool expectedResult,
+        int expectedHotPos,
+        KeyCode expectedKey,
+        bool supportFirstUpperCase = false
+    ) {
+        var hotKeySpecifier = (Rune)'_';
 
+        bool result = TextFormatter.FindHotKey (
+                                                text,
+                                                hotKeySpecifier,
+                                                out int hotPos,
+                                                out Key hotKey,
+                                                supportFirstUpperCase);
+        if (expectedResult) {
+            Assert.True (result);
+        } else {
+            Assert.False (result);
+        }
+
+        Assert.Equal (expectedResult, result);
+        Assert.Equal (expectedHotPos, hotPos);
+        Assert.Equal (expectedKey, hotKey);
+    }
         bool result = TextFormatter.FindHotKey (
                                                 text,
                                                 hotKeySpecifier,
@@ -506,7 +606,42 @@ ssb
         bool supportFirstUpperCase = false
     ) {
         var hotKeySpecifier = (Rune)'_';
+    [Theory]
+    [InlineData ("_1 Before", true, 0, (KeyCode)'1')] // Digits 
+    [InlineData ("a_1 Second", true, 1, (KeyCode)'1')]
+    [InlineData ("Last _1", true, 5, (KeyCode)'1')]
+    [InlineData ("After 1_", false, -1, KeyCode.Null)]
+    [InlineData ("Multiple _1 and _2", true, 9, (KeyCode)'1')]
+    [InlineData ("_1 Before", true, 0, (KeyCode)'1', true)] // Turn on FirstUpperCase and verify same results
+    [InlineData ("a_1 Second", true, 1, (KeyCode)'1', true)]
+    [InlineData ("Last _1", true, 5, (KeyCode)'1', true)]
+    [InlineData ("After 1_", false, -1, KeyCode.Null, true)]
+    [InlineData ("Multiple _1 and _2", true, 9, (KeyCode)'1', true)]
+    public void FindHotKey_Numeric_Succeeds (
+        string text,
+        bool expectedResult,
+        int expectedHotPos,
+        KeyCode expectedKey,
+        bool supportFirstUpperCase = false
+    ) {
+        var hotKeySpecifier = (Rune)'_';
 
+        bool result = TextFormatter.FindHotKey (
+                                                text,
+                                                hotKeySpecifier,
+                                                out int hotPos,
+                                                out Key hotKey,
+                                                supportFirstUpperCase);
+        if (expectedResult) {
+            Assert.True (result);
+        } else {
+            Assert.False (result);
+        }
+
+        Assert.Equal (expectedResult, result);
+        Assert.Equal (expectedHotPos, hotPos);
+        Assert.Equal (expectedKey, hotKey);
+    }
         bool result = TextFormatter.FindHotKey (
                                                 text,
                                                 hotKeySpecifier,
@@ -538,6 +673,20 @@ ssb
     [InlineData ("non-english: _кдать", true, (KeyCode)'к')] // Lower case Cryllic K (к)
     public void FindHotKey_Symbols_Returns_Symbol (string text, bool found, KeyCode expected) {
         var hotKeySpecifier = (Rune)'_';
+    [Theory]
+    [InlineData ("_\"k before", true, (KeyCode)'"')] // BUGBUG: Not sure why this fails. " is a normal char
+    [InlineData ("\"_k before", true, KeyCode.K)]
+    [InlineData ("_`~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", true, (KeyCode)'`')]
+    [InlineData ("`_~!@#$%^&*()-_=+[{]}\\|;:'\",<.>/?", true, (KeyCode)'~')]
+    [InlineData (
+                    "`~!@#$%^&*()-__=+[{]}\\|;:'\",<.>/?",
+                    true,
+                    (KeyCode)'=')] // BUGBUG: Not sure why this fails. Ignore the first and consider the second
+    [InlineData ("_ ~  s  gui.cs   master ↑10", true, (KeyCode)'')] // ~IsLetterOrDigit + Unicode
+    [InlineData (" ~  s  gui.cs  _ master ↑10", true, (KeyCode)'')] // ~IsLetterOrDigit + Unicode
+    [InlineData ("non-english: _кдать", true, (KeyCode)'к')] // Lower case Cryllic K (к)
+    public void FindHotKey_Symbols_Returns_Symbol (string text, bool found, KeyCode expected) {
+        var hotKeySpecifier = (Rune)'_';
 
         bool result = TextFormatter.FindHotKey (text, hotKeySpecifier, out int _, out Key hotKey);
         Assert.Equal (found, result);
@@ -551,6 +700,30 @@ ssb
         Assert.Null (exception);
     }
 
+    [Theory]
+    [InlineData (
+                    "Hello world, how are you today? Pretty neat!",
+                    44,
+                    80,
+                    "Hello      world,      how      are      you      today?      Pretty      neat!")]
+    public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Horizontal (
+        string text,
+        int runeCount,
+        int maxWidth,
+        string justifiedText
+    ) {
+        Assert.Equal (runeCount, text.GetRuneCount ());
+
+        var fmtText = string.Empty;
+        for (int i = text.GetRuneCount (); i < maxWidth; i++) {
+            fmtText = TextFormatter.Format (text, i, TextAlignment.Justified, false, true)[0];
+            Assert.Equal (i, fmtText.GetRuneCount ());
+            char c = fmtText[^1];
+            Assert.True (text.EndsWith (c));
+        }
+
+        Assert.Equal (justifiedText, fmtText);
+    }
     [Theory]
     [InlineData (
                     "Hello world, how are you today? Pretty neat!",
@@ -607,6 +780,37 @@ ssb
 
         Assert.Equal (justifiedText, fmtText);
     }
+    [Theory]
+    [InlineData (
+                    "Hello world, how are you today? Pretty neat!",
+                    44,
+                    80,
+                    "Hello      world,      how      are      you      today?      Pretty      neat!")]
+    public void Format_Justified_Always_Returns_Text_Width_Equal_To_Passed_Width_Vertical (
+        string text,
+        int runeCount,
+        int maxWidth,
+        string justifiedText
+    ) {
+        Assert.Equal (runeCount, text.GetRuneCount ());
+
+        var fmtText = string.Empty;
+        for (int i = text.GetRuneCount (); i < maxWidth; i++) {
+            fmtText = TextFormatter.Format (
+                                            text,
+                                            i,
+                                            TextAlignment.Justified,
+                                            false,
+                                            true,
+                                            0,
+                                            TextDirection.TopBottom_LeftRight)[0];
+            Assert.Equal (i, fmtText.GetRuneCount ());
+            char c = fmtText[^1];
+            Assert.True (text.EndsWith (c));
+        }
+
+        Assert.Equal (justifiedText, fmtText);
+    }
 
     [Theory]
     [InlineData ("Truncate", 3, "Tru")]
@@ -615,7 +819,29 @@ ssb
         List<string> list = TextFormatter.Format (text, width, false, false);
         Assert.Equal (expected, list[^1]);
     }
+    [Theory]
+    [InlineData ("Truncate", 3, "Tru")]
+    [InlineData ("デモエムポンズ", 3, "デ")]
+    public void Format_Truncate_Simple_And_Wide_Runes (string text, int width, string expected) {
+        List<string> list = TextFormatter.Format (text, width, false, false);
+        Assert.Equal (expected, list[^1]);
+    }
 
+    [Theory]
+    [MemberData (nameof (FormatEnvironmentNewLine))]
+    public void Format_With_PreserveTrailingSpaces_And_Without_PreserveTrailingSpaces (
+        string text,
+        int width,
+        IEnumerable<string> expected
+    ) {
+        var preserveTrailingSpaces = false;
+        List<string> formated = TextFormatter.Format (text, width, false, true, preserveTrailingSpaces);
+        Assert.Equal (expected, formated);
+
+        preserveTrailingSpaces = true;
+        formated = TextFormatter.Format (text, width, false, true, preserveTrailingSpaces);
+        Assert.Equal (expected, formated);
+    }
     [Theory]
     [MemberData (nameof (FormatEnvironmentNewLine))]
     public void Format_With_PreserveTrailingSpaces_And_Without_PreserveTrailingSpaces (
@@ -683,7 +909,19 @@ ssb
     [InlineData ("Hello World", 11)]
     [InlineData ("こんにちは世界", 14)]
     public void GetColumns_Simple_And_Wide_Runes (string text, int width) { Assert.Equal (width, text.GetColumns ()); }
+    [Theory]
+    [InlineData ("Hello World", 11)]
+    [InlineData ("こんにちは世界", 14)]
+    public void GetColumns_Simple_And_Wide_Runes (string text, int width) { Assert.Equal (width, text.GetColumns ()); }
 
+    [Theory]
+    [InlineData ("Hello World", 6, 6)]
+    [InlineData ("こんにちは 世界", 6, 3)]
+    [MemberData (nameof (CMGlyphs))]
+    public void GetLengthThatFits_List_Simple_And_Wide_Runes (string text, int columns, int expectedLength) {
+        List<Rune> runes = text.ToRuneList ();
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
+    }
     [Theory]
     [InlineData ("Hello World", 6, 6)]
     [InlineData ("こんにちは 世界", 6, 3)]
@@ -702,7 +940,47 @@ ssb
 
         Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
     }
+    [Theory]
+    [InlineData ("test", 3, 3)]
+    [InlineData ("test", 4, 4)]
+    [InlineData ("test", 10, 4)]
+    public void GetLengthThatFits_Runelist (string text, int columns, int expectedLength) {
+        List<Rune> runes = text.ToRuneList ();
 
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (runes, columns));
+    }
+
+    [Theory]
+    [InlineData ("Hello World", 6, 6)]
+    [InlineData ("こんにちは 世界", 6, 3)]
+    public void GetLengthThatFits_Simple_And_Wide_Runes (string text, int columns, int expectedLength) {
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (text, columns));
+    }
+
+    [Theory]
+    [InlineData ("test", 3, 3)]
+    [InlineData ("test", 4, 4)]
+    [InlineData ("test", 10, 4)]
+    [InlineData ("test", 1, 1)]
+    [InlineData ("test", 0, 0)]
+    [InlineData ("test", -1, 0)]
+    [InlineData (null, -1, 0)]
+    [InlineData ("", -1, 0)]
+    public void GetLengthThatFits_String (string text, int columns, int expectedLength) {
+        Assert.Equal (expectedLength, TextFormatter.GetLengthThatFits (text, columns));
+    }
+
+    [Fact]
+    public void GetLengthThatFits_With_Combining_Runes () {
+        var text = "Les Mise\u0328\u0301rables";
+        Assert.Equal (16, TextFormatter.GetLengthThatFits (text, 14));
+    }
+
+    [Fact]
+    public void GetMaxColsForWidth_With_Combining_Runes () {
+        List<string> text = new() { "Les Mis", "e\u0328\u0301", "rables" };
+        Assert.Equal (1, TextFormatter.GetMaxColsForWidth (text, 1));
+    }
     [Theory]
     [InlineData ("Hello World", 6, 6)]
     [InlineData ("こんにちは 世界", 6, 3)]
@@ -782,7 +1060,43 @@ ssb
         tf.HotKey = KeyCode.CtrlMask | KeyCode.Q;
         Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, tf.HotKey);
     }
+    [Theory]
+    [InlineData ("Hello World", 11, 6, 1, 1)]
+    [InlineData ("こんにちは 世界", 15, 6, 1, 2)]
+    public void GetSumMaxCharWidth_Simple_And_Wide_Runes (
+        string text,
+        int width,
+        int index,
+        int length,
+        int indexWidth
+    ) {
+        Assert.Equal (width, TextFormatter.GetSumMaxCharWidth (text));
+        Assert.Equal (indexWidth, TextFormatter.GetSumMaxCharWidth (text, index, length));
+    }
 
+    [Fact]
+    public void GetSumMaxCharWidth_With_Combining_Runes () {
+        var text = "Les Mise\u0328\u0301rables";
+        Assert.Equal (1, TextFormatter.GetSumMaxCharWidth (text, 1, 1));
+    }
+
+    [Fact]
+    public void Internal_Tests () {
+        var tf = new TextFormatter ();
+        Assert.Equal (KeyCode.Null, tf.HotKey);
+        tf.HotKey = KeyCode.CtrlMask | KeyCode.Q;
+        Assert.Equal (KeyCode.CtrlMask | KeyCode.Q, tf.HotKey);
+    }
+
+    [Theory]
+    [InlineData ("")]
+    [InlineData (null)]
+    [InlineData ("test")]
+    public void Justify_Invalid (string text) {
+        Assert.Equal (text, TextFormatter.Justify (text, 0));
+        Assert.Equal (text, TextFormatter.Justify (text, 0));
+        Assert.Throws<ArgumentOutOfRangeException> (() => TextFormatter.Justify (text, -1));
+    }
     [Theory]
     [InlineData ("")]
     [InlineData (null)]
@@ -853,6 +1167,66 @@ ssb
         bool replace = false
     ) {
         var fillChar = '+';
+    [Theory]
+
+    // Even # of spaces
+    //            0123456789
+    [InlineData ("012 456 89", "012 456 89", 10, 0, "+", true)]
+    [InlineData ("012 456 89", "012++456+89", 11, 1)]
+    [InlineData ("012 456 89", "012 456 89", 12, 2, "++", true)]
+    [InlineData ("012 456 89", "012+++456++89", 13, 3)]
+    [InlineData ("012 456 89", "012 456 89", 14, 4, "+++", true)]
+    [InlineData ("012 456 89", "012++++456+++89", 15, 5)]
+    [InlineData ("012 456 89", "012 456 89", 16, 6, "++++", true)]
+    [InlineData ("012 456 89", "012 456 89", 30, 20, "+++++++++++", true)]
+    [InlineData ("012 456 89", "012+++++++++++++456++++++++++++89", 33, 23)]
+
+    // Odd # of spaces
+    //            01234567890123
+    [InlineData ("012 456 89 end", "012 456 89 end", 14, 0, "+", true)]
+    [InlineData ("012 456 89 end", "012++456+89+end", 15, 1)]
+    [InlineData ("012 456 89 end", "012++456++89+end", 16, 2)]
+    [InlineData ("012 456 89 end", "012 456 89 end", 17, 3, "++", true)]
+    [InlineData ("012 456 89 end", "012+++456++89++end", 18, 4)]
+    [InlineData ("012 456 89 end", "012+++456+++89++end", 19, 5)]
+    [InlineData ("012 456 89 end", "012 456 89 end", 20, 6, "+++", true)]
+    [InlineData ("012 456 89 end", "012++++++++456++++++++89+++++++end", 34, 20)]
+    [InlineData ("012 456 89 end", "012+++++++++456+++++++++89++++++++end", 37, 23)]
+
+    // Unicode
+    // Even # of chars
+    //            0123456789
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ Ð²Ð Ñ", 10, 0, "+", true)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ++Ð²Ð+Ñ", 11, 1)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ Ð²Ð Ñ", 12, 2, "++", true)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ+++Ð²Ð++Ñ", 13, 3)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ Ð²Ð Ñ", 14, 4, "+++", true)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ++++Ð²Ð+++Ñ", 15, 5)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ Ð²Ð Ñ", 16, 6, "++++", true)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ Ð²Ð Ñ", 30, 20, "+++++++++++", true)]
+    [InlineData ("Ð¿ÑÐ Ð²Ð Ñ", "Ð¿ÑÐ+++++++++++++Ð²Ð++++++++++++Ñ", 33, 23)]
+
+    // Unicode
+    // Odd # of chars
+    //            0123456789
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð ÑÐ Ð²Ð Ñ", 10, 0, "+", true)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð++ÑÐ+Ð²Ð+Ñ", 11, 1)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð++ÑÐ++Ð²Ð+Ñ", 12, 2)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð ÑÐ Ð²Ð Ñ", 13, 3, "++", true)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð+++ÑÐ++Ð²Ð++Ñ", 14, 4)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð+++ÑÐ+++Ð²Ð++Ñ", 15, 5)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð ÑÐ Ð²Ð Ñ", 16, 6, "+++", true)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð++++++++ÑÐ++++++++Ð²Ð+++++++Ñ", 30, 20)]
+    [InlineData ("Ð ÑÐ Ð²Ð Ñ", "Ð+++++++++ÑÐ+++++++++Ð²Ð++++++++Ñ", 33, 23)]
+    public void Justify_Sentence (
+        string text,
+        string justifiedText,
+        int forceToWidth,
+        int widthOffset,
+        string replaceWith = null,
+        bool replace = false
+    ) {
+        var fillChar = '+';
 
         Assert.Equal (forceToWidth, text.GetRuneCount () + widthOffset);
         if (replace) {
@@ -863,7 +1237,36 @@ ssb
         Assert.True (Math.Abs (forceToWidth - justifiedText.GetRuneCount ()) < text.Count (s => s == ' '));
         Assert.True (Math.Abs (forceToWidth - justifiedText.GetColumns ()) < text.Count (s => s == ' '));
     }
+        Assert.Equal (forceToWidth, text.GetRuneCount () + widthOffset);
+        if (replace) {
+            justifiedText = text.Replace (" ", replaceWith);
+        }
 
+        Assert.Equal (justifiedText, TextFormatter.Justify (text, forceToWidth, fillChar));
+        Assert.True (Math.Abs (forceToWidth - justifiedText.GetRuneCount ()) < text.Count (s => s == ' '));
+        Assert.True (Math.Abs (forceToWidth - justifiedText.GetColumns ()) < text.Count (s => s == ' '));
+    }
+
+    [Theory]
+    [InlineData ("word")] // Even # of chars
+    [InlineData ("word.")] // Odd # of chars
+    [InlineData ("Ð¿ÑÐ¸Ð²ÐµÑ")] // Unicode (even #)
+    [InlineData ("Ð¿ÑÐ¸Ð²ÐµÑ.")] // Unicode (odd # of chars)
+    public void Justify_SingleWord (string text) {
+        string justifiedText = text;
+        var fillChar = '+';
+
+        int width = text.GetRuneCount ();
+        Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+        width = text.GetRuneCount () + 1;
+        Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+        width = text.GetRuneCount () + 2;
+        Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+        width = text.GetRuneCount () + 10;
+        Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+        width = text.GetRuneCount () + 11;
+        Assert.Equal (justifiedText, TextFormatter.Justify (text, width, fillChar));
+    }
     [Theory]
     [InlineData ("word")] // Even # of chars
     [InlineData ("word.")] // Odd # of chars
@@ -1209,7 +1612,42 @@ ssb
 
         Assert.Equal (list, resultLines);
     }
+        Assert.Equal (list, resultLines);
+    }
 
+    [Theory]
+    [InlineData ("", 0, 0, TextAlignment.Left, false, 1, true)]
+    [InlineData ("", 1, 1, TextAlignment.Left, false, 1, true)]
+    [InlineData ("A sentence has words.", 0, -21, TextAlignment.Left, false, 1, true)]
+    [InlineData ("A sentence has words.", 1, -20, TextAlignment.Left, false, 1, false)]
+    [InlineData ("A sentence has words.", 5, -16, TextAlignment.Left, false, 1, false)]
+    [InlineData ("A sentence has words.", 20, -1, TextAlignment.Left, false, 1, false)]
+
+    // no clip
+    [InlineData ("A sentence has words.", 21, 0, TextAlignment.Left, false, 1, false)]
+    [InlineData ("A sentence has words.", 22, 1, TextAlignment.Left, false, 1, false)]
+    public void Reformat_NoWordrap_SingleLine (
+        string text,
+        int maxWidth,
+        int widthOffset,
+        TextAlignment textAlignment,
+        bool wrap,
+        int linesCount,
+        bool stringEmpty
+    ) {
+        Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
+        int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
+        List<string> list = TextFormatter.Format (text, maxWidth, textAlignment, wrap);
+        Assert.NotEmpty (list);
+        Assert.True (list.Count == linesCount);
+        if (stringEmpty) {
+            Assert.Equal (string.Empty, list[0]);
+        } else {
+            Assert.NotEqual (string.Empty, list[0]);
+        }
+
+        Assert.Equal (StringExtensions.ToString (text.ToRunes ()[..expectedClippedWidth]), list[0]);
+    }
     [Theory]
     [InlineData ("", 0, 0, TextAlignment.Left, false, 1, true)]
     [InlineData ("", 1, 1, TextAlignment.Left, false, 1, true)]
@@ -1287,7 +1725,83 @@ ssb
         Assert.Equal (list.Count, resultLines.Count ());
         Assert.Equal (resultLines, list);
     }
+    [Theory]
 
+    // Unicode
+    [InlineData (
+                    "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
+                    8,
+                    -1,
+                    TextAlignment.Left,
+                    true,
+                    false,
+                    new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
+
+    // no clip
+    [InlineData (
+                    "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
+                    9,
+                    0,
+                    TextAlignment.Left,
+                    true,
+                    false,
+                    new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
+    [InlineData (
+                    "\u2460\u2461\u2462\n\u2460\u2461\u2462\u2463\u2464",
+                    10,
+                    1,
+                    TextAlignment.Left,
+                    true,
+                    false,
+                    new[] { "\u2460\u2461\u2462", "\u2460\u2461\u2462\u2463\u2464" })]
+    public void Reformat_Unicode_Wrap_Spaces_NewLines (
+        string text,
+        int maxWidth,
+        int widthOffset,
+        TextAlignment textAlignment,
+        bool wrap,
+        bool preserveTrailingSpaces,
+        IEnumerable<string> resultLines
+    ) {
+        Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
+        List<string> list = TextFormatter.Format (text, maxWidth, textAlignment, wrap, preserveTrailingSpaces);
+        Assert.Equal (list.Count, resultLines.Count ());
+        Assert.Equal (resultLines, list);
+    }
+
+    [Theory]
+
+    // Unicode
+    // Even # of chars
+    //       0123456789
+    [InlineData ("\u2660Ð¿ÑÐ Ð²Ð Ñ", 10, -1, TextAlignment.Left, true, false, new[] { "\u2660Ð¿ÑÐ Ð²Ð", "Ñ" })]
+
+    // no clip
+    [InlineData ("\u2660Ð¿ÑÐ Ð²Ð Ñ", 11, 0, TextAlignment.Left, true, false, new[] { "\u2660Ð¿ÑÐ Ð²Ð Ñ" })]
+    [InlineData ("\u2660Ð¿ÑÐ Ð²Ð Ñ", 12, 1, TextAlignment.Left, true, false, new[] { "\u2660Ð¿ÑÐ Ð²Ð Ñ" })]
+
+    // Unicode
+    // Odd # of chars
+    //            0123456789
+    [InlineData ("\u2660 ÑÐ Ð²Ð Ñ", 9, -1, TextAlignment.Left, true, false, new[] { "\u2660 ÑÐ Ð²Ð", "Ñ" })]
+
+    // no clip
+    [InlineData ("\u2660 ÑÐ Ð²Ð Ñ", 10, 0, TextAlignment.Left, true, false, new[] { "\u2660 ÑÐ Ð²Ð Ñ" })]
+    [InlineData ("\u2660 ÑÐ Ð²Ð Ñ", 11, 1, TextAlignment.Left, true, false, new[] { "\u2660 ÑÐ Ð²Ð Ñ" })]
+    public void Reformat_Unicode_Wrap_Spaces_No_NewLines (
+        string text,
+        int maxWidth,
+        int widthOffset,
+        TextAlignment textAlignment,
+        bool wrap,
+        bool preserveTrailingSpaces,
+        IEnumerable<string> resultLines
+    ) {
+        Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
+        List<string> list = TextFormatter.Format (text, maxWidth, textAlignment, wrap, preserveTrailingSpaces);
+        Assert.Equal (list.Count, resultLines.Count ());
+        Assert.Equal (resultLines, list);
+    }
     [Theory]
 
     // Unicode
@@ -1514,6 +2028,14 @@ ssb
         List<string> splited = TextFormatter.SplitNewLine (text);
         Assert.Equal (expected, splited);
     }
+    [Theory]
+    [InlineData (
+                    "First Line 界\nSecond Line 界\nThird Line 界\n",
+                    new[] { "First Line 界", "Second Line 界", "Third Line 界", "" })]
+    public void SplitNewLine_Ending_With_NewLine_Only_LF (string text, IEnumerable<string> expected) {
+        List<string> splited = TextFormatter.SplitNewLine (text);
+        Assert.Equal (expected, splited);
+    }
 
     [Theory]
     [InlineData (
@@ -1523,7 +2045,41 @@ ssb
         List<string> splited = TextFormatter.SplitNewLine (text);
         Assert.Equal (expected, splited);
     }
+    [Theory]
+    [InlineData (
+                    "First Line 界\nSecond Line 界\nThird Line 界",
+                    new[] { "First Line 界", "Second Line 界", "Third Line 界" })]
+    public void SplitNewLine_Ending_Without_NewLine_Only_LF (string text, IEnumerable<string> expected) {
+        List<string> splited = TextFormatter.SplitNewLine (text);
+        Assert.Equal (expected, splited);
+    }
 
+    [Theory]
+    [InlineData ("New Test 你", 10, 10, 20320, 20320, 9, "你")]
+    [InlineData ("New Test \U0001d539", 10, 11, 120121, 55349, 9, "𝔹")]
+    public void String_Array_Is_Not_Always_Equal_ToRunes_Array (
+        string text,
+        int runesLength,
+        int stringLength,
+        int runeValue,
+        int stringValue,
+        int index,
+        string expected
+    ) {
+        Rune[] usToRunes = text.ToRunes ();
+        Assert.Equal (runesLength, usToRunes.Length);
+        Assert.Equal (stringLength, text.Length);
+        Assert.Equal (runeValue, usToRunes[index].Value);
+        Assert.Equal (stringValue, text[index]);
+        Assert.Equal (expected, usToRunes[index].ToString ());
+        if (char.IsHighSurrogate (text[index])) {
+            // Rune array length isn't equal to string array
+            Assert.Equal (expected, new string (new[] { text[index], text[index + 1] }));
+        } else {
+            // Rune array length is equal to string array
+            Assert.Equal (expected, text[index].ToString ());
+        }
+    }
     [Theory]
     [InlineData ("New Test 你", 10, 10, 20320, 20320, 9, "你")]
     [InlineData ("New Test \U0001d539", 10, 11, 120121, 55349, 9, "𝔹")]
@@ -1565,7 +2121,26 @@ ssb
     ) {
         var driver = new FakeDriver ();
         driver.Init ();
+    [Theory]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+    public void TabWith_PreserveTrailingSpaces_False (
+        int width,
+        int height,
+        TextDirection textDirection,
+        int tabWidth,
+        string expected
+    ) {
+        var driver = new FakeDriver ();
+        driver.Init ();
 
+        var text = "This is a \tTab";
+        var tf = new TextFormatter ();
+        tf.Direction = textDirection;
+        tf.TabWidth = tabWidth;
+        tf.Text = text;
         var text = "This is a \tTab";
         var tf = new TextFormatter ();
         tf.Direction = textDirection;
@@ -1583,10 +2158,37 @@ ssb
                  true,
                  driver);
         TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
+        Assert.True (tf.WordWrap);
+        Assert.False (tf.PreserveTrailingSpaces);
+        Assert.Equal (new Size (width, height), tf.Size);
+        tf.Draw (
+                 new Rect (0, 0, width, height),
+                 new Attribute (ColorName.White, ColorName.Black),
+                 new Attribute (ColorName.Blue, ColorName.Black),
+                 default (Rect),
+                 true,
+                 driver);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
 
         driver.End ();
     }
+        driver.End ();
+    }
 
+    [Theory]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+    public void TabWith_PreserveTrailingSpaces_True (
+        int width,
+        int height,
+        TextDirection textDirection,
+        int tabWidth,
+        string expected
+    ) {
+        var driver = new FakeDriver ();
+        driver.Init ();
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
     [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
@@ -1608,7 +2210,23 @@ ssb
         tf.TabWidth = tabWidth;
         tf.PreserveTrailingSpaces = true;
         tf.Text = text;
+        var text = "This is a \tTab";
+        var tf = new TextFormatter ();
+        tf.Direction = textDirection;
+        tf.TabWidth = tabWidth;
+        tf.PreserveTrailingSpaces = true;
+        tf.Text = text;
 
+        Assert.True (tf.WordWrap);
+        Assert.Equal (new Size (width, height), tf.Size);
+        tf.Draw (
+                 new Rect (0, 0, width, height),
+                 new Attribute (ColorName.White, ColorName.Black),
+                 new Attribute (ColorName.Blue, ColorName.Black),
+                 default (Rect),
+                 true,
+                 driver);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
         Assert.True (tf.WordWrap);
         Assert.Equal (new Size (width, height), tf.Size);
         tf.Draw (
@@ -1622,7 +2240,23 @@ ssb
 
         driver.End ();
     }
+        driver.End ();
+    }
 
+    [Theory]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
+    [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
+    public void TabWith_WordWrap_True (
+        int width,
+        int height,
+        TextDirection textDirection,
+        int tabWidth,
+        string expected
+    ) {
+        var driver = new FakeDriver ();
+        driver.Init ();
     [Theory]
     [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
     [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
@@ -1644,7 +2278,23 @@ ssb
         tf.TabWidth = tabWidth;
         tf.WordWrap = true;
         tf.Text = text;
+        var text = "This is a \tTab";
+        var tf = new TextFormatter ();
+        tf.Direction = textDirection;
+        tf.TabWidth = tabWidth;
+        tf.WordWrap = true;
+        tf.Text = text;
 
+        Assert.False (tf.PreserveTrailingSpaces);
+        Assert.Equal (new Size (width, height), tf.Size);
+        tf.Draw (
+                 new Rect (0, 0, width, height),
+                 new Attribute (ColorName.White, ColorName.Black),
+                 new Attribute (ColorName.Blue, ColorName.Black),
+                 default (Rect),
+                 true,
+                 driver);
+        TestHelpers.AssertDriverContentsWithFrameAre (expected, _output, driver);
         Assert.False (tf.PreserveTrailingSpaces);
         Assert.Equal (new Size (width, height), tf.Size);
         tf.Draw (

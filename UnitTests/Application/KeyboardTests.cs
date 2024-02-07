@@ -224,7 +224,13 @@ public class KeyboardTests {
                                                                      false,
                                                                      false));
             } else {
-                FakeConsole.MockKeyPresses.Push (new ConsoleKeyInfo (c, (ConsoleKey)c, false, false, false));
+                FakeConsole.MockKeyPresses.Push (
+                                                 new ConsoleKeyInfo (
+                                                                     c,
+                                                                     (ConsoleKey)c,
+                                                                     false,
+                                                                     false,
+                                                                     false));
             }
         }
 

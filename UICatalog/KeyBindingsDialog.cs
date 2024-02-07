@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog; 
+namespace UICatalog;
 
 class KeyBindingsDialog : Dialog {
     // TODO: Update to use Key instead of KeyCode
     private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
-    private readonly Command[] commands;
-    private readonly ListView commandsListView;
-    private readonly Label keyLabel;
+    private readonly Command[] _commands;
+    private readonly ListView _commandsListView;
+    private readonly Label _keyLabel;
 
     public KeyBindingsDialog () {
         Title = "Keybindings";
@@ -22,48 +22,50 @@ class KeyBindingsDialog : Dialog {
         }
 
         // known commands that views can support
-        commands = Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ();
+        _commands = Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ();
 
-        commandsListView = new ListView (commands) {
-                                                       Width = Dim.Percent (50),
-                                                       Height = Dim.Percent (100) - 1
-                                                   };
+        _commandsListView = new ListView {
+                                             Width = Dim.Percent (50),
+                                             Height = Dim.Percent (100) - 1,
+                                             Source = new ListWrapper (_commands),
+                                             SelectedItem = 0
+                                         };
 
-        Add (commandsListView);
+        Add (_commandsListView);
 
-        keyLabel = new Label {
-                                 Text = "Key: None",
-                                 Width = Dim.Fill (),
-                                 X = Pos.Percent (50),
-                                 Y = 0
-                             };
-        Add (keyLabel);
+        _keyLabel = new Label {
+                                  Text = "Key: None",
+                                  Width = Dim.Fill (),
+                                  X = Pos.Percent (50),
+                                  Y = 0
+                              };
+        Add (_keyLabel);
 
         var btnChange = new Button {
-                                       Text = "Ch_ange",
                                        X = Pos.Percent (50),
-                                       Y = 1
+                                       Y = 1,
+                                       Text = "Ch_ange"
                                    };
         Add (btnChange);
         btnChange.Clicked += RemapKey;
 
-        var close = new Button ("Ok");
+        var close = new Button { Text = "Ok" };
         close.Clicked += (s, e) => {
             Application.RequestStop ();
             ViewTracker.Instance.StartUsingNewKeyMap (CurrentBindings);
         };
         AddButton (close);
 
-        var cancel = new Button ("Cancel");
+        var cancel = new Button { Text = "Cancel" };
         cancel.Clicked += (s, e) => Application.RequestStop ();
         AddButton (cancel);
 
         // Register event handler as the last thing in constructor to prevent early calls
         // before it is even shown (e.g. OnEnter)
-        commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
+        _commandsListView.SelectedItemChanged += CommandsListView_SelectedItemChanged;
 
         // Setup to show first ListView entry
-        SetTextBoxToShowBinding (commands.First ());
+        SetTextBoxToShowBinding (_commands.First ());
     }
 
     private void CommandsListView_SelectedItemChanged (object sender, ListViewItemEventArgs obj) {
@@ -71,7 +73,7 @@ class KeyBindingsDialog : Dialog {
     }
 
     private void RemapKey (object sender, EventArgs e) {
-        Command cmd = commands[commandsListView.SelectedItem];
+        Command cmd = _commands[_commandsListView.SelectedItem];
         KeyCode? key = null;
 
         // prompt user to hit a key
@@ -90,9 +92,9 @@ class KeyBindingsDialog : Dialog {
 
     private void SetTextBoxToShowBinding (Command cmd) {
         if (CurrentBindings.ContainsKey (cmd)) {
-            keyLabel.Text = "Key: " + CurrentBindings[cmd];
+            _keyLabel.Text = "Key: " + CurrentBindings[cmd];
         } else {
-            keyLabel.Text = "Key: None";
+            _keyLabel.Text = "Key: None";
         }
 
         SetNeedsDisplay ();
@@ -100,22 +102,20 @@ class KeyBindingsDialog : Dialog {
 
     /// <summary>Tracks views as they are created in UICatalog so that their keybindings can be managed.</summary>
     private class ViewTracker {
-        public static ViewTracker Instance;
-        private Dictionary<Command, KeyCode> keybindings;
-
         /// <summary>All views seen so far and a bool to indicate if we have applied keybindings to them</summary>
-        private readonly Dictionary<View, bool> knownViews = new ();
+        private readonly Dictionary<View, bool> _knownViews = new ();
 
-        private readonly object lockKnownViews = new ();
+        private readonly object _lockKnownViews = new ();
+        private Dictionary<Command, KeyCode> _keybindings;
 
-        public ViewTracker (View top) {
+        private ViewTracker (View top) {
             RecordView (top);
 
             // Refresh known windows
             Application.AddTimeout (
                                     TimeSpan.FromMilliseconds (100),
                                     () => {
-                                        lock (lockKnownViews) {
+                                        lock (_lockKnownViews) {
                                             RecordView (Application.Top);
 
                                             ApplyKeyBindingsToAllKnownViews ();
@@ -125,27 +125,29 @@ class KeyBindingsDialog : Dialog {
                                     });
         }
 
+        public static ViewTracker Instance { get; private set; }
+
         internal static void Initialize () { Instance = new ViewTracker (Application.Top); }
 
         internal void StartUsingNewKeyMap (Dictionary<Command, KeyCode> currentBindings) {
-            lock (lockKnownViews) {
+            lock (_lockKnownViews) {
                 // change our knowledge of what keys to bind
-                keybindings = currentBindings;
+                _keybindings = currentBindings;
 
                 // Mark that we have not applied the key bindings yet to any views
-                foreach (View view in knownViews.Keys) {
-                    knownViews[view] = false;
+                foreach (View view in _knownViews.Keys) {
+                    _knownViews[view] = false;
                 }
             }
         }
 
         private void ApplyKeyBindingsToAllKnownViews () {
-            if (keybindings == null) {
+            if (_keybindings == null) {
                 return;
             }
 
             // Key is the view Value is whether we have already done it
-            foreach (KeyValuePair<View, bool> viewDone in knownViews) {
+            foreach (KeyValuePair<View, bool> viewDone in _knownViews) {
                 View view = viewDone.Key;
                 bool done = viewDone.Value;
 
@@ -156,7 +158,7 @@ class KeyBindingsDialog : Dialog {
 
                 HashSet<Command> supported = new HashSet<Command> (view.GetSupportedCommands ());
 
-                foreach (KeyValuePair<Command, KeyCode> kvp in keybindings) {
+                foreach (KeyValuePair<Command, KeyCode> kvp in _keybindings) {
                     // if the view supports the keybinding
                     if (supported.Contains (kvp.Key)) {
                         // if the key was bound to any other commands clear that
@@ -165,14 +167,14 @@ class KeyBindingsDialog : Dialog {
                     }
 
                     // mark that we have done this view so don't need to set keybindings again on it
-                    knownViews[view] = true;
+                    _knownViews[view] = true;
                 }
             }
         }
 
         private void RecordView (View view) {
-            if (!knownViews.ContainsKey (view)) {
-                knownViews.Add (view, false);
+            if (!_knownViews.ContainsKey (view)) {
+                _knownViews.Add (view, false);
             }
 
             // may already have subviews that were added to it

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class RuneCellTests {
     private readonly ITestOutputHelper _output;
@@ -50,7 +50,7 @@ public class RuneCellTests {
     [Fact]
     [AutoInitShutdown]
     public void RuneCell_LoadRuneCells_InheritsPreviousColorScheme () {
-        List<RuneCell> runeCells = new ();
+        List<RuneCell> runeCells = new List<RuneCell> ();
         foreach (KeyValuePair<string, ColorScheme> color in Colors.ColorSchemes) {
             string csName = color.Key;
             foreach (Rune rune in csName.EnumerateRunes ()) {
@@ -73,22 +73,22 @@ Menu
 Error   ";
         TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
 
-        Attribute[] attributes = {
-                                     // 0
-                                     Colors.ColorSchemes["TopLevel"].Focus,
+        Attribute[] attributes = new[] {
+                                           // 0
+                                           Colors.ColorSchemes["TopLevel"].Focus,
 
-                                     // 1
-                                     Colors.ColorSchemes["Base"].Focus,
+                                           // 1
+                                           Colors.ColorSchemes["Base"].Focus,
 
-                                     // 2
-                                     Colors.ColorSchemes["Dialog"].Focus,
+                                           // 2
+                                           Colors.ColorSchemes["Dialog"].Focus,
 
-                                     // 3
-                                     Colors.ColorSchemes["Menu"].Focus,
+                                           // 3
+                                           Colors.ColorSchemes["Menu"].Focus,
 
-                                     // 4
-                                     Colors.ColorSchemes["Error"].Focus
-                                 };
+                                           // 4
+                                           Colors.ColorSchemes["Error"].Focus
+                                       };
         var expectedColor = @"
 0000000000
 1111000000
@@ -170,10 +170,10 @@ ror       ";
     [AutoInitShutdown]
     public void RuneCell_LoadRuneCells_Without_ColorScheme_Is_Never_Null () {
         List<RuneCell> cells = new List<RuneCell> {
-                                                      new() { Rune = new Rune ('T') },
-                                                      new() { Rune = new Rune ('e') },
-                                                      new() { Rune = new Rune ('s') },
-                                                      new() { Rune = new Rune ('t') }
+                                                      new () { Rune = new Rune ('T') },
+                                                      new () { Rune = new Rune ('e') },
+                                                      new () { Rune = new Rune ('s') },
+                                                      new () { Rune = new Rune ('t') }
                                                   };
         TextView tv = CreateTextView ();
         Application.Top.Add (tv);
@@ -191,10 +191,12 @@ ror       ";
     [AutoInitShutdown]
     public void RuneCellEventArgs_WordWrap_True () {
         var eventCount = 0;
-        List<List<RuneCell>> text = new() {
-                                              TextModel.ToRuneCells ("This is the first line.".ToRunes ()),
-                                              TextModel.ToRuneCells ("This is the second line.".ToRunes ())
-                                          };
+        List<List<RuneCell>> text = new List<List<RuneCell>> {
+                                                                 TextModel.ToRuneCells (
+                                                                  "This is the first line.".ToRunes ()),
+                                                                 TextModel.ToRuneCells (
+                                                                  "This is the second line.".ToRunes ())
+                                                             };
         TextView tv = CreateTextView ();
         tv.DrawNormalColor += _textView_DrawColor;
         tv.DrawReadOnlyColor += _textView_DrawColor;

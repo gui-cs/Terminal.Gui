@@ -277,9 +277,9 @@ public partial class View : Responder, ISupportInitializeNotification {
             subview.Dispose ();
         }
 
-        base.Dispose (disposing);
-        Debug.Assert (InternalSubviews.Count == 0);
-    }
+		base.Dispose (disposing);
+		Debug.Assert (InternalSubviews.Count == 0);
+	}
 
     private bool CanBeVisible (View view) {
         if (!view.Visible) {
@@ -295,147 +295,36 @@ public partial class View : Responder, ISupportInitializeNotification {
         return true;
     }
 
-    #region Constructors and Initialization
-
-    /// <summary>
-    ///     Initializes a new instance of a <see cref="View"/> class with the absolute dimensions specified in the
-    ///     <paramref name="frame"/> parameter.
-    /// </summary>
-    /// <param name="frame">The region covered by this view.</param>
-    /// <remarks>
-    ///     <para>
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view. The <see cref="View"/> will be created using
-    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size (<see cref="View.Frame"/>) will be adjusted to
-    ///         fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
-    ///     </para>
-    /// </remarks>
-    public View (Rect frame) : this (frame, null) { }
-
-    /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
-    /// <remarks>
-    ///     <para>
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view. The <see cref="View"/> will be created using
-    ///         <see cref="LayoutStyle.Absolute"/> coordinates. The initial size (<see cref="View.Frame"/>) will be adjusted to
-    ///         fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
-    ///     </para>
-    /// </remarks>
-    public View () : this (string.Empty) { }
-
-    /// <summary>
-    ///     Initializes a new instance of <see cref="View"/> in at the position specified with the dimensions specified in
-    ///     the <paramref name="x"/> and <paramref name="y"/> parameters.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The <see cref="View"/> will be created at the given coordinates with the given string. The size (
-    ///         <see cref="View.Frame"/>) will be adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n')
-    ///         for multiple lines.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="x">column to locate the View.</param>
-    /// <param name="y">row to locate the View.</param>
-    /// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-    public View (int x, int y, string text) : this (TextFormatter.CalcRect (x, y, text), text) { }
-
-    /// <summary>
-    ///     Initializes a new instance of a <see cref="View"/> class with the absolute dimensions specified in the
-    ///     <paramref name="frame"/> parameter.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The <see cref="View"/> will be created at the given coordinates with the given string. The size (
-    ///         <see cref="View.Frame"/>) will be adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n')
-    ///         for multiple lines.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="frame">Location.</param>
-    /// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-    public View (Rect frame, string text) { SetInitialProperties (text, frame, LayoutStyle.Absolute); }
-
-    /// <summary>
-    ///     Initializes a new instance of a <see cref="View"/> class with using the given text and text styling
-    ///     information.
-    /// </summary>
-    /// <remarks>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         The <see cref="View"/> will be created at the given coordinates with the given string. The size (
-    ///         <see cref="View.Frame"/>) will be adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n')
-    ///         for multiple lines.
-    ///     </para>
-    ///     <para>
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view.
-    ///     </para>
-    ///     <para>If <see cref="Height"/> is greater than one, word wrapping is provided.</para>
-    ///     <para>
-    ///         This constructor initialize a View with a <see cref="LayoutStyle"/> of <see cref="LayoutStyle.Absolute"/>.
-    ///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
-    ///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
-    ///     </para>
-    /// </remarks>
-    /// <param name="text">text to initialize the <see cref="Text"/> property with.</param>
-    /// <param name="direction">The text direction.</param>
-    public View (string text, TextDirection direction = TextDirection.LeftRight_TopBottom) {
-        SetInitialProperties (text, Rect.Empty, LayoutStyle.Computed, direction);
-    }
-
-    // TODO: v2 - Remove constructors with parameters
-
-    /// <summary>Private helper to set the initial properties of the View that were provided via constructors.</summary>
-    /// <param name="text"></param>
-    /// <param name="rect"></param>
-    /// <param name="layoutStyle"></param>
-    /// <param name="direction"></param>
-    private void SetInitialProperties (
-        string text,
-        Rect rect,
-        LayoutStyle layoutStyle = LayoutStyle.Computed,
-        TextDirection direction = TextDirection.LeftRight_TopBottom
-    ) {
-        TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
-        TextDirection = direction;
+	#region Constructors and Initialization
+	/// <summary>
+	/// Initializes a new instance of <see cref="View"/>.
+	/// </summary>
+	/// <remarks>
+	///         <para>
+	///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+	///         control the size and location of the view.
+	///         The <see cref="View"/> will be created using <see cref="LayoutStyle.Absolute"/>
+	///         coordinates. The initial size (<see cref="View.Frame"/>) will be
+	///         adjusted to fit the contents of <see cref="Text"/>, including newlines ('\n') for multiple lines.
+	///         </para>
+	///         <para>
+	///         If <see cref="Height"/> is greater than one, word wrapping is provided.
+	///         </para>
+	///         <para>
+	///         This constructor initialize a View with a <see cref="LayoutStyle"/> of
+	///         <see cref="LayoutStyle.Absolute"/>.
+	///         Use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties to dynamically
+	///         control the size and location of the view, changing it to  <see cref="LayoutStyle.Computed"/>.
+	///         </para>
+	/// </remarks>
+	public View () {
+		TextFormatter = new TextFormatter ();
+		TextFormatter.HotKeyChanged += TextFormatter_HotKeyChanged;
+		TextDirection = direction;
 
         CanFocus = false;
         TabIndex = -1;
         TabStop = false;
-
-        Text = text == null ? string.Empty : text;
-        Frame = rect.IsEmpty ? TextFormatter.CalcRect (0, 0, text, direction) : rect;
 
         AddCommands ();
 

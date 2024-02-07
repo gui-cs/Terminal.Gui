@@ -35,8 +35,8 @@ public class WizardStep : FrameView {
     //private string title = string.Empty;
 
     // The contentView works like the ContentView in FrameView.
-    private readonly View contentView = new() { Id = "WizardContentView" };
-    private readonly TextView helpTextView = new ();
+    private readonly View _contentView = new () { Id = "WizardContentView" };
+    private readonly TextView _helpTextView = new ();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class using <see cref="LayoutStyle.Computed"/>
@@ -44,11 +44,11 @@ public class WizardStep : FrameView {
     /// </summary>
     public WizardStep () {
         BorderStyle = LineStyle.None;
-        base.Add (contentView);
+        base.Add (_contentView);
 
-        helpTextView.ReadOnly = true;
-        helpTextView.WordWrap = true;
-        base.Add (helpTextView);
+        _helpTextView.ReadOnly = true;
+        _helpTextView.WordWrap = true;
+        base.Add (_helpTextView);
 
         // BUGBUG: v2 - Disabling scrolling for now
         //var scrollBar = new ScrollBarView (helpTextView, true);
@@ -109,9 +109,9 @@ public class WizardStep : FrameView {
     /// </summary>
     /// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
     public string HelpText {
-        get => helpTextView.Text;
+        get => _helpTextView.Text;
         set {
-            helpTextView.Text = value;
+            _helpTextView.Text = value;
             ShowHide ();
             SetNeedsDisplay ();
         }
@@ -124,7 +124,7 @@ public class WizardStep : FrameView {
     /// <summary>Add the specified <see cref="View"/> to the <see cref="WizardStep"/>.</summary>
     /// <param name="view"><see cref="View"/> to add to this container</param>
     public override void Add (View view) {
-        contentView.Add (view);
+        _contentView.Add (view);
         if (view.CanFocus) {
             CanFocus = true;
         }
@@ -147,7 +147,7 @@ public class WizardStep : FrameView {
             container?.Remove (view);
         }
 
-        if (contentView.InternalSubviews.Count < 1) {
+        if (_contentView.InternalSubviews.Count < 1) {
             CanFocus = false;
         }
 
@@ -157,33 +157,33 @@ public class WizardStep : FrameView {
     /// <summary>Removes all <see cref="View"/>s from the <see cref="WizardStep"/>.</summary>
     /// <remarks></remarks>
     public override void RemoveAll () {
-        contentView.RemoveAll ();
+        _contentView.RemoveAll ();
         ShowHide ();
     }
 
     /// <summary>Does the work to show and hide the contentView and helpView as appropriate</summary>
     internal void ShowHide () {
-        contentView.Height = Dim.Fill ();
-        helpTextView.Height = Dim.Fill ();
-        helpTextView.Width = Dim.Fill ();
+        _contentView.Height = Dim.Fill ();
+        _helpTextView.Height = Dim.Fill ();
+        _helpTextView.Width = Dim.Fill ();
 
-        if (contentView.InternalSubviews?.Count > 0) {
-            if (helpTextView.Text.Length > 0) {
-                contentView.Width = Dim.Percent (70);
-                helpTextView.X = Pos.Right (contentView);
-                helpTextView.Width = Dim.Fill ();
+        if (_contentView.InternalSubviews?.Count > 0) {
+            if (_helpTextView.Text.Length > 0) {
+                _contentView.Width = Dim.Percent (70);
+                _helpTextView.X = Pos.Right (_contentView);
+                _helpTextView.Width = Dim.Fill ();
             } else {
-                contentView.Width = Dim.Fill ();
+                _contentView.Width = Dim.Fill ();
             }
         } else {
-            if (helpTextView.Text.Length > 0) {
-                helpTextView.X = 0;
+            if (_helpTextView.Text.Length > 0) {
+                _helpTextView.X = 0;
             }
 
             // Error - no pane shown
         }
 
-        contentView.Visible = contentView.InternalSubviews?.Count > 0;
-        helpTextView.Visible = helpTextView.Text.Length > 0;
+        _contentView.Visible = _contentView.InternalSubviews?.Count > 0;
+        _helpTextView.Visible = _helpTextView.Text.Length > 0;
     }
 } // end of WizardStep class

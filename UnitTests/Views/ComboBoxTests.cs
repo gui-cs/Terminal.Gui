@@ -1,17 +1,18 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class ComboBoxTests {
-    private readonly ITestOutputHelper output;
-    public ComboBoxTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public ComboBoxTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     [AutoInitShutdown]
     public void Constructor_With_Source_Initialize_With_The_Passed_SelectedItem () {
-        var cb = new ComboBox (new List<string> { "One", "Two", "Three" }) {
-                                                                               SelectedItem = 1
-                                                                           };
+        var cb = new ComboBox {
+                                  Source = new ListWrapper (new List<string> { "One", "Two", "Three" }),
+                                  SelectedItem = 1
+                              };
         cb.BeginInit ();
         cb.EndInit ();
         cb.LayoutSubviews ();
@@ -35,7 +36,7 @@ public class ComboBoxTests {
         Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
-        cb = new ComboBox ("Test");
+        cb = new ComboBox { Text = "Test" };
         cb.BeginInit ();
         cb.EndInit ();
         cb.LayoutSubviews ();
@@ -45,7 +46,13 @@ public class ComboBoxTests {
         Assert.Equal (new Rect (0, 0, 0, 2), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
-        cb = new ComboBox (new Rect (1, 2, 10, 20), new List<string> { "One", "Two", "Three" });
+        cb = new ComboBox {
+                              X = 1,
+                              Y = 2,
+                              Width = 10,
+                              Height = 20,
+                              Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
+                          };
         cb.BeginInit ();
         cb.EndInit ();
         cb.LayoutSubviews ();
@@ -55,7 +62,9 @@ public class ComboBoxTests {
         Assert.Equal (new Rect (1, 2, 10, 20), cb.Frame);
         Assert.Equal (-1, cb.SelectedItem);
 
-        cb = new ComboBox (new List<string> { "One", "Two", "Three" });
+        cb = new ComboBox {
+                              Source = new ListWrapper (new List<string> { "One", "Two", "Three" })
+                          };
         cb.BeginInit ();
         cb.EndInit ();
         cb.LayoutSubviews ();
@@ -69,7 +78,7 @@ public class ComboBoxTests {
     [Fact]
     [AutoInitShutdown]
     public void EnsureKeyEventsDoNotCauseExceptions () {
-        var comboBox = new ComboBox ("0");
+        var comboBox = new ComboBox { Text = "0" };
 
         string[] source = Enumerable.Range (0, 15).Select (x => x.ToString ()).ToArray ();
         comboBox.SetSource (source);
@@ -88,7 +97,7 @@ public class ComboBoxTests {
                                   Height = 4,
                                   Width = 5
                               };
-        List<string> list = new() { "One", "Two", "Three" };
+        List<string> list = new List<string> { "One", "Two", "Three" };
 
         cb.Expanded += (s, e) => cb.SetSource (list);
         cb.Collapsed += (s, e) => cb.Source = null;
@@ -217,7 +226,8 @@ public class ComboBoxTests {
 
     [Fact]
     [AutoInitShutdown]
-    public void HideDropdownListOnClick_False_ReadOnly_True_OpenSelectedItem_With_Mouse_And_Key_CursorDown_And_Esc () {
+    public void
+        HideDropdownListOnClick_False_ReadOnly_True_OpenSelectedItem_With_Mouse_And_Key_CursorDown_And_Esc () {
         var selected = "";
         var cb = new ComboBox {
                                   Height = 4,
@@ -561,7 +571,7 @@ public class ComboBoxTests {
 One   
 Two   
 Three ",
-                                                      output);
+                                                      _output);
 
         Attribute[] attributes = new[] {
                                            // 0
@@ -844,7 +854,7 @@ Three ",
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Command () {
-        List<string> source = new() { "One", "Two", "Three" };
+        List<string> source = new List<string> { "One", "Two", "Three" };
         var cb = new ComboBox { Width = 10 };
         cb.SetSource (source);
         Application.Top.Add (cb);
@@ -914,7 +924,7 @@ Three ",
 One      ▼
 One       
 ",
-                                                      output);
+                                                      _output);
 
         Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageDown)));
         Assert.True (cb.IsShow);
@@ -926,7 +936,7 @@ One
 Two      ▼
 Two       
 ",
-                                                      output);
+                                                      _output);
 
         Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageDown)));
         Assert.True (cb.IsShow);
@@ -938,7 +948,7 @@ Two
 Three    ▼
 Three     
 ",
-                                                      output);
+                                                      _output);
         Assert.True (cb.NewKeyDownEvent (new Key (KeyCode.PageUp)));
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -1001,7 +1011,7 @@ Three
         Application.Top.FocusFirst ();
         Assert.Null (cb.Source);
         Assert.Equal (-1, cb.SelectedItem);
-        List<string> source = new ();
+        List<string> source = new List<string> ();
         cb.SetSource (source);
         Assert.NotNull (cb.Source);
         Assert.Equal (0, cb.Source.Count);

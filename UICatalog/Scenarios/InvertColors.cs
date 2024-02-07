@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Invert Colors", "Invert the foreground and the background colors.")]
 [ScenarioCategory ("Colors")]
@@ -12,26 +12,27 @@ public class InvertColors : Scenario {
     public override void Setup () {
         Win.ColorScheme = Colors.ColorSchemes["TopLevel"];
 
-        List<Label> labels = new ();
+        List<Label> labels = new List<Label> ();
         ColorName[] foreColors = Enum.GetValues (typeof (ColorName)).Cast<ColorName> ().ToArray ();
         for (var y = 0; y < foreColors.Length; y++) {
             ColorName fore = foreColors[y];
             ColorName back = foreColors[(y + 1) % foreColors.Length];
             var color = new Attribute (fore, back);
 
-            var label = new Label ($"{fore} on {back}") {
-                                                            ColorScheme = new ColorScheme (),
-                                                            Y = y
-                                                        };
+            var label = new Label {
+                                      ColorScheme = new ColorScheme (),
+                                      Y = y,
+                                      Text = $"{fore} on {back}"
+                                  };
             label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
             Win.Add (label);
             labels.Add (label);
         }
 
         var button = new Button {
-                                    Text = "Invert color!",
                                     X = Pos.Center (),
-                                    Y = foreColors.Length + 1
+                                    Y = foreColors.Length + 1,
+                                    Text = "Invert color!"
                                 };
         button.Clicked += (s, e) => {
             foreach (Label label in labels) {

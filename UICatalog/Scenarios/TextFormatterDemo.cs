@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("TextFormatter Demo", "Demos and tests the TextFormatter class.")]
 [ScenarioCategory ("Text and Formatting")]
@@ -26,8 +26,12 @@ public class TextFormatterDemo : Scenario {
             "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
         var blockText = new Label {
-                                      AutoSize = false, ColorScheme = Colors.ColorSchemes["TopLevel"], X = 0, Y = 0,
-                                      Height = 10, Width = Dim.Fill ()
+                                      ColorScheme = Colors.ColorSchemes["TopLevel"],
+                                      X = 0,
+                                      Y = 0,
+                                      Height = 10,
+                                      Width = Dim.Fill (),
+                                      AutoSize = false
                                   };
 
         var block = new StringBuilder ();
@@ -44,10 +48,12 @@ public class TextFormatterDemo : Scenario {
         blockText.Text = block.ToString (); // .Replace(" ", "\u00A0"); // \u00A0 is 'non-breaking space
         Win.Add (blockText);
 
-        var unicodeCheckBox = new CheckBox ("Unicode", Application.Top.HotKeySpecifier == (Rune)' ') {
-                                  X = 0,
-                                  Y = Pos.Bottom (blockText) + 1
-                              };
+        var unicodeCheckBox = new CheckBox {
+                                               X = 0,
+                                               Y = Pos.Bottom (blockText) + 1,
+                                               Text = "Unicode",
+                                               Checked = Application.Top.HotKeySpecifier == (Rune)' '
+                                           };
 
         Win.Add (unicodeCheckBox);
 
@@ -58,33 +64,42 @@ public class TextFormatterDemo : Scenario {
         var multiLineHeight = 5;
 
         foreach (TextAlignment alignment in alignments) {
-            singleLines[(int)alignment] = new Label (text) {
-                                                               AutoSize = false, TextAlignment = alignment, X = 0,
-                                                               Width = Dim.Fill (),
-                                                               Height = 1, ColorScheme = Colors.ColorSchemes["Dialog"]
-                                                           };
-            multipleLines[(int)alignment] = new Label (text) {
-                                                                 AutoSize = false, TextAlignment = alignment, X = 0,
-                                                                 Width = Dim.Fill (),
-                                                                 Height = multiLineHeight,
-                                                                 ColorScheme = Colors.ColorSchemes["Dialog"]
-                                                             };
+            singleLines[(int)alignment] = new Label {
+                                                        TextAlignment = alignment,
+                                                        X = 0,
+                                                        Width = Dim.Fill (),
+                                                        Height = 1,
+                                                        ColorScheme = Colors.ColorSchemes["Dialog"],
+                                                        AutoSize = false,
+                                                        Text = text
+                                                    };
+            multipleLines[(int)alignment] = new Label {
+                                                          TextAlignment = alignment,
+                                                          X = 0,
+                                                          Width = Dim.Fill (),
+                                                          Height = multiLineHeight,
+                                                          ColorScheme = Colors.ColorSchemes["Dialog"],
+                                                          AutoSize = false,
+                                                          Text = text
+                                                      };
         }
 
-        var label = new Label ("Demonstrating single-line (should clip):") { Y = Pos.Bottom (unicodeCheckBox) + 1 };
+        var label = new Label {
+                                  Y = Pos.Bottom (unicodeCheckBox) + 1, Text = "Demonstrating multi-line and word wrap:"
+                              };
         Win.Add (label);
         foreach (TextAlignment alignment in alignments) {
-            label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
+            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             Win.Add (label);
             singleLines[(int)alignment].Y = Pos.Bottom (label);
             Win.Add (singleLines[(int)alignment]);
             label = singleLines[(int)alignment];
         }
 
-        label = new Label ("Demonstrating multi-line and word wrap:") { Y = Pos.Bottom (label) };
+        label = new Label { Y = Pos.Bottom (label), Text = "Demonstrating multi-line and word wrap:" };
         Win.Add (label);
         foreach (TextAlignment alignment in alignments) {
-            label = new Label ($"{alignment}:") { Y = Pos.Bottom (label) };
+            label = new Label { Y = Pos.Bottom (label), Text = $"{alignment}:" };
             Win.Add (label);
             multipleLines[(int)alignment].Y = Pos.Bottom (label);
             Win.Add (multipleLines[(int)alignment]);

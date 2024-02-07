@@ -4,7 +4,7 @@ using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
 using Terminal.Gui;
 
-namespace ReactiveExample; 
+namespace ReactiveExample;
 
 public class LoginView : Window, IViewFor<LoginViewModel> {
     private readonly CompositeDisposable _disposable = new ();
@@ -32,11 +32,12 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
     }
 
     private Button ClearButton (View previous) {
-        var clearButton = new Button ("Clear") {
-                                                   X = Pos.Left (previous),
-                                                   Y = Pos.Top (previous) + 1,
-                                                   Width = 40
-                                               };
+        var clearButton = new Button {
+                                         X = Pos.Left (previous),
+                                         Y = Pos.Top (previous) + 1,
+                                         Width = 40,
+                                         Text = "Clear"
+                                     };
         clearButton
             .Events ()
             .Clicked
@@ -49,10 +50,10 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
 
     private Button LoginButton (View previous) {
         var loginButton = new Button {
-                                         Text = "Login",
                                          X = Pos.Left (previous),
                                          Y = Pos.Top (previous) + 1,
-                                         Width = 40
+                                         Width = 40,
+                                         Text = "Login"
                                      };
         loginButton
             .Events ()
@@ -67,11 +68,12 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
     private Label LoginProgressLabel (View previous) {
         var progress = "Logging in...";
         var idle = "Press 'Login' to log in.";
-        var loginProgressLabel = new Label (idle) {
-                                                      X = Pos.Left (previous),
-                                                      Y = Pos.Top (previous) + 1,
-                                                      Width = 40
-                                                  };
+        var loginProgressLabel = new Label {
+                                               X = Pos.Left (previous),
+                                               Y = Pos.Top (previous) + 1,
+                                               Width = 40,
+                                               Text = idle
+                                           };
         ViewModel
             .WhenAnyObservable (x => x.Login.IsExecuting)
             .Select (executing => executing ? progress : idle)
@@ -84,11 +86,12 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
     }
 
     private TextField PasswordInput (View previous) {
-        var passwordInput = new TextField (ViewModel.Password) {
-                                                                   X = Pos.Left (previous),
-                                                                   Y = Pos.Top (previous) + 1,
-                                                                   Width = 40
-                                                               };
+        var passwordInput = new TextField {
+                                              X = Pos.Left (previous),
+                                              Y = Pos.Top (previous) + 1,
+                                              Width = 40,
+                                              Text = ViewModel.Password
+                                          };
         ViewModel
             .WhenAnyValue (x => x.Password)
             .BindTo (passwordInput, x => x.Text)
@@ -122,18 +125,19 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
     }
 
     private Label TitleLabel () {
-        var label = new Label ("Login Form");
+        var label = new Label { Text = "Login Form" };
         Add (label);
 
         return label;
     }
 
     private TextField UsernameInput (View previous) {
-        var usernameInput = new TextField (ViewModel.Username) {
-                                                                   X = Pos.Left (previous),
-                                                                   Y = Pos.Top (previous) + 1,
-                                                                   Width = 40
-                                                               };
+        var usernameInput = new TextField {
+                                              X = Pos.Left (previous),
+                                              Y = Pos.Top (previous) + 1,
+                                              Width = 40,
+                                              Text = ViewModel.Username
+                                          };
         ViewModel
             .WhenAnyValue (x => x.Username)
             .BindTo (usernameInput, x => x.Text)
@@ -169,11 +173,12 @@ public class LoginView : Window, IViewFor<LoginViewModel> {
     private Label ValidationLabel (View previous) {
         var error = "Please, enter user name and password.";
         var success = "The input is valid!";
-        var validationLabel = new Label (error) {
-                                                    X = Pos.Left (previous),
-                                                    Y = Pos.Top (previous) + 1,
-                                                    Width = 40
-                                                };
+        var validationLabel = new Label {
+                                            X = Pos.Left (previous),
+                                            Y = Pos.Top (previous) + 1,
+                                            Width = 40,
+                                            Text = error
+                                        };
         ViewModel
             .WhenAnyValue (x => x.IsValid)
             .Select (valid => valid ? success : error)

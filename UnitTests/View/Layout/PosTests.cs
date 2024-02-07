@@ -397,9 +397,11 @@ public class PosTests {
         field.KeyDown += (s, k) => {
             if (k.KeyCode == KeyCode.Enter) {
                 field.Text = $"Label {count}";
-                var label = new Label (field.Text) { X = 0, Y = field.Y /*, Width = 20*/ };
+                var label = new Label { X = 0, Y = field.Y, /* Width = 20, */ Text = field.Text };
                 view.Add (label);
                 Assert.Equal ($"Label {count}", label.Text);
+                Assert.Equal ($"Absolute({count})", label.Y.ToString ());
+
                 Assert.Equal ($"Absolute({count})", field.Y.ToString ());
                 field.Y += 1;
                 count++;
@@ -445,7 +447,7 @@ public class PosTests {
 
         for (var i = 0; i < count; i++) {
             field.Text = $"Label {i}";
-            var label = new Label (field.Text) { X = 0, Y = field.Y /*, Width = 20*/ };
+            var label = new Label { X = 0, Y = field.Y, /* Width = 20 */, Text = field.Text };
             view.Add (label);
             Assert.Equal ($"Label {i}", label.Text);
             Assert.Equal ($"Absolute({i})", field.Y.ToString ());
@@ -760,7 +762,7 @@ public class PosTests {
         testInt = 1;
 
         // Pos.Y(win) +1
-        pos = Pos.Y (new View (testRect)) + testInt;
+        pos = Pos.Y (new View { Frame = testRect }) + testInt;
         Assert.Equal (
                       $"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))",
                       pos.ToString ());
@@ -768,7 +770,7 @@ public class PosTests {
         testInt = -1;
 
         // Pos.Y(win) -1
-        pos = Pos.Y (new View (testRect)) - testInt;
+        pos = Pos.Y (new View { Frame = testRect }) - testInt;
         Assert.Equal (
                       $"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))",
                       pos.ToString ());
@@ -780,15 +782,15 @@ public class PosTests {
         pos = Pos.Bottom (new View ());
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
-        pos = Pos.Bottom (new View (testRect));
+        pos = Pos.Bottom (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
         testRect = new Rect (1, 2, 3, 4);
-        pos = Pos.Bottom (new View (testRect));
+        pos = Pos.Bottom (new View { Frame = testRect });
         Assert.Equal ($"View(side={side},target=View(){testRect})", pos.ToString ());
 
         // Pos.Bottom(win) + 0
-        pos = Pos.Bottom (new View (testRect)) + testInt;
+        pos = Pos.Bottom (new View { Frame = testRect }) + testInt;
         Assert.Equal (
                       $"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))",
                       pos.ToString ());
@@ -796,7 +798,7 @@ public class PosTests {
         testInt = 1;
 
         // Pos.Bottom(win) +1
-        pos = Pos.Bottom (new View (testRect)) + testInt;
+        pos = Pos.Bottom (new View { Frame = testRect }) + testInt;
         Assert.Equal (
                       $"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))",
                       pos.ToString ());
@@ -804,7 +806,7 @@ public class PosTests {
         testInt = -1;
 
         // Pos.Bottom(win) -1
-        pos = Pos.Bottom (new View (testRect)) - testInt;
+        pos = Pos.Bottom (new View { Frame = testRect }) - testInt;
         Assert.Equal (
                       $"Combine(View(side={side},target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))",
                       pos.ToString ());

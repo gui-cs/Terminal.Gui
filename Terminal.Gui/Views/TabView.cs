@@ -11,13 +11,13 @@ public class TabView : View {
     /// </summary>
     private readonly View _contentView;
 
-    private Tab _selectedTab;
-    private TabToRender[] _tabLocations;
     private readonly List<Tab> _tabs = new ();
 
     /// <summary>This sub view is the 2 or 3 line control that represents the actual tabs themselves.</summary>
     private readonly TabRowView _tabsBar;
 
+    private Tab _selectedTab;
+    private TabToRender[] _tabLocations;
     private int _tabScrollOffset;
 
     /// <summary>Initializes a <see cref="TabView"/> class using <see cref="LayoutStyle.Computed"/> layout.</summary>
@@ -65,9 +65,13 @@ public class TabView : View {
         AddCommand (
                     Command.NextView,
                     () => {
-                        _contentView.SetFocus ();
+                        if (_contentView is { HasFocus: false }) {
+                            _contentView.SetFocus ();
 
-                        return true;
+                            return true;
+                        }
+
+                        return false;
                     });
         AddCommand (
                     Command.PreviousView,
@@ -255,7 +259,7 @@ public class TabView : View {
     /// <returns>The valid <see cref="TabScrollOffset"/> for the given value.</returns>
     public int EnsureValidScrollOffsets (int value) { return Math.Max (Math.Min (value, Tabs.Count - 1), 0); }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override void OnDrawContent (Rect contentArea) {
         Driver.SetAttribute (GetNormalColor ());
 
@@ -268,7 +272,7 @@ public class TabView : View {
         }
     }
 
-    ///<inheritdoc/>
+    /// <inheritdoc/>
     public override void OnDrawContentComplete (Rect contentArea) { _tabsBar.OnDrawContentComplete (contentArea); }
 
     /// <summary>
@@ -588,7 +592,11 @@ public class TabView : View {
                     if (i == 0 && _host.TabScrollOffset == 0) {
                         if (_host.Style.TabsOnBottom) {
                             // Upper left vertical line
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), -1, Orientation.Vertical, tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        -1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle);
                         } else {
                             // Lower left vertical line
                             lc.AddLine (
@@ -600,8 +608,16 @@ public class TabView : View {
                     } else if (i > 0 && i <= tabLocations.Length - 1) {
                         if (_host.Style.TabsOnBottom) {
                             // URCorner
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), -1, Orientation.Horizontal, tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle);
                         } else {
                             // LRCorner
                             lc.AddLine (
@@ -631,7 +647,11 @@ public class TabView : View {
                                             tab.BorderStyle);
                             } else {
                                 // Upper left tee
-                                lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
+                                lc.AddLine (
+                                            new Point (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle);
                                 lc.AddLine (
                                             new Point (vts.X - 1, vts.Y - 1),
                                             0,
@@ -657,7 +677,11 @@ public class TabView : View {
                                             tab.BorderStyle);
                             } else {
                                 // Upper right tee
-                                lc.AddLine (new Point (vts.Right, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
+                                lc.AddLine (
+                                            new Point (vts.Right, vts.Y - 1),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle);
                                 lc.AddLine (
                                             new Point (vts.Right, vts.Y - 1),
                                             0,
@@ -669,8 +693,16 @@ public class TabView : View {
 
                     if (_host.Style.TabsOnBottom) {
                         //URCorner
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 1, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    1,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     } else {
                         //LLCorner
                         lc.AddLine (
@@ -702,12 +734,24 @@ public class TabView : View {
                             }
 
                             // ULCorner
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Horizontal, tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle);
                         } else {
                             if (_host.Style.ShowTopLine) {
                                 // ULCorner
-                                lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
+                                lc.AddLine (
+                                            new Point (vts.X - 1, vts.Y - 1),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle);
                                 lc.AddLine (
                                             new Point (vts.X - 1, vts.Y - 1),
                                             1,
@@ -716,59 +760,140 @@ public class TabView : View {
                             }
 
                             // LLCorner
-                            lc.AddLine (new Point (vts.X - 1, vts.Bottom), -1, Orientation.Vertical, tab.BorderStyle);
-                            lc.AddLine (new Point (vts.X - 1, vts.Bottom), 1, Orientation.Horizontal, tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Bottom),
+                                        -1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle);
                         }
                     } else if (i > 0) {
                         if (_host.Style.ShowTopLine || _host.Style.TabsOnBottom) {
                             // Upper left tee
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                            lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 0, Orientation.Horizontal, tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle);
+                            lc.AddLine (
+                                        new Point (vts.X - 1, vts.Y - 1),
+                                        0,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle);
                         }
 
                         // Lower left tee
-                        lc.AddLine (new Point (vts.X - 1, vts.Bottom), -1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.X - 1, vts.Bottom), 0, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.X - 1, vts.Bottom),
+                                    -1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.X - 1, vts.Bottom),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     }
                 } else if (i < tabLocations.Length - 1) {
                     if (_host.Style.ShowTopLine) {
                         // Upper right tee
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 0, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     }
 
                     if (_host.Style.ShowTopLine || !_host.Style.TabsOnBottom) {
                         // Lower right tee
-                        lc.AddLine (new Point (vts.Right, vts.Bottom), -1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.Right, vts.Bottom), 0, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Bottom),
+                                    -1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Bottom),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     } else {
                         // Upper right tee
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 0, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     }
                 }
 
-                if (i == 0 && i != selectedTab && _host.TabScrollOffset == 0 && _host.Style.ShowBorder) {
+                if (i == 0 && i != selectedTab && _host.TabScrollOffset == 0 &&
+                    _host.Style.ShowBorder) {
                     if (_host.Style.TabsOnBottom) {
                         // Upper left vertical line
-                        lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 0, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.X - 1, vts.Y - 1), 1, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.X - 1, vts.Y - 1),
+                                    0,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.X - 1, vts.Y - 1),
+                                    1,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     } else {
                         // Lower left vertical line
-                        lc.AddLine (new Point (vts.X - 1, vts.Bottom), 0, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.X - 1, vts.Bottom), 1, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.X - 1, vts.Bottom),
+                                    0,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.X - 1, vts.Bottom),
+                                    1,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     }
                 }
 
                 if (i == tabLocations.Length - 1 && i != selectedTab) {
                     if (_host.Style.TabsOnBottom) {
                         // Upper right tee
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.Right, vts.Y - 1), 0, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Y - 1),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     } else {
                         // Lower right tee
-                        lc.AddLine (new Point (vts.Right, vts.Bottom), -1, Orientation.Vertical, tab.BorderStyle);
-                        lc.AddLine (new Point (vts.Right, vts.Bottom), 0, Orientation.Horizontal, tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Bottom),
+                                    -1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle);
+                        lc.AddLine (
+                                    new Point (vts.Right, vts.Bottom),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle);
                     }
                 }
 
@@ -790,7 +915,9 @@ public class TabView : View {
                                             tab.BorderStyle);
                             } else {
                                 lc.AddLine (
-                                            new Point (vts.Right, vts.Bottom - lastSelectedTab),
+                                            new Point (
+                                                       vts.Right,
+                                                       vts.Bottom - lastSelectedTab),
                                             lineLength - arrowOffset,
                                             Orientation.Horizontal,
                                             tab.BorderStyle);
@@ -815,14 +942,18 @@ public class TabView : View {
                             if (_host.Style.TabsOnBottom) {
                                 // More LRCorner
                                 lc.AddLine (
-                                            new Point (tabsBarVts.Right - 1, vts.Y - lastSelectedTab),
+                                            new Point (
+                                                       tabsBarVts.Right - 1,
+                                                       vts.Y - lastSelectedTab),
                                             -1,
                                             Orientation.Vertical,
                                             tab.BorderStyle);
                             } else {
                                 // More URCorner
                                 lc.AddLine (
-                                            new Point (tabsBarVts.Right - 1, vts.Bottom - lastSelectedTab),
+                                            new Point (
+                                                       tabsBarVts.Right - 1,
+                                                       vts.Bottom - lastSelectedTab),
                                             1,
                                             Orientation.Vertical,
                                             tab.BorderStyle);
@@ -918,7 +1049,10 @@ public class TabView : View {
                     }
                 }
 
-                tab.TextFormatter.Draw (tab.BoundsToScreen (tab.Bounds), prevAttr, ColorScheme.HotNormal);
+                tab.TextFormatter.Draw (
+                                        tab.BoundsToScreen (tab.Bounds),
+                                        prevAttr,
+                                        ColorScheme.HotNormal);
 
                 tab.OnRenderLineCanvas ();
 

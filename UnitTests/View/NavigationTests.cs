@@ -234,9 +234,9 @@ public class NavigationTests {
     [Fact]
     public void CanFocus_Set_Changes_TabIndex_And_TabStop () {
         var r = new View ();
-        var v1 = new View ("1");
-        var v2 = new View ("2");
-        var v3 = new View ("3");
+        var v1 = new View { Text = "1" };
+        var v2 = new View { Text = "2" };
+        var v3 = new View { Text = "3" };
 
         r.Add (v1, v2, v3);
 
@@ -414,7 +414,7 @@ public class NavigationTests {
     [AutoInitShutdown]
     public void Enabled_False_Sets_HasFocus_To_False () {
         var wasClicked = false;
-        var view = new Button ("Click Me");
+        var view = new Button { Text = "Click Me" };
         view.Clicked += (s, e) => wasClicked = !wasClicked;
         Application.Top.Add (view);
 
@@ -442,7 +442,7 @@ public class NavigationTests {
     [AutoInitShutdown]
     public void Enabled_Sets_Also_Sets_Subviews () {
         var wasClicked = false;
-        var button = new Button ("Click Me");
+        var button = new Button { Text = "Click Me" };
         button.IsDefault = true;
         button.Clicked += (s, e) => wasClicked = !wasClicked;
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };

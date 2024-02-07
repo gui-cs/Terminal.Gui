@@ -2,7 +2,7 @@
 using System.Text;
 using Terminal.Gui;
 
-namespace UICatalog.Scenarios; 
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("HexEditor", "A binary (hex) editor using the HexView control.")]
 [ScenarioCategory ("Controls")]
@@ -35,37 +35,36 @@ public class HexEditor : Scenario {
         _hexView.PositionChanged += _hexView_PositionChanged;
         Win.Add (_hexView);
 
-        var menu = new MenuBar (
-                                new MenuBarItem[] {
-                                                      new (
-                                                           "_File",
-                                                           new MenuItem[] {
-                                                                              new ("_New", "", () => New ()),
-                                                                              new ("_Open", "", () => Open ()),
-                                                                              new ("_Save", "", () => Save ()),
-                                                                              null,
-                                                                              new ("_Quit", "", () => Quit ())
-                                                                          }),
-                                                      new (
-                                                           "_Edit",
-                                                           new MenuItem[] {
-                                                                              new ("_Copy", "", () => Copy ()),
-                                                                              new ("C_ut", "", () => Cut ()),
-                                                                              new ("_Paste", "", () => Paste ())
-                                                                          }),
-                                                      new (
-                                                           "_Options",
-                                                           new[] {
-                                                                     _miAllowEdits =
-                                                                         new MenuItem (
-                                                                          "_AllowEdits",
-                                                                          "",
-                                                                          () => ToggleAllowEdits ()) {
-                                                                             Checked = _hexView.AllowEdits,
-                                                                             CheckType = MenuItemCheckStyle.Checked
-                                                                         }
-                                                                 })
-                                                  });
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new ("_New", "", () => New ()),
+                                                                                new ("_Open", "", () => Open ()),
+                                                                                new ("_Save", "", () => Save ()),
+                                                                                null,
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            }),
+                                   new MenuBarItem (
+                                                    "_Edit",
+                                                    new MenuItem[] {
+                                                                       new ("_Copy", "", () => Copy ()),
+                                                                       new ("C_ut", "", () => Cut ()),
+                                                                       new ("_Paste", "", () => Paste ())
+                                                                   }),
+                                   new MenuBarItem (
+                                                    "_Options",
+                                                    new[] {
+                                                              _miAllowEdits = new MenuItem (
+                                                                               "_AllowEdits",
+                                                                               "",
+                                                                               () => ToggleAllowEdits ()) {
+                                                                                  Checked = _hexView.AllowEdits,
+                                                                                  CheckType = MenuItemCheckStyle
+                                                                                      .Checked
+                                                                              }
+                                                          })
+                                       ]
+                               };
         Application.Top.Add (menu);
 
         _statusBar = new StatusBar (
@@ -122,8 +121,11 @@ public class HexEditor : Scenario {
     private Stream LoadFile () {
         var stream = new MemoryStream ();
         if (!_saved && _hexView != null && _hexView.Edits.Count > 0) {
-            if (MessageBox.ErrorQuery ("Save", "The changes were not saved. Want to open without saving?", "Yes", "No")
-                == 1) {
+            if (MessageBox.ErrorQuery (
+                                       "Save",
+                                       "The changes were not saved. Want to open without saving?",
+                                       "Yes",
+                                       "No") == 1) {
                 return _hexView.Source;
             }
 
@@ -149,10 +151,7 @@ public class HexEditor : Scenario {
     }
 
     private void Open () {
-        var d = new OpenDialog {
-                                   Text = "Open",
-                                   AllowsMultipleSelection = false
-                               };
+        var d = new OpenDialog { Title = "Open", AllowsMultipleSelection = false };
         Application.Run (d);
 
         if (!d.Canceled) {

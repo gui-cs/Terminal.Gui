@@ -6,7 +6,7 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Text Alignment and Direction", "Demos horiztonal and vertical text alignment and text direction.")]
+[ScenarioMetadata ("Text Alignment and Direction", "Demos horizontal and vertical text alignment and text direction.")]
 [ScenarioCategory ("Text and Formatting")]
 public class TextAlignmentsAndDirections : Scenario {
     public override void Setup () {
@@ -23,66 +23,78 @@ public class TextAlignmentsAndDirections : Scenario {
         // Horizontal Single-Line 
 
         var labelHL = new Label {
-                                    Text = "Left",
-                                    AutoSize = false,
                                     X = 1,
                                     Y = 1,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
-                                    ColorScheme = Colors.ColorSchemes["Dialog"]
+                                    ColorScheme = Colors.ColorSchemes["Dialog"],
+                                    Text = "Left"
                                 };
         var labelHC = new Label {
-                                    Text = "Centered",
-                                    AutoSize = false,
                                     X = 1,
                                     Y = 2,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
-                                    ColorScheme = Colors.ColorSchemes["Dialog"]
+                                    ColorScheme = Colors.ColorSchemes["Dialog"],
+                                    Text = "Centered"
                                 };
         var labelHR = new Label {
-                                    Text = "Right",
-                                    AutoSize = false,
                                     X = 1,
                                     Y = 3,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
-                                    ColorScheme = Colors.ColorSchemes["Dialog"]
+                                    ColorScheme = Colors.ColorSchemes["Dialog"],
+                                    Text = "Right"
                                 };
         var labelHJ = new Label {
-                                    Text = "Justified",
-                                    AutoSize = false,
                                     X = 1,
                                     Y = 4,
                                     Width = 9,
                                     Height = 1,
                                     TextAlignment = TextAlignment.Right,
-                                    ColorScheme = Colors.ColorSchemes["Dialog"]
+                                    ColorScheme = Colors.ColorSchemes["Dialog"],
+                                    Text = "Justified"
                                 };
 
-        var txtLabelHL = new Label (txt) {
-                                             AutoSize = false, X = Pos.Right (labelHL) + 1, Y = Pos.Y (labelHL),
-                                             Width = Dim.Fill (1) - 9, Height = 1, ColorScheme = color1,
-                                             TextAlignment = TextAlignment.Left
-                                         };
-        var txtLabelHC = new Label (txt) {
-                                             AutoSize = false, X = Pos.Right (labelHC) + 1, Y = Pos.Y (labelHC),
-                                             Width = Dim.Fill (1) - 9, Height = 1, ColorScheme = color2,
-                                             TextAlignment = TextAlignment.Centered
-                                         };
-        var txtLabelHR = new Label (txt) {
-                                             AutoSize = false, X = Pos.Right (labelHR) + 1, Y = Pos.Y (labelHR),
-                                             Width = Dim.Fill (1) - 9, Height = 1, ColorScheme = color1,
-                                             TextAlignment = TextAlignment.Right
-                                         };
-        var txtLabelHJ = new Label (txt) {
-                                             AutoSize = false, X = Pos.Right (labelHJ) + 1, Y = Pos.Y (labelHJ),
-                                             Width = Dim.Fill (1) - 9, Height = 1, ColorScheme = color2,
-                                             TextAlignment = TextAlignment.Justified
-                                         };
+        var txtLabelHL = new Label {
+                                       X = Pos.Right (labelHL) + 1,
+                                       Y = Pos.Y (labelHL),
+                                       Width = Dim.Fill (1) - 9,
+                                       Height = 1,
+                                       ColorScheme = color1,
+                                       TextAlignment = TextAlignment.Left,
+                                       Text = txt
+                                   };
+        var txtLabelHC = new Label {
+                                       X = Pos.Right (labelHC) + 1,
+                                       Y = Pos.Y (labelHC),
+                                       Width = Dim.Fill (1) - 9,
+                                       Height = 1,
+                                       ColorScheme = color2,
+                                       TextAlignment = TextAlignment.Centered,
+                                       Text = txt
+                                   };
+        var txtLabelHR = new Label {
+                                       X = Pos.Right (labelHR) + 1,
+                                       Y = Pos.Y (labelHR),
+                                       Width = Dim.Fill (1) - 9,
+                                       Height = 1,
+                                       ColorScheme = color1,
+                                       TextAlignment = TextAlignment.Right,
+                                       Text = txt
+                                   };
+        var txtLabelHJ = new Label {
+                                       X = Pos.Right (labelHJ) + 1,
+                                       Y = Pos.Y (labelHJ),
+                                       Width = Dim.Fill (1) - 9,
+                                       Height = 1,
+                                       ColorScheme = color2,
+                                       TextAlignment = TextAlignment.Justified,
+                                       Text = txt
+                                   };
 
         txts.Add (txtLabelHL);
         txts.Add (txtLabelHC);
@@ -101,78 +113,86 @@ public class TextAlignmentsAndDirections : Scenario {
         // Vertical Single-Line
 
         var labelVT = new Label {
-                                    Text = "Top",
-                                    AutoSize = false,
                                     X = Pos.AnchorEnd (8),
                                     Y = 1,
                                     Width = 2,
                                     Height = 9,
                                     ColorScheme = color1,
                                     TextDirection = TextDirection.TopBottom_LeftRight,
-                                    VerticalTextAlignment = VerticalTextAlignment.Bottom
+                                    VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                    Text = "Top"
                                 };
         var labelVM = new Label {
-                                    Text = "Middle",
-                                    AutoSize = false,
                                     X = Pos.AnchorEnd (6),
                                     Y = 1,
                                     Width = 2,
                                     Height = 9,
                                     ColorScheme = color1,
                                     TextDirection = TextDirection.TopBottom_LeftRight,
-                                    VerticalTextAlignment = VerticalTextAlignment.Bottom
+                                    VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                    Text = "Middle"
                                 };
         var labelVB = new Label {
-                                    Text = "Bottom",
-                                    AutoSize = false,
                                     X = Pos.AnchorEnd (4),
                                     Y = 1,
                                     Width = 2,
                                     Height = 9,
                                     ColorScheme = color1,
                                     TextDirection = TextDirection.TopBottom_LeftRight,
-                                    VerticalTextAlignment = VerticalTextAlignment.Bottom
+                                    VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                    Text = "Bottom"
                                 };
         var labelVJ = new Label {
-                                    Text = "Justified",
-                                    AutoSize = false,
                                     X = Pos.AnchorEnd (2),
                                     Y = 1,
                                     Width = 1,
                                     Height = 9,
                                     ColorScheme = color1,
                                     TextDirection = TextDirection.TopBottom_LeftRight,
-                                    VerticalTextAlignment = VerticalTextAlignment.Bottom
+                                    VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                    Text = "Justified"
                                 };
 
-        var txtLabelVT = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (labelVT), Y = Pos.Bottom (labelVT) + 1,
-                                             Width = 1,
-                                             Height = Dim.Fill (1), ColorScheme = color1,
-                                             TextDirection = TextDirection.TopBottom_LeftRight,
-                                             VerticalTextAlignment = VerticalTextAlignment.Top
-                                         };
-        var txtLabelVM = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (labelVM), Y = Pos.Bottom (labelVM) + 1,
-                                             Width = 1,
-                                             Height = Dim.Fill (1), ColorScheme = color2,
-                                             TextDirection = TextDirection.TopBottom_LeftRight,
-                                             VerticalTextAlignment = VerticalTextAlignment.Middle
-                                         };
-        var txtLabelVB = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (labelVB), Y = Pos.Bottom (labelVB) + 1,
-                                             Width = 1,
-                                             Height = Dim.Fill (1), ColorScheme = color1,
-                                             TextDirection = TextDirection.TopBottom_LeftRight,
-                                             VerticalTextAlignment = VerticalTextAlignment.Bottom
-                                         };
-        var txtLabelVJ = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (labelVJ), Y = Pos.Bottom (labelVJ) + 1,
-                                             Width = 1,
-                                             Height = Dim.Fill (1), ColorScheme = color2,
-                                             TextDirection = TextDirection.TopBottom_LeftRight,
-                                             VerticalTextAlignment = VerticalTextAlignment.Justified
-                                         };
+        var txtLabelVT = new Label {
+                                       X = Pos.X (labelVT),
+                                       Y = Pos.Bottom (labelVT) + 1,
+                                       Width = 1,
+                                       Height = Dim.Fill (1),
+                                       ColorScheme = color1,
+                                       TextDirection = TextDirection.TopBottom_LeftRight,
+                                       VerticalTextAlignment = VerticalTextAlignment.Top,
+                                       Text = txt
+                                   };
+        var txtLabelVM = new Label {
+                                       X = Pos.X (labelVM),
+                                       Y = Pos.Bottom (labelVM) + 1,
+                                       Width = 1,
+                                       Height = Dim.Fill (1),
+                                       ColorScheme = color2,
+                                       TextDirection = TextDirection.TopBottom_LeftRight,
+                                       VerticalTextAlignment = VerticalTextAlignment.Middle,
+                                       Text = txt
+                                   };
+        var txtLabelVB = new Label {
+                                       X = Pos.X (labelVB),
+                                       Y = Pos.Bottom (labelVB) + 1,
+                                       Width = 1,
+                                       Height = Dim.Fill (1),
+                                       ColorScheme = color1,
+                                       TextDirection = TextDirection.TopBottom_LeftRight,
+                                       VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                       Text = txt
+                                   };
+        var txtLabelVJ = new Label {
+                                       X = Pos.X (labelVJ),
+                                       Y = Pos.Bottom (labelVJ) + 1,
+                                       Width = 1,
+                                       Height = Dim.Fill (1),
+                                       ColorScheme = color2,
+                                       TextDirection = TextDirection.TopBottom_LeftRight,
+                                       VerticalTextAlignment = VerticalTextAlignment.Justified,
+                                       Text = txt
+                                   };
 
         txts.Add (txtLabelVT);
         txts.Add (txtLabelVM);
@@ -191,76 +211,105 @@ public class TextAlignmentsAndDirections : Scenario {
         // Multi-Line
 
         var container = new View {
-                                     X = 0, Y = Pos.Bottom (txtLabelHJ), Width = Dim.Fill (31), Height = Dim.Fill (6),
+                                     X = 0,
+                                     Y = Pos.Bottom (txtLabelHJ),
+                                     Width = Dim.Fill (31),
+                                     Height = Dim.Fill (6),
                                      ColorScheme = color2
                                  };
 
-        var txtLabelTL = new Label (txt) {
-                                             AutoSize = false, X = 1 /*                    */, Y = 1,
-                                             Width = Dim.Percent (100f / 3f),
-                                             Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Left,
-                                             VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1
-                                         };
-        var txtLabelTC = new Label (txt) {
-                                             AutoSize = false, X = Pos.Right (txtLabelTL) + 2, Y = 1,
-                                             Width = Dim.Percent (100f / 3f),
-                                             Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Centered,
-                                             VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1
-                                         };
-        var txtLabelTR = new Label (txt) {
-                                             AutoSize = false, X = Pos.Right (txtLabelTC) + 2, Y = 1,
-                                             Width = Dim.Percent (100f, true),
-                                             Height = Dim.Percent (100f / 3f), TextAlignment = TextAlignment.Right,
-                                             VerticalTextAlignment = VerticalTextAlignment.Top, ColorScheme = color1
-                                         };
+        var txtLabelTL = new Label {
+                                       X = 1 /*                    */,
+                                       Y = 1,
+                                       Width = Dim.Percent (100f / 3f),
+                                       Height = Dim.Percent (100f / 3f),
+                                       TextAlignment = TextAlignment.Left,
+                                       VerticalTextAlignment = VerticalTextAlignment.Top,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
+        var txtLabelTC = new Label {
+                                       X = Pos.Right (txtLabelTL) + 2,
+                                       Y = 1,
+                                       Width = Dim.Percent (100f / 3f),
+                                       Height = Dim.Percent (100f / 3f),
+                                       TextAlignment = TextAlignment.Centered,
+                                       VerticalTextAlignment = VerticalTextAlignment.Top,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
+        var txtLabelTR = new Label {
+                                       X = Pos.Right (txtLabelTC) + 2,
+                                       Y = 1,
+                                       Width = Dim.Percent (100f, true),
+                                       Height = Dim.Percent (100f / 3f),
+                                       TextAlignment = TextAlignment.Right,
+                                       VerticalTextAlignment = VerticalTextAlignment.Top,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
 
-        var txtLabelML = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (txtLabelTL) /*    */,
-                                             Y = Pos.Bottom (txtLabelTL) + 1,
-                                             Width = Dim.Width (txtLabelTL), Height = Dim.Percent (100f / 3f),
-                                             TextAlignment = TextAlignment.Left,
-                                             VerticalTextAlignment = VerticalTextAlignment.Middle,
-                                             ColorScheme = color1
-                                         };
-        var txtLabelMC = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (txtLabelTC) /*    */,
-                                             Y = Pos.Bottom (txtLabelTC) + 1,
-                                             Width = Dim.Width (txtLabelTC), Height = Dim.Percent (100f / 3f),
-                                             TextAlignment = TextAlignment.Centered,
-                                             VerticalTextAlignment = VerticalTextAlignment.Middle, ColorScheme = color1
-                                         };
-        var txtLabelMR = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (txtLabelTR) /*    */,
-                                             Y = Pos.Bottom (txtLabelTR) + 1,
-                                             Width = Dim.Percent (100f, true), Height = Dim.Percent (100f / 3f),
-                                             TextAlignment = TextAlignment.Right,
-                                             VerticalTextAlignment = VerticalTextAlignment.Middle,
-                                             ColorScheme = color1
-                                         };
+        var txtLabelML = new Label {
+                                       X = Pos.X (txtLabelTL),
+                                       Y = Pos.Bottom (txtLabelTL) + 1,
+                                       Width = Dim.Width (txtLabelTL),
+                                       Height = Dim.Percent (100f / 3f),
+                                       TextAlignment = TextAlignment.Left,
+                                       VerticalTextAlignment = VerticalTextAlignment.Middle,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
+        var txtLabelMC = new Label {
+                                       X = Pos.X (txtLabelTC),
+                                       Y = Pos.Bottom (txtLabelTC) + 1,
+                                       Width = Dim.Width (txtLabelTC),
+                                       Height = Dim.Percent (100f / 3f),
+                                       TextAlignment = TextAlignment.Centered,
+                                       VerticalTextAlignment = VerticalTextAlignment.Middle,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
+        var txtLabelMR = new Label {
+                                       X = Pos.X (txtLabelTR),
+                                       Y = Pos.Bottom (txtLabelTR) + 1,
+                                       Width = Dim.Percent (100f, true),
+                                       Height = Dim.Percent (100f / 3f),
+                                       TextAlignment = TextAlignment.Right,
+                                       VerticalTextAlignment = VerticalTextAlignment.Middle,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
 
-        var txtLabelBL = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (txtLabelML) /*    */,
-                                             Y = Pos.Bottom (txtLabelML) + 1,
-                                             Width = Dim.Width (txtLabelML), Height = Dim.Percent (100f, true),
-                                             TextAlignment = TextAlignment.Left,
-                                             VerticalTextAlignment = VerticalTextAlignment.Bottom,
-                                             ColorScheme = color1
-                                         };
-        var txtLabelBC = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (txtLabelMC) /*    */,
-                                             Y = Pos.Bottom (txtLabelMC) + 1,
-                                             Width = Dim.Width (txtLabelMC), Height = Dim.Percent (100f, true),
-                                             TextAlignment = TextAlignment.Centered,
-                                             VerticalTextAlignment = VerticalTextAlignment.Bottom, ColorScheme = color1
-                                         };
-        var txtLabelBR = new Label (txt) {
-                                             AutoSize = false, X = Pos.X (txtLabelMR) /*    */,
-                                             Y = Pos.Bottom (txtLabelMR) + 1,
-                                             Width = Dim.Percent (100f, true), Height = Dim.Percent (100f, true),
-                                             TextAlignment = TextAlignment.Right,
-                                             VerticalTextAlignment = VerticalTextAlignment.Bottom,
-                                             ColorScheme = color1
-                                         };
+        var txtLabelBL = new Label {
+                                       X = Pos.X (txtLabelML),
+                                       Y = Pos.Bottom (txtLabelML) + 1,
+                                       Width = Dim.Width (txtLabelML),
+                                       Height = Dim.Percent (100f, true),
+                                       TextAlignment = TextAlignment.Left,
+                                       VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
+        var txtLabelBC = new Label {
+                                       X = Pos.X (txtLabelMC),
+                                       Y = Pos.Bottom (txtLabelMC) + 1,
+                                       Width = Dim.Width (txtLabelMC),
+                                       Height = Dim.Percent (100f, true),
+                                       TextAlignment = TextAlignment.Centered,
+                                       VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
+        var txtLabelBR = new Label {
+                                       X = Pos.X (txtLabelMR),
+                                       Y = Pos.Bottom (txtLabelMR) + 1,
+                                       Width = Dim.Percent (100f, true),
+                                       Height = Dim.Percent (100f, true),
+                                       TextAlignment = TextAlignment.Right,
+                                       VerticalTextAlignment = VerticalTextAlignment.Bottom,
+                                       ColorScheme = color1,
+                                       Text = txt
+                                   };
 
         mtxts.Add (txtLabelTL);
         mtxts.Add (txtLabelTC);
@@ -329,12 +378,11 @@ public class TextAlignmentsAndDirections : Scenario {
         // JUSTIFY CHECKBOX
 
         var justifyCheckbox = new CheckBox {
-                                               Text = "Justify",
-                                               AutoSize = false,
                                                X = Pos.Right (container) + 1,
                                                Y = Pos.Y (container) + 1,
                                                Width = Dim.Fill (10),
-                                               Height = 1
+                                               Height = 1,
+                                               Text = "Justify"
                                            };
 
         justifyCheckbox.Toggled += (s, e) => {
@@ -362,13 +410,14 @@ public class TextAlignmentsAndDirections : Scenario {
 
         List<TextDirection> directionsEnum = Enum.GetValues (typeof (TextDirection)).Cast<TextDirection> ().ToList ();
 
-        var directionOptions = new RadioGroup (directionsEnum.Select (e => e.ToString ()).ToArray ()) {
-                                   X = Pos.Right (container) + 1,
-                                   Y = Pos.Bottom (justifyCheckbox) + 1,
-                                   Width = Dim.Fill (10),
-                                   Height = Dim.Fill (1),
-                                   HotKeySpecifier = (Rune)'\xffff'
-                               };
+        var directionOptions = new RadioGroup {
+                                                  X = Pos.Right (container) + 1,
+                                                  Y = Pos.Bottom (justifyCheckbox) + 1,
+                                                  Width = Dim.Fill (10),
+                                                  Height = Dim.Fill (1),
+                                                  HotKeySpecifier = (Rune)'\xffff',
+                                                  RadioLabels = directionsEnum.Select (e => e.ToString ()).ToArray ()
+                                              };
 
         directionOptions.SelectedItemChanged += (s, ev) => {
             foreach (Label v in mtxts) {

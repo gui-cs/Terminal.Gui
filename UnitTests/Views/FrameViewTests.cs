@@ -1,24 +1,24 @@
 ﻿using Xunit.Abstractions;
 
-namespace Terminal.Gui.ViewsTests; 
+namespace Terminal.Gui.ViewsTests;
 
 public class FrameViewTests {
-    private readonly ITestOutputHelper output;
-    public FrameViewTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public FrameViewTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
-    public void Constuctors_Defaults () {
+    public void Constructors_Defaults () {
         var fv = new FrameView ();
         Assert.Equal (string.Empty, fv.Title);
         Assert.Equal (string.Empty, fv.Text);
         Assert.Equal (LineStyle.Single, fv.BorderStyle);
 
-        fv = new FrameView ("Test");
+        fv = new FrameView { Title = "Test" };
         Assert.Equal ("Test", fv.Title);
         Assert.Equal (string.Empty, fv.Text);
         Assert.Equal (LineStyle.Single, fv.BorderStyle);
 
-        fv = new FrameView (new Rect (1, 2, 10, 20), "Test");
+        fv = new FrameView { X = 1, Y = 2, Width = 10, Height = 20, Title = "Test" };
         Assert.Equal ("Test", fv.Title);
         Assert.Equal (string.Empty, fv.Text);
         fv.BeginInit ();
@@ -37,7 +37,7 @@ public class FrameViewTests {
         Application.Top.Add (fv);
         Application.Begin (Application.Top);
         Assert.Equal (new Rect (0, 0, 0, 0), fv.Frame);
-        TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+        TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
 
         fv.Height = 5;
         fv.Width = 5;
@@ -50,7 +50,7 @@ public class FrameViewTests {
 │   │
 │   │
 └───┘",
-                                                      output);
+                                                      _output);
 
         fv.X = 1;
         fv.Y = 2;
@@ -63,7 +63,7 @@ public class FrameViewTests {
  │   │
  │   │
  └───┘",
-                                                      output);
+                                                      _output);
 
         fv.X = -1;
         fv.Y = -2;
@@ -74,7 +74,7 @@ public class FrameViewTests {
    │
    │
 ───┘",
-                                                      output);
+                                                      _output);
 
         fv.X = 7;
         fv.Y = 8;
@@ -84,6 +84,6 @@ public class FrameViewTests {
                                                       @"
        ┌──
        │  ",
-                                                      output);
+                                                      _output);
     }
 }

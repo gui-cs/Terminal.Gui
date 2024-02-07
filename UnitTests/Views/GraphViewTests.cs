@@ -93,7 +93,9 @@ public class GraphViewTests {
             // but still report a failure and name the test that didn't shut down.  Note
             // that the test that didn't shutdown won't be the one currently running it will
             // be the last one
-            throw new Exception ("A test did not call shutdown correctly.  Test stack trace was:" + LastInitFakeDriver);
+            throw new Exception (
+                                 "A test did not call shutdown correctly.  Test stack trace was:" +
+                                 LastInitFakeDriver);
         }
 
         driver.Init ();
@@ -133,19 +135,31 @@ public class GraphViewTests {
                 // https://en.wikipedia.org/wiki/Machine_epsilon
                 var epsilon = 0.0001f;
 
-                Point p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Top + epsilon));
+                Point p = gv.GraphSpaceToScreen (
+                                                 new PointF (
+                                                             graphSpace.Left + epsilon,
+                                                             graphSpace.Top + epsilon));
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
-                p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon, graphSpace.Top + epsilon));
+                p = gv.GraphSpaceToScreen (
+                                           new PointF (
+                                                       graphSpace.Right - epsilon,
+                                                       graphSpace.Top + epsilon));
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
-                p = gv.GraphSpaceToScreen (new PointF (graphSpace.Left + epsilon, graphSpace.Bottom - epsilon));
+                p = gv.GraphSpaceToScreen (
+                                           new PointF (
+                                                       graphSpace.Left + epsilon,
+                                                       graphSpace.Bottom - epsilon));
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
 
-                p = gv.GraphSpaceToScreen (new PointF (graphSpace.Right - epsilon, graphSpace.Bottom - epsilon));
+                p = gv.GraphSpaceToScreen (
+                                           new PointF (
+                                                       graphSpace.Right - epsilon,
+                                                       graphSpace.Bottom - epsilon));
                 Assert.Equal (x, p.X);
                 Assert.Equal (y, p.Y);
             }
@@ -494,23 +508,23 @@ public class SeriesTests {
     }
 
     private class FakeSeries : ISeries {
-        private readonly Action<GraphView, Rect, RectangleF> drawSeries;
+        private readonly Action<GraphView, Rect, RectangleF> _drawSeries;
 
         public FakeSeries (
             Action<GraphView, Rect, RectangleF> drawSeries
         ) {
-            this.drawSeries = drawSeries;
+            _drawSeries = drawSeries;
         }
 
         public void DrawSeries (GraphView graph, Rect bounds, RectangleF graphBounds) {
-            drawSeries (graph, bounds, graphBounds);
+            _drawSeries (graph, bounds, graphBounds);
         }
     }
 }
 
 public class MultiBarSeriesTests {
-    private readonly ITestOutputHelper output;
-    public MultiBarSeriesTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public MultiBarSeriesTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void MultiBarSeries_BarSpacing () {
@@ -533,7 +547,9 @@ public class MultiBarSeriesTests {
 
         var ex = Assert.Throws<ArgumentException> (() => series.AddBars ("Cars", (Rune)'#', 1));
 
-        Assert.Equal ("Number of values must match the number of bars per category (Parameter 'values')", ex.Message);
+        Assert.Equal (
+                      "Number of values must match the number of bars per category (Parameter 'values')",
+                      ex.Message);
     }
 
     [Fact]
@@ -637,7 +653,7 @@ public class MultiBarSeriesTests {
  │  MM  MM  MM
  ┼──┬M──┬M──┬M──────
    heytherebob  ";
-        TestHelpers.AssertDriverContentsAre (looksLike, output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1005,8 +1021,8 @@ public class AxisTests {
 }
 
 public class TextAnnotationTests {
-    private readonly ITestOutputHelper output;
-    public TextAnnotationTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public TextAnnotationTests (ITestOutputHelper output) { _output = output; }
 
     [Theory]
     [InlineData (null)]
@@ -1037,7 +1053,7 @@ public class TextAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1064,7 +1080,7 @@ public class TextAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
@@ -1082,7 +1098,7 @@ public class TextAnnotationTests {
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1113,7 +1129,7 @@ public class TextAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1141,7 +1157,7 @@ public class TextAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1184,7 +1200,24 @@ public class TextAnnotationTests {
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
+
+        // user scrolls up one unit of graph space
+        gv.ScrollOffset = new PointF (0, 1f);
+        gv.Draw ();
+
+        // we expect no change in the location of the annotation (only the axis label changes)
+        // this is because screen units are constant and do not change as the viewport into
+        // graph space scrolls to different areas of the graph
+        expected =
+            @"
+ │
+ ┤ hey!
+ ┤
+1┼┬┬┬┬┬┬┬┬
+ 0    5";
+
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1192,8 +1225,8 @@ public class TextAnnotationTests {
 }
 
 public class LegendTests {
-    private readonly ITestOutputHelper output;
-    public LegendTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public LegendTests (ITestOutputHelper output) { _output = output; }
 
     [Fact]
     public void Constructors_Defaults () {
@@ -1232,7 +1265,7 @@ public class LegendTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1259,7 +1292,7 @@ public class LegendTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1267,8 +1300,8 @@ public class LegendTests {
 }
 
 public class PathAnnotationTests {
-    private readonly ITestOutputHelper output;
-    public PathAnnotationTests (ITestOutputHelper output) { this.output = output; }
+    private readonly ITestOutputHelper _output;
+    public PathAnnotationTests (ITestOutputHelper output) { _output = output; }
 
     [Theory]
     [InlineData (true)]
@@ -1286,11 +1319,7 @@ public class PathAnnotationTests {
 
         try {
             // Create a label with a short text 
-            // AutoSize off because you can't change dims AND have autosize on
-            var lbl1 = new Label {
-                                     Text = "ff",
-                                     AutoSize = false
-                                 };
+            var lbl1 = new Label { Text = "ff" };
 
             // Specify that the label should be very wide
             if (useFill) {
@@ -1346,7 +1375,7 @@ public class PathAnnotationTests {
          
          
           ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1371,7 +1400,7 @@ public class PathAnnotationTests {
          
          
           ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1403,7 +1432,7 @@ public class PathAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1435,7 +1464,7 @@ public class PathAnnotationTests {
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1476,7 +1505,7 @@ public class PathAnnotationTests {
    0    5
          
           ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1515,7 +1544,7 @@ public class PathAnnotationTests {
  0    5   
           
           ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        TestHelpers.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();

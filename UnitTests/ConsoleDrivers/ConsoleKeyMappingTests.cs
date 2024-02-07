@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ConsoleDrivers;
+using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
+
+namespace Terminal.Gui.ConsoleDrivers;
 
 public class ConsoleKeyMappingTests {
 #if ENABLE_VK_PACKET_NON_WINDOWS
@@ -469,7 +471,7 @@ public class ConsoleKeyMappingTests {
         KeyCode expectedKeyCode
     ) {
         var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
-        KeyCode keyCode = ConsoleKeyMapping.MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
+        KeyCode keyCode = MapConsoleKeyInfoToKeyCode (consoleKeyInfo);
 
         Assert.Equal (keyCode, expectedKeyCode);
     }
@@ -498,9 +500,9 @@ public class ConsoleKeyMappingTests {
         bool control,
         KeyCode excpectedKeyCode
     ) {
-        ConsoleModifiers modifiers = ConsoleKeyMapping.GetModifiers (shift, alt, control);
+        ConsoleModifiers modifiers = GetModifiers (shift, alt, control);
         var keyCode = (KeyCode)keyChar;
-        keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
+        keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
         Assert.Equal (keyCode, excpectedKeyCode);
     }
@@ -576,7 +578,7 @@ public class ConsoleKeyMappingTests {
         uint expectedScanCode
     ) {
         var consoleKeyInfo = new ConsoleKeyInfo (keyChar, consoleKey, shift, alt, control);
-        uint scanCode = ConsoleKeyMapping.GetScanCodeFromConsoleKeyInfo (consoleKeyInfo);
+        uint scanCode = GetScanCodeFromConsoleKeyInfo (consoleKeyInfo);
 
         Assert.Equal (scanCode, expectedScanCode);
     }
@@ -613,12 +615,12 @@ public class ConsoleKeyMappingTests {
         char expectedKeyChar,
         KeyCode excpectedKeyCode
     ) {
-        ConsoleModifiers modifiers = ConsoleKeyMapping.GetModifiers (true, false, false);
-        uint keyChar = ConsoleKeyMapping.GetKeyChar (unicodeChar, modifiers);
+        ConsoleModifiers modifiers = GetModifiers (true, false, false);
+        uint keyChar = GetKeyChar (unicodeChar, modifiers);
         Assert.Equal (keyChar, expectedKeyChar);
 
         var keyCode = (KeyCode)keyChar;
-        keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
+        keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
         Assert.Equal (keyCode, excpectedKeyCode);
     }
@@ -655,12 +657,12 @@ public class ConsoleKeyMappingTests {
         char expectedKeyChar,
         KeyCode excpectedKeyCode
     ) {
-        ConsoleModifiers modifiers = ConsoleKeyMapping.GetModifiers (false, false, false);
-        uint keyChar = ConsoleKeyMapping.GetKeyChar (unicodeChar, modifiers);
+        ConsoleModifiers modifiers = GetModifiers (false, false, false);
+        uint keyChar = GetKeyChar (unicodeChar, modifiers);
         Assert.Equal (keyChar, expectedKeyChar);
 
         var keyCode = (KeyCode)keyChar;
-        keyCode = ConsoleKeyMapping.MapToKeyCodeModifiers (modifiers, keyCode);
+        keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
         Assert.Equal (keyCode, excpectedKeyCode);
     }

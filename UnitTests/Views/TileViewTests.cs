@@ -2,6 +2,7 @@
 
 namespace Terminal.Gui.ViewsTests;
 
+
 public class TileViewTests {
     private readonly ITestOutputHelper _output;
     public TileViewTests (ITestOutputHelper output) { _output = output; }
@@ -33,7 +34,41 @@ public class TileViewTests {
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        var looksLike =
+            @"
+┌─────────┬────────┐
+│bleh     │blah    │
+│         │        │
+│         │        │
+│         │        │
+├─────────┴────────┤
+│Hello             │
+│                  │
+│                  │
+└──────────────────┘";
+
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1 () {
+        TileView tv = Get5x1TilesView ();
+
+        tv.Tiles.ElementAt (0).MinSize = int.MaxValue;
+
+        tv.Draw ();
+
+        var looksLike =
+            @"
+┌────┬────┬────┬────┬───┐
+│1111│2222│3333│4444│555│
+│    │    │    │    │   │
+└────┴────┴────┴────┴───┘
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
         var looksLike =
             @"
 ┌─────────┬────────┐
@@ -88,6 +123,26 @@ public class TileViewTests {
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        for (var x = 0; x <= 5; x++) {
+            // All these values would result in tile 0 getting smaller
+            // so are not allowed (tile[0] has a min size of Int.Max)
+            Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 6; x < 10; x++) {
+            // All these values would result in tile 0 getting bigger
+            // so are allowed
+            Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 10; x < 100; x++) {
+            // These values would result in the first splitter moving past
+            // the second splitter so are not allowed
+            Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
         looksLike =
             @"
@@ -98,7 +153,33 @@ public class TileViewTests {
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        looksLike =
+            @"
+┌────────┬┬────┬────┬───┐
+│11111111││3333│4444│555│
+│        ││    │    │   │
+└────────┴┴────┴────┴───┘
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1_NoBorder () {
+        TileView tv = Get5x1TilesView (false);
+
+        tv.Tiles.ElementAt (0).MinSize = int.MaxValue;
+
+        tv.Draw ();
+
+        var looksLike =
+            @"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
     [Fact]
     [AutoInitShutdown]
     public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter1_NoBorder () {
@@ -137,7 +218,37 @@ public class TileViewTests {
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        for (var x = 0; x <= 5; x++) {
+            // All these values would result in tile 0 getting smaller
+            // so are not allowed (tile[0] has a min size of Int.Max)
+            Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
 
+        for (var x = 6; x < 10; x++) {
+            // All these values would result in tile 0 getting bigger
+            // so are allowed
+            Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 10; x < 100; x++) {
+            // These values would result in the first splitter moving past
+            // the second splitter so are not allowed
+            Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
+
+        looksLike =
+            @"
+111111111││3333│4444│5555
+         ││    │    │
+         ││    │    │
+         ││    │    │
+
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
         looksLike =
             @"
 111111111││3333│4444│5555
@@ -167,6 +278,24 @@ public class TileViewTests {
 └────┴────┴────┴────┴───┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter2 () {
+        TileView tv = Get5x1TilesView ();
+
+        tv.Tiles.ElementAt (1).MinSize = 2;
+        tv.Tiles.ElementAt (2).MinSize = 3;
+
+        tv.Draw ();
+
+        var looksLike =
+            @"
+┌────┬────┬────┬────┬───┐
+│1111│2222│3333│4444│555│
+│    │    │    │    │   │
+└────┴────┴────┴────┴───┘
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         for (var x = 10; x > 7; x--) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
@@ -178,7 +307,46 @@ public class TileViewTests {
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        for (var x = 10; x > 7; x--) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
 
+        for (var x = 7; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
+
+        looksLike =
+            @"
+┌────┬──┬──────┬────┬───┐
+│1111│22│333333│4444│555│
+│    │  │      │    │   │
+└────┴──┴──────┴────┴───┘
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+
+        for (var x = 10; x < 12; x++) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 12; x < 25; x++) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
+
+        looksLike =
+            @"
+┌────┬─────┬───┬────┬───┐
+│1111│22222│333│4444│555│
+│    │     │   │    │   │
+└────┴─────┴───┴────┴───┘
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
         looksLike =
             @"
 ┌────┬──┬──────┬────┬───┐
@@ -227,6 +395,43 @@ public class TileViewTests {
      │    │    │    │
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter2_NoBorder () {
+        TileView tv = Get5x1TilesView (false);
+
+        tv.Tiles.ElementAt (1).MinSize = 2;
+        tv.Tiles.ElementAt (2).MinSize = 3;
+
+        tv.Draw ();
+
+        var looksLike =
+            @"
+11111│2222│3333│4444│5555
+     │    │    │    │
+     │    │    │    │
+     │    │    │    │
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+
+        for (var x = 10; x > 7; x--) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 7; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
+
+        looksLike =
+            @"
+
+11111│22│333333│4444│5555
+     │  │      │    │
+     │  │      │    │
+     │  │      │    │
 
         for (var x = 10; x > 7; x--) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
@@ -249,7 +454,18 @@ public class TileViewTests {
 
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 10; x < 12; x++) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 12; x < 25; x++) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
         for (var x = 10; x < 12; x++) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
@@ -279,7 +495,26 @@ public class TileViewTests {
 
         tv.Tiles.ElementAt (3).MinSize = 2;
         tv.Tiles.ElementAt (4).MinSize = 1;
+        looksLike =
+            @"  
+11111│22222│333│4444│5555
+     │     │   │    │
+     │     │   │    │
+     │     │   │    │
 
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4 () {
+        TileView tv = Get5x1TilesView ();
+
+        tv.Tiles.ElementAt (3).MinSize = 2;
+        tv.Tiles.ElementAt (4).MinSize = 1;
+
+        tv.Draw ();
         tv.Draw ();
 
         var looksLike =
@@ -288,7 +523,25 @@ public class TileViewTests {
 │1111│2222│3333│4444│555│
 │    │    │    │    │   │
 └────┴────┴────┴────┴───┘
+        var looksLike =
+            @"
+┌────┬────┬────┬────┬───┐
+│1111│2222│3333│4444│555│
+│    │    │    │    │   │
+└────┴────┴────┴────┴───┘
 ";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+
+        for (var x = 20; x > 17; x--) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 17; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         for (var x = 20; x > 17; x--) {
@@ -309,9 +562,24 @@ public class TileViewTests {
 │    │    │    │  │     │
 └────┴────┴────┴──┴─────┘
 
+        looksLike =
+            @"
+┌────┬────┬────┬──┬─────┐
+│1111│2222│3333│44│55555│
+│    │    │    │  │     │
+└────┴────┴────┴──┴─────┘
+
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 20; x < 23; x++) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 23; x < 100; x++) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
         for (var x = 20; x < 23; x++) {
             Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
@@ -322,7 +590,15 @@ public class TileViewTests {
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
+┌────┬────┬────┬──────┬─┐
+│1111│2222│3333│444444│5│
+│    │    │    │      │ │
+└────┴────┴────┴──────┴─┘
         looksLike =
             @"
 ┌────┬────┬────┬──────┬─┐
@@ -332,7 +608,13 @@ public class TileViewTests {
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4_NoBorder () {
+        TileView tv = Get5x1TilesView (false);
     [Fact]
     [AutoInitShutdown]
     public void Test5Panel_MinSizes_VerticalSplitters_ResizeSplitter4_NoBorder () {
@@ -340,9 +622,14 @@ public class TileViewTests {
 
         tv.Tiles.ElementAt (3).MinSize = 2;
         tv.Tiles.ElementAt (4).MinSize = 1;
+        tv.Tiles.ElementAt (3).MinSize = 2;
+        tv.Tiles.ElementAt (4).MinSize = 1;
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -351,7 +638,31 @@ public class TileViewTests {
      │    │    │    │
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 20; x > 17; x--) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
+
+        for (var x = 17; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
+
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
+
+        looksLike =
+            @"   
+11111│2222│3333│44│555555
+     │    │    │  │
+     │    │    │  │
+     │    │    │  │
+";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+
+        for (var x = 20; x < 24; x++) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
         for (var x = 20; x > 17; x--) {
             Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
@@ -379,10 +690,21 @@ public class TileViewTests {
         for (var x = 24; x < 100; x++) {
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
+        for (var x = 24; x < 100; x++) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
+11111│2222│3333│4444444│5
+     │    │    │       │
+     │    │    │       │
+     │    │    │       │
         looksLike =
             @"
 11111│2222│3333│4444444│5
@@ -397,9 +719,19 @@ public class TileViewTests {
     [AutoInitShutdown]
     public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder () {
         TileView tv = Get5x1TilesView ();
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder () {
+        TileView tv = Get5x1TilesView ();
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -408,16 +740,25 @@ public class TileViewTests {
 └────┴────┴────┴────┴───┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 5; x > 0; x--) {
+            Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
         for (var x = 5; x > 0; x--) {
             Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
         Assert.False (tv.SetSplitterPos (0, 0));
+        Assert.False (tv.SetSplitterPos (0, 0));
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌┬────────┬────┬────┬───┐
@@ -426,7 +767,11 @@ public class TileViewTests {
 └┴────────┴────┴────┴───┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 6; x < 10; x++) {
+            Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
         for (var x = 6; x < 10; x++) {
             Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
@@ -436,10 +781,19 @@ public class TileViewTests {
             // the second splitter so are not allowed
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
+        for (var x = 10; x < 100; x++) {
+            // These values would result in the first splitter moving past
+            // the second splitter so are not allowed
+            Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────────┬┬────┬────┬───┐
@@ -454,9 +808,19 @@ public class TileViewTests {
     [AutoInitShutdown]
     public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder_NoBorder () {
         TileView tv = Get5x1TilesView (false);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter1_CannotCrossBorder_NoBorder () {
+        TileView tv = Get5x1TilesView (false);
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -465,14 +829,22 @@ public class TileViewTests {
      │    │    │    │
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 5; x >= 0; x--) {
+            Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
         for (var x = 5; x >= 0; x--) {
             Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 │222222222│3333│4444│5555
@@ -481,7 +853,11 @@ public class TileViewTests {
 │         │    │    │
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 6; x < 10; x++) {
+            Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
         for (var x = 6; x < 10; x++) {
             Assert.True (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
@@ -491,10 +867,19 @@ public class TileViewTests {
             // the second splitter so are not allowed
             Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
         }
+        for (var x = 10; x < 100; x++) {
+            // These values would result in the first splitter moving past
+            // the second splitter so are not allowed
+            Assert.False (tv.SetSplitterPos (0, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 111111111││3333│4444│5555
@@ -505,14 +890,23 @@ public class TileViewTests {
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours () {
+        TileView tv = Get5x1TilesView ();
     [Fact]
     [AutoInitShutdown]
     public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours () {
         TileView tv = Get5x1TilesView ();
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -521,7 +915,11 @@ public class TileViewTests {
 └────┴────┴────┴────┴───┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 10; x > 5; x--) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
         for (var x = 10; x > 5; x--) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
@@ -529,10 +927,17 @@ public class TileViewTests {
         for (var x = 5; x > 0; x--) {
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
+        for (var x = 5; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────┬┬────────┬────┬───┐
@@ -541,7 +946,11 @@ public class TileViewTests {
 └────┴┴────────┴────┴───┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 10; x < 15; x++) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
         for (var x = 10; x < 15; x++) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
@@ -549,10 +958,17 @@ public class TileViewTests {
         for (var x = 15; x < 25; x++) {
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
+        for (var x = 15; x < 25; x++) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────┬────────┬┬────┬───┐
@@ -562,14 +978,23 @@ public class TileViewTests {
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours_NoBorder () {
+        TileView tv = Get5x1TilesView (false);
     [Fact]
     [AutoInitShutdown]
     public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter2_CannotMoveOverNeighbours_NoBorder () {
         TileView tv = Get5x1TilesView (false);
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 11111│2222│3333│4444│5555
@@ -578,7 +1003,11 @@ public class TileViewTests {
      │    │    │    │
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 10; x > 5; x--) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
         for (var x = 10; x > 5; x--) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
@@ -586,10 +1015,17 @@ public class TileViewTests {
         for (var x = 5; x > 0; x--) {
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
+        for (var x = 5; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 11111││33333333│4444│5555
@@ -599,7 +1035,11 @@ public class TileViewTests {
 
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 10; x < 15; x++) {
+            Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
         for (var x = 10; x < 15; x++) {
             Assert.True (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
@@ -607,10 +1047,17 @@ public class TileViewTests {
         for (var x = 15; x < 25; x++) {
             Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
         }
+        for (var x = 15; x < 25; x++) {
+            Assert.False (tv.SetSplitterPos (1, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 11111│22222222││4444│5555
@@ -625,9 +1072,19 @@ public class TileViewTests {
     [AutoInitShutdown]
     public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours () {
         TileView tv = Get5x1TilesView ();
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours () {
+        TileView tv = Get5x1TilesView ();
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 ┌────┬────┬────┬────┬───┐
@@ -636,7 +1093,11 @@ public class TileViewTests {
 └────┴────┴────┴────┴───┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 20; x > 15; x--) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
         for (var x = 20; x > 15; x--) {
             Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
@@ -644,10 +1105,17 @@ public class TileViewTests {
         for (var x = 15; x > 0; x--) {
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
+        for (var x = 15; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────┬────┬────┬┬───────┐
@@ -656,7 +1124,11 @@ public class TileViewTests {
 └────┴────┴────┴┴───────┘
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 20; x < 24; x++) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
         for (var x = 20; x < 24; x++) {
             Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
@@ -664,10 +1136,17 @@ public class TileViewTests {
         for (var x = 24; x < 100; x++) {
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
+        for (var x = 24; x < 100; x++) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────┬────┬────┬───────┬┐
@@ -677,14 +1156,23 @@ public class TileViewTests {
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours_NoBorder () {
+        TileView tv = Get5x1TilesView (false);
     [Fact]
     [AutoInitShutdown]
     public void Test5Panel_NoMinSizes_VerticalSplitters_ResizeSplitter4_CannotMoveOverNeighbours_NoBorder () {
         TileView tv = Get5x1TilesView (false);
 
         tv.Draw ();
+        tv.Draw ();
 
+        var looksLike =
+            @"   
         var looksLike =
             @"   
 11111│2222│3333│4444│5555
@@ -693,7 +1181,11 @@ public class TileViewTests {
      │    │    │    │
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 20; x > 15; x--) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
         for (var x = 20; x > 15; x--) {
             Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
@@ -701,10 +1193,17 @@ public class TileViewTests {
         for (var x = 15; x > 0; x--) {
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
+        for (var x = 15; x > 0; x--) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"  
         looksLike =
             @"  
 11111│2222│3333││55555555
@@ -714,7 +1213,11 @@ public class TileViewTests {
 
 ";
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        for (var x = 20; x < 25; x++) {
+            Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
         for (var x = 20; x < 25; x++) {
             Assert.True (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
@@ -722,10 +1225,17 @@ public class TileViewTests {
         for (var x = 25; x < 100; x++) {
             Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
         }
+        for (var x = 25; x < 100; x++) {
+            Assert.False (tv.SetSplitterPos (3, x), $"Assert failed for x={x}");
+        }
 
         tv.SetNeedsDisplay ();
         tv.Draw ();
+        tv.SetNeedsDisplay ();
+        tv.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 11111│2222│3333│44444444│
@@ -871,7 +1381,146 @@ public class TileViewTests {
 111111│222222│444444
 111111│222222│444444
 111111│222222│444444
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringInsertTile () {
+        TileView tv = GetTileView (20, 10);
+
+        var myReusableView = new DisposeCounter ();
+
+        // I want my view in the first tile
+        tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+        Assert.Equal (0, myReusableView.DisposalCount);
+
+        // I've changed my mind, I want 3 tiles now
+        tv.InsertTile (0);
+        tv.InsertTile (2);
+
+        // but I still want my view in the first tile
+        tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+        Assert.Multiple (
+                         () => Assert.Equal (0, myReusableView.DisposalCount),
+                         () => {
+                             tv.Dispose ();
+                             Assert.True (myReusableView.DisposalCount >= 1);
+                         });
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRebuildForTileCount () {
+        TileView tv = GetTileView (20, 10);
+
+        var myReusableView = new DisposeCounter ();
+
+        // I want my view in the first tile
+        tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+        Assert.Equal (0, myReusableView.DisposalCount);
+
+        // I've changed my mind, I want 3 tiles now
+        tv.RebuildForTileCount (3);
+
+        // but I still want my view in the first tile
+        tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+        Assert.Multiple (
+                         () => Assert.Equal (0, myReusableView.DisposalCount),
+                         () => {
+                             tv.Dispose ();
+                             Assert.Equal (1, myReusableView.DisposalCount);
+                         });
+    }
+
+    [Theory]
+    [AutoInitShutdown]
+    [InlineData (0)]
+    [InlineData (1)]
+    public void TestDisposal_NoEarlyDisposalsOfUsersViews_DuringRemoveTile (int idx) {
+        TileView tv = GetTileView (20, 10);
+
+        var myReusableView = new DisposeCounter ();
+
+        // I want my view in the first tile
+        tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+        Assert.Equal (0, myReusableView.DisposalCount);
+
+        tv.RemoveTile (idx);
+
+        // but I still want my view in the first tile
+        tv.Tiles.ElementAt (0).ContentView.Add (myReusableView);
+        Assert.Multiple (
+                         () => Assert.Equal (0, myReusableView.DisposalCount),
+                         () => {
+                             tv.Dispose ();
+                             Assert.True (myReusableView.DisposalCount >= 1);
+                         });
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TestNestedContainer2LeftAnd1Right_RendersNicely () {
+        TileView tileView = GetNestedContainer2Left1Right (false);
+
+        Assert.Equal (20, tileView.Frame.Width);
+        Assert.Equal (10, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
+        Assert.Equal (9, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
+
+        Assert.IsType<TileView> (tileView.Tiles.ElementAt (0).ContentView);
+        var left = (TileView)tileView.Tiles.ElementAt (0).ContentView;
+        Assert.Same (left.SuperView, tileView);
+
+        Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.Subviews.Count);
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews[0]);
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews[1]);
+        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.Subviews[0];
+        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.Subviews[1];
+
+        Assert.Same (left.Tiles.ElementAt (0).ContentView, onesTop.SuperView);
+        Assert.Same (left.Tiles.ElementAt (0).ContentView, onesBottom.SuperView);
+
+        Assert.Equal (10, onesTop.Frame.Width);
+        Assert.Equal (10, onesBottom.Frame.Width);
+
+        tileView.Draw ();
+
+        var looksLike =
+            @"    
+1111111111│222222222
+1111111111│222222222
+          │
+          │
+          │
+──────────┤
+          │
+          │
+          │
+          │";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TestNestedContainer3RightAnd1Down_RendersNicely () {
+        TileView tileView = GetNestedContainer3Right1Down (false);
+
+        tileView.Draw ();
+
+        var looksLike =
+            @"
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222│333333
+111111│222222├──────
+111111│222222│444444
+111111│222222│444444
+111111│222222│444444
+111111│222222│444444
 ";
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         // It looks good but lets double check the measurements incase
@@ -919,9 +1568,57 @@ public class TileViewTests {
     [AutoInitShutdown]
     public void TestNestedContainer3RightAnd1Down_TileVisibility_WithBorder () {
         TileView tileView = GetNestedContainer3Right1Down (true);
+        // It looks good but lets double check the measurements incase
+        // anything is sticking out but drawn over
+
+        // 3 panels + 2 splitters
+        Assert.Equal (5, tileView.Subviews.Count);
+
+        // Check X and Widths of Tiles
+        Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
+        Assert.Equal (6, tileView.Tiles.ElementAt (0).ContentView.Frame.Width);
+
+        Assert.Equal (7, tileView.Tiles.ElementAt (1).ContentView.Frame.X);
+        Assert.Equal (6, tileView.Tiles.ElementAt (1).ContentView.Frame.Width);
+
+        Assert.Equal (14, tileView.Tiles.ElementAt (2).ContentView.Frame.X);
+        Assert.Equal (6, tileView.Tiles.ElementAt (2).ContentView.Frame.Width);
+
+        // Check Y and Heights of Tiles
+        Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.Y);
+        Assert.Equal (10, tileView.Tiles.ElementAt (0).ContentView.Frame.Height);
+
+        Assert.Equal (0, tileView.Tiles.ElementAt (1).ContentView.Frame.Y);
+        Assert.Equal (10, tileView.Tiles.ElementAt (1).ContentView.Frame.Height);
+
+        Assert.Equal (0, tileView.Tiles.ElementAt (2).ContentView.Frame.Y);
+        Assert.Equal (10, tileView.Tiles.ElementAt (2).ContentView.Frame.Height);
+
+        // Check Sub containers in last panel
+        var subSplit = (TileView)tileView.Tiles.ElementAt (2).ContentView;
+        Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.X);
+        Assert.Equal (6, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
+        Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
+        Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
+        Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+
+        Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
+        Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
+        Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
+        Assert.Equal (4, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
+        Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void TestNestedContainer3RightAnd1Down_TileVisibility_WithBorder () {
+        TileView tileView = GetNestedContainer3Right1Down (true);
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 ┌─────┬──────┬─────┐
@@ -936,14 +1633,22 @@ public class TileViewTests {
 └─────┴──────┴─────┘";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────────────┬─────┐
@@ -958,14 +1663,22 @@ public class TileViewTests {
 └────────────┴─────┘";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌────────────┬─────┐
@@ -980,14 +1693,22 @@ public class TileViewTests {
 └────────────┴─────┘";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌─────┬────────────┐
@@ -1002,14 +1723,22 @@ public class TileViewTests {
 └─────┴────────────┘";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌──────────────────┐
@@ -1023,15 +1752,23 @@ public class TileViewTests {
 │111111111111111111│
 └──────────────────┘";
 
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌──────────────────┐
@@ -1046,14 +1783,22 @@ public class TileViewTests {
 └──────────────────┘";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌──────────────────┐
@@ -1068,16 +1813,25 @@ public class TileViewTests {
 └──────────────────┘";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 ┌──────────────────┐
@@ -1093,13 +1847,22 @@ public class TileViewTests {
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
     [Fact]
     [AutoInitShutdown]
     public void TestNestedContainer3RightAnd1Down_TileVisibility_WithoutBorder () {
         TileView tileView = GetNestedContainer3Right1Down (false);
         tileView.Draw ();
+    [Fact]
+    [AutoInitShutdown]
+    public void TestNestedContainer3RightAnd1Down_TileVisibility_WithoutBorder () {
+        TileView tileView = GetNestedContainer3Right1Down (false);
+        tileView.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 111111│222222│333333
@@ -1114,14 +1877,22 @@ public class TileViewTests {
 111111│222222│444444";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 2222222222222│333333
@@ -1136,14 +1907,22 @@ public class TileViewTests {
 2222222222222│444444";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 1111111111111│333333
@@ -1158,14 +1937,22 @@ public class TileViewTests {
 1111111111111│444444";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 111111│2222222222222
@@ -1180,14 +1967,22 @@ public class TileViewTests {
 111111│2222222222222";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = true;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 11111111111111111111
@@ -1202,14 +1997,22 @@ public class TileViewTests {
 11111111111111111111";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = true;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = true;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 22222222222222222222
@@ -1224,14 +2027,22 @@ public class TileViewTests {
 22222222222222222222";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = true;
+        tileView.LayoutSubviews ();
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = true;
         tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 33333333333333333333
@@ -1246,16 +2057,25 @@ public class TileViewTests {
 44444444444444444444";
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
 
         tileView.Tiles.ElementAt (0).ContentView.Visible = false;
         tileView.Tiles.ElementAt (1).ContentView.Visible = false;
         tileView.Tiles.ElementAt (2).ContentView.Visible = false;
         tileView.LayoutSubviews ();
+        tileView.Tiles.ElementAt (0).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (1).ContentView.Visible = false;
+        tileView.Tiles.ElementAt (2).ContentView.Visible = false;
+        tileView.LayoutSubviews ();
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        looksLike =
+            @"
         looksLike =
             @"
 			 ";
@@ -1268,7 +2088,17 @@ public class TileViewTests {
     public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill () {
         TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
         tileView.Draw ();
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void TestNestedContainer3RightAnd1Down_TitleDoesNotOverspill () {
+        TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
+        tileView.Draw ();
+
+        var looksLike =
+            @"
         var looksLike =
             @"
 ┌ T1 ─┬ T3 ──┬ T2 ─┐
@@ -1284,20 +2114,33 @@ public class TileViewTests {
 
         TestHelpers.AssertDriverContentsAre (looksLike, _output);
     }
+        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+    }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void TestNestedContainer3RightAnd1Down_TitleTriesToOverspill () {
+        TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
     [Fact]
     [AutoInitShutdown]
     public void TestNestedContainer3RightAnd1Down_TitleTriesToOverspill () {
         TileView tileView = GetNestedContainer3Right1Down (true, true, 1);
 
         tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
+        tileView.Tiles.ElementAt (0).Title = new string ('x', 100);
 
+        ((TileView)tileView.Tiles.ElementAt (1).ContentView)
+            .Tiles.ElementAt (1)
+            .Title = new string ('y', 100);
         ((TileView)tileView.Tiles.ElementAt (1).ContentView)
             .Tiles.ElementAt (1)
             .Title = new string ('y', 100);
 
         tileView.Draw ();
+        tileView.Draw ();
 
+        var looksLike =
+            @"
         var looksLike =
             @"
 ┌ xxxx┬ T3 ──┬ T2 ─┐
@@ -2221,7 +3064,14 @@ public class TileViewTests {
         newContainer.Orientation = Orientation.Horizontal;
         newContainer.ColorScheme = new ColorScheme ();
         container.ColorScheme = new ColorScheme ();
+        newContainer.Orientation = Orientation.Horizontal;
+        newContainer.ColorScheme = new ColorScheme ();
+        container.ColorScheme = new ColorScheme ();
 
+        container.LayoutSubviews ();
+
+        return container;
+    }
         container.LayoutSubviews ();
 
         return container;
@@ -2236,11 +3086,29 @@ public class TileViewTests {
                                              Height = 10
                                          };
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
+    /// <summary>Creates a vertical orientation root container with 3 tiles. The rightmost is split horizontally</summary>
+    /// <param name="withBorder"></param>
+    /// <returns></returns>
+    private TileView GetNestedContainer3Right1Down (bool withBorder, bool withTitles = false, int split = 2) {
+        var container = new TileView (3) {
+                                             Width = 20,
+                                             Height = 10
+                                         };
+        container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
+        Assert.True (container.TrySplitTile (split, 2, out TileView newContainer));
         Assert.True (container.TrySplitTile (split, 2, out TileView newContainer));
 
         newContainer.Orientation = Orientation.Horizontal;
+        newContainer.Orientation = Orientation.Horizontal;
 
+        var i = 0;
+        foreach (Tile tile in container.Tiles.Union (newContainer.Tiles)) {
+            if (tile.ContentView is TileView) {
+                continue;
+            }
+
+            i++;
         var i = 0;
         foreach (Tile tile in container.Tiles.Union (newContainer.Tiles)) {
             if (tile.ContentView is TileView) {
@@ -2252,7 +3120,24 @@ public class TileViewTests {
             if (withTitles) {
                 tile.Title = "T" + i;
             }
+            if (withTitles) {
+                tile.Title = "T" + i;
+            }
 
+            tile.ContentView.Add (
+                                  new TextView {
+                                                   Width = Dim.Fill (),
+                                                   Height = Dim.Fill (),
+                                                   Text =
+                                                       string.Join (
+                                                                    '\n',
+                                                                    Enumerable.Repeat (
+                                                                               new string (i.ToString ()[0], 100),
+                                                                               10)
+                                                                              .ToArray ()),
+                                                   WordWrap = false
+                                               });
+        }
             tile.ContentView.Add (
                                   new TextView {
                                                    Width = Dim.Fill (),
@@ -2276,13 +3161,27 @@ public class TileViewTests {
 
         return container;
     }
+        newContainer.ColorScheme = new ColorScheme ();
+        container.ColorScheme = new ColorScheme ();
+        container.BeginInit ();
+        container.EndInit ();
+        container.LayoutSubviews ();
+
+        return container;
+    }
 
     private TileView GetTileView (int width, int height, bool withBorder = false) {
         var container = new TileView {
                                          Width = width,
                                          Height = height
                                      };
+    private TileView GetTileView (int width, int height, bool withBorder = false) {
+        var container = new TileView {
+                                         Width = width,
+                                         Height = height
+                                     };
 
+        container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
         container.LineStyle = withBorder ? LineStyle.Single : LineStyle.None;
 
         container.Tiles.ElementAt (0)
@@ -2312,7 +3211,26 @@ public class TileViewTests {
 
         container.Tiles.ElementAt (0).MinSize = 0;
         container.Tiles.ElementAt (1).MinSize = 0;
+        container.Tiles.ElementAt (0).MinSize = 0;
+        container.Tiles.ElementAt (1).MinSize = 0;
 
+        Application.Top.Add (container);
+        container.ColorScheme = new ColorScheme ();
+        container.BeginInit ();
+        container.EndInit ();
+        container.LayoutSubviews ();
+
+        return container;
+    }
+
+    private class DisposeCounter : View {
+        public int DisposalCount;
+
+        protected override void Dispose (bool disposing) {
+            DisposalCount++;
+            base.Dispose (disposing);
+        }
+    }
         Application.Top.Add (container);
         container.ColorScheme = new ColorScheme ();
         container.BeginInit ();

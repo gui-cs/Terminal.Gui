@@ -50,7 +50,11 @@ public class DefaultFileOperations : IFileOperations {
             if (!string.IsNullOrWhiteSpace (newName)) {
                 try {
                     if (toRename is IFileInfo f) {
-                        IFileInfo newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory.FullName, newName));
+                        IFileInfo newLocation =
+                            fileSystem.FileInfo.New (
+                                                     Path.Combine (
+                                                                   f.Directory.FullName,
+                                                                   newName));
                         f.MoveTo (newLocation.FullName);
 
                         return newLocation;
@@ -58,7 +62,10 @@ public class DefaultFileOperations : IFileOperations {
                         var d = (IDirectoryInfo)toRename;
 
                         IDirectoryInfo newLocation =
-                            fileSystem.DirectoryInfo.New (Path.Combine (d.Parent.FullName, newName));
+                            fileSystem.DirectoryInfo.New (
+                                                          Path.Combine (
+                                                                        d.Parent.FullName,
+                                                                        newName));
                         d.MoveTo (newLocation.FullName);
 
                         return newLocation;
@@ -78,7 +85,9 @@ public class DefaultFileOperations : IFileOperations {
         if (Prompt (Strings.fdNewTitle, "", out string named)) {
             if (!string.IsNullOrWhiteSpace (named)) {
                 try {
-                    IDirectoryInfo newDir = fileSystem.DirectoryInfo.New (Path.Combine (inDirectory.FullName, named));
+                    IDirectoryInfo newDir =
+                        fileSystem.DirectoryInfo.New (
+                                                      Path.Combine (inDirectory.FullName, named));
                     newDir.Create ();
 
                     return newDir;
@@ -94,24 +103,26 @@ public class DefaultFileOperations : IFileOperations {
 
     private bool Prompt (string title, string defaultText, out string result) {
         var confirm = false;
-        var btnOk = new Button (Strings.btnOk) {
-                                                   IsDefault = true
-                                               };
+        var btnOk = new Button {
+                                   IsDefault = true,
+                                   Text = Strings.btnOk
+                               };
         btnOk.Clicked += (s, e) => {
             confirm = true;
             Application.RequestStop ();
         };
-        var btnCancel = new Button (Strings.btnCancel);
+        var btnCancel = new Button { Text = Strings.btnCancel };
         btnCancel.Clicked += (s, e) => {
             confirm = false;
             Application.RequestStop ();
         };
 
-        var lbl = new Label (Strings.fdRenamePrompt);
-        var tf = new TextField (defaultText) {
-                                                 X = Pos.Right (lbl),
-                                                 Width = Dim.Fill ()
-                                             };
+        var lbl = new Label { Text = Strings.fdRenamePrompt };
+        var tf = new TextField {
+                                   X = Pos.Right (lbl),
+                                   Width = Dim.Fill (),
+                                   Text = defaultText
+                               };
         tf.SelectAll ();
 
         var dlg = new Dialog {

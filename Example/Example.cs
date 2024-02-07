@@ -8,14 +8,14 @@ using Terminal.Gui;
 
 Application.Run<ExampleWindow> ();
 
-Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).usernameText.Text}");
+Console.WriteLine ($"Username: {((ExampleWindow)Application.Top).UserNameText.Text}");
 
 // Before the application exits, reset Terminal.Gui for clean shutdown
 Application.Shutdown ();
 
 // Defines a top-level window with border and title
 public class ExampleWindow : Window {
-    public TextField usernameText;
+    public TextField UserNameText;
 
     public ExampleWindow () {
         Title = $"Example App ({Application.QuitKey} to quit)";
@@ -25,9 +25,7 @@ public class ExampleWindow : Window {
                                           Text = "Username:"
                                       };
 
-        usernameText = new TextField {
-                                         Text = "",
-
+        UserNameText = new TextField {
                                          // Position text field adjacent to the label
                                          X = Pos.Right (usernameLabel) + 1,
 
@@ -42,11 +40,10 @@ public class ExampleWindow : Window {
                                       };
 
         var passwordText = new TextField {
-                                             Text = "",
                                              Secret = true,
 
                                              // align with the text box above
-                                             X = Pos.Left (usernameText),
+                                             X = Pos.Left (UserNameText),
                                              Y = Pos.Top (passwordLabel),
                                              Width = Dim.Fill ()
                                          };
@@ -63,7 +60,7 @@ public class ExampleWindow : Window {
 
         // When login button is clicked display a message popup
         btnLogin.Clicked += (s, e) => {
-            if (usernameText.Text == "admin" && passwordText.Text == "password") {
+            if (UserNameText.Text == "admin" && passwordText.Text == "password") {
                 MessageBox.Query ("Logging In", "Login Successful", "Ok");
                 Application.RequestStop ();
             } else {
@@ -72,6 +69,6 @@ public class ExampleWindow : Window {
         };
 
         // Add the views to the Window
-        Add (usernameLabel, usernameText, passwordLabel, passwordText, btnLogin);
+        Add (usernameLabel, UserNameText, passwordLabel, passwordText, btnLogin);
     }
 }
