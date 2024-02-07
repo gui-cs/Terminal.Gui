@@ -133,7 +133,9 @@ public class Buttons : Scenario {
         var moveBtn = new Button {
                                      X = 0,
                                      Y = Pos.Center () - 1,
+                                     AutoSize = false,
                                      Width = 30,
+                                     Height = 1,
                                      ColorScheme = Colors.ColorSchemes["Error"],
                                      Text = "Move This \u263b Button v_ia Pos"
                                  };
@@ -149,7 +151,9 @@ public class Buttons : Scenario {
         var sizeBtn = new Button {
                                      X = 0,
                                      Y = Pos.Center () + 1,
+                                     AutoSize = false,
                                      Width = 30,
+                                     Height = 1,
                                      ColorScheme = Colors.ColorSchemes["Error"],
                                      Text = "Size This \u263a Button _via Pos"
                                  };
@@ -244,6 +248,8 @@ public class Buttons : Scenario {
         var moveHotKeyBtn = new Button {
                                            X = 2,
                                            Y = Pos.Bottom (radioGroup) + 1,
+                                           AutoSize = false,
+                                           Height = 1,
                                            Width = Dim.Width (computedFrame) - 2,
                                            ColorScheme = Colors.ColorSchemes["TopLevel"],
                                            Text = mhkb
@@ -255,6 +261,8 @@ public class Buttons : Scenario {
         var moveUnicodeHotKeyBtn = new Button {
                                                   X = Pos.Left (absoluteFrame) + 1,
                                                   Y = Pos.Bottom (radioGroup) + 1,
+                                                  AutoSize = false,
+                                                  Height = 1,
                                                   Width = Dim.Width (absoluteFrame) -
                                                           2, // BUGBUG: Not always the width isn't calculated correctly.
                                                   ColorScheme = Colors.ColorSchemes["TopLevel"],

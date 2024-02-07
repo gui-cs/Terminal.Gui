@@ -145,6 +145,7 @@ public class LabelsAsLabels : Scenario {
         var moveBtn = new Label {
                                     X = 0,
                                     Y = Pos.Center () - 1,
+                                    AutoSize = false,
                                     Width = 30,
                                     ColorScheme = Colors.ColorSchemes["Error"],
                                     HotKeySpecifier = (Rune)'_',
@@ -163,11 +164,11 @@ public class LabelsAsLabels : Scenario {
         var sizeBtn = new Label {
                                     X = 0,
                                     Y = Pos.Center () + 1,
+                                    AutoSize = false,
                                     Width = 30,
                                     ColorScheme = Colors.ColorSchemes["Error"],
                                     HotKeySpecifier = (Rune)'_',
                                     CanFocus = true,
-                                    AutoSize = false,
                                     Text = "Size This \u263a Label _via Pos"
                                 };
         sizeBtn.Clicked += (s, e) => {
@@ -268,6 +269,7 @@ public class LabelsAsLabels : Scenario {
         var moveHotKeyBtn = new Label {
                                           X = 2,
                                           Y = Pos.Bottom (radioGroup) + 1,
+                                          AutoSize = false,
                                           Width = Dim.Width (computedFrame) - 2,
                                           ColorScheme = Colors.ColorSchemes["TopLevel"],
                                           HotKeySpecifier = (Rune)'_',
@@ -281,6 +283,7 @@ public class LabelsAsLabels : Scenario {
         var moveUnicodeHotKeyBtn = new Label {
                                                  X = Pos.Left (absoluteFrame) + 1,
                                                  Y = Pos.Bottom (radioGroup) + 1,
+                                                 AutoSize = false,
                                                  Width = Dim.Width (absoluteFrame) - 2,
                                                  ColorScheme = Colors.ColorSchemes["TopLevel"],
                                                  HotKeySpecifier = (Rune)'_',

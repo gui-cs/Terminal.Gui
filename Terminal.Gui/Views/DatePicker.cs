@@ -157,7 +157,6 @@ public class DatePicker : View {
         _dateLabel = new Label {
                                    X = 0,
                                    Y = 0,
-                                   Height = 1,
                                    Text = "Date: "
                                };
 
@@ -182,6 +181,7 @@ public class DatePicker : View {
                                   };
 
         _previousMonthButton = new Button {
+                                              AutoSize = false,
                                               X = Pos.Center () - 4,
                                               Y = Pos.Bottom (_calendar) - 1,
                                               Height = 1,
@@ -196,6 +196,7 @@ public class DatePicker : View {
         };
 
         _nextMonthButton = new Button {
+                                          AutoSize = false,
                                           X = Pos.Right (_previousMonthButton) + 2,
                                           Y = Pos.Bottom (_calendar) - 1,
                                           Height = 1,

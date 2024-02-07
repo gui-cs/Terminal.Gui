@@ -201,6 +201,7 @@ public class ListColumns : Scenario {
                                               X = 0,
                                               Y = Pos.Bottom (_listColView),
                                               Text = "0,0",
+                                              AutoSize = false,
                                               Width = Dim.Fill (),
                                               TextAlignment = TextAlignment.Right
                                           };

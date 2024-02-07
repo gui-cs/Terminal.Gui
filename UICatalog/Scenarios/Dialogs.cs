@@ -18,7 +18,7 @@ public class Dialogs : Scenario {
                                   };
 
         var label = new Label {
-                                  X = 0, Y = 0, Width = 15, Height = 1, TextAlignment = TextAlignment.Right,
+                                  X = 0, Y = 0, TextAlignment = TextAlignment.Right,
                                   Text = "Width:"
                               };
         frame.Add (label);
@@ -33,6 +33,7 @@ public class Dialogs : Scenario {
         frame.Add (widthEdit);
 
         label = new Label {
+                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
@@ -65,6 +66,7 @@ public class Dialogs : Scenario {
                              });
 
         label = new Label {
+                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
@@ -84,6 +86,7 @@ public class Dialogs : Scenario {
         frame.Add (titleEdit);
 
         label = new Label {
+                              AutoSize = false,
                               X = 0,
                               Y = Pos.Bottom (label),
                               Width = Dim.Width (label),
@@ -146,7 +149,6 @@ public class Dialogs : Scenario {
         label = new Label {
                               X = Pos.Center (),
                               Y = Pos.Bottom (frame) + 4,
-                              Height = 1,
                               TextAlignment = TextAlignment.Right,
                               Text = "Button Pressed:"
                           };
@@ -155,8 +157,6 @@ public class Dialogs : Scenario {
         var buttonPressedLabel = new Label {
                                                X = Pos.Center (),
                                                Y = Pos.Bottom (frame) + 5,
-                                               Width = 25,
-                                               Height = 1,
                                                ColorScheme = Colors.ColorSchemes["Error"],
                                                Text = " "
                                            };

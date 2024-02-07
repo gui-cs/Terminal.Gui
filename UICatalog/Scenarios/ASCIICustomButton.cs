@@ -192,6 +192,7 @@ public class ASCIICustomButtonTest : Scenario {
             for (var j = 0; j < count; j++) {
                 Pos yPos = prevButton == null ? 0 : Pos.Bottom (prevButton);
                 var button = new ASCIICustomButton {
+                                                       AutoSize = false,
                                                        Id = j.ToString (),
                                                        Text = $"section {j}",
                                                        Y = yPos,
@@ -209,6 +210,7 @@ public class ASCIICustomButtonTest : Scenario {
             }
 
             var closeButton = new ASCIICustomButton {
+                                                        AutoSize = false,
                                                         Id = "close",
                                                         Text = "Close",
                                                         Y = Pos.Bottom (prevButton),

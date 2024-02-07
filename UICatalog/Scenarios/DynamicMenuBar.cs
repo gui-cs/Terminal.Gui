@@ -132,6 +132,7 @@ public class DynamicMenuBar : Scenario {
                 TextAlignment = TextAlignment.Centered,
                 X = Pos.Right (_btnPrevious) + 1,
                 Y = Pos.Top (_btnPrevious),
+                AutoSize = false,
                 Width = Dim.Fill () - Dim.Function (() => _btnAdd.Frame.Width + 1),
                 Height = 1
             };
@@ -143,6 +144,7 @@ public class DynamicMenuBar : Scenario {
                 TextAlignment = TextAlignment.Centered,
                 X = Pos.Right (_btnPrevious) + 1,
                 Y = Pos.Top (_btnPrevious) + 1,
+                AutoSize = false,
                 Width = Dim.Fill () - Dim.Width (_btnAdd) - 1
             };
             _frmMenu.Add (_lblParent);

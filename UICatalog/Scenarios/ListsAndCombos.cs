@@ -31,6 +31,7 @@ public class ListsAndCombos : Scenario {
         var lbListView = new Label {
                                        ColorScheme = Colors.ColorSchemes["TopLevel"],
                                        X = 0,
+                                       AutoSize = false,
                                        Width = Dim.Percent (40),
                                        Text = "Listview"
                                    };
@@ -77,6 +78,7 @@ public class ListsAndCombos : Scenario {
         var lbComboBox = new Label {
                                        ColorScheme = Colors.ColorSchemes["TopLevel"],
                                        X = Pos.Right (lbListView) + 1,
+                                       AutoSize = false,
                                        Width = Dim.Percent (40),
                                        Text = "ComboBox"
                                    };

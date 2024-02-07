@@ -44,37 +44,36 @@ public class Localization : Scenario {
                                             .Append ("Invariant")
                                             .ToArray ();
         MenuItem[] languageMenus = Application.SupportedCultures
-                                              .Select (
-                                                       c => new MenuItem (
-                                                                          $"{c.NativeName} ({c.Name})",
+                                              .Select (c => new MenuItem ($"{c.NativeName} ({c.Name})",
                                                                           "",
                                                                           () => SetCulture (c)))
-                                              .Concat (
-                                                       new MenuItem[] {
+                                              .Concat (new MenuItem[] {
                                                                           null,
-                                                                          new (
-                                                                               "Invariant",
+                                                                          new ("Invariant",
                                                                                "",
-                                                                               () => SetCulture (
-                                                                                CultureInfo.InvariantCulture))
-                                                                      }
-                                                      )
+                                                                               () =>
+                                                                                   SetCulture (CultureInfo
+                                                                                       .InvariantCulture))
+                                                                      })
                                               .ToArray ();
         var menu = new MenuBar {
                                    Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new MenuBarItem (
-                                                                                 "_Language",
-                                                                                 languageMenus),
-                                                                                null,
-                                                                                new ("_Quit", "", Quit)
-                                                                            })
+                                   new MenuBarItem ("_File",
+                                   new MenuItem[] {
+                                                      new MenuBarItem ("_Language",
+                                                                       languageMenus),
+                                                      null,
+                                                      new ("_Quit", "", Quit)
+                                                  })
                                        ]
                                };
         Application.Top.Add (menu);
 
         var selectLanguageLabel = new Label {
-                                                X = 2, Y = 1, Width = Dim.Fill (2), AutoSize = true,
+                                                X = 2,
+                                                Y = 1,
+                                                AutoSize = false,
+                                                Width = Dim.Fill (2),
                                                 Text = "Please select a language."
                                             };
         Win.Add (selectLanguageLabel);
@@ -96,8 +95,9 @@ public class Localization : Scenario {
         var textAndFileDialogLabel = new Label {
                                                    X = 2,
                                                    Y = Pos.Top (_languageComboBox) + 3,
+                                                   AutoSize = false,
                                                    Width = Dim.Fill (2),
-                                                   AutoSize = true,
+                                                   Height = 1,
                                                    Text =
                                                        "Right click on the text field to open a context menu, click the button to open a file dialog.\r\nOpen mode will loop through 'File', 'Directory' and 'Mixed' as 'Open' or 'Save' button clicked."
                                                };
@@ -138,17 +138,13 @@ public class Localization : Scenario {
         var wizardLabel = new Label {
                                         X = 2,
                                         Y = Pos.Bottom (textField) + 1,
+                                        AutoSize = false,
                                         Width = Dim.Fill (2),
-                                        AutoSize = true,
                                         Text = "Click the button to open a wizard."
                                     };
         Win.Add (wizardLabel);
 
-        var wizardButton = new Button {
-                                          X = 2,
-                                          Y = Pos.Bottom (wizardLabel) + 1,
-                                          Text = "Open _wizard"
-                                      };
+        var wizardButton = new Button { X = 2, Y = Pos.Bottom (wizardLabel) + 1, Text = "Open _wizard" };
         wizardButton.Clicked += (sender, e) => ShowWizard ();
         Win.Add (wizardButton);
 
@@ -178,24 +174,10 @@ public class Localization : Scenario {
     }
 
     public void ShowWizard () {
-        var wizard = new Wizard {
-                                    Height = 8,
-                                    Width = 36,
-                                    Title = "The wizard"
-                                };
-        wizard.AddStep (
-                        new WizardStep {
-                                           HelpText = "Wizard first step"
-                                       });
-        wizard.AddStep (
-                        new WizardStep {
-                                           HelpText = "Wizard step 2",
-                                           NextButtonText = ">>> (_N)"
-                                       });
-        wizard.AddStep (
-                        new WizardStep {
-                                           HelpText = "Wizard last step"
-                                       });
+        var wizard = new Wizard { Height = 8, Width = 36, Title = "The wizard" };
+        wizard.AddStep (new WizardStep { HelpText = "Wizard first step" });
+        wizard.AddStep (new WizardStep { HelpText = "Wizard step 2", NextButtonText = ">>> (_N)" });
+        wizard.AddStep (new WizardStep { HelpText = "Wizard last step" });
         Application.Run (wizard);
     }
 

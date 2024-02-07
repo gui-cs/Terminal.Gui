@@ -16,6 +16,7 @@ public class BasicColors : Scenario {
         foreach (ColorName bg in colors) {
             var attr = new Attribute (bg, colors.Length - 1 - bg);
             var vl = new Label {
+                                   AutoSize = false,
                                    X = vx,
                                    Y = 0,
                                    Width = 1,
@@ -27,6 +28,7 @@ public class BasicColors : Scenario {
                                };
             Win.Add (vl);
             var hl = new Label {
+                                   AutoSize = false,
                                    X = 15,
                                    Y = y,
                                    Width = 13,

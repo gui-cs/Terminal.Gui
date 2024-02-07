@@ -21,7 +21,6 @@ public class ListViewWithSelection : Scenario {
         _customRenderCB = new CheckBox {
                                            X = 0,
                                            Y = 0,
-                                           Height = 1,
                                            Text = "Use custom rendering"
                                        };
         Win.Add (_customRenderCB);
@@ -30,7 +29,6 @@ public class ListViewWithSelection : Scenario {
         _allowMarkingCB = new CheckBox {
                                            X = Pos.Right (_customRenderCB) + 1,
                                            Y = 0,
-                                           Height = 1,
                                            Text = "Allow Marking",
                                            AllowNullChecked = false
                                        };
@@ -40,7 +38,6 @@ public class ListViewWithSelection : Scenario {
         _allowMultipleCB = new CheckBox {
                                             X = Pos.Right (_allowMarkingCB) + 1,
                                             Y = 0,
-                                            Height = 1,
                                             Visible = (bool)_allowMarkingCB.Checked,
                                             Text = "Allow Multi-Select"
                                         };
