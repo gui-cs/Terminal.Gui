@@ -144,7 +144,6 @@ public class ViewTests {
 
         View v = label
                      ? new Label {
-                                     Width = Dim.Fill (),
                                      Text = new string ('c', 100)
                                  }
                      : new TextView {
@@ -414,7 +413,6 @@ At 0,0
 
         var label = new Label {
                                   ColorScheme = Colors.ColorSchemes["Menu"],
-                                  Width = Dim.Fill (),
                                   X = 0,
                                   Y = 0,
                                   Text = "This should be the first line."
@@ -457,7 +455,7 @@ At 0,0
                                 frame.Frame.Top,
                                 frame.Frame.Right,
                                 frame.Frame.Bottom));
-        Assert.Equal (new Rect (0, 0, 38, 1), label.Frame);
+        Assert.Equal (new Rect (0, 0, 30, 1), label.Frame);
         Assert.Equal (new Rect (0, 1, 13, 1), button.Frame); // this proves frame was set
         Application.End (runState);
     }
