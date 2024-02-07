@@ -1204,7 +1204,7 @@ public partial class View {
     /// Determines if the View's <see cref="Height"/> can be set to a new value.
     /// </summary>
     /// <remarks>
-    /// TrySetHidth can only be called when AutoSize is true (or being set to true).
+    /// TrySetHeight can only be called when AutoSize is true (or being set to true).
     /// </remarks>
     /// <param name="desiredHeight"></param>
     /// <param name="resultHeight">

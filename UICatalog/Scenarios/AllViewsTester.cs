@@ -48,22 +48,18 @@ public class AllViewsTester : Scenario {
     }
 
     public override void Setup () {
-        var statusBar = new StatusBar (
-                                       new StatusItem[] {
-                                                            new (
-                                                                 Application.QuitKey,
+        var statusBar = new StatusBar (new StatusItem[] {
+                                                            new (Application.QuitKey,
                                                                  $"{Application.QuitKey} to Quit",
                                                                  () => Quit ()),
-                                                            new (
-                                                                 KeyCode.F2,
+                                                            new (KeyCode.F2,
                                                                  "~F2~ Toggle Frame Ruler",
                                                                  () => {
                                                                      ConsoleDriver.Diagnostics ^=
                                                                          ConsoleDriver.DiagnosticFlags.FrameRuler;
                                                                      Application.Top.SetNeedsDisplay ();
                                                                  }),
-                                                            new (
-                                                                 KeyCode.F3,
+                                                            new (KeyCode.F3,
                                                                  "~F3~ Toggle Frame Padding",
                                                                  () => {
                                                                      ConsoleDriver.Diagnostics ^=
@@ -142,11 +138,7 @@ public class AllViewsTester : Scenario {
 
         var label = new Label { X = 0, Y = 0, Text = "X:" };
         _locationFrame.Add (label);
-        _xRadioGroup = new RadioGroup {
-                                          X = 0,
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _xRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         _xRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
         _xText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_xVal}" };
         _xText.TextChanged += (s, args) => {
@@ -172,11 +164,7 @@ public class AllViewsTester : Scenario {
             catch { }
         };
         _locationFrame.Add (_yText);
-        _yRadioGroup = new RadioGroup {
-                                          X = Pos.X (label),
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _yRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _yRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
         _locationFrame.Add (_yRadioGroup);
 
@@ -191,11 +179,7 @@ public class AllViewsTester : Scenario {
         radioItems = new[] { "_Percent(width)", "_Fill(width)", "_Sized(width)" };
         label = new Label { X = 0, Y = 0, Text = "Width:" };
         _sizeFrame.Add (label);
-        _wRadioGroup = new RadioGroup {
-                                          X = 0,
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _wRadioGroup = new RadioGroup { X = 0, Y = Pos.Bottom (label), RadioLabels = radioItems };
         _wRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
         _wText = new TextField { X = Pos.Right (label) + 1, Y = 0, Width = 4, Text = $"{_wVal}" };
         _wText.TextChanged += (s, args) => {
@@ -243,11 +227,7 @@ public class AllViewsTester : Scenario {
         };
         _sizeFrame.Add (_hText);
 
-        _hRadioGroup = new RadioGroup {
-                                          X = Pos.X (label),
-                                          Y = Pos.Bottom (label),
-                                          RadioLabels = radioItems
-                                      };
+        _hRadioGroup = new RadioGroup { X = Pos.X (label), Y = Pos.Bottom (label), RadioLabels = radioItems };
         _hRadioGroup.SelectedItemChanged += (s, selected) => DimPosChanged (_curView);
         _sizeFrame.Add (_hRadioGroup);
 
@@ -322,9 +302,7 @@ public class AllViewsTester : Scenario {
         // If the view supports a Source property, set it so we have something to look at
         if (view != null && view.GetType ().GetProperty ("Source") != null &&
             view.GetType ().GetProperty ("Source").PropertyType == typeof (IListDataSource)) {
-            var source = new ListWrapper (
-                                          new List<string>
-                                          { "Test Text #1", "Test Text #2", "Test Text #3" });
+            var source = new ListWrapper (new List<string> { "Test Text #1", "Test Text #2", "Test Text #3" });
             view?.GetType ().GetProperty ("Source")?.GetSetMethod ()?.Invoke (view, new[] { source });
         }
 
@@ -390,8 +368,7 @@ public class AllViewsTester : Scenario {
     private List<Type> GetAllViewClassesCollection () {
         List<Type> types = new ();
         foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                           .Where (
-                                                   myType =>
+                                           .Where (myType =>
                                                        myType.IsClass && !myType.IsAbstract && myType.IsPublic &&
                                                        myType.IsSubclassOf (typeof (View)))) {
             types.Add (type);
