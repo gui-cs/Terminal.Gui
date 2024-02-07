@@ -26,9 +26,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ScrollView")]
 public class CharacterMap : Scenario {
-    private TableView _categoryList;
     private CharMap _charMap;
     public Label _errorLabel;
+    private TableView _categoryList;
 
     // Don't create a Window, just return the top-level view
     public override void Init () {
@@ -37,42 +37,28 @@ public class CharacterMap : Scenario {
     }
 
     public override void Setup () {
-        _charMap = new CharMap {
-                                   X = 0,
-                                   Y = 1,
-                                   Height = Dim.Fill ()
-                               };
+        _charMap = new CharMap { X = 0, Y = 1, Height = Dim.Fill () };
         Application.Top.Add (_charMap);
 
         var jumpLabel = new Label {
-                                      X = Pos.Right (_charMap) + 1,
-                                      Y = Pos.Y (_charMap),
-                                      HotKeySpecifier = (Rune)'_',
-                                      Text = "_Jump To Code Point:"
-                                  };
+            X = Pos.Right (_charMap) + 1,
+            Y = Pos.Y (_charMap),
+            HotKeySpecifier = (Rune)'_',
+            Text = "_Jump To Code Point:"
+        };
         Application.Top.Add (jumpLabel);
         var jumpEdit = new TextField {
-                                         X = Pos.Right (jumpLabel) + 1,
-                                         Y = Pos.Y (_charMap),
-                                         Width = 10,
-                                         Caption = "e.g. 01BE3"
-                                     };
+            X = Pos.Right (jumpLabel) + 1, Y = Pos.Y (_charMap), Width = 10, Caption = "e.g. 01BE3"
+        };
         Application.Top.Add (jumpEdit);
         _errorLabel = new Label {
-                                    X = Pos.Right (jumpEdit) + 1,
-                                    Y = Pos.Y (_charMap),
-                                    ColorScheme = Colors.ColorSchemes["error"],
-                                    Text = "err"
-                                };
+            X = Pos.Right (jumpEdit) + 1, Y = Pos.Y (_charMap), ColorScheme = Colors.ColorSchemes["error"], Text = "err"
+        };
         Application.Top.Add (_errorLabel);
 
         jumpEdit.TextChanged += JumpEdit_TextChanged;
 
-        _categoryList = new TableView {
-                                          X = Pos.Right (_charMap),
-                                          Y = Pos.Bottom (jumpLabel),
-                                          Height = Dim.Fill ()
-                                      };
+        _categoryList = new TableView { X = Pos.Right (_charMap), Y = Pos.Bottom (jumpLabel), Height = Dim.Fill () };
 
         _categoryList.FullRowSelect = true;
 
@@ -101,19 +87,17 @@ public class CharacterMap : Scenario {
 
                 table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
                 _categoryList.SelectedRow = table.Data
-                                                 .Select ((item, index) => new { item, index })
-                                                 .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                 ?.index ?? -1;
+                                                .Select ((item, index) => new { item, index })
+                                                .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                ?.index ?? -1;
             }
         };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
         _categoryList.Style.ColumnStyles.Add (
-                                              0,
-                                              new ColumnStyle {
-                                                                  MaxWidth = longestName, MinWidth = longestName,
-                                                                  MinAcceptableWidth = longestName
-                                                              });
+            0,
+            new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName }
+        );
         _categoryList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
         _categoryList.Style.ColumnStyles.Add (2, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
 
@@ -133,20 +117,21 @@ public class CharacterMap : Scenario {
         _categoryList.Initialized += _categoryList_Initialized;
 
         var menu = new MenuBar {
-                                   Menus =  [
-                                   new MenuBarItem ("_File", new MenuItem[] {
-                                                                                new (
-                                                                                 "_Quit",
-                                                                                 $"{Application.QuitKey}",
-                                                                                 () => Application.RequestStop ())
-                                                                            }),
-                                   new MenuBarItem (
-                                                    "_Options",
-                                                    new[] {
-                                                              CreateMenuShowWidth ()
-                                                          })
-                                       ]
-                               };
+            Menus =  [
+            new MenuBarItem ("_File",
+            new MenuItem[] {
+                new (
+                    "_Quit",
+                    $"{Application.QuitKey}",
+                    () => Application.RequestStop ()
+                )
+            }),
+            new MenuBarItem (
+                    "_Options",
+                    new[] { CreateMenuShowWidth () }
+                )
+                ]
+        };
         Application.Top.Add (menu);
     }
 
@@ -186,18 +171,17 @@ public class CharacterMap : Scenario {
                                                             : UnicodeRange.Ranges.OrderBy (orderBy);
 
         return new EnumerableTableSource<UnicodeRange> (
-                                                        sortedRanges,
-                                                        new Dictionary<string, Func<UnicodeRange, object>> {
-                                                            { $"Category{categorySort}", s => s.Category },
-                                                            { $"Start{startSort}", s => $"{s.Start:x5}" },
-                                                            { $"End{endSort}", s => $"{s.End:x5}" }
-                                                        });
+            sortedRanges,
+            new Dictionary<string, Func<UnicodeRange, object>> {
+                { $"Category{categorySort}", s => s.Category },
+                { $"Start{startSort}", s => $"{s.Start:x5}" },
+                { $"End{endSort}", s => $"{s.End:x5}" }
+            }
+        );
     }
 
     private MenuItem CreateMenuShowWidth () {
-        var item = new MenuItem {
-                                    Title = "_Show Glyph Width"
-                                };
+        var item = new MenuItem { Title = "_Show Glyph Width" };
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = _charMap?.ShowGlyphWidths;
         item.Action += () => { _charMap.ShowGlyphWidths = (bool)(item.Checked = !item.Checked); };
@@ -254,9 +238,9 @@ public class CharacterMap : Scenario {
 
         EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
         _categoryList.SelectedRow = table.Data
-                                         .Select ((item, index) => new { item, index })
-                                         .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
-                                         ?.index ?? -1;
+                                        .Select ((item, index) => new { item, index })
+                                        .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
+                                        ?.index ?? -1;
         _categoryList.EnsureSelectedCellIsVisible ();
 
         // Ensure the typed glyph is selected 
@@ -265,6 +249,101 @@ public class CharacterMap : Scenario {
 }
 
 class CharMap : ScrollView {
+    public CharMap () {
+        ColorScheme = Colors.ColorSchemes["Dialog"];
+        CanFocus = true;
+        ContentSize = new Size (
+            RowWidth,
+            (MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight
+        );
+
+        AddCommand (
+            Command.ScrollUp,
+            () => {
+                if (SelectedCodePoint >= 16) {
+                    SelectedCodePoint -= 16;
+                }
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.ScrollDown,
+            () => {
+                if (SelectedCodePoint < MaxCodePoint - 16) {
+                    SelectedCodePoint += 16;
+                }
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.ScrollLeft,
+            () => {
+                if (SelectedCodePoint > 0) {
+                    SelectedCodePoint--;
+                }
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.ScrollRight,
+            () => {
+                if (SelectedCodePoint < MaxCodePoint) {
+                    SelectedCodePoint++;
+                }
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.PageUp,
+            () => {
+                int page = (Bounds.Height / _rowHeight - 1) * 16;
+                SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.PageDown,
+            () => {
+                int page = (Bounds.Height / _rowHeight - 1) * 16;
+                SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.TopHome,
+            () => {
+                SelectedCodePoint = 0;
+
+                return true;
+            }
+        );
+        AddCommand (
+            Command.BottomEnd,
+            () => {
+                SelectedCodePoint = MaxCodePoint;
+
+                return true;
+            }
+        );
+        KeyBindings.Add (Key.Enter, Command.Accept);
+        AddCommand (
+            Command.Accept,
+            () => {
+                ShowDetails ();
+
+                return true;
+            }
+        );
+
+        MouseClick += Handle_MouseClick;
+    }
+
     private const CursorVisibility _cursor = CursorVisibility.Default;
     private const int COLUMN_WIDTH = 3;
     private ContextMenu _contextMenu = new ();
@@ -272,101 +351,12 @@ class CharMap : ScrollView {
     private int _selected;
     private int _start;
 
-    public CharMap () {
-        ColorScheme = Colors.ColorSchemes["Dialog"];
-        CanFocus = true;
-        ContentSize = new Size (
-                                RowWidth,
-                                (MaxCodePoint / 16 + (ShowHorizontalScrollIndicator ? 2 : 1)) * _rowHeight);
-
-        AddCommand (
-                    Command.ScrollUp,
-                    () => {
-                        if (SelectedCodePoint >= 16) {
-                            SelectedCodePoint -= 16;
-                        }
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.ScrollDown,
-                    () => {
-                        if (SelectedCodePoint < MaxCodePoint - 16) {
-                            SelectedCodePoint += 16;
-                        }
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.ScrollLeft,
-                    () => {
-                        if (SelectedCodePoint > 0) {
-                            SelectedCodePoint--;
-                        }
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.ScrollRight,
-                    () => {
-                        if (SelectedCodePoint < MaxCodePoint) {
-                            SelectedCodePoint++;
-                        }
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.PageUp,
-                    () => {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
-                        SelectedCodePoint -= Math.Min (page, SelectedCodePoint);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.PageDown,
-                    () => {
-                        int page = (Bounds.Height / _rowHeight - 1) * 16;
-                        SelectedCodePoint += Math.Min (page, MaxCodePoint - SelectedCodePoint);
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.TopHome,
-                    () => {
-                        SelectedCodePoint = 0;
-
-                        return true;
-                    });
-        AddCommand (
-                    Command.BottomEnd,
-                    () => {
-                        SelectedCodePoint = MaxCodePoint;
-
-                        return true;
-                    });
-        KeyBindings.Add (Key.Enter, Command.Accept);
-        AddCommand (
-                    Command.Accept,
-                    () => {
-                        ShowDetails ();
-
-                        return true;
-                    });
-
-        MouseClick += Handle_MouseClick;
-    }
-
-    /// <summary>Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates</summary>
-    public Point Cursor {
-        get {
-            int row = SelectedCodePoint / 16 * _rowHeight + ContentOffset.Y + 1;
-            int col = SelectedCodePoint % 16 * COLUMN_WIDTH + ContentOffset.X + RowLabelWidth +
-                      1; // + 1 for padding
-
-            return new Point (col, row);
+    public bool ShowGlyphWidths {
+        get => _rowHeight == 2;
+        set {
+            _rowHeight = value ? 2 : 1;
+            SetNeedsDisplay ();
         }
-        set => throw new NotImplementedException ();
     }
 
     public static int MaxCodePoint => 0x10FFFF;
@@ -390,8 +380,9 @@ class CharMap : ScrollView {
                 } else if (row + ContentOffset.Y >= height) {
                     // Moving down.
                     ContentOffset = new Point (
-                                               ContentOffset.X,
-                                               Math.Min (row, row - height + _rowHeight));
+                        ContentOffset.X,
+                        Math.Min (row, row - height + _rowHeight)
+                    );
                 }
 
                 int width = Bounds.Width / COLUMN_WIDTH * COLUMN_WIDTH -
@@ -402,21 +393,14 @@ class CharMap : ScrollView {
                 } else if (col + ContentOffset.X >= width) {
                     // Moving right.
                     ContentOffset = new Point (
-                                               Math.Min (col, col - width + COLUMN_WIDTH),
-                                               ContentOffset.Y);
+                        Math.Min (col, col - width + COLUMN_WIDTH),
+                        ContentOffset.Y
+                    );
                 }
             }
 
             SetNeedsDisplay ();
             SelectedCodePointChanged?.Invoke (this, new ListViewItemEventArgs (SelectedCodePoint, null));
-        }
-    }
-
-    public bool ShowGlyphWidths {
-        get => _rowHeight == 2;
-        set {
-            _rowHeight = value ? 2 : 1;
-            SetNeedsDisplay ();
         }
     }
 
@@ -431,6 +415,18 @@ class CharMap : ScrollView {
             SelectedCodePoint = value;
             SetNeedsDisplay ();
         }
+    }
+
+    /// <summary>Gets the coordinates of the Cursor based on the SelectedCodePoint in screen coordinates</summary>
+    public Point Cursor {
+        get {
+            int row = SelectedCodePoint / 16 * _rowHeight + ContentOffset.Y + 1;
+            int col = SelectedCodePoint % 16 * COLUMN_WIDTH + ContentOffset.X + RowLabelWidth +
+                      1; // + 1 for padding
+
+            return new Point (col, row);
+        }
+        set => throw new NotImplementedException ();
     }
 
     private static int RowLabelWidth => $"U+{MaxCodePoint:x5}".Length + 1;
@@ -469,24 +465,28 @@ class CharMap : ScrollView {
         }
 
         var viewport = new Rect (
-                                 ContentOffset,
-                                 new Size (
-                                           Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
-                                           Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)));
+            ContentOffset,
+            new Size (
+                Math.Max (Bounds.Width - (ShowVerticalScrollIndicator ? 1 : 0), 0),
+                Math.Max (Bounds.Height - (ShowHorizontalScrollIndicator ? 1 : 0), 0)
+            )
+        );
 
         Rect oldClip = ClipToBounds ();
         if (ShowHorizontalScrollIndicator) {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from height
             Driver.Clip = new Rect (
-                                    Driver.Clip.Location,
-                                    new Size (Driver.Clip.Width, Driver.Clip.Height - 1));
+                Driver.Clip.Location,
+                new Size (Driver.Clip.Width, Driver.Clip.Height - 1)
+            );
         }
 
         if (ShowVerticalScrollIndicator) {
             // ClipToBounds doesn't know about the scroll indicators, so if off, subtract one from width
             Driver.Clip = new Rect (
-                                    Driver.Clip.Location,
-                                    new Size (Driver.Clip.Width - 1, Driver.Clip.Height));
+                Driver.Clip.Location,
+                new Size (Driver.Clip.Width - 1, Driver.Clip.Height)
+            );
         }
 
         int cursorCol = Cursor.X - ContentOffset.X - RowLabelWidth - 1;
@@ -502,9 +502,10 @@ class CharMap : ScrollView {
                 Driver.SetAttribute (GetHotNormalColor ());
                 Driver.AddStr (" ");
                 Driver.SetAttribute (
-                                     HasFocus && cursorCol + ContentOffset.X + RowLabelWidth == x
-                                         ? ColorScheme.HotFocus
-                                         : GetHotNormalColor ());
+                    HasFocus && cursorCol + ContentOffset.X + RowLabelWidth == x
+                        ? ColorScheme.HotFocus
+                        : GetHotNormalColor ()
+                );
                 Driver.AddStr ($"{hexDigit:x}");
                 Driver.SetAttribute (GetHotNormalColor ());
                 Driver.AddStr (" ");
@@ -578,9 +579,10 @@ class CharMap : ScrollView {
 
             Move (0, y);
             Driver.SetAttribute (
-                                 HasFocus && cursorRow + ContentOffset.Y + 1 == y
-                                     ? ColorScheme.HotFocus
-                                     : ColorScheme.HotNormal);
+                HasFocus && cursorRow + ContentOffset.Y + 1 == y
+                    ? ColorScheme.HotFocus
+                    : ColorScheme.HotNormal
+            );
             if (!ShowGlyphWidths || ((y - ContentOffset.Y) % _rowHeight > 0)) {
                 Driver.AddStr ($"U+{val / 16:x5}_ ");
             } else {
@@ -685,26 +687,29 @@ class CharMap : ScrollView {
         if (me.Flags == _contextMenu.MouseFlags) {
             SelectedCodePoint = val;
             _contextMenu = new ContextMenu {
-                                               Position = new Point (me.X + 1, me.Y + 1),
-                                               MenuItems = new MenuBarItem (
-                                                                            new MenuItem[] {
-                                                                                new (
-                                                                                 "_Copy Glyph",
-                                                                                 "",
-                                                                                 CopyGlyph,
-                                                                                 null,
-                                                                                 null,
-                                                                                 (KeyCode)Key.C.WithCtrl),
-                                                                                new (
-                                                                                 "Copy Code _Point",
-                                                                                 "",
-                                                                                 CopyCodePoint,
-                                                                                 null,
-                                                                                 null,
-                                                                                 (KeyCode)Key.C.WithCtrl
-                                                                                     .WithShift)
-                                                                            })
-                                           };
+                Position = new Point (me.X + 1, me.Y + 1),
+                MenuItems = new MenuBarItem (
+                    new MenuItem[] {
+                        new (
+                            "_Copy Glyph",
+                            "",
+                            CopyGlyph,
+                            null,
+                            null,
+                            (KeyCode)Key.C.WithCtrl
+                        ),
+                        new (
+                            "Copy Code _Point",
+                            "",
+                            CopyCodePoint,
+                            null,
+                            null,
+                            (KeyCode)Key.C.WithCtrl
+                                .WithShift
+                        )
+                    }
+                )
+            };
             _contextMenu.Show ();
         }
     }
@@ -714,28 +719,24 @@ class CharMap : ScrollView {
         var decResponse = string.Empty;
 
         var waitIndicator = new Dialog {
-                                           Title = "Getting Code Point Information",
-                                           X = Pos.Center (),
-                                           Y = Pos.Center (),
-                                           Height = 7,
-                                           Width = 50,
-                                           Buttons =  [new Button { Text = "Cancel"
-                                       }]
+            Title = "Getting Code Point Information",
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Height = 7,
+            Width = 50,
+            Buttons =  [new Button { Text = "Cancel"
+        }]
         };
         var errorLabel = new Label {
-                                       Text = UcdApiClient.BaseUrl,
-                                       AutoSize = false,
-                                       X = 0,
-                                       Y = 1,
-                                       Width = Dim.Fill (),
-                                       Height = Dim.Fill (1),
-                                       TextAlignment = TextAlignment.Centered
-                                   };
-        var spinner = new SpinnerView {
-                                          X = Pos.Center (),
-                                          Y = Pos.Center (),
-                                          Style = new Aesthetic ()
-                                      };
+            Text = UcdApiClient.BaseUrl,
+            AutoSize = false,
+            X = 0,
+            Y = 1,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (1),
+            TextAlignment = TextAlignment.Centered
+        };
+        var spinner = new SpinnerView { X = Pos.Center (), Y = Pos.Center (), Style = new Aesthetic () };
         spinner.AutoSpin = true;
         waitIndicator.Add (errorLabel);
         waitIndicator.Add (spinner);
@@ -746,12 +747,13 @@ class CharMap : ScrollView {
             catch (HttpRequestException e) {
                 (s as Dialog).Text = e.Message;
                 Application.Invoke (
-                                    () => {
-                                        spinner.Visible = false;
-                                        errorLabel.Text = e.Message;
-                                        errorLabel.ColorScheme = Colors.ColorSchemes["Error"];
-                                        errorLabel.Visible = true;
-                                    });
+                    () => {
+                        spinner.Visible = false;
+                        errorLabel.Text = e.Message;
+                        errorLabel.ColorScheme = Colors.ColorSchemes["Error"];
+                        errorLabel.Visible = true;
+                    }
+                );
             }
 
             (s as Dialog)?.RequestStop ();
@@ -775,11 +777,10 @@ class CharMap : ScrollView {
                 //	Console.WriteLine (nestedPropertyElement.GetString ());
                 //}
                 decResponse = JsonSerializer.Serialize (
-                                                        document.RootElement,
-                                                        new
-                                                        JsonSerializerOptions {
-                                                                                  WriteIndented = true
-                                                                              });
+                    document.RootElement,
+                    new
+                        JsonSerializerOptions { WriteIndented = true }
+                );
             }
 
             var title = $"{ToCamelCase (name)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
@@ -788,10 +789,7 @@ class CharMap : ScrollView {
             var copyCP = new Button { Text = "Copy Code _Point" };
             var cancel = new Button { Text = "Cancel" };
 
-            var dlg = new Dialog {
-                                     Title = title,
-                                     Buttons =  [copyGlyph, copyCP, cancel]
-                                 };
+            var dlg = new Dialog { Title = title, Buttons =  [copyGlyph, copyCP, cancel] };
 
             copyGlyph.Clicked += (s, a) => {
                 CopyGlyph ();
@@ -804,127 +802,80 @@ class CharMap : ScrollView {
             cancel.Clicked += (s, a) => dlg.RequestStop ();
 
             var rune = (Rune)SelectedCodePoint;
-            var label = new Label {
-                                      Text = "IsAscii: ",
-                                      X = 0,
-                                      Y = 0
-                                  };
+            var label = new Label { Text = "IsAscii: ", X = 0, Y = 0 };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.IsAscii}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.IsAscii}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = ", Bmp: ",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = ", Bmp: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.IsBmp}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.IsBmp}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = ", CombiningMark: ",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = ", CombiningMark: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.IsCombiningMark ()}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.IsCombiningMark ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = ", SurrogatePair: ",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = ", SurrogatePair: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.IsSurrogatePair ()}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.IsSurrogatePair ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = ", Plane: ",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = ", Plane: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.Plane}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.Plane}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = "Columns: ",
-                                  X = 0,
-                                  Y = Pos.Bottom (label)
-                              };
+            label = new Label { Text = "Columns: ", X = 0, Y = Pos.Bottom (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.GetColumns ()}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.GetColumns ()}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = ", Utf16SequenceLength: ",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = ", Utf16SequenceLength: ", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
 
-            label = new Label {
-                                  Text = $"{rune.Utf16SequenceLength}",
-                                  X = Pos.Right (label),
-                                  Y = Pos.Top (label)
-                              };
+            label = new Label { Text = $"{rune.Utf16SequenceLength}", X = Pos.Right (label), Y = Pos.Top (label) };
             dlg.Add (label);
             label = new Label {
-                                  Text =
-                                      $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
-                                  X = 0,
-                                  Y = Pos.Bottom (label)
-                              };
+                Text =
+                    $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
+                X = 0,
+                Y = Pos.Bottom (label)
+            };
             dlg.Add (label);
 
             var json = new TextView {
-                                        X = 0,
-                                        Y = Pos.Bottom (label),
-                                        Width = Dim.Fill (),
-                                        Height = Dim.Fill (2),
-                                        ReadOnly = true,
-                                        Text = decResponse
-                                    };
+                X = 0,
+                Y = Pos.Bottom (label),
+                Width = Dim.Fill (),
+                Height = Dim.Fill (2),
+                ReadOnly = true,
+                Text = decResponse
+            };
             dlg.Add (json);
 
             Application.Run (dlg);
         } else {
             MessageBox.ErrorQuery (
-                                   "Code Point API",
-                                   $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} did not return a result for\r\n {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.",
-                                   "Ok");
+                "Code Point API",
+                $"{
+                    UcdApiClient.BaseUrl
+                }codepoint/dec/{
+                    SelectedCodePoint
+                } did not return a result for\r\n {
+                    new Rune (SelectedCodePoint)
+                } U+{
+                    SelectedCodePoint
+                    :x5}.",
+                "Ok"
+            );
         }
 
         // BUGBUG: This is a workaround for some weird ScrollView related mouse grab bug
@@ -967,16 +918,16 @@ public class UcdApiClient {
 }
 
 class UnicodeRange {
-    public static List<UnicodeRange> Ranges = GetRanges ();
-    public string Category;
-    public int End;
-    public int Start;
-
     public UnicodeRange (int start, int end, string category) {
         Start = start;
         End = end;
         Category = category;
     }
+
+    public static List<UnicodeRange> Ranges = GetRanges ();
+    public int End;
+    public int Start;
+    public string Category;
 
     public static List<UnicodeRange> GetRanges () {
         IEnumerable<UnicodeRange> ranges =
@@ -989,46 +940,52 @@ class UnicodeRange {
             select new UnicodeRange (urange.FirstCodePoint, urange.FirstCodePoint + urange.Length, name);
 
         // .NET 8.0 only supports BMP in UnicodeRanges: https://learn.microsoft.com/en-us/dotnet/api/system.text.unicode.unicoderanges?view=net-8.0
-        List<UnicodeRange> nonBmpRanges = new List<UnicodeRange> {
-                                                                     new (
-                                                                          0x1F130,
-                                                                          0x1F149,
-                                                                          "Squared Latin Capital Letters"),
-                                                                     new (
-                                                                          0x12400,
-                                                                          0x1240f,
-                                                                          "Cuneiform Numbers and Punctuation"),
-                                                                     new (0x10000, 0x1007F, "Linear B Syllabary"),
-                                                                     new (0x10080, 0x100FF, "Linear B Ideograms"),
-                                                                     new (0x10100, 0x1013F, "Aegean Numbers"),
-                                                                     new (0x10300, 0x1032F, "Old Italic"),
-                                                                     new (0x10330, 0x1034F, "Gothic"),
-                                                                     new (0x10380, 0x1039F, "Ugaritic"),
-                                                                     new (0x10400, 0x1044F, "Deseret"),
-                                                                     new (0x10450, 0x1047F, "Shavian"),
-                                                                     new (0x10480, 0x104AF, "Osmanya"),
-                                                                     new (0x10800, 0x1083F, "Cypriot Syllabary"),
-                                                                     new (
-                                                                          0x1D000,
-                                                                          0x1D0FF,
-                                                                          "Byzantine Musical Symbols"),
-                                                                     new (0x1D100, 0x1D1FF, "Musical Symbols"),
-                                                                     new (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
-                                                                     new (
-                                                                          0x1D400,
-                                                                          0x1D7FF,
-                                                                          "Mathematical Alphanumeric Symbols"),
-                                                                     new (0x1F600, 0x1F532, "Emojis Symbols"),
-                                                                     new (
-                                                                          0x20000,
-                                                                          0x2A6DF,
-                                                                          "CJK Unified Ideographs Extension B"),
-                                                                     new (
-                                                                          0x2F800,
-                                                                          0x2FA1F,
-                                                                          "CJK Compatibility Ideographs Supplement"),
-                                                                     new (0xE0000, 0xE007F, "Tags")
-                                                                 };
+        List<UnicodeRange> nonBmpRanges = new() {
+            new (
+                0x1F130,
+                0x1F149,
+                "Squared Latin Capital Letters"
+            ),
+            new (
+                0x12400,
+                0x1240f,
+                "Cuneiform Numbers and Punctuation"
+            ),
+            new (0x10000, 0x1007F, "Linear B Syllabary"),
+            new (0x10080, 0x100FF, "Linear B Ideograms"),
+            new (0x10100, 0x1013F, "Aegean Numbers"),
+            new (0x10300, 0x1032F, "Old Italic"),
+            new (0x10330, 0x1034F, "Gothic"),
+            new (0x10380, 0x1039F, "Ugaritic"),
+            new (0x10400, 0x1044F, "Deseret"),
+            new (0x10450, 0x1047F, "Shavian"),
+            new (0x10480, 0x104AF, "Osmanya"),
+            new (0x10800, 0x1083F, "Cypriot Syllabary"),
+            new (
+                0x1D000,
+                0x1D0FF,
+                "Byzantine Musical Symbols"
+            ),
+            new (0x1D100, 0x1D1FF, "Musical Symbols"),
+            new (0x1D300, 0x1D35F, "Tai Xuan Jing Symbols"),
+            new (
+                0x1D400,
+                0x1D7FF,
+                "Mathematical Alphanumeric Symbols"
+            ),
+            new (0x1F600, 0x1F532, "Emojis Symbols"),
+            new (
+                0x20000,
+                0x2A6DF,
+                "CJK Unified Ideographs Extension B"
+            ),
+            new (
+                0x2F800,
+                0x2FA1F,
+                "CJK Compatibility Ideographs Supplement"
+            ),
+            new (0xE0000, 0xE007F, "Tags")
+        };
 
         return ranges.Concat (nonBmpRanges).OrderBy (r => r.Category).ToList ();
     }

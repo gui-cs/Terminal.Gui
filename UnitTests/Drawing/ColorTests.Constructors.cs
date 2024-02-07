@@ -1,7 +1,6 @@
 namespace Terminal.Gui.DrawingTests;
 
 public partial class ColorTests {
-
     [Fact]
     public void Constructor_Empty_ReturnsColorWithZeroValue () {
         Color color = new ();
@@ -17,12 +16,17 @@ public partial class ColorTests {
 
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithByteRGBAValues_AllValuesCorrect ([CombinatorialValues (0, 1, 254)] byte r, [CombinatorialValues (0, 1, 253)] byte g, [CombinatorialValues (0, 1, 252)] byte b, [CombinatorialValues (0, 1, 251)] byte a) {
+    public void Constructor_WithByteRGBAValues_AllValuesCorrect (
+        [CombinatorialValues (0, 1, 254)] byte r,
+        [CombinatorialValues (0, 1, 253)] byte g,
+        [CombinatorialValues (0, 1, 252)] byte b,
+        [CombinatorialValues (0, 1, 251)] byte a
+    ) {
         var color = new Color (r, g, b, a);
 
         ReadOnlySpan<byte> bytes = [b, g, r, a];
-        int expectedRgba = BitConverter.ToInt32 (bytes);
-        uint expectedArgb = BitConverter.ToUInt32 (bytes);
+        var expectedRgba = BitConverter.ToInt32 (bytes);
+        var expectedArgb = BitConverter.ToUInt32 (bytes);
 
         Assert.Multiple (
             () => Assert.Equal (r, color.R),
@@ -33,14 +37,19 @@ public partial class ColorTests {
             () => Assert.Equal (expectedArgb, color.Argb)
         );
     }
+
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithByteRGBValues_AllValuesCorrect ([CombinatorialValues (0, 1, 254)] byte r, [CombinatorialValues (0, 1, 253)] byte g, [CombinatorialValues (0, 1, 252)] byte b) {
+    public void Constructor_WithByteRGBValues_AllValuesCorrect (
+        [CombinatorialValues (0, 1, 254)] byte r,
+        [CombinatorialValues (0, 1, 253)] byte g,
+        [CombinatorialValues (0, 1, 252)] byte b
+    ) {
         var color = new Color (r, g, b);
 
         ReadOnlySpan<byte> bytes = [b, g, r, 255];
-        int expectedRgba = BitConverter.ToInt32 (bytes);
-        uint expectedArgb = BitConverter.ToUInt32 (bytes);
+        var expectedRgba = BitConverter.ToInt32 (bytes);
+        var expectedArgb = BitConverter.ToUInt32 (bytes);
 
         Assert.Multiple (
             () => Assert.Equal (r, color.R),
@@ -53,8 +62,14 @@ public partial class ColorTests {
     }
 
     [Theory]
-    [MemberData (nameof (ColorTestsTheoryDataGenerators.Constructor_WithColorName_AllChannelsCorrect), MemberType = typeof (ColorTestsTheoryDataGenerators))]
-    public void Constructor_WithColorName_AllChannelsCorrect (ColorName cname, ValueTuple<byte, byte, byte> expectedColorValues) {
+    [MemberData (
+        nameof (ColorTestsTheoryDataGenerators.Constructor_WithColorName_AllChannelsCorrect),
+        MemberType = typeof (ColorTestsTheoryDataGenerators)
+    )]
+    public void Constructor_WithColorName_AllChannelsCorrect (
+        ColorName cname,
+        ValueTuple<byte, byte, byte> expectedColorValues
+    ) {
         var color = new Color (cname);
 
         (byte r, byte g, byte b) = expectedColorValues;
@@ -68,10 +83,15 @@ public partial class ColorTests {
 
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithInt32_AllValuesCorrect ([CombinatorialValues (0, 1, 254)] byte r, [CombinatorialValues (0, 1, 253)] byte g, [CombinatorialValues (0, 1, 252)] byte b, [CombinatorialValues (0, 1, 251)] byte a) {
+    public void Constructor_WithInt32_AllValuesCorrect (
+        [CombinatorialValues (0, 1, 254)] byte r,
+        [CombinatorialValues (0, 1, 253)] byte g,
+        [CombinatorialValues (0, 1, 252)] byte b,
+        [CombinatorialValues (0, 1, 251)] byte a
+    ) {
         ReadOnlySpan<byte> bytes = [b, g, r, a];
-        int expectedRgba = BitConverter.ToInt32 (bytes);
-        uint expectedArgb = BitConverter.ToUInt32 (bytes);
+        var expectedRgba = BitConverter.ToInt32 (bytes);
+        var expectedArgb = BitConverter.ToUInt32 (bytes);
 
         var color = new Color (expectedRgba);
 
@@ -87,7 +107,12 @@ public partial class ColorTests {
 
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithInt32RGBAValues_AllValuesCorrect ([CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int r, [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int g, [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int b, [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int a) {
+    public void Constructor_WithInt32RGBAValues_AllValuesCorrect (
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int r,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int g,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int b,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int a
+    ) {
         var color = new Color (r, g, b, a);
 
         Assert.Multiple (
@@ -100,7 +125,11 @@ public partial class ColorTests {
 
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithInt32RGBValues_AllValuesCorrect ([CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int r, [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int g, [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int b) {
+    public void Constructor_WithInt32RGBValues_AllValuesCorrect (
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int r,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int g,
+        [CombinatorialRandomData (Count = 4, Minimum = 0, Maximum = 255)] int b
+    ) {
         var color = new Color (r, g, b);
 
         Assert.Multiple (
@@ -113,7 +142,9 @@ public partial class ColorTests {
 
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithString_EmptyOrWhitespace_ThrowsArgumentException ([CombinatorialValues ("", "\t", " ", "\r", "\r\n", "\n", "   ")] string badString) {
+    public void Constructor_WithString_EmptyOrWhitespace_ThrowsArgumentException (
+        [CombinatorialValues ("", "\t", " ", "\r", "\r\n", "\n", "   ")] string badString
+    ) {
         Assert.Throws<ArgumentException> (() => Color.Parse (badString));
     }
 
@@ -124,9 +155,14 @@ public partial class ColorTests {
 
     [Theory]
     [CombinatorialData]
-    public void Constructor_WithUInt32_AllChannelsCorrect ([CombinatorialValues (0, 1, 254)] byte r, [CombinatorialValues (0, 1, 253)] byte g, [CombinatorialValues (0, 1, 252)] byte b, [CombinatorialValues (0, 1, 251)] byte a) {
+    public void Constructor_WithUInt32_AllChannelsCorrect (
+        [CombinatorialValues (0, 1, 254)] byte r,
+        [CombinatorialValues (0, 1, 253)] byte g,
+        [CombinatorialValues (0, 1, 252)] byte b,
+        [CombinatorialValues (0, 1, 251)] byte a
+    ) {
         ReadOnlySpan<byte> bytes = [b, g, r, a];
-        uint expectedArgb = BitConverter.ToUInt32 (bytes);
+        var expectedArgb = BitConverter.ToUInt32 (bytes);
 
         var color = new Color (expectedArgb);
 
@@ -138,6 +174,7 @@ public partial class ColorTests {
         );
     }
 }
+
 public static partial class ColorTestsTheoryDataGenerators {
     public static TheoryData<ColorName, ValueTuple<byte, byte, byte>> Constructor_WithColorName_AllChannelsCorrect () {
         TheoryData<ColorName, ValueTuple<byte, byte, byte>> data = [];
@@ -157,6 +194,7 @@ public static partial class ColorTestsTheoryDataGenerators {
         data.Add (ColorName.BrightMagenta, new ValueTuple<byte, byte, byte> (180, 0, 158));
         data.Add (ColorName.BrightYellow, new ValueTuple<byte, byte, byte> (249, 241, 165));
         data.Add (ColorName.White, new ValueTuple<byte, byte, byte> (242, 242, 242));
+
         return data;
     }
 }

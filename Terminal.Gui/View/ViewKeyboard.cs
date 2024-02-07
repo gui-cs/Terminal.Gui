@@ -4,16 +4,17 @@ public partial class View {
     private void AddCommands () {
         // By default, the Default command is bound to the HotKey enabling focus
         AddCommand (
-                    Command.Default,
-                    () => {
-                        if (CanFocus) {
-                            SetFocus ();
+            Command.Default,
+            () => {
+                if (CanFocus) {
+                    SetFocus ();
 
-                            return true;
-                        }
+                    return true;
+                }
 
-                        return false;
-                    });
+                return false;
+            }
+        );
 
         // By default the Accept command does nothing
         AddCommand (Command.Accept, () => false);
@@ -68,8 +69,9 @@ public partial class View {
         set {
             if (value is null) {
                 throw new ArgumentException (
-                                             @"HotKey must not be null. Use Key.Empty to clear the HotKey.",
-                                             nameof (value));
+                    @"HotKey must not be null. Use Key.Empty to clear the HotKey.",
+                    nameof (value)
+                );
             }
 
             if (AddKeyBindingsForHotKey (_hotKey, value)) {
@@ -519,8 +521,8 @@ public partial class View {
     ///     Invoked when a key is released. Set <see cref="Key.Handled"/> to true to stop the key up event from being processed
     ///     by other views.
     ///     <remarks>
-    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on distinct
-    ///         KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
+    ///         Not all terminals support key distinct down/up notifications, Applications should avoid depending on
+    ///         distinct KeyDown and KeyUp events and instead should use <see cref="KeyDown"/>.
     ///         <para>See <see href="../docs/keyboard.md">for an overview of Terminal.Gui keyboard APIs.</see></para>
     ///     </remarks>
     /// </summary>
@@ -575,10 +577,12 @@ public partial class View {
 
         // Now, process any key bindings in the subviews that are tagged to KeyBindingScope.HotKey.
         foreach (View view in Subviews.Where (
-                                              v => v.KeyBindings.TryGet (
-                                                                         keyEvent.KeyCode,
-                                                                         KeyBindingScope.HotKey,
-                                                                         out KeyBinding _))) {
+                     v => v.KeyBindings.TryGet (
+                         keyEvent.KeyCode,
+                         KeyBindingScope.HotKey,
+                         out KeyBinding _
+                     )
+                 )) {
             // TODO: I think this TryGet is not needed due to the one in the lambda above. Use `Get` instead?
             if (view.KeyBindings.TryGet (keyEvent.KeyCode, KeyBindingScope.HotKey, out KeyBinding binding)) {
                 keyEvent.Scope = KeyBindingScope.HotKey;
@@ -618,7 +622,14 @@ public partial class View {
         foreach (Command command in binding.Commands) {
             if (!CommandImplementations.ContainsKey (command)) {
                 throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {command} ({keyEvent.KeyCode}) but that command is not supported by this View ({GetType ().Name})");
+                    @$"A KeyBinding was set up for the command {
+                        command
+                    } ({
+                        keyEvent.KeyCode
+                    }) but that command is not supported by this View ({
+                        GetType ().Name
+                    })"
+                );
             }
 
             // each command has its own return value

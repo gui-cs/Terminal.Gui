@@ -17,8 +17,6 @@
 ///     <para>Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> can be customized.</para>
 /// </remarsk>
 public class Adornment : View {
-    private Thickness _thickness = Thickness.Empty;
-
     /// <inheritdoc/>
     public Adornment () {
         /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
@@ -28,24 +26,7 @@ public class Adornment : View {
     /// <param name="parent"></param>
     public Adornment (View parent) { Parent = parent; }
 
-    /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
-    public override Rect Bounds {
-        get => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
-        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
-    }
-
-    /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
-    /// <remarks>
-    ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
-    ///     relationship with their containing View.
-    /// </remarks>
-    public View Parent { get; set; }
-
-    /// <summary>
-    ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an
-    ///     <see cref="InvalidOperationException"/>. TODO: Are we sure?
-    /// </summary>
-    public override View SuperView { get => null; set => throw new NotImplementedException (); }
+    private Thickness _thickness = Thickness.Empty;
 
     /// <summary>
     ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
@@ -54,6 +35,12 @@ public class Adornment : View {
     public override bool SuperViewRendersLineCanvas {
         get => false; // throw new NotImplementedException ();
         set => throw new NotImplementedException ();
+    }
+
+    /// <summary>Gets the rectangle that describes the inner area of the Adornment. The Location is always (0,0).</summary>
+    public override Rect Bounds {
+        get => Thickness?.GetInside (new Rect (Point.Empty, Frame.Size)) ?? new Rect (Point.Empty, Frame.Size);
+        set => throw new InvalidOperationException ("It makes no sense to set Bounds of a Thickness.");
     }
 
     /// <summary>Defines the rectangle that the <see cref="Adornment"/> will use to draw its content.</summary>
@@ -68,6 +55,19 @@ public class Adornment : View {
             }
         }
     }
+
+    /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
+    /// <remarks>
+    ///     Adornments are distinguished from typical View classes in that they are not sub-views, but have a parent/child
+    ///     relationship with their containing View.
+    /// </remarks>
+    public View Parent { get; set; }
+
+    /// <summary>
+    ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); this method always throws an
+    ///     <see cref="InvalidOperationException"/>. TODO: Are we sure?
+    /// </summary>
+    public override View SuperView { get => null; set => throw new NotImplementedException (); }
 
     /// <inheritdoc/>
     public override void BoundsToScreen (int col, int row, out int rcol, out int rrow, bool clipped = true) {
@@ -135,8 +135,9 @@ public class Adornment : View {
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
     public virtual void OnThicknessChanged (Thickness previousThickness) {
         ThicknessChanged?.Invoke (
-                                  this,
-                                  new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness });
+            this,
+            new ThicknessEventArgs { Thickness = Thickness, PreviousThickness = previousThickness }
+        );
     }
 
     /// <summary>Fired whenever the <see cref="Thickness"/> property changes.</summary>

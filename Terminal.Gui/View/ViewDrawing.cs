@@ -229,10 +229,9 @@ public partial class View {
         if (focused) {
             DrawHotString (text, scheme.HotFocus, scheme.Focus);
         } else {
-            DrawHotString (
-                           text,
-                           Enabled ? scheme.HotNormal : scheme.Disabled,
-                           Enabled ? scheme.Normal : scheme.Disabled);
+            DrawHotString (text,
+               Enabled ? scheme.HotNormal : scheme.Disabled,
+               Enabled ? scheme.Normal : scheme.Disabled);
         }
     }
 

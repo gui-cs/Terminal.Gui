@@ -6,12 +6,6 @@ using Terminal.Gui;
 namespace UICatalog;
 
 class KeyBindingsDialog : Dialog {
-    // TODO: Update to use Key instead of KeyCode
-    private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
-    private readonly Command[] _commands;
-    private readonly ListView _commandsListView;
-    private readonly Label _keyLabel;
-
     public KeyBindingsDialog () {
         Title = "Keybindings";
 
@@ -25,27 +19,18 @@ class KeyBindingsDialog : Dialog {
         _commands = Enum.GetValues (typeof (Command)).Cast<Command> ().ToArray ();
 
         _commandsListView = new ListView {
-                                             Width = Dim.Percent (50),
-                                             Height = Dim.Percent (100) - 1,
-                                             Source = new ListWrapper (_commands),
-                                             SelectedItem = 0
-                                         };
+            Width = Dim.Percent (50),
+            Height = Dim.Percent (100) - 1,
+            Source = new ListWrapper (_commands),
+            SelectedItem = 0
+        };
 
         Add (_commandsListView);
 
-        _keyLabel = new Label {
-                                  Text = "Key: None",
-                                  Width = Dim.Fill (),
-                                  X = Pos.Percent (50),
-                                  Y = 0
-                              };
+        _keyLabel = new Label { Text = "Key: None", Width = Dim.Fill (), X = Pos.Percent (50), Y = 0 };
         Add (_keyLabel);
 
-        var btnChange = new Button {
-                                       X = Pos.Percent (50),
-                                       Y = 1,
-                                       Text = "Ch_ange"
-                                   };
+        var btnChange = new Button { X = Pos.Percent (50), Y = 1, Text = "Ch_ange" };
         Add (btnChange);
         btnChange.Clicked += RemapKey;
 
@@ -67,6 +52,12 @@ class KeyBindingsDialog : Dialog {
         // Setup to show first ListView entry
         SetTextBoxToShowBinding (_commands.First ());
     }
+
+    // TODO: Update to use Key instead of KeyCode
+    private static readonly Dictionary<Command, KeyCode> CurrentBindings = new ();
+    private readonly Command[] _commands;
+    private readonly Label _keyLabel;
+    private readonly ListView _commandsListView;
 
     private void CommandsListView_SelectedItemChanged (object sender, ListViewItemEventArgs obj) {
         SetTextBoxToShowBinding ((Command)obj.Value);
@@ -102,28 +93,29 @@ class KeyBindingsDialog : Dialog {
 
     /// <summary>Tracks views as they are created in UICatalog so that their keybindings can be managed.</summary>
     private class ViewTracker {
-        /// <summary>All views seen so far and a bool to indicate if we have applied keybindings to them</summary>
-        private readonly Dictionary<View, bool> _knownViews = new ();
-
-        private readonly object _lockKnownViews = new ();
-        private Dictionary<Command, KeyCode> _keybindings;
-
         private ViewTracker (View top) {
             RecordView (top);
 
             // Refresh known windows
             Application.AddTimeout (
-                                    TimeSpan.FromMilliseconds (100),
-                                    () => {
-                                        lock (_lockKnownViews) {
-                                            RecordView (Application.Top);
+                TimeSpan.FromMilliseconds (100),
+                () => {
+                    lock (_lockKnownViews) {
+                        RecordView (Application.Top);
 
-                                            ApplyKeyBindingsToAllKnownViews ();
-                                        }
+                        ApplyKeyBindingsToAllKnownViews ();
+                    }
 
-                                        return true;
-                                    });
+                    return true;
+                }
+            );
         }
+
+        /// <summary>All views seen so far and a bool to indicate if we have applied keybindings to them</summary>
+        private readonly Dictionary<View, bool> _knownViews = new ();
+
+        private readonly object _lockKnownViews = new ();
+        private Dictionary<Command, KeyCode> _keybindings;
 
         public static ViewTracker Instance { get; private set; }
 
@@ -156,7 +148,7 @@ class KeyBindingsDialog : Dialog {
                     continue;
                 }
 
-                HashSet<Command> supported = new HashSet<Command> (view.GetSupportedCommands ());
+                HashSet<Command> supported = new (view.GetSupportedCommands ());
 
                 foreach (KeyValuePair<Command, KeyCode> kvp in _keybindings) {
                     // if the view supports the keybinding
