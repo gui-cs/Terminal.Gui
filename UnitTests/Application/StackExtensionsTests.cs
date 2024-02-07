@@ -1,188 +1,177 @@
 ﻿namespace Terminal.Gui.ApplicationTests;
 
 public class StackExtensionsTests {
-	[Fact]
-	public void Stack_Toplevels_CreateToplevels ()
-	{
-		var Toplevels = CreateToplevels ();
+    [Fact]
+    public void Stack_Toplevels_Contains () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
+        var comparer = new ToplevelEqualityComparer ();
 
-		var index = Toplevels.Count - 1;
-		foreach (var top in Toplevels) {
-			if (top.GetType () == typeof (Toplevel)) {
-				Assert.Equal ("Top", top.Id);
-			} else {
-				Assert.Equal ($"w{index}", top.Id);
-			}
+        Assert.True (Toplevels.Contains (new Window { Id = "w2" }, comparer));
+        Assert.False (Toplevels.Contains (new Toplevel { Id = "top2" }, comparer));
+    }
 
-			index--;
-		}
+    [Fact]
+    public void Stack_Toplevels_CreateToplevels () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		var tops = Toplevels.ToArray ();
+        int index = Toplevels.Count - 1;
+        foreach (Toplevel top in Toplevels) {
+            if (top.GetType () == typeof (Toplevel)) {
+                Assert.Equal ("Top", top.Id);
+            } else {
+                Assert.Equal ($"w{index}", top.Id);
+            }
 
-		Assert.Equal ("w4", tops [0].Id);
-		Assert.Equal ("w3", tops [1].Id);
-		Assert.Equal ("w2", tops [2].Id);
-		Assert.Equal ("w1", tops [3].Id);
-		Assert.Equal ("Top", tops [^1].Id);
-	}
+            index--;
+        }
 
-	[Fact]
-	public void Stack_Toplevels_Replace ()
-	{
-		var Toplevels = CreateToplevels ();
+        Toplevel[] tops = Toplevels.ToArray ();
 
-		var valueToReplace = new Window { Id = "w1" };
-		var valueToReplaceWith = new Window { Id = "new" };
-		var comparer = new ToplevelEqualityComparer ();
+        Assert.Equal ("w4", tops[0].Id);
+        Assert.Equal ("w3", tops[1].Id);
+        Assert.Equal ("w2", tops[2].Id);
+        Assert.Equal ("w1", tops[3].Id);
+        Assert.Equal ("Top", tops[^1].Id);
+    }
 
-		Toplevels.Replace (valueToReplace, valueToReplaceWith, comparer);
+    [Fact]
+    public void Stack_Toplevels_FindDuplicates () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
+        var comparer = new ToplevelEqualityComparer ();
 
-		var tops = Toplevels.ToArray ();
+        Toplevels.Push (new Toplevel { Id = "w4" });
+        Toplevels.Push (new Toplevel { Id = "w1" });
 
-		Assert.Equal ("w4", tops [0].Id);
-		Assert.Equal ("w3", tops [1].Id);
-		Assert.Equal ("w2", tops [2].Id);
-		Assert.Equal ("new", tops [3].Id);
-		Assert.Equal ("Top", tops [^1].Id);
-	}
+        Toplevel[] dup = Toplevels.FindDuplicates (comparer).ToArray ();
 
-	[Fact]
-	public void Stack_Toplevels_Swap ()
-	{
-		var Toplevels = CreateToplevels ();
+        Assert.Equal ("w4", dup[0].Id);
+        Assert.Equal ("w1", dup[^1].Id);
+    }
 
-		var valueToSwapFrom = new Window { Id = "w3" };
-		var valueToSwapTo = new Window { Id = "w1" };
-		var comparer = new ToplevelEqualityComparer ();
-		Toplevels.Swap (valueToSwapFrom, valueToSwapTo, comparer);
+    [Fact]
+    public void Stack_Toplevels_MoveNext () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		var tops = Toplevels.ToArray ();
+        Toplevels.MoveNext ();
 
-		Assert.Equal ("w4", tops [0].Id);
-		Assert.Equal ("w1", tops [1].Id);
-		Assert.Equal ("w2", tops [2].Id);
-		Assert.Equal ("w3", tops [3].Id);
-		Assert.Equal ("Top", tops [^1].Id);
-	}
+        Toplevel[] tops = Toplevels.ToArray ();
 
-	[Fact]
-	public void Stack_Toplevels_MoveNext ()
-	{
-		var Toplevels = CreateToplevels ();
+        Assert.Equal ("w3", tops[0].Id);
+        Assert.Equal ("w2", tops[1].Id);
+        Assert.Equal ("w1", tops[2].Id);
+        Assert.Equal ("Top", tops[3].Id);
+        Assert.Equal ("w4", tops[^1].Id);
+    }
 
-		Toplevels.MoveNext ();
+    [Fact]
+    public void Stack_Toplevels_MovePrevious () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		var tops = Toplevels.ToArray ();
+        Toplevels.MovePrevious ();
 
-		Assert.Equal ("w3", tops [0].Id);
-		Assert.Equal ("w2", tops [1].Id);
-		Assert.Equal ("w1", tops [2].Id);
-		Assert.Equal ("Top", tops [3].Id);
-		Assert.Equal ("w4", tops [^1].Id);
-	}
+        Toplevel[] tops = Toplevels.ToArray ();
 
-	[Fact]
-	public void Stack_Toplevels_MovePrevious ()
-	{
-		var Toplevels = CreateToplevels ();
+        Assert.Equal ("Top", tops[0].Id);
+        Assert.Equal ("w4", tops[1].Id);
+        Assert.Equal ("w3", tops[2].Id);
+        Assert.Equal ("w2", tops[3].Id);
+        Assert.Equal ("w1", tops[^1].Id);
+    }
 
-		Toplevels.MovePrevious ();
+    [Fact]
+    public void Stack_Toplevels_MoveTo () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		var tops = Toplevels.ToArray ();
+        var valueToMove = new Window { Id = "w1" };
+        var comparer = new ToplevelEqualityComparer ();
 
-		Assert.Equal ("Top", tops [0].Id);
-		Assert.Equal ("w4", tops [1].Id);
-		Assert.Equal ("w3", tops [2].Id);
-		Assert.Equal ("w2", tops [3].Id);
-		Assert.Equal ("w1", tops [^1].Id);
-	}
+        Toplevels.MoveTo (valueToMove, 1, comparer);
 
-	[Fact]
-	public void ToplevelEqualityComparer_GetHashCode ()
-	{
-		var Toplevels = CreateToplevels ();
+        Toplevel[] tops = Toplevels.ToArray ();
 
-		// Only allows unique keys
-		var hCodes = new HashSet<int> ();
+        Assert.Equal ("w4", tops[0].Id);
+        Assert.Equal ("w1", tops[1].Id);
+        Assert.Equal ("w3", tops[2].Id);
+        Assert.Equal ("w2", tops[3].Id);
+        Assert.Equal ("Top", tops[^1].Id);
+    }
 
-		foreach (var top in Toplevels) {
-			Assert.True (hCodes.Add (top.GetHashCode ()));
-		}
-	}
+    [Fact]
+    public void Stack_Toplevels_MoveTo_From_Last_To_Top () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-	[Fact]
-	public void Stack_Toplevels_FindDuplicates ()
-	{
-		var Toplevels = CreateToplevels ();
-		var comparer = new ToplevelEqualityComparer ();
+        var valueToMove = new Window { Id = "Top" };
+        var comparer = new ToplevelEqualityComparer ();
 
-		Toplevels.Push (new Toplevel { Id = "w4" });
-		Toplevels.Push (new Toplevel { Id = "w1" });
+        Toplevels.MoveTo (valueToMove, 0, comparer);
 
-		var dup = Toplevels.FindDuplicates (comparer).ToArray ();
+        Toplevel[] tops = Toplevels.ToArray ();
 
-		Assert.Equal ("w4", dup [0].Id);
-		Assert.Equal ("w1", dup [^1].Id);
-	}
+        Assert.Equal ("Top", tops[0].Id);
+        Assert.Equal ("w4", tops[1].Id);
+        Assert.Equal ("w3", tops[2].Id);
+        Assert.Equal ("w2", tops[3].Id);
+        Assert.Equal ("w1", tops[^1].Id);
+    }
 
-	[Fact]
-	public void Stack_Toplevels_Contains ()
-	{
-		var Toplevels = CreateToplevels ();
-		var comparer = new ToplevelEqualityComparer ();
+    [Fact]
+    public void Stack_Toplevels_Replace () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		Assert.True (Toplevels.Contains (new Window { Id = "w2" }, comparer));
-		Assert.False (Toplevels.Contains (new Toplevel { Id = "top2" }, comparer));
-	}
+        var valueToReplace = new Window { Id = "w1" };
+        var valueToReplaceWith = new Window { Id = "new" };
+        var comparer = new ToplevelEqualityComparer ();
 
-	[Fact]
-	public void Stack_Toplevels_MoveTo ()
-	{
-		var Toplevels = CreateToplevels ();
+        Toplevels.Replace (valueToReplace, valueToReplaceWith, comparer);
 
-		var valueToMove = new Window { Id = "w1" };
-		var comparer = new ToplevelEqualityComparer ();
+        Toplevel[] tops = Toplevels.ToArray ();
 
-		Toplevels.MoveTo (valueToMove, 1, comparer);
+        Assert.Equal ("w4", tops[0].Id);
+        Assert.Equal ("w3", tops[1].Id);
+        Assert.Equal ("w2", tops[2].Id);
+        Assert.Equal ("new", tops[3].Id);
+        Assert.Equal ("Top", tops[^1].Id);
+    }
 
-		var tops = Toplevels.ToArray ();
+    [Fact]
+    public void Stack_Toplevels_Swap () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		Assert.Equal ("w4", tops [0].Id);
-		Assert.Equal ("w1", tops [1].Id);
-		Assert.Equal ("w3", tops [2].Id);
-		Assert.Equal ("w2", tops [3].Id);
-		Assert.Equal ("Top", tops [^1].Id);
-	}
+        var valueToSwapFrom = new Window { Id = "w3" };
+        var valueToSwapTo = new Window { Id = "w1" };
+        var comparer = new ToplevelEqualityComparer ();
+        Toplevels.Swap (valueToSwapFrom, valueToSwapTo, comparer);
 
-	[Fact]
-	public void Stack_Toplevels_MoveTo_From_Last_To_Top ()
-	{
-		var Toplevels = CreateToplevels ();
+        Toplevel[] tops = Toplevels.ToArray ();
 
-		var valueToMove = new Window { Id = "Top" };
-		var comparer = new ToplevelEqualityComparer ();
+        Assert.Equal ("w4", tops[0].Id);
+        Assert.Equal ("w1", tops[1].Id);
+        Assert.Equal ("w2", tops[2].Id);
+        Assert.Equal ("w3", tops[3].Id);
+        Assert.Equal ("Top", tops[^1].Id);
+    }
 
-		Toplevels.MoveTo (valueToMove, 0, comparer);
+    [Fact]
+    public void ToplevelEqualityComparer_GetHashCode () {
+        Stack<Toplevel> Toplevels = CreateToplevels ();
 
-		var tops = Toplevels.ToArray ();
+        // Only allows unique keys
+        HashSet<int> hCodes = new HashSet<int> ();
 
-		Assert.Equal ("Top", tops [0].Id);
-		Assert.Equal ("w4", tops [1].Id);
-		Assert.Equal ("w3", tops [2].Id);
-		Assert.Equal ("w2", tops [3].Id);
-		Assert.Equal ("w1", tops [^1].Id);
-	}
+        foreach (Toplevel top in Toplevels) {
+            Assert.True (hCodes.Add (top.GetHashCode ()));
+        }
+    }
 
-	Stack<Toplevel> CreateToplevels ()
-	{
-		var Toplevels = new Stack<Toplevel> ();
+    private Stack<Toplevel> CreateToplevels () {
+        Stack<Toplevel> Toplevels = new Stack<Toplevel> ();
 
-		Toplevels.Push (new Toplevel { Id = "Top" });
-		Toplevels.Push (new Window { Id = "w1" });
-		Toplevels.Push (new Window { Id = "w2" });
-		Toplevels.Push (new Window { Id = "w3" });
-		Toplevels.Push (new Window { Id = "w4" });
+        Toplevels.Push (new Toplevel { Id = "Top" });
+        Toplevels.Push (new Window { Id = "w1" });
+        Toplevels.Push (new Window { Id = "w2" });
+        Toplevels.Push (new Window { Id = "w3" });
+        Toplevels.Push (new Window { Id = "w4" });
 
-		return Toplevels;
-	}
+        return Toplevels;
+    }
 }

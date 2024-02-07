@@ -7,226 +7,221 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("LineView")]
 public class TileViewNesting : Scenario {
-	CheckBox _cbBorder;
-	CheckBox _cbHorizontal;
-	CheckBox _cbTitles;
-	CheckBox _cbUseLabels;
+    private CheckBox _cbBorder;
+    private CheckBox _cbHorizontal;
+    private CheckBox _cbTitles;
+    private CheckBox _cbUseLabels;
+    private bool _loaded;
+    private TextField _textField;
+    private int _viewsCreated;
+    private int _viewsToCreate;
+    private View _workArea;
 
-	bool _loaded;
-	TextField _textField;
-	int _viewsCreated;
-	int _viewsToCreate;
+    /// <summary>Setup the scenario.</summary>
+    public override void Setup () {
+        // Scenario Windows.
+        Win.Title = GetName ();
+        Win.Y = 1;
 
-	View _workArea;
+        var lblViews = new Label { Text = "Number Of Views:" };
+        _textField = new TextField {
+                                       X = Pos.Right (lblViews),
+                                       Width = 10,
+                                       Text = "2"
+                                   };
 
-	/// <summary>
-	///         Setup the scenario.
-	/// </summary>
-	public override void Setup ()
-	{
-		// Scenario Windows.
-		Win.Title = GetName ();
-		Win.Y = 1;
+        _textField.TextChanged += (s, e) => SetupTileView ();
 
-		var lblViews = new Label { Text = "Number Of Views:" };
-		_textField = new TextField {
-			X = Pos.Right (lblViews),
-			Width = 10,
-			Text = "2"
-		};
+        _cbHorizontal = new CheckBox {
+                                         X = Pos.Right (_textField) + 1,
+                                         Text = "Horizontal"
+                                     };
+        _cbHorizontal.Toggled += (s, e) => SetupTileView ();
 
-		_textField.TextChanged += (s, e) => SetupTileView ();
+        _cbBorder = new CheckBox {
+                                     X = Pos.Right (_cbHorizontal) + 1,
+                                     Text = "Border"
+                                 };
+        _cbBorder.Toggled += (s, e) => SetupTileView ();
 
-		_cbHorizontal = new CheckBox {
-			X = Pos.Right (_textField) + 1,
-			Text = "Horizontal"
-		};
-		_cbHorizontal.Toggled += (s, e) => SetupTileView ();
+        _cbTitles = new CheckBox {
+                                     X = Pos.Right (_cbBorder) + 1,
+                                     Text = "Titles"
+                                 };
+        _cbTitles.Toggled += (s, e) => SetupTileView ();
 
-		_cbBorder = new CheckBox {
-			X = Pos.Right (_cbHorizontal) + 1,
-			Text = "Border"
-		};
-		_cbBorder.Toggled += (s, e) => SetupTileView ();
+        _cbUseLabels = new CheckBox {
+                                        X = Pos.Right (_cbTitles) + 1,
+                                        Text = "Use Labels"
+                                    };
+        _cbUseLabels.Toggled += (s, e) => SetupTileView ();
 
-		_cbTitles = new CheckBox {
-			X = Pos.Right (_cbBorder) + 1,
-			Text = "Titles"
-		};
-		_cbTitles.Toggled += (s, e) => SetupTileView ();
+        _workArea = new View {
+                                 X = 0,
+                                 Y = 1,
+                                 Width = Dim.Fill (),
+                                 Height = Dim.Fill ()
+                             };
 
-		_cbUseLabels = new CheckBox {
-			X = Pos.Right (_cbTitles) + 1,
-			Text = "Use Labels"
-		};
-		_cbUseLabels.Toggled += (s, e) => SetupTileView ();
+        var menu = new MenuBar {
+                                   Menus =  [
+                                   new MenuBarItem ("_File", new MenuItem[] {
+                                                                                new ("_Quit", "", () => Quit ())
+                                                                            })
+                                       ]
+                               };
 
-		_workArea = new View {
-			X = 0,
-			Y = 1,
-			Width = Dim.Fill (),
-			Height = Dim.Fill ()
-		};
+        Win.Add (lblViews);
+        Win.Add (_textField);
+        Win.Add (_cbHorizontal);
+        Win.Add (_cbBorder);
+        Win.Add (_cbTitles);
+        Win.Add (_cbUseLabels);
+        Win.Add (_workArea);
 
-		var menu = new MenuBar {
-			Menus = [
-				new MenuBarItem ("_File", new MenuItem [] {
-					new("_Quit", "", () => Quit ())
-				})
-			]
-		};
+        SetupTileView ();
 
-		Win.Add (lblViews);
-		Win.Add (_textField);
-		Win.Add (_cbHorizontal);
-		Win.Add (_cbBorder);
-		Win.Add (_cbTitles);
-		Win.Add (_cbUseLabels);
-		Win.Add (_workArea);
+        Application.Top.Add (menu);
 
-		SetupTileView ();
+        Win.Loaded += (s, e) => _loaded = true;
+    }
 
-		Application.Top.Add (menu);
+    private void AddMoreViews (TileView to) {
+        if (_viewsCreated == _viewsToCreate) {
+            return;
+        }
 
-		Win.Loaded += (s, e) => _loaded = true;
-	}
+        if (!(to.Tiles.ElementAt (0).ContentView is TileView)) {
+            Split (to, true);
+        }
 
-	void SetupTileView ()
-	{
-		var numberOfViews = GetNumberOfViews ();
+        if (!(to.Tiles.ElementAt (1).ContentView is TileView)) {
+            Split (to, false);
+        }
 
-		var titles = _cbTitles.Checked;
-		var border = _cbBorder.Checked;
-		var startHorizontal = _cbHorizontal.Checked;
+        if (to.Tiles.ElementAt (0).ContentView is TileView && to.Tiles.ElementAt (1).ContentView is TileView) {
+            AddMoreViews ((TileView)to.Tiles.ElementAt (0).ContentView);
+            AddMoreViews ((TileView)to.Tiles.ElementAt (1).ContentView);
+        }
+    }
 
-		foreach (var sub in _workArea.Subviews) {
-			sub.Dispose ();
-		}
+    private View CreateContentControl (int number) {
+        return (bool)_cbUseLabels.Checked ? CreateLabelView (number) : CreateTextView (number);
+    }
 
-		_workArea.RemoveAll ();
+    private View CreateLabelView (int number) {
+        return new Label {
+                             Width = Dim.Fill (),
+                             Height = 1,
+                             AutoSize = false,
+                             Text = number.ToString ().Repeat (1000),
+                             CanFocus = true
+                         };
+    }
 
-		if (numberOfViews <= 0) {
-			return;
-		}
+    private View CreateTextView (int number) {
+        return new TextView {
+                                Width = Dim.Fill (),
+                                Height = Dim.Fill (),
+                                Text = number.ToString ().Repeat (1000),
+                                AllowsTab = false
 
-		var root = CreateTileView (1, (bool)startHorizontal ? Orientation.Horizontal : Orientation.Vertical);
+                                //WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
+                            };
+    }
 
-		root.Tiles.ElementAt (0).ContentView.Add (CreateContentControl (1));
-		root.Tiles.ElementAt (0).Title = (bool)_cbTitles.Checked ? "View 1" : string.Empty;
-		root.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (2));
-		root.Tiles.ElementAt (1).Title = (bool)_cbTitles.Checked ? "View 2" : string.Empty;
+    private TileView CreateTileView (int titleNumber, Orientation orientation) {
+        var toReturn = new TileView {
+                                        Width = Dim.Fill (),
+                                        Height = Dim.Fill (),
 
-		root.LineStyle = (bool)border ? LineStyle.Rounded : LineStyle.None;
+                                        // flip the orientation
+                                        Orientation = orientation
+                                    };
 
-		_workArea.Add (root);
+        toReturn.Tiles.ElementAt (0).Title = (bool)_cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
+        toReturn.Tiles.ElementAt (1).Title = (bool)_cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
 
-		if (numberOfViews == 1) {
-			root.Tiles.ElementAt (1).ContentView.Visible = false;
-		}
+        return toReturn;
+    }
 
-		if (numberOfViews > 2) {
-			_viewsCreated = 2;
-			_viewsToCreate = numberOfViews;
-			AddMoreViews (root);
-		}
+    private int GetNumberOfViews () {
+        if (int.TryParse (_textField.Text, out int views) && views >= 0) {
+            return views;
+        }
 
-		if (_loaded) {
-			_workArea.LayoutSubviews ();
-		}
-	}
+        return 0;
+    }
 
-	View CreateContentControl (int number) =>
-		(bool)_cbUseLabels.Checked ? CreateLabelView (number) : CreateTextView (number);
+    private void Quit () { Application.RequestStop (); }
 
-	View CreateLabelView (int number) =>
-		new Label {
-			Width = Dim.Fill (),
-			Height = 1,
-			AutoSize = false,
-			Text = number.ToString ().Repeat (1000),
-			CanFocus = true
-		};
+    private void SetupTileView () {
+        int numberOfViews = GetNumberOfViews ();
 
-	View CreateTextView (int number) =>
-		new TextView {
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			Text = number.ToString ().Repeat (1000),
-			AllowsTab = false
-			//WordWrap = true,  // TODO: This is very slow (like 10s to render with 45 views)
-		};
+        bool? titles = _cbTitles.Checked;
+        bool? border = _cbBorder.Checked;
+        bool? startHorizontal = _cbHorizontal.Checked;
 
-	void AddMoreViews (TileView to)
-	{
-		if (_viewsCreated == _viewsToCreate) {
-			return;
-		}
+        foreach (View sub in _workArea.Subviews) {
+            sub.Dispose ();
+        }
 
-		if (!(to.Tiles.ElementAt (0).ContentView is TileView)) {
-			Split (to, true);
-		}
+        _workArea.RemoveAll ();
 
-		if (!(to.Tiles.ElementAt (1).ContentView is TileView)) {
-			Split (to, false);
-		}
+        if (numberOfViews <= 0) {
+            return;
+        }
 
-		if (to.Tiles.ElementAt (0).ContentView is TileView && to.Tiles.ElementAt (1).ContentView is TileView) {
-			AddMoreViews ((TileView)to.Tiles.ElementAt (0).ContentView);
-			AddMoreViews ((TileView)to.Tiles.ElementAt (1).ContentView);
-		}
-	}
+        TileView root = CreateTileView (1, (bool)startHorizontal ? Orientation.Horizontal : Orientation.Vertical);
 
-	void Split (TileView to, bool left)
-	{
-		if (_viewsCreated == _viewsToCreate) {
-			return;
-		}
+        root.Tiles.ElementAt (0).ContentView.Add (CreateContentControl (1));
+        root.Tiles.ElementAt (0).Title = (bool)_cbTitles.Checked ? "View 1" : string.Empty;
+        root.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (2));
+        root.Tiles.ElementAt (1).Title = (bool)_cbTitles.Checked ? "View 2" : string.Empty;
 
-		TileView newView;
+        root.LineStyle = (bool)border ? LineStyle.Rounded : LineStyle.None;
 
-		if (left) {
-			to.TrySplitTile (0, 2, out newView);
-		} else {
-			to.TrySplitTile (1, 2, out newView);
-		}
+        _workArea.Add (root);
 
-		_viewsCreated++;
+        if (numberOfViews == 1) {
+            root.Tiles.ElementAt (1).ContentView.Visible = false;
+        }
 
-		// During splitting the old Title will have been migrated to View1 so we only need
-		// to set the Title on View2 (the one that gets our new TextView)
-		newView.Tiles.ElementAt (1).Title = (bool)_cbTitles.Checked ? $"View {_viewsCreated}" : string.Empty;
+        if (numberOfViews > 2) {
+            _viewsCreated = 2;
+            _viewsToCreate = numberOfViews;
+            AddMoreViews (root);
+        }
 
-		// Flip orientation
-		newView.Orientation = to.Orientation == Orientation.Vertical
-			? Orientation.Horizontal
-			: Orientation.Vertical;
+        if (_loaded) {
+            _workArea.LayoutSubviews ();
+        }
+    }
 
-		newView.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (_viewsCreated));
-	}
+    private void Split (TileView to, bool left) {
+        if (_viewsCreated == _viewsToCreate) {
+            return;
+        }
 
-	TileView CreateTileView (int titleNumber, Orientation orientation)
-	{
-		var toReturn = new TileView {
-			Width = Dim.Fill (),
-			Height = Dim.Fill (),
-			// flip the orientation
-			Orientation = orientation
-		};
+        TileView newView;
 
-		toReturn.Tiles.ElementAt (0).Title = (bool)_cbTitles.Checked ? $"View {titleNumber}" : string.Empty;
-		toReturn.Tiles.ElementAt (1).Title = (bool)_cbTitles.Checked ? $"View {titleNumber + 1}" : string.Empty;
+        if (left) {
+            to.TrySplitTile (0, 2, out newView);
+        } else {
+            to.TrySplitTile (1, 2, out newView);
+        }
 
-		return toReturn;
-	}
+        _viewsCreated++;
 
-	int GetNumberOfViews ()
-	{
-		if (int.TryParse (_textField.Text, out var views) && views >= 0) {
-			return views;
-		}
+        // During splitting the old Title will have been migrated to View1 so we only need
+        // to set the Title on View2 (the one that gets our new TextView)
+        newView.Tiles.ElementAt (1).Title = (bool)_cbTitles.Checked ? $"View {_viewsCreated}" : string.Empty;
 
-		return 0;
-	}
+        // Flip orientation
+        newView.Orientation = to.Orientation == Orientation.Vertical
+                                  ? Orientation.Horizontal
+                                  : Orientation.Vertical;
 
-	void Quit () => Application.RequestStop ();
+        newView.Tiles.ElementAt (1).ContentView.Add (CreateContentControl (_viewsCreated));
+    }
 }

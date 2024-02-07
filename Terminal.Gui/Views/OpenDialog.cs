@@ -14,65 +14,49 @@ using Terminal.Gui.Resources;
 
 namespace Terminal.Gui;
 
-/// <summary>
-///         Determine which <see cref="System.IO" /> type to open.
-/// </summary>
+/// <summary>Determine which <see cref="System.IO"/> type to open.</summary>
 public enum OpenMode {
-	/// <summary>
-	///         Opens only file or files.
-	/// </summary>
-	File,
+    /// <summary>Opens only file or files.</summary>
+    File,
 
-	/// <summary>
-	///         Opens only directory or directories.
-	/// </summary>
-	Directory,
+    /// <summary>Opens only directory or directories.</summary>
+    Directory,
 
-	/// <summary>
-	///         Opens files and directories.
-	/// </summary>
-	Mixed
+    /// <summary>Opens files and directories.</summary>
+    Mixed
 }
 
-/// <summary>
-///         The <see cref="OpenDialog" />provides an interactive dialog box for users to select files or directories.
-/// </summary>
+/// <summary>The <see cref="OpenDialog"/>provides an interactive dialog box for users to select files or directories.</summary>
 /// <remarks>
-///         <para>
-///                 The open dialog can be used to select files for opening, it can be configured to allow
-///                 multiple items to be selected (based on the AllowsMultipleSelection) variable and
-///                 you can control whether this should allow files or directories to be selected.
-///         </para>
-///         <para>
-///                 To use, create an instance of <see cref="OpenDialog" />, and pass it to
-///                 <see cref="Application.Run(Func{Exception, bool})" />. This will run the dialog modally,
-///                 and when this returns, the list of files will be available on the <see cref="FilePaths" /> property.
-///         </para>
-///         <para>
-///                 To select more than one file, users can use the spacebar, or control-t.
-///         </para>
+///     <para>
+///         The open dialog can be used to select files for opening, it can be configured to allow multiple items to be
+///         selected (based on the AllowsMultipleSelection) variable and you can control whether this should allow files or
+///         directories to be selected.
+///     </para>
+///     <para>
+///         To use, create an instance of <see cref="OpenDialog"/>, and pass it to
+///         <see cref="Application.Run(Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
+///         the list of files will be available on the <see cref="FilePaths"/> property.
+///     </para>
+///     <para>To select more than one file, users can use the spacebar, or control-t.</para>
 /// </remarks>
 public class OpenDialog : FileDialog {
-	/// <summary>
-	///         Initializes a new <see cref="OpenDialog" />.
-	/// </summary>
-	public OpenDialog () { }
+    /// <summary>Initializes a new <see cref="OpenDialog"/>.</summary>
+    public OpenDialog () { }
 
-	/// <inheritdoc />
-	public override OpenMode OpenMode {
-		get => base.OpenMode;
-		set {
-			base.OpenMode = value;
-			Style.OkButtonText = value == OpenMode.File ? Strings.btnOpen :
-				value == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
-		}
-	}
+    /// <summary>Returns the selected files, or an empty list if nothing has been selected</summary>
+    /// <value>The file paths.</value>
+    public IReadOnlyList<string> FilePaths =>
+        Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly ()
+        : AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new[] { Path });
 
-	/// <summary>
-	///         Returns the selected files, or an empty list if nothing has been selected
-	/// </summary>
-	/// <value>The file paths.</value>
-	public IReadOnlyList<string> FilePaths =>
-		Canceled ? Enumerable.Empty<string> ().ToList ().AsReadOnly ()
-		: AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> (new [] { Path });
+    /// <inheritdoc/>
+    public override OpenMode OpenMode {
+        get => base.OpenMode;
+        set {
+            base.OpenMode = value;
+            Style.OkButtonText = value == OpenMode.File ? Strings.btnOpen :
+                                 value == OpenMode.Directory ? Strings.fdSelectFolder : Strings.fdSelectMixed;
+        }
+    }
 }

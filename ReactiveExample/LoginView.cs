@@ -7,195 +7,190 @@ using Terminal.Gui;
 namespace ReactiveExample;
 
 public class LoginView : Window, IViewFor<LoginViewModel> {
-	readonly CompositeDisposable _disposable = new ();
+    private readonly CompositeDisposable _disposable = new ();
 
-	public LoginView (LoginViewModel viewModel)
-	{
-		Title = "Reactive Extensions Example";
-		ViewModel = viewModel;
-		var usernameLengthLabel = UsernameLengthLabel (TitleLabel ());
-		var usernameInput = UsernameInput (usernameLengthLabel);
-		var passwordLengthLabel = PasswordLengthLabel (usernameInput);
-		var passwordInput = PasswordInput (passwordLengthLabel);
-		var validationLabel = ValidationLabel (passwordInput);
-		var loginButton = LoginButton (validationLabel);
-		var clearButton = ClearButton (loginButton);
-		LoginProgressLabel (clearButton);
-	}
+    public LoginView (LoginViewModel viewModel) {
+        Title = "Reactive Extensions Example";
+        ViewModel = viewModel;
+        Label usernameLengthLabel = UsernameLengthLabel (TitleLabel ());
+        TextField usernameInput = UsernameInput (usernameLengthLabel);
+        Label passwordLengthLabel = PasswordLengthLabel (usernameInput);
+        TextField passwordInput = PasswordInput (passwordLengthLabel);
+        Label validationLabel = ValidationLabel (passwordInput);
+        Button loginButton = LoginButton (validationLabel);
+        Button clearButton = ClearButton (loginButton);
+        LoginProgressLabel (clearButton);
+    }
 
-	public LoginViewModel ViewModel { get; set; }
+    public LoginViewModel ViewModel { get; set; }
 
-	object IViewFor.ViewModel {
-		get => ViewModel;
-		set => ViewModel = (LoginViewModel)value;
-	}
+    object IViewFor.ViewModel { get => ViewModel; set => ViewModel = (LoginViewModel)value; }
 
-	protected override void Dispose (bool disposing)
-	{
-		_disposable.Dispose ();
-		base.Dispose (disposing);
-	}
+    protected override void Dispose (bool disposing) {
+        _disposable.Dispose ();
+        base.Dispose (disposing);
+    }
 
-	Label TitleLabel ()
-	{
-		var label = new Label { Text = "Login Form" };
-		Add (label);
-		return label;
-	}
+    private Button ClearButton (View previous) {
+        var clearButton = new Button {
+                                         X = Pos.Left (previous),
+                                         Y = Pos.Top (previous) + 1,
+                                         Width = 40,
+                                         Text = "Clear"
+                                     };
+        clearButton
+            .Events ()
+            .Clicked
+            .InvokeCommand (ViewModel, x => x.Clear)
+            .DisposeWith (_disposable);
+        Add (clearButton);
 
-	TextField UsernameInput (View previous)
-	{
-		var usernameInput = new TextField {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40,
-			Text = ViewModel.Username
-		};
-		ViewModel
-			.WhenAnyValue (x => x.Username)
-			.BindTo (usernameInput, x => x.Text)
-			.DisposeWith (_disposable);
-		usernameInput
-			.Events ()
-			.TextChanged
-			.Select (old => usernameInput.Text)
-			.DistinctUntilChanged ()
-			.BindTo (ViewModel, x => x.Username)
-			.DisposeWith (_disposable);
-		Add (usernameInput);
-		return usernameInput;
-	}
+        return clearButton;
+    }
 
-	Label UsernameLengthLabel (View previous)
-	{
-		var usernameLengthLabel = new Label {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40
-		};
-		ViewModel
-			.WhenAnyValue (x => x.UsernameLength)
-			.Select (length => $"Username ({length} characters)")
-			.BindTo (usernameLengthLabel, x => x.Text)
-			.DisposeWith (_disposable);
-		Add (usernameLengthLabel);
-		return usernameLengthLabel;
-	}
+    private Button LoginButton (View previous) {
+        var loginButton = new Button {
+                                         X = Pos.Left (previous),
+                                         Y = Pos.Top (previous) + 1,
+                                         Width = 40,
+                                         Text = "Login"
+                                     };
+        loginButton
+            .Events ()
+            .Clicked
+            .InvokeCommand (ViewModel, x => x.Login)
+            .DisposeWith (_disposable);
+        Add (loginButton);
 
-	TextField PasswordInput (View previous)
-	{
-		var passwordInput = new TextField {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40,
-			Text = ViewModel.Password
-		};
-		ViewModel
-			.WhenAnyValue (x => x.Password)
-			.BindTo (passwordInput, x => x.Text)
-			.DisposeWith (_disposable);
-		passwordInput
-			.Events ()
-			.TextChanged
-			.Select (old => passwordInput.Text)
-			.DistinctUntilChanged ()
-			.BindTo (ViewModel, x => x.Password)
-			.DisposeWith (_disposable);
-		Add (passwordInput);
-		return passwordInput;
-	}
+        return loginButton;
+    }
 
-	Label PasswordLengthLabel (View previous)
-	{
-		var passwordLengthLabel = new Label {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40
-		};
-		ViewModel
-			.WhenAnyValue (x => x.PasswordLength)
-			.Select (length => $"Password ({length} characters)")
-			.BindTo (passwordLengthLabel, x => x.Text)
-			.DisposeWith (_disposable);
-		Add (passwordLengthLabel);
-		return passwordLengthLabel;
-	}
+    private Label LoginProgressLabel (View previous) {
+        var progress = "Logging in...";
+        var idle = "Press 'Login' to log in.";
+        var loginProgressLabel = new Label {
+                                               X = Pos.Left (previous),
+                                               Y = Pos.Top (previous) + 1,
+                                               Width = 40,
+                                               Text = idle
+                                           };
+        ViewModel
+            .WhenAnyObservable (x => x.Login.IsExecuting)
+            .Select (executing => executing ? progress : idle)
+            .ObserveOn (RxApp.MainThreadScheduler)
+            .BindTo (loginProgressLabel, x => x.Text)
+            .DisposeWith (_disposable);
+        Add (loginProgressLabel);
 
-	Label ValidationLabel (View previous)
-	{
-		var error = "Please, enter user name and password.";
-		var success = "The input is valid!";
-		var validationLabel = new Label {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40,
-			Text = error
-		};
-		ViewModel
-			.WhenAnyValue (x => x.IsValid)
-			.Select (valid => valid ? success : error)
-			.BindTo (validationLabel, x => x.Text)
-			.DisposeWith (_disposable);
-		ViewModel
-			.WhenAnyValue (x => x.IsValid)
-			.Select (valid => valid ? Colors.ColorSchemes ["Base"] : Colors.ColorSchemes ["Error"])
-			.BindTo (validationLabel, x => x.ColorScheme)
-			.DisposeWith (_disposable);
-		Add (validationLabel);
-		return validationLabel;
-	}
+        return loginProgressLabel;
+    }
 
-	Label LoginProgressLabel (View previous)
-	{
-		var progress = "Logging in...";
-		var idle = "Press 'Login' to log in.";
-		var loginProgressLabel = new Label {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40,
-			Text = idle
-		};
-		ViewModel
-			.WhenAnyObservable (x => x.Login.IsExecuting)
-			.Select (executing => executing ? progress : idle)
-			.ObserveOn (RxApp.MainThreadScheduler)
-			.BindTo (loginProgressLabel, x => x.Text)
-			.DisposeWith (_disposable);
-		Add (loginProgressLabel);
-		return loginProgressLabel;
-	}
+    private TextField PasswordInput (View previous) {
+        var passwordInput = new TextField {
+                                              X = Pos.Left (previous),
+                                              Y = Pos.Top (previous) + 1,
+                                              Width = 40,
+                                              Text = ViewModel.Password
+                                          };
+        ViewModel
+            .WhenAnyValue (x => x.Password)
+            .BindTo (passwordInput, x => x.Text)
+            .DisposeWith (_disposable);
+        passwordInput
+            .Events ()
+            .TextChanged
+            .Select (old => passwordInput.Text)
+            .DistinctUntilChanged ()
+            .BindTo (ViewModel, x => x.Password)
+            .DisposeWith (_disposable);
+        Add (passwordInput);
 
-	Button LoginButton (View previous)
-	{
-		var loginButton = new Button {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40,
-			Text = "Login"
-		};
-		loginButton
-			.Events ()
-			.Clicked
-			.InvokeCommand (ViewModel, x => x.Login)
-			.DisposeWith (_disposable);
-		Add (loginButton);
-		return loginButton;
-	}
+        return passwordInput;
+    }
 
-	Button ClearButton (View previous)
-	{
-		var clearButton = new Button {
-			X = Pos.Left (previous),
-			Y = Pos.Top (previous) + 1,
-			Width = 40,
-			Text = "Clear"
-		};
-		clearButton
-			.Events ()
-			.Clicked
-			.InvokeCommand (ViewModel, x => x.Clear)
-			.DisposeWith (_disposable);
-		Add (clearButton);
-		return clearButton;
-	}
+    private Label PasswordLengthLabel (View previous) {
+        var passwordLengthLabel = new Label {
+                                                X = Pos.Left (previous),
+                                                Y = Pos.Top (previous) + 1,
+                                                Width = 40
+                                            };
+        ViewModel
+            .WhenAnyValue (x => x.PasswordLength)
+            .Select (length => $"Password ({length} characters)")
+            .BindTo (passwordLengthLabel, x => x.Text)
+            .DisposeWith (_disposable);
+        Add (passwordLengthLabel);
+
+        return passwordLengthLabel;
+    }
+
+    private Label TitleLabel () {
+        var label = new Label { Text = "Login Form" };
+        Add (label);
+
+        return label;
+    }
+
+    private TextField UsernameInput (View previous) {
+        var usernameInput = new TextField {
+                                              X = Pos.Left (previous),
+                                              Y = Pos.Top (previous) + 1,
+                                              Width = 40,
+                                              Text = ViewModel.Username
+                                          };
+        ViewModel
+            .WhenAnyValue (x => x.Username)
+            .BindTo (usernameInput, x => x.Text)
+            .DisposeWith (_disposable);
+        usernameInput
+            .Events ()
+            .TextChanged
+            .Select (old => usernameInput.Text)
+            .DistinctUntilChanged ()
+            .BindTo (ViewModel, x => x.Username)
+            .DisposeWith (_disposable);
+        Add (usernameInput);
+
+        return usernameInput;
+    }
+
+    private Label UsernameLengthLabel (View previous) {
+        var usernameLengthLabel = new Label {
+                                                X = Pos.Left (previous),
+                                                Y = Pos.Top (previous) + 1,
+                                                Width = 40
+                                            };
+        ViewModel
+            .WhenAnyValue (x => x.UsernameLength)
+            .Select (length => $"Username ({length} characters)")
+            .BindTo (usernameLengthLabel, x => x.Text)
+            .DisposeWith (_disposable);
+        Add (usernameLengthLabel);
+
+        return usernameLengthLabel;
+    }
+
+    private Label ValidationLabel (View previous) {
+        var error = "Please, enter user name and password.";
+        var success = "The input is valid!";
+        var validationLabel = new Label {
+                                            X = Pos.Left (previous),
+                                            Y = Pos.Top (previous) + 1,
+                                            Width = 40,
+                                            Text = error
+                                        };
+        ViewModel
+            .WhenAnyValue (x => x.IsValid)
+            .Select (valid => valid ? success : error)
+            .BindTo (validationLabel, x => x.Text)
+            .DisposeWith (_disposable);
+        ViewModel
+            .WhenAnyValue (x => x.IsValid)
+            .Select (valid => valid ? Colors.ColorSchemes["Base"] : Colors.ColorSchemes["Error"])
+            .BindTo (validationLabel, x => x.ColorScheme)
+            .DisposeWith (_disposable);
+        Add (validationLabel);
+
+        return validationLabel;
+    }
 }

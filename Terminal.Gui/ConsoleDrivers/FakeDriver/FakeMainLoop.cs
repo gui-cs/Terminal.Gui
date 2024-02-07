@@ -1,42 +1,30 @@
-﻿using System;
-using static Terminal.Gui.NetEvents;
+﻿namespace Terminal.Gui;
 
-namespace Terminal.Gui;
+class FakeMainLoop : IMainLoopDriver {
+    public Action<ConsoleKeyInfo> MockKeyPressed;
 
-internal class FakeMainLoop : IMainLoopDriver {
+    public FakeMainLoop (ConsoleDriver consoleDriver = null) {
+        // No implementation needed for FakeMainLoop
+    }
 
-	public Action<ConsoleKeyInfo> MockKeyPressed;
+    public void Setup (MainLoop mainLoop) {
+        // No implementation needed for FakeMainLoop
+    }
 
-	public FakeMainLoop (ConsoleDriver consoleDriver = null)
-	{
-		// No implementation needed for FakeMainLoop
-	}
+    public void Wakeup () {
+        // No implementation needed for FakeMainLoop
+    }
 
-	public void Setup (MainLoop mainLoop)
-	{
-		// No implementation needed for FakeMainLoop
-	}
+    public bool EventsPending () {
+        // Always return true for FakeMainLoop
+        return true;
+    }
 
-	public void Wakeup ()
-	{
-		// No implementation needed for FakeMainLoop
-	}
+    public void Iteration () {
+        if (FakeConsole.MockKeyPresses.Count > 0) {
+            MockKeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
+        }
+    }
 
-	public bool EventsPending ()
-	{
-		// Always return true for FakeMainLoop
-		return true;
-	}
-
-	public void Iteration ()
-	{
-		if (FakeConsole.MockKeyPresses.Count > 0) {
-			MockKeyPressed?.Invoke (FakeConsole.MockKeyPresses.Pop ());
-		}
-	}
-
-	public void TearDown ()
-	{
-	}
+    public void TearDown () { }
 }
-

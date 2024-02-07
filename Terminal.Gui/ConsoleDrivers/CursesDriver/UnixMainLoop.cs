@@ -1,219 +1,194 @@
 //
 // mainloop.cs: Linux/Curses MainLoop implementation.
 //
-using System;
-using System.Collections.Generic;
+
 using System.Runtime.InteropServices;
-using static Terminal.Gui.NetEvents;
 
-namespace Terminal.Gui {
-	/// <summary>
-	/// Unix main loop, suitable for using on Posix systems
-	/// </summary>
-	/// <remarks>
-	/// In addition to the general functions of the MainLoop, the Unix version
-	/// can watch file descriptors using the AddWatch methods.
-	/// </remarks>
-	internal class UnixMainLoop : IMainLoopDriver {
-		private CursesDriver _cursesDriver;
-		public UnixMainLoop (ConsoleDriver consoleDriver = null)
-		{
-			// UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
-			_cursesDriver = (CursesDriver)Application.Driver;
-		}
+namespace Terminal.Gui; 
 
-		public const int KEY_RESIZE = unchecked((int)0xffffffffffffffff);
+/// <summary>Unix main loop, suitable for using on Posix systems</summary>
+/// <remarks>
+///     In addition to the general functions of the MainLoop, the Unix version can watch file descriptors using the
+///     AddWatch methods.
+/// </remarks>
+class UnixMainLoop : IMainLoopDriver {
+    /// <summary>Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.</summary>
+    [Flags]
+    public enum Condition : short {
+        /// <summary>There is data to read</summary>
+        PollIn = 1,
 
-		[StructLayout (LayoutKind.Sequential)]
-		struct Pollfd {
-			public int fd;
-			public short events, revents;
-		}
+        /// <summary>Writing to the specified descriptor will not block</summary>
+        PollOut = 4,
 
-		/// <summary>
-		///	Condition on which to wake up from file descriptor activity.  These match the Linux/BSD poll definitions.
-		/// </summary>
-		[Flags]
-		public enum Condition : short {
-			/// <summary>
-			/// There is data to read
-			/// </summary>
-			PollIn = 1,
-			/// <summary>
-			/// Writing to the specified descriptor will not block
-			/// </summary>
-			PollOut = 4,
-			/// <summary>
-			/// There is urgent data to read
-			/// </summary>
-			PollPri = 2,
-			/// <summary>
-			///  Error condition on output
-			/// </summary>
-			PollErr = 8,
-			/// <summary>
-			/// Hang-up on output
-			/// </summary>
-			PollHup = 16,
-			/// <summary>
-			/// File descriptor is not open.
-			/// </summary>
-			PollNval = 32
-		}
+        /// <summary>There is urgent data to read</summary>
+        PollPri = 2,
 
-		class Watch {
-			public int File;
-			public Condition Condition;
-			public Func<MainLoop, bool> Callback;
-		}
+        /// <summary>Error condition on output</summary>
+        PollErr = 8,
 
-		readonly Dictionary<int, Watch> _descriptorWatchers = new Dictionary<int, Watch> ();
+        /// <summary>Hang-up on output</summary>
+        PollHup = 16,
 
-		[DllImport ("libc")]
-		extern static int poll ([In, Out] Pollfd [] ufds, uint nfds, int timeout);
+        /// <summary>File descriptor is not open.</summary>
+        PollNval = 32
+    }
 
-		[DllImport ("libc")]
-		extern static int pipe ([In, Out] int [] pipes);
+    public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
+    private static readonly nint _ignore = Marshal.AllocHGlobal (1);
+    private readonly Dictionary<int, Watch> _descriptorWatchers = new ();
+    private readonly int[] _wakeUpPipes = new int [2];
+    private readonly CursesDriver _cursesDriver;
+    private MainLoop _mainLoop;
+    private bool _pollDirty = true;
+    private Pollfd[] _pollMap;
+    private bool _winChanged;
 
-		[DllImport ("libc")]
-		extern static int read (int fd, IntPtr buf, IntPtr n);
+    public UnixMainLoop (ConsoleDriver consoleDriver = null) {
+        // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
+        _cursesDriver = (CursesDriver)Application.Driver;
+    }
 
-		[DllImport ("libc")]
-		extern static int write (int fd, IntPtr buf, IntPtr n);
+    void IMainLoopDriver.Wakeup () {
+        if (!ConsoleDriver.RunningUnitTests) {
+            write (_wakeUpPipes[1], _ignore, 1);
+        }
+    }
 
-		Pollfd [] _pollMap;
-		bool _pollDirty = true;
-		readonly int [] _wakeUpPipes = new int [2];
-		static readonly IntPtr _ignore = Marshal.AllocHGlobal (1);
-		MainLoop _mainLoop;
-		bool _winChanged;
+    void IMainLoopDriver.Setup (MainLoop mainLoop) {
+        _mainLoop = mainLoop;
+        if (ConsoleDriver.RunningUnitTests) {
+            return;
+        }
 
-		void IMainLoopDriver.Wakeup ()
-		{
-			if (!ConsoleDriver.RunningUnitTests) {
-				write (_wakeUpPipes [1], _ignore, (IntPtr)1);
-			}
-		}
+        try {
+            pipe (_wakeUpPipes);
+            AddWatch (
+                      _wakeUpPipes[0],
+                      Condition.PollIn,
+                      ml => {
+                          read (_wakeUpPipes[0], _ignore, 1);
 
-		void IMainLoopDriver.Setup (MainLoop mainLoop)
-		{
-			this._mainLoop = mainLoop;
-			if (ConsoleDriver.RunningUnitTests) {
-				return;
-			}
+                          return true;
+                      });
+        }
+        catch (DllNotFoundException e) {
+            throw new NotSupportedException ("libc not found", e);
+        }
+    }
 
-			try {
-				pipe (_wakeUpPipes);
-				AddWatch (_wakeUpPipes [0], Condition.PollIn, ml => {
-					read (_wakeUpPipes [0], _ignore, (IntPtr)1);
-					return true;
-				});
-			} catch (DllNotFoundException e) {
-				throw new NotSupportedException ("libc not found", e);
-			}
-		}
+    bool IMainLoopDriver.EventsPending () {
+        UpdatePollMap ();
 
-		/// <summary>
-		///	Removes an active watch from the mainloop.
-		/// </summary>
-		/// <remarks>
-		///	The token parameter is the value returned from AddWatch
-		/// </remarks>
-		internal void RemoveWatch (object token)
-		{
-			if (!ConsoleDriver.RunningUnitTests) {
-				if (token is not Watch watch) {
-					return;
-				}
-				_descriptorWatchers.Remove (watch.File);
-			}
-		}
+        bool checkTimersResult = _mainLoop.CheckTimersAndIdleHandlers (out int pollTimeout);
 
-		/// <summary>
-		///  Watches a file descriptor for activity.
-		/// </summary>
-		/// <remarks>
-		///  When the condition is met, the provided callback
-		///  is invoked.  If the callback returns false, the
-		///  watch is automatically removed.
-		///
-		///  The return value is a token that represents this watch, you can
-		///  use this token to remove the watch by calling RemoveWatch.
-		/// </remarks>
-		internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
-		{
-			if (callback == null) {
-				throw new ArgumentNullException (nameof (callback));
-			}
+        int n = poll (_pollMap, (uint)_pollMap.Length, pollTimeout);
 
-			var watch = new Watch () { Condition = condition, Callback = callback, File = fileDescriptor };
-			_descriptorWatchers [fileDescriptor] = watch;
-			_pollDirty = true;
-			return watch;
-		}
+        if (n == KEY_RESIZE) {
+            _winChanged = true;
+        }
 
-		void UpdatePollMap ()
-		{
-			if (!_pollDirty) {
-				return;
-			}
-			_pollDirty = false;
+        return checkTimersResult || (n >= KEY_RESIZE);
+    }
 
-			_pollMap = new Pollfd [_descriptorWatchers.Count];
-			var i = 0;
-			foreach (var fd in _descriptorWatchers.Keys) {
-				_pollMap [i].fd = fd;
-				_pollMap [i].events = (short)_descriptorWatchers [fd].Condition;
-				i++;
-			}
-		}
+    void IMainLoopDriver.Iteration () {
+        if (_winChanged) {
+            _winChanged = false;
+            _cursesDriver.ProcessInput ();
 
-		bool IMainLoopDriver.EventsPending ()
-		{
-			UpdatePollMap ();
+            // This is needed on the mac. See https://github.com/gui-cs/Terminal.Gui/pull/2922#discussion_r1365992426
+            _cursesDriver.ProcessWinChange ();
+        }
 
-			var checkTimersResult = _mainLoop.CheckTimersAndIdleHandlers (out var pollTimeout);
+        if (_pollMap == null) {
+            return;
+        }
 
-			var n = poll (_pollMap, (uint)_pollMap.Length, pollTimeout);
+        foreach (Pollfd p in _pollMap) {
+            Watch watch;
 
-			if (n == KEY_RESIZE) {
-				_winChanged = true;
-			}
+            if (p.revents == 0) {
+                continue;
+            }
 
-			return checkTimersResult || n >= KEY_RESIZE;
-		}
+            if (!_descriptorWatchers.TryGetValue (p.fd, out watch)) {
+                continue;
+            }
 
-		void IMainLoopDriver.Iteration ()
-		{
-			if (_winChanged) {
-				_winChanged = false;
-				_cursesDriver.ProcessInput ();
-				// This is needed on the mac. See https://github.com/gui-cs/Terminal.Gui/pull/2922#discussion_r1365992426
-				_cursesDriver.ProcessWinChange ();
-			}
-			if (_pollMap == null) return;
-			foreach (var p in _pollMap) {
-				Watch watch;
+            if (!watch.Callback (_mainLoop)) {
+                _descriptorWatchers.Remove (p.fd);
+            }
+        }
+    }
 
-				if (p.revents == 0) {
-					continue;
-				}
+    void IMainLoopDriver.TearDown () {
+        _descriptorWatchers?.Clear ();
 
-				if (!_descriptorWatchers.TryGetValue (p.fd, out watch)) {
-					continue;
-				}
+        _mainLoop = null;
+    }
 
-				if (!watch.Callback (this._mainLoop)) {
-					_descriptorWatchers.Remove (p.fd);
-				}
-			}
-		}
+    /// <summary>Watches a file descriptor for activity.</summary>
+    /// <remarks>
+    ///     When the condition is met, the provided callback is invoked.  If the callback returns false, the watch is
+    ///     automatically removed. The return value is a token that represents this watch, you can use this token to remove the
+    ///     watch by calling RemoveWatch.
+    /// </remarks>
+    internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback) {
+        if (callback == null) {
+            throw new ArgumentNullException (nameof (callback));
+        }
 
-		void IMainLoopDriver.TearDown ()
-		{
-			_descriptorWatchers?.Clear ();
+        var watch = new Watch { Condition = condition, Callback = callback, File = fileDescriptor };
+        _descriptorWatchers[fileDescriptor] = watch;
+        _pollDirty = true;
 
-			_mainLoop = null;
-		}
-	}
+        return watch;
+    }
+
+    /// <summary>Removes an active watch from the mainloop.</summary>
+    /// <remarks>The token parameter is the value returned from AddWatch</remarks>
+    internal void RemoveWatch (object token) {
+        if (!ConsoleDriver.RunningUnitTests) {
+            if (token is not Watch watch) {
+                return;
+            }
+
+            _descriptorWatchers.Remove (watch.File);
+        }
+    }
+
+    [DllImport ("libc")] private extern static int pipe ([In] [Out] int[] pipes);
+    [DllImport ("libc")] private extern static int poll ([In] [Out] Pollfd[] ufds, uint nfds, int timeout);
+    [DllImport ("libc")] private extern static int read (int fd, nint buf, nint n);
+
+    private void UpdatePollMap () {
+        if (!_pollDirty) {
+            return;
+        }
+
+        _pollDirty = false;
+
+        _pollMap = new Pollfd [_descriptorWatchers.Count];
+        var i = 0;
+        foreach (int fd in _descriptorWatchers.Keys) {
+            _pollMap[i].fd = fd;
+            _pollMap[i].events = (short)_descriptorWatchers[fd].Condition;
+            i++;
+        }
+    }
+
+    [DllImport ("libc")] private extern static int write (int fd, nint buf, nint n);
+
+    [StructLayout (LayoutKind.Sequential)]
+    private struct Pollfd {
+        public int fd;
+        public short events;
+        public readonly short revents;
+    }
+
+    private class Watch {
+        public Func<MainLoop, bool> Callback;
+        public Condition Condition;
+        public int File;
+    }
 }

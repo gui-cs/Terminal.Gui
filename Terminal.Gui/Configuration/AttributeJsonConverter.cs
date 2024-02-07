@@ -1,97 +1,95 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui; 
+namespace Terminal.Gui;
 
-/// <summary>
-/// Json converter fro the <see cref="Attribute"/> class.
-/// </summary>
+/// <summary>Json converter fro the <see cref="Attribute"/> class.</summary>
 class AttributeJsonConverter : JsonConverter<Attribute> {
-	static AttributeJsonConverter _instance;
+    private static AttributeJsonConverter _instance;
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public static AttributeJsonConverter Instance {
-		get {
-			if (_instance == null) {
-				_instance = new AttributeJsonConverter ();
-			}
+    /// <summary></summary>
+    public static AttributeJsonConverter Instance {
+        get {
+            if (_instance == null) {
+                _instance = new AttributeJsonConverter ();
+            }
 
-			return _instance;
-		}
-	}
+            return _instance;
+        }
+    }
 
-	public override Attribute Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-	{
-		if (reader.TokenType != JsonTokenType.StartObject) {
-			throw new JsonException ($"Unexpected StartObject token when parsing Attribute: {reader.TokenType}.");
-		}
+    public override Attribute Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
+        if (reader.TokenType != JsonTokenType.StartObject) {
+            throw new JsonException ($"Unexpected StartObject token when parsing Attribute: {reader.TokenType}.");
+        }
 
-		var attribute = new Attribute ();
-		Color? foreground = null;
-		Color? background = null;
-		while (reader.Read ()) {
-			if (reader.TokenType == JsonTokenType.EndObject) {
-				if (foreground == null || background == null) {
-					throw new JsonException ("Both Foreground and Background colors must be provided.");
-				}
-				return new Attribute (foreground.Value, background.Value);
-			}
+        var attribute = new Attribute ();
+        Color? foreground = null;
+        Color? background = null;
+        while (reader.Read ()) {
+            if (reader.TokenType == JsonTokenType.EndObject) {
+                if ((foreground == null) || (background == null)) {
+                    throw new JsonException ("Both Foreground and Background colors must be provided.");
+                }
 
-			if (reader.TokenType != JsonTokenType.PropertyName) {
-				throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
-			}
+                return new Attribute (foreground.Value, background.Value);
+            }
 
-			var propertyName = reader.GetString ();
-			reader.Read ();
-			var color = $"\"{reader.GetString ()}\"";
+            if (reader.TokenType != JsonTokenType.PropertyName) {
+                throw new JsonException ($"Unexpected token when parsing Attribute: {reader.TokenType}.");
+            }
 
-			switch (propertyName?.ToLower ()) {
-			case "foreground":
-				foreground = JsonSerializer.Deserialize<Color> (color, options);
-				break;
-			case "background":
-				background = JsonSerializer.Deserialize<Color> (color, options);
-				break;
-			//case "bright":
-			//case "bold":
-			//	attribute.Bright = reader.GetBoolean ();
-			//	break;
-			//case "dim":
-			//	attribute.Dim = reader.GetBoolean ();
-			//	break;
-			//case "underline":
-			//	attribute.Underline = reader.GetBoolean ();
-			//	break;
-			//case "blink":
-			//	attribute.Blink = reader.GetBoolean ();
-			//	break;
-			//case "reverse":
-			//	attribute.Reverse = reader.GetBoolean ();
-			//	break;
-			//case "hidden":
-			//	attribute.Hidden = reader.GetBoolean ();
-			//	break;
-			//case "strike-through":
-			//	attribute.StrikeThrough = reader.GetBoolean ();
-			//	break;				
-			default:
-				throw new JsonException ($"Unknown Attribute property {propertyName}.");
-			}
-		}
-		throw new JsonException ();
-	}
+            string propertyName = reader.GetString ();
+            reader.Read ();
+            var color = $"\"{reader.GetString ()}\"";
 
-	public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options)
-	{
-		writer.WriteStartObject ();
-		writer.WritePropertyName (nameof (Attribute.Foreground));
-		ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
-		writer.WritePropertyName (nameof (Attribute.Background));
-		ColorJsonConverter.Instance.Write (writer, value.Background, options);
+            switch (propertyName?.ToLower ()) {
+                case "foreground":
+                    foreground = JsonSerializer.Deserialize<Color> (color, options);
 
-		writer.WriteEndObject ();
-	}
+                    break;
+                case "background":
+                    background = JsonSerializer.Deserialize<Color> (color, options);
+
+                    break;
+
+                //case "bright":
+                //case "bold":
+                //	attribute.Bright = reader.GetBoolean ();
+                //	break;
+                //case "dim":
+                //	attribute.Dim = reader.GetBoolean ();
+                //	break;
+                //case "underline":
+                //	attribute.Underline = reader.GetBoolean ();
+                //	break;
+                //case "blink":
+                //	attribute.Blink = reader.GetBoolean ();
+                //	break;
+                //case "reverse":
+                //	attribute.Reverse = reader.GetBoolean ();
+                //	break;
+                //case "hidden":
+                //	attribute.Hidden = reader.GetBoolean ();
+                //	break;
+                //case "strike-through":
+                //	attribute.StrikeThrough = reader.GetBoolean ();
+                //	break;				
+                default:
+                    throw new JsonException ($"Unknown Attribute property {propertyName}.");
+            }
+        }
+
+        throw new JsonException ();
+    }
+
+    public override void Write (Utf8JsonWriter writer, Attribute value, JsonSerializerOptions options) {
+        writer.WriteStartObject ();
+        writer.WritePropertyName (nameof (Attribute.Foreground));
+        ColorJsonConverter.Instance.Write (writer, value.Foreground, options);
+        writer.WritePropertyName (nameof (Attribute.Background));
+        ColorJsonConverter.Instance.Write (writer, value.Background, options);
+
+        writer.WriteEndObject ();
+    }
 }

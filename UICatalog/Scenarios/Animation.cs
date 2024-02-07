@@ -14,214 +14,206 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Threading")]
 [ScenarioCategory ("Drawing")]
 public class Animation : Scenario {
-	bool _isDisposed;
+    private bool _isDisposed;
 
-	public override void Setup ()
-	{
-		base.Setup ();
+    public override void Setup () {
+        base.Setup ();
 
-		var imageView = new ImageView {
-			Width = Dim.Fill (),
-			Height = Dim.Fill () - 2
-		};
+        var imageView = new ImageView {
+                                          Width = Dim.Fill (),
+                                          Height = Dim.Fill () - 2
+                                      };
 
-		Win.Add (imageView);
+        Win.Add (imageView);
 
-		var lbl = new Label { Y = Pos.AnchorEnd (2), Text = "Image by Wikiscient" };
-		Win.Add (lbl);
+        var lbl = new Label { Y = Pos.AnchorEnd (2), Text = "Image by Wikiscient" };
+        Win.Add (lbl);
 
-		var lbl2 = new Label {
-			Y = Pos.AnchorEnd (1),
-			Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
-		};
-		Win.Add (lbl2);
+        var lbl2 = new Label {
+                                 Y = Pos.AnchorEnd (1),
+                                 Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
+                             };
+        Win.Add (lbl2);
 
-		DirectoryInfo dir;
+        DirectoryInfo dir;
 
-		var assemblyLocation = Assembly.GetExecutingAssembly ().Location;
+        string assemblyLocation = Assembly.GetExecutingAssembly ().Location;
 
-		if (!string.IsNullOrEmpty (assemblyLocation)) {
-			dir = new DirectoryInfo (Path.GetDirectoryName (assemblyLocation));
-		} else {
-			dir = new DirectoryInfo (AppContext.BaseDirectory);
-		}
+        if (!string.IsNullOrEmpty (assemblyLocation)) {
+            dir = new DirectoryInfo (Path.GetDirectoryName (assemblyLocation));
+        } else {
+            dir = new DirectoryInfo (AppContext.BaseDirectory);
+        }
 
-		var f = new FileInfo (
-			Path.Combine (dir.FullName, "Scenarios", "Spinning_globe_dark_small.gif"));
-		if (!f.Exists) {
-			MessageBox.ErrorQuery ("Could not find gif", "Could not find " + f.FullName, "Ok");
-			return;
-		}
+        var f = new FileInfo (
+                              Path.Combine (dir.FullName, "Scenarios", "Spinning_globe_dark_small.gif"));
+        if (!f.Exists) {
+            MessageBox.ErrorQuery ("Could not find gif", "Could not find " + f.FullName, "Ok");
 
-		imageView.SetImage (Image.Load<Rgba32> (File.ReadAllBytes (f.FullName)));
+            return;
+        }
 
-		Task.Run (() => {
-			while (!_isDisposed) {
-				// When updating from a Thread/Task always use Invoke
-				Application.Invoke (() => {
-					imageView.NextFrame ();
-					imageView.SetNeedsDisplay ();
-				});
+        imageView.SetImage (Image.Load<Rgba32> (File.ReadAllBytes (f.FullName)));
 
-				Task.Delay (100).Wait ();
-			}
-		});
-	}
+        Task.Run (
+                  () => {
+                      while (!_isDisposed) {
+                          // When updating from a Thread/Task always use Invoke
+                          Application.Invoke (
+                                              () => {
+                                                  imageView.NextFrame ();
+                                                  imageView.SetNeedsDisplay ();
+                                              });
 
-	protected override void Dispose (bool disposing)
-	{
-		_isDisposed = true;
-		base.Dispose (disposing);
-	}
+                          Task.Delay (100).Wait ();
+                      }
+                  });
+    }
 
-	// This is a C# port of https://github.com/andraaspar/bitmap-to-braille by Andraaspar
+    protected override void Dispose (bool disposing) {
+        _isDisposed = true;
+        base.Dispose (disposing);
+    }
 
-	/// <summary>
-	///         Renders an image as unicode Braille.
-	/// </summary>
-	public class BitmapToBraille {
-		public const int CHAR_WIDTH = 2;
-		public const int CHAR_HEIGHT = 4;
+    // This is a C# port of https://github.com/andraaspar/bitmap-to-braille by Andraaspar
 
-		const string CHARS =
-			" ⠁⠂⠃⠄⠅⠆⠇⡀⡁⡂⡃⡄⡅⡆⡇⠈⠉⠊⠋⠌⠍⠎⠏⡈⡉⡊⡋⡌⡍⡎⡏⠐⠑⠒⠓⠔⠕⠖⠗⡐⡑⡒⡓⡔⡕⡖⡗⠘⠙⠚⠛⠜⠝⠞⠟⡘⡙⡚⡛⡜⡝⡞⡟⠠⠡⠢⠣⠤⠥⠦⠧⡠⡡⡢⡣⡤⡥⡦⡧⠨⠩⠪⠫⠬⠭⠮⠯⡨⡩⡪⡫⡬⡭⡮⡯⠰⠱⠲⠳⠴⠵⠶⠷⡰⡱⡲⡳⡴⡵⡶⡷⠸⠹⠺⠻⠼⠽⠾⠿⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⣀⣁⣂⣃⣄⣅⣆⣇⢈⢉⢊⢋⢌⢍⢎⢏⣈⣉⣊⣋⣌⣍⣎⣏⢐⢑⢒⢓⢔⢕⢖⢗⣐⣑⣒⣓⣔⣕⣖⣗⢘⢙⢚⢛⢜⢝⢞⢟⣘⣙⣚⣛⣜⣝⣞⣟⢠⢡⢢⢣⢤⢥⢦⢧⣠⣡⣢⣣⣤⣥⣦⣧⢨⢩⢪⢫⢬⢭⢮⢯⣨⣩⣪⣫⣬⣭⣮⣯⢰⢱⢲⢳⢴⢵⢶⢷⣰⣱⣲⣳⣴⣵⣶⣷⢸⢹⢺⢻⢼⢽⢾⢿⣸⣹⣺⣻⣼⣽⣾⣿";
+    /// <summary>Renders an image as unicode Braille.</summary>
+    public class BitmapToBraille {
+        public const int CHAR_HEIGHT = 4;
+        public const int CHAR_WIDTH = 2;
 
-		public BitmapToBraille (int widthPixels, int heightPixels, Func<int, int, bool> pixelIsLit)
-		{
-			WidthPixels = widthPixels;
-			HeightPixels = heightPixels;
-			PixelIsLit = pixelIsLit;
-		}
+        private const string CHARS =
+            " ⠁⠂⠃⠄⠅⠆⠇⡀⡁⡂⡃⡄⡅⡆⡇⠈⠉⠊⠋⠌⠍⠎⠏⡈⡉⡊⡋⡌⡍⡎⡏⠐⠑⠒⠓⠔⠕⠖⠗⡐⡑⡒⡓⡔⡕⡖⡗⠘⠙⠚⠛⠜⠝⠞⠟⡘⡙⡚⡛⡜⡝⡞⡟⠠⠡⠢⠣⠤⠥⠦⠧⡠⡡⡢⡣⡤⡥⡦⡧⠨⠩⠪⠫⠬⠭⠮⠯⡨⡩⡪⡫⡬⡭⡮⡯⠰⠱⠲⠳⠴⠵⠶⠷⡰⡱⡲⡳⡴⡵⡶⡷⠸⠹⠺⠻⠼⠽⠾⠿⡸⡹⡺⡻⡼⡽⡾⡿⢀⢁⢂⢃⢄⢅⢆⢇⣀⣁⣂⣃⣄⣅⣆⣇⢈⢉⢊⢋⢌⢍⢎⢏⣈⣉⣊⣋⣌⣍⣎⣏⢐⢑⢒⢓⢔⢕⢖⢗⣐⣑⣒⣓⣔⣕⣖⣗⢘⢙⢚⢛⢜⢝⢞⢟⣘⣙⣚⣛⣜⣝⣞⣟⢠⢡⢢⢣⢤⢥⢦⢧⣠⣡⣢⣣⣤⣥⣦⣧⢨⢩⢪⢫⢬⢭⢮⢯⣨⣩⣪⣫⣬⣭⣮⣯⢰⢱⢲⢳⢴⢵⢶⢷⣰⣱⣲⣳⣴⣵⣶⣷⢸⢹⢺⢻⢼⢽⢾⢿⣸⣹⣺⣻⣼⣽⣾⣿";
 
-		public int WidthPixels { get; }
-		public int HeightPixels { get; }
+        public BitmapToBraille (int widthPixels, int heightPixels, Func<int, int, bool> pixelIsLit) {
+            WidthPixels = widthPixels;
+            HeightPixels = heightPixels;
+            PixelIsLit = pixelIsLit;
+        }
 
-		public Func<int, int, bool> PixelIsLit { get; }
+        public int HeightPixels { get; }
 
-		public string GenerateImage ()
-		{
-			var imageHeightChars = (int)Math.Ceiling ((double)HeightPixels / CHAR_HEIGHT);
-			var imageWidthChars = (int)Math.Ceiling ((double)WidthPixels / CHAR_WIDTH);
+        public Func<int, int, bool> PixelIsLit { get; }
 
-			var result = new StringBuilder ();
+        public int WidthPixels { get; }
 
-			for (var y = 0; y < imageHeightChars; y++) {
-				for (var x = 0; x < imageWidthChars; x++) {
-					var baseX = x * CHAR_WIDTH;
-					var baseY = y * CHAR_HEIGHT;
+        public string GenerateImage () {
+            var imageHeightChars = (int)Math.Ceiling ((double)HeightPixels / CHAR_HEIGHT);
+            var imageWidthChars = (int)Math.Ceiling ((double)WidthPixels / CHAR_WIDTH);
 
-					var charIndex = 0;
-					var value = 1;
+            var result = new StringBuilder ();
 
-					for (var charX = 0; charX < CHAR_WIDTH; charX++) {
-						for (var charY = 0; charY < CHAR_HEIGHT; charY++) {
-							var bitmapX = baseX + charX;
-							var bitmapY = baseY + charY;
-							var pixelExists = bitmapX < WidthPixels &&
-									  bitmapY < HeightPixels;
+            for (var y = 0; y < imageHeightChars; y++) {
+                for (var x = 0; x < imageWidthChars; x++) {
+                    int baseX = x * CHAR_WIDTH;
+                    int baseY = y * CHAR_HEIGHT;
 
-							if (pixelExists && PixelIsLit (bitmapX, bitmapY)) {
-								charIndex += value;
-							}
+                    var charIndex = 0;
+                    var value = 1;
 
-							value *= 2;
-						}
-					}
+                    for (var charX = 0; charX < CHAR_WIDTH; charX++) {
+                        for (var charY = 0; charY < CHAR_HEIGHT; charY++) {
+                            int bitmapX = baseX + charX;
+                            int bitmapY = baseY + charY;
+                            bool pixelExists = bitmapX < WidthPixels &&
+                                               bitmapY < HeightPixels;
 
-					result.Append (CHARS [charIndex]);
-				}
+                            if (pixelExists && PixelIsLit (bitmapX, bitmapY)) {
+                                charIndex += value;
+                            }
 
-				result.Append ('\n');
-			}
+                            value *= 2;
+                        }
+                    }
 
-			return result.ToString ().TrimEnd ();
-		}
-	}
+                    result.Append (CHARS[charIndex]);
+                }
 
-	class ImageView : View {
-		string [] brailleCache;
-		int currentFrame;
-		int frameCount;
+                result.Append ('\n');
+            }
 
-		Image<Rgba32> [] fullResImages;
-		Image<Rgba32> [] matchSizes;
+            return result.ToString ().TrimEnd ();
+        }
+    }
 
-		Rect oldSize = Rect.Empty;
+    private class ImageView : View {
+        private string[] brailleCache;
+        private int currentFrame;
+        private int frameCount;
+        private Image<Rgba32>[] fullResImages;
+        private Image<Rgba32>[] matchSizes;
+        private Rect oldSize = Rect.Empty;
+        public void NextFrame () { currentFrame = (currentFrame + 1) % frameCount; }
 
-		internal void SetImage (Image<Rgba32> image)
-		{
-			frameCount = image.Frames.Count;
+        public override void OnDrawContent (Rect contentArea) {
+            base.OnDrawContent (contentArea);
 
-			fullResImages = new Image<Rgba32> [frameCount];
-			matchSizes = new Image<Rgba32> [frameCount];
-			brailleCache = new string [frameCount];
+            if (oldSize != Bounds) {
+                // Invalidate cached images now size has changed
+                matchSizes = new Image<Rgba32> [frameCount];
+                brailleCache = new string [frameCount];
+                oldSize = Bounds;
+            }
 
-			for (var i = 0; i < frameCount - 1; i++) {
-				fullResImages [i] = image.Frames.ExportFrame (0);
-			}
+            Image<Rgba32> imgScaled = matchSizes[currentFrame];
+            string braille = brailleCache[currentFrame];
 
-			fullResImages [frameCount - 1] = image;
+            if (imgScaled == null) {
+                Image<Rgba32> imgFull = fullResImages[currentFrame];
 
-			SetNeedsDisplay ();
-		}
+                // keep aspect ratio
+                int newSize = Math.Min (Bounds.Width, Bounds.Height);
 
-		public void NextFrame () => currentFrame = (currentFrame + 1) % frameCount;
+                // generate one
+                matchSizes[currentFrame] = imgScaled = imgFull.Clone (
+                                                                      x => x.Resize (
+                                                                       newSize * BitmapToBraille.CHAR_HEIGHT,
+                                                                       newSize * BitmapToBraille.CHAR_HEIGHT));
+            }
 
-		public override void OnDrawContent (Rect contentArea)
-		{
-			base.OnDrawContent (contentArea);
+            if (braille == null) {
+                brailleCache[currentFrame] = braille = GetBraille (matchSizes[currentFrame]);
+            }
 
-			if (oldSize != Bounds) {
-				// Invalidate cached images now size has changed
-				matchSizes = new Image<Rgba32> [frameCount];
-				brailleCache = new string [frameCount];
-				oldSize = Bounds;
-			}
+            string[] lines = braille.Split ('\n');
 
-			var imgScaled = matchSizes [currentFrame];
-			var braille = brailleCache [currentFrame];
+            for (var y = 0; y < lines.Length; y++) {
+                string line = lines[y];
+                for (var x = 0; x < line.Length; x++) {
+                    AddRune (x, y, (Rune)line[x]);
+                }
+            }
+        }
 
-			if (imgScaled == null) {
-				var imgFull = fullResImages [currentFrame];
+        internal void SetImage (Image<Rgba32> image) {
+            frameCount = image.Frames.Count;
 
-				// keep aspect ratio
-				var newSize = Math.Min (Bounds.Width, Bounds.Height);
+            fullResImages = new Image<Rgba32> [frameCount];
+            matchSizes = new Image<Rgba32> [frameCount];
+            brailleCache = new string [frameCount];
 
-				// generate one
-				matchSizes [currentFrame] = imgScaled = imgFull.Clone (
-					x => x.Resize (
-						newSize * BitmapToBraille.CHAR_HEIGHT,
-						newSize * BitmapToBraille.CHAR_HEIGHT));
-			}
+            for (var i = 0; i < frameCount - 1; i++) {
+                fullResImages[i] = image.Frames.ExportFrame (0);
+            }
 
-			if (braille == null) {
-				brailleCache [currentFrame] = braille = GetBraille (matchSizes [currentFrame]);
-			}
+            fullResImages[frameCount - 1] = image;
 
-			var lines = braille.Split ('\n');
+            SetNeedsDisplay ();
+        }
 
-			for (var y = 0; y < lines.Length; y++) {
-				var line = lines [y];
-				for (var x = 0; x < line.Length; x++) {
-					AddRune (x, y, (Rune)line [x]);
-				}
-			}
-		}
+        private string GetBraille (Image<Rgba32> img) {
+            var braille = new BitmapToBraille (
+                                               img.Width,
+                                               img.Height,
+                                               (x, y) => IsLit (img, x, y));
 
-		string GetBraille (Image<Rgba32> img)
-		{
-			var braille = new BitmapToBraille (
-				img.Width,
-				img.Height,
-				(x, y) => IsLit (img, x, y));
+            return braille.GenerateImage ();
+        }
 
-			return braille.GenerateImage ();
-		}
+        private bool IsLit (Image<Rgba32> img, int x, int y) {
+            Rgba32 rgb = img[x, y];
 
-		bool IsLit (Image<Rgba32> img, int x, int y)
-		{
-			var rgb = img [x, y];
-			return rgb.R + rgb.G + rgb.B > 50;
-		}
-	}
+            return rgb.R + rgb.G + rgb.B > 50;
+        }
+    }
 }

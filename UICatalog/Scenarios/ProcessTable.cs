@@ -1,61 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using Terminal.Gui;
-using System.Linq;
-using System.Globalization;
-using static Terminal.Gui.TableView;
 using System.Diagnostics;
+using Terminal.Gui;
 
-namespace UICatalog.Scenarios {
+namespace UICatalog.Scenarios; 
 
-	[ScenarioMetadata (Name: "ProcessTable", Description: "Demonstrates TableView with the currently running processes.")]
-	[ScenarioCategory ("TableView")]
-	public class ProcessTable : Scenario {
-		TableView tableView;
-		public override void Setup ()
-		{
-			Win.Title = this.GetName ();
-			Win.Y = 1; // menu
-			Win.Height = Dim.Fill (1); // status bar
+[ScenarioMetadata ("ProcessTable", "Demonstrates TableView with the currently running processes.")]
+[ScenarioCategory ("TableView")]
+public class ProcessTable : Scenario {
+    private TableView tableView;
 
-			this.tableView = new TableView () {
-				X = 0,
-				Y = 0,
-				Width = Dim.Fill (),
-				Height = Dim.Fill (1),
-			};
+    public override void Setup () {
+        Win.Title = GetName ();
+        Win.Y = 1; // menu
+        Win.Height = Dim.Fill (1); // status bar
 
-			// First time
-			CreateProcessTable ();
+        tableView = new TableView {
+                                      X = 0,
+                                      Y = 0,
+                                      Width = Dim.Fill (),
+                                      Height = Dim.Fill (1)
+                                  };
 
-			// Then every second
-			Application.AddTimeout (TimeSpan.FromSeconds (1),
-				() => {
-					CreateProcessTable ();
-					return true;
-				});
+        // First time
+        CreateProcessTable ();
 
-			Win.Add (tableView);
+        // Then every second
+        Application.AddTimeout (
+                                TimeSpan.FromSeconds (1),
+                                () => {
+                                    CreateProcessTable ();
 
-		}
+                                    return true;
+                                });
 
-		private void CreateProcessTable ()
-		{
-			var ro = tableView.RowOffset;
-			var co = tableView.ColumnOffset;
-			tableView.Table = new EnumerableTableSource<Process> (Process.GetProcesses (),
-				new Dictionary<string, Func<Process, object>>() {
-					{ "ID",(p)=>p.Id},
-					{ "Name",(p)=>p.ProcessName},
-					{ "Threads",(p)=>p.Threads.Count},
-					{ "Virtual Memory",(p)=>p.VirtualMemorySize64},
-					{ "Working Memory",(p)=>p.WorkingSet64},
-				});
+        Win.Add (tableView);
+    }
 
-			tableView.RowOffset = ro;
-			tableView.ColumnOffset = co;
-			tableView.EnsureValidScrollOffsets ();
-		}
-	}
+    private void CreateProcessTable () {
+        int ro = tableView.RowOffset;
+        int co = tableView.ColumnOffset;
+        tableView.Table = new EnumerableTableSource<Process> (
+                                                              Process.GetProcesses (),
+                                                              new Dictionary<string, Func<Process, object>> {
+                                                                  { "ID", p => p.Id },
+                                                                  { "Name", p => p.ProcessName },
+                                                                  { "Threads", p => p.Threads.Count },
+                                                                  { "Virtual Memory", p => p.VirtualMemorySize64 },
+                                                                  { "Working Memory", p => p.WorkingSet64 }
+                                                              });
+
+        tableView.RowOffset = ro;
+        tableView.ColumnOffset = co;
+        tableView.EnsureValidScrollOffsets ();
+    }
 }

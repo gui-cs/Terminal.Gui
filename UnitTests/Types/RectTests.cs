@@ -1,413 +1,500 @@
-﻿using System;
-using Terminal.Gui;
-using Xunit;
+﻿namespace Terminal.Gui.TypeTests; 
 
-namespace Terminal.Gui.TypeTests {
-	public class RectTests {
-		[Fact]
-		public void Rect_New ()
-		{
-			var rect = new Rect ();
-			Assert.True (rect.IsEmpty);
+public class RectTests {
+    [Theory]
 
-			rect = new Rect (new Point (), new Size ());
-			Assert.True (rect.IsEmpty);
+    // Empty
+    [InlineData (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0)]
+    [InlineData (
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    -1,
+                    0,
+                    2,
+                    0)]
+    [InlineData (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    -1,
+                    0,
+                    2)]
+    [InlineData (
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    -1,
+                    -1,
+                    2,
+                    2)]
+    [InlineData (
+                    0,
+                    0,
+                    0,
+                    0,
+                    -1,
+                    -1, // Throws
+                    0,
+                    0,
+                    0,
+                    0)]
 
-			rect = new Rect (1, 2, 3, 4);
-			Assert.False (rect.IsEmpty);
+    // Zero location, Size of 1
+    [InlineData (
+                    0,
+                    0,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1)]
+    [InlineData (
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    0,
+                    -1,
+                    0,
+                    3,
+                    1)]
+    [InlineData (
+                    0,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    0,
+                    -1,
+                    1,
+                    3)]
+    [InlineData (
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1,
+                    -1,
+                    -1,
+                    3,
+                    3)]
 
-			rect = new Rect (-1, -2, 3, 4);
-			Assert.False (rect.IsEmpty);
+    // Positive location, Size of 1
+    [InlineData (
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    1,
+                    1,
+                    1,
+                    1)]
+    [InlineData (
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    1,
+                    3,
+                    1)]
+    [InlineData (
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    1,
+                    1,
+                    0,
+                    1,
+                    3)]
+    [InlineData (
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    3,
+                    3)]
+    public void Inflate (
+        int x,
+        int y,
+        int width,
+        int height,
+        int inflateWidth,
+        int inflateHeight,
+        int expectedX,
+        int exptectedY,
+        int expectedWidth,
+        int expectedHeight
+    ) {
+        var rect = new Rect (x, y, width, height);
 
-			Action action = () => new Rect (1, 2, -3, 4);
-			var ex = Assert.Throws<ArgumentException> (action);
-			Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
+        if ((rect.Width + inflateWidth < 0) || (rect.Height + inflateHeight < 0)) {
+            Assert.Throws<ArgumentException> (() => rect.Inflate (inflateWidth, inflateHeight));
+        } else {
+            rect.Inflate (inflateWidth, inflateHeight);
+        }
 
-			action = () => new Rect (1, 2, 3, -4);
-			ex = Assert.Throws<ArgumentException> (action);
-			Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
+        Assert.Equal (expectedWidth, rect.Width);
+        Assert.Equal (expectedHeight, rect.Height);
+        Assert.Equal (expectedX, rect.X);
+        Assert.Equal (exptectedY, rect.Y);
 
-			action = () => new Rect (1, 2, -3, -4);
-			ex = Assert.Throws<ArgumentException> (action);
-			Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
-		}
+        // Use the other overload (Size)
+        rect = new Rect (x, y, width, height);
+        if ((rect.Width + inflateWidth < 0) || (rect.Height + inflateHeight < 0)) {
+            Assert.Throws<ArgumentException> (() => rect.Inflate (new Size (inflateWidth, inflateHeight)));
+        } else {
+            rect.Inflate (new Size (inflateWidth, inflateHeight));
+        }
 
-		[Fact]
-		public void Rect_SetsValue ()
-		{
-			var rect = new Rect () {
-				X = 0,
-				Y = 0
-			};
-			Assert.True (rect.IsEmpty);
+        Assert.Equal (expectedWidth, rect.Width);
+        Assert.Equal (expectedHeight, rect.Height);
+        Assert.Equal (expectedX, rect.X);
+        Assert.Equal (exptectedY, rect.Y);
+    }
 
-			rect = new Rect () {
-				X = -1,
-				Y = -2
-			};
-			Assert.False (rect.IsEmpty);
+    [Fact]
+    public void Negative_X_Y_Positions () {
+        var rect = new Rect (-10, -5, 100, 50);
+        int yCount = 0, xCount = 0, yxCount = 0;
 
-			rect = new Rect () {
-				Width = 3,
-				Height = 4
-			};
-			Assert.False (rect.IsEmpty);
+        for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
+            yCount++;
+            xCount = 0;
+            for (int col = rect.X; col < rect.X + rect.Width; col++) {
+                xCount++;
+                yxCount++;
+            }
+        }
 
-			rect = new Rect () {
-				X = -1,
-				Y = -2,
-				Width = 3,
-				Height = 4
-			};
-			Assert.False (rect.IsEmpty);
+        Assert.Equal (yCount, rect.Height);
+        Assert.Equal (xCount, rect.Width);
+        Assert.Equal (yxCount, rect.Height * rect.Width);
+    }
 
-			Action action = () => {
-				rect = new Rect () {
-					X = -1,
-					Y = -2,
-					Width = -3,
-					Height = 4
-				};
-			};
-			var ex = Assert.Throws<ArgumentException> (action);
-			Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
+    [Fact]
+    public void Positive_X_Y_Positions () {
+        var rect = new Rect (10, 5, 100, 50);
+        int yCount = 0, xCount = 0, yxCount = 0;
 
-			action = () => {
-				rect = new Rect () {
-					X = -1,
-					Y = -2,
-					Width = 3,
-					Height = -4
-				};
-			};
-			ex = Assert.Throws<ArgumentException> (action);
-			Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
+        for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
+            yCount++;
+            xCount = 0;
+            for (int col = rect.X; col < rect.X + rect.Width; col++) {
+                xCount++;
+                yxCount++;
+            }
+        }
 
-			action = () => {
-				rect = new Rect () {
-					X = -1,
-					Y = -2,
-					Width = -3,
-					Height = -4
-				};
-			};
-			ex = Assert.Throws<ArgumentException> (action);
-			Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
-		}
+        Assert.Equal (yCount, rect.Height);
+        Assert.Equal (xCount, rect.Width);
+        Assert.Equal (yxCount, rect.Height * rect.Width);
+    }
 
-		[Fact]
-		public void Rect_Equals ()
-		{
-			var rect1 = new Rect ();
-			var rect2 = new Rect ();
-			Assert.Equal (rect1, rect2);
+    [Fact]
+    public void Rect_Contains () {
+        var rect = new Rect (0, 0, 3, 3);
+        Assert.True (rect.Contains (new Point (1, 1)));
+        Assert.True (rect.Contains (new Point (1, 2)));
+        Assert.True (rect.Contains (new Point (2, 1)));
+        Assert.True (rect.Contains (new Point (2, 2)));
 
-			rect1 = new Rect (1, 2, 3, 4);
-			rect2 = new Rect (1, 2, 3, 4);
-			Assert.Equal (rect1, rect2);
+        Assert.False (rect.Contains (new Point (-1, 1)));
+        Assert.False (rect.Contains (new Point (1, -1)));
+        Assert.False (rect.Contains (new Point (3, 2)));
+        Assert.False (rect.Contains (new Point (2, 3)));
+        Assert.False (rect.Contains (new Point (3, 3)));
 
-			rect1 = new Rect (1, 2, 3, 4);
-			rect2 = new Rect (-1, 2, 3, 4);
-			Assert.NotEqual (rect1, rect2);
-		}
+        Assert.True (rect.Contains (new Rect (1, 1, 2, 2)));
+        Assert.True (rect.Contains (new Rect (1, 2, 2, 1)));
+        Assert.True (rect.Contains (new Rect (2, 1, 1, 2)));
+        Assert.True (rect.Contains (new Rect (2, 2, 1, 1)));
+        Assert.True (rect.Contains (new Rect (0, 0, 3, 3)));
 
-		[Fact]
-		public void Positive_X_Y_Positions ()
-		{
-			var rect = new Rect (10, 5, 100, 50);
-			int yCount = 0, xCount = 0, yxCount = 0;
+        Assert.False (rect.Contains (new Rect (-1, 1, 3, 3)));
+        Assert.False (rect.Contains (new Rect (1, -1, 3, 3)));
+        Assert.False (rect.Contains (new Rect (3, 2, 3, 3)));
+        Assert.False (rect.Contains (new Rect (2, 3, 3, 3)));
+        Assert.False (rect.Contains (new Rect (3, 3, 3, 3)));
 
-			for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
-				yCount++;
-				xCount = 0;
-				for (int col = rect.X; col < rect.X + rect.Width; col++) {
-					xCount++;
-					yxCount++;
-				}
-			}
-			Assert.Equal (yCount, rect.Height);
-			Assert.Equal (xCount, rect.Width);
-			Assert.Equal (yxCount, rect.Height * rect.Width);
-		}
+        Assert.True (rect.Contains (1, 1));
+        Assert.True (rect.Contains (1, 2));
+        Assert.True (rect.Contains (2, 1));
+        Assert.True (rect.Contains (2, 2));
 
-		[Fact]
-		public void Negative_X_Y_Positions ()
-		{
-			var rect = new Rect (-10, -5, 100, 50);
-			int yCount = 0, xCount = 0, yxCount = 0;
+        Assert.False (rect.Contains (-1, 1));
+        Assert.False (rect.Contains (1, -1));
+        Assert.False (rect.Contains (3, 2));
+        Assert.False (rect.Contains (2, 3));
+        Assert.False (rect.Contains (3, 3));
+    }
 
-			for (int line = rect.Y; line < rect.Y + rect.Height; line++) {
-				yCount++;
-				xCount = 0;
-				for (int col = rect.X; col < rect.X + rect.Width; col++) {
-					xCount++;
-					yxCount++;
-				}
-			}
-			Assert.Equal (yCount, rect.Height);
-			Assert.Equal (xCount, rect.Width);
-			Assert.Equal (yxCount, rect.Height * rect.Width);
-		}
+    [Fact]
+    public void Rect_Equals () {
+        var rect1 = new Rect ();
+        var rect2 = new Rect ();
+        Assert.Equal (rect1, rect2);
 
-		[Theory]
-		// Empty
-		[InlineData (
-			0, 0, 0, 0,
-			0, 0,
-			0, 0, 0, 0)]
-		[InlineData (
-			0, 0, 0, 0,
-			1, 0,
-			-1, 0, 2, 0)]
-		[InlineData (
-			0, 0, 0, 0,
-			0, 1,
-			0, -1, 0, 2)]
-		[InlineData (
-			0, 0, 0, 0,
-			1, 1,
-			-1, -1, 2, 2)]
-		[InlineData (
-			0, 0, 0, 0,
-			-1, -1,        // Throws
-			0, 0, 0, 0)]
-		// Zero location, Size of 1
-		[InlineData (
-			0, 0, 1, 1,
-			0, 0,
-			0, 0, 1, 1)]
-		[InlineData (
-			0, 0, 1, 1,
-			1, 0,
-			-1, 0, 3, 1)]
-		[InlineData (
-			0, 0, 1, 1,
-			0, 1,
-			0, -1, 1, 3)]
-		[InlineData (
-			0, 0, 1, 1,
-			1, 1,
-			-1, -1, 3, 3)]
-		// Positive location, Size of 1
-		[InlineData (
-			1, 1, 1, 1,
-			0, 0,
-			1, 1, 1, 1)]
-		[InlineData (
-			1, 1, 1, 1,
-			1, 0,
-			0, 1, 3, 1)]
-		[InlineData (
-			1, 1, 1, 1,
-			0, 1,
-			1, 0, 1, 3)]
-		[InlineData (
-			1, 1, 1, 1,
-			1, 1,
-			0, 0, 3, 3)]
-		public void Inflate (int x, int y, int width, int height, int inflateWidth, int inflateHeight, int expectedX, int exptectedY, int expectedWidth, int expectedHeight)
-		{
-			var rect = new Rect (x, y, width, height);
+        rect1 = new Rect (1, 2, 3, 4);
+        rect2 = new Rect (1, 2, 3, 4);
+        Assert.Equal (rect1, rect2);
 
-			if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0) {
-				Assert.Throws<ArgumentException> (() => rect.Inflate (inflateWidth, inflateHeight));
-			} else {
-				rect.Inflate (inflateWidth, inflateHeight);
-			}
-			Assert.Equal (expectedWidth, rect.Width);
-			Assert.Equal (expectedHeight, rect.Height);
-			Assert.Equal (expectedX, rect.X);
-			Assert.Equal (exptectedY, rect.Y);
+        rect1 = new Rect (1, 2, 3, 4);
+        rect2 = new Rect (-1, 2, 3, 4);
+        Assert.NotEqual (rect1, rect2);
+    }
 
-			// Use the other overload (Size)
-			rect = new Rect (x, y, width, height);
-			if (rect.Width + inflateWidth < 0 || rect.Height + inflateHeight < 0) {
-				Assert.Throws<ArgumentException> (() => rect.Inflate (new Size (inflateWidth, inflateHeight)));
-			} else {
-				rect.Inflate (new Size (inflateWidth, inflateHeight));
-			}
-			Assert.Equal (expectedWidth, rect.Width);
-			Assert.Equal (expectedHeight, rect.Height);
-			Assert.Equal (expectedX, rect.X);
-			Assert.Equal (exptectedY, rect.Y);
-		}
+    [Fact]
+    public void Rect_New () {
+        var rect = new Rect ();
+        Assert.True (rect.IsEmpty);
 
-		[Fact]
-		public void Union_PositiveCoords ()
-		{
-			var r1 = new Rect (0, 0, 2, 2);
-			var r2 = new Rect (1, 1, 2, 2);
-			var result = Rect.Union (r1, r2);
-			Assert.Equal (new Rect (0, 0, 3, 3), result);
-		}
+        rect = new Rect (new Point (), new Size ());
+        Assert.True (rect.IsEmpty);
 
-		[Fact]
-		public void Union_NegativeCoords ()
-		{
-			// arrange
-			Rect rect1 = new Rect (-2, -2, 4, 4);
-			Rect rect2 = new Rect (-1, -1, 5, 5);
+        rect = new Rect (1, 2, 3, 4);
+        Assert.False (rect.IsEmpty);
 
-			// act
-			Rect result = Rect.Union (rect1, rect2);
+        rect = new Rect (-1, -2, 3, 4);
+        Assert.False (rect.IsEmpty);
 
-			// assert
-			Assert.Equal (new Rect (-2, -2, 6, 6), result);
-		}
+        Action action = () => new Rect (1, 2, -3, 4);
+        var ex = Assert.Throws<ArgumentException> (action);
+        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
 
-		[Fact]
-		public void Union_EmptyRectangles ()
-		{
-			var r1 = new Rect (0, 0, 0, 0);
-			var r2 = new Rect (1, 1, 0, 0);
-			var result = Rect.Union (r1, r2);
-			Assert.Equal (new Rect (0, 0, 1, 1), result);
-		}
+        action = () => new Rect (1, 2, 3, -4);
+        ex = Assert.Throws<ArgumentException> (action);
+        Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
 
-		[Fact]
-		public void Union_SameRectangle ()
-		{
-			var r1 = new Rect (0, 0, 2, 2);
-			var r2 = new Rect (0, 0, 2, 2);
-			var result = Rect.Union (r1, r2);
-			Assert.Equal (new Rect (0, 0, 2, 2), result);
-		}
+        action = () => new Rect (1, 2, -3, -4);
+        ex = Assert.Throws<ArgumentException> (action);
+        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
+    }
 
-		[Fact]
-		public void Union_RectanglesOverlap_ReturnsCombinedRectangle ()
-		{
-			// arrange
-			var rect1 = new Rect (1, 1, 3, 3);
-			var rect2 = new Rect (2, 2, 3, 3);
+    [Fact]
+    public void Rect_SetsValue () {
+        var rect = new Rect {
+                                X = 0,
+                                Y = 0
+                            };
+        Assert.True (rect.IsEmpty);
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+        rect = new Rect {
+                            X = -1,
+                            Y = -2
+                        };
+        Assert.False (rect.IsEmpty);
 
-			// assert
-			Assert.Equal (new Rect (1, 1, 4, 4), result);
-		}
+        rect = new Rect {
+                            Width = 3,
+                            Height = 4
+                        };
+        Assert.False (rect.IsEmpty);
 
-		[Fact]
-		public void Union_RectanglesTouchHorizontally_ReturnsCombinedRectangle ()
-		{
-			// arrange
-			var rect1 = new Rect (1, 1, 3, 3);
-			var rect2 = new Rect (4, 2, 3, 3);
+        rect = new Rect {
+                            X = -1,
+                            Y = -2,
+                            Width = 3,
+                            Height = 4
+                        };
+        Assert.False (rect.IsEmpty);
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+        Action action = () => {
+            rect = new Rect {
+                                X = -1,
+                                Y = -2,
+                                Width = -3,
+                                Height = 4
+                            };
+        };
+        var ex = Assert.Throws<ArgumentException> (action);
+        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
 
-			// assert
-			Assert.Equal (new Rect (1, 1, 6, 4), result);
-		}
+        action = () => {
+            rect = new Rect {
+                                X = -1,
+                                Y = -2,
+                                Width = 3,
+                                Height = -4
+                            };
+        };
+        ex = Assert.Throws<ArgumentException> (action);
+        Assert.Equal ("Height must be greater or equal to 0.", ex.Message);
 
-		[Fact]
-		public void Union_RectanglesTouchVertically_ReturnsCombinedRectangle ()
-		{
-			// arrange
-			var rect1 = new Rect (1, 1, 3, 3);
-			var rect2 = new Rect (2, 4, 3, 3);
+        action = () => {
+            rect = new Rect {
+                                X = -1,
+                                Y = -2,
+                                Width = -3,
+                                Height = -4
+                            };
+        };
+        ex = Assert.Throws<ArgumentException> (action);
+        Assert.Equal ("Width must be greater or equal to 0.", ex.Message);
+    }
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+    [Fact]
+    public void Union_EmptyRectangles () {
+        var r1 = new Rect (0, 0, 0, 0);
+        var r2 = new Rect (1, 1, 0, 0);
+        Rect result = Rect.Union (r1, r2);
+        Assert.Equal (new Rect (0, 0, 1, 1), result);
+    }
 
-			// assert
-			Assert.Equal (new Rect (1, 1, 4, 6), result);
-		}
+    [Fact]
+    public void Union_NegativeCoords () {
+        // arrange
+        var rect1 = new Rect (-2, -2, 4, 4);
+        var rect2 = new Rect (-1, -1, 5, 5);
 
-		[Fact]
-		public void Union_RectanglesDoNotOverlap_ReturnsCombinedRectangle ()
-		{
-			// arrange
-			var rect1 = new Rect (1, 1, 3, 3);
-			var rect2 = new Rect (5, 5, 3, 3);
+        // act
+        Rect result = Rect.Union (rect1, rect2);
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+        // assert
+        Assert.Equal (new Rect (-2, -2, 6, 6), result);
+    }
 
-			// assert
-			Assert.Equal (new Rect (1, 1, 7, 7), result);
-		}
+    [Fact]
+    public void Union_PositiveCoords () {
+        var r1 = new Rect (0, 0, 2, 2);
+        var r2 = new Rect (1, 1, 2, 2);
+        Rect result = Rect.Union (r1, r2);
+        Assert.Equal (new Rect (0, 0, 3, 3), result);
+    }
 
-		[Fact]
-		public void Union_RectangleBIsLarger_ReturnsB ()
-		{
-			// arrange
-			var rect1 = new Rect (1, 1, 3, 3);
-			var rect2 = new Rect (2, 2, 6, 6);
+    [Fact]
+    public void Union_RectangleAHasNegativeCoordinates_ReturnsCombinedRectangle () {
+        // arrange
+        var rect1 = new Rect (-2, -2, 5, 5);
+        var rect2 = new Rect (3, 3, 4, 4);
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+        // act
+        Rect result = Rect.Union (rect1, rect2);
 
-			// assert
-			Assert.Equal (new Rect (1, 1, 7, 7), result);
-		}
+        // assert
+        Assert.Equal (new Rect (-2, -2, 9, 9), result);
+    }
 
-		[Fact]
-		public void Union_RectangleAIsLarger_ReturnsA ()
-		{
-			// arrange
-			var rect1 = new Rect (1, 1, 6, 6);
-			var rect2 = new Rect (2, 2, 3, 3);
+    [Fact]
+    public void Union_RectangleAIsLarger_ReturnsA () {
+        // arrange
+        var rect1 = new Rect (1, 1, 6, 6);
+        var rect2 = new Rect (2, 2, 3, 3);
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+        // act
+        Rect result = Rect.Union (rect1, rect2);
 
-			// assert
-			Assert.Equal (new Rect (1, 1, 6, 6), result);
-		}
+        // assert
+        Assert.Equal (new Rect (1, 1, 6, 6), result);
+    }
 
-		[Fact]
-		public void Union_RectangleAHasNegativeCoordinates_ReturnsCombinedRectangle ()
-		{
-			// arrange
-			var rect1 = new Rect (-2, -2, 5, 5);
-			var rect2 = new Rect (3, 3, 4, 4);
+    [Fact]
+    public void Union_RectangleBIsLarger_ReturnsB () {
+        // arrange
+        var rect1 = new Rect (1, 1, 3, 3);
+        var rect2 = new Rect (2, 2, 6, 6);
 
-			// act
-			var result = Rect.Union (rect1, rect2);
+        // act
+        Rect result = Rect.Union (rect1, rect2);
 
-			// assert
-			Assert.Equal (new Rect (-2, -2, 9, 9), result);
-		}
+        // assert
+        Assert.Equal (new Rect (1, 1, 7, 7), result);
+    }
 
-		[Fact]
-		public void Rect_Contains ()
-		{
-			var rect = new Rect (0, 0, 3, 3);
-			Assert.True (rect.Contains (new Point (1, 1)));
-			Assert.True (rect.Contains (new Point (1, 2)));
-			Assert.True (rect.Contains (new Point (2, 1)));
-			Assert.True (rect.Contains (new Point (2, 2)));
+    [Fact]
+    public void Union_RectanglesDoNotOverlap_ReturnsCombinedRectangle () {
+        // arrange
+        var rect1 = new Rect (1, 1, 3, 3);
+        var rect2 = new Rect (5, 5, 3, 3);
 
-			Assert.False (rect.Contains (new Point (-1, 1)));
-			Assert.False (rect.Contains (new Point (1, -1)));
-			Assert.False (rect.Contains (new Point (3, 2)));
-			Assert.False (rect.Contains (new Point (2, 3)));
-			Assert.False (rect.Contains (new Point (3, 3)));
+        // act
+        Rect result = Rect.Union (rect1, rect2);
 
-			Assert.True (rect.Contains (new Rect (1, 1, 2, 2)));
-			Assert.True (rect.Contains (new Rect (1, 2, 2, 1)));
-			Assert.True (rect.Contains (new Rect (2, 1, 1, 2)));
-			Assert.True (rect.Contains (new Rect (2, 2, 1, 1)));
-			Assert.True (rect.Contains (new Rect (0, 0, 3, 3)));
+        // assert
+        Assert.Equal (new Rect (1, 1, 7, 7), result);
+    }
 
-			Assert.False (rect.Contains (new Rect (-1, 1, 3, 3)));
-			Assert.False (rect.Contains (new Rect (1, -1, 3, 3)));
-			Assert.False (rect.Contains (new Rect (3, 2, 3, 3)));
-			Assert.False (rect.Contains (new Rect (2, 3, 3, 3)));
-			Assert.False (rect.Contains (new Rect (3, 3, 3, 3)));
+    [Fact]
+    public void Union_RectanglesOverlap_ReturnsCombinedRectangle () {
+        // arrange
+        var rect1 = new Rect (1, 1, 3, 3);
+        var rect2 = new Rect (2, 2, 3, 3);
 
-			Assert.True (rect.Contains (1, 1));
-			Assert.True (rect.Contains (1, 2));
-			Assert.True (rect.Contains (2, 1));
-			Assert.True (rect.Contains (2, 2));
+        // act
+        Rect result = Rect.Union (rect1, rect2);
 
-			Assert.False (rect.Contains (-1, 1));
-			Assert.False (rect.Contains (1, -1));
-			Assert.False (rect.Contains (3, 2));
-			Assert.False (rect.Contains (2, 3));
-			Assert.False (rect.Contains (3, 3));
-		}
-	}
+        // assert
+        Assert.Equal (new Rect (1, 1, 4, 4), result);
+    }
+
+    [Fact]
+    public void Union_RectanglesTouchHorizontally_ReturnsCombinedRectangle () {
+        // arrange
+        var rect1 = new Rect (1, 1, 3, 3);
+        var rect2 = new Rect (4, 2, 3, 3);
+
+        // act
+        Rect result = Rect.Union (rect1, rect2);
+
+        // assert
+        Assert.Equal (new Rect (1, 1, 6, 4), result);
+    }
+
+    [Fact]
+    public void Union_RectanglesTouchVertically_ReturnsCombinedRectangle () {
+        // arrange
+        var rect1 = new Rect (1, 1, 3, 3);
+        var rect2 = new Rect (2, 4, 3, 3);
+
+        // act
+        Rect result = Rect.Union (rect1, rect2);
+
+        // assert
+        Assert.Equal (new Rect (1, 1, 4, 6), result);
+    }
+
+    [Fact]
+    public void Union_SameRectangle () {
+        var r1 = new Rect (0, 0, 2, 2);
+        var r2 = new Rect (0, 0, 2, 2);
+        Rect result = Rect.Union (r1, r2);
+        Assert.Equal (new Rect (0, 0, 2, 2), result);
+    }
 }
